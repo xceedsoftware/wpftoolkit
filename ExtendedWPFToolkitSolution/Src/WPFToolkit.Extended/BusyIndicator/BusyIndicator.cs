@@ -34,15 +34,14 @@ namespace Microsoft.Windows.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(BusyIndicator), new FrameworkPropertyMetadata(typeof(BusyIndicator)));
         }
 
+        public BusyIndicator()
+        {
+            _displayAfterTimer.Tick += DisplayAfterTimerElapsed;
+        }
+
         #endregion //Constructors
 
         #region Base Class Overrides
-
-        protected override void OnInitialized(EventArgs e)
-        {
-            base.OnInitialized(e);
-            _displayAfterTimer.Tick += new EventHandler(DisplayAfterTimerElapsed);
-        }
 
         /// <summary>
         /// Overrides the OnApplyTemplate method.
