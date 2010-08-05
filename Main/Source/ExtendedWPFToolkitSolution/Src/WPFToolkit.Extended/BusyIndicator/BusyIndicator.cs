@@ -9,7 +9,6 @@ namespace Microsoft.Windows.Controls
     /// <summary>
     /// A control to provide a visual indicator when an application is busy.
     /// </summary>
-    /// <QualityBand>Preview</QualityBand>
     [TemplateVisualState(Name = VisualStates.StateIdle, GroupName = VisualStates.GroupBusyStatus)]
     [TemplateVisualState(Name = VisualStates.StateBusy, GroupName = VisualStates.GroupBusyStatus)]
     [TemplateVisualState(Name = VisualStates.StateVisible, GroupName = VisualStates.GroupVisibility)]
