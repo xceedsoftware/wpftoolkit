@@ -144,13 +144,6 @@
     <!-- MessageBox                                                                      -->
     <!-- =============================================================================== -->
 
-    <SolidColorBrush x:Key="MessageBoxMainBrushColor" Color="#FF3C688D"/>
-    <LinearGradientBrush x:Key="BorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="#7FFFFFFF" Offset="0.05"/>
-        <GradientStop Color="#B2FFFFFF" Offset="0.07"/>
-        <GradientStop Color="#00FFFFFF" Offset="1"/>
-    </LinearGradientBrush>
-
     <LinearGradientBrush x:Key="MessageBoxDarkBrush" EndPoint="0.5,1" StartPoint="0.5,0">
         <GradientStop Color="#FFA3AEB9" Offset="0"/>
         <GradientStop Color="#FF8399A9" Offset="0.375"/>
@@ -158,7 +151,7 @@
         <GradientStop Color="#FF617584" Offset="1"/>
     </LinearGradientBrush>
 
-    <LinearGradientBrush x:Key="MessageBoxBorderBrush" StartPoint="0,0" EndPoint="0,1">
+    <LinearGradientBrush x:Key="MessageBoxWindowBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
         <LinearGradientBrush.GradientStops>
             <GradientStopCollection>
                 <GradientStop Offset="0" Color="#FFffffff"/>
@@ -168,7 +161,7 @@
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <LinearGradientBrush x:Key="MessageBoxButtonHoverBrush" StartPoint="0,0" EndPoint="0,1">
+    <LinearGradientBrush x:Key="MessageBoxWindowButtonHoverBrush" StartPoint="0,0" EndPoint="0,1">
         <LinearGradientBrush.GradientStops>
             <GradientStopCollection>
                 <GradientStop Offset="0" Color="#FFb5bdc8"/>
@@ -179,7 +172,8 @@
             </GradientStopCollection>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
-    <LinearGradientBrush x:Key="MessageBoxButtonPressedBrush" StartPoint="0,0" EndPoint="0,1">
+    
+    <LinearGradientBrush x:Key="MessageBoxWindowButtonPressedBrush" StartPoint="0,0" EndPoint="0,1">
         <LinearGradientBrush.GradientStops>
             <GradientStopCollection>
                 <GradientStop Offset="0" Color="#FF6b7c8d"/>
@@ -205,34 +199,17 @@
                                 <VisualState x:Name="MouseOver">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource MessageBoxButtonHoverBrush}"></DiscreteObjectKeyFrame>
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource MessageBoxWindowButtonHoverBrush}"></DiscreteObjectKeyFrame>
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource MessageBoxButtonPressedBrush}"></DiscreteObjectKeyFrame>
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource MessageBoxWindowButtonPressedBrush}"></DiscreteObjectKeyFrame>
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
-                                <VisualState x:Name="Disabled">
-                                    <Storyboard>
-                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="DisabledVisualElement" Storyboard.TargetProperty="Opacity">
-                                            <SplineDoubleKeyFrame KeyTime="0" Value=".55"/>
-                                        </DoubleAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                            <VisualStateGroup x:Name="FocusStates">
-                                <VisualState x:Name="Focused">
-                                    <Storyboard>
-                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="FocusVisualElement" Storyboard.TargetProperty="Opacity">
-                                            <SplineDoubleKeyFrame KeyTime="0" Value="1"/>
-                                        </DoubleAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualState>
-                                <VisualState x:Name="Unfocused"/>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <Border x:Name="Background" CornerRadius="0,0,2,0" Background="{StaticResource MessageBoxDarkBrush}">
@@ -246,8 +223,6 @@
 								Opacity="1"
 								Data="M 2,6 C2,6 3,6 3,6 3,6 3,5 3,5 3,5 4,5 4,5 4,5 4,6 4,6 4,6 5,6 5,6 5,6 7,6 7,6 7,6 7,5 7,5 7,5 6,5 6,5 6,5 6,4 6,4 6,4 5,4 5,4 5,4 5,2 5,2 5,2 6,2 6,2 6,2 6,1 6,1 6,1 7,1 7,1 7,1 7,0 7,0 7,0 5,0 5,0 5,0 4,0 4,0 4,0 4,1 4,1 4,1 3,1 3,1 3,1 3,0 3,0 3,0 2,0 2,0 2,0 0,0 0,0 0,0 0,1 0,1 0,1 1,1 1,1 1,1 1,2 1,2 1,2 2,2 2,2 2,2 2,4 2,4 2,4 1,4 1,4 1,4 1,5 1,5 1,5 0,5 0,5 0,5 0,6 0,6 0,6 2,6 2,6 z"
 								Fill="White" Margin="0,0,0,1" Visibility="Collapsed" />
-                        <Border x:Name="DisabledVisualElement" Background="#FFFFFFFF" CornerRadius="0,0,4,0" IsHitTestVisible="false" Opacity="0"/>
-                        <Border x:Name="FocusVisualElement" BorderBrush="#FF6DBDD1" BorderThickness="1" CornerRadius="0,0,3,0" Margin="1" IsHitTestVisible="false" Opacity="0"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -260,16 +235,21 @@
     </ControlTemplate>
 
     <Style TargetType="{x:Type local:MessageBox}">
-        <Setter Property="IsEnabled" Value="true" />
         <Setter Property="Background" Value="#FFFFFFFF"/>
+        <Setter Property="BorderBrush" Value="{StaticResource MessageBoxDarkBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="HorizontalContentAlignment" Value="Left" />
-        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="CaptionForeground" Value="#FF000000" />
+        <Setter Property="CloseButtonStyle" Value="{StaticResource MessageBoxCloseButtonStyle}" /> 
         <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="IsEnabled" Value="true" />
         <Setter Property="MinWidth" Value="350" />
         <Setter Property="MinHeight" Value="50" />
-        <Setter Property="BorderBrush" Value="{StaticResource MessageBoxDarkBrush}" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="WindowBorderBrush" Value="{StaticResource MessageBoxDarkBrush}" />
+        <Setter Property="WindowBackground" Value="{StaticResource MessageBoxWindowBackgroundBrush}" />
+        <Setter Property="WindowOpacity" Value="1.0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:MessageBox}">
@@ -325,11 +305,11 @@
                         </VisualStateManager.VisualStateGroups>
 
                         <!-- Borders -->
-                        <Grid>
-                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5,5,0,0" Opacity="0.65"/>
-                            <Grid x:Name="MessageBoxBorderGrid" Margin="0" Background="{x:Null}">
-                                <Border x:Name="MessageBoxBorder" Margin="1,1,1,1" Background="{StaticResource MessageBoxBorderBrush}" CornerRadius="4,4,0,0" Opacity="0.65"/>
-                                <Border x:Name="MessageBoxOuterBorder" BorderBrush="White" BorderThickness="1" CornerRadius="4,4,0,0" Margin="1" Opacity="0.7"/>
+                        <Grid  x:Name="MessageBoxWindowGrid">
+                            <Border BorderBrush="{TemplateBinding WindowBorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5,5,0,0" Opacity="{TemplateBinding WindowOpacity}"/>
+                            <Grid Margin="0" Background="{x:Null}">
+                                <Border x:Name="MessageBoxWindow" Margin="1,1,1,1" Background="{TemplateBinding WindowBackground}" CornerRadius="4,4,0,0" Opacity="{TemplateBinding WindowOpacity}"/>
+                                <Border BorderBrush="White" BorderThickness="1" CornerRadius="4,4,0,0" Margin="1" Opacity="0.7"/>
                             </Grid>
                         </Grid>
 
@@ -346,8 +326,7 @@
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <Border BorderBrush="#FFFFFFFF" BorderThickness="1" CornerRadius="1"/>
-                                <Border Margin="1" BorderThickness="1" CornerRadius="0.1" BorderBrush="{StaticResource MessageBoxMainBrushColor}"/>
-                                <Border Margin="1"  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0.1" Background="{TemplateBinding Background}" BorderBrush="{StaticResource MessageBoxDarkBrush}">
+                                <Border Margin="1"  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0.1" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}">
 
                                     <Grid MinWidth="350">
                                         <Grid.RowDefinitions>
@@ -365,7 +344,13 @@
                                             <Image x:Name="MessageBoxImage" VerticalAlignment="Top" SnapsToDevicePixels="True" Stretch="None"  Margin="-6,-1,10,-4" Source="{TemplateBinding ImageSource}"></Image>
 
                                             <!-- Message Text -->
-                                            <TextBlock x:Name="MessageText" Grid.Column="1" Text="{TemplateBinding Text}" TextWrapping="Wrap" VerticalAlignment="Center" MaxWidth="450" />
+                                            <TextBlock x:Name="MessageText" Grid.Column="1" TextWrapping="Wrap" VerticalAlignment="Center" MaxWidth="450"
+                                                       Text="{TemplateBinding Text}" 
+                                                       FontFamily="{TemplateBinding FontFamily}"
+                                                       FontSize="{TemplateBinding FontSize}"
+                                                       FontStyle="{TemplateBinding FontStyle}"
+                                                       FontWeight="{TemplateBinding FontWeight}"
+                                                       Foreground="{TemplateBinding Foreground}"/>
 
                                         </Grid>
 
@@ -410,8 +395,9 @@
                                 <Grid>
                                     <Grid x:Name="CaptionHeader"  Margin="1,1,105,0" VerticalAlignment="Center">
                                         <!-- Caption -->
-                                        <ContentControl x:Name="Caption" Margin="5,0,0,0" Foreground="#FF000000" IsTabStop="False" HorizontalAlignment="Stretch"
-                                                        Content="{TemplateBinding Caption}" />
+                                        <ContentControl x:Name="Caption" Margin="5,0,0,0" IsTabStop="False" HorizontalAlignment="Stretch"
+                                                        Content="{TemplateBinding Caption}"
+                                                        Foreground="{TemplateBinding CaptionForeground}"/>
 
                                     </Grid>
                                     <Thumb x:Name="PART_DragWidget" Template="{StaticResource MessageBoxDragWidgetTemplate}"/>
@@ -424,7 +410,7 @@
 
                         <!-- Close Button -->
                         <Border BorderBrush="#A5FFFFFF" BorderThickness="1,0,1,1" CornerRadius="0,0,3,3" VerticalAlignment="Top" Margin="0,1,7,0" HorizontalAlignment="Right">
-                            <Button x:Name="PART_CloseButton" Style="{StaticResource MessageBoxCloseButtonStyle}" Height="17" Width="43" IsTabStop="False">
+                            <Button x:Name="PART_CloseButton" Style="{TemplateBinding CloseButtonStyle}" Height="17" Width="43" IsTabStop="False">
                                 <Path Height="10" HorizontalAlignment="Center" VerticalAlignment="Center" Width="12" Fill="#E4FFFFFF" Stretch="Fill" Stroke="#FF535666" 
                                       Data="M0.5,0.5 L4.5178828,0.5 L6.0620003,3.125 L7.4936447,0.5 L11.5,0.5 L11.5,1.5476431 L8.7425003,6.1201854 L11.5,10.359666 L11.5,11.5 L7.4941902,11.5 L6.0620003,8.8740005 L4.5172949,11.5 L0.5,11.5 L0.5,10.43379 L3.3059995,6.1201582 L0.5,1.4676378 L0.5,0.5 z"/>
                             </Button>
