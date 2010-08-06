@@ -61,21 +61,27 @@ namespace Microsoft.Windows.Controls
         #region Dependency Properties
 
         public static readonly DependencyProperty CaptionProperty = DependencyProperty.Register("Caption", typeof(string), typeof(MessageBox), new UIPropertyMetadata(String.Empty));
-        /// <summary>
-        /// Gets or sets the caption.
-        /// </summary>
-        /// <value>The caption.</value>
         public string Caption
         {
             get { return (string)GetValue(CaptionProperty); }
             set { SetValue(CaptionProperty, value); }
         }
 
+        public static readonly DependencyProperty CaptionForegroundProperty = DependencyProperty.Register("CaptionForeground", typeof(Brush), typeof(MessageBox), new UIPropertyMetadata(null));
+        public Brush CaptionForeground
+        {
+            get { return (Brush)GetValue(CaptionForegroundProperty); }
+            set { SetValue(CaptionForegroundProperty, value); }
+        }
+
+        public static readonly DependencyProperty CloseButtonStyleProperty = DependencyProperty.Register("CloseButtonStyle", typeof(Style), typeof(MessageBox), new PropertyMetadata(null));
+        public Style CloseButtonStyle
+        {
+            get { return (Style)GetValue(CloseButtonStyleProperty); }
+            set { SetValue(CloseButtonStyleProperty, value); }
+        }
+
         public static readonly DependencyProperty ImageSourceProperty = DependencyProperty.Register("ImageSource", typeof(ImageSource), typeof(MessageBox), new UIPropertyMetadata(default(ImageSource)));
-        /// <summary>
-        /// Gets or sets the message image source.
-        /// </summary>
-        /// <value>The message image source.</value>
         public ImageSource ImageSource
         {
             get { return (ImageSource)GetValue(ImageSourceProperty); }
@@ -83,14 +89,31 @@ namespace Microsoft.Windows.Controls
         }
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(MessageBox), new UIPropertyMetadata(String.Empty));
-        /// <summary>
-        /// Gets or sets the message text.
-        /// </summary>
-        /// <value>The message text.</value>
         public string Text
         {
             get { return (string)GetValue(TextProperty); }
             set { SetValue(TextProperty, value); }
+        }
+
+        public static readonly DependencyProperty WindowBackgroundProperty = DependencyProperty.Register("WindowBackground", typeof(Brush), typeof(MessageBox), new PropertyMetadata(null));
+        public Brush WindowBackground
+        {
+            get { return (Brush)GetValue(WindowBackgroundProperty); }
+            set { SetValue(WindowBackgroundProperty, value); }
+        }
+
+        public static readonly DependencyProperty WindowBorderBrushProperty = DependencyProperty.Register("WindowBorderBrush", typeof(Brush), typeof(MessageBox), new PropertyMetadata(null));
+        public Brush WindowBorderBrush
+        {
+            get { return (Brush)GetValue(WindowBorderBrushProperty); }
+            set { SetValue(WindowBorderBrushProperty, value); }
+        }
+
+        public static readonly DependencyProperty WindowOpacityProperty = DependencyProperty.Register("WindowOpacity", typeof(double), typeof(MessageBox), new PropertyMetadata(null));
+        public double WindowOpacity
+        {
+            get { return (double)GetValue(WindowOpacityProperty); }
+            set { SetValue(WindowOpacityProperty, value); }
         }
 
         #endregion //Dependency Properties
