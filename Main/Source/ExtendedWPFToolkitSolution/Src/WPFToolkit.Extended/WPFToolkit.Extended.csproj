@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="BusyIndicator\BusyIndicator.cs" />
     <Compile Include="ChildWindow\ChildWindow.cs" />
+    <Compile Include="ChildWindow\WindowState.cs" />
     <Compile Include="MessageBox\MessageBox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

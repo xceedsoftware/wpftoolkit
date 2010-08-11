@@ -132,6 +132,13 @@ namespace Microsoft.Windows.Controls
             set { SetValue(IconSourceProperty, value); }
         }
 
+        public static readonly DependencyProperty IsModalProperty = DependencyProperty.Register("IsModal", typeof(bool), typeof(ChildWindow), new UIPropertyMetadata(true));
+        public bool IsModal
+        {
+            get { return (bool)GetValue(IsModalProperty); }
+            set { SetValue(IsModalProperty, value); }
+        }
+
         #region Left
 
         public static readonly DependencyProperty LeftProperty = DependencyProperty.Register("Left", typeof(double), typeof(ChildWindow), new PropertyMetadata(0.0, new PropertyChangedCallback(OnLeftPropertyChanged)));
@@ -143,51 +150,31 @@ namespace Microsoft.Windows.Controls
 
         private static void OnLeftPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            ChildWindow dialog = (ChildWindow)obj;
-            dialog.Left = dialog.GetRestrictedLeft();
-            dialog.ProcessMove((double)e.NewValue - (double)e.OldValue, 0);
+            ChildWindow window = (ChildWindow)obj;
+            window.Left = window.GetRestrictedLeft();
+            window.ProcessMove((double)e.NewValue - (double)e.OldValue, 0);
         }
 
         #endregion //Left
 
         #region OverlayBrush
 
-        public static readonly DependencyProperty OverlayBrushProperty = DependencyProperty.Register("OverlayBrush", typeof(Brush), typeof(ChildWindow), new PropertyMetadata(OnOverlayBrushPropertyChanged));
+        public static readonly DependencyProperty OverlayBrushProperty = DependencyProperty.Register("OverlayBrush", typeof(Brush), typeof(ChildWindow));
         public Brush OverlayBrush
         {
             get { return (Brush)GetValue(OverlayBrushProperty); }
             set { SetValue(OverlayBrushProperty, value); }
         }
 
-        private static void OnOverlayBrushPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ChildWindow cw = (ChildWindow)d;
-
-            if (cw.Overlay != null)
-            {
-                cw.Overlay.Background = (Brush)e.NewValue;
-            }
-        }
-
         #endregion //OverlayBrush
 
         #region OverlayOpacity
 
-        public static readonly DependencyProperty OverlayOpacityProperty = DependencyProperty.Register("OverlayOpacity", typeof(double), typeof(ChildWindow), new PropertyMetadata(OnOverlayOpacityPropertyChanged));
+        public static readonly DependencyProperty OverlayOpacityProperty = DependencyProperty.Register("OverlayOpacity", typeof(double), typeof(ChildWindow));
         public double OverlayOpacity
         {
             get { return (double)GetValue(OverlayOpacityProperty); }
             set { SetValue(OverlayOpacityProperty, value); }
-        }
-
-        private static void OnOverlayOpacityPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ChildWindow cw = (ChildWindow)d;
-
-            if (cw.Overlay != null)
-            {
-                cw.Overlay.Opacity = (double)e.NewValue;
-            }
         }
 
         #endregion //OverlayOpacity
@@ -203,9 +190,9 @@ namespace Microsoft.Windows.Controls
 
         private static void OnTopPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            ChildWindow dialog = (ChildWindow)obj;
-            dialog.Top = dialog.GetRestrictedTop();
-            dialog.ProcessMove(0, (double)e.NewValue - (double)e.OldValue);
+            ChildWindow window = (ChildWindow)obj;
+            window.Top = window.GetRestrictedTop();
+            window.ProcessMove(0, (double)e.NewValue - (double)e.OldValue);
         }
 
         #endregion //TopProperty
@@ -230,6 +217,23 @@ namespace Microsoft.Windows.Controls
             get { return (double)GetValue(WindowOpacityProperty); }
             set { SetValue(WindowOpacityProperty, value); }
         }
+
+        #region WindowState
+
+        public static readonly DependencyProperty WindowStateProperty = DependencyProperty.Register("WindowState", typeof(WindowState), typeof(ChildWindow), new PropertyMetadata(WindowState.Closed, new PropertyChangedCallback(OnWindowStatePropertyChanged)));
+        public WindowState WindowState
+        {
+            get { return (WindowState)GetValue(WindowStateProperty); }
+            set { SetValue(WindowStateProperty, WindowState); }
+        }
+
+        private static void OnWindowStatePropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        {
+            ChildWindow window = (ChildWindow)obj;
+            window.SetWindowState((WindowState)e.NewValue);
+        }
+
+        #endregion //WindowState
 
         #endregion //Dependency Properties
 
@@ -317,6 +321,37 @@ namespace Microsoft.Windows.Controls
             return Top;
         }
 
+        private void SetWindowState(WindowState state)
+        {
+            switch (state)
+            {
+                case WindowState.Closed:
+                    {
+                        Visibility = System.Windows.Visibility.Hidden;
+                        break;
+                    }
+                case WindowState.Open:
+                    {
+                        Visibility = System.Windows.Visibility.Visible;
+                        SetZIndex();                        
+                        break;
+                    }
+            }
+        }
+
+        private void SetZIndex()
+        {
+            if (_parent != null)
+            {
+                int parentIndex = (int)_parent.GetValue(Canvas.ZIndexProperty);
+                this.SetValue(Canvas.ZIndexProperty, ++parentIndex);
+            }
+            else
+            {
+                this.SetValue(Canvas.ZIndexProperty, 1);
+            }
+        }
+
         private void SetStartupPosition()
         {
             CenterChildWindow();
@@ -349,13 +384,13 @@ namespace Microsoft.Windows.Controls
 
         public void Show()
         {
-            Visibility = System.Windows.Visibility.Visible;
+            SetWindowState(WindowState.Open);
         }
 
 
         public void Close()
         {
-            Visibility = System.Windows.Visibility.Hidden;
+            SetWindowState(WindowState.Closed);
         }
 
         #endregion //Public
