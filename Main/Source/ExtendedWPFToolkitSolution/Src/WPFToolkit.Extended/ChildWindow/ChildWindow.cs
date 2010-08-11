@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
+using System.ComponentModel;
 
 namespace Microsoft.Windows.Controls
 {
@@ -224,7 +225,7 @@ namespace Microsoft.Windows.Controls
         public WindowState WindowState
         {
             get { return (WindowState)GetValue(WindowStateProperty); }
-            set { SetValue(WindowStateProperty, WindowState); }
+            set { SetValue(WindowStateProperty, value); }
         }
 
         private static void OnWindowStatePropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
@@ -236,6 +237,28 @@ namespace Microsoft.Windows.Controls
         #endregion //WindowState
 
         #endregion //Dependency Properties
+
+        private bool? _dialogResult;
+        /// <summary>
+        /// Gets or sets a value indicating whether the ChildWindow was accepted or canceled.
+        /// </summary>
+        /// <value>
+        /// True if the child window was accepted; false if the child window was
+        /// canceled. The default is null.
+        /// </value>
+        [TypeConverter(typeof(NullableBoolConverter))]
+        public bool? DialogResult
+        {
+            get { return _dialogResult; }
+            set
+            {
+                if (_dialogResult != value)
+                {
+                    _dialogResult = value;
+                    Close();
+                }
+            }
+        }
 
         #endregion //Properties
 
@@ -327,17 +350,54 @@ namespace Microsoft.Windows.Controls
             {
                 case WindowState.Closed:
                     {
-                        Visibility = System.Windows.Visibility.Hidden;
+                        ExecuteClose();
                         break;
                     }
                 case WindowState.Open:
                     {
-                        Visibility = System.Windows.Visibility.Visible;
-                        SetZIndex();                        
+                        ExecuteOpen();
                         break;
                     }
             }
         }
+
+        private void ExecuteClose()
+        {
+            CancelEventArgs e = new CancelEventArgs();
+            OnClosing(e);
+
+            if (!e.Cancel)
+            {
+                Visibility = System.Windows.Visibility.Hidden;
+
+                if (!_dialogResult.HasValue)
+                    _dialogResult = false;
+
+                OnClosed(EventArgs.Empty);
+            }
+            else
+            {
+                _dialogResult = null;  //if the Close is cancelled, DialogResult should always be NULL:
+            }
+        }
+
+        private void ExecuteOpen()
+        {
+            _dialogResult = null; //reset the dialogResult to null each time the window is opened
+
+            Visibility = System.Windows.Visibility.Visible;
+
+            if (_parent != null)
+            {
+                int parentIndex = (int)_parent.GetValue(Canvas.ZIndexProperty);
+                this.SetValue(Canvas.ZIndexProperty, ++parentIndex);
+            }
+            else
+            {
+                this.SetValue(Canvas.ZIndexProperty, 1);
+            }
+        }
+
 
         private void SetZIndex()
         {
@@ -384,17 +444,40 @@ namespace Microsoft.Windows.Controls
 
         public void Show()
         {
-            SetWindowState(WindowState.Open);
+            WindowState = WindowState.Open;
         }
-
 
         public void Close()
         {
-            SetWindowState(WindowState.Closed);
+            WindowState = WindowState.Closed;
         }
 
         #endregion //Public
 
         #endregion //Methods
+
+        #region Events
+
+        /// <summary>
+        /// Occurs when the ChildWindow is closed.
+        /// </summary>
+        public event EventHandler Closed;
+        protected virtual void OnClosed(EventArgs e)
+        {
+            if (Closed != null)
+                Closed(this, e);
+        }
+
+        /// <summary>
+        /// Occurs when the ChildWindow is closing.
+        /// </summary>
+        public event EventHandler<CancelEventArgs> Closing;
+        protected virtual void OnClosing(CancelEventArgs e)
+        {
+            if (Closing != null)
+                Closing(this, e);
+        }
+
+        #endregion //Events
     }
 }
