@@ -89,6 +89,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="BusyIndicator\VisualStates.BusyIndicator.cs" />
+    <Compile Include="RichTextBox\Formatters\ITextFormatter.cs" />
+    <Compile Include="RichTextBox\Formatters\PlainTextFormatter.cs" />
+    <Compile Include="RichTextBox\Formatters\RtfFormatter.cs" />
+    <Compile Include="RichTextBox\Formatters\XamlFormatter.cs" />
+    <Compile Include="RichTextBox\RichTextBox.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\VisualStates.MessageBox.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
