@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Threading;
 
 namespace Microsoft.Windows.Controls
 {
@@ -9,6 +10,7 @@ namespace Microsoft.Windows.Controls
         #region Private Members
 
         private bool _textHasLoaded;
+        bool isInvokePending;
 
         #endregion //Private Members
 
@@ -80,6 +82,15 @@ namespace Microsoft.Windows.Controls
 
         #region Methods
 
+        private void InvokeUpdateText()
+        {
+            if (!isInvokePending)
+            {
+                Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(UpdateText));
+                isInvokePending = true;
+            }
+        }
+
         private void UpdateText()
         {
             //when the Text is null and the Text hasn't been loaded, it indicates that the OnTextPropertyChanged event hasn't exceuted
@@ -90,6 +101,8 @@ namespace Microsoft.Windows.Controls
 
             if (_textHasLoaded)
                 Text = TextFormatter.GetText(Document);
+
+            isInvokePending = false;
         }
 
         #endregion //Methods
@@ -102,11 +115,11 @@ namespace Microsoft.Windows.Controls
 
             if (binding.UpdateSourceTrigger == UpdateSourceTrigger.Default || binding.UpdateSourceTrigger == UpdateSourceTrigger.LostFocus)
             {
-                LostFocus += (o, ea) => UpdateText();
+                LostFocus += (o, ea) => InvokeUpdateText();
             }
             else
             {
-                TextChanged += (o, ea) => UpdateText();
+                TextChanged += (o, ea) => InvokeUpdateText();
             }
         }
 
