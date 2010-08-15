@@ -61,6 +61,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ColorPicker\ColorPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MessageBox\MessageBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -74,6 +78,10 @@
     <Compile Include="BusyIndicator\BusyIndicator.cs" />
     <Compile Include="ChildWindow\ChildWindow.cs" />
     <Compile Include="ChildWindow\WindowState.cs" />
+    <Compile Include="ColorPicker\ColorPicker.cs" />
+    <Compile Include="ColorPicker\HsvColor.cs" />
+    <Compile Include="ColorPicker\ColorUtilities.cs" />
+    <Compile Include="ColorPicker\ColorSpectrumSlider.cs" />
     <Compile Include="MessageBox\MessageBox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
