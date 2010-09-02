@@ -68,9 +68,9 @@ namespace Microsoft.Windows.Controls
         #region ScA
 
         public static readonly DependencyProperty ScAProperty = DependencyProperty.Register("ScA", typeof(float), typeof(ColorPicker), new PropertyMetadata((float)1, new PropertyChangedCallback(OnScAPropertyChangedChanged)));
-        public double ScA
+        public float ScA
         {
-            get { return (double)GetValue(ScAProperty); }
+            get { return (float)GetValue(ScAProperty); }
             set { SetValue(ScAProperty, value); }
         }
 
@@ -92,14 +92,14 @@ namespace Microsoft.Windows.Controls
 
         #region ScR
 
-        public static readonly DependencyProperty ScRProperty = DependencyProperty.Register("ScR", typeof(float), typeof(ColorPicker), new PropertyMetadata((float)1, new PropertyChangedCallback(ScRChanged)));
-        public double ScR
+        public static readonly DependencyProperty ScRProperty = DependencyProperty.Register("ScR", typeof(float), typeof(ColorPicker), new PropertyMetadata((float)1, new PropertyChangedCallback(OnScRPropertyChanged)));
+        public float ScR
         {
-            get { return (double)GetValue(ScRProperty); }
+            get { return (float)GetValue(ScRProperty); }
             set { SetValue(RProperty, value); }
         }
 
-        private static void ScRChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnScRPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
 
         }
@@ -108,14 +108,14 @@ namespace Microsoft.Windows.Controls
 
         #region ScG
 
-        public static readonly DependencyProperty ScGProperty = DependencyProperty.Register("ScG", typeof(float), typeof(ColorPicker), new PropertyMetadata((float)1, new PropertyChangedCallback(ScGChanged)));
-        public double ScG
+        public static readonly DependencyProperty ScGProperty = DependencyProperty.Register("ScG", typeof(float), typeof(ColorPicker), new PropertyMetadata((float)1, new PropertyChangedCallback(OnScGPropertyChanged)));
+        public float ScG
         {
-            get { return (double)GetValue(ScGProperty); }
+            get { return (float)GetValue(ScGProperty); }
             set { SetValue(GProperty, value); }
         }
 
-        private static void ScGChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnScGPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
 
         }
@@ -125,9 +125,9 @@ namespace Microsoft.Windows.Controls
         #region ScB
 
         public static readonly DependencyProperty ScBProperty = DependencyProperty.Register("ScB", typeof(float), typeof(ColorPicker), new PropertyMetadata((float)1, new PropertyChangedCallback(OnScBPropertyChanged)));
-        public double ScB
+        public float ScB
         {
-            get { return (double)GetValue(BProperty); }
+            get { return (float)GetValue(BProperty); }
             set { SetValue(BProperty, value); }
         }
 
@@ -357,7 +357,8 @@ namespace Microsoft.Windows.Controls
 
             _currentColorPosition = p;
 
-            CalculateColor(p);
+            if (calculateColor)
+                CalculateColor(p);
         }
 
         private void UpdateColorShadeSelectorPosition(Color color)
@@ -371,17 +372,17 @@ namespace Microsoft.Windows.Controls
 
             _currentColorPosition = p;
 
-            _colorShadeSelectorTransform.X = p.X * _colorShadingCanvas.Width;
-            _colorShadeSelectorTransform.Y = p.Y * _colorShadingCanvas.Height;
+            _colorShadeSelectorTransform.X = (p.X * _colorShadingCanvas.Width) - 5;
+            _colorShadeSelectorTransform.Y = (p.Y * _colorShadingCanvas.Height) - 5;
         }
 
         private void CalculateColor(Point p)
         {
             HsvColor hsv = new HsvColor(360 - _spectrumSlider.Value, 1, 1) { S = p.X, V = 1 - p.Y };
             _currentColor = ColorUtilities.ConvertHsvToRgb(hsv.H, hsv.S, hsv.V); ;
-            _currentColor.ScA = (float)GetValue(ScAProperty);
+            _currentColor.ScA = ScA;
             CurrentColor = _currentColor;
-            SetValue(HexadecimalStringProperty, _currentColor.ToString());
+            HexadecimalString = _currentColor.ToString();
         }
 
         #endregion //Methods

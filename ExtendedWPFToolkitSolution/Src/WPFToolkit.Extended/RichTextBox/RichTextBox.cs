@@ -115,11 +115,11 @@ namespace Microsoft.Windows.Controls
 
             if (binding.UpdateSourceTrigger == UpdateSourceTrigger.Default || binding.UpdateSourceTrigger == UpdateSourceTrigger.LostFocus)
             {
-                LostFocus += (o, ea) => InvokeUpdateText();
+                LostFocus += (o, ea) => UpdateText(); //do this synchronously
             }
             else
             {
-                TextChanged += (o, ea) => InvokeUpdateText();
+                TextChanged += (o, ea) => InvokeUpdateText(); //do this async
             }
         }
 
