@@ -4,8 +4,98 @@
                     xmlns:local="clr-namespace:Microsoft.Windows.Controls">
 
     <!-- =============================================================================== -->
+    <!-- Common Styles                                                                   -->
+    <!-- =============================================================================== -->
+
+    <LinearGradientBrush x:Key="WindowDarkBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FFA3AEB9" Offset="0"/>
+        <GradientStop Color="#FF8399A9" Offset="0.375"/>
+        <GradientStop Color="#FF718597" Offset="0.375"/>
+        <GradientStop Color="#FF617584" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="WindowBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Offset="0" Color="#FFffffff"/>
+                <GradientStop Offset="0.479" Color="#FFf4f5f6"/>
+                <GradientStop Offset="1" Color="#FFd0d6db"/>
+            </GradientStopCollection>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="WindowButtonHoverBrush" StartPoint="0,0" EndPoint="0,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Offset="0" Color="#FFb5bdc8"/>
+                <GradientStop Offset="0.370" Color="#FF8399a9"/>
+                <GradientStop Offset="0.370" Color="#FF718597"/>
+                <GradientStop Offset="0.906" Color="#FFb9c1ca"/>
+                <GradientStop Offset="1" Color="#FFb9c1ca"/>
+            </GradientStopCollection>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="WindowButtonPressedBrush" StartPoint="0,0" EndPoint="0,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Offset="0" Color="#FF6b7c8d"/>
+                <GradientStop Offset="0.370" Color="#FF4d606f"/>
+                <GradientStop Offset="0.370" Color="#FF465460"/>
+                <GradientStop Offset="0.906" Color="#FF262d33"/>
+                <GradientStop Offset="1" Color="#FF262d33"/>
+            </GradientStopCollection>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <Style x:Key="WindowCloseButtonStyle" TargetType="Button">
+        <Setter Property="Foreground" Value="#FF000000"/>
+        <Setter Property="Padding" Value="3"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource WindowButtonHoverBrush}"></DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource WindowButtonPressedBrush}"></DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border x:Name="Background" CornerRadius="0,0,2,0" Background="{StaticResource WindowDarkBrush}">
+                            <Border Margin="1,0,1,1" BorderBrush="#59FFFFFF" BorderThickness="1" CornerRadius="0,0,1,0"/>
+                        </Border>
+                        <ContentPresenter x:Name="contentPresenter" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                        <Path x:Name="path"
+								Height="6"
+								Width="7"
+								Stretch="Fill"
+								Opacity="1"
+								Data="M 2,6 C2,6 3,6 3,6 3,6 3,5 3,5 3,5 4,5 4,5 4,5 4,6 4,6 4,6 5,6 5,6 5,6 7,6 7,6 7,6 7,5 7,5 7,5 6,5 6,5 6,5 6,4 6,4 6,4 5,4 5,4 5,4 5,2 5,2 5,2 6,2 6,2 6,2 6,1 6,1 6,1 7,1 7,1 7,1 7,0 7,0 7,0 5,0 5,0 5,0 4,0 4,0 4,0 4,1 4,1 4,1 3,1 3,1 3,1 3,0 3,0 3,0 2,0 2,0 2,0 0,0 0,0 0,0 0,1 0,1 0,1 1,1 1,1 1,1 1,2 1,2 1,2 2,2 2,2 2,2 2,4 2,4 2,4 1,4 1,4 1,4 1,5 1,5 1,5 0,5 0,5 0,5 0,6 0,6 0,6 2,6 2,6 z"
+								Fill="White" Margin="0,0,0,1" Visibility="Collapsed" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- =============================================================================== -->
     <!-- BusyIndicator                                                                   -->
     <!-- =============================================================================== -->
+
     <Style TargetType="{x:Type local:BusyIndicator}">
         <Setter Property="BusyContent" Value="Please wait..."/>
         <Setter Property="IsTabStop" Value="False"/>
@@ -144,91 +234,6 @@
     <!-- MessageBox                                                                      -->
     <!-- =============================================================================== -->
 
-    <LinearGradientBrush x:Key="MessageBoxDarkBrush" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="#FFA3AEB9" Offset="0"/>
-        <GradientStop Color="#FF8399A9" Offset="0.375"/>
-        <GradientStop Color="#FF718597" Offset="0.375"/>
-        <GradientStop Color="#FF617584" Offset="1"/>
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="MessageBoxWindowBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
-        <LinearGradientBrush.GradientStops>
-            <GradientStopCollection>
-                <GradientStop Offset="0" Color="#FFffffff"/>
-                <GradientStop Offset="0.479" Color="#FFf4f5f6"/>
-                <GradientStop Offset="1" Color="#FFd0d6db"/>
-            </GradientStopCollection>
-        </LinearGradientBrush.GradientStops>
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="MessageBoxWindowButtonHoverBrush" StartPoint="0,0" EndPoint="0,1">
-        <LinearGradientBrush.GradientStops>
-            <GradientStopCollection>
-                <GradientStop Offset="0" Color="#FFb5bdc8"/>
-                <GradientStop Offset="0.370" Color="#FF8399a9"/>
-                <GradientStop Offset="0.370" Color="#FF718597"/>
-                <GradientStop Offset="0.906" Color="#FFb9c1ca"/>
-                <GradientStop Offset="1" Color="#FFb9c1ca"/>
-            </GradientStopCollection>
-        </LinearGradientBrush.GradientStops>
-    </LinearGradientBrush>
-    
-    <LinearGradientBrush x:Key="MessageBoxWindowButtonPressedBrush" StartPoint="0,0" EndPoint="0,1">
-        <LinearGradientBrush.GradientStops>
-            <GradientStopCollection>
-                <GradientStop Offset="0" Color="#FF6b7c8d"/>
-                <GradientStop Offset="0.370" Color="#FF4d606f"/>
-                <GradientStop Offset="0.370" Color="#FF465460"/>
-                <GradientStop Offset="0.906" Color="#FF262d33"/>
-                <GradientStop Offset="1" Color="#FF262d33"/>
-            </GradientStopCollection>
-        </LinearGradientBrush.GradientStops>
-    </LinearGradientBrush>
-
-    <Style x:Key="MessageBoxCloseButtonStyle" TargetType="Button">
-        <Setter Property="Foreground" Value="#FF000000"/>
-        <Setter Property="Padding" Value="3"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Grid>
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal"/>
-                                <VisualState x:Name="MouseOver">
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource MessageBoxWindowButtonHoverBrush}"></DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualState>
-                                <VisualState x:Name="Pressed">
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource MessageBoxWindowButtonPressedBrush}"></DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                        <Border x:Name="Background" CornerRadius="0,0,2,0" Background="{StaticResource MessageBoxDarkBrush}">
-                            <Border Margin="1,0,1,1" BorderBrush="#59FFFFFF" BorderThickness="1" CornerRadius="0,0,1,0"/>
-                        </Border>
-                        <ContentPresenter x:Name="contentPresenter" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"/>
-                        <Path x:Name="path"
-								Height="6"
-								Width="7"
-								Stretch="Fill"
-								Opacity="1"
-								Data="M 2,6 C2,6 3,6 3,6 3,6 3,5 3,5 3,5 4,5 4,5 4,5 4,6 4,6 4,6 5,6 5,6 5,6 7,6 7,6 7,6 7,5 7,5 7,5 6,5 6,5 6,5 6,4 6,4 6,4 5,4 5,4 5,4 5,2 5,2 5,2 6,2 6,2 6,2 6,1 6,1 6,1 7,1 7,1 7,1 7,0 7,0 7,0 5,0 5,0 5,0 4,0 4,0 4,0 4,1 4,1 4,1 3,1 3,1 3,1 3,0 3,0 3,0 2,0 2,0 2,0 0,0 0,0 0,0 0,1 0,1 0,1 1,1 1,1 1,1 1,2 1,2 1,2 2,2 2,2 2,2 2,4 2,4 2,4 1,4 1,4 1,4 1,5 1,5 1,5 0,5 0,5 0,5 0,6 0,6 0,6 2,6 2,6 z"
-								Fill="White" Margin="0,0,0,1" Visibility="Collapsed" />
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <ControlTemplate x:Key="MessageBoxDragWidgetTemplate" TargetType="{x:Type Thumb}">
         <Border Background="Transparent">
         </Border>
@@ -236,10 +241,10 @@
 
     <Style TargetType="{x:Type local:MessageBox}">
         <Setter Property="Background" Value="#FFFFFFFF"/>
-        <Setter Property="BorderBrush" Value="{StaticResource MessageBoxDarkBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource WindowDarkBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CaptionForeground" Value="#FF000000" />
-        <Setter Property="CloseButtonStyle" Value="{StaticResource MessageBoxCloseButtonStyle}" /> 
+        <Setter Property="CloseButtonStyle" Value="{StaticResource WindowCloseButtonStyle}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="IsEnabled" Value="true" />
@@ -247,8 +252,8 @@
         <Setter Property="MinHeight" Value="50" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
-        <Setter Property="WindowBorderBrush" Value="{StaticResource MessageBoxDarkBrush}" />
-        <Setter Property="WindowBackground" Value="{StaticResource MessageBoxWindowBackgroundBrush}" />
+        <Setter Property="WindowBorderBrush" Value="{StaticResource WindowDarkBrush}" />
+        <Setter Property="WindowBackground" Value="{StaticResource WindowBackgroundBrush}" />
         <Setter Property="WindowOpacity" Value="1.0" />
         <Setter Property="Template">
             <Setter.Value>
@@ -433,97 +438,12 @@
         <GradientStop Color="#00FFFFFF" Offset="1"/>
     </LinearGradientBrush>
 
-    <LinearGradientBrush x:Key="ChildWindowDarkBrush" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="#FFA3AEB9" Offset="0"/>
-        <GradientStop Color="#FF8399A9" Offset="0.375"/>
-        <GradientStop Color="#FF718597" Offset="0.375"/>
-        <GradientStop Color="#FF617584" Offset="1"/>
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="ChildWindowBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
-        <LinearGradientBrush.GradientStops>
-            <GradientStopCollection>
-                <GradientStop Offset="0" Color="#FFffffff"/>
-                <GradientStop Offset="0.479" Color="#FFf4f5f6"/>
-                <GradientStop Offset="1" Color="#FFd0d6db"/>
-            </GradientStopCollection>
-        </LinearGradientBrush.GradientStops>
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="ChildWindowButtonHoverBrush" StartPoint="0,0" EndPoint="0,1">
-        <LinearGradientBrush.GradientStops>
-            <GradientStopCollection>
-                <GradientStop Offset="0" Color="#FFb5bdc8"/>
-                <GradientStop Offset="0.370" Color="#FF8399a9"/>
-                <GradientStop Offset="0.370" Color="#FF718597"/>
-                <GradientStop Offset="0.906" Color="#FFb9c1ca"/>
-                <GradientStop Offset="1" Color="#FFb9c1ca"/>
-            </GradientStopCollection>
-        </LinearGradientBrush.GradientStops>
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="ChildWindowButtonPressedBrush" StartPoint="0,0" EndPoint="0,1">
-        <LinearGradientBrush.GradientStops>
-            <GradientStopCollection>
-                <GradientStop Offset="0" Color="#FF6b7c8d"/>
-                <GradientStop Offset="0.370" Color="#FF4d606f"/>
-                <GradientStop Offset="0.370" Color="#FF465460"/>
-                <GradientStop Offset="0.906" Color="#FF262d33"/>
-                <GradientStop Offset="1" Color="#FF262d33"/>
-            </GradientStopCollection>
-        </LinearGradientBrush.GradientStops>
-    </LinearGradientBrush>
-
-    <Style x:Key="ChildWindowCloseButtonStyle" TargetType="Button">
-        <Setter Property="Foreground" Value="#FF000000"/>
-        <Setter Property="Padding" Value="3"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Grid>
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal"/>
-                                <VisualState x:Name="MouseOver">
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource ChildWindowButtonHoverBrush}"></DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualState>
-                                <VisualState x:Name="Pressed">
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource ChildWindowButtonPressedBrush}"></DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                        <Border x:Name="Background" CornerRadius="0,0,2,0" Background="{StaticResource ChildWindowDarkBrush}">
-                            <Border Margin="1,0,1,1" BorderBrush="#59FFFFFF" BorderThickness="1" CornerRadius="0,0,1,0"/>
-                        </Border>
-                        <ContentPresenter x:Name="contentPresenter" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"/>
-                        <Path x:Name="path"
-								Height="6"
-								Width="7"
-								Stretch="Fill"
-								Opacity="1"
-								Data="M 2,6 C2,6 3,6 3,6 3,6 3,5 3,5 3,5 4,5 4,5 4,5 4,6 4,6 4,6 5,6 5,6 5,6 7,6 7,6 7,6 7,5 7,5 7,5 6,5 6,5 6,5 6,4 6,4 6,4 5,4 5,4 5,4 5,2 5,2 5,2 6,2 6,2 6,2 6,1 6,1 6,1 7,1 7,1 7,1 7,0 7,0 7,0 5,0 5,0 5,0 4,0 4,0 4,0 4,1 4,1 4,1 3,1 3,1 3,1 3,0 3,0 3,0 2,0 2,0 2,0 0,0 0,0 0,0 0,1 0,1 0,1 1,1 1,1 1,1 1,2 1,2 1,2 2,2 2,2 2,2 2,4 2,4 2,4 1,4 1,4 1,4 1,5 1,5 1,5 0,5 0,5 0,5 0,6 0,6 0,6 2,6 2,6 z"
-								Fill="White" Margin="0,0,0,1" Visibility="Collapsed" />
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <Style TargetType="{x:Type local:ChildWindow}">
         <Setter Property="Background" Value="#FFFFFFFF"/>
-        <Setter Property="BorderBrush" Value="{StaticResource ChildWindowDarkBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource WindowDarkBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CaptionForeground" Value="#FF000000" />
-        <Setter Property="CloseButtonStyle" Value="{StaticResource ChildWindowCloseButtonStyle}" />
+        <Setter Property="CloseButtonStyle" Value="{StaticResource WindowCloseButtonStyle}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="IsEnabled" Value="true" />
@@ -531,8 +451,8 @@
         <Setter Property="OverlayOpacity" Value="1" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
-        <Setter Property="WindowBorderBrush" Value="{StaticResource ChildWindowDarkBrush}" />
-        <Setter Property="WindowBackground" Value="{StaticResource ChildWindowBackgroundBrush}" />
+        <Setter Property="WindowBorderBrush" Value="{StaticResource WindowDarkBrush}" />
+        <Setter Property="WindowBackground" Value="{StaticResource WindowBackgroundBrush}" />
         <Setter Property="WindowOpacity" Value="1.0" />
         <Setter Property="Template">
             <Setter.Value>
@@ -541,6 +461,35 @@
                         <Grid.Resources>
                             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
                         </Grid.Resources>
+
+                        <!--VisualStateManager-->
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="WindowStatesGroup">
+                                <VisualState x:Name="Closed">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Root" Storyboard.TargetProperty="Visibility" Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Open">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Root" Storyboard.TargetProperty="Visibility" Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
                         <Grid x:Name="PART_Overlay" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0" RenderTransformOrigin="0.5,0.5" 
                               Background="{TemplateBinding OverlayBrush}" 
                               Opacity="{TemplateBinding OverlayOpacity}"
@@ -596,7 +545,6 @@
                                         </Grid>
                                     </Grid>
                                 </Border>
-
                             </Grid>
 
                             <!-- Buttons -->

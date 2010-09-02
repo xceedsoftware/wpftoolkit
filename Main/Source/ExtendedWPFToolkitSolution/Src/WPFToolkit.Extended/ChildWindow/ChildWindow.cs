@@ -8,6 +8,8 @@ using System.ComponentModel;
 
 namespace Microsoft.Windows.Controls
 {
+    [TemplateVisualState(GroupName = VisualStates.WindowStatesGroup, Name = VisualStates.Open)]
+    [TemplateVisualState(GroupName = VisualStates.WindowStatesGroup, Name = VisualStates.Closed)]
     public class ChildWindow : ContentControl
     {
         #region Private Members
@@ -31,7 +33,15 @@ namespace Microsoft.Windows.Controls
 
         public ChildWindow()
         {
-
+            LayoutUpdated += (o, e) =>
+            {
+                //we only want to set the start position if this is the first time the control has bee initialized
+                if (!_startupPositionInitialized)
+                {
+                    SetStartupPosition();
+                    _startupPositionInitialized = true;
+                }
+            };
         }
 
         #endregion //Constructors
@@ -58,27 +68,16 @@ namespace Microsoft.Windows.Controls
             WindowRoot = GetTemplateChild("PART_WindowRoot") as Grid;
 
             WindowRoot.RenderTransform = _moveTransform;
-        }
 
-        protected override Size ArrangeOverride(Size arrangeBounds)
-        {
+            //TODO: move somewhere else
             _parent = VisualTreeHelper.GetParent(this) as FrameworkElement;
-            _parent.LayoutUpdated += (o, e) =>
+            _parent.SizeChanged += (o, ea) =>
             {
-                //we only want to set the start position if this is the first time the control has bee initialized
-                if (!_startupPositionInitialized)
-                {
-                    _startupPositionInitialized = true;
-                    SetStartupPosition();
-                }
-            };
-            _parent.SizeChanged += (o, e) =>
-            {
-                Overlay.Height = e.NewSize.Height;
-                Overlay.Width = e.NewSize.Width;
+                Overlay.Height = ea.NewSize.Height;
+                Overlay.Width = ea.NewSize.Width;
             };
 
-            return base.ArrangeOverride(arrangeBounds);
+            ChangeVisualState();
         }
 
         #endregion //Base Class Overrides
@@ -221,7 +220,7 @@ namespace Microsoft.Windows.Controls
 
         #region WindowState
 
-        public static readonly DependencyProperty WindowStateProperty = DependencyProperty.Register("WindowState", typeof(WindowState), typeof(ChildWindow), new PropertyMetadata(WindowState.Closed, new PropertyChangedCallback(OnWindowStatePropertyChanged)));
+        public static readonly DependencyProperty WindowStateProperty = DependencyProperty.Register("WindowState", typeof(WindowState), typeof(ChildWindow), new PropertyMetadata(WindowState.Open, new PropertyChangedCallback(OnWindowStatePropertyChanged)));
         public WindowState WindowState
         {
             get { return (WindowState)GetValue(WindowStateProperty); }
@@ -359,6 +358,8 @@ namespace Microsoft.Windows.Controls
                         break;
                     }
             }
+
+            ChangeVisualState();
         }
 
         private void ExecuteClose()
@@ -368,8 +369,6 @@ namespace Microsoft.Windows.Controls
 
             if (!e.Cancel)
             {
-                Visibility = System.Windows.Visibility.Hidden;
-
                 if (!_dialogResult.HasValue)
                     _dialogResult = false;
 
@@ -384,20 +383,8 @@ namespace Microsoft.Windows.Controls
         private void ExecuteOpen()
         {
             _dialogResult = null; //reset the dialogResult to null each time the window is opened
-
-            Visibility = System.Windows.Visibility.Visible;
-
-            if (_parent != null)
-            {
-                int parentIndex = (int)_parent.GetValue(Canvas.ZIndexProperty);
-                this.SetValue(Canvas.ZIndexProperty, ++parentIndex);
-            }
-            else
-            {
-                this.SetValue(Canvas.ZIndexProperty, 1);
-            }
+            SetZIndex();
         }
-
 
         private void SetZIndex()
         {
@@ -425,6 +412,18 @@ namespace Microsoft.Windows.Controls
             {
                 Left = (_parent.ActualWidth - WindowRoot.ActualWidth) / 2.0;
                 Top = (_parent.ActualHeight - WindowRoot.ActualHeight) / 2.0;
+            }
+        }
+
+        protected virtual void ChangeVisualState()
+        {
+            if (WindowState == WindowState.Closed)
+            {
+                VisualStateManager.GoToState(this, VisualStates.Closed, true);
+            }
+            else
+            {
+                VisualStateManager.GoToState(this, VisualStates.Open, true);
             }
         }
 

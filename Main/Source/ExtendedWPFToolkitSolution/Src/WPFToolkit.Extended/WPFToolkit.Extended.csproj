@@ -53,22 +53,6 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="BusyIndicator\BusyIndicator.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ChildWindow\ChildWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ColorPicker\ColorPicker.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MessageBox\MessageBox.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -77,6 +61,7 @@
   <ItemGroup>
     <Compile Include="BusyIndicator\BusyIndicator.cs" />
     <Compile Include="ChildWindow\ChildWindow.cs" />
+    <Compile Include="ChildWindow\VisualStates.ChildWindow.cs" />
     <Compile Include="ChildWindow\WindowState.cs" />
     <Compile Include="ColorPicker\ColorPicker.cs" />
     <Compile Include="ColorPicker\HsvColor.cs" />
