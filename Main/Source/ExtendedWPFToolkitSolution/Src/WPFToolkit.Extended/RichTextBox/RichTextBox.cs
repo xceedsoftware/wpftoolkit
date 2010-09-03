@@ -113,13 +113,16 @@ namespace Microsoft.Windows.Controls
         {
             Binding binding = BindingOperations.GetBinding(this, TextProperty);
 
-            if (binding.UpdateSourceTrigger == UpdateSourceTrigger.Default || binding.UpdateSourceTrigger == UpdateSourceTrigger.LostFocus)
+            if (binding != null)
             {
-                LostFocus += (o, ea) => UpdateText(); //do this synchronously
-            }
-            else
-            {
-                TextChanged += (o, ea) => InvokeUpdateText(); //do this async
+                if (binding.UpdateSourceTrigger == UpdateSourceTrigger.Default || binding.UpdateSourceTrigger == UpdateSourceTrigger.LostFocus)
+                {
+                    LostFocus += (o, ea) => UpdateText(); //do this synchronously
+                }
+                else
+                {
+                    TextChanged += (o, ea) => InvokeUpdateText(); //do this async
+                }
             }
         }
 
