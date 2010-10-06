@@ -20,6 +20,7 @@ namespace Microsoft.Windows.Controls
         private ColorSpectrumSlider _spectrumSlider;
         private Point? _currentColorPosition;
         private Color _currentColor = Colors.White;
+        private bool _isLoaded;
 
         #endregion //Private Members
 
@@ -257,6 +258,8 @@ namespace Microsoft.Windows.Controls
 
             _okButton = (Button)GetTemplateChild("PART_OkButton");
             _okButton.Click += OkButton_Click;
+
+            SetSelectedColor(SelectedColor);
         }
 
         #endregion //Base Class Overrides
@@ -332,7 +335,7 @@ namespace Microsoft.Windows.Controls
             SetValue(RProperty, _currentColor.R);
             SetValue(GProperty, _currentColor.G);
             SetValue(BProperty, _currentColor.B);
-            UpdateColorShadeSelectorPosition(theColor);
+            UpdateColorShadeSelectorPosition(_currentColor);
         }
 
         private void UpdateColorShadeSelectorPositionAndCalculateColor(Point p, bool calculateColor = true)
@@ -363,6 +366,9 @@ namespace Microsoft.Windows.Controls
 
         private void UpdateColorShadeSelectorPosition(Color color)
         {
+            if (_spectrumSlider == null || _colorShadingCanvas == null)
+                return;
+
             _currentColorPosition = null;
 
             HsvColor hsv = ColorUtilities.ConvertRgbToHsv(color.R, color.G, color.B);
