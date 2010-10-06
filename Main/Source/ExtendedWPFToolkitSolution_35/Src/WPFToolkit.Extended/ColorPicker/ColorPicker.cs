@@ -257,6 +257,8 @@ namespace Microsoft.Windows.Controls
 
             _okButton = (Button)GetTemplateChild("PART_OkButton");
             _okButton.Click += OkButton_Click;
+
+            SetSelectedColor(SelectedColor);
         }
 
         #endregion //Base Class Overrides
@@ -363,6 +365,9 @@ namespace Microsoft.Windows.Controls
 
         private void UpdateColorShadeSelectorPosition(Color color)
         {
+            if (_spectrumSlider == null || _colorShadingCanvas == null)
+                return;
+
             _currentColorPosition = null;
 
             HsvColor hsv = ColorUtilities.ConvertRgbToHsv(color.R, color.G, color.B);
