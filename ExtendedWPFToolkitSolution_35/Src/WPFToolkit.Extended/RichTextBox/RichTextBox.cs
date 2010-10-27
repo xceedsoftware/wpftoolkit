@@ -116,7 +116,7 @@ namespace Microsoft.Windows.Controls
             {
                 if (binding.UpdateSourceTrigger == UpdateSourceTrigger.Default || binding.UpdateSourceTrigger == UpdateSourceTrigger.LostFocus)
                 {
-                    LostFocus += (o, ea) => UpdateText(); //do this synchronously
+                    PreviewLostKeyboardFocus += (o, ea) => UpdateText(); //do this synchronously
                 }
                 else
                 {
