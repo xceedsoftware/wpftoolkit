@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Threading;
+using Microsoft.Windows.Controls.Formatting;
 
 namespace Microsoft.Windows.Controls
 {
@@ -10,7 +11,8 @@ namespace Microsoft.Windows.Controls
         #region Private Members
 
         private bool _textHasLoaded;
-        bool isInvokePending;
+        private bool isInvokePending;
+        private FormatToolbarManager _manager;
 
         #endregion //Private Members
 
@@ -31,25 +33,24 @@ namespace Microsoft.Windows.Controls
 
         #region Properties
 
-        private ITextFormatter _textFormatter;
-        /// <summary>
-        /// The ITextFormatter the is used to format the text of the RichTextBox.
-        /// Deafult formatter is the RtfFormatter
-        /// </summary>
-        public ITextFormatter TextFormatter
-        {
-            get
-            {
-                if (_textFormatter == null)
-                    _textFormatter = new RtfFormatter(); //default is rtf
+        #region AllowFormatting
 
-                return _textFormatter;
-            }
-            set
-            {
-                _textFormatter = value;
-            }
+        public static readonly DependencyProperty AllowFormatingProperty = DependencyProperty.Register("AllowFormating", typeof(bool), typeof(RichTextBox), new PropertyMetadata(false, new PropertyChangedCallback(OnAllowFormatingPropertyChanged)));
+        public bool AllowFormating
+        {
+            get { return (bool)GetValue(AllowFormatingProperty); }
+            set { SetValue(AllowFormatingProperty, value); }
         }
+
+        private static void OnAllowFormatingPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            RichTextBox rtb = (RichTextBox)d;
+
+            if ((bool)e.NewValue)
+                rtb._manager = new FormatToolbarManager(rtb);
+        }
+
+        #endregion //AllowFormatting
 
         #region Text
 
@@ -77,6 +78,30 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Text
+
+        #region TextFormatter
+
+        private ITextFormatter _textFormatter;
+        /// <summary>
+        /// The ITextFormatter the is used to format the text of the RichTextBox.
+        /// Deafult formatter is the RtfFormatter
+        /// </summary>
+        public ITextFormatter TextFormatter
+        {
+            get
+            {
+                if (_textFormatter == null)
+                    _textFormatter = new RtfFormatter(); //default is rtf
+
+                return _textFormatter;
+            }
+            set
+            {
+                _textFormatter = value;
+            }
+        }
+
+        #endregion //TextFormatter
 
         #endregion //Properties
 
