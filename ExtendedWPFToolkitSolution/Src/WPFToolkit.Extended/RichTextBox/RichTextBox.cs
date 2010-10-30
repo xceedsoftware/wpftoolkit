@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Threading;
-using Microsoft.Windows.Controls.Formatting;
 
 namespace Microsoft.Windows.Controls
 {
@@ -12,7 +11,6 @@ namespace Microsoft.Windows.Controls
 
         private bool _textHasLoaded;
         private bool isInvokePending;
-        private FormatToolbarManager _manager;
 
         #endregion //Private Members
 
@@ -33,28 +31,9 @@ namespace Microsoft.Windows.Controls
 
         #region Properties
 
-        #region AllowFormatting
-
-        public static readonly DependencyProperty AllowFormatingProperty = DependencyProperty.Register("AllowFormating", typeof(bool), typeof(RichTextBox), new PropertyMetadata(false, new PropertyChangedCallback(OnAllowFormatingPropertyChanged)));
-        public bool AllowFormating
-        {
-            get { return (bool)GetValue(AllowFormatingProperty); }
-            set { SetValue(AllowFormatingProperty, value); }
-        }
-
-        private static void OnAllowFormatingPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            RichTextBox rtb = (RichTextBox)d;
-
-            if ((bool)e.NewValue)
-                rtb._manager = new FormatToolbarManager(rtb);
-        }
-
-        #endregion //AllowFormatting
-
         #region Text
 
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(RichTextBox), new FrameworkPropertyMetadata(String.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnTextPropertyChanged), new CoerceValueCallback(CoerceTextProperty), true, System.Windows.Data.UpdateSourceTrigger.LostFocus));
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(RichTextBox), new FrameworkPropertyMetadata(String.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnTextPropertyChanged, CoerceTextProperty, true, UpdateSourceTrigger.LostFocus));
         public string Text
         {
             get { return (string)GetValue(TextProperty); }
