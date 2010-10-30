@@ -4,22 +4,38 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
+using Microsoft.Windows.Controls.Core;
 
-namespace Microsoft.Windows.Controls.Formatting
+namespace Microsoft.Windows.Controls
 {
     /// <summary>
-    /// Interaction logic for FormatToolbar.xaml
+    /// Interaction logic for RichTextBoxFormatBar.xaml
     /// </summary>
-    public partial class FormatToolbar : UserControl
+    public partial class RichTextBoxFormatBar : UserControl, IRichTextBoxFormatBar
     {
         #region Properties
 
-        public static readonly DependencyProperty RichTextBoxProperty = DependencyProperty.Register("RichTextBox", typeof(RichTextBox), typeof(FormatToolbar));
-        public RichTextBox RichTextBox
+        #region RichTextBox
+
+        public static readonly DependencyProperty RichTextBoxProperty = DependencyProperty.Register("RichTextBox", typeof(global::System.Windows.Controls.RichTextBox), typeof(RichTextBoxFormatBar), new PropertyMetadata(null, new PropertyChangedCallback(OnRichTextBoxPropertyChanged)));
+        public global::System.Windows.Controls.RichTextBox RichTextBox
         {
-            get { return (RichTextBox)GetValue(RichTextBoxProperty); }
+            get { return (global::System.Windows.Controls.RichTextBox)GetValue(RichTextBoxProperty); }
             set { SetValue(RichTextBoxProperty, value); }
         }
+
+        private static void OnRichTextBoxPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            RichTextBoxFormatBar formatBar = d as RichTextBoxFormatBar;
+            formatBar.HookupRichTextBoxEvents();
+        }
+
+        private void HookupRichTextBoxEvents()
+        {
+            RichTextBox.SelectionChanged += RichTextBox_SelectionChanged;
+        }
+
+        #endregion //RichTextBox
 
         public double[] FontSizes
         {
@@ -36,15 +52,13 @@ namespace Microsoft.Windows.Controls.Formatting
         }
 
         #endregion
-
+        
         #region Constructors
 
-        public FormatToolbar(RichTextBox richTextBox)
+        public RichTextBoxFormatBar()
         {
             InitializeComponent();
             Loaded += FormatToolbar_Loaded;
-            RichTextBox = richTextBox;
-            RichTextBox.SelectionChanged += RichTextBox_SelectionChanged;
         }
 
         #endregion //Constructors

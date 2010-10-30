@@ -4,7 +4,7 @@ using System.Windows.Media;
 using System.Windows.Documents;
 using System.Windows;
 
-namespace Microsoft.Windows.Controls.Formatting
+namespace Microsoft.Windows.Controls.Core
 {
     /// <summary>
     /// An adorner that can display one and only one UIElement.  

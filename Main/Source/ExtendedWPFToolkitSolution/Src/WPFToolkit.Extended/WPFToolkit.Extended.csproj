@@ -53,9 +53,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="RichTextBox\FormatToolbar\FormatToolbar.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="RichTextBoxFormatBar\RichTextBoxFormatBar.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -86,11 +86,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="BusyIndicator\VisualStates.BusyIndicator.cs" />
-    <Compile Include="RichTextBox\FormatToolbar\FormatToolbarManager.cs" />
-    <Compile Include="RichTextBox\FormatToolbar\FormatToolbar.xaml.cs">
-      <DependentUpon>FormatToolbar.xaml</DependentUpon>
+    <Compile Include="RichTextBoxFormatBar\IRichTextBoxFormatBar.cs" />
+    <Compile Include="RichTextBoxFormatBar\RichTextBoxFormatBar.xaml.cs">
+      <DependentUpon>RichTextBoxFormatBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RichTextBox\FormatToolbar\UIElementAdorner.cs" />
+    <Compile Include="RichTextBoxFormatBar\RichTextBoxFormatBarManager.cs" />
+    <Compile Include="Core\UIElementAdorner.cs" />
     <Compile Include="RichTextBox\Formatters\ITextFormatter.cs" />
     <Compile Include="RichTextBox\Formatters\PlainTextFormatter.cs" />
     <Compile Include="RichTextBox\Formatters\RtfFormatter.cs" />
@@ -115,13 +116,28 @@
     <Resource Include="MessageBox\Icons\Warning48.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="RichTextBox\FormatToolbar\Images\Bold16.png" />
-    <Resource Include="RichTextBox\FormatToolbar\Images\CenterAlign16.png" />
-    <Resource Include="RichTextBox\FormatToolbar\Images\Italic16.png" />
-    <Resource Include="RichTextBox\FormatToolbar\Images\JustifyAlign16.png" />
-    <Resource Include="RichTextBox\FormatToolbar\Images\LeftAlign16.png" />
-    <Resource Include="RichTextBox\FormatToolbar\Images\RightAlign16.png" />
-    <Resource Include="RichTextBox\FormatToolbar\Images\Underline16.png" />
+    <Resource Include="RichTextBoxFormatBar\Images\Bold16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\CenterAlign16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\Italic16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\JustifyAlign16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\LeftAlign16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\RightAlign16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\Underline16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="RichTextBox\FormatToolbar\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
