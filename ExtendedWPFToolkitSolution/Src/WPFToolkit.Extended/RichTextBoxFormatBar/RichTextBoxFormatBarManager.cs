@@ -93,7 +93,7 @@ namespace Microsoft.Windows.Controls
             _adorner = new UIElementAdorner<Control>(_richTextBox);
 
             formatBar.RichTextBox = _richTextBox;
-            _toolbar = formatBar;            
+            _toolbar = formatBar;
         }
 
         /// <summary>
@@ -116,28 +116,21 @@ namespace Microsoft.Windows.Controls
         /// <param name="adorningEditor"></param>
         private void PositionFormatBar(Control adorningEditor)
         {
-            Rect wordBoundary = _richTextBox.Selection.End.GetPositionAtOffset(0, LogicalDirection.Backward).GetCharacterRect(LogicalDirection.Backward);
+            Point mousePosition = Mouse.GetPosition(_richTextBox);
 
-            double left = wordBoundary.X;
-            double top = (wordBoundary.Y + wordBoundary.Height) - adorningEditor.ActualHeight;
+            double left = mousePosition.X;
+            double top = (mousePosition.Y - 15) - adorningEditor.ActualHeight;
 
-            //top boundary
+            //top
             if (top < 0)
             {
-                top = wordBoundary.Y + wordBoundary.Height;
+                top = mousePosition.Y + 10;
             }
 
             //right boundary
             if (left + adorningEditor.ActualWidth > _richTextBox.ActualWidth - 20)
             {
                 left = left - (adorningEditor.ActualWidth - (_richTextBox.ActualWidth - left));
-                top = wordBoundary.Y + wordBoundary.Height + 5;
-            }
-
-            //bottom boundary
-            if (top + adorningEditor.ActualHeight > _richTextBox.ActualHeight - 20)
-            {
-                top = wordBoundary.Y - (adorningEditor.ActualHeight + wordBoundary.Height);
             }
 
             _adorner.SetOffsets(left, top);
