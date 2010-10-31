@@ -130,7 +130,7 @@ namespace Microsoft.Windows.Controls
             //right boundary
             if (left + adorningEditor.ActualWidth > _richTextBox.ActualWidth - 20)
             {
-                left = left - adorningEditor.ActualWidth;
+                left = left - (adorningEditor.ActualWidth - (_richTextBox.ActualWidth - left));
                 top = wordBoundary.Y + wordBoundary.Height + 5;
             }
 
