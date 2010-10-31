@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using Microsoft.Windows.Controls.Core;
+using System.Windows.Input;
 
 namespace Microsoft.Windows.Controls
 {
@@ -51,10 +52,10 @@ namespace Microsoft.Windows.Controls
 
         #region Event Handlers
 
-        void RichTextBox_SelectionChanged(object sender, EventArgs e)
+        void RichTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             TextRange selectedText = new TextRange(_richTextBox.Selection.Start, _richTextBox.Selection.End);
-            if (selectedText.Text.Length > 0 && !String.IsNullOrWhiteSpace(selectedText.Text)) 
+            if (selectedText.Text.Length > 0 && !String.IsNullOrWhiteSpace(selectedText.Text))
             {
                 ShowAdorner();
             }
@@ -62,6 +63,16 @@ namespace Microsoft.Windows.Controls
             {
                 HideAdorner();
             }
+        }
+
+        void RichTextBox_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            //if the mouse moves outside the richtextbox bounds hide the adorner
+            //though this deosn't always work, especially if the user moves the mouse very quickly.
+            //need to find a better solution, but this will work for now.
+            Point p = e.GetPosition(_richTextBox);
+            if (p.X <= 5.0 || p.X >= _richTextBox.ActualWidth - 5 || p.Y <= 3.0 || p.Y >= _richTextBox.ActualHeight - 3)
+                HideAdorner();
         }
 
         #endregion //Event Handlers
@@ -77,23 +88,12 @@ namespace Microsoft.Windows.Controls
         {
             _richTextBox = richTextBox;
             _richTextBox.PreviewMouseMove += RichTextBox_PreviewMouseMove;
-            _richTextBox.Selection.Changed += RichTextBox_SelectionChanged;
+            _richTextBox.PreviewMouseLeftButtonUp += RichTextBox_PreviewMouseLeftButtonUp;
 
             _adorner = new UIElementAdorner<Control>(_richTextBox);
 
             formatBar.RichTextBox = _richTextBox;
-            _toolbar = formatBar;
-            
-        }
-
-        void RichTextBox_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            //if the mouse moves outside the richtextbox bounds hide the adorner
-            //though this deosn't always work, especially if the user moves the mouse very quickly.
-            //need to find a better solution, but this will work for now.
-            Point p = e.GetPosition(_richTextBox);
-            if (p.X <= 5.0 || p.X >= _richTextBox.ActualWidth - 5 || p.Y <= 3.0 || p.Y >= _richTextBox.ActualHeight - 3)
-                HideAdorner();
+            _toolbar = formatBar;            
         }
 
         /// <summary>
