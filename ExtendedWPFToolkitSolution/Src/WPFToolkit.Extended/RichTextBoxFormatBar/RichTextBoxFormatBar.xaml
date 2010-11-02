@@ -168,30 +168,30 @@
 
                 <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
                     <ToggleButton x:Name="_btnBold" Style="{StaticResource FormatBarToggleButtonStyle}"
-                    Command="EditingCommands.ToggleBold" CommandTarget="{Binding ElementName=_window, Path=RichTextBox}">
+                    Command="EditingCommands.ToggleBold" CommandTarget="{Binding ElementName=_window, Path=Target}">
                         <Image Source="/WPFToolkit.Extended;component/RichTextBoxFormatBar/Images/Bold16.png" />
                     </ToggleButton>
                     <ToggleButton x:Name="_btnItalic" Style="{StaticResource FormatBarToggleButtonStyle}"
-                    Command="{x:Static EditingCommands.ToggleItalic}" CommandTarget="{Binding ElementName=_window, Path=RichTextBox}">
+                    Command="{x:Static EditingCommands.ToggleItalic}" CommandTarget="{Binding ElementName=_window, Path=Target}">
                         <Image Source="/WPFToolkit.Extended;component/RichTextBoxFormatBar/Images/Italic16.png" />
                     </ToggleButton>
                     <ToggleButton x:Name="_btnUnderline" Style="{StaticResource FormatBarToggleButtonStyle}"
-                    Command="{x:Static EditingCommands.ToggleUnderline}" CommandTarget="{Binding ElementName=_window, Path=RichTextBox}">
+                    Command="{x:Static EditingCommands.ToggleUnderline}" CommandTarget="{Binding ElementName=_window, Path=Target}">
                         <Image Source="/WPFToolkit.Extended;component/RichTextBoxFormatBar/Images/Underline16.png" />
                     </ToggleButton>
 
                     <Separator />
 
                     <RadioButton x:Name="_btnAlignLeft" Style="{StaticResource FormatBarToggleButtonStyle}"
-                             Command="{x:Static EditingCommands.AlignLeft}"  CommandTarget="{Binding ElementName=_window, Path=RichTextBox}" >
+                             Command="{x:Static EditingCommands.AlignLeft}"  CommandTarget="{Binding ElementName=_window, Path=Target}" >
                         <Image Source="/WPFToolkit.Extended;component/RichTextBoxFormatBar/Images/LeftAlign16.png" />
                     </RadioButton>
                     <RadioButton x:Name="_btnAlignCenter" Style="{StaticResource FormatBarToggleButtonStyle}"
-                             Command="{x:Static EditingCommands.AlignCenter}"  CommandTarget="{Binding ElementName=_window, Path=RichTextBox}" >
+                             Command="{x:Static EditingCommands.AlignCenter}"  CommandTarget="{Binding ElementName=_window, Path=Target}" >
                         <Image Source="/WPFToolkit.Extended;component/RichTextBoxFormatBar/Images/CenterAlign16.png" />
                     </RadioButton>
                     <RadioButton x:Name="_btnAlignRight" Style="{StaticResource FormatBarToggleButtonStyle}"
-                             Command="{x:Static EditingCommands.AlignRight}"  CommandTarget="{Binding ElementName=_window, Path=RichTextBox}" >
+                             Command="{x:Static EditingCommands.AlignRight}"  CommandTarget="{Binding ElementName=_window, Path=Target}" >
                         <Image Source="/WPFToolkit.Extended;component/RichTextBoxFormatBar/Images/RightAlign16.png" />
                     </RadioButton>
 
