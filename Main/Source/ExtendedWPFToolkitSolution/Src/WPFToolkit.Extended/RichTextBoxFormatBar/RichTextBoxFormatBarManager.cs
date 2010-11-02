@@ -52,17 +52,22 @@ namespace Microsoft.Windows.Controls
 
         #region Event Handlers
 
-        void RichTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        void RichTextBox_MouseButtonUp(object sender, MouseButtonEventArgs e)
         {
-            TextRange selectedText = new TextRange(_richTextBox.Selection.Start, _richTextBox.Selection.End);
-            if (selectedText.Text.Length > 0 && !String.IsNullOrWhiteSpace(selectedText.Text))
+            if (e.LeftButton == MouseButtonState.Released)
             {
-                ShowAdorner();
+                TextRange selectedText = new TextRange(_richTextBox.Selection.Start, _richTextBox.Selection.End);
+                if (selectedText.Text.Length > 0 && !String.IsNullOrWhiteSpace(selectedText.Text))
+                {
+                    ShowAdorner();
+                }
+                else
+                {
+                    HideAdorner();
+                }
             }
-            else
-            {
-                HideAdorner();
-            }
+
+            e.Handled = true;
         }
 
         void RichTextBox_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -96,7 +101,10 @@ namespace Microsoft.Windows.Controls
         {
             _richTextBox = richTextBox;
             _richTextBox.PreviewMouseMove += RichTextBox_PreviewMouseMove;
-            _richTextBox.PreviewMouseLeftButtonUp += RichTextBox_PreviewMouseLeftButtonUp;
+            //we cannot use the PreviewMouseLeftButtonUp event because of selection bugs.
+            //we cannot use the MouseLeftButtonUp event because it is handled by the RichTextBox and does not bubble up to here, so we must
+            //add a hander to the MouseUpEvent using the Addhandler syntax, and specify to listen for handled events too.
+            _richTextBox.AddHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(RichTextBox_MouseButtonUp), true);
             _richTextBox.TextChanged += RichTextBox_TextChanged;
 
             _adorner = new UIElementAdorner<Control>(_richTextBox);
