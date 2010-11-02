@@ -75,6 +75,14 @@ namespace Microsoft.Windows.Controls
                 HideAdorner();
         }
 
+        void RichTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            //this fixes the bug when applying text transformations the text would lose it's highlight.  That was because the RichTextBox was losing focus
+            //so we just give it focus again and it seems to do the trick of re-highlighting it.
+            if (!_richTextBox.IsFocused)
+                _richTextBox.Focus();
+        }
+
         #endregion //Event Handlers
 
         #region Methods
@@ -89,6 +97,7 @@ namespace Microsoft.Windows.Controls
             _richTextBox = richTextBox;
             _richTextBox.PreviewMouseMove += RichTextBox_PreviewMouseMove;
             _richTextBox.PreviewMouseLeftButtonUp += RichTextBox_PreviewMouseLeftButtonUp;
+            _richTextBox.TextChanged += RichTextBox_TextChanged;
 
             _adorner = new UIElementAdorner<Control>(_richTextBox);
 
