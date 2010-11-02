@@ -92,7 +92,7 @@ namespace Microsoft.Windows.Controls
 
             _adorner = new UIElementAdorner<Control>(_richTextBox);
 
-            formatBar.RichTextBox = _richTextBox;
+            formatBar.Target = _richTextBox;
             _toolbar = formatBar;
         }
 

@@ -17,11 +17,11 @@ namespace Microsoft.Windows.Controls
 
         #region RichTextBox
 
-        public static readonly DependencyProperty RichTextBoxProperty = DependencyProperty.Register("RichTextBox", typeof(global::System.Windows.Controls.RichTextBox), typeof(RichTextBoxFormatBar), new PropertyMetadata(null, new PropertyChangedCallback(OnRichTextBoxPropertyChanged)));
-        public global::System.Windows.Controls.RichTextBox RichTextBox
+        public static readonly DependencyProperty TargetProperty = DependencyProperty.Register("Target", typeof(global::System.Windows.Controls.RichTextBox), typeof(RichTextBoxFormatBar), new PropertyMetadata(null, OnRichTextBoxPropertyChanged));
+        public global::System.Windows.Controls.RichTextBox Target
         {
-            get { return (global::System.Windows.Controls.RichTextBox)GetValue(RichTextBoxProperty); }
-            set { SetValue(RichTextBoxProperty, value); }
+            get { return (global::System.Windows.Controls.RichTextBox)GetValue(TargetProperty); }
+            set { SetValue(TargetProperty, value); }
         }
 
         private static void OnRichTextBoxPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -32,12 +32,12 @@ namespace Microsoft.Windows.Controls
 
         private void HookupRichTextBoxEvents()
         {
-            RichTextBox.SelectionChanged += RichTextBox_SelectionChanged;
+            Target.SelectionChanged += RichTextBox_SelectionChanged;
         }
 
         #endregion //RichTextBox
 
-        public double[] FontSizes
+        public static double[] FontSizes
         {
             get
             {
@@ -67,7 +67,7 @@ namespace Microsoft.Windows.Controls
 
         void FormatToolbar_Loaded(object sender, RoutedEventArgs e)
         {
-            _cmbFontFamilies.ItemsSource = System.Windows.Media.Fonts.SystemFontFamilies;
+            _cmbFontFamilies.ItemsSource = Fonts.SystemFontFamilies;
             _cmbFontSizes.ItemsSource = FontSizes;
         }
 
@@ -122,13 +122,13 @@ namespace Microsoft.Windows.Controls
 
         void UpdateItemCheckedState(ToggleButton button, DependencyProperty formattingProperty, object expectedValue)
         {
-            object currentValue = RichTextBox.Selection.GetPropertyValue(formattingProperty);
+            object currentValue = Target.Selection.GetPropertyValue(formattingProperty);
             button.IsChecked = (currentValue == DependencyProperty.UnsetValue) ? false : currentValue != null && currentValue.Equals(expectedValue);
         }
 
         private void UpdateSelectedFontFamily()
         {
-            object value = RichTextBox.Selection.GetPropertyValue(TextElement.FontFamilyProperty);
+            object value = Target.Selection.GetPropertyValue(TextElement.FontFamilyProperty);
             FontFamily currentFontFamily = (FontFamily)((value == DependencyProperty.UnsetValue) ? null : value);
             if (currentFontFamily != null)
             {
@@ -138,7 +138,7 @@ namespace Microsoft.Windows.Controls
 
         private void UpdateSelectedFontSize()
         {
-            object value = RichTextBox.Selection.GetPropertyValue(TextElement.FontSizeProperty);
+            object value = Target.Selection.GetPropertyValue(TextElement.FontSizeProperty);
             _cmbFontSizes.SelectedValue = (value == DependencyProperty.UnsetValue) ? null : value;
         }
 
@@ -147,13 +147,13 @@ namespace Microsoft.Windows.Controls
             if (value == null)
                 return;
 
-            RichTextBox.Selection.ApplyPropertyValue(formattingProperty, value);
+            Target.Selection.ApplyPropertyValue(formattingProperty, value);
         }
 
         private void ProcessMove(DragDeltaEventArgs e)
         {
-            AdornerLayer layer = AdornerLayer.GetAdornerLayer(RichTextBox);
-            UIElementAdorner<Control> adorner = layer.GetAdorners(RichTextBox)[0] as UIElementAdorner<Control>;
+            AdornerLayer layer = AdornerLayer.GetAdornerLayer(Target);
+            UIElementAdorner<Control> adorner = layer.GetAdorners(Target)[0] as UIElementAdorner<Control>;
             adorner.SetOffsets(adorner.OffsetLeft + e.HorizontalChange, adorner.OffsetTop + e.VerticalChange);
         }
 
