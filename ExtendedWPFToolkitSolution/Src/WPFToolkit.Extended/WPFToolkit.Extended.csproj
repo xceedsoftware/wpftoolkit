@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BusyIndicator\BusyIndicator.cs" />
+    <Compile Include="ButtonSpinner\ButtonSpinner.cs" />
     <Compile Include="ChildWindow\ChildWindow.cs" />
     <Compile Include="ChildWindow\VisualStates.ChildWindow.cs" />
     <Compile Include="ChildWindow\WindowState.cs" />
@@ -71,6 +72,10 @@
     <Compile Include="ColorPicker\HsvColor.cs" />
     <Compile Include="ColorPicker\ColorUtilities.cs" />
     <Compile Include="ColorPicker\ColorSpectrumSlider.cs" />
+    <Compile Include="Core\Primitives\SpinDirection.cs" />
+    <Compile Include="Core\Primitives\SpinEventArgs.cs" />
+    <Compile Include="Core\Primitives\Spinner.cs" />
+    <Compile Include="Core\Primitives\ValidSpinDirections.cs" />
     <Compile Include="MessageBox\MessageBox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
