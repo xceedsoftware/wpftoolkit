@@ -250,6 +250,7 @@
         <Setter Property="IsEnabled" Value="true" />
         <Setter Property="MinWidth" Value="350" />
         <Setter Property="MinHeight" Value="50" />
+        <Setter Property="MaxHeight" Value="250" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
         <Setter Property="WindowBorderBrush" Value="{StaticResource WindowDarkBrush}" />
@@ -349,13 +350,15 @@
                                             <Image x:Name="MessageBoxImage" VerticalAlignment="Top" SnapsToDevicePixels="True" Stretch="None"  Margin="-6,-1,10,-4" Source="{TemplateBinding ImageSource}"></Image>
 
                                             <!-- Message Text -->
-                                            <TextBlock x:Name="MessageText" Grid.Column="1" TextWrapping="Wrap" VerticalAlignment="Center" MaxWidth="450"
-                                                       Text="{TemplateBinding Text}" 
-                                                       FontFamily="{TemplateBinding FontFamily}"
-                                                       FontSize="{TemplateBinding FontSize}"
-                                                       FontStyle="{TemplateBinding FontStyle}"
-                                                       FontWeight="{TemplateBinding FontWeight}"
-                                                       Foreground="{TemplateBinding Foreground}"/>
+                                            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                                                <TextBlock x:Name="MessageText" TextWrapping="Wrap" VerticalAlignment="Center" MaxWidth="450"
+                                                           Text="{TemplateBinding Text}" 
+                                                           FontFamily="{TemplateBinding FontFamily}"
+                                                           FontSize="{TemplateBinding FontSize}"
+                                                           FontStyle="{TemplateBinding FontStyle}"
+                                                           FontWeight="{TemplateBinding FontWeight}"
+                                                           Foreground="{TemplateBinding Foreground}"/>
+                                            </ScrollViewer>
 
                                         </Grid>
 
