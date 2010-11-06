@@ -68,13 +68,8 @@ namespace Microsoft.Windows.Controls
 
         private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            NumericUpDown nud = (NumericUpDown)d;
-            nud.SyncTextAndValueProperties(e.Property, e.NewValue);
-        }
-
-        protected virtual void OnTextChanged(string oldValue, string newValue)
-        {
-
+            UpDownBase<T> udb = (UpDownBase<T>)d;
+            udb.SyncTextAndValueProperties(e.Property, e.NewValue);
         }
 
         #endregion //Text
@@ -110,17 +105,8 @@ namespace Microsoft.Windows.Controls
             get { return _spinner; }
             private set
             {
-                if (_spinner != null)
-                {
-                    _spinner.Spin -= OnSpinnerSpin;
-                }
-
                 _spinner = value;
-
-                if (_spinner != null)
-                {
-                    _spinner.Spin += OnSpinnerSpin;
-                }
+                _spinner.Spin += OnSpinnerSpin;
             }
         }
 
@@ -128,9 +114,7 @@ namespace Microsoft.Windows.Controls
 
         #region Constructors
 
-        protected UpDownBase()
-        {
-        }
+        protected UpDownBase() { }
 
         #endregion //Constructors
 
@@ -161,6 +145,11 @@ namespace Microsoft.Windows.Controls
                     {
                         DoDecrement();
                         e.Handled = true;
+                        break;
+                    }
+                case Key.Enter:
+                    {
+                        SyncTextAndValueProperties(UpDownBase<T>.TextProperty, TextBox.Text);
                         break;
                     }
             }
@@ -262,7 +251,7 @@ namespace Microsoft.Windows.Controls
             }
         }
 
-        private void SyncTextAndValueProperties(DependencyProperty p, object newValue)
+        protected void SyncTextAndValueProperties(DependencyProperty p, object newValue)
         {
             //prevents recursive syncing properties
             if (_isSyncingTextAndValueProperties)
@@ -270,14 +259,15 @@ namespace Microsoft.Windows.Controls
 
             _isSyncingTextAndValueProperties = true;
 
-            if (NumericUpDown.ValueProperty == p)
-            {
-                SetValue(NumericUpDown.TextProperty, FormatValue());
-            }
-            else if (NumericUpDown.TextProperty == p)
+            //this only occures when the user typed in the value
+            if (NumericUpDown.TextProperty == p)
             {
                 SetValue(NumericUpDown.ValueProperty, ParseValue(newValue.ToString()));
             }
+
+            //we need to update the text no matter what because the user could have used the spin buttons to change dthe value
+            //or typed in the textbox so we need to reformat the entered value.
+            SetValue(NumericUpDown.TextProperty, FormatValue());
 
             _isSyncingTextAndValueProperties = false;
         }
