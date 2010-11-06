@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace Microsoft.Windows.Controls.Primitives
+namespace Microsoft.Windows.Controls
 {
     /// <summary>
     /// Provides data for the Spinner.Spin event.

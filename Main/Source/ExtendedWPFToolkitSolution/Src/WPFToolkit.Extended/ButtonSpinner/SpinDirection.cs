@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Microsoft.Windows.Controls.Primitives
+namespace Microsoft.Windows.Controls
 {
     /// <summary>
     /// Represents spin directions that could be initiated by the end-user.

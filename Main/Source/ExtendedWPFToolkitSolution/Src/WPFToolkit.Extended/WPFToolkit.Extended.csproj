@@ -72,11 +72,12 @@
     <Compile Include="ColorPicker\HsvColor.cs" />
     <Compile Include="ColorPicker\ColorUtilities.cs" />
     <Compile Include="ColorPicker\ColorSpectrumSlider.cs" />
-    <Compile Include="Core\Primitives\SpinDirection.cs" />
-    <Compile Include="Core\Primitives\SpinEventArgs.cs" />
-    <Compile Include="Core\Primitives\Spinner.cs" />
-    <Compile Include="Core\Primitives\ValidSpinDirections.cs" />
+    <Compile Include="ButtonSpinner\SpinDirection.cs" />
+    <Compile Include="ButtonSpinner\SpinEventArgs.cs" />
+    <Compile Include="ButtonSpinner\Spinner.cs" />
+    <Compile Include="ButtonSpinner\ValidSpinDirections.cs" />
     <Compile Include="MessageBox\MessageBox.cs" />
+    <Compile Include="NumericUpDown\NumericUpDown.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -102,6 +103,7 @@
     <Compile Include="RichTextBox\Formatters\RtfFormatter.cs" />
     <Compile Include="RichTextBox\Formatters\XamlFormatter.cs" />
     <Compile Include="RichTextBox\RichTextBox.cs" />
+    <Compile Include="UpDownBase\UpDownBase.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\VisualStates.MessageBox.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -142,6 +144,7 @@
     <Resource Include="RichTextBoxFormatBar\Images\Underline16.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Core\Primitives\" />
     <Folder Include="RichTextBox\FormatToolbar\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

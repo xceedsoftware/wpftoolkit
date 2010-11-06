@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows;
 
-namespace Microsoft.Windows.Controls.Primitives
+namespace Microsoft.Windows.Controls
 {
     /// <summary>
     /// Base class for controls that represents controls that can spin.

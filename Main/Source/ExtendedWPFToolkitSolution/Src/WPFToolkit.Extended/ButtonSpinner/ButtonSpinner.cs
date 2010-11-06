@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Controls.Primitives;
-using Microsoft.Windows.Controls.Primitives;
 
 namespace Microsoft.Windows.Controls
 {
