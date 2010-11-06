@@ -11,7 +11,7 @@ namespace Microsoft.Windows.Controls
 
         #region Minimum
 
-        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register("Minimum", typeof(double), typeof(NumericUpDown), new PropertyMetadata(0d, OnMinimumPropertyChanged));
+        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register("Minimum", typeof(double), typeof(NumericUpDown), new PropertyMetadata(Double.MinValue, OnMinimumPropertyChanged));
         public double Minimum
         {
             get { return (double)GetValue(MinimumProperty); }
@@ -29,7 +29,7 @@ namespace Microsoft.Windows.Controls
 
         #region Maximum
 
-        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register("Maximum", typeof(double), typeof(NumericUpDown), new PropertyMetadata(100d, OnMaximumPropertyChanged));
+        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register("Maximum", typeof(double), typeof(NumericUpDown), new PropertyMetadata(Double.MaxValue, OnMaximumPropertyChanged));
         public double Maximum
         {
             get { return (double)GetValue(MaximumProperty); }
@@ -113,7 +113,11 @@ namespace Microsoft.Windows.Controls
 
         protected override double ParseValue(string text)
         {
-            return double.Parse(text, NumberStyles.Any, CultureInfo.CurrentCulture);
+            NumberFormatInfo info = NumberFormatInfo.GetInstance(CultureInfo.CurrentCulture);
+            if (text.Contains(info.PercentSymbol))
+                return TryParcePercent(text, info);
+            else
+                return TryParceDouble(text, info);
         }
 
         protected internal override string FormatValue()
@@ -156,6 +160,26 @@ namespace Microsoft.Windows.Controls
             {
                 Spinner.ValidSpinDirection = validDirections;
             }
+        }
+
+        private double TryParcePercent(string text, NumberFormatInfo info)
+        {
+            double result;
+            text = text.Replace(info.PercentSymbol, null);
+            result = TryParceDouble(text, info);
+            return result / 100;
+        }
+
+        private double TryParceDouble(string text, NumberFormatInfo info)
+        {
+            double result;
+            if (!double.TryParse(text, NumberStyles.Any, info, out result))
+            {
+                //an error occured now lets reset our value, text, and the text in the textbox
+                result = Value;
+                TextBox.Text = Text = FormatValue();
+            }
+            return result;
         }
 
         #endregion //Methods

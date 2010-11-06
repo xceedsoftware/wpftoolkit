@@ -1059,17 +1059,17 @@
                 <ControlTemplate TargetType="{x:Type local:ButtonSpinner}">
                     <Grid>
                         <Border x:Name="ElementContainer" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
-                            <DockPanel>
+                            <DockPanel Focusable="False">
                                 <Grid DockPanel.Dock="Right">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="1" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <RepeatButton x:Name="IncreaseButton" SnapsToDevicePixels="True" Grid.Row="0" Focusable="False" Style="{StaticResource SpinButtonStyle}" ContentTemplate="{StaticResource IncreaseGlyph}" ClickMode="Press" />
-                                    <RepeatButton x:Name="DecreaseButton" SnapsToDevicePixels="True" Grid.Row="2" Focusable="False" Style="{StaticResource SpinButtonStyle}" ContentTemplate="{StaticResource DecreaseGlyph}" ClickMode="Press" />
+                                    <RepeatButton x:Name="IncreaseButton" SnapsToDevicePixels="True" Grid.Row="0"  Style="{StaticResource SpinButtonStyle}" ContentTemplate="{StaticResource IncreaseGlyph}" ClickMode="Press" />
+                                    <RepeatButton x:Name="DecreaseButton" SnapsToDevicePixels="True" Grid.Row="2" Style="{StaticResource SpinButtonStyle}" ContentTemplate="{StaticResource DecreaseGlyph}" ClickMode="Press" />
                                 </Grid>
-                                <ContentControl x:Name="presentationSite"
+                                <ContentControl x:Name="presentationSite" Focusable="False"
                                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                 VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                                 Content="{TemplateBinding Content}" />
@@ -1089,7 +1089,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:NumericUpDown}">
-                    <local:ButtonSpinner x:Name="Spinner">
+                    <local:ButtonSpinner x:Name="Spinner" IsTabStop="False">
                         <TextBox x:Name="Text" BorderThickness="0" 
                                  FontFamily="{TemplateBinding FontFamily}" 
                                  FontSize="{TemplateBinding FontSize}" 
