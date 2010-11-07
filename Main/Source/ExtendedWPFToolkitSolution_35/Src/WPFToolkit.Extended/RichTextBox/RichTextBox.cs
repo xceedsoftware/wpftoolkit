@@ -10,7 +10,7 @@ namespace Microsoft.Windows.Controls
         #region Private Members
 
         private bool _textHasLoaded;
-        bool isInvokePending;
+        private bool isInvokePending;
 
         #endregion //Private Members
 
@@ -24,36 +24,16 @@ namespace Microsoft.Windows.Controls
         public RichTextBox(System.Windows.Documents.FlowDocument document)
             : base(document)
         {
-            
-        }  
-       
+
+        }
+
         #endregion //Constructors
 
         #region Properties
 
-        private ITextFormatter _textFormatter;
-        /// <summary>
-        /// The ITextFormatter the is used to format the text of the RichTextBox.
-        /// Deafult formatter is the RtfFormatter
-        /// </summary>
-        public ITextFormatter TextFormatter
-        {
-            get
-            {
-                if (_textFormatter == null)
-                    _textFormatter = new RtfFormatter(); //default is rtf
-
-                return _textFormatter;
-            }
-            set
-            {
-                _textFormatter = value;
-            }
-        }
-
         #region Text
 
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(RichTextBox), new FrameworkPropertyMetadata(String.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnTextPropertyChanged), new CoerceValueCallback(CoerceTextProperty), true, System.Windows.Data.UpdateSourceTrigger.LostFocus));
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(RichTextBox), new FrameworkPropertyMetadata(String.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnTextPropertyChanged, CoerceTextProperty, true, UpdateSourceTrigger.LostFocus));
         public string Text
         {
             get { return (string)GetValue(TextProperty); }
@@ -77,6 +57,30 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Text
+
+        #region TextFormatter
+
+        private ITextFormatter _textFormatter;
+        /// <summary>
+        /// The ITextFormatter the is used to format the text of the RichTextBox.
+        /// Deafult formatter is the RtfFormatter
+        /// </summary>
+        public ITextFormatter TextFormatter
+        {
+            get
+            {
+                if (_textFormatter == null)
+                    _textFormatter = new RtfFormatter(); //default is rtf
+
+                return _textFormatter;
+            }
+            set
+            {
+                _textFormatter = value;
+            }
+        }
+
+        #endregion //TextFormatter
 
         #endregion //Properties
 
@@ -112,6 +116,7 @@ namespace Microsoft.Windows.Controls
         private void RichTextBox_Loaded(object sender, RoutedEventArgs e)
         {
             Binding binding = BindingOperations.GetBinding(this, TextProperty);
+
             if (binding != null)
             {
                 if (binding.UpdateSourceTrigger == UpdateSourceTrigger.Default || binding.UpdateSourceTrigger == UpdateSourceTrigger.LostFocus)
