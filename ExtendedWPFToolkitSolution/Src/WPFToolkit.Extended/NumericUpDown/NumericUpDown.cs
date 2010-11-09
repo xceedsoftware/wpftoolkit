@@ -19,11 +19,14 @@ namespace Microsoft.Windows.Controls
 
         private static void OnMinimumPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            NumericUpDown nud = d as NumericUpDown;
+            nud.SetValidSpinDirection();
         }
 
         protected virtual void OnMinimumChanged(double oldValue, double newValue)
         {
         }
+
         #endregion Minimum
 
         #region Maximum
@@ -37,6 +40,8 @@ namespace Microsoft.Windows.Controls
 
         private static void OnMaximumPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            NumericUpDown nud = d as NumericUpDown;
+            nud.SetValidSpinDirection();
         }
 
         protected virtual void OnMaximumChanged(double oldValue, double newValue)
