@@ -76,6 +76,11 @@
     <Compile Include="ButtonSpinner\SpinEventArgs.cs" />
     <Compile Include="ButtonSpinner\Spinner.cs" />
     <Compile Include="ButtonSpinner\ValidSpinDirections.cs" />
+    <Compile Include="Magnifier\Converters\BorderThicknessToStrokeThicknessConverter.cs" />
+    <Compile Include="Magnifier\Converters\RadiusConverter.cs" />
+    <Compile Include="Magnifier\Magnifier.cs" />
+    <Compile Include="Magnifier\MagnifierAdorner.cs" />
+    <Compile Include="Magnifier\MagnifierManager.cs" />
     <Compile Include="MessageBox\MessageBox.cs" />
     <Compile Include="NumericUpDown\NumericUpDown.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
