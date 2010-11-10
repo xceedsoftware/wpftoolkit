@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel;
+using System.Windows.Shapes;
 
 namespace Microsoft.Windows.Controls
 {
@@ -14,13 +15,16 @@ namespace Microsoft.Windows.Controls
     {
         #region Private Members
 
+        private Grid _root;
         private TranslateTransform _moveTransform = new TranslateTransform();
         private bool _startupPositionInitialized;
         private bool _isMouseCaptured;
         private Point _clickPoint;
         private Point _oldPosition;
         private Border _dragWidget;
-        private FrameworkElement _parent;
+        private FrameworkElement _parentContainer;
+        private Rectangle _modalLayer = new Rectangle();
+        private Canvas _modalLayerPanel = new Canvas();
 
         #endregion //Private Members
 
@@ -33,15 +37,8 @@ namespace Microsoft.Windows.Controls
 
         public ChildWindow()
         {
-            LayoutUpdated += (o, e) =>
-            {
-                //we only want to set the start position if this is the first time the control has bee initialized
-                if (!_startupPositionInitialized)
-                {
-                    SetStartupPosition();
-                    _startupPositionInitialized = true;
-                }
-            };
+            _modalLayer.Fill = new SolidColorBrush(Colors.Gray);
+            _modalLayer.Opacity = 0.5;
         }
 
         #endregion //Constructors
@@ -64,21 +61,27 @@ namespace Microsoft.Windows.Controls
             if (CloseButton != null)
                 CloseButton.Click += (o, e) => Close();
 
-            Overlay = GetTemplateChild("PART_Overlay") as Panel;
+            //Overlay = GetTemplateChild("PART_Overlay") as Panel;
             WindowRoot = GetTemplateChild("PART_WindowRoot") as Grid;
 
             WindowRoot.RenderTransform = _moveTransform;
 
             //TODO: move somewhere else
-            _parent = VisualTreeHelper.GetParent(this) as FrameworkElement;
-            _parent.SizeChanged += (o, ea) =>
+            _parentContainer = VisualTreeHelper.GetParent(this) as FrameworkElement;
+            _parentContainer.LayoutUpdated += ParentContainer_LayoutUpdated;
+            _parentContainer.SizeChanged += (o, ea) =>
             {
-                Overlay.Height = ea.NewSize.Height;
-                Overlay.Width = ea.NewSize.Width;
+                _modalLayer.Height = ea.NewSize.Height;
+                _modalLayer.Width = ea.NewSize.Width;
             };
+
+            _root = GetTemplateChild("Root") as Grid;
+            _root.Children.Add(_modalLayerPanel);
 
             ChangeVisualState();
         }
+
+
 
         #endregion //Base Class Overrides
 
@@ -86,7 +89,6 @@ namespace Microsoft.Windows.Controls
 
         #region Internal Properties
 
-        internal Panel Overlay { get; private set; }
         internal Grid WindowRoot { get; private set; }
         internal Thumb DragWidget { get; private set; }
         internal Button MinimizeButton { get; private set; }
@@ -132,11 +134,32 @@ namespace Microsoft.Windows.Controls
             set { SetValue(IconSourceProperty, value); }
         }
 
-        public static readonly DependencyProperty IsModalProperty = DependencyProperty.Register("IsModal", typeof(bool), typeof(ChildWindow), new UIPropertyMetadata(true));
+        public static readonly DependencyProperty IsModalProperty = DependencyProperty.Register("IsModal", typeof(bool), typeof(ChildWindow), new UIPropertyMetadata(false, new PropertyChangedCallback(OnIsModalPropertyChanged)));
         public bool IsModal
         {
             get { return (bool)GetValue(IsModalProperty); }
             set { SetValue(IsModalProperty, value); }
+        }
+
+        private static void OnIsModalPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ChildWindow childWindow = (ChildWindow)d;
+            if ((bool)e.NewValue)
+                childWindow.ShowModalLayer();
+            else
+                childWindow.HideModalLayer();
+        }
+
+        private void ShowModalLayer()
+        {
+
+            _modalLayerPanel.Children.Add(_modalLayer);
+            BringToFront();
+        }
+
+        private void HideModalLayer()
+        {
+
         }
 
         #region Left
@@ -301,6 +324,19 @@ namespace Microsoft.Windows.Controls
             }
         }
 
+        private void ParentContainer_LayoutUpdated(object sender, EventArgs e)
+        {
+            if (DesignerProperties.GetIsInDesignMode(this))
+                return;
+
+            //we only want to set the start position if this is the first time the control has bee initialized
+            if (!_startupPositionInitialized)
+            {
+                SetStartupPosition();
+                _startupPositionInitialized = true;
+            }
+        }
+
         #endregion //Event Handlers
 
         #region Methods
@@ -309,16 +345,16 @@ namespace Microsoft.Windows.Controls
 
         private double GetRestrictedLeft()
         {
-            if (_parent != null)
+            if (_parentContainer != null)
             {
                 if (Left < 0)
                 {
                     return 0;
                 }
 
-                if (Left + WindowRoot.ActualWidth > _parent.ActualWidth)
+                if (Left + WindowRoot.ActualWidth > _parentContainer.ActualWidth)
                 {
-                    return _parent.ActualWidth - WindowRoot.ActualWidth;
+                    return _parentContainer.ActualWidth - WindowRoot.ActualWidth;
                 }
             }
 
@@ -327,16 +363,16 @@ namespace Microsoft.Windows.Controls
 
         private double GetRestrictedTop()
         {
-            if (_parent != null)
+            if (_parentContainer != null)
             {
                 if (Top < 0)
                 {
                     return 0;
                 }
 
-                if (Top + WindowRoot.ActualHeight > _parent.ActualHeight)
+                if (Top + WindowRoot.ActualHeight > _parentContainer.ActualHeight)
                 {
-                    return _parent.ActualHeight - WindowRoot.ActualHeight;
+                    return _parentContainer.ActualHeight - WindowRoot.ActualHeight;
                 }
             }
 
@@ -383,14 +419,14 @@ namespace Microsoft.Windows.Controls
         private void ExecuteOpen()
         {
             _dialogResult = null; //reset the dialogResult to null each time the window is opened
-            SetZIndex();
+            SetZIndex(); //TODO: replace with BringToFront
         }
 
         private void SetZIndex()
         {
-            if (_parent != null)
+            if (_parentContainer != null)
             {
-                int parentIndex = (int)_parent.GetValue(Canvas.ZIndexProperty);
+                int parentIndex = (int)_parentContainer.GetValue(Canvas.ZIndexProperty);
                 this.SetValue(Canvas.ZIndexProperty, ++parentIndex);
             }
             else
@@ -399,19 +435,32 @@ namespace Microsoft.Windows.Controls
             }
         }
 
+        private void BringToFront()
+        {
+            int zIndex = 0;
+
+            this.SetValue(Canvas.ZIndexProperty, 1);
+
+            Canvas.SetZIndex(this, zIndex += 99);
+
+            //if modal
+
+        }
+
         private void SetStartupPosition()
         {
             CenterChildWindow();
+            BringToFront();
         }
 
         private void CenterChildWindow()
         {
             _moveTransform.X = _moveTransform.Y = 0;
 
-            if (_parent != null)
+            if (_parentContainer != null)
             {
-                Left = (_parent.ActualWidth - WindowRoot.ActualWidth) / 2.0;
-                Top = (_parent.ActualHeight - WindowRoot.ActualHeight) / 2.0;
+                Left = (_parentContainer.ActualWidth - WindowRoot.ActualWidth) / 2.0;
+                Top = (_parentContainer.ActualHeight - WindowRoot.ActualHeight) / 2.0;
             }
         }
 

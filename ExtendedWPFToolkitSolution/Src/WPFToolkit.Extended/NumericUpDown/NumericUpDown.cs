@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Windows;
 using System.Globalization;
+using Microsoft.Windows.Controls.Primitives;
 
 namespace Microsoft.Windows.Controls
 {
-    public class NumericUpDown : UpDownBase<double>
+    public class NumericUpDown : UpDownBase
     {
         #region Properties
 
@@ -21,10 +22,6 @@ namespace Microsoft.Windows.Controls
         {
             NumericUpDown nud = d as NumericUpDown;
             nud.SetValidSpinDirection();
-        }
-
-        protected virtual void OnMinimumChanged(double oldValue, double newValue)
-        {
         }
 
         #endregion Minimum
@@ -44,26 +41,15 @@ namespace Microsoft.Windows.Controls
             nud.SetValidSpinDirection();
         }
 
-        protected virtual void OnMaximumChanged(double oldValue, double newValue)
-        {
-        }
         #endregion Maximum
 
         #region Increment
 
-        public static readonly DependencyProperty IncrementProperty = DependencyProperty.Register("Increment", typeof(double), typeof(NumericUpDown), new PropertyMetadata(1d, OnIncrementPropertyChanged));
+        public static readonly DependencyProperty IncrementProperty = DependencyProperty.Register("Increment", typeof(double), typeof(NumericUpDown), new PropertyMetadata(1.0));
         public double Increment
         {
             get { return (double)GetValue(IncrementProperty); }
             set { SetValue(IncrementProperty, value); }
-        }
-
-        private static void OnIncrementPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-        }
-
-        protected virtual void OnIncrementChanged(double oldValue, double newValue)
-        {
         }
 
         #endregion
@@ -85,7 +71,7 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnStringFormatChanged(string oldValue, string newValue)
         {
-            Text = FormatValue();
+            SyncTextAndValueProperties(InputBase.DisplayTextProperty, Value);
         }
 
         #endregion //FormatString
@@ -97,7 +83,9 @@ namespace Microsoft.Windows.Controls
         static NumericUpDown()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(NumericUpDown), new FrameworkPropertyMetadata(typeof(NumericUpDown)));
-        }        
+            ValueTypeProperty.OverrideMetadata(typeof(NumericUpDown), new FrameworkPropertyMetadata(typeof(double)));
+            ValueProperty.OverrideMetadata(typeof(NumericUpDown), new FrameworkPropertyMetadata(default(Double)));
+        }
 
         #endregion //Constructors
 
@@ -109,33 +97,55 @@ namespace Microsoft.Windows.Controls
             SetValidSpinDirection();
         }
 
-        protected override void OnValueChanged(RoutedPropertyChangedEventArgs<double> e)
+        protected override void OnValueChanged(object oldValue, object newValue)
         {
             SetValidSpinDirection();
         }
 
-        protected override double ParseValue(string text)
+        protected override object ConvertTextToValue(string text)
         {
             NumberFormatInfo info = NumberFormatInfo.GetInstance(CultureInfo.CurrentCulture);
             if (text.Contains(info.PercentSymbol))
-                return TryParcePercent(text, info);
+            {
+                if (ValueType == typeof(decimal))
+                    return TryParceDecimalPercent(text, info);
+                else
+                    return TryParceDoublePercent(text, info);
+            }
             else
-                return TryParceDouble(text, info);
+            {
+                if (ValueType == typeof(decimal))
+                    return TryParceDecimal(text, info);
+                else if (ValueType == typeof(int))
+                    return TryParceInteger(text, info);
+                else
+                    return TryParceDouble(text, info);
+            }
         }
 
-        protected internal override string FormatValue()
+        protected override string ConvertValueToText(object value)
         {
-            return Value.ToString(FormatString, CultureInfo.CurrentCulture);
+            return (Convert.ToDecimal(Value)).ToString(FormatString, CultureInfo.CurrentCulture);
         }
 
         protected override void OnIncrement()
         {
-            Value = (double)((decimal)Value + (decimal)Increment);
+            double newValue = (double)(Convert.ToDecimal(Value) + (decimal)Increment);
+
+            if (ValueType != typeof(Double))
+                Value = Convert.ChangeType(newValue, ValueType);
+            else
+                Value = newValue;
         }
 
         protected override void OnDecrement()
         {
-            Value = (double)((decimal)Value - (decimal)Increment);
+            double newValue = (double)(Convert.ToDecimal(Value) - (decimal)Increment);
+
+            if (ValueType != typeof(Double))
+                Value = Convert.ChangeType(newValue, ValueType);
+            else
+                Value = newValue;
         }
 
         #endregion //Base Class Overrides
@@ -149,12 +159,12 @@ namespace Microsoft.Windows.Controls
         {
             ValidSpinDirections validDirections = ValidSpinDirections.None;
 
-            if (Value < Maximum)
+            if (Convert.ToDouble(Value) < Maximum)
             {
                 validDirections = validDirections | ValidSpinDirections.Increase;
             }
 
-            if (Value > Minimum)
+            if (Convert.ToDouble(Value) > Minimum)
             {
                 validDirections = validDirections | ValidSpinDirections.Decrease;
             }
@@ -165,7 +175,7 @@ namespace Microsoft.Windows.Controls
             }
         }
 
-        private double TryParcePercent(string text, NumberFormatInfo info)
+        private double TryParceDoublePercent(string text, NumberFormatInfo info)
         {
             double result;
             text = text.Replace(info.PercentSymbol, null);
@@ -173,14 +183,46 @@ namespace Microsoft.Windows.Controls
             return result / 100;
         }
 
+        private decimal TryParceDecimalPercent(string text, NumberFormatInfo info)
+        {
+            decimal result;
+            text = text.Replace(info.PercentSymbol, null);
+            result = TryParceDecimal(text, info);
+            return result / 100;
+        }
+
+        private decimal TryParceDecimal(string text, NumberFormatInfo info)
+        {
+            decimal result;
+            if (!decimal.TryParse(text, NumberStyles.Any, info, out result))
+            {
+                //an error occured now lets reset our value
+                result = Convert.ToDecimal(Value);
+                TextBox.Text = DisplayText = ConvertValueToText(result);
+            }
+            return result;
+        }
+
         private double TryParceDouble(string text, NumberFormatInfo info)
         {
             double result;
             if (!double.TryParse(text, NumberStyles.Any, info, out result))
             {
-                //an error occured now lets reset our value, text, and the text in the textbox
-                result = Value;
-                TextBox.Text = Text = FormatValue();
+                //an error occured now lets reset our value
+                result = Convert.ToDouble(Value);
+                TextBox.Text = DisplayText = ConvertValueToText(result);
+            }
+            return result;
+        }
+
+        private int TryParceInteger(string text, NumberFormatInfo info)
+        {
+            int result;
+            if (!int.TryParse(text, NumberStyles.Any, info, out result))
+            {
+                //an error occured now lets reset our value
+                result = Convert.ToInt32(Value);
+                TextBox.Text = DisplayText = ConvertValueToText(result);
             }
             return result;
         }

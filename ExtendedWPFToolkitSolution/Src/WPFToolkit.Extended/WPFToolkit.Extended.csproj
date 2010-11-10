@@ -81,6 +81,8 @@
     <Compile Include="Magnifier\Magnifier.cs" />
     <Compile Include="Magnifier\MagnifierAdorner.cs" />
     <Compile Include="Magnifier\MagnifierManager.cs" />
+    <Compile Include="Core\Primitives\InputBase.cs" />
+    <Compile Include="MaskedTextBox\MaskedTextBox.cs" />
     <Compile Include="MessageBox\MessageBox.cs" />
     <Compile Include="NumericUpDown\NumericUpDown.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -108,7 +110,7 @@
     <Compile Include="RichTextBox\Formatters\RtfFormatter.cs" />
     <Compile Include="RichTextBox\Formatters\XamlFormatter.cs" />
     <Compile Include="RichTextBox\RichTextBox.cs" />
-    <Compile Include="UpDownBase\UpDownBase.cs" />
+    <Compile Include="Core\Primitives\UpDownBase.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\VisualStates.MessageBox.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -149,7 +151,7 @@
     <Resource Include="RichTextBoxFormatBar\Images\Underline16.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Core\Primitives\" />
+    <Folder Include="UpDownBase\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
