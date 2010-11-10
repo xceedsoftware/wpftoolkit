@@ -76,6 +76,7 @@
     <Compile Include="ButtonSpinner\SpinEventArgs.cs" />
     <Compile Include="ButtonSpinner\Spinner.cs" />
     <Compile Include="ButtonSpinner\ValidSpinDirections.cs" />
+    <Compile Include="Core\Converters\InverseBoolConverter.cs" />
     <Compile Include="Magnifier\Converters\BorderThicknessToStrokeThicknessConverter.cs" />
     <Compile Include="Magnifier\Converters\RadiusConverter.cs" />
     <Compile Include="Magnifier\Magnifier.cs" />
@@ -110,7 +111,7 @@
     <Compile Include="RichTextBox\Formatters\RtfFormatter.cs" />
     <Compile Include="RichTextBox\Formatters\XamlFormatter.cs" />
     <Compile Include="RichTextBox\RichTextBox.cs" />
-    <Compile Include="Core\Primitives\UpDownBase.cs" />
+    <Compile Include="UpDownBase\UpDownBase.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\VisualStates.MessageBox.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -150,9 +151,7 @@
   <ItemGroup>
     <Resource Include="RichTextBoxFormatBar\Images\Underline16.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UpDownBase\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
