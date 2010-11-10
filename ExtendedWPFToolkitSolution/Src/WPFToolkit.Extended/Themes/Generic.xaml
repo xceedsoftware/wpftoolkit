@@ -2,7 +2,14 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
                     xmlns:sys="clr-namespace:System;assembly=mscorlib" 
                     xmlns:local="clr-namespace:Microsoft.Windows.Controls"
+                    xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters"
                     xmlns:magConverters="clr-namespace:Microsoft.Windows.Controls.Mag.Converters">
+
+    <!-- =============================================================================== -->
+    <!-- Common Converters                                                               -->
+    <!-- =============================================================================== -->
+    
+    <coreConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
 
     <!-- =============================================================================== -->
     <!-- Common Styles                                                                   -->
@@ -1094,6 +1101,7 @@
                                  FontStyle="{TemplateBinding FontStyle}" 
                                  FontWeight="{TemplateBinding FontWeight}" 
                                  Foreground="{TemplateBinding Foreground}" 
+                                 IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
                                  MinWidth="20" AcceptsReturn="False" 
                                  TextAlignment="Right" TextWrapping="NoWrap" 
                                  Text="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}" />
@@ -1112,14 +1120,15 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:MaskedTextBox}">
                     <TextBox x:Name="TextBox" 
-                                 FontFamily="{TemplateBinding FontFamily}" 
-                                 FontSize="{TemplateBinding FontSize}" 
-                                 FontStretch="{TemplateBinding FontStretch}"
-                                 FontStyle="{TemplateBinding FontStyle}" 
-                                 FontWeight="{TemplateBinding FontWeight}" 
-                                 Foreground="{TemplateBinding Foreground}"                                  
-                                 MinWidth="20" AcceptsReturn="False" TextWrapping="NoWrap" 
-                                 Text="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}" />
+                             FontFamily="{TemplateBinding FontFamily}" 
+                             FontSize="{TemplateBinding FontSize}" 
+                             FontStretch="{TemplateBinding FontStretch}"
+                             FontStyle="{TemplateBinding FontStyle}" 
+                             FontWeight="{TemplateBinding FontWeight}" 
+                             Foreground="{TemplateBinding Foreground}"
+                             IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                             MinWidth="20" AcceptsReturn="False" TextWrapping="NoWrap" 
+                             Text="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

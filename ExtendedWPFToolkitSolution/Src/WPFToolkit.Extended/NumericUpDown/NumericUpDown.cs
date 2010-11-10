@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Globalization;
-using Microsoft.Windows.Controls.Primitives;
 
 namespace Microsoft.Windows.Controls
 {
@@ -71,7 +70,7 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnStringFormatChanged(string oldValue, string newValue)
         {
-            SyncTextAndValueProperties(InputBase.DisplayTextProperty, Value);
+            SyncTextAndValueProperties(NumericUpDown.DisplayTextProperty, Value);
         }
 
         #endregion //FormatString
@@ -104,23 +103,21 @@ namespace Microsoft.Windows.Controls
 
         protected override object ConvertTextToValue(string text)
         {
+            object result = null;
+
             NumberFormatInfo info = NumberFormatInfo.GetInstance(CultureInfo.CurrentCulture);
-            if (text.Contains(info.PercentSymbol))
+
+            try
             {
-                if (ValueType == typeof(decimal))
-                    return TryParceDecimalPercent(text, info);
-                else
-                    return TryParceDoublePercent(text, info);
+                result = FormatString.Contains("P") ? ParsePercent(text, ValueType, info) : ParseDataValue(text, ValueType, info);
             }
-            else
+            catch
             {
-                if (ValueType == typeof(decimal))
-                    return TryParceDecimal(text, info);
-                else if (ValueType == typeof(int))
-                    return TryParceInteger(text, info);
-                else
-                    return TryParceDouble(text, info);
+                TextBox.Text = DisplayText = ConvertValueToText(Value);
+                return Value;
             }
+
+            return result;
         }
 
         protected override string ConvertValueToText(object value)
@@ -131,21 +128,13 @@ namespace Microsoft.Windows.Controls
         protected override void OnIncrement()
         {
             double newValue = (double)(Convert.ToDecimal(Value) + (decimal)Increment);
-
-            if (ValueType != typeof(Double))
-                Value = Convert.ChangeType(newValue, ValueType);
-            else
-                Value = newValue;
+            Value = ValueType != typeof(Double) ? Convert.ChangeType(newValue, ValueType) : newValue;
         }
 
         protected override void OnDecrement()
         {
             double newValue = (double)(Convert.ToDecimal(Value) - (decimal)Increment);
-
-            if (ValueType != typeof(Double))
-                Value = Convert.ChangeType(newValue, ValueType);
-            else
-                Value = newValue;
+            Value = ValueType != typeof(Double) ? Convert.ChangeType(newValue, ValueType) : newValue;
         }
 
         #endregion //Base Class Overrides
@@ -175,57 +164,75 @@ namespace Microsoft.Windows.Controls
             }
         }
 
-        private double TryParceDoublePercent(string text, NumberFormatInfo info)
+        #region Parsing
+
+        private static object ParseDataValue(string text, Type dataType, NumberFormatInfo info)
         {
-            double result;
+            try
+            {
+                if (typeof(double) == dataType)
+                {
+                    return ParseDouble(text, info);
+                }
+                else if (typeof(float) == dataType)
+                {
+                    return ParseFloat(text, info);
+                }
+                else if (typeof(byte) == dataType || typeof(sbyte) == dataType ||
+                         typeof(short) == dataType || typeof(ushort) == dataType || typeof(Int16) == dataType ||
+                         typeof(int) == dataType || typeof(uint) == dataType || typeof(Int32) == dataType ||
+                         typeof(long) == dataType || typeof(ulong) == dataType || typeof(Int64) == dataType)
+                {
+                    return ParseWholeNumber(text, dataType, info);
+                }
+                else if (typeof(decimal) == dataType)
+                {
+                    return ParseDecimal(text, info);
+                }
+                else
+                {
+                    throw new ArgumentException("Type not supported");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        private static double ParseDouble(string text, NumberFormatInfo info)
+        {
+            return double.Parse(text, NumberStyles.Any, info);
+        }
+
+        private static float ParseFloat(string text, NumberFormatInfo info)
+        {
+            double result = double.Parse(text, NumberStyles.Any, info);
+            return (float)result;
+        }
+
+        private static decimal ParseDecimal(string text, NumberFormatInfo info)
+        {
+            return decimal.Parse(text, NumberStyles.Any, info);
+        }
+
+        private static object ParseWholeNumber(string text, Type dataType, NumberFormatInfo info)
+        {
+            decimal result = decimal.Parse(text, NumberStyles.Any, info);
+            return Convert.ChangeType(result, dataType, info);
+        }
+
+        private static object ParsePercent(string text, Type dataType, NumberFormatInfo info)
+        {
             text = text.Replace(info.PercentSymbol, null);
-            result = TryParceDouble(text, info);
-            return result / 100;
+
+            decimal result = decimal.Parse(text, NumberStyles.Any, info);
+            result = result / 100;
+
+            return Convert.ChangeType(result, dataType, info);
         }
 
-        private decimal TryParceDecimalPercent(string text, NumberFormatInfo info)
-        {
-            decimal result;
-            text = text.Replace(info.PercentSymbol, null);
-            result = TryParceDecimal(text, info);
-            return result / 100;
-        }
-
-        private decimal TryParceDecimal(string text, NumberFormatInfo info)
-        {
-            decimal result;
-            if (!decimal.TryParse(text, NumberStyles.Any, info, out result))
-            {
-                //an error occured now lets reset our value
-                result = Convert.ToDecimal(Value);
-                TextBox.Text = DisplayText = ConvertValueToText(result);
-            }
-            return result;
-        }
-
-        private double TryParceDouble(string text, NumberFormatInfo info)
-        {
-            double result;
-            if (!double.TryParse(text, NumberStyles.Any, info, out result))
-            {
-                //an error occured now lets reset our value
-                result = Convert.ToDouble(Value);
-                TextBox.Text = DisplayText = ConvertValueToText(result);
-            }
-            return result;
-        }
-
-        private int TryParceInteger(string text, NumberFormatInfo info)
-        {
-            int result;
-            if (!int.TryParse(text, NumberStyles.Any, info, out result))
-            {
-                //an error occured now lets reset our value
-                result = Convert.ToInt32(Value);
-                TextBox.Text = DisplayText = ConvertValueToText(result);
-            }
-            return result;
-        }
+        #endregion
 
         #endregion //Methods
     }
