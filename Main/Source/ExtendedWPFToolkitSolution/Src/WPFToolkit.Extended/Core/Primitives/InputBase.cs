@@ -57,7 +57,7 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #region Value
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(object), typeof(InputBase), new FrameworkPropertyMetadata(default(object), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValuePropertyChanged));
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(object), typeof(InputBase), new FrameworkPropertyMetadata(default(object), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValuePropertyChanged, OnCoerceValuePropertyCallback));
         public virtual object Value
         {
             get { return (object)GetValue(ValueProperty); }
@@ -81,6 +81,20 @@ namespace Microsoft.Windows.Controls.Primitives
         protected virtual void OnValueChanged(object oldValue, object newValue)
         {
                         
+        }
+
+        private static object OnCoerceValuePropertyCallback(DependencyObject d, object baseValue)
+        {
+            InputBase inputBase = d as InputBase;
+            if (inputBase != null)
+                return inputBase.OnCoerceValue(baseValue);
+            else
+                return baseValue;
+        }
+
+        protected virtual object OnCoerceValue(object value)
+        {
+            return value;
         }
 
         #endregion //Value
