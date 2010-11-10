@@ -70,7 +70,7 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnStringFormatChanged(string oldValue, string newValue)
         {
-            SyncTextAndValueProperties(NumericUpDown.DisplayTextProperty, Value);
+            SyncTextAndValueProperties(NumericUpDown.TextProperty, Value);
         }
 
         #endregion //FormatString
@@ -133,7 +133,7 @@ namespace Microsoft.Windows.Controls
             }
             catch
             {
-                TextBox.Text = DisplayText = ConvertValueToText(Value);
+                TextBox.Text = Text = ConvertValueToText(Value);
                 return Value;
             }
 

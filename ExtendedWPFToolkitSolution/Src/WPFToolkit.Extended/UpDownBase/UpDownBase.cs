@@ -72,7 +72,7 @@ namespace Microsoft.Windows.Controls
                     }
                 case Key.Enter:
                     {
-                        SyncTextAndValueProperties(InputBase.DisplayTextProperty, TextBox.Text);
+                        SyncTextAndValueProperties(UpDownBase.TextProperty, TextBox.Text);
                         break;
                     }
             }

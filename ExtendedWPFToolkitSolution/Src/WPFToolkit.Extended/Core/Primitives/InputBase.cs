@@ -20,30 +20,6 @@ namespace Microsoft.Windows.Controls.Primitives
 
         public virtual object PreviousValue { get; internal set; }
 
-        #region DisplayText
-
-        public static readonly DependencyProperty DisplayTextProperty = DependencyProperty.Register("DisplayText", typeof(string), typeof(InputBase), new FrameworkPropertyMetadata(default(String), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnDisplayTextPropertyChanged));
-        public string DisplayText
-        {
-            get { return (string)this.GetValue(DisplayTextProperty); }
-            set { this.SetValue(DisplayTextProperty, value); }
-        }
-
-        private static void OnDisplayTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            InputBase input = (InputBase)d;
-            input.OnDisplayTextChanged((string)e.OldValue, (string)e.NewValue);
-            if (input._isInitialized)
-                input.SyncTextAndValueProperties(e.Property, e.NewValue);
-        }
-
-        protected virtual void OnDisplayTextChanged(string previousValue, string currentValue)
-        {
-
-        }
-
-        #endregion //DisplayText
-
         #region IsEditable
 
         public static readonly DependencyProperty IsEditableProperty = DependencyProperty.Register("IsEditable", typeof(bool), typeof(InputBase), new PropertyMetadata(true));
@@ -54,6 +30,30 @@ namespace Microsoft.Windows.Controls.Primitives
         }
 
         #endregion //IsEditable
+
+        #region Text
+
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(InputBase), new FrameworkPropertyMetadata(default(String), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnTextPropertyChanged));
+        public string Text
+        {
+            get { return (string)this.GetValue(TextProperty); }
+            set { this.SetValue(TextProperty, value); }
+        }
+
+        private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            InputBase input = (InputBase)d;
+            input.OnTextChanged((string)e.OldValue, (string)e.NewValue);
+            if (input._isInitialized)
+                input.SyncTextAndValueProperties(e.Property, e.NewValue);
+        }
+
+        protected virtual void OnTextChanged(string previousValue, string currentValue)
+        {
+
+        }
+
+        #endregion //Text
 
         #region Value
 
@@ -117,7 +117,7 @@ namespace Microsoft.Windows.Controls.Primitives
         protected virtual void OnValueTypeChanged(Type oldValue, Type newType)
         {
             if (_isInitialized)
-                SyncTextAndValueProperties(DisplayTextProperty, DisplayText);
+                SyncTextAndValueProperties(TextProperty, Text);
         }
 
         #endregion //ValueType
@@ -150,12 +150,12 @@ namespace Microsoft.Windows.Controls.Primitives
             _isSyncingTextAndValueProperties = true;
 
             //this only occures when the user typed in the value
-            if (InputBase.DisplayTextProperty == p)
+            if (InputBase.TextProperty == p)
             {
                 SetValue(InputBase.ValueProperty, ConvertTextToValue(newValue.ToString()));
             }
 
-            SetValue(InputBase.DisplayTextProperty, ConvertValueToText(newValue));
+            SetValue(InputBase.TextProperty, ConvertValueToText(newValue));
 
             _isSyncingTextAndValueProperties = false;
         }
