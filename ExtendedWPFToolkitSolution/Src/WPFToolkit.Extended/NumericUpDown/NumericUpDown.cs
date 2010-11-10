@@ -101,6 +101,26 @@ namespace Microsoft.Windows.Controls
             SetValidSpinDirection();
         }
 
+        protected override object OnCoerceValue(object value)
+        {
+            if (value == null) return value;
+
+            double val = Convert.ToDouble(value);
+
+            if (val < Minimum)
+            {
+                return Minimum;
+            }
+            else if (val > Maximum)
+            {
+                return Maximum;
+            }
+            else
+            {
+                return value;
+            }
+        }
+
         protected override object ConvertTextToValue(string text)
         {
             object result = null;
