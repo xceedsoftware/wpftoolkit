@@ -1104,7 +1104,7 @@
                                  IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
                                  MinWidth="20" AcceptsReturn="False" 
                                  TextAlignment="Right" TextWrapping="NoWrap" 
-                                 Text="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}" />
+                                 Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" />
                     </local:ButtonSpinner>
                 </ControlTemplate>
             </Setter.Value>
@@ -1128,7 +1128,7 @@
                              Foreground="{TemplateBinding Foreground}"
                              IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
                              MinWidth="20" AcceptsReturn="False" TextWrapping="NoWrap" 
-                             Text="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}" />
+                             Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

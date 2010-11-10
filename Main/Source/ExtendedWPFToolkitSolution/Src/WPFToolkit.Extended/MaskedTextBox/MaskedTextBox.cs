@@ -229,7 +229,7 @@ namespace Microsoft.Windows.Controls
 
         private void UpdateText(MaskedTextProvider provider, int position)
         {
-            DisplayText = provider.ToDisplayString();
+            Text = provider.ToDisplayString();
 
             if (TextBox != null)
                 TextBox.SelectionStart = position;
