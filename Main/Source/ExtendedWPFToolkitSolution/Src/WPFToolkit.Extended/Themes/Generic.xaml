@@ -494,11 +494,7 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
 
-                        <Grid x:Name="PART_Overlay" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0" RenderTransformOrigin="0.5,0.5" 
-                              Background="{TemplateBinding OverlayBrush}" 
-                              Opacity="{TemplateBinding OverlayOpacity}"
-                              Visibility="{TemplateBinding IsModal, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                        <Grid x:Name="PART_WindowRoot" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <Grid x:Name="PART_WindowRoot" HorizontalAlignment="Left" VerticalAlignment="Top" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
                             <Grid.RenderTransform>
                                 <TransformGroup>
                                     <ScaleTransform />
@@ -1091,7 +1087,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:NumericUpDown}">
                     <local:ButtonSpinner x:Name="Spinner" IsTabStop="False">
-                        <TextBox x:Name="Text" BorderThickness="0" 
+                        <TextBox x:Name="TextBox" BorderThickness="0" 
                                  FontFamily="{TemplateBinding FontFamily}" 
                                  FontSize="{TemplateBinding FontSize}" 
                                  FontStretch="{TemplateBinding FontStretch}"
@@ -1100,8 +1096,30 @@
                                  Foreground="{TemplateBinding Foreground}" 
                                  MinWidth="20" AcceptsReturn="False" 
                                  TextAlignment="Right" TextWrapping="NoWrap" 
-                                 Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" />
+                                 Text="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}" />
                     </local:ButtonSpinner>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- =============================================================================== -->
+    <!-- MaskedTextBox                                                                   -->
+    <!-- =============================================================================== -->
+
+    <Style TargetType="{x:Type local:MaskedTextBox}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:MaskedTextBox}">
+                    <TextBox x:Name="TextBox" 
+                                 FontFamily="{TemplateBinding FontFamily}" 
+                                 FontSize="{TemplateBinding FontSize}" 
+                                 FontStretch="{TemplateBinding FontStretch}"
+                                 FontStyle="{TemplateBinding FontStyle}" 
+                                 FontWeight="{TemplateBinding FontWeight}" 
+                                 Foreground="{TemplateBinding Foreground}"                                  
+                                 MinWidth="20" AcceptsReturn="False" TextWrapping="NoWrap" 
+                                 Text="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
