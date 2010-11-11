@@ -7,11 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFToolkit.Extended.Samples
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFToolkit.Extended.Design", "Src\WPFToolkit.Extended.Design\WPFToolkit.Extended.Design.csproj", "{FA6645C6-7CA5-427C-91F2-916D9FECD76C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFToolkit.Extended.DataVisualization", "Src\WPFToolkit.Extended.DataVisualization\WPFToolkit.Extended.DataVisualization.csproj", "{C921A4BC-1781-4A14-B1D0-C41E49C7606A}"
-EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 4
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
 		SccLocalPath0 = .
@@ -24,9 +22,6 @@ Global
 		SccProjectUniqueName3 = Src\\WPFToolkit.Extended.Design\\WPFToolkit.Extended.Design.csproj
 		SccProjectName3 = Src/WPFToolkit.Extended.Design
 		SccLocalPath3 = Src\\WPFToolkit.Extended.Design
-		SccProjectUniqueName4 = Src\\WPFToolkit.Extended.DataVisualization\\WPFToolkit.Extended.DataVisualization.csproj
-		SccProjectName4 = Src/WPFToolkit.Extended.DataVisualization
-		SccLocalPath4 = Src\\WPFToolkit.Extended.DataVisualization
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,16 +62,6 @@ Global
 		{FA6645C6-7CA5-427C-91F2-916D9FECD76C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{FA6645C6-7CA5-427C-91F2-916D9FECD76C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{FA6645C6-7CA5-427C-91F2-916D9FECD76C}.Release|x86.ActiveCfg = Release|Any CPU
-		{C921A4BC-1781-4A14-B1D0-C41E49C7606A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C921A4BC-1781-4A14-B1D0-C41E49C7606A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C921A4BC-1781-4A14-B1D0-C41E49C7606A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{C921A4BC-1781-4A14-B1D0-C41E49C7606A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{C921A4BC-1781-4A14-B1D0-C41E49C7606A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C921A4BC-1781-4A14-B1D0-C41E49C7606A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C921A4BC-1781-4A14-B1D0-C41E49C7606A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C921A4BC-1781-4A14-B1D0-C41E49C7606A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{C921A4BC-1781-4A14-B1D0-C41E49C7606A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{C921A4BC-1781-4A14-B1D0-C41E49C7606A}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
