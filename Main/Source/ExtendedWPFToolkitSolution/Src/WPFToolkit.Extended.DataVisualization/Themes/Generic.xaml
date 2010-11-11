@@ -1,0 +1,1174 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+     xmlns:datavis="clr-namespace:System.Windows.Controls.DataVisualization"
+    xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting"
+    xmlns:chartingprimitives="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives">
+
+    <!--  charting:AreaDataPoint  -->
+    <Style TargetType="charting:AreaDataPoint">
+        <Setter Property="Background" Value="Orange" />
+        <Setter Property="BorderBrush" Value="Gray" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Width" Value="4" />
+        <Setter Property="Height" Value="4" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:AreaDataPoint">
+                    <Grid x:Name="Root" Opacity="0">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="MouseOverHighlight" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0.24" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SelectionStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Unselected" />
+                                <VisualState x:Name="Selected">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="SelectionHighlight" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0.18" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="RevealStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.5" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Shown">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="1" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Hidden">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <ToolTipService.ToolTip>
+                            <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                        </ToolTipService.ToolTip>
+                        <Ellipse Stroke="{TemplateBinding BorderBrush}" Fill="{TemplateBinding Background}" />
+                        <Ellipse RenderTransformOrigin="0.661,0.321">
+                            <Ellipse.Fill>
+                                <RadialGradientBrush GradientOrigin="0.681,0.308">
+                                    <GradientStop Color="#00FFFFFF" />
+                                    <GradientStop Color="#FF3D3A3A" Offset="1" />
+                                </RadialGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                        <Ellipse x:Name="SelectionHighlight" Opacity="0" Fill="Red" />
+                        <Ellipse x:Name="MouseOverHighlight" Opacity="0" Fill="White" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:AreaSeries  -->
+    <Style TargetType="charting:AreaSeries">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="PathStyle">
+            <Setter.Value>
+                <Style TargetType="Path">
+                    <Setter Property="Opacity" Value="0.6" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:AreaSeries">
+                    <Canvas x:Name="PlotArea">
+                        <Path Data="{TemplateBinding Geometry}" Fill="{TemplateBinding Background}" Style="{TemplateBinding PathStyle}" />
+                    </Canvas>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:AxisLabel  -->
+    <Style TargetType="charting:AxisLabel">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="StringFormat" Value="{}{0}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:AxisLabel">
+                    <TextBlock Text="{TemplateBinding FormattedContent}">
+                    </TextBlock>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:BarDataPoint  -->
+    <Style TargetType="charting:BarDataPoint">
+        <Setter Property="Background" Value="Orange" />
+        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:BarDataPoint">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Opacity="0" x:Name="Root">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="MouseOverHighlight" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SelectionStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Unselected" />
+                                <VisualState x:Name="Selected">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="SelectionHighlight" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="RevealStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.5" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Shown">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Hidden">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="0" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Grid Background="{TemplateBinding Background}">
+                            <Rectangle>
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush>
+                                        <GradientStop Color="#77ffffff" Offset="0" />
+                                        <GradientStop Color="#00ffffff" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Border BorderBrush="#ccffffff" BorderThickness="1">
+                                <Border BorderBrush="#77ffffff" BorderThickness="1" />
+                            </Border>
+                            <Rectangle x:Name="SelectionHighlight" Fill="Red" Opacity="0" />
+                            <Rectangle x:Name="MouseOverHighlight" Fill="White" Opacity="0" />
+                        </Grid>
+                        <ToolTipService.ToolTip>
+                            <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                        </ToolTipService.ToolTip>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:BubbleDataPoint  -->
+    <Style TargetType="charting:BubbleDataPoint">
+        <Setter Property="Background" Value="Orange" />
+        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:BubbleDataPoint">
+                    <Grid x:Name="Root" Opacity="0">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="MouseOverHighlight" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SelectionStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Unselected" />
+                                <VisualState x:Name="Selected">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="SelectionHighlight" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="RevealStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.5" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Shown">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Hidden">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="0" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Ellipse Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}" />
+                        <Ellipse>
+                            <Ellipse.Fill>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="#77ffffff" Offset="0" />
+                                    <GradientStop Color="#00ffffff" Offset="1" />
+                                </LinearGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                        <Ellipse x:Name="SelectionHighlight" Fill="Red" Opacity="0" />
+                        <Ellipse x:Name="MouseOverHighlight" Fill="White" Opacity="0" />
+                        <ToolTipService.ToolTip>
+                            <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                        </ToolTipService.ToolTip>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:Chart  -->
+    <Style TargetType="charting:Chart">
+        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Padding" Value="10" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Palette">
+            <Setter.Value>
+                <datavis:ResourceDictionaryCollection>
+                    <!-- Blue -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FFB9D6F7" />
+                            <GradientStop Color="#FF284B70" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Red -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FFFBB7B5" />
+                            <GradientStop Color="#FF702828" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Light Green -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FFB8C0AC" />
+                            <GradientStop Color="#FF5F7143" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Yellow -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FFFDE79C" />
+                            <GradientStop Color="#FFF6BC0C" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Indigo -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FFA9A3BD" />
+                            <GradientStop Color="#FF382C6C" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Magenta -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FFB1A1B1" />
+                            <GradientStop Color="#FF50224F" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Dark Green -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FF9DC2B3" />
+                            <GradientStop Color="#FF1D7554" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Gray Shade -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FFB5B5B5" />
+                            <GradientStop Color="#FF4C4C4C" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Blue -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FF98C1DC" />
+                            <GradientStop Color="#FF0271AE" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Brown -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FFC1C0AE" />
+                            <GradientStop Color="#FF706E41" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Cyan -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FFADBDC0" />
+                            <GradientStop Color="#FF446A73" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Special Blue -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FF2F8CE2" />
+                            <GradientStop Color="#FF0C3E69" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Gray Shade 2 -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FFDCDCDC" />
+                            <GradientStop Color="#FF757575" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Gray Shade 3 -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FFF4F4F4" />
+                            <GradientStop Color="#FFB7B7B7" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                    <!-- Gray Shade 4 -->
+                    <ResourceDictionary>
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
+                            <GradientStop Color="#FFF4F4F4" />
+                            <GradientStop Color="#FFA3A3A3" Offset="1" />
+                        </RadialGradientBrush>
+                        <Style x:Key="DataPointStyle" TargetType="Control">
+                            <Setter Property="Background" Value="{StaticResource Background}" />
+                        </Style>
+                        <Style x:Key="DataShapeStyle" TargetType="Shape">
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
+                        </Style>
+                    </ResourceDictionary>
+                </datavis:ResourceDictionaryCollection>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="TitleStyle">
+            <Setter.Value>
+                <Style TargetType="datavis:Title">
+                    <Setter Property="FontSize" Value="16" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="Margin" Value="0,10,0,10" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="LegendStyle">
+            <Setter.Value>
+                <Style TargetType="datavis:Legend">
+                    <Setter Property="Margin" Value="15,0,15,0" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="BorderBrush" Value="#FFDBDBDB" />
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush EndPoint="0.442,0.005" StartPoint="0.558,0.995">
+                                <GradientStop Color="#FFDBDBDB" />
+                                <GradientStop Color="#FFFFFFFF" Offset="1" />
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ChartAreaStyle">
+            <Setter.Value>
+                <Style TargetType="Panel">
+                    <Setter Property="MinWidth" Value="100" />
+                    <Setter Property="MinHeight" Value="75" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="PlotAreaStyle">
+            <Setter.Value>
+                <Style TargetType="Grid">
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush EndPoint="0.457,0.296" StartPoint="0.459,1.296">
+                                <GradientStop Color="#FFCBCBCB" />
+                                <GradientStop Color="#FFFFFFFF" Offset="1" />
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:Chart">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <datavis:Title Content="{TemplateBinding Title}" Style="{TemplateBinding TitleStyle}" />
+
+                            <!-- Use a nested Grid to avoid possible clipping behavior resulting from ColumnSpan+Width=Auto -->
+                            <Grid Grid.Row="1" Margin="0,15,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <datavis:Legend x:Name="Legend" Header="{TemplateBinding LegendTitle}" Style="{TemplateBinding LegendStyle}" Grid.Column="1" />
+                                <chartingprimitives:EdgePanel x:Name="ChartArea" Style="{TemplateBinding ChartAreaStyle}">
+                                    <Grid Canvas.ZIndex="-1" Style="{TemplateBinding PlotAreaStyle}" />
+                                    <Border Canvas.ZIndex="10" BorderBrush="#FF919191" BorderThickness="1" />
+                                </chartingprimitives:EdgePanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:ColumnDataPoint  -->
+    <Style TargetType="charting:ColumnDataPoint">
+        <Setter Property="Background" Value="Orange" />
+        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:ColumnDataPoint">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Opacity="0" x:Name="Root">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="MouseOverHighlight" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SelectionStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Unselected" />
+                                <VisualState x:Name="Selected">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="SelectionHighlight" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="RevealStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.5" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Shown">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Hidden">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="0" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Grid Background="{TemplateBinding Background}">
+                            <Rectangle>
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush>
+                                        <GradientStop Color="#77ffffff" Offset="0" />
+                                        <GradientStop Color="#00ffffff" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Border BorderBrush="#ccffffff" BorderThickness="1">
+                                <Border BorderBrush="#77ffffff" BorderThickness="1" />
+                            </Border>
+                            <Rectangle x:Name="SelectionHighlight" Fill="Red" Opacity="0" />
+                            <Rectangle x:Name="MouseOverHighlight" Fill="White" Opacity="0" />
+                        </Grid>
+                        <ToolTipService.ToolTip>
+                            <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                        </ToolTipService.ToolTip>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:DataPointSeries  -->
+    <Style TargetType="charting:DataPointSeries">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:DataPointSeries">
+                    <Canvas x:Name="PlotArea" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:DateTimeAxisLabel  -->
+    <Style TargetType="charting:DateTimeAxisLabel">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="YearsIntervalStringFormat" Value="{}{0:yyyy}" />
+        <Setter Property="MonthsIntervalStringFormat" Value="{}{0:d}" />
+        <Setter Property="WeeksIntervalStringFormat" Value="{}{0:d}" />
+        <Setter Property="DaysIntervalStringFormat" Value="{}{0:d}" />
+        <Setter Property="HoursIntervalStringFormat" Value="{}{0:t}" />
+        <Setter Property="MinutesIntervalStringFormat" Value="{}{0:t}" />
+        <Setter Property="SecondsIntervalStringFormat" Value="{}{0:T}" />
+        <Setter Property="MillisecondsIntervalStringFormat" Value="{}{0:mm:ss.fff}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:DateTimeAxisLabel">
+                    <TextBlock Text="{TemplateBinding FormattedContent}">
+                    </TextBlock>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:DefinitionSeries  -->
+    <Style TargetType="charting:DefinitionSeries">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:DefinitionSeries">
+                    <Grid x:Name="SeriesArea" Background="{TemplateBinding Background}">
+                        <chartingprimitives:DelegatingListBox x:Name="ItemContainer" Background="Transparent" BorderThickness="0">
+                            <chartingprimitives:DelegatingListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </chartingprimitives:DelegatingListBox.ItemsPanel>
+                            <chartingprimitives:DelegatingListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <ContentPresenter Content="{TemplateBinding Content}" />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </chartingprimitives:DelegatingListBox.ItemContainerStyle>
+                        </chartingprimitives:DelegatingListBox>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:DisplayAxis  -->
+    <Style TargetType="charting:DisplayAxis">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="TitleStyle">
+            <Setter.Value>
+                <Style TargetType="datavis:Title">
+                    <Setter Property="FontStyle" Value="Italic" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="MajorTickMarkStyle">
+            <Setter.Value>
+                <Style TargetType="Line">
+                    <Setter Property="Stroke" Value="Black" />
+                    <Setter Property="X2" Value="4" />
+                    <Setter Property="Y2" Value="4" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="GridLineStyle">
+            <Setter.Value>
+                <Style TargetType="Line">
+                    <Setter Property="Stroke" Value="Gray" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:DisplayAxis">
+                    <Grid x:Name="AxisGrid" Background="{TemplateBinding Background}">
+                        <datavis:Title x:Name="AxisTitle" Style="{TemplateBinding TitleStyle}" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:LegendItem  -->
+    <Style TargetType="charting:LegendItem">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:LegendItem">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <StackPanel Orientation="Horizontal">
+                            <Rectangle Width="8" Height="8" Fill="{Binding Background}" Stroke="{Binding BorderBrush}" StrokeThickness="1" Margin="0,0,3,0" />
+                            <datavis:Title Content="{TemplateBinding Content}" />
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:LineDataPoint  -->
+    <Style TargetType="charting:LineDataPoint">
+        <Setter Property="Background" Value="Orange" />
+        <Setter Property="BorderBrush" Value="Gray" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Width" Value="8" />
+        <Setter Property="Height" Value="8" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:LineDataPoint">
+                    <Grid x:Name="Root" Opacity="0">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="MouseOverHighlight" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0.24" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SelectionStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Unselected" />
+                                <VisualState x:Name="Selected">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="SelectionHighlight" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0.18" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="RevealStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.5" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Shown">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="1" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Hidden">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <ToolTipService.ToolTip>
+                            <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                        </ToolTipService.ToolTip>
+                        <Ellipse Stroke="{TemplateBinding BorderBrush}" Fill="{TemplateBinding Background}" />
+                        <Ellipse RenderTransformOrigin="0.661,0.321">
+                            <Ellipse.Fill>
+                                <RadialGradientBrush GradientOrigin="0.681,0.308">
+                                    <GradientStop Color="#00FFFFFF" />
+                                    <GradientStop Color="#FF3D3A3A" Offset="1" />
+                                </RadialGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                        <Ellipse x:Name="SelectionHighlight" Opacity="0" Fill="Red" />
+                        <Ellipse x:Name="MouseOverHighlight" Opacity="0" Fill="White" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:LineSeries  -->
+    <Style TargetType="charting:LineSeries">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="PolylineStyle">
+            <Setter.Value>
+                <Style TargetType="Polyline">
+                    <Setter Property="StrokeThickness" Value="2" />
+                    <Setter Property="StrokeMiterLimit" Value="1" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:LineSeries">
+                    <Canvas x:Name="PlotArea">
+                        <Polyline Points="{TemplateBinding Points}" Stroke="{TemplateBinding Background}" Style="{TemplateBinding PolylineStyle}" />
+                    </Canvas>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:NumericAxisLabel  -->
+    <Style TargetType="charting:NumericAxisLabel">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="StringFormat" Value="{}{0:0.##}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:NumericAxisLabel">
+                    <TextBlock Text="{TemplateBinding FormattedContent}">
+                    </TextBlock>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:PieDataPoint  -->
+    <Style TargetType="charting:PieDataPoint">
+        <Setter Property="Background" Value="Orange" />
+        <Setter Property="BorderBrush" Value="White" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="RatioStringFormat" Value="{}{0:p2}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:PieDataPoint">
+                    <Grid x:Name="Root" Opacity="0">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="MouseOverHighlight" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SelectionStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Unselected" />
+                                <VisualState x:Name="Selected">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="SelectionHighlight" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="RevealStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.5" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Shown">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Hidden">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="0" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Path x:Name="Slice" Data="{TemplateBinding Geometry}" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeMiterLimit="1">
+                            <ToolTipService.ToolTip>
+                                <StackPanel>
+                                    <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                                    <ContentControl Content="{TemplateBinding FormattedRatio}" />
+                                </StackPanel>
+                            </ToolTipService.ToolTip>
+                        </Path>
+                        <Path x:Name="SelectionHighlight" Data="{TemplateBinding GeometrySelection}" Fill="Red" StrokeMiterLimit="1" IsHitTestVisible="False" Opacity="0" />
+                        <Path x:Name="MouseOverHighlight" Data="{TemplateBinding GeometryHighlight}" Fill="White" StrokeMiterLimit="1" IsHitTestVisible="False" Opacity="0" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:PieSeries  -->
+    <Style TargetType="charting:PieSeries">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Margin" Value="10,10,10,10" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:PieSeries">
+                    <Canvas x:Name="PlotArea" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:RangeAxis  -->
+    <Style TargetType="charting:RangeAxis">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="TitleStyle">
+            <Setter.Value>
+                <Style TargetType="datavis:Title">
+                    <Setter Property="FontStyle" Value="Italic" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="MajorTickMarkStyle">
+            <Setter.Value>
+                <Style TargetType="Line">
+                    <Setter Property="Stroke" Value="Black" />
+                    <Setter Property="X2" Value="4" />
+                    <Setter Property="Y2" Value="4" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="MinorTickMarkStyle">
+            <Setter.Value>
+                <Style TargetType="Line">
+                    <Setter Property="Stroke" Value="Gray" />
+                    <Setter Property="X2" Value="2" />
+                    <Setter Property="Y2" Value="2" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="GridLineStyle">
+            <Setter.Value>
+                <Style TargetType="Line">
+                    <Setter Property="Stroke" Value="Gray" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:RangeAxis">
+                    <Grid x:Name="AxisGrid" Background="{TemplateBinding Background}">
+                        <datavis:Title x:Name="AxisTitle" Style="{TemplateBinding TitleStyle}" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  charting:ScatterDataPoint  -->
+    <Style TargetType="charting:ScatterDataPoint">
+        <Setter Property="Background" Value="Orange" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="BorderBrush" Value="#FF686868" />
+        <Setter Property="Width" Value="8" />
+        <Setter Property="Height" Value="8" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:ScatterDataPoint">
+                    <Grid x:Name="Root" Opacity="0">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="MouseOverHighlight" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0.3" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SelectionStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.1" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Unselected" />
+                                <VisualState x:Name="Selected">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="SelectionHighlight" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0.185" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="RevealStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.5" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Shown">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Root" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00" Value="1" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Hidden">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <ToolTipService.ToolTip>
+                            <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                        </ToolTipService.ToolTip>
+                        <Path Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" Stretch="Fill" StrokeThickness="1" StrokeLineJoin="Round" Data="F1 M 0,50L 50,0 100,50 50,100L 0,50 Z " />
+                        <Path x:Name="MouseOverHighlight" Stretch="Fill" StrokeThickness="1" StrokeLineJoin="Round" Stroke="{x:Null}" Data="F1 M 0,50L 50,0 100,50 50,100L 0,50 Z  " Opacity="0" Fill="White" />
+                        <Path x:Name="SelectionHighlight" Stretch="Fill" StrokeThickness="1" StrokeLineJoin="Round" Stroke="{x:Null}" Data="F1 M 0,50L 50,0 100,50 50,100L 0,50 Z " Fill="Red" Opacity="0" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  chartingprimitives:DelegatingListBox  -->
+    <Style TargetType="chartingprimitives:DelegatingListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+        <Setter Property="IsTabStop" Value="False" />
+    </Style>
+
+    <!--  datavis:Legend  -->
+    <Style TargetType="datavis:Legend">
+        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="TitleStyle">
+            <Setter.Value>
+                <Style TargetType="datavis:Title">
+                    <Setter Property="Margin" Value="0,5,0,10" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="datavis:Legend">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="2">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <datavis:Title Grid.Row="0" x:Name="HeaderContent" Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" Style="{TemplateBinding TitleStyle}" />
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" BorderThickness="0" Padding="0" IsTabStop="False">
+                                <ItemsPresenter x:Name="Items" Margin="10,0,10,10" />
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  datavis:Title  -->
+    <Style TargetType="datavis:Title">
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="datavis:Title">
+                    <Grid Background="{TemplateBinding Background}">
+                        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  datavis:TreeMap  -->
+    <Style TargetType="datavis:TreeMap">
+        <Setter Property="IsTabStop" Value="false" />
+        <Setter Property="MinWidth" Value="20" />
+        <Setter Property="MinHeight" Value="20" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="datavis:TreeMap">
+                    <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Cursor="{TemplateBinding Cursor}" Opacity="{TemplateBinding Opacity}" OpacityMask="{TemplateBinding OpacityMask}">
+                        <Canvas x:Name="Container" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ItemDefinition">
+            <Setter.Value>
+                <datavis:TreeMapItemDefinition ValueBinding="{Binding}">
+                    <datavis:TreeMapItemDefinition.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="Black" Background="Transparent" BorderThickness="1" ToolTipService.ToolTip="{Binding}">
+                                <ContentControl Content="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                        </DataTemplate>
+                    </datavis:TreeMapItemDefinition.ItemTemplate>
+                </datavis:TreeMapItemDefinition>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+</ResourceDictionary>
