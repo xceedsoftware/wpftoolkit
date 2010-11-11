@@ -1112,6 +1112,32 @@
     </Style>
 
     <!-- =============================================================================== -->
+    <!-- DateTimeUpDown                                                                  -->
+    <!-- =============================================================================== -->
+    
+    <Style TargetType="{x:Type local:DateTimeUpDown}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:DateTimeUpDown}">
+                    <local:ButtonSpinner x:Name="Spinner">
+                        <TextBox x:Name="TextBox" BorderThickness="0" 
+                                 FontFamily="{TemplateBinding FontFamily}" 
+                                 FontSize="{TemplateBinding FontSize}" 
+                                 FontStretch="{TemplateBinding FontStretch}"
+                                 FontStyle="{TemplateBinding FontStyle}" 
+                                 FontWeight="{TemplateBinding FontWeight}" 
+                                 Foreground="{TemplateBinding Foreground}" 
+                                 IsReadOnly="True"
+                                 MinWidth="20" AcceptsReturn="False" 
+                                 TextAlignment="Right" TextWrapping="NoWrap" 
+                                 Text="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}" />
+                    </local:ButtonSpinner>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- =============================================================================== -->
     <!-- MaskedTextBox                                                                   -->
     <!-- =============================================================================== -->
 

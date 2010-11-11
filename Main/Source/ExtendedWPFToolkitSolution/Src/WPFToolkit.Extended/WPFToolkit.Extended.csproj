@@ -77,6 +77,10 @@
     <Compile Include="ButtonSpinner\Spinner.cs" />
     <Compile Include="ButtonSpinner\ValidSpinDirections.cs" />
     <Compile Include="Core\Converters\InverseBoolConverter.cs" />
+    <Compile Include="DateTimeUpDown\DateTimeFormat.cs" />
+    <Compile Include="DateTimeUpDown\DateTimeInfo.cs" />
+    <Compile Include="DateTimeUpDown\DateTimePart.cs" />
+    <Compile Include="DateTimeUpDown\DateTimeUpDown.cs" />
     <Compile Include="Magnifier\Converters\BorderThicknessToStrokeThicknessConverter.cs" />
     <Compile Include="Magnifier\Converters\RadiusConverter.cs" />
     <Compile Include="Magnifier\Magnifier.cs" />
