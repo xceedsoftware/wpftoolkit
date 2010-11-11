@@ -10,8 +10,8 @@ namespace Microsoft.Windows.Controls
         #region Members
 
         private List<DateTimeInfo> _dateTimeInfoList = new List<DateTimeInfo>();
-        internal bool _selectionChanged = true;
-        internal int _selectedDateTimeInfoIndex;
+        private DateTimeInfo _selectedDateTimeInfo;
+        private bool _fireSelectionChangedEvent = true;
 
         #endregion //Members
 
@@ -79,22 +79,54 @@ namespace Microsoft.Windows.Controls
 
         void TextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
-            if (_selectionChanged)
+            if (_fireSelectionChangedEvent)
                 SelectDateTimePart();
             else
-                _selectionChanged = true;
+                _fireSelectionChangedEvent = true;
         }
 
         #endregion //Event Hanlders
 
         #region Methods
 
+        #region Abstract
+
+        protected override void OnIncrement()
+        {
+            UpdateDateTime(1);
+        }
+
+        protected override void OnDecrement()
+        {
+            UpdateDateTime(-1);
+        }
+
+        protected override object ConvertTextToValue(string text)
+        {
+            throw new NotImplementedException("ConvertTextToValue");
+        }
+
+        protected override string ConvertValueToText(object value)
+        {
+            if (value == null) return string.Empty;
+
+            DateTime? dt = DateTime.Parse(value.ToString(), CultureInfo.CurrentCulture);
+
+            if (dt.HasValue)
+                return dt.Value.ToString(GetFormatString(Format), CultureInfo.CurrentCulture);
+            else
+                return string.Empty;
+        }
+
+        #endregion //Abstract
+
         private void InitializeDateTimeInfoList()
         {
             string format = GetFormatString(Format);
             while (format.Length > 0)
             {
-                int elementLength = GetGroupLengthByMask(format);
+                int elementLength = GetElementLengthByFormat(format);
+                DateTimeInfo info = null;
 
                 switch (format[0])
                 {
@@ -102,17 +134,10 @@ namespace Microsoft.Windows.Controls
                     case '\'':
                         {
                             int closingQuotePosition = format.IndexOf(format[0], 1);
-                            _dateTimeInfoList.Add(new DateTimeInfo()
-                            {
-                                IsReadOnly = true,
-                                Type = DateTimePart.Other,
-                                Length = 1,
-                                Content = format.Substring(1, Math.Max(1, closingQuotePosition - 1)).ToString(),
-                            });
+                            info = new DateTimeInfo { IsReadOnly = true, Type = DateTimePart.Other, Length = 1, Content = format.Substring(1, Math.Max(1, closingQuotePosition - 1)).ToString() };
                             elementLength = Math.Max(1, closingQuotePosition + 1);
                             break;
                         }
-
                     case 'D':
                     case 'd':
                         {
@@ -121,23 +146,9 @@ namespace Microsoft.Windows.Controls
                                 d = "%" + d;
 
                             if (elementLength > 2)
-                            {
-                                _dateTimeInfoList.Add(new DateTimeInfo()
-                                {
-                                    IsReadOnly = true,
-                                    Type = DateTimePart.DayName,
-                                    Pattern = d
-                                });
-                            }
+                                info = new DateTimeInfo { IsReadOnly = true, Type = DateTimePart.DayName, Format = d };
                             else
-                            {
-                                _dateTimeInfoList.Add(new DateTimeInfo()
-                                {
-                                    IsReadOnly = false,
-                                    Type = DateTimePart.Day,
-                                    Pattern = d
-                                });
-                            }
+                                info = new DateTimeInfo { IsReadOnly = false, Type = DateTimePart.Day, Format = d };
                             break;
                         }
                     case 'F':
@@ -147,12 +158,7 @@ namespace Microsoft.Windows.Controls
                             if (elementLength == 1)
                                 f = "%" + f;
 
-                            _dateTimeInfoList.Add(new DateTimeInfo()
-                            {
-                                IsReadOnly = false,
-                                Type = DateTimePart.Millisecond,
-                                Pattern = f
-                            });
+                            info = new DateTimeInfo { IsReadOnly = false, Type = DateTimePart.Millisecond, Format = f };
                             break;
                         }
                     case 'h':
@@ -161,12 +167,7 @@ namespace Microsoft.Windows.Controls
                             if (elementLength == 1)
                                 h = "%" + h;
 
-                            _dateTimeInfoList.Add(new DateTimeInfo()
-                            {
-                                IsReadOnly = false,
-                                Type = DateTimePart.Hour12,
-                                Pattern = h
-                            });
+                            info = new DateTimeInfo { IsReadOnly = false, Type = DateTimePart.Hour12, Format = h };
                             break;
                         }
                     case 'H':
@@ -175,12 +176,7 @@ namespace Microsoft.Windows.Controls
                             if (elementLength == 1)
                                 H = "%" + H;
 
-                            _dateTimeInfoList.Add(new DateTimeInfo()
-                            {
-                                IsReadOnly = false,
-                                Type = DateTimePart.Hour24,
-                                Pattern = H
-                            });
+                            info = new DateTimeInfo { IsReadOnly = false, Type = DateTimePart.Hour24, Format = H };
                             break;
                         }
                     case 'M':
@@ -190,23 +186,9 @@ namespace Microsoft.Windows.Controls
                                 M = "%" + M;
 
                             if (elementLength >= 3)
-                            {
-                                _dateTimeInfoList.Add(new DateTimeInfo()
-                                {
-                                    IsReadOnly = false,
-                                    Type = DateTimePart.MonthName,
-                                    Pattern = M
-                                });
-                            }
+                                info = new DateTimeInfo { IsReadOnly = false, Type = DateTimePart.MonthName, Format = M };
                             else
-                            {
-                                _dateTimeInfoList.Add(new DateTimeInfo()
-                                {
-                                    IsReadOnly = false,
-                                    Type = DateTimePart.Month,
-                                    Pattern = M
-                                });
-                            }
+                                info = new DateTimeInfo { IsReadOnly = false, Type = DateTimePart.Month, Format = M };
                             break;
                         }
                     case 'S':
@@ -215,12 +197,8 @@ namespace Microsoft.Windows.Controls
                             string s = format.Substring(0, elementLength);
                             if (elementLength == 1)
                                 s = "%" + s;
-                            _dateTimeInfoList.Add(new DateTimeInfo()
-                            {
-                                IsReadOnly = false,
-                                Type = DateTimePart.Second,
-                                Pattern = s
-                            });
+
+                            info = new DateTimeInfo { IsReadOnly = false, Type = DateTimePart.Second, Format = s };
                             break;
                         }
                     case 'T':
@@ -228,15 +206,9 @@ namespace Microsoft.Windows.Controls
                         {
                             string t = format.Substring(0, elementLength);
                             if (elementLength == 1)
-                            {
                                 t = "%" + t;
-                            }
-                            _dateTimeInfoList.Add(new DateTimeInfo()
-                            {
-                                IsReadOnly = false,
-                                Type = DateTimePart.AmPmDesignator,
-                                Pattern = t
-                            });
+
+                            info = new DateTimeInfo { IsReadOnly = false, Type = DateTimePart.AmPmDesignator, Format = t };
                             break;
                         }
                     case 'Y':
@@ -244,28 +216,16 @@ namespace Microsoft.Windows.Controls
                         {
                             string y = format.Substring(0, elementLength);
                             if (elementLength == 1)
-                            {
                                 y = "%" + y;
-                            }
-                            _dateTimeInfoList.Add(new DateTimeInfo()
-                            {
-                                IsReadOnly = false,
-                                Type = DateTimePart.Year,
-                                Pattern = y
-                            });
+
+                            info = new DateTimeInfo { IsReadOnly = false, Type = DateTimePart.Year, Format = y };
                             break;
                         }
                     case '\\':
                         {
                             if (format.Length >= 2)
                             {
-                                _dateTimeInfoList.Add(new DateTimeInfo()
-                                {
-                                    IsReadOnly = true,
-                                    Content = format.Substring(1, 1),
-                                    Length = 1,
-                                    Type = DateTimePart.Other
-                                });
+                                info = new DateTimeInfo { IsReadOnly = true, Content = format.Substring(1, 1), Length = 1, Type = DateTimePart.Other };
                                 elementLength = 2;
                             }
                             break;
@@ -274,149 +234,90 @@ namespace Microsoft.Windows.Controls
                         {
                             string g = format.Substring(0, elementLength);
                             if (elementLength == 1)
-                            {
                                 g = "%" + g;
-                            }
-                            _dateTimeInfoList.Add(new DateTimeInfo()
-                            {
-                                IsReadOnly = true,
-                                Type = DateTimePart.Period,
-                                Pattern = format.Substring(0, elementLength)
-                            });
+
+                            info = new DateTimeInfo { IsReadOnly = true, Type = DateTimePart.Period, Format = format.Substring(0, elementLength) };
                             break;
                         }
                     case 'm':
                         {
                             string m = format.Substring(0, elementLength);
                             if (elementLength == 1)
-                            {
                                 m = "%" + m;
-                            }
-                            _dateTimeInfoList.Add(new DateTimeInfo()
-                            {
-                                IsReadOnly = false,
-                                Type = DateTimePart.Minute,
-                                Pattern = m
-                            });
+
+                            info = new DateTimeInfo { IsReadOnly = false, Type = DateTimePart.Minute, Format = m };
                             break;
                         }
                     case 'z':
                         {
                             string z = format.Substring(0, elementLength);
                             if (elementLength == 1)
-                            {
                                 z = "%" + z;
-                            }
-                            _dateTimeInfoList.Add(new DateTimeInfo()
-                            {
-                                IsReadOnly = true,
-                                Type = DateTimePart.TimeZone,
-                                Pattern = z
-                            });
+
+                            info = new DateTimeInfo { IsReadOnly = true, Type = DateTimePart.TimeZone, Format = z };
                             break;
                         }
                     default:
                         {
                             elementLength = 1;
-                            _dateTimeInfoList.Add(new DateTimeInfo()
-                            {
-                                IsReadOnly = true,
-                                Length = 1,
-                                Content = format[0].ToString(),
-                                Type = DateTimePart.Other
-                            });
+                            info = new DateTimeInfo { IsReadOnly = true, Length = 1, Content = format[0].ToString(), Type = DateTimePart.Other };
                             break;
                         }
                 }
 
+                _dateTimeInfoList.Add(info);
                 format = format.Substring(elementLength);
             }
         }
 
-        private static int GetGroupLengthByMask(string mask)
+        private static int GetElementLengthByFormat(string format)
         {
-            for (int i = 1; i < mask.Length; i++)
+            for (int i = 1; i < format.Length; i++)
             {
-                if (String.Compare(mask[i].ToString(), mask[0].ToString(), false) != 0)
+                if (String.Compare(format[i].ToString(), format[0].ToString(), false) != 0)
                 {
                     return i;
                 }
             }
-            return mask.Length;
+            return format.Length;
         }
 
-        public void ParseValueIntoDateTimeInfo()
+        private void ParseValueIntoDateTimeInfo()
         {
-            string displayText = string.Empty;
+            string text = string.Empty;
 
-            for (int i = 0; i < _dateTimeInfoList.Count; i++)
+            _dateTimeInfoList.ForEach(info =>
             {
-                var charProperty = _dateTimeInfoList[i];
-
-                if (charProperty.Pattern == null)
+                if (info.Format == null)
                 {
-                    _dateTimeInfoList[i].StartPosition = displayText.Length;
-                    _dateTimeInfoList[i].Length = charProperty.Content.Length;
-                    displayText += charProperty.Content;
+                    info.StartPosition = text.Length;
+                    info.Length = info.Content.Length;
+                    text += info.Content;
                 }
                 else
                 {
                     DateTime date = DateTime.Parse(Value.ToString());
-
-                    _dateTimeInfoList[i].StartPosition = displayText.Length;
-
-                    charProperty.Content = date.ToString(charProperty.Pattern, DateTimeFormatInfo);
-
-                    _dateTimeInfoList[i].Length = charProperty.Content.Length;
-
-                    displayText += charProperty.Content;
+                    info.StartPosition = text.Length;
+                    info.Content = date.ToString(info.Format, DateTimeFormatInfo);
+                    info.Length = info.Content.Length;
+                    text += info.Content;
                 }
-            }
+            });
         }
 
         private void SelectDateTimePart()
         {
-            for (int i = 0; i < _dateTimeInfoList.Count; i++)
+            _dateTimeInfoList.ForEach(info =>
             {
-                var charProperty = _dateTimeInfoList[i];
-
-                if ((charProperty.StartPosition <= TextBox.SelectionStart) && (TextBox.SelectionStart < (charProperty.StartPosition + charProperty.Length)))
+                if ((info.StartPosition <= TextBox.SelectionStart) && (TextBox.SelectionStart < (info.StartPosition + info.Length)))
                 {
-                    if (charProperty.IsReadOnly == false)
-                    {
-                        _selectionChanged = false;
-
-                        for (int j = 0; j < _dateTimeInfoList.Count; j++)
-                        {
-                            _dateTimeInfoList[j].KeyPressCount = 0;
-                        }
-
-                        TextBox.Select(charProperty.StartPosition, charProperty.Length);
-                        _selectionChanged = true;
-                        _selectedDateTimeInfoIndex = i;
-
-                        return;
-                    }
-                    else
-                    {
-                        _selectionChanged = false;
-
-                        for (int j = 0; j < _dateTimeInfoList.Count; j++)
-                        {
-                            _dateTimeInfoList[j].KeyPressCount = 0;
-                        }
-
-                        TextBox.Select(charProperty.StartPosition, charProperty.Length);
-                        _selectionChanged = true;
-                        _selectedDateTimeInfoIndex = i;
-                        return;
-                    }
+                    _fireSelectionChangedEvent = false;
+                    TextBox.Select(info.StartPosition, info.Length);
+                    _fireSelectionChangedEvent = true;
+                    _selectedDateTimeInfo = info;
+                    return;
                 }
-            }
-            _selectionChanged = false;
-            TextBox.Select(TextBox.SelectionStart, 0);
-            _selectionChanged = true;
-            _selectedDateTimeInfoIndex = -1;
+            });
         }
 
         private string GetFormatString(DateTimeFormat dateTimeFormat)
@@ -448,118 +349,66 @@ namespace Microsoft.Windows.Controls
             }
         }
 
-        #region Abstract
-
-        protected override void OnIncrement()
+        private void UpdateDateTime(int value)
         {
-            DateTimeInfo info = _dateTimeInfoList[_selectedDateTimeInfoIndex];
-
-            _selectionChanged = false;
-
-            //TODO: refactor
-            if (info.Type == DateTimePart.Year)
+            _fireSelectionChangedEvent = false;
+            DateTimeInfo info = _selectedDateTimeInfo;
+            switch (info.Type)
             {
-                Value = ((DateTime)Value).AddYears(1);
-            }
-            else if (info.Type == DateTimePart.Month || info.Type == DateTimePart.MonthName)
-            {
-                Value = ((DateTime)Value).AddMonths(1);
-            }
-            else if (info.Type == DateTimePart.Day || info.Type == DateTimePart.DayName)
-            {
-                Value = ((DateTime)Value).AddDays(1);
-            }
-            else if (info.Type == DateTimePart.Hour12 || info.Type == DateTimePart.Hour24)
-            {
-                Value = ((DateTime)Value).AddHours(1);
-            }
-            else if (info.Type == DateTimePart.Minute)
-            {
-                Value = ((DateTime)Value).AddMinutes(1);
-            }
-            else if (info.Type == DateTimePart.Second)
-            {
-                Value = ((DateTime)Value).AddSeconds(1);
-            }
-            else if (info.Type == DateTimePart.Millisecond)
-            {
-                Value = ((DateTime)Value).AddMilliseconds(1);
-            }
-            else if (info.Type == DateTimePart.AmPmDesignator)
-            {
-                Value = ((DateTime)Value).AddHours(12);
+                case DateTimePart.Year:
+                    {
+                        Value = ((DateTime)Value).AddYears(value);
+                        break;
+                    }
+                case DateTimePart.Month:
+                case DateTimePart.MonthName:
+                    {
+                        Value = ((DateTime)Value).AddMonths(value);
+                        break;
+                    }
+                case DateTimePart.Day:
+                case DateTimePart.DayName:
+                    {
+                        Value = ((DateTime)Value).AddDays(value);
+                        break;
+                    }
+                case DateTimePart.Hour12:
+                case DateTimePart.Hour24:
+                    {
+                        Value = ((DateTime)Value).AddHours(value);
+                        break;
+                    }
+                case DateTimePart.Minute:
+                    {
+                        Value = ((DateTime)Value).AddMinutes(value);
+                        break;
+                    }
+                case DateTimePart.Second:
+                    {
+                        Value = ((DateTime)Value).AddSeconds(value);
+                        break;
+                    }
+                case DateTimePart.Millisecond:
+                    {
+                        Value = ((DateTime)Value).AddMilliseconds(value);
+                        break;
+                    }
+                case DateTimePart.AmPmDesignator:
+                    {
+                        Value = ((DateTime)Value).AddHours(value * 12);
+                        break;
+                    }
+                default:
+                    {
+                        break;
+                    }
             }
 
             //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event
             TextBox.Select(info.StartPosition, info.Length);
-
-            _selectionChanged = true;
+            _fireSelectionChangedEvent = true;
         }
 
-        protected override void OnDecrement()
-        {
-            DateTimeInfo info = _dateTimeInfoList[_selectedDateTimeInfoIndex];
-
-            _selectionChanged = false;
-
-            //TODO: refactor
-            if (info.Type == DateTimePart.Year)
-            {
-                Value = ((DateTime)Value).AddYears(-1);
-            }
-            else if (info.Type == DateTimePart.Month || info.Type == DateTimePart.MonthName)
-            {
-                Value = ((DateTime)Value).AddMonths(-1);
-            }
-            else if (info.Type == DateTimePart.Day || info.Type == DateTimePart.DayName)
-            {
-                Value = ((DateTime)Value).AddDays(-1);
-            }
-            else if (info.Type == DateTimePart.Hour12 || info.Type == DateTimePart.Hour24)
-            {
-                Value = ((DateTime)Value).AddHours(-1);
-            }
-            else if (info.Type == DateTimePart.Minute)
-            {
-                Value = ((DateTime)Value).AddMinutes(-1);
-            }
-            else if (info.Type == DateTimePart.Second)
-            {
-                Value = ((DateTime)Value).AddSeconds(-1);
-            }
-            else if (info.Type == DateTimePart.Millisecond)
-            {
-                Value = ((DateTime)Value).AddMilliseconds(-1);
-            }
-            else if (info.Type == DateTimePart.AmPmDesignator)
-            {
-                Value = ((DateTime)Value).AddHours(-12);
-            }
-
-            //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event
-            TextBox.Select(info.StartPosition, info.Length);
-
-            _selectionChanged = true;
-        }
-
-        protected override object ConvertTextToValue(string text)
-        {
-            return text;
-        }
-
-        protected override string ConvertValueToText(object value)
-        {
-            if (value == null) return string.Empty;
-
-            DateTime? dt = DateTime.Parse(value.ToString(), CultureInfo.CurrentCulture);
-
-            if (dt.HasValue)
-                return dt.Value.ToString(GetFormatString(Format), CultureInfo.CurrentCulture);
-            else
-                return string.Empty;
-        }
-
-        #endregion //Abstract
         #endregion //Methods
     }
 }
