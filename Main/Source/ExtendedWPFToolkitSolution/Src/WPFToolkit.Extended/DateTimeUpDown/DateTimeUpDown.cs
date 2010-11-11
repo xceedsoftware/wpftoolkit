@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Microsoft.Windows.Controls
 {
@@ -70,7 +71,15 @@ namespace Microsoft.Windows.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            TextBox.SelectionChanged += new RoutedEventHandler(TextBox_SelectionChanged);
+            TextBox.SelectionChanged += TextBox_SelectionChanged;
+        }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+                return;
+
+            base.OnPreviewKeyDown(e);
         }
 
         #endregion //Base Class Overrides
