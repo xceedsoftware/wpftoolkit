@@ -150,18 +150,6 @@ namespace Microsoft.Windows.Controls
                 childWindow.HideModalLayer();
         }
 
-        private void ShowModalLayer()
-        {
-
-            _modalLayerPanel.Children.Add(_modalLayer);
-            BringToFront();
-        }
-
-        private void HideModalLayer()
-        {
-
-        }
-
         #region Left
 
         public static readonly DependencyProperty LeftProperty = DependencyProperty.Register("Left", typeof(double), typeof(ChildWindow), new PropertyMetadata(0.0, new PropertyChangedCallback(OnLeftPropertyChanged)));
@@ -419,32 +407,24 @@ namespace Microsoft.Windows.Controls
         private void ExecuteOpen()
         {
             _dialogResult = null; //reset the dialogResult to null each time the window is opened
-            SetZIndex(); //TODO: replace with BringToFront
-        }
-
-        private void SetZIndex()
-        {
-            if (_parentContainer != null)
-            {
-                int parentIndex = (int)_parentContainer.GetValue(Canvas.ZIndexProperty);
-                this.SetValue(Canvas.ZIndexProperty, ++parentIndex);
-            }
-            else
-            {
-                this.SetValue(Canvas.ZIndexProperty, 1);
-            }
+            BringToFront();
         }
 
         private void BringToFront()
         {
-            int zIndex = 0;
+            int index = 0;
 
-            this.SetValue(Canvas.ZIndexProperty, 1);
+            if (_parentContainer != null)
+            {
+                index = (int)_parentContainer.GetValue(Canvas.ZIndexProperty);
+            }
 
-            Canvas.SetZIndex(this, zIndex += 99);
+            this.SetValue(Canvas.ZIndexProperty, ++index);
 
-            //if modal
-
+            if (IsModal)
+            {
+                Canvas.SetZIndex(_modalLayerPanel, -1);
+            }
         }
 
         private void SetStartupPosition()
@@ -474,6 +454,23 @@ namespace Microsoft.Windows.Controls
             {
                 VisualStateManager.GoToState(this, VisualStates.Open, true);
             }
+        }
+
+        private void ShowModalLayer()
+        {
+            if (!DesignerProperties.GetIsInDesignMode(this))
+            {
+                if (!_modalLayerPanel.Children.Contains(_modalLayer))
+                    _modalLayerPanel.Children.Add(_modalLayer);
+
+                BringToFront();
+            }
+        }
+
+        private void HideModalLayer()
+        {
+            if (_modalLayerPanel.Children.Contains(_modalLayer))
+                _modalLayerPanel.Children.Remove(_modalLayer);
         }
 
         #endregion //Private
