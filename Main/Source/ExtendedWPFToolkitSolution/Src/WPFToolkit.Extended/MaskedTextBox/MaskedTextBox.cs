@@ -117,10 +117,17 @@ namespace Microsoft.Windows.Controls
             {
                 convertedValue = valueToConvert;
             }
+#if !VS2008
             else if (String.IsNullOrWhiteSpace(valueToConvert))
             {
                 convertedValue = Activator.CreateInstance(dataType);
             }
+#else
+            else if (String.IsNullOrEmpty(valueToConvert))
+            {
+                convertedValue = Activator.CreateInstance(dataType);
+            }
+#endif
             else if (null == convertedValue && valueToConvert is IConvertible)
             {
                 convertedValue = Convert.ChangeType(valueToConvert, dataType);

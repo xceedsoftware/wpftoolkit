@@ -269,7 +269,7 @@ namespace Microsoft.Windows.Controls
         void ColorShadingCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point p = e.GetPosition(_colorShadingCanvas);
-            UpdateColorShadeSelectorPositionAndCalculateColor(p);
+            UpdateColorShadeSelectorPositionAndCalculateColor(p, true);
         }
 
         void ColorShadingCanvas_MouseMove(object sender, MouseEventArgs e)
@@ -277,7 +277,7 @@ namespace Microsoft.Windows.Controls
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 Point p = e.GetPosition(_colorShadingCanvas);
-                UpdateColorShadeSelectorPositionAndCalculateColor(p);
+                UpdateColorShadeSelectorPositionAndCalculateColor(p, true);
                 Mouse.Synchronize();
             }
         }
@@ -338,7 +338,7 @@ namespace Microsoft.Windows.Controls
             UpdateColorShadeSelectorPosition(_currentColor);
         }
 
-        private void UpdateColorShadeSelectorPositionAndCalculateColor(Point p, bool calculateColor = true)
+        private void UpdateColorShadeSelectorPositionAndCalculateColor(Point p, bool calculateColor)
         {
             if (p.Y < 0)
                 p.Y = 0;
