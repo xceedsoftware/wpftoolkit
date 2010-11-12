@@ -57,10 +57,17 @@ namespace Microsoft.Windows.Controls
             if (e.LeftButton == MouseButtonState.Released)
             {
                 TextRange selectedText = new TextRange(_richTextBox.Selection.Start, _richTextBox.Selection.End);
+#if !VS2008                
                 if (selectedText.Text.Length > 0 && !String.IsNullOrWhiteSpace(selectedText.Text))
                 {
                     ShowAdorner();
                 }
+#else
+                if (selectedText.Text.Length > 0 && !String.IsNullOrEmpty(selectedText.Text))
+                {
+                    ShowAdorner();
+                }
+#endif
                 else
                 {
                     HideAdorner();
