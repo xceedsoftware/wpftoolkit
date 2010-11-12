@@ -1130,7 +1130,7 @@
                                  IsReadOnly="True"
                                  MinWidth="20" AcceptsReturn="False" 
                                  TextAlignment="Right" TextWrapping="NoWrap" 
-                                 Text="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}" />
+                                 Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" />
                     </local:ButtonSpinner>
                 </ControlTemplate>
             </Setter.Value>
