@@ -66,8 +66,19 @@ namespace Microsoft.Windows.Controls
 
             WindowRoot.RenderTransform = _moveTransform;
 
-            //TODO: move somewhere else
+
             _parentContainer = VisualTreeHelper.GetParent(this) as FrameworkElement;
+
+            //this is for XBAP applications only. When inside an XBAP the parent container has no height or width until it has loaded. Therefore
+            //we need to handle the loaded event and reposition the window.
+            if (System.Windows.Interop.BrowserInteropHelper.IsBrowserHosted)
+            {
+                _parentContainer.Loaded += (o, e) =>
+                    {
+                        CenterChildWindow();
+                    };
+            }
+
             _parentContainer.LayoutUpdated += ParentContainer_LayoutUpdated;
             _parentContainer.SizeChanged += (o, ea) =>
             {
@@ -340,7 +351,7 @@ namespace Microsoft.Windows.Controls
                     return 0;
                 }
 
-                if (Left + WindowRoot.ActualWidth > _parentContainer.ActualWidth)
+                if (Left + WindowRoot.ActualWidth > _parentContainer.ActualWidth && _parentContainer.ActualWidth != 0)
                 {
                     return _parentContainer.ActualWidth - WindowRoot.ActualWidth;
                 }
@@ -351,14 +362,14 @@ namespace Microsoft.Windows.Controls
 
         private double GetRestrictedTop()
         {
-            if (_parentContainer != null)
+            if (_parentContainer != null )
             {
                 if (Top < 0)
                 {
                     return 0;
                 }
 
-                if (Top + WindowRoot.ActualHeight > _parentContainer.ActualHeight)
+                if (Top + WindowRoot.ActualHeight > _parentContainer.ActualHeight && _parentContainer.ActualHeight != 0)
                 {
                     return _parentContainer.ActualHeight - WindowRoot.ActualHeight;
                 }
