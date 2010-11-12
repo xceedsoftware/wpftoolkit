@@ -107,6 +107,7 @@
     <Style TargetType="{x:Type local:BusyIndicator}">
         <Setter Property="BusyContent" Value="Please wait..."/>
         <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Focusable" Value="False" />
         <Setter Property="OverlayStyle">
             <Setter.Value>
                 <Style TargetType="Rectangle">
@@ -253,6 +254,7 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CaptionForeground" Value="#FF000000" />
         <Setter Property="CloseButtonStyle" Value="{StaticResource WindowCloseButtonStyle}" />
+        <Setter Property="Focusable" Value="False" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="IsEnabled" Value="true" />
@@ -455,6 +457,7 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CaptionForeground" Value="#FF000000" />
         <Setter Property="CloseButtonStyle" Value="{StaticResource WindowCloseButtonStyle}" />
+        <Setter Property="Focusable" Value="False" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="IsEnabled" Value="true" />
@@ -766,6 +769,7 @@
     </Style>
 
     <Style TargetType="{x:Type local:ColorPicker}">
+        <Setter Property="Focusable" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ColorPicker}">
@@ -1044,6 +1048,7 @@
     </Style>
 
     <Style TargetType="{x:Type local:ButtonSpinner}">
+        <Setter Property="Focusable" Value="False" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="BorderBrush">
             <Setter.Value>
@@ -1090,6 +1095,7 @@
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:NumericUpDown}">
+        <Setter Property="Focusable" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:NumericUpDown}">
@@ -1116,6 +1122,7 @@
     <!-- =============================================================================== -->
     
     <Style TargetType="{x:Type local:DateTimeUpDown}">
+        <Setter Property="Focusable" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:DateTimeUpDown}">
@@ -1142,6 +1149,7 @@
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:MaskedTextBox}">
+        <Setter Property="Focusable" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:MaskedTextBox}">
