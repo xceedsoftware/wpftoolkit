@@ -1,28 +1,84 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
+using System.Collections.ObjectModel;
+using System.Reflection;
 
 namespace Microsoft.Windows.Controls
 {
     public class ColorPicker : Control
     {
-        #region Private Members
+        #region Members
 
         ToggleButton _colorPickerToggleButton;
         Popup _colorPickerCanvasPopup;
-        Button _okButton;
-        private TranslateTransform _colorShadeSelectorTransform = new TranslateTransform();
-        private Canvas _colorShadingCanvas;
-        private Canvas _colorShadeSelector;
-        private ColorSpectrumSlider _spectrumSlider;
-        private Point? _currentColorPosition;
-        private Color _currentColor = Colors.White;
-        private bool _isLoaded;
+        ListBox _availableColors;
+        ListBox _standardColors;
+        ListBox _recentColors;
 
-        #endregion //Private Members
+        #endregion //Members
+
+        #region Properties
+
+        #region AvailableColors
+
+        public static readonly DependencyProperty AvailableColorsProperty = DependencyProperty.Register("AvailableColors", typeof(ObservableCollection<ColorItem>), typeof(ColorPicker), new UIPropertyMetadata(CreateAvailableColors()));
+        public ObservableCollection<ColorItem> AvailableColors
+        {
+            get { return (ObservableCollection<ColorItem>)GetValue(AvailableColorsProperty); }
+            set { SetValue(AvailableColorsProperty, value); }
+        }
+
+        #endregion //AvailableColors
+
+        #region RecenColors
+
+        public static readonly DependencyProperty RecentColorsProperty = DependencyProperty.Register("RecentColors", typeof(ObservableCollection<ColorItem>), typeof(ColorPicker), new UIPropertyMetadata(null));
+        public ObservableCollection<ColorItem> RecentColors
+        {
+            get { return (ObservableCollection<ColorItem>)GetValue(RecentColorsProperty); }
+            set { SetValue(RecentColorsProperty, value); }
+        }
+
+        #endregion //RecentColors
+
+        #region SelectedColor
+
+        public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register("SelectedColor", typeof(Color), typeof(ColorPicker), new FrameworkPropertyMetadata(Colors.White, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnSelectedColorPropertyChanged)));
+        public Color SelectedColor
+        {
+            get { return (Color)GetValue(SelectedColorProperty); }
+            set { SetValue(SelectedColorProperty, value); }
+        }
+
+        private static void OnSelectedColorPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ColorPicker colorPicker = (ColorPicker)d;
+            if (colorPicker != null)
+                colorPicker.SelectedColorChanged((Color)e.OldValue, (Color)e.NewValue);
+        }
+
+        private void SelectedColorChanged(Color oldValue, Color newValue)
+        {
+            
+        }
+
+        #endregion //SelectedColor
+
+        #region StandardColors
+
+        public static readonly DependencyProperty StandardColorsProperty = DependencyProperty.Register("StandardColors", typeof(ObservableCollection<ColorItem>), typeof(ColorPicker), new UIPropertyMetadata(CreateStandardColors()));
+        public ObservableCollection<ColorItem> StandardColors
+        {
+            get { return (ObservableCollection<ColorItem>)GetValue(StandardColorsProperty); }
+            set { SetValue(StandardColorsProperty, value); }
+        }
+
+        #endregion //StandardColors
+
+        #endregion //Properties
 
         #region Constructors
 
@@ -33,206 +89,10 @@ namespace Microsoft.Windows.Controls
 
         public ColorPicker()
         {
-
+            RecentColors = new ObservableCollection<ColorItem>();
         }
 
         #endregion //Constructors
-
-        #region Properties
-
-        public static readonly DependencyProperty CurrentColorProperty = DependencyProperty.Register("CurrentColor", typeof(Color), typeof(ColorPicker), new PropertyMetadata(Colors.White));
-        public Color CurrentColor
-        {
-            get { return (Color)GetValue(CurrentColorProperty); }
-            set { SetValue(CurrentColorProperty, value); }
-        }
-
-        #region SelectedColor
-
-        public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register("SelectedColor", typeof(Color), typeof(ColorPicker), new FrameworkPropertyMetadata(Colors.White, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(SelectedColorPropertyChanged)));
-        public Color SelectedColor
-        {
-            get { return (Color)GetValue(SelectedColorProperty); }
-            set { SetValue(SelectedColorProperty, value); }
-        }
-
-        private static void SelectedColorPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ColorPicker colorPicker = (ColorPicker)d;
-            colorPicker.SetSelectedColor((Color)e.NewValue);
-        }
-
-        #endregion //SelectedColor
-
-        #region ScRGB
-
-        #region ScA
-
-        public static readonly DependencyProperty ScAProperty = DependencyProperty.Register("ScA", typeof(float), typeof(ColorPicker), new PropertyMetadata((float)1, new PropertyChangedCallback(OnScAPropertyChangedChanged)));
-        public float ScA
-        {
-            get { return (float)GetValue(ScAProperty); }
-            set { SetValue(ScAProperty, value); }
-        }
-
-        private static void OnScAPropertyChangedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ColorPicker c = (ColorPicker)d;
-            c.SetScA((float)e.NewValue);
-        }
-
-        protected virtual void SetScA(float newValue)
-        {
-            _currentColor.ScA = newValue;
-            A = _currentColor.A;
-            CurrentColor = _currentColor;
-            HexadecimalString = _currentColor.ToString();
-        }
-
-        #endregion //ScA
-
-        #region ScR
-
-        public static readonly DependencyProperty ScRProperty = DependencyProperty.Register("ScR", typeof(float), typeof(ColorPicker), new PropertyMetadata((float)1, new PropertyChangedCallback(OnScRPropertyChanged)));
-        public float ScR
-        {
-            get { return (float)GetValue(ScRProperty); }
-            set { SetValue(RProperty, value); }
-        }
-
-        private static void OnScRPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-
-        }
-
-        #endregion //ScR
-
-        #region ScG
-
-        public static readonly DependencyProperty ScGProperty = DependencyProperty.Register("ScG", typeof(float), typeof(ColorPicker), new PropertyMetadata((float)1, new PropertyChangedCallback(OnScGPropertyChanged)));
-        public float ScG
-        {
-            get { return (float)GetValue(ScGProperty); }
-            set { SetValue(GProperty, value); }
-        }
-
-        private static void OnScGPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-
-        }
-
-        #endregion //ScG
-
-        #region ScB
-
-        public static readonly DependencyProperty ScBProperty = DependencyProperty.Register("ScB", typeof(float), typeof(ColorPicker), new PropertyMetadata((float)1, new PropertyChangedCallback(OnScBPropertyChanged)));
-        public float ScB
-        {
-            get { return (float)GetValue(BProperty); }
-            set { SetValue(BProperty, value); }
-        }
-
-        private static void OnScBPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-
-        }
-
-        #endregion //ScB
-
-        #endregion //ScRGB
-
-        #region RGB
-
-        #region A
-
-        public static readonly DependencyProperty AProperty = DependencyProperty.Register("A", typeof(byte), typeof(ColorPicker), new PropertyMetadata((byte)255, new PropertyChangedCallback(OnAPropertyChanged)));
-        public byte A
-        {
-            get { return (byte)GetValue(AProperty); }
-            set { SetValue(AProperty, value); }
-        }
-
-        private static void OnAPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ColorPicker c = (ColorPicker)d;
-            c.SetA((byte)e.NewValue);
-        }
-
-        protected virtual void SetA(byte newValue)
-        {
-            _currentColor.A = newValue;
-            SetValue(CurrentColorProperty, _currentColor);
-        }
-
-        #endregion //A
-
-        #region R
-
-        public static readonly DependencyProperty RProperty = DependencyProperty.Register("R", typeof(byte), typeof(ColorPicker), new PropertyMetadata((byte)255, new PropertyChangedCallback(OnRPropertyChanged)));
-        public byte R
-        {
-            get { return (byte)GetValue(RProperty); }
-            set { SetValue(RProperty, value); }
-        }
-
-        private static void OnRPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-
-        }
-
-        #endregion //R
-
-        #region G
-
-        public static readonly DependencyProperty GProperty = DependencyProperty.Register("G", typeof(byte), typeof(ColorPicker), new PropertyMetadata((byte)255, new PropertyChangedCallback(OnGPropertyChanged)));
-        public byte G
-        {
-            get { return (byte)GetValue(GProperty); }
-            set { SetValue(GProperty, value); }
-        }
-
-        private static void OnGPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-
-        }
-
-        #endregion //G
-
-        #region B
-
-        public static readonly DependencyProperty BProperty = DependencyProperty.Register("B", typeof(byte), typeof(ColorPicker), new PropertyMetadata((byte)255, new PropertyChangedCallback(OnBPropertyChanged)));
-        public byte B
-        {
-            get { return (byte)GetValue(BProperty); }
-            set { SetValue(BProperty, value); }
-        }
-
-        private static void OnBPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-
-        }
-
-        #endregion //B
-
-        #endregion //RGB
-
-        #region HexadecimalString
-
-        public static readonly DependencyProperty HexadecimalStringProperty = DependencyProperty.Register("HexadecimalString", typeof(string), typeof(ColorPicker), new PropertyMetadata("#FFFFFFFF", new PropertyChangedCallback(OnHexadecimalStringPropertyChanged)));
-        public string HexadecimalString
-        {
-            get { return (string)GetValue(HexadecimalStringProperty); }
-            set { SetValue(HexadecimalStringProperty, value); }
-        }
-
-        private static void OnHexadecimalStringPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-
-        }
-
-        #endregion //HexadecimalString
-
-        #endregion //Properties
 
         #region Base Class Overrides
 
@@ -243,79 +103,39 @@ namespace Microsoft.Windows.Controls
             _colorPickerToggleButton = (ToggleButton)GetTemplateChild("PART_ColorPickerToggleButton");
             _colorPickerToggleButton.Click += ColorPickerToggleButton_Clicked;
 
-            _colorPickerCanvasPopup = (Popup)GetTemplateChild("PART_ColorPickerCanvasPopup");
+            _colorPickerCanvasPopup = (Popup)GetTemplateChild("PART_ColorPickerPalettePopup");
 
-            _colorShadingCanvas = (Canvas)GetTemplateChild("PART_ColorShadingCanvas");
-            _colorShadingCanvas.MouseLeftButtonDown += ColorShadingCanvas_MouseLeftButtonDown;
-            _colorShadingCanvas.MouseMove += ColorShadingCanvas_MouseMove;
-            _colorShadingCanvas.SizeChanged += ColorShadingCanvas_SizeChanged;
+            _availableColors = (ListBox)GetTemplateChild("PART_AvailableColors");
+            _availableColors.SelectionChanged += Color_SelectionChanged;
 
-            _colorShadeSelector = (Canvas)GetTemplateChild("PART_ColorShadeSelector");
-            _colorShadeSelector.RenderTransform = _colorShadeSelectorTransform;
+            _standardColors = (ListBox)GetTemplateChild("PART_StandardColors");
+            _standardColors.SelectionChanged += Color_SelectionChanged;
 
-            _spectrumSlider = (ColorSpectrumSlider)GetTemplateChild("PART_SpectrumSlider");
-            _spectrumSlider.ValueChanged += SpectrumSlider_ValueChanged;
-
-            _okButton = (Button)GetTemplateChild("PART_OkButton");
-            _okButton.Click += OkButton_Click;
-
-            SetSelectedColor(SelectedColor);
+            _recentColors = (ListBox)GetTemplateChild("PART_RecentColors");
+            _recentColors.SelectionChanged += Color_SelectionChanged;
         }
 
         #endregion //Base Class Overrides
 
         #region Event Handlers
 
-        void ColorShadingCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            Point p = e.GetPosition(_colorShadingCanvas);
-            UpdateColorShadeSelectorPositionAndCalculateColor(p, true);
-        }
-
-        void ColorShadingCanvas_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                Point p = e.GetPosition(_colorShadingCanvas);
-                UpdateColorShadeSelectorPositionAndCalculateColor(p, true);
-                Mouse.Synchronize();
-            }
-        }
-
-        void ColorShadingCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (_currentColorPosition != null)
-            {
-                Point _newPoint = new Point
-                {
-                    X = ((Point)_currentColorPosition).X * e.NewSize.Width,
-                    Y = ((Point)_currentColorPosition).Y * e.NewSize.Height
-                };
-
-                UpdateColorShadeSelectorPositionAndCalculateColor(_newPoint, false);
-            }
-        }
-
-        void SpectrumSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (_currentColorPosition != null)
-            {
-                CalculateColor((Point)_currentColorPosition);
-            }
-        }
-
-        void OkButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (_colorPickerCanvasPopup.IsOpen || _colorPickerToggleButton.IsChecked == true)
-            {
-                CloseColorPicker();
-                SelectedColor = CurrentColor;
-            }
-        }
-
         void ColorPickerToggleButton_Clicked(object sender, RoutedEventArgs e)
         {
             _colorPickerCanvasPopup.IsOpen = _colorPickerToggleButton.IsChecked ?? false;
+        }
+
+        private void Color_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ListBox lb = (ListBox)sender;
+
+            if (e.AddedItems.Count > 0)
+            {
+                var colorItem = (ColorItem)e.AddedItems[0];
+                SelectedColor = colorItem.Color;
+                UpdateRecentColors(colorItem);
+                CloseColorPicker();
+                lb.SelectedIndex = -1; //for now I don't care about keeping track of the selected color
+            }
         }
 
         #endregion //Event Handlers
@@ -328,67 +148,48 @@ namespace Microsoft.Windows.Controls
             _colorPickerCanvasPopup.IsOpen = false;
         }
 
-        private void SetSelectedColor(Color theColor)
+        private void UpdateRecentColors(ColorItem colorItem)
         {
-            _currentColor = theColor;
-            SetValue(AProperty, _currentColor.A);
-            SetValue(RProperty, _currentColor.R);
-            SetValue(GProperty, _currentColor.G);
-            SetValue(BProperty, _currentColor.B);
-            UpdateColorShadeSelectorPosition(_currentColor);
+            if (!RecentColors.Contains(colorItem))
+                RecentColors.Add(colorItem);
+
+            if (RecentColors.Count > 10) //don't allow more than ten, maybe make a property that can be set by the user.
+                RecentColors.RemoveAt(0);
         }
 
-        private void UpdateColorShadeSelectorPositionAndCalculateColor(Point p, bool calculateColor)
+        private static ObservableCollection<ColorItem> CreateStandardColors()
         {
-            if (p.Y < 0)
-                p.Y = 0;
-
-            if (p.X < 0)
-                p.X = 0;
-
-            if (p.X > _colorShadingCanvas.ActualWidth)
-                p.X = _colorShadingCanvas.ActualWidth;
-
-            if (p.Y > _colorShadingCanvas.ActualHeight)
-                p.Y = _colorShadingCanvas.ActualHeight;
-
-            _colorShadeSelectorTransform.X = p.X - (_colorShadeSelector.Width / 2);
-            _colorShadeSelectorTransform.Y = p.Y - (_colorShadeSelector.Height / 2);
-
-            p.X = p.X / _colorShadingCanvas.ActualWidth;
-            p.Y = p.Y / _colorShadingCanvas.ActualHeight;
-
-            _currentColorPosition = p;
-
-            if (calculateColor)
-                CalculateColor(p);
+            ObservableCollection<ColorItem> _standardColors = new ObservableCollection<ColorItem>();
+            _standardColors.Add(new ColorItem(Colors.White, "White"));
+            _standardColors.Add(new ColorItem(Colors.Gray, "Gray"));
+            _standardColors.Add(new ColorItem(Colors.Black, "Black"));
+            _standardColors.Add(new ColorItem(Colors.Red, "Red"));
+            _standardColors.Add(new ColorItem(Colors.Green, "Geen"));
+            _standardColors.Add(new ColorItem(Colors.Blue, "Blue"));
+            _standardColors.Add(new ColorItem(Colors.Yellow, "Yellow"));
+            _standardColors.Add(new ColorItem(Colors.Orange, "Orange"));
+            _standardColors.Add(new ColorItem(Colors.Brown, "Brown"));
+            _standardColors.Add(new ColorItem(Colors.Purple, "Purple"));
+            return _standardColors;
         }
 
-        private void UpdateColorShadeSelectorPosition(Color color)
+        private static ObservableCollection<ColorItem> CreateAvailableColors()
         {
-            if (_spectrumSlider == null || _colorShadingCanvas == null)
-                return;
+            ObservableCollection<ColorItem> _standardColors = new ObservableCollection<ColorItem>();
 
-            _currentColorPosition = null;
+            PropertyInfo[] properties = typeof(Colors).GetProperties(BindingFlags.Static | BindingFlags.Public);
+            foreach (PropertyInfo info in properties)
+            {
+                if (String.Compare(info.Name, "Transparent", false) != 0)
+                {
+                    Color c = (Color)info.GetValue(typeof(Colors), null);
+                    var colorItem = new ColorItem(c, info.Name);
+                    if (!_standardColors.Contains(colorItem))
+                        _standardColors.Add(colorItem);
+                }
+            }
 
-            HsvColor hsv = ColorUtilities.ConvertRgbToHsv(color.R, color.G, color.B);
-            _spectrumSlider.Value = hsv.H;
-
-            Point p = new Point(hsv.S, 1 - hsv.V);
-
-            _currentColorPosition = p;
-
-            _colorShadeSelectorTransform.X = (p.X * _colorShadingCanvas.Width) - 5;
-            _colorShadeSelectorTransform.Y = (p.Y * _colorShadingCanvas.Height) - 5;
-        }
-
-        private void CalculateColor(Point p)
-        {
-            HsvColor hsv = new HsvColor(360 - _spectrumSlider.Value, 1, 1) { S = p.X, V = 1 - p.Y };
-            _currentColor = ColorUtilities.ConvertHsvToRgb(hsv.H, hsv.S, hsv.V); ;
-            _currentColor.ScA = ScA;
-            CurrentColor = _currentColor;
-            HexadecimalString = _currentColor.ToString();
+            return _standardColors;
         }
 
         #endregion //Methods
