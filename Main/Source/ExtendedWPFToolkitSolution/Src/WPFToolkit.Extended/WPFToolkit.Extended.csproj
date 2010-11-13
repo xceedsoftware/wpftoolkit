@@ -68,14 +68,12 @@
     <Compile Include="ChildWindow\ChildWindow.cs" />
     <Compile Include="ChildWindow\VisualStates.ChildWindow.cs" />
     <Compile Include="ChildWindow\WindowState.cs" />
-    <Compile Include="ColorPicker\ColorPicker.cs" />
-    <Compile Include="ColorPicker\HsvColor.cs" />
-    <Compile Include="ColorPicker\ColorUtilities.cs" />
-    <Compile Include="ColorPicker\ColorSpectrumSlider.cs" />
     <Compile Include="ButtonSpinner\SpinDirection.cs" />
     <Compile Include="ButtonSpinner\SpinEventArgs.cs" />
     <Compile Include="ButtonSpinner\Spinner.cs" />
     <Compile Include="ButtonSpinner\ValidSpinDirections.cs" />
+    <Compile Include="ColorPicker\ColorItem.cs" />
+    <Compile Include="ColorPicker\ColorPicker.cs" />
     <Compile Include="Core\Converters\InverseBoolConverter.cs" />
     <Compile Include="DateTimeUpDown\DateTimeFormat.cs" />
     <Compile Include="DateTimeUpDown\DateTimeInfo.cs" />
