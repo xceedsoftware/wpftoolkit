@@ -33,7 +33,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;VS2008</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -102,17 +102,11 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ChildWindow\WindowState.cs">
       <Link>ChildWindow\WindowState.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ColorPicker\ColorItem.cs">
+      <Link>ColorPicker\ColorItem.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ColorPicker\ColorPicker.cs">
       <Link>ColorPicker\ColorPicker.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ColorPicker\ColorSpectrumSlider.cs">
-      <Link>ColorPicker\ColorSpectrumSlider.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ColorPicker\ColorUtilities.cs">
-      <Link>ColorPicker\ColorUtilities.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ColorPicker\HsvColor.cs">
-      <Link>ColorPicker\HsvColor.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Converters\InverseBoolConverter.cs">
       <Link>Core\Converters\InverseBoolConverter.cs</Link>
