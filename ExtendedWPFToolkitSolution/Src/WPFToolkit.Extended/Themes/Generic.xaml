@@ -695,13 +695,16 @@
     </DataTemplate>
 
     <Style TargetType="{x:Type local:ColorPicker}">
+        <Setter Property="ButtonStyle" Value="{StaticResource ColorPickerToggleButton}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ColorPickerDarkBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ColorPicker}">
                     <Grid>
-                        <Border BorderBrush="{StaticResource ColorPickerDarkBorderBrush}" BorderThickness="1" CornerRadius="0">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0">
                             <Grid>
-                                <ToggleButton x:Name="PART_ColorPickerToggleButton" Style="{StaticResource ColorPickerToggleButton}" MinHeight="22">
+                                <ToggleButton x:Name="PART_ColorPickerToggleButton" Style="{TemplateBinding ButtonStyle}" MinHeight="22">
                                     <ToggleButton.Background>
                                         <SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}"/>
                                     </ToggleButton.Background>
