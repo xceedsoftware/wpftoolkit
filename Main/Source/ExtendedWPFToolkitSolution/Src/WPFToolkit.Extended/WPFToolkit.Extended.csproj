@@ -153,7 +153,16 @@
   <ItemGroup>
     <Resource Include="RichTextBoxFormatBar\Images\Underline16.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\FontColorPicker16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\TextHighlightColorPicker16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\Bullets16.png" />
+    <Resource Include="RichTextBoxFormatBar\Images\Numbering16.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -43,7 +43,7 @@ namespace Microsoft.Windows.Controls
 
         #endregion //FormatBar
 
-        bool AdornerIsVisible
+        public bool IsAdornerVisible
         {
             get { return _adorner.Visibility == Visibility.Visible; }
         }
@@ -91,7 +91,7 @@ namespace Microsoft.Windows.Controls
         {
             //this fixes the bug when applying text transformations the text would lose it's highlight.  That was because the RichTextBox was losing focus
             //so we just give it focus again and it seems to do the trick of re-highlighting it.
-            if (!_richTextBox.IsFocused)
+            if (!_richTextBox.IsFocused && !_richTextBox.Selection.IsEmpty)
                 _richTextBox.Focus();
         }
 
@@ -125,6 +125,9 @@ namespace Microsoft.Windows.Controls
         /// </summary>
         void ShowAdorner()
         {
+            if (_adorner.Visibility == Visibility.Visible)
+                return;
+
             VerifyAdornerLayer();
 
             Control adorningEditor = _toolbar as Control;
@@ -182,7 +185,7 @@ namespace Microsoft.Windows.Controls
         /// </summary>
         void HideAdorner()
         {
-            if (AdornerIsVisible)
+            if (IsAdornerVisible)
             {
                 _adorner.Visibility = Visibility.Collapsed;
                 _adorner.Child = null;

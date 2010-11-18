@@ -27,12 +27,6 @@ namespace Microsoft.Windows.Controls
         private static void OnRichTextBoxPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             RichTextBoxFormatBar formatBar = d as RichTextBoxFormatBar;
-            formatBar.HookupRichTextBoxEvents();
-        }
-
-        private void HookupRichTextBoxEvents()
-        {
-            Target.SelectionChanged += RichTextBox_SelectionChanged;
         }
 
         #endregion //RichTextBox
@@ -52,13 +46,16 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion
-        
+
         #region Constructors
 
         public RichTextBoxFormatBar()
         {
             InitializeComponent();
             Loaded += FormatToolbar_Loaded;
+
+            _cmbFontFamilies.ItemsSource = Fonts.SystemFontFamilies;
+            _cmbFontSizes.ItemsSource = FontSizes;
         }
 
         #endregion //Constructors
@@ -67,8 +64,7 @@ namespace Microsoft.Windows.Controls
 
         void FormatToolbar_Loaded(object sender, RoutedEventArgs e)
         {
-            _cmbFontFamilies.ItemsSource = Fonts.SystemFontFamilies;
-            _cmbFontSizes.ItemsSource = FontSizes;
+            UpdateVisualState();
         }
 
         private void FontFamily_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -88,9 +84,32 @@ namespace Microsoft.Windows.Controls
             ApplyPropertyValueToSelectedText(TextElement.FontSizeProperty, e.AddedItems[0]);
         }
 
-        void RichTextBox_SelectionChanged(object sender, RoutedEventArgs e)
+        void FontColor_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color> e)
         {
-            UpdateVisualState();
+            Color selectedColor = (Color)e.NewValue;
+            ApplyPropertyValueToSelectedText(TextElement.ForegroundProperty, new SolidColorBrush(selectedColor));
+        }
+
+        private void FontBackgroundColor_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color> e)
+        {
+            Color selectedColor = (Color)e.NewValue;
+            ApplyPropertyValueToSelectedText(TextElement.BackgroundProperty, new SolidColorBrush(selectedColor));
+        }
+
+        private void Bullets_Clicked(object sender, RoutedEventArgs e)
+        {
+            if (BothSelectionListsAreChecked())
+            {
+                _btnNumbers.IsChecked = false;
+            }
+        }
+
+        private void Numbers_Clicked(object sender, RoutedEventArgs e)
+        {
+            if (BothSelectionListsAreChecked())
+            {
+                _btnBullets.IsChecked = false;
+            }
         }
 
         private void DragWidget_DragDelta(object sender, DragDeltaEventArgs e)
@@ -107,6 +126,9 @@ namespace Microsoft.Windows.Controls
             UpdateToggleButtonState();
             UpdateSelectedFontFamily();
             UpdateSelectedFontSize();
+            UpdateFontColor();
+            UpdateFontBackgroundColor();
+            UpdateSelectionListType();
         }
 
         private void UpdateToggleButtonState()
@@ -140,6 +162,54 @@ namespace Microsoft.Windows.Controls
         {
             object value = Target.Selection.GetPropertyValue(TextElement.FontSizeProperty);
             _cmbFontSizes.SelectedValue = (value == DependencyProperty.UnsetValue) ? null : value;
+        }
+
+        private void UpdateFontColor()
+        {
+            object value = Target.Selection.GetPropertyValue(TextElement.ForegroundProperty);
+            Color currentColor = (Color)((value == DependencyProperty.UnsetValue) ? Colors.Black : ((SolidColorBrush)value).Color);
+            _cmbFontColor.SelectedColor = currentColor;
+        }
+
+        private void UpdateFontBackgroundColor()
+        {
+            object value = Target.Selection.GetPropertyValue(TextElement.BackgroundProperty);
+            Color currentColor = (Color)((value == null || value == DependencyProperty.UnsetValue) ? Colors.White : ((SolidColorBrush)value).Color);
+            _cmbFontBackgroundColor.SelectedColor = currentColor;
+        }
+
+        /// <summary>
+        /// Updates the visual state of the List styles, such as Numbers and Bullets.
+        /// </summary>
+        private void UpdateSelectionListType()
+        {
+            //uncheck both
+            _btnBullets.IsChecked = false;
+            _btnNumbers.IsChecked = false;
+
+            Paragraph startParagraph = Target.Selection.Start.Paragraph;
+            Paragraph endParagraph = Target.Selection.End.Paragraph;
+            if (startParagraph != null && endParagraph != null && (startParagraph.Parent is ListItem) && (endParagraph.Parent is ListItem) && object.ReferenceEquals(((ListItem)startParagraph.Parent).List, ((ListItem)endParagraph.Parent).List))
+            {
+                TextMarkerStyle markerStyle = ((ListItem)startParagraph.Parent).List.MarkerStyle;
+                if (markerStyle == TextMarkerStyle.Disc) //bullets
+                {
+                    _btnBullets.IsChecked = true;
+                }
+                else if (markerStyle == TextMarkerStyle.Decimal) //numbers
+                {
+                    _btnNumbers.IsChecked = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if both selection lists are checked. (Bullets and Numbers)
+        /// </summary>
+        /// <returns></returns>
+        private bool BothSelectionListsAreChecked()
+        {
+            return _btnBullets.IsChecked == true && _btnNumbers.IsChecked == true;
         }
 
         void ApplyPropertyValueToSelectedText(DependencyProperty formattingProperty, object value)

@@ -33,6 +33,17 @@ namespace Microsoft.Windows.Controls
 
         #endregion //AvailableColors
 
+        #region ButtonStyle
+
+        public static readonly DependencyProperty ButtonStyleProperty = DependencyProperty.Register("ButtonStyle", typeof(Style), typeof(ColorPicker));
+        public Style ButtonStyle
+        {
+            get { return (Style)GetValue(ButtonStyleProperty); }
+            set { SetValue(ButtonStyleProperty, value); }
+        }
+
+        #endregion //ButtonStyle
+
         #region RecenColors
 
         public static readonly DependencyProperty RecentColorsProperty = DependencyProperty.Register("RecentColors", typeof(ObservableCollection<ColorItem>), typeof(ColorPicker), new UIPropertyMetadata(null));
@@ -46,7 +57,7 @@ namespace Microsoft.Windows.Controls
 
         #region SelectedColor
 
-        public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register("SelectedColor", typeof(Color), typeof(ColorPicker), new FrameworkPropertyMetadata(Colors.White, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnSelectedColorPropertyChanged)));
+        public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register("SelectedColor", typeof(Color), typeof(ColorPicker), new FrameworkPropertyMetadata(Colors.Black, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnSelectedColorPropertyChanged)));
         public Color SelectedColor
         {
             get { return (Color)GetValue(SelectedColorProperty); }
@@ -57,12 +68,14 @@ namespace Microsoft.Windows.Controls
         {
             ColorPicker colorPicker = (ColorPicker)d;
             if (colorPicker != null)
-                colorPicker.SelectedColorChanged((Color)e.OldValue, (Color)e.NewValue);
+                colorPicker.OnSelectedColorChanged((Color)e.OldValue, (Color)e.NewValue);
         }
 
-        private void SelectedColorChanged(Color oldValue, Color newValue)
+        private void OnSelectedColorChanged(Color oldValue, Color newValue)
         {
-            
+            RoutedPropertyChangedEventArgs<Color> args = new RoutedPropertyChangedEventArgs<Color>(oldValue, newValue);
+            args.RoutedEvent = ColorPicker.SelectedColorChangedEvent;
+            RaiseEvent(args);
         }
 
         #endregion //SelectedColor
@@ -139,6 +152,17 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Event Handlers
+
+        #region Events
+
+        public static readonly RoutedEvent SelectedColorChangedEvent = EventManager.RegisterRoutedEvent("SelectedColorChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<Color>), typeof(ColorPicker));
+        public event RoutedPropertyChangedEventHandler<Color> SelectedColorChanged
+        {
+            add { AddHandler(SelectedColorChangedEvent, value); }
+            remove { RemoveHandler(SelectedColorChangedEvent, value); }
+        }
+
+        #endregion //Events
 
         #region Methods
 

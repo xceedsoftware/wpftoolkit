@@ -4,7 +4,6 @@ using System.Globalization;
 
 namespace Microsoft.Windows.Controls
 {
-
     public class NumericUpDown : UpDownBase<double>
     {
         #region Properties
@@ -90,8 +89,7 @@ namespace Microsoft.Windows.Controls
 
         #region Constructors
 
-        public NumericUpDown()
-            : base()
+        static NumericUpDown()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(NumericUpDown), new FrameworkPropertyMetadata(typeof(NumericUpDown)));
         }
