@@ -99,6 +99,7 @@ namespace Microsoft.Windows.Controls
         protected override void OnValueChanged(object oldValue, object newValue)
         {
             SetValidSpinDirection();
+            base.OnValueChanged(oldValue, newValue);
         }
 
         protected override object OnCoerceValue(object value)

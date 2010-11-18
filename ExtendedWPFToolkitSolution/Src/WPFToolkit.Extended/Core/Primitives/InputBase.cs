@@ -80,7 +80,9 @@ namespace Microsoft.Windows.Controls.Primitives
 
         protected virtual void OnValueChanged(object oldValue, object newValue)
         {
-                        
+            RoutedPropertyChangedEventArgs<object> args = new RoutedPropertyChangedEventArgs<object>(oldValue, newValue);
+            args.RoutedEvent = InputBase.ValueChangedEvent;
+            RaiseEvent(args);
         }
 
         private static object OnCoerceValuePropertyCallback(DependencyObject d, object baseValue)
@@ -138,6 +140,17 @@ namespace Microsoft.Windows.Controls.Primitives
         }
 
         #endregion //Base Class Overrides
+
+        #region Events
+
+        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<object>), typeof(InputBase));
+        public event RoutedPropertyChangedEventHandler<object> ValueChanged
+        {
+            add { AddHandler(ValueChangedEvent, value); }
+            remove { RemoveHandler(ValueChangedEvent, value); }
+        }
+
+        #endregion //Events
 
         #region Methods
 

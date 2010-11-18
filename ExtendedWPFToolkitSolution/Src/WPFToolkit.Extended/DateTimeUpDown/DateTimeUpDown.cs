@@ -62,6 +62,8 @@ namespace Microsoft.Windows.Controls
         {
             //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
             ParseValueIntoDateTimeInfo();
+
+            base.OnValueChanged(oldValue, newValue);
         }
 
         #endregion //Constructors
