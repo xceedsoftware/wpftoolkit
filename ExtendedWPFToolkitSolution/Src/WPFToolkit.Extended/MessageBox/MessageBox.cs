@@ -345,18 +345,21 @@ namespace Microsoft.Windows.Controls
         /// <returns></returns>
         private Window CreateContainer()
         {
-            return new Window()
-            {
-                AllowsTransparency = true,
-                Background = Brushes.Transparent,
-                Content = this,
-                Owner = Window.GetWindow(ResolveOwner()),
-                ShowInTaskbar = false,
-                SizeToContent = System.Windows.SizeToContent.WidthAndHeight,
-                ResizeMode = System.Windows.ResizeMode.NoResize,
-                WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
-                WindowStyle = System.Windows.WindowStyle.None
-            };
+            var newWindow = new Window();
+            newWindow.AllowsTransparency = true;
+            newWindow.Background = Brushes.Transparent;
+            newWindow.Content = this;
+
+            var owner = ResolveOwner();
+            if (owner != null)
+                newWindow.Owner = Window.GetWindow(owner);
+
+            newWindow.ShowInTaskbar = false;
+            newWindow.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;
+            newWindow.ResizeMode = System.Windows.ResizeMode.NoResize;
+            newWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+            newWindow.WindowStyle = System.Windows.WindowStyle.None;
+            return newWindow;
         }
 
         #endregion //Private
