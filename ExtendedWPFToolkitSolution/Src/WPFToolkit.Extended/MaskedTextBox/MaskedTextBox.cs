@@ -141,6 +141,10 @@ namespace Microsoft.Windows.Controls
             if (value == null)
                 value = string.Empty;
 
+            //I have only seen this occur while in Blend, but we need it here so the Blend designer doesn't crash.
+            if (MaskProvider == null) 
+                return value.ToString();
+
             MaskProvider.Set(value.ToString());
             return MaskProvider.ToDisplayString();
         }
