@@ -54,16 +54,14 @@ namespace Microsoft.Windows.Controls
         {
             ValidSpinDirections valid = e.Direction == SpinDirection.Increase ? ValidSpinDirections.Increase : ValidSpinDirections.Decrease;
 
-            if ((ValidSpinDirection & valid) != valid)
+            //Only raise the event if spin is allowed.
+            if ((ValidSpinDirection & valid) == valid)
             {
-                // spin is not allowed.
-                throw new InvalidOperationException("Spin action is not valid at this moment.");
-            }
-
-            EventHandler<SpinEventArgs> handler = Spin;
-            if (handler != null)
-            {
-                handler(this, e);
+                EventHandler<SpinEventArgs> handler = Spin;
+                if (handler != null)
+                {
+                    handler(this, e);
+                }
             }
         }
 
