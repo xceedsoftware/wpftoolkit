@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Globalization;
+using System.Windows.Input;
 
 namespace Microsoft.Windows.Controls
 {
@@ -75,6 +76,17 @@ namespace Microsoft.Windows.Controls
 
         #endregion //FormatString
 
+        #region SelectAllOnGotFocus
+
+        public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register("SelectAllOnGotFocus", typeof(bool), typeof(NumericUpDown), new PropertyMetadata(false));
+        public bool SelectAllOnGotFocus
+        {
+            get { return (bool)GetValue(SelectAllOnGotFocusProperty); }
+            set { SetValue(SelectAllOnGotFocusProperty, value); }
+        }
+
+        #endregion //SelectAllOnGotFocus
+
         #endregion
 
         #region Constructors
@@ -94,6 +106,13 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
             SetValidSpinDirection();
+
+            if (SelectAllOnGotFocus)
+            {
+                //in order to select all the text we must handle both the keybord (tabbing) and mouse (clicking) events
+                TextBox.GotKeyboardFocus += OnTextBoxGotKeyBoardFocus;
+                TextBox.PreviewMouseLeftButtonDown += OnTextBoxPreviewMouseLeftButtonDown;
+            }
         }
 
         protected override void OnValueChanged(object oldValue, object newValue)
@@ -159,6 +178,24 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Base Class Overrides
+
+        #region Event Handlers
+
+        private void OnTextBoxGotKeyBoardFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox.SelectAll();
+        }
+
+        void OnTextBoxPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!TextBox.IsKeyboardFocused)
+            {
+                e.Handled = true;
+                TextBox.Focus();
+            }
+        }
+
+        #endregion //Event Handlers
 
         #region Methods
 
