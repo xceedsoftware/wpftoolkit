@@ -22,7 +22,7 @@ namespace Microsoft.Windows.Controls
 
         #region Format
 
-        public static readonly DependencyProperty FormatProperty = DependencyProperty.Register("Format", typeof(DateTimeFormat), typeof(DateTimeUpDown), new UIPropertyMetadata(DateTimeFormat.ShortTime, OnFormatChanged));
+        public static readonly DependencyProperty FormatProperty = DependencyProperty.Register("Format", typeof(DateTimeFormat), typeof(DateTimeUpDown), new UIPropertyMetadata(DateTimeFormat.FullDateTime, OnFormatChanged));
         public DateTimeFormat Format
         {
             get { return (DateTimeFormat)GetValue(FormatProperty); }
@@ -56,6 +56,7 @@ namespace Microsoft.Windows.Controls
         public DateTimeUpDown()
         {
             DateTimeFormatInfo = DateTimeFormatInfo.GetInstance(CultureInfo.CurrentCulture);
+            InitializeDateTimeInfoList();
         }
 
         protected override void OnValueChanged(object oldValue, object newValue)

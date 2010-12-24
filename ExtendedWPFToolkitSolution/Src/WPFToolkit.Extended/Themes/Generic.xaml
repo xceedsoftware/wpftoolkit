@@ -961,6 +961,7 @@
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:NumericUpDown}">
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
@@ -988,6 +989,7 @@
     <!-- =============================================================================== -->
     
     <Style TargetType="{x:Type local:DateTimeUpDown}">
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
@@ -1015,6 +1017,7 @@
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:MaskedTextBox}">
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
