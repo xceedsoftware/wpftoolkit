@@ -10,7 +10,7 @@ namespace Microsoft.Windows.Controls
         #region Private Members
 
         private bool _textHasLoaded;
-        private bool isInvokePending;
+        private bool _isInvokePending;
 
         #endregion //Private Members
 
@@ -24,9 +24,9 @@ namespace Microsoft.Windows.Controls
         public RichTextBox(System.Windows.Documents.FlowDocument document)
             : base(document)
         {
-            
-        }  
-       
+
+        }
+
         #endregion //Constructors
 
         #region Properties
@@ -77,6 +77,11 @@ namespace Microsoft.Windows.Controls
             set
             {
                 _textFormatter = value;
+
+                //if the Text has already been set and we are changing the TextFormatter then re-set the text
+                if (_textHasLoaded)
+                    _textFormatter.SetText(Document, Text);
+
             }
         }
 
@@ -88,10 +93,10 @@ namespace Microsoft.Windows.Controls
 
         private void InvokeUpdateText()
         {
-            if (!isInvokePending)
+            if (!_isInvokePending)
             {
                 Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(UpdateText));
-                isInvokePending = true;
+                _isInvokePending = true;
             }
         }
 
@@ -106,7 +111,7 @@ namespace Microsoft.Windows.Controls
             if (_textHasLoaded)
                 Text = TextFormatter.GetText(Document);
 
-            isInvokePending = false;
+            _isInvokePending = false;
         }
 
         #endregion //Methods
