@@ -240,6 +240,9 @@ namespace Microsoft.Windows.Controls
 
         private void UpdateText(MaskedTextProvider provider, int position)
         {
+            if (provider == null)
+                throw new ArgumentNullException("MaskedTextProvider", "Mask cannot be null.");
+
             Text = provider.ToDisplayString();
 
             if (TextBox != null)
@@ -254,6 +257,11 @@ namespace Microsoft.Windows.Controls
 
         private void ResolveMaskProvider(string mask)
         {
+            //do not create a mask provider if the Mask is empty, which can occur if the IncludePrompt and IncludeLiterals properties
+            //are set prior to the Mask.
+            if (String.IsNullOrWhiteSpace(mask))
+                return;
+
             MaskProvider = new MaskedTextProvider(mask)
             {
                 IncludePrompt = this.IncludePrompt,
