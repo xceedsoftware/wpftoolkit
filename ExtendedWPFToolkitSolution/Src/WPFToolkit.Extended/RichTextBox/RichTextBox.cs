@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Threading;
 
 namespace Microsoft.Windows.Controls
 {
@@ -9,8 +8,7 @@ namespace Microsoft.Windows.Controls
     {
         #region Private Members
 
-        private bool _textHasLoaded;
-        private bool _isInvokePending;
+        private bool _textSetInternally;
 
         #endregion //Private Members
 
@@ -44,11 +42,9 @@ namespace Microsoft.Windows.Controls
         {
             RichTextBox rtb = (RichTextBox)d;
 
-            if (!rtb._textHasLoaded)
-            {
+            // if the text is not being set internally then load the text into the RichTextBox
+            if (!rtb._textSetInternally)
                 rtb.TextFormatter.SetText(rtb.Document, (string)e.NewValue);
-                rtb._textHasLoaded = true;
-            }
         }
 
         private static object CoerceTextProperty(DependencyObject d, object value)
@@ -77,11 +73,6 @@ namespace Microsoft.Windows.Controls
             set
             {
                 _textFormatter = value;
-
-                //if the Text has already been set and we are changing the TextFormatter then re-set the text
-                if (_textHasLoaded)
-                    _textFormatter.SetText(Document, Text);
-
             }
         }
 
@@ -91,27 +82,13 @@ namespace Microsoft.Windows.Controls
 
         #region Methods
 
-        private void InvokeUpdateText()
-        {
-            if (!_isInvokePending)
-            {
-                Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(UpdateText));
-                _isInvokePending = true;
-            }
-        }
-
         private void UpdateText()
         {
-            //when the Text is null and the Text hasn't been loaded, it indicates that the OnTextPropertyChanged event hasn't exceuted
-            //and since we are initializing the text from here, we don't want the OnTextPropertyChanged to execute, so set the loaded flag to true.
-            //this prevents the cursor to jumping to the front of the textbox after the first letter is typed.
-            if (!_textHasLoaded && string.IsNullOrEmpty(Text))
-                _textHasLoaded = true;
+            _textSetInternally = true;
 
-            if (_textHasLoaded)
-                Text = TextFormatter.GetText(Document);
+            Text = TextFormatter.GetText(Document);
 
-            _isInvokePending = false;
+            _textSetInternally = false;
         }
 
         #endregion //Methods
@@ -126,11 +103,11 @@ namespace Microsoft.Windows.Controls
             {
                 if (binding.UpdateSourceTrigger == UpdateSourceTrigger.Default || binding.UpdateSourceTrigger == UpdateSourceTrigger.LostFocus)
                 {
-                    PreviewLostKeyboardFocus += (o, ea) => UpdateText(); //do this synchronously
+                    PreviewLostKeyboardFocus += (o, ea) => UpdateText();
                 }
                 else
                 {
-                    TextChanged += (o, ea) => InvokeUpdateText(); //do this async
+                    TextChanged += (o, ea) => UpdateText();
                 }
             }
         }
