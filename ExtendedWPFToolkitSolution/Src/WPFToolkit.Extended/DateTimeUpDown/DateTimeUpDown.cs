@@ -59,14 +59,6 @@ namespace Microsoft.Windows.Controls
             InitializeDateTimeInfoList();
         }
 
-        protected override void OnValueChanged(object oldValue, object newValue)
-        {
-            //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
-            ParseValueIntoDateTimeInfo();
-
-            base.OnValueChanged(oldValue, newValue);
-        }
-
         #endregion //Constructors
 
         #region Base Class Overrides
@@ -83,6 +75,14 @@ namespace Microsoft.Windows.Controls
                 return;
 
             base.OnPreviewKeyDown(e);
+        }
+
+        protected override void OnValueChanged(object oldValue, object newValue)
+        {
+            //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
+            ParseValueIntoDateTimeInfo();
+
+            base.OnValueChanged(oldValue, newValue);
         }
 
         protected override object OnCoerceValue(object value)
@@ -378,6 +378,12 @@ namespace Microsoft.Windows.Controls
         {
             _fireSelectionChangedEvent = false;
             DateTimeInfo info = _selectedDateTimeInfo;
+
+            //this only occurs when the user manually type in a value for the Value Property
+            if (info == null)
+                info = _dateTimeInfoList[0];
+
+
             switch (info.Type)
             {
                 case DateTimePart.Year:
