@@ -85,6 +85,17 @@ namespace Microsoft.Windows.Controls
             base.OnPreviewKeyDown(e);
         }
 
+        protected override object OnCoerceValue(object value)
+        {
+            //if the user entered a string value to represent a date or time, we need to parse that string into a valid DatTime value
+            if (value != null && !(value is DateTime))
+            {
+                return DateTime.Parse(value.ToString(), DateTimeFormatInfo);
+            }
+
+            return base.OnCoerceValue(value);
+        }
+
         #endregion //Base Class Overrides
 
         #region Event Hanlders
