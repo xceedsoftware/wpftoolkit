@@ -134,6 +134,8 @@ namespace Microsoft.Windows.Controls
 
         private void InitializeDateTimeInfoList()
         {
+            _dateTimeInfoList.Clear();
+
             string format = GetFormatString(Format);
             while (format.Length > 0)
             {
