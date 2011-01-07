@@ -259,7 +259,7 @@ namespace Microsoft.Windows.Controls
         {
             //do not create a mask provider if the Mask is empty, which can occur if the IncludePrompt and IncludeLiterals properties
             //are set prior to the Mask.
-            if (String.IsNullOrWhiteSpace(mask))
+            if (String.IsNullOrEmpty(mask))
                 return;
 
             MaskProvider = new MaskedTextProvider(mask)
