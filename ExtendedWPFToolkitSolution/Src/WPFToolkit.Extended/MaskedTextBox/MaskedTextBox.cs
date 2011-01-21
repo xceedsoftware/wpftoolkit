@@ -103,6 +103,9 @@ namespace Microsoft.Windows.Controls
             TextBox = GetTemplateChild("TextBox") as TextBox;
             TextBox.PreviewTextInput += TextBox_PreviewTextInput;
             TextBox.PreviewKeyDown += TextBox_PreviewKeyDown;
+
+            TextBox.CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, Paste)); //handle paste
+            TextBox.CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, null, CanCut)); //surpress cut
         }
 
         protected override object ConvertTextToValue(string text)
@@ -142,7 +145,7 @@ namespace Microsoft.Windows.Controls
                 value = string.Empty;
 
             //I have only seen this occur while in Blend, but we need it here so the Blend designer doesn't crash.
-            if (MaskProvider == null) 
+            if (MaskProvider == null)
                 return value.ToString();
 
             MaskProvider.Set(value.ToString());
@@ -190,7 +193,6 @@ namespace Microsoft.Windows.Controls
 
         void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            base.OnPreviewKeyDown(e);
             MaskedTextProvider provider = MaskProvider;
             int position = TextBox.SelectionStart;
             int selectionlength = TextBox.SelectionLength;
@@ -232,6 +234,8 @@ namespace Microsoft.Windows.Controls
 
                 e.Handled = true;
             }
+
+            base.OnPreviewKeyDown(e);
         }
 
         #endregion //Event Handlers
@@ -270,5 +274,32 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Methods
+
+        #region Commands
+
+        private void Paste(object sender, RoutedEventArgs e)
+        {
+            MaskedTextProvider provider = MaskProvider;
+            int position = TextBox.SelectionStart;
+
+            object data = Clipboard.GetData(DataFormats.Text);
+            if (data != null)
+            {
+                string text = data.ToString().Trim();
+                if (text.Length > 0)
+                {
+                    provider.Set(text);
+                    UpdateText(provider, position);
+                }
+            }
+        }
+
+        private void CanCut(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = false;
+            e.Handled = true;
+        }
+
+        #endregion //Commands
     }
 }
