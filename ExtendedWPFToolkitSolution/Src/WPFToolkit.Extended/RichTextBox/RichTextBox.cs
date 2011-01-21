@@ -72,7 +72,11 @@ namespace Microsoft.Windows.Controls
             }
             set
             {
-                _textFormatter = value;
+                if (_textFormatter != value)
+                {
+                    _textFormatter = value;
+                    _textFormatter.SetText(Document, Text);
+                }
             }
         }
 
