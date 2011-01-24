@@ -4,6 +4,7 @@ namespace Microsoft.Windows.Controls
 {
     public enum DateTimeFormat
     {
+        Custom,
         FullDateTime,
         LongDate,
         LongTime,
