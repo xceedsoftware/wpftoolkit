@@ -38,10 +38,38 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnFormatChanged(DateTimeFormat oldValue, DateTimeFormat newValue)
         {
-            InitializeDateTimeInfoList();
+            //if using a CustomFormat then the initialization occurs on the CustomFormatString property
+            if (newValue != DateTimeFormat.Custom)
+                InitializeDateTimeInfoList();
         }
 
         #endregion //Format
+
+        #region FormatString
+
+        public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register("FormatString", typeof(string), typeof(DateTimeUpDown), new UIPropertyMetadata(default(String), OnFormatStringChanged));
+        public string FormatString
+        {
+            get { return (string)GetValue(FormatStringProperty); }
+            set { SetValue(FormatStringProperty, value); }
+        }
+
+        private static void OnFormatStringChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            DateTimeUpDown dateTimeUpDown = o as DateTimeUpDown;
+            if (dateTimeUpDown != null)
+                dateTimeUpDown.OnFormatStringChanged((string)e.OldValue, (string)e.NewValue);
+        }
+
+        protected virtual void OnFormatStringChanged(string oldValue, string newValue)
+        {
+            if (string.IsNullOrEmpty(newValue))
+                throw new ArgumentException("CustomFormat should be specified.", FormatString);
+
+            InitializeDateTimeInfoList();
+        }
+
+        #endregion //FormatString
 
         #endregion //Properties
 
@@ -369,6 +397,8 @@ namespace Microsoft.Windows.Controls
                     return DateTimeFormatInfo.UniversalSortableDateTimePattern;
                 case DateTimeFormat.YearMonth:
                     return DateTimeFormatInfo.YearMonthPattern;
+                case DateTimeFormat.Custom:
+                    return FormatString;
                 default:
                     throw new ArgumentException("Not a supported format");
             }
