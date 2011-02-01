@@ -115,6 +115,14 @@ namespace Microsoft.Windows.Controls
             }
         }
 
+        protected override void OnAccessKey(AccessKeyEventArgs e)
+        {
+            if (TextBox != null)
+                TextBox.Focus();
+
+            base.OnAccessKey(e);
+        }
+
         protected override void OnValueChanged(object oldValue, object newValue)
         {
             SetValidSpinDirection();
