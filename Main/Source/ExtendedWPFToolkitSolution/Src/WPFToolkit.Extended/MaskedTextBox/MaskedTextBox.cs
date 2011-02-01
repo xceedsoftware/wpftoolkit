@@ -108,6 +108,14 @@ namespace Microsoft.Windows.Controls
             TextBox.CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, null, CanCut)); //surpress cut
         }
 
+        protected override void OnAccessKey(AccessKeyEventArgs e)
+        {
+            if (TextBox != null)
+                TextBox.Focus();
+
+            base.OnAccessKey(e);
+        }
+
         protected override object ConvertTextToValue(string text)
         {
             object convertedValue = null;
