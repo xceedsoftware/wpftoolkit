@@ -95,6 +95,14 @@ namespace Microsoft.Windows.Controls
             _textSetInternally = false;
         }
 
+        /// <summary>
+        /// Clears the content of the RichTextBox.
+        /// </summary>
+        public void Clear()
+        {
+            Document.Blocks.Clear();
+        }
+
         #endregion //Methods
 
         #region Event Hanlders
