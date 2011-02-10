@@ -171,7 +171,11 @@
 
                                         <Grid>
                                             <Image Source="/WPFToolkit.Extended;component/RichTextBoxFormatBar/Images/FontColorPicker16.png" Width="16" Height="16" />
-                                            <Rectangle Grid.Row="1" Fill="{TemplateBinding Background}" Height="4" Margin="0,12,0,0" />
+                                            <Rectangle Grid.Row="1" Height="4" Margin="0,12,0,0">
+                                                <Rectangle.Fill>
+                                                    <SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=extToolkit:ColorPicker}}" />
+                                                </Rectangle.Fill>
+                                            </Rectangle>
                                         </Grid>
 
                                         <Path Grid.Column="1" Width="7" Height="4" 
