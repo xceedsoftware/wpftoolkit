@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.Collections.ObjectModel;
 using System.Reflection;
+using System.Windows.Input;
 
 namespace Microsoft.Windows.Controls
 {
@@ -12,7 +13,7 @@ namespace Microsoft.Windows.Controls
     {
         #region Members
 
-        ToggleButton _colorPickerToggleButton;
+        //ToggleButton _colorPickerToggleButton;
         Popup _colorPickerCanvasPopup;
         ListBox _availableColors;
         ListBox _standardColors;
@@ -42,9 +43,20 @@ namespace Microsoft.Windows.Controls
             set { SetValue(ButtonStyleProperty, value); }
         }
 
-        #endregion //ButtonStyle
+        #endregion //ButtonStyle        
 
-        #region RecenColors
+        #region IsOpen
+
+        public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register("IsOpen", typeof(bool), typeof(ColorPicker), new UIPropertyMetadata(false));
+        public bool IsOpen
+        {
+            get { return (bool)GetValue(IsOpenProperty); }
+            set { SetValue(IsOpenProperty, value); }
+        }
+
+        #endregion //IsOpen
+
+        #region RecentColors
 
         public static readonly DependencyProperty RecentColorsProperty = DependencyProperty.Register("RecentColors", typeof(ObservableCollection<ColorItem>), typeof(ColorPicker), new UIPropertyMetadata(null));
         public ObservableCollection<ColorItem> RecentColors
@@ -73,12 +85,25 @@ namespace Microsoft.Windows.Controls
 
         private void OnSelectedColorChanged(Color oldValue, Color newValue)
         {
+            //SelectedColorText = newValue.GetColorName();
+
             RoutedPropertyChangedEventArgs<Color> args = new RoutedPropertyChangedEventArgs<Color>(oldValue, newValue);
             args.RoutedEvent = ColorPicker.SelectedColorChangedEvent;
             RaiseEvent(args);
         }
 
         #endregion //SelectedColor
+
+        #region SelectedColorText
+
+        //public static readonly DependencyProperty SelectedColorTextProperty = DependencyProperty.Register("SelectedColorText", typeof(string), typeof(ColorPicker), new UIPropertyMetadata("Black"));
+        //public string SelectedColorText
+        //{
+        //    get { return (string)GetValue(SelectedColorTextProperty); }
+        //    protected set { SetValue(SelectedColorTextProperty, value); }
+        //}
+
+        #endregion //SelectedColorText
 
         #region StandardColors
 
@@ -103,6 +128,8 @@ namespace Microsoft.Windows.Controls
         public ColorPicker()
         {
             RecentColors = new ObservableCollection<ColorItem>();
+            Keyboard.AddKeyDownHandler(this, OnKeyDown);
+            Mouse.AddPreviewMouseDownOutsideCapturedElementHandler(this, OnMouseDownOutsideCapturedElement);
         }
 
         #endregion //Constructors
@@ -113,10 +140,10 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            _colorPickerToggleButton = (ToggleButton)GetTemplateChild("PART_ColorPickerToggleButton");
-            _colorPickerToggleButton.Click += ColorPickerToggleButton_Clicked;
+            //_colorPickerToggleButton = (ToggleButton)GetTemplateChild("PART_ColorPickerToggleButton");
 
             _colorPickerCanvasPopup = (Popup)GetTemplateChild("PART_ColorPickerPalettePopup");
+            _colorPickerCanvasPopup.Opened += ColorPickerCanvasPopup_Opened;
 
             _availableColors = (ListBox)GetTemplateChild("PART_AvailableColors");
             _availableColors.SelectionChanged += Color_SelectionChanged;
@@ -132,9 +159,27 @@ namespace Microsoft.Windows.Controls
 
         #region Event Handlers
 
-        void ColorPickerToggleButton_Clicked(object sender, RoutedEventArgs e)
+        void ColorPickerCanvasPopup_Opened(object sender, EventArgs e)
         {
-            _colorPickerCanvasPopup.IsOpen = _colorPickerToggleButton.IsChecked ?? false;
+            Mouse.Capture(this, CaptureMode.SubTree);
+        }
+
+        private void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Escape:
+                case Key.Tab:
+                    {
+                        CloseColorPicker();
+                        break;
+                    }
+            }
+        }
+
+        private void OnMouseDownOutsideCapturedElement(object sender, MouseButtonEventArgs e)
+        {
+            CloseColorPicker();
         }
 
         private void Color_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -168,8 +213,9 @@ namespace Microsoft.Windows.Controls
 
         private void CloseColorPicker()
         {
-            _colorPickerToggleButton.IsChecked = false;
-            _colorPickerCanvasPopup.IsOpen = false;
+            if (IsOpen)
+                IsOpen = false;
+            ReleaseMouseCapture();
         }
 
         private void UpdateRecentColors(ColorItem colorItem)
