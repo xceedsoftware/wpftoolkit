@@ -13,11 +13,11 @@ namespace Microsoft.Windows.Controls
     {
         #region Members
 
-        //ToggleButton _colorPickerToggleButton;
-        Popup _colorPickerCanvasPopup;
-        ListBox _availableColors;
-        ListBox _standardColors;
-        ListBox _recentColors;
+        //private ToggleButton _colorPickerToggleButton;
+        private Popup _colorPickerCanvasPopup;
+        private ListBox _availableColors;
+        private ListBox _standardColors;
+        private ListBox _recentColors;
 
         #endregion //Members
 
@@ -43,7 +43,18 @@ namespace Microsoft.Windows.Controls
             set { SetValue(ButtonStyleProperty, value); }
         }
 
-        #endregion //ButtonStyle        
+        #endregion //ButtonStyle
+
+        #region DisplayColorAndName
+
+        public static readonly DependencyProperty DisplayColorAndNameProperty = DependencyProperty.Register("DisplayColorAndName", typeof(bool), typeof(ColorPicker), new UIPropertyMetadata(false));
+        public bool DisplayColorAndName
+        {
+            get { return (bool)GetValue(DisplayColorAndNameProperty); }
+            set { SetValue(DisplayColorAndNameProperty, value); }
+        }
+
+        #endregion //DisplayColorAndName
 
         #region IsOpen
 
@@ -85,7 +96,7 @@ namespace Microsoft.Windows.Controls
 
         private void OnSelectedColorChanged(Color oldValue, Color newValue)
         {
-            //SelectedColorText = newValue.GetColorName();
+            SelectedColorText = newValue.GetColorName();
 
             RoutedPropertyChangedEventArgs<Color> args = new RoutedPropertyChangedEventArgs<Color>(oldValue, newValue);
             args.RoutedEvent = ColorPicker.SelectedColorChangedEvent;
@@ -96,12 +107,12 @@ namespace Microsoft.Windows.Controls
 
         #region SelectedColorText
 
-        //public static readonly DependencyProperty SelectedColorTextProperty = DependencyProperty.Register("SelectedColorText", typeof(string), typeof(ColorPicker), new UIPropertyMetadata("Black"));
-        //public string SelectedColorText
-        //{
-        //    get { return (string)GetValue(SelectedColorTextProperty); }
-        //    protected set { SetValue(SelectedColorTextProperty, value); }
-        //}
+        public static readonly DependencyProperty SelectedColorTextProperty = DependencyProperty.Register("SelectedColorText", typeof(string), typeof(ColorPicker), new UIPropertyMetadata("Black"));
+        public string SelectedColorText
+        {
+            get { return (string)GetValue(SelectedColorTextProperty); }
+            protected set { SetValue(SelectedColorTextProperty, value); }
+        }
 
         #endregion //SelectedColorText
 
@@ -247,13 +258,11 @@ namespace Microsoft.Windows.Controls
         {
             ObservableCollection<ColorItem> _standardColors = new ObservableCollection<ColorItem>();
 
-            PropertyInfo[] properties = typeof(Colors).GetProperties(BindingFlags.Static | BindingFlags.Public);
-            foreach (PropertyInfo info in properties)
+            foreach (var item in ColorUtilities.KnownColors)
             {
-                if (String.Compare(info.Name, "Transparent", false) != 0)
+                if (String.Compare(item.Key, "Transparent", false) != 0)
                 {
-                    Color c = (Color)info.GetValue(typeof(Colors), null);
-                    var colorItem = new ColorItem(c, info.Name);
+                    var colorItem = new ColorItem(item.Value, item.Key);
                     if (!_standardColors.Contains(colorItem))
                         _standardColors.Add(colorItem);
                 }
