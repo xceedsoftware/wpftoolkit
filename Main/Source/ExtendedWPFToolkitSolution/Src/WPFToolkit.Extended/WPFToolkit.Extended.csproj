@@ -74,6 +74,7 @@
     <Compile Include="ButtonSpinner\ValidSpinDirections.cs" />
     <Compile Include="ColorPicker\ColorItem.cs" />
     <Compile Include="ColorPicker\ColorPicker.cs" />
+    <Compile Include="ColorPicker\ColorUtilities.cs" />
     <Compile Include="Core\Converters\InverseBoolConverter.cs" />
     <Compile Include="DateTimeUpDown\DateTimeFormat.cs" />
     <Compile Include="DateTimeUpDown\DateTimeInfo.cs" />
