@@ -174,7 +174,7 @@ namespace Microsoft.Windows.Controls
         private void UpdateFontBackgroundColor()
         {
             object value = Target.Selection.GetPropertyValue(TextElement.BackgroundProperty);
-            Color currentColor = (Color)((value == null || value == DependencyProperty.UnsetValue) ? Colors.White : ((SolidColorBrush)value).Color);
+            Color currentColor = (Color)((value == null || value == DependencyProperty.UnsetValue) ? default(Color) : ((SolidColorBrush)value).Color);
             _cmbFontBackgroundColor.SelectedColor = currentColor;
         }
 
