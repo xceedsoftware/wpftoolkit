@@ -4,7 +4,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.Collections.ObjectModel;
-using System.Reflection;
 using System.Windows.Input;
 
 namespace Microsoft.Windows.Controls
@@ -241,15 +240,15 @@ namespace Microsoft.Windows.Controls
         private static ObservableCollection<ColorItem> CreateStandardColors()
         {
             ObservableCollection<ColorItem> _standardColors = new ObservableCollection<ColorItem>();
+            _standardColors.Add(new ColorItem(Colors.Transparent, "Transparent"));
             _standardColors.Add(new ColorItem(Colors.White, "White"));
             _standardColors.Add(new ColorItem(Colors.Gray, "Gray"));
             _standardColors.Add(new ColorItem(Colors.Black, "Black"));
             _standardColors.Add(new ColorItem(Colors.Red, "Red"));
-            _standardColors.Add(new ColorItem(Colors.Green, "Geen"));
+            _standardColors.Add(new ColorItem(Colors.Green, "Green"));
             _standardColors.Add(new ColorItem(Colors.Blue, "Blue"));
             _standardColors.Add(new ColorItem(Colors.Yellow, "Yellow"));
             _standardColors.Add(new ColorItem(Colors.Orange, "Orange"));
-            _standardColors.Add(new ColorItem(Colors.Brown, "Brown"));
             _standardColors.Add(new ColorItem(Colors.Purple, "Purple"));
             return _standardColors;
         }
@@ -260,7 +259,7 @@ namespace Microsoft.Windows.Controls
 
             foreach (var item in ColorUtilities.KnownColors)
             {
-                if (String.Compare(item.Key, "Transparent", false) != 0)
+                if (!String.Equals(item.Key, "Transparent"))
                 {
                     var colorItem = new ColorItem(item.Value, item.Key);
                     if (!_standardColors.Contains(colorItem))
