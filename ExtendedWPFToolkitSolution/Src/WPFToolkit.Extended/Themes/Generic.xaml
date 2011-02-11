@@ -581,6 +581,8 @@
     <!-- ColorPicker                                                                     -->
     <!-- =============================================================================== -->
 
+    <coreConverters:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
+    
     <LinearGradientBrush x:Key="ColorPickerDarkBorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
         <GradientStop Color="#FFA3AEB9" Offset="0"/>
         <GradientStop Color="#FF8399A9" Offset="0.375"/>
@@ -596,6 +598,26 @@
             </GradientStopCollection>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
+
+    <DrawingBrush  x:Key="CheckerBrush" Viewport="0,0,10,10" ViewportUnits="Absolute" TileMode="Tile">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="White">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0 100,100" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="LightGray">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                            <RectangleGeometry Rect="0,0 50,50" />
+                            <RectangleGeometry Rect="50,50 50,50" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
 
     <Style x:Key="ColorPaletteLisBoxStyle" TargetType="{x:Type ListBoxItem}">
         <Setter Property="ToolTip" Value="{Binding Name}" />
@@ -622,14 +644,21 @@
             </Setter.Value>
         </Setter>
     </Style>
-
+    
     <DataTemplate x:Key="ColorItemTemplate">
         <Grid>
             <Border BorderBrush="#FFC9CACA" BorderThickness="1" Margin="2,2,2,2" >
                 <Rectangle Width="14" Height="14">
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding Color}" />
-                    </Rectangle.Fill>
+                    <Rectangle.Style>
+                        <Style TargetType="Rectangle">
+                            <Setter Property="Fill" Value="{Binding Color, Converter={StaticResource ColorToSolidColorBrushConverter}}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Name}" Value="Transparent">
+                                    <Setter Property="Fill" Value="{StaticResource CheckerBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Rectangle.Style>
                 </Rectangle>
             </Border>
         </Grid>
@@ -691,7 +720,16 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
+    <Style x:Key="ColorDisplayStyle" TargetType="Border">
+        <Setter Property="Background" Value="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ColorToSolidColorBrushConverter}}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}" Value="Transparent">
+                <Setter Property="Background" Value="{StaticResource CheckerBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <Style TargetType="{x:Type local:ColorPicker}">
         <Setter Property="BorderBrush" Value="{StaticResource ColorPickerDarkBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
@@ -703,19 +741,11 @@
                     <Grid>
                         <ToggleButton x:Name="PART_ColorPickerToggleButton" Style="{TemplateBinding ButtonStyle}" MinHeight="22" ClickMode="Press" IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}" >
                             <Grid>
-                                <Border x:Name="ColorOnly">
-                                    <Border.Background>
-                                        <SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}"/>
-                                    </Border.Background>
-                                </Border>
+                                <Border x:Name="ColorOnly" Style="{StaticResource ColorDisplayStyle}" />
 
                                 <Border x:Name="ColorAndName" Background="White" Visibility="Hidden">
                                     <StackPanel Orientation="Horizontal">
-                                        <Border HorizontalAlignment="Left" Width="20" Margin="2,1,4,1" >
-                                            <Border.Background>
-                                                <SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}"/>
-                                            </Border.Background>
-                                        </Border>
+                                        <Border HorizontalAlignment="Left" Width="20" Margin="2,1,4,1" Style="{StaticResource ColorDisplayStyle}" BorderThickness="1" BorderBrush="#FFC9CACA" />
                                         <TextBlock Text="{Binding SelectedColorText, RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Border>
