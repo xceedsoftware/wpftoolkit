@@ -67,6 +67,7 @@
     <Compile Include="ButtonSpinner\ButtonSpinner.cs" />
     <Compile Include="ChildWindow\ChildWindow.cs" />
     <Compile Include="ChildWindow\VisualStates.ChildWindow.cs" />
+    <Compile Include="ChildWindow\WindowStartupLocation.cs" />
     <Compile Include="ChildWindow\WindowState.cs" />
     <Compile Include="ButtonSpinner\SpinDirection.cs" />
     <Compile Include="ButtonSpinner\SpinEventArgs.cs" />

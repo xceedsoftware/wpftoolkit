@@ -64,11 +64,12 @@ namespace Microsoft.Windows.Controls
             if (CloseButton != null)
                 CloseButton.Click += (o, e) => Close();
 
-            //Overlay = GetTemplateChild("PART_Overlay") as Panel;
             WindowRoot = GetTemplateChild("PART_WindowRoot") as Grid;
             WindowRoot.RenderTransform = _moveTransform;
 
             _parentContainer = VisualTreeHelper.GetParent(this) as FrameworkElement;
+            _parentContainer.LayoutUpdated += ParentContainer_LayoutUpdated;
+            _parentContainer.SizeChanged += ParentContainer_SizeChanged;
 
             //this is for XBAP applications only. When inside an XBAP the parent container has no height or width until it has loaded. Therefore
             //we need to handle the loaded event and reposition the window.
@@ -76,16 +77,9 @@ namespace Microsoft.Windows.Controls
             {
                 _parentContainer.Loaded += (o, e) =>
                     {
-                        CenterChildWindow();
+                        ExecuteOpen();
                     };
             }
-
-            _parentContainer.LayoutUpdated += ParentContainer_LayoutUpdated;
-            _parentContainer.SizeChanged += (o, ea) =>
-            {
-                _modalLayer.Height = ea.NewSize.Height;
-                _modalLayer.Width = ea.NewSize.Width;
-            };
 
             _root = GetTemplateChild("Root") as Grid;
 
@@ -195,7 +189,7 @@ namespace Microsoft.Windows.Controls
 
         private static void OnIsModalPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ChildWindow childWindow = (ChildWindow)d;
+            ChildWindow childWindow = d as ChildWindow;
             if (childWindow != null)
                 childWindow.OnIsModalChanged((bool)e.OldValue, (bool)e.NewValue);
         }
@@ -227,9 +221,15 @@ namespace Microsoft.Windows.Controls
 
         private static void OnLeftPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            ChildWindow window = (ChildWindow)obj;
-            window.Left = window.GetRestrictedLeft();
-            window.ProcessMove((double)e.NewValue - (double)e.OldValue, 0);
+            ChildWindow childWindow = obj as ChildWindow;
+            if (childWindow != null)
+                childWindow.OnLeftPropertyChanged((double)e.OldValue, (double)e.NewValue);
+        }
+
+        private void OnLeftPropertyChanged(double oldValue, double newValue)
+        {
+            Left = GetRestrictedLeft();
+            ProcessMove(newValue - oldValue, 0);
         }
 
         #endregion //Left
@@ -267,9 +267,15 @@ namespace Microsoft.Windows.Controls
 
         private static void OnTopPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            ChildWindow window = (ChildWindow)obj;
-            window.Top = window.GetRestrictedTop();
-            window.ProcessMove(0, (double)e.NewValue - (double)e.OldValue);
+            ChildWindow childWindow = obj as ChildWindow;
+            if (childWindow != null)
+                childWindow.OnTopPropertyChanged((double)e.OldValue, (double)e.NewValue);
+        }
+
+        private void OnTopPropertyChanged(double oldValue, double newValue)
+        {
+            Top = GetRestrictedTop();
+            ProcessMove(0, newValue - oldValue);
         }
 
         #endregion //TopProperty
@@ -294,6 +300,29 @@ namespace Microsoft.Windows.Controls
             get { return (double)GetValue(WindowOpacityProperty); }
             set { SetValue(WindowOpacityProperty, value); }
         }
+
+        #region WindowStartupLocation
+
+        public static readonly DependencyProperty WindowStartupLocationProperty = DependencyProperty.Register("WindowStartupLocation", typeof(WindowStartupLocation), typeof(ChildWindow), new UIPropertyMetadata(WindowStartupLocation.Manual, OnWindowStartupLocationChanged));
+        public WindowStartupLocation WindowStartupLocation
+        {
+            get { return (WindowStartupLocation)GetValue(WindowStartupLocationProperty); }
+            set { SetValue(WindowStartupLocationProperty, value); }
+        }
+
+        private static void OnWindowStartupLocationChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            ChildWindow childWindow = o as ChildWindow;
+            if (childWindow != null)
+                childWindow.OnWindowStartupLocationChanged((WindowStartupLocation)e.OldValue, (WindowStartupLocation)e.NewValue);
+        }
+
+        protected virtual void OnWindowStartupLocationChanged(WindowStartupLocation oldValue, WindowStartupLocation newValue)
+        {
+            // TODO: Add your property changed side-effects. Descendants can override as well.
+        }
+
+        #endregion //WindowStartupLocation
 
         #region WindowState
 
@@ -386,9 +415,20 @@ namespace Microsoft.Windows.Controls
             //we only want to set the start position if this is the first time the control has bee initialized
             if (!_startupPositionInitialized)
             {
-                SetStartupPosition();
+                ExecuteOpen();
                 _startupPositionInitialized = true;
             }
+        }
+
+        void ParentContainer_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            //resize our modal layer
+            _modalLayer.Height = e.NewSize.Height;
+            _modalLayer.Width = e.NewSize.Width;
+            
+            //reposition our window
+            Left = GetRestrictedLeft();
+            Top = GetRestrictedTop();
         }
 
         #endregion //Event Handlers
@@ -399,16 +439,15 @@ namespace Microsoft.Windows.Controls
 
         private double GetRestrictedLeft()
         {
+            if (Left < 0)
+                return 0;
+
             if (_parentContainer != null)
             {
-                if (Left < 0)
-                {
-                    return 0;
-                }
-
                 if (Left + WindowRoot.ActualWidth > _parentContainer.ActualWidth && _parentContainer.ActualWidth != 0)
                 {
-                    return _parentContainer.ActualWidth - WindowRoot.ActualWidth;
+                    double left = _parentContainer.ActualWidth - WindowRoot.ActualWidth;
+                    return left < 0 ? 0 : left;
                 }
             }
 
@@ -417,16 +456,15 @@ namespace Microsoft.Windows.Controls
 
         private double GetRestrictedTop()
         {
+            if (Top < 0)
+                return 0;
+
             if (_parentContainer != null)
             {
-                if (Top < 0)
-                {
-                    return 0;
-                }
-
                 if (Top + WindowRoot.ActualHeight > _parentContainer.ActualHeight && _parentContainer.ActualHeight != 0)
                 {
-                    return _parentContainer.ActualHeight - WindowRoot.ActualHeight;
+                    double top = _parentContainer.ActualHeight - WindowRoot.ActualHeight;
+                    return top < 0 ? 0 : top;
                 }
             }
 
@@ -466,13 +504,17 @@ namespace Microsoft.Windows.Controls
             }
             else
             {
-                _dialogResult = null;  //if the Close is cancelled, DialogResult should always be NULL:
+                _dialogResult = null;  //if the Close is cancelled, DialogResult should always be null
             }
         }
 
         private void ExecuteOpen()
         {
             _dialogResult = null; //reset the dialogResult to null each time the window is opened
+
+            if (WindowStartupLocation == Controls.WindowStartupLocation.Center)
+                CenterChildWindow();
+
             BringToFront();
         }
 
@@ -481,44 +523,20 @@ namespace Microsoft.Windows.Controls
             int index = 0;
 
             if (_parentContainer != null)
-            {
                 index = (int)_parentContainer.GetValue(Canvas.ZIndexProperty);
-            }
 
-            this.SetValue(Canvas.ZIndexProperty, ++index);
+            SetValue(Canvas.ZIndexProperty, ++index);
 
             if (IsModal)
-            {
                 Canvas.SetZIndex(_modalLayerPanel, -1);
-            }
-        }
-
-        private void SetStartupPosition()
-        {
-            CenterChildWindow();
-            BringToFront();
         }
 
         private void CenterChildWindow()
         {
-            _moveTransform.X = _moveTransform.Y = 0;
-
             if (_parentContainer != null)
             {
                 Left = (_parentContainer.ActualWidth - WindowRoot.ActualWidth) / 2.0;
                 Top = (_parentContainer.ActualHeight - WindowRoot.ActualHeight) / 2.0;
-            }
-        }
-
-        protected virtual void ChangeVisualState()
-        {
-            if (WindowState == WindowState.Closed)
-            {
-                VisualStateManager.GoToState(this, VisualStates.Closed, true);
-            }
-            else
-            {
-                VisualStateManager.GoToState(this, VisualStates.Open, true);
             }
         }
 
@@ -539,14 +557,26 @@ namespace Microsoft.Windows.Controls
                 _modalLayerPanel.Children.Remove(_modalLayer);
         }
 
+        private void ProcessMove(double x, double y)
+        {
+            _moveTransform.X += x;
+            _moveTransform.Y += y;
+        }
+
         #endregion //Private
 
         #region Protected
 
-        protected void ProcessMove(double x, double y)
+        protected virtual void ChangeVisualState()
         {
-            _moveTransform.X += x;
-            _moveTransform.Y += y;
+            if (WindowState == WindowState.Closed)
+            {
+                VisualStateManager.GoToState(this, VisualStates.Closed, true);
+            }
+            else
+            {
+                VisualStateManager.GoToState(this, VisualStates.Open, true);
+            }
         }
 
         #endregion //Protected

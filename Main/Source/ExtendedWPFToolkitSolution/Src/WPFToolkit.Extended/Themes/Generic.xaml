@@ -526,7 +526,7 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
 
-                        <Grid x:Name="PART_WindowRoot" HorizontalAlignment="Left" VerticalAlignment="Top" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" >
+                        <Grid x:Name="PART_WindowRoot" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="{TemplateBinding MinWidth}" MinHeight="{TemplateBinding MinHeight}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" >
                             <Grid.RenderTransform>
                                 <TransformGroup>
                                     <ScaleTransform />
