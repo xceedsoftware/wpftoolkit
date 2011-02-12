@@ -26,6 +26,9 @@ namespace Microsoft.Windows.Controls
         private Rectangle _modalLayer = new Rectangle();
         private Canvas _modalLayerPanel = new Canvas();
 
+        private const int _horizaontalOffset = 3;
+        private const int _verticalOffset = 3;
+
         #endregion //Private Members
 
         #region Constructors
@@ -63,9 +66,7 @@ namespace Microsoft.Windows.Controls
 
             //Overlay = GetTemplateChild("PART_Overlay") as Panel;
             WindowRoot = GetTemplateChild("PART_WindowRoot") as Grid;
-
             WindowRoot.RenderTransform = _moveTransform;
-
 
             _parentContainer = VisualTreeHelper.GetParent(this) as FrameworkElement;
 
@@ -87,12 +88,50 @@ namespace Microsoft.Windows.Controls
             };
 
             _root = GetTemplateChild("Root") as Grid;
+
+            Style focusStyle = _root.Resources["FocusVisualStyle"] as Style;
+            if (focusStyle != null)
+            {
+                Setter focusStyleDataContext = new Setter(Control.DataContextProperty, this);
+                focusStyle.Setters.Add(focusStyleDataContext);
+                FocusVisualStyle = focusStyle;
+            }
+
             _root.Children.Add(_modalLayerPanel);
 
             ChangeVisualState();
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
 
+            if (WindowState == WindowState.Open)
+            {
+                switch (e.Key)
+                {
+                    case Key.Left:
+                        this.Left -= _horizaontalOffset;
+                        e.Handled = true;
+                        break;
+
+                    case Key.Right:
+                        this.Left += _horizaontalOffset;
+                        e.Handled = true;
+                        break;
+
+                    case Key.Down:
+                        this.Top += _verticalOffset;
+                        e.Handled = true;
+                        break;
+
+                    case Key.Up:
+                        this.Top -= _verticalOffset;
+                        e.Handled = true;
+                        break;
+                }
+            }
+        }
 
         #endregion //Base Class Overrides
 
@@ -145,6 +184,8 @@ namespace Microsoft.Windows.Controls
             set { SetValue(IconSourceProperty, value); }
         }
 
+        #region IsModal
+
         public static readonly DependencyProperty IsModalProperty = DependencyProperty.Register("IsModal", typeof(bool), typeof(ChildWindow), new UIPropertyMetadata(false, new PropertyChangedCallback(OnIsModalPropertyChanged)));
         public bool IsModal
         {
@@ -155,11 +196,25 @@ namespace Microsoft.Windows.Controls
         private static void OnIsModalPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ChildWindow childWindow = (ChildWindow)d;
-            if ((bool)e.NewValue)
-                childWindow.ShowModalLayer();
-            else
-                childWindow.HideModalLayer();
+            if (childWindow != null)
+                childWindow.OnIsModalChanged((bool)e.OldValue, (bool)e.NewValue);
         }
+
+        private void OnIsModalChanged(bool oldValue, bool newValue)
+        {
+            if (newValue)
+            {
+                KeyboardNavigation.SetTabNavigation(this, KeyboardNavigationMode.Cycle);
+                ShowModalLayer();
+            }
+            else
+            {
+                KeyboardNavigation.SetTabNavigation(this, KeyboardNavigationMode.Continue);
+                HideModalLayer();
+            }
+        }
+
+        #endregion //IsModal
 
         #region Left
 
@@ -362,7 +417,7 @@ namespace Microsoft.Windows.Controls
 
         private double GetRestrictedTop()
         {
-            if (_parentContainer != null )
+            if (_parentContainer != null)
             {
                 if (Top < 0)
                 {
