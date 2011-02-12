@@ -455,7 +455,7 @@
         <GradientStop Color="#7FFFFFFF" Offset="0.05"/>
         <GradientStop Color="#B2FFFFFF" Offset="0.07"/>
         <GradientStop Color="#00FFFFFF" Offset="1"/>
-    </LinearGradientBrush>
+    </LinearGradientBrush>    
 
     <Style TargetType="{x:Type local:ChildWindow}">
         <Setter Property="Background" Value="#FFFFFFFF"/>
@@ -463,10 +463,10 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CaptionForeground" Value="#FF000000" />
         <Setter Property="CloseButtonStyle" Value="{StaticResource WindowCloseButtonStyle}" />
-        <Setter Property="Focusable" Value="False" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="IsEnabled" Value="true" />
+        <Setter Property="IsTabStop" Value="False" />
         <Setter Property="OverlayBrush" Value="#7F000000" />
         <Setter Property="OverlayOpacity" Value="1" />
         <Setter Property="VerticalAlignment" Value="Top" />
@@ -480,6 +480,22 @@
                     <Grid x:Name="Root">
                         <Grid.Resources>
                             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+                            <Style x:Key="FocusVisualStyle" TargetType="Control">
+                                <Setter Property="BorderBrush" Value="Black"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Margin" Value="-1"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Rectangle Stroke="{TemplateBinding BorderBrush}" Fill="{TemplateBinding Background}" Margin="{TemplateBinding Margin}" StrokeDashArray="4 3" StrokeThickness="0.5">
+                                                <Rectangle.RenderTransform>
+                                                    <TranslateTransform X="{Binding Left}" Y="{Binding Top}"/>
+                                                </Rectangle.RenderTransform>
+                                            </Rectangle>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
                         </Grid.Resources>
 
                         <!--VisualStateManager-->
@@ -510,7 +526,7 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
 
-                        <Grid x:Name="PART_WindowRoot" HorizontalAlignment="Left" VerticalAlignment="Top" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
+                        <Grid x:Name="PART_WindowRoot" HorizontalAlignment="Left" VerticalAlignment="Top" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" >
                             <Grid.RenderTransform>
                                 <TransformGroup>
                                     <ScaleTransform />
