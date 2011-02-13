@@ -71,6 +71,10 @@ namespace Microsoft.Windows.Controls
             _parentContainer.LayoutUpdated += ParentContainer_LayoutUpdated;
             _parentContainer.SizeChanged += ParentContainer_SizeChanged;
 
+            //initialize our modal background width/height
+            _modalLayer.Height = _parentContainer.ActualHeight;
+            _modalLayer.Width = _parentContainer.ActualWidth;
+
             //this is for XBAP applications only. When inside an XBAP the parent container has no height or width until it has loaded. Therefore
             //we need to handle the loaded event and reposition the window.
             if (System.Windows.Interop.BrowserInteropHelper.IsBrowserHosted)
@@ -528,7 +532,7 @@ namespace Microsoft.Windows.Controls
             SetValue(Canvas.ZIndexProperty, ++index);
 
             if (IsModal)
-                Canvas.SetZIndex(_modalLayerPanel, -1);
+                Canvas.SetZIndex(_modalLayerPanel, index - 2);
         }
 
         private void CenterChildWindow()
@@ -547,14 +551,13 @@ namespace Microsoft.Windows.Controls
                 if (!_modalLayerPanel.Children.Contains(_modalLayer))
                     _modalLayerPanel.Children.Add(_modalLayer);
 
-                BringToFront();
+                _modalLayer.Visibility = System.Windows.Visibility.Visible;
             }
         }
 
         private void HideModalLayer()
         {
-            if (_modalLayerPanel.Children.Contains(_modalLayer))
-                _modalLayerPanel.Children.Remove(_modalLayer);
+            _modalLayer.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         private void ProcessMove(double x, double y)
