@@ -110,6 +110,16 @@ namespace Microsoft.Windows.Controls
                         Value = null;
                         break;
                     }
+                case Key.Left:
+                    {
+                        PerformKeyboardSelection(-1);
+                        break;
+                    }
+                case Key.Right:
+                    {
+                        PerformKeyboardSelection(1);
+                        break;
+                    }
                 default:
                     {
                         break;
@@ -147,7 +157,7 @@ namespace Microsoft.Windows.Controls
         void TextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
             if (_fireSelectionChangedEvent)
-                SelectDateTimePart();
+                PerformMouseSelection();
             else
                 _fireSelectionChangedEvent = true;
         }
@@ -184,6 +194,8 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Abstract
+
+        #region Private
 
         private void InitializeDateTimeInfoList()
         {
@@ -372,19 +384,52 @@ namespace Microsoft.Windows.Controls
             });
         }
 
-        private void SelectDateTimePart()
+        private void PerformMouseSelection()
         {
             _dateTimeInfoList.ForEach(info =>
             {
                 if ((info.StartPosition <= TextBox.SelectionStart) && (TextBox.SelectionStart < (info.StartPosition + info.Length)))
                 {
-                    _fireSelectionChangedEvent = false;
-                    TextBox.Select(info.StartPosition, info.Length);
-                    _fireSelectionChangedEvent = true;
-                    _selectedDateTimeInfo = info;
+                    Select(info);
                     return;
                 }
             });
+        }
+
+        /// <summary>
+        /// Performs the keyboard selection.
+        /// </summary>
+        /// <param name="direction">The direction.</param>
+        /// <remarks>-1 = Left, 1 = Right</remarks>
+        private void PerformKeyboardSelection(int direction)
+        {
+            DateTimeInfo info;
+            int index = _dateTimeInfoList.IndexOf(_selectedDateTimeInfo);
+
+            //make sure we stay within the selection ranges
+            if ((index == 0 && direction == -1) || (index == _dateTimeInfoList.Count - 1 && direction == 1))
+                return;
+
+            //get the DateTimeInfo at the next position
+            index += direction;
+            info = _dateTimeInfoList[index];
+
+            //we don't care about spaces and commas, only select valid DateTimeInfos
+            while (info.Type == DateTimePart.Other)
+            {
+                info = _dateTimeInfoList[index += direction];
+            }
+
+            //perform selection
+            Select(info);
+        }
+
+        private void Select(DateTimeInfo info)
+        {
+            _fireSelectionChangedEvent = false;
+            TextBox.Select(info.StartPosition, info.Length);
+            _fireSelectionChangedEvent = true;
+            _selectedDateTimeInfo = info;
         }
 
         private string GetFormatString(DateTimeFormat dateTimeFormat)
@@ -483,6 +528,8 @@ namespace Microsoft.Windows.Controls
             TextBox.Select(info.StartPosition, info.Length);
             _fireSelectionChangedEvent = true;
         }
+
+        #endregion //Private
 
         #endregion //Methods
     }
