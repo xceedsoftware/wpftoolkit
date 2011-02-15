@@ -40,8 +40,8 @@ namespace Microsoft.Windows.Controls
 
         public ChildWindow()
         {
-            _modalLayer.Fill = new SolidColorBrush(Colors.Gray);
-            _modalLayer.Opacity = 0.5;
+            _modalLayer.Fill = OverlayBrush;
+            _modalLayer.Opacity = OverlayOpacity;
         }
 
         #endregion //Constructors
@@ -145,14 +145,20 @@ namespace Microsoft.Windows.Controls
 
         #endregion //Internal Properties
 
-        #region Dependency Properties
+        #region Public Properties
 
-        public static readonly DependencyProperty CaptionProperty = DependencyProperty.Register("Caption", typeof(string), typeof(ChildWindow), new UIPropertyMetadata(String.Empty));
-        public string Caption
+        #region Caption
+
+        public static readonly DependencyProperty CaptionProperty = DependencyProperty.Register("Caption", typeof(object), typeof(ChildWindow), new UIPropertyMetadata(String.Empty));
+        public object Caption
         {
-            get { return (string)GetValue(CaptionProperty); }
+            get { return (object)GetValue(CaptionProperty); }
             set { SetValue(CaptionProperty, value); }
         }
+
+        #endregion //Caption
+
+        #region CaptionForeground
 
         public static readonly DependencyProperty CaptionForegroundProperty = DependencyProperty.Register("CaptionForeground", typeof(Brush), typeof(ChildWindow), new UIPropertyMetadata(null));
         public Brush CaptionForeground
@@ -161,12 +167,20 @@ namespace Microsoft.Windows.Controls
             set { SetValue(CaptionForegroundProperty, value); }
         }
 
+        #endregion //CaptionForeground
+
+        #region CloseButtonStyle
+
         public static readonly DependencyProperty CloseButtonStyleProperty = DependencyProperty.Register("CloseButtonStyle", typeof(Style), typeof(ChildWindow), new PropertyMetadata(null));
         public Style CloseButtonStyle
         {
             get { return (Style)GetValue(CloseButtonStyleProperty); }
             set { SetValue(CloseButtonStyleProperty, value); }
         }
+
+        #endregion //CloseButtonStyle
+
+        #region CloseButtonVisibility
 
         public static readonly DependencyProperty CloseButtonVisibilityProperty = DependencyProperty.Register("CloseButtonVisibility", typeof(Visibility), typeof(ChildWindow), new PropertyMetadata(Visibility.Visible));
         public Visibility CloseButtonVisibility
@@ -175,12 +189,33 @@ namespace Microsoft.Windows.Controls
             set { SetValue(CloseButtonVisibilityProperty, value); }
         }
 
-        public static readonly DependencyProperty IconSourceProperty = DependencyProperty.Register("Icon", typeof(ImageSource), typeof(ChildWindow), new UIPropertyMetadata(default(ImageSource)));
-        public ImageSource Icon
+        #endregion //CloseButtonVisibility
+
+        #region DialogResult
+
+        private bool? _dialogResult;
+        /// <summary>
+        /// Gets or sets a value indicating whether the ChildWindow was accepted or canceled.
+        /// </summary>
+        /// <value>
+        /// True if the child window was accepted; false if the child window was
+        /// canceled. The default is null.
+        /// </value>
+        [TypeConverter(typeof(NullableBoolConverter))]
+        public bool? DialogResult
         {
-            get { return (ImageSource)GetValue(IconSourceProperty); }
-            set { SetValue(IconSourceProperty, value); }
+            get { return _dialogResult; }
+            set
+            {
+                if (_dialogResult != value)
+                {
+                    _dialogResult = value;
+                    Close();
+                }
+            }
         }
+
+        #endregion //DialogResult
 
         #region IsModal
 
@@ -240,22 +275,46 @@ namespace Microsoft.Windows.Controls
 
         #region OverlayBrush
 
-        public static readonly DependencyProperty OverlayBrushProperty = DependencyProperty.Register("OverlayBrush", typeof(Brush), typeof(ChildWindow));
+        public static readonly DependencyProperty OverlayBrushProperty = DependencyProperty.Register("OverlayBrush", typeof(Brush), typeof(ChildWindow), new PropertyMetadata(Brushes.Gray, OnOverlayBrushChanged));
         public Brush OverlayBrush
         {
             get { return (Brush)GetValue(OverlayBrushProperty); }
             set { SetValue(OverlayBrushProperty, value); }
         }
 
+        private static void OnOverlayBrushChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ChildWindow childWindow = d as ChildWindow;
+            if (childWindow != null)
+                childWindow.OnOverlayBrushChanged((Brush)e.OldValue, (Brush)e.NewValue);
+        }
+
+        protected virtual void OnOverlayBrushChanged(Brush oldValue, Brush newValue)
+        {
+            _modalLayer.Fill = newValue;
+        }
+
         #endregion //OverlayBrush
 
         #region OverlayOpacity
 
-        public static readonly DependencyProperty OverlayOpacityProperty = DependencyProperty.Register("OverlayOpacity", typeof(double), typeof(ChildWindow));
+        public static readonly DependencyProperty OverlayOpacityProperty = DependencyProperty.Register("OverlayOpacity", typeof(double), typeof(ChildWindow), new PropertyMetadata(0.5, OnOverlayOpacityChanged));
         public double OverlayOpacity
         {
             get { return (double)GetValue(OverlayOpacityProperty); }
             set { SetValue(OverlayOpacityProperty, value); }
+        }
+
+        private static void OnOverlayOpacityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ChildWindow childWindow = d as ChildWindow;
+            if (childWindow != null)
+                childWindow.OnOverlayOpacityChanged((double)e.OldValue, (double)e.NewValue);
+        }
+
+        protected virtual void OnOverlayOpacityChanged(double oldValue, double newValue)
+        {
+            _modalLayer.Opacity = newValue;
         }
 
         #endregion //OverlayOpacity
@@ -284,12 +343,18 @@ namespace Microsoft.Windows.Controls
 
         #endregion //TopProperty
 
+        #region WindowBackground
+
         public static readonly DependencyProperty WindowBackgroundProperty = DependencyProperty.Register("WindowBackground", typeof(Brush), typeof(ChildWindow), new PropertyMetadata(null));
         public Brush WindowBackground
         {
             get { return (Brush)GetValue(WindowBackgroundProperty); }
             set { SetValue(WindowBackgroundProperty, value); }
         }
+
+        #endregion //WindowBackground
+
+        #region WindowBorderBrush
 
         public static readonly DependencyProperty WindowBorderBrushProperty = DependencyProperty.Register("WindowBorderBrush", typeof(Brush), typeof(ChildWindow), new PropertyMetadata(null));
         public Brush WindowBorderBrush
@@ -298,12 +363,18 @@ namespace Microsoft.Windows.Controls
             set { SetValue(WindowBorderBrushProperty, value); }
         }
 
+        #endregion //WindowBorderBrush
+
+        #region WindowOpacity
+
         public static readonly DependencyProperty WindowOpacityProperty = DependencyProperty.Register("WindowOpacity", typeof(double), typeof(ChildWindow), new PropertyMetadata(null));
         public double WindowOpacity
         {
             get { return (double)GetValue(WindowOpacityProperty); }
             set { SetValue(WindowOpacityProperty, value); }
         }
+
+        #endregion //WindowOpacity
 
         #region WindowStartupLocation
 
@@ -345,29 +416,7 @@ namespace Microsoft.Windows.Controls
 
         #endregion //WindowState
 
-        #endregion //Dependency Properties
-
-        private bool? _dialogResult;
-        /// <summary>
-        /// Gets or sets a value indicating whether the ChildWindow was accepted or canceled.
-        /// </summary>
-        /// <value>
-        /// True if the child window was accepted; false if the child window was
-        /// canceled. The default is null.
-        /// </value>
-        [TypeConverter(typeof(NullableBoolConverter))]
-        public bool? DialogResult
-        {
-            get { return _dialogResult; }
-            set
-            {
-                if (_dialogResult != value)
-                {
-                    _dialogResult = value;
-                    Close();
-                }
-            }
-        }
+        #endregion //Public Properties
 
         #endregion //Properties
 
