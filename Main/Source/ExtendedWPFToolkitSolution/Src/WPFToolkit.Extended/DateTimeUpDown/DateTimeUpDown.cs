@@ -99,8 +99,22 @@ namespace Microsoft.Windows.Controls
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
-                return;
+            switch (e.Key)
+            {
+                case Key.Enter:
+                    {
+                        return;
+                    }
+                case Key.Delete:
+                    {
+                        Value = null;
+                        break;
+                    }
+                default:
+                    {
+                        break;
+                    }
+            }
 
             base.OnPreviewKeyDown(e);
         }
@@ -108,7 +122,9 @@ namespace Microsoft.Windows.Controls
         protected override void OnValueChanged(object oldValue, object newValue)
         {
             //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
-            ParseValueIntoDateTimeInfo();
+            //but only if it is not null
+            if (newValue != null)
+                ParseValueIntoDateTimeInfo();
 
             base.OnValueChanged(oldValue, newValue);
         }
@@ -144,12 +160,14 @@ namespace Microsoft.Windows.Controls
 
         protected override void OnIncrement()
         {
-            UpdateDateTime(1);
+            if (Value != null)
+                UpdateDateTime(1);
         }
 
         protected override void OnDecrement()
         {
-            UpdateDateTime(-1);
+            if (Value != null)
+                UpdateDateTime(-1);
         }
 
         protected override object ConvertTextToValue(string text)
@@ -161,12 +179,8 @@ namespace Microsoft.Windows.Controls
         {
             if (value == null) return string.Empty;
 
-            DateTime? dt = DateTime.Parse(value.ToString(), CultureInfo.CurrentCulture);
-
-            if (dt.HasValue)
-                return dt.Value.ToString(GetFormatString(Format), CultureInfo.CurrentCulture);
-            else
-                return string.Empty;
+            DateTime dt = DateTime.Parse(value.ToString(), CultureInfo.CurrentCulture);
+            return dt.ToString(GetFormatString(Format), CultureInfo.CurrentCulture);
         }
 
         #endregion //Abstract
