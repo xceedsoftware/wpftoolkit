@@ -29,6 +29,8 @@ namespace Microsoft.Windows.Controls
         private const int _horizaontalOffset = 3;
         private const int _verticalOffset = 3;
 
+        bool _ignorePropertyChanged;
+
         #endregion //Private Members
 
         #region Constructors
@@ -408,10 +410,17 @@ namespace Microsoft.Windows.Controls
             set { SetValue(WindowStateProperty, value); }
         }
 
-        private static void OnWindowStatePropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        private static void OnWindowStatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ChildWindow window = (ChildWindow)obj;
-            window.SetWindowState((WindowState)e.NewValue);
+            ChildWindow childWindow = d as ChildWindow;
+            if (childWindow != null)
+                childWindow.OnWindowStatePropertyChanged((WindowState)e.OldValue, (WindowState)e.NewValue);
+        }
+
+        protected virtual void OnWindowStatePropertyChanged(WindowState oldValue, WindowState newValue)
+        {
+            if (!_ignorePropertyChanged)
+                SetWindowState(newValue);
         }
 
         #endregion //WindowState
@@ -478,7 +487,7 @@ namespace Microsoft.Windows.Controls
             //resize our modal layer
             _modalLayer.Height = e.NewSize.Height;
             _modalLayer.Width = e.NewSize.Width;
-            
+
             //reposition our window
             Left = GetRestrictedLeft();
             Top = GetRestrictedTop();
@@ -540,7 +549,7 @@ namespace Microsoft.Windows.Controls
                     }
             }
 
-            ChangeVisualState();
+            ChangeVisualState(); //perform the close
         }
 
         private void ExecuteClose()
@@ -557,8 +566,17 @@ namespace Microsoft.Windows.Controls
             }
             else
             {
-                _dialogResult = null;  //if the Close is cancelled, DialogResult should always be null
+                CancelClose();
             }
+        }
+
+        private void CancelClose()
+        {
+            _dialogResult = null; //when the close is cancelled, DialogResult should be null
+
+            _ignorePropertyChanged = true;
+            WindowState = WindowState.Open; //now reset the window state to open because the close was cancelled
+            _ignorePropertyChanged = false;
         }
 
         private void ExecuteOpen()
