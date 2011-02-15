@@ -465,10 +465,7 @@
         <Setter Property="CloseButtonStyle" Value="{StaticResource WindowCloseButtonStyle}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
-        <Setter Property="IsEnabled" Value="true" />
         <Setter Property="IsTabStop" Value="False" />
-        <Setter Property="OverlayBrush" Value="#7F000000" />
-        <Setter Property="OverlayOpacity" Value="1" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
         <Setter Property="WindowBorderBrush" Value="{StaticResource WindowDarkBrush}" />
