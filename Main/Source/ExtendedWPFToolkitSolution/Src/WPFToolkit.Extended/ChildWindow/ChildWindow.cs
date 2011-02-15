@@ -582,6 +582,8 @@ namespace Microsoft.Windows.Controls
 
             if (IsModal)
                 Canvas.SetZIndex(_modalLayerPanel, index - 2);
+
+            Focus();
         }
 
         private void CenterChildWindow()
