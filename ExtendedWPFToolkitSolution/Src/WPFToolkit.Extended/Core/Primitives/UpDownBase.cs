@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using Microsoft.Windows.Controls.Primitives;
 using System.Windows.Input;
 
-namespace Microsoft.Windows.Controls
+namespace Microsoft.Windows.Controls.Primitives
 {
     public abstract class UpDownBase : InputBase
     {

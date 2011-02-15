@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Globalization;
 using System.Windows.Input;
+using Microsoft.Windows.Controls.Primitives;
 
 namespace Microsoft.Windows.Controls
 {
