@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
+using System.Diagnostics;
 
 namespace Microsoft.Windows.Controls
 {
@@ -19,7 +11,7 @@ namespace Microsoft.Windows.Controls
     {
         #region Members
 
-        ToggleButton _dropDownButton;
+        ToggleButton _toggleButton;
         Popup _popup;
 
         #endregion //Members
@@ -29,6 +21,12 @@ namespace Microsoft.Windows.Controls
         static SplitButton()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(SplitButton), new FrameworkPropertyMetadata(typeof(SplitButton)));
+        }
+
+        public SplitButton()
+        {
+            Keyboard.AddKeyDownHandler(this, OnKeyDown);
+            Mouse.AddPreviewMouseDownOutsideCapturedElementHandler(this, OnMouseDownOutsideCapturedElement);
         }
 
         #endregion //Constructors
@@ -77,6 +75,7 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnIsOpenChanged(bool oldValue, bool newValue)
         {
             // TODO: Add your property changed side-effects. Descendants can override as well.
+            Debug.WriteLine("{0} : {1}", oldValue, newValue);
         }
 
         #endregion //IsOpen
@@ -89,11 +88,57 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            _dropDownButton = (ToggleButton)GetTemplateChild("PART_ToggleButton");
+            _toggleButton = (ToggleButton)GetTemplateChild("PART_ToggleButton");
+            _toggleButton.Click += new RoutedEventHandler(_toggleButton_Click);            
+            
 
             _popup = (Popup)GetTemplateChild("PART_Popup");
+            _popup.Opened += Popup_Opened;
+        }
+
+        void _toggleButton_Click(object sender, RoutedEventArgs e)
+        {           
+            Debug.WriteLine("IsOpen : {0}  |  IsChecked : {1}", IsOpen, _toggleButton.IsChecked);
         }
 
         #endregion //Base Class Overrides
+
+        #region Event Handlers
+
+        void Popup_Opened(object sender, EventArgs e)
+        {
+            Mouse.Capture(this, CaptureMode.SubTree);
+        }
+
+        private void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Escape:
+                case Key.Tab:
+                    {
+                        CloseDropDown();
+                        break;
+                    }
+            }
+        }
+
+        private void OnMouseDownOutsideCapturedElement(object sender, MouseButtonEventArgs e)
+        {
+            CloseDropDown();
+        }
+
+        #endregion //Event Handlers
+
+        #region Methods
+
+        private void CloseDropDown()
+        {
+            if (IsOpen)
+                IsOpen = false;
+            ReleaseMouseCapture();
+        }
+
+        #endregion //Methods
     }
 }
