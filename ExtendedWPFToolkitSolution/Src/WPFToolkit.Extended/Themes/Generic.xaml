@@ -455,7 +455,7 @@
         <GradientStop Color="#7FFFFFFF" Offset="0.05"/>
         <GradientStop Color="#B2FFFFFF" Offset="0.07"/>
         <GradientStop Color="#00FFFFFF" Offset="1"/>
-    </LinearGradientBrush>    
+    </LinearGradientBrush>
 
     <Style TargetType="{x:Type local:ChildWindow}">
         <Setter Property="Background" Value="#FFFFFFFF"/>
@@ -595,7 +595,7 @@
     <!-- =============================================================================== -->
 
     <coreConverters:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
-    
+
     <LinearGradientBrush x:Key="ColorPickerDarkBorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
         <GradientStop Color="#FFA3AEB9" Offset="0"/>
         <GradientStop Color="#FF8399A9" Offset="0.375"/>
@@ -657,7 +657,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <DataTemplate x:Key="ColorItemTemplate">
         <Grid>
             <Border BorderBrush="#FFC9CACA" BorderThickness="1" Margin="2,2,2,2" >
@@ -1127,4 +1127,127 @@
         </Setter>
     </Style>
 
+    <!-- =============================================================================== -->
+    <!-- SplitButton                                                                     -->
+    <!-- =============================================================================== -->
+
+    <Style x:Key="SplitButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="{StaticResource SpinButtonNormalCenterFillKey}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource SpinButtonNormalOuterBorderFillKey}"/>
+        <Setter Property="Foreground" Value="{StaticResource SpinButtonGlyphNormalForegroundFillKey}"/>
+        <Setter Property="BorderThickness" Value="1, 1, 0, 1"/>
+        <Setter Property="Padding" Value="3,1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Bd" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" CornerRadius="2,0,0,2">
+                        <Grid>
+                            <Border x:Name="innerBd" BorderBrush="{StaticResource SpinButtonNormalInnerBorderFillKey}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2,0,0,2"/>
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" TargetName="innerBd" Value="{StaticResource SpinButtonHottrackInnerBorderFillKey}"/>
+                            <Setter Property="Background" TargetName="Bd" Value="{StaticResource SpinButtonHottrackCenterFillKey}"/>
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource SpinButtonHottrackOuterBorderFillKey}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource SpinButtonPressedOuterBorderFillKey}"/>
+                            <Setter Property="Background" TargetName="Bd" Value="{StaticResource SpinButtonPressedCenterFillKey}"/>
+                            <Setter Property="BorderBrush" TargetName="innerBd" Value="{StaticResource SpinButtonPressedInnerBorderFillKey}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False"/>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SplitButtonDropDownStyle" TargetType="{x:Type ToggleButton}">
+        <Setter Property="Background" Value="{StaticResource SpinButtonNormalCenterFillKey}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource SpinButtonNormalOuterBorderFillKey}"/>
+        <Setter Property="Foreground" Value="{StaticResource SpinButtonGlyphNormalForegroundFillKey}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="3,1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ToggleButton}">
+                    <Border x:Name="Bd" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" CornerRadius="0,2,2,0">
+                        <Grid>
+                            <Border x:Name="innerBd" BorderBrush="{StaticResource SpinButtonNormalInnerBorderFillKey}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0,2,2,0"/>
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" TargetName="innerBd" Value="{StaticResource SpinButtonHottrackInnerBorderFillKey}"/>
+                            <Setter Property="Background" TargetName="Bd" Value="{StaticResource SpinButtonHottrackCenterFillKey}"/>
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource SpinButtonHottrackOuterBorderFillKey}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource SpinButtonPressedOuterBorderFillKey}"/>
+                            <Setter Property="Background" TargetName="Bd" Value="{StaticResource SpinButtonPressedCenterFillKey}"/>
+                            <Setter Property="BorderBrush" TargetName="innerBd" Value="{StaticResource SpinButtonPressedInnerBorderFillKey}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource SpinButtonPressedOuterBorderFillKey}"/>
+                            <Setter Property="Background" TargetName="Bd" Value="{StaticResource SpinButtonPressedCenterFillKey}"/>
+                            <Setter Property="BorderBrush" TargetName="innerBd" Value="{StaticResource SpinButtonPressedInnerBorderFillKey}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False"/>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:SplitButton}">
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:SplitButton}">
+                    <Grid x:Name="MainGrid" SnapsToDevicePixels="True">
+                        <Border x:Name="OuterBorder" Background="{TemplateBinding Background}" CornerRadius="2">
+                            <Border x:Name="InnerBorder" Background="Transparent" CornerRadius="2">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button x:Name="PART_HeaderButton" Style="{StaticResource SplitButtonStyle}" >
+                                        <ContentPresenter Name="Content" Margin="{TemplateBinding Padding}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" RecognizesAccessKey="true" />
+                                    </Button>
+                                    <ToggleButton x:Name="PART_ToggleButton" Grid.Column="1" IsTabStop="False"                                                  
+                                                  Style="{StaticResource SplitButtonDropDownStyle}" 
+                                                  ClickMode="Press"
+                                                  IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"  >
+                                        <Grid x:Name="arrowGlyph" IsHitTestVisible="False">
+                                            <Path Width="7" Height="4" Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z" Fill="#FF000000"/>
+                                        </Grid>
+                                    </ToggleButton>
+                                </Grid>
+                            </Border>
+                        </Border>
+
+                        <Popup x:Name="PART_Popup" 
+                               HorizontalOffset="1"
+                               VerticalOffset="-1"
+                               AllowsTransparency="True"
+                               StaysOpen="False"
+                               Placement="Bottom"
+                               Focusable="False"
+                               IsOpen="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}">
+                            <!-- TODO: Create Popup Styles that can be reused on all popups in the toolkit-->
+                            <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource ColorPickerDarkBorderBrush}" >
+                                <ContentPresenter Content="{TemplateBinding DropDownContent}" />
+                            </Border>
+                        </Popup>
+
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>
