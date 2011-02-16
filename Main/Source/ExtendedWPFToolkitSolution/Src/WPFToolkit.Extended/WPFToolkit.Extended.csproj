@@ -117,6 +117,7 @@
     <Compile Include="RichTextBox\Formatters\XamlFormatter.cs" />
     <Compile Include="RichTextBox\RichTextBox.cs" />
     <Compile Include="Core\Primitives\UpDownBase.cs" />
+    <Compile Include="SplitButton\SplitButton.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\VisualStates.MessageBox.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
