@@ -1238,7 +1238,7 @@
                                StaysOpen="False"
                                Placement="Bottom"
                                Focusable="False"
-                               IsOpen="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}">
+                               IsOpen="{Binding IsChecked, ElementName=PART_ToggleButton}">
                             <!-- TODO: Create Popup Styles that can be reused on all popups in the toolkit-->
                             <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource ColorPickerDarkBorderBrush}" >
                                 <ContentPresenter Content="{TemplateBinding DropDownContent}" />
@@ -1246,6 +1246,9 @@
                         </Popup>
 
                     </Grid>
+                    <ControlTemplate.Triggers>
+                        
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
