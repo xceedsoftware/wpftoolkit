@@ -1216,7 +1216,7 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <Button x:Name="PART_HeaderButton" Style="{StaticResource SplitButtonStyle}" >
+                                    <Button x:Name="PART_ActionButton" Style="{StaticResource SplitButtonStyle}" >
                                         <ContentPresenter Name="Content" Margin="{TemplateBinding Padding}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" RecognizesAccessKey="true" />
                                     </Button>
                                     <ToggleButton x:Name="PART_ToggleButton" Grid.Column="1" IsTabStop="False"                                                  
