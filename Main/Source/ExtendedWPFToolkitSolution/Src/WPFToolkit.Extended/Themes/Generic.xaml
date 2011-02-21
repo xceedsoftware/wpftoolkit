@@ -1220,9 +1220,9 @@
                                         <ContentPresenter Name="Content" Margin="{TemplateBinding Padding}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" RecognizesAccessKey="true" />
                                     </Button>
                                     <ToggleButton x:Name="PART_ToggleButton" Grid.Column="1" IsTabStop="False"                                                  
-                                                  Style="{StaticResource SplitButtonDropDownStyle}" 
-                                                  ClickMode="Press"
-                                                  IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"  >
+                                                  Style="{StaticResource SplitButtonDropDownStyle}"
+                                                  IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                                  IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}">
                                         <Grid x:Name="arrowGlyph" IsHitTestVisible="False">
                                             <Path Width="7" Height="4" Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z" Fill="#FF000000"/>
                                         </Grid>

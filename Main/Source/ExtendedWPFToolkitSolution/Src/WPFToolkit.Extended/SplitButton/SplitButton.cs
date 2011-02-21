@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
-using System.Diagnostics;
 
 namespace Microsoft.Windows.Controls
 {
@@ -74,8 +73,7 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnIsOpenChanged(bool oldValue, bool newValue)
         {
-            // TODO: Add your property changed side-effects. Descendants can override as well.
-            Debug.WriteLine("{0} : {1}", oldValue, newValue);
+            // TODO: check for cancel event args on an OnOpening event
         }
 
         #endregion //IsOpen
@@ -89,25 +87,24 @@ namespace Microsoft.Windows.Controls
             base.OnApplyTemplate();
 
             _toggleButton = (ToggleButton)GetTemplateChild("PART_ToggleButton");
-            _toggleButton.Click += new RoutedEventHandler(_toggleButton_Click);            
+            _toggleButton.Click += ToggleButton_Click;      
             
-
             _popup = (Popup)GetTemplateChild("PART_Popup");
             _popup.Opened += Popup_Opened;
-        }
-
-        void _toggleButton_Click(object sender, RoutedEventArgs e)
-        {           
-            Debug.WriteLine("IsOpen : {0}  |  IsChecked : {1}", IsOpen, _toggleButton.IsChecked);
         }
 
         #endregion //Base Class Overrides
 
         #region Event Handlers
 
+        void ToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         void Popup_Opened(object sender, EventArgs e)
         {
-            Mouse.Capture(this, CaptureMode.SubTree);
+            
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)
