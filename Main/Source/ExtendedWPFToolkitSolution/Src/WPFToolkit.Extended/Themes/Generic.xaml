@@ -868,105 +868,6 @@
         <Path Width="7" Height="4" Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z" Fill="{StaticResource SpinButtonGlyphNormalForegroundFillKey}"/>
     </DataTemplate>
 
-    <SolidColorBrush x:Key="SpinButtonNormalOuterBorderFillKey" Color="#FFABADB3"/>
-    <LinearGradientBrush x:Key="SpinButtonNormalInnerBorderFillKey" StartPoint="0.5,0" EndPoint="0.5,1">
-        <LinearGradientBrush.GradientStops>
-            <GradientStopCollection>
-                <GradientStop Offset="0" Color="#FFfcfcfc"/>
-                <GradientStop Offset="0.69" Color="#FFf9f9f9"/>
-                <GradientStop Offset="0.69" Color="#FFf3f3f3"/>
-                <GradientStop Offset="1" Color="#FFf3f3f3"/>
-            </GradientStopCollection>
-        </LinearGradientBrush.GradientStops>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="SpinButtonNormalCenterFillKey" StartPoint="0.5,0" EndPoint="0.5,1">
-        <LinearGradientBrush.GradientStops>
-            <GradientStopCollection>
-                <GradientStop Offset="0" Color="#FFf2f2f2"/>
-                <GradientStop Offset="0.69" Color="#FFe8e8e8"/>
-                <GradientStop Offset="0.69" Color="#FFd1d1d1"/>
-                <GradientStop Offset="1" Color="#FFd1d1d1"/>
-            </GradientStopCollection>
-        </LinearGradientBrush.GradientStops>
-    </LinearGradientBrush>
-
-    <SolidColorBrush x:Key="SpinButtonHottrackOuterBorderFillKey" Color="#FF3C7FB1"/>
-    <LinearGradientBrush x:Key="SpinButtonHottrackInnerBorderFillKey" StartPoint="0.5,0" EndPoint="0.5,1">
-        <LinearGradientBrush.GradientStops>
-            <GradientStopCollection>
-                <GradientStop Color="#FFfafdfe" Offset="0" />
-                <GradientStop Color="#FFf5fbfe" Offset="0.5" />
-                <GradientStop Color="#FFeff9fe" Offset="0.5009999871253967" />
-                <GradientStop Color="#FFe8f5fc" Offset="1" />
-            </GradientStopCollection>
-        </LinearGradientBrush.GradientStops>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="SpinButtonHottrackCenterFillKey" StartPoint="0.5,0" EndPoint="0.5,1">
-        <LinearGradientBrush.GradientStops>
-            <GradientStopCollection>
-                <GradientStop Color="#FFeaf6fd" Offset="0" />
-                <GradientStop Color="#FFd9f0fc" Offset="0.5" />
-                <GradientStop Color="#FFbee6fd" Offset="0.5009999871253967" />
-                <GradientStop Color="#FFa7d9f5" Offset="1" />
-            </GradientStopCollection>
-        </LinearGradientBrush.GradientStops>
-    </LinearGradientBrush>
-    <SolidColorBrush x:Key="SpinButtonPressedOuterBorderFillKey" Color="#FF2C628B"/>
-    <LinearGradientBrush x:Key="SpinButtonPressedInnerBorderFillKey" StartPoint="0.5,0" EndPoint="0.5,1">
-        <LinearGradientBrush.GradientStops>
-            <GradientStopCollection>
-                <GradientStop Color="#FF9eb0ba" Offset="0" />
-                <GradientStop Color="#FF9abacb" Offset="0.5" />
-                <GradientStop Color="#FF78aac5" Offset="0.5008999705314636" />
-                <GradientStop Color="#FF5a96b8" Offset="0.8999999761581421" />
-                <GradientStop Color="#FF68b2da" Offset="1" />
-            </GradientStopCollection>
-        </LinearGradientBrush.GradientStops>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="SpinButtonPressedCenterFillKey" StartPoint="0.5,0" EndPoint="0.5,1">
-        <LinearGradientBrush.GradientStops>
-            <GradientStopCollection>
-                <GradientStop Color="#FFe5f4fc" Offset="0" />
-                <GradientStop Color="#FFc4e5f6" Offset="0.5" />
-                <GradientStop Color="#FF98d1ef" Offset="0.5009999871253967" />
-                <GradientStop Color="#FF68b3db" Offset="1" />
-            </GradientStopCollection>
-        </LinearGradientBrush.GradientStops>
-    </LinearGradientBrush>
-
-    <Style x:Key="SpinButtonStyle" TargetType="{x:Type RepeatButton}">
-        <Setter Property="Background" Value="{StaticResource SpinButtonNormalCenterFillKey}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource SpinButtonNormalOuterBorderFillKey}"/>
-        <Setter Property="Foreground" Value="{StaticResource SpinButtonGlyphNormalForegroundFillKey}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="3,1"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type RepeatButton}">
-                    <Border x:Name="Bd" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" CornerRadius="0">
-                        <Grid>
-                            <Border x:Name="innerBd" BorderBrush="{StaticResource SpinButtonNormalInnerBorderFillKey}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0"/>
-                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}"/>
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="BorderBrush" TargetName="innerBd" Value="{StaticResource SpinButtonHottrackInnerBorderFillKey}"/>
-                            <Setter Property="Background" TargetName="Bd" Value="{StaticResource SpinButtonHottrackCenterFillKey}"/>
-                            <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource SpinButtonHottrackOuterBorderFillKey}"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource SpinButtonPressedOuterBorderFillKey}"/>
-                            <Setter Property="Background" TargetName="Bd" Value="{StaticResource SpinButtonPressedCenterFillKey}"/>
-                            <Setter Property="BorderBrush" TargetName="innerBd" Value="{StaticResource SpinButtonPressedInnerBorderFillKey}"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False"/>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <Style TargetType="{x:Type local:ButtonSpinner}">
         <Setter Property="Focusable" Value="False" />
         <Setter Property="IsTabStop" Value="True" />
@@ -996,8 +897,34 @@
                                         <RowDefinition Height="1" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <RepeatButton x:Name="IncreaseButton" SnapsToDevicePixels="True" Grid.Row="0"  Style="{StaticResource SpinButtonStyle}" ContentTemplate="{StaticResource IncreaseGlyph}" ClickMode="Press" IsTabStop="{Binding IsTabStop, RelativeSource={RelativeSource TemplatedParent}}" />
-                                    <RepeatButton x:Name="DecreaseButton" SnapsToDevicePixels="True" Grid.Row="2" Style="{StaticResource SpinButtonStyle}" ContentTemplate="{StaticResource DecreaseGlyph}" ClickMode="Press" IsTabStop="{Binding IsTabStop, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <RepeatButton x:Name="IncreaseButton" SnapsToDevicePixels="True" Grid.Row="0" ClickMode="Press" IsTabStop="{Binding IsTabStop, RelativeSource={RelativeSource TemplatedParent}}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <ContentPresenter />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                        <Grid>
+                                            <chrome:ButtonChrome CornerRadius="0"
+                                                                 RenderEnabled="{TemplateBinding IsEnabled}"
+                                                                 RenderMouseOver="{Binding IsMouseOver, ElementName=IncreaseButton}"
+                                                                 RenderPressed="{Binding IsPressed, ElementName=IncreaseButton}"/>
+                                            <ContentControl ContentTemplate="{StaticResource IncreaseGlyph}" Margin="5,1" />
+                                        </Grid>
+                                    </RepeatButton>
+                                    <RepeatButton x:Name="DecreaseButton" SnapsToDevicePixels="True" Grid.Row="2" ClickMode="Press" IsTabStop="{Binding IsTabStop, RelativeSource={RelativeSource TemplatedParent}}" >
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <ContentPresenter />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                        <Grid>
+                                            <chrome:ButtonChrome CornerRadius="0"
+                                                                 RenderEnabled="{TemplateBinding IsEnabled}"
+                                                                 RenderMouseOver="{Binding IsMouseOver, ElementName=DecreaseButton}"
+                                                                 RenderPressed="{Binding IsPressed, ElementName=DecreaseButton}"/>
+                                            <ContentControl ContentTemplate="{StaticResource DecreaseGlyph}" Margin="5,1" />
+                                        </Grid>
+                                    </RepeatButton>
                                 </Grid>
                                 <ContentControl x:Name="presentationSite" Focusable="False"
                                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
