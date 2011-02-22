@@ -73,6 +73,7 @@
     <Compile Include="ButtonSpinner\SpinEventArgs.cs" />
     <Compile Include="ButtonSpinner\Spinner.cs" />
     <Compile Include="ButtonSpinner\ValidSpinDirections.cs" />
+    <Compile Include="Chromes\ButtonChrome.cs" />
     <Compile Include="ColorPicker\ColorItem.cs" />
     <Compile Include="ColorPicker\ColorPicker.cs" />
     <Compile Include="ColorPicker\ColorUtilities.cs" />

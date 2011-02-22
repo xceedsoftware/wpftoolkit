@@ -3,7 +3,8 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib" 
                     xmlns:local="clr-namespace:Microsoft.Windows.Controls"
                     xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters"
-                    xmlns:magConverters="clr-namespace:Microsoft.Windows.Controls.Mag.Converters">
+                    xmlns:magConverters="clr-namespace:Microsoft.Windows.Controls.Mag.Converters"
+                    xmlns:chrome="clr-namespace:Microsoft.Windows.Controls.Chromes">
 
     <!-- =============================================================================== -->
     <!-- Common Converters                                                               -->
@@ -1248,6 +1249,426 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <!-- =============================================================================== -->
+    <!-- ButtonChrome                                                                    -->
+    <!-- =============================================================================== -->
+
+    <CornerRadius x:Key="ControlOuterBorderCornerRadius">3</CornerRadius>
+    <CornerRadius x:Key="ControlInnerBorderCornerRadius">1</CornerRadius>
+
+    <!-- Normal -->
+    <SolidColorBrush x:Key="ControlOuterBorder_Normal" Color="#FF707070" />
+    <SolidColorBrush x:Key="ControlInnerBorder_Normal" Color="#FFFFFFFF" />
+    <LinearGradientBrush x:Key="ControlBackground_Normal" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#F3F3F3" Offset="0"/>
+        <GradientStop Color="#EBEBEB" Offset="0.5"/>
+        <GradientStop Color="#DDDDDD" Offset="0.5"/>
+        <GradientStop Color="#CDCDCD" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Active -->
+    <SolidColorBrush x:Key="ControlOuterBorder_Active" Color="#FFFFC92B" />
+    <SolidColorBrush x:Key="ControlInnerBorder_Active" Color="#FFFFFFFF" />
+    <LinearGradientBrush x:Key="ControlBackground_Active" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FFFFFEF3"/>
+        <GradientStop Color="#FFFAF0AF" Offset="1"/>
+    </LinearGradientBrush>
+
+
+    <!--Mouse Over-->
+    <SolidColorBrush x:Key="ControlOuterBorder_MouseOver" Color="#FFFFC92B" />
+    <SolidColorBrush x:Key="ControlInnerBorder_MouseOver" Color="#FFFFFFFF" />
+    <LinearGradientBrush x:Key="ControlBackground_MouseOver" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FFFFFBDA" Offset="0"/>
+        <GradientStop Color="#FFFEEBAE" Offset="0.50"/>
+        <GradientStop Color="#FFFFD25A" Offset="0.50"/>
+        <GradientStop Color="#FFFFFBA3" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- MouseOver Checked -->
+    <LinearGradientBrush x:Key="ControlOuterBorder_MouseOverChecked" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FF282828"/>
+        <GradientStop Color="#FF5F5F5F" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ControlInnerBorder_MouseOverChecked" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FFB69A78"/>
+        <GradientStop Color="#FFFFE17A" Offset="0.169"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ControlBackground_MouseOverChecked" EndPoint="0.5,1"
+			StartPoint="0.5,0">
+        <GradientStop Color="#FFFFE8AB" Offset="0" />
+        <GradientStop Color="#FFFFE08F" Offset="0.5" />
+        <GradientStop Color="#FFFEAF27" Offset="0.5" />
+        <GradientStop Color="#FFFFE74E" Offset="1" />
+    </LinearGradientBrush>
+
+
+    <!-- Pressed -->
+    <LinearGradientBrush x:Key="ControlOuterBorder_Pressed" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FF616161" Offset="0"/>
+        <GradientStop Color="#FF989898" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ControlInnerBorder_Pressed" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FFB69A78"/>
+        <GradientStop Color="#FFFFE17A" Offset="0.126"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ControlBackground_Pressed" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FFFFDCAB" Offset="0"/>
+        <GradientStop Color="#FFFFD18F" Offset="0.5"/>
+        <GradientStop Color="#FFFE9227" Offset="0.5"/>
+        <GradientStop Color="#FFFFBA74" Offset="0"/>
+    </LinearGradientBrush>
+
+    <!-- Focused -->
+    <SolidColorBrush x:Key="ControlOuterBorder_Focused" Color="#FFFFC92B" />
+    <SolidColorBrush x:Key="ControlInnerBorder_Focused" Color="Transparent" />
+    <SolidColorBrush x:Key="ControlBackground_Focused" Color="Transparent" />
+
+    <!-- Disabled -->
+    <SolidColorBrush x:Key="ControlOuterBorder_Disabled" Color="#FF9BB0CD" />
+    <SolidColorBrush x:Key="ControlInnerBorder_Disabled" Color="Transparent" />
+    <SolidColorBrush x:Key="ControlBackground_Disabled" Color="#FFE2F0FD" />
+
+    <!-- Disabled Checked -->
+    <LinearGradientBrush x:Key="ControlOuterBorder_DisabledChecked" EndPoint="0.5,1"
+			StartPoint="0.5,0">
+        <GradientStop Color="#FF282828" />
+        <GradientStop Color="#FF5F5F5F" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ControlInnerBorder_DisabledChecked" EndPoint="0.5,1"
+			StartPoint="0.5,0">
+        <GradientStop Color="#FFB69A78" />
+        <GradientStop Color="#FFFFE17A" Offset="0.126" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="ControlBackground_DisabledChecked" Color="#FFE2F0FD" />
+
+    <!-- Checked -->
+    <SolidColorBrush x:Key="ControlOuterBorder_Checked" Color="#FFFFC92B" />
+    <SolidColorBrush x:Key="ControlInnerBorder_Checked" Color="#FFFFFFFF" />
+    <LinearGradientBrush x:Key="ControlBackground_Checked" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FFFFDCAB" Offset="0" />
+        <GradientStop Color="#FFFFD18F" Offset="0.5" />
+        <GradientStop Color="#FFFE9227" Offset="0.5" />
+        <GradientStop Color="#FFFFD74E" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- Highlighted -->
+    <SolidColorBrush x:Key="ControlOuterBorder_Highlighted" Color="#FFFFC92B" />
+    <SolidColorBrush x:Key="ControlInnerBorder_Highlighted" Color="#FFFFFFFF" />
+    <LinearGradientBrush x:Key="ControlBackground_Highlighted" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FFFFFBA3" Offset="1"/>
+        <GradientStop Color="#FFFFFBDA" Offset="0"/>
+    </LinearGradientBrush>
+
+    <!-- Selected -->
+    <SolidColorBrush x:Key="ControlOuterBorder_Selected" Color="#FFFFC92B" />
+    <SolidColorBrush x:Key="ControlInnerBorder_Selected" Color="#FFFFFFFF" />
+    <LinearGradientBrush x:Key="ControlBackground_Selected" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FFFCE79F" Offset="1"/>
+        <GradientStop Color="#FFFDD3A8"/>
+    </LinearGradientBrush>
+
+
+    <Style TargetType="{x:Type chrome:ButtonChrome}">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Background" Value="{StaticResource ControlBackground_Normal}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ControlOuterBorder_Normal}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{StaticResource ControlOuterBorderCornerRadius}" />
+        <Setter Property="InnerCornerRadius" Value="{StaticResource ControlInnerBorderCornerRadius}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type chrome:ButtonChrome}">
+                    <Grid>
+
+                        <Border x:Name="OuterBorder" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}">
+                            <Border x:Name="InnerBorder" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding InnerCornerRadius}" BorderBrush="{StaticResource ControlInnerBorder_Normal}" />
+                        </Border>
+
+                        <Border x:Name="ActiveVisual" Opacity="0" Visibility="Collapsed" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{StaticResource ControlOuterBorder_Active}" Background="{StaticResource ControlBackground_Active}">
+                            <Border x:Name="ActiveInnerVisual" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding InnerCornerRadius}" BorderBrush="{StaticResource ControlInnerBorder_Active}" />
+                        </Border>
+
+                        <Border x:Name="MouseOverVisual" Opacity="0" Visibility="Collapsed" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{StaticResource ControlOuterBorder_MouseOver}" Background="{StaticResource ControlBackground_MouseOver}">
+                            <Border x:Name="MouseOverInnerVisual" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding InnerCornerRadius}" BorderBrush="{StaticResource ControlInnerBorder_MouseOver}" />
+                        </Border>
+                        <Border x:Name="PressedVisual" Opacity="0" Visibility="Collapsed" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{StaticResource ControlOuterBorder_Pressed}" Background="{StaticResource ControlBackground_Pressed}">
+                            <Border x:Name="PressedInnerVisual" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding InnerCornerRadius}" BorderBrush="{StaticResource ControlInnerBorder_Pressed}" />
+                        </Border>
+
+                        <Border x:Name="FocusVisual" Opacity="0" Visibility="Collapsed" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{StaticResource ControlOuterBorder_Focused}" Background="{StaticResource ControlBackground_Focused}">
+                            <Border x:Name="FocusInnerVisual" BorderThickness="1" CornerRadius="{TemplateBinding InnerCornerRadius}" BorderBrush="{StaticResource ControlInnerBorder_Focused}"/>
+                        </Border>
+
+                    </Grid>
+                    <ControlTemplate.Triggers>
+
+                        <!-- If button is disabled and is checked -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="RenderEnabled" Value="False" />
+                                <Condition Property="RenderChecked" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource ControlOuterBorder_DisabledChecked}" />
+                            <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{StaticResource ControlInnerBorder_DisabledChecked}" />
+                            <Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlBackground_DisabledChecked}" />
+                        </MultiTrigger>
+
+                        <!-- If button is disabled, not checked, and is rendered normal -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="RenderEnabled" Value="False" />
+                                <Condition Property="RenderChecked" Value="False" />
+                                <Condition Property="RenderNormal" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource ControlOuterBorder_Disabled}" />
+                            <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{StaticResource ControlInnerBorder_Disabled}" />
+                            <Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlBackground_Disabled}" />
+                        </MultiTrigger>
+
+                        <!-- if button is enabled and pressed -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="RenderEnabled" Value="True" />
+                                <Condition Property="RenderPressed" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PressedVisual" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PressedVisual" Storyboard.TargetProperty="Opacity">
+                                            <LinearDoubleKeyFrame KeyTime="00:00:00.050" Value="1" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </MultiTrigger.EnterActions>
+                            <MultiTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PressedVisual" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00.115">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PressedVisual" Storyboard.TargetProperty="Opacity">
+                                            <LinearDoubleKeyFrame KeyTime="00:00:00.115" Value="0" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </MultiTrigger.ExitActions>
+                        </MultiTrigger>
+
+                        <!-- if button is enabled, checked, the mouse is over, but it is not pressed -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="RenderEnabled" Value="True" />
+                                <Condition Property="RenderChecked" Value="True" />
+                                <Condition Property="RenderMouseOver" Value="True" />
+                                <Condition Property="RenderPressed" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource ControlOuterBorder_MouseOverChecked}" />
+                            <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{StaticResource ControlInnerBorder_MouseOverChecked}" />
+                            <Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlBackground_MouseOverChecked}" />
+                        </MultiTrigger>
+
+                        <!-- if button is enabled, is not checked, the mouse is over, and not pressed -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="RenderEnabled" Value="True" />
+                                <Condition Property="RenderChecked" Value="False" />
+                                <Condition Property="RenderMouseOver" Value="True" />
+                                <Condition Property="RenderPressed" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MouseOverVisual" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MouseOverVisual" Storyboard.TargetProperty="Opacity">
+                                            <LinearDoubleKeyFrame KeyTime="00:00:00.115" Value="1" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </MultiTrigger.EnterActions>
+                            <MultiTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MouseOverVisual" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00.150">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MouseOverVisual" Storyboard.TargetProperty="Opacity">
+                                            <LinearDoubleKeyFrame KeyTime="00:00:00.150" Value="0" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </MultiTrigger.ExitActions>
+                        </MultiTrigger>
+
+                        <!-- if button is enabled, checked, he mouse is not over, and it is not pressed -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="RenderEnabled" Value="True" />
+                                <Condition Property="RenderChecked" Value="True" />
+                                <Condition Property="RenderMouseOver" Value="False" />
+                                <Condition Property="RenderPressed" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource ControlOuterBorder_Checked}" />
+                            <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{StaticResource ControlInnerBorder_Checked}" />
+                            <Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlBackground_Checked}" />
+                        </MultiTrigger>
+
+                        <!-- if button is focused, is enabled, not pressed, and the mouse is not over -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="RenderFocused" Value="True" />
+                                <Condition Property="RenderEnabled" Value="True" />
+                                <Condition Property="RenderPressed" Value="False" />
+                                <Condition Property="RenderMouseOver" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="FocusVisual" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="FocusVisual" Storyboard.TargetProperty="Opacity">
+                                            <LinearDoubleKeyFrame KeyTime="00:00:00.25" Value="1" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </MultiTrigger.EnterActions>
+                            <MultiTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="FocusVisual" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00.115">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="FocusVisual" Storyboard.TargetProperty="Opacity">
+                                            <LinearDoubleKeyFrame KeyTime="00:00:00.115" Value="0" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </MultiTrigger.ExitActions>
+                        </MultiTrigger>
+
+                        <!-- if the button is enabled, not checked, is active, not pressed, and the mouse is not over -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="RenderEnabled" Value="True" />
+                                <Condition Property="RenderChecked" Value="False" />
+                                <Condition Property="RenderActive" Value="True" />
+                                <Condition Property="RenderHighlighted" Value="False" />
+                                <Condition Property="RenderSelected" Value="False" />
+                                <Condition Property="RenderPressed" Value="False" />
+                                <Condition Property="RenderMouseOver" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ActiveVisual" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ActiveVisual" Storyboard.TargetProperty="Opacity">
+                                            <LinearDoubleKeyFrame KeyTime="00:00:00.115" Value="1" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </MultiTrigger.EnterActions>
+                            <MultiTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ActiveVisual" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00.150">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ActiveVisual" Storyboard.TargetProperty="Opacity">
+                                            <LinearDoubleKeyFrame KeyTime="00:00:00.150" Value="0" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </MultiTrigger.ExitActions>
+                        </MultiTrigger>
+
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="RenderEnabled" Value="True" />
+                                <Condition Property="RenderChecked" Value="False" />
+                                <Condition Property="RenderHighlighted" Value="True" />
+                                <Condition Property="RenderMouseOver" Value="False" />
+                                <Condition Property="RenderPressed" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource ControlOuterBorder_Highlighted}" />
+                            <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{StaticResource ControlInnerBorder_Highlighted}" />
+                            <Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlBackground_Highlighted}" />
+                        </MultiTrigger>
+
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="RenderEnabled" Value="True" />
+                                <Condition Property="RenderChecked" Value="False" />
+                                <Condition Property="RenderHighlighted" Value="False" />
+                                <Condition Property="RenderSelected" Value="True" />
+                                <Condition Property="RenderMouseOver" Value="False" />
+                                <Condition Property="RenderPressed" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource ControlOuterBorder_Selected}" />
+                            <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{StaticResource ControlInnerBorder_Selected}" />
+                            <Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlBackground_Selected}" />
+                        </MultiTrigger>
+
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="RenderNormal" Value="False" />
+                                <Condition Property="RenderHighlighted" Value="False" />
+                                <Condition Property="RenderSelected" Value="False" />
+                                <Condition Property="RenderChecked" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="Transparent" />
+                            <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{x:Null}" />
+                            <Setter TargetName="OuterBorder" Property="Background" Value="Transparent" />
+                        </MultiTrigger>
+
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
