@@ -24,7 +24,13 @@ namespace Microsoft.Windows.Controls.Chromes
 
         protected virtual void OnCornerRadiusChanged(CornerRadius oldValue, CornerRadius newValue)
         {
-            // TODO: Add your property changed side-effects. Descendants can override as well.
+            //we always want the InnerBorderRadius to be one less than the CornerRadius
+            CornerRadius newInnerCornerRadius = new CornerRadius(Math.Max(0, newValue.TopLeft - 1), 
+                                                                 Math.Max(0, newValue.TopRight - 1), 
+                                                                 Math.Max(0, newValue.BottomRight - 1), 
+                                                                 Math.Max(0, newValue.BottomLeft - 1));
+
+            InnerCornerRadius = newInnerCornerRadius;
         }
 
         #endregion //CornerRadius
@@ -51,29 +57,6 @@ namespace Microsoft.Windows.Controls.Chromes
         }
 
         #endregion //InnerCornerRadius
-
-        #region RenderActive
-
-        public static readonly DependencyProperty RenderActiveProperty = DependencyProperty.Register("RenderActive", typeof(bool), typeof(ButtonChrome), new UIPropertyMetadata(false, OnRenderActiveChanged));
-        public bool RenderActive
-        {
-            get { return (bool)GetValue(RenderActiveProperty); }
-            set { SetValue(RenderActiveProperty, value); }
-        }
-
-        private static void OnRenderActiveChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            ButtonChrome buttonChrome = o as ButtonChrome;
-            if (buttonChrome != null)
-                buttonChrome.OnRenderActiveChanged((bool)e.OldValue, (bool)e.NewValue);
-        }
-
-        protected virtual void OnRenderActiveChanged(bool oldValue, bool newValue)
-        {
-            // TODO: Add your property changed side-effects. Descendants can override as well.
-        }
-
-        #endregion //RenderActive
 
         #region RenderChecked
 
@@ -212,52 +195,6 @@ namespace Microsoft.Windows.Controls.Chromes
         }
 
         #endregion //RenderPressed
-
-        #region RenderSelected
-
-        public static readonly DependencyProperty RenderSelectedProperty = DependencyProperty.Register("RenderSelected", typeof(bool), typeof(ButtonChrome), new UIPropertyMetadata(false, OnRenderSelectedChanged));
-        public bool RenderSelected
-        {
-            get { return (bool)GetValue(RenderSelectedProperty); }
-            set { SetValue(RenderSelectedProperty, value); }
-        }
-
-        private static void OnRenderSelectedChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            ButtonChrome buttonChrome = o as ButtonChrome;
-            if (buttonChrome != null)
-                buttonChrome.OnRenderSelectedChanged((bool)e.OldValue, (bool)e.NewValue);
-        }
-
-        protected virtual void OnRenderSelectedChanged(bool oldValue, bool newValue)
-        {
-            // TODO: Add your property changed side-effects. Descendants can override as well.
-        }
-
-        #endregion //RenderSelected
-
-        #region RenderHighlighted
-
-        public static readonly DependencyProperty RenderHighlightedProperty = DependencyProperty.Register("RenderHighlighted", typeof(bool), typeof(ButtonChrome), new UIPropertyMetadata(false, OnRenderHighlightedChanged));
-        public bool RenderHighlighted
-        {
-            get { return (bool)GetValue(RenderHighlightedProperty); }
-            set { SetValue(RenderHighlightedProperty, value); }
-        }
-
-        private static void OnRenderHighlightedChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            ButtonChrome buttonChrome = o as ButtonChrome;
-            if (buttonChrome != null)
-                buttonChrome.OnRenderHighlightedChanged((bool)e.OldValue, (bool)e.NewValue);
-        }
-
-        protected virtual void OnRenderHighlightedChanged(bool oldValue, bool newValue)
-        {
-            // TODO: Add your property changed side-effects. Descendants can override as well.
-        }        
-
-        #endregion //RenderHighlighted
 
         #region Contsructors
 
