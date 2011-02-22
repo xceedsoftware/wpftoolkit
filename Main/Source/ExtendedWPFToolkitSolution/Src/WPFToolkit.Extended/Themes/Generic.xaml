@@ -1265,35 +1265,54 @@
 
     <!-- Normal -->
     <SolidColorBrush x:Key="ControlOuterBorder_Normal" Color="#FF707070" />
-    <SolidColorBrush x:Key="ControlInnerBorder_Normal" Color="#FFFFFFFF" />
-    <LinearGradientBrush x:Key="ControlBackground_Normal" EndPoint="0.5,1" StartPoint="0.5,0">
+    <LinearGradientBrush x:Key="ControlInnerBorder_Normal" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#FAFFFFFF" Offset="0"/>
+        <GradientStop Color="#85FFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ControlBackground_Normal" EndPoint="0,1" StartPoint="0,0">
         <GradientStop Color="#F3F3F3" Offset="0"/>
         <GradientStop Color="#EBEBEB" Offset="0.5"/>
         <GradientStop Color="#DDDDDD" Offset="0.5"/>
         <GradientStop Color="#CDCDCD" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- Active -->
-    <SolidColorBrush x:Key="ControlOuterBorder_Active" Color="#FFFFC92B" />
-    <SolidColorBrush x:Key="ControlInnerBorder_Active" Color="#FFFFFFFF" />
-    <LinearGradientBrush x:Key="ControlBackground_Active" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="#FFFFFEF3"/>
-        <GradientStop Color="#FFFAF0AF" Offset="1"/>
-    </LinearGradientBrush>
-
-
     <!--Mouse Over-->
-    <SolidColorBrush x:Key="ControlOuterBorder_MouseOver" Color="#FFFFC92B" />
-    <SolidColorBrush x:Key="ControlInnerBorder_MouseOver" Color="#FFFFFFFF" />
-    <LinearGradientBrush x:Key="ControlBackground_MouseOver" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="#FFFFFBDA" Offset="0"/>
-        <GradientStop Color="#FFFEEBAE" Offset="0.50"/>
-        <GradientStop Color="#FFFFD25A" Offset="0.50"/>
-        <GradientStop Color="#FFFFFBA3" Offset="1"/>
+    <SolidColorBrush x:Key="ControlOuterBorder_MouseOver" Color="#3C7FB1" />
+    <LinearGradientBrush x:Key="ControlInnerBorder_MouseOver" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#FAFFFFFF" Offset="0"/>
+        <GradientStop Color="#85FFFFFF" Offset="1"/>
     </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ControlBackground_MouseOver" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#FFEAF6FD" Offset="0"/>
+        <GradientStop Color="#FFD9F0FC" Offset="0.50"/>
+        <GradientStop Color="#FFBEE6FD" Offset="0.50"/>
+        <GradientStop Color="#FFA7D9F5" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Pressed -->
+    <SolidColorBrush x:Key="ControlOuterBorder_Pressed" Color="#2C628B" />
+    <LinearGradientBrush x:Key="ControlInnerBorder_Pressed" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#FAFFFFFF" Offset="0"/>
+        <GradientStop Color="#85FFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ControlBackground_Pressed" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#C2E4F6" Offset="0.5"/>
+        <GradientStop Color="#ABDAF3" Offset="0.5"/>
+        <GradientStop Color="#90CBEB" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Disabled -->
+    <SolidColorBrush x:Key="ControlOuterBorder_Disabled" Color="#ADB2B5" />
+    <LinearGradientBrush x:Key="ControlInnerBorder_Disabled" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#FAFFFFFF" Offset="0"/>
+        <GradientStop Color="#85FFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="ControlBackground_Disabled" Color="#F4F4F4" />
+
+
 
     <!-- MouseOver Checked -->
-    <LinearGradientBrush x:Key="ControlOuterBorder_MouseOverChecked" EndPoint="0.5,1" StartPoint="0.5,0">
+    <!--<LinearGradientBrush x:Key="ControlOuterBorder_MouseOverChecked" EndPoint="0.5,1" StartPoint="0.5,0">
         <GradientStop Color="#FF282828"/>
         <GradientStop Color="#FF5F5F5F" Offset="1"/>
     </LinearGradientBrush>
@@ -1307,37 +1326,23 @@
         <GradientStop Color="#FFFFE08F" Offset="0.5" />
         <GradientStop Color="#FFFEAF27" Offset="0.5" />
         <GradientStop Color="#FFFFE74E" Offset="1" />
-    </LinearGradientBrush>
+    </LinearGradientBrush>-->
 
-
-    <!-- Pressed -->
-    <LinearGradientBrush x:Key="ControlOuterBorder_Pressed" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="#FF616161" Offset="0"/>
-        <GradientStop Color="#FF989898" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="ControlInnerBorder_Pressed" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="#FFB69A78"/>
-        <GradientStop Color="#FFFFE17A" Offset="0.126"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="ControlBackground_Pressed" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="#FFFFDCAB" Offset="0"/>
-        <GradientStop Color="#FFFFD18F" Offset="0.5"/>
-        <GradientStop Color="#FFFE9227" Offset="0.5"/>
-        <GradientStop Color="#FFFFBA74" Offset="0"/>
-    </LinearGradientBrush>
+    <!-- Active -->
+    <!--<SolidColorBrush x:Key="ControlOuterBorder_Active" Color="#FFFFC92B" />
+    <SolidColorBrush x:Key="ControlInnerBorder_Active" Color="#FFFFFFFF" />
+    <LinearGradientBrush x:Key="ControlBackground_Active" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FFFFFEF3"/>
+        <GradientStop Color="#FFFAF0AF" Offset="1"/>
+    </LinearGradientBrush>-->
 
     <!-- Focused -->
-    <SolidColorBrush x:Key="ControlOuterBorder_Focused" Color="#FFFFC92B" />
+    <!--<SolidColorBrush x:Key="ControlOuterBorder_Focused" Color="#FFFFC92B" />
     <SolidColorBrush x:Key="ControlInnerBorder_Focused" Color="Transparent" />
-    <SolidColorBrush x:Key="ControlBackground_Focused" Color="Transparent" />
-
-    <!-- Disabled -->
-    <SolidColorBrush x:Key="ControlOuterBorder_Disabled" Color="#FF9BB0CD" />
-    <SolidColorBrush x:Key="ControlInnerBorder_Disabled" Color="Transparent" />
-    <SolidColorBrush x:Key="ControlBackground_Disabled" Color="#FFE2F0FD" />
+    <SolidColorBrush x:Key="ControlBackground_Focused" Color="Transparent" />-->
 
     <!-- Disabled Checked -->
-    <LinearGradientBrush x:Key="ControlOuterBorder_DisabledChecked" EndPoint="0.5,1"
+    <!--<LinearGradientBrush x:Key="ControlOuterBorder_DisabledChecked" EndPoint="0.5,1"
 			StartPoint="0.5,0">
         <GradientStop Color="#FF282828" />
         <GradientStop Color="#FF5F5F5F" Offset="1" />
@@ -1347,33 +1352,33 @@
         <GradientStop Color="#FFB69A78" />
         <GradientStop Color="#FFFFE17A" Offset="0.126" />
     </LinearGradientBrush>
-    <SolidColorBrush x:Key="ControlBackground_DisabledChecked" Color="#FFE2F0FD" />
+    <SolidColorBrush x:Key="ControlBackground_DisabledChecked" Color="#FFE2F0FD" />-->
 
     <!-- Checked -->
-    <SolidColorBrush x:Key="ControlOuterBorder_Checked" Color="#FFFFC92B" />
+    <!--<SolidColorBrush x:Key="ControlOuterBorder_Checked" Color="#FFFFC92B" />
     <SolidColorBrush x:Key="ControlInnerBorder_Checked" Color="#FFFFFFFF" />
     <LinearGradientBrush x:Key="ControlBackground_Checked" EndPoint="0.5,1" StartPoint="0.5,0">
         <GradientStop Color="#FFFFDCAB" Offset="0" />
         <GradientStop Color="#FFFFD18F" Offset="0.5" />
         <GradientStop Color="#FFFE9227" Offset="0.5" />
         <GradientStop Color="#FFFFD74E" Offset="1" />
-    </LinearGradientBrush>
+    </LinearGradientBrush>-->
 
     <!-- Highlighted -->
-    <SolidColorBrush x:Key="ControlOuterBorder_Highlighted" Color="#FFFFC92B" />
+    <!--<SolidColorBrush x:Key="ControlOuterBorder_Highlighted" Color="#FFFFC92B" />
     <SolidColorBrush x:Key="ControlInnerBorder_Highlighted" Color="#FFFFFFFF" />
     <LinearGradientBrush x:Key="ControlBackground_Highlighted" EndPoint="0.5,1" StartPoint="0.5,0">
         <GradientStop Color="#FFFFFBA3" Offset="1"/>
         <GradientStop Color="#FFFFFBDA" Offset="0"/>
-    </LinearGradientBrush>
+    </LinearGradientBrush>-->
 
     <!-- Selected -->
-    <SolidColorBrush x:Key="ControlOuterBorder_Selected" Color="#FFFFC92B" />
+    <!--<SolidColorBrush x:Key="ControlOuterBorder_Selected" Color="#FFFFC92B" />
     <SolidColorBrush x:Key="ControlInnerBorder_Selected" Color="#FFFFFFFF" />
     <LinearGradientBrush x:Key="ControlBackground_Selected" EndPoint="0.5,1" StartPoint="0.5,0">
         <GradientStop Color="#FFFCE79F" Offset="1"/>
         <GradientStop Color="#FFFDD3A8"/>
-    </LinearGradientBrush>
+    </LinearGradientBrush>-->
 
 
     <Style TargetType="{x:Type chrome:ButtonChrome}">
@@ -1394,9 +1399,9 @@
                             <Border x:Name="InnerBorder" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding InnerCornerRadius}" BorderBrush="{StaticResource ControlInnerBorder_Normal}" />
                         </Border>
 
-                        <Border x:Name="ActiveVisual" Opacity="0" Visibility="Collapsed" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{StaticResource ControlOuterBorder_Active}" Background="{StaticResource ControlBackground_Active}">
+                        <!--<Border x:Name="ActiveVisual" Opacity="0" Visibility="Collapsed" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{StaticResource ControlOuterBorder_Active}" Background="{StaticResource ControlBackground_Active}">
                             <Border x:Name="ActiveInnerVisual" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding InnerCornerRadius}" BorderBrush="{StaticResource ControlInnerBorder_Active}" />
-                        </Border>
+                        </Border>-->
 
                         <Border x:Name="MouseOverVisual" Opacity="0" Visibility="Collapsed" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{StaticResource ControlOuterBorder_MouseOver}" Background="{StaticResource ControlBackground_MouseOver}">
                             <Border x:Name="MouseOverInnerVisual" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding InnerCornerRadius}" BorderBrush="{StaticResource ControlInnerBorder_MouseOver}" />
@@ -1405,15 +1410,15 @@
                             <Border x:Name="PressedInnerVisual" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding InnerCornerRadius}" BorderBrush="{StaticResource ControlInnerBorder_Pressed}" />
                         </Border>
 
-                        <Border x:Name="FocusVisual" Opacity="0" Visibility="Collapsed" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{StaticResource ControlOuterBorder_Focused}" Background="{StaticResource ControlBackground_Focused}">
+                        <!--<Border x:Name="FocusVisual" Opacity="0" Visibility="Collapsed" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{StaticResource ControlOuterBorder_Focused}" Background="{StaticResource ControlBackground_Focused}">
                             <Border x:Name="FocusInnerVisual" BorderThickness="1" CornerRadius="{TemplateBinding InnerCornerRadius}" BorderBrush="{StaticResource ControlInnerBorder_Focused}"/>
-                        </Border>
+                        </Border>-->
 
                     </Grid>
                     <ControlTemplate.Triggers>
 
                         <!-- If button is disabled and is checked -->
-                        <MultiTrigger>
+                        <!--<MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="RenderEnabled" Value="False" />
                                 <Condition Property="RenderChecked" Value="True" />
@@ -1421,10 +1426,10 @@
                             <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource ControlOuterBorder_DisabledChecked}" />
                             <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{StaticResource ControlInnerBorder_DisabledChecked}" />
                             <Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlBackground_DisabledChecked}" />
-                        </MultiTrigger>
+                        </MultiTrigger>-->
 
                         <!-- If button is disabled, not checked, and is rendered normal -->
-                        <MultiTrigger>
+                        <!--<MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="RenderEnabled" Value="False" />
                                 <Condition Property="RenderChecked" Value="False" />
@@ -1433,7 +1438,7 @@
                             <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource ControlOuterBorder_Disabled}" />
                             <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{StaticResource ControlInnerBorder_Disabled}" />
                             <Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlBackground_Disabled}" />
-                        </MultiTrigger>
+                        </MultiTrigger>-->
 
                         <!-- if button is enabled and pressed -->
                         <MultiTrigger>
@@ -1476,7 +1481,7 @@
                         </MultiTrigger>
 
                         <!-- if button is enabled, checked, the mouse is over, but it is not pressed -->
-                        <MultiTrigger>
+                        <!--<MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="RenderEnabled" Value="True" />
                                 <Condition Property="RenderChecked" Value="True" />
@@ -1486,7 +1491,7 @@
                             <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource ControlOuterBorder_MouseOverChecked}" />
                             <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{StaticResource ControlInnerBorder_MouseOverChecked}" />
                             <Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlBackground_MouseOverChecked}" />
-                        </MultiTrigger>
+                        </MultiTrigger>-->
 
                         <!-- if button is enabled, is not checked, the mouse is over, and not pressed -->
                         <MultiTrigger>
@@ -1531,7 +1536,7 @@
                         </MultiTrigger>
 
                         <!-- if button is enabled, checked, he mouse is not over, and it is not pressed -->
-                        <MultiTrigger>
+                        <!--<MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="RenderEnabled" Value="True" />
                                 <Condition Property="RenderChecked" Value="True" />
@@ -1541,10 +1546,10 @@
                             <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource ControlOuterBorder_Checked}" />
                             <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{StaticResource ControlInnerBorder_Checked}" />
                             <Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlBackground_Checked}" />
-                        </MultiTrigger>
+                        </MultiTrigger>-->
 
                         <!-- if button is focused, is enabled, not pressed, and the mouse is not over -->
-                        <MultiTrigger>
+                        <!--<MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="RenderFocused" Value="True" />
                                 <Condition Property="RenderEnabled" Value="True" />
@@ -1583,10 +1588,10 @@
                                     </Storyboard>
                                 </BeginStoryboard>
                             </MultiTrigger.ExitActions>
-                        </MultiTrigger>
+                        </MultiTrigger>-->
 
                         <!-- if the button is enabled, not checked, is active, not pressed, and the mouse is not over -->
-                        <MultiTrigger>
+                        <!--<MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="RenderEnabled" Value="True" />
                                 <Condition Property="RenderChecked" Value="False" />
@@ -1628,9 +1633,9 @@
                                     </Storyboard>
                                 </BeginStoryboard>
                             </MultiTrigger.ExitActions>
-                        </MultiTrigger>
+                        </MultiTrigger>-->
 
-                        <MultiTrigger>
+                        <!--<MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="RenderEnabled" Value="True" />
                                 <Condition Property="RenderChecked" Value="False" />
@@ -1641,9 +1646,9 @@
                             <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource ControlOuterBorder_Highlighted}" />
                             <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{StaticResource ControlInnerBorder_Highlighted}" />
                             <Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlBackground_Highlighted}" />
-                        </MultiTrigger>
+                        </MultiTrigger>-->
 
-                        <MultiTrigger>
+                        <!--<MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="RenderEnabled" Value="True" />
                                 <Condition Property="RenderChecked" Value="False" />
@@ -1655,9 +1660,9 @@
                             <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource ControlOuterBorder_Selected}" />
                             <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{StaticResource ControlInnerBorder_Selected}" />
                             <Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlBackground_Selected}" />
-                        </MultiTrigger>
+                        </MultiTrigger>-->
 
-                        <MultiTrigger>
+                        <!--<MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="RenderNormal" Value="False" />
                                 <Condition Property="RenderHighlighted" Value="False" />
@@ -1667,7 +1672,7 @@
                             <Setter TargetName="OuterBorder" Property="BorderBrush" Value="Transparent" />
                             <Setter TargetName="InnerBorder" Property="BorderBrush" Value="{x:Null}" />
                             <Setter TargetName="OuterBorder" Property="Background" Value="Transparent" />
-                        </MultiTrigger>
+                        </MultiTrigger>-->
 
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
