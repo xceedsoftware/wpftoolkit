@@ -1260,8 +1260,8 @@
     <!-- ButtonChrome                                                                    -->
     <!-- =============================================================================== -->
 
-    <CornerRadius x:Key="ControlOuterBorderCornerRadius">3</CornerRadius>
-    <CornerRadius x:Key="ControlInnerBorderCornerRadius">1</CornerRadius>
+    <CornerRadius x:Key="ControlOuterBorderCornerRadius">2.75</CornerRadius>
+    <CornerRadius x:Key="ControlInnerBorderCornerRadius">1.75</CornerRadius>
 
     <!-- Normal -->
     <SolidColorBrush x:Key="ControlOuterBorder_Normal" Color="#FF707070" />
