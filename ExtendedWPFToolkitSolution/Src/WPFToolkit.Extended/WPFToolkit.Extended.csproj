@@ -53,7 +53,55 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="BusyIndicator\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ButtonSpinner\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChildWindow\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Chromes\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ColorPicker\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DateTimeUpDown\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Magnifier\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MaskedTextBox\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MessageBox\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NumericUpDown\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="RichTextBoxFormatBar\RichTextBoxFormatBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SplitButton\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Common\Generic_Common.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -63,35 +111,35 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BusyIndicator\BusyIndicator.cs" />
-    <Compile Include="ButtonSpinner\ButtonSpinner.cs" />
-    <Compile Include="ChildWindow\ChildWindow.cs" />
-    <Compile Include="ChildWindow\VisualStates.ChildWindow.cs" />
-    <Compile Include="ChildWindow\WindowStartupLocation.cs" />
-    <Compile Include="ChildWindow\WindowState.cs" />
-    <Compile Include="ButtonSpinner\SpinDirection.cs" />
-    <Compile Include="ButtonSpinner\SpinEventArgs.cs" />
-    <Compile Include="ButtonSpinner\Spinner.cs" />
-    <Compile Include="ButtonSpinner\ValidSpinDirections.cs" />
-    <Compile Include="Chromes\ButtonChrome.cs" />
-    <Compile Include="ColorPicker\ColorItem.cs" />
-    <Compile Include="ColorPicker\ColorPicker.cs" />
-    <Compile Include="ColorPicker\ColorUtilities.cs" />
+    <Compile Include="BusyIndicator\Implementation\BusyIndicator.cs" />
+    <Compile Include="ButtonSpinner\Implementation\ButtonSpinner.cs" />
+    <Compile Include="ChildWindow\Implementation\ChildWindow.cs" />
+    <Compile Include="ChildWindow\Implementation\VisualStates.ChildWindow.cs" />
+    <Compile Include="ChildWindow\Implementation\WindowStartupLocation.cs" />
+    <Compile Include="ChildWindow\Implementation\WindowState.cs" />
+    <Compile Include="ButtonSpinner\Implementation\SpinDirection.cs" />
+    <Compile Include="ButtonSpinner\Implementation\SpinEventArgs.cs" />
+    <Compile Include="ButtonSpinner\Implementation\Spinner.cs" />
+    <Compile Include="ButtonSpinner\Implementation\ValidSpinDirections.cs" />
+    <Compile Include="Chromes\Implementation\ButtonChrome.cs" />
+    <Compile Include="ColorPicker\Implementation\ColorItem.cs" />
+    <Compile Include="ColorPicker\Implementation\ColorPicker.cs" />
+    <Compile Include="ColorPicker\Implementation\ColorUtilities.cs" />
     <Compile Include="Core\Converters\ColorToSolidColorBrushConverter.cs" />
     <Compile Include="Core\Converters\InverseBoolConverter.cs" />
-    <Compile Include="DateTimeUpDown\DateTimeFormat.cs" />
-    <Compile Include="DateTimeUpDown\DateTimeInfo.cs" />
-    <Compile Include="DateTimeUpDown\DateTimePart.cs" />
-    <Compile Include="DateTimeUpDown\DateTimeUpDown.cs" />
-    <Compile Include="Magnifier\Converters\BorderThicknessToStrokeThicknessConverter.cs" />
-    <Compile Include="Magnifier\Converters\RadiusConverter.cs" />
-    <Compile Include="Magnifier\Magnifier.cs" />
-    <Compile Include="Magnifier\MagnifierAdorner.cs" />
-    <Compile Include="Magnifier\MagnifierManager.cs" />
+    <Compile Include="DateTimeUpDown\Implementation\DateTimeFormat.cs" />
+    <Compile Include="DateTimeUpDown\Implementation\DateTimeInfo.cs" />
+    <Compile Include="DateTimeUpDown\Implementation\DateTimePart.cs" />
+    <Compile Include="DateTimeUpDown\Implementation\DateTimeUpDown.cs" />
+    <Compile Include="Magnifier\Implementation\Converters\BorderThicknessToStrokeThicknessConverter.cs" />
+    <Compile Include="Magnifier\Implementation\Converters\RadiusConverter.cs" />
+    <Compile Include="Magnifier\Implementation\Magnifier.cs" />
+    <Compile Include="Magnifier\Implementation\MagnifierAdorner.cs" />
+    <Compile Include="Magnifier\Implementation\MagnifierManager.cs" />
     <Compile Include="Core\Primitives\InputBase.cs" />
-    <Compile Include="MaskedTextBox\MaskedTextBox.cs" />
-    <Compile Include="MessageBox\MessageBox.cs" />
-    <Compile Include="NumericUpDown\NumericUpDown.cs" />
+    <Compile Include="MaskedTextBox\Implementation\MaskedTextBox.cs" />
+    <Compile Include="MessageBox\Implementation\MessageBox.cs" />
+    <Compile Include="NumericUpDown\Implementation\NumericUpDown.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -105,7 +153,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="BusyIndicator\VisualStates.BusyIndicator.cs" />
+    <Compile Include="BusyIndicator\Implementation\VisualStates.BusyIndicator.cs" />
     <Compile Include="RichTextBoxFormatBar\IRichTextBoxFormatBar.cs" />
     <Compile Include="RichTextBoxFormatBar\RichTextBoxFormatBar.xaml.cs">
       <DependentUpon>RichTextBoxFormatBar.xaml</DependentUpon>
@@ -118,9 +166,9 @@
     <Compile Include="RichTextBox\Formatters\XamlFormatter.cs" />
     <Compile Include="RichTextBox\RichTextBox.cs" />
     <Compile Include="Core\Primitives\UpDownBase.cs" />
-    <Compile Include="SplitButton\SplitButton.cs" />
+    <Compile Include="SplitButton\Implementation\SplitButton.cs" />
     <Compile Include="VisualStates.cs" />
-    <Compile Include="MessageBox\VisualStates.MessageBox.cs" />
+    <Compile Include="MessageBox\Implementation\VisualStates.MessageBox.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
