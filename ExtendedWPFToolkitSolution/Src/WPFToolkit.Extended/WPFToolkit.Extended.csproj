@@ -41,7 +41,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>sn.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -184,7 +184,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="sn.pfx" />
+    <None Include="sn.snk" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="MessageBox\Icons\Error48.png" />
