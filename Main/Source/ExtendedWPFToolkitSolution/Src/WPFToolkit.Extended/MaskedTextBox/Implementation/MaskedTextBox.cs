@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Windows.Controls;
-using System.Windows;
-using System.Windows.Input;
 using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using Microsoft.Windows.Controls.Primitives;
 
 namespace Microsoft.Windows.Controls
 {
-
     public class MaskedTextBox : InputBase
     {
         #region Properties
@@ -250,6 +249,8 @@ namespace Microsoft.Windows.Controls
 
         #region Methods
 
+        #region Private
+
         private void UpdateText(MaskedTextProvider provider, int position)
         {
             if (provider == null)
@@ -280,6 +281,23 @@ namespace Microsoft.Windows.Controls
                 IncludeLiterals = this.IncludeLiterals
             };
         }
+
+        #endregion //Private
+
+        #region Public
+
+        /// <summary>
+        /// Attempts to set focus to this element.
+        /// </summary>
+        public new void Focus()
+        {
+            if (TextBox != null)
+                TextBox.Focus();
+            else
+                base.Focus();
+        }
+
+        #endregion //Public
 
         #endregion //Methods
 
