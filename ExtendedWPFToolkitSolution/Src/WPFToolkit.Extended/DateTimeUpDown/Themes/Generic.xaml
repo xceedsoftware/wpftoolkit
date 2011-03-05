@@ -24,6 +24,7 @@
                                  IsReadOnly="True"
                                  MinWidth="20" AcceptsReturn="False" 
                                  TextAlignment="Right" TextWrapping="NoWrap" 
+                                 TabIndex="{TemplateBinding TabIndex}"
                                  Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" />
                     </local:ButtonSpinner>
                 </ControlTemplate>
