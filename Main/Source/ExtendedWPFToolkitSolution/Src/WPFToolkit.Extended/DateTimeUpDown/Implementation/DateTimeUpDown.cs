@@ -41,7 +41,7 @@ namespace Microsoft.Windows.Controls
         {
             //if using a CustomFormat then the initialization occurs on the CustomFormatString property
             if (newValue != DateTimeFormat.Custom)
-                InitializeDateTimeInfoList();
+                InitializeDateTimeInfoListAndParseValue();
         }
 
         #endregion //Format
@@ -67,7 +67,7 @@ namespace Microsoft.Windows.Controls
             if (string.IsNullOrEmpty(newValue))
                 throw new ArgumentException("CustomFormat should be specified.", FormatString);
 
-            InitializeDateTimeInfoList();
+            InitializeDateTimeInfoListAndParseValue();
         }
 
         #endregion //FormatString
@@ -197,6 +197,13 @@ namespace Microsoft.Windows.Controls
         #endregion //Abstract
 
         #region Private
+
+        private void InitializeDateTimeInfoListAndParseValue()
+        {
+            InitializeDateTimeInfoList();
+            if (Value != null)
+                ParseValueIntoDateTimeInfo();
+        }
 
         private void InitializeDateTimeInfoList()
         {
