@@ -49,17 +49,6 @@ namespace Microsoft.Windows.Controls
 
         protected Window Container { get; private set; }
         protected Thumb DragWidget { get; private set; }
-        protected Button CloseButton { get; private set; }
-
-        protected Button OkButton { get; private set; }
-        protected Button CancelButton { get; private set; }
-        protected Button YesButton { get; private set; }
-        protected Button NoButton { get; private set; }
-
-        protected Button OkButton1 { get; private set; }
-        protected Button CancelButton1 { get; private set; }
-        protected Button YesButton1 { get; private set; }
-        protected Button NoButton1 { get; private set; }
 
         #endregion //Protected Properties
 
@@ -460,20 +449,16 @@ namespace Microsoft.Windows.Controls
             switch (button.Name)
             {
                 case "PART_NoButton":
-                case "PART_NoButton1":
                     MessageBoxResult = MessageBoxResult.No;
                     break;
                 case "PART_YesButton":
-                case "PART_YesButton1":
                     MessageBoxResult = MessageBoxResult.Yes;
                     break;
                 case "PART_CloseButton":
                 case "PART_CancelButton":
-                case "PART_CancelButton1":
                     MessageBoxResult = MessageBoxResult.Cancel;
                     break;
                 case "PART_OkButton":
-                case "PART_OkButton1":
                     MessageBoxResult = MessageBoxResult.OK;
                     break;
             }
