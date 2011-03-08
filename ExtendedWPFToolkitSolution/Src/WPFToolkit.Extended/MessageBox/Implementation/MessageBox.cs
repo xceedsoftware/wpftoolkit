@@ -19,6 +19,11 @@ namespace Microsoft.Windows.Controls
         /// </summary>
         private MessageBoxButton _button = MessageBoxButton.OK;
 
+        /// <summary>
+        /// Tracks the MessageBoxResult to set as the default and focused button
+        /// </summary>
+        private MessageBoxResult _defaultResult = MessageBoxResult.None;
+
         #endregion //Private Members
 
         #region Constructors
@@ -129,47 +134,15 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            DragWidget = (Thumb)GetTemplateChild("PART_DragWidget");
+            DragWidget = GetTemplateChild("PART_DragWidget") as Thumb;
             if (DragWidget != null)
                 DragWidget.DragDelta += (o, e) => ProcessMove(e);
 
-            CloseButton = (Button)GetTemplateChild("PART_CloseButton");
-            if (CloseButton != null)
-                CloseButton.Click += (o, e) => Close();
-
-            NoButton = (Button)GetTemplateChild("PART_NoButton");
-            if (NoButton != null)
-                NoButton.Click += (o, e) => Button_Click(o, e);
-
-            NoButton1 = (Button)GetTemplateChild("PART_NoButton1");
-            if (NoButton1 != null)
-                NoButton1.Click += (o, e) => Button_Click(o, e);
-
-            YesButton = (Button)GetTemplateChild("PART_YesButton");
-            if (YesButton != null)
-                YesButton.Click += (o, e) => Button_Click(o, e);
-
-            YesButton1 = (Button)GetTemplateChild("PART_YesButton1");
-            if (YesButton1 != null)
-                YesButton1.Click += (o, e) => Button_Click(o, e);
-
-            CancelButton = (Button)GetTemplateChild("PART_CancelButton");
-            if (CancelButton != null)
-                CancelButton.Click += (o, e) => Button_Click(o, e);
-
-            CancelButton1 = (Button)GetTemplateChild("PART_CancelButton1");
-            if (CancelButton1 != null)
-                CancelButton1.Click += (o, e) => Button_Click(o, e);
-
-            OkButton = (Button)GetTemplateChild("PART_OkButton");
-            if (OkButton != null)
-                OkButton.Click += (o, e) => Button_Click(o, e);
-
-            OkButton1 = (Button)GetTemplateChild("PART_OkButton1");
-            if (OkButton1 != null)
-                OkButton1.Click += (o, e) => Button_Click(o, e);
+            AddHandler(ButtonBase.ClickEvent, new RoutedEventHandler(Button_Click));
 
             ChangeVisualState(_button.ToString(), true);
+
+            SetDefaultResult();
         }
 
         #endregion //Base Class Overrides
@@ -208,7 +181,7 @@ namespace Microsoft.Windows.Controls
         /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
         public static MessageBoxResult Show(string messageText, string caption, MessageBoxButton button)
         {
-            return ShowCore(messageText, caption, button, MessageBoxImage.None);
+            return ShowCore(messageText, caption, button, MessageBoxImage.None, MessageBoxResult.None);
         }
 
         /// <summary>
@@ -221,48 +194,29 @@ namespace Microsoft.Windows.Controls
         /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
         public static MessageBoxResult Show(string messageText, string caption, MessageBoxButton button, MessageBoxImage icon)
         {
-            return ShowCore(messageText, caption, button, icon);
+            return ShowCore(messageText, caption, button, icon, MessageBoxResult.None);
+        }
+
+        /// <summary>
+        /// Displays a message box that has a message and that returns a result.
+        /// </summary>
+        /// <param name="messageText">A System.String that specifies the text to display.</param>
+        /// <param name="caption">A System.String that specifies the title bar caption to display.</param>
+        /// <param name="button">A System.Windows.MessageBoxButton value that specifies which button or buttons to display.</param>
+        /// <param name="image"> A System.Windows.MessageBoxImage value that specifies the icon to display.</param>
+        /// <param name="defaultResult">A System.Windows.MessageBoxResult value that specifies the default result of the MessageBox.</param>
+        /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
+        public static MessageBoxResult Show(string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult)
+        {
+            return ShowCore(messageText, caption, button, icon, defaultResult);
         }
 
         #endregion //Public Static
 
-        #region Private Static
-
-        private static MessageBoxResult ShowCore(string messageText, string caption, MessageBoxButton button, MessageBoxImage icon)
-        {
-            MessageBox msgBox = new MessageBox();
-            msgBox.InitializeMessageBox(messageText, caption, button, icon);
-            msgBox.Show();
-            return msgBox.MessageBoxResult;
-        }
-
-        /// <summary>
-        /// Resolves the owner Window of the MessageBox.
-        /// </summary>
-        /// <returns></returns>
-        private static FrameworkElement ResolveOwner()
-        {
-            FrameworkElement owner = null;
-            if (Application.Current != null)
-            {
-                foreach (Window w in Application.Current.Windows)
-                {
-                    if (w.IsActive)
-                    {
-                        owner = w;
-                        break;
-                    }
-                }
-            }
-            return owner;
-        }
-
-        #endregion //Private Static
-
         #region Protected
 
         /// <summary>
-        /// Shows the MessageBox
+        /// Shows the container which contains the MessageBox.
         /// </summary>
         protected void Show()
         {
@@ -276,11 +230,12 @@ namespace Microsoft.Windows.Controls
         /// <param name="caption">The caption.</param>
         /// <param name="button">The button.</param>
         /// <param name="image">The image.</param>
-        protected void InitializeMessageBox(string text, string caption, MessageBoxButton button, MessageBoxImage image)
+        protected void InitializeMessageBox(string text, string caption, MessageBoxButton button, MessageBoxImage image, MessageBoxResult defaultResult)
         {
             Text = text;
             Caption = caption;
             _button = button;
+            _defaultResult = defaultResult;
             SetImageSource(image);
             Container = CreateContainer();
         }
@@ -298,6 +253,118 @@ namespace Microsoft.Windows.Controls
         #endregion //Protected
 
         #region Private
+
+        /// <summary>
+        /// Sets the button that represents the _defaultResult to the default button and gives it focus.
+        /// </summary>
+        private void SetDefaultResult()
+        {
+            var defaultButton = GetDefaultButtonFromDefaultResult();
+            if (defaultButton != null)
+            {
+                defaultButton.IsDefault = true;
+                defaultButton.Focus();
+            }
+        }
+
+        /// <summary>
+        /// Gets the default button from the _defaultResult.
+        /// </summary>
+        /// <returns>The default button that represents the defaultResult</returns>
+        private Button GetDefaultButtonFromDefaultResult()
+        {
+            Button defaultButton = null;
+            switch (_defaultResult)
+            {
+                case MessageBoxResult.Cancel:
+                    defaultButton = GetMessageBoxButton("PART_CancelButton");
+                    break;
+                case MessageBoxResult.No:
+                    defaultButton = GetMessageBoxButton("PART_NoButton");
+                    break;
+                case MessageBoxResult.OK:
+                    defaultButton = GetMessageBoxButton("PART_OkButton");
+                    break;
+                case MessageBoxResult.Yes:
+                    defaultButton = GetMessageBoxButton("PART_YesButton");
+                    break;
+                case MessageBoxResult.None:
+                    defaultButton = GetDefaultButton();
+                    break;
+            }
+            return defaultButton;
+        }
+
+        /// <summary>
+        /// Gets the default button.
+        /// </summary>
+        /// <remarks>Used when the _defaultResult is set to None</remarks>
+        /// <returns>The button to use as the default</returns>
+        private Button GetDefaultButton()
+        {
+            Button defaultButton = null;
+            switch (_button)
+            {
+                case MessageBoxButton.OK:
+                case MessageBoxButton.OKCancel:
+                    defaultButton = GetMessageBoxButton("PART_OkButton");
+                    break;
+                case MessageBoxButton.YesNo:
+                case MessageBoxButton.YesNoCancel:
+                    defaultButton = GetMessageBoxButton("PART_YesButton");
+                    break;
+            }
+            return defaultButton;
+        }
+
+        /// <summary>
+        /// Gets a message box button.
+        /// </summary>
+        /// <param name="name">The name of the button to get.</param>
+        /// <returns>The button</returns>
+        private Button GetMessageBoxButton(string name)
+        {
+            Button button = GetTemplateChild(name) as Button;
+            return button;
+        }
+
+        /// <summary>
+        /// Shows the MessageBox.
+        /// </summary>
+        /// <param name="messageText">The message text.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="button">The button.</param>
+        /// <param name="icon">The icon.</param>
+        /// <param name="defaultResult">The default result.</param>
+        /// <returns></returns>
+        private static MessageBoxResult ShowCore(string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult)
+        {
+            MessageBox msgBox = new MessageBox();
+            msgBox.InitializeMessageBox(messageText, caption, button, icon, defaultResult);
+            msgBox.Show();
+            return msgBox.MessageBoxResult;
+        }
+
+        /// <summary>
+        /// Resolves the owner Window of the MessageBox.
+        /// </summary>
+        /// <returns>the owner element</returns>
+        private static FrameworkElement ResolveOwner()
+        {
+            FrameworkElement owner = null;
+            if (Application.Current != null)
+            {
+                foreach (Window w in Application.Current.Windows)
+                {
+                    if (w.IsActive)
+                    {
+                        owner = w;
+                        break;
+                    }
+                }
+            }
+            return owner;
+        }
 
         /// <summary>
         /// Sets the message image source.
@@ -389,7 +456,7 @@ namespace Microsoft.Windows.Controls
         /// <param name="e">The <see cref="System.Windows.RoutedEventArgs"/> instance containing the event data.</param>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Button button = e.Source as Button;
+            Button button = e.OriginalSource as Button;
             switch (button.Name)
             {
                 case "PART_NoButton":
@@ -400,6 +467,7 @@ namespace Microsoft.Windows.Controls
                 case "PART_YesButton1":
                     MessageBoxResult = MessageBoxResult.Yes;
                     break;
+                case "PART_CloseButton":
                 case "PART_CancelButton":
                 case "PART_CancelButton1":
                     MessageBoxResult = MessageBoxResult.Cancel;
