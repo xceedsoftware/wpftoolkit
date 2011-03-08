@@ -122,7 +122,7 @@
                             <VisualStateGroup x:Name="group1">
                                 <VisualState x:Name="OK">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="OkGrid" Storyboard.TargetProperty="Visibility">
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_OkButton" Storyboard.TargetProperty="Visibility">
                                             <DiscreteObjectKeyFrame KeyTime="0">
                                                 <DiscreteObjectKeyFrame.Value>
                                                     <Visibility>Visible</Visibility>
@@ -133,7 +133,14 @@
                                 </VisualState>
                                 <VisualState x:Name="OKCancel">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="OkCancelGrid" Storyboard.TargetProperty="Visibility">
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_OkButton" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_CancelButton" Storyboard.TargetProperty="Visibility">
                                             <DiscreteObjectKeyFrame KeyTime="0">
                                                 <DiscreteObjectKeyFrame.Value>
                                                     <Visibility>Visible</Visibility>
@@ -144,7 +151,14 @@
                                 </VisualState>
                                 <VisualState x:Name="YesNo">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="YesNoGrid" Storyboard.TargetProperty="Visibility">
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_YesButton" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_NoButton" Storyboard.TargetProperty="Visibility">
                                             <DiscreteObjectKeyFrame KeyTime="0">
                                                 <DiscreteObjectKeyFrame.Value>
                                                     <Visibility>Visible</Visibility>
@@ -156,7 +170,21 @@
 
                                 <VisualState x:Name="YesNoCancel">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="YesNoCancelGrid" Storyboard.TargetProperty="Visibility">
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_YesButton" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_NoButton" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_CancelButton" Storyboard.TargetProperty="Visibility">
                                             <DiscreteObjectKeyFrame KeyTime="0">
                                                 <DiscreteObjectKeyFrame.Value>
                                                     <Visibility>Visible</Visibility>
@@ -222,35 +250,16 @@
 
                                         <!-- Buttons -->
                                         <Grid Grid.Row="1" HorizontalAlignment="Right" Margin="12,0,12,12">
-                                            <Grid x:Name="OkGrid" Visibility="Collapsed">
-                                                <Button x:Name="PART_OkButton" MinWidth="65" Margin="6,0,0,0" IsDefault="True">OK</Button>
-                                            </Grid>
-                                            <Grid x:Name="OkCancelGrid" Visibility="Collapsed">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Button x:Name="PART_OkButton1" MinWidth="65" Margin="6,0,0,0" IsDefault="True">OK</Button>
-                                                <Button Grid.Column="1" x:Name="PART_CancelButton" MinWidth="65" Margin="6,0,0,0">Cancel</Button>
-                                            </Grid>
-                                            <Grid x:Name="YesNoGrid" Visibility="Collapsed">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Button x:Name="PART_YesButton" MinWidth="65" Margin="6,0,0,0" IsDefault="True">Yes</Button>
-                                                <Button Grid.Column="1" x:Name="PART_NoButton" MinWidth="65" Margin="6,0,0,0">No</Button>
-                                            </Grid>
-                                            <Grid x:Name="YesNoCancelGrid" Visibility="Collapsed">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Button x:Name="PART_YesButton1" MinWidth="65" Margin="6,0,0,0" IsDefault="True">Yes</Button>
-                                                <Button Grid.Column="1" x:Name="PART_NoButton1" MinWidth="65" Margin="6,0,0,0">No</Button>
-                                                <Button Grid.Column="2" x:Name="PART_CancelButton1" MinWidth="65" Margin="6,0,0,0">Cancel</Button>
-                                            </Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Button Grid.Column="0" x:Name="PART_YesButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed">Yes</Button>
+                                            <Button Grid.Column="1" x:Name="PART_NoButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed">No</Button>
+                                            <Button Grid.Column="2" x:Name="PART_OkButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed">OK</Button>
+                                            <Button Grid.Column="3" x:Name="PART_CancelButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed">Cancel</Button>
                                         </Grid>
                                     </Grid>
                                 </Border>
