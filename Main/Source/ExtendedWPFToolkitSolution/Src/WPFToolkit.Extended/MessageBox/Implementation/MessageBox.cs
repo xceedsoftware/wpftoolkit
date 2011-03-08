@@ -352,12 +352,16 @@ namespace Microsoft.Windows.Controls
 
             var owner = ResolveOwner();
             if (owner != null)
+            {
                 newWindow.Owner = Window.GetWindow(owner);
+                newWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+            }
+            else
+                newWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
 
             newWindow.ShowInTaskbar = false;
             newWindow.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;
             newWindow.ResizeMode = System.Windows.ResizeMode.NoResize;
-            newWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
             newWindow.WindowStyle = System.Windows.WindowStyle.None;
             return newWindow;
         }
