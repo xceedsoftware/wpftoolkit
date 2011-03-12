@@ -86,10 +86,9 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         protected virtual void OnSelectedObjectChanged(object oldValue, object newValue)
         {
-            SelectedObjectType = newValue.GetType();
+            SetSelectedObjectNameBinding(newValue);
 
-            if (newValue is FrameworkElement)
-                SelectedObjectName = (newValue as FrameworkElement).Name;
+            SelectedObjectType = newValue.GetType();
 
             _propertyItemsCache = GetObjectProperties(newValue);
 
@@ -166,7 +165,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
             if (newValue != null)
                 newValue.IsSelected = true;
-        }        
+        }
 
         #endregion //SelectedProperty
 
@@ -303,6 +302,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             }
 
             return propertyCollection;
+        }
+
+        private void SetSelectedObjectNameBinding(object selectedObject)
+        {
+            if (selectedObject is FrameworkElement)
+            {
+                var binding = new Binding("Name");
+                binding.Source = selectedObject;
+                binding.Mode = BindingMode.OneWay;
+                BindingOperations.SetBinding(this, PropertyGrid.SelectedObjectNameProperty, binding);
+            }
         }
 
         #endregion //Methods
