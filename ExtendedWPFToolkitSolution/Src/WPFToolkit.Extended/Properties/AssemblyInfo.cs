@@ -60,3 +60,4 @@ using System.Windows.Markup;
 
 [assembly: XmlnsPrefix("http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended", "extToolkit")]
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended", "Microsoft.Windows.Controls")]
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended", "Microsoft.Windows.Controls.PropertyGrid")]
