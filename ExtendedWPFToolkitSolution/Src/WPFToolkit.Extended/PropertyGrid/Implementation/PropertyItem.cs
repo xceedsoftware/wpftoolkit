@@ -96,6 +96,14 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             IsSelected = true;
         }
 
+        protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Editor != null)
+                Editor.Focus();
+
+            e.Handled = true;
+        }
+
         #endregion //Base Class Overrides
     }
 }
