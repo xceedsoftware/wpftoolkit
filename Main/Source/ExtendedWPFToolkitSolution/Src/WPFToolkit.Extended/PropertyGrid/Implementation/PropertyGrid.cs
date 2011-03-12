@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel;
 using Microsoft.Windows.Controls.PropertyGrid.Implementation.EditorProviders;
+using System.Windows.Input;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
@@ -41,52 +42,28 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         protected virtual void OnIsCategorizedChanged(bool oldValue, bool newValue)
         {
             LoadProperties(newValue);
-        }        
+        }
 
         #endregion //IsCategorized
 
         #region NameWidth
 
-        public static readonly DependencyProperty NameWidthProperty = DependencyProperty.Register("NameWidth", typeof(double), typeof(PropertyGrid), new UIPropertyMetadata(120.0, OnNameWidthChanged));
-        public double NameWidth
+        public static readonly DependencyProperty NameColumnWidthProperty = DependencyProperty.Register("NameColumnWidth", typeof(double), typeof(PropertyGrid), new UIPropertyMetadata(120.0));
+        public double NameColumnWidth
         {
-            get { return (double)GetValue(NameWidthProperty); }
-            set { SetValue(NameWidthProperty, value); }
-        }
-
-        private static void OnNameWidthChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            PropertyGrid propertyGrid = o as PropertyGrid;
-            if (propertyGrid != null)
-                propertyGrid.OnNameWidthChanged((double)e.OldValue, (double)e.NewValue);
-        }
-
-        protected virtual void OnNameWidthChanged(double oldValue, double newValue)
-        {
-            // TODO: Add your property changed side-effects. Descendants can override as well.
+            get { return (double)GetValue(NameColumnWidthProperty); }
+            set { SetValue(NameColumnWidthProperty, value); }
         }
 
         #endregion //NameWidth
 
         #region Properties
 
-        public static readonly DependencyProperty PropertiesProperty = DependencyProperty.Register("Properties", typeof(PropertyCollection), typeof(PropertyGrid), new UIPropertyMetadata(null, OnPropertiesChanged));
+        public static readonly DependencyProperty PropertiesProperty = DependencyProperty.Register("Properties", typeof(PropertyCollection), typeof(PropertyGrid), new UIPropertyMetadata(null));
         public PropertyCollection Properties
         {
             get { return (PropertyCollection)GetValue(PropertiesProperty); }
             private set { SetValue(PropertiesProperty, value); }
-        }
-
-        private static void OnPropertiesChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            PropertyGrid propertyGrid = o as PropertyGrid;
-            if (propertyGrid != null)
-                propertyGrid.OnPropertiesChanged((PropertyCollection)e.OldValue, (PropertyCollection)e.NewValue);
-        }
-
-        protected virtual void OnPropertiesChanged(PropertyCollection oldValue, PropertyCollection newValue)
-        {
-            // TODO: Add your property changed side-effects. Descendants can override as well.
         }
 
         #endregion //Properties
@@ -127,7 +104,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         public Type SelectedObjectType
         {
             get { return (Type)GetValue(SelectedObjectTypeProperty); }
-            set { SetValue(SelectedObjectTypeProperty, value); }
+            private set { SetValue(SelectedObjectTypeProperty, value); }
         }
 
         private static void OnSelectedObjectTypeChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
@@ -146,49 +123,52 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #region SelectedObjectTypeName
 
-        public static readonly DependencyProperty SelectedObjectTypeNameProperty = DependencyProperty.Register("SelectedObjectTypeName", typeof(string), typeof(PropertyGrid), new UIPropertyMetadata(string.Empty, OnSelectedObjectTypeNameChanged));
+        public static readonly DependencyProperty SelectedObjectTypeNameProperty = DependencyProperty.Register("SelectedObjectTypeName", typeof(string), typeof(PropertyGrid), new UIPropertyMetadata(string.Empty));
         public string SelectedObjectTypeName
         {
             get { return (string)GetValue(SelectedObjectTypeNameProperty); }
-            set { SetValue(SelectedObjectTypeNameProperty, value); }
-        }
-
-        private static void OnSelectedObjectTypeNameChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            PropertyGrid propertyGrid = o as PropertyGrid;
-            if (propertyGrid != null)
-                propertyGrid.OnSelectedObjectTypeNameChanged((string)e.OldValue, (string)e.NewValue);
-        }
-
-        protected virtual void OnSelectedObjectTypeNameChanged(string oldValue, string newValue)
-        {
-            // TODO: Add your property changed side-effects. Descendants can override as well.
+            private set { SetValue(SelectedObjectTypeNameProperty, value); }
         }
 
         #endregion //SelectedObjectTypeName
 
         #region SelectedObjectName
 
-        public static readonly DependencyProperty SelectedObjectNameProperty = DependencyProperty.Register("SelectedObjectName", typeof(string), typeof(PropertyGrid), new UIPropertyMetadata(string.Empty, OnSelectedObjectNameChanged));
+        public static readonly DependencyProperty SelectedObjectNameProperty = DependencyProperty.Register("SelectedObjectName", typeof(string), typeof(PropertyGrid), new UIPropertyMetadata(string.Empty));
         public string SelectedObjectName
         {
             get { return (string)GetValue(SelectedObjectNameProperty); }
-            set { SetValue(SelectedObjectNameProperty, value); }
-        }
-
-        private static void OnSelectedObjectNameChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            PropertyGrid propertyGrid = o as PropertyGrid;
-            if (propertyGrid != null)
-                propertyGrid.OnSelectedObjectNameChanged((string)e.OldValue, (string)e.NewValue);
-        }
-
-        protected virtual void OnSelectedObjectNameChanged(string oldValue, string newValue)
-        {
-            // TODO: Add your property changed side-effects. Descendants can override as well.
+            private set { SetValue(SelectedObjectNameProperty, value); }
         }
 
         #endregion //SelectedObjectName
+
+        #region SelectedProperty
+
+        public static readonly DependencyProperty SelectedPropertyProperty = DependencyProperty.Register("SelectedProperty", typeof(PropertyItem), typeof(PropertyGrid), new UIPropertyMetadata(null, OnSelectedPropertyChanged));
+        public PropertyItem SelectedProperty
+        {
+            get { return (PropertyItem)GetValue(SelectedPropertyProperty); }
+            internal set { SetValue(SelectedPropertyProperty, value); }
+        }
+
+        private static void OnSelectedPropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            PropertyGrid propertyGrid = o as PropertyGrid;
+            if (propertyGrid != null)
+                propertyGrid.OnSelectedPropertyChanged((PropertyItem)e.OldValue, (PropertyItem)e.NewValue);
+        }
+
+        protected virtual void OnSelectedPropertyChanged(PropertyItem oldValue, PropertyItem newValue)
+        {
+            if (oldValue != null)
+                oldValue.IsSelected = false;
+
+            if (newValue != null)
+                newValue.IsSelected = true;
+        }        
+
+        #endregion //SelectedProperty
 
         #endregion //Properties
 
@@ -211,13 +191,23 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             _dragThumb.DragDelta += DragThumb_DragDelta;
         }
 
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            //hitting enter on textbox will update value of underlying source
+            if (this.SelectedProperty != null && e.Key == Key.Enter && e.OriginalSource is TextBox)
+            {
+                BindingExpression be = ((TextBox)e.OriginalSource).GetBindingExpression(TextBox.TextProperty);
+                be.UpdateSource();
+            }
+        }
+
         #endregion //Base Class Overrides
 
         #region Event Handlers
 
         void DragThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            NameWidth = Math.Max(0, NameWidth + e.HorizontalChange);
+            NameColumnWidth = Math.Max(0, NameColumnWidth + e.HorizontalChange);
         }
 
         #endregion //Event Handlers
@@ -232,7 +222,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                 Properties = GetAlphabetizedProperties(_propertyItemsCache);
         }
 
-        private static List<PropertyItem> GetObjectProperties(object instance)
+        private List<PropertyItem> GetObjectProperties(object instance)
         {
             var propertyItems = new List<PropertyItem>();
             if (instance == null)
@@ -243,14 +233,14 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             // Get all properties of the type
             propertyItems.AddRange(properties.Cast<PropertyDescriptor>().
                 Where(p => p.IsBrowsable && p.Name != "GenericParameterAttributes").
-                Select(property => CreatePropertyItem(property, instance)));
+                Select(property => CreatePropertyItem(property, instance, this)));
 
             return propertyItems;
         }
 
-        private static PropertyItem CreatePropertyItem(PropertyDescriptor property, object instance)
+        private static PropertyItem CreatePropertyItem(PropertyDescriptor property, object instance, PropertyGrid grid)
         {
-            PropertyItem propertyItem = new PropertyItem(instance, property);
+            PropertyItem propertyItem = new PropertyItem(instance, property, grid);
             ITypeEditorProvider editorProvider = null;
 
             if (propertyItem.PropertyType == typeof(string))
@@ -275,20 +265,18 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             return propertyItem;
         }
 
-        private PropertyCollection GetCategorizedProperties(List<PropertyItem> propertyItems)
+        private static PropertyCollection GetCategorizedProperties(List<PropertyItem> propertyItems)
         {
             PropertyCollection propertyCollection = new PropertyCollection();
 
-            CollectionViewSource src = new CollectionViewSource();
-            src.Source = propertyItems;
+            CollectionViewSource src = new CollectionViewSource { Source = propertyItems };
             src.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
             src.SortDescriptions.Add(new SortDescription("Category", ListSortDirection.Ascending));
             src.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
 
             foreach (CollectionViewGroup item in src.View.Groups)
             {
-                PropertyCategoryItem propertyCategoryItem = new PropertyCategoryItem();
-                propertyCategoryItem.Category = item.Name.ToString();
+                PropertyCategoryItem propertyCategoryItem = new PropertyCategoryItem { Category = item.Name.ToString() };
                 foreach (var propertyitem in item.Items)
                 {
                     propertyCategoryItem.Properties.Add((PropertyItem)propertyitem);
@@ -299,15 +287,14 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             return propertyCollection;
         }
 
-        private PropertyCollection GetAlphabetizedProperties(List<PropertyItem> propertyItems)
+        private static PropertyCollection GetAlphabetizedProperties(List<PropertyItem> propertyItems)
         {
             PropertyCollection propertyCollection = new PropertyCollection();
 
             if (propertyItems == null)
                 return propertyCollection;
 
-            CollectionViewSource src = new CollectionViewSource();
-            src.Source = propertyItems;
+            CollectionViewSource src = new CollectionViewSource { Source = propertyItems };
             src.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
 
             foreach (var item in ((ListCollectionView)(src.View)))

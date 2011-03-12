@@ -102,13 +102,15 @@
     <Style TargetType="{x:Type local:PropertyItem}">
         <Setter Property="BorderBrush" Value="#FFF0F0F0" />
         <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:PropertyItem}">
                     <Border>
                         <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="{Binding NameWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGrid}}}"/>
+                                <ColumnDefinition Width="{Binding NameColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGrid}}}"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
@@ -117,10 +119,19 @@
                             </Border>
 
                             <Border BorderThickness="0.5" BorderBrush="#FFF0F0F0" x:Name="PART_Editor"  Grid.Column="1" Background="Transparent">
-                                <ContentControl Content="{TemplateBinding Editor}" VerticalAlignment="Center" />
+                                <ContentControl Content="{TemplateBinding Editor}" VerticalAlignment="Center" Focusable="False" IsTabStop="False" />
                             </Border>
                         </Grid>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="PART_Name" Property="Background" Value="#CED4DF" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="PART_Name" Property="Background" Value="#43577B" />
+                            <Setter TargetName="PART_Name" Property="TextElement.Foreground" Value="White" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -165,7 +176,7 @@
 
                             <Grid Grid.Row="2" Background="White">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                    <ItemsControl ItemsSource="{Binding Properties, RelativeSource={RelativeSource TemplatedParent}}" >
+                                    <ItemsControl ItemsSource="{Binding Properties, RelativeSource={RelativeSource TemplatedParent}}" IsTabStop="False" Focusable="False" >
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <VirtualizingStackPanel />
@@ -176,7 +187,7 @@
 
                                 <Thumb x:Name="PART_DragThumb" HorizontalAlignment="Left" Width="5" Margin="6,0,0,0" Cursor="SizeWE">
                                     <Thumb.RenderTransform>
-                                        <TranslateTransform X="{Binding NameWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGrid}}}" />
+                                        <TranslateTransform X="{Binding NameColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGrid}}}" />
                                     </Thumb.RenderTransform>
                                     <Thumb.Template>
                                         <ControlTemplate>
@@ -189,8 +200,8 @@
 
                             <GridSplitter Height="3" Grid.Row="3" HorizontalAlignment="Stretch" />
                             <StackPanel Grid.Row="4" Margin="0,0,0,5">
-                                <TextBlock Padding="2 2 2 0" FontWeight="Bold" Text="Property Name" />
-                                <TextBlock Padding="5 2 2 0" TextWrapping="WrapWithOverflow" Text="Property Description" />
+                                <TextBlock Padding="2 2 2 0" FontWeight="Bold" Text="{Binding SelectedProperty.Name, RelativeSource={RelativeSource TemplatedParent}}" />
+                                <TextBlock Padding="5 2 2 0" TextWrapping="WrapWithOverflow" Text="{Binding SelectedProperty.Description, RelativeSource={RelativeSource TemplatedParent}}" />
                             </StackPanel>
                         </Grid>
                     </Border>
