@@ -19,5 +19,19 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                 return null;
             }
         }
+
+        public ICustomTypeEditor this[Type targetType]
+        {
+            get
+            {
+                foreach (var item in Items)
+                {
+                    if (item.TargetType == targetType)
+                        return item;
+                }
+
+                return null;
+            }
+        }
     }
 }

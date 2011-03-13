@@ -7,5 +7,6 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
     {
         ITypeEditor Editor { get; set; }
         IList<string> Properties { get; set; }
+        Type TargetType { get; set; }
     }
 }

@@ -266,11 +266,16 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             //check for custom editor
             if (CustomTypeEditors.Count > 0)
             {
-                ICustomTypeEditor customEditor = CustomTypeEditors[propertyItem.Name];
-                if (customEditor != null)
+                //first check if the custom editor is type based
+                ICustomTypeEditor customEditor = CustomTypeEditors[propertyItem.PropertyType];
+                if (customEditor == null)
                 {
-                    editor = customEditor.Editor;
+                    //must be property based
+                    customEditor = CustomTypeEditors[propertyItem.Name];
                 }
+
+                if (customEditor != null)
+                    editor = customEditor.Editor;
             }
 
             //no custom editor found

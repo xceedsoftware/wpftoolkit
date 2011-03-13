@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
@@ -12,5 +13,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
             get { return _properties; }
             set { _properties = value; }
         }
+
+        public Type TargetType { get; set; }
     }
 }
