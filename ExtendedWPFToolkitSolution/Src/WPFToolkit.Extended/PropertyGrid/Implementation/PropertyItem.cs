@@ -69,6 +69,44 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //Editor
 
+        #region Value
+
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(object), typeof(PropertyItem), new UIPropertyMetadata(null, new PropertyChangedCallback(OnValueChanged), new CoerceValueCallback(OnCoerceValue)));
+        public object Value
+        {
+            get { return (object)GetValue(ValueProperty); }
+            set { SetValue(ValueProperty, value); }
+        }
+
+        private static object OnCoerceValue(DependencyObject o, object value)
+        {
+            PropertyItem propertyItem = o as PropertyItem;
+            if (propertyItem != null)
+                return propertyItem.OnCoerceValue((object)value);
+            else
+                return value;
+        }
+
+        private static void OnValueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            PropertyItem propertyItem = o as PropertyItem;
+            if (propertyItem != null)
+                propertyItem.OnValueChanged((object)e.OldValue, (object)e.NewValue);
+        }
+
+        protected virtual object OnCoerceValue(object value)
+        {
+            // TODO: Keep the proposed value within the desired range.
+            return value;
+        }
+
+        protected virtual void OnValueChanged(object oldValue, object newValue)
+        {
+            // TODO: Add your property changed side-effects. Descendants can override as well.
+        }        
+
+        #endregion //Value
+
         #endregion //Properties
 
         #region Constructor
