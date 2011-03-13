@@ -243,7 +243,10 @@
     <Resource Include="RichTextBoxFormatBar\Images\Numbering16.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="PropertyGrid\Images\" />
+    <Resource Include="PropertyGrid\Images\SortAscending16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="PropertyGrid\Images\Categorize16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
