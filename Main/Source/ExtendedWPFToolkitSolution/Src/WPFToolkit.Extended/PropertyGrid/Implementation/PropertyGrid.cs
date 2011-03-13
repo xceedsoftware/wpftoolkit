@@ -7,8 +7,8 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel;
-using Microsoft.Windows.Controls.PropertyGrid.Implementation.EditorProviders;
 using System.Windows.Input;
+using Microsoft.Windows.Controls.PropertyGrid.Editors;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
@@ -22,6 +22,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         #endregion //Members
 
         #region Properties
+
+        #region CustomTypeEditors
+
+        public static readonly DependencyProperty CustomTypeEditorsProperty = DependencyProperty.Register("CustomTypeEditors", typeof(CustomTypeEditorCollection), typeof(PropertyGrid), new UIPropertyMetadata(new CustomTypeEditorCollection()));
+        public CustomTypeEditorCollection CustomTypeEditors
+        {
+            get { return (CustomTypeEditorCollection)GetValue(CustomTypeEditorsProperty); }
+            set { SetValue(CustomTypeEditorsProperty, value); }
+        }
+
+        #endregion //CustomTypeEditors
 
         #region IsCategorized
 
@@ -237,29 +248,46 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             return propertyItems;
         }
 
-        private static PropertyItem CreatePropertyItem(PropertyDescriptor property, object instance, PropertyGrid grid)
+        private PropertyItem CreatePropertyItem(PropertyDescriptor property, object instance, PropertyGrid grid)
         {
             PropertyItem propertyItem = new PropertyItem(instance, property, grid);
-            ITypeEditorProvider editorProvider = null;
 
-            if (propertyItem.PropertyType == typeof(string))
-                editorProvider = new TextBoxEditorProvider();
-            else if (propertyItem.PropertyType == typeof(bool))
-                editorProvider = new CheckBoxEditorProvider();
-            else if (propertyItem.PropertyType.IsEnum)
-                editorProvider = new EnumComboBoxEditorProvider();
-            else if (propertyItem.PropertyType == typeof(FontFamily) || propertyItem.PropertyType == typeof(FontWeight) || propertyItem.PropertyType == typeof(FontStyle) || propertyItem.PropertyType == typeof(FontStretch))
-                editorProvider = new FontComboBoxEditorProvider();
-            else if (propertyItem.PropertyType == typeof(double))
-                editorProvider = new TextBoxEditorProvider();
-            else if (propertyItem.PropertyType == typeof(object) || propertyItem.PropertyType == typeof(Thickness))
-                editorProvider = new TextBoxEditorProvider();
-
-            if (editorProvider != null)
+            var binding = new Binding(property.Name)
             {
-                editorProvider.Initialize(propertyItem);
-                propertyItem.Editor = editorProvider.ResolveEditor();
+                Source = instance,
+                ValidatesOnExceptions = true,
+                ValidatesOnDataErrors = true,
+                Mode = propertyItem.IsWriteable ? BindingMode.TwoWay : BindingMode.OneWay
+            };
+            propertyItem.SetBinding(PropertyItem.ValueProperty, binding);
+
+            ITypeEditor editor = null;
+
+            //check for custom editor
+            if (CustomTypeEditors.Count > 0)
+            {
+                ICustomTypeEditor customEditor = CustomTypeEditors[propertyItem.Name];
+                if (customEditor != null)
+                {
+                    editor = customEditor.Editor;
+                }
             }
+
+            //no custom editor found
+            if (editor == null)
+            {
+                if (propertyItem.PropertyType == typeof(bool))
+                    editor = new CheckBoxEditor();
+                else if (propertyItem.PropertyType.IsEnum)
+                    editor = new EnumComboBoxEditor();
+                else if (propertyItem.PropertyType == typeof(FontFamily) || propertyItem.PropertyType == typeof(FontWeight) || propertyItem.PropertyType == typeof(FontStyle) || propertyItem.PropertyType == typeof(FontStretch))
+                    editor = new FontComboBoxEditor();
+                else
+                    editor = new TextBoxEditor();
+            }
+
+            editor.Attach(propertyItem);
+            propertyItem.Editor = editor.ResolveEditor();
 
             return propertyItem;
         }

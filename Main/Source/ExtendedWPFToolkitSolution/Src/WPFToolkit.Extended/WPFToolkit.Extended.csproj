@@ -164,12 +164,17 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="BusyIndicator\Implementation\VisualStates.BusyIndicator.cs" />
-    <Compile Include="PropertyGrid\Implementation\EditorProviders\CheckBoxEditorProvider.cs" />
-    <Compile Include="PropertyGrid\Implementation\EditorProviders\EnumComboBoxEditorProvider.cs" />
-    <Compile Include="PropertyGrid\Implementation\EditorProviders\FontComboBoxEditorProvider.cs" />
-    <Compile Include="PropertyGrid\Implementation\EditorProviders\ITypeEditorProvider.cs" />
-    <Compile Include="PropertyGrid\Implementation\EditorProviders\NumericUpDownEditorProvider.cs" />
-    <Compile Include="PropertyGrid\Implementation\EditorProviders\TextBoxEditorProvider.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\CheckBoxEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\ColorEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\ComboBoxEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\CustomTypeEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\CustomTypeEditorCollection.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\EnumComboBoxEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\FontComboBoxEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\ICustomTypeEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\ITypeEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\TextBoxEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\TypeEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyGrid.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyCategoryItem.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyCollection.cs" />
