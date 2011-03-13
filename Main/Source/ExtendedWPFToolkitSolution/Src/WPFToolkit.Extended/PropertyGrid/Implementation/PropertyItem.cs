@@ -129,13 +129,10 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #region Base Class Overrides
 
-        protected override void OnPreviewMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
-        {
-            IsSelected = true;
-        }
-
         protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
         {
+            IsSelected = true;
+
             if (Editor != null)
                 Editor.Focus();
 

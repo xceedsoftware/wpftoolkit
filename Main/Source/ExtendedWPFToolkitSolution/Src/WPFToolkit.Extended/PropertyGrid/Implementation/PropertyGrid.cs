@@ -283,6 +283,10 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             {
                 if (propertyItem.PropertyType == typeof(bool))
                     editor = new CheckBoxEditor();
+                else if (propertyItem.PropertyType == typeof(int))
+                    editor = new IntegerUpDownEditor();
+                else if (propertyItem.PropertyType == typeof(double))
+                    editor = new NumericUpDownEditor();
                 else if (propertyItem.PropertyType.IsEnum)
                     editor = new EnumComboBoxEditor();
                 else if (propertyItem.PropertyType == typeof(FontFamily) || propertyItem.PropertyType == typeof(FontWeight) || propertyItem.PropertyType == typeof(FontStyle) || propertyItem.PropertyType == typeof(FontStretch))
