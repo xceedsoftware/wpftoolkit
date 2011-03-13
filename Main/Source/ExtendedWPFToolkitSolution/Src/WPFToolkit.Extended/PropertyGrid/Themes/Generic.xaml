@@ -9,6 +9,117 @@
 
     <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
 
+    <SolidColorBrush x:Key="MouseOverBorderBrush" Color="#FFFFB700" />
+    <LinearGradientBrush x:Key="MouseOverBackgroundBrush" StartPoint="0,0" EndPoint="0,1" >
+        <GradientStop Offset="0" Color="#FFFEFBF4" />
+        <GradientStop Offset="0.19" Color="#FFFDE7CE" />
+        <GradientStop Offset="0.39" Color="#FFFDDEB8" />
+        <GradientStop Offset="0.39" Color="#FFFFCE6B" />
+        <GradientStop Offset="0.79" Color="#FFFFDE9A" />
+        <GradientStop Offset="1" Color="#FFFFEBAA" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="CheckedBorderBrush" Color="#FFC29B29" />
+    <LinearGradientBrush x:Key="CheckedBackgroundBrush" StartPoint="0,0" EndPoint="0,1" >
+        <GradientStop Offset="0" Color="#FFFFDCA0" />
+        <GradientStop Offset="0.18" Color="#FFFFD692" />
+        <GradientStop Offset="0.39" Color="#FFFFC45D" />
+        <GradientStop Offset="1" Color="#FFFFD178" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="PressedBorderBrush" Color="#FFC29B29" />
+    <LinearGradientBrush x:Key="PressedBackgroundBrush" StartPoint="0,0" EndPoint="0,1" >
+        <GradientStop Offset="0" Color="#FFE3C085" />
+        <GradientStop Offset="0.19" Color="#FFF4CC89" />
+        <GradientStop Offset="0.36" Color="#FFF5C777" />
+        <GradientStop Offset="0.36" Color="#FFF5BB56" />
+        <GradientStop Offset="0.79" Color="#FFF4CE9A" />
+        <GradientStop Offset="1" Color="#FFF3E28D" />
+    </LinearGradientBrush>
+
+    <Style x:Key="OptionsToggleButtonStyle" TargetType="{x:Type RadioButton}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Height" Value="22" />
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="ToolTipService.InitialShowDelay" Value="900"/>
+        <Setter Property="ToolTipService.ShowDuration" Value="20000"/>
+        <Setter Property="ToolTipService.BetweenShowDelay" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RadioButton}">
+                    <Grid SnapsToDevicePixels="True">
+                        <Border x:Name="OuterBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="2"/>
+                        <Border x:Name="MiddleBorder" BorderBrush="Transparent" BorderThickness="{TemplateBinding BorderThickness}" Background="Transparent" CornerRadius="2">
+                            <Border x:Name="InnerBorder" BorderBrush="Transparent" BorderThickness="{TemplateBinding BorderThickness}" Background="Transparent" CornerRadius="2" Padding="{TemplateBinding Padding}">
+                                <StackPanel x:Name="StackPanel" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
+                                    <ContentPresenter x:Name="Content" Content="{TemplateBinding Content}" Margin="1"
+                                           RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                                </StackPanel>
+                            </Border>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" TargetName="OuterBorder" Value="{StaticResource MouseOverBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" TargetName="OuterBorder" Value="{StaticResource MouseOverBorderBrush}"/>
+                            <Setter Property="BorderBrush" TargetName="InnerBorder" Value="#80FFFFFF"/>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" TargetName="Content" Value="0.5"/>
+                            <Setter Property="TextElement.Foreground" TargetName="OuterBorder" Value="#FF9E9E9E"/>
+                        </Trigger>
+
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Background" TargetName="OuterBorder" Value="{StaticResource CheckedBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" TargetName="OuterBorder" Value="{StaticResource CheckedBorderBrush}"/>
+                            <Setter Property="BorderBrush" TargetName="InnerBorder">
+                                <Setter.Value>
+                                    <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                        <GradientStop Color="#FFE7CBAD" Offset="0"/>
+                                        <GradientStop Color="#FFF7D7B5" Offset="0.1"/>
+                                        <GradientStop Color="#FFFFD38C" Offset="0.36"/>
+                                        <GradientStop Color="#FFFFC75A" Offset="0.36"/>
+                                        <GradientStop Color="#FFFFEFA5" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" TargetName="OuterBorder" Value="{StaticResource PressedBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" TargetName="OuterBorder" Value="{StaticResource PressedBorderBrush}"/>
+                            <Setter Property="BorderBrush" TargetName="InnerBorder" Value="Transparent"/>
+                        </Trigger>
+
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsChecked" Value="True"/>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" TargetName="MiddleBorder">
+                                <Setter.Value>
+                                    <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                        <GradientStop Color="#40FFFEFE" Offset="0"/>
+                                        <GradientStop Color="#40FFFEFE" Offset="0.39"/>
+                                        <GradientStop Color="#20FFCE68" Offset="0.39"/>
+                                        <GradientStop Color="#20FFCE68" Offset="0.69"/>
+                                        <GradientStop Color="#10FFFFFF" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <SolidColorBrush x:Key="GlyphBrush" Color="#FF31347C"/>
 
     <ControlTemplate x:Key="ExpanderToggleButton" TargetType="{x:Type ToggleButton}">
@@ -166,12 +277,18 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid Background="#BCC7D8" Margin="4">
-                                    <StackPanel Orientation="Horizontal" Margin="2" >
-                                        <RadioButton IsChecked="{Binding IsCategorized, RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" />
-                                        <RadioButton IsChecked="{Binding IsCategorized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}" VerticalAlignment="Center"/>
+                                    <StackPanel Orientation="Horizontal" Margin="1" >
+                                        <RadioButton IsChecked="{Binding IsCategorized, RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" 
+                                                     Style="{StaticResource OptionsToggleButtonStyle}" ToolTip="Categorize">
+                                            <Image Source="/WPFToolkit.Extended;component/PropertyGrid/Images/Categorize16.png" Width="16" Height="16" />
+                                        </RadioButton>
+                                        <RadioButton IsChecked="{Binding IsCategorized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}" VerticalAlignment="Center" 
+                                                     Style="{StaticResource OptionsToggleButtonStyle}" ToolTip="Alphabetical">
+                                            <Image Source="/WPFToolkit.Extended;component/PropertyGrid/Images/SortAscending16.png" Width="16" Height="16"/>                                                                                              
+                                        </RadioButton>
                                     </StackPanel>
                                 </Grid>
-                                <TextBox Grid.Column="1" Text="Not Implemented" Margin="4" Opacity=".5" />
+                                <TextBox Grid.Column="1" Text="Not Implemented" Margin="4" Opacity=".5" Visibility="Hidden"  />
                             </Grid>
 
                             <Grid Grid.Row="2" Background="White">
