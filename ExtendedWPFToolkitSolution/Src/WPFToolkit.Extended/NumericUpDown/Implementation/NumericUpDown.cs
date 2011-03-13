@@ -57,7 +57,7 @@ namespace Microsoft.Windows.Controls
 
         #region FormatString
 
-        public static readonly DependencyProperty StringFormatProperty = DependencyProperty.Register("FormatString", typeof(string), typeof(NumericUpDown), new PropertyMetadata("F0", OnStringFormatPropertyPropertyChanged));
+        public static readonly DependencyProperty StringFormatProperty = DependencyProperty.Register("FormatString", typeof(string), typeof(NumericUpDown), new PropertyMetadata(string.Empty, OnStringFormatPropertyPropertyChanged));
         public string FormatString
         {
             get { return (string)GetValue(StringFormatProperty); }
@@ -124,6 +124,12 @@ namespace Microsoft.Windows.Controls
             base.OnAccessKey(e);
         }
 
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            if (TextBox != null)
+                TextBox.Focus();
+        }
+
         protected override void OnValueChanged(object oldValue, object newValue)
         {
             SetValidSpinDirection();
@@ -171,18 +177,31 @@ namespace Microsoft.Windows.Controls
 
         protected override string ConvertValueToText(object value)
         {
-            return (Convert.ToDecimal(Value)).ToString(FormatString, CultureInfo.CurrentCulture);
+            //TODO: create GetTextFromValue methods for each data type;
+            if (value is double)
+            {
+                double d = (double)value;
+
+                if (Double.IsNaN(d))
+                    return "NaN";
+                else if (Double.IsPositiveInfinity(d) || Double.MaxValue == d)
+                    return "Infinity";
+                else if (Double.IsNegativeInfinity(d) || Double.MinValue == d)
+                    return "Negative-Infinity";
+            }
+
+            return (Convert.ToDouble(Value)).ToString(FormatString, CultureInfo.CurrentCulture);
         }
 
         protected override void OnIncrement()
         {
-            double newValue = (double)(Convert.ToDecimal(Value) + (decimal)Increment);
+            double newValue = (double)(Convert.ToDouble(Value) + (double)Increment);
             Value = ValueType != typeof(Double) ? Convert.ChangeType(newValue, ValueType) : newValue;
         }
 
         protected override void OnDecrement()
         {
-            double newValue = (double)(Convert.ToDecimal(Value) - (decimal)Increment);
+            double newValue = (double)(Convert.ToDouble(Value) - (double)Increment);
             Value = ValueType != typeof(Double) ? Convert.ChangeType(newValue, ValueType) : newValue;
         }
 
