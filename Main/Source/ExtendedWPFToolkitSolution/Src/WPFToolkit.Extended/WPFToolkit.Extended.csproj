@@ -169,6 +169,7 @@
     <Compile Include="PropertyGrid\Implementation\Editors\ComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\CustomTypeEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\CustomTypeEditorCollection.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\DateTimeUpDownEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\EnumComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\FontComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\ICustomTypeEditor.cs" />

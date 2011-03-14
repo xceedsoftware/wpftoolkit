@@ -226,7 +226,22 @@
                             </Grid.ColumnDefinitions>
 
                             <Border BorderThickness="0.5" BorderBrush="#FFF0F0F0" x:Name="PART_Name">
-                                <TextBlock Text="{Binding Name, RelativeSource={RelativeSource TemplatedParent}}" Margin="7,2,0,2"/>
+                                <Grid Margin="7,2,2,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Name, RelativeSource={RelativeSource TemplatedParent}}"  HorizontalAlignment="Stretch" TextTrimming="CharacterEllipsis"/>
+
+                                    <Border x:Name="Options" Grid.Column="1" HorizontalAlignment="Right" Margin="5,0,5,0" Height="8" Width="8"
+                                            Background="Black" Visibility="Collapsed" ToolTip="{Binding ValueSource, RelativeSource={RelativeSource TemplatedParent}}">
+                                        <Border.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Reset Value" />
+                                            </ContextMenu>
+                                        </Border.ContextMenu>
+                                    </Border>
+                                </Grid>
                             </Border>
 
                             <Border BorderThickness="0.5" BorderBrush="#FFF0F0F0" x:Name="PART_Editor"  Grid.Column="1" Background="Transparent">
@@ -235,6 +250,10 @@
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <!--<DataTrigger Binding="{Binding IsDataBound, RelativeSource={RelativeSource Self}}" Value="True">
+                            <Setter TargetName="Options" Property="Background" Value="Red"/>
+                            <Setter TargetName="Options" Property="ToolTip" Value="Databinding"/>
+                        </DataTrigger>-->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="PART_Name" Property="Background" Value="#CED4DF" />
                         </Trigger>
@@ -246,8 +265,8 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style>    
-    
+    </Style>
+
     <Style TargetType="{x:Type local:PropertyGrid}">
         <Setter Property="Background" Value="#CED4DF" />
         <Setter Property="BorderBrush" Value="#43577B" />
@@ -284,7 +303,7 @@
                                         </RadioButton>
                                         <RadioButton IsChecked="{Binding IsCategorized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}" VerticalAlignment="Center" 
                                                      Style="{StaticResource OptionsToggleButtonStyle}" ToolTip="Alphabetical">
-                                            <Image Source="/WPFToolkit.Extended;component/PropertyGrid/Images/SortAscending16.png" Width="16" Height="16"/>                                                                                              
+                                            <Image Source="/WPFToolkit.Extended;component/PropertyGrid/Images/SortAscending16.png" Width="16" Height="16"/>
                                         </RadioButton>
                                     </StackPanel>
                                 </Grid>
