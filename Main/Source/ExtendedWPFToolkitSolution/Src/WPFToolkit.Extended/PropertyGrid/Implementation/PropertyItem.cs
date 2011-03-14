@@ -1,8 +1,12 @@
 ﻿using System;
-using System.Windows.Controls;
+using System.Linq;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
+using Microsoft.Windows.Controls.PropertyGrid.Commands;
+using System.Windows.Markup.Primitives;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
@@ -11,6 +15,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         #region Members
 
         private DependencyPropertyDescriptor _dpDescriptor;
+        private MarkupObject _markupObject;
 
         #endregion //Members
 
@@ -29,7 +34,30 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         public string Description { get { return PropertyDescriptor.Description; } }
 
-        public object Instance { get; private set; }
+        #region Editor
+
+        public static readonly DependencyProperty EditorProperty = DependencyProperty.Register("Editor", typeof(FrameworkElement), typeof(PropertyItem), new UIPropertyMetadata(null));
+        public FrameworkElement Editor
+        {
+            get { return (FrameworkElement)GetValue(EditorProperty); }
+            set { SetValue(EditorProperty, value); }
+        }
+
+        #endregion //Editor
+
+        private object _instance;
+        public object Instance
+        {
+            get
+            {
+                return _instance;
+            }
+            private set
+            {
+                _instance = value;
+                _markupObject = MarkupWriter.GetMarkupObjectFor(_instance);
+            }
+        }
 
         /// <summary>
         /// Gets if the property is data bound
@@ -41,6 +69,30 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                 var dependencyObject = Instance as DependencyObject;
                 if (dependencyObject != null && _dpDescriptor != null)
                     return BindingOperations.GetBindingExpressionBase(dependencyObject, _dpDescriptor.DependencyProperty) != null;
+
+                return false;
+            }
+        }
+
+        public bool IsDynamicResource
+        {
+            get
+            {
+                var markupProperty = _markupObject.Properties.Where(p => p.Name == PropertyDescriptor.Name).FirstOrDefault();
+                if (markupProperty != null)
+                    return markupProperty.Value is DynamicResourceExtension;
+                return false;
+            }
+        }
+
+        public bool HasResourceApplied
+        {
+            //TODO: need to find a better way to determine if a StaticResource has been applied to any property not just a style
+            get
+            {
+                var markupProperty = _markupObject.Properties.Where(p => p.Name == PropertyDescriptor.Name).FirstOrDefault();
+                if (markupProperty != null)
+                    return markupProperty.Value is Style;
 
                 return false;
             }
@@ -74,39 +126,35 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         public bool IsWriteable { get { return !IsReadOnly; } }
 
-        public PropertyDescriptor PropertyDescriptor { get; private set; }
+        private PropertyDescriptor _propertyDescriptor;
+        public PropertyDescriptor PropertyDescriptor
+        {
+            get
+            {
+                return _propertyDescriptor;
+            }
+            private set
+            {
+                _propertyDescriptor = value;
+                Name = _propertyDescriptor.Name;
+                Category = _propertyDescriptor.Category;
+                _dpDescriptor = DependencyPropertyDescriptor.FromProperty(_propertyDescriptor);
+            }
+        }
 
         public PropertyGrid PropertyGrid { get; private set; }
 
         public Type PropertyType { get { return PropertyDescriptor.PropertyType; } }
 
-        #region Editor
-
-        public static readonly DependencyProperty EditorProperty = DependencyProperty.Register("Editor", typeof(FrameworkElement), typeof(PropertyItem), new UIPropertyMetadata(null));
-        public FrameworkElement Editor
-        {
-            get { return (FrameworkElement)GetValue(EditorProperty); }
-            set { SetValue(EditorProperty, value); }
-        }
-
-        #endregion //Editor
+        public ICommand ResetValueCommand { get; private set; }
 
         #region Value
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(object), typeof(PropertyItem), new UIPropertyMetadata(null, new PropertyChangedCallback(OnValueChanged), new CoerceValueCallback(OnCoerceValue)));
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(object), typeof(PropertyItem), new UIPropertyMetadata(null, OnValueChanged));
         public object Value
         {
             get { return (object)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
-        }
-
-        private static object OnCoerceValue(DependencyObject o, object value)
-        {
-            PropertyItem propertyItem = o as PropertyItem;
-            if (propertyItem != null)
-                return propertyItem.OnCoerceValue((object)value);
-            else
-                return value;
         }
 
         private static void OnValueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
@@ -116,16 +164,10 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                 propertyItem.OnValueChanged((object)e.OldValue, (object)e.NewValue);
         }
 
-        protected virtual object OnCoerceValue(object value)
-        {
-            // TODO: Keep the proposed value within the desired range.
-            return value;
-        }
-
         protected virtual void OnValueChanged(object oldValue, object newValue)
         {
             // TODO: Add your property changed side-effects. Descendants can override as well.
-        }        
+        }
 
         #endregion //Value
 
@@ -155,29 +197,62 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         public PropertyItem(object instance, PropertyDescriptor property, PropertyGrid propertyGrid)
         {
-            Instance = instance;
-            PropertyDescriptor = property;
-            Name = PropertyDescriptor.Name;
-            Category = PropertyDescriptor.Category;
-            PropertyGrid = propertyGrid;
 
-            _dpDescriptor = DependencyPropertyDescriptor.FromProperty(property);
+            PropertyDescriptor = property;
+            PropertyGrid = propertyGrid;
+            Instance = instance;
+
+            CommandBindings.Add(new CommandBinding(PropertyItemCommands.ResetValue, ExecuteResetValueCommand, CanExecuteResetValueCommand));
+
+            AddHandler(Mouse.MouseDownEvent, new MouseButtonEventHandler(PropertyItem_MouseDown), true);
+            AddHandler(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(PropertyItem_PreviewMouseDown), true);
         }
 
         #endregion //Constructor
 
-        #region Base Class Overrides
+        #region Event Handlers
 
-        protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
+        void PropertyItem_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            IsSelected = true;
-
             if (Editor != null)
                 Editor.Focus();
 
             e.Handled = true;
         }
 
-        #endregion //Base Class Overrides
+        void PropertyItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            IsSelected = true;
+
+            //if it is a comboBox then the selection will not take when Focus is called
+            if (!(e.Source is ComboBox))
+                Focus();
+        }
+
+        #endregion  //Event Handlers
+
+        #region Commands
+
+        private void ExecuteResetValueCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (PropertyDescriptor.CanResetValue(Instance))
+                PropertyDescriptor.ResetValue(Instance);
+
+            //TODO: notify UI that the ValueSource may have changed to update the icon
+        }
+
+        private void CanExecuteResetValueCommand(object sender, CanExecuteRoutedEventArgs e)
+        {
+            bool canExecute = false;
+
+            if (PropertyDescriptor.CanResetValue(Instance) && !PropertyDescriptor.IsReadOnly)
+            {
+                canExecute = true;
+            }
+
+            e.CanExecute = canExecute;
+        }
+
+        #endregion //Commands
     }
 }
