@@ -2,11 +2,18 @@
 using System.Windows.Controls;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Data;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
     public class PropertyItem : Control
     {
+        #region Members
+
+        private DependencyPropertyDescriptor _dpDescriptor;
+
+        #endregion //Members
+
         #region Properties
 
         #region Category
@@ -23,6 +30,21 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         public string Description { get { return PropertyDescriptor.Description; } }
 
         public object Instance { get; private set; }
+
+        /// <summary>
+        /// Gets if the property is data bound
+        /// </summary>
+        public bool IsDataBound
+        {
+            get
+            {
+                var dependencyObject = Instance as DependencyObject;
+                if (dependencyObject != null && _dpDescriptor != null)
+                    return BindingOperations.GetBindingExpressionBase(dependencyObject, _dpDescriptor.DependencyProperty) != null;
+
+                return false;
+            }
+        }
 
         public bool IsReadOnly { get { return PropertyDescriptor.IsReadOnly; } }
 
@@ -107,6 +129,21 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //Value
 
+        /// <summary>
+        /// Gets the value source.
+        /// </summary>
+        public BaseValueSource ValueSource
+        {
+            get
+            {
+                var dependencyObject = Instance as DependencyObject;
+                if (_dpDescriptor != null && dependencyObject != null)
+                    return DependencyPropertyHelper.GetValueSource(dependencyObject, _dpDescriptor.DependencyProperty).BaseValueSource;
+
+                return BaseValueSource.Unknown;
+            }
+        }
+
         #endregion //Properties
 
         #region Constructor
@@ -123,6 +160,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             Name = PropertyDescriptor.Name;
             Category = PropertyDescriptor.Category;
             PropertyGrid = propertyGrid;
+
+            _dpDescriptor = DependencyPropertyDescriptor.FromProperty(property);
         }
 
         #endregion //Constructor

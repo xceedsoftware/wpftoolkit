@@ -59,7 +59,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #region NameWidth
 
-        public static readonly DependencyProperty NameColumnWidthProperty = DependencyProperty.Register("NameColumnWidth", typeof(double), typeof(PropertyGrid), new UIPropertyMetadata(120.0));
+        public static readonly DependencyProperty NameColumnWidthProperty = DependencyProperty.Register("NameColumnWidth", typeof(double), typeof(PropertyGrid), new UIPropertyMetadata(150.0));
         public double NameColumnWidth
         {
             get { return (double)GetValue(NameColumnWidthProperty); }
@@ -287,6 +287,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                     editor = new IntegerUpDownEditor();
                 else if (propertyItem.PropertyType == typeof(double))
                     editor = new NumericUpDownEditor();
+                else if (propertyItem.PropertyType == typeof(DateTime))
+                    editor = new DateTimeUpDownEditor();
                 else if (propertyItem.PropertyType.IsEnum)
                     editor = new EnumComboBoxEditor();
                 else if (propertyItem.PropertyType == typeof(FontFamily) || propertyItem.PropertyType == typeof(FontWeight) || propertyItem.PropertyType == typeof(FontStyle) || propertyItem.PropertyType == typeof(FontStretch))
