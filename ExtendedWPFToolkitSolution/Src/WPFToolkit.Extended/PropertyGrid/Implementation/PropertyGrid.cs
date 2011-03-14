@@ -53,6 +53,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         protected virtual void OnIsCategorizedChanged(bool oldValue, bool newValue)
         {
             LoadProperties(newValue);
+            SetDragThumbMargin();
         }
 
         #endregion //IsCategorized
@@ -104,6 +105,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             _propertyItemsCache = GetObjectProperties(newValue);
 
             LoadProperties(IsCategorized);
+            SetDragThumbMargin();
         }
 
         #endregion //SelectedObject
@@ -363,6 +365,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                 binding.Mode = BindingMode.OneWay;
                 BindingOperations.SetBinding(this, PropertyGrid.SelectedObjectNameProperty, binding);
             }
+        }
+
+        private void SetDragThumbMargin()
+        {
+            if (_dragThumb == null)
+                return;
+
+            if (IsCategorized)
+                _dragThumb.Margin = new Thickness(6, 0, 0, 0);
+            else
+                _dragThumb.Margin = new Thickness(-1, 0, 0, 0);
         }
 
         #endregion //Methods
