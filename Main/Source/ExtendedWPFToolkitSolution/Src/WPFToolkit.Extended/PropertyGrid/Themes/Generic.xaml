@@ -10,6 +10,7 @@
     <!-- PropertyGrid                                                                    -->
     <!-- =============================================================================== -->
 
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
     <pgConverters:ValueSourceToImagePathConverter x:Key="ValueSourceToImagePathConverter" />
     <pgConverters:ValueSourceToToolTipConverter x:Key="ValueSourceToToolTipConverter" />
@@ -353,8 +354,8 @@
 
                             </Grid>
 
-                            <GridSplitter Height="3" Grid.Row="3" HorizontalAlignment="Stretch" />
-                            <StackPanel Grid.Row="4" Margin="0,0,0,5">
+                            <GridSplitter Height="3" Grid.Row="3" HorizontalAlignment="Stretch" Visibility="{Binding DisplaySummary, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <StackPanel Grid.Row="4" Margin="0,0,0,5" Visibility="{Binding DisplaySummary, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                 <TextBlock Padding="2 2 2 0" FontWeight="Bold" Text="{Binding SelectedProperty.Name, RelativeSource={RelativeSource TemplatedParent}}" />
                                 <TextBlock Padding="5 2 2 0" TextWrapping="WrapWithOverflow" Text="{Binding SelectedProperty.Description, RelativeSource={RelativeSource TemplatedParent}}" />
                             </StackPanel>

@@ -57,7 +57,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //IsCategorized
 
-        #region NameWidth
+        #region NameColumnWidth
 
         public static readonly DependencyProperty NameColumnWidthProperty = DependencyProperty.Register("NameColumnWidth", typeof(double), typeof(PropertyGrid), new UIPropertyMetadata(150.0));
         public double NameColumnWidth
@@ -66,7 +66,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             set { SetValue(NameColumnWidthProperty, value); }
         }
 
-        #endregion //NameWidth
+        #endregion //NameColumnWidth
 
         #region Properties
 
@@ -179,6 +179,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         }
 
         #endregion //SelectedProperty
+
+        #region DisplaySummary
+
+        public static readonly DependencyProperty DisplaySummaryProperty = DependencyProperty.Register("DisplaySummary", typeof(bool), typeof(PropertyGrid), new UIPropertyMetadata(true));
+        public bool DisplaySummary
+        {
+            get { return (bool)GetValue(DisplaySummaryProperty); }
+            set { SetValue(DisplaySummaryProperty, value); }
+        }
+
+        #endregion //DisplaySummary
 
         #endregion //Properties
 
