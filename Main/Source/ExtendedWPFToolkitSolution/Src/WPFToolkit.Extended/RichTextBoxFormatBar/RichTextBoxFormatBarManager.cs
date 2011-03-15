@@ -54,27 +54,23 @@ namespace Microsoft.Windows.Controls
 
         void RichTextBox_MouseButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Released)
+            if (e.ChangedButton == MouseButton.Left && e.LeftButton == MouseButtonState.Released)
             {
                 TextRange selectedText = new TextRange(_richTextBox.Selection.Start, _richTextBox.Selection.End);
-#if !VS2008                
+#if !VS2008
                 if (selectedText.Text.Length > 0 && !String.IsNullOrWhiteSpace(selectedText.Text))
-                {
                     ShowAdorner();
-                }
 #else
                 if (selectedText.Text.Length > 0 && !String.IsNullOrEmpty(selectedText.Text))
-                {
                     ShowAdorner();
-                }
 #endif
                 else
-                {
                     HideAdorner();
-                }
-            }
 
-            e.Handled = true;
+                e.Handled = true;
+            }
+            else
+                HideAdorner();
         }
 
         void RichTextBox_PreviewMouseMove(object sender, MouseEventArgs e)
