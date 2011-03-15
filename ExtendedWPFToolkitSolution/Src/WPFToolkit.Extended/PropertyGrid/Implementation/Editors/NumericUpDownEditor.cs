@@ -2,18 +2,11 @@
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
-    public class NumericUpDownEditor : TypeEditor
+    public class NumericUpDownEditor : TypeEditor<NumericUpDown>
     {
-        protected override void Initialize()
+        protected override void SetValueDependencyProperty()
         {
-            Editor = new NumericUpDown();
             ValueProperty = NumericUpDown.ValueProperty;
-            SetEditorProperties();
-        }
-
-        protected virtual void SetEditorProperties()
-        {
-            //TODO: override in derived classes to specify custom value type
         }
     }
 }

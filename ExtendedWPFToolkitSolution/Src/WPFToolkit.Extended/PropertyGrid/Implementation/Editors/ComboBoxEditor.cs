@@ -3,11 +3,10 @@ using System.Windows.Controls;
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
-    public abstract class ComboBoxEditor : TypeEditor
+    public abstract class ComboBoxEditor : TypeEditor<ComboBox>
     {
-        protected override void Initialize()
+        protected override void SetValueDependencyProperty()
         {
-            Editor = new ComboBox();
             ValueProperty = ComboBox.SelectedItemProperty;
         }
 
@@ -17,11 +16,11 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
             base.Attach(propertyItem);
         }
 
+        protected abstract IList<object> CreateItemsSource(PropertyItem propertyItem);
+
         private void SetItemsSource(PropertyItem propertyItem)
         {
-            (Editor as ComboBox).ItemsSource = CreateItemsSource(propertyItem);
+            Editor.ItemsSource = CreateItemsSource(propertyItem);
         }
-
-        protected abstract IList<object> CreateItemsSource(PropertyItem propertyItem);
     }
 }

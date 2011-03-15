@@ -2,11 +2,10 @@
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
-    public class DateTimeUpDownEditor : TypeEditor
+    public class DateTimeUpDownEditor : TypeEditor<DateTimeUpDown>
     {
-        protected override void Initialize()
+        protected override void SetValueDependencyProperty()
         {
-            Editor = new DateTimeUpDown();
             ValueProperty = DateTimeUpDown.ValueProperty;
         }
     }

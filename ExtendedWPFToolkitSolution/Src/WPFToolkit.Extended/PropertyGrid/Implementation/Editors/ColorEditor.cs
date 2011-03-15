@@ -2,11 +2,10 @@
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
-    public class ColorEditor : TypeEditor
+    public class ColorEditor : TypeEditor<ColorPicker>
     {
-        protected override void Initialize()
+        protected override void SetValueDependencyProperty()
         {
-            Editor = new ColorPicker();
             ValueProperty = ColorPicker.SelectedColorProperty;
         }
     }

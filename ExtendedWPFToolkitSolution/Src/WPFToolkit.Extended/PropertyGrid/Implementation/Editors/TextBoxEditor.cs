@@ -3,11 +3,10 @@ using System.Windows.Controls;
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
-    public class TextBoxEditor : TypeEditor
+    public class TextBoxEditor : TypeEditor<TextBox>
     {
-        protected override void Initialize()
+        protected override void SetValueDependencyProperty()
         {
-            Editor = new TextBox();
             ValueProperty = TextBox.TextProperty;
         }
     }

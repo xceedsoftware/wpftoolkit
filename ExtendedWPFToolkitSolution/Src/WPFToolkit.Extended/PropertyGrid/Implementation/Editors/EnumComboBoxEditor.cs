@@ -2,27 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Windows.Controls;
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
-    public class EnumComboBoxEditor : TypeEditor
+    public class EnumComboBoxEditor : ComboBoxEditor
     {
-        protected override void Initialize()
+        protected override IList<object> CreateItemsSource(PropertyItem propertyItem)
         {
-            Editor = new ComboBox();
-            ValueProperty = ComboBox.SelectedItemProperty;
-        }
-
-        public override void Attach(PropertyItem propertyItem)
-        {
-            SetItemsSource(propertyItem);
-            base.Attach(propertyItem);
-        }
-
-        private void SetItemsSource(PropertyItem propertyItem)
-        {
-            (Editor as ComboBox).ItemsSource = GetValues(propertyItem.PropertyType);
+            return GetValues(propertyItem.PropertyType);
         }
 
         private static object[] GetValues(Type enumType)
