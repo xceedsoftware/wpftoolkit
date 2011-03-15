@@ -317,7 +317,7 @@
                                 <Grid Background="#BCC7D8" Margin="4">
                                     <StackPanel Orientation="Horizontal" Margin="1" >
                                         <RadioButton IsChecked="{Binding IsCategorized, RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" 
-                                                     Style="{StaticResource OptionsToggleButtonStyle}" ToolTip="Categorize">
+                                                     Style="{StaticResource OptionsToggleButtonStyle}" ToolTip="Categorized">
                                             <Image Source="/WPFToolkit.Extended;component/PropertyGrid/Images/Categorize16.png" Width="16" Height="16" />
                                         </RadioButton>
                                         <RadioButton IsChecked="{Binding IsCategorized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}" VerticalAlignment="Center" 

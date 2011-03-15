@@ -14,6 +14,7 @@
     <!-- ColorPicker                                                                     -->
     <!-- =============================================================================== -->
 
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <coreConverters:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
 
     <LinearGradientBrush x:Key="ColorPickerDarkBorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
@@ -196,7 +197,7 @@
                                     </Grid.RowDefinitions>
 
                                     <!-- Available Colors -->
-                                    <Grid Grid.Row="1">
+                                    <Grid Grid.Row="1" Visibility="{TemplateBinding DisplayAvailableColors, Converter={StaticResource BooleanToVisibilityConverter}}">
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
@@ -217,7 +218,7 @@
                                     </Grid>
 
                                     <!-- Standard Colors-->
-                                    <Grid Grid.Row="2">
+                                    <Grid Grid.Row="2" Visibility="{TemplateBinding DisplayStandardColors, Converter={StaticResource BooleanToVisibilityConverter}}">
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
@@ -238,7 +239,7 @@
                                     </Grid>
 
                                     <!-- Recent Colors-->
-                                    <Grid Grid.Row="3" Margin="0,1,0,1">
+                                    <Grid Grid.Row="3" Margin="0,1,0,1" Visibility="{TemplateBinding DisplayRecentColors, Converter={StaticResource BooleanToVisibilityConverter}}">
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />

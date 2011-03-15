@@ -75,6 +75,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ColorCanvas\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ColorPicker\Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -132,11 +136,15 @@
     <Compile Include="ButtonSpinner\Implementation\Spinner.cs" />
     <Compile Include="ButtonSpinner\Implementation\ValidSpinDirections.cs" />
     <Compile Include="Chromes\Implementation\ButtonChrome.cs" />
+    <Compile Include="ColorCanvas\Implementation\ColorCanvas.cs" />
+    <Compile Include="Core\Primitives\HsvColor.cs" />
     <Compile Include="ColorPicker\Implementation\ColorItem.cs" />
     <Compile Include="ColorPicker\Implementation\ColorPicker.cs" />
-    <Compile Include="ColorPicker\Implementation\ColorUtilities.cs" />
+    <Compile Include="Core\Utilities\ColorUtilities.cs" />
+    <Compile Include="ColorCanvas\Implementation\ColorSpectrumSlider.cs" />
     <Compile Include="Core\Converters\ColorToSolidColorBrushConverter.cs" />
     <Compile Include="Core\Converters\InverseBoolConverter.cs" />
+    <Compile Include="Core\Converters\SolidColorBrushToColorConverter.cs" />
     <Compile Include="Core\Utilities\ContextMenuUtilities.cs" />
     <Compile Include="DateTimeUpDown\Implementation\DateTimeFormat.cs" />
     <Compile Include="DateTimeUpDown\Implementation\DateTimeInfo.cs" />

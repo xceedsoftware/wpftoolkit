@@ -5,7 +5,8 @@
         <ResourceDictionary Source="/WPFToolkit.Extended;component/BusyIndicator/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/ButtonSpinner/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/ChildWindow/Themes/Generic.xaml" />
-        <ResourceDictionary Source="/WPFToolkit.Extended;component/ColorPicker/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/WPFToolkit.Extended;component/ColorCanvas/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/WPFToolkit.Extended;component/ColorPicker/Themes/Generic.xaml" />        
         <ResourceDictionary Source="/WPFToolkit.Extended;component/Magnifier/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/MaskedTextBox/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/MessageBox/Themes/Generic.xaml" />
@@ -14,6 +15,5 @@
         <ResourceDictionary Source="/WPFToolkit.Extended;component/SplitButton/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/PropertyGrid/Themes/Generic.xaml" />
     </ResourceDictionary.MergedDictionaries>
-
 
 </ResourceDictionary>
