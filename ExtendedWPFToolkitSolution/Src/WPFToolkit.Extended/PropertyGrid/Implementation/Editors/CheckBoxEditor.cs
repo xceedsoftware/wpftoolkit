@@ -8,8 +8,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
         protected override void Initialize()
         {
             Editor = new CheckBox();
-            Editor.Margin = new Thickness(4, 0, 0, 0);
-
+            Editor.Margin = new Thickness(5, 0, 0, 0);
             ValueProperty = CheckBox.IsCheckedProperty;
         }
     }

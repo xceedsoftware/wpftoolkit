@@ -52,8 +52,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         protected virtual void OnIsCategorizedChanged(bool oldValue, bool newValue)
         {
-            LoadProperties(newValue);
-            SetDragThumbMargin();
+            InitializePropertyGrid(newValue);
         }
 
         #endregion //IsCategorized
@@ -104,8 +103,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
             _propertyItemsCache = GetObjectProperties(newValue);
 
-            LoadProperties(IsCategorized);
-            SetDragThumbMargin();
+            InitializePropertyGrid(IsCategorized);
         }
 
         #endregion //SelectedObject
@@ -146,11 +144,31 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #region SelectedObjectName
 
-        public static readonly DependencyProperty SelectedObjectNameProperty = DependencyProperty.Register("SelectedObjectName", typeof(string), typeof(PropertyGrid), new UIPropertyMetadata(string.Empty));
+        public static readonly DependencyProperty SelectedObjectNameProperty = DependencyProperty.Register("SelectedObjectName", typeof(string), typeof(PropertyGrid), new UIPropertyMetadata(string.Empty, OnSelectedObjectNameChanged, OnCoerceSelectedObjectName));
         public string SelectedObjectName
         {
             get { return (string)GetValue(SelectedObjectNameProperty); }
             private set { SetValue(SelectedObjectNameProperty, value); }
+        }
+
+        private static object OnCoerceSelectedObjectName(DependencyObject o, object baseValue)
+        {
+            if (String.IsNullOrEmpty((String)baseValue))
+                return "<no name>";
+
+            return baseValue;
+        }
+
+        private static void OnSelectedObjectNameChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            PropertyGrid propertyGrid = o as PropertyGrid;
+            if (propertyGrid != null)
+                propertyGrid.SelectedObjectNameChanged((string)e.OldValue, (string)e.NewValue);
+        }
+
+        protected virtual void SelectedObjectNameChanged(string oldValue, string newValue)
+        {
+
         }
 
         #endregion //SelectedObjectName
@@ -237,6 +255,12 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #region Methods
 
+        private void InitializePropertyGrid(bool isCategorized)
+        {
+            LoadProperties(isCategorized);
+            SetDragThumbMargin(isCategorized);
+        }
+
         private void LoadProperties(bool isCategorized)
         {
             if (isCategorized)
@@ -294,7 +318,9 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             //no custom editor found
             if (editor == null)
             {
-                if (propertyItem.PropertyType == typeof(bool))
+                if (propertyItem.IsReadOnly)
+                    editor = new TextBlockEditor();
+                else if (propertyItem.PropertyType == typeof(bool))
                     editor = new CheckBoxEditor();
                 else if (propertyItem.PropertyType == typeof(int))
                     editor = new IntegerUpDownEditor();
@@ -367,12 +393,12 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             }
         }
 
-        private void SetDragThumbMargin()
+        private void SetDragThumbMargin(bool isCategorized)
         {
             if (_dragThumb == null)
                 return;
 
-            if (IsCategorized)
+            if (isCategorized)
                 _dragThumb.Margin = new Thickness(6, 0, 0, 0);
             else
                 _dragThumb.Margin = new Thickness(-1, 0, 0, 0);

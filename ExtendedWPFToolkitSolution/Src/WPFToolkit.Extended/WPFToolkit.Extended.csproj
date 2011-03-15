@@ -179,6 +179,7 @@
     <Compile Include="PropertyGrid\Implementation\Editors\IntegerUpDownEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\ITypeEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\NumericUpDownEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\TextBlockEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\TextBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\TypeEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyGrid.cs" />
