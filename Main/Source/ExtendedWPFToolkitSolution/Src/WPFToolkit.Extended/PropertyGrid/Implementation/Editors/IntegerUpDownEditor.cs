@@ -4,13 +4,12 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
     public class IntegerUpDownEditor : NumericUpDownEditor
     {
-        protected override void SetEditorProperties()
+        protected override void SetControlProperties()
         {
-            NumericUpDown nud = (NumericUpDown)Editor;
-            nud.Maximum = int.MaxValue;
-            nud.Minimum = int.MinValue;
-            nud.ValueType = typeof(int);
-            nud.FormatString = "F0";
+            Editor.Maximum = int.MaxValue;
+            Editor.Minimum = int.MinValue;
+            Editor.ValueType = typeof(int);
+            Editor.FormatString = "F0";
         }
     }
 }

@@ -4,11 +4,12 @@ using System.Windows.Data;
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
-    public abstract class TypeEditor : ITypeEditor
+    public abstract class TypeEditor<T> : ITypeEditor
+        where T : FrameworkElement, new()
     {
         #region Properties
 
-        protected FrameworkElement Editor { get; set; }
+        protected T Editor { get; set; }
         protected DependencyProperty ValueProperty { get; set; }
 
         #endregion //Properties
@@ -17,7 +18,9 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 
         public TypeEditor()
         {
-            Initialize();
+            Editor = new T();
+            SetValueDependencyProperty();
+            SetControlProperties();
         }
 
         #endregion //Constructors
@@ -26,7 +29,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 
         public virtual void Attach(PropertyItem propertyItem)
         {
-            ResolveBinding(propertyItem);
+            ResolveValueBinding(propertyItem);
         }
 
         public virtual FrameworkElement ResolveEditor()
@@ -38,23 +41,29 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 
         #region Methods
 
-        protected abstract void Initialize();
+        protected virtual IValueConverter CreateValueConverter()
+        {
+            return null;
+        }
 
-        protected virtual void ResolveBinding(PropertyItem propertyItem)
+        protected virtual void ResolveValueBinding(PropertyItem propertyItem)
         {
             var _binding = new Binding("Value");
             _binding.Source = propertyItem;
             _binding.ValidatesOnExceptions = true;
             _binding.ValidatesOnDataErrors = true;
             _binding.Mode = propertyItem.IsWriteable ? BindingMode.TwoWay : BindingMode.OneWay;
-            _binding.Converter = CreateConverter();
+            _binding.Converter = CreateValueConverter();
             BindingOperations.SetBinding(Editor, ValueProperty, _binding);
         }
 
-        protected virtual IValueConverter CreateConverter()
+        protected virtual void SetControlProperties()
         {
-            return null;
+            //TODO: implement in derived class
         }
+
+        protected abstract void SetValueDependencyProperty();
+
 
         #endregion //Methods
     }
