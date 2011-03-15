@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using Microsoft.Windows.Controls.Core.Utilities;
 
 namespace Microsoft.Windows.Controls
 {
@@ -44,6 +45,29 @@ namespace Microsoft.Windows.Controls
 
         #endregion //ButtonStyle
 
+        #region DisplayAvailableColors
+
+        public static readonly DependencyProperty DisplayAvailableColorsProperty = DependencyProperty.Register("DisplayAvailableColors", typeof(bool), typeof(ColorPicker), new UIPropertyMetadata(true, OnDisplayAvailableColorsChanged));
+        public bool DisplayAvailableColors
+        {
+            get { return (bool)GetValue(DisplayAvailableColorsProperty); }
+            set { SetValue(DisplayAvailableColorsProperty, value); }
+        }
+
+        private static void OnDisplayAvailableColorsChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            ColorPicker colorPicker = o as ColorPicker;
+            if (colorPicker != null)
+                colorPicker.OnDisplayAvailableColorsChanged((bool)e.OldValue, (bool)e.NewValue);
+        }
+
+        protected virtual void OnDisplayAvailableColorsChanged(bool oldValue, bool newValue)
+        {
+            // TODO: Add your property changed side-effects. Descendants can override as well.
+        }        
+
+        #endregion //DisplayAvailableColors
+
         #region DisplayColorAndName
 
         public static readonly DependencyProperty DisplayColorAndNameProperty = DependencyProperty.Register("DisplayColorAndName", typeof(bool), typeof(ColorPicker), new UIPropertyMetadata(false));
@@ -54,6 +78,52 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //DisplayColorAndName
+
+        #region DisplayRecentColors
+
+        public static readonly DependencyProperty DisplayRecentColorsProperty = DependencyProperty.Register("DisplayRecentColors", typeof(bool), typeof(ColorPicker), new UIPropertyMetadata(true, OnDisplayRecentColorsChanged));
+        public bool DisplayRecentColors
+        {
+            get { return (bool)GetValue(DisplayRecentColorsProperty); }
+            set { SetValue(DisplayRecentColorsProperty, value); }
+        }
+
+        private static void OnDisplayRecentColorsChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            ColorPicker colorPicker = o as ColorPicker;
+            if (colorPicker != null)
+                colorPicker.OnDisplayRecentColorsChanged((bool)e.OldValue, (bool)e.NewValue);
+        }
+
+        protected virtual void OnDisplayRecentColorsChanged(bool oldValue, bool newValue)
+        {
+            // TODO: Add your property changed side-effects. Descendants can override as well.
+        }
+
+        #endregion //DisplayRecentColors
+
+        #region DisplayStandardColors
+
+        public static readonly DependencyProperty DisplayStandardColorsProperty = DependencyProperty.Register("DisplayStandardColors", typeof(bool), typeof(ColorPicker), new UIPropertyMetadata(true, OnDisplayStandardColorsChanged));
+        public bool DisplayStandardColors
+        {
+            get { return (bool)GetValue(DisplayStandardColorsProperty); }
+            set { SetValue(DisplayStandardColorsProperty, value); }
+        }
+
+        private static void OnDisplayStandardColorsChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            ColorPicker colorPicker = o as ColorPicker;
+            if (colorPicker != null)
+                colorPicker.OnDisplayStandardColorsChanged((bool)e.OldValue, (bool)e.NewValue);
+        }
+
+        protected virtual void OnDisplayStandardColorsChanged(bool oldValue, bool newValue)
+        {
+            // TODO: Add your property changed side-effects. Descendants can override as well.
+        }
+
+        #endregion //DisplayStandardColors
 
         #region IsOpen
 
