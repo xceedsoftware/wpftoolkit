@@ -15,6 +15,7 @@
     <!-- =============================================================================== -->
 
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    <coreConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
     <coreConverters:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
 
     <LinearGradientBrush x:Key="ColorPickerDarkBorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
@@ -102,7 +103,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
-                    <Border Background="{TemplateBinding Background}" CornerRadius="2" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                    <Grid SnapsToDevicePixels="True">
+                        <chrome:ButtonChrome x:Name="ToggleButtonChrome"
+                                            RenderChecked="{Binding IsOpen, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:ColorPicker}}"
+                                            RenderEnabled="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:ColorPicker}}"
+											RenderMouseOver="{TemplateBinding IsMouseOver}"
+											RenderPressed="{TemplateBinding IsPressed}" />
+
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -115,41 +122,7 @@
                                 <Path Width="7" Height="4" Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z" Fill="#FF000000"/>
                             </Grid>
                         </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="true">
-                            <Setter Property="BorderBrush" Value="{StaticResource ButtonHoverBorder}"/>
-                            <Setter Property="Background" Value="{StaticResource ButtonChecked}"/>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="true">
-                            <Setter Property="BorderBrush" Value="{StaticResource ButtonHoverBorder}"/>
-                            <Setter Property="Background" Value="{StaticResource ButtonHover}"/>
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="true">
-                            <Setter Property="BorderBrush" Value="{StaticResource ButtonHoverBorder}"/>
-                            <Setter Property="Background" Value="{StaticResource ButtonHover}"/>
-                        </Trigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsMouseOver" Value="true"/>
-                                <Condition Property="IsChecked" Value="true"/>
-                            </MultiTrigger.Conditions>
-                            <Setter Property="BorderBrush" Value="{StaticResource ButtonPressedBorder}"/>
-                            <Setter Property="Background" Value="{StaticResource ButtonPressed}"/>
-                        </MultiTrigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsKeyboardFocused" Value="true"/>
-                                <Condition Property="IsChecked" Value="true"/>
-                            </MultiTrigger.Conditions>
-                            <Setter Property="BorderBrush" Value="{StaticResource ButtonPressedBorder}"/>
-                            <Setter Property="Background" Value="{StaticResource ButtonPressed}"/>
-                        </MultiTrigger>
-                        <Trigger Property="IsPressed" Value="true">
-                            <Setter Property="BorderBrush" Value="{StaticResource ButtonPressedBorder}"/>
-                            <Setter Property="Background" Value="{StaticResource ButtonPressed}"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -173,8 +146,10 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ColorPicker}">
                     <Grid>
-                        <ToggleButton x:Name="PART_ColorPickerToggleButton" Style="{TemplateBinding ButtonStyle}" MinHeight="22" ClickMode="Press" IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}" >
-                            <Grid>
+                        <ToggleButton x:Name="PART_ColorPickerToggleButton" IsTabStop="False" MinHeight="22" IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                      IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                                      Style="{TemplateBinding ButtonStyle}">
+                            <Grid Margin="2,2,0,2">
                                 <Border x:Name="ColorOnly" Style="{StaticResource ColorDisplayStyle}" />
 
                                 <Border x:Name="ColorAndName" Background="White" Visibility="Hidden">
@@ -186,79 +161,97 @@
                             </Grid>
                         </ToggleButton>
 
-                        <Popup x:Name="PART_ColorPickerPalettePopup"  VerticalAlignment="Bottom" IsOpen="{Binding ElementName=PART_ColorPickerToggleButton, Path=IsChecked}"  >
+                        <Popup x:Name="PART_ColorPickerPalettePopup"  VerticalAlignment="Bottom" IsOpen="{Binding ElementName=PART_ColorPickerToggleButton, Path=IsChecked}" StaysOpen="False" AllowsTransparency="True" Focusable="False"  HorizontalOffset="1" VerticalOffset="1"  >
                             <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource ColorPickerDarkBorderBrush}" Padding="3">
-                                <Grid Margin="4">
+                                <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition />
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
 
-                                    <!-- Available Colors -->
-                                    <Grid Grid.Row="1" Visibility="{TemplateBinding DisplayAvailableColors, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition />
-                                            </Grid.RowDefinitions>
-                                            <TextBlock Text="Available Colors" Background="AliceBlue" Padding="2" Margin="0,0,0,1" />
-                                            <ListBox x:Name="PART_AvailableColors" Grid.Row="1" Background="Transparent" BorderThickness="0" SelectionMode="Single"
+                                    <Grid x:Name="_gridStandardColorsHost" Margin="4">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Available Colors -->
+                                        <Grid Grid.Row="1" Visibility="{TemplateBinding ShowAvailableColors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Available Colors" Background="AliceBlue" Padding="2" Margin="0,0,0,1" />
+                                                <ListBox x:Name="PART_AvailableColors" Grid.Row="1" Background="Transparent" BorderThickness="0" SelectionMode="Single"
                                                      ItemsSource="{Binding AvailableColors, RelativeSource={RelativeSource TemplatedParent}}"                                                      
                                                      ItemTemplate="{StaticResource ColorItemTemplate}"
                                                      ItemContainerStyle="{StaticResource ColorPaletteLisBoxStyle}">
-                                                <ListBox.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <WrapPanel Width="200" />
-                                                    </ItemsPanelTemplate>
-                                                </ListBox.ItemsPanel>
-                                            </ListBox>
+                                                    <ListBox.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <WrapPanel Width="200" />
+                                                        </ItemsPanelTemplate>
+                                                    </ListBox.ItemsPanel>
+                                                </ListBox>
+                                            </Grid>
                                         </Grid>
-                                    </Grid>
 
-                                    <!-- Standard Colors-->
-                                    <Grid Grid.Row="2" Visibility="{TemplateBinding DisplayStandardColors, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                            </Grid.RowDefinitions>
-                                            <TextBlock Text="Standard Colors" Background="AliceBlue" Padding="2" Margin="0,1,0,1"/>
-                                            <ListBox x:Name="PART_StandardColors" Grid.Row="1" SelectionMode="Single" Background="Transparent" BorderThickness="0"
+                                        <!-- Standard Colors-->
+                                        <Grid Grid.Row="2" Visibility="{TemplateBinding ShowStandardColors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Standard Colors" Background="AliceBlue" Padding="2" Margin="0,1,0,1"/>
+                                                <ListBox x:Name="PART_StandardColors" Grid.Row="1" SelectionMode="Single" Background="Transparent" BorderThickness="0"
                                                      ItemsSource="{Binding StandardColors, RelativeSource={RelativeSource TemplatedParent}}"                                                      
                                                      ItemTemplate="{StaticResource ColorItemTemplate}"
                                                      ItemContainerStyle="{StaticResource ColorPaletteLisBoxStyle}">
-                                                <ListBox.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <WrapPanel Width="200" />
-                                                    </ItemsPanelTemplate>
-                                                </ListBox.ItemsPanel>
-                                            </ListBox>
+                                                    <ListBox.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <WrapPanel Width="200" />
+                                                        </ItemsPanelTemplate>
+                                                    </ListBox.ItemsPanel>
+                                                </ListBox>
+                                            </Grid>
                                         </Grid>
-                                    </Grid>
 
-                                    <!-- Recent Colors-->
-                                    <Grid Grid.Row="3" Margin="0,1,0,1" Visibility="{TemplateBinding DisplayRecentColors, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                            </Grid.RowDefinitions>
-                                            <TextBlock Text="Recent Colors" Background="AliceBlue" Padding="2" Margin="0,1,0,1"/>
-                                            <ListBox x:Name="PART_RecentColors" Grid.Row="1"  SelectionMode="Single" Background="Transparent" BorderThickness="0"
+                                        <!-- Recent Colors-->
+                                        <Grid Grid.Row="3" Margin="0,1,0,1" Visibility="{TemplateBinding ShowRecentColors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Recent Colors" Background="AliceBlue" Padding="2" Margin="0,1,0,1"/>
+                                                <ListBox x:Name="PART_RecentColors" Grid.Row="1"  SelectionMode="Single" Background="Transparent" BorderThickness="0"
                                                      ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}"                                                     
                                                      ItemTemplate="{StaticResource ColorItemTemplate}"
                                                      ItemContainerStyle="{StaticResource ColorPaletteLisBoxStyle}">
-                                                <ListBox.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <WrapPanel Width="200" />
-                                                    </ItemsPanelTemplate>
-                                                </ListBox.ItemsPanel>
-                                            </ListBox>
+                                                    <ListBox.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <WrapPanel Width="200" />
+                                                        </ItemsPanelTemplate>
+                                                    </ListBox.ItemsPanel>
+                                                </ListBox>
+                                            </Grid>
                                         </Grid>
                                     </Grid>
 
+                                    <!-- ColorCanvas -->
+                                    <Grid x:Name="_colorCanvasHost" Visibility="Collapsed">
+                                        <local:ColorCanvas x:Name="PART_ColorCanvas" Background="Transparent" BorderThickness="0"
+                                                           SelectedColor="{Binding SelectedColor, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    </Grid>
+                                    
+                                    <Separator Grid.Row="1" HorizontalAlignment="Stretch" Margin="5,0,5,0" />
+
+                                    <!-- More Colors Button -->
+                                    <ToggleButton x:Name="_colorMode" Grid.Row="2" Content="Advanced" Margin="5" Visibility="{TemplateBinding ShowAdvancedButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 </Grid>
                             </Border>
                         </Popup>
@@ -267,6 +260,11 @@
                         <Trigger Property="DisplayColorAndName" Value="True">
                             <Setter TargetName="ColorOnly" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="ColorAndName" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger SourceName="_colorMode" Property="IsChecked" Value="True">
+                            <Setter TargetName="_colorMode" Property="Content" Value="Standard" />
+                            <Setter TargetName="_colorCanvasHost" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="_gridStandardColorsHost" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
