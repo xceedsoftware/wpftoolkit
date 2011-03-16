@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Windows.Controls.Primitives;
 using Microsoft.Windows.Controls.Core.Utilities;
+using System.Windows.Data;
 
 namespace Microsoft.Windows.Controls
 {
@@ -237,18 +238,28 @@ namespace Microsoft.Windows.Controls
         #endregion //RGB
 
         #region HexadecimalString
-
-        public static readonly DependencyProperty HexadecimalStringProperty = DependencyProperty.Register("HexadecimalString", typeof(string), typeof(ColorCanvas), new PropertyMetadata("#FFFFFFFF", new PropertyChangedCallback(OnHexadecimalStringPropertyChanged)));
+        
+        public static readonly DependencyProperty HexadecimalStringProperty = DependencyProperty.Register("HexadecimalString", typeof(string), typeof(ColorCanvas), new UIPropertyMetadata("#FFFFFFFF", OnHexadecimalStringChanged));
         public string HexadecimalString
         {
             get { return (string)GetValue(HexadecimalStringProperty); }
             set { SetValue(HexadecimalStringProperty, value); }
         }
 
-        private static void OnHexadecimalStringPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnHexadecimalStringChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-
+            ColorCanvas colorCanvas = o as ColorCanvas;
+            if (colorCanvas != null)
+                colorCanvas.OnHexadecimalStringChanged((string)e.OldValue, (string)e.NewValue);
         }
+
+        protected virtual void OnHexadecimalStringChanged(string oldValue, string newValue)
+        {
+            if (!SelectedColor.ToString().Equals(newValue))
+            {                
+                SetSelectedColorAndPositionSelector((Color)ColorConverter.ConvertFromString(newValue));
+            }
+        }       
 
         #endregion //HexadecimalString
 
@@ -281,6 +292,16 @@ namespace Microsoft.Windows.Controls
             _spectrumSlider.ValueChanged += SpectrumSlider_ValueChanged;
 
             SetSelectedColorAndPositionSelector(SelectedColor);
+        }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            //hitting enter on textbox will update value of underlying source
+            if (e.Key == Key.Enter && e.OriginalSource is TextBox)
+            {
+                BindingExpression be = ((TextBox)e.OriginalSource).GetBindingExpression(TextBox.TextProperty);
+                be.UpdateSource();
+            }
         }
 
         #endregion //Base Class Overrides
