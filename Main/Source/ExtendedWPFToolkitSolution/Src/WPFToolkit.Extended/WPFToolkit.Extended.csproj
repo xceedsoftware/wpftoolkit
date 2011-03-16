@@ -123,6 +123,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="WatermarkTextBox\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BusyIndicator\Implementation\BusyIndicator.cs" />
@@ -210,6 +214,7 @@
     <Compile Include="SplitButton\Implementation\SplitButton.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\Implementation\VisualStates.MessageBox.cs" />
+    <Compile Include="WatermarkTextBox\Implementation\WatermarkTextBox.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -278,6 +283,7 @@
   <ItemGroup>
     <Resource Include="PropertyGrid\Images\Style11.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
