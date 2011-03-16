@@ -339,8 +339,8 @@
     <Border CornerRadius="3" BorderThickness="1" BorderBrush="Gray" Background="WhiteSmoke">
         <Grid Margin="5,0,5,5">
             <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Thumb x:Name="_dragWidget" Height="10" 
