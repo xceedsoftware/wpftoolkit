@@ -13,7 +13,12 @@ namespace Microsoft.Windows.Controls.Core.Utilities
 
         public static string GetColorName(this Color color)
         {
-            return KnownColors.Where(kvp => kvp.Value.Equals(color)).Select(kvp => kvp.Key).FirstOrDefault();
+            string colorName = KnownColors.Where(kvp => kvp.Value.Equals(color)).Select(kvp => kvp.Key).FirstOrDefault();
+
+            if (String.IsNullOrEmpty(colorName))
+                colorName = color.ToString();
+
+            return colorName;
         }
 
         private static Dictionary<string, Color> GetKnownColors()
