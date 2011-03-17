@@ -83,6 +83,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="DateTimePicker\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DateTimeUpDown\Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -150,6 +154,7 @@
     <Compile Include="Core\Converters\InverseBoolConverter.cs" />
     <Compile Include="Core\Converters\SolidColorBrushToColorConverter.cs" />
     <Compile Include="Core\Utilities\ContextMenuUtilities.cs" />
+    <Compile Include="DateTimePicker\Implementation\DateTimePicker.cs" />
     <Compile Include="DateTimeUpDown\Implementation\DateTimeFormat.cs" />
     <Compile Include="DateTimeUpDown\Implementation\DateTimeInfo.cs" />
     <Compile Include="DateTimeUpDown\Implementation\DateTimePart.cs" />
