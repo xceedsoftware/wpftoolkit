@@ -18,6 +18,7 @@ namespace Microsoft.Windows.Controls
         private Canvas _colorShadeSelector;
         private ColorSpectrumSlider _spectrumSlider;
         private Point? _currentColorPosition;
+        private bool _surpressPropertyChanged;
 
         #endregion //Private Members
 
@@ -25,7 +26,7 @@ namespace Microsoft.Windows.Controls
 
         #region SelectedColor
 
-        public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register("SelectedColor", typeof(Color), typeof(ColorCanvas), new UIPropertyMetadata(Colors.White, OnSelectedColorChanged));
+        public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register("SelectedColor", typeof(Color), typeof(ColorCanvas), new UIPropertyMetadata(Colors.Black, OnSelectedColorChanged));
         public Color SelectedColor
         {
             get { return (Color)GetValue(SelectedColorProperty); }
@@ -42,6 +43,7 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnSelectedColorChanged(Color oldValue, Color newValue)
         {
             UpdateRGBValues(newValue);
+            UpdateColorShadeSelectorPosition(newValue);
         }
 
         #endregion //SelectedColor
@@ -50,15 +52,11 @@ namespace Microsoft.Windows.Controls
 
         #region A
 
-        public static readonly DependencyProperty AProperty = DependencyProperty.Register("A", typeof(byte), typeof(ColorCanvas), new UIPropertyMetadata((byte)255, new PropertyChangedCallback(OnAChanged), new CoerceValueCallback(OnCoerceA)));
-
-        private static object OnCoerceA(DependencyObject o, object value)
+        public static readonly DependencyProperty AProperty = DependencyProperty.Register("A", typeof(byte), typeof(ColorCanvas), new UIPropertyMetadata((byte)255, OnAChanged));
+        public byte A
         {
-            ColorCanvas colorCanvas = o as ColorCanvas;
-            if (colorCanvas != null)
-                return colorCanvas.OnCoerceA((byte)value);
-            else
-                return value;
+            get { return (byte)GetValue(AProperty); }
+            set { SetValue(AProperty, value); }
         }
 
         private static void OnAChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
@@ -68,43 +66,21 @@ namespace Microsoft.Windows.Controls
                 colorCanvas.OnAChanged((byte)e.OldValue, (byte)e.NewValue);
         }
 
-        protected virtual byte OnCoerceA(byte value)
-        {
-            // TODO: Keep the proposed value within the desired range.
-            return value;
-        }
-
         protected virtual void OnAChanged(byte oldValue, byte newValue)
         {
-            UpdateRGBColor();
-        }
-
-        public byte A
-        {
-            // IMPORTANT: To maintain parity between setting a property in XAML and procedural code, do not touch the getter and setter inside this dependency property!
-            get
-            {
-                return (byte)GetValue(AProperty);
-            }
-            set
-            {
-                SetValue(AProperty, value);
-            }
+            if (!_surpressPropertyChanged)
+                UpdateRGBColor();
         }
 
         #endregion //A
 
         #region R
 
-        public static readonly DependencyProperty RProperty = DependencyProperty.Register("R", typeof(byte), typeof(ColorCanvas), new UIPropertyMetadata((byte)255, new PropertyChangedCallback(OnRChanged), new CoerceValueCallback(OnCoerceR)));
-
-        private static object OnCoerceR(DependencyObject o, object value)
+        public static readonly DependencyProperty RProperty = DependencyProperty.Register("R", typeof(byte), typeof(ColorCanvas), new UIPropertyMetadata((byte)0, OnRChanged));
+        public byte R
         {
-            ColorCanvas colorCanvas = o as ColorCanvas;
-            if (colorCanvas != null)
-                return colorCanvas.OnCoerceR((byte)value);
-            else
-                return value;
+            get { return (byte)GetValue(RProperty); }
+            set { SetValue(RProperty, value); }
         }
 
         private static void OnRChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
@@ -114,44 +90,21 @@ namespace Microsoft.Windows.Controls
                 colorCanvas.OnRChanged((byte)e.OldValue, (byte)e.NewValue);
         }
 
-        protected virtual byte OnCoerceR(byte value)
-        {
-            // TODO: Keep the proposed value within the desired range.
-            return value;
-        }
-
         protected virtual void OnRChanged(byte oldValue, byte newValue)
         {
-            UpdateRGBColor();
+            if (!_surpressPropertyChanged)
+                UpdateRGBColor();
         }
-
-        public byte R
-        {
-            // IMPORTANT: To maintain parity between setting a property in XAML and procedural code, do not touch the getter and setter inside this dependency property!
-            get
-            {
-                return (byte)GetValue(RProperty);
-            }
-            set
-            {
-                SetValue(RProperty, value);
-            }
-        }
-
 
         #endregion //R
 
         #region G
 
-        public static readonly DependencyProperty GProperty = DependencyProperty.Register("G", typeof(byte), typeof(ColorCanvas), new UIPropertyMetadata((byte)255, new PropertyChangedCallback(OnGChanged), new CoerceValueCallback(OnCoerceG)));
-
-        private static object OnCoerceG(DependencyObject o, object value)
+        public static readonly DependencyProperty GProperty = DependencyProperty.Register("G", typeof(byte), typeof(ColorCanvas), new UIPropertyMetadata((byte)0, OnGChanged));
+        public byte G
         {
-            ColorCanvas colorCanvas = o as ColorCanvas;
-            if (colorCanvas != null)
-                return colorCanvas.OnCoerceG((byte)value);
-            else
-                return value;
+            get { return (byte)GetValue(GProperty); }
+            set { SetValue(GProperty, value); }
         }
 
         private static void OnGChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
@@ -161,44 +114,21 @@ namespace Microsoft.Windows.Controls
                 colorCanvas.OnGChanged((byte)e.OldValue, (byte)e.NewValue);
         }
 
-        protected virtual byte OnCoerceG(byte value)
-        {
-            // TODO: Keep the proposed value within the desired range.
-            return value;
-        }
-
         protected virtual void OnGChanged(byte oldValue, byte newValue)
         {
-            UpdateRGBColor();
+            if (!_surpressPropertyChanged)
+                UpdateRGBColor();
         }
-
-        public byte G
-        {
-            // IMPORTANT: To maintain parity between setting a property in XAML and procedural code, do not touch the getter and setter inside this dependency property!
-            get
-            {
-                return (byte)GetValue(GProperty);
-            }
-            set
-            {
-                SetValue(GProperty, value);
-            }
-        }
-
 
         #endregion //G
 
         #region B
 
-        public static readonly DependencyProperty BProperty = DependencyProperty.Register("B", typeof(byte), typeof(ColorCanvas), new UIPropertyMetadata((byte)255, new PropertyChangedCallback(OnBChanged), new CoerceValueCallback(OnCoerceB)));
-
-        private static object OnCoerceB(DependencyObject o, object value)
+        public static readonly DependencyProperty BProperty = DependencyProperty.Register("B", typeof(byte), typeof(ColorCanvas), new UIPropertyMetadata((byte)0, OnBChanged));
+        public byte B
         {
-            ColorCanvas colorCanvas = o as ColorCanvas;
-            if (colorCanvas != null)
-                return colorCanvas.OnCoerceB((byte)value);
-            else
-                return value;
+            get { return (byte)GetValue(BProperty); }
+            set { SetValue(BProperty, value); }
         }
 
         private static void OnBChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
@@ -208,37 +138,18 @@ namespace Microsoft.Windows.Controls
                 colorCanvas.OnBChanged((byte)e.OldValue, (byte)e.NewValue);
         }
 
-        protected virtual byte OnCoerceB(byte value)
-        {
-            // TODO: Keep the proposed value within the desired range.
-            return value;
-        }
-
         protected virtual void OnBChanged(byte oldValue, byte newValue)
         {
-            UpdateRGBColor();
+            if (!_surpressPropertyChanged)
+                UpdateRGBColor();
         }
-
-        public byte B
-        {
-            // IMPORTANT: To maintain parity between setting a property in XAML and procedural code, do not touch the getter and setter inside this dependency property!
-            get
-            {
-                return (byte)GetValue(BProperty);
-            }
-            set
-            {
-                SetValue(BProperty, value);
-            }
-        }
-
 
         #endregion //B
 
         #endregion //RGB
 
         #region HexadecimalString
-        
+
         public static readonly DependencyProperty HexadecimalStringProperty = DependencyProperty.Register("HexadecimalString", typeof(string), typeof(ColorCanvas), new UIPropertyMetadata("#FFFFFFFF", OnHexadecimalStringChanged));
         public string HexadecimalString
         {
@@ -256,10 +167,10 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnHexadecimalStringChanged(string oldValue, string newValue)
         {
             if (!SelectedColor.ToString().Equals(newValue))
-            {                
+            {
                 SetSelectedColorAndPositionSelector((Color)ColorConverter.ConvertFromString(newValue));
             }
-        }       
+        }
 
         #endregion //HexadecimalString
 
@@ -291,7 +202,8 @@ namespace Microsoft.Windows.Controls
             _spectrumSlider = (ColorSpectrumSlider)GetTemplateChild("PART_SpectrumSlider");
             _spectrumSlider.ValueChanged += SpectrumSlider_ValueChanged;
 
-            SetSelectedColorAndPositionSelector(SelectedColor);
+            UpdateRGBValues(SelectedColor);
+            UpdateColorShadeSelectorPosition(SelectedColor);
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -363,10 +275,14 @@ namespace Microsoft.Windows.Controls
 
         private void UpdateRGBValues(Color color)
         {
+            _surpressPropertyChanged = true;
+
             A = color.A;
             R = color.R;
             G = color.G;
             B = color.B;
+
+            _surpressPropertyChanged = false;
         }
 
         private void SetSelectedColorAndPositionSelector(Color color)
