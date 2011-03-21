@@ -127,6 +127,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="TimePicker\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WatermarkTextBox\Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -145,6 +149,7 @@
     <Compile Include="ButtonSpinner\Implementation\ValidSpinDirections.cs" />
     <Compile Include="Chromes\Implementation\ButtonChrome.cs" />
     <Compile Include="ColorCanvas\Implementation\ColorCanvas.cs" />
+    <Compile Include="Core\Converters\TimeFormatToDateTimeFormatConverter.cs" />
     <Compile Include="Core\Primitives\HsvColor.cs" />
     <Compile Include="ColorPicker\Implementation\ColorItem.cs" />
     <Compile Include="ColorPicker\Implementation\ColorPicker.cs" />
@@ -217,6 +222,8 @@
     <Compile Include="RichTextBox\RichTextBox.cs" />
     <Compile Include="Core\Primitives\UpDownBase.cs" />
     <Compile Include="SplitButton\Implementation\SplitButton.cs" />
+    <Compile Include="TimePicker\Implementation\TimeFormat.cs" />
+    <Compile Include="TimePicker\Implementation\TimePicker.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\Implementation\VisualStates.MessageBox.cs" />
     <Compile Include="WatermarkTextBox\Implementation\WatermarkTextBox.cs" />
