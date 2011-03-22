@@ -2,7 +2,11 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+#if VS2008
+using Microsoft.Windows.Controls.Primitives;
+#else
 using System.Windows.Controls.Primitives;
+#endif
 
 namespace Microsoft.Windows.Controls
 {

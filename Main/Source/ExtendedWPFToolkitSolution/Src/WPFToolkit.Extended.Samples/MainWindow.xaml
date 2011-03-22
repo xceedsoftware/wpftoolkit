@@ -1,9 +1,11 @@
 ﻿<Window x:Class="WPFToolkit.Extended.Samples.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
-        Title="MainWindow" Height="350" Width="525" >
+        xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended" 
+        xmlns:local="clr-namespace:WPFToolkit.Extended.Samples"
+        Title="MainWindow" Height="600" Width="800" WindowStartupLocation="CenterScreen" ForceCursor="True">
+
     <Grid>
-        
+
     </Grid>
 </Window>
