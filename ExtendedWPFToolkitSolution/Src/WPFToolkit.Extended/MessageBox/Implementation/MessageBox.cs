@@ -24,6 +24,11 @@ namespace Microsoft.Windows.Controls
         /// </summary>
         private MessageBoxResult _defaultResult = MessageBoxResult.None;
 
+        /// <summary>
+        /// Tracks the owner of the MessageBox
+        /// </summary>
+        private Window _owner;
+
         #endregion //Private Members
 
         #region Constructors
@@ -151,6 +156,17 @@ namespace Microsoft.Windows.Controls
         }
 
         /// <summary>
+        /// Displays a message box that has a message and that returns a result.
+        /// </summary>
+        /// <param name="owner">A System.Windows.Window that represents the owner of the MessageBox</param>
+        /// <param name="messageText">A System.String that specifies the text to display.</param>
+        /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
+        public static MessageBoxResult Show(Window owner, string messageText)
+        {
+            return Show(owner, messageText, string.Empty, MessageBoxButton.OK);
+        }
+
+        /// <summary>
         /// Displays a message box that has a message and title bar caption; and that returns a result.
         /// </summary>
         /// <param name="messageText">A System.String that specifies the text to display.</param>
@@ -159,6 +175,12 @@ namespace Microsoft.Windows.Controls
         public static MessageBoxResult Show(string messageText, string caption)
         {
             return Show(messageText, caption, MessageBoxButton.OK);
+        }
+
+
+        public static MessageBoxResult Show(Window owner, string messageText, string caption)
+        {
+            return Show(owner, messageText, caption, MessageBoxButton.OK);
         }
 
         /// <summary>
@@ -170,7 +192,13 @@ namespace Microsoft.Windows.Controls
         /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
         public static MessageBoxResult Show(string messageText, string caption, MessageBoxButton button)
         {
-            return ShowCore(messageText, caption, button, MessageBoxImage.None, MessageBoxResult.None);
+            return ShowCore(null, messageText, caption, button, MessageBoxImage.None, MessageBoxResult.None);
+        }
+
+
+        public static MessageBoxResult Show(Window owner, string messageText, string caption, MessageBoxButton button)
+        {
+            return ShowCore(owner, messageText, caption, button, MessageBoxImage.None, MessageBoxResult.None);
         }
 
         /// <summary>
@@ -183,7 +211,13 @@ namespace Microsoft.Windows.Controls
         /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
         public static MessageBoxResult Show(string messageText, string caption, MessageBoxButton button, MessageBoxImage icon)
         {
-            return ShowCore(messageText, caption, button, icon, MessageBoxResult.None);
+            return ShowCore(null, messageText, caption, button, icon, MessageBoxResult.None);
+        }
+
+
+        public static MessageBoxResult Show(Window owner, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon)
+        {
+            return ShowCore(owner, messageText, caption, button, icon, MessageBoxResult.None);
         }
 
         /// <summary>
@@ -197,7 +231,13 @@ namespace Microsoft.Windows.Controls
         /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
         public static MessageBoxResult Show(string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult)
         {
-            return ShowCore(messageText, caption, button, icon, defaultResult);
+            return ShowCore(null, messageText, caption, button, icon, defaultResult);
+        }
+
+
+        public static MessageBoxResult Show(Window owner, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult)
+        {
+            return ShowCore(owner, messageText, caption, button, icon, defaultResult);
         }
 
         #endregion //Public Static
@@ -219,12 +259,13 @@ namespace Microsoft.Windows.Controls
         /// <param name="caption">The caption.</param>
         /// <param name="button">The button.</param>
         /// <param name="image">The image.</param>
-        protected void InitializeMessageBox(string text, string caption, MessageBoxButton button, MessageBoxImage image, MessageBoxResult defaultResult)
+        protected void InitializeMessageBox(Window owner, string text, string caption, MessageBoxButton button, MessageBoxImage image, MessageBoxResult defaultResult)
         {
             Text = text;
             Caption = caption;
             _button = button;
             _defaultResult = defaultResult;
+            _owner = owner;
             SetImageSource(image);
             Container = CreateContainer();
         }
@@ -326,10 +367,10 @@ namespace Microsoft.Windows.Controls
         /// <param name="icon">The icon.</param>
         /// <param name="defaultResult">The default result.</param>
         /// <returns></returns>
-        private static MessageBoxResult ShowCore(string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult)
+        private static MessageBoxResult ShowCore(Window owner, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult)
         {
             MessageBox msgBox = new MessageBox();
-            msgBox.InitializeMessageBox(messageText, caption, button, icon, defaultResult);
+            msgBox.InitializeMessageBox(owner, messageText, caption, button, icon, defaultResult);
             msgBox.Show();
             return msgBox.MessageBoxResult;
         }
@@ -337,10 +378,10 @@ namespace Microsoft.Windows.Controls
         /// <summary>
         /// Resolves the owner Window of the MessageBox.
         /// </summary>
-        /// <returns>the owner element</returns>
-        private static FrameworkElement ResolveOwner()
+        /// <returns>the owner Window</returns>
+        private static Window ResolveOwnerWindow()
         {
-            FrameworkElement owner = null;
+            Window owner = null;
             if (Application.Current != null)
             {
                 foreach (Window w in Application.Current.Windows)
@@ -405,13 +446,10 @@ namespace Microsoft.Windows.Controls
             newWindow.AllowsTransparency = true;
             newWindow.Background = Brushes.Transparent;
             newWindow.Content = this;
-
-            var owner = ResolveOwner();
-            if (owner != null)
-            {
-                newWindow.Owner = Window.GetWindow(owner);
+            newWindow.Owner = _owner ?? ResolveOwnerWindow();   
+         
+            if (newWindow.Owner != null)
                 newWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-            }
             else
                 newWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
 
