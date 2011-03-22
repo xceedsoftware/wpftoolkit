@@ -5,7 +5,7 @@ namespace Microsoft.Windows.Controls.Core.Utilities
 {
     public class ContextMenuUtilities
     {
-        public static readonly DependencyProperty OpenOnMouseLeftButtonClickProperty = DependencyProperty.RegisterAttached("OpenOnMouseLeftButtonClick", typeof(bool), typeof(FrameworkElement), new FrameworkPropertyMetadata(false, OpenOnMouseLeftButtonClickChanged));
+        public static readonly DependencyProperty OpenOnMouseLeftButtonClickProperty = DependencyProperty.RegisterAttached("OpenOnMouseLeftButtonClick", typeof(bool), typeof(ContextMenuUtilities), new FrameworkPropertyMetadata(false, OpenOnMouseLeftButtonClickChanged));
         public static void SetOpenOnMouseLeftButtonClick(FrameworkElement element, bool value)
         {
             element.SetValue(OpenOnMouseLeftButtonClickProperty, value);
