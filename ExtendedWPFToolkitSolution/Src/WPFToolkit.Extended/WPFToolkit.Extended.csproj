@@ -222,6 +222,7 @@
     <Compile Include="Core\Primitives\UpDownBase.cs" />
     <Compile Include="SplitButton\Implementation\SplitButton.cs" />
     <Compile Include="TimePicker\Implementation\TimeFormat.cs" />
+    <Compile Include="TimePicker\Implementation\TimeItem.cs" />
     <Compile Include="TimePicker\Implementation\TimePicker.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\Implementation\VisualStates.MessageBox.cs" />

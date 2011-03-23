@@ -4,6 +4,10 @@
                     xmlns:chrome="clr-namespace:Microsoft.Windows.Controls.Chromes"
                     xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters">
 
+    <!-- =============================================================================== -->
+    <!-- ResourceDictionary for TimePicker and related controls                          -->
+    <!-- =============================================================================== -->
+
     <coreConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
     <coreConverters:TimeFormatToDateTimeFormatConverter x:Key="TimeFormatToDateTimeFormatConverter" />
 
@@ -51,10 +55,33 @@
         </Setter>
     </Style>
 
+    <SolidColorBrush x:Key="ListItemHover" Color="#FFE7F5FD"/>
+    
+    <Style x:Key="TimeItemStyle" TargetType="ListBoxItem">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border Name="Border" SnapsToDevicePixels="true">                        
+                            <ContentPresenter Margin="4" />                        
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource ListItemHover}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- =============================================================================== -->
     <!-- TimePicker                                                                      -->
     <!-- =============================================================================== -->
-    
+
     <Style TargetType="{x:Type local:TimePicker}">
         <Setter Property="Template">
             <Setter.Value>
@@ -69,7 +96,7 @@
                                 <local:DateTimeUpDown x:Name="PART_TimeUpDown" BorderThickness="1,1,0,1"  
                                                       Format="{TemplateBinding Format, Converter={StaticResource TimeFormatToDateTimeFormatConverter}}"
                                                       FormatString="{TemplateBinding FormatString}"
-                                                      Value="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}}" />
+                                                      Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}" />
                                 <ToggleButton x:Name="_timePickerToggleButton" Grid.Column="1"
                                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                               Style="{StaticResource TimePickerToggleButtonStyle}"
@@ -77,10 +104,11 @@
                             </Grid>
                             <Popup IsOpen="{Binding IsChecked, ElementName=_timePickerToggleButton}" StaysOpen="False">
                                 <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" >
-                                    <ListBox x:Name="PART_TimeListItems" BorderThickness="0"
-                                             SelectedItem="{Binding SelectedTime, RelativeSource={RelativeSource TemplatedParent}}">
-                                        
-                                    </ListBox>
+                                    <Grid>
+                                        <ListBox x:Name="PART_TimeListItems" BorderThickness="0" Width="150" Height="130"
+                                                 DisplayMemberPath="Display"
+                                                 ItemContainerStyle="{StaticResource TimeItemStyle}"/>
+                                    </Grid>
                                 </Border>
                             </Popup>
                         </Grid>

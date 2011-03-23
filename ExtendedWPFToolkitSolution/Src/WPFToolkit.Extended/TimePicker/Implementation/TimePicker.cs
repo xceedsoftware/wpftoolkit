@@ -1,33 +1,72 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Collections;
+using System.Globalization;
 
 namespace Microsoft.Windows.Controls
 {
     public class TimePicker : Control
     {
+        #region Members
+
+        ListBox _timeListBox;
+        private DateTimeFormatInfo DateTimeFormatInfo { get; set; }
         internal static readonly TimeSpan EndTimeDefaultValue = new TimeSpan(23, 59, 0);
         internal static readonly TimeSpan StartTimeDefaultValue = new TimeSpan(0, 0, 0);
         internal static readonly TimeSpan TimeIntervalDefaultValue = new TimeSpan(1, 0, 0);
 
-        #region Members
-
-        ListBox _timeListBox;
-
         #endregion //Members
 
         #region Properties
+
+        #region EndTime
+
+        public static readonly DependencyProperty EndTimeProperty = DependencyProperty.Register("EndTime", typeof(TimeSpan), typeof(TimePicker), new UIPropertyMetadata(EndTimeDefaultValue, new PropertyChangedCallback(OnEndTimeChanged), new CoerceValueCallback(OnCoerceEndTime)));
+
+        private static object OnCoerceEndTime(DependencyObject o, object value)
+        {
+            TimePicker timePicker = o as TimePicker;
+            if (timePicker != null)
+                return timePicker.OnCoerceEndTime((TimeSpan)value);
+            else
+                return value;
+        }
+
+        private static void OnEndTimeChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            TimePicker timePicker = o as TimePicker;
+            if (timePicker != null)
+                timePicker.OnEndTimeChanged((TimeSpan)e.OldValue, (TimeSpan)e.NewValue);
+        }
+
+        protected virtual TimeSpan OnCoerceEndTime(TimeSpan value)
+        {
+            // TODO: Keep the proposed value within the desired range.
+            return value;
+        }
+
+        protected virtual void OnEndTimeChanged(TimeSpan oldValue, TimeSpan newValue)
+        {
+            // TODO: Add your property changed side-effects. Descendants can override as well.
+        }
+
+        public TimeSpan EndTime
+        {
+            // IMPORTANT: To maintain parity between setting a property in XAML and procedural code, do not touch the getter and setter inside this dependency property!
+            get
+            {
+                return (TimeSpan)GetValue(EndTimeProperty);
+            }
+            set
+            {
+                SetValue(EndTimeProperty, value);
+            }
+        }
+        
+
+        #endregion //EndTime
 
         #region Format
 
@@ -99,56 +138,98 @@ namespace Microsoft.Windows.Controls
 
         #endregion //Minimum
 
-        #region SelectedDate
+        #region StartTime
 
-        public static readonly DependencyProperty SelectedDateProperty = DependencyProperty.Register("SelectedDate", typeof(DateTime?), typeof(TimePicker), new UIPropertyMetadata(DateTime.Now, OnSelectedDateChanged));
-        public DateTime? SelectedDate
-        {
-            get { return (DateTime?)GetValue(SelectedDateProperty); }
-            set { SetValue(SelectedDateProperty, value); }
-        }
+        public static readonly DependencyProperty StartTimeProperty = DependencyProperty.Register("StartTime", typeof(TimeSpan), typeof(TimePicker), new UIPropertyMetadata(StartTimeDefaultValue, new PropertyChangedCallback(OnStartTimeChanged), new CoerceValueCallback(OnCoerceStartTime)));
 
-        private static void OnSelectedDateChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        private static object OnCoerceStartTime(DependencyObject o, object value)
         {
             TimePicker timePicker = o as TimePicker;
             if (timePicker != null)
-                timePicker.OnSelectedDateChanged((DateTime?)e.OldValue, (DateTime?)e.NewValue);
+                return timePicker.OnCoerceStartTime((TimeSpan)value);
+            else
+                return value;
         }
 
-        protected virtual void OnSelectedDateChanged(DateTime? oldValue, DateTime? newValue)
-        {
-
-        }
-
-        #endregion //SelectedDate
-
-        #region SelectedTime
-
-        public static readonly DependencyProperty SelectedTimeProperty = DependencyProperty.Register("SelectedTime", typeof(TimeSpan?), typeof(TimePicker), new UIPropertyMetadata(null, OnSelectedTimeChanged));
-        public TimeSpan? SelectedTime
-        {
-            get { return (TimeSpan?)GetValue(SelectedTimeProperty); }
-            set { SetValue(SelectedTimeProperty, value); }
-        }
-
-        private static void OnSelectedTimeChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        private static void OnStartTimeChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
             TimePicker timePicker = o as TimePicker;
             if (timePicker != null)
-                timePicker.OnSelectedTimeChanged((TimeSpan?)e.OldValue, (TimeSpan?)e.NewValue);
+                timePicker.OnStartTimeChanged((TimeSpan)e.OldValue, (TimeSpan)e.NewValue);
         }
 
-        protected virtual void OnSelectedTimeChanged(TimeSpan? oldValue, TimeSpan? newValue)
+        protected virtual TimeSpan OnCoerceStartTime(TimeSpan value)
         {
-            var current = DateTime.Now;
+            // TODO: Keep the proposed value within the desired range.
+            return value;
+        }
 
-            var date = SelectedDate ?? current;
-            var time = SelectedTime ?? current.TimeOfDay;
+        protected virtual void OnStartTimeChanged(TimeSpan oldValue, TimeSpan newValue)
+        {
+            // TODO: Add your property changed side-effects. Descendants can override as well.
+        }
 
-            SelectedDate = new DateTime(date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
+        public TimeSpan StartTime
+        {
+            // IMPORTANT: To maintain parity between setting a property in XAML and procedural code, do not touch the getter and setter inside this dependency property!
+            get
+            {
+                return (TimeSpan)GetValue(StartTimeProperty);
+            }
+            set
+            {
+                SetValue(StartTimeProperty, value);
+            }
+        }
+        
+
+        #endregion //StartTime
+
+        #region TimeInterval
+
+        public static readonly DependencyProperty TimeIntervalProperty = DependencyProperty.Register("TimeInterval", typeof(TimeSpan), typeof(TimePicker), new UIPropertyMetadata(TimeIntervalDefaultValue, OnTimeIntervalChanged));
+        public TimeSpan TimeInterval
+        {
+            get { return (TimeSpan)GetValue(TimeIntervalProperty); }
+            set { SetValue(TimeIntervalProperty, value); }
+        }
+
+        private static void OnTimeIntervalChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            TimePicker timePicker = o as TimePicker;
+            if (timePicker != null)
+                timePicker.OnTimeIntervalChanged((TimeSpan)e.OldValue, (TimeSpan)e.NewValue);
+        }
+
+        protected virtual void OnTimeIntervalChanged(TimeSpan oldValue, TimeSpan newValue)
+        {
+            // TODO: Add your property changed side-effects. Descendants can override as well.
+        }
+
+        #endregion //TimeInterval
+
+        #region Value
+
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(DateTime?), typeof(TimePicker), new UIPropertyMetadata(null, OnValueChanged));
+        public DateTime? Value
+        {
+            get { return (DateTime?)GetValue(ValueProperty); }
+            set { SetValue(ValueProperty, value); }
+        }
+
+        private static void OnValueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            TimePicker timePicker = o as TimePicker;
+            if (timePicker != null)
+                timePicker.OnValueChanged((DateTime?)e.OldValue, (DateTime?)e.NewValue);
+        }
+
+        protected virtual void OnValueChanged(DateTime? oldValue, DateTime? newValue)
+        {
+            // TODO: Add your property changed side-effects. Descendants can override as well.
         }        
 
-        #endregion //SelectedTime
+        #endregion //Value
 
         #endregion //Properties
 
@@ -161,6 +242,7 @@ namespace Microsoft.Windows.Controls
 
         public TimePicker()
         {
+            DateTimeFormatInfo = DateTimeFormatInfo.GetInstance(CultureInfo.CurrentCulture);
             Keyboard.AddKeyDownHandler(this, OnKeyDown);
             Mouse.AddPreviewMouseDownOutsideCapturedElementHandler(this, OnMouseDownOutsideCapturedElement);
         }
@@ -174,25 +256,8 @@ namespace Microsoft.Windows.Controls
             base.OnApplyTemplate();
 
             _timeListBox = (ListBox)GetTemplateChild("PART_TimeListItems");
-            _timeListBox.ItemsSource = GenerateItemsSource();
-            _timeListBox.SelectionChanged += new SelectionChangedEventHandler(_timeListBox_SelectionChanged);
-        }
-
-        void _timeListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //if (e.AddedItems.Count > 0)
-            //{
-            //    TimeSpan newTime = (TimeSpan)e.AddedItems[0];
-
-            //    var current = DateTime.Now;
-
-            //    var date = this.SelectedDate.HasValue ? this.SelectedDate.Value : current;
-            //    var time = this.SelectedTime.HasValue ? this.SelectedTime.Value : current.TimeOfDay;
-
-            //    SelectedDate = new DateTime(date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
-            //}
-
-            CloseTimePicker();
+            _timeListBox.ItemsSource = GenerateTimeListItemsSource();
+            _timeListBox.SelectionChanged += TimeListBox_SelectionChanged;
         }
 
         #endregion //Base Class Overrides
@@ -217,6 +282,20 @@ namespace Microsoft.Windows.Controls
             CloseTimePicker();
         }
 
+        void TimeListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0)
+            {
+                TimeItem selectedTimeListItem = (TimeItem)e.AddedItems[0];
+                var time = selectedTimeListItem.Time; ;
+                var date = Value ?? DateTime.MinValue;
+
+                Value = new DateTime(date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
+            }
+
+            CloseTimePicker();
+        }
+
         #endregion //Event Handlers
 
         #region Methods
@@ -228,13 +307,10 @@ namespace Microsoft.Windows.Controls
             ReleaseMouseCapture();
         }
 
-        private static IEnumerable GenerateItemsSource()
+        public IEnumerable GenerateTimeListItemsSource()
         {
-            //TimeSpan time = this.StartTime;
-            //TimeSpan endTime = this.EndTime;
-
-            TimeSpan time = StartTimeDefaultValue;
-            TimeSpan endTime = EndTimeDefaultValue;
+            TimeSpan time = StartTime;
+            TimeSpan endTime = EndTime;
 
             if (endTime <= time)
             {
@@ -242,19 +318,32 @@ namespace Microsoft.Windows.Controls
                 time = StartTimeDefaultValue;
             }
 
-            //TimeSpan timeInterval = this.TimeInterval;
-            TimeSpan timeInterval = TimeIntervalDefaultValue;
+            TimeSpan timeInterval = TimeInterval;
 
             if (time != null && endTime != null && timeInterval != null && timeInterval.Ticks > 0)
             {
                 while (time <= endTime)
                 {
-                    yield return time;
+                    yield return new TimeItem(DateTime.MinValue.Add(time).ToString(GetTimeFormat(), CultureInfo.CurrentCulture), time);
                     time = time.Add(timeInterval);
                 }
                 yield break;
             }
+        }
 
+        private string GetTimeFormat()
+        {
+            switch (Format)
+            {
+                case TimeFormat.Custom:
+                    return FormatString;
+                case TimeFormat.LongTime:
+                    return DateTimeFormatInfo.LongTimePattern;
+                case TimeFormat.ShortTime:
+                    return DateTimeFormatInfo.ShortTimePattern;
+                default:
+                    return DateTimeFormatInfo.ShortTimePattern;
+            }
         }
 
         #endregion //Methods
