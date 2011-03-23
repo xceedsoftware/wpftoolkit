@@ -6,11 +6,10 @@ using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Microsoft.Windows.Controls
 {
-    [TemplateVisualState(GroupName = VisualStates.WindowStatesGroup, Name = VisualStates.Open)]
-    [TemplateVisualState(GroupName = VisualStates.WindowStatesGroup, Name = VisualStates.Closed)]
     public class ChildWindow : ContentControl
     {
         #region Private Members
@@ -42,6 +41,8 @@ namespace Microsoft.Windows.Controls
 
         public ChildWindow()
         {
+            IsVisibleChanged += ChildWindow_IsVisibleChanged;
+
             _modalLayer.Fill = OverlayBrush;
             _modalLayer.Opacity = OverlayOpacity;
         }
@@ -98,8 +99,17 @@ namespace Microsoft.Windows.Controls
             }
 
             _root.Children.Add(_modalLayerPanel);
+        }
 
-            ChangeVisualState();
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            Action action = () =>
+            {
+                if (FocusedElement != null)
+                    FocusedElement.Focus();
+            };
+
+            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -218,6 +228,17 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //DialogResult
+
+        #region FocusedElement
+
+        public static readonly DependencyProperty FocusedElementProperty = DependencyProperty.Register("FocusedElement", typeof(FrameworkElement), typeof(ChildWindow), new UIPropertyMetadata(null));
+        public FrameworkElement FocusedElement
+        {
+            get { return (FrameworkElement)GetValue(FocusedElementProperty); }
+            set { SetValue(FocusedElementProperty, value); }
+        } 
+
+        #endregion
 
         #region IsModal
 
@@ -431,6 +452,12 @@ namespace Microsoft.Windows.Controls
 
         #region Event Handlers
 
+        void ChildWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if ((bool)e.NewValue)
+                Focus();
+        }
+
         void HeaderLeftMouseButtonDown(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
@@ -548,8 +575,6 @@ namespace Microsoft.Windows.Controls
                         break;
                     }
             }
-
-            ChangeVisualState(); //perform the close
         }
 
         private void ExecuteClose()
@@ -600,8 +625,6 @@ namespace Microsoft.Windows.Controls
 
             if (IsModal)
                 Canvas.SetZIndex(_modalLayerPanel, index - 2);
-
-            Focus();
         }
 
         private void CenterChildWindow()
@@ -636,22 +659,6 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Private
-
-        #region Protected
-
-        protected virtual void ChangeVisualState()
-        {
-            if (WindowState == WindowState.Closed)
-            {
-                VisualStateManager.GoToState(this, VisualStates.Closed, true);
-            }
-            else
-            {
-                VisualStateManager.GoToState(this, VisualStates.Open, true);
-            }
-        }
-
-        #endregion //Protected
 
         #region Public
 
