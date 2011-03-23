@@ -136,34 +136,6 @@
                             </Style>
                         </Grid.Resources>
 
-                        <!--VisualStateManager-->
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="WindowStatesGroup">
-                                <VisualState x:Name="Closed">
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Root" Storyboard.TargetProperty="Visibility" Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <Visibility>Collapsed</Visibility>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualState>
-                                <VisualState x:Name="Open">
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Root" Storyboard.TargetProperty="Visibility" Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <Visibility>Visible</Visibility>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-
                         <Grid x:Name="PART_WindowRoot" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="{TemplateBinding MinWidth}" MinHeight="{TemplateBinding MinHeight}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" >
                             <Grid.RenderTransform>
                                 <TransformGroup>
@@ -226,6 +198,11 @@
                             </Border>
                         </Grid>
                     </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="WindowState" Value="Closed">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

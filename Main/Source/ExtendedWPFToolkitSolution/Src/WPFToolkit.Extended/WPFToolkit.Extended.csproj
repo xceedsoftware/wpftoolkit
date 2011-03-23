@@ -140,7 +140,6 @@
     <Compile Include="BusyIndicator\Implementation\BusyIndicator.cs" />
     <Compile Include="ButtonSpinner\Implementation\ButtonSpinner.cs" />
     <Compile Include="ChildWindow\Implementation\ChildWindow.cs" />
-    <Compile Include="ChildWindow\Implementation\VisualStates.ChildWindow.cs" />
     <Compile Include="ChildWindow\Implementation\WindowStartupLocation.cs" />
     <Compile Include="ChildWindow\Implementation\WindowState.cs" />
     <Compile Include="ButtonSpinner\Implementation\SpinDirection.cs" />

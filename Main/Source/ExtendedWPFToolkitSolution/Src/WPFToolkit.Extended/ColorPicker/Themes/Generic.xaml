@@ -146,7 +146,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ColorPicker}">
                     <Grid>
-                        <ToggleButton x:Name="PART_ColorPickerToggleButton" IsTabStop="False" MinHeight="22" IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                        <ToggleButton x:Name="PART_ColorPickerToggleButton" IsTabStop="True" MinHeight="22" IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                                       IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
                                       Style="{TemplateBinding ButtonStyle}">
                             <Grid Margin="2,2,0,2">
