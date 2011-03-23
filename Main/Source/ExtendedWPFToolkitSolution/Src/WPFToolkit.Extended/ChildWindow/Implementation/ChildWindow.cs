@@ -424,7 +424,7 @@ namespace Microsoft.Windows.Controls
 
         #region WindowState
 
-        public static readonly DependencyProperty WindowStateProperty = DependencyProperty.Register("WindowState", typeof(WindowState), typeof(ChildWindow), new PropertyMetadata(WindowState.Open, new PropertyChangedCallback(OnWindowStatePropertyChanged)));
+        public static readonly DependencyProperty WindowStateProperty = DependencyProperty.Register("WindowState", typeof(WindowState), typeof(ChildWindow), new FrameworkPropertyMetadata(WindowState.Open, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnWindowStatePropertyChanged));
         public WindowState WindowState
         {
             get { return (WindowState)GetValue(WindowStateProperty); }
