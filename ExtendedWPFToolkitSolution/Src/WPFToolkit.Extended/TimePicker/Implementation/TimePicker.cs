@@ -64,7 +64,7 @@ namespace Microsoft.Windows.Controls
                 SetValue(EndTimeProperty, value);
             }
         }
-        
+
 
         #endregion //EndTime
 
@@ -181,7 +181,7 @@ namespace Microsoft.Windows.Controls
                 SetValue(StartTimeProperty, value);
             }
         }
-        
+
 
         #endregion //StartTime
 
@@ -226,8 +226,22 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnValueChanged(DateTime? oldValue, DateTime? newValue)
         {
-            // TODO: Add your property changed side-effects. Descendants can override as well.
-        }        
+            //TODO: refactor this
+            if (newValue.HasValue)
+            {
+                var items = _timeListBox.ItemsSource;
+                foreach (TimeItem item in items)
+                {
+                    if (item.Time == newValue.Value.TimeOfDay)
+                    {
+                        int index = _timeListBox.Items.IndexOf(item);
+                        if (_timeListBox.SelectedIndex != index)
+                            _timeListBox.SelectedIndex = index;
+                        break;
+                    }
+                }
+            }
+        }
 
         #endregion //Value
 

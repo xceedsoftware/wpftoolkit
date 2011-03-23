@@ -12,5 +12,23 @@ namespace Microsoft.Windows.Controls
             Display = display;
             Time = time;
         }
+
+        #region Base Class Overrides
+
+        public override bool Equals(object obj)
+        {
+            var item = obj as TimeItem;
+            if (item != null)
+                return Time == item.Time;
+            else
+                return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return Time.GetHashCode();
+        }
+
+        #endregion //Base Class Overrides
     }
 }
