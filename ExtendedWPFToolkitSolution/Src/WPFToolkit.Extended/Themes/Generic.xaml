@@ -4,6 +4,7 @@
         <ResourceDictionary Source="/WPFToolkit.Extended;component/Chromes/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/BusyIndicator/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/ButtonSpinner/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/WPFToolkit.Extended;component/Calculator/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/ChildWindow/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/ColorCanvas/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/ColorPicker/Themes/Generic.xaml" />        
