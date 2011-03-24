@@ -65,7 +65,10 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <local:DateTimeUpDown BorderThickness="1,1,0,1" Format="{TemplateBinding Format}" FormatString="{TemplateBinding FormatString}" 
+                                <local:DateTimeUpDown BorderThickness="1,1,0,1" 
+                                                      AllowSpin="{TemplateBinding AllowSpin}"
+                                                      Format="{TemplateBinding Format}" FormatString="{TemplateBinding FormatString}" 
+                                                      ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
                                                       Value="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}}" />
                                 <ToggleButton x:Name="_calendarToggleButton" Grid.Column="1"
                                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"

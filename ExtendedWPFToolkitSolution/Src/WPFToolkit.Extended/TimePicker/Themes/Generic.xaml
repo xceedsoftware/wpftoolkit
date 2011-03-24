@@ -94,8 +94,10 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <local:DateTimeUpDown x:Name="PART_TimeUpDown" BorderThickness="1,1,0,1"  
+                                                      AllowSpin="{TemplateBinding AllowSpin}"
                                                       Format="{TemplateBinding Format, Converter={StaticResource TimeFormatToDateTimeFormatConverter}}"
                                                       FormatString="{TemplateBinding FormatString}"
+                                                      ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
                                                       Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}" />
                                 <ToggleButton x:Name="_timePickerToggleButton" Grid.Column="1"
                                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
