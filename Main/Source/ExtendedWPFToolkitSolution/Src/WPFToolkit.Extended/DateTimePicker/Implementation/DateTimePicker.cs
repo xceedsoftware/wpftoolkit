@@ -20,6 +20,17 @@ namespace Microsoft.Windows.Controls
 
         #region Properties
 
+        #region AllowSpin
+
+        public static readonly DependencyProperty AllowSpinProperty = DependencyProperty.Register("AllowSpin", typeof(bool), typeof(DateTimePicker), new UIPropertyMetadata(true));
+        public bool AllowSpin
+        {
+            get { return (bool)GetValue(AllowSpinProperty); }
+            set { SetValue(AllowSpinProperty, value); }
+        }
+
+        #endregion //AllowSpin
+
         #region Format
 
         public static readonly DependencyProperty FormatProperty = DependencyProperty.Register("Format", typeof(DateTimeFormat), typeof(DateTimePicker), new UIPropertyMetadata(DateTimeFormat.FullDateTime, OnFormatChanged));
@@ -116,6 +127,17 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //SelectedDate
+
+        #region ShowButtonSpinner
+
+        public static readonly DependencyProperty ShowButtonSpinnerProperty = DependencyProperty.Register("ShowButtonSpinner", typeof(bool), typeof(DateTimePicker), new UIPropertyMetadata(true));
+        public bool ShowButtonSpinner
+        {
+            get { return (bool)GetValue(ShowButtonSpinnerProperty); }
+            set { SetValue(ShowButtonSpinnerProperty, value); }
+        }
+
+        #endregion //ShowButtonSpinner
 
         #endregion //Properties
 

@@ -21,6 +21,17 @@ namespace Microsoft.Windows.Controls
 
         #region Properties
 
+        #region AllowSpin
+
+        public static readonly DependencyProperty AllowSpinProperty = DependencyProperty.Register("AllowSpin", typeof(bool), typeof(TimePicker), new UIPropertyMetadata(true));
+        public bool AllowSpin
+        {
+            get { return (bool)GetValue(AllowSpinProperty); }
+            set { SetValue(AllowSpinProperty, value); }
+        }
+
+        #endregion //AllowSpin
+
         #region EndTime
 
         public static readonly DependencyProperty EndTimeProperty = DependencyProperty.Register("EndTime", typeof(TimeSpan), typeof(TimePicker), new UIPropertyMetadata(EndTimeDefaultValue, new PropertyChangedCallback(OnEndTimeChanged), new CoerceValueCallback(OnCoerceEndTime)));
@@ -137,6 +148,17 @@ namespace Microsoft.Windows.Controls
 
 
         #endregion //Minimum
+
+        #region ShowButtonSpinner
+
+        public static readonly DependencyProperty ShowButtonSpinnerProperty = DependencyProperty.Register("ShowButtonSpinner", typeof(bool), typeof(TimePicker), new UIPropertyMetadata(true));
+        public bool ShowButtonSpinner
+        {
+            get { return (bool)GetValue(ShowButtonSpinnerProperty); }
+            set { SetValue(ShowButtonSpinnerProperty, value); }
+        }
+
+        #endregion //ShowButtonSpinner
 
         #region StartTime
 
