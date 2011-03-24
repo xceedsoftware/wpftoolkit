@@ -8,12 +8,13 @@
 
     <Style TargetType="{x:Type local:DateTimeUpDown}">
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
         <Setter Property="Focusable" Value="False" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>        
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:DateTimeUpDown}">
-                    <local:ButtonSpinner x:Name="Spinner" IsTabStop="False" BorderThickness="{TemplateBinding BorderThickness}">
+                    <local:ButtonSpinner x:Name="Spinner" IsTabStop="False" BorderThickness="{TemplateBinding BorderThickness}"
+                                         AllowSpin="{TemplateBinding AllowSpin}" ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
                         <TextBox x:Name="TextBox" BorderThickness="0" 
                                  Background="{TemplateBinding Background}"
                                  FontFamily="{TemplateBinding FontFamily}" 

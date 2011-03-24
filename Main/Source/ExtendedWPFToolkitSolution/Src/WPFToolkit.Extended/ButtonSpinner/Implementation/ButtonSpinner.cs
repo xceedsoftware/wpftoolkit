@@ -14,6 +14,17 @@ namespace Microsoft.Windows.Controls
     {
         #region Properties
 
+        #region AllowSpin
+
+        public static readonly DependencyProperty AllowSpinProperty = DependencyProperty.Register("AllowSpin", typeof(bool), typeof(ButtonSpinner), new UIPropertyMetadata(true));
+        public bool AllowSpin
+        {
+            get { return (bool)GetValue(AllowSpinProperty); }
+            set { SetValue(AllowSpinProperty, value); }
+        }
+
+        #endregion //AllowSpin
+
         #region Content
 
         /// <summary>
@@ -39,29 +50,7 @@ namespace Microsoft.Windows.Controls
 
         #endregion //Content
 
-        private ButtonBase _increaseButton;
-        /// <summary>
-        /// Gets or sets the IncreaseButton template part.
-        /// </summary>
-        private ButtonBase IncreaseButton
-        {
-            get { return _increaseButton; }
-            set
-            {
-                if (_increaseButton != null)
-                {
-                    _increaseButton.Click -= OnButtonClick;
-                }
-
-                _increaseButton = value;
-
-                if (_increaseButton != null)
-                {
-                    _increaseButton.Click += OnButtonClick;
-                }
-            }
-        }
-
+        #region DecreaseButton
 
         private ButtonBase _decreaseButton;
         /// <summary>
@@ -86,6 +75,46 @@ namespace Microsoft.Windows.Controls
             }
         }
 
+        #endregion //DecreaseButton
+
+        #region IncreaseButton
+
+        private ButtonBase _increaseButton;
+        /// <summary>
+        /// Gets or sets the IncreaseButton template part.
+        /// </summary>
+        private ButtonBase IncreaseButton
+        {
+            get { return _increaseButton; }
+            set
+            {
+                if (_increaseButton != null)
+                {
+                    _increaseButton.Click -= OnButtonClick;
+                }
+
+                _increaseButton = value;
+
+                if (_increaseButton != null)
+                {
+                    _increaseButton.Click += OnButtonClick;
+                }
+            }
+        }
+
+        #endregion //IncreaseButton
+
+        #region ShowButtonSpinner
+
+        public static readonly DependencyProperty ShowButtonSpinnerProperty = DependencyProperty.Register("ShowButtonSpinner", typeof(bool), typeof(ButtonSpinner), new UIPropertyMetadata(true));
+        public bool ShowButtonSpinner
+        {
+            get { return (bool)GetValue(ShowButtonSpinnerProperty); }
+            set { SetValue(ShowButtonSpinnerProperty, value); }
+        }
+
+        #endregion //ShowButtonSpinner
+
         #endregion //Properties
 
         #region Constructors
@@ -107,27 +136,6 @@ namespace Microsoft.Windows.Controls
             DecreaseButton = GetTemplateChild("DecreaseButton") as ButtonBase;
 
             SetButtonUsage();
-        }
-
-        #endregion //Base Class Overrides
-
-        /// <summary>
-        /// Occurs when the Content property value changed.
-        /// </summary>
-        /// <param name="oldValue">The old value of the Content property.</param>
-        /// <param name="newValue">The new value of the Content property.</param>
-        protected virtual void OnContentChanged(object oldValue, object newValue) { }
-
-        /// <summary>
-        /// Handle click event of IncreaseButton and DecreaseButton template parts,
-        /// translating Click to appropriate Spin event.
-        /// </summary>
-        /// <param name="sender">Event sender, should be either IncreaseButton or DecreaseButton template part.</param>
-        /// <param name="e">Event args.</param>
-        private void OnButtonClick(object sender, RoutedEventArgs e)
-        {
-            SpinDirection direction = sender == IncreaseButton ? SpinDirection.Increase : SpinDirection.Decrease;
-            OnSpin(new SpinEventArgs(direction));
         }
 
         /// <summary>
@@ -171,6 +179,36 @@ namespace Microsoft.Windows.Controls
             SetButtonUsage();
         }
 
+        #endregion //Base Class Overrides
+
+        #region Event Handlers
+
+        /// <summary>
+        /// Handle click event of IncreaseButton and DecreaseButton template parts,
+        /// translating Click to appropriate Spin event.
+        /// </summary>
+        /// <param name="sender">Event sender, should be either IncreaseButton or DecreaseButton template part.</param>
+        /// <param name="e">Event args.</param>
+        private void OnButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (AllowSpin)
+            {
+                SpinDirection direction = sender == IncreaseButton ? SpinDirection.Increase : SpinDirection.Decrease;
+                OnSpin(new SpinEventArgs(direction));
+            }
+        }
+
+        #endregion //Event Handlers
+
+        #region Methods
+
+        /// <summary>
+        /// Occurs when the Content property value changed.
+        /// </summary>
+        /// <param name="oldValue">The old value of the Content property.</param>
+        /// <param name="newValue">The new value of the Content property.</param>
+        protected virtual void OnContentChanged(object oldValue, object newValue) { }
+
         /// <summary>
         /// Disables or enables the buttons based on the valid spin direction.
         /// </summary>
@@ -187,5 +225,7 @@ namespace Microsoft.Windows.Controls
                 DecreaseButton.IsEnabled = ((ValidSpinDirection & ValidSpinDirections.Decrease) == ValidSpinDirections.Decrease);
             }
         }
+
+        #endregion //Methods
     }
 }

@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using Microsoft.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows;
 
 namespace Microsoft.Windows.Controls.Primitives
 {
@@ -22,6 +23,28 @@ namespace Microsoft.Windows.Controls.Primitives
         #endregion //Members
 
         #region Properties
+
+        #region AllowSpin
+
+        public static readonly DependencyProperty AllowSpinProperty = DependencyProperty.Register("AllowSpin", typeof(bool), typeof(UpDownBase), new UIPropertyMetadata(true));
+        public bool AllowSpin
+        {
+            get { return (bool)GetValue(AllowSpinProperty); }
+            set { SetValue(AllowSpinProperty, value); }
+        }
+
+        #endregion //AllowSpin
+
+        #region ShowButtonSpinner
+
+        public static readonly DependencyProperty ShowButtonSpinnerProperty = DependencyProperty.Register("ShowButtonSpinner", typeof(bool), typeof(UpDownBase), new UIPropertyMetadata(true));
+        public bool ShowButtonSpinner
+        {
+            get { return (bool)GetValue(ShowButtonSpinnerProperty); }
+            set { SetValue(ShowButtonSpinnerProperty, value); }
+        }
+
+        #endregion //ShowButtonSpinner
 
         protected TextBox TextBox { get; private set; }
 
@@ -60,19 +83,22 @@ namespace Microsoft.Windows.Controls.Primitives
             {
                 case Key.Up:
                     {
-                        DoIncrement();
+                        if (AllowSpin)
+                            DoIncrement();
                         e.Handled = true;
                         break;
                     }
                 case Key.Down:
                     {
-                        DoDecrement();
+                        if (AllowSpin)
+                            DoDecrement();
                         e.Handled = true;
                         break;
                     }
                 case Key.Enter:
                     {
-                        SyncTextAndValueProperties(UpDownBase.TextProperty, TextBox.Text);
+                        if (IsEditable)
+                            SyncTextAndValueProperties(UpDownBase.TextProperty, TextBox.Text);
                         break;
                     }
             }
@@ -82,7 +108,7 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             base.OnMouseWheel(e);
 
-            if (!e.Handled)
+            if (!e.Handled && AllowSpin)
             {
                 if (e.Delta < 0)
                 {
@@ -103,7 +129,8 @@ namespace Microsoft.Windows.Controls.Primitives
 
         private void OnSpinnerSpin(object sender, SpinEventArgs e)
         {
-            OnSpin(e);
+            if (AllowSpin)
+                OnSpin(e);
         }
 
         #endregion //Event Handlers

@@ -7,6 +7,8 @@
     <!-- ButtonSpinner                                                                   -->
     <!-- =============================================================================== -->
 
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
     <SolidColorBrush x:Key="SpinButtonGlyphNormalForegroundFillKey" Color="#FF000000" />
 
     <DataTemplate x:Key="IncreaseGlyph">
@@ -40,7 +42,7 @@
                     <Grid>
                         <Border x:Name="ElementContainer" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
                             <DockPanel Focusable="False">
-                                <Grid DockPanel.Dock="Right">
+                                <Grid DockPanel.Dock="Right" Visibility="{TemplateBinding ShowButtonSpinner, Converter={StaticResource BooleanToVisibilityConverter}}">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="1" />
