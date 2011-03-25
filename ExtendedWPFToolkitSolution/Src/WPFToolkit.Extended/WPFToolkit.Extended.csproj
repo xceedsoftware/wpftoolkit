@@ -144,6 +144,7 @@
     <Compile Include="BusyIndicator\Implementation\BusyIndicator.cs" />
     <Compile Include="ButtonSpinner\Implementation\ButtonSpinner.cs" />
     <Compile Include="Calculator\Implementation\Calculator.cs" />
+    <Compile Include="Calculator\Implementation\CalculatorCommands.cs" />
     <Compile Include="ChildWindow\Implementation\ChildWindow.cs" />
     <Compile Include="ChildWindow\Implementation\WindowStartupLocation.cs" />
     <Compile Include="ChildWindow\Implementation\WindowState.cs" />
@@ -157,6 +158,7 @@
     <Compile Include="Core\Primitives\HsvColor.cs" />
     <Compile Include="ColorPicker\Implementation\ColorItem.cs" />
     <Compile Include="ColorPicker\Implementation\ColorPicker.cs" />
+    <Compile Include="Core\Utilities\CalculatorUtilities.cs" />
     <Compile Include="Core\Utilities\ColorUtilities.cs" />
     <Compile Include="ColorCanvas\Implementation\ColorSpectrumSlider.cs" />
     <Compile Include="Core\Converters\ColorToSolidColorBrushConverter.cs" />

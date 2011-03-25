@@ -4,23 +4,56 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Microsoft.Windows.Controls.Core.Utilities;
 
 namespace Microsoft.Windows.Controls
 {
-    public static class CalculatorCommands
-    {
-        private static RoutedCommand _calculatorButtonClickCommand = new RoutedCommand();
-        public static RoutedCommand CalculatorButtonClick
-        {
-            get { return _calculatorButtonClickCommand; }
-        }
-    }
-
     public class Calculator : Control
     {
+        #region Members
+
         private ContentControl _buttonPanel;
         private readonly DispatcherTimer _timer;
         private Button _calculatorButton;
+
+        #endregion //Members
+
+        #region Enumerations
+
+        public enum CalculatorButtonType
+        {
+            Add,
+            Back,
+            Cancel,
+            Clear,
+            Decimal,
+            Divide,
+            Eight,
+            Equal,
+            Five,
+            Four,
+            Fract,
+            MAdd,
+            MC,
+            MR,
+            MS,
+            MSub,
+            Multiply,
+            Nine,
+            None,
+            One,
+            Percent,
+            Seven,
+            Sign,
+            Six,
+            Sqrt,
+            Subtract,
+            Three,
+            Two,
+            Zero
+        }
+
+        #endregion //Enumerations
 
         #region Properties
 
@@ -45,12 +78,33 @@ namespace Microsoft.Windows.Controls
         {
             Button button = o as Button;
             button.CommandParameter = newValue;
-            button.Content = GetCalculatorButtonContent(newValue);
+            button.Content = CalculatorUtilities.GetCalculatorButtonContent(newValue);
         }
 
         #endregion //CalculatorButtonType
 
+        #region DisplayText
 
+        public static readonly DependencyProperty DisplayTextProperty = DependencyProperty.Register("DisplayText", typeof(string), typeof(Calculator), new UIPropertyMetadata("0", OnDisplayTextChanged));
+        public string DisplayText
+        {
+            get { return (string)GetValue(DisplayTextProperty); }
+            set { SetValue(DisplayTextProperty, value); }
+        }
+
+        private static void OnDisplayTextChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            Calculator calculator = o as Calculator;
+            if (calculator != null)
+                calculator.OnDisplayTextChanged((string)e.OldValue, (string)e.NewValue);
+        }
+
+        protected virtual void OnDisplayTextChanged(string oldValue, string newValue)
+        {
+            // TODO: Add your property changed side-effects. Descendants can override as well.
+        }
+
+        #endregion //DisplayText
 
         #region Value
 
@@ -107,52 +161,12 @@ namespace Microsoft.Windows.Controls
 
         protected override void OnTextInput(TextCompositionEventArgs e)
         {
-            var buttonType = GetCalculatorButtonTypeFromText(e.Text);
-
-            AnimateCalculatorButtonClick(buttonType);
-        }
-
-        private void AnimateCalculatorButtonClick(CalculatorButtonType buttonType)
-        {
-            _calculatorButton = FindButtonByCalculatorButtonType(_buttonPanel, buttonType);
-            if (_calculatorButton != null)
+            var buttonType = CalculatorUtilities.GetCalculatorButtonTypeFromText(e.Text);
+            if (buttonType != CalculatorButtonType.None)
             {
-                VisualStateManager.GoToState(_calculatorButton, "Pressed", true);
-                _timer.Start();
+                AnimateCalculatorButtonClick(buttonType);
+                ProcessCalculatorButton(buttonType);
             }
-        }
-
-        private CalculatorButtonType GetCalculatorButtonTypeFromText(string text)
-        {
-            switch (text)
-            {
-                case "0": return CalculatorButtonType.Zero;
-                case "1": return CalculatorButtonType.One;
-                case "2": return CalculatorButtonType.Two;
-                case "3": return CalculatorButtonType.Three;
-                case "4": return CalculatorButtonType.Four;
-                case "5": return CalculatorButtonType.Five;
-                case "6": return CalculatorButtonType.Six;
-                case "7": return CalculatorButtonType.Seven;
-                case "8": return CalculatorButtonType.Eight;
-                case "9": return CalculatorButtonType.Nine;
-                case "%": return CalculatorButtonType.Percent;
-                case "+": return CalculatorButtonType.Add;
-                case "-": return CalculatorButtonType.Subtract;
-                case "*": return CalculatorButtonType.Mul;
-                case "/":
-                case ":": return CalculatorButtonType.Div;
-                case " ":
-                case "\r":
-                case "=": return CalculatorButtonType.Equal;
-                case "\b": return CalculatorButtonType.Back;
-            }
-
-            //check for the escape key
-            if (text == ((char)27).ToString())
-                return CalculatorButtonType.Clear;
-
-            return CalculatorButtonType.None;
         }
 
         #endregion //Base Class Overrides
@@ -174,122 +188,58 @@ namespace Microsoft.Windows.Controls
 
         #region Methods
 
-        public static Button FindButtonByCalculatorButtonType(DependencyObject parent, CalculatorButtonType type)
+        private void AnimateCalculatorButtonClick(CalculatorButtonType buttonType)
         {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
-            {
-                var child = VisualTreeHelper.GetChild(parent, i);
+            _calculatorButton = CalculatorUtilities.FindButtonByCalculatorButtonType(_buttonPanel, buttonType);
+            VisualStateManager.GoToState(_calculatorButton, "Pressed", true);
+            _timer.Start();
+        }        
 
-                object buttonType = child.GetValue(Button.CommandParameterProperty);
-
-                if (buttonType != null && (CalculatorButtonType)buttonType == type)
-                {
-                    return child as Button;
-                }
-                else
-                {
-                    var result = FindButtonByCalculatorButtonType(child, type);
-
-                    if (result != null)
-                        return result;
-                }
-            }
-            return null;
+        private void ProcessCalculatorButton(CalculatorButtonType buttonType)
+        {
+            if (CalculatorUtilities.IsDigit(buttonType))
+                ProcessDigit(buttonType);
+            else if (CalculatorUtilities.IsOperation(buttonType))
+                ProcessOperation(buttonType);
+            else
+                ProcessMisc(buttonType);
         }
 
-        private static string GetCalculatorButtonContent(CalculatorButtonType type)
+        private void ProcessDigit(CalculatorButtonType butonType)
         {
-            string content = string.Empty;
-            switch (type)
+
+        }
+
+        private void ProcessOperation(CalculatorButtonType buttonType)
+        {
+            switch (buttonType)
             {
                 case CalculatorButtonType.Add:
-                    content = "+";
-                    break;
-                case CalculatorButtonType.Back:
-                    content = "Back";
-                    break;
-                case CalculatorButtonType.Cancel:
-                    content = "CE";
-                    break;
-                case CalculatorButtonType.Clear:
-                    content = "C";
-                    break;
-                case CalculatorButtonType.Decimal:
-                    content = ".";
-                    break;
-                case CalculatorButtonType.Div:
-                    content = "/";
-                    break;
-                case CalculatorButtonType.Eight:
-                    content = "8";
-                    break;
-                case CalculatorButtonType.Equal:
-                    content = "=";
-                    break;
-                case CalculatorButtonType.Five:
-                    content = "5";
-                    break;
-                case CalculatorButtonType.Four:
-                    content = "4";
-                    break;
-                case CalculatorButtonType.Fract:
-                    content = "1/x";
-                    break;
-                case CalculatorButtonType.MAdd:
-                    content = "M+";
-                    break;
-                case CalculatorButtonType.MC:
-                    content = "MC";
-                    break;
-                case CalculatorButtonType.MR:
-                    content = "MR";
-                    break;
-                case CalculatorButtonType.MS:
-                    content = "MS";
-                    break;
-                case CalculatorButtonType.MSub:
-                    content = "M-";
-                    break;
-                case CalculatorButtonType.Mul:
-                    content = "*";
-                    break;
-                case CalculatorButtonType.Nine:
-                    content = "9";
-                    break;
-                case CalculatorButtonType.None:
-                    break;
-                case CalculatorButtonType.One:
-                    content = "1";
-                    break;
-                case CalculatorButtonType.Percent:
-                    content = "%";
-                    break;
-                case CalculatorButtonType.Seven:
-                    content = "7";
-                    break;
-                case CalculatorButtonType.Sign:
-                    content = "+/-";
-                    break;
-                case CalculatorButtonType.Six:
-                    content = "6";
-                    break;
-                case CalculatorButtonType.Sqrt:
-                    content = "Sqrt";
+                    
                     break;
                 case CalculatorButtonType.Subtract:
-                    content = "-";
+
                     break;
-                case CalculatorButtonType.Three:
-                    content = "3";
+                case CalculatorButtonType.Multiply:
+
                     break;
-                case CalculatorButtonType.Two:
-                    content = "2";
+                case CalculatorButtonType.Divide:
+
                     break;
-                case CalculatorButtonType.Zero:
-                    content = "0";
+                case CalculatorButtonType.Percent:
+
                     break;
             }
-            return content;
+        }
+
+        private void ProcessMisc(CalculatorButtonType buttonType)
+        {
+
+        }
+
+        private void CalculateValue()
+        {
+
         }
 
         #endregion //Methods
@@ -298,43 +248,10 @@ namespace Microsoft.Windows.Controls
 
         private void ExecuteCalculatorButtonClick(object sender, ExecutedRoutedEventArgs e)
         {
-
+            var buttonType = (CalculatorButtonType)e.Parameter;
+            ProcessCalculatorButton(buttonType);
         }
 
         #endregion //Commands
-
-
-        public enum CalculatorButtonType
-        {
-            Add,
-            Back,
-            Cancel,
-            Clear,
-            Decimal,
-            Div,
-            Eight,
-            Equal,
-            Five,
-            Four,
-            Fract,
-            MAdd,
-            MC,
-            MR,
-            MS,
-            MSub,
-            Mul,
-            Nine,
-            None,
-            One,
-            Percent,
-            Seven,
-            Sign,
-            Six,
-            Sqrt,
-            Subtract,
-            Three,
-            Two,
-            Zero
-        }
     }
 }
