@@ -97,7 +97,7 @@ namespace Microsoft.Windows.Controls.Core.Utilities
                 case Calculator.CalculatorButtonType.Four:
                     content = "4";
                     break;
-                case Calculator.CalculatorButtonType.Fract:
+                case Calculator.CalculatorButtonType.Fraction:
                     content = "1/x";
                     break;
                 case Calculator.CalculatorButtonType.MAdd:
@@ -132,7 +132,7 @@ namespace Microsoft.Windows.Controls.Core.Utilities
                 case Calculator.CalculatorButtonType.Seven:
                     content = "7";
                     break;
-                case Calculator.CalculatorButtonType.Sign:
+                case Calculator.CalculatorButtonType.Negate:
                     content = "+/-";
                     break;
                 case Calculator.CalculatorButtonType.Six:
@@ -187,11 +187,15 @@ namespace Microsoft.Windows.Controls.Core.Utilities
                 case Calculator.CalculatorButtonType.Multiply:
                 case Calculator.CalculatorButtonType.Divide:
                 case Calculator.CalculatorButtonType.Percent:
+                case Calculator.CalculatorButtonType.Sqrt:
+                case Calculator.CalculatorButtonType.Fraction:
                     return true;
                 default:
                     return false;
             }
         }
+
+        //TODO: add error handling
 
         public static decimal Add(decimal firstNumber, decimal secondNumber)
         {
@@ -211,6 +215,26 @@ namespace Microsoft.Windows.Controls.Core.Utilities
         public static decimal Divide(decimal firstNumber, decimal secondNumber)
         {
             return firstNumber / secondNumber;
+        }
+
+        public static decimal Percent(decimal firstNumber, decimal secondNumber)
+        {
+            return firstNumber * secondNumber / 100M;
+        }
+
+        public static decimal SquareRoot(decimal operand)
+        {
+            return Convert.ToDecimal(Math.Sqrt(Convert.ToDouble(operand)));
+        }
+
+        public static decimal Fraction(decimal operand)
+        {
+            return 1 / operand;
+        }
+
+        public static decimal Negate(decimal operand)
+        {
+            return operand * -1M;
         }
     }
 }

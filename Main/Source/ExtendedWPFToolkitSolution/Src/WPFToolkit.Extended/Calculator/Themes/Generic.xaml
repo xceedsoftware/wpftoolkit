@@ -339,7 +339,7 @@
                                     Style="{StaticResource CalculatorOperatorButtonStyle}"/>
 
             <Button Grid.Column="6" Grid.Row="2" MinWidth="28" MinHeight="26"
-                                    local:Calculator.CalculatorButtonType="Sign"
+                                    local:Calculator.CalculatorButtonType="Negate"
                                     Command="local:CalculatorCommands.CalculatorButtonClick"
                                     Style="{StaticResource CalculatorOperatorButtonStyle}"/>
 
@@ -394,7 +394,7 @@
                                     Style="{StaticResource CalculatorOperatorButtonStyle}"/>
 
             <Button Grid.Column="8" Grid.Row="6" MinWidth="28" MinHeight="26"
-                                    local:Calculator.CalculatorButtonType="Fract"
+                                    local:Calculator.CalculatorButtonType="Fraction"
                                     Command="local:CalculatorCommands.CalculatorButtonClick"
                                     Style="{StaticResource CalculatorOperatorButtonStyle}"/>
 
@@ -455,6 +455,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:Calculator}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
@@ -473,6 +477,7 @@
                             <ContentControl x:Name="PART_CalculatorButtonPanel" Grid.Row="1" Template="{StaticResource CalculatorButtonPanel}" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
                         </Grid>
                     </Border>
+                    </Grid>
                     <!--<ControlTemplate.Triggers>
                         <Trigger Property="IsFocused" Value="True">
                             <Setter TargetName="PART_Display" Property="Background" Value="#E7F5FF" />
