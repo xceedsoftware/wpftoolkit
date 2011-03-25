@@ -29,6 +29,7 @@ namespace Microsoft.Windows.Controls.Core.Utilities
                 case "\b": return Calculator.CalculatorButtonType.Back;
                 case "\r":
                 case "=": return Calculator.CalculatorButtonType.Equal;
+                case ".": return Calculator.CalculatorButtonType.Decimal;
             }
 
             //check for the escape key
@@ -170,6 +171,7 @@ namespace Microsoft.Windows.Controls.Core.Utilities
                 case Calculator.CalculatorButtonType.Seven:
                 case Calculator.CalculatorButtonType.Eight:
                 case Calculator.CalculatorButtonType.Nine:
+                case Calculator.CalculatorButtonType.Decimal:
                     return true;
                 default:
                     return false;
@@ -189,6 +191,26 @@ namespace Microsoft.Windows.Controls.Core.Utilities
                 default:
                     return false;
             }
+        }
+
+        public static decimal Add(decimal firstNumber, decimal secondNumber)
+        {
+            return firstNumber + secondNumber;
+        }
+
+        public static decimal Subtract(decimal firstNumber, decimal secondNumber)
+        {
+            return firstNumber - secondNumber;
+        }
+
+        public static decimal Multiply(decimal firstNumber, decimal secondNumber)
+        {
+            return firstNumber * secondNumber;
+        }
+
+        public static decimal Divide(decimal firstNumber, decimal secondNumber)
+        {
+            return firstNumber / secondNumber;
         }
     }
 }
