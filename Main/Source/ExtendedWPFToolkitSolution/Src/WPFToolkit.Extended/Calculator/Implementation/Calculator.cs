@@ -18,6 +18,7 @@ namespace Microsoft.Windows.Controls
         private bool _showNewNumber = true;
         private decimal _previousValue;
         private Operation _lastOperation = Operation.None;
+        private CalculatorButtonType _lastButtonPressed;
 
         #endregion //Members
 
@@ -123,6 +124,29 @@ namespace Microsoft.Windows.Controls
 
         #endregion //DisplayText
 
+        #region Memory
+
+        public static readonly DependencyProperty MemoryProperty = DependencyProperty.Register("Memory", typeof(decimal), typeof(Calculator), new UIPropertyMetadata(default(decimal), OnMemoryChanged));
+        public decimal Memory
+        {
+            get { return (decimal)GetValue(MemoryProperty); }
+            set { SetValue(MemoryProperty, value); }
+        }
+
+        private static void OnMemoryChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            Calculator calculator = o as Calculator;
+            if (calculator != null)
+                calculator.OnMemoryChanged((decimal)e.OldValue, (decimal)e.NewValue);
+        }
+
+        protected virtual void OnMemoryChanged(decimal oldValue, decimal newValue)
+        {
+            // TODO: Add your property changed side-effects. Descendants can override as well.
+        }
+
+        #endregion //Memory
+
         #region Value
 
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(decimal), typeof(Calculator), new UIPropertyMetadata(default(decimal), OnValueChanged));
@@ -205,72 +229,6 @@ namespace Microsoft.Windows.Controls
 
         #region Methods
 
-        private void ProcessCalculatorButton(CalculatorButtonType buttonType)
-        {
-            if (CalculatorUtilities.IsDigit(buttonType))
-                ProcessDigit(buttonType);
-            else
-                ProcessOperation(buttonType);
-        }
-
-        private void ProcessDigit(CalculatorButtonType buttonType)
-        {
-            if (_showNewNumber)
-                DisplayText = CalculatorUtilities.GetCalculatorButtonContent(buttonType);
-            else
-                DisplayText += CalculatorUtilities.GetCalculatorButtonContent(buttonType);
-
-            _showNewNumber = false;
-        }
-
-        private void ProcessOperation(CalculatorButtonType buttonType)
-        {
-            switch (buttonType)
-            {
-                case CalculatorButtonType.Add:
-                    Calculate(Operation.Add);
-                    break;
-                case CalculatorButtonType.Subtract:
-                    Calculate(Operation.Subtract);
-                    break;
-                case CalculatorButtonType.Multiply:
-                    Calculate(Operation.Multiply);
-                    break;
-                case CalculatorButtonType.Divide:
-                    Calculate(Operation.Divide);
-                    break;
-                case CalculatorButtonType.Percent:
-                    Calculate(Operation.Percent);
-                    break;
-                case CalculatorButtonType.Sqrt:
-                    Calculate(Operation.Sqrt, Operation.None);
-                    break;
-                case CalculatorButtonType.Fraction:
-                    Calculate(Operation.Fraction, Operation.None);
-                    break;
-                case CalculatorButtonType.Negate:
-                    Calculate(Operation.Negate, Operation.None);
-                    break;
-                case CalculatorButtonType.Equal:
-                    Calculate(Operation.None);
-                    break;
-                case CalculatorButtonType.Clear:                    
-                    Calculate(Operation.Clear, Operation.None);
-                    DisplayText = Value.ToString();
-                    break;
-                case CalculatorButtonType.Cancel:
-                    DisplayText = _previousValue.ToString();
-                    _lastOperation = Operation.None;
-                    _showNewNumber = true;
-                    return;
-                default:
-                    break;
-            }
-
-            _previousValue = Decimal.Parse(DisplayText);
-            _showNewNumber = true;
-        }
-
         private void Calculate()
         {
             if (_lastOperation == Operation.None)
@@ -331,6 +289,121 @@ namespace Microsoft.Windows.Controls
             }
 
             return newValue;
+        }
+
+        void ProcessBackKey()
+        {
+            string displayText;
+            if (DisplayText.Length > 1 && !(DisplayText.Length == 2 && DisplayText[0] == '-'))
+            {
+                displayText = DisplayText.Remove(DisplayText.Length - 1, 1);
+            }
+            else
+            {
+                displayText = "0";
+                _showNewNumber = true;
+            }
+
+            DisplayText = displayText;
+        }
+
+        private void ProcessCalculatorButton(CalculatorButtonType buttonType)
+        {
+            if (CalculatorUtilities.IsDigit(buttonType))
+                ProcessDigitKey(buttonType);
+            else if ((CalculatorUtilities.IsMemory(buttonType)))
+                ProcessMemoryKey(buttonType);
+            else
+                ProcessOperationKey(buttonType);
+
+            _lastButtonPressed = buttonType;
+        }
+
+        private void ProcessDigitKey(CalculatorButtonType buttonType)
+        {
+            if (_showNewNumber)
+                DisplayText = CalculatorUtilities.GetCalculatorButtonContent(buttonType);
+            else
+                DisplayText += CalculatorUtilities.GetCalculatorButtonContent(buttonType);
+
+            _showNewNumber = false;
+        }
+
+        private void ProcessMemoryKey(Calculator.CalculatorButtonType buttonType)
+        {
+            switch (buttonType)
+            {
+                case Calculator.CalculatorButtonType.MAdd:
+                    Memory += Decimal.Parse(DisplayText);
+                    break;
+                case Calculator.CalculatorButtonType.MC:
+                    Memory = decimal.Zero;
+                    break;
+                case Calculator.CalculatorButtonType.MR:
+                    DisplayText = Memory.ToString();
+                    break;
+                case Calculator.CalculatorButtonType.MS:
+                    Memory = Decimal.Parse(DisplayText);
+                    break;
+                case Calculator.CalculatorButtonType.MSub:
+                    Memory -= Decimal.Parse(DisplayText);
+                    break;
+                default:
+                    break;
+            }
+
+            _showNewNumber = true;
+        }
+
+        private void ProcessOperationKey(CalculatorButtonType buttonType)
+        {
+            switch (buttonType)
+            {
+                case CalculatorButtonType.Add:
+                    Calculate(Operation.Add);
+                    break;
+                case CalculatorButtonType.Subtract:
+                    Calculate(Operation.Subtract);
+                    break;
+                case CalculatorButtonType.Multiply:
+                    Calculate(Operation.Multiply);
+                    break;
+                case CalculatorButtonType.Divide:
+                    Calculate(Operation.Divide);
+                    break;
+                case CalculatorButtonType.Percent:
+                    Calculate(Operation.Percent);
+                    break;
+                case CalculatorButtonType.Sqrt:
+                    Calculate(Operation.Sqrt, Operation.None);
+                    break;
+                case CalculatorButtonType.Fraction:
+                    Calculate(Operation.Fraction, Operation.None);
+                    break;
+                case CalculatorButtonType.Negate:
+                    Calculate(Operation.Negate, Operation.None);
+                    break;
+                case CalculatorButtonType.Equal:
+                    Calculate(Operation.None);
+                    break;
+                case CalculatorButtonType.Clear:
+                    Calculate(Operation.Clear, Operation.None);
+                    DisplayText = Value.ToString();
+                    break;
+                case CalculatorButtonType.Cancel:
+                    DisplayText = _previousValue.ToString();
+                    _lastOperation = Operation.None;
+                    _showNewNumber = true;
+                    return;
+                case CalculatorButtonType.Back:
+                    ProcessBackKey();
+                    return;
+                default:
+                    break;
+            }
+
+            _previousValue = Decimal.Parse(DisplayText);
+            _showNewNumber = true;
         }
 
         private void SimulateCalculatorButtonClick(CalculatorButtonType buttonType)

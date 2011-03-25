@@ -178,17 +178,15 @@ namespace Microsoft.Windows.Controls.Core.Utilities
             }
         }
 
-        public static bool IsOperation(Calculator.CalculatorButtonType buttonType)
+        public static bool IsMemory(Calculator.CalculatorButtonType buttonType)
         {
             switch (buttonType)
             {
-                case Calculator.CalculatorButtonType.Add:
-                case Calculator.CalculatorButtonType.Subtract:
-                case Calculator.CalculatorButtonType.Multiply:
-                case Calculator.CalculatorButtonType.Divide:
-                case Calculator.CalculatorButtonType.Percent:
-                case Calculator.CalculatorButtonType.Sqrt:
-                case Calculator.CalculatorButtonType.Fraction:
+                case Calculator.CalculatorButtonType.MAdd:
+                case Calculator.CalculatorButtonType.MC:
+                case Calculator.CalculatorButtonType.MR:
+                case Calculator.CalculatorButtonType.MS:
+                case Calculator.CalculatorButtonType.MSub:
                     return true;
                 default:
                     return false;
