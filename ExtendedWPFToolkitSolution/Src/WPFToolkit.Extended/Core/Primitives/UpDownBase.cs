@@ -95,12 +95,12 @@ namespace Microsoft.Windows.Controls.Primitives
                         e.Handled = true;
                         break;
                     }
-                case Key.Enter:
-                    {
-                        if (IsEditable)
-                            SyncTextAndValueProperties(UpDownBase.TextProperty, TextBox.Text);
-                        break;
-                    }
+                //case Key.Enter:
+                //    {
+                //        if (IsEditable)
+                //            SyncTextAndValueProperties(UpDownBase.TextProperty, TextBox.Text);
+                //        break;
+                //    }
             }
         }
 
