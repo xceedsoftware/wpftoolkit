@@ -8,6 +8,15 @@ namespace Microsoft.Windows.Controls
 {
     public class NumericUpDown : UpDownBase
     {
+        #region Members
+
+        /// <summary>
+        /// Flags if the Text and Value properties are in the process of being sync'd
+        /// </summary>
+        private bool _isSyncingTextAndValueProperties;
+
+        #endregion //Members
+
         #region Properties
 
         #region Minimum
@@ -88,59 +97,29 @@ namespace Microsoft.Windows.Controls
 
         #endregion //SelectAllOnGotFocus
 
-        #endregion
+        #region Value
 
-        #region Constructors
-
-        static NumericUpDown()
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(decimal?), typeof(NumericUpDown), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue));
+        public decimal? Value
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(NumericUpDown), new FrameworkPropertyMetadata(typeof(NumericUpDown)));
-            ValueTypeProperty.OverrideMetadata(typeof(NumericUpDown), new FrameworkPropertyMetadata(typeof(decimal)));
-            ValueProperty.OverrideMetadata(typeof(NumericUpDown), new FrameworkPropertyMetadata(default(decimal)));
+            get { return (decimal?)GetValue(ValueProperty); }
+            set { SetValue(ValueProperty, value); }
         }
 
-        #endregion //Constructors
-
-        #region Base Class Overrides
-
-        public override void OnApplyTemplate()
+        private static object OnCoerceValue(DependencyObject o, object value)
         {
-            base.OnApplyTemplate();
-            SetValidSpinDirection();
-
-            if (SelectAllOnGotFocus)
-            {
-                //in order to select all the text we must handle both the keybord (tabbing) and mouse (clicking) events
-                TextBox.GotKeyboardFocus += OnTextBoxGotKeyBoardFocus;
-                TextBox.PreviewMouseLeftButtonDown += OnTextBoxPreviewMouseLeftButtonDown;
-            }
+            NumericUpDown numericUpDown = o as NumericUpDown;
+            if (numericUpDown != null)
+                return numericUpDown.OnCoerceValue((decimal?)value);
+            else
+                return value;
         }
 
-        protected override void OnAccessKey(AccessKeyEventArgs e)
-        {
-            if (TextBox != null)
-                TextBox.Focus();
-
-            base.OnAccessKey(e);
-        }
-
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            if (TextBox != null)
-                TextBox.Focus();
-        }
-
-        protected override void OnValueChanged(object oldValue, object newValue)
-        {
-            SetValidSpinDirection();
-            base.OnValueChanged(oldValue, newValue);
-        }
-
-        protected override object OnCoerceValue(object value)
+        protected virtual decimal? OnCoerceValue(decimal? value)
         {
             if (value == null) return value;
 
-            decimal val = Convert.ToDecimal(value);
+            decimal val = value.Value;
 
             if (val < Minimum)
             {
@@ -156,53 +135,92 @@ namespace Microsoft.Windows.Controls
             }
         }
 
-        protected override object ConvertTextToValue(string text)
+        private static void OnValueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-            object result = null;
-
-            NumberFormatInfo info = NumberFormatInfo.GetInstance(CultureInfo.CurrentCulture);
-
-            try
-            {
-                result = FormatString.Contains("P") ? ParsePercent(text, ValueType, info) : ParseDataValue(text, ValueType, info);
-            }
-            catch
-            {
-                TextBox.Text = Text = ConvertValueToText(Value);
-                return Value;
-            }
-
-            return result;
+            NumericUpDown numericUpDown = o as NumericUpDown;
+            if (numericUpDown != null)
+                numericUpDown.OnValueChanged((decimal?)e.OldValue, (decimal?)e.NewValue);
         }
 
-        protected override string ConvertValueToText(object value)
+        protected virtual void OnValueChanged(decimal? oldValue, decimal? newValue)
         {
-            //TODO: create GetTextFromValue methods for each data type;
-            if (value is double)
+            SetValidSpinDirection();
+
+            SyncTextAndValueProperties(NumericUpDown.ValueProperty, newValue);
+
+            RoutedPropertyChangedEventArgs<decimal?> args = new RoutedPropertyChangedEventArgs<decimal?>(oldValue, newValue);
+            args.RoutedEvent = NumericUpDown.ValueChangedEvent;
+            RaiseEvent(args);
+        }
+
+        #endregion //Value
+
+        #endregion
+
+        #region Constructors
+
+        static NumericUpDown()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(NumericUpDown), new FrameworkPropertyMetadata(typeof(NumericUpDown)));
+        }
+
+        #endregion //Constructors
+
+        #region Base Class Overrides
+
+        protected override void OnAccessKey(AccessKeyEventArgs e)
+        {
+            if (TextBox != null)
+                TextBox.Focus();
+
+            base.OnAccessKey(e);
+        }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            SetValidSpinDirection();
+
+            if (SelectAllOnGotFocus)
             {
-                double d = (double)value;
-
-                if (Double.IsNaN(d))
-                    return "NaN";
-                else if (Double.IsPositiveInfinity(d) || Double.MaxValue == d)
-                    return "Infinity";
-                else if (Double.IsNegativeInfinity(d) || Double.MinValue == d)
-                    return "Negative-Infinity";
+                //in order to select all the text we must handle both the keybord (tabbing) and mouse (clicking) events
+                TextBox.GotKeyboardFocus += OnTextBoxGotKeyBoardFocus;
+                TextBox.PreviewMouseLeftButtonDown += OnTextBoxPreviewMouseLeftButtonDown;
             }
+        }
 
-            return (Convert.ToDecimal(Value)).ToString(FormatString, CultureInfo.CurrentCulture);
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            if (TextBox != null)
+                TextBox.Focus();
         }
 
         protected override void OnIncrement()
         {
-            decimal newValue = (Convert.ToDecimal(Value) + Increment);
-            Value = ValueType != typeof(Decimal) ? Convert.ChangeType(newValue, ValueType) : newValue;
+            if (Value.HasValue)
+                Value += Increment;
         }
 
         protected override void OnDecrement()
         {
-            decimal newValue = (Convert.ToDecimal(Value) - Increment);
-            Value = ValueType != typeof(Decimal) ? Convert.ChangeType(newValue, ValueType) : newValue;
+            if (Value.HasValue)
+                Value -= Increment;
+        }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            base.OnPreviewKeyDown(e);
+
+            if (e.Key == Key.Enter)
+            {
+                if (IsEditable)
+                    SyncTextAndValueProperties(InputBase.TextProperty, TextBox.Text);
+            }
+        }
+
+        protected override void OnTextChanged(string previousValue, string currentValue)
+        {
+            SyncTextAndValueProperties(InputBase.TextProperty, currentValue);
         }
 
         #endregion //Base Class Overrides
@@ -225,7 +243,83 @@ namespace Microsoft.Windows.Controls
 
         #endregion //Event Handlers
 
+        #region Events
+
+        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<decimal?>), typeof(NumericUpDown));
+        public event RoutedPropertyChangedEventHandler<decimal?> ValueChanged
+        {
+            add { AddHandler(ValueChangedEvent, value); }
+            remove { RemoveHandler(ValueChangedEvent, value); }
+        }
+
+        #endregion //Events
+
         #region Methods
+
+        private decimal? ConvertTextToValue(string text)
+        {
+            decimal? result = null;
+
+            if (String.IsNullOrEmpty(text))
+                return result;
+
+            NumberFormatInfo info = NumberFormatInfo.GetInstance(CultureInfo.CurrentCulture);
+
+            try
+            {
+                result = FormatString.Contains("P") ? ParsePercent(text, info) : ParseDecimal(text, info);
+            }
+            catch
+            {
+                Text = ConvertValueToText(Value);
+                return Value;
+            }
+
+            return result;
+        }
+
+        private string ConvertValueToText(object value)
+        {
+            if (!Value.HasValue)
+                return String.Empty;
+
+            return Value.Value.ToString(FormatString, CultureInfo.CurrentCulture);
+        }
+
+        private void SyncTextAndValueProperties(DependencyProperty p, object newValue)
+        {
+            //prevents recursive syncing properties
+            if (_isSyncingTextAndValueProperties)
+                return;
+
+            _isSyncingTextAndValueProperties = true;
+
+            //this only occures when the user typed in the value
+            if (InputBase.TextProperty == p)
+            {
+                string text = newValue == null ? String.Empty : newValue.ToString();
+                SetValue(NumericUpDown.ValueProperty, ConvertTextToValue(text));
+            }
+
+            SetValue(InputBase.TextProperty, ConvertValueToText(newValue));
+
+            _isSyncingTextAndValueProperties = false;
+        }
+
+        private static decimal ParseDecimal(string text, NumberFormatInfo info)
+        {
+            return decimal.Parse(text, NumberStyles.Any, info);
+        }
+
+        private static decimal ParsePercent(string text, NumberFormatInfo info)
+        {
+            text = text.Replace(info.PercentSymbol, null);
+
+            decimal result = decimal.Parse(text, NumberStyles.Any, info);
+            result = result / 100;
+
+            return result;
+        }
 
         /// <summary>
         /// Sets the valid spin direction based on current value, minimum and maximum.
@@ -249,75 +343,6 @@ namespace Microsoft.Windows.Controls
                 Spinner.ValidSpinDirection = validDirections;
             }
         }
-
-        #region Parsing
-
-        private static object ParseDataValue(string text, Type dataType, NumberFormatInfo info)
-        {
-            try
-            {
-                if (typeof(decimal) == dataType)
-                {
-                    return ParseDecimal(text, info);
-                }
-                else if (typeof(double) == dataType)
-                {
-                    return ParseDouble(text, info);
-                }
-                else if (typeof(float) == dataType)
-                {
-                    return ParseFloat(text, info);
-                }
-                else if (typeof(byte) == dataType || typeof(sbyte) == dataType ||
-                         typeof(short) == dataType || typeof(ushort) == dataType || typeof(Int16) == dataType ||
-                         typeof(int) == dataType || typeof(uint) == dataType || typeof(Int32) == dataType ||
-                         typeof(long) == dataType || typeof(ulong) == dataType || typeof(Int64) == dataType)
-                {
-                    return ParseWholeNumber(text, dataType, info);
-                }
-                else
-                {
-                    throw new ArgumentException("Type not supported");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
-
-        private static double ParseDouble(string text, NumberFormatInfo info)
-        {
-            return double.Parse(text, NumberStyles.Any, info);
-        }
-
-        private static float ParseFloat(string text, NumberFormatInfo info)
-        {
-            return float.Parse(text, NumberStyles.Any, info);
-        }
-
-        private static decimal ParseDecimal(string text, NumberFormatInfo info)
-        {
-            return decimal.Parse(text, NumberStyles.Any, info);
-        }
-
-        private static object ParseWholeNumber(string text, Type dataType, NumberFormatInfo info)
-        {
-            decimal result = decimal.Parse(text, NumberStyles.Any, info);
-            return Convert.ChangeType(result, dataType, info);
-        }
-
-        private static object ParsePercent(string text, Type dataType, NumberFormatInfo info)
-        {
-            text = text.Replace(info.PercentSymbol, null);
-
-            decimal result = decimal.Parse(text, NumberStyles.Any, info);
-            result = result / 100;
-
-            return Convert.ChangeType(result, dataType, info);
-        }
-
-        #endregion
 
         #endregion //Methods
     }

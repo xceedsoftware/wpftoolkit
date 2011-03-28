@@ -9,6 +9,16 @@ namespace Microsoft.Windows.Controls
 {
     public class MaskedTextBox : InputBase
     {
+        #region Members
+
+        /// <summary>
+        /// Flags if the Text and Value properties are in the process of being sync'd
+        /// </summary>
+        private bool _isSyncingTextAndValueProperties;
+        private bool _isInitialized;
+
+        #endregion //Members
+
         #region Properties
 
         protected MaskedTextProvider MaskProvider { get; set; }
@@ -84,6 +94,58 @@ namespace Microsoft.Windows.Controls
 
         #endregion //Mask
 
+        #region Value
+
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(object), typeof(MaskedTextBox), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged));
+        public object Value
+        {
+            get { return (object)GetValue(ValueProperty); }
+            set { SetValue(ValueProperty, value); }
+        }
+
+        private static void OnValueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            MaskedTextBox maskedTextBox = o as MaskedTextBox;
+            if (maskedTextBox != null)
+                maskedTextBox.OnValueChanged((object)e.OldValue, (object)e.NewValue);
+        }
+
+        protected virtual void OnValueChanged(object oldValue, object newValue)
+        {
+            if (_isInitialized)
+                SyncTextAndValueProperties(DateTimeUpDown.ValueProperty, newValue);
+
+            RoutedPropertyChangedEventArgs<object> args = new RoutedPropertyChangedEventArgs<object>(oldValue, newValue);
+            args.RoutedEvent = MaskedTextBox.ValueChangedEvent;
+            RaiseEvent(args);
+        }
+
+        #endregion //Value
+
+        #region ValueType
+
+        public static readonly DependencyProperty ValueTypeProperty = DependencyProperty.Register("ValueType", typeof(Type), typeof(MaskedTextBox), new UIPropertyMetadata(typeof(String), OnValueTypeChanged));
+        public Type ValueType
+        {
+            get { return (Type)GetValue(ValueTypeProperty); }
+            set { SetValue(ValueTypeProperty, value); }
+        }
+
+        private static void OnValueTypeChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            MaskedTextBox maskedTextBox = o as MaskedTextBox;
+            if (maskedTextBox != null)
+                maskedTextBox.OnValueTypeChanged((Type)e.OldValue, (Type)e.NewValue);
+        }
+
+        protected virtual void OnValueTypeChanged(Type oldValue, Type newValue)
+        {
+            if (_isInitialized)
+                SyncTextAndValueProperties(InputBase.TextProperty, Text);
+        }
+
+        #endregion //ValueType
+
         #endregion //Properties
 
         #region Constructors
@@ -115,48 +177,27 @@ namespace Microsoft.Windows.Controls
             base.OnAccessKey(e);
         }
 
-        protected override object ConvertTextToValue(string text)
+        protected override void OnGotFocus(RoutedEventArgs e)
         {
-            object convertedValue = null;
-
-            Type dataType = ValueType;
-
-            string valueToConvert = MaskProvider.ToString();
-
-            if (valueToConvert.GetType() == dataType || dataType.IsInstanceOfType(valueToConvert))
-            {
-                convertedValue = valueToConvert;
-            }
-#if !VS2008
-            else if (String.IsNullOrWhiteSpace(valueToConvert))
-            {
-                convertedValue = Activator.CreateInstance(dataType);
-            }
-#else
-            else if (String.IsNullOrEmpty(valueToConvert))
-            {
-                convertedValue = Activator.CreateInstance(dataType);
-            }
-#endif
-            else if (null == convertedValue && valueToConvert is IConvertible)
-            {
-                convertedValue = Convert.ChangeType(valueToConvert, dataType);
-            }
-
-            return convertedValue;
+            if (TextBox != null)
+                TextBox.Focus();
         }
 
-        protected override string ConvertValueToText(object value)
+        protected override void OnInitialized(EventArgs e)
         {
-            if (value == null)
-                value = string.Empty;
+            base.OnInitialized(e);
 
-            //I have only seen this occur while in Blend, but we need it here so the Blend designer doesn't crash.
-            if (MaskProvider == null)
-                return value.ToString();
+            if (!_isInitialized)
+            {
+                _isInitialized = true;
+                SyncTextAndValueProperties(ValueProperty, Value);
+            }
+        }
 
-            MaskProvider.Set(value.ToString());
-            return MaskProvider.ToDisplayString();
+        protected override void OnTextChanged(string previousValue, string currentValue)
+        {
+            if (_isInitialized)
+                SyncTextAndValueProperties(InputBase.TextProperty, currentValue);
         }
 
         #endregion
@@ -247,6 +288,17 @@ namespace Microsoft.Windows.Controls
 
         #endregion //Event Handlers
 
+        #region Events
+
+        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<object>), typeof(MaskedTextBox));
+        public event RoutedPropertyChangedEventHandler<object> ValueChanged
+        {
+            add { AddHandler(ValueChangedEvent, value); }
+            remove { RemoveHandler(ValueChangedEvent, value); }
+        }
+
+        #endregion //Events
+
         #region Methods
 
         #region Private
@@ -284,20 +336,69 @@ namespace Microsoft.Windows.Controls
 
         #endregion //Private
 
-        #region Public
-
-        /// <summary>
-        /// Attempts to set focus to this element.
-        /// </summary>
-        public new void Focus()
+        private object ConvertTextToValue(string text)
         {
-            if (TextBox != null)
-                TextBox.Focus();
-            else
-                base.Focus();
+            object convertedValue = null;
+
+            Type dataType = ValueType;
+
+            string valueToConvert = MaskProvider.ToString().Trim();
+
+            if (valueToConvert.GetType() == dataType || dataType.IsInstanceOfType(valueToConvert))
+            {
+                convertedValue = valueToConvert;
+            }
+#if !VS2008
+            else if (String.IsNullOrWhiteSpace(valueToConvert))
+            {
+                convertedValue = Activator.CreateInstance(dataType);
+            }
+#else
+            else if (String.IsNullOrEmpty(valueToConvert))
+            {
+                convertedValue = Activator.CreateInstance(dataType);
+            }
+#endif
+            else if (null == convertedValue && valueToConvert is IConvertible)
+            {
+                convertedValue = Convert.ChangeType(valueToConvert, dataType);
+            }
+
+            return convertedValue;
         }
 
-        #endregion //Public
+        private string ConvertValueToText(object value)
+        {
+            if (value == null)
+                value = string.Empty;
+
+            //I have only seen this occur while in Blend, but we need it here so the Blend designer doesn't crash.
+            if (MaskProvider == null)
+                return value.ToString();
+
+            MaskProvider.Set(value.ToString());
+            return MaskProvider.ToDisplayString();
+        }
+
+        protected void SyncTextAndValueProperties(DependencyProperty p, object newValue)
+        {
+            //prevents recursive syncing properties
+            if (_isSyncingTextAndValueProperties)
+                return;
+
+            _isSyncingTextAndValueProperties = true;
+
+            //this only occures when the user typed in the value
+            if (InputBase.TextProperty == p)
+            {
+                if (newValue != null)
+                    SetValue(MaskedTextBox.ValueProperty, ConvertTextToValue(newValue.ToString()));
+            }
+
+            SetValue(InputBase.TextProperty, ConvertValueToText(newValue));
+
+            _isSyncingTextAndValueProperties = false;
+        }
 
         #endregion //Methods
 
