@@ -94,7 +94,7 @@
                         <Popup x:Name="PART_CalculatorPopup" IsOpen="{Binding IsChecked, ElementName=_calculatorToggleButton}" StaysOpen="False">
                             <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" Padding="3">
                                 <StackPanel>
-                                    <local:Calculator x:Name="PART_Calculator" Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" BorderThickness="0" />
+                                    <local:Calculator x:Name="PART_Calculator" Background="Transparent" BorderThickness="0" Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
                                 </StackPanel>
                             </Border>
                         </Popup>
