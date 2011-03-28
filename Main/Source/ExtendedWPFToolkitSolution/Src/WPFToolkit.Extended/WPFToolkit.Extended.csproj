@@ -67,6 +67,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="CalculatorUpDown\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Calculator\Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -143,6 +147,7 @@
   <ItemGroup>
     <Compile Include="BusyIndicator\Implementation\BusyIndicator.cs" />
     <Compile Include="ButtonSpinner\Implementation\ButtonSpinner.cs" />
+    <Compile Include="CalculatorUpDown\Implementation\CalculatorUpDown.cs" />
     <Compile Include="Calculator\Implementation\Calculator.cs" />
     <Compile Include="Calculator\Implementation\CalculatorCommands.cs" />
     <Compile Include="ChildWindow\Implementation\ChildWindow.cs" />

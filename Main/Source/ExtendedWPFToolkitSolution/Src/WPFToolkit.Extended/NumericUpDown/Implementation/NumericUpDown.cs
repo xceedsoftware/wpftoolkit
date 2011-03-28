@@ -12,10 +12,10 @@ namespace Microsoft.Windows.Controls
 
         #region Minimum
 
-        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register("Minimum", typeof(double), typeof(NumericUpDown), new PropertyMetadata(Double.MinValue, OnMinimumPropertyChanged));
-        public double Minimum
+        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register("Minimum", typeof(decimal), typeof(NumericUpDown), new PropertyMetadata(Decimal.MinValue, OnMinimumPropertyChanged));
+        public decimal Minimum
         {
-            get { return (double)GetValue(MinimumProperty); }
+            get { return (decimal)GetValue(MinimumProperty); }
             set { SetValue(MinimumProperty, value); }
         }
 
@@ -29,10 +29,10 @@ namespace Microsoft.Windows.Controls
 
         #region Maximum
 
-        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register("Maximum", typeof(double), typeof(NumericUpDown), new PropertyMetadata(Double.MaxValue, OnMaximumPropertyChanged));
-        public double Maximum
+        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register("Maximum", typeof(decimal), typeof(NumericUpDown), new PropertyMetadata(Decimal.MaxValue, OnMaximumPropertyChanged));
+        public decimal Maximum
         {
-            get { return (double)GetValue(MaximumProperty); }
+            get { return (decimal)GetValue(MaximumProperty); }
             set { SetValue(MaximumProperty, value); }
         }
 
@@ -46,10 +46,10 @@ namespace Microsoft.Windows.Controls
 
         #region Increment
 
-        public static readonly DependencyProperty IncrementProperty = DependencyProperty.Register("Increment", typeof(double), typeof(NumericUpDown), new PropertyMetadata(1.0));
-        public double Increment
+        public static readonly DependencyProperty IncrementProperty = DependencyProperty.Register("Increment", typeof(decimal), typeof(NumericUpDown), new PropertyMetadata(1M));
+        public decimal Increment
         {
-            get { return (double)GetValue(IncrementProperty); }
+            get { return (decimal)GetValue(IncrementProperty); }
             set { SetValue(IncrementProperty, value); }
         }
 
@@ -95,8 +95,8 @@ namespace Microsoft.Windows.Controls
         static NumericUpDown()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(NumericUpDown), new FrameworkPropertyMetadata(typeof(NumericUpDown)));
-            ValueTypeProperty.OverrideMetadata(typeof(NumericUpDown), new FrameworkPropertyMetadata(typeof(double)));
-            ValueProperty.OverrideMetadata(typeof(NumericUpDown), new FrameworkPropertyMetadata(default(Double)));
+            ValueTypeProperty.OverrideMetadata(typeof(NumericUpDown), new FrameworkPropertyMetadata(typeof(decimal)));
+            ValueProperty.OverrideMetadata(typeof(NumericUpDown), new FrameworkPropertyMetadata(default(decimal)));
         }
 
         #endregion //Constructors
@@ -140,7 +140,7 @@ namespace Microsoft.Windows.Controls
         {
             if (value == null) return value;
 
-            double val = Convert.ToDouble(value);
+            decimal val = Convert.ToDecimal(value);
 
             if (val < Minimum)
             {
@@ -190,19 +190,19 @@ namespace Microsoft.Windows.Controls
                     return "Negative-Infinity";
             }
 
-            return (Convert.ToDouble(Value)).ToString(FormatString, CultureInfo.CurrentCulture);
+            return (Convert.ToDecimal(Value)).ToString(FormatString, CultureInfo.CurrentCulture);
         }
 
         protected override void OnIncrement()
         {
-            double newValue = (double)(Convert.ToDouble(Value) + (double)Increment);
-            Value = ValueType != typeof(Double) ? Convert.ChangeType(newValue, ValueType) : newValue;
+            decimal newValue = (Convert.ToDecimal(Value) + Increment);
+            Value = ValueType != typeof(Decimal) ? Convert.ChangeType(newValue, ValueType) : newValue;
         }
 
         protected override void OnDecrement()
         {
-            double newValue = (double)(Convert.ToDouble(Value) - (double)Increment);
-            Value = ValueType != typeof(Double) ? Convert.ChangeType(newValue, ValueType) : newValue;
+            decimal newValue = (Convert.ToDecimal(Value) - Increment);
+            Value = ValueType != typeof(Decimal) ? Convert.ChangeType(newValue, ValueType) : newValue;
         }
 
         #endregion //Base Class Overrides
@@ -234,12 +234,12 @@ namespace Microsoft.Windows.Controls
         {
             ValidSpinDirections validDirections = ValidSpinDirections.None;
 
-            if (Convert.ToDouble(Value) < Maximum)
+            if (Convert.ToDecimal(Value) < Maximum)
             {
                 validDirections = validDirections | ValidSpinDirections.Increase;
             }
 
-            if (Convert.ToDouble(Value) > Minimum)
+            if (Convert.ToDecimal(Value) > Minimum)
             {
                 validDirections = validDirections | ValidSpinDirections.Decrease;
             }
@@ -256,7 +256,11 @@ namespace Microsoft.Windows.Controls
         {
             try
             {
-                if (typeof(double) == dataType)
+                if (typeof(decimal) == dataType)
+                {
+                    return ParseDecimal(text, info);
+                }
+                else if (typeof(double) == dataType)
                 {
                     return ParseDouble(text, info);
                 }
@@ -270,10 +274,6 @@ namespace Microsoft.Windows.Controls
                          typeof(long) == dataType || typeof(ulong) == dataType || typeof(Int64) == dataType)
                 {
                     return ParseWholeNumber(text, dataType, info);
-                }
-                else if (typeof(decimal) == dataType)
-                {
-                    return ParseDecimal(text, info);
                 }
                 else
                 {
@@ -293,8 +293,7 @@ namespace Microsoft.Windows.Controls
 
         private static float ParseFloat(string text, NumberFormatInfo info)
         {
-            double result = double.Parse(text, NumberStyles.Any, info);
-            return (float)result;
+            return float.Parse(text, NumberStyles.Any, info);
         }
 
         private static decimal ParseDecimal(string text, NumberFormatInfo info)
