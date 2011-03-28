@@ -126,26 +126,25 @@ namespace Microsoft.Windows.Controls
 
         #region Memory
 
-        public static readonly DependencyProperty MemoryProperty = DependencyProperty.Register("Memory", typeof(decimal), typeof(Calculator), new UIPropertyMetadata(default(decimal), OnMemoryChanged));
+        public static readonly DependencyProperty MemoryProperty = DependencyProperty.Register("Memory", typeof(decimal), typeof(Calculator), new UIPropertyMetadata(default(decimal)));
         public decimal Memory
         {
             get { return (decimal)GetValue(MemoryProperty); }
             set { SetValue(MemoryProperty, value); }
         }
 
-        private static void OnMemoryChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            Calculator calculator = o as Calculator;
-            if (calculator != null)
-                calculator.OnMemoryChanged((decimal)e.OldValue, (decimal)e.NewValue);
-        }
-
-        protected virtual void OnMemoryChanged(decimal oldValue, decimal newValue)
-        {
-            // TODO: Add your property changed side-effects. Descendants can override as well.
-        }
-
         #endregion //Memory
+
+        #region Precision
+
+        public static readonly DependencyProperty PrecisionProperty = DependencyProperty.Register("Precision", typeof(int), typeof(Calculator), new UIPropertyMetadata(6));
+        public int Precision
+        {
+            get { return (int)GetValue(PrecisionProperty); }
+            set { SetValue(PrecisionProperty, value); }
+        }    
+
+        #endregion //Precision
 
         #region Value
 
@@ -234,7 +233,7 @@ namespace Microsoft.Windows.Controls
             if (_lastOperation == Operation.None)
                 return;
 
-            Value = CalculateValue(_lastOperation);
+            Value = Decimal.Round(CalculateValue(_lastOperation), Precision);
         }
 
         private void Calculate(Operation newOperation)
