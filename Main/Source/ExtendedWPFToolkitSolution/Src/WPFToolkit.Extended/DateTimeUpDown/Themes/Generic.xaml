@@ -9,7 +9,8 @@
     <Style TargetType="{x:Type local:DateTimeUpDown}">
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Focusable" Value="False" />
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>        
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Right" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:DateTimeUpDown}">
@@ -23,9 +24,10 @@
                                  FontStyle="{TemplateBinding FontStyle}" 
                                  FontWeight="{TemplateBinding FontWeight}" 
                                  Foreground="{TemplateBinding Foreground}" 
+                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                  IsReadOnly="True"
                                  MinWidth="20" AcceptsReturn="False" 
-                                 TextAlignment="Right" TextWrapping="NoWrap" 
+                                 TextWrapping="NoWrap" 
                                  TabIndex="{TemplateBinding TabIndex}"
                                  Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" />
                     </local:ButtonSpinner>

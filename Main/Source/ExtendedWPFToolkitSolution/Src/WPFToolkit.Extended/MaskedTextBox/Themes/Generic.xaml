@@ -24,6 +24,7 @@
                              FontStyle="{TemplateBinding FontStyle}" 
                              FontWeight="{TemplateBinding FontWeight}" 
                              Foreground="{TemplateBinding Foreground}"
+                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                              IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
                              MinWidth="20" AcceptsReturn="False" TextWrapping="NoWrap" 
                              TabIndex="{TemplateBinding TabIndex}"
