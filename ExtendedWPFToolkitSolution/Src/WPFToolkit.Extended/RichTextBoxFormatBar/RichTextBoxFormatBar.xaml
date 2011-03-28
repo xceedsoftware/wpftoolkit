@@ -2,14 +2,17 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:extToolkit="clr-namespace:Microsoft.Windows.Controls"
-              Background="Transparent"
-              IsTabStop="False"
+             xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters"
+             Background="Transparent"
+             IsTabStop="False"
              x:Name="_window">
     <UserControl.Effect>
         <DropShadowEffect BlurRadius="5" Opacity=".25" />
     </UserControl.Effect>
 
     <UserControl.Resources>
+
+        <coreConverters:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
 
         <Style TargetType="{x:Type Separator}" BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
 
@@ -171,11 +174,8 @@
 
                                         <Grid>
                                             <Image Source="/WPFToolkit.Extended;component/RichTextBoxFormatBar/Images/FontColorPicker16.png" Width="16" Height="16" />
-                                            <Rectangle Grid.Row="1" Height="4" Margin="0,12,0,0">
-                                                <Rectangle.Fill>
-                                                    <SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=extToolkit:ColorPicker}}" />
-                                                </Rectangle.Fill>
-                                            </Rectangle>
+                                            <Rectangle Grid.Row="1" Height="4" Margin="0,12,0,0"
+                                                       Fill="{Binding SelectedColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=extToolkit:ColorPicker}, Converter={StaticResource ColorToSolidColorBrushConverter}}" />
                                         </Grid>
 
                                         <Path Grid.Column="1" Width="7" Height="4" 
@@ -265,11 +265,8 @@
 
                                         <Grid>
                                             <Image Source="/WPFToolkit.Extended;component/RichTextBoxFormatBar/Images/TextHighlightColorPicker16.png" Width="16" Height="16" />
-                                            <Rectangle Grid.Row="1" Height="4" Margin="0,12,0,0">
-                                                <Rectangle.Fill>
-                                                    <SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=extToolkit:ColorPicker}}" />
-                                                </Rectangle.Fill>
-                                            </Rectangle>
+                                            <Rectangle Grid.Row="1" Height="4" Margin="0,12,0,0"
+                                                       Fill="{Binding SelectedColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=extToolkit:ColorPicker}, Converter={StaticResource ColorToSolidColorBrushConverter}}" />
                                         </Grid>
 
                                         <Path Grid.Column="1" Width="7" Height="4" 
