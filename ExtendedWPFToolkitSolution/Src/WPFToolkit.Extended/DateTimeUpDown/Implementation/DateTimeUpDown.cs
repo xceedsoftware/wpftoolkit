@@ -17,7 +17,7 @@ namespace Microsoft.Windows.Controls
         private bool _fireSelectionChangedEvent = true;
         private bool _isSyncingTextAndValueProperties;
 
-        private DateTimeParser _dateParser;
+        private DateTimeParser _dateTimeParser;
 
         #endregion //Members
 
@@ -165,8 +165,6 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
             TextBox.SelectionChanged += TextBox_SelectionChanged;
-
-            _dateParser = new DateTimeParser(DateTimeFormatInfo, GetFormatString(Format));
         }
 
         protected override void OnIncrement()
@@ -212,16 +210,20 @@ namespace Microsoft.Windows.Controls
 
         protected override void OnTextChanged(string previousValue, string currentValue)
         {
+            //TODO: clean this up and make sure it doesn't fire recursively
+
             if (String.IsNullOrEmpty(currentValue))
             {
                 Value = null;
                 return;
             }
 
-            //TODO: clean this up and make sure it doesn't fire recursively
+            if (_dateTimeParser == null)
+                _dateTimeParser = new DateTimeParser(DateTimeFormatInfo, GetFormatString(Format));
+
             DateTime current = Value.HasValue ? Value.Value : DateTime.Now;
             DateTime result;
-            var success = _dateParser.TryParse(currentValue, out result, current);
+            var success = _dateTimeParser.TryParse(currentValue, out result, current);
 
             SyncTextAndValueProperties(InputBase.TextProperty, result);
         }
