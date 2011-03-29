@@ -24,7 +24,7 @@
     <SolidColorBrush x:Key="TextBox_DisabledBackground" Color="#F4F4F4" />
 
     <DataTemplate x:Key="DefaultWatermarkTemplate">
-        <ContentControl Content="{Binding}" Foreground="Gray" />
+        <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
     </DataTemplate>
 
     <Style TargetType="{x:Type local:WatermarkTextBox}">
@@ -61,7 +61,7 @@
                                           Content="{TemplateBinding Watermark}"
                                           ContentTemplate="{TemplateBinding WatermarkTemplate}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"                                       
                                           IsHitTestVisible="False"
                                           Margin="{TemplateBinding Padding}"
                                           Visibility="Collapsed"/>
