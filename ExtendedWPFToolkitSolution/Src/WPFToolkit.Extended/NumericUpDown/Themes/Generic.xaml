@@ -6,7 +6,7 @@
     <coreConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
 
     <DataTemplate x:Key="DefaultWatermarkTemplate">
-        <ContentControl Content="{Binding}" Foreground="Gray" />
+        <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
     </DataTemplate>
 
     <!-- =============================================================================== -->

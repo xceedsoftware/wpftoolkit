@@ -3,7 +3,7 @@
                     xmlns:local="clr-namespace:Microsoft.Windows.Controls">
 
     <DataTemplate x:Key="DefaultWatermarkTemplate">
-        <ContentControl Content="{Binding}" Foreground="Gray" />
+        <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
     </DataTemplate>
     
     <!-- =============================================================================== -->
