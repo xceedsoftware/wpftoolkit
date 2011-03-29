@@ -75,6 +75,18 @@ namespace Microsoft.Windows.Controls
 
         #endregion //FormatString
 
+        #region NullValue
+
+        public static readonly DependencyProperty NullValueProperty = DependencyProperty.Register("NullValue", typeof(DateTime), typeof(DateTimeUpDown), new UIPropertyMetadata(DateTime.Now));
+        public DateTime NullValue
+        {
+            get { return (DateTime)GetValue(NullValueProperty); }
+            set { SetValue(NullValueProperty, value); }
+        }
+        
+
+        #endregion //NullValue
+
         #region Value
 
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(DateTime?), typeof(DateTimeUpDown), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue));
@@ -215,14 +227,18 @@ namespace Microsoft.Windows.Controls
 
         protected override void OnIncrement()
         {
-            if (Value != null)
+            if (Value.HasValue)
                 UpdateDateTime(1);
+            else
+                Value = NullValue;
         }
 
         protected override void OnDecrement()
         {
-            if (Value != null)
+            if (Value.HasValue)
                 UpdateDateTime(-1);
+            else
+                Value = NullValue;
         }
 
         #endregion //Abstract

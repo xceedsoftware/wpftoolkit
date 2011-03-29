@@ -86,6 +86,18 @@ namespace Microsoft.Windows.Controls
 
         #endregion //FormatString
 
+        #region NullValue
+
+        public static readonly DependencyProperty NullValueProperty = DependencyProperty.Register("NullValue", typeof(decimal), typeof(NumericUpDown), new UIPropertyMetadata(default(decimal)));
+        public decimal NullValue
+        {
+            get { return (decimal)GetValue(NullValueProperty); }
+            set { SetValue(NullValueProperty, value); }
+        }
+        
+
+        #endregion //NullValue
+
         #region SelectAllOnGotFocus
 
         public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register("SelectAllOnGotFocus", typeof(bool), typeof(NumericUpDown), new PropertyMetadata(false));
@@ -199,12 +211,16 @@ namespace Microsoft.Windows.Controls
         {
             if (Value.HasValue)
                 Value += Increment;
+            else
+                Value = NullValue;
         }
 
         protected override void OnDecrement()
         {
             if (Value.HasValue)
                 Value -= Increment;
+            else
+                Value = NullValue;
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
