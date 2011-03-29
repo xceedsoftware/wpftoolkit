@@ -105,11 +105,14 @@ namespace Microsoft.Windows.Controls
             var dates = date.Split(dateSeparators, StringSplitOptions.RemoveEmptyEntries).ToList();
             var formats = Format.Split(dateSeparators, StringSplitOptions.RemoveEmptyEntries).ToList();
 
+            if (dates.Count != formats.Count)
+                return string.Empty;
+
             //strip out the date pieces
             for (int i = 0; i < formats.Count; i++)
             {
                 var format = formats[i];
-                if (!format.Equals("dddd") && !format.Contains(DateTimeFormatInfo.AMDesignator) && !format.Contains(DateTimeFormatInfo.PMDesignator))
+                if (!format.Equals("dddd") && !format.Equals(DateTimeFormatInfo.AMDesignator) && !format.Equals(DateTimeFormatInfo.PMDesignator))
                 {
                     if (format.Contains("M"))
                         dateParts[0] = dates[i];
