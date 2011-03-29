@@ -5,7 +5,11 @@
                     xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters">
 
     <coreConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
-    
+
+    <DataTemplate x:Key="DefaultWatermarkTemplate">
+        <ContentControl Content="{Binding}" Foreground="Gray" />
+    </DataTemplate>
+
     <!-- =============================================================================== -->
     <!-- MaskedTextBox                                                                   -->
     <!-- =============================================================================== -->
@@ -13,22 +17,25 @@
     <Style TargetType="{x:Type local:MaskedTextBox}">
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
         <Setter Property="Focusable" Value="False" />
+        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:MaskedTextBox}">
-                    <TextBox x:Name="TextBox" 
-                             Background="{TemplateBinding Background}"
-                             FontFamily="{TemplateBinding FontFamily}" 
-                             FontSize="{TemplateBinding FontSize}" 
-                             FontStretch="{TemplateBinding FontStretch}"
-                             FontStyle="{TemplateBinding FontStyle}" 
-                             FontWeight="{TemplateBinding FontWeight}" 
-                             Foreground="{TemplateBinding Foreground}"
-                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                             IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
-                             MinWidth="20" AcceptsReturn="False" TextWrapping="NoWrap" 
-                             TabIndex="{TemplateBinding TabIndex}"
-                             Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" />
+                    <local:WatermarkTextBox x:Name="TextBox" 
+                                            Background="{TemplateBinding Background}"
+                                            FontFamily="{TemplateBinding FontFamily}" 
+                                            FontSize="{TemplateBinding FontSize}" 
+                                            FontStretch="{TemplateBinding FontStretch}"
+                                            FontStyle="{TemplateBinding FontStyle}" 
+                                            FontWeight="{TemplateBinding FontWeight}" 
+                                            Foreground="{TemplateBinding Foreground}"
+                                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                                            MinWidth="20" AcceptsReturn="False" TextWrapping="NoWrap" 
+                                            TabIndex="{TemplateBinding TabIndex}"
+                                            Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
+                                            Watermark="{TemplateBinding Watermark}"
+                                            WatermarkTemplate="{TemplateBinding WatermarkTemplate}"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
