@@ -1,6 +1,9 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:Microsoft.Windows.Controls">
+                    xmlns:local="clr-namespace:Microsoft.Windows.Controls"
+                    xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters">
+
+    <coreConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
 
     <DataTemplate x:Key="DefaultWatermarkTemplate">
         <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
@@ -30,7 +33,7 @@
                                                 FontWeight="{TemplateBinding FontWeight}" 
                                                 Foreground="{TemplateBinding Foreground}" 
                                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                IsReadOnly="True"
+                                                IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
                                                 MinWidth="20" AcceptsReturn="False" 
                                                 TextWrapping="NoWrap" 
                                                 TabIndex="{TemplateBinding TabIndex}"

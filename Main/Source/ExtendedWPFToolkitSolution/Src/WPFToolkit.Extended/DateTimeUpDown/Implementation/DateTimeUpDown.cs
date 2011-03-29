@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Windows.Controls.Primitives;
+using System.Windows.Data;
 
 namespace Microsoft.Windows.Controls
 {
@@ -15,6 +16,8 @@ namespace Microsoft.Windows.Controls
         private DateTimeInfo _selectedDateTimeInfo;
         private bool _fireSelectionChangedEvent = true;
         private bool _isSyncingTextAndValueProperties;
+
+        private DateTimeParser _dateParser;
 
         #endregion //Members
 
@@ -83,7 +86,7 @@ namespace Microsoft.Windows.Controls
             get { return (DateTime)GetValue(NullValueProperty); }
             set { SetValue(NullValueProperty, value); }
         }
-        
+
 
         #endregion //NullValue
 
@@ -162,6 +165,24 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
             TextBox.SelectionChanged += TextBox_SelectionChanged;
+
+            _dateParser = new DateTimeParser(DateTimeFormatInfo, GetFormatString(Format));
+        }
+
+        protected override void OnIncrement()
+        {
+            if (Value.HasValue)
+                UpdateDateTime(1);
+            else
+                Value = NullValue;
+        }
+
+        protected override void OnDecrement()
+        {
+            if (Value.HasValue)
+                UpdateDateTime(-1);
+            else
+                Value = NullValue;
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -170,30 +191,39 @@ namespace Microsoft.Windows.Controls
             {
                 case Key.Enter:
                     {
+                        if (IsEditable)
+                        {
+                            _fireSelectionChangedEvent = false;
+                            BindingExpression binding = BindingOperations.GetBindingExpression(TextBox, System.Windows.Controls.TextBox.TextProperty);
+                            binding.UpdateSource();
+                            _fireSelectionChangedEvent = true;
+                        }
                         return;
-                    }
-                case Key.Delete:
-                    {
-                        Value = null;
-                        break;
-                    }
-                case Key.Left:
-                    {
-                        PerformKeyboardSelection(-1);
-                        break;
-                    }
-                case Key.Right:
-                    {
-                        PerformKeyboardSelection(1);
-                        break;
                     }
                 default:
                     {
+                        _fireSelectionChangedEvent = false;
                         break;
                     }
             }
 
             base.OnPreviewKeyDown(e);
+        }
+
+        protected override void OnTextChanged(string previousValue, string currentValue)
+        {
+            if (String.IsNullOrEmpty(currentValue))
+            {
+                Value = null;
+                return;
+            }
+
+            //TODO: clean this up and make sure it doesn't fire recursively
+            DateTime current = Value.HasValue ? Value.Value : DateTime.Now;
+            DateTime result;
+            var success = _dateParser.TryParse(currentValue, out result, current);
+
+            SyncTextAndValueProperties(InputBase.TextProperty, result);
         }
 
         #endregion //Base Class Overrides
@@ -202,7 +232,7 @@ namespace Microsoft.Windows.Controls
 
         void TextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
-            if (_fireSelectionChangedEvent)
+            if (_fireSelectionChangedEvent) 
                 PerformMouseSelection();
             else
                 _fireSelectionChangedEvent = true;
@@ -222,28 +252,6 @@ namespace Microsoft.Windows.Controls
         #endregion //Events
 
         #region Methods
-
-        #region Abstract
-
-        protected override void OnIncrement()
-        {
-            if (Value.HasValue)
-                UpdateDateTime(1);
-            else
-                Value = NullValue;
-        }
-
-        protected override void OnDecrement()
-        {
-            if (Value.HasValue)
-                UpdateDateTime(-1);
-            else
-                Value = NullValue;
-        }
-
-        #endregion //Abstract
-
-        #region Private
 
         private void InitializeDateTimeInfoListAndParseValue()
         {
@@ -268,7 +276,7 @@ namespace Microsoft.Windows.Controls
                     case '\'':
                         {
                             int closingQuotePosition = format.IndexOf(format[0], 1);
-                            info = new DateTimeInfo { IsReadOnly = true, Type = DateTimePart.Other, Length = 1, Content = format.Substring(1, Math.Max(1, closingQuotePosition - 1)).ToString() };
+                            info = new DateTimeInfo { IsReadOnly = true, Type = DateTimePart.Other, Length = 1, Content = format.Substring(1, Math.Max(1, closingQuotePosition - 1)) };
                             elementLength = Math.Max(1, closingQuotePosition + 1);
                             break;
                         }
@@ -451,34 +459,6 @@ namespace Microsoft.Windows.Controls
             });
         }
 
-        /// <summary>
-        /// Performs the keyboard selection.
-        /// </summary>
-        /// <param name="direction">The direction.</param>
-        /// <remarks>-1 = Left, 1 = Right</remarks>
-        private void PerformKeyboardSelection(int direction)
-        {
-            DateTimeInfo info;
-            int index = _dateTimeInfoList.IndexOf(_selectedDateTimeInfo);
-
-            //make sure we stay within the selection ranges
-            if ((index == 0 && direction == -1) || (index == _dateTimeInfoList.Count - 1 && direction == 1))
-                return;
-
-            //get the DateTimeInfo at the next position
-            index += direction;
-            info = _dateTimeInfoList[index];
-
-            //we don't care about spaces and commas, only select valid DateTimeInfos
-            while (info.Type == DateTimePart.Other)
-            {
-                info = _dateTimeInfoList[index += direction];
-            }
-
-            //perform selection
-            Select(info);
-        }
-
         private void Select(DateTimeInfo info)
         {
             _fireSelectionChangedEvent = false;
@@ -526,7 +506,6 @@ namespace Microsoft.Windows.Controls
             //this only occurs when the user manually type in a value for the Value Property
             if (info == null)
                 info = _dateTimeInfoList[0];
-
 
             switch (info.Type)
             {
@@ -584,14 +563,15 @@ namespace Microsoft.Windows.Controls
             _fireSelectionChangedEvent = true;
         }
 
-        #endregion //Private
-
-        protected object ConvertTextToValue(string text)
+        private DateTime? ConvertTextToValue(string text)
         {
-            throw new NotImplementedException("ConvertTextToValue");
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            return DateTime.Parse(text, CultureInfo.CurrentCulture);
         }
 
-        protected string ConvertValueToText(object value)
+        private string ConvertValueToText(object value)
         {
             if (value == null) return string.Empty;
 
@@ -599,7 +579,7 @@ namespace Microsoft.Windows.Controls
             return dt.ToString(GetFormatString(Format), CultureInfo.CurrentCulture);
         }
 
-        protected void SyncTextAndValueProperties(DependencyProperty p, object newValue)
+        private void SyncTextAndValueProperties(DependencyProperty p, object newValue)
         {
             //prevents recursive syncing properties
             if (_isSyncingTextAndValueProperties)
