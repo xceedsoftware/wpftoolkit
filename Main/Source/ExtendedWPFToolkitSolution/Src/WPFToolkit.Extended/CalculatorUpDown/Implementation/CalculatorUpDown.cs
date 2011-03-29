@@ -1,16 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
 
 namespace Microsoft.Windows.Controls
@@ -25,6 +15,17 @@ namespace Microsoft.Windows.Controls
         #endregion //Members
 
         #region Properties
+
+        #region EnterClosesCalculator
+
+        public static readonly DependencyProperty EnterClosesCalculatorProperty = DependencyProperty.Register("EnterClosesCalculator", typeof(bool), typeof(CalculatorUpDown), new UIPropertyMetadata(false));
+        public bool EnterClosesCalculator
+        {
+            get { return (bool)GetValue(EnterClosesCalculatorProperty); }
+            set { SetValue(EnterClosesCalculatorProperty, value); }
+        }
+
+        #endregion //EnterClosesCalculator
 
         #region IsOpen
 
@@ -44,7 +45,7 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnIsOpenChanged(bool oldValue, bool newValue)
         {
-            
+
         }
 
         #endregion //IsOpen
@@ -90,11 +91,21 @@ namespace Microsoft.Windows.Controls
         {
             switch (e.Key)
             {
+                case Key.Enter:
+                    {
+                        if (EnterClosesCalculator && IsOpen)
+                            CloseCalculatorUpDown();
+                        break;
+                    }
                 case Key.Escape:
-                case Key.Tab:
                     {
                         CloseCalculatorUpDown();
                         e.Handled = true;
+                        break;
+                    }
+                case Key.Tab:
+                    {
+                        CloseCalculatorUpDown();
                         break;
                     }
             }
