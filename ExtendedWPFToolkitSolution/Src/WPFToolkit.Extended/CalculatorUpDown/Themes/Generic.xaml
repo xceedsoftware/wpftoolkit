@@ -50,6 +50,9 @@
         </Setter>
     </Style>
 
+    <DataTemplate x:Key="DefaultWatermarkTemplate">
+        <ContentControl Content="{Binding}" Foreground="Gray" />
+    </DataTemplate>
 
     <!-- =============================================================================== -->
     <!-- CalculatorUpDown                                                                -->
@@ -60,6 +63,7 @@
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
         <Setter Property="HorizontalContentAlignment" Value="Right" />
+        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:CalculatorUpDown}">
@@ -71,20 +75,22 @@
                             </Grid.ColumnDefinitions>
                             <local:ButtonSpinner x:Name="Spinner" IsTabStop="False" BorderThickness="{TemplateBinding BorderThickness}"
                                          AllowSpin="{TemplateBinding AllowSpin}" ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
-                                <TextBox x:Name="TextBox" BorderThickness="0" 
-                                         Background="{TemplateBinding Background}"
-                                         FontFamily="{TemplateBinding FontFamily}" 
-                                         FontSize="{TemplateBinding FontSize}" 
-                                         FontStretch="{TemplateBinding FontStretch}"
-                                         FontStyle="{TemplateBinding FontStyle}" 
-                                         FontWeight="{TemplateBinding FontWeight}" 
-                                         Foreground="{TemplateBinding Foreground}" 
-                                         HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                         IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
-                                         MinWidth="20" AcceptsReturn="False" 
-                                         TextWrapping="NoWrap" 
-                                         TabIndex="{TemplateBinding TabIndex}"
-                                         Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" />
+                                <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0" 
+                                                        Background="{TemplateBinding Background}"
+                                                        FontFamily="{TemplateBinding FontFamily}" 
+                                                        FontSize="{TemplateBinding FontSize}" 
+                                                        FontStretch="{TemplateBinding FontStretch}"
+                                                        FontStyle="{TemplateBinding FontStyle}" 
+                                                        FontWeight="{TemplateBinding FontWeight}" 
+                                                        Foreground="{TemplateBinding Foreground}" 
+                                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                        IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                                                        MinWidth="20" AcceptsReturn="False" 
+                                                        TextWrapping="NoWrap" 
+                                                        TabIndex="{TemplateBinding TabIndex}"
+                                                        Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
+                                                        Watermark="{TemplateBinding Watermark}"
+                                                        WatermarkTemplate="{TemplateBinding WatermarkTemplate}"/>
                             </local:ButtonSpinner>
                             <ToggleButton x:Name="_calculatorToggleButton" Grid.Column="1"
                                           IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
