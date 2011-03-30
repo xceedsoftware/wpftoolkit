@@ -193,6 +193,7 @@ namespace Microsoft.Windows.Controls
 
             _colorShadingCanvas = (Canvas)GetTemplateChild("PART_ColorShadingCanvas");
             _colorShadingCanvas.MouseLeftButtonDown += ColorShadingCanvas_MouseLeftButtonDown;
+            _colorShadingCanvas.MouseLeftButtonUp += ColorShadingCanvas_MouseLeftButtonUp;
             _colorShadingCanvas.MouseMove += ColorShadingCanvas_MouseMove;
             _colorShadingCanvas.SizeChanged += ColorShadingCanvas_SizeChanged;
 
@@ -224,6 +225,12 @@ namespace Microsoft.Windows.Controls
         {
             Point p = e.GetPosition(_colorShadingCanvas);
             UpdateColorShadeSelectorPositionAndCalculateColor(p, true);
+            _colorShadingCanvas.CaptureMouse();
+        }
+
+        void ColorShadingCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _colorShadingCanvas.ReleaseMouseCapture();
         }
 
         void ColorShadingCanvas_MouseMove(object sender, MouseEventArgs e)
@@ -266,6 +273,7 @@ namespace Microsoft.Windows.Controls
         {
             SelectedColor = Color.FromArgb(A, R, G, B);
             UpdateColorShadeSelectorPosition(SelectedColor);
+            HexadecimalString = SelectedColor.ToString();
         }
 
         private void UpdateSelectedColor(Color color)
