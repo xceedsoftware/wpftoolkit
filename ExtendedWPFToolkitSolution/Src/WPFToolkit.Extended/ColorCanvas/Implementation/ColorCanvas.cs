@@ -325,7 +325,7 @@ namespace Microsoft.Windows.Controls
 
             HsvColor hsv = ColorUtilities.ConvertRgbToHsv(color.R, color.G, color.B);
 
-            if (color.R != color.G && color.R != color.B)
+            if (!(color.R == color.G && color.R == color.B))
                 _spectrumSlider.Value = hsv.H;
 
             Point p = new Point(hsv.S, 1 - hsv.V);
