@@ -26,7 +26,7 @@ namespace Microsoft.Windows.Controls
 
         #region SelectedColor
 
-        public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register("SelectedColor", typeof(Color), typeof(ColorCanvas), new UIPropertyMetadata(Colors.Black, OnSelectedColorChanged));
+        public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register("SelectedColor", typeof(Color), typeof(ColorCanvas), new FrameworkPropertyMetadata(Colors.Black, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedColorChanged));
         public Color SelectedColor
         {
             get { return (Color)GetValue(SelectedColorProperty); }

@@ -89,45 +89,6 @@ namespace Microsoft.Windows.Controls
 
         #endregion //IsOpen
 
-        #region SelectedDate
-
-        public static readonly DependencyProperty SelectedDateProperty = DependencyProperty.Register("SelectedDate", typeof(DateTime?), typeof(DateTimePicker), new UIPropertyMetadata(DateTime.Now, new PropertyChangedCallback(OnSelectedDateChanged), new CoerceValueCallback(OnCoerceSelectedDate)));
-        public DateTime? SelectedDate
-        {
-            get { return (DateTime?)GetValue(SelectedDateProperty); }
-            set { SetValue(SelectedDateProperty, value); }
-        }
-
-        private static object OnCoerceSelectedDate(DependencyObject o, object value)
-        {
-            DateTimePicker dateTimePicker = o as DateTimePicker;
-            if (dateTimePicker != null)
-                return dateTimePicker.OnCoerceSelectedDate((DateTime?)value);
-            else
-                return value;
-        }
-
-        private static void OnSelectedDateChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            DateTimePicker dateTimePicker = o as DateTimePicker;
-            if (dateTimePicker != null)
-                dateTimePicker.OnSelectedDateChanged((DateTime?)e.OldValue, (DateTime?)e.NewValue);
-        }
-
-        protected virtual DateTime? OnCoerceSelectedDate(DateTime? value)
-        {
-            // TODO: Keep the proposed value within the desired range.
-            return value;
-        }
-
-        protected virtual void OnSelectedDateChanged(DateTime? oldValue, DateTime? newValue)
-        {
-            if (_calendar != null && _calendar.SelectedDate.Value != newValue.Value)
-                _calendar.SelectedDate = newValue;
-        }
-
-        #endregion //SelectedDate
-
         #region ShowButtonSpinner
 
         public static readonly DependencyProperty ShowButtonSpinnerProperty = DependencyProperty.Register("ShowButtonSpinner", typeof(bool), typeof(DateTimePicker), new UIPropertyMetadata(true));
@@ -138,6 +99,48 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //ShowButtonSpinner
+
+        #region Value
+
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(DateTime?), typeof(DateTimePicker), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue));
+        public DateTime? Value
+        {
+            get { return (DateTime?)GetValue(ValueProperty); }
+            set { SetValue(ValueProperty, value); }
+        }
+
+        private static object OnCoerceValue(DependencyObject o, object value)
+        {
+            DateTimePicker dateTimePicker = o as DateTimePicker;
+            if (dateTimePicker != null)
+                return dateTimePicker.OnCoerceValue((DateTime?)value);
+            else
+                return value;
+        }
+
+        private static void OnValueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            DateTimePicker dateTimePicker = o as DateTimePicker;
+            if (dateTimePicker != null)
+                dateTimePicker.OnValueChanged((DateTime?)e.OldValue, (DateTime?)e.NewValue);
+        }
+
+        protected virtual DateTime? OnCoerceValue(DateTime? value)
+        {
+            // TODO: Keep the proposed value within the desired range.
+            return value;
+        }
+
+        protected virtual void OnValueChanged(DateTime? oldValue, DateTime? newValue)
+        {
+            if (_calendar != null && _calendar.SelectedDate.HasValue && newValue.HasValue && _calendar.SelectedDate.Value != newValue.Value)
+            {
+                _calendar.SelectedDate = newValue;
+                _calendar.DisplayDate = newValue.Value;
+            }
+        }
+
+        #endregion //Value
 
         #endregion //Properties
 
@@ -164,7 +167,7 @@ namespace Microsoft.Windows.Controls
 
             _calendar = (Calendar)GetTemplateChild("Part_Calendar");
             _calendar.SelectedDatesChanged += Calendar_SelectedDatesChanged;
-            _calendar.SelectedDate = SelectedDate;
+            _calendar.SelectedDate = Value ?? null;
         }
 
         protected override void OnPreviewMouseUp(MouseButtonEventArgs e)
@@ -200,7 +203,7 @@ namespace Microsoft.Windows.Controls
             if (e.AddedItems.Count > 0)
             {
                 var newDate = (DateTime?)e.AddedItems[0];
-                SelectedDate = newDate.Value;
+                Value = newDate;
             }
         }
 

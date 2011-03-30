@@ -65,12 +65,12 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <local:DateTimeUpDown BorderThickness="1,1,0,1" 
+                                <local:DateTimeUpDown BorderThickness="1,1,0,1"
                                                       AllowSpin="{TemplateBinding AllowSpin}"
                                                       Format="{TemplateBinding Format}" FormatString="{TemplateBinding FormatString}" 
                                                       ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
-                                                      Value="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}}" />
-                                <ToggleButton x:Name="_calendarToggleButton" Grid.Column="1"
+                                                      Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}" />
+                                <ToggleButton x:Name="_calendarToggleButton" Grid.Column="1" Background="White"
                                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                               Style="{StaticResource DateTimePickerToggleButtonStyle}"
                                               IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"/>
@@ -78,9 +78,8 @@
                             <Popup IsOpen="{Binding IsChecked, ElementName=_calendarToggleButton}" StaysOpen="False">
                                 <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" Padding="3">
                                     <StackPanel>
-                                        <Calendar x:Name="Part_Calendar"    
-                                                  DisplayDate="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"/>
-                                        <local:DateTimeUpDown x:Name="Part_TimeUpDown" Format="ShortTime" Value="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}}" Background="White" />
+                                        <Calendar x:Name="Part_Calendar" BorderThickness="0" />
+                                        <local:TimePicker x:Name="Part_TimeUpDown" Format="ShortTime" Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}" />
                                     </StackPanel>
                                 </Border>
                             </Popup>

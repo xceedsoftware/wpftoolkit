@@ -53,8 +53,8 @@ namespace Microsoft.Windows.Controls
         private string ResolveDateTimeString(string dateTime, DateTime currentDate)
         {
             //  1/1/0001 12:00:00 AM
-            string[] dateParts = new string[3] { "1", "1", "0001" };
-            string[] timeParts = new string[3] { "12", "00", "00" };
+            string[] dateParts = new string[3] { currentDate.Month.ToString(), currentDate.Day.ToString(), currentDate.Year.ToString() };
+            string[] timeParts = new string[3] { currentDate.Hour.ToString(), currentDate.Minute.ToString(), currentDate.Second.ToString() };
             string designator = "AM";
 
             string[] dateTimeSeparators = new string[] { ",", " ", "-", DateTimeFormatInfo.DateSeparator, DateTimeFormatInfo.TimeSeparator };
