@@ -27,6 +27,17 @@ namespace Microsoft.Windows.Controls
 
         //TODO: add minimum and maximum properties
 
+        #region DefaultValue
+
+        public static readonly DependencyProperty DefaultValueProperty = DependencyProperty.Register("DefaultValue", typeof(DateTime), typeof(DateTimeUpDown), new UIPropertyMetadata(DateTime.Now));
+        public DateTime DefaultValue
+        {
+            get { return (DateTime)GetValue(DefaultValueProperty); }
+            set { SetValue(DefaultValueProperty, value); }
+        }
+
+        #endregion //DefaultValue
+
         #region Format
 
         public static readonly DependencyProperty FormatProperty = DependencyProperty.Register("Format", typeof(DateTimeFormat), typeof(DateTimeUpDown), new UIPropertyMetadata(DateTimeFormat.FullDateTime, OnFormatChanged));
@@ -77,18 +88,6 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //FormatString
-
-        #region NullValue
-
-        public static readonly DependencyProperty NullValueProperty = DependencyProperty.Register("NullValue", typeof(DateTime), typeof(DateTimeUpDown), new UIPropertyMetadata(DateTime.Now));
-        public DateTime NullValue
-        {
-            get { return (DateTime)GetValue(NullValueProperty); }
-            set { SetValue(NullValueProperty, value); }
-        }
-
-
-        #endregion //NullValue
 
         #region Value
 
@@ -172,7 +171,7 @@ namespace Microsoft.Windows.Controls
             if (Value.HasValue)
                 UpdateDateTime(1);
             else
-                Value = NullValue;
+                Value = DefaultValue;
         }
 
         protected override void OnDecrement()
@@ -180,7 +179,7 @@ namespace Microsoft.Windows.Controls
             if (Value.HasValue)
                 UpdateDateTime(-1);
             else
-                Value = NullValue;
+                Value = DefaultValue;
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
