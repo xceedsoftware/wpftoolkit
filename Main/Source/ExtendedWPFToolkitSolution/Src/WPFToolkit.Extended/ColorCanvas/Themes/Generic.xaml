@@ -317,7 +317,7 @@
         <Setter Property="IsSnapToTickEnabled" Value="True" />
         <Setter Property="IsDirectionReversed" Value="False" />
         <Setter Property="IsMoveToPointEnabled" Value="True" />
-        <Setter Property="Value" Value="360" />
+        <Setter Property="Value" Value="0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ColorSpectrumSlider}">
