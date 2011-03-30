@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Globalization;
-using System.Text.RegularExpressions;
 
 namespace Microsoft.Windows.Controls
 {
@@ -14,8 +11,6 @@ namespace Microsoft.Windows.Controls
         private DateTimeFormatInfo DateTimeFormatInfo { get; set; }
 
         public string Format { get; set; }
-
-        private IEnumerable<string> MonthNames { get { return DateTimeFormatInfo.AbbreviatedMonthNames.Union(DateTimeFormatInfo.MonthNames); } }
 
         #endregion //Properties
 
@@ -44,136 +39,63 @@ namespace Microsoft.Windows.Controls
             if (string.IsNullOrEmpty(value))
                 return false;
 
-            //parse date
-            DateTime date;
-            success = TryParseDate(value, out date, currentDate);
+            var dateTimeString = ResolveDateTimeString(value, currentDate);
 
-            //parse time
-            DateTime time;
-            success = TryParseTime(value, out time, currentDate);
+            if (!String.IsNullOrEmpty(dateTimeString))
+                success = DateTime.TryParse(dateTimeString, DateTimeFormatInfo, DateTimeStyles.None, out result);
 
-            //merge the two
-            result = MergeDateAndTime(date, time);
+            if (!success)
+                result = currentDate;
 
             return success;
         }
 
-        #region Parse Date
-
-        public bool TryParseDate(string value, out DateTime result, DateTime currentDate)
+        private string ResolveDateTimeString(string dateTime, DateTime currentDate)
         {
-            bool success = false;
-            result = currentDate;
+            //  1/1/0001 12:00:00 AM
+            string[] dateParts = new string[3] { "1", "1", "0001" };
+            string[] timeParts = new string[3] { "12", "00", "00" };
+            string designator = "AM";
 
-            if (string.IsNullOrEmpty(value))
-                return false;
+            string[] dateTimeSeparators = new string[] { ",", " ", "-", DateTimeFormatInfo.DateSeparator, DateTimeFormatInfo.TimeSeparator };
 
-            var dateParts = GetDateParts(ResolveDateString(value)).ToArray();
+            var dateTimeParts = dateTime.Split(dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var formats = Format.Split(dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries).ToList();
 
-            if (dateParts.Length > 0)
-            {
-                var dateFormatParts = DateTimeFormatInfo.ShortDatePattern.Split(new string[] { DateTimeFormatInfo.DateSeparator }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                int yearIndex = dateFormatParts.IndexOf(dateFormatParts.FirstOrDefault(e => e.Contains("y") || e.Contains("Y")));
-                if (yearIndex >= 0 && yearIndex < dateParts.Length && dateParts[yearIndex].Length <= 2 && !dateParts.Any(dp => dp.Length > 2 && dp != dateParts[yearIndex]))
-                {
-                    if (dateParts[yearIndex].Length == 0)
-                    {
-                        dateParts[yearIndex] = "00";
-                    }
-                    else if (dateParts[yearIndex].Length == 1)
-                    {
-                        dateParts[yearIndex] = "0" + dateParts[yearIndex];
-                    }
-
-                    dateParts[yearIndex] = string.Format("{0}{1}", currentDate.Year / 100, dateParts[yearIndex]);
-                }
-
-                success = DateTime.TryParse(string.Join(DateTimeFormatInfo.DateSeparator, dateParts), DateTimeFormatInfo, DateTimeStyles.None, out result);
-                if (!success)
-                    result = currentDate;
-            }
-
-            return success;
-        }
-
-        private string ResolveDateString(string date)
-        {
-            string[] dateParts = new string[3]; // Month/Day/Year
-
-            string[] dateSeparators = new string[] { ",", " ", "/", "-", "T" };
-
-            var dates = date.Split(dateSeparators, StringSplitOptions.RemoveEmptyEntries).ToList();
-            var formats = Format.Split(dateSeparators, StringSplitOptions.RemoveEmptyEntries).ToList();
-
-            if (dates.Count != formats.Count)
+            //something went wrong
+            if (dateTimeParts.Count != formats.Count)
                 return string.Empty;
 
-            //strip out the date pieces
             for (int i = 0; i < formats.Count; i++)
             {
                 var format = formats[i];
-                if (!format.Equals("dddd") && !format.Equals(DateTimeFormatInfo.AMDesignator) && !format.Equals(DateTimeFormatInfo.PMDesignator))
+                if (!format.Contains("ddd") && !format.Contains("GMT"))
                 {
                     if (format.Contains("M"))
-                        dateParts[0] = dates[i];
+                        dateParts[0] = dateTimeParts[i];
                     else if (format.Contains("d"))
-                        dateParts[1] = dates[i];
+                        dateParts[1] = dateTimeParts[i];
                     else if (format.Contains("y"))
-                        dateParts[2] = dates[i];
+                    {
+                        dateParts[2] = dateTimeParts[i];
+                        if (dateParts[2].Length == 2)
+                            dateParts[2] = string.Format("{0}{1}", currentDate.Year / 100, dateParts[2]);
+                    }
+                    else if (format.Contains("h") || format.Contains("H"))
+                        timeParts[0] = dateTimeParts[i];
+                    else if (format.Contains("m"))
+                        timeParts[1] = dateTimeParts[i];
+                    else if (format.Contains("s"))
+                        timeParts[2] = dateTimeParts[i];
+                    else if (format.Contains("t"))
+                        designator = dateTimeParts[i];
                 }
             }
 
-            return string.Join(DateTimeFormatInfo.DateSeparator, dateParts);
-        }
+            var date = string.Join(DateTimeFormatInfo.DateSeparator, dateParts);
+            var time = string.Join(DateTimeFormatInfo.TimeSeparator, timeParts);
 
-        protected List<string> GetDateParts(string date)
-        {
-            var months = new Regex(GetDatePattern(), RegexOptions.IgnoreCase);
-            var dateParts = months.Matches(date)
-                                 .OfType<Match>()
-                                 .Select(match => match.Value)
-                                 .Where(s => !string.IsNullOrEmpty(s))
-                                 .ToList();
-            return dateParts;
-        }
-
-        protected string GetDatePattern()
-        {
-            var pattern = new StringBuilder(@"[0-9]+");
-
-            foreach (var m in MonthNames.Where(m => !string.IsNullOrEmpty(m)))
-            {
-                pattern.AppendFormat(@"|(?<=\b|\W|[0-9_]){0}(?=\b|\W|[0-9_])", m);
-            }
-
-            return pattern.ToString();
-        }
-
-        #endregion //Parse Date
-
-        #region Parse Time
-
-        public bool TryParseTime(string value, out DateTime result, DateTime fallback)
-        {
-            bool success = false;
-            result = fallback;
-
-            if (string.IsNullOrEmpty(value))
-                return false;
-
-            return success;
-        }
-
-        private string ResolveTimeString(string time)
-        {
-            return string.Empty;
-        }
-
-        #endregion //Parse Time
-
-        public static DateTime MergeDateAndTime(DateTime date, DateTime time)
-        {
-            return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second, time.Millisecond);
+            return String.Format("{0} {1} {2}", date, time, designator);
         }
 
         #endregion // Methods
