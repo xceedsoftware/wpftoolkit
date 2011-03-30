@@ -42,6 +42,7 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnSelectedColorChanged(Color oldValue, Color newValue)
         {
+            HexadecimalString = newValue.ToString();
             UpdateRGBValues(newValue);
             UpdateColorShadeSelectorPosition(newValue);
         }
@@ -69,7 +70,7 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnAChanged(byte oldValue, byte newValue)
         {
             if (!_surpressPropertyChanged)
-                UpdateRGBColor();
+                UpdateSelectedColor();
         }
 
         #endregion //A
@@ -93,7 +94,7 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnRChanged(byte oldValue, byte newValue)
         {
             if (!_surpressPropertyChanged)
-                UpdateRGBColor();
+                UpdateSelectedColor();
         }
 
         #endregion //R
@@ -117,7 +118,7 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnGChanged(byte oldValue, byte newValue)
         {
             if (!_surpressPropertyChanged)
-                UpdateRGBColor();
+                UpdateSelectedColor();
         }
 
         #endregion //G
@@ -141,7 +142,7 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnBChanged(byte oldValue, byte newValue)
         {
             if (!_surpressPropertyChanged)
-                UpdateRGBColor();
+                UpdateSelectedColor();
         }
 
         #endregion //B
@@ -167,9 +168,7 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnHexadecimalStringChanged(string oldValue, string newValue)
         {
             if (!SelectedColor.ToString().Equals(newValue))
-            {
-                SetSelectedColorAndPositionSelector((Color)ColorConverter.ConvertFromString(newValue));
-            }
+                UpdateSelectedColor((Color)ColorConverter.ConvertFromString(newValue));
         }
 
         #endregion //HexadecimalString
@@ -269,11 +268,9 @@ namespace Microsoft.Windows.Controls
 
         #region Methods
 
-        private void UpdateRGBColor()
+        private void UpdateSelectedColor()
         {
             SelectedColor = Color.FromArgb(A, R, G, B);
-            UpdateColorShadeSelectorPosition(SelectedColor);
-            HexadecimalString = SelectedColor.ToString();
         }
 
         private void UpdateSelectedColor(Color color)
@@ -291,13 +288,6 @@ namespace Microsoft.Windows.Controls
             B = color.B;
 
             _surpressPropertyChanged = false;
-        }
-
-        private void SetSelectedColorAndPositionSelector(Color color)
-        {
-            UpdateSelectedColor(color);
-            UpdateRGBValues(color);
-            UpdateColorShadeSelectorPosition(color);
         }
 
         private void UpdateColorShadeSelectorPositionAndCalculateColor(Point p, bool calculateColor)
