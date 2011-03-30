@@ -59,6 +59,7 @@
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:CalculatorUpDown}">
+        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
         <Setter Property="BorderThickness" Value="1,1,0,1" />
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
@@ -73,7 +74,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <local:ButtonSpinner x:Name="Spinner" IsTabStop="False" BorderThickness="{TemplateBinding BorderThickness}"
+                            <local:ButtonSpinner x:Name="Spinner" IsTabStop="False" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
                                          AllowSpin="{TemplateBinding AllowSpin}" ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
                                 <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0" 
                                                         Background="{TemplateBinding Background}"
@@ -100,7 +101,7 @@
                         <Popup x:Name="PART_CalculatorPopup" IsOpen="{Binding IsChecked, ElementName=_calculatorToggleButton}" StaysOpen="False">
                             <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" Padding="3">
                                 <StackPanel>
-                                    <local:Calculator x:Name="PART_Calculator" Background="Transparent" BorderThickness="0" Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+                                    <local:Calculator x:Name="PART_Calculator" Background="Transparent" BorderThickness="0" Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}" />
                                 </StackPanel>
                             </Border>
                         </Popup>

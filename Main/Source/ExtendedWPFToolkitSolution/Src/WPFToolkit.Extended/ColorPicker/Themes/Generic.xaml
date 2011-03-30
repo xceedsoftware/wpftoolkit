@@ -245,7 +245,7 @@
                                     <!-- ColorCanvas -->
                                     <Grid x:Name="_colorCanvasHost" Visibility="Collapsed">
                                         <local:ColorCanvas x:Name="PART_ColorCanvas" Background="Transparent" BorderThickness="0"
-                                                           SelectedColor="{Binding SelectedColor, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                                           SelectedColor="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}" />
                                     </Grid>
                                     
                                     <Separator Grid.Row="1" HorizontalAlignment="Stretch" Margin="5,0,5,0" />

@@ -232,7 +232,7 @@ namespace Microsoft.Windows.Controls
 
         #region Value
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(DateTime?), typeof(TimePicker), new UIPropertyMetadata(null, OnValueChanged));
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(DateTime?), typeof(TimePicker), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged));
         public DateTime? Value
         {
             get { return (DateTime?)GetValue(ValueProperty); }

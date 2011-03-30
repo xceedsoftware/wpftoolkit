@@ -148,7 +148,7 @@ namespace Microsoft.Windows.Controls
 
         #region Value
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(decimal), typeof(Calculator), new UIPropertyMetadata(default(decimal), OnValueChanged));
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(decimal), typeof(Calculator), new FrameworkPropertyMetadata(default(decimal), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged));
         public decimal Value
         {
             get { return (decimal)GetValue(ValueProperty); }

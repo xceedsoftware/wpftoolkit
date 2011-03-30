@@ -15,6 +15,7 @@
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:MaskedTextBox}">
+        <Setter Property="Background" Value="White"/>
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
         <Setter Property="Focusable" Value="False" />
         <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
