@@ -19,6 +19,17 @@ namespace Microsoft.Windows.Controls
 
         #region Properties
 
+        #region DefaultValue
+
+        public static readonly DependencyProperty DefaultValueProperty = DependencyProperty.Register("DefaultValue", typeof(decimal), typeof(NumericUpDown), new UIPropertyMetadata(default(decimal)));
+        public decimal DefaultValue
+        {
+            get { return (decimal)GetValue(DefaultValueProperty); }
+            set { SetValue(DefaultValueProperty, value); }
+        }
+
+        #endregion //DefaultValue
+
         #region Minimum
 
         public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register("Minimum", typeof(decimal), typeof(NumericUpDown), new PropertyMetadata(Decimal.MinValue, OnMinimumPropertyChanged));
@@ -85,18 +96,6 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //FormatString
-
-        #region NullValue
-
-        public static readonly DependencyProperty NullValueProperty = DependencyProperty.Register("NullValue", typeof(decimal), typeof(NumericUpDown), new UIPropertyMetadata(default(decimal)));
-        public decimal NullValue
-        {
-            get { return (decimal)GetValue(NullValueProperty); }
-            set { SetValue(NullValueProperty, value); }
-        }
-        
-
-        #endregion //NullValue
 
         #region SelectAllOnGotFocus
 
@@ -212,7 +211,7 @@ namespace Microsoft.Windows.Controls
             if (Value.HasValue)
                 Value += Increment;
             else
-                Value = NullValue;
+                Value = DefaultValue;
         }
 
         protected override void OnDecrement()
@@ -220,7 +219,7 @@ namespace Microsoft.Windows.Controls
             if (Value.HasValue)
                 Value -= Increment;
             else
-                Value = NullValue;
+                Value = DefaultValue;
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
