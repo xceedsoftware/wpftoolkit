@@ -21,23 +21,24 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #region Text
 
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(InputBase), new PropertyMetadata(default(String), OnTextPropertyChanged));
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(InputBase), new UIPropertyMetadata(default(String), OnTextChanged));
         public string Text
         {
             get { return (string)GetValue(TextProperty); }
             set { SetValue(TextProperty, value); }
         }
 
-        private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnTextChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-            InputBase input = (InputBase)d;
-            input.OnTextChanged((string)e.OldValue, (string)e.NewValue);
+            InputBase inputBase = o as InputBase;
+            if (inputBase != null)
+                inputBase.OnTextChanged((string)e.OldValue, (string)e.NewValue);
         }
 
-        protected virtual void OnTextChanged(string previousValue, string currentValue)
+        protected virtual void OnTextChanged(string oldValue, string newValue)
         {
 
-        }
+        }        
 
         #endregion //Text
 
