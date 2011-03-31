@@ -1,12 +1,24 @@
 ﻿using System;
 using System.Windows.Controls;
 using System.Windows;
+using System.Globalization;
 
 namespace Microsoft.Windows.Controls.Primitives
 {
     public abstract class InputBase : Control
     {
         #region Properties
+
+        #region CultureInfo
+
+        public static readonly DependencyProperty CultureInfoProperty = DependencyProperty.Register("CultureInfo", typeof(CultureInfo), typeof(InputBase), new UIPropertyMetadata(CultureInfo.CurrentCulture));
+        public CultureInfo CultureInfo
+        {
+            get { return (CultureInfo)GetValue(CultureInfoProperty); }
+            set { SetValue(CultureInfoProperty, value); }
+        }
+
+        #endregion //CultureInfo
 
         #region IsEditable
 

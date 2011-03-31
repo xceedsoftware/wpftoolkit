@@ -6,6 +6,7 @@ using Microsoft.Windows.Controls.Primitives;
 
 namespace Microsoft.Windows.Controls
 {
+    [Obsolete("This control has been replaced with numeric data type specific controls; DecimalUpDown, DoubleUpDown, IntegerUpDown")]
     public class NumericUpDown : UpDownBase
     {
         #region Members

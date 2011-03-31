@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using Microsoft.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows;
+using System.Windows.Data;
 
 namespace Microsoft.Windows.Controls.Primitives
 {
@@ -187,6 +188,13 @@ namespace Microsoft.Windows.Controls.Primitives
         #endregion //Methods
     }
 
+
+
+
+
+
+
+
     /// <summary>
     /// This is going to be the new UpDownBase class.  In order to reliably support the different numeric data types, I need to create a specific control for each data type.
     /// So instead of copying and pasting I am going to try to create a generic base class that has most of the logic in it.  This will make the NumericUpDown control obsolete
@@ -216,8 +224,8 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #region Properties
 
+        protected Spinner Spinner { get; private set; }
         protected TextBox TextBox { get; private set; }
-        internal Spinner Spinner { get; private set; }
 
         #region AllowSpin
 
@@ -260,7 +268,7 @@ namespace Microsoft.Windows.Controls.Primitives
         }
 
         protected virtual T OnCoerceValue(T value)
-        {
+        {            
             return value;
         }
 
@@ -273,7 +281,7 @@ namespace Microsoft.Windows.Controls.Primitives
 
         protected virtual void OnValueChanged(T oldValue, T newValue)
         {
-            SyncTextAndValueProperties(NumericUpDown.ValueProperty, newValue);
+            SyncTextAndValueProperties(NumericUpDown.ValueProperty, string.Empty);
 
             RoutedPropertyChangedEventArgs<T> args = new RoutedPropertyChangedEventArgs<T>(oldValue, newValue);
             args.RoutedEvent = NumericUpDown.ValueChangedEvent;
@@ -291,6 +299,14 @@ namespace Microsoft.Windows.Controls.Primitives
         #endregion //Constructors
 
         #region Base Class Overrides
+
+        protected override void OnAccessKey(AccessKeyEventArgs e)
+        {
+            if (TextBox != null)
+                TextBox.Focus();
+
+            base.OnAccessKey(e);
+        }
 
         public override void OnApplyTemplate()
         {
@@ -313,14 +329,14 @@ namespace Microsoft.Windows.Controls.Primitives
             {
                 case Key.Up:
                     {
-                        if (AllowSpin)
+                        if (AllowSpin && IsEditable)
                             DoIncrement();
                         e.Handled = true;
                         break;
                     }
                 case Key.Down:
                     {
-                        if (AllowSpin)
+                        if (AllowSpin && IsEditable)
                             DoDecrement();
                         e.Handled = true;
                         break;
@@ -328,7 +344,10 @@ namespace Microsoft.Windows.Controls.Primitives
                 case Key.Enter:
                     {
                         if (IsEditable)
-                            SyncTextAndValueProperties(UpDownBase.TextProperty, TextBox.Text);
+                        {
+                            var binding = BindingOperations.GetBindingExpression(TextBox, System.Windows.Controls.TextBox.TextProperty);
+                            binding.UpdateSource();
+                        }
                         break;
                     }
             }
@@ -338,7 +357,7 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             base.OnMouseWheel(e);
 
-            if (!e.Handled && AllowSpin)
+            if (!e.Handled && AllowSpin && IsEditable)
             {
                 if (e.Delta < 0)
                 {
@@ -416,7 +435,7 @@ namespace Microsoft.Windows.Controls.Primitives
             }
         }
 
-        private void SyncTextAndValueProperties(DependencyProperty p, object newValue)
+        private void SyncTextAndValueProperties(DependencyProperty p, string text)
         {
             //prevents recursive syncing properties
             if (_isSyncingTextAndValueProperties)
@@ -427,11 +446,10 @@ namespace Microsoft.Windows.Controls.Primitives
             //this only occures when the user typed in the value
             if (InputBase.TextProperty == p)
             {
-                string text = newValue == null ? String.Empty : newValue.ToString();
-                SetValue(UpDownBase<T>.ValueProperty, ConvertTextToValue(text));
+                Value = ConvertTextToValue(text);
             }
 
-            SetValue(InputBase.TextProperty, ConvertValueToText(newValue));
+            Text = ConvertValueToText();
 
             _isSyncingTextAndValueProperties = false;
         }
@@ -450,7 +468,7 @@ namespace Microsoft.Windows.Controls.Primitives
 
         protected abstract T ConvertTextToValue(string text);
 
-        protected abstract string ConvertValueToText(object value);
+        protected abstract string ConvertValueToText();
 
         #endregion //Abstract
 
