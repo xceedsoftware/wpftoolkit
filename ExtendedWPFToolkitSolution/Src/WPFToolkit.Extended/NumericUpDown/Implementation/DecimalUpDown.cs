@@ -55,7 +55,7 @@ namespace Microsoft.Windows.Controls
 
             try
             {
-                result = Decimal.Parse(text, System.Globalization.NumberStyles.Any, CultureInfo);
+                result = FormatString.Contains("P") ? ParsePercent(text, CultureInfo) : ParseDecimal(text, CultureInfo);
             }
             catch
             {

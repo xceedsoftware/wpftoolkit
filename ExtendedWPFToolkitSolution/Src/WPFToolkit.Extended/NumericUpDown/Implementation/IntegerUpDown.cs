@@ -55,7 +55,8 @@ namespace Microsoft.Windows.Controls
 
             try
             {
-                result = Int32.Parse(text, System.Globalization.NumberStyles.Any, CultureInfo);
+                //don't know why someone would format an integer as %, but just in case they do.
+                result = FormatString.Contains("P") ? Decimal.ToInt32(ParsePercent(text, CultureInfo)) : ParseInt(text, CultureInfo);
             }
             catch
             {
