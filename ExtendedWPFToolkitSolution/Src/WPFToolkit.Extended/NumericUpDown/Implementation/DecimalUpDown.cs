@@ -1,21 +1,21 @@
 ﻿using System;
+using Microsoft.Windows.Controls.Primitives;
 using System.Windows;
 using System.Windows.Input;
-using Microsoft.Windows.Controls.Primitives;
 
 namespace Microsoft.Windows.Controls
 {
-    public class IntegerUpDown : UpDownBase<int?>
+    public class DecimalUpDown : UpDownBase<decimal?>
     {
         #region Properties
 
         #region DefaultValue
 
         //can possibly be in base class
-        public static readonly DependencyProperty DefaultValueProperty = DependencyProperty.Register("DefaultValue", typeof(int), typeof(IntegerUpDown), new UIPropertyMetadata(default(int)));
-        public int DefaultValue
+        public static readonly DependencyProperty DefaultValueProperty = DependencyProperty.Register("DefaultValue", typeof(decimal), typeof(DecimalUpDown), new UIPropertyMetadata(default(decimal)));
+        public decimal DefaultValue
         {
-            get { return (int)GetValue(DefaultValueProperty); }
+            get { return (decimal)GetValue(DefaultValueProperty); }
             set { SetValue(DefaultValueProperty, value); }
         }
 
@@ -23,7 +23,7 @@ namespace Microsoft.Windows.Controls
 
         #region FormatString
 
-        public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register("FormatString", typeof(string), typeof(IntegerUpDown), new UIPropertyMetadata(String.Empty));
+        public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register("FormatString", typeof(string), typeof(DecimalUpDown), new UIPropertyMetadata(String.Empty));
         public string FormatString
         {
             get { return (string)GetValue(FormatStringProperty); }
@@ -34,10 +34,10 @@ namespace Microsoft.Windows.Controls
 
         #region Increment
 
-        public static readonly DependencyProperty IncrementProperty = DependencyProperty.Register("Increment", typeof(int), typeof(IntegerUpDown), new PropertyMetadata(1));
-        public int Increment
+        public static readonly DependencyProperty IncrementProperty = DependencyProperty.Register("Increment", typeof(decimal), typeof(DecimalUpDown), new PropertyMetadata(1m));
+        public decimal Increment
         {
-            get { return (int)GetValue(IncrementProperty); }
+            get { return (decimal)GetValue(IncrementProperty); }
             set { SetValue(IncrementProperty, value); }
         }
 
@@ -45,21 +45,21 @@ namespace Microsoft.Windows.Controls
 
         #region Maximum
 
-        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register("Maximum", typeof(int), typeof(IntegerUpDown), new UIPropertyMetadata(int.MaxValue, OnMaximumChanged));
-        public int Maximum
+        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register("Maximum", typeof(decimal), typeof(DecimalUpDown), new UIPropertyMetadata(decimal.MaxValue, OnMaximumChanged));
+        public decimal Maximum
         {
-            get { return (int)GetValue(MaximumProperty); }
+            get { return (decimal)GetValue(MaximumProperty); }
             set { SetValue(MaximumProperty, value); }
         }
 
         private static void OnMaximumChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-            IntegerUpDown integerUpDown = o as IntegerUpDown;
-            if (integerUpDown != null)
-                integerUpDown.OnMaximumChanged((int)e.OldValue, (int)e.NewValue);
+            DecimalUpDown decimalUpDown = o as DecimalUpDown;
+            if (decimalUpDown != null)
+                decimalUpDown.OnMaximumChanged((decimal)e.OldValue, (decimal)e.NewValue);
         }
 
-        protected virtual void OnMaximumChanged(int oldValue, int newValue)
+        protected virtual void OnMaximumChanged(decimal oldValue, decimal newValue)
         {
             //SetValidSpinDirection();
         }
@@ -68,21 +68,21 @@ namespace Microsoft.Windows.Controls
 
         #region Minimum
 
-        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register("Minimum", typeof(int), typeof(IntegerUpDown), new UIPropertyMetadata(int.MinValue, OnMinimumChanged));
-        public int Minimum
+        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register("Minimum", typeof(decimal), typeof(DecimalUpDown), new UIPropertyMetadata(decimal.MinValue, OnMinimumChanged));
+        public decimal Minimum
         {
-            get { return (int)GetValue(MinimumProperty); }
+            get { return (decimal)GetValue(MinimumProperty); }
             set { SetValue(MinimumProperty, value); }
         }
 
         private static void OnMinimumChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-            IntegerUpDown integerUpDown = o as IntegerUpDown;
-            if (integerUpDown != null)
-                integerUpDown.OnMinimumChanged((int)e.OldValue, (int)e.NewValue);
+            DecimalUpDown decimalUpDown = o as DecimalUpDown;
+            if (decimalUpDown != null)
+                decimalUpDown.OnMinimumChanged((decimal)e.OldValue, (decimal)e.NewValue);
         }
 
-        protected virtual void OnMinimumChanged(int oldValue, int newValue)
+        protected virtual void OnMinimumChanged(decimal oldValue, decimal newValue)
         {
             //SetValidSpinDirection();
         }
@@ -91,7 +91,7 @@ namespace Microsoft.Windows.Controls
 
         #region SelectAllOnGotFocus
 
-        public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register("SelectAllOnGotFocus", typeof(bool), typeof(IntegerUpDown), new PropertyMetadata(false));
+        public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register("SelectAllOnGotFocus", typeof(bool), typeof(DecimalUpDown), new PropertyMetadata(false));
         public bool SelectAllOnGotFocus
         {
             get { return (bool)GetValue(SelectAllOnGotFocusProperty); }
@@ -104,9 +104,9 @@ namespace Microsoft.Windows.Controls
 
         #region Constructors
 
-        static IntegerUpDown()
+        static DecimalUpDown()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(IntegerUpDown), new FrameworkPropertyMetadata(typeof(IntegerUpDown)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DecimalUpDown), new FrameworkPropertyMetadata(typeof(DecimalUpDown)));
         }
 
         #endregion //Constructors
@@ -127,11 +127,11 @@ namespace Microsoft.Windows.Controls
             //SetValidSpinDirection();
         }
 
-        protected override int? OnCoerceValue(int? value)
+        protected override decimal? OnCoerceValue(decimal? value)
         {
             if (value == null) return value;
 
-            int val = value.Value;
+            decimal val = value.Value;
 
             if (value < Minimum)
                 return Minimum;
@@ -157,16 +157,16 @@ namespace Microsoft.Windows.Controls
                 Value = DefaultValue;
         }
 
-        protected override int? ConvertTextToValue(string text)
+        protected override decimal? ConvertTextToValue(string text)
         {
-            int? result = null;
+            decimal? result = null;
 
             if (String.IsNullOrEmpty(text))
                 return result;
 
             try
             {
-                result = Int32.Parse(text, System.Globalization.NumberStyles.Any, CultureInfo);
+                result = Decimal.Parse(text, System.Globalization.NumberStyles.Any, CultureInfo);
             }
             catch
             {
@@ -185,7 +185,7 @@ namespace Microsoft.Windows.Controls
             return Value.Value.ToString(FormatString, CultureInfo);
         }
 
-        protected override void OnValueChanged(int? oldValue, int? newValue)
+        protected override void OnValueChanged(decimal? oldValue, decimal? newValue)
         {
             //SetValidSpinDirection();
             base.OnValueChanged(oldValue, newValue);
