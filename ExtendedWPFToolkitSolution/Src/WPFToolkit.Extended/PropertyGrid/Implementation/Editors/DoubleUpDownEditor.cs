@@ -2,11 +2,11 @@
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
-    public class NumericUpDownEditor : TypeEditor<NumericUpDown>
+    public class DoubleUpDownEditor : TypeEditor<DoubleUpDown>
     {
         protected override void SetValueDependencyProperty()
         {
-            ValueProperty = NumericUpDown.ValueProperty;
+            ValueProperty = DoubleUpDown.ValueProperty;
         }
     }
 }
