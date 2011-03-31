@@ -142,16 +142,16 @@ namespace Microsoft.Windows.Controls
         {
             get { return (int)GetValue(PrecisionProperty); }
             set { SetValue(PrecisionProperty, value); }
-        }    
+        }
 
         #endregion //Precision
 
         #region Value
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(decimal), typeof(Calculator), new FrameworkPropertyMetadata(default(decimal), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged));
-        public decimal Value
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(decimal?), typeof(Calculator), new FrameworkPropertyMetadata(default(decimal), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged));
+        public decimal? Value
         {
-            get { return (decimal)GetValue(ValueProperty); }
+            get { return (decimal?)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
         }
 
@@ -159,12 +159,15 @@ namespace Microsoft.Windows.Controls
         {
             Calculator calculator = o as Calculator;
             if (calculator != null)
-                calculator.OnValueChanged((decimal)e.OldValue, (decimal)e.NewValue);
+                calculator.OnValueChanged((decimal?)e.OldValue, (decimal?)e.NewValue);
         }
 
-        protected virtual void OnValueChanged(decimal oldValue, decimal newValue)
+        protected virtual void OnValueChanged(decimal? oldValue, decimal? newValue)
         {
-            DisplayText = newValue.ToString();
+            if (newValue.HasValue)
+                DisplayText = newValue.ToString();
+            else
+                DisplayText = "0";
         }
 
         #endregion //Value

@@ -8,14 +8,13 @@ using System.Windows.Data;
 
 namespace Microsoft.Windows.Controls
 {
-    public class DateTimeUpDown : UpDownBase
+    public class DateTimeUpDown : UpDownBase<DateTime?>
     {
         #region Members
 
         private List<DateTimeInfo> _dateTimeInfoList = new List<DateTimeInfo>();
         private DateTimeInfo _selectedDateTimeInfo;
         private bool _fireSelectionChangedEvent = true;
-        private bool _isSyncingTextAndValueProperties;
 
         private DateTimeParser _dateTimeParser;
 
@@ -89,58 +88,6 @@ namespace Microsoft.Windows.Controls
 
         #endregion //FormatString
 
-        #region Value
-
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(DateTime?), typeof(DateTimeUpDown), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue));
-        public DateTime? Value
-        {
-            get { return (DateTime?)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
-        }
-
-        private static object OnCoerceValue(DependencyObject o, object value)
-        {
-            DateTimeUpDown dateTimeUpDown = o as DateTimeUpDown;
-            if (dateTimeUpDown != null)
-                return dateTimeUpDown.OnCoerceValue((DateTime?)value);
-            else
-                return value;
-        }
-
-        protected virtual DateTime? OnCoerceValue(DateTime? value)
-        {
-            //if the user entered a string value to represent a date or time, we need to parse that string into a valid DatTime value
-            if (value != null && !(value is DateTime))
-            {
-                return DateTime.Parse(value.ToString(), DateTimeFormatInfo);
-            }
-
-            return value;
-        }
-
-        private static void OnValueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            DateTimeUpDown dateTimeUpDown = o as DateTimeUpDown;
-            if (dateTimeUpDown != null)
-                dateTimeUpDown.OnValueChanged((DateTime?)e.OldValue, (DateTime?)e.NewValue);
-        }
-
-        protected virtual void OnValueChanged(DateTime? oldValue, DateTime? newValue)
-        {
-            //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
-            //but only if it is not null
-            if (newValue != null)
-                ParseValueIntoDateTimeInfo();
-
-            SyncTextAndValueProperties(DateTimeUpDown.ValueProperty, newValue);
-
-            RoutedPropertyChangedEventArgs<DateTime?> args = new RoutedPropertyChangedEventArgs<DateTime?>(oldValue, newValue);
-            args.RoutedEvent = DateTimeUpDown.ValueChangedEvent;
-            RaiseEvent(args);
-        }
-
-        #endregion //Value
-
         #endregion //Properties
 
         #region Constructors
@@ -152,7 +99,7 @@ namespace Microsoft.Windows.Controls
 
         public DateTimeUpDown()
         {
-            DateTimeFormatInfo = DateTimeFormatInfo.GetInstance(CultureInfo.CurrentCulture);
+            DateTimeFormatInfo = DateTimeFormatInfo.GetInstance(CultureInfo);
             InitializeDateTimeInfoList();
         }
 
@@ -194,6 +141,7 @@ namespace Microsoft.Windows.Controls
                             BindingExpression binding = BindingOperations.GetBindingExpression(TextBox, System.Windows.Controls.TextBox.TextProperty);
                             binding.UpdateSource();
                             _fireSelectionChangedEvent = true;
+                            e.Handled = true;
                         }
                         return;
                     }
@@ -210,7 +158,6 @@ namespace Microsoft.Windows.Controls
         protected override void OnTextChanged(string previousValue, string currentValue)
         {
             //TODO: clean this up and make sure it doesn't fire recursively
-
             if (String.IsNullOrEmpty(currentValue))
             {
                 Value = null;
@@ -224,7 +171,44 @@ namespace Microsoft.Windows.Controls
             DateTime result;
             var success = _dateTimeParser.TryParse(currentValue, out result, current);
 
-            SyncTextAndValueProperties(InputBase.TextProperty, result);
+            SyncTextAndValueProperties(InputBase.TextProperty, result.ToString());
+        }
+
+        protected override DateTime? OnCoerceValue(DateTime? value)
+        {
+            //if the user entered a string value to represent a date or time, we need to parse that string into a valid DatTime value
+            if (value != null && !(value is DateTime))
+            {
+                return DateTime.Parse(value.ToString(), DateTimeFormatInfo);
+            }
+
+            return value;
+        }
+
+        protected override DateTime? ConvertTextToValue(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            return DateTime.Parse(text, CultureInfo.CurrentCulture);
+        }
+
+        protected override string ConvertValueToText()
+        {
+            if (Value == null) return string.Empty;
+
+            DateTime dt = DateTime.Parse(Value.ToString(), CultureInfo);
+            return dt.ToString(GetFormatString(Format), CultureInfo);
+        }
+
+        protected override void OnValueChanged(DateTime? oldValue, DateTime? newValue)
+        {
+            //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
+            //but only if it is not null
+            if (newValue != null)
+                ParseValueIntoDateTimeInfo();
+
+            base.OnValueChanged(oldValue, newValue);
         }
 
         #endregion //Base Class Overrides
@@ -233,24 +217,13 @@ namespace Microsoft.Windows.Controls
 
         void TextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
-            if (_fireSelectionChangedEvent) 
+            if (_fireSelectionChangedEvent)
                 PerformMouseSelection();
             else
                 _fireSelectionChangedEvent = true;
         }
 
         #endregion //Event Hanlders
-
-        #region Events
-
-        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<DateTime?>), typeof(DateTimeUpDown));
-        public event RoutedPropertyChangedEventHandler<DateTime?> ValueChanged
-        {
-            add { AddHandler(ValueChangedEvent, value); }
-            remove { RemoveHandler(ValueChangedEvent, value); }
-        }
-
-        #endregion //Events
 
         #region Methods
 
@@ -562,42 +535,6 @@ namespace Microsoft.Windows.Controls
             //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event
             TextBox.Select(info.StartPosition, info.Length);
             _fireSelectionChangedEvent = true;
-        }
-
-        private DateTime? ConvertTextToValue(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return null;
-
-            return DateTime.Parse(text, CultureInfo.CurrentCulture);
-        }
-
-        private string ConvertValueToText(object value)
-        {
-            if (value == null) return string.Empty;
-
-            DateTime dt = DateTime.Parse(value.ToString(), CultureInfo.CurrentCulture);
-            return dt.ToString(GetFormatString(Format), CultureInfo.CurrentCulture);
-        }
-
-        private void SyncTextAndValueProperties(DependencyProperty p, object newValue)
-        {
-            //prevents recursive syncing properties
-            if (_isSyncingTextAndValueProperties)
-                return;
-
-            _isSyncingTextAndValueProperties = true;
-
-            //this only occures when the user typed in the value
-            if (InputBase.TextProperty == p)
-            {
-                string text = newValue == null ? String.Empty : newValue.ToString();
-                SetValue(DateTimeUpDown.ValueProperty, ConvertTextToValue(text));
-            }
-
-            SetValue(InputBase.TextProperty, ConvertValueToText(newValue));
-
-            _isSyncingTextAndValueProperties = false;
         }
 
         #endregion //Methods
