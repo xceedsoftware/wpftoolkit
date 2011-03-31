@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Windows.Controls.Primitives;
+using System.Globalization;
 
 namespace Microsoft.Windows.Controls
 {
@@ -155,6 +156,34 @@ namespace Microsoft.Windows.Controls
         //    if (Spinner != null)
         //        Spinner.ValidSpinDirection = validDirections;
         //}
+
+
+        protected static decimal ParseDecimal(string text, IFormatProvider cultureInfo)
+        {
+            return Decimal.Parse(text, NumberStyles.Any, cultureInfo);
+        }
+
+        protected static double ParseDouble(string text, IFormatProvider cultureInfo)
+        {
+            return Double.Parse(text, NumberStyles.Any, cultureInfo);
+        }
+
+        protected static int ParseInt(string text, IFormatProvider cultureInfo)
+        {
+            return Int32.Parse(text, NumberStyles.Any, cultureInfo);
+        }
+
+        protected static decimal ParsePercent(string text, IFormatProvider cultureInfo)
+        {
+            NumberFormatInfo info = NumberFormatInfo.GetInstance(cultureInfo);
+
+            text = text.Replace(info.PercentSymbol, null);
+
+            decimal result = Decimal.Parse(text, NumberStyles.Any, info);
+            result = result / 100;
+
+            return result;
+        }
 
         #endregion //Methods
     }
