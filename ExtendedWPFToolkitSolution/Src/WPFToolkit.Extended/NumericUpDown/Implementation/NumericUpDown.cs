@@ -92,7 +92,8 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnStringFormatChanged(string oldValue, string newValue)
         {
-            SyncTextAndValueProperties(NumericUpDown.TextProperty, Value);
+            //Don't think this is needed anymore
+            //SyncTextAndValueProperties(NumericUpDown.TextProperty, Value);
         }
 
         #endregion //FormatString
