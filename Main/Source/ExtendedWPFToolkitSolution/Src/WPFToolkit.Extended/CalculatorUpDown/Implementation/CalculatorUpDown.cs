@@ -5,7 +5,7 @@ using System.Windows.Controls.Primitives;
 
 namespace Microsoft.Windows.Controls
 {
-    public class CalculatorUpDown : NumericUpDown
+    public class CalculatorUpDown : DecimalUpDown
     {
         #region Members
 
