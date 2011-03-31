@@ -322,8 +322,10 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                     editor = new TextBlockEditor();
                 else if (propertyItem.PropertyType == typeof(bool))
                     editor = new CheckBoxEditor();
-                else if (propertyItem.PropertyType == typeof(double) || propertyItem.PropertyType == typeof(int))
-                    editor = new NumericUpDownEditor();
+                //else if (propertyItem.PropertyType == typeof(double))
+                //    editor = new NumericUpDownEditor();
+                else if (propertyItem.PropertyType == typeof(int) || propertyItem.PropertyType == typeof(int?))
+                    editor = new IntegerUpDownEditor();
                 else if (propertyItem.PropertyType == typeof(DateTime))
                     editor = new DateTimeUpDownEditor();
                 else if (propertyItem.PropertyType.IsEnum)

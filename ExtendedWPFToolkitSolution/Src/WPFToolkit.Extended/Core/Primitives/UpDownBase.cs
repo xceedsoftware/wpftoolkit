@@ -243,7 +243,7 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #region Value
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(T), typeof(UpDownBase<T>), new UIPropertyMetadata(default(T), OnValueChanged, OnCoerceValue));
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(T), typeof(UpDownBase<T>), new FrameworkPropertyMetadata(default(T), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue));
         public T Value
         {
             get { return (T)GetValue(ValueProperty); }
@@ -301,6 +301,12 @@ namespace Microsoft.Windows.Controls.Primitives
             Spinner.Spin += OnSpinnerSpin;
         }
 
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            if (TextBox != null)
+                TextBox.Focus();
+        }
+
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             switch (e.Key)
@@ -319,12 +325,12 @@ namespace Microsoft.Windows.Controls.Primitives
                         e.Handled = true;
                         break;
                     }
-                //case Key.Enter:
-                //    {
-                //        if (IsEditable)
-                //            SyncTextAndValueProperties(UpDownBase.TextProperty, TextBox.Text);
-                //        break;
-                //    }
+                case Key.Enter:
+                    {
+                        if (IsEditable)
+                            SyncTextAndValueProperties(UpDownBase.TextProperty, TextBox.Text);
+                        break;
+                    }
             }
         }
 
@@ -366,7 +372,7 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #region Events
 
-        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<T>), typeof(NumericUpDown));
+        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<T>), typeof(UpDownBase<T>));
         public event RoutedPropertyChangedEventHandler<T> ValueChanged
         {
             add { AddHandler(ValueChangedEvent, value); }
