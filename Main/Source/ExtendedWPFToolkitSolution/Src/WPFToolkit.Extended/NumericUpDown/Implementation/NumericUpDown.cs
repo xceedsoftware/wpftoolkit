@@ -363,4 +363,158 @@ namespace Microsoft.Windows.Controls
 
         #endregion //Methods
     }
+
+    public abstract class NumericUpDown<T> : UpDownBase<T>
+    {
+        #region Properties
+
+        #region DefaultValue
+
+        public static readonly DependencyProperty DefaultValueProperty = DependencyProperty.Register("DefaultValue", typeof(T), typeof(NumericUpDown<T>), new UIPropertyMetadata(default(T)));
+        public T DefaultValue
+        {
+            get { return (T)GetValue(DefaultValueProperty); }
+            set { SetValue(DefaultValueProperty, value); }
+        }
+
+        #endregion //DefaultValue
+
+        #region FormatString
+
+        public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register("FormatString", typeof(string), typeof(NumericUpDown<T>), new UIPropertyMetadata(String.Empty));
+        public string FormatString
+        {
+            get { return (string)GetValue(FormatStringProperty); }
+            set { SetValue(FormatStringProperty, value); }
+        }
+
+        #endregion //FormatString
+
+        #region Increment
+
+        public static readonly DependencyProperty IncrementProperty = DependencyProperty.Register("Increment", typeof(T), typeof(NumericUpDown<T>), new PropertyMetadata(default(T)));
+        public T Increment
+        {
+            get { return (T)GetValue(IncrementProperty); }
+            set { SetValue(IncrementProperty, value); }
+        }
+
+        #endregion
+
+        #region Maximum
+
+        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register("Maximum", typeof(T), typeof(NumericUpDown<T>), new UIPropertyMetadata(default(T), OnMaximumChanged));
+        public T Maximum
+        {
+            get { return (T)GetValue(MaximumProperty); }
+            set { SetValue(MaximumProperty, value); }
+        }
+
+        private static void OnMaximumChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            NumericUpDown<T> integerUpDown = o as NumericUpDown<T>;
+            if (integerUpDown != null)
+                integerUpDown.OnMaximumChanged((T)e.OldValue, (T)e.NewValue);
+        }
+
+        protected virtual void OnMaximumChanged(T oldValue, T newValue)
+        {
+            //SetValidSpinDirection();
+        }
+
+        #endregion //Maximum
+
+        #region Minimum
+
+        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register("Minimum", typeof(T), typeof(NumericUpDown<T>), new UIPropertyMetadata(default(T), OnMinimumChanged));
+        public T Minimum
+        {
+            get { return (T)GetValue(MinimumProperty); }
+            set { SetValue(MinimumProperty, value); }
+        }
+
+        private static void OnMinimumChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            NumericUpDown<T> integerUpDown = o as NumericUpDown<T>;
+            if (integerUpDown != null)
+                integerUpDown.OnMinimumChanged((T)e.OldValue, (T)e.NewValue);
+        }
+
+        protected virtual void OnMinimumChanged(T oldValue, T newValue)
+        {
+            //SetValidSpinDirection();
+        }
+
+        #endregion //Minimum
+
+        #region SelectAllOnGotFocus
+
+        public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register("SelectAllOnGotFocus", typeof(bool), typeof(NumericUpDown<T>), new PropertyMetadata(false));
+        public bool SelectAllOnGotFocus
+        {
+            get { return (bool)GetValue(SelectAllOnGotFocusProperty); }
+            set { SetValue(SelectAllOnGotFocusProperty, value); }
+        }
+
+        #endregion //SelectAllOnGotFocus
+
+        #endregion //Properties
+
+        #region Base Class Overrides
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            if (SelectAllOnGotFocus)
+            {
+                //in order to select all the text we must handle both the keybord (tabbing) and mouse (clicking) events
+                TextBox.GotKeyboardFocus += OnTextBoxGotKeyBoardFocus;
+                TextBox.PreviewMouseLeftButtonDown += OnTextBoxPreviewMouseLeftButtonDown;
+            }
+
+            //SetValidSpinDirection();
+        }
+
+        #endregion //Base Class Overrides
+
+        #region Event Handlers
+
+        private void OnTextBoxGotKeyBoardFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox.SelectAll();
+        }
+
+        void OnTextBoxPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!TextBox.IsKeyboardFocused)
+            {
+                e.Handled = true;
+                TextBox.Focus();
+            }
+        }
+
+        #endregion //Event Handlers
+
+        #region Methods
+
+        /// <summary>
+        /// Sets the valid spin direction based on current value, minimum and maximum.
+        /// </summary>
+        //private void SetValidSpinDirection()
+        //{
+        //    ValidSpinDirections validDirections = ValidSpinDirections.None;
+
+        //    if (Value < Maximum)
+        //        validDirections = validDirections | ValidSpinDirections.Increase;
+
+        //    if (Value > Minimum)
+        //        validDirections = validDirections | ValidSpinDirections.Decrease;
+
+        //    if (Spinner != null)
+        //        Spinner.ValidSpinDirection = validDirections;
+        //}
+
+        #endregion //Methods
+    }
 }
