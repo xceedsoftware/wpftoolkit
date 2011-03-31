@@ -177,6 +177,7 @@
     <Compile Include="DateTimeUpDown\Implementation\DateTimePart.cs" />
     <Compile Include="DateTimeUpDown\Implementation\DateTimeUpDown.cs" />
     <Compile Include="DateTimeUpDown\Implementation\DateTimeParser.cs" />
+    <Compile Include="NumericUpDown\Implementation\IntegerUpDown.cs" />
     <Compile Include="Magnifier\Implementation\Converters\BorderThicknessToStrokeThicknessConverter.cs" />
     <Compile Include="Magnifier\Implementation\Converters\RadiusConverter.cs" />
     <Compile Include="Magnifier\Implementation\Magnifier.cs" />
@@ -211,6 +212,7 @@
     <Compile Include="PropertyGrid\Implementation\Editors\EnumComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\FontComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\ICustomTypeEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\IntegerUpDownEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\ITypeEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\NumericUpDownEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\TextBlockEditor.cs" />
