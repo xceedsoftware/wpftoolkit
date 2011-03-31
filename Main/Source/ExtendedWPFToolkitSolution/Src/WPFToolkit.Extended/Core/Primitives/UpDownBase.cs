@@ -135,14 +135,14 @@ namespace Microsoft.Windows.Controls.Primitives
             {
                 case Key.Up:
                     {
-                        if (AllowSpin && IsEditable)
+                        if (AllowSpin)
                             DoIncrement();
                         e.Handled = true;
                         break;
                     }
                 case Key.Down:
                     {
-                        if (AllowSpin && IsEditable)
+                        if (AllowSpin)
                             DoDecrement();
                         e.Handled = true;
                         break;
@@ -163,7 +163,7 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             base.OnMouseWheel(e);
 
-            if (!e.Handled && AllowSpin && IsEditable)
+            if (!e.Handled && AllowSpin)
             {
                 if (e.Delta < 0)
                 {

@@ -9,23 +9,18 @@
     <DataTemplate x:Key="DefaultWatermarkTemplate">
         <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
     </DataTemplate>
-
-    <!-- =============================================================================== -->
-    <!-- DecimalUpDown                                                                   -->
-    <!-- =============================================================================== -->
-
-    <Style TargetType="{x:Type local:DecimalUpDown}">
+    
+    <Style x:Key="NumericUpDown" TargetType="Control">
         <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-        <Setter Property="HorizontalContentAlignment" Value="Right" />
-        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
+        <Setter Property="HorizontalContentAlignment" Value="Right" />        
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:DecimalUpDown}">
+                <ControlTemplate TargetType="Control">
                     <local:ButtonSpinner x:Name="Spinner" IsTabStop="False" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
-                                         AllowSpin="{TemplateBinding AllowSpin}" ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
+                                         AllowSpin="{Binding AllowSpin, RelativeSource={RelativeSource TemplatedParent}}" ShowButtonSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}">
                         <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0" 
                                                 Background="{TemplateBinding Background}"
                                                 FontFamily="{TemplateBinding FontFamily}" 
@@ -40,88 +35,36 @@
                                                 TextWrapping="NoWrap" 
                                                 TabIndex="{TemplateBinding TabIndex}"
                                                 Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
-                                                Watermark="{TemplateBinding Watermark}"
-                                                WatermarkTemplate="{TemplateBinding WatermarkTemplate}"/>
+                                                Watermark="{Binding Watermark, RelativeSource={RelativeSource TemplatedParent}}"
+                                                WatermarkTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}}"/>
                     </local:ButtonSpinner>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- =============================================================================== -->
+    <!-- DecimalUpDown                                                                   -->
+    <!-- =============================================================================== -->
+
+    <Style TargetType="{x:Type local:DecimalUpDown}" BasedOn="{StaticResource NumericUpDown}">
+        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
     </Style>
 
     <!-- =============================================================================== -->
     <!-- DoubleUpDown                                                                    -->
     <!-- =============================================================================== -->
 
-    <Style TargetType="{x:Type local:DoubleUpDown}">
-        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Focusable" Value="False" />
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-        <Setter Property="HorizontalContentAlignment" Value="Right" />
+    <Style TargetType="{x:Type local:DoubleUpDown}" BasedOn="{StaticResource NumericUpDown}">
         <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:DoubleUpDown}">
-                    <local:ButtonSpinner x:Name="Spinner" IsTabStop="False" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
-                                         AllowSpin="{TemplateBinding AllowSpin}" ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
-                        <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0" 
-                                                Background="{TemplateBinding Background}"
-                                                FontFamily="{TemplateBinding FontFamily}" 
-                                                FontSize="{TemplateBinding FontSize}" 
-                                                FontStretch="{TemplateBinding FontStretch}"
-                                                FontStyle="{TemplateBinding FontStyle}" 
-                                                FontWeight="{TemplateBinding FontWeight}" 
-                                                Foreground="{TemplateBinding Foreground}" 
-                                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
-                                                MinWidth="20" AcceptsReturn="False" 
-                                                TextWrapping="NoWrap" 
-                                                TabIndex="{TemplateBinding TabIndex}"
-                                                Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
-                                                Watermark="{TemplateBinding Watermark}"
-                                                WatermarkTemplate="{TemplateBinding WatermarkTemplate}"/>
-                    </local:ButtonSpinner>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
     </Style>
 
     <!-- =============================================================================== -->
     <!-- IntegerUpDown                                                                   -->
     <!-- =============================================================================== -->
-    
-    <Style TargetType="{x:Type local:IntegerUpDown}">
-        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Focusable" Value="False" />
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-        <Setter Property="HorizontalContentAlignment" Value="Right" />
-        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:IntegerUpDown}">
-                    <local:ButtonSpinner x:Name="Spinner" IsTabStop="False" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
-                                         AllowSpin="{TemplateBinding AllowSpin}" ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
-                        <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0" 
-                                                Background="{TemplateBinding Background}"
-                                                FontFamily="{TemplateBinding FontFamily}" 
-                                                FontSize="{TemplateBinding FontSize}" 
-                                                FontStretch="{TemplateBinding FontStretch}"
-                                                FontStyle="{TemplateBinding FontStyle}" 
-                                                FontWeight="{TemplateBinding FontWeight}" 
-                                                Foreground="{TemplateBinding Foreground}" 
-                                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
-                                                MinWidth="20" AcceptsReturn="False" 
-                                                TextWrapping="NoWrap" 
-                                                TabIndex="{TemplateBinding TabIndex}"
-                                                Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
-                                                Watermark="{TemplateBinding Watermark}"
-                                                WatermarkTemplate="{TemplateBinding WatermarkTemplate}"/>
-                    </local:ButtonSpinner>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 
+    <Style TargetType="{x:Type local:IntegerUpDown}" BasedOn="{StaticResource NumericUpDown}">
+        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
+    </Style>
+   
 </ResourceDictionary>
