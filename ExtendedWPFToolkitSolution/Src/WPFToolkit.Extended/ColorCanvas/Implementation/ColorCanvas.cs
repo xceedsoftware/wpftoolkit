@@ -45,6 +45,10 @@ namespace Microsoft.Windows.Controls
             HexadecimalString = newValue.ToString();
             UpdateRGBValues(newValue);
             UpdateColorShadeSelectorPosition(newValue);
+
+            RoutedPropertyChangedEventArgs<Color> args = new RoutedPropertyChangedEventArgs<Color>(oldValue, newValue);
+            args.RoutedEvent = SelectedColorChangedEvent;
+            RaiseEvent(args);
         }
 
         #endregion //SelectedColor
@@ -265,6 +269,17 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Event Handlers
+
+        #region Events
+
+        public static readonly RoutedEvent SelectedColorChangedEvent = EventManager.RegisterRoutedEvent("SelectedColorChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<Color>), typeof(ColorCanvas));
+        public event RoutedPropertyChangedEventHandler<Color> SelectedColorChanged
+        {
+            add { AddHandler(SelectedColorChangedEvent, value); }
+            remove { RemoveHandler(SelectedColorChangedEvent, value); }
+        }
+
+        #endregion //Events
 
         #region Methods
 
