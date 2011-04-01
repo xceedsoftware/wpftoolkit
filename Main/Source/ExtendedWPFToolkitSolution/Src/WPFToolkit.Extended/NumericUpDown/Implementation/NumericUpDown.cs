@@ -23,11 +23,23 @@ namespace Microsoft.Windows.Controls
 
         #region FormatString
 
-        public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register("FormatString", typeof(string), typeof(NumericUpDown<T>), new UIPropertyMetadata(String.Empty));
+        public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register("FormatString", typeof(string), typeof(NumericUpDown<T>), new UIPropertyMetadata(String.Empty, OnFormatStringChanged));
         public string FormatString
         {
             get { return (string)GetValue(FormatStringProperty); }
             set { SetValue(FormatStringProperty, value); }
+        }
+
+        private static void OnFormatStringChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            NumericUpDown<T> numericUpDown = o as NumericUpDown<T>;
+            if (numericUpDown != null)
+                numericUpDown.OnFormatStringChanged((string)e.OldValue, (string)e.NewValue);
+        }
+
+        protected virtual void OnFormatStringChanged(string oldValue, string newValue)
+        {
+            Text = ConvertValueToText();
         }
 
         #endregion //FormatString
@@ -54,9 +66,9 @@ namespace Microsoft.Windows.Controls
 
         private static void OnMaximumChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-            NumericUpDown<T> integerUpDown = o as NumericUpDown<T>;
-            if (integerUpDown != null)
-                integerUpDown.OnMaximumChanged((T)e.OldValue, (T)e.NewValue);
+            NumericUpDown<T> numericUpDown = o as NumericUpDown<T>;
+            if (numericUpDown != null)
+                numericUpDown.OnMaximumChanged((T)e.OldValue, (T)e.NewValue);
         }
 
         protected virtual void OnMaximumChanged(T oldValue, T newValue)
@@ -77,9 +89,9 @@ namespace Microsoft.Windows.Controls
 
         private static void OnMinimumChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-            NumericUpDown<T> integerUpDown = o as NumericUpDown<T>;
-            if (integerUpDown != null)
-                integerUpDown.OnMinimumChanged((T)e.OldValue, (T)e.NewValue);
+            NumericUpDown<T> numericUpDown = o as NumericUpDown<T>;
+            if (numericUpDown != null)
+                numericUpDown.OnMinimumChanged((T)e.OldValue, (T)e.NewValue);
         }
 
         protected virtual void OnMinimumChanged(T oldValue, T newValue)
