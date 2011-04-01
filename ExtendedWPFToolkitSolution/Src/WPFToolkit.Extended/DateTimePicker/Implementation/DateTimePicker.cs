@@ -100,6 +100,28 @@ namespace Microsoft.Windows.Controls
 
         #endregion //ShowButtonSpinner
 
+        #region TimeWatermark
+
+        public static readonly DependencyProperty TimeWatermarkProperty = DependencyProperty.Register("TimeWatermark", typeof(object), typeof(DateTimePicker), new UIPropertyMetadata(null));
+        public object TimeWatermark
+        {
+            get { return (object)GetValue(TimeWatermarkProperty); }
+            set { SetValue(TimeWatermarkProperty, value); }
+        }
+
+        #endregion //TimeWatermark
+
+        #region TimeWatermarkTemplate
+
+        public static readonly DependencyProperty TimeWatermarkTemplateProperty = DependencyProperty.Register("TimeWatermarkTemplate", typeof(DataTemplate), typeof(DateTimePicker), new UIPropertyMetadata(null));
+        public DataTemplate TimeWatermarkTemplate
+        {
+            get { return (DataTemplate)GetValue(TimeWatermarkTemplateProperty); }
+            set { SetValue(TimeWatermarkTemplateProperty, value); }
+        }
+
+        #endregion //TimeWatermarkTemplate
+
         #region Value
 
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(DateTime?), typeof(DateTimePicker), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue));
@@ -141,6 +163,28 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Value
+
+        #region Watermark
+
+        public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register("Watermark", typeof(object), typeof(DateTimePicker), new UIPropertyMetadata(null));
+        public object Watermark
+        {
+            get { return (object)GetValue(WatermarkProperty); }
+            set { SetValue(WatermarkProperty, value); }
+        }
+
+        #endregion //Watermark
+
+        #region WatermarkTemplate
+
+        public static readonly DependencyProperty WatermarkTemplateProperty = DependencyProperty.Register("WatermarkTemplate", typeof(DataTemplate), typeof(DateTimePicker), new UIPropertyMetadata(null));
+        public DataTemplate WatermarkTemplate
+        {
+            get { return (DataTemplate)GetValue(WatermarkTemplateProperty); }
+            set { SetValue(WatermarkTemplateProperty, value); }
+        }
+
+        #endregion //WatermarkTemplate
 
         #endregion //Properties
 

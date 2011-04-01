@@ -11,6 +11,10 @@
     <coreConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
     <coreConverters:TimeFormatToDateTimeFormatConverter x:Key="TimeFormatToDateTimeFormatConverter" />
 
+    <DataTemplate x:Key="DefaultWatermarkTemplate">
+        <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
+    </DataTemplate>
+    
     <LinearGradientBrush x:Key="PopupDarkBorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
         <GradientStop Color="#FFA3AEB9" Offset="0"/>
         <GradientStop Color="#FF8399A9" Offset="0.375"/>
@@ -83,6 +87,7 @@
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:TimePicker}">
+        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:TimePicker}">
@@ -98,7 +103,9 @@
                                                       Format="{TemplateBinding Format, Converter={StaticResource TimeFormatToDateTimeFormatConverter}}"
                                                       FormatString="{TemplateBinding FormatString}"
                                                       ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
-                                                      Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}" />
+                                                      Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
+                                                      Watermark="{TemplateBinding Watermark}"
+                                                      WatermarkTemplate="{TemplateBinding WatermarkTemplate}"/>
                                 <ToggleButton x:Name="_timePickerToggleButton" Grid.Column="1"
                                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                               Style="{StaticResource TimePickerToggleButtonStyle}"

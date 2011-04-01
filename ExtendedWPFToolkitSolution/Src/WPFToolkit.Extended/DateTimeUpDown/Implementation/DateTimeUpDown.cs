@@ -24,8 +24,6 @@ namespace Microsoft.Windows.Controls
 
         private DateTimeFormatInfo DateTimeFormatInfo { get; set; }
 
-        //TODO: add minimum and maximum properties
-
         #region DefaultValue
 
         public static readonly DependencyProperty DefaultValueProperty = DependencyProperty.Register("DefaultValue", typeof(DateTime), typeof(DateTimeUpDown), new UIPropertyMetadata(DateTime.Now));
@@ -55,9 +53,13 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnFormatChanged(DateTimeFormat oldValue, DateTimeFormat newValue)
         {
+            _dateTimeParser.Format = GetFormatString(newValue);
+
             //if using a CustomFormat then the initialization occurs on the CustomFormatString property
             if (newValue != DateTimeFormat.Custom)
                 InitializeDateTimeInfoListAndParseValue();
+
+            Text = ConvertValueToText();
         }
 
         #endregion //Format
@@ -88,6 +90,18 @@ namespace Microsoft.Windows.Controls
 
         #endregion //FormatString
 
+        #region Maximum
+
+
+
+        #endregion //Maximum
+
+        #region Minimum
+
+
+
+        #endregion //Minimum
+
         #endregion //Properties
 
         #region Constructors
@@ -100,6 +114,7 @@ namespace Microsoft.Windows.Controls
         public DateTimeUpDown()
         {
             DateTimeFormatInfo = DateTimeFormatInfo.GetInstance(CultureInfo);
+            _dateTimeParser = new DateTimeParser(DateTimeFormatInfo, GetFormatString(Format));
             InitializeDateTimeInfoList();
         }
 
@@ -163,9 +178,6 @@ namespace Microsoft.Windows.Controls
                 Value = null;
                 return;
             }
-
-            if (_dateTimeParser == null)
-                _dateTimeParser = new DateTimeParser(DateTimeFormatInfo, GetFormatString(Format));
 
             DateTime current = Value.HasValue ? Value.Value : DateTime.Now;
             DateTime result;

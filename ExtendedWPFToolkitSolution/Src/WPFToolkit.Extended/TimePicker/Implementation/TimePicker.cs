@@ -249,7 +249,7 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnValueChanged(DateTime? oldValue, DateTime? newValue)
         {
             //TODO: refactor this
-            if (newValue.HasValue)
+            if (newValue.HasValue && _timeListBox != null)
             {
                 var items = _timeListBox.ItemsSource;
                 foreach (TimeItem item in items)
@@ -266,6 +266,28 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Value
+
+        #region Watermark
+
+        public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register("Watermark", typeof(object), typeof(TimePicker), new UIPropertyMetadata(null));
+        public object Watermark
+        {
+            get { return (object)GetValue(WatermarkProperty); }
+            set { SetValue(WatermarkProperty, value); }
+        }
+
+        #endregion //Watermark
+
+        #region WatermarkTemplate
+
+        public static readonly DependencyProperty WatermarkTemplateProperty = DependencyProperty.Register("WatermarkTemplate", typeof(DataTemplate), typeof(TimePicker), new UIPropertyMetadata(null));
+        public DataTemplate WatermarkTemplate
+        {
+            get { return (DataTemplate)GetValue(WatermarkTemplateProperty); }
+            set { SetValue(WatermarkTemplateProperty, value); }
+        }
+
+        #endregion //WatermarkTemplate
 
         #endregion //Properties
 
