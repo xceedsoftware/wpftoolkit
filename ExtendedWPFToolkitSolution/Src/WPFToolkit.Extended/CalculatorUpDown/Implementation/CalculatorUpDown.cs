@@ -16,6 +16,17 @@ namespace Microsoft.Windows.Controls
 
         #region Properties
 
+        #region DisplayText
+
+        public static readonly DependencyProperty DisplayTextProperty = DependencyProperty.Register("DisplayText", typeof(string), typeof(CalculatorUpDown), new UIPropertyMetadata("0"));
+        public string DisplayText
+        {
+            get { return (string)GetValue(DisplayTextProperty); }
+            set { SetValue(DisplayTextProperty, value); }
+        }
+
+        #endregion //DisplayText
+
         #region EnterClosesCalculator
 
         public static readonly DependencyProperty EnterClosesCalculatorProperty = DependencyProperty.Register("EnterClosesCalculator", typeof(bool), typeof(CalculatorUpDown), new UIPropertyMetadata(false));
@@ -49,6 +60,28 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //IsOpen
+
+        #region Memory
+
+        public static readonly DependencyProperty MemoryProperty = DependencyProperty.Register("Memory", typeof(decimal), typeof(CalculatorUpDown), new UIPropertyMetadata(default(decimal)));
+        public decimal Memory
+        {
+            get { return (decimal)GetValue(MemoryProperty); }
+            set { SetValue(MemoryProperty, value); }
+        }
+
+        #endregion //Memory
+
+        #region Precision
+
+        public static readonly DependencyProperty PrecisionProperty = DependencyProperty.Register("Precision", typeof(int), typeof(CalculatorUpDown), new UIPropertyMetadata(6));
+        public int Precision
+        {
+            get { return (int)GetValue(PrecisionProperty); }
+            set { SetValue(PrecisionProperty, value); }
+        }
+
+        #endregion //Precision
 
         #endregion //Properties
 
