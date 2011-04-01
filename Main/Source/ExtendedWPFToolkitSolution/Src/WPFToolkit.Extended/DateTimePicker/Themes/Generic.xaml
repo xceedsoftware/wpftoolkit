@@ -6,6 +6,10 @@
 
     <coreConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
 
+    <DataTemplate x:Key="DefaultWatermarkTemplate">
+        <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
+    </DataTemplate>
+    
     <LinearGradientBrush x:Key="PopupDarkBorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
         <GradientStop Color="#FFA3AEB9" Offset="0"/>
         <GradientStop Color="#FF8399A9" Offset="0.375"/>
@@ -55,6 +59,8 @@
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:DateTimePicker}">
+        <Setter Property="TimeWatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
+        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:DateTimePicker}">
@@ -69,7 +75,9 @@
                                                       AllowSpin="{TemplateBinding AllowSpin}"
                                                       Format="{TemplateBinding Format}" FormatString="{TemplateBinding FormatString}" 
                                                       ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
-                                                      Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}" />
+                                                      Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
+                                                      Watermark="{TemplateBinding Watermark}"
+                                                      WatermarkTemplate="{TemplateBinding WatermarkTemplate}" />
                                 <ToggleButton x:Name="_calendarToggleButton" Grid.Column="1" Background="White"
                                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                               Style="{StaticResource DateTimePickerToggleButtonStyle}"
@@ -79,7 +87,11 @@
                                 <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" Padding="3">
                                     <StackPanel>
                                         <Calendar x:Name="Part_Calendar" BorderThickness="0" />
-                                        <local:TimePicker x:Name="Part_TimeUpDown" Format="ShortTime" Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}" />
+                                        <local:TimePicker x:Name="Part_TimeUpDown" 
+                                                          Format="ShortTime" 
+                                                          Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
+                                                          Watermark="{TemplateBinding TimeWatermark}"
+                                                          WatermarkTemplate="{TemplateBinding TimeWatermarkTemplate}"/>
                                     </StackPanel>
                                 </Border>
                             </Popup>
