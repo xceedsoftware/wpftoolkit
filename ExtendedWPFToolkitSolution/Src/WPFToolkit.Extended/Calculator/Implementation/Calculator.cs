@@ -168,6 +168,10 @@ namespace Microsoft.Windows.Controls
                 DisplayText = newValue.ToString();
             else
                 DisplayText = "0";
+
+            RoutedPropertyChangedEventArgs<decimal?> args = new RoutedPropertyChangedEventArgs<decimal?>(oldValue, newValue);
+            args.RoutedEvent = ValueChangedEvent;
+            RaiseEvent(args);
         }
 
         #endregion //Value
@@ -236,7 +240,15 @@ namespace Microsoft.Windows.Controls
             if (_lastOperation == Operation.None)
                 return;
 
-            Value = Decimal.Round(CalculateValue(_lastOperation), Precision);
+            try
+            {
+                Value = Decimal.Round(CalculateValue(_lastOperation), Precision);
+            }
+            catch
+            {
+                Value = null;
+                DisplayText = "ERROR";
+            }
         }
 
         private void Calculate(Operation newOperation)
@@ -404,7 +416,7 @@ namespace Microsoft.Windows.Controls
                     break;
             }
 
-            _previousValue = Decimal.Parse(DisplayText);
+            Decimal.TryParse(DisplayText, out _previousValue);
             _showNewNumber = true;
         }
 
@@ -416,6 +428,17 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Methods
+
+        #region Events
+
+        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<decimal?>), typeof(Calculator));
+        public event RoutedPropertyChangedEventHandler<decimal?> ValueChanged
+        {
+            add { AddHandler(ValueChangedEvent, value); }
+            remove { RemoveHandler(ValueChangedEvent, value); }
+        }
+
+        #endregion //Events
 
         #region Commands
 
