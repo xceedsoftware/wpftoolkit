@@ -269,7 +269,7 @@ namespace Microsoft.Windows.Controls
         private decimal CalculateValue(Operation operation)
         {
             decimal newValue = decimal.Zero;
-            decimal currentValue = Decimal.Parse(DisplayText);
+            decimal currentValue = CalculatorUtilities.ParseDecimal(DisplayText);
 
             switch (operation)
             {
@@ -345,10 +345,12 @@ namespace Microsoft.Windows.Controls
 
         private void ProcessMemoryKey(Calculator.CalculatorButtonType buttonType)
         {
+            decimal currentValue = CalculatorUtilities.ParseDecimal(DisplayText);
+
             switch (buttonType)
             {
                 case Calculator.CalculatorButtonType.MAdd:
-                    Memory += Decimal.Parse(DisplayText);
+                    Memory += currentValue;
                     break;
                 case Calculator.CalculatorButtonType.MC:
                     Memory = decimal.Zero;
@@ -357,10 +359,10 @@ namespace Microsoft.Windows.Controls
                     DisplayText = Memory.ToString();
                     break;
                 case Calculator.CalculatorButtonType.MS:
-                    Memory = Decimal.Parse(DisplayText);
+                    Memory = currentValue;
                     break;
                 case Calculator.CalculatorButtonType.MSub:
-                    Memory -= Decimal.Parse(DisplayText);
+                    Memory -= currentValue;
                     break;
                 default:
                     break;

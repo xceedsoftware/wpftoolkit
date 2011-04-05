@@ -29,8 +29,11 @@ namespace Microsoft.Windows.Controls.Core.Utilities
                 case "\b": return Calculator.CalculatorButtonType.Back;
                 case "\r":
                 case "=": return Calculator.CalculatorButtonType.Equal;
-                case ".": return Calculator.CalculatorButtonType.Decimal;
             }
+
+            //the check for the decimal is not in the switch statement. To help localize we check against the current culture's decimal seperator
+            if (text == System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat.CurrencyDecimalSeparator)
+                return Calculator.CalculatorButtonType.Decimal;
 
             //check for the escape key
             if (text == ((char)27).ToString())
@@ -193,7 +196,10 @@ namespace Microsoft.Windows.Controls.Core.Utilities
             }
         }
 
-        //TODO: add error handling
+        public static decimal ParseDecimal(string text)
+        {
+            return Decimal.Parse(text, System.Threading.Thread.CurrentThread.CurrentCulture);
+        }
 
         public static decimal Add(decimal firstNumber, decimal secondNumber)
         {
