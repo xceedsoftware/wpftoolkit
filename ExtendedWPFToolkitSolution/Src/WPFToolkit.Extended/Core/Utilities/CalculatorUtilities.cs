@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Media;
+using System.Globalization;
 
 namespace Microsoft.Windows.Controls.Core.Utilities
 {
@@ -32,7 +33,7 @@ namespace Microsoft.Windows.Controls.Core.Utilities
             }
 
             //the check for the decimal is not in the switch statement. To help localize we check against the current culture's decimal seperator
-            if (text == System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat.CurrencyDecimalSeparator)
+            if (text == CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator)
                 return Calculator.CalculatorButtonType.Decimal;
 
             //check for the escape key
@@ -83,7 +84,7 @@ namespace Microsoft.Windows.Controls.Core.Utilities
                     content = "C";
                     break;
                 case Calculator.CalculatorButtonType.Decimal:
-                    content = ".";
+                    content = CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator;
                     break;
                 case Calculator.CalculatorButtonType.Divide:
                     content = "/";
@@ -198,7 +199,7 @@ namespace Microsoft.Windows.Controls.Core.Utilities
 
         public static decimal ParseDecimal(string text)
         {
-            return Decimal.Parse(text, System.Threading.Thread.CurrentThread.CurrentCulture);
+            return Decimal.Parse(text, CultureInfo.CurrentCulture);
         }
 
         public static decimal Add(decimal firstNumber, decimal secondNumber)
