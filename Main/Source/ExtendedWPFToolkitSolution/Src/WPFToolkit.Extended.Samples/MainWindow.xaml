@@ -3,9 +3,40 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended" 
         xmlns:local="clr-namespace:WPFToolkit.Extended.Samples"
-        Title="MainWindow" Height="600" Width="800" WindowStartupLocation="CenterScreen" ForceCursor="True">
+        Title="MainWindow" Height="600" Width="250" WindowStartupLocation="CenterScreen" ForceCursor="True"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib" Background="White">
+    
+    <Window.Resources>
+        
+    </Window.Resources>
 
-    <Grid>
+    <StackPanel>
 
-    </Grid>
+        <extToolkit:DecimalUpDown Margin="25,5,25,5" Value="{Binding Decimal}" FormatString="{Binding Text}" Watermark="Enter Decimal" SelectAllOnGotFocus="True" />
+
+        <extToolkit:DoubleUpDown Margin="25,5,25,5" Value="{Binding Double}" FormatString="{Binding Text}" Watermark="Enter Double" SelectAllOnGotFocus="True" />
+
+        <extToolkit:IntegerUpDown Margin="25,5,25,5" Value="{Binding Integer}" FormatString="{Binding Text}" Watermark="Enter Integer" SelectAllOnGotFocus="True" />
+
+        <!--<extToolkit:Calculator Precision="3" ValueChanged="Calculator_ValueChanged" />-->
+
+        <!--<extToolkit:CalculatorUpDown Watermark="Enter Value" Margin="10" />-->
+       
+        <!--<extToolkit:ColorPicker />-->
+        
+        <!--<extToolkit:ColorCanvas SelectedColorChanged="ColorCanvas_SelectedColorChanged" />-->
+
+        <!--<extToolkit:DateTimeUpDown VerticalAlignment="Center" Margin="25" Watermark="Enter Date" Format="FullDateTime" Value="{Binding DueDate}" />-->
+
+        <!--<extToolkit:TimePicker VerticalAlignment="Center" Margin="25" Value="{Binding DueDate}" Watermark="Enter Time" />-->
+
+        <!--<extToolkit:DateTimePicker Margin="25" Background="White" Value="{Binding DueDate}" Watermark="Select Date" TimeWatermark="Select Time" />-->
+
+        <!--<extToolkit:MaskedTextBox Value="{Binding Price}" Mask="00.00" Margin="25" Watermark="Enter Value" />-->
+
+     
+        <!--<extToolkit:PropertyGrid Margin="25" SelectedObject="{Binding ElementName=_text}" Height="300" />-->
+       
+
+    </StackPanel>
 </Window>

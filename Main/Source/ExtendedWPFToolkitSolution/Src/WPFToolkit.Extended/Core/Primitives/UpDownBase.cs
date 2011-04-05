@@ -163,7 +163,7 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             base.OnMouseWheel(e);
 
-            if (!e.Handled && AllowSpin)
+            if (!e.Handled && AllowSpin && TextBox.IsFocused)
             {
                 if (e.Delta < 0)
                 {
@@ -256,6 +256,11 @@ namespace Microsoft.Windows.Controls.Primitives
             }
 
             Text = ConvertValueToText();
+
+#if VS2008
+            //there is a bug in .NET 3.5 which will not correctly update the textbox text through binding.
+            TextBox.Text = Text;
+#endif
 
             _isSyncingTextAndValueProperties = false;
         }

@@ -267,7 +267,7 @@
                                             Style="{StaticResource ColorCanvasSliderStyle}"
                                             Value="{Binding R, RelativeSource={RelativeSource TemplatedParent}}"
                                             VerticalAlignment="Center"/>
-                                    <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Value, ElementName=PART_RSlider, StringFormat=F0}"
+                                    <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Value, ElementName=PART_RSlider}"
                                              VerticalAlignment="Center"
                                              Style="{StaticResource ColorCanvasTextBoxStyle}"/>
 
@@ -277,7 +277,7 @@
                                             Style="{StaticResource ColorCanvasSliderStyle}"
                                             Value="{Binding G, RelativeSource={RelativeSource TemplatedParent}}"
                                             VerticalAlignment="Center"/>
-                                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Value, ElementName=PART_GSlider, StringFormat=F0}"
+                                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Value, ElementName=PART_GSlider}"
                                              VerticalAlignment="Center" Style="{StaticResource ColorCanvasTextBoxStyle}"/>
 
                                     <TextBlock Grid.Row="2" Grid.Column="0" Text="B"
@@ -286,7 +286,7 @@
                                             Style="{StaticResource ColorCanvasSliderStyle}"
                                             Value="{Binding B, RelativeSource={RelativeSource TemplatedParent}}"
                                             VerticalAlignment="Center"/>
-                                    <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding Value, ElementName=PART_BSlider, StringFormat=F0}"
+                                    <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding Value, ElementName=PART_BSlider}"
                                              VerticalAlignment="Center" Style="{StaticResource ColorCanvasTextBoxStyle}"/>
 
                                     <TextBlock Grid.Row="3" Grid.Column="0" Text="A"
@@ -295,7 +295,7 @@
                                             Style="{StaticResource ColorCanvasSliderStyle}"
                                             Value="{Binding Path=A, RelativeSource={RelativeSource TemplatedParent}}"
                                             VerticalAlignment="Center"/>
-                                    <TextBox Grid.Row="3" Grid.Column="3" Text="{Binding Value, ElementName=PART_OpacitySlider, StringFormat=F0}"
+                                    <TextBox Grid.Row="3" Grid.Column="3" Text="{Binding Value, ElementName=PART_OpacitySlider}"
                                              VerticalAlignment="Center" Style="{StaticResource ColorCanvasTextBoxStyle}"/>
 
                                 </Grid>
@@ -317,7 +317,7 @@
         <Setter Property="IsSnapToTickEnabled" Value="True" />
         <Setter Property="IsDirectionReversed" Value="False" />
         <Setter Property="IsMoveToPointEnabled" Value="True" />
-        <Setter Property="Value" Value="360" />
+        <Setter Property="Value" Value="0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ColorSpectrumSlider}">

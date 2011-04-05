@@ -21,6 +21,21 @@
     <SccProvider>SAK</SccProvider>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\sn.snk</AssemblyOriginatorKeyFile>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -75,6 +90,14 @@
     <Page Include="ButtonSpinner\Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CalculatorUpDown\Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Calculator\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ChildWindow\Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -163,11 +186,17 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ButtonSpinner\Implementation\ValidSpinDirections.cs">
       <Link>ButtonSpinner\Implementation\ValidSpinDirections.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CalculatorUpDown\Implementation\CalculatorUpDown.cs">
+      <Link>CalculatorUpDown\Implementation\CalculatorUpDown.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Calculator\Implementation\Calculator.cs">
+      <Link>Calculator\Implementation\Calculator.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Calculator\Implementation\CalculatorCommands.cs">
+      <Link>Calculator\Implementation\CalculatorCommands.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ChildWindow\Implementation\ChildWindow.cs">
       <Link>ChildWindow\Implementation\ChildWindow.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ChildWindow\Implementation\VisualStates.ChildWindow.cs">
-      <Link>ChildWindow\Implementation\VisualStates.ChildWindow.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ChildWindow\Implementation\WindowStartupLocation.cs">
       <Link>ChildWindow\Implementation\WindowStartupLocation.cs</Link>
@@ -189,6 +218,9 @@
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ColorPicker\Implementation\ColorPicker.cs">
       <Link>ColorPicker\Implementation\ColorPicker.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Converters\CalculatorMemoryToVisibilityConverter.cs">
+      <Link>Core\Converters\CalculatorMemoryToVisibilityConverter.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Converters\ColorToSolidColorBrushConverter.cs">
       <Link>Core\Converters\ColorToSolidColorBrushConverter.cs</Link>
@@ -214,6 +246,9 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\UIElementAdorner.cs">
       <Link>Core\UIElementAdorner.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Utilities\CalculatorUtilities.cs">
+      <Link>Core\Utilities\CalculatorUtilities.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Utilities\ColorUtilities.cs">
       <Link>Core\Utilities\ColorUtilities.cs</Link>
     </Compile>
@@ -228,6 +263,9 @@
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\DateTimeUpDown\Implementation\DateTimeInfo.cs">
       <Link>DateTimeUpDown\Implementation\DateTimeInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\DateTimeUpDown\Implementation\DateTimeParser.cs">
+      <Link>DateTimeUpDown\Implementation\DateTimeParser.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\DateTimeUpDown\Implementation\DateTimePart.cs">
       <Link>DateTimeUpDown\Implementation\DateTimePart.cs</Link>
@@ -259,6 +297,15 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\MessageBox\Implementation\VisualStates.MessageBox.cs">
       <Link>MessageBox\Implementation\VisualStates.MessageBox.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\NumericUpDown\Implementation\DecimalUpDown.cs">
+      <Link>NumericUpDown\Implementation\DecimalUpDown.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\NumericUpDown\Implementation\DoubleUpDown.cs">
+      <Link>NumericUpDown\Implementation\DoubleUpDown.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\NumericUpDown\Implementation\IntegerUpDown.cs">
+      <Link>NumericUpDown\Implementation\IntegerUpDown.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\NumericUpDown\Implementation\NumericUpDown.cs">
       <Link>NumericUpDown\Implementation\NumericUpDown.cs</Link>
     </Compile>
@@ -289,6 +336,12 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\DateTimeUpDownEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\DateTimeUpDownEditor.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\DecimalUpDownEditor.cs">
+      <Link>PropertyGrid\Implementation\Editors\DecimalUpDownEditor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\DoubleUpDownEditor.cs">
+      <Link>PropertyGrid\Implementation\Editors\DoubleUpDownEditor.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\EnumComboBoxEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\EnumComboBoxEditor.cs</Link>
     </Compile>
@@ -303,9 +356,6 @@
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\ITypeEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\ITypeEditor.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\NumericUpDownEditor.cs">
-      <Link>PropertyGrid\Implementation\Editors\NumericUpDownEditor.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\TextBlockEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\TextBlockEditor.cs</Link>
@@ -358,6 +408,9 @@
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\TimePicker\Implementation\TimeFormat.cs">
       <Link>TimePicker\Implementation\TimeFormat.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\TimePicker\Implementation\TimeItem.cs">
+      <Link>TimePicker\Implementation\TimeItem.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\TimePicker\Implementation\TimePicker.cs">
       <Link>TimePicker\Implementation\TimePicker.cs</Link>
@@ -424,6 +477,24 @@
     <Resource Include="PropertyGrid\Images\Resource11.png" />
     <Resource Include="PropertyGrid\Images\SortAscending16.png" />
     <Resource Include="PropertyGrid\Images\Style11.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

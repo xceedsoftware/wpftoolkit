@@ -4,8 +4,16 @@
                     xmlns:chrome="clr-namespace:Microsoft.Windows.Controls.Chromes"
                     xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters">
 
+    <!-- =============================================================================== -->
+    <!-- ResourceDictionary for TimePicker and related controls                          -->
+    <!-- =============================================================================== -->
+
     <coreConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
     <coreConverters:TimeFormatToDateTimeFormatConverter x:Key="TimeFormatToDateTimeFormatConverter" />
+
+    <DataTemplate x:Key="DefaultWatermarkTemplate">
+        <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
+    </DataTemplate>
 
     <LinearGradientBrush x:Key="PopupDarkBorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
         <GradientStop Color="#FFA3AEB9" Offset="0"/>
@@ -51,11 +59,35 @@
         </Setter>
     </Style>
 
+    <SolidColorBrush x:Key="ListItemHover" Color="#FFE7F5FD"/>
+
+    <Style x:Key="TimeItemStyle" TargetType="ListBoxItem">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border Name="Border" SnapsToDevicePixels="true">
+                        <ContentPresenter Margin="4" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource ListItemHover}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- =============================================================================== -->
     <!-- TimePicker                                                                      -->
     <!-- =============================================================================== -->
-    
+
     <Style TargetType="{x:Type local:TimePicker}">
+        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:TimePicker}">
@@ -67,9 +99,13 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <local:DateTimeUpDown x:Name="PART_TimeUpDown" BorderThickness="1,1,0,1"  
+                                                      AllowSpin="{TemplateBinding AllowSpin}"
                                                       Format="{TemplateBinding Format, Converter={StaticResource TimeFormatToDateTimeFormatConverter}}"
                                                       FormatString="{TemplateBinding FormatString}"
-                                                      Value="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}}" />
+                                                      ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
+                                                      Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
+                                                      Watermark="{TemplateBinding Watermark}"
+                                                      WatermarkTemplate="{TemplateBinding WatermarkTemplate}"/>
                                 <ToggleButton x:Name="_timePickerToggleButton" Grid.Column="1"
                                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                               Style="{StaticResource TimePickerToggleButtonStyle}"
@@ -77,10 +113,11 @@
                             </Grid>
                             <Popup IsOpen="{Binding IsChecked, ElementName=_timePickerToggleButton}" StaysOpen="False">
                                 <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" >
-                                    <ListBox x:Name="PART_TimeListItems" BorderThickness="0"
-                                             SelectedItem="{Binding SelectedTime, RelativeSource={RelativeSource TemplatedParent}}">
-                                        
-                                    </ListBox>
+                                    <Grid>
+                                        <ListBox x:Name="PART_TimeListItems" BorderThickness="0" Width="150" Height="130"
+                                                 DisplayMemberPath="Display"
+                                                 ItemContainerStyle="{StaticResource TimeItemStyle}"/>
+                                    </Grid>
                                 </Border>
                             </Popup>
                         </Grid>

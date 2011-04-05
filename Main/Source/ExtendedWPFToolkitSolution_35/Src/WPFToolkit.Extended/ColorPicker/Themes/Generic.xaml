@@ -146,7 +146,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ColorPicker}">
                     <Grid>
-                        <ToggleButton x:Name="PART_ColorPickerToggleButton" IsTabStop="False" MinHeight="22" IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                        <ToggleButton x:Name="PART_ColorPickerToggleButton" IsTabStop="True" MinHeight="22" IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                                       IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
                                       Style="{TemplateBinding ButtonStyle}">
                             <Grid Margin="2,2,0,2">
@@ -187,9 +187,10 @@
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Text="Available Colors" Background="AliceBlue" Padding="2" Margin="0,0,0,1" />
                                                 <ListBox x:Name="PART_AvailableColors" Grid.Row="1" Background="Transparent" BorderThickness="0" SelectionMode="Single"
-                                                     ItemsSource="{Binding AvailableColors, RelativeSource={RelativeSource TemplatedParent}}"                                                      
-                                                     ItemTemplate="{StaticResource ColorItemTemplate}"
-                                                     ItemContainerStyle="{StaticResource ColorPaletteLisBoxStyle}">
+                                                         ItemsSource="{Binding AvailableColors, RelativeSource={RelativeSource TemplatedParent}}"                                                      
+                                                         ItemTemplate="{StaticResource ColorItemTemplate}"
+                                                         ItemContainerStyle="{StaticResource ColorPaletteLisBoxStyle}"
+                                                         Style="{x:Null}">
                                                     <ListBox.ItemsPanel>
                                                         <ItemsPanelTemplate>
                                                             <WrapPanel Width="200" />
@@ -208,9 +209,10 @@
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Text="Standard Colors" Background="AliceBlue" Padding="2" Margin="0,1,0,1"/>
                                                 <ListBox x:Name="PART_StandardColors" Grid.Row="1" SelectionMode="Single" Background="Transparent" BorderThickness="0"
-                                                     ItemsSource="{Binding StandardColors, RelativeSource={RelativeSource TemplatedParent}}"                                                      
-                                                     ItemTemplate="{StaticResource ColorItemTemplate}"
-                                                     ItemContainerStyle="{StaticResource ColorPaletteLisBoxStyle}">
+                                                         ItemsSource="{Binding StandardColors, RelativeSource={RelativeSource TemplatedParent}}"                                                      
+                                                         ItemTemplate="{StaticResource ColorItemTemplate}"
+                                                         ItemContainerStyle="{StaticResource ColorPaletteLisBoxStyle}"
+                                                         Style="{x:Null}">
                                                     <ListBox.ItemsPanel>
                                                         <ItemsPanelTemplate>
                                                             <WrapPanel Width="200" />
@@ -229,9 +231,10 @@
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Text="Recent Colors" Background="AliceBlue" Padding="2" Margin="0,1,0,1"/>
                                                 <ListBox x:Name="PART_RecentColors" Grid.Row="1"  SelectionMode="Single" Background="Transparent" BorderThickness="0"
-                                                     ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}"                                                     
-                                                     ItemTemplate="{StaticResource ColorItemTemplate}"
-                                                     ItemContainerStyle="{StaticResource ColorPaletteLisBoxStyle}">
+                                                         ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}"                                                     
+                                                         ItemTemplate="{StaticResource ColorItemTemplate}"
+                                                         ItemContainerStyle="{StaticResource ColorPaletteLisBoxStyle}"
+                                                         Style="{x:Null}">
                                                     <ListBox.ItemsPanel>
                                                         <ItemsPanelTemplate>
                                                             <WrapPanel Width="200" />
@@ -245,9 +248,9 @@
                                     <!-- ColorCanvas -->
                                     <Grid x:Name="_colorCanvasHost" Visibility="Collapsed">
                                         <local:ColorCanvas x:Name="PART_ColorCanvas" Background="Transparent" BorderThickness="0"
-                                                           SelectedColor="{Binding SelectedColor, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                                           SelectedColor="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}" />
                                     </Grid>
-                                    
+
                                     <Separator Grid.Row="1" HorizontalAlignment="Stretch" Margin="5,0,5,0" />
 
                                     <!-- More Colors Button -->

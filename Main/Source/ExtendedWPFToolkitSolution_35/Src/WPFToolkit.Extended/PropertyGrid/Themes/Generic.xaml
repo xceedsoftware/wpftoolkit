@@ -305,7 +305,7 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Orientation="Horizontal" Margin="6,2,0,4">
-                                <TextBlock Text="{TemplateBinding SelectedObjectTypeName}" FontWeight="Bold"/>                                
+                                <TextBlock Text="{TemplateBinding SelectedObjectTypeName}" FontWeight="Bold"/>
                                 <TextBlock Text="{TemplateBinding SelectedObjectName}" Margin="5,0,0,0" />
                             </StackPanel>
 
