@@ -41,6 +41,9 @@ namespace Microsoft.Windows.Controls
 
         public ChildWindow()
         {
+            if (DesignerProperties.GetIsInDesignMode(this))
+                WindowState = Controls.WindowState.Open;
+
             IsVisibleChanged += ChildWindow_IsVisibleChanged;
 
             _modalLayer.Fill = OverlayBrush;
