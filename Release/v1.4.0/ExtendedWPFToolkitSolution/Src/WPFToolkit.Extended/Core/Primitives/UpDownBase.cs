@@ -259,7 +259,8 @@ namespace Microsoft.Windows.Controls.Primitives
 
 #if VS2008
             //there is a bug in .NET 3.5 which will not correctly update the textbox text through binding.
-            TextBox.Text = Text;
+            if (TextBox != null)
+                TextBox.Text = Text;
 #endif
 
             _isSyncingTextAndValueProperties = false;
