@@ -3,9 +3,13 @@
                     xmlns:local="clr-namespace:Microsoft.Windows.Controls"
                     xmlns:chrome="clr-namespace:Microsoft.Windows.Controls.Chromes"
                     xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters"
-                    xmlns:toolkit="clr-namespace:Microsoft.Windows.Controls;assembly=WPFToolkit">
+                    xmlns:toolkit="http://schemas.microsoft.com/wpf/2008/toolkit">
 
     <coreConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
+
+    <DataTemplate x:Key="DefaultWatermarkTemplate">
+        <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
+    </DataTemplate>
 
     <LinearGradientBrush x:Key="PopupDarkBorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
         <GradientStop Color="#FFA3AEB9" Offset="0"/>
@@ -56,6 +60,8 @@
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:DateTimePicker}">
+        <Setter Property="TimeWatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
+        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:DateTimePicker}">
@@ -66,9 +72,14 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <local:DateTimeUpDown BorderThickness="1,1,0,1" Format="{TemplateBinding Format}" FormatString="{TemplateBinding FormatString}" 
-                                                      Value="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}}" />
-                                <ToggleButton x:Name="_calendarToggleButton" Grid.Column="1"
+                                <local:DateTimeUpDown BorderThickness="1,1,0,1"
+                                                      AllowSpin="{TemplateBinding AllowSpin}"
+                                                      Format="{TemplateBinding Format}" FormatString="{TemplateBinding FormatString}" 
+                                                      ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
+                                                      Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
+                                                      Watermark="{TemplateBinding Watermark}"
+                                                      WatermarkTemplate="{TemplateBinding WatermarkTemplate}" />
+                                <ToggleButton x:Name="_calendarToggleButton" Grid.Column="1" Background="White"
                                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                               Style="{StaticResource DateTimePickerToggleButtonStyle}"
                                               IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"/>
@@ -76,9 +87,12 @@
                             <Popup IsOpen="{Binding IsChecked, ElementName=_calendarToggleButton}" StaysOpen="False">
                                 <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" Padding="3">
                                     <StackPanel>
-                                        <toolkit:Calendar x:Name="Part_Calendar"    
-                                                  DisplayDate="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"/>
-                                        <local:DateTimeUpDown x:Name="Part_TimeUpDown" Format="ShortTime" Value="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}}" Background="White" />
+                                        <toolkit:Calendar x:Name="Part_Calendar" BorderThickness="0" />
+                                        <local:TimePicker x:Name="Part_TimeUpDown" 
+                                                          Format="ShortTime" 
+                                                          Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
+                                                          Watermark="{TemplateBinding TimeWatermark}"
+                                                          WatermarkTemplate="{TemplateBinding TimeWatermarkTemplate}"/>
                                     </StackPanel>
                                 </Border>
                             </Popup>

@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Microsoft.Windows.Controls">
-    
+
     <LinearGradientBrush x:Key="TextBoxBorder" EndPoint="0,20" MappingMode="Absolute" StartPoint="0,0">
         <GradientStop Color="#ABADB3" Offset="0.05"/>
         <GradientStop Color="#E2E3EA" Offset="0.07"/>
@@ -24,7 +24,7 @@
     <SolidColorBrush x:Key="TextBox_DisabledBackground" Color="#F4F4F4" />
 
     <DataTemplate x:Key="DefaultWatermarkTemplate">
-        <ContentControl Content="{Binding}" Foreground="Gray" />
+        <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
     </DataTemplate>
 
     <Style TargetType="{x:Type local:WatermarkTextBox}">
@@ -43,24 +43,24 @@
                     <Grid>
 
                         <Border x:Name="Border" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="1" Background="{TemplateBinding Background}">
-                            
+
                         </Border>
 
                         <Border x:Name="MouseOverVisual" Opacity="0" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{StaticResource TextBox_MouseOver}" CornerRadius="1" >
-                            
+
                         </Border>
 
                         <Border x:Name="FocusVisual" Opacity="0" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{StaticResource TextBox_Focused}" CornerRadius="1" >
-                           
+
                         </Border>
 
                         <ScrollViewer x:Name="PART_ContentHost" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                        
+
                         <ContentPresenter x:Name="PART_WatermarkHost" 
                                           Content="{TemplateBinding Watermark}"
                                           ContentTemplate="{TemplateBinding WatermarkTemplate}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"                                       
                                           IsHitTestVisible="False"
                                           Margin="{TemplateBinding Padding}"
                                           Visibility="Collapsed"/>

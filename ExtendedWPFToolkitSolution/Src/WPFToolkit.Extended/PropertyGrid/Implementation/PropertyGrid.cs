@@ -277,10 +277,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
             var properties = TypeDescriptor.GetProperties(instance.GetType(), new Attribute[] { new PropertyFilterAttribute(PropertyFilterOptions.All) });
 
-            // Get all properties of the type
-            propertyItems.AddRange(properties.Cast<PropertyDescriptor>().
-                Where(p => p.IsBrowsable && p.Name != "GenericParameterAttributes").
-                Select(property => CreatePropertyItem(property, instance, this)));
+            try
+            {
+
+                // Get all properties of the type
+                propertyItems.AddRange(properties.Cast<PropertyDescriptor>().
+                    Where(p => p.IsBrowsable && p.Name != "GenericParameterAttributes").
+                    Select(property => CreatePropertyItem(property, instance, this)));
+            }
+            catch (Exception ex)
+            {
+            }
 
             return propertyItems;
         }
@@ -315,27 +322,34 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                     editor = customEditor.Editor;
             }
 
-            //no custom editor found
-            if (editor == null)
+            try
             {
-                if (propertyItem.IsReadOnly)
-                    editor = new TextBlockEditor();
-                else if (propertyItem.PropertyType == typeof(bool))
-                    editor = new CheckBoxEditor();
-                else if (propertyItem.PropertyType == typeof(decimal) || propertyItem.PropertyType == typeof(decimal?))
-                    editor = new DecimalUpDownEditor();
-                else if (propertyItem.PropertyType == typeof(double) || propertyItem.PropertyType == typeof(double?))
-                    editor = new DoubleUpDownEditor();
-                else if (propertyItem.PropertyType == typeof(int) || propertyItem.PropertyType == typeof(int?))
-                    editor = new IntegerUpDownEditor();
-                else if (propertyItem.PropertyType == typeof(DateTime))
-                    editor = new DateTimeUpDownEditor();
-                else if (propertyItem.PropertyType.IsEnum)
-                    editor = new EnumComboBoxEditor();
-                else if (propertyItem.PropertyType == typeof(FontFamily) || propertyItem.PropertyType == typeof(FontWeight) || propertyItem.PropertyType == typeof(FontStyle) || propertyItem.PropertyType == typeof(FontStretch))
-                    editor = new FontComboBoxEditor();
-                else
-                    editor = new TextBoxEditor();
+                //no custom editor found
+                if (editor == null)
+                {
+                    if (propertyItem.IsReadOnly)
+                        editor = new TextBlockEditor();
+                    else if (propertyItem.PropertyType == typeof(bool))
+                        editor = new CheckBoxEditor();
+                    else if (propertyItem.PropertyType == typeof(decimal) || propertyItem.PropertyType == typeof(decimal?))
+                        editor = new DecimalUpDownEditor();
+                    else if (propertyItem.PropertyType == typeof(double) || propertyItem.PropertyType == typeof(double?))
+                        editor = new DoubleUpDownEditor();
+                    else if (propertyItem.PropertyType == typeof(int) || propertyItem.PropertyType == typeof(int?))
+                        editor = new IntegerUpDownEditor();
+                    else if (propertyItem.PropertyType == typeof(DateTime))
+                        editor = new DateTimeUpDownEditor();
+                    else if (propertyItem.PropertyType.IsEnum)
+                        editor = new EnumComboBoxEditor();
+                    else if (propertyItem.PropertyType == typeof(FontFamily) || propertyItem.PropertyType == typeof(FontWeight) || propertyItem.PropertyType == typeof(FontStyle) || propertyItem.PropertyType == typeof(FontStretch))
+                        editor = new FontComboBoxEditor();
+                    else
+                        editor = new TextBoxEditor();
+                }
+            }
+            catch (Exception ex)
+            {
+
             }
 
             editor.Attach(propertyItem);
