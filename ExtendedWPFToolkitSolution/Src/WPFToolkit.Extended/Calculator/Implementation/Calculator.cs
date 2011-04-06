@@ -169,7 +169,7 @@ namespace Microsoft.Windows.Controls
             else
                 DisplayText = "0";
 
-            RoutedPropertyChangedEventArgs<decimal?> args = new RoutedPropertyChangedEventArgs<decimal?>(oldValue, newValue);
+            RoutedPropertyChangedEventArgs<object> args = new RoutedPropertyChangedEventArgs<object>(oldValue, newValue);
             args.RoutedEvent = ValueChangedEvent;
             RaiseEvent(args);
         }
@@ -433,8 +433,9 @@ namespace Microsoft.Windows.Controls
 
         #region Events
 
-        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<decimal?>), typeof(Calculator));
-        public event RoutedPropertyChangedEventHandler<decimal?> ValueChanged
+        //Due to a bug in Visual Studio, you cannot create event handlers for nullable args in XAML, so I have to use object instead.
+        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<object>), typeof(Calculator));
+        public event RoutedPropertyChangedEventHandler<object> ValueChanged
         {
             add { AddHandler(ValueChangedEvent, value); }
             remove { RemoveHandler(ValueChangedEvent, value); }

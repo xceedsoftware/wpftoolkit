@@ -127,7 +127,10 @@ namespace Microsoft.Windows.Controls
             VerifyAdornerLayer();
 
             Control adorningEditor = _toolbar as Control;
-            _adorner.Child = adorningEditor;
+
+            if (_adorner.Child == null)
+                _adorner.Child = adorningEditor;
+
             _adorner.Visibility = Visibility.Visible;
 
             PositionFormatBar(adorningEditor);
@@ -184,7 +187,7 @@ namespace Microsoft.Windows.Controls
             if (IsAdornerVisible)
             {
                 _adorner.Visibility = Visibility.Collapsed;
-                _adorner.Child = null;
+                //_adorner.Child = null;
             }
         }
 
