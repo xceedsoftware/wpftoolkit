@@ -285,9 +285,9 @@ namespace Microsoft.Windows.Controls
                 case Operation.Divide:
                     newValue = CalculatorUtilities.Divide(_previousValue, currentValue);
                     break;
-                case Operation.Percent:
-                    newValue = CalculatorUtilities.Percent(_previousValue, currentValue);
-                    break;
+                //case Operation.Percent:
+                //    newValue = CalculatorUtilities.Percent(_previousValue, currentValue);
+                //    break;
                 case Operation.Sqrt:
                     newValue = CalculatorUtilities.SquareRoot(currentValue);
                     break;
@@ -388,8 +388,18 @@ namespace Microsoft.Windows.Controls
                     Calculate(Operation.Divide);
                     break;
                 case CalculatorButtonType.Percent:
-                    Calculate(Operation.Percent);
-                    break;
+                    if (_lastOperation != Operation.None)
+                    {
+                        decimal currentValue = CalculatorUtilities.ParseDecimal(DisplayText);
+                        decimal newValue = CalculatorUtilities.Percent(_previousValue, currentValue);
+                        DisplayText = newValue.ToString();
+                    }
+                    else
+                    {
+                        DisplayText = "0";
+                        _showNewNumber = true;
+                    }
+                    return;
                 case CalculatorButtonType.Sqrt:
                     Calculate(Operation.Sqrt, Operation.None);
                     break;
