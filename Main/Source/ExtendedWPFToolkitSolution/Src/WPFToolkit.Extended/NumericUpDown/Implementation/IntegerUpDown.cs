@@ -20,14 +20,12 @@ namespace Microsoft.Windows.Controls
 
         #region Base Class Overrides
 
-        protected override int? OnCoerceValue(int? value)
+        protected override void CoerceValue(int? value)
         {
             if (value < Minimum)
-                return Minimum;
+                Value = Minimum;
             else if (value > Maximum)
-                return Maximum;
-            else
-                return value;
+                Value = Maximum;
         }
 
         protected override void OnIncrement()

@@ -57,25 +57,11 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #region Value
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(T), typeof(UpDownBase<T>), new FrameworkPropertyMetadata(default(T), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue));
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(T), typeof(UpDownBase<T>), new FrameworkPropertyMetadata(default(T), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged));
         public T Value
         {
             get { return (T)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
-        }
-
-        private static object OnCoerceValue(DependencyObject o, object value)
-        {
-            UpDownBase<T> upDownBase = o as UpDownBase<T>;
-            if (upDownBase != null)
-                return upDownBase.OnCoerceValue((T)value);
-            else
-                return value;
-        }
-
-        protected virtual T OnCoerceValue(T value)
-        {
-            return value;
         }
 
         private static void OnValueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
@@ -87,9 +73,11 @@ namespace Microsoft.Windows.Controls.Primitives
 
         protected virtual void OnValueChanged(T oldValue, T newValue)
         {
+            CoerceValue(newValue);
+
             SyncTextAndValueProperties(ValueProperty, string.Empty);
 
-            RoutedPropertyChangedEventArgs<T> args = new RoutedPropertyChangedEventArgs<T>(oldValue, newValue);
+            RoutedPropertyChangedEventArgs<object> args = new RoutedPropertyChangedEventArgs<object>(oldValue, newValue);
             args.RoutedEvent = ValueChangedEvent;
             RaiseEvent(args);
         }
@@ -197,8 +185,9 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #region Events
 
-        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<T>), typeof(UpDownBase<T>));
-        public event RoutedPropertyChangedEventHandler<T> ValueChanged
+        //Due to a bug in Visual Studio, you cannot create event handlers for generic T args in XAML, so I have to use object instead.
+        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<object>), typeof(UpDownBase<T>));
+        public event RoutedPropertyChangedEventHandler<object> ValueChanged
         {
             add { AddHandler(ValueChangedEvent, value); }
             remove { RemoveHandler(ValueChangedEvent, value); }
@@ -268,6 +257,23 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #region Abstract
 
+
+        /// <summary>
+        /// Coerces the value.
+        /// </summary>
+        protected abstract void CoerceValue(T value);
+
+        /// <summary>
+        /// Converts the formatted text to a value.
+        /// </summary>
+        protected abstract T ConvertTextToValue(string text);
+
+        /// <summary>
+        /// Converts the value to formatted text.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract string ConvertValueToText();
+
         /// <summary>
         /// Called by OnSpin when the spin direction is SpinDirection.Increase.
         /// </summary>
@@ -277,10 +283,6 @@ namespace Microsoft.Windows.Controls.Primitives
         /// Called by OnSpin when the spin direction is SpinDirection.Descrease.
         /// </summary>
         protected abstract void OnDecrement();
-
-        protected abstract T ConvertTextToValue(string text);
-
-        protected abstract string ConvertValueToText();
 
         #endregion //Abstract
 

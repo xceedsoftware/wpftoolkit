@@ -128,6 +128,11 @@ namespace Microsoft.Windows.Controls
             TextBox.SelectionChanged += TextBox_SelectionChanged;
         }
 
+        protected override void CoerceValue(DateTime? value)
+        {
+            //TODO: implement Min and Max values and keep the Value between those parameters
+        }
+
         protected override void OnIncrement()
         {
             if (Value.HasValue)
@@ -184,17 +189,6 @@ namespace Microsoft.Windows.Controls
             var success = _dateTimeParser.TryParse(currentValue, out result, current);
 
             SyncTextAndValueProperties(InputBase.TextProperty, result.ToString());
-        }
-
-        protected override DateTime? OnCoerceValue(DateTime? value)
-        {
-            //if the user entered a string value to represent a date or time, we need to parse that string into a valid DatTime value
-            if (value != null && !(value is DateTime))
-            {
-                return DateTime.Parse(value.ToString(), DateTimeFormatInfo);
-            }
-
-            return value;
         }
 
         protected override DateTime? ConvertTextToValue(string text)
