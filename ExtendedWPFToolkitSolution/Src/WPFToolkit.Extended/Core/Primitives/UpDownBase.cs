@@ -73,9 +73,11 @@ namespace Microsoft.Windows.Controls.Primitives
 
         protected virtual void OnValueChanged(T oldValue, T newValue)
         {
-            CoerceValue(newValue);
+            ValidateValue(newValue);
 
             SyncTextAndValueProperties(ValueProperty, string.Empty);
+
+            SetValidSpinDirection();
 
             RoutedPropertyChangedEventArgs<object> args = new RoutedPropertyChangedEventArgs<object>(oldValue, newValue);
             args.RoutedEvent = ValueChangedEvent;
@@ -109,6 +111,8 @@ namespace Microsoft.Windows.Controls.Primitives
             TextBox = GetTemplateChild(ElementTextName) as TextBox;
             Spinner = GetTemplateChild(ElementSpinnerName) as Spinner;
             Spinner.Spin += OnSpinnerSpin;
+
+            SetValidSpinDirection();
         }
 
         protected override void OnGotFocus(RoutedEventArgs e)
@@ -256,12 +260,11 @@ namespace Microsoft.Windows.Controls.Primitives
         }
 
         #region Abstract
-
-
+        
         /// <summary>
         /// Coerces the value.
         /// </summary>
-        protected abstract void CoerceValue(T value);
+        protected abstract T CoerceValue(T value);
 
         /// <summary>
         /// Converts the formatted text to a value.
@@ -283,6 +286,17 @@ namespace Microsoft.Windows.Controls.Primitives
         /// Called by OnSpin when the spin direction is SpinDirection.Descrease.
         /// </summary>
         protected abstract void OnDecrement();
+
+        /// <summary>
+        /// Sets the valid spin directions.
+        /// </summary>
+        protected abstract void SetValidSpinDirection();
+
+        /// <summary>
+        /// Validates the value and keeps it between the Min and Max values.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        protected abstract void ValidateValue(T value);
 
         #endregion //Abstract
 
