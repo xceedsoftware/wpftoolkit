@@ -73,7 +73,7 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnMaximumChanged(T oldValue, T newValue)
         {
-            //SetValidSpinDirection();
+            SetValidSpinDirection();
         }
 
         #endregion //Maximum
@@ -96,7 +96,7 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnMinimumChanged(T oldValue, T newValue)
         {
-            //SetValidSpinDirection();
+            SetValidSpinDirection();
         }
 
         #endregion //Minimum
@@ -126,8 +126,6 @@ namespace Microsoft.Windows.Controls
                 TextBox.GotKeyboardFocus += OnTextBoxGotKeyBoardFocus;
                 TextBox.PreviewMouseLeftButtonDown += OnTextBoxPreviewMouseLeftButtonDown;
             }
-
-            //SetValidSpinDirection();
         }
 
         #endregion //Base Class Overrides
@@ -151,24 +149,6 @@ namespace Microsoft.Windows.Controls
         #endregion //Event Handlers
 
         #region Methods
-
-        /// <summary>
-        /// Sets the valid spin direction based on current value, minimum and maximum.
-        /// </summary>
-        //private void SetValidSpinDirection()
-        //{
-        //    ValidSpinDirections validDirections = ValidSpinDirections.None;
-
-        //    if (Value < Maximum)
-        //        validDirections = validDirections | ValidSpinDirections.Increase;
-
-        //    if (Value > Minimum)
-        //        validDirections = validDirections | ValidSpinDirections.Decrease;
-
-        //    if (Spinner != null)
-        //        Spinner.ValidSpinDirection = validDirections;
-        //}
-
 
         protected static decimal ParseDecimal(string text, IFormatProvider cultureInfo)
         {

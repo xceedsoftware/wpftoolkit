@@ -128,9 +128,10 @@ namespace Microsoft.Windows.Controls
             TextBox.SelectionChanged += TextBox_SelectionChanged;
         }
 
-        protected override void CoerceValue(DateTime? value)
+        protected override DateTime? CoerceValue(DateTime? value)
         {
-            //TODO: implement Min and Max values and keep the Value between those parameters
+            //TODO: implement Minimum and Maximum
+            return value;
         }
 
         protected override void OnIncrement()
@@ -207,6 +208,11 @@ namespace Microsoft.Windows.Controls
             return dt.ToString(GetFormatString(Format), CultureInfo);
         }
 
+        protected override void SetValidSpinDirection()
+        {
+            //TODO: implement Minimum and Maximum
+        }
+
         protected override void OnValueChanged(DateTime? oldValue, DateTime? newValue)
         {
             //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
@@ -215,6 +221,11 @@ namespace Microsoft.Windows.Controls
                 ParseValueIntoDateTimeInfo();
 
             base.OnValueChanged(oldValue, newValue);
+        }
+
+        protected override void ValidateValue(DateTime? value)
+        {
+            //TODO: implement min/max
         }
 
         #endregion //Base Class Overrides

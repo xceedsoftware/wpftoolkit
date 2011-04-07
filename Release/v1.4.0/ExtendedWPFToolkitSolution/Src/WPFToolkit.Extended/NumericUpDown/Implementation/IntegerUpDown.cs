@@ -20,12 +20,14 @@ namespace Microsoft.Windows.Controls
 
         #region Base Class Overrides
 
-        protected override void CoerceValue(int? value)
+        protected override int? CoerceValue(int? value)
         {
             if (value < Minimum)
-                Value = Minimum;
+                return Minimum;
             else if (value > Maximum)
-                Value = Maximum;
+                return Maximum;
+            else
+                return value;
         }
 
         protected override void OnIncrement()
@@ -55,6 +57,7 @@ namespace Microsoft.Windows.Controls
             {
                 //don't know why someone would format an integer as %, but just in case they do.
                 result = FormatString.Contains("P") ? Decimal.ToInt32(ParsePercent(text, CultureInfo)) : ParseInt(text, CultureInfo);
+                result = CoerceValue(result);
             }
             catch
             {
@@ -71,6 +74,28 @@ namespace Microsoft.Windows.Controls
                 return string.Empty;
 
             return Value.Value.ToString(FormatString, CultureInfo);
+        }
+
+        protected override void SetValidSpinDirection()
+        {
+            ValidSpinDirections validDirections = ValidSpinDirections.None;
+
+            if (Value < Maximum || !Value.HasValue)
+                validDirections = validDirections | ValidSpinDirections.Increase;
+
+            if (Value > Minimum || !Value.HasValue)
+                validDirections = validDirections | ValidSpinDirections.Decrease;
+
+            if (Spinner != null)
+                Spinner.ValidSpinDirection = validDirections;
+        }
+
+        protected override void ValidateValue(int? value)
+        {
+            if (value < Minimum)
+                Value = Minimum;
+            else if (value > Maximum)
+                Value = Maximum;
         }
 
         #endregion //Base Class Overrides
