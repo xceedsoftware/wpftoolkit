@@ -9,13 +9,13 @@
     <DataTemplate x:Key="DefaultWatermarkTemplate">
         <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
     </DataTemplate>
-    
+
     <Style x:Key="NumericUpDown" TargetType="Control">
         <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-        <Setter Property="HorizontalContentAlignment" Value="Right" />        
+        <Setter Property="HorizontalContentAlignment" Value="Right" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Control">
@@ -32,6 +32,7 @@
                                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                 IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
                                                 MinWidth="20" AcceptsReturn="False" 
+                                                TextAlignment="{Binding TextAlignment, RelativeSource={RelativeSource TemplatedParent}}"
                                                 TextWrapping="NoWrap" 
                                                 TabIndex="{TemplateBinding TabIndex}"
                                                 Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
@@ -48,6 +49,7 @@
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:DecimalUpDown}" BasedOn="{StaticResource NumericUpDown}">
+        <Setter Property="TextAlignment" Value="Right" />
         <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
     </Style>
 
@@ -56,6 +58,7 @@
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:DoubleUpDown}" BasedOn="{StaticResource NumericUpDown}">
+        <Setter Property="TextAlignment" Value="Right" />
         <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
     </Style>
 
@@ -64,7 +67,8 @@
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:IntegerUpDown}" BasedOn="{StaticResource NumericUpDown}">
+        <Setter Property="TextAlignment" Value="Right" />
         <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
     </Style>
-   
+
 </ResourceDictionary>

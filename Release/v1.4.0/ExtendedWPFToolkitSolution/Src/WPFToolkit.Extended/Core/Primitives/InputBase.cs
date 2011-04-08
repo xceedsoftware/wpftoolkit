@@ -50,9 +50,21 @@ namespace Microsoft.Windows.Controls.Primitives
         protected virtual void OnTextChanged(string oldValue, string newValue)
         {
 
-        }        
+        }
 
         #endregion //Text
+
+        #region TextAlignment
+
+        public static readonly DependencyProperty TextAlignmentProperty = DependencyProperty.Register("TextAlignment", typeof(TextAlignment), typeof(InputBase), new UIPropertyMetadata(TextAlignment.Left));
+        public TextAlignment TextAlignment
+        {
+            get { return (TextAlignment)GetValue(TextAlignmentProperty); }
+            set { SetValue(TextAlignmentProperty, value); }
+        }
+
+
+        #endregion //TextAlignment
 
         #region Watermark
 
