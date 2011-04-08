@@ -19,6 +19,7 @@
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
         <Setter Property="HorizontalContentAlignment" Value="Right" />
+        <Setter Property="TextAlignment" Value="Right" />
         <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -36,6 +37,7 @@
                                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                 IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
                                                 MinWidth="20" AcceptsReturn="False" 
+                                                TextAlignment="{TemplateBinding TextAlignment}"
                                                 TextWrapping="NoWrap" 
                                                 TabIndex="{TemplateBinding TabIndex}"
                                                 Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
