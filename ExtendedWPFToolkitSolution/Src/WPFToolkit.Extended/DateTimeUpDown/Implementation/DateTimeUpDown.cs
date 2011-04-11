@@ -85,6 +85,8 @@ namespace Microsoft.Windows.Controls
             if (string.IsNullOrEmpty(newValue))
                 throw new ArgumentException("CustomFormat should be specified.", FormatString);
 
+            _dateTimeParser.Format = newValue;
+
             InitializeDateTimeInfoListAndParseValue();
         }
 
