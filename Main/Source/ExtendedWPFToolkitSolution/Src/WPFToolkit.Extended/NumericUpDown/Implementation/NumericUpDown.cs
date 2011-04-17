@@ -39,7 +39,8 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnFormatStringChanged(string oldValue, string newValue)
         {
-            Text = ConvertValueToText();
+            if (IsInitialized)
+                Text = ConvertValueToText();
         }
 
         #endregion //FormatString
