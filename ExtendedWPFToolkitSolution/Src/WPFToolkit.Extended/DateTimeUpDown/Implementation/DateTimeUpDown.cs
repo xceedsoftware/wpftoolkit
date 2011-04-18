@@ -54,11 +54,7 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnFormatChanged(DateTimeFormat oldValue, DateTimeFormat newValue)
         {
             _dateTimeParser.Format = GetFormatString(newValue);
-
-            //if using a CustomFormat then the initialization occurs on the CustomFormatString property
-            if (newValue != DateTimeFormat.Custom)
-                InitializeDateTimeInfoListAndParseValue();
-
+            InitializeDateTimeInfoListAndParseValue();
             Text = ConvertValueToText();
         }
 
@@ -83,10 +79,9 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnFormatStringChanged(string oldValue, string newValue)
         {
             if (string.IsNullOrEmpty(newValue))
-                throw new ArgumentException("CustomFormat should be specified.", FormatString);
+                throw new ArgumentException("FormatString should be specified.", "newValue");
 
             _dateTimeParser.Format = newValue;
-
             InitializeDateTimeInfoListAndParseValue();
         }
 
@@ -258,6 +253,10 @@ namespace Microsoft.Windows.Controls
             _dateTimeInfoList.Clear();
 
             string format = GetFormatString(Format);
+
+            if (format == null)
+                return;
+
             while (format.Length > 0)
             {
                 int elementLength = GetElementLengthByFormat(format);
