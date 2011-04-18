@@ -44,6 +44,17 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #endregion //AllowSpin
 
+        #region MouseWheelActiveOnFocus
+
+        public static readonly DependencyProperty MouseWheelActiveOnFocusProperty = DependencyProperty.Register("MouseWheelActiveOnFocus", typeof(bool), typeof(UpDownBase<T>), new UIPropertyMetadata(true));
+        public bool MouseWheelActiveOnFocus
+        {
+            get { return (bool)GetValue(MouseWheelActiveOnFocusProperty); }
+            set { SetValue(MouseWheelActiveOnFocusProperty, value); }
+        }        
+
+        #endregion //MouseWheelActiveOnFocus
+
         #region ShowButtonSpinner
 
         public static readonly DependencyProperty ShowButtonSpinnerProperty = DependencyProperty.Register("ShowButtonSpinner", typeof(bool), typeof(UpDownBase<T>), new UIPropertyMetadata(true));
@@ -155,7 +166,7 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             base.OnMouseWheel(e);
 
-            if (!e.Handled && AllowSpin && TextBox.IsFocused)
+            if (!e.Handled && AllowSpin && ((TextBox.IsFocused && MouseWheelActiveOnFocus) || !MouseWheelActiveOnFocus))
             {
                 if (e.Delta < 0)
                 {
@@ -260,7 +271,7 @@ namespace Microsoft.Windows.Controls.Primitives
         }
 
         #region Abstract
-        
+
         /// <summary>
         /// Coerces the value.
         /// </summary>
