@@ -15,7 +15,8 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-        <Setter Property="HorizontalContentAlignment" Value="Right" />        
+        <Setter Property="HorizontalContentAlignment" Value="Right" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Control">
@@ -36,6 +37,7 @@
                                                 TextWrapping="NoWrap" 
                                                 TabIndex="{TemplateBinding TabIndex}"
                                                 Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
+                                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                                 Watermark="{Binding Watermark, RelativeSource={RelativeSource TemplatedParent}}"
                                                 WatermarkTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}}"/>
                     </local:ButtonSpinner>
