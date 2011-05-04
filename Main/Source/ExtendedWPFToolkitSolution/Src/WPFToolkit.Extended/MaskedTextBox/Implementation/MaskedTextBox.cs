@@ -334,8 +334,6 @@ namespace Microsoft.Windows.Controls
             };
         }
 
-        #endregion //Private
-
         private object ConvertTextToValue(string text)
         {
             object convertedValue = null;
@@ -380,7 +378,7 @@ namespace Microsoft.Windows.Controls
             return MaskProvider.ToDisplayString();
         }
 
-        protected void SyncTextAndValueProperties(DependencyProperty p, object newValue)
+        private void SyncTextAndValueProperties(DependencyProperty p, object newValue)
         {
             //prevents recursive syncing properties
             if (_isSyncingTextAndValueProperties)
@@ -399,6 +397,23 @@ namespace Microsoft.Windows.Controls
 
             _isSyncingTextAndValueProperties = false;
         }
+
+        #endregion //Private    
+
+        #region Public
+
+        /// <summary>
+        /// Attempts to set focus to this element.
+        /// </summary>
+        public new void Focus()
+        {
+            if (TextBox != null)
+                TextBox.Focus();
+            else
+                base.Focus();
+        }
+
+        #endregion //Public
 
         #endregion //Methods
 
