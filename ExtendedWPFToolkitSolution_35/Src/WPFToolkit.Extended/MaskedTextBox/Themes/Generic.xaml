@@ -18,6 +18,8 @@
                 <ControlTemplate TargetType="{x:Type local:MaskedTextBox}">
                     <TextBox x:Name="TextBox" 
                              Background="{TemplateBinding Background}"
+                             BorderBrush="{TemplateBinding BorderBrush}"
+                             BorderThickness="{TemplateBinding BorderThickness}"
                              FontFamily="{TemplateBinding FontFamily}" 
                              FontSize="{TemplateBinding FontSize}" 
                              FontStretch="{TemplateBinding FontStretch}"
