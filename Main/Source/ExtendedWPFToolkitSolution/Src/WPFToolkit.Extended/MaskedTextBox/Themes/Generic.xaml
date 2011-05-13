@@ -22,8 +22,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:MaskedTextBox}">
-                    <local:WatermarkTextBox x:Name="TextBox" 
+                    <local:WatermarkTextBox x:Name="TextBox"
                                             Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
                                             FontFamily="{TemplateBinding FontFamily}" 
                                             FontSize="{TemplateBinding FontSize}" 
                                             FontStretch="{TemplateBinding FontStretch}"
