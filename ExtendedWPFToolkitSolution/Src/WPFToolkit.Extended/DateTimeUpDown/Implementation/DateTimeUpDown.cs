@@ -55,7 +55,10 @@ namespace Microsoft.Windows.Controls
         {
             _dateTimeParser.Format = GetFormatString(newValue);
             InitializeDateTimeInfoListAndParseValue();
-            Text = ConvertValueToText();
+
+            //I forgot why I set the text here. I believe it had to deal with databinding to the format. Either way we need to make sure there is a value before we try to set the text.
+            if (Value.HasValue)
+                Text = ConvertValueToText();
         }
 
         #endregion //Format
