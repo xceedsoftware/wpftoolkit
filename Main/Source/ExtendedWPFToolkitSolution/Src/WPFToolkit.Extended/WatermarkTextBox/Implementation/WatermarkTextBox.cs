@@ -1,12 +1,24 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Microsoft.Windows.Controls
 {
     public class WatermarkTextBox : TextBox
     {
         #region Properties
+
+        #region SelectAllOnGotFocus
+
+        public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register("SelectAllOnGotFocus", typeof(bool), typeof(WatermarkTextBox), new PropertyMetadata(false));
+        public bool SelectAllOnGotFocus
+        {
+            get { return (bool)GetValue(SelectAllOnGotFocusProperty); }
+            set { SetValue(SelectAllOnGotFocusProperty, value); }
+        }
+
+        #endregion //SelectAllOnGotFocus
 
         #region Watermark
 
@@ -40,5 +52,28 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Constructors
+
+        #region Base Class Overrides
+
+        protected override void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
+        {
+            if (SelectAllOnGotFocus)
+                SelectAll();
+
+            base.OnGotKeyboardFocus(e);
+        }
+
+        protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            if (!IsKeyboardFocused)
+            {
+                e.Handled = true;
+                Focus();
+            }
+
+            base.OnPreviewMouseLeftButtonDown(e);
+        }
+
+        #endregion //Base Class Overrides
     }
 }
