@@ -32,119 +32,6 @@ namespace Microsoft.Windows.Controls
 
         #endregion //Private Members
 
-        #region Constructors
-
-        static ChildWindow()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(ChildWindow), new FrameworkPropertyMetadata(typeof(ChildWindow)));
-        }
-
-        public ChildWindow()
-        {
-            IsVisibleChanged += ChildWindow_IsVisibleChanged;
-
-            _modalLayer.Fill = OverlayBrush;
-            _modalLayer.Opacity = OverlayOpacity;
-        }
-
-        #endregion //Constructors
-
-        #region Base Class Overrides
-
-        public override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-
-            _dragWidget = (Border)GetTemplateChild("PART_DragWidget");
-            if (_dragWidget != null)
-            {
-                _dragWidget.AddHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(HeaderLeftMouseButtonDown), true);
-                _dragWidget.AddHandler(UIElement.MouseLeftButtonUpEvent, new MouseButtonEventHandler(HeaderMouseLeftButtonUp), true);
-                _dragWidget.MouseMove += (o, e) => HeaderMouseMove(e);
-            }
-
-            CloseButton = (Button)GetTemplateChild("PART_CloseButton");
-            if (CloseButton != null)
-                CloseButton.Click += (o, e) => Close();
-
-            WindowRoot = GetTemplateChild("PART_WindowRoot") as Grid;
-            WindowRoot.RenderTransform = _moveTransform;
-
-            _parentContainer = VisualTreeHelper.GetParent(this) as FrameworkElement;
-            _parentContainer.LayoutUpdated += ParentContainer_LayoutUpdated;
-            _parentContainer.SizeChanged += ParentContainer_SizeChanged;
-
-            //initialize our modal background width/height
-            _modalLayer.Height = _parentContainer.ActualHeight;
-            _modalLayer.Width = _parentContainer.ActualWidth;
-
-            //this is for XBAP applications only. When inside an XBAP the parent container has no height or width until it has loaded. Therefore
-            //we need to handle the loaded event and reposition the window.
-            if (System.Windows.Interop.BrowserInteropHelper.IsBrowserHosted)
-            {
-                _parentContainer.Loaded += (o, e) =>
-                    {
-                        ExecuteOpen();
-                    };
-            }
-
-            _root = GetTemplateChild("Root") as Grid;
-
-            Style focusStyle = _root.Resources["FocusVisualStyle"] as Style;
-            if (focusStyle != null)
-            {
-                Setter focusStyleDataContext = new Setter(Control.DataContextProperty, this);
-                focusStyle.Setters.Add(focusStyleDataContext);
-                FocusVisualStyle = focusStyle;
-            }
-
-            _root.Children.Add(_modalLayerPanel);
-        }
-
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            Action action = () =>
-            {
-                if (FocusedElement != null)
-                    FocusedElement.Focus();
-            };
-
-            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
-        }
-
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            base.OnKeyDown(e);
-
-            if (WindowState == WindowState.Open)
-            {
-                switch (e.Key)
-                {
-                    case Key.Left:
-                        this.Left -= _horizaontalOffset;
-                        e.Handled = true;
-                        break;
-
-                    case Key.Right:
-                        this.Left += _horizaontalOffset;
-                        e.Handled = true;
-                        break;
-
-                    case Key.Down:
-                        this.Top += _verticalOffset;
-                        e.Handled = true;
-                        break;
-
-                    case Key.Up:
-                        this.Top -= _verticalOffset;
-                        e.Handled = true;
-                        break;
-                }
-            }
-        }
-
-        #endregion //Base Class Overrides
-
         #region Properties
 
         #region Internal Properties
@@ -229,6 +116,32 @@ namespace Microsoft.Windows.Controls
 
         #endregion //DialogResult
 
+        #region DesignerWindowState
+
+        public static readonly DependencyProperty DesignerWindowStateProperty = DependencyProperty.Register("DesignerWindowState", typeof(WindowState), typeof(ChildWindow), new PropertyMetadata(WindowState.Closed, OnDesignerWindowStatePropertyChanged));
+        public WindowState DesignerWindowState
+        {
+            get { return (WindowState)GetValue(DesignerWindowStateProperty); }
+            set { SetValue(DesignerWindowStateProperty, value); }
+        }
+
+        private static void OnDesignerWindowStatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ChildWindow childWindow = d as ChildWindow;
+            if (childWindow != null)
+                childWindow.OnDesignerWindowStatePropertyChanged((WindowState)e.OldValue, (WindowState)e.NewValue);
+        }
+
+        protected virtual void OnDesignerWindowStatePropertyChanged(WindowState oldValue, WindowState newValue)
+        {
+            if (DesignerProperties.GetIsInDesignMode(this))
+            {
+                Visibility = newValue == Controls.WindowState.Open ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        #endregion //DesignerWindowState
+
         #region FocusedElement
 
         public static readonly DependencyProperty FocusedElementProperty = DependencyProperty.Register("FocusedElement", typeof(FrameworkElement), typeof(ChildWindow), new UIPropertyMetadata(null));
@@ -236,7 +149,7 @@ namespace Microsoft.Windows.Controls
         {
             get { return (FrameworkElement)GetValue(FocusedElementProperty); }
             set { SetValue(FocusedElementProperty, value); }
-        } 
+        }
 
         #endregion
 
@@ -440,8 +353,15 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnWindowStatePropertyChanged(WindowState oldValue, WindowState newValue)
         {
-            if (!_ignorePropertyChanged)
-                SetWindowState(newValue);
+            if (!DesignerProperties.GetIsInDesignMode(this))
+            {
+                if (!_ignorePropertyChanged)
+                    SetWindowState(newValue);
+            }
+            else
+            {
+                Visibility = DesignerWindowState == Controls.WindowState.Open ? Visibility.Visible : System.Windows.Visibility.Collapsed;
+            }
         }
 
         #endregion //WindowState
@@ -449,6 +369,121 @@ namespace Microsoft.Windows.Controls
         #endregion //Public Properties
 
         #endregion //Properties
+
+        #region Constructors
+
+        static ChildWindow()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ChildWindow), new FrameworkPropertyMetadata(typeof(ChildWindow)));
+        }
+
+        public ChildWindow()
+        {
+            DesignerWindowState = Controls.WindowState.Open;
+
+            IsVisibleChanged += ChildWindow_IsVisibleChanged;
+
+            _modalLayer.Fill = OverlayBrush;
+            _modalLayer.Opacity = OverlayOpacity;
+        }
+
+        #endregion //Constructors
+
+        #region Base Class Overrides
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            _dragWidget = (Border)GetTemplateChild("PART_DragWidget");
+            if (_dragWidget != null)
+            {
+                _dragWidget.AddHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(HeaderLeftMouseButtonDown), true);
+                _dragWidget.AddHandler(UIElement.MouseLeftButtonUpEvent, new MouseButtonEventHandler(HeaderMouseLeftButtonUp), true);
+                _dragWidget.MouseMove += (o, e) => HeaderMouseMove(e);
+            }
+
+            CloseButton = (Button)GetTemplateChild("PART_CloseButton");
+            if (CloseButton != null)
+                CloseButton.Click += (o, e) => Close();
+
+            WindowRoot = GetTemplateChild("PART_WindowRoot") as Grid;
+            WindowRoot.RenderTransform = _moveTransform;
+
+            _parentContainer = VisualTreeHelper.GetParent(this) as FrameworkElement;
+            _parentContainer.LayoutUpdated += ParentContainer_LayoutUpdated;
+            _parentContainer.SizeChanged += ParentContainer_SizeChanged;
+
+            //initialize our modal background width/height
+            _modalLayer.Height = _parentContainer.ActualHeight;
+            _modalLayer.Width = _parentContainer.ActualWidth;
+
+            //this is for XBAP applications only. When inside an XBAP the parent container has no height or width until it has loaded. Therefore
+            //we need to handle the loaded event and reposition the window.
+            if (System.Windows.Interop.BrowserInteropHelper.IsBrowserHosted)
+            {
+                _parentContainer.Loaded += (o, e) =>
+                    {
+                        ExecuteOpen();
+                    };
+            }
+
+            _root = GetTemplateChild("Root") as Grid;
+
+            Style focusStyle = _root.Resources["FocusVisualStyle"] as Style;
+            if (focusStyle != null)
+            {
+                Setter focusStyleDataContext = new Setter(Control.DataContextProperty, this);
+                focusStyle.Setters.Add(focusStyleDataContext);
+                FocusVisualStyle = focusStyle;
+            }
+
+            _root.Children.Add(_modalLayerPanel);
+        }
+
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            Action action = () =>
+            {
+                if (FocusedElement != null)
+                    FocusedElement.Focus();
+            };
+
+            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            if (WindowState == WindowState.Open)
+            {
+                switch (e.Key)
+                {
+                    case Key.Left:
+                        this.Left -= _horizaontalOffset;
+                        e.Handled = true;
+                        break;
+
+                    case Key.Right:
+                        this.Left += _horizaontalOffset;
+                        e.Handled = true;
+                        break;
+
+                    case Key.Down:
+                        this.Top += _verticalOffset;
+                        e.Handled = true;
+                        break;
+
+                    case Key.Up:
+                        this.Top -= _verticalOffset;
+                        e.Handled = true;
+                        break;
+                }
+            }
+        }
+
+        #endregion //Base Class Overrides
 
         #region Event Handlers
 
