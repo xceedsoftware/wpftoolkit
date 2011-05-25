@@ -115,40 +115,6 @@ namespace Microsoft.Windows.Controls
 
         #endregion //Properties
 
-        #region Base Class Overrides
-
-        public override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-
-            if (SelectAllOnGotFocus)
-            {
-                //in order to select all the text we must handle both the keybord (tabbing) and mouse (clicking) events
-                TextBox.GotKeyboardFocus += OnTextBoxGotKeyBoardFocus;
-                TextBox.PreviewMouseLeftButtonDown += OnTextBoxPreviewMouseLeftButtonDown;
-            }
-        }
-
-        #endregion //Base Class Overrides
-
-        #region Event Handlers
-
-        private void OnTextBoxGotKeyBoardFocus(object sender, RoutedEventArgs e)
-        {
-            TextBox.SelectAll();
-        }
-
-        void OnTextBoxPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (!TextBox.IsKeyboardFocused)
-            {
-                e.Handled = true;
-                TextBox.Focus();
-            }
-        }
-
-        #endregion //Event Handlers
-
         #region Methods
 
         protected static decimal ParseDecimal(string text, IFormatProvider cultureInfo)
