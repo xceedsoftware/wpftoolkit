@@ -207,7 +207,7 @@ namespace Microsoft.Windows.Controls
         void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             //if the text is readonly do not add the text
-            if (TextBox.IsReadOnly)
+            if (!IsEditable)
             {
                 e.Handled = true;
                 return;
@@ -241,6 +241,9 @@ namespace Microsoft.Windows.Controls
 
         void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (!IsEditable)
+                return;
+
             MaskedTextProvider provider = MaskProvider;
             int position = TextBox.SelectionStart;
             int selectionlength = TextBox.SelectionLength;
@@ -398,7 +401,7 @@ namespace Microsoft.Windows.Controls
             _isSyncingTextAndValueProperties = false;
         }
 
-        #endregion //Private    
+        #endregion //Private
 
         #region Public
 
@@ -421,6 +424,9 @@ namespace Microsoft.Windows.Controls
 
         private void Paste(object sender, RoutedEventArgs e)
         {
+            if (!IsEditable)
+                return;
+
             MaskedTextProvider provider = MaskProvider;
             int position = TextBox.SelectionStart;
 
