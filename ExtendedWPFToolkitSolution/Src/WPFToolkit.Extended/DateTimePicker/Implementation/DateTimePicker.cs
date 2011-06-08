@@ -10,7 +10,7 @@ using System.Windows.Controls.Primitives;
 
 namespace Microsoft.Windows.Controls
 {
-    public class DateTimePicker : Control
+    public class DateTimePicker : DateTimeUpDown
     {
         #region Members
 
@@ -19,64 +19,6 @@ namespace Microsoft.Windows.Controls
         #endregion //Members
 
         #region Properties
-
-        #region AllowSpin
-
-        public static readonly DependencyProperty AllowSpinProperty = DependencyProperty.Register("AllowSpin", typeof(bool), typeof(DateTimePicker), new UIPropertyMetadata(true));
-        public bool AllowSpin
-        {
-            get { return (bool)GetValue(AllowSpinProperty); }
-            set { SetValue(AllowSpinProperty, value); }
-        }
-
-        #endregion //AllowSpin
-
-        #region Format
-
-        public static readonly DependencyProperty FormatProperty = DependencyProperty.Register("Format", typeof(DateTimeFormat), typeof(DateTimePicker), new UIPropertyMetadata(DateTimeFormat.FullDateTime, OnFormatChanged));
-        public DateTimeFormat Format
-        {
-            get { return (DateTimeFormat)GetValue(FormatProperty); }
-            set { SetValue(FormatProperty, value); }
-        }
-
-        private static void OnFormatChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            DateTimePicker DateTimePicker = o as DateTimePicker;
-            if (DateTimePicker != null)
-                DateTimePicker.OnFormatChanged((DateTimeFormat)e.OldValue, (DateTimeFormat)e.NewValue);
-        }
-
-        protected virtual void OnFormatChanged(DateTimeFormat oldValue, DateTimeFormat newValue)
-        {
-
-        }
-
-        #endregion //Format
-
-        #region FormatString
-
-        public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register("FormatString", typeof(string), typeof(DateTimePicker), new UIPropertyMetadata(default(String), OnFormatStringChanged));
-        public string FormatString
-        {
-            get { return (string)GetValue(FormatStringProperty); }
-            set { SetValue(FormatStringProperty, value); }
-        }
-
-        private static void OnFormatStringChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            DateTimePicker DateTimePicker = o as DateTimePicker;
-            if (DateTimePicker != null)
-                DateTimePicker.OnFormatStringChanged((string)e.OldValue, (string)e.NewValue);
-        }
-
-        protected virtual void OnFormatStringChanged(string oldValue, string newValue)
-        {
-            if (string.IsNullOrEmpty(newValue))
-                throw new ArgumentException("CustomFormat should be specified.", FormatString);
-        }
-
-        #endregion //FormatString
 
         #region IsOpen
 
@@ -88,17 +30,6 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //IsOpen
-
-        #region ShowButtonSpinner
-
-        public static readonly DependencyProperty ShowButtonSpinnerProperty = DependencyProperty.Register("ShowButtonSpinner", typeof(bool), typeof(DateTimePicker), new UIPropertyMetadata(true));
-        public bool ShowButtonSpinner
-        {
-            get { return (bool)GetValue(ShowButtonSpinnerProperty); }
-            set { SetValue(ShowButtonSpinnerProperty, value); }
-        }
-
-        #endregion //ShowButtonSpinner
 
         #region TimeWatermark
 
@@ -121,74 +52,6 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //TimeWatermarkTemplate
-
-        #region Value
-
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(DateTime?), typeof(DateTimePicker), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue));
-        public DateTime? Value
-        {
-            get { return (DateTime?)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
-        }
-
-        private static object OnCoerceValue(DependencyObject o, object value)
-        {
-            DateTimePicker dateTimePicker = o as DateTimePicker;
-            if (dateTimePicker != null)
-                return dateTimePicker.OnCoerceValue((DateTime?)value);
-            else
-                return value;
-        }
-
-        private static void OnValueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            DateTimePicker dateTimePicker = o as DateTimePicker;
-            if (dateTimePicker != null)
-                dateTimePicker.OnValueChanged((DateTime?)e.OldValue, (DateTime?)e.NewValue);
-        }
-
-        protected virtual DateTime? OnCoerceValue(DateTime? value)
-        {
-            // TODO: Keep the proposed value within the desired range.
-            return value;
-        }
-
-        protected virtual void OnValueChanged(DateTime? oldValue, DateTime? newValue)
-        {
-            if (_calendar != null && _calendar.SelectedDate.HasValue && newValue.HasValue && _calendar.SelectedDate.Value != newValue.Value)
-            {
-                _calendar.SelectedDate = newValue;
-                _calendar.DisplayDate = newValue.Value;
-            }
-
-            RoutedPropertyChangedEventArgs<object> args = new RoutedPropertyChangedEventArgs<object>(oldValue, newValue);
-            args.RoutedEvent = ValueChangedEvent;
-            RaiseEvent(args);
-        }
-
-        #endregion //Value
-
-        #region Watermark
-
-        public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register("Watermark", typeof(object), typeof(DateTimePicker), new UIPropertyMetadata(null));
-        public object Watermark
-        {
-            get { return (object)GetValue(WatermarkProperty); }
-            set { SetValue(WatermarkProperty, value); }
-        }
-
-        #endregion //Watermark
-
-        #region WatermarkTemplate
-
-        public static readonly DependencyProperty WatermarkTemplateProperty = DependencyProperty.Register("WatermarkTemplate", typeof(DataTemplate), typeof(DateTimePicker), new UIPropertyMetadata(null));
-        public DataTemplate WatermarkTemplate
-        {
-            get { return (DataTemplate)GetValue(WatermarkTemplateProperty); }
-            set { SetValue(WatermarkTemplateProperty, value); }
-        }
-
-        #endregion //WatermarkTemplate
 
         #endregion //Properties
 
@@ -224,6 +87,17 @@ namespace Microsoft.Windows.Controls
                 Mouse.Capture(null);  
         }
 
+        protected override void OnValueChanged(DateTime? oldValue, DateTime? newValue)
+        {
+            if (_calendar != null && _calendar.SelectedDate.HasValue && newValue.HasValue && _calendar.SelectedDate.Value != newValue.Value)
+            {
+                _calendar.SelectedDate = newValue;
+                _calendar.DisplayDate = newValue.Value;
+            }
+
+            base.OnValueChanged(oldValue, newValue);
+        }
+
         #endregion //Base Class Overrides
 
         #region Event Handlers
@@ -256,18 +130,6 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Event Handlers
-
-        #region Events
-
-        //Due to a bug in Visual Studio, you cannot create event handlers for Nullable<T> args in XAML, so I have to use object instead.
-        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<object>), typeof(DateTimePicker));
-        public event RoutedPropertyChangedEventHandler<object> ValueChanged
-        {
-            add { AddHandler(ValueChangedEvent, value); }
-            remove { RemoveHandler(ValueChangedEvent, value); }
-        }
-
-        #endregion //Events
 
         #region Methods
 
