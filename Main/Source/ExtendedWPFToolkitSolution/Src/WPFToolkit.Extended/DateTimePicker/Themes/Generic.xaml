@@ -59,6 +59,12 @@
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:DateTimePicker}">
+        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Right" />
+        <Setter Property="TextAlignment" Value="Right" />
         <Setter Property="TimeWatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
         <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
         <Setter Property="Template">
@@ -71,13 +77,26 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <local:DateTimeUpDown BorderThickness="1,1,0,1"
-                                                      AllowSpin="{TemplateBinding AllowSpin}"
-                                                      Format="{TemplateBinding Format}" FormatString="{TemplateBinding FormatString}" 
-                                                      ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
-                                                      Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
-                                                      Watermark="{TemplateBinding Watermark}"
-                                                      WatermarkTemplate="{TemplateBinding WatermarkTemplate}" />
+                                <local:ButtonSpinner x:Name="Spinner" IsTabStop="False" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
+                                         AllowSpin="{TemplateBinding AllowSpin}" ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
+                                    <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0" 
+                                                Background="{TemplateBinding Background}"
+                                                FontFamily="{TemplateBinding FontFamily}" 
+                                                FontSize="{TemplateBinding FontSize}" 
+                                                FontStretch="{TemplateBinding FontStretch}"
+                                                FontStyle="{TemplateBinding FontStyle}" 
+                                                FontWeight="{TemplateBinding FontWeight}" 
+                                                Foreground="{TemplateBinding Foreground}" 
+                                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                                                MinWidth="20" AcceptsReturn="False" 
+                                                TextAlignment="{TemplateBinding TextAlignment}"
+                                                TextWrapping="NoWrap" 
+                                                TabIndex="{TemplateBinding TabIndex}"
+                                                Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
+                                                Watermark="{TemplateBinding Watermark}"
+                                                WatermarkTemplate="{TemplateBinding WatermarkTemplate}"/>
+                                </local:ButtonSpinner>
                                 <ToggleButton x:Name="_calendarToggleButton" Grid.Column="1" Background="White"
                                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                               Style="{StaticResource DateTimePickerToggleButtonStyle}"
