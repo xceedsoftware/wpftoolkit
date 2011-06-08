@@ -39,7 +39,7 @@ namespace Microsoft.Windows.Controls
             bool success = false;
             result = currentDate;
 
-            if (string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(Format))
                 return false;
 
             var dateTimeString = ResolveDateTimeString(value, currentDate);
