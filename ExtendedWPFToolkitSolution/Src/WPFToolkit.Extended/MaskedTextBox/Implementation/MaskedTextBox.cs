@@ -337,32 +337,44 @@ namespace Microsoft.Windows.Controls
             };
         }
 
+        private bool _convertExceptionOccurred = false;
+
         private object ConvertTextToValue(string text)
         {
+
             object convertedValue = null;
 
             Type dataType = ValueType;
 
             string valueToConvert = MaskProvider.ToString().Trim();
 
-            if (valueToConvert.GetType() == dataType || dataType.IsInstanceOfType(valueToConvert))
+            try
             {
-                convertedValue = valueToConvert;
-            }
+                if (valueToConvert.GetType() == dataType || dataType.IsInstanceOfType(valueToConvert))
+                {
+                    convertedValue = valueToConvert;
+                }
 #if !VS2008
-            else if (String.IsNullOrWhiteSpace(valueToConvert))
-            {
-                convertedValue = Activator.CreateInstance(dataType);
-            }
+                else if (String.IsNullOrWhiteSpace(valueToConvert))
+                {
+                    convertedValue = Activator.CreateInstance(dataType);
+                }
 #else
             else if (String.IsNullOrEmpty(valueToConvert))
             {
                 convertedValue = Activator.CreateInstance(dataType);
             }
 #endif
-            else if (null == convertedValue && valueToConvert is IConvertible)
+                else if (null == convertedValue && valueToConvert is IConvertible)
+                {
+                    convertedValue = Convert.ChangeType(valueToConvert, dataType);
+                }
+            }
+            catch
             {
-                convertedValue = Convert.ChangeType(valueToConvert, dataType);
+                //if an excpetion occurs revert back to original value
+                _convertExceptionOccurred = true;
+                return Value;
             }
 
             return convertedValue;
@@ -372,6 +384,12 @@ namespace Microsoft.Windows.Controls
         {
             if (value == null)
                 value = string.Empty;
+
+            if (_convertExceptionOccurred)
+            {
+                value = Value;
+                _convertExceptionOccurred = false;
+            }
 
             //I have only seen this occur while in Blend, but we need it here so the Blend designer doesn't crash.
             if (MaskProvider == null)
