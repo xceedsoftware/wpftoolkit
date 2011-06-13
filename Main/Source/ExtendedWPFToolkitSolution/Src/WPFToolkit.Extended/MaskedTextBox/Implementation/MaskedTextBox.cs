@@ -1,13 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using Microsoft.Windows.Controls.Primitives;
+using System.Windows.Controls;
 
 namespace Microsoft.Windows.Controls
 {
-    public class MaskedTextBox : InputBase
+    public class MaskedTextBox : TextBox
     {
         #region Members
 
@@ -16,13 +15,13 @@ namespace Microsoft.Windows.Controls
         /// </summary>
         private bool _isSyncingTextAndValueProperties;
         private bool _isInitialized;
+        private bool _convertExceptionOccurred = false;
 
         #endregion //Members
 
         #region Properties
 
         protected MaskedTextProvider MaskProvider { get; set; }
-        private TextBox TextBox { get; set; }
 
         #region IncludePrompt
 
@@ -94,6 +93,57 @@ namespace Microsoft.Windows.Controls
 
         #endregion //Mask
 
+        #region PromptChar
+
+        public static readonly DependencyProperty PromptCharProperty = DependencyProperty.Register("PromptChar", typeof(char), typeof(MaskedTextBox), new UIPropertyMetadata('_', OnPromptCharChanged));
+        public char PromptChar
+        {
+            get { return (char)GetValue(PromptCharProperty); }
+            set { SetValue(PromptCharProperty, value); }
+        }
+
+        private static void OnPromptCharChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            MaskedTextBox maskedTextBox = o as MaskedTextBox;
+            if (maskedTextBox != null)
+                maskedTextBox.OnPromptCharChanged((char)e.OldValue, (char)e.NewValue);
+        }
+
+        protected virtual void OnPromptCharChanged(char oldValue, char newValue)
+        {
+            ResolveMaskProvider(Mask);
+        }
+
+        #endregion //PromptChar
+
+        #region SelectAllOnGotFocus
+
+        public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register("SelectAllOnGotFocus", typeof(bool), typeof(MaskedTextBox), new PropertyMetadata(false));
+        public bool SelectAllOnGotFocus
+        {
+            get { return (bool)GetValue(SelectAllOnGotFocusProperty); }
+            set { SetValue(SelectAllOnGotFocusProperty, value); }
+        }
+
+        #endregion //SelectAllOnGotFocus
+
+        #region Text
+
+        private static void OnTextChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            MaskedTextBox inputBase = o as MaskedTextBox;
+            if (inputBase != null)
+                inputBase.OnTextChanged((string)e.OldValue, (string)e.NewValue);
+        }
+
+        protected virtual void OnTextChanged(string oldValue, string newValue)
+        {
+            if (_isInitialized)
+                SyncTextAndValueProperties(MaskedTextBox.TextProperty, newValue);
+        }
+
+        #endregion //Text
+
         #region Value
 
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(object), typeof(MaskedTextBox), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged));
@@ -141,7 +191,7 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnValueTypeChanged(Type oldValue, Type newValue)
         {
             if (_isInitialized)
-                SyncTextAndValueProperties(InputBase.TextProperty, Text);
+                SyncTextAndValueProperties(MaskedTextBox.TextProperty, Text);
         }
 
         #endregion //ValueType
@@ -152,35 +202,24 @@ namespace Microsoft.Windows.Controls
 
         static MaskedTextBox()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(MaskedTextBox), new FrameworkPropertyMetadata(typeof(MaskedTextBox)));
+            TextProperty.OverrideMetadata(typeof(MaskedTextBox), new FrameworkPropertyMetadata(OnTextChanged));
         }
 
         #endregion //Constructors
 
-        #region Overrides
+        #region Base Class Overrides
 
         public override void OnApplyTemplate()
         {
-            TextBox = GetTemplateChild("TextBox") as TextBox;
-            TextBox.PreviewTextInput += TextBox_PreviewTextInput;
-            TextBox.PreviewKeyDown += TextBox_PreviewKeyDown;
+            base.OnApplyTemplate();
 
-            TextBox.CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, Paste)); //handle paste
-            TextBox.CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, null, CanCut)); //surpress cut
-        }
+            PreviewTextInput += TextBox_PreviewTextInput;
+            PreviewKeyDown += TextBox_PreviewKeyDown;
 
-        protected override void OnAccessKey(AccessKeyEventArgs e)
-        {
-            if (TextBox != null)
-                TextBox.Focus();
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, Paste)); //handle paste
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, null, CanCut)); //surpress cut
 
-            base.OnAccessKey(e);
-        }
-
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            if (TextBox != null)
-                TextBox.Focus();
+            UpdateText(MaskProvider, 0);
         }
 
         protected override void OnInitialized(EventArgs e)
@@ -194,28 +233,42 @@ namespace Microsoft.Windows.Controls
             }
         }
 
-        protected override void OnTextChanged(string previousValue, string currentValue)
+        protected override void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
         {
-            if (_isInitialized)
-                SyncTextAndValueProperties(InputBase.TextProperty, currentValue);
+            if (SelectAllOnGotFocus)
+                SelectAll();
+
+            base.OnGotKeyboardFocus(e);
         }
 
-        #endregion
+        protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            if (!IsKeyboardFocused)
+            {
+                e.Handled = true;
+                Focus();
+            }
+
+            base.OnPreviewMouseLeftButtonDown(e);
+        }
+
+        #endregion //Base Class Overrides
 
         #region Event Handlers
 
         void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             //if the text is readonly do not add the text
-            if (!IsEditable)
+            if (IsReadOnly)
             {
                 e.Handled = true;
                 return;
             }
 
-            int position = TextBox.SelectionStart;
+            int position = SelectionStart;
             MaskedTextProvider provider = MaskProvider;
-            if (position < TextBox.Text.Length)
+
+            if (position < Text.Length)
             {
                 position = GetNextCharacterPosition(position);
 
@@ -241,16 +294,16 @@ namespace Microsoft.Windows.Controls
 
         void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (!IsEditable)
+            if (IsReadOnly)
                 return;
 
             MaskedTextProvider provider = MaskProvider;
-            int position = TextBox.SelectionStart;
-            int selectionlength = TextBox.SelectionLength;
+            int position = SelectionStart;
+            int selectionlength = SelectionLength;
             // If no selection use the start position else use end position
             int endposition = (selectionlength == 0) ? position : position + selectionlength - 1;
 
-            if (e.Key == Key.Delete && position < TextBox.Text.Length)//handle the delete key
+            if (e.Key == Key.Delete && position < Text.Length)//handle the delete key
             {
                 if (provider.RemoveAt(position, endposition))
                     UpdateText(provider, position);
@@ -313,8 +366,7 @@ namespace Microsoft.Windows.Controls
 
             Text = provider.ToDisplayString();
 
-            if (TextBox != null)
-                TextBox.SelectionStart = position;
+            SelectionStart = position;
         }
 
         private int GetNextCharacterPosition(int startPosition)
@@ -333,17 +385,15 @@ namespace Microsoft.Windows.Controls
             MaskProvider = new MaskedTextProvider(mask)
             {
                 IncludePrompt = this.IncludePrompt,
-                IncludeLiterals = this.IncludeLiterals
+                IncludeLiterals = this.IncludeLiterals,
+                PromptChar = this.PromptChar
             };
         }
 
-        private bool _convertExceptionOccurred = false;
-
         private object ConvertTextToValue(string text)
         {
-
             object convertedValue = null;
-
+            
             Type dataType = ValueType;
 
             string valueToConvert = MaskProvider.ToString().Trim();
@@ -408,33 +458,18 @@ namespace Microsoft.Windows.Controls
             _isSyncingTextAndValueProperties = true;
 
             //this only occures when the user typed in the value
-            if (InputBase.TextProperty == p)
+            if (MaskedTextBox.TextProperty == p)
             {
                 if (newValue != null)
                     SetValue(MaskedTextBox.ValueProperty, ConvertTextToValue(newValue.ToString()));
             }
 
-            SetValue(InputBase.TextProperty, ConvertValueToText(newValue));
+            SetValue(MaskedTextBox.TextProperty, ConvertValueToText(newValue));
 
             _isSyncingTextAndValueProperties = false;
         }
 
         #endregion //Private
-
-        #region Public
-
-        /// <summary>
-        /// Attempts to set focus to this element.
-        /// </summary>
-        public new void Focus()
-        {
-            if (TextBox != null)
-                TextBox.Focus();
-            else
-                base.Focus();
-        }
-
-        #endregion //Public
 
         #endregion //Methods
 
@@ -442,11 +477,11 @@ namespace Microsoft.Windows.Controls
 
         private void Paste(object sender, RoutedEventArgs e)
         {
-            if (!IsEditable)
+            if (IsReadOnly)
                 return;
 
             MaskedTextProvider provider = MaskProvider;
-            int position = TextBox.SelectionStart;
+            int position = SelectionStart;
 
             object data = Clipboard.GetData(DataFormats.Text);
             if (data != null)
