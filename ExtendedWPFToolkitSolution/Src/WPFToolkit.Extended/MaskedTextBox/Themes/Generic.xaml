@@ -10,12 +10,20 @@
         <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
     </DataTemplate>
 
+    <LinearGradientBrush x:Key="TextBoxBorder" EndPoint="0,20" MappingMode="Absolute" StartPoint="0,0">
+        <GradientStop Color="#ABADB3" Offset="0.05"/>
+        <GradientStop Color="#E2E3EA" Offset="0.07"/>
+        <GradientStop Color="#E3E9EF" Offset="1"/>
+    </LinearGradientBrush>
+
     <!-- =============================================================================== -->
     <!-- MaskedTextBox                                                                   -->
     <!-- =============================================================================== -->
 
     <Style TargetType="{x:Type local:MaskedTextBox}">
         <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="{StaticResource TextBoxBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
         <Setter Property="Focusable" Value="False" />
         <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
