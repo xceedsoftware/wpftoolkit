@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Threading;
 
 namespace Microsoft.Windows.Controls
 {
@@ -44,7 +45,15 @@ namespace Microsoft.Windows.Controls
 
             // if the text is not being set internally then load the text into the RichTextBox
             if (!rtb._textSetInternally)
-                rtb.TextFormatter.SetText(rtb.Document, (string)e.NewValue);
+            {
+                if (!rtb._textSetInternally)
+                {
+                    Dispatcher.CurrentDispatcher.BeginInvoke(new Action(delegate()
+                    {
+                        rtb.TextFormatter.SetText(rtb.Document, (string)e.NewValue);
+                    }), DispatcherPriority.Background);
+                }
+            }
         }
 
         private static object CoerceTextProperty(DependencyObject d, object value)
