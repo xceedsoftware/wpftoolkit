@@ -10,6 +10,7 @@ namespace Microsoft.Windows.Controls
         #region Private Members
 
         private bool _textSetInternally;
+        bool _surpressGetText;
 
         #endregion //Private Members
 
@@ -46,13 +47,18 @@ namespace Microsoft.Windows.Controls
             // if the text is not being set internally then load the text into the RichTextBox
             if (!rtb._textSetInternally)
             {
-                if (!rtb._textSetInternally)
-                {
-                    Dispatcher.CurrentDispatcher.BeginInvoke(new Action(delegate()
+                //to help with performance this is placed on the dispatcher for processing. For some reason when this is done the TextChanged event is fired multiple times
+                //forcing the UpdateText method to be called multiple times and the setter of the source property to be set multiple times. To fix this, we simply set the _surpressGetText
+                //member to true before the operation and set it to false when the operation completes. This will prevent the Text property from being set multiple times.
+                rtb._surpressGetText = true;
+                DispatcherOperation dop = Dispatcher.CurrentDispatcher.BeginInvoke(new Action(delegate()
                     {
                         rtb.TextFormatter.SetText(rtb.Document, (string)e.NewValue);
                     }), DispatcherPriority.Background);
-                }
+                dop.Completed += (sender, ea) =>
+                    {
+                        rtb._surpressGetText = false;
+                    };
             }
         }
 
@@ -99,7 +105,8 @@ namespace Microsoft.Windows.Controls
         {
             _textSetInternally = true;
 
-            Text = TextFormatter.GetText(Document);
+            if (!_surpressGetText)
+                Text = TextFormatter.GetText(Document);
 
             _textSetInternally = false;
         }
