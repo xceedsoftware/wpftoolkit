@@ -691,6 +691,8 @@ namespace Microsoft.Windows.Controls
         {
             _moveTransform.X += x;
             _moveTransform.Y += y;
+
+            InvalidateArrange();
         }
 
         #endregion //Private
