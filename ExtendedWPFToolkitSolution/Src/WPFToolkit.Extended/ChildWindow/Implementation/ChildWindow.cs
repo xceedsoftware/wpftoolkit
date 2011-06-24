@@ -430,6 +430,9 @@ namespace Microsoft.Windows.Controls
 
             _root = GetTemplateChild("Root") as Grid;
 
+#if VS2008
+            FocusVisualStyle = null;
+#else
             Style focusStyle = _root.Resources["FocusVisualStyle"] as Style;
             if (focusStyle != null)
             {
@@ -437,7 +440,7 @@ namespace Microsoft.Windows.Controls
                 focusStyle.Setters.Add(focusStyleDataContext);
                 FocusVisualStyle = focusStyle;
             }
-
+#endif
             _root.Children.Add(_modalLayerPanel);
         }
 
