@@ -1,25 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Controls.Primitives;
 using System.ComponentModel;
 using System.Collections;
 
 namespace Microsoft.Windows.Controls
 {
-    public class CheckListBox : MultiSelector
+    public class CheckListBox : ItemsControl
     {
         private bool _surpressSelectionChanged;
+
+        #region Constructors
 
         static CheckListBox()
         {
@@ -28,8 +22,12 @@ namespace Microsoft.Windows.Controls
 
         public CheckListBox()
         {
-
+            SelectedItems = new List<object>();
+            AddHandler(CheckListBox.SelectedEvent, new RoutedEventHandler(CheckListBox_Selected));
+            AddHandler(CheckListBox.UnselectedEvent, new RoutedEventHandler(CheckListBox_Unselected));
         }
+
+        #endregion //Constructors
 
         #region Properties
 
@@ -48,6 +46,31 @@ namespace Microsoft.Windows.Controls
             set { SetValue(CommandProperty, value); }
         }
 
+        #region SelectedItem
+
+        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register("SelectedItem", typeof(object), typeof(CheckListBox), new UIPropertyMetadata(null, OnSelectedItemChanged));
+        public object SelectedItem
+        {
+            get { return (object)GetValue(SelectedItemProperty); }
+            set { SetValue(SelectedItemProperty, value); }
+        }
+
+        private static void OnSelectedItemChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            CheckListBox checkListBox = o as CheckListBox;
+            if (checkListBox != null)
+                checkListBox.OnSelectedItemChanged((object)e.OldValue, (object)e.NewValue);
+        }
+
+        protected virtual void OnSelectedItemChanged(object oldValue, object newValue)
+        {
+            OnSelectionChanged();
+        }
+
+        #endregion //SelectedItem
+
+        public IList SelectedItems { get; private set; }
+
         #endregion //Properties
 
         #region Base Class Overrides
@@ -65,7 +88,6 @@ namespace Microsoft.Windows.Controls
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
             _surpressSelectionChanged = true;
-
             var checkListBoxItem = element as FrameworkElement;
             if (!String.IsNullOrEmpty(CheckedMemberPath))
             {
@@ -74,16 +96,55 @@ namespace Microsoft.Windows.Controls
                 checkListBoxItem.SetBinding(CheckListBoxItem.IsSelectedProperty, isCheckedBinding);
             }
             base.PrepareContainerForItemOverride(element, item);
-
             _surpressSelectionChanged = false;
         }
 
-        protected override void OnSelectionChanged(SelectionChangedEventArgs e)
+        #endregion //Base Class Overrides
+
+        #region Events
+
+        public static readonly RoutedEvent SelectedEvent = EventManager.RegisterRoutedEvent("Selected", RoutingStrategy.Bubble, typeof(SelectionChangedEventHandler), typeof(CheckListBox));
+        public static readonly RoutedEvent UnselectedEvent = EventManager.RegisterRoutedEvent("Unselected", RoutingStrategy.Bubble, typeof(SelectionChangedEventHandler), typeof(CheckListBox));
+        public static readonly RoutedEvent SelectionChangedEvent = EventManager.RegisterRoutedEvent("SelectionChanged", RoutingStrategy.Bubble, typeof(CheckListBoxSelectionChangedEventHandler), typeof(CheckListBox));
+        public event CheckListBoxSelectionChangedEventHandler SelectionChanged
         {
-            if (!_surpressSelectionChanged)
-                base.OnSelectionChanged(e);
+            add { AddHandler(SelectionChangedEvent, value); }
+            remove { RemoveHandler(SelectionChangedEvent, value); }
         }
 
-        #endregion //Base Class Overrides
+        #endregion //Events
+
+        void CheckListBox_Selected(object sender, RoutedEventArgs e)
+        {
+            SetSelectedItem(e.OriginalSource);
+            SelectedItems.Add(SelectedItem);
+        }
+
+        void CheckListBox_Unselected(object sender, RoutedEventArgs e)
+        {
+            SetSelectedItem(e.OriginalSource);
+            SelectedItems.Remove(SelectedItem);
+        }
+
+        private void SetSelectedItem(object source)
+        {
+            if (_surpressSelectionChanged)
+                return;
+
+            var selectedCheckListBoxItem = source as FrameworkElement;
+            if (selectedCheckListBoxItem != null)
+                SelectedItem = selectedCheckListBoxItem.DataContext;
+        }
+
+        private void OnSelectionChanged()
+        {
+            if (_surpressSelectionChanged)
+                return;
+
+            RaiseEvent(new CheckListBoxSelectionChangedEventArgs(CheckListBox.SelectionChangedEvent, this, SelectedItem));
+
+            if (Command != null)
+                Command.Execute(SelectedItem);
+        }
     }
 }
