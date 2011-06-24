@@ -24,7 +24,7 @@ namespace Microsoft.Windows.Controls
 
         #region Properties
 
-        public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register("IsSelected", typeof(bool), typeof(CheckListBoxItem), new UIPropertyMetadata(false, OnIsSelectedChanged));
+        public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register("IsSelected", typeof(bool), typeof(CheckListBoxItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnIsSelectedChanged));
         public bool IsSelected
         {
             get { return (bool)GetValue(IsSelectedProperty); }
@@ -41,44 +41,23 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnIsSelectedChanged(bool oldValue, bool newValue)
         {
             if (newValue)
-                OnSelected(new RoutedEventArgs(Selector.SelectedEvent, this));
+                RaiseSelectionChangedEvent(new RoutedEventArgs(CheckListBox.SelectedEvent, this));
             else
-                OnUnselected(new RoutedEventArgs(Selector.UnselectedEvent, this));
+                RaiseSelectionChangedEvent(new RoutedEventArgs(CheckListBox.UnselectedEvent, this));
         }
 
         #endregion //Properties
 
         #region Events
 
-        public static readonly RoutedEvent SelectedEvent = Selector.SelectedEvent.AddOwner(typeof(CheckListBoxItem));
-        public event RoutedEventHandler Selected
-        {
-            add { base.AddHandler(SelectedEvent, value); }
-            remove { base.RemoveHandler(SelectedEvent, value); }
-        }
-
-        public static readonly RoutedEvent UnselectedEvent = Selector.UnselectedEvent.AddOwner(typeof(CheckListBoxItem));
-        public event RoutedEventHandler Unselected
-        {
-            add { base.AddHandler(UnselectedEvent, value); }
-            remove { base.RemoveHandler(UnselectedEvent, value); }
-        }
+        public static readonly RoutedEvent SelectedEvent = CheckListBox.SelectedEvent.AddOwner(typeof(CheckListBoxItem));
+        public static readonly RoutedEvent UnselectedEvent = CheckListBox.UnselectedEvent.AddOwner(typeof(CheckListBoxItem));
 
         #endregion
 
         #region Methods
 
-        protected virtual void OnSelected(RoutedEventArgs e)
-        {
-            this.OnIsSelectedChanged(true, e);
-        }
-
-        protected virtual void OnUnselected(RoutedEventArgs e)
-        {
-            this.OnIsSelectedChanged(false, e);
-        }
-
-        private void OnIsSelectedChanged(bool newValue, RoutedEventArgs e)
+        private void RaiseSelectionChangedEvent(RoutedEventArgs e)
         {
             base.RaiseEvent(e);
         }

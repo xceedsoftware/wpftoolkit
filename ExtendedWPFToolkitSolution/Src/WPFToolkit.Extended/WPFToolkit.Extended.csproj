@@ -152,6 +152,7 @@
     <Compile Include="Calculator\Implementation\CalculatorCommands.cs" />
     <Compile Include="CheckListBox\Implementation\CheckListBoxItem.cs" />
     <Compile Include="CheckListBox\Implementation\CheckListBox.cs" />
+    <Compile Include="CheckListBox\Implementation\CheckListBoxSelectionChangedEventArgs.cs" />
     <Compile Include="ChildWindow\Implementation\ChildWindow.cs" />
     <Compile Include="ChildWindow\Implementation\WindowStartupLocation.cs" />
     <Compile Include="ChildWindow\Implementation\WindowState.cs" />

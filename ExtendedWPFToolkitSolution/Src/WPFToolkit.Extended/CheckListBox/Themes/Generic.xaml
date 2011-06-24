@@ -34,9 +34,8 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <CheckBox Name="PART_CheckBox" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}}" 
-                                      Command="{Binding Command, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:CheckListBox}}" 
-                                      CommandParameter="{Binding}"  VerticalAlignment="Center" Focusable="False"  Margin="1,1,5,1"/>
+                            <CheckBox Name="PART_CheckBox" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}}"
+                                      VerticalAlignment="Center" Focusable="False"  Margin="1,1,5,1"/>
                             <Border Grid.Column="1">
                                 <ContentPresenter Margin="2" ContentSource="Content" />
                             </Border>
