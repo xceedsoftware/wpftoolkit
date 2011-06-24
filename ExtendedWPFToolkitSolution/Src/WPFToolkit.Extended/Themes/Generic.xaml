@@ -6,6 +6,7 @@
         <ResourceDictionary Source="/WPFToolkit.Extended;component/ButtonSpinner/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/Calculator/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/CalculatorUpDown/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/WPFToolkit.Extended;component/CheckListBox/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/ChildWindow/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/ColorCanvas/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/ColorPicker/Themes/Generic.xaml" />        
