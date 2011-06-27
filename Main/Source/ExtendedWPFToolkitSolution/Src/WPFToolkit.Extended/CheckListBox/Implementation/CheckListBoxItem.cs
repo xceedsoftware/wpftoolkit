@@ -22,6 +22,11 @@ namespace Microsoft.Windows.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CheckListBoxItem), new FrameworkPropertyMetadata(typeof(CheckListBoxItem)));
         }
 
+        public CheckListBoxItem()
+        {
+            AddHandler(Mouse.MouseDownEvent, new MouseButtonEventHandler(CheckListBoxItem_MouseDown));
+        }
+
         #region Properties
 
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register("IsSelected", typeof(bool), typeof(CheckListBoxItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnIsSelectedChanged));
@@ -54,6 +59,15 @@ namespace Microsoft.Windows.Controls
         public static readonly RoutedEvent UnselectedEvent = CheckListBox.UnselectedEvent.AddOwner(typeof(CheckListBoxItem));
 
         #endregion
+
+        #region Event Hanlders
+
+        void CheckListBoxItem_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            IsSelected = !IsSelected;
+        }
+
+        #endregion //Event Hanlders
 
         #region Methods
 
