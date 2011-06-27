@@ -5,6 +5,8 @@
                     xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters">
     
     <Style TargetType="{x:Type local:CheckListBox}">
+        <Setter Property="BorderBrush" Value="#FF707070" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="KeyboardNavigation.TabNavigation" Value="Once"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -21,7 +23,7 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type local:CheckListBoxItem}">
+    <Style TargetType="{x:Type local:CheckListBoxItem}" >
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:CheckListBoxItem}">
@@ -35,23 +37,19 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <CheckBox Name="PART_CheckBox" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}}"
-                                      VerticalAlignment="Center" Focusable="False"  Margin="1,1,5,1"/>
+                                      VerticalAlignment="Center" Focusable="False"  Margin="3,1,5,1"/>
                             <Border Grid.Column="1">
                                 <ContentPresenter Margin="2" ContentSource="Content" />
                             </Border>
                         </Grid>
                     </Border>
                     
-                    <!--<ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="true">
-                            <Setter TargetName="_background" Property="Background" Value="Blue"/>
-                            <Setter Property="Foreground" Value="White"/>
-                        </Trigger>
+                    <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="true">
                             <Setter TargetName="_background" Property="Background" Value="Blue"/>
                             <Setter Property="Foreground" Value="White"/>
                         </Trigger>
-                    </ControlTemplate.Triggers>-->
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
