@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFToolkit.Extended", "Src\WPFToolkit.Extended\WPFToolkit.Extended.csproj", "{72E591D6-8F83-4D8C-8F67-9C325E623234}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFToolkit.Extended.Examples", "Src\WPFToolkit.Extended.Examples\WPFToolkit.Extended.Examples.csproj", "{747652D0-6AA6-4F96-99F7-0C834274FAB2}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Src\\WPFToolkit.Extended\\WPFToolkit.Extended.csproj
+		SccProjectName1 = Src/WPFToolkit.Extended
+		SccLocalPath1 = Src\\WPFToolkit.Extended
+		SccProjectUniqueName2 = Src\\WPFToolkit.Extended.Examples\\WPFToolkit.Extended.Examples.csproj
+		SccProjectName2 = Src/WPFToolkit.Extended.Examples
+		SccLocalPath2 = Src\\WPFToolkit.Extended.Examples
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Release|Any CPU.Build.0 = Release|Any CPU
+		{747652D0-6AA6-4F96-99F7-0C834274FAB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{747652D0-6AA6-4F96-99F7-0C834274FAB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{747652D0-6AA6-4F96-99F7-0C834274FAB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{747652D0-6AA6-4F96-99F7-0C834274FAB2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
