@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Samples.Modules.Button
+namespace Samples.Modules.Button.Views
 {
     /// <summary>
     /// Interaction logic for NavigationView.xaml

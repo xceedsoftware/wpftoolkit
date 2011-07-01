@@ -1,0 +1,6 @@
+﻿<TreeViewItem x:Class="Samples.Modules.PropertyGrid.Views.NavigationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              Header="ChildWindow" Tag="Samples.Modules.PropertyGrid.Views.HomeView">
+
+</TreeViewItem>

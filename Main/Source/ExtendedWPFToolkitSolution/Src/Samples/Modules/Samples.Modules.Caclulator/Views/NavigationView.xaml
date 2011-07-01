@@ -1,0 +1,9 @@
+﻿<TreeViewItem x:Class="Samples.Modules.Calculator.Views.NavigationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              Header="Calculator Controls" Tag="Samples.Modules.Calculator.Views.HomeView">
+
+    <TreeViewItem Header="Calculator" Tag="Samples.Modules.Calculator.Views.CalculatorView"/>
+    <TreeViewItem Header="CalculatorUpDown" Tag="Samples.Modules.Calculator.Views.CalculatorUpDownView"/>
+
+</TreeViewItem>

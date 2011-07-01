@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Samples.Infrastructure;
 using Microsoft.Practices.Prism.Regions;
 using Microsoft.Practices.Unity;
+using Samples.Infrastructure.Extensions;
+using Samples.Modules.Button.Views;
 
 namespace Samples.Modules.Button
 {
@@ -20,7 +19,9 @@ namespace Samples.Modules.Button
 
         protected override void RegisterViewsAndTypes()
         {
-            Container.RegisterType(typeof(object), typeof(HomeView), typeof(HomeView).FullName);
+            Container.RegisterNavigationType(typeof(HomeView));
+            Container.RegisterNavigationType(typeof(ButtonSpinnerView));
+            Container.RegisterNavigationType(typeof(SplitButtonView));
         }
     }
 }

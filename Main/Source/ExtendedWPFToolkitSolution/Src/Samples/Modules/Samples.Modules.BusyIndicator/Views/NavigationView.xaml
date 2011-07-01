@@ -4,8 +4,4 @@
               Header="BusyIndicator" 
               Tag="Samples.Modules.BusyIndicator.HomeView">
     
-        <TreeViewItem Header="Sub Item 1" />
-        <TreeViewItem Header="Sub Item 2" />
-        <TreeViewItem Header="Sub Item 3" />
-    
 </TreeViewItem>

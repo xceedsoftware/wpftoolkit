@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Samples.Modules.Button.Properties
+namespace Samples.Modules.Calculator.Properties
 {
 
 
