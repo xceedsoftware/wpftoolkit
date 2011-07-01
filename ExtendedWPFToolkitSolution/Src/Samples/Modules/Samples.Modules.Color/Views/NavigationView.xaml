@@ -1,6 +1,7 @@
 ﻿<TreeViewItem x:Class="Samples.Modules.Color.Views.NavigationView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-              Header="Color" Tag="Samples.Modules.Color.Views.HomeView">
+              xmlns:views="clr-namespace:Samples.Modules.Color.Views"
+              Header="Color" Tag="{x:Type views:HomeView}">
 
 </TreeViewItem>

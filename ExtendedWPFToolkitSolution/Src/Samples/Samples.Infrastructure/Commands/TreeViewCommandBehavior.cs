@@ -17,8 +17,8 @@ namespace Samples.Infrastructure.Commands
         {
             //This treeview command is specfic to the navigation region, 
             //so I always want to pass the tag of the selected treeviewitem
-            //because it will conatin the fully qualified navigation path
-            CommandParameter = (e.NewValue as FrameworkElement).Tag;
+            //because it will conatin the Type of view to navigate to.
+            CommandParameter = ((e.NewValue as FrameworkElement).Tag as Type).FullName;
             ExecuteCommand();
         }
     }

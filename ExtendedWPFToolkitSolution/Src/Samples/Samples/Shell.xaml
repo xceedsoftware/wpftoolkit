@@ -34,7 +34,14 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Border CornerRadius="3" BorderBrush="Gray" BorderThickness="1"  >
+            <Border CornerRadius="5" BorderBrush="#FF666666" BorderThickness="1" >
+                <Border.Background>
+                    <LinearGradientBrush EndPoint="0.697,0.976" StartPoint="0.277,0.197">
+                        <GradientStop Color="#43000000" Offset="0"/>
+                        <GradientStop Color="#34394D" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                
                 <TreeView prism:RegionManager.RegionName="{x:Static inf:RegionNames.NavigationRegion}" 
                           infCommands:TreeViewSelected.Command="{Binding NavigateCommand}" 
                           BorderBrush="{x:Null}" Background="{x:Null}" 
@@ -43,6 +50,7 @@
                     <!-- TODO: Style the TreeViewItems-->
 
                 </TreeView>
+                
             </Border>
 
             <Border Grid.Column="1" Margin="10,0,10,0" BorderBrush="Gray" BorderThickness="1" Background="White"
