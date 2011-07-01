@@ -6,11 +6,11 @@ using Samples.Infrastructure;
 using Microsoft.Practices.Prism.Regions;
 using Microsoft.Practices.Unity;
 
-namespace Samples.Modules.ButtonSpinner
+namespace Samples.Modules.Button
 {
-    public class ButtonSpinnerModule : ModuleBase
+    public class ButtonModule : ModuleBase
     {
-        public ButtonSpinnerModule(IUnityContainer container, IRegionManager regionManager)
+        public ButtonModule(IUnityContainer container, IRegionManager regionManager)
             : base(container, regionManager) { }
 
         protected override void InitializeModule()

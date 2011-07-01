@@ -12,14 +12,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Samples.Modules.ButtonSpinner
+namespace Samples.Modules.Button
 {
     /// <summary>
-    /// Interaction logic for HomeView.xaml
+    /// Interaction logic for NavigationView.xaml
     /// </summary>
-    public partial class HomeView : UserControl
+    public partial class NavigationView : TreeViewItem
     {
-        public HomeView()
+        public NavigationView()
         {
             InitializeComponent();
         }

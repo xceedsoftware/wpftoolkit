@@ -1,0 +1,9 @@
+﻿<TreeViewItem x:Class="Samples.Modules.Button.NavigationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              Header="ButtonSpinner" Tag="Samples.Modules.Button.HomeView">
+
+    <TreeViewItem Header="ButtonSpinner" />
+    <TreeViewItem Header="SplitButton" />
+
+</TreeViewItem>
