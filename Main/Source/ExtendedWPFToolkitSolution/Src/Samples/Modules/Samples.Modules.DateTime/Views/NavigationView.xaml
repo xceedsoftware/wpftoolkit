@@ -1,6 +1,7 @@
 ﻿<TreeViewItem x:Class="Samples.Modules.DateTime.Views.NavigationView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-              Header="DateTime" Tag="Samples.Modules.DateTime.Views.HomeView">
+              xmlns:views="clr-namespace:Samples.Modules.DateTime.Views"
+              Header="DateTime" Tag="{x:Type views:HomeView}">
 
 </TreeViewItem>
