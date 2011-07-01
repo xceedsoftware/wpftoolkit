@@ -3,20 +3,37 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFToolkit.Extended", "Src\WPFToolkit.Extended\WPFToolkit.Extended.csproj", "{72E591D6-8F83-4D8C-8F67-9C325E623234}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFToolkit.Extended.Samples", "Src\WPFToolkit.Extended.Samples\WPFToolkit.Extended.Samples.csproj", "{47B3F3DF-FAB7-4D0A-9267-109D30BF387F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{01F2E61E-7F20-4F2E-8A3C-6604B18415B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples", "Src\Samples\Samples\Samples.csproj", "{6EE69D18-F8AB-4CF9-AC3D-4719F36A8D99}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{F927B3FE-820C-4EE1-921F-D10D3AE287AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples.Modules.BusyIndicator", "Src\Samples\Modules\Samples.Modules.BusyIndicator\Samples.Modules.BusyIndicator.csproj", "{1A9C0E21-DE3B-4B2D-9EF0-39AA1922CDA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples.Infrastructure", "Src\Samples\Samples.Infrastructure\Samples.Infrastructure.csproj", "{A4A049A4-665A-4651-9046-7D06E9D0CCDC}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
+		SccNumberOfProjects = 5
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = Src\\WPFToolkit.Extended\\WPFToolkit.Extended.csproj
 		SccProjectName1 = Src/WPFToolkit.Extended
 		SccLocalPath1 = Src\\WPFToolkit.Extended
-		SccProjectUniqueName2 = Src\\WPFToolkit.Extended.Samples\\WPFToolkit.Extended.Samples.csproj
-		SccProjectName2 = Src/WPFToolkit.Extended.Samples
-		SccLocalPath2 = Src\\WPFToolkit.Extended.Samples
+		SccProjectUniqueName2 = Src\\Samples\\Samples\\Samples.csproj
+		SccProjectTopLevelParentUniqueName2 = ExtendedWPFToolkit.sln
+		SccProjectName2 = Src/Samples/Samples
+		SccLocalPath2 = Src\\Samples\\Samples
+		SccProjectUniqueName3 = Src\\Samples\\Modules\\Samples.Modules.BusyIndicator\\Samples.Modules.BusyIndicator.csproj
+		SccProjectTopLevelParentUniqueName3 = ExtendedWPFToolkit.sln
+		SccProjectName3 = Src/Samples/Modules/Samples.Modules.BusyIndicator
+		SccLocalPath3 = Src\\Samples\\Modules\\Samples.Modules.BusyIndicator
+		SccProjectUniqueName4 = Src\\Samples\\Samples.Infrastructure\\Samples.Infrastructure.csproj
+		SccProjectTopLevelParentUniqueName4 = ExtendedWPFToolkit.sln
+		SccProjectName4 = Src/Samples/Samples.Infrastructure
+		SccLocalPath4 = Src\\Samples\\Samples.Infrastructure
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,18 +54,44 @@ Global
 		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Release|x86.ActiveCfg = Release|Any CPU
-		{47B3F3DF-FAB7-4D0A-9267-109D30BF387F}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{47B3F3DF-FAB7-4D0A-9267-109D30BF387F}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{47B3F3DF-FAB7-4D0A-9267-109D30BF387F}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{47B3F3DF-FAB7-4D0A-9267-109D30BF387F}.Debug|x86.ActiveCfg = Debug|x86
-		{47B3F3DF-FAB7-4D0A-9267-109D30BF387F}.Debug|x86.Build.0 = Debug|x86
-		{47B3F3DF-FAB7-4D0A-9267-109D30BF387F}.Release|Any CPU.ActiveCfg = Release|x86
-		{47B3F3DF-FAB7-4D0A-9267-109D30BF387F}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{47B3F3DF-FAB7-4D0A-9267-109D30BF387F}.Release|Mixed Platforms.Build.0 = Release|x86
-		{47B3F3DF-FAB7-4D0A-9267-109D30BF387F}.Release|x86.ActiveCfg = Release|x86
-		{47B3F3DF-FAB7-4D0A-9267-109D30BF387F}.Release|x86.Build.0 = Release|x86
+		{6EE69D18-F8AB-4CF9-AC3D-4719F36A8D99}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{6EE69D18-F8AB-4CF9-AC3D-4719F36A8D99}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{6EE69D18-F8AB-4CF9-AC3D-4719F36A8D99}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{6EE69D18-F8AB-4CF9-AC3D-4719F36A8D99}.Debug|x86.ActiveCfg = Debug|x86
+		{6EE69D18-F8AB-4CF9-AC3D-4719F36A8D99}.Debug|x86.Build.0 = Debug|x86
+		{6EE69D18-F8AB-4CF9-AC3D-4719F36A8D99}.Release|Any CPU.ActiveCfg = Release|x86
+		{6EE69D18-F8AB-4CF9-AC3D-4719F36A8D99}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{6EE69D18-F8AB-4CF9-AC3D-4719F36A8D99}.Release|Mixed Platforms.Build.0 = Release|x86
+		{6EE69D18-F8AB-4CF9-AC3D-4719F36A8D99}.Release|x86.ActiveCfg = Release|x86
+		{6EE69D18-F8AB-4CF9-AC3D-4719F36A8D99}.Release|x86.Build.0 = Release|x86
+		{1A9C0E21-DE3B-4B2D-9EF0-39AA1922CDA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A9C0E21-DE3B-4B2D-9EF0-39AA1922CDA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A9C0E21-DE3B-4B2D-9EF0-39AA1922CDA6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1A9C0E21-DE3B-4B2D-9EF0-39AA1922CDA6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1A9C0E21-DE3B-4B2D-9EF0-39AA1922CDA6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1A9C0E21-DE3B-4B2D-9EF0-39AA1922CDA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A9C0E21-DE3B-4B2D-9EF0-39AA1922CDA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A9C0E21-DE3B-4B2D-9EF0-39AA1922CDA6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1A9C0E21-DE3B-4B2D-9EF0-39AA1922CDA6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1A9C0E21-DE3B-4B2D-9EF0-39AA1922CDA6}.Release|x86.ActiveCfg = Release|Any CPU
+		{A4A049A4-665A-4651-9046-7D06E9D0CCDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4A049A4-665A-4651-9046-7D06E9D0CCDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4A049A4-665A-4651-9046-7D06E9D0CCDC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A4A049A4-665A-4651-9046-7D06E9D0CCDC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A4A049A4-665A-4651-9046-7D06E9D0CCDC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A4A049A4-665A-4651-9046-7D06E9D0CCDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4A049A4-665A-4651-9046-7D06E9D0CCDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4A049A4-665A-4651-9046-7D06E9D0CCDC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A4A049A4-665A-4651-9046-7D06E9D0CCDC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A4A049A4-665A-4651-9046-7D06E9D0CCDC}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6EE69D18-F8AB-4CF9-AC3D-4719F36A8D99} = {01F2E61E-7F20-4F2E-8A3C-6604B18415B9}
+		{F927B3FE-820C-4EE1-921F-D10D3AE287AE} = {01F2E61E-7F20-4F2E-8A3C-6604B18415B9}
+		{A4A049A4-665A-4651-9046-7D06E9D0CCDC} = {01F2E61E-7F20-4F2E-8A3C-6604B18415B9}
+		{1A9C0E21-DE3B-4B2D-9EF0-39AA1922CDA6} = {F927B3FE-820C-4EE1-921F-D10D3AE287AE}
 	EndGlobalSection
 EndGlobal
