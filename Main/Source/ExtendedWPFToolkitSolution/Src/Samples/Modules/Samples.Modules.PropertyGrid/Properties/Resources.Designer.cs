@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Samples.Modules.ButtonSpinner.Properties
+namespace Samples.Modules.PropertyGrid.Properties
 {
 
 
@@ -44,7 +44,7 @@ namespace Samples.Modules.ButtonSpinner.Properties
             {
                 if ((resourceMan == null))
                 {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Samples.Modules.ButtonSpinner.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Samples.Modules.PropertyGrid.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

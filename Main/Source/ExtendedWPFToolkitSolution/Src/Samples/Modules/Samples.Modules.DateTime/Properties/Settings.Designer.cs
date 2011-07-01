@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Samples.Modules.ButtonSpinner.Properties
+namespace Samples.Modules.DateTime.Properties
 {
 
 
