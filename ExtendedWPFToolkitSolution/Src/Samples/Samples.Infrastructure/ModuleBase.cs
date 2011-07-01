@@ -18,9 +18,13 @@ namespace Samples.Infrastructure
 
         public void Initialize()
         {
+            //types must be registered first
             RegisterViewsAndTypes();
+            //now initialize the module
+            InitializeModule();
         }
 
+        protected abstract void InitializeModule();
         protected abstract void RegisterViewsAndTypes();
     }
 }
