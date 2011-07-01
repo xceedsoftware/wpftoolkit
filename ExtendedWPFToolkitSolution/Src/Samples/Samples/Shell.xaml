@@ -4,23 +4,53 @@
         xmlns:inf="clr-namespace:Samples.Infrastructure;assembly=Samples.Infrastructure"
         xmlns:infCommands="clr-namespace:Samples.Infrastructure.Commands;assembly=Samples.Infrastructure"
         xmlns:prism="http://www.codeplex.com/CompositeWPF"
-        Title="Shell" Height="600" Width="800">
-    
-    <Window.Resources>
-        
-    </Window.Resources>
-    
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        Title="Extended WPF Toolkit - Samples" Height="768" Width="1024" >
+    <Window.Background>
+        <ImageBrush ImageSource="/Images/Background.jpg" />
+    </Window.Background>
 
-        <TreeView prism:RegionManager.RegionName="{x:Static inf:RegionNames.NavigationRegion}"
-                  infCommands:TreeViewSelected.Command="{Binding NavigateCommand}"
-                  MinWidth="150"  />
-        
-        <ContentControl Grid.Column="1" prism:RegionManager.RegionName="{x:Static inf:RegionNames.ContentRegion}" Margin="10" />
+    <Window.Resources>
+
+        <!--<Style TargetType="TreeViewItem">
+
+        </Style>-->
+
+    </Window.Resources>
+
+    <Grid Margin="15" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"  />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+
+        <Grid Margin="10,0,10,10">
+            <TextBlock Text="Extended WPF Toolkit" Foreground="WHite" FontSize="28" FontWeight="Bold"   />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border CornerRadius="3" BorderBrush="Gray" BorderThickness="1"  >
+                <TreeView prism:RegionManager.RegionName="{x:Static inf:RegionNames.NavigationRegion}" 
+                          infCommands:TreeViewSelected.Command="{Binding NavigateCommand}" 
+                          BorderBrush="{x:Null}" Background="{x:Null}" 
+                          MinWidth="150" Margin="3">
+                    
+                    <!-- TODO: Style the TreeViewItems-->
+
+                </TreeView>
+            </Border>
+
+            <Border Grid.Column="1" Margin="10,0,10,0" BorderBrush="Gray" BorderThickness="1" Background="White"
+                CornerRadius="3">
+                <ContentControl prism:RegionManager.RegionName="{x:Static inf:RegionNames.ContentRegion}" Margin="5" />
+            </Border>
+
+        </Grid>
 
     </Grid>
 </Window>
