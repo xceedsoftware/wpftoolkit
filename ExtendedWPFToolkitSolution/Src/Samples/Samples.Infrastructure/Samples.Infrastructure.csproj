@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Commands\TreeViewCommandBehavior.cs" />
     <Compile Include="Commands\TreeViewSelected.cs" />
+    <Compile Include="Extensions\UnityContainerExtensions.cs" />
     <Compile Include="ModuleBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

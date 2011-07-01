@@ -2,6 +2,7 @@
 using Samples.Infrastructure;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Prism.Regions;
+using Samples.Infrastructure.Extensions;
 
 namespace Samples.Modules.BusyIndicator
 {
@@ -14,7 +15,7 @@ namespace Samples.Modules.BusyIndicator
 
         protected override void RegisterViewsAndTypes()
         {
-            Container.RegisterType(typeof(object), typeof(HomeView), typeof(HomeView).FullName);
+            Container.RegisterNavigationType(typeof(HomeView));
         }
 
         protected override void InitializeModule()
