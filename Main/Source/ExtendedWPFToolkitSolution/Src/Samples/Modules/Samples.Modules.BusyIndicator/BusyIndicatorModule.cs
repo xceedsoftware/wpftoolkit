@@ -7,14 +7,19 @@ namespace Samples.Modules.BusyIndicator
 {
     public class BusyIndicatorModule : ModuleBase
     {
-        protected BusyIndicatorModule(IUnityContainer container, IRegionManager regionManager)
+        public BusyIndicatorModule(IUnityContainer container, IRegionManager regionManager)
             : base(container, regionManager)
         {
         }
 
         protected override void RegisterViewsAndTypes()
         {
+            Container.RegisterType(typeof(object), typeof(HomeView), typeof(HomeView).FullName);
+        }
 
+        protected override void InitializeModule()
+        {
+            RegionManager.RegisterViewWithRegion(RegionNames.NavigationRegion, typeof(NavigationView));
         }
     }
 }

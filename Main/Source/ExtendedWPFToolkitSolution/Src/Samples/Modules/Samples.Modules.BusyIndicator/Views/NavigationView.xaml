@@ -1,0 +1,11 @@
+﻿<TreeViewItem x:Class="Samples.Modules.BusyIndicator.NavigationView"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"  
+              Header="BusyIndicator" 
+              Tag="Samples.Modules.BusyIndicator.HomeView">
+    
+        <TreeViewItem Header="Sub Item 1" />
+        <TreeViewItem Header="Sub Item 2" />
+        <TreeViewItem Header="Sub Item 3" />
+    
+</TreeViewItem>

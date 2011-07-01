@@ -73,9 +73,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="IShellViewModel.cs" />
     <Compile Include="Shell.xaml.cs">
       <DependentUpon>Shell.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ShellViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -105,6 +107,14 @@
     <ProjectReference Include="..\..\WPFToolkit.Extended\WPFToolkit.Extended.csproj">
       <Project>{72E591D6-8F83-4D8C-8F67-9C325E623234}</Project>
       <Name>WPFToolkit.Extended</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Modules\Samples.Modules.BusyIndicator\Samples.Modules.BusyIndicator.csproj">
+      <Project>{1A9C0E21-DE3B-4B2D-9EF0-39AA1922CDA6}</Project>
+      <Name>Samples.Modules.BusyIndicator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Modules\Samples.Modules.ButtonSpinner\Samples.Modules.ButtonSpinner.csproj">
+      <Project>{1CFCE8B5-5A5F-4161-BA12-F317ED0E6463}</Project>
+      <Name>Samples.Modules.ButtonSpinner</Name>
     </ProjectReference>
     <ProjectReference Include="..\Samples.Infrastructure\Samples.Infrastructure.csproj">
       <Project>{A4A049A4-665A-4651-9046-7D06E9D0CCDC}</Project>
