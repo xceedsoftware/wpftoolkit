@@ -67,7 +67,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             if (Properties != null)
                 Properties.Filter(newValue);
         }
-        
+
         #endregion //Filter
 
         #region IsCategorized
@@ -133,13 +133,15 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         protected virtual void OnSelectedObjectChanged(object oldValue, object newValue)
         {
-            SetSelectedObjectNameBinding(newValue);
-
-            SelectedObjectType = newValue.GetType();
-
-            _propertyItemsCache = GetObjectProperties(newValue);
-
-            InitializePropertyGrid(IsCategorized);
+            if (newValue == null)
+                ResetPropertyGrid();
+            else
+            {
+                SetSelectedObjectNameBinding(newValue);
+                SelectedObjectType = newValue.GetType();
+                _propertyItemsCache = GetObjectProperties(newValue);
+                InitializePropertyGrid(IsCategorized);
+            }
         }
 
         #endregion //SelectedObject
@@ -162,8 +164,13 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         protected virtual void OnSelectedObjectTypeChanged(Type oldValue, Type newValue)
         {
-            DisplayNameAttribute displayNameAttribute = newValue.GetCustomAttributes(false).OfType<DisplayNameAttribute>().FirstOrDefault();
-            SelectedObjectTypeName = displayNameAttribute == null ? newValue.Name : displayNameAttribute.DisplayName;
+            if (newValue == null)
+                SelectedObjectTypeName = string.Empty;
+            else
+            {
+                DisplayNameAttribute displayNameAttribute = newValue.GetCustomAttributes(false).OfType<DisplayNameAttribute>().FirstOrDefault();
+                SelectedObjectTypeName = displayNameAttribute == null ? newValue.Name : displayNameAttribute.DisplayName;
+            }
         }
 
         #endregion //SelectedObjectType
@@ -407,6 +414,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                         editor = new IntegerUpDownEditor();
                     else if (propertyItem.PropertyType == typeof(DateTime))
                         editor = new DateTimeUpDownEditor();
+                    else if ((propertyItem.PropertyType == typeof(Color)))
+                        editor = new ColorEditor();
                     else if (propertyItem.PropertyType.IsEnum)
                         editor = new EnumComboBoxEditor();
                     else if (propertyItem.PropertyType == typeof(FontFamily) || propertyItem.PropertyType == typeof(FontWeight) || propertyItem.PropertyType == typeof(FontStyle) || propertyItem.PropertyType == typeof(FontStretch))
@@ -462,6 +471,14 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                 _dragThumb.Margin = new Thickness(6, 0, 0, 0);
             else
                 _dragThumb.Margin = new Thickness(-1, 0, 0, 0);
+        }
+
+        private void ResetPropertyGrid()
+        {
+            SelectedObjectName = String.Empty;
+            SelectedObjectType = null;
+            _propertyItemsCache = null;
+            Properties = null;
         }
 
         #endregion //Methods
