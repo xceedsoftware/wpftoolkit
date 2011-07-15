@@ -263,6 +263,10 @@ namespace Microsoft.Windows.Controls
                     }
                 }
             }
+
+            RoutedPropertyChangedEventArgs<object> args = new RoutedPropertyChangedEventArgs<object>(oldValue, newValue);
+            args.RoutedEvent = ValueChangedEvent;
+            RaiseEvent(args);
         }
 
         #endregion //Value
@@ -355,6 +359,18 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Event Handlers
+
+        #region Events
+
+        //Due to a bug in Visual Studio, you cannot create event handlers for nullable args in XAML, so I have to use object instead.
+        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<object>), typeof(TimePicker));
+        public event RoutedPropertyChangedEventHandler<object> ValueChanged
+        {
+            add { AddHandler(ValueChangedEvent, value); }
+            remove { RemoveHandler(ValueChangedEvent, value); }
+        }
+
+        #endregion //Events
 
         #region Methods
 
