@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:extToolkit="clr-namespace:Microsoft.Windows.Controls"
                     xmlns:local="clr-namespace:Microsoft.Windows.Controls.PropertyGrid"
                     xmlns:converters="clr-namespace:Microsoft.Windows.Controls.Core.Converters"
                     xmlns:pgConverters="clr-namespace:Microsoft.Windows.Controls.PropertyGrid.Converters"
@@ -326,17 +327,20 @@
                                         </RadioButton>
                                     </StackPanel>
                                 </Grid>
-                                <TextBox Grid.Column="1" Text="Not Implemented" Margin="4" Opacity=".5" Visibility="Hidden"  />
+                                <extToolkit:WatermarkTextBox Grid.Column="1" Margin="4" Opacity=".5" 
+                                                             Text="{Binding Filter, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"
+                                                             Watermark="Search" />
                             </Grid>
 
                             <Grid Grid.Row="2" Background="White">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                                     <ItemsControl ItemsSource="{Binding Properties, RelativeSource={RelativeSource TemplatedParent}}" IsTabStop="False" Focusable="False" >
+                                    <!--<ItemsControl ItemsSource="{Binding Source={StaticResource PropertiesSource}}" IsTabStop="False" Focusable="False" >-->
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <VirtualizingStackPanel />
                                             </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
+                                        </ItemsControl.ItemsPanel>                                        
                                     </ItemsControl>
                                 </ScrollViewer>
 

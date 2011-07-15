@@ -18,6 +18,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         private Thumb _dragThumb;
         private List<PropertyItem> _propertyItemsCache;
+        private CollectionViewSource _collectionViewSource;
 
         #endregion //Members
 
@@ -33,6 +34,40 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         }
 
         #endregion //CustomTypeEditors
+
+        #region DisplaySummary
+
+        public static readonly DependencyProperty DisplaySummaryProperty = DependencyProperty.Register("DisplaySummary", typeof(bool), typeof(PropertyGrid), new UIPropertyMetadata(true));
+        public bool DisplaySummary
+        {
+            get { return (bool)GetValue(DisplaySummaryProperty); }
+            set { SetValue(DisplaySummaryProperty, value); }
+        }
+
+        #endregion //DisplaySummary
+
+        #region Filter
+
+        public static readonly DependencyProperty FilterProperty = DependencyProperty.Register("Filter", typeof(string), typeof(PropertyGrid), new UIPropertyMetadata(null, OnFilterChanged));
+        public string Filter
+        {
+            get { return (string)GetValue(FilterProperty); }
+            set { SetValue(FilterProperty, value); }
+        }
+
+        private static void OnFilterChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            PropertyGrid propertyGrid = o as PropertyGrid;
+            if (propertyGrid != null)
+                propertyGrid.OnFilterChanged((string)e.OldValue, (string)e.NewValue);
+        }
+
+        protected virtual void OnFilterChanged(string oldValue, string newValue)
+        {
+            
+        }
+        
+        #endregion //Filter
 
         #region IsCategorized
 
@@ -200,17 +235,6 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //SelectedProperty
 
-        #region DisplaySummary
-
-        public static readonly DependencyProperty DisplaySummaryProperty = DependencyProperty.Register("DisplaySummary", typeof(bool), typeof(PropertyGrid), new UIPropertyMetadata(true));
-        public bool DisplaySummary
-        {
-            get { return (bool)GetValue(DisplaySummaryProperty); }
-            set { SetValue(DisplaySummaryProperty, value); }
-        }
-
-        #endregion //DisplaySummary
-
         #endregion //Properties
 
         #region Constructors
@@ -218,6 +242,12 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         static PropertyGrid()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(PropertyGrid), new FrameworkPropertyMetadata(typeof(PropertyGrid)));
+        }
+
+        public PropertyGrid()
+        {
+            CollectionViewSource collectionView = new CollectionViewSource() { Source = Properties };
+            Resources.Add("PropertiesSource", collectionView);
         }
 
         #endregion //Constructors
@@ -275,21 +305,41 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             if (instance == null)
                 return propertyItems;
 
-            var properties = TypeDescriptor.GetProperties(instance.GetType(), new Attribute[] { new PropertyFilterAttribute(PropertyFilterOptions.All) });
-
             try
             {
-
-                // Get all properties of the type
-                propertyItems.AddRange(properties.Cast<PropertyDescriptor>().
-                    Where(p => p.IsBrowsable && p.Name != "GenericParameterAttributes").
-                    Select(property => CreatePropertyItem(property, instance, this)));
+                var descriptors = GetPropertyDescriptors(instance);
+                foreach (PropertyDescriptor descriptor in descriptors)
+                {
+                    propertyItems.Add(CreatePropertyItem(descriptor, instance, this));
+                }
             }
             catch (Exception ex)
             {
+                //TODO: handle this some how
             }
 
             return propertyItems;
+        }
+
+        private static PropertyDescriptorCollection GetPropertyDescriptors(object instance)
+        {
+            PropertyDescriptorCollection descriptors;
+
+            TypeConverter tc = TypeDescriptor.GetConverter(instance);
+            if (tc == null || !tc.GetPropertiesSupported())
+            {
+
+                if (instance is ICustomTypeDescriptor)
+                    descriptors = ((ICustomTypeDescriptor)instance).GetProperties();
+                else
+                    descriptors = TypeDescriptor.GetProperties(instance.GetType());
+            }
+            else
+            {
+                descriptors = tc.GetProperties(instance);
+            }
+
+            return descriptors;
         }
 
         private PropertyItem CreatePropertyItem(PropertyDescriptor property, object instance, PropertyGrid grid)
@@ -349,7 +399,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             }
             catch (Exception ex)
             {
-
+                //TODO: handle this some how
             }
 
             editor.Attach(propertyItem);
