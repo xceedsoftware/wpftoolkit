@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Windows.Controls.Core.Converters;
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
