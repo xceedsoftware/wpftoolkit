@@ -162,7 +162,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         protected virtual void OnSelectedObjectTypeChanged(Type oldValue, Type newValue)
         {
-            SelectedObjectTypeName = newValue.Name;
+            DisplayNameAttribute displayNameAttribute = newValue.GetCustomAttributes(false).OfType<DisplayNameAttribute>().FirstOrDefault();
+            SelectedObjectTypeName = displayNameAttribute == null ? newValue.Name : displayNameAttribute.DisplayName;
         }
 
         #endregion //SelectedObjectType

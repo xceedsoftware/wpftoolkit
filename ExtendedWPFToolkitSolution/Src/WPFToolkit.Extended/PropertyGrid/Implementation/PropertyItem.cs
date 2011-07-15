@@ -34,6 +34,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         public string Description { get { return PropertyDescriptor.Description; } }
 
+        #region DisplayName
+
+        public static readonly DependencyProperty DisplayNameProperty = DependencyProperty.Register("DisplayName", typeof(string), typeof(PropertyItem), new UIPropertyMetadata(null));
+        public string DisplayName
+        {
+            get { return (string)GetValue(DisplayNameProperty); }
+            set { SetValue(DisplayNameProperty, value); }
+        }        
+
+        #endregion //DisplayName
+
         #region Editor
 
         public static readonly DependencyProperty EditorProperty = DependencyProperty.Register("Editor", typeof(FrameworkElement), typeof(PropertyItem), new UIPropertyMetadata(null));
@@ -137,6 +148,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             {
                 _propertyDescriptor = value;
                 Name = _propertyDescriptor.Name;
+                DisplayName = _propertyDescriptor.DisplayName;
                 Category = _propertyDescriptor.Category;
                 _dpDescriptor = DependencyPropertyDescriptor.FromProperty(_propertyDescriptor);
             }
