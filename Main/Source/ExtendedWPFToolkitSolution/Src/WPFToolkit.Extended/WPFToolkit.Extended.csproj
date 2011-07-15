@@ -206,6 +206,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="BusyIndicator\Implementation\VisualStates.BusyIndicator.cs" />
+    <Compile Include="PropertyGrid\Implementation\Commands\PropertyGridCommands.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\ValueSourceToImagePathConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\ValueSourceToToolTipConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\CheckBoxEditor.cs" />
@@ -225,7 +226,6 @@
     <Compile Include="PropertyGrid\Implementation\Editors\TextBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\TypeEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyGrid.cs" />
-    <Compile Include="PropertyGrid\Implementation\PropertyCategoryItem.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyCollection.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyItem.cs" />
     <Compile Include="PropertyGrid\Implementation\Commands\PropertyItemCommands.cs" />
@@ -316,7 +316,9 @@
   <ItemGroup>
     <Resource Include="PropertyGrid\Images\Style11.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="PropertyGrid\Images\ClearFilter16.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
