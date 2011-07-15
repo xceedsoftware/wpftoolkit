@@ -9,6 +9,7 @@ using System.Windows.Controls.Primitives;
 using System.ComponentModel;
 using System.Windows.Input;
 using Microsoft.Windows.Controls.PropertyGrid.Editors;
+using Microsoft.Windows.Controls.PropertyGrid.Commands;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
@@ -18,7 +19,6 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         private Thumb _dragThumb;
         private List<PropertyItem> _propertyItemsCache;
-        private CollectionViewSource _collectionViewSource;
 
         #endregion //Members
 
@@ -64,7 +64,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         protected virtual void OnFilterChanged(string oldValue, string newValue)
         {
-            
+            if (Properties != null)
+                Properties.Filter(newValue);
         }
         
         #endregion //Filter
@@ -246,8 +247,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         public PropertyGrid()
         {
-            CollectionViewSource collectionView = new CollectionViewSource() { Source = Properties };
-            Resources.Add("PropertiesSource", collectionView);
+            CommandBindings.Add(new CommandBinding(PropertyGridCommands.ClearFilter, ClearFilter, CanClearFilter));
         }
 
         #endregion //Constructors
@@ -283,6 +283,20 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //Event Handlers
 
+        #region Commands
+
+        private void ClearFilter(object sender, ExecutedRoutedEventArgs e)
+        {
+            Filter = String.Empty;
+        }
+
+        private void CanClearFilter(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !String.IsNullOrEmpty(Filter);
+        }
+
+        #endregion //Commands
+
         #region Methods
 
         private void InitializePropertyGrid(bool isCategorized)
@@ -293,6 +307,9 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         private void LoadProperties(bool isCategorized)
         {
+            //clear any filters first
+            Filter = String.Empty;
+
             if (isCategorized)
                 Properties = GetCategorizedProperties(_propertyItemsCache);
             else
@@ -410,41 +427,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         private static PropertyCollection GetCategorizedProperties(List<PropertyItem> propertyItems)
         {
-            PropertyCollection propertyCollection = new PropertyCollection();
-
-            CollectionViewSource src = new CollectionViewSource { Source = propertyItems };
-            src.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
-            src.SortDescriptions.Add(new SortDescription("Category", ListSortDirection.Ascending));
-            src.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
-
-            foreach (CollectionViewGroup item in src.View.Groups)
-            {
-                PropertyCategoryItem propertyCategoryItem = new PropertyCategoryItem { Category = item.Name.ToString() };
-                foreach (var propertyitem in item.Items)
-                {
-                    propertyCategoryItem.Properties.Add((PropertyItem)propertyitem);
-                }
-                propertyCollection.Add(propertyCategoryItem);
-            }
-
+            PropertyCollection propertyCollection = new PropertyCollection(propertyItems);
+            propertyCollection.GroupBy("Category");
+            propertyCollection.SortBy("Category", ListSortDirection.Ascending);
+            propertyCollection.SortBy("Name", ListSortDirection.Ascending);
             return propertyCollection;
         }
 
         private static PropertyCollection GetAlphabetizedProperties(List<PropertyItem> propertyItems)
         {
-            PropertyCollection propertyCollection = new PropertyCollection();
-
-            if (propertyItems == null)
-                return propertyCollection;
-
-            CollectionViewSource src = new CollectionViewSource { Source = propertyItems };
-            src.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
-
-            foreach (var item in ((ListCollectionView)(src.View)))
-            {
-                propertyCollection.Add((PropertyItem)item);
-            }
-
+            PropertyCollection propertyCollection = new PropertyCollection(propertyItems);
+            propertyCollection.SortBy("Name", ListSortDirection.Ascending);
             return propertyCollection;
         }
 
