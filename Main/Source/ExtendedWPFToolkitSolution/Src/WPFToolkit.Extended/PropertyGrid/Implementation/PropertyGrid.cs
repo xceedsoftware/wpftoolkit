@@ -335,7 +335,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                 var descriptors = GetPropertyDescriptors(instance);
                 foreach (PropertyDescriptor descriptor in descriptors)
                 {
-                    propertyItems.Add(CreatePropertyItem(descriptor, instance, this));
+                    if (descriptor.IsBrowsable)
+                        propertyItems.Add(CreatePropertyItem(descriptor, instance, this));
                 }
             }
             catch (Exception ex)
