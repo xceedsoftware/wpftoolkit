@@ -10,9 +10,8 @@ namespace Microsoft.Windows.Controls
     public class SplitButton : ContentControl, ICommandSource
     {
         #region Members
+        
         Button _actionButton;
-        ToggleButton _toggleButton;
-        Popup _popup;
 
         #endregion //Members
 
@@ -74,7 +73,10 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnIsOpenChanged(bool oldValue, bool newValue)
         {
-            // TODO: check for cancel event args on an OnOpening event
+            if (newValue)
+                RaiseRoutedEvent(SplitButton.OpenedEvent);
+            else
+                RaiseRoutedEvent(SplitButton.ClosedEvent);
         }
 
         #endregion //IsOpen
@@ -90,6 +92,20 @@ namespace Microsoft.Windows.Controls
             remove { RemoveHandler(ClickEvent, value); }
         }
 
+        public static readonly RoutedEvent OpenedEvent = EventManager.RegisterRoutedEvent("Opened", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(SplitButton));
+        public event RoutedEventHandler Opened
+        {
+            add { AddHandler(OpenedEvent, value); }
+            remove { RemoveHandler(OpenedEvent, value); }
+        }
+
+        public static readonly RoutedEvent ClosedEvent = EventManager.RegisterRoutedEvent("Closed", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(SplitButton));
+        public event RoutedEventHandler Closed
+        {
+            add { AddHandler(ClosedEvent, value); }
+            remove { RemoveHandler(ClosedEvent, value); }
+        }
+
         #endregion //Events
 
         #region Base Class Overrides
@@ -100,11 +116,6 @@ namespace Microsoft.Windows.Controls
 
             _actionButton = (Button)GetTemplateChild("PART_ActionButton");
             _actionButton.Click += ActionButton_Click;
-
-            _toggleButton = (ToggleButton)GetTemplateChild("PART_ToggleButton");
-
-            _popup = (Popup)GetTemplateChild("PART_Popup");
-            //_popup.Opened += Popup_Opened;
         }
 
         #endregion //Base Class Overrides
@@ -114,11 +125,6 @@ namespace Microsoft.Windows.Controls
         void ActionButton_Click(object sender, RoutedEventArgs e)
         {
             OnClick();
-        }
-
-        void Popup_Opened(object sender, EventArgs e)
-        {
-
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)
@@ -161,7 +167,7 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnClick()
         {
-            RaiseClickEvent();
+            RaiseRoutedEvent(SplitButton.ClickEvent);
             RaiseCommand();
         }
         #endregion //Protected
@@ -169,11 +175,11 @@ namespace Microsoft.Windows.Controls
         #region Private
 
         /// <summary>
-        /// Raises the click event.
+        /// Raises routed events.
         /// </summary>
-        private void RaiseClickEvent()
+        private void RaiseRoutedEvent(RoutedEvent routedEvent)
         {
-            RoutedEventArgs args = new RoutedEventArgs(SplitButton.ClickEvent, this);
+            RoutedEventArgs args = new RoutedEventArgs(routedEvent, this);
             RaiseEvent(args);
         }
 
@@ -234,7 +240,7 @@ namespace Microsoft.Windows.Controls
         #region ICommandSource Members
 
         // Keeps a copy of the CanExecuteChnaged handler so it doesn't get garbage collected.
-        private static EventHandler canExecuteChangedHandler;
+        private EventHandler canExecuteChangedHandler;
 
         #region Command
 
