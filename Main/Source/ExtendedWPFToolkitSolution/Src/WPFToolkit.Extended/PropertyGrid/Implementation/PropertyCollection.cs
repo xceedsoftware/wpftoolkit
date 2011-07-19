@@ -44,7 +44,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             GetDefaultView().Filter = (item) => 
             {
                 var property = item as PropertyItem;
-                return property.Name.ToLower().StartsWith(text.ToLower());
+                return property.DisplayName.ToLower().StartsWith(text.ToLower());
             };
         }
     }
