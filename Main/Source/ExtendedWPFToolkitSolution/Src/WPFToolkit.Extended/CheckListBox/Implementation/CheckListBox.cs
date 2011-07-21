@@ -64,7 +64,7 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnSelectedItemChanged(object oldValue, object newValue)
         {
-            OnSelectionChanged();
+            
         }
 
         #endregion //SelectedItem
@@ -92,6 +92,7 @@ namespace Microsoft.Windows.Controls
             if (!String.IsNullOrEmpty(CheckedMemberPath))
             {
                 Binding isCheckedBinding = new Binding(CheckedMemberPath);
+                isCheckedBinding.Mode = BindingMode.TwoWay;
                 isCheckedBinding.Source = item;
                 checkListBoxItem.SetBinding(CheckListBoxItem.IsSelectedProperty, isCheckedBinding);
             }
@@ -118,12 +119,14 @@ namespace Microsoft.Windows.Controls
         {
             SetSelectedItem(e.OriginalSource);
             SelectedItems.Add(SelectedItem);
+            OnCheckedChanged();
         }
 
         void CheckListBox_Unselected(object sender, RoutedEventArgs e)
         {
             SetSelectedItem(e.OriginalSource);
             SelectedItems.Remove(SelectedItem);
+            OnCheckedChanged();
         }
 
         private void SetSelectedItem(object source)
@@ -136,7 +139,7 @@ namespace Microsoft.Windows.Controls
                 SelectedItem = selectedCheckListBoxItem.DataContext;
         }
 
-        private void OnSelectionChanged()
+        private void OnCheckedChanged()
         {
             if (_surpressSelectionChanged)
                 return;
