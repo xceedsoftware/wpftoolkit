@@ -58,7 +58,7 @@ namespace Microsoft.Windows.Controls
             Dictionary<string, string> dateParts = GetDateParts(currentDate);
             string[] timeParts = new string[3] { currentDate.Hour.ToString(), currentDate.Minute.ToString(), currentDate.Second.ToString() };
             string designator = "";
-            string[] dateTimeSeparators = new string[] { ",", " ", "-", DateTimeFormatInfo.DateSeparator, DateTimeFormatInfo.TimeSeparator };
+            string[] dateTimeSeparators = new string[] { ",", " ", "-", ".", DateTimeFormatInfo.DateSeparator, DateTimeFormatInfo.TimeSeparator };
 
             var dateTimeParts = dateTime.Split(dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries).ToList();
             var formats = Format.Split(dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries).ToList();
