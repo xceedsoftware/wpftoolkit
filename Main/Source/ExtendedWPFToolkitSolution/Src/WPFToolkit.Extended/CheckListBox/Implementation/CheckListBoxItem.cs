@@ -29,11 +29,11 @@ namespace Microsoft.Windows.Controls
 
         #region Properties
 
-        public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register("IsSelected", typeof(bool), typeof(CheckListBoxItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnIsSelectedChanged));
-        public bool IsSelected
+        public static readonly DependencyProperty IsCheckedProperty = DependencyProperty.Register("IsChecked", typeof(bool), typeof(CheckListBoxItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnIsSelectedChanged));
+        public bool IsChecked
         {
-            get { return (bool)GetValue(IsSelectedProperty); }
-            set { SetValue(IsSelectedProperty, value); }
+            get { return (bool)GetValue(IsCheckedProperty); }
+            set { SetValue(IsCheckedProperty, value); }
         }
 
         private static void OnIsSelectedChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
@@ -46,17 +46,17 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnIsSelectedChanged(bool oldValue, bool newValue)
         {
             if (newValue)
-                RaiseSelectionChangedEvent(new RoutedEventArgs(CheckListBox.SelectedEvent, this));
+                RaiseSelectionChangedEvent(new RoutedEventArgs(CheckListBox.CheckedEvent, this));
             else
-                RaiseSelectionChangedEvent(new RoutedEventArgs(CheckListBox.UnselectedEvent, this));
+                RaiseSelectionChangedEvent(new RoutedEventArgs(CheckListBox.UncheckedEvent, this));
         }
 
         #endregion //Properties
 
         #region Events
 
-        public static readonly RoutedEvent SelectedEvent = CheckListBox.SelectedEvent.AddOwner(typeof(CheckListBoxItem));
-        public static readonly RoutedEvent UnselectedEvent = CheckListBox.UnselectedEvent.AddOwner(typeof(CheckListBoxItem));
+        public static readonly RoutedEvent SelectedEvent = CheckListBox.CheckedEvent.AddOwner(typeof(CheckListBoxItem));
+        public static readonly RoutedEvent UnselectedEvent = CheckListBox.UncheckedEvent.AddOwner(typeof(CheckListBoxItem));
 
         #endregion
 
@@ -64,7 +64,7 @@ namespace Microsoft.Windows.Controls
 
         void CheckListBoxItem_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            IsSelected = !IsSelected;
+            IsChecked = !IsChecked;
         }
 
         #endregion //Event Hanlders
