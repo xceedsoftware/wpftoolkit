@@ -33,6 +33,17 @@ namespace Microsoft.Windows.Controls
 
         #endregion //AvailableColors
 
+        #region AvailableColorsHeader
+
+        public static readonly DependencyProperty AvailableColorsHeaderProperty = DependencyProperty.Register("AvailableColorsHeader", typeof(string), typeof(ColorPicker), new UIPropertyMetadata("Available Colors"));
+        public string AvailableColorsHeader
+        {
+            get { return (string)GetValue(AvailableColorsHeaderProperty); }
+            set { SetValue(AvailableColorsHeaderProperty, value); }
+        }
+
+        #endregion //AvailableColorsHeader
+
         #region ButtonStyle
 
         public static readonly DependencyProperty ButtonStyleProperty = DependencyProperty.Register("ButtonStyle", typeof(Style), typeof(ColorPicker));
@@ -76,6 +87,17 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //RecentColors
+
+        #region RecentColorsHeader
+
+        public static readonly DependencyProperty RecentColorsHeaderProperty = DependencyProperty.Register("RecentColorsHeader", typeof(string), typeof(ColorPicker), new UIPropertyMetadata("Recent Colors"));
+        public string RecentColorsHeader
+        {
+            get { return (string)GetValue(RecentColorsHeaderProperty); }
+            set { SetValue(RecentColorsHeaderProperty, value); }
+        }
+
+        #endregion //RecentColorsHeader
 
         #region SelectedColor
 
@@ -122,7 +144,7 @@ namespace Microsoft.Windows.Controls
         {
             get { return (bool)GetValue(ShowAdvancedButtonProperty); }
             set { SetValue(ShowAdvancedButtonProperty, value); }
-        }        
+        }
 
         #endregion //ShowAdvancedButton
 
@@ -169,6 +191,17 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //StandardColors
+
+        #region StandardColorsHeader
+
+        public static readonly DependencyProperty StandardColorsHeaderProperty = DependencyProperty.Register("StandardColorsHeader", typeof(string), typeof(ColorPicker), new UIPropertyMetadata("Standard Colors"));
+        public string StandardColorsHeader
+        {
+            get { return (string)GetValue(StandardColorsHeaderProperty); }
+            set { SetValue(StandardColorsHeaderProperty, value); }
+        }
+
+        #endregion //StandardColorsHeader
 
         #endregion //Properties
 
