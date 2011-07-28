@@ -103,6 +103,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="DropDownButton\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Magnifier\Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -180,6 +184,7 @@
     <Compile Include="DateTimeUpDown\Implementation\DateTimePart.cs" />
     <Compile Include="DateTimeUpDown\Implementation\DateTimeUpDown.cs" />
     <Compile Include="DateTimeUpDown\Implementation\DateTimeParser.cs" />
+    <Compile Include="DropDownButton\Implementation\DropDownButton.cs" />
     <Compile Include="NumericUpDown\Implementation\DecimalUpDown.cs" />
     <Compile Include="NumericUpDown\Implementation\DoubleUpDown.cs" />
     <Compile Include="NumericUpDown\Implementation\IntegerUpDown.cs" />
