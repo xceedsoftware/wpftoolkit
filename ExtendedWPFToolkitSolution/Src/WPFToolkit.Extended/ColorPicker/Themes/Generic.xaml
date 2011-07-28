@@ -185,7 +185,7 @@
                                                     <RowDefinition Height="Auto" />
                                                     <RowDefinition />
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Text="Available Colors" Background="AliceBlue" Padding="2" Margin="0,0,0,1" />
+                                                <TextBlock Text="{TemplateBinding AvailableColorsHeader}" Background="AliceBlue" Padding="2" Margin="0,0,0,1" />
                                                 <ListBox x:Name="PART_AvailableColors" Grid.Row="1" Background="Transparent" BorderThickness="0" SelectionMode="Single"
                                                          ItemsSource="{Binding AvailableColors, RelativeSource={RelativeSource TemplatedParent}}"                                                      
                                                          ItemTemplate="{StaticResource ColorItemTemplate}"
@@ -207,7 +207,7 @@
                                                     <RowDefinition Height="Auto" />
                                                     <RowDefinition Height="Auto" />
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Text="Standard Colors" Background="AliceBlue" Padding="2" Margin="0,1,0,1"/>
+                                                <TextBlock Text="{TemplateBinding StandardColorsHeader}" Background="AliceBlue" Padding="2" Margin="0,1,0,1"/>
                                                 <ListBox x:Name="PART_StandardColors" Grid.Row="1" SelectionMode="Single" Background="Transparent" BorderThickness="0"
                                                          ItemsSource="{Binding StandardColors, RelativeSource={RelativeSource TemplatedParent}}"                                                      
                                                          ItemTemplate="{StaticResource ColorItemTemplate}"
@@ -229,7 +229,7 @@
                                                     <RowDefinition Height="Auto" />
                                                     <RowDefinition Height="Auto" />
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Text="Recent Colors" Background="AliceBlue" Padding="2" Margin="0,1,0,1"/>
+                                                <TextBlock Text="{TemplateBinding RecentColorsHeader}" Background="AliceBlue" Padding="2" Margin="0,1,0,1"/>
                                                 <ListBox x:Name="PART_RecentColors" Grid.Row="1"  SelectionMode="Single" Background="Transparent" BorderThickness="0"
                                                          ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}"                                                     
                                                          ItemTemplate="{StaticResource ColorItemTemplate}"
