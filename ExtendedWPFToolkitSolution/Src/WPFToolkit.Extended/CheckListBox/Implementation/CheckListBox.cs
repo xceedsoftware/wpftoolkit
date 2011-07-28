@@ -22,9 +22,9 @@ namespace Microsoft.Windows.Controls
 
         public CheckListBox()
         {
-            SelectedItems = new List<object>();
-            AddHandler(CheckListBox.SelectedEvent, new RoutedEventHandler(CheckListBox_Selected));
-            AddHandler(CheckListBox.UnselectedEvent, new RoutedEventHandler(CheckListBox_Unselected));
+            CheckedItems = new List<object>();
+            AddHandler(CheckListBox.CheckedEvent, new RoutedEventHandler(CheckListBox_Checked));
+            AddHandler(CheckListBox.UncheckedEvent, new RoutedEventHandler(CheckListBox_Unchecked));
         }
 
         #endregion //Constructors
@@ -46,30 +46,30 @@ namespace Microsoft.Windows.Controls
             set { SetValue(CommandProperty, value); }
         }
 
-        #region SelectedItem
+        #region CheckedItem
 
-        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register("SelectedItem", typeof(object), typeof(CheckListBox), new UIPropertyMetadata(null, OnSelectedItemChanged));
-        public object SelectedItem
+        public static readonly DependencyProperty CheckedItemProperty = DependencyProperty.Register("CheckedItem", typeof(object), typeof(CheckListBox), new UIPropertyMetadata(null, OnCheckedItemChanged));
+        public object CheckedItem
         {
-            get { return (object)GetValue(SelectedItemProperty); }
-            set { SetValue(SelectedItemProperty, value); }
+            get { return (object)GetValue(CheckedItemProperty); }
+            set { SetValue(CheckedItemProperty, value); }
         }
 
-        private static void OnSelectedItemChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        private static void OnCheckedItemChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
             CheckListBox checkListBox = o as CheckListBox;
             if (checkListBox != null)
-                checkListBox.OnSelectedItemChanged((object)e.OldValue, (object)e.NewValue);
+                checkListBox.OnCheckedItemChanged((object)e.OldValue, (object)e.NewValue);
         }
 
-        protected virtual void OnSelectedItemChanged(object oldValue, object newValue)
+        protected virtual void OnCheckedItemChanged(object oldValue, object newValue)
         {
             
         }
 
-        #endregion //SelectedItem
+        #endregion //CheckedItem
 
-        public IList SelectedItems { get; private set; }
+        public IList CheckedItems { get; private set; }
 
         #endregion //Properties
 
@@ -94,7 +94,7 @@ namespace Microsoft.Windows.Controls
                 Binding isCheckedBinding = new Binding(CheckedMemberPath);
                 isCheckedBinding.Mode = BindingMode.TwoWay;
                 isCheckedBinding.Source = item;
-                checkListBoxItem.SetBinding(CheckListBoxItem.IsSelectedProperty, isCheckedBinding);
+                checkListBoxItem.SetBinding(CheckListBoxItem.IsCheckedProperty, isCheckedBinding);
             }
             base.PrepareContainerForItemOverride(element, item);
             _surpressSelectionChanged = false;
@@ -104,39 +104,39 @@ namespace Microsoft.Windows.Controls
 
         #region Events
 
-        public static readonly RoutedEvent SelectedEvent = EventManager.RegisterRoutedEvent("Selected", RoutingStrategy.Bubble, typeof(SelectionChangedEventHandler), typeof(CheckListBox));
-        public static readonly RoutedEvent UnselectedEvent = EventManager.RegisterRoutedEvent("Unselected", RoutingStrategy.Bubble, typeof(SelectionChangedEventHandler), typeof(CheckListBox));
-        public static readonly RoutedEvent SelectionChangedEvent = EventManager.RegisterRoutedEvent("SelectionChanged", RoutingStrategy.Bubble, typeof(CheckListBoxSelectionChangedEventHandler), typeof(CheckListBox));
-        public event CheckListBoxSelectionChangedEventHandler SelectionChanged
+        public static readonly RoutedEvent CheckedEvent = EventManager.RegisterRoutedEvent("CheckedEvent", RoutingStrategy.Bubble, typeof(SelectionChangedEventHandler), typeof(CheckListBox));
+        public static readonly RoutedEvent UncheckedEvent = EventManager.RegisterRoutedEvent("UncheckedEvent", RoutingStrategy.Bubble, typeof(SelectionChangedEventHandler), typeof(CheckListBox));
+        public static readonly RoutedEvent CheckedChangedEvent = EventManager.RegisterRoutedEvent("CheckedChanged", RoutingStrategy.Bubble, typeof(CheckListBoxCheckedChangedEventHandler), typeof(CheckListBox));
+        public event CheckListBoxCheckedChangedEventHandler CheckedChanged
         {
-            add { AddHandler(SelectionChangedEvent, value); }
-            remove { RemoveHandler(SelectionChangedEvent, value); }
+            add { AddHandler(CheckedChangedEvent, value); }
+            remove { RemoveHandler(CheckedChangedEvent, value); }
         }
 
         #endregion //Events
 
-        void CheckListBox_Selected(object sender, RoutedEventArgs e)
+        void CheckListBox_Checked(object sender, RoutedEventArgs e)
         {
-            SetSelectedItem(e.OriginalSource);
-            SelectedItems.Add(SelectedItem);
+            SetCheckedItem(e.OriginalSource);
+            CheckedItems.Add(CheckedItem);
             OnCheckedChanged();
         }
 
-        void CheckListBox_Unselected(object sender, RoutedEventArgs e)
+        void CheckListBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            SetSelectedItem(e.OriginalSource);
-            SelectedItems.Remove(SelectedItem);
+            SetCheckedItem(e.OriginalSource);
+            CheckedItems.Remove(CheckedItem);
             OnCheckedChanged();
         }
 
-        private void SetSelectedItem(object source)
+        private void SetCheckedItem(object source)
         {
             if (_surpressSelectionChanged)
                 return;
 
             var selectedCheckListBoxItem = source as FrameworkElement;
             if (selectedCheckListBoxItem != null)
-                SelectedItem = selectedCheckListBoxItem.DataContext;
+                CheckedItem = selectedCheckListBoxItem.DataContext;
         }
 
         private void OnCheckedChanged()
@@ -144,10 +144,10 @@ namespace Microsoft.Windows.Controls
             if (_surpressSelectionChanged)
                 return;
 
-            RaiseEvent(new CheckListBoxSelectionChangedEventArgs(CheckListBox.SelectionChangedEvent, this, SelectedItem));
+            RaiseEvent(new CheckListBoxCheckedChangedEventArgs(CheckListBox.CheckedChangedEvent, this, CheckedItem));
 
             if (Command != null)
-                Command.Execute(SelectedItem);
+                Command.Execute(CheckedItem);
         }
     }
 }
