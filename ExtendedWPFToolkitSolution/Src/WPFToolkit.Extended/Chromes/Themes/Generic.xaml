@@ -95,6 +95,13 @@
                             <Border x:Name="FocusInnerVisual" BorderThickness="1" CornerRadius="{TemplateBinding InnerCornerRadius}" BorderBrush="{StaticResource ControlInnerBorder_Focused}" />
                         </Border>
 
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+										  IsEnabled="{TemplateBinding IsEnabled}"
+										  Content="{TemplateBinding Content}"
+										  ContentStringFormat="{TemplateBinding ContentStringFormat}"
+										  ContentTemplate="{TemplateBinding ContentTemplate}"
+										  ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+
                     </Grid>
                     <ControlTemplate.Triggers>
 

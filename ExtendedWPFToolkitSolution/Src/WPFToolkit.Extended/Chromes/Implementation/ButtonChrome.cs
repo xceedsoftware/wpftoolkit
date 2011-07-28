@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace Microsoft.Windows.Controls.Chromes
 {
-    public class ButtonChrome : Control
+    public class ButtonChrome : ContentControl
     {
         #region CornerRadius
 
