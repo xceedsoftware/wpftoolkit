@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using Microsoft.Windows.Controls.PropertyGrid.Editors;
 using Microsoft.Windows.Controls.PropertyGrid.Commands;
+using System.Collections;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
@@ -405,7 +406,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                 {
                     if (propertyItem.IsReadOnly)
                         editor = new TextBlockEditor();
-                    else if (propertyItem.PropertyType == typeof(bool))
+                    else if (propertyItem.PropertyType == typeof(bool) || propertyItem.PropertyType == typeof(bool?))
                         editor = new CheckBoxEditor();
                     else if (propertyItem.PropertyType == typeof(decimal) || propertyItem.PropertyType == typeof(decimal?))
                         editor = new DecimalUpDownEditor();
@@ -413,7 +414,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                         editor = new DoubleUpDownEditor();
                     else if (propertyItem.PropertyType == typeof(int) || propertyItem.PropertyType == typeof(int?))
                         editor = new IntegerUpDownEditor();
-                    else if (propertyItem.PropertyType == typeof(DateTime))
+                    else if (propertyItem.PropertyType == typeof(DateTime) || propertyItem.PropertyType == typeof(DateTime?))
                         editor = new DateTimeUpDownEditor();
                     else if ((propertyItem.PropertyType == typeof(Color)))
                         editor = new ColorEditor();
@@ -421,6 +422,12 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                         editor = new EnumComboBoxEditor();
                     else if (propertyItem.PropertyType == typeof(FontFamily) || propertyItem.PropertyType == typeof(FontWeight) || propertyItem.PropertyType == typeof(FontStyle) || propertyItem.PropertyType == typeof(FontStretch))
                         editor = new FontComboBoxEditor();
+                    else if (propertyItem.PropertyType.IsGenericType)
+                    {
+                        var interfaces = propertyItem.PropertyType.GetInterfaces();
+                        if (interfaces.Contains(typeof(IEnumerable)))
+                            editor = new CollectionEditor();
+                    }
                     else
                         editor = new TextBoxEditor();
                 }

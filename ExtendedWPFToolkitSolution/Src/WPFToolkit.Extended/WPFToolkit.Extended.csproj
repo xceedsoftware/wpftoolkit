@@ -119,6 +119,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="PropertyGrid\Implementation\Editors\CollectionEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PropertyGrid\Implementation\Editors\CollectionEditorDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PropertyGrid\Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -215,6 +223,12 @@
     <Compile Include="PropertyGrid\Implementation\Converters\ValueSourceToImagePathConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\ValueSourceToToolTipConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\CheckBoxEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\CollectionEditor.xaml.cs">
+      <DependentUpon>CollectionEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PropertyGrid\Implementation\Editors\CollectionEditorDialog.xaml.cs">
+      <DependentUpon>CollectionEditorDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PropertyGrid\Implementation\Editors\ColorEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\ComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\CustomTypeEditor.cs" />
