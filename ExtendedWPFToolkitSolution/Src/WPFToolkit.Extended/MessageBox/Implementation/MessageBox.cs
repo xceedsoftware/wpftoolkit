@@ -73,6 +73,13 @@ namespace Microsoft.Windows.Controls
             set { SetValue(CaptionForegroundProperty, value); }
         }
 
+        public static readonly DependencyProperty CancelButtonContentProperty = DependencyProperty.Register("CancelButtonContent", typeof(object), typeof(MessageBox), new UIPropertyMetadata("Cancel"));
+        public object CancelButtonContent
+        {
+            get { return (object)GetValue(CancelButtonContentProperty); }
+            set { SetValue(CancelButtonContentProperty, value); }
+        }
+
         public static readonly DependencyProperty CloseButtonStyleProperty = DependencyProperty.Register("CloseButtonStyle", typeof(Style), typeof(MessageBox), new PropertyMetadata(null));
         public Style CloseButtonStyle
         {
@@ -85,6 +92,20 @@ namespace Microsoft.Windows.Controls
         {
             get { return (ImageSource)GetValue(ImageSourceProperty); }
             set { SetValue(ImageSourceProperty, value); }
+        }
+
+        public static readonly DependencyProperty NoButtonContentProperty = DependencyProperty.Register("NoButtonContent", typeof(object), typeof(MessageBox), new UIPropertyMetadata("No"));
+        public object NoButtonContent
+        {
+            get { return (object)GetValue(NoButtonContentProperty); }
+            set { SetValue(NoButtonContentProperty, value); }
+        }
+
+        public static readonly DependencyProperty OkButtonContentProperty = DependencyProperty.Register("OkButtonContent", typeof(object), typeof(MessageBox), new UIPropertyMetadata("OK"));
+        public object OkButtonContent
+        {
+            get { return (object)GetValue(OkButtonContentProperty); }
+            set { SetValue(OkButtonContentProperty, value); }
         }
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(MessageBox), new UIPropertyMetadata(String.Empty));
@@ -113,6 +134,13 @@ namespace Microsoft.Windows.Controls
         {
             get { return (double)GetValue(WindowOpacityProperty); }
             set { SetValue(WindowOpacityProperty, value); }
+        }
+
+        public static readonly DependencyProperty YesButtonContentProperty = DependencyProperty.Register("YesButtonContent", typeof(object), typeof(MessageBox), new UIPropertyMetadata("Yes"));
+        public object YesButtonContent
+        {
+            get { return (object)GetValue(YesButtonContentProperty); }
+            set { SetValue(YesButtonContentProperty, value); }
         }
 
         #endregion //Dependency Properties
@@ -446,8 +474,8 @@ namespace Microsoft.Windows.Controls
             newWindow.AllowsTransparency = true;
             newWindow.Background = Brushes.Transparent;
             newWindow.Content = this;
-            newWindow.Owner = _owner ?? ResolveOwnerWindow();   
-         
+            newWindow.Owner = _owner ?? ResolveOwnerWindow();
+
             if (newWindow.Owner != null)
                 newWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
             else
