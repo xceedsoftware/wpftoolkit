@@ -9,12 +9,6 @@ namespace Microsoft.Windows.Controls
 {
     public class DropDownButton : ContentControl, ICommandSource
     {
-        #region Members
-
-        ToggleButton _dropDownButton;
-
-        #endregion //Members
-
         #region Constructors
 
         static DropDownButton()
@@ -31,6 +25,22 @@ namespace Microsoft.Windows.Controls
         #endregion //Constructors
 
         #region Properties
+
+        private System.Windows.Controls.Primitives.ButtonBase _button;
+        protected System.Windows.Controls.Primitives.ButtonBase Button
+        {
+            get { return _button; }
+            set
+            {
+                if (_button != null)
+                    _button.Click -= DropDownButton_Click;
+
+                _button = value;
+
+                if (_button != null)
+                    _button.Click += DropDownButton_Click;
+            }
+        }
 
         #region DropDownContent
 
@@ -88,14 +98,7 @@ namespace Microsoft.Windows.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-
-            if (_dropDownButton != null)
-                _dropDownButton.Click -= DropDownButton_Click;
-
-            _dropDownButton = GetTemplateChild("PART_DropDownButton") as ToggleButton;
-
-            if (_dropDownButton != null)
-                _dropDownButton.Click += DropDownButton_Click;
+            Button = GetTemplateChild("PART_DropDownButton") as ToggleButton;
         }
 
         #endregion //Base Class Overrides
