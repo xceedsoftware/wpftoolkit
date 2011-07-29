@@ -1,11 +1,23 @@
 ﻿<UserControl x:Class="Samples.Modules.Wizard.Views.HomeView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended">
     <Grid>
-        <TextBlock Text="Wizard View" />
+        <extToolkit:Wizard >
+            <extToolkit:WizardPage x:Name="page1" Title="Page 1 Title"
+                                   Description="Page 1 Description">
+                <Label Content="Page 1 content" />
+            </extToolkit:WizardPage>
+            <extToolkit:WizardPage x:Name="page2" Title="Page 2 Title"
+                                   Description="Page 2 Description"
+                                   NextPage="{Binding ElementName=page3}"
+                                   PreviousPage="{Binding ElementName=page1}" >
+                <Label Content="Page 2 content" />
+            </extToolkit:WizardPage>
+            <extToolkit:WizardPage x:Name="page3" Title="Page 3 Title"
+                                   Description="Page 3 Description">
+                <Label Content="Page 3 content" />
+            </extToolkit:WizardPage>
+        </extToolkit:Wizard>
     </Grid>
 </UserControl>

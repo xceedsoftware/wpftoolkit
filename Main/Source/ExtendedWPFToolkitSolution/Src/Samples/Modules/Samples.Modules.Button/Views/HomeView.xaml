@@ -1,6 +1,7 @@
 ﻿<UserControl x:Class="Samples.Modules.Button.Views.HomeView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
@@ -8,11 +9,27 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Text="Button Module Title" />
+        
+        
+
+        <!--<extToolkit:DropDownButton Content="Click Me" Margin="15" Command="{Binding MyCommand}" CommandParameter="{Binding ClickCount}" >
+            <extToolkit:DropDownButton.DropDownContent>
+                <extToolkit:ColorCanvas />
+            </extToolkit:DropDownButton.DropDownContent>
+        </extToolkit:DropDownButton>
+
+        <extToolkit:SplitButton Content="Click Me" Margin="15" Grid.Row="1" Command="{Binding MyCommand}" CommandParameter="{Binding ClickCount}" >
+            <extToolkit:SplitButton.DropDownContent>
+                <extToolkit:ColorCanvas />
+            </extToolkit:SplitButton.DropDownContent>
+        </extToolkit:SplitButton>-->
+
+
+        <!--<TextBlock Text="Button Module Title" />
         <TextBlock Grid.Row="1" Margin="10" 
                    Text="Button module text"
-                   TextWrapping="Wrap" />
+                   TextWrapping="Wrap" />-->
     </Grid>
 </UserControl>

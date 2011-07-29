@@ -22,6 +22,85 @@ namespace Samples.Modules.PropertyGrid.Views
         public HomeView()
         {
             InitializeComponent();
+            _listBox.Items.Add(new Data() { Name = "Item One" });
+            _listBox.Items.Add(new Data() { Name = "Item Two" });
+        }
+    }
+
+    public class Data
+    {
+        private List<Person> _pages = new List<Person>();
+        public List<Person> Pages
+        {
+            get { return _pages; }
+            set
+            {
+                _pages = value;
+            }
+        }
+
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+            }
+        }
+
+        private bool? _isLate;
+        public bool? IsLate
+        {
+            get { return _isLate; }
+            set
+            {
+                _isLate = value;
+            }
+        }
+
+        private DateTime? _datOfBirth;
+        public DateTime? DatOfBirth
+        {
+            get { return _datOfBirth; }
+            set
+            {
+                _datOfBirth = value;
+            }
+        }
+
+        public Data()
+        {
+            Pages.Add(new Person() { FirstName = "One" });
+            Pages.Add(new Person() { FirstName = "Two" });
+        }
+    }
+
+    public class Person
+    {
+        private string _firstName;
+        public string FirstName
+        {
+            get { return _firstName; }
+            set
+            {
+                _firstName = value;
+            }
+        }
+
+        private string _lastName;
+        public string LastName
+        {
+            get { return _lastName; }
+            set
+            {
+                _lastName = value;
+            }
+        }
+
+        public Person()
+        {
+
         }
     }
 }

@@ -180,6 +180,7 @@
     <Compile Include="ColorCanvas\Implementation\ColorCanvas.cs" />
     <Compile Include="Core\Converters\CalculatorMemoryToVisibilityConverter.cs" />
     <Compile Include="Core\Converters\TimeFormatToDateTimeFormatConverter.cs" />
+    <Compile Include="Core\Converters\WizardPageButtonVisibilityConverter.cs" />
     <Compile Include="Core\Primitives\HsvColor.cs" />
     <Compile Include="ColorPicker\Implementation\ColorItem.cs" />
     <Compile Include="ColorPicker\Implementation\ColorPicker.cs" />
@@ -274,6 +275,7 @@
     <Compile Include="Wizard\Implementation\WizardCommands.cs" />
     <Compile Include="Wizard\Implementation\WizardPage.cs" />
     <Compile Include="Wizard\Implementation\Wizard.cs" />
+    <Compile Include="Wizard\Implementation\WizardPageButtonVisibility.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
