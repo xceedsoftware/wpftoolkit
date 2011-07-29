@@ -40,9 +40,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples.Modules.Button", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples.Modules.PropertyGrid", "Src\Samples\Modules\Samples.Modules.PropertyGrid\Samples.Modules.PropertyGrid.csproj", "{511FB369-57D2-430B-9002-F367DF165E70}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples.Modules.Wizard", "Src\Samples\Modules\Samples.Modules.Wizard\Samples.Modules.Wizard.csproj", "{DB0F7672-AFCC-4152-A231-7DCFDD5F219F}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 13
+		SccNumberOfProjects = 14
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
 		SccLocalPath0 = .
@@ -93,6 +95,10 @@ Global
 		SccProjectTopLevelParentUniqueName12 = ExtendedWPFToolkit.sln
 		SccProjectName12 = Src/Samples/Modules/Samples.Modules.Caclulator
 		SccLocalPath12 = Src\\Samples\\Modules\\Samples.Modules.Caclulator
+		SccProjectUniqueName13 = Src\\Samples\\Modules\\Samples.Modules.Wizard\\Samples.Modules.Wizard.csproj
+		SccProjectTopLevelParentUniqueName13 = ExtendedWPFToolkit.sln
+		SccProjectName13 = Src/Samples/Modules/Samples.Modules.Wizard
+		SccLocalPath13 = Src\\Samples\\Modules\\Samples.Modules.Wizard
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -223,6 +229,16 @@ Global
 		{511FB369-57D2-430B-9002-F367DF165E70}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{511FB369-57D2-430B-9002-F367DF165E70}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{511FB369-57D2-430B-9002-F367DF165E70}.Release|x86.ActiveCfg = Release|Any CPU
+		{DB0F7672-AFCC-4152-A231-7DCFDD5F219F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB0F7672-AFCC-4152-A231-7DCFDD5F219F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB0F7672-AFCC-4152-A231-7DCFDD5F219F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{DB0F7672-AFCC-4152-A231-7DCFDD5F219F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{DB0F7672-AFCC-4152-A231-7DCFDD5F219F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DB0F7672-AFCC-4152-A231-7DCFDD5F219F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB0F7672-AFCC-4152-A231-7DCFDD5F219F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB0F7672-AFCC-4152-A231-7DCFDD5F219F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{DB0F7672-AFCC-4152-A231-7DCFDD5F219F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{DB0F7672-AFCC-4152-A231-7DCFDD5F219F}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -240,5 +256,6 @@ Global
 		{10EFEFC6-F2CC-4C6E-955C-668B17F7F342} = {F927B3FE-820C-4EE1-921F-D10D3AE287AE}
 		{22F36E4A-98E6-4A1C-96CA-52CA46F19274} = {F927B3FE-820C-4EE1-921F-D10D3AE287AE}
 		{511FB369-57D2-430B-9002-F367DF165E70} = {F927B3FE-820C-4EE1-921F-D10D3AE287AE}
+		{DB0F7672-AFCC-4152-A231-7DCFDD5F219F} = {F927B3FE-820C-4EE1-921F-D10D3AE287AE}
 	EndGlobalSection
 EndGlobal

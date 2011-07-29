@@ -1,0 +1,66 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Microsoft.Windows.Controls">
+
+    <Style TargetType="{x:Type local:Wizard}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:Wizard}">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            
+                            <ItemsPresenter />
+                            
+                            <StackPanel Background="{TemplateBinding Background}" Grid.Row="1" Margin="7">
+                                <Grid Margin="{TemplateBinding Padding}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Name="PART_HelpButton" Grid.Column="0" MinWidth="75" Content="Help" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Name="PART_CancelButton" Margin="0,0,7,0" MinWidth="75" Content="Cancel" />
+                                        <Button Name="PART_BackButton" MinWidth="75" Content="Back" />
+                                        <Button Name="PART_NextButton" MinWidth="75" Content="Next" />
+                                        <Button Name="PART_FinishButton" Margin="7,0,0,0" MinWidth="75" Content="Finish" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:WizardPage}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:WizardPage}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Name="PART_Header" >
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Margin="16,9,0,1" TextWrapping="Wrap" FontWeight="Bold" Text="{TemplateBinding Caption}" />
+                                <TextBlock Margin="32,0,0,3" TextWrapping="Wrap" Text="{TemplateBinding Description}" />
+                            </StackPanel>
+                        </Grid>
+                        <Border Grid.Row="1" SnapsToDevicePixels="true" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                            <Grid Background="{TemplateBinding Background}">
+                                <ContentPresenter Margin="14" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
