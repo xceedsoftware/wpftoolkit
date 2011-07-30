@@ -2,8 +2,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Markup;
-using System.Windows.Data;
 
 namespace Microsoft.Windows.Controls
 {
@@ -25,6 +23,20 @@ namespace Microsoft.Windows.Controls
             set { SetValue(BackButtonVisibilityProperty, value); }
         }
 
+        public static readonly DependencyProperty CanCancelProperty = DependencyProperty.Register("CanCancel", typeof(bool), typeof(Wizard), new UIPropertyMetadata(true));
+        public bool CanCancel
+        {
+            get { return (bool)GetValue(CanCancelProperty); }
+            set { SetValue(CanCancelProperty, value); }
+        }
+
+        public static readonly DependencyProperty CancelButtonClosesWindowProperty = DependencyProperty.Register("CancelButtonClosesWindow", typeof(bool), typeof(Wizard), new UIPropertyMetadata(true));
+        public bool CancelButtonClosesWindow
+        {
+            get { return (bool)GetValue(CancelButtonClosesWindowProperty); }
+            set { SetValue(CancelButtonClosesWindowProperty, value); }
+        }
+
         public static readonly DependencyProperty CancelButtonContentProperty = DependencyProperty.Register("CancelButtonContent", typeof(object), typeof(Wizard), new UIPropertyMetadata("Cancel"));
         public object CancelButtonContent
         {
@@ -37,6 +49,34 @@ namespace Microsoft.Windows.Controls
         {
             get { return (Visibility)GetValue(CancelButtonVisibilityProperty); }
             set { SetValue(CancelButtonVisibilityProperty, value); }
+        }
+
+        public static readonly DependencyProperty CanFinishProperty = DependencyProperty.Register("CanFinish", typeof(bool), typeof(Wizard), new UIPropertyMetadata(false));
+        public bool CanFinish
+        {
+            get { return (bool)GetValue(CanFinishProperty); }
+            set { SetValue(CanFinishProperty, value); }
+        }
+
+        public static readonly DependencyProperty CanHelpProperty = DependencyProperty.Register("CanHelp", typeof(bool), typeof(Wizard), new UIPropertyMetadata(true));
+        public bool CanHelp
+        {
+            get { return (bool)GetValue(CanHelpProperty); }
+            set { SetValue(CanHelpProperty, value); }
+        }
+
+        public static readonly DependencyProperty CanSelectNextPageProperty = DependencyProperty.Register("CanSelectNextPage", typeof(bool), typeof(Wizard), new UIPropertyMetadata(true));
+        public bool CanSelectNextPage
+        {
+            get { return (bool)GetValue(CanSelectNextPageProperty); }
+            set { SetValue(CanSelectNextPageProperty, value); }
+        }
+
+        public static readonly DependencyProperty CanSelectPreviousPageProperty = DependencyProperty.Register("CanSelectPreviousPage", typeof(bool), typeof(Wizard), new UIPropertyMetadata(true));
+        public bool CanSelectPreviousPage
+        {
+            get { return (bool)GetValue(CanSelectPreviousPageProperty); }
+            set { SetValue(CanSelectPreviousPageProperty, value); }
         }
 
         #region CurrentPage
@@ -61,6 +101,13 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //CurrentPage
+
+        public static readonly DependencyProperty FinishButtonClosesWindowProperty = DependencyProperty.Register("FinishButtonClosesWindow", typeof(bool), typeof(Wizard), new UIPropertyMetadata(true));
+        public bool FinishButtonClosesWindow
+        {
+            get { return (bool)GetValue(FinishButtonClosesWindowProperty); }
+            set { SetValue(FinishButtonClosesWindowProperty, value); }
+        }
 
         public static readonly DependencyProperty FinishButtonContentProperty = DependencyProperty.Register("FinishButtonContent", typeof(object), typeof(Wizard), new UIPropertyMetadata("Finish"));
         public object FinishButtonContent
@@ -115,11 +162,11 @@ namespace Microsoft.Windows.Controls
 
         public Wizard()
         {
-            CommandBindings.Add(new CommandBinding(WizardCommands.Cancel, CancelWizard, CanCancelWizard));
-            CommandBindings.Add(new CommandBinding(WizardCommands.Finish, FinishWizard, CanFinishWizard));
-            CommandBindings.Add(new CommandBinding(WizardCommands.Help, RequestHelp, CanRequestHelp));
-            CommandBindings.Add(new CommandBinding(WizardCommands.NextPage, SelectNextPage, CanSelectNextPage));
-            CommandBindings.Add(new CommandBinding(WizardCommands.PreviousPage, SelectPreviousPage, CanSelectPreviousPage));
+            CommandBindings.Add(new CommandBinding(WizardCommands.Cancel, ExecuteCancelWizard, CanExecuteCancelWizard));
+            CommandBindings.Add(new CommandBinding(WizardCommands.Finish, ExecuteFinishWizard, CanExecuteFinishWizard));
+            CommandBindings.Add(new CommandBinding(WizardCommands.Help, ExecuteRequestHelp, CanExecuteRequestHelp));
+            CommandBindings.Add(new CommandBinding(WizardCommands.NextPage, ExecuteSelectNextPage, CanExecuteSelectNextPage));
+            CommandBindings.Add(new CommandBinding(WizardCommands.PreviousPage, ExecuteSelectPreviousPage, CanExecuteSelectPreviousPage));
         }
 
         #endregion //Constructors
@@ -148,37 +195,61 @@ namespace Microsoft.Windows.Controls
 
         #region Commands
 
-        private void CancelWizard(object sender, ExecutedRoutedEventArgs e)
+        private void ExecuteCancelWizard(object sender, ExecutedRoutedEventArgs e)
         {
             RaiseRoutedEvent(Wizard.CancelEvent);
+
+            if (CancelButtonClosesWindow)
+                CloseParentWindow(false);
         }
 
-        private void CanCancelWizard(object sender, CanExecuteRoutedEventArgs e)
+        private void CanExecuteCancelWizard(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            if (CurrentPage != null)
+            {
+                if (CurrentPage.CanCancel.HasValue)
+                    e.CanExecute = CurrentPage.CanCancel.Value;
+                else
+                    e.CanExecute = CanCancel;
+            }
         }
 
-        private void FinishWizard(object sender, ExecutedRoutedEventArgs e)
+        private void ExecuteFinishWizard(object sender, ExecutedRoutedEventArgs e)
         {
             RaiseRoutedEvent(Wizard.FinishEvent);
+
+            if (FinishButtonClosesWindow)
+                CloseParentWindow(true);
         }
 
-        private void CanFinishWizard(object sender, CanExecuteRoutedEventArgs e)
+        private void CanExecuteFinishWizard(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            if (CurrentPage != null)
+            {
+                if (CurrentPage.CanFinish.HasValue)
+                    e.CanExecute = CurrentPage.CanFinish.Value;
+                else
+                    e.CanExecute = CanFinish;
+            }
         }
 
-        private void RequestHelp(object sender, ExecutedRoutedEventArgs e)
+        private void ExecuteRequestHelp(object sender, ExecutedRoutedEventArgs e)
         {
             RaiseRoutedEvent(Wizard.HelpEvent);
         }
 
-        private void CanRequestHelp(object sender, CanExecuteRoutedEventArgs e)
+        private void CanExecuteRequestHelp(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            if (CurrentPage != null)
+            {
+                if (CurrentPage.CanHelp.HasValue)
+                    e.CanExecute = CurrentPage.CanHelp.Value;
+                else
+                    e.CanExecute = CanHelp;
+            }
         }
 
-        private void SelectNextPage(object sender, ExecutedRoutedEventArgs e)
+        private void ExecuteSelectNextPage(object sender, ExecutedRoutedEventArgs e)
         {
             WizardPage nextPage = null;
 
@@ -200,23 +271,21 @@ namespace Microsoft.Windows.Controls
             CurrentPage = nextPage;
         }
 
-        private void CanSelectNextPage(object sender, CanExecuteRoutedEventArgs e)
+        private void CanExecuteSelectNextPage(object sender, CanExecuteRoutedEventArgs e)
         {
             if (CurrentPage != null)
             {
-                if (CurrentPage.NextPage != null)
-                    e.CanExecute = true;
-                else
+                if (CurrentPage.CanSelectNextPage.HasValue) //check to see if page has overriden default behavior
                 {
-                    var currentIndex = Items.IndexOf(CurrentPage);
-                    var nextPageIndex = currentIndex + 1;
-                    if (nextPageIndex < Items.Count)
-                        e.CanExecute = true;
+                    if (CurrentPage.CanSelectNextPage.Value)
+                        e.CanExecute = NextPageExists();
                 }
+                else if (CanSelectNextPage)
+                    e.CanExecute = NextPageExists();
             }
         }
 
-        private void SelectPreviousPage(object sender, ExecutedRoutedEventArgs e)
+        private void ExecuteSelectPreviousPage(object sender, ExecutedRoutedEventArgs e)
         {
             WizardPage previousPage = null;
 
@@ -238,19 +307,17 @@ namespace Microsoft.Windows.Controls
             CurrentPage = previousPage;
         }
 
-        private void CanSelectPreviousPage(object sender, CanExecuteRoutedEventArgs e)
+        private void CanExecuteSelectPreviousPage(object sender, CanExecuteRoutedEventArgs e)
         {
             if (CurrentPage != null)
             {
-                if (CurrentPage.PreviousPage != null)
-                    e.CanExecute = true;
-                else
+                if (CurrentPage.CanSelectPreviousPage.HasValue) //check to see if page has overriden default behavior
                 {
-                    var currentIndex = Items.IndexOf(CurrentPage);
-                    var previousPageIndex = currentIndex - 1;
-                    if (previousPageIndex > 0 && previousPageIndex < Items.Count)
-                        e.CanExecute = true;
+                    if (CurrentPage.CanSelectPreviousPage.Value)
+                        e.CanExecute = PreviousPageExists();
                 }
+                else if (CanSelectPreviousPage)
+                    e.CanExecute = PreviousPageExists();
             }
         }
 
@@ -289,6 +356,64 @@ namespace Microsoft.Windows.Controls
         #endregion //Events
 
         #region Methods
+
+        private void CloseParentWindow(bool dialogResult)
+        {
+            Window window = Window.GetWindow(this);
+            if (window != null)
+            {
+                try
+                {
+                    window.DialogResult = dialogResult;
+                }
+                catch (InvalidOperationException)
+                {
+                    //DialogResult can be set only after Window is created and shown as dialog.
+                    //So if the Window is not shown as a dialog then an exception would occur. Therefore
+                    //let's just swallow the exception
+                }
+                finally
+                {
+                    window.Close();
+                }
+            }
+        }
+
+        private bool NextPageExists()
+        {
+            bool exists = false;
+
+            if (CurrentPage.NextPage != null) //check to see if a next page has been specified
+                exists = true;
+            else
+            {
+                //lets use an index to find the next page
+                var currentIndex = Items.IndexOf(CurrentPage);
+                var nextPageIndex = currentIndex + 1;
+                if (nextPageIndex < Items.Count)
+                    exists = true;
+            }
+
+            return exists;
+        }
+
+        private bool PreviousPageExists()
+        {
+            bool exists = false;
+
+            if (CurrentPage.PreviousPage != null) //check to see if a previous page has been specified
+                exists = true;
+            else
+            {
+                //lets use an index to find the next page
+                var currentIndex = Items.IndexOf(CurrentPage);
+                var previousPageIndex = currentIndex - 1;
+                if (previousPageIndex > 0 && previousPageIndex < Items.Count)
+                    exists = true;
+            }
+
+            return exists;
+        }
 
         private void RaiseRoutedEvent(RoutedEvent routedEvent)
         {

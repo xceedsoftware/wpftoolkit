@@ -5,7 +5,7 @@
     <Grid>
         <extToolkit:Wizard >
             <extToolkit:WizardPage x:Name="page1" Title="Page 1 Title"
-                                   Description="Page 1 Description">
+                                   Description="Page 1 Description" >
                 <Label Content="Page 1 content" />
             </extToolkit:WizardPage>
             <extToolkit:WizardPage x:Name="page2" Title="Page 2 Title"
@@ -15,7 +15,7 @@
                 <Label Content="Page 2 content" />
             </extToolkit:WizardPage>
             <extToolkit:WizardPage x:Name="page3" Title="Page 3 Title"
-                                   Description="Page 3 Description">
+                                   Description="Page 3 Description" CanFinish="True">
                 <Label Content="Page 3 content" />
             </extToolkit:WizardPage>
         </extToolkit:Wizard>
