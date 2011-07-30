@@ -15,11 +15,46 @@ namespace Microsoft.Windows.Controls
             set { SetValue(BackButtonVisibilityProperty, value); }
         }
 
+        public static readonly DependencyProperty CanCancelProperty = DependencyProperty.Register("CanCancel", typeof(bool?), typeof(WizardPage), new UIPropertyMetadata(null));
+        public bool? CanCancel
+        {
+            get { return (bool?)GetValue(CanCancelProperty); }
+            set { SetValue(CanCancelProperty, value); }
+        }
+
         public static readonly DependencyProperty CancelButtonVisibilityProperty = DependencyProperty.Register("CancelButtonVisibility", typeof(WizardPageButtonVisibility), typeof(WizardPage), new UIPropertyMetadata(WizardPageButtonVisibility.Inherit));
         public WizardPageButtonVisibility CancelButtonVisibility
         {
             get { return (WizardPageButtonVisibility)GetValue(CancelButtonVisibilityProperty); }
             set { SetValue(CancelButtonVisibilityProperty, value); }
+        }
+
+        public static readonly DependencyProperty CanFinishProperty = DependencyProperty.Register("CanFinish", typeof(bool?), typeof(WizardPage), new UIPropertyMetadata(null));
+        public bool? CanFinish
+        {
+            get { return (bool?)GetValue(CanFinishProperty); }
+            set { SetValue(CanFinishProperty, value); }
+        }
+
+        public static readonly DependencyProperty CanHelpProperty = DependencyProperty.Register("CanHelp", typeof(bool?), typeof(WizardPage), new UIPropertyMetadata(null));
+        public bool? CanHelp
+        {
+            get { return (bool?)GetValue(CanHelpProperty); }
+            set { SetValue(CanHelpProperty, value); }
+        }
+
+        public static readonly DependencyProperty CanSelectNextPageProperty = DependencyProperty.Register("CanSelectNextPage", typeof(bool?), typeof(WizardPage), new UIPropertyMetadata(null));
+        public bool? CanSelectNextPage
+        {
+            get { return (bool?)GetValue(CanSelectNextPageProperty); }
+            set { SetValue(CanSelectNextPageProperty, value); }
+        }
+
+        public static readonly DependencyProperty CanSelectPreviousPageProperty = DependencyProperty.Register("CanSelectPreviousPage", typeof(bool?), typeof(WizardPage), new UIPropertyMetadata(null));
+        public bool? CanSelectPreviousPage
+        {
+            get { return (bool?)GetValue(CanSelectPreviousPageProperty); }
+            set { SetValue(CanSelectPreviousPageProperty, value); }
         }
 
         public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register("Description", typeof(string), typeof(WizardPage));
