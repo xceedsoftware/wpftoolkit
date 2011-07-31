@@ -489,6 +489,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             Properties = null;
         }
 
+        /// <summary>
+        /// Updates all property values in the PropertyGrid with the data from the SelectedObject
+        /// </summary>
+        public void Update()
+        {
+            foreach (var item in Properties)
+            {
+                BindingOperations.GetBindingExpressionBase(item, PropertyItem.ValueProperty).UpdateTarget();
+            }
+        }
+
         #endregion //Methods
     }
 }
