@@ -2,8 +2,16 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:propertyGrid="clr-namespace:Microsoft.Windows.Controls.PropertyGrid"
-        Title="Collection Editor" Height="400" Width="800" WindowStartupLocation="CenterScreen">
-    <Grid>
+        Title="Collection Editor" Height="400" Width="600" WindowStartupLocation="CenterScreen">
+    
+    <Window.CommandBindings>
+        <CommandBinding Command="New" Executed="AddNew" CanExecute="CanAddNew" />
+        <CommandBinding Command="Delete" Executed="Delete" CanExecute="CanDelete" />
+        <CommandBinding Command="ComponentCommands.MoveDown" Executed="MoveDown" CanExecute="CanMoveDown" />
+        <CommandBinding Command="ComponentCommands.MoveUp" Executed="MoveUp" CanExecute="CanMoveUp" />
+    </Window.CommandBindings>
+    
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -11,18 +19,62 @@
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <ListBox x:Name="_listBox" />
+            <Grid Margin="0,0,10,0" MinWidth="200">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-            <propertyGrid:PropertyGrid x:Name="_propertyGrid" Grid.Column="1" SelectedObject="{Binding SelectedItem, ElementName=_listBox}" />
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="Select Type:" Margin="4" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="_newItemTypes" Margin="0,0,4,0"
+                                  ItemsSource="{Binding NewItemTypes}"
+                                  DisplayMemberPath="Name"
+                                  SelectedIndex="0"/>
+                        <Button Content="Add" Grid.Column="1" Width="50"
+                                Command="New" CommandParameter="{Binding SelectedItem, ElementName=_newItemTypes}"/>
+                    </Grid>
+                </StackPanel>
+                
+                <ListBox x:Name="_listBox" Grid.Row="1" Margin="0,4,0,0"
+                         ItemsSource="{Binding Items}"
+                         SelectedIndex="0"
+                         SelectedItem="{Binding SelectedItem}"/>
+                
+                <StackPanel Grid.Column="1" Grid.Row="1" Margin="5,4,0,0">
+                    <Button Command="ComponentCommands.MoveUp" CommandParameter="{Binding SelectedItem, ElementName=_listBox}">Up</Button>
+                    <Button Command="ComponentCommands.MoveDown" CommandParameter="{Binding SelectedItem, ElementName=_listBox}">Down</Button>
+                    <Button Command="Delete" CommandParameter="{Binding SelectedItem, ElementName=_listBox}" >Delete</Button>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Properties:" Margin="4" />
+                <propertyGrid:PropertyGrid x:Name="_propertyGrid" Grid.Row="1" SelectedObject="{Binding SelectedItem}" />
+            </Grid>
         </Grid>
-        
+
         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right" Margin="5" >
-            <Button Width="65" Margin="2" Click="Button_Click" >OK</Button>
-            <!--<Button Width="65" Margin="2">Cancel</Button>-->
+            <Button Width="75" Margin="2" Click="OkButton_Click" IsDefault="True">OK</Button>
+            <Button Width="75" Margin="2" IsCancel="True">Cancel</Button>
         </StackPanel>
 
     </Grid>

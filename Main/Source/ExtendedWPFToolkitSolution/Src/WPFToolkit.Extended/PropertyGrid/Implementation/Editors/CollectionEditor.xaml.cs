@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Collections;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
@@ -38,7 +30,12 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            CollectionEditorDialog editor = new CollectionEditorDialog(_item);
+            CollectionEditorDialog editor = new CollectionEditorDialog(_item.PropertyType);
+
+            Binding binding = new Binding("Value");
+            binding.Source = _item;
+            binding.Mode = _item.IsWriteable ? BindingMode.TwoWay : BindingMode.OneWay;
+            BindingOperations.SetBinding(editor, CollectionEditorDialog.ItemsSourceProperty, binding);
             editor.ShowDialog();
         }
     }
