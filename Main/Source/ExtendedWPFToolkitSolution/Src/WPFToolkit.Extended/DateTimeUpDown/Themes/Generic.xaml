@@ -28,6 +28,7 @@
                                          AllowSpin="{TemplateBinding AllowSpin}" ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
                         <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0" 
                                                 Background="{TemplateBinding Background}"
+                                                ContextMenu="{TemplateBinding ContextMenu}"
                                                 FontFamily="{TemplateBinding FontFamily}" 
                                                 FontSize="{TemplateBinding FontSize}" 
                                                 FontStretch="{TemplateBinding FontStretch}"
