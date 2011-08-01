@@ -87,6 +87,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="CollectionEditors\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ColorCanvas\Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -123,7 +127,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PropertyGrid\Implementation\Editors\CollectionEditorDialog.xaml">
+    <Page Include="CollectionEditors\Implementation\CollectionEditorDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -177,6 +181,8 @@
     <Compile Include="ButtonSpinner\Implementation\Spinner.cs" />
     <Compile Include="ButtonSpinner\Implementation\ValidSpinDirections.cs" />
     <Compile Include="Chromes\Implementation\ButtonChrome.cs" />
+    <Compile Include="CollectionEditors\Implementation\CollectionEditor.cs" />
+    <Compile Include="Core\Converters\ObjectTypeToNameConverter.cs" />
     <Compile Include="ColorCanvas\Implementation\ColorCanvas.cs" />
     <Compile Include="Core\Converters\CalculatorMemoryToVisibilityConverter.cs" />
     <Compile Include="Core\Converters\TimeFormatToDateTimeFormatConverter.cs" />
@@ -231,7 +237,7 @@
     <Compile Include="PropertyGrid\Implementation\Editors\CollectionEditor.xaml.cs">
       <DependentUpon>CollectionEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PropertyGrid\Implementation\Editors\CollectionEditorDialog.xaml.cs">
+    <Compile Include="CollectionEditors\Implementation\CollectionEditorDialog.xaml.cs">
       <DependentUpon>CollectionEditorDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="PropertyGrid\Implementation\Editors\ColorEditor.cs" />
@@ -346,6 +352,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="PropertyGrid\Images\ClearFilter16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CollectionEditors\Images\Delete16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

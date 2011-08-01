@@ -10,7 +10,6 @@ using System.ComponentModel;
 using System.Windows.Input;
 using Microsoft.Windows.Controls.PropertyGrid.Editors;
 using Microsoft.Windows.Controls.PropertyGrid.Commands;
-using System.Collections;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
@@ -424,9 +423,18 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                         editor = new FontComboBoxEditor();
                     else if (propertyItem.PropertyType.IsGenericType)
                     {
-                        var interfaces = propertyItem.PropertyType.GetInterfaces();
-                        if (interfaces.Contains(typeof(IEnumerable)))
-                            editor = new CollectionEditor();
+                        if (propertyItem.PropertyType.GetInterface("IList") != null)
+                        {
+                            bool isEditable = false;
+
+                            var t = propertyItem.PropertyType.GetGenericArguments()[0];
+                            if (!t.IsPrimitive && !t.Equals(typeof(String)))
+                                isEditable = true;
+
+                            editor = new Microsoft.Windows.Controls.PropertyGrid.Editors.CollectionEditor(isEditable);
+                        }
+                        else
+                            editor = new TextBlockEditor();
                     }
                     else
                         editor = new TextBoxEditor();
