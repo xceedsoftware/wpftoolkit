@@ -7,7 +7,7 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <TextBlock Text="(Collection)" VerticalAlignment="Center" />
-        <Button Grid.Column="1"
+        <Button x:Name="_editorButton" Grid.Column="1"
                 Content=" ... "
                 Click="Button_Click"/>
     </Grid>

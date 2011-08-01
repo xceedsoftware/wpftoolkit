@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Collections;
 using System.Windows.Data;
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Editors
@@ -18,6 +17,12 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
             InitializeComponent();
         }
 
+        public CollectionEditor(bool isEditable) : this()
+        {
+            if (!isEditable)
+                _editorButton.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
         public void Attach(PropertyItem propertyItem)
         {
             _item = propertyItem;
@@ -31,7 +36,6 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             CollectionEditorDialog editor = new CollectionEditorDialog(_item.PropertyType);
-
             Binding binding = new Binding("Value");
             binding.Source = _item;
             binding.Mode = _item.IsWriteable ? BindingMode.TwoWay : BindingMode.OneWay;

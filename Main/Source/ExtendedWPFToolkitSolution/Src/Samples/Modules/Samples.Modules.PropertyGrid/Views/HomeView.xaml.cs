@@ -39,6 +39,16 @@ namespace Samples.Modules.PropertyGrid.Views
             }
         }
 
+        private List<int> _valueTypes = new List<int>() { 1, 2, 3 };
+        public List<int> ValueTypes
+        {
+            get { return _valueTypes; }
+            set
+            {
+                _valueTypes = value;
+            }
+        }
+
         private string _name;
         public string Name
         {
@@ -68,6 +78,17 @@ namespace Samples.Modules.PropertyGrid.Views
                 _datOfBirth = value;
             }
         }
+
+        private Color _color;
+        public Color Color
+        {
+            get { return _color; }
+            set
+            {
+                _color = value;
+            }
+        }
+        
 
         public Data()
         {

@@ -18,9 +18,9 @@ namespace Samples
         {
             // Put the following code before InitializeComponent()
             // Sets the culture to French (France)
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("da-DK");
+            //Thread.CurrentThread.CurrentCulture = new CultureInfo("da-DK");
             // Sets the UI culture to French (France)
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo("da-DK");
+            //Thread.CurrentThread.CurrentUICulture = new CultureInfo("da-DK");
 
             base.OnStartup(e);
             Bootstrapper bootstrapper = new Bootstrapper();
