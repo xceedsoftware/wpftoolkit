@@ -16,6 +16,7 @@
         <ResourceDictionary Source="/WPFToolkit.Extended;component/MessageBox/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/DateTimeUpDown/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/DateTimePicker/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/WPFToolkit.Extended;component/MultiLineTextEditor/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/NumericUpDown/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/SplitButton/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/PropertyGrid/Themes/Generic.xaml" />
@@ -23,4 +24,6 @@
         <ResourceDictionary Source="/WPFToolkit.Extended;component/WatermarkTextBox/Themes/Generic.xaml" />
         <ResourceDictionary Source="/WPFToolkit.Extended;component/Wizard/Themes/Generic.xaml" />
     </ResourceDictionary.MergedDictionaries>    
+
+
 </ResourceDictionary>
