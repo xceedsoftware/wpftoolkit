@@ -10,12 +10,25 @@ namespace Microsoft.Windows.Controls
     {
         #region Members
 
-        TextBox _textBox;
         Thumb _resizeThumb;
 
         #endregion //Members
 
         #region Properties
+
+        public static readonly DependencyProperty DropDownHeightProperty = DependencyProperty.Register("DropDownHeight", typeof(double), typeof(MultiLineTextEditor), new UIPropertyMetadata(150.0));
+        public double DropDownHeight
+        {
+            get { return (double)GetValue(DropDownHeightProperty); }
+            set { SetValue(DropDownHeightProperty, value); }
+        }
+
+        public static readonly DependencyProperty DropDownWidthProperty = DependencyProperty.Register("DropDownWidth", typeof(double), typeof(MultiLineTextEditor), new UIPropertyMetadata(200.0));
+        public double DropDownWidth
+        {
+            get { return (double)GetValue(DropDownWidthProperty); }
+            set { SetValue(DropDownWidthProperty, value); }
+        }
 
         #region IsOpen
 
@@ -40,6 +53,14 @@ namespace Microsoft.Windows.Controls
 
         #endregion //IsOpen
 
+        public static readonly DependencyProperty IsSpellCheckEnabledProperty = DependencyProperty.Register("IsSpellCheckEnabled", typeof(bool), typeof(MultiLineTextEditor), new UIPropertyMetadata(false));
+        public bool IsSpellCheckEnabled
+        {
+            get { return (bool)GetValue(IsSpellCheckEnabledProperty); }
+            set { SetValue(IsSpellCheckEnabledProperty, value); }
+        }
+        
+
         #region Text
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(MultiLineTextEditor), new FrameworkPropertyMetadata(String.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnTextChanged));
@@ -62,6 +83,21 @@ namespace Microsoft.Windows.Controls
         }
 
         #endregion //Text
+
+        public static readonly DependencyProperty TextAlignmentProperty = DependencyProperty.Register("TextAlignment", typeof(TextAlignment), typeof(MultiLineTextEditor), new UIPropertyMetadata(TextAlignment.Left));
+        public TextAlignment TextAlignment
+        {
+            get { return (TextAlignment)GetValue(TextAlignmentProperty); }
+            set { SetValue(TextAlignmentProperty, value); }
+        }
+
+        public static readonly DependencyProperty TextWrappingProperty = DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(MultiLineTextEditor), new UIPropertyMetadata(TextWrapping.NoWrap));
+        public TextWrapping TextWrapping
+        {
+            get { return (TextWrapping)GetValue(TextWrappingProperty); }
+            set { SetValue(TextWrappingProperty, value); }
+        }
+        
 
         #endregion //Properties
 
@@ -86,8 +122,6 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            _textBox = (TextBox)GetTemplateChild("PART_TextBox");
-
             if (_resizeThumb != null)
                 _resizeThumb.DragDelta -= ResizeThumb_DragDelta;
             _resizeThumb = (Thumb)GetTemplateChild("PART_ResizeThumb");
@@ -95,18 +129,6 @@ namespace Microsoft.Windows.Controls
             if (_resizeThumb != null)
                 _resizeThumb.DragDelta += ResizeThumb_DragDelta;
 
-        }
-
-        void ResizeThumb_DragDelta(object sender, DragDeltaEventArgs e)
-        {
-            double yadjust = this._textBox.Height + e.VerticalChange;
-            double xadjust = this._textBox.Width + e.HorizontalChange;
-
-            if ((xadjust >= 0) && (yadjust >= 0))
-            {
-                this._textBox.Width = xadjust;
-                this._textBox.Height = yadjust;
-            }
         }
 
         #endregion //Bass Class Overrides
@@ -129,6 +151,18 @@ namespace Microsoft.Windows.Controls
         private void OnMouseDownOutsideCapturedElement(object sender, MouseButtonEventArgs e)
         {
             CloseEditor();
+        }
+
+        void ResizeThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            double yadjust = DropDownHeight + e.VerticalChange;
+            double xadjust = DropDownWidth + e.HorizontalChange;
+
+            if ((xadjust >= 0) && (yadjust >= 0))
+            {
+                DropDownWidth = xadjust;
+                DropDownHeight = yadjust;
+            }
         }
 
         #endregion //Event Handlers
