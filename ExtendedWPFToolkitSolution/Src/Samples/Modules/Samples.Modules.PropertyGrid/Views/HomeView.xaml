@@ -17,5 +17,12 @@
 
         <!--<extToolkit:PropertyGrid Grid.Column="1" Name="propertyGrid1" SelectedObject="{Binding ElementName=_button}"  />-->
         <extToolkit:PropertyGrid Grid.Column="1" Name="propertyGrid1" SelectedObject="{Binding ElementName=_listBox, Path=SelectedItem}"  />
+        <!--<StackPanel  HorizontalAlignment="Center" VerticalAlignment="Center">
+            <extToolkit:PrimitiveTypeCollectionEditor x:Name="_editor" Width="150" Content="(Collection)"   />
+            <Button Click="Button_Click">
+                <Path Stroke="Black" SnapsToDevicePixels="true" StrokeThickness="1" Data="F0 M 0,0 L 6,6 M 0,3 L 3,6 " />
+            </Button>
+        </StackPanel>-->
+
     </Grid>
 </UserControl>

@@ -24,7 +24,16 @@ namespace Samples.Modules.PropertyGrid.Views
             InitializeComponent();
             _listBox.Items.Add(new Data() { Name = "Item One" });
             _listBox.Items.Add(new Data() { Name = "Item Two" });
+            //_editor.ItemsSourceType = typeof(List<double>);
+            //_editor.ItemType = typeof(double);
+            //_editor.ItemsSource = new List<String>() { "A", "B", "C" };
+            //_editor.ItemsSource = new List<double>() { 1.0, 2.0, 3.0 };
         }
+
+        //private void Button_Click(object sender, RoutedEventArgs e)
+        //{
+        //    MessageBox.Show(_editor.ItemsSource.Count.ToString());
+        //}
     }
 
     public class Data
@@ -88,7 +97,7 @@ namespace Samples.Modules.PropertyGrid.Views
                 _color = value;
             }
         }
-        
+
 
         public Data()
         {
