@@ -96,14 +96,15 @@
                                       IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
                                       VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"/>
                         <Popup IsOpen="{Binding IsChecked, ElementName=PART_DropDownButton}" StaysOpen="False"
-                                   Placement="Bottom" SnapsToDevicePixels="True" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                               Placement="Bottom" SnapsToDevicePixels="True" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide"
+                               Width="{TemplateBinding DropDownWidth}" Height="{TemplateBinding DropDownHeight}">
                             <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}">
                                 <Grid>
-                                    <TextBox x:Name="PART_TextBox" AcceptsReturn="true" TextWrapping="NoWrap" Padding="{TemplateBinding Padding}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
-                                             Width="200" Height="150" 
+                                    <TextBox x:Name="PART_TextBox" AcceptsReturn="true" TextWrapping="{TemplateBinding TextWrapping}" Padding="{TemplateBinding Padding}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                                             SpellCheck.IsEnabled="{TemplateBinding IsSpellCheckEnabled}"
                                              Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
-                                             Margin="3">
-                                    </TextBox>
+                                             TextAlignment="{TemplateBinding TextAlignment}"
+                                             Margin="3" />
                                     <Thumb x:Name="PART_ResizeThumb" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE">
                                         <Thumb.Template>
                                             <ControlTemplate TargetType="{x:Type Thumb}">
