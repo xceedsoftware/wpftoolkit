@@ -92,6 +92,13 @@ namespace Microsoft.Windows.Controls
             set { SetValue(NextPageProperty, value); }
         }
 
+        public static readonly DependencyProperty PageTypeProperty = DependencyProperty.Register("PageType", typeof(WizardPageType), typeof(WizardPage), new UIPropertyMetadata(WizardPageType.Interior));
+        public WizardPageType PageType
+        {
+            get { return (WizardPageType)GetValue(PageTypeProperty); }
+            set { SetValue(PageTypeProperty, value); }
+        }        
+
         public static readonly DependencyProperty PreviousPageProperty = DependencyProperty.Register("PreviousPage", typeof(WizardPage), typeof(WizardPage), new UIPropertyMetadata(null));
         public WizardPage PreviousPage
         {
@@ -104,7 +111,7 @@ namespace Microsoft.Windows.Controls
         {
             get { return (string)base.GetValue(TitleProperty); }
             set { base.SetValue(TitleProperty, value); }
-        }        
+        }
 
         #endregion //Properties
 
