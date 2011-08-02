@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Collections;
 using System.Reflection;
-using System.Windows.Input;
 
 namespace Microsoft.Windows.Controls
 {
@@ -14,8 +12,6 @@ namespace Microsoft.Windows.Controls
     {
         #region Members
 
-        TextBox _textBox;
-        Thumb _resizeThumb;
         bool _surpressTextChanged;
         bool _conversionFailed;
 
@@ -128,74 +124,12 @@ namespace Microsoft.Windows.Controls
 
         public PrimitiveTypeCollectionEditor()
         {
-            Keyboard.AddKeyDownHandler(this, OnKeyDown);
-            Mouse.AddPreviewMouseDownOutsideCapturedElementHandler(this, OnMouseDownOutsideCapturedElement);
+
         }
 
         #endregion //Constructors
 
-        #region Bass Class Overrides
-
-        public override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-
-            _textBox = (TextBox)GetTemplateChild("PART_TextBox");
-
-            if (_resizeThumb != null)
-                _resizeThumb.DragDelta -= ResizeThumb_DragDelta;
-
-            _resizeThumb = (Thumb)GetTemplateChild("PART_ResizeThumb");
-
-            if (_resizeThumb != null)
-                _resizeThumb.DragDelta += ResizeThumb_DragDelta;
-
-        }
-
-        void ResizeThumb_DragDelta(object sender, DragDeltaEventArgs e)
-        {
-            double yadjust = this._textBox.Height + e.VerticalChange;
-            double xadjust = this._textBox.Width + e.HorizontalChange;
-
-            if ((xadjust >= 0) && (yadjust >= 0))
-            {
-                this._textBox.Width = xadjust;
-                this._textBox.Height = yadjust;
-            }
-        }
-
-        #endregion //Bass Class Overrides
-
-        #region Event Handlers
-
-        private void OnKeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Escape:
-                case Key.Tab:
-                    {
-                        CloseEditor();
-                        break;
-                    }
-            }
-        }
-
-        private void OnMouseDownOutsideCapturedElement(object sender, MouseButtonEventArgs e)
-        {
-            CloseEditor();
-        }
-
-        #endregion //Event Handlers
-
         #region Methods
-
-        private void CloseEditor()
-        {
-            if (IsOpen)
-                IsOpen = false;
-            ReleaseMouseCapture();
-        }
 
         private void PersistChanges()
         {

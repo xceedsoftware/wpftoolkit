@@ -119,6 +119,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MultiLineTextEditor\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="NumericUpDown\Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -204,6 +208,7 @@
     <Compile Include="DateTimeUpDown\Implementation\DateTimeUpDown.cs" />
     <Compile Include="DateTimeUpDown\Implementation\DateTimeParser.cs" />
     <Compile Include="DropDownButton\Implementation\DropDownButton.cs" />
+    <Compile Include="MultiLineTextEditor\Implementation\MultiLineTextEditor.cs" />
     <Compile Include="NumericUpDown\Implementation\DecimalUpDown.cs" />
     <Compile Include="NumericUpDown\Implementation\DoubleUpDown.cs" />
     <Compile Include="NumericUpDown\Implementation\IntegerUpDown.cs" />
@@ -357,6 +362,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="CollectionEditors\Images\Delete16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CollectionEditors\Images\Notes16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
