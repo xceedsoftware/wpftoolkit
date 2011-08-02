@@ -289,6 +289,7 @@
     <Compile Include="Wizard\Implementation\WizardPage.cs" />
     <Compile Include="Wizard\Implementation\Wizard.cs" />
     <Compile Include="Wizard\Implementation\WizardPageButtonVisibility.cs" />
+    <Compile Include="Wizard\Implementation\WizardPageType.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
