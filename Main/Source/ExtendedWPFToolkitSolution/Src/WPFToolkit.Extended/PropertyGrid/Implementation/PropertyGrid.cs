@@ -275,8 +275,11 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             //hitting enter on textbox will update value of underlying source
             if (this.SelectedProperty != null && e.Key == Key.Enter && e.OriginalSource is TextBox)
             {
-                BindingExpression be = ((TextBox)e.OriginalSource).GetBindingExpression(TextBox.TextProperty);
-                be.UpdateSource();
+                if (!(e.OriginalSource as TextBox).AcceptsReturn)
+                {
+                    BindingExpression be = ((TextBox)e.OriginalSource).GetBindingExpression(TextBox.TextProperty);
+                    be.UpdateSource();
+                }
             }
         }
 
@@ -425,13 +428,11 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                     {
                         if (propertyItem.PropertyType.GetInterface("IList") != null)
                         {
-                            bool isEditable = false;
-
                             var t = propertyItem.PropertyType.GetGenericArguments()[0];
                             if (!t.IsPrimitive && !t.Equals(typeof(String)))
-                                isEditable = true;
-
-                            editor = new Microsoft.Windows.Controls.PropertyGrid.Editors.CollectionEditor(isEditable);
+                                editor = new Microsoft.Windows.Controls.PropertyGrid.Editors.CollectionEditor();
+                            else
+                                editor = new Microsoft.Windows.Controls.PropertyGrid.Editors.PrimitiveTypeCollectionEditor();
                         }
                         else
                             editor = new TextBlockEditor();
