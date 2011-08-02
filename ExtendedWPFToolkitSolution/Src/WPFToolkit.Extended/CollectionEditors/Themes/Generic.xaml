@@ -198,7 +198,7 @@
                             <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}">
                                 <Grid>
                                     <TextBox x:Name="PART_TextBox" AcceptsReturn="true" TextWrapping="NoWrap" Padding="{TemplateBinding Padding}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
-                                                 Width="{Binding Path=ActualWidth, ElementName=Root}" Height="150" 
+                                                 Width="200" Height="150" 
                                                  Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
                                              Margin="3">
                                     </TextBox>
