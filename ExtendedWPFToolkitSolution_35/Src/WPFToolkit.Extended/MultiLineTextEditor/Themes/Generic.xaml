@@ -58,6 +58,8 @@
         </Setter>
     </Style>
 
+    <Image x:Key="ImageContent" Height="16" Width="18" Source="/WPFToolkit.Extended;component/MultiLineTextEditor/Images/Notes16.png" />
+
     <Style TargetType="{x:Type local:MultiLineTextEditor}">
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush">
@@ -71,11 +73,7 @@
             </Setter.Value>
         </Setter>
         <Setter Property="BorderThickness" Value="1,1,0,1" />
-        <Setter Property="Content">
-            <Setter.Value>
-                <Image Height="16" Width="18" Source="/WPFToolkit.Extended;component/MultiLineTextEditor/Images/Notes16.png" />
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Content" Value="{StaticResource ImageContent}" />
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Padding" Value="2,0,0,0" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />

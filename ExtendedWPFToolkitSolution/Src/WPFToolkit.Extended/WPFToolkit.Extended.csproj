@@ -365,7 +365,7 @@
     <Resource Include="CollectionEditors\Images\Delete16.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="CollectionEditors\Images\Notes16.png" />
+    <Resource Include="MultiLineTextEditor\Images\Notes16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

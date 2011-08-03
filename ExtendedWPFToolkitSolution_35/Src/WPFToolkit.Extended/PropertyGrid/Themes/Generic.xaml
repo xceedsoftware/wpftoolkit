@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:extToolkit="clr-namespace:Microsoft.Windows.Controls"
                     xmlns:local="clr-namespace:Microsoft.Windows.Controls.PropertyGrid"
                     xmlns:converters="clr-namespace:Microsoft.Windows.Controls.Core.Converters"
                     xmlns:pgConverters="clr-namespace:Microsoft.Windows.Controls.PropertyGrid.Converters"
@@ -126,6 +127,54 @@
         </Setter>
     </Style>
 
+    <Style x:Key="ClearFilterButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Height" Value="22" />
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="ToolTipService.InitialShowDelay" Value="900"/>
+        <Setter Property="ToolTipService.ShowDuration" Value="20000"/>
+        <Setter Property="ToolTipService.BetweenShowDelay" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid SnapsToDevicePixels="True">
+                        <Border x:Name="OuterBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="2"/>
+                        <Border x:Name="MiddleBorder" BorderBrush="Transparent" BorderThickness="{TemplateBinding BorderThickness}" Background="Transparent" CornerRadius="2">
+                            <Border x:Name="InnerBorder" BorderBrush="Transparent" BorderThickness="{TemplateBinding BorderThickness}" Background="Transparent" CornerRadius="2" Padding="{TemplateBinding Padding}">
+                                <StackPanel x:Name="StackPanel" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
+                                    <ContentPresenter x:Name="Content" Content="{TemplateBinding Content}" Margin="1"
+                                           RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                                </StackPanel>
+                            </Border>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" TargetName="OuterBorder" Value="{StaticResource MouseOverBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" TargetName="OuterBorder" Value="{StaticResource MouseOverBorderBrush}"/>
+                            <Setter Property="BorderBrush" TargetName="InnerBorder" Value="#80FFFFFF"/>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" TargetName="Content" Value="0.5"/>
+                            <Setter Property="TextElement.Foreground" TargetName="OuterBorder" Value="#FF9E9E9E"/>
+                        </Trigger>
+
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" TargetName="OuterBorder" Value="{StaticResource PressedBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" TargetName="OuterBorder" Value="{StaticResource PressedBorderBrush}"/>
+                            <Setter Property="BorderBrush" TargetName="InnerBorder" Value="Transparent"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <SolidColorBrush x:Key="GlyphBrush" Color="#FF31347C"/>
 
     <ControlTemplate x:Key="ExpanderToggleButton" TargetType="{x:Type ToggleButton}">
@@ -200,22 +249,6 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type local:PropertyCategoryItem}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:PropertyCategoryItem}">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                        <Expander Header="{TemplateBinding Category}" Style="{StaticResource ExpanderStyle}" IsExpanded="True">
-                            <ItemsControl ItemsSource="{Binding Properties, RelativeSource={RelativeSource TemplatedParent}}" />
-                        </Expander>
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <Style TargetType="{x:Type local:PropertyItem}">
         <Setter Property="BorderBrush" Value="#FFF0F0F0" />
         <Setter Property="BorderThickness" Value="1" />
@@ -243,9 +276,9 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Text="{Binding Name, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Stretch" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding DisplayName, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Stretch" TextTrimming="CharacterEllipsis"/>
 
-                                    <Grid Grid.Column="1" HorizontalAlignment="Right" Margin="5,0,5,0" 
+                                    <Grid Grid.Column="1" HorizontalAlignment="Right" Margin="5,0,5,0"  Visibility="{Binding ShowAdvancedOptions, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:PropertyGrid}, Converter={StaticResource BooleanToVisibilityConverter}}"
                                           utilities:ContextMenuUtilities.OpenOnMouseLeftButtonClick="True"
                                           ContextMenu="{StaticResource ContextMenu}" >
 
@@ -326,7 +359,35 @@
                                         </RadioButton>
                                     </StackPanel>
                                 </Grid>
-                                <TextBox Grid.Column="1" Text="Not Implemented" Margin="4" Opacity=".5" Visibility="Hidden"  />
+
+                                <Border Grid.Column="1" Margin="4,4,0,4" Background="White" BorderBrush="Gray" BorderThickness="1"  >
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <extToolkit:WatermarkTextBox x:Name="_txtFilter" Background="Transparent" 
+                                                                 Text="{Binding Filter, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"
+                                                                 Watermark="Search">
+                                            <extToolkit:WatermarkTextBox.Style>
+                                                <Style TargetType="Control">
+                                                    <Setter Property="BorderThickness" Value="0" />
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="BorderThickness" Value="1" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </extToolkit:WatermarkTextBox.Style>
+
+                                        </extToolkit:WatermarkTextBox>
+
+                                        <Button Grid.Column="1" Command="commands:PropertyGridCommands.ClearFilter" Style="{StaticResource ClearFilterButtonStyle}"
+                                                HorizontalAlignment="Left">
+                                            <Image Source="/WPFToolkit.Extended;component/PropertyGrid/Images/ClearFilter16.png" Width="16" Height="16"/>
+                                        </Button>
+                                    </Grid>
+                                </Border>
                             </Grid>
 
                             <Grid Grid.Row="2" Background="White">
@@ -337,6 +398,29 @@
                                                 <VirtualizingStackPanel />
                                             </ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
+
+                                        <ItemsControl.GroupStyle>
+                                            <GroupStyle>
+                                                <GroupStyle.ContainerStyle>
+                                                    <Style TargetType="{x:Type GroupItem}">
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate>
+                                                                    <Border Background="{TemplateBinding Background}"
+                                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                                            BorderThickness="{TemplateBinding BorderThickness}">
+                                                                        <Expander Header="{Binding Name}" Style="{StaticResource ExpanderStyle}" IsExpanded="True">
+                                                                            <ItemsPresenter />
+                                                                        </Expander>
+                                                                    </Border>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+                                                </GroupStyle.ContainerStyle>
+                                            </GroupStyle>
+                                        </ItemsControl.GroupStyle>
+
                                     </ItemsControl>
                                 </ScrollViewer>
 
@@ -355,7 +439,7 @@
 
                             <GridSplitter Height="3" Grid.Row="3" HorizontalAlignment="Stretch" Visibility="{Binding DisplaySummary, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <StackPanel Grid.Row="4" Margin="0,0,0,5" Visibility="{Binding DisplaySummary, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                <TextBlock Padding="2 2 2 0" FontWeight="Bold" Text="{Binding SelectedProperty.Name, RelativeSource={RelativeSource TemplatedParent}}" />
+                                <TextBlock Padding="2 2 2 0" FontWeight="Bold" Text="{Binding SelectedProperty.DisplayName, RelativeSource={RelativeSource TemplatedParent}}" />
                                 <TextBlock Padding="5 2 2 0" TextWrapping="WrapWithOverflow" Text="{Binding SelectedProperty.Description, RelativeSource={RelativeSource TemplatedParent}}" />
                             </StackPanel>
                         </Grid>
