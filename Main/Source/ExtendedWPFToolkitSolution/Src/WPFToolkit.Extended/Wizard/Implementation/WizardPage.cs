@@ -121,7 +121,7 @@ namespace Microsoft.Windows.Controls
             set { SetValue(NextPageProperty, value); }
         }
 
-        public static readonly DependencyProperty PageTypeProperty = DependencyProperty.Register("PageType", typeof(WizardPageType), typeof(WizardPage), new UIPropertyMetadata(WizardPageType.Interior));
+        public static readonly DependencyProperty PageTypeProperty = DependencyProperty.Register("PageType", typeof(WizardPageType), typeof(WizardPage), new UIPropertyMetadata(WizardPageType.Exterior));
         public WizardPageType PageType
         {
             get { return (WizardPageType)GetValue(PageTypeProperty); }
