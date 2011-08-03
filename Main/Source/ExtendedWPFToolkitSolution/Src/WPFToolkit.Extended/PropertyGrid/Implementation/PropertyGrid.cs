@@ -244,6 +244,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //SelectedProperty
 
+        #region ShowAdvancedOptions
+
+        public static readonly DependencyProperty ShowAdvancedOptionsProperty = DependencyProperty.Register("ShowAdvancedOptions", typeof(bool), typeof(PropertyGrid), new UIPropertyMetadata(false));
+        public bool ShowAdvancedOptions
+        {
+            get { return (bool)GetValue(ShowAdvancedOptionsProperty); }
+            set { SetValue(ShowAdvancedOptionsProperty, value); }
+        }
+
+        #endregion //ShowAdvancedOptions
+
         #endregion //Properties
 
         #region Constructors
