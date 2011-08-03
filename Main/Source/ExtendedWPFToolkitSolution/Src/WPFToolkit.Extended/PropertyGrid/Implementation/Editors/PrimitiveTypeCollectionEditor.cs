@@ -6,6 +6,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
     {
         protected override void SetControlProperties()
         {
+            Editor.BorderThickness = new System.Windows.Thickness(0);
             Editor.Content = "(Collection)";
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Windows.Controls.Core.Converters;
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
@@ -7,6 +6,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
     {
         protected override void SetControlProperties()
         {
+            Editor.BorderThickness = new System.Windows.Thickness(0);
             Editor.DisplayColorAndName = true;
         }
         protected override void SetValueDependencyProperty()
