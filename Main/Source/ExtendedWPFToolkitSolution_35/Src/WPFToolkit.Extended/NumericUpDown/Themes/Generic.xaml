@@ -24,6 +24,7 @@
                                          AllowSpin="{Binding AllowSpin, RelativeSource={RelativeSource TemplatedParent}}" ShowButtonSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}">
                         <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0" 
                                                 Background="{TemplateBinding Background}"
+                                                ContextMenu="{TemplateBinding ContextMenu}"
                                                 FontFamily="{TemplateBinding FontFamily}" 
                                                 FontSize="{TemplateBinding FontSize}" 
                                                 FontStretch="{TemplateBinding FontStretch}"
@@ -32,7 +33,7 @@
                                                 Foreground="{TemplateBinding Foreground}" 
                                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                 IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
-                                                MinWidth="20" AcceptsReturn="False"
+                                                MinWidth="20" AcceptsReturn="False" 
                                                 SelectAllOnGotFocus="{Binding SelectAllOnGotFocus, RelativeSource={RelativeSource TemplatedParent}}"
                                                 TextAlignment="{Binding TextAlignment, RelativeSource={RelativeSource TemplatedParent}}"
                                                 TextWrapping="NoWrap" 

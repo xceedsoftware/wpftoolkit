@@ -78,6 +78,16 @@
     <Reference Include="WPFToolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CollectionEditors\Implementation\CollectionEditorDialog.xaml">
+      <Link>CollectionEditor\Implementation\CollectionEditorDialog.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\CollectionEditor.xaml">
+      <Link>PropertyGrid\Implementation\Editors\CollectionEditor.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\RichTextBoxFormatBar\RichTextBoxFormatBar.xaml">
       <Link>RichTextBoxFormatBar\RichTextBoxFormatBar.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
@@ -99,6 +109,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="CheckListBox\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ChildWindow\Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -106,6 +120,10 @@
     <Page Include="Chromes\Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CollectionEditors\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ColorCanvas\Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -123,6 +141,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="DropDownButton\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Magnifier\Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -130,6 +152,10 @@
     <Page Include="MessageBox\Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MultiLineTextEditor\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="NumericUpDown\Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -158,6 +184,10 @@
     <Page Include="WatermarkTextBox\Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Wizard\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -191,6 +221,15 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Calculator\Implementation\CalculatorCommands.cs">
       <Link>Calculator\Implementation\CalculatorCommands.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CheckListBox\Implementation\CheckListBox.cs">
+      <Link>CheckListBox\Implementation\CheckListBox.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CheckListBox\Implementation\CheckListBoxCheckedChangedEventArgs.cs">
+      <Link>CheckListBox\Implementation\CheckListBoxCheckedChangedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CheckListBox\Implementation\CheckListBoxItem.cs">
+      <Link>CheckListBox\Implementation\CheckListBoxItem.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ChildWindow\Implementation\ChildWindow.cs">
       <Link>ChildWindow\Implementation\ChildWindow.cs</Link>
     </Compile>
@@ -202,6 +241,16 @@
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Chromes\Implementation\ButtonChrome.cs">
       <Link>Chromes\Implementation\ButtonChrome.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CollectionEditors\Implementation\CollectionEditor.cs">
+      <Link>CollectionEditor\Implementation\CollectionEditor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CollectionEditors\Implementation\CollectionEditorDialog.xaml.cs">
+      <Link>CollectionEditor\Implementation\CollectionEditorDialog.xaml.cs</Link>
+      <DependentUpon>CollectionEditorDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CollectionEditors\Implementation\PrimitiveTypeCollectionEditor.cs">
+      <Link>CollectionEditor\Implementation\PrimitiveTypeCollectionEditor.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ColorCanvas\Implementation\ColorCanvas.cs">
       <Link>ColorCanvas\Implementation\ColorCanvas.cs</Link>
@@ -224,11 +273,17 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Converters\InverseBoolConverter.cs">
       <Link>Core\Converters\InverseBoolConverter.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Converters\ObjectTypeToNameConverter.cs">
+      <Link>Core\Converters\ObjectTypeToNameConverter.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Converters\SolidColorBrushToColorConverter.cs">
       <Link>Core\Converters\SolidColorBrushToColorConverter.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Converters\TimeFormatToDateTimeFormatConverter.cs">
       <Link>Core\Converters\TimeFormatToDateTimeFormatConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Converters\WizardPageButtonVisibilityConverter.cs">
+      <Link>Core\Converters\WizardPageButtonVisibilityConverter.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Primitives\HsvColor.cs">
       <Link>Core\Primitives\HsvColor.cs</Link>
@@ -269,6 +324,9 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\DateTimeUpDown\Implementation\DateTimeUpDown.cs">
       <Link>DateTimeUpDown\Implementation\DateTimeUpDown.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\DropDownButton\Implementation\DropDownButton.cs">
+      <Link>DropDownButton\Implementation\DropDownButton.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Magnifier\Implementation\Converters\BorderThicknessToStrokeThicknessConverter.cs">
       <Link>Magnifier\Implementation\Converters\BorderThicknessToStrokeThicknessConverter.cs</Link>
     </Compile>
@@ -293,6 +351,9 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\MessageBox\Implementation\VisualStates.MessageBox.cs">
       <Link>MessageBox\Implementation\VisualStates.MessageBox.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\MultiLineTextEditor\Implementation\MultiLineTextEditor.cs">
+      <Link>MultiLineTextEditor\Implementation\MultiLineTextEditor.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\NumericUpDown\Implementation\DecimalUpDown.cs">
       <Link>NumericUpDown\Implementation\DecimalUpDown.cs</Link>
     </Compile>
@@ -304,6 +365,9 @@
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\NumericUpDown\Implementation\NumericUpDown.cs">
       <Link>NumericUpDown\Implementation\NumericUpDown.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Commands\PropertyGridCommands.cs">
+      <Link>PropertyGrid\Implementation\Commands\PropertyGridCommands.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Commands\PropertyItemCommands.cs">
       <Link>PropertyGrid\Implementation\Commands\PropertyItemCommands.cs</Link>
@@ -319,6 +383,10 @@
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\CheckBoxEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\CheckBoxEditor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\CollectionEditor.xaml.cs">
+      <Link>PropertyGrid\Implementation\Editors\CollectionEditor.xaml.cs</Link>
+      <DependentUpon>CollectionEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\ColorEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\ColorEditor.cs</Link>
@@ -353,6 +421,9 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\ITypeEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\ITypeEditor.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\PrimitiveTypeCollectionEditor.cs">
+      <Link>PropertyGrid\Implementation\Editors\PrimitiveTypeCollectionEditor.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\TextBlockEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\TextBlockEditor.cs</Link>
     </Compile>
@@ -361,9 +432,6 @@
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\TypeEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\TypeEditor.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\PropertyCategoryItem.cs">
-      <Link>PropertyGrid\Implementation\PropertyCategoryItem.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\PropertyCollection.cs">
       <Link>PropertyGrid\Implementation\PropertyCollection.cs</Link>
@@ -416,6 +484,21 @@
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\WatermarkTextBox\Implementation\WatermarkTextBox.cs">
       <Link>WatermarkTextBox\Implementation\WatermarkTextBox.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Wizard\Implementation\Wizard.cs">
+      <Link>Wizard\Implementation\Wizard.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Wizard\Implementation\WizardCommands.cs">
+      <Link>Wizard\Implementation\WizardCommands.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Wizard\Implementation\WizardPage.cs">
+      <Link>Wizard\Implementation\WizardPage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Wizard\Implementation\WizardPageButtonVisibility.cs">
+      <Link>Wizard\Implementation\WizardPageButtonVisibility.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Wizard\Implementation\WizardPageType.cs">
+      <Link>Wizard\Implementation\WizardPageType.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -474,7 +557,9 @@
     <Resource Include="PropertyGrid\Images\SortAscending16.png" />
     <Resource Include="PropertyGrid\Images\Style11.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="PropertyGrid\Images\ClearFilter16.png" />
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
@@ -491,6 +576,10 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CollectionEditors\Images\Delete16.png" />
+    <Resource Include="MultiLineTextEditor\Images\Notes16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

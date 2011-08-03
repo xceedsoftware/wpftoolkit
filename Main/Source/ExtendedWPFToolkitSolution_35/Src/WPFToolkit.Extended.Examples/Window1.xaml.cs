@@ -27,7 +27,7 @@ namespace WPFToolkit.Extended.Examples
 
         void Window1_Loaded(object sender, RoutedEventArgs e)
         {
-            
+
         }
     }
 }

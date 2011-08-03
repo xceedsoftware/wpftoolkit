@@ -256,10 +256,10 @@
                                                 <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <Button Grid.Column="0" x:Name="PART_YesButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed">Yes</Button>
-                                            <Button Grid.Column="1" x:Name="PART_NoButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed">No</Button>
-                                            <Button Grid.Column="2" x:Name="PART_OkButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed">OK</Button>
-                                            <Button Grid.Column="3" x:Name="PART_CancelButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed">Cancel</Button>
+                                            <Button Grid.Column="0" x:Name="PART_YesButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed" Content="{TemplateBinding YesButtonContent}" />
+                                            <Button Grid.Column="1" x:Name="PART_NoButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed" Content="{TemplateBinding NoButtonContent}" />
+                                            <Button Grid.Column="2" x:Name="PART_OkButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed" Content="{TemplateBinding OkButtonContent}" />
+                                            <Button Grid.Column="3" x:Name="PART_CancelButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed" Content="{TemplateBinding CancelButtonContent}" />
                                         </Grid>
                                     </Grid>
                                 </Border>
