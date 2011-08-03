@@ -9,7 +9,7 @@ namespace Microsoft.Windows.Controls
     {
         #region Properties
 
-        public static readonly DependencyProperty BackButtonContentProperty = DependencyProperty.Register("BackButtonContent", typeof(object), typeof(Wizard), new UIPropertyMetadata("Back"));
+        public static readonly DependencyProperty BackButtonContentProperty = DependencyProperty.Register("BackButtonContent", typeof(object), typeof(Wizard), new UIPropertyMetadata("< Back"));
         public object BackButtonContent
         {
             get { return (object)GetValue(BackButtonContentProperty); }
@@ -102,6 +102,14 @@ namespace Microsoft.Windows.Controls
 
         #endregion //CurrentPage
 
+        public static readonly DependencyProperty ExteriorPanelMinWidthProperty = DependencyProperty.Register("ExteriorPanelMinWidth", typeof(double), typeof(Wizard), new UIPropertyMetadata(165.0));
+        public double ExteriorPanelMinWidth
+        {
+            get { return (double)GetValue(ExteriorPanelMinWidthProperty); }
+            set { SetValue(ExteriorPanelMinWidthProperty, value); }
+        }
+        
+
         public static readonly DependencyProperty FinishButtonClosesWindowProperty = DependencyProperty.Register("FinishButtonClosesWindow", typeof(bool), typeof(Wizard), new UIPropertyMetadata(true));
         public bool FinishButtonClosesWindow
         {
@@ -137,7 +145,7 @@ namespace Microsoft.Windows.Controls
             set { SetValue(HelpButtonVisibilityProperty, value); }
         }
 
-        public static readonly DependencyProperty NextButtonContentProperty = DependencyProperty.Register("NextButtonContent", typeof(object), typeof(Wizard), new UIPropertyMetadata("Next"));
+        public static readonly DependencyProperty NextButtonContentProperty = DependencyProperty.Register("NextButtonContent", typeof(object), typeof(Wizard), new UIPropertyMetadata("Next >"));
         public object NextButtonContent
         {
             get { return (object)GetValue(NextButtonContentProperty); }
