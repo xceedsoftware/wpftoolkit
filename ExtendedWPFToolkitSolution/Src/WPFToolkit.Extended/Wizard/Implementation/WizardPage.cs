@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Microsoft.Windows.Controls
 {
@@ -64,11 +65,39 @@ namespace Microsoft.Windows.Controls
             set { base.SetValue(DescriptionProperty, value); }
         }
 
+        public static readonly DependencyProperty ExteriorPanelBackgroundProperty = DependencyProperty.Register("ExteriorPanelBackground", typeof(Brush), typeof(WizardPage), new UIPropertyMetadata(null));
+        public Brush ExteriorPanelBackground
+        {
+            get { return (Brush)GetValue(ExteriorPanelBackgroundProperty); }
+            set { SetValue(ExteriorPanelBackgroundProperty, value); }
+        }        
+
+        public static readonly DependencyProperty ExteriorPanelContentProperty = DependencyProperty.Register("ExteriorPanelContent", typeof(object), typeof(WizardPage), new UIPropertyMetadata(null));
+        public object ExteriorPanelContent
+        {
+            get { return (object)GetValue(ExteriorPanelContentProperty); }
+            set { SetValue(ExteriorPanelContentProperty, value); }
+        }
+
         public static readonly DependencyProperty FinishButtonVisibilityProperty = DependencyProperty.Register("FinishButtonVisibility", typeof(WizardPageButtonVisibility), typeof(WizardPage), new UIPropertyMetadata(WizardPageButtonVisibility.Inherit));
         public WizardPageButtonVisibility FinishButtonVisibility
         {
             get { return (WizardPageButtonVisibility)GetValue(FinishButtonVisibilityProperty); }
             set { SetValue(FinishButtonVisibilityProperty, value); }
+        }
+
+        public static readonly DependencyProperty HeaderBackgroundProperty = DependencyProperty.Register("HeaderBackground", typeof(Brush), typeof(WizardPage), new UIPropertyMetadata(Brushes.White));
+        public Brush HeaderBackground
+        {
+            get { return (Brush)GetValue(HeaderBackgroundProperty); }
+            set { SetValue(HeaderBackgroundProperty, value); }
+        }
+
+        public static readonly DependencyProperty HeaderImageProperty = DependencyProperty.Register("HeaderImage", typeof(ImageSource), typeof(WizardPage), new UIPropertyMetadata(null));
+        public ImageSource HeaderImage
+        {
+            get { return (ImageSource)GetValue(HeaderImageProperty); }
+            set { SetValue(HeaderImageProperty, value); }
         }
 
         public static readonly DependencyProperty HelpButtonVisibilityProperty = DependencyProperty.Register("HelpButtonVisibility", typeof(WizardPageButtonVisibility), typeof(WizardPage), new UIPropertyMetadata(WizardPageButtonVisibility.Inherit));
@@ -97,7 +126,7 @@ namespace Microsoft.Windows.Controls
         {
             get { return (WizardPageType)GetValue(PageTypeProperty); }
             set { SetValue(PageTypeProperty, value); }
-        }        
+        }
 
         public static readonly DependencyProperty PreviousPageProperty = DependencyProperty.Register("PreviousPage", typeof(WizardPage), typeof(WizardPage), new UIPropertyMetadata(null));
         public WizardPage PreviousPage
