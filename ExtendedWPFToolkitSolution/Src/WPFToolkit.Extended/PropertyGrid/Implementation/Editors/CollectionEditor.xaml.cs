@@ -17,12 +17,6 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
             InitializeComponent();
         }
 
-        public CollectionEditor(bool isEditable) : this()
-        {
-            if (!isEditable)
-                _editorButton.Visibility = System.Windows.Visibility.Collapsed;
-        }
-
         public void Attach(PropertyItem propertyItem)
         {
             _item = propertyItem;

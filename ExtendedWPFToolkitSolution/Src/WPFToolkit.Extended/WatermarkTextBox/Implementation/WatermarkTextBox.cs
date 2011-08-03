@@ -57,15 +57,15 @@ namespace Microsoft.Windows.Controls
 
         protected override void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
         {
+            base.OnGotKeyboardFocus(e);
+
             if (SelectAllOnGotFocus)
                 SelectAll();
-
-            base.OnGotKeyboardFocus(e);
         }
 
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            if (!IsKeyboardFocused)
+            if (!IsKeyboardFocused && SelectAllOnGotFocus)
             {
                 e.Handled = true;
                 Focus();
