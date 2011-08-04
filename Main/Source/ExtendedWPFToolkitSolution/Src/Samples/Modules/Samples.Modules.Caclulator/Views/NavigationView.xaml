@@ -4,6 +4,10 @@
               xmlns:views="clr-namespace:Samples.Modules.Calculator.Views"
               Header="Calculator Controls" Tag="{x:Type views:HomeView}">
 
+    <TreeViewItem.Resources>
+        <Style TargetType="views:NavigationView" BasedOn="{StaticResource {x:Type TreeViewItem}}" />
+    </TreeViewItem.Resources>
+
     <TreeViewItem Header="Calculator" Tag="{x:Type views:CalculatorView}"/>
     <TreeViewItem Header="CalculatorUpDown" Tag="{x:Type views:CalculatorUpDownView}"/>
 

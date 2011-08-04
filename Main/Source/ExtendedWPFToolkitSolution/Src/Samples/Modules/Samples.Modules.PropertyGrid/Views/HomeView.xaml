@@ -1,28 +1,9 @@
-﻿<UserControl x:Class="Samples.Modules.PropertyGrid.Views.HomeView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended">
+﻿<infControls:DemoView x:Class="Samples.Modules.PropertyGrid.Views.HomeView"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"  
+                      xmlns:infControls="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
+                      Title="PropertyGrid"           >
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <!--<Button x:Name="_button" Content="Property Grid" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" />-->
-        <ListBox x:Name="_listBox"  Margin="20" MinWidth="150">
-
-        </ListBox>
-
-        <!--<extToolkit:PropertyGrid Grid.Column="1" Name="propertyGrid1" SelectedObject="{Binding ElementName=_button}"  />-->
-        <extToolkit:PropertyGrid Grid.Column="1" Name="propertyGrid1" SelectedObject="{Binding ElementName=_listBox, Path=SelectedItem}"  />
-        <!--<StackPanel  HorizontalAlignment="Center" VerticalAlignment="Center">
-            <extToolkit:PrimitiveTypeCollectionEditor x:Name="_editor" Width="150" Content="(Collection)"   />
-            <Button Click="Button_Click">
-                <Path Stroke="Black" SnapsToDevicePixels="true" StrokeThickness="1" Data="F0 M 0,0 L 6,6 M 0,3 L 3,6 " />
-            </Button>
-        </StackPanel>-->
-
+        <TextBlock Text="PropertyGrid View" />
     </Grid>
-</UserControl>
+</infControls:DemoView>

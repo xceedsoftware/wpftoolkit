@@ -4,4 +4,8 @@
               xmlns:views="clr-namespace:Samples.Modules.DateTime.Views"
               Header="DateTime" Tag="{x:Type views:HomeView}">
 
+    <TreeViewItem.Resources>
+        <Style TargetType="views:NavigationView" BasedOn="{StaticResource {x:Type TreeViewItem}}" />
+    </TreeViewItem.Resources>
+
 </TreeViewItem>

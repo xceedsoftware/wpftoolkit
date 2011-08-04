@@ -3,8 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
               xmlns:views="clr-namespace:Samples.Modules.Button.Views"
               Header="Button Controls" Tag="{x:Type views:HomeView}">
+    
+    <TreeViewItem.Resources>
+        <Style TargetType="views:NavigationView" BasedOn="{StaticResource {x:Type TreeViewItem}}" />
+    </TreeViewItem.Resources>
 
     <TreeViewItem Header="ButtonSpinner" Tag="{x:Type views:ButtonSpinnerView}"/>
+    <TreeViewItem Header="DropDownButton" />
     <TreeViewItem Header="SplitButton" Tag="{x:Type views:SplitButtonView}"/>
 
 </TreeViewItem>
