@@ -1,8 +1,10 @@
-﻿<UserControl x:Class="Samples.Modules.DateTime.Views.HomeView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended">
+﻿<infControls:DemoView x:Class="Samples.Modules.DateTime.Views.HomeView"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
+                      xmlns:infControls="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
+                      Title="DateTime Controls">
     <Grid>
-        <extToolkit:DateTimePicker Format="Custom" FormatString="HH:mm:ss"    />
+        <TextBlock Text="DateTime controls" /> 
     </Grid>
-</UserControl>
+</infControls:DemoView>

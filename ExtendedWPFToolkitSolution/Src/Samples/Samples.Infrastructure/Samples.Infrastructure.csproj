@@ -63,6 +63,11 @@
   <ItemGroup>
     <Compile Include="Commands\TreeViewCommandBehavior.cs" />
     <Compile Include="Commands\TreeViewSelected.cs" />
+    <Compile Include="Controls\DemoView.cs" />
+    <Compile Include="Converters\CSharpColorConverter.cs" />
+    <Compile Include="Converters\XamlColorConverter.cs" />
+    <Compile Include="Core\CodeFormatting\CSharpFormat.cs" />
+    <Compile Include="Core\CodeFormatting\XamlFormat.cs" />
     <Compile Include="Extensions\UnityContainerExtensions.cs" />
     <Compile Include="ModuleBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -79,6 +84,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="RegionNames.cs" />
+    <Compile Include="ViewModelBase.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -89,7 +95,12 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

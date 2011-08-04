@@ -127,7 +127,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetDir)*.*" "$(SolutionDir)Src\Samples\Samples\bin\$(ConfigurationName)\" /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetDir)*.*" "$(SolutionDir)Src\Samples\Samples\bin\$(ConfigurationName)\" /Y
+xcopy "$(ProjectDir)Views" "$(SolutionDir)Src\Samples\Samples\bin\$(ConfigurationName)\Samples\$(ProjectName)\" /s /Y /I</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -6,11 +6,11 @@ using Samples.Infrastructure;
 
 namespace Samples
 {
-    public class ShellViewModel : IShellViewModel
+    public class ShellViewModel : ViewModelBase, IShellViewModel
     {
         private readonly IRegionManager _regionManager;
 
-        public ICommand NavigateCommand { get; set; }
+        public ICommand NavigateCommand { get; set; }     
 
         public ShellViewModel(IRegionManager regionManager)
         {

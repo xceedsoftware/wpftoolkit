@@ -4,4 +4,8 @@
               xmlns:views="clr-namespace:Samples.Modules.Color.Views"
               Header="Color" Tag="{x:Type views:HomeView}">
 
+    <TreeViewItem.Resources>
+        <Style TargetType="views:NavigationView" BasedOn="{StaticResource {x:Type TreeViewItem}}" />
+    </TreeViewItem.Resources>
+
 </TreeViewItem>

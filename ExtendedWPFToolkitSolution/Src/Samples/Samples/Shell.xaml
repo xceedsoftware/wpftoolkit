@@ -1,64 +1,46 @@
-﻿<Window x:Class="Samples.Shell"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window x:Class="Samples.Shell" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:inf="clr-namespace:Samples.Infrastructure;assembly=Samples.Infrastructure"
         xmlns:infCommands="clr-namespace:Samples.Infrastructure.Commands;assembly=Samples.Infrastructure"
         xmlns:prism="http://www.codeplex.com/CompositeWPF"
+        Background="Black"
         Title="Extended WPF Toolkit - Samples" Height="768" Width="1024" >
-    <Window.Background>
-        <ImageBrush ImageSource="/Images/Background.jpg" />
-    </Window.Background>
+    <Grid>
+        <Image Source="/Images/Background.png" Stretch="None" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.RowSpan="2" />
+        <Grid Margin="15" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"  />
+                <RowDefinition />
+            </Grid.RowDefinitions>
 
-    <Window.Resources>
+            <Grid Margin="10,0,10,10">
+                <TextBlock Text="Extended WPF Toolkit" Foreground="WHite" FontSize="28" FontWeight="Bold"   />
+            </Grid>
 
-        <!--<Style TargetType="TreeViewItem">
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-        </Style>-->
-
-    </Window.Resources>
-
-    <Grid Margin="15" >
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"  />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-
-
-        <Grid Margin="10,0,10,10">
-            <TextBlock Text="Extended WPF Toolkit" Foreground="WHite" FontSize="28" FontWeight="Bold"   />
-        </Grid>
-
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <Border CornerRadius="5" BorderBrush="#FF666666" BorderThickness="1" >
-                <Border.Background>
-                    <LinearGradientBrush EndPoint="0.697,0.976" StartPoint="0.277,0.197">
-                        <GradientStop Color="#43000000" Offset="0"/>
-                        <GradientStop Color="#34394D" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
-                
-                <TreeView prism:RegionManager.RegionName="{x:Static inf:RegionNames.NavigationRegion}" 
+                <Border CornerRadius="5" BorderBrush="#FF666666" BorderThickness="1" >
+                    <TreeView prism:RegionManager.RegionName="{x:Static inf:RegionNames.NavigationRegion}" 
                           infCommands:TreeViewSelected.Command="{Binding NavigateCommand}" 
-                          BorderBrush="{x:Null}" Background="{x:Null}" 
-                          MinWidth="150" Margin="3">
-                    
-                    <!-- TODO: Style the TreeViewItems-->
+                          BorderBrush="{x:Null}" MinWidth="200" Margin="3">
+                        <TreeView.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#A1000000" Offset="0" />
+                                <GradientStop Color="Black" Offset="1" />
+                            </LinearGradientBrush>
+                        </TreeView.Background>
+                    </TreeView>
+                </Border>
 
-                </TreeView>
-                
-            </Border>
+                <Border Grid.Column="1" Margin="10,0,10,0" BorderBrush="Gray" BorderThickness="1" Background="#2C2E3E" CornerRadius="3">
+                    <ContentControl x:Name="MainContent" prism:RegionManager.RegionName="{x:Static inf:RegionNames.ContentRegion}" Margin="5,0,5,8" />
+                </Border>
 
-            <Border Grid.Column="1" Margin="10,0,10,0" BorderBrush="Gray" BorderThickness="1" Background="White"
-                CornerRadius="3">
-                <ContentControl prism:RegionManager.RegionName="{x:Static inf:RegionNames.ContentRegion}" Margin="5" />
-            </Border>
-
+            </Grid>
         </Grid>
-
     </Grid>
 </Window>
