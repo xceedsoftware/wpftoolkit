@@ -3,15 +3,15 @@ using Samples.Infrastructure.Controls;
 using Microsoft.Practices.Prism.Regions;
 using System.Windows.Data;
 
-namespace Samples.Modules.BusyIndicator
+namespace Samples.Modules.BusyIndicator.Views
 {
     /// <summary>
     /// Interaction logic for HomeView.xaml
     /// </summary>
     [RegionMemberLifetime(KeepAlive=false)]
-    public partial class HomeView : DemoView
+    public partial class BusyIndicatorView : DemoView
     {
-        public HomeView()
+        public BusyIndicatorView()
         {
             InitializeComponent();
         }

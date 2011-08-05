@@ -3,6 +3,8 @@ using Samples.Infrastructure;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Prism.Regions;
 using Samples.Infrastructure.Extensions;
+using Samples.Modules.BusyIndicator.NavigationItems;
+using Samples.Modules.BusyIndicator.Views;
 
 namespace Samples.Modules.BusyIndicator
 {
@@ -15,12 +17,14 @@ namespace Samples.Modules.BusyIndicator
 
         protected override void RegisterViewsAndTypes()
         {
-            Container.RegisterNavigationType(typeof(HomeView));
+            Container.RegisterNavigationType(typeof(BusyIndicatorView));
+            Container.RegisterNavigationType(typeof(BusyIndicatorCustomContentView));
+            Container.RegisterNavigationType(typeof(BusyIndicatorCustomContentTemplateView));
         }
 
         protected override void InitializeModule()
         {
-            RegionManager.RegisterViewWithRegion(RegionNames.NavigationRegion, typeof(NavigationView));
+            RegionManager.RegisterViewWithRegion(RegionNames.NavigationRegion, typeof(BusyIndicatorNavItem));
         }
     }
 }

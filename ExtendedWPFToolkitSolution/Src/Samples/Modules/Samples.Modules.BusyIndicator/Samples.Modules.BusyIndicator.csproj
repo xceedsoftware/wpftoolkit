@@ -59,11 +59,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BusyIndicatorModule.cs" />
-    <Compile Include="Views\HomeView.xaml.cs">
-      <DependentUpon>HomeView.xaml</DependentUpon>
+    <Compile Include="NavigationItems\BusyIndicatorNavItem.xaml.cs">
+      <DependentUpon>BusyIndicatorNavItem.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\NavigationView.xaml.cs">
-      <DependentUpon>NavigationView.xaml</DependentUpon>
+    <Compile Include="Views\BusyIndicatorCustomContentTemplateView.xaml.cs">
+      <DependentUpon>BusyIndicatorCustomContentTemplateView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BusyIndicatorCustomContentView.xaml.cs">
+      <DependentUpon>BusyIndicatorCustomContentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BusyIndicatorView.xaml.cs">
+      <DependentUpon>BusyIndicatorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -99,11 +105,23 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\HomeView.xaml">
+    <Page Include="NavigationItems\BusyIndicatorNavItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\NavigationView.xaml">
+    <Page Include="Resources\Common.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BusyIndicatorCustomContentTemplateView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BusyIndicatorCustomContentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BusyIndicatorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

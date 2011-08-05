@@ -4,6 +4,7 @@ using Microsoft.Practices.Prism.Regions;
 using Microsoft.Practices.Unity;
 using Samples.Infrastructure.Extensions;
 using Samples.Modules.Button.Views;
+using Samples.Modules.Button.NavigationItems;
 
 namespace Samples.Modules.Button
 {
@@ -14,13 +15,15 @@ namespace Samples.Modules.Button
 
         protected override void InitializeModule()
         {
-            RegionManager.RegisterViewWithRegion(RegionNames.NavigationRegion, typeof(NavigationView));
+            RegionManager.RegisterViewWithRegion(RegionNames.NavigationRegion, typeof(ButtonSpinnerNavItem));
+            RegionManager.RegisterViewWithRegion(RegionNames.NavigationRegion, typeof(DropDownButtonNavItem));
+            RegionManager.RegisterViewWithRegion(RegionNames.NavigationRegion, typeof(SplitButtonNavItem));
         }
 
         protected override void RegisterViewsAndTypes()
         {
-            Container.RegisterNavigationType(typeof(HomeView));
             Container.RegisterNavigationType(typeof(ButtonSpinnerView));
+            Container.RegisterNavigationType(typeof(DropDownButtonView));
             Container.RegisterNavigationType(typeof(SplitButtonView));
         }
     }
