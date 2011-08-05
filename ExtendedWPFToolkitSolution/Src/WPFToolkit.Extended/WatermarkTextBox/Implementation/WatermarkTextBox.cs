@@ -61,6 +61,8 @@ namespace Microsoft.Windows.Controls
 
             if (SelectAllOnGotFocus)
                 SelectAll();
+            else
+                SelectionLength = 0;                
         }
 
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
