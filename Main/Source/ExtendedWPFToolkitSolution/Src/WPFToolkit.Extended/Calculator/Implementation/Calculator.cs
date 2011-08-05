@@ -222,7 +222,11 @@ namespace Microsoft.Windows.Controls
 
         private void Calculator_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
-            Focus();
+            if (!IsFocused)
+            {
+                Focus();
+                e.Handled = true;
+            }
         }
 
         void Timer_Tick(object sender, EventArgs e)

@@ -4,6 +4,7 @@ using Microsoft.Practices.Prism.Regions;
 using Microsoft.Practices.Unity;
 using Samples.Infrastructure.Extensions;
 using Samples.Modules.Calculator.Views;
+using Samples.Modules.Calculator.NavigationItems;
 
 namespace Samples.Modules.Calculator
 {
@@ -14,12 +15,12 @@ namespace Samples.Modules.Calculator
 
         protected override void InitializeModule()
         {
-            RegionManager.RegisterViewWithRegion(RegionNames.NavigationRegion, typeof(NavigationView));
+            RegionManager.RegisterViewWithRegion(RegionNames.NavigationRegion, typeof(CalculatorNavItem));
+            RegionManager.RegisterViewWithRegion(RegionNames.NavigationRegion, typeof(CalculatorUpDownNavItem));
         }
 
         protected override void RegisterViewsAndTypes()
         {
-            Container.RegisterNavigationType(typeof(HomeView));
             Container.RegisterNavigationType(typeof(CalculatorView));
             Container.RegisterNavigationType(typeof(CalculatorUpDownView));
         }

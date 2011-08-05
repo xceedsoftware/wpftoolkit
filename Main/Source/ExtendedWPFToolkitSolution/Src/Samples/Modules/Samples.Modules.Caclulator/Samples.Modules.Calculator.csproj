@@ -62,11 +62,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CalculatorModule.cs" />
-    <Compile Include="Views\HomeView.xaml.cs">
-      <DependentUpon>HomeView.xaml</DependentUpon>
+    <Compile Include="NavigationItems\CalculatorNavItem.xaml.cs">
+      <DependentUpon>CalculatorNavItem.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\NavigationView.xaml.cs">
-      <DependentUpon>NavigationView.xaml</DependentUpon>
+    <Compile Include="NavigationItems\CalculatorUpDownNavItem.xaml.cs">
+      <DependentUpon>CalculatorUpDownNavItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -108,13 +108,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\HomeView.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="NavigationItems\CalculatorNavItem.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\NavigationView.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="NavigationItems\CalculatorUpDownNavItem.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\CalculatorUpDownView.xaml">
       <SubType>Designer</SubType>
