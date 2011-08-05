@@ -120,7 +120,9 @@
                         <Grid>
                             <TabControl TabStripPlacement="Top" Style="{StaticResource TabControlStyle}" >
                                 <TabItem Header="Sample" Style="{StaticResource TabItemStyle}">
-                                    <ContentPresenter Margin="10"  />
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" >
+                                        <ContentPresenter Margin="10" ScrollViewer.CanContentScroll="True"  />
+                                    </ScrollViewer>
                                 </TabItem>
                                 <TabItem Header="XAML" Style="{StaticResource TabItemStyle}">
                                     <ContentPresenter x:Name="_xamlCode" Content="{Binding XamlText, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource XamlColorConverter}}"
