@@ -20,6 +20,7 @@ namespace Samples.Modules.Text
         protected override void RegisterViewsAndTypes()
         {
             Container.RegisterNavigationType(typeof(HomeView));
+            Container.RegisterNavigationType(typeof(WatermarkTextBoxView));
         }
     }
 }
