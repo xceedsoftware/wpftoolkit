@@ -2,13 +2,8 @@
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:infControls="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
-                      xmlns:infConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters;assembly=WPFToolkit.Extended"
                       xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
-                      Title="DropDownButton" >
-    <infControls:DemoView.Resources>
-        <infConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
-    </infControls:DemoView.Resources>
-    
+                      Title="DropDownButton" >    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
