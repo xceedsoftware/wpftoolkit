@@ -62,6 +62,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ButtonModule.cs" />
+    <Compile Include="NavigationItems\ButtonSpinnerNavItem.xaml.cs">
+      <DependentUpon>ButtonSpinnerNavItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NavigationItems\DropDownButtonNavItem.xaml.cs">
+      <DependentUpon>DropDownButtonNavItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NavigationItems\SplitButtonNavItem.xaml.cs">
+      <DependentUpon>SplitButtonNavItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ButtonSpinnerView.xaml.cs">
       <DependentUpon>ButtonSpinnerView.xaml</DependentUpon>
     </Compile>
@@ -78,11 +87,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Views\HomeView.xaml.cs">
-      <DependentUpon>HomeView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\NavigationView.xaml.cs">
-      <DependentUpon>NavigationView.xaml</DependentUpon>
+    <Compile Include="Views\DropDownButtonView.xaml.cs">
+      <DependentUpon>DropDownButtonView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SplitButtonView.xaml.cs">
       <DependentUpon>SplitButtonView.xaml</DependentUpon>
@@ -98,17 +104,25 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="NavigationItems\ButtonSpinnerNavItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NavigationItems\DropDownButtonNavItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NavigationItems\SplitButtonNavItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ButtonSpinnerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\HomeView.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="Views\DropDownButtonView.xaml">
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\NavigationView.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SplitButtonView.xaml">
       <SubType>Designer</SubType>

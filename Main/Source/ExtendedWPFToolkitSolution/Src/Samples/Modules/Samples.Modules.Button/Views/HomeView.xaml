@@ -1,9 +1,0 @@
-﻿<infControls:DemoView x:Class="Samples.Modules.Button.Views.HomeView"
-                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:infControls="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
-                      Title="Button Controls">
-    <Grid>
-       
-    </Grid>
-</infControls:DemoView>

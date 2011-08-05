@@ -1,0 +1,14 @@
+﻿<TreeViewItem x:Class="Samples.Modules.BusyIndicator.NavigationItems.BusyIndicatorNavItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:navItems="clr-namespace:Samples.Modules.BusyIndicator.NavigationItems"
+              xmlns:views="clr-namespace:Samples.Modules.BusyIndicator.Views"
+              Header="BusyIndicator" Tag="{x:Type views:BusyIndicatorView}">
+    <TreeViewItem.Resources>
+        <Style TargetType="navItems:BusyIndicatorNavItem" BasedOn="{StaticResource {x:Type TreeViewItem}}" />
+    </TreeViewItem.Resources>
+
+    <TreeViewItem Header="Custom Content" Tag="{x:Type views:BusyIndicatorCustomContentView}" />
+    <TreeViewItem Header="Custom Content Template" Tag="{x:Type views:BusyIndicatorCustomContentTemplateView}" />
+    
+</TreeViewItem>
