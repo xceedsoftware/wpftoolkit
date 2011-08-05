@@ -11,5 +11,6 @@
     <TreeViewItem Header="MaskedTextBox" />
     <TreeViewItem Header="MultiLineTextEditor" />
     <TreeViewItem Header="RichTextBox" />
+    <TreeViewItem Header="WatermarkTextBox" Tag="{x:Type views:WatermarkTextBoxView}" />
 
 </TreeViewItem>

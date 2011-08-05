@@ -5,6 +5,7 @@
         
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/TextBlockStyles.xaml"   />
                 <ResourceDictionary Source="/Resources/TreeViewStyles.xaml"   />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

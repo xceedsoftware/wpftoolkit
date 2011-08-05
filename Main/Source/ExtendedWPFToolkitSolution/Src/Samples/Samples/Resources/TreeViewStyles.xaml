@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-
+    
     <SolidColorBrush x:Key="HighlightFill" Color="#59FFFFFF"/>
     <LinearGradientBrush x:Key="SelectedFill" EndPoint="0,1" StartPoint="0,0">
         <GradientStop Color="#59FFFFFF" Offset="0"/>
