@@ -7,17 +7,24 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <TextBlock Text="The WatermarkTextBox is simply a TextBox that allows you to sepcify an object, usually a String, to represent null or missing text." />
-        
-        <StackPanel Grid.Row="1" Margin="10">
+
+        <GroupBox Header="Features" Grid.Row="1" >
+            <Grid Margin="5">
+                <CheckBox x:Name="_selectAll" Content="SelectAllOnGotFocus" VerticalAlignment="Center" Margin="5" ToolTip="Selects all text in the WatermarkTextBox when it receives focus." />
+            </Grid>
+        </GroupBox>
+
+        <StackPanel Grid.Row="2" Margin="10">
             <TextBlock Text="Default:" Style="{StaticResource Header}" />
-            <extToolkit:WatermarkTextBox Grid.Column="1" Margin="5" Watermark="Enter Text" />
+            <extToolkit:WatermarkTextBox Grid.Column="1" Margin="5" MinWidth="200" Watermark="Enter Text" SelectAllOnGotFocus="{Binding IsChecked, ElementName=_selectAll}"/>
 
             <TextBlock Text="Image Watermark:" Style="{StaticResource Header}" />
-            <extToolkit:WatermarkTextBox Grid.Column="1" Margin="5" >
+            <extToolkit:WatermarkTextBox Grid.Column="1" Margin="5" SelectAllOnGotFocus="{Binding IsChecked, ElementName=_selectAll}" >
                 <extToolkit:WatermarkTextBox.Watermark>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Samples.Modules.Text;component/Images/PencilTool16.png" Stretch="None" />
@@ -27,7 +34,7 @@
             </extToolkit:WatermarkTextBox>
 
             <TextBlock Grid.Row="2" Text="Custom WatermarkTemplate:" Style="{StaticResource Header}" />
-            <extToolkit:WatermarkTextBox Grid.Row="2" Grid.Column="1" Margin="5" Watermark="Enter Text">
+            <extToolkit:WatermarkTextBox Grid.Row="2" Grid.Column="1" Margin="5" Watermark="Enter Text" SelectAllOnGotFocus="{Binding IsChecked, ElementName=_selectAll}">
                 <extToolkit:WatermarkTextBox.WatermarkTemplate>
                     <DataTemplate>
                         <Border BorderBrush="Green" BorderThickness="1" Padding="5" >
