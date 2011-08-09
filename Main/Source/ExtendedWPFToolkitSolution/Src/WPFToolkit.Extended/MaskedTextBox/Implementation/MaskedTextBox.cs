@@ -339,6 +339,13 @@ namespace Microsoft.Windows.Controls
                 e.Handled = true;
             }
 
+            //if all text is selected and the user begins to type, we want to delete all selected text and continue typing the new values
+            if (SelectionLength == Text.Length)
+            {
+                if (provider.RemoveAt(position, endposition))
+                    UpdateText(provider, position);
+            }
+
             base.OnPreviewKeyDown(e);
         }
 
