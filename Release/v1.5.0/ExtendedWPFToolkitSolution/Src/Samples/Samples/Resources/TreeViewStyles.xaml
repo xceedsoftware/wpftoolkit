@@ -1,0 +1,231 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <SolidColorBrush x:Key="HighlightFill" Color="#59FFFFFF"/>
+    <LinearGradientBrush x:Key="SelectedFill" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#59FFFFFF" Offset="0"/>
+        <GradientStop Color="#33FFFFFF" Offset="1"/>
+        <GradientStop Color="#19FFFFFF" Offset="0.5"/>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="ForegroundHighlightFill" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="ForegroundFill" Color="#FFFFFFFF"/>
+    <LinearGradientBrush x:Key="GlyphFill" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#FFFFFFFF" Offset="0"/>
+        <GradientStop Color="#FF959595" Offset="1"/>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="ControlFill" Color="#00FFFFFF"/>
+    <SolidColorBrush x:Key="CommonFill" Color="#00FFFFFF"/>
+
+    <Style x:Key="TreeViewItemToggleButton" TargetType="{x:Type ToggleButton}">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ToggleButton}">
+                    <ControlTemplate.Resources>
+                        <Storyboard x:Key="ExpandIndicatorIsChecked">
+                            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="path" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)">
+                                <SplineDoubleKeyFrame KeyTime="00:00:00.2000000" Value="90"/>
+                            </DoubleAnimationUsingKeyFrames>
+                            <ThicknessAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="path" Storyboard.TargetProperty="(FrameworkElement.Margin)">
+                                <SplineThicknessKeyFrame KeyTime="00:00:00.2000000" Value="0,1,0,0"/>
+                            </ThicknessAnimationUsingKeyFrames>
+                        </Storyboard>
+                        <Storyboard x:Key="ExpandIndicatorIsCheckedFalse">
+                            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="path" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)">
+                                <SplineDoubleKeyFrame KeyTime="00:00:00" Value="90"/>
+                                <SplineDoubleKeyFrame KeyTime="00:00:00.2000000" Value="0"/>
+                            </DoubleAnimationUsingKeyFrames>
+                            <ThicknessAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="path" Storyboard.TargetProperty="(FrameworkElement.Margin)">
+                                <SplineThicknessKeyFrame KeyTime="00:00:00" Value="1,0,0,0"/>
+                                <SplineThicknessKeyFrame KeyTime="00:00:00.2000000" Value="2,0,0,0"/>
+                            </ThicknessAnimationUsingKeyFrames>
+                            <BooleanAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="grid" Storyboard.TargetProperty="(UIElement.SnapsToDevicePixels)">
+                                <DiscreteBooleanKeyFrame KeyTime="00:00:00.2000000" Value="True"/>
+                            </BooleanAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </ControlTemplate.Resources>
+                    <Grid Width="15" Height="13" Background="Transparent" x:Name="grid">
+                        <Ellipse Width="12" Height="12" Fill="{TemplateBinding Background}" Stroke="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Path HorizontalAlignment="Center" VerticalAlignment="Center" Height="6" Width="6" Stretch="Fill" Opacity="1" 
+                              Data="M303,349 C303,349 303,345 303,345 303,345 309.04167,347 309.04167,347 309.04167,347 303,349 303,349 z" Fill="{TemplateBinding Foreground}" Margin="2,0,0,0" x:Name="path" RenderTransformOrigin="0.5,0.5">
+                            <Path.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                    <SkewTransform AngleX="0" AngleY="0"/>
+                                    <RotateTransform Angle="0"/>
+                                    <TranslateTransform X="0" Y="0"/>
+                                </TransformGroup>
+                            </Path.RenderTransform>
+                        </Path>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Trigger.ExitActions>
+                                <BeginStoryboard x:Name="ExpandIndicatorIsCheckedFalse_BeginStoryboard1" Storyboard="{StaticResource ExpandIndicatorIsCheckedFalse}"/>
+                            </Trigger.ExitActions>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource ExpandIndicatorIsChecked}" x:Name="ExpandIndicatorIsChecked_BeginStoryboard"/>
+                            </Trigger.EnterActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Foreground" Value="{StaticResource GlyphFill}"/>
+        <Setter Property="Background" Value="{StaticResource ControlFill}"/>
+    </Style>
+
+    <Style TargetType="{x:Type TreeViewItem}">
+        <Setter Property="Background" Value="{StaticResource CommonFill}"/>
+        <Setter Property="HorizontalContentAlignment" Value="{Binding Path=HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+        <Setter Property="VerticalContentAlignment" Value="{Binding Path=VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+        <Setter Property="Padding" Value="1,0,0,0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                    <ControlTemplate.Resources>
+                        <Storyboard x:Key="TreeItemIsExpanded">
+                            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="ItemsHost" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                <SplineDoubleKeyFrame KeyTime="00:00:00.2000000" Value="1"/>
+                            </DoubleAnimationUsingKeyFrames>
+                        </Storyboard>
+                        <Storyboard x:Key="MouseOver">
+                            <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Selection_Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)">
+                                <SplineColorKeyFrame KeyTime="00:00:00" Value="#4CFFFFFF"/>
+                            </ColorAnimationUsingKeyFrames>
+                            <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Selection_Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)">
+                                <SplineColorKeyFrame KeyTime="00:00:00" Value="#4CFFFFFF"/>
+                            </ColorAnimationUsingKeyFrames>
+                            <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Selection_Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)">
+                                <SplineColorKeyFrame KeyTime="00:00:00" Value="#4CFFFFFF"/>
+                            </ColorAnimationUsingKeyFrames>
+                        </Storyboard>
+                        <Storyboard x:Key="MouseOut">
+                            <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Selection_Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)">
+                                <SplineColorKeyFrame KeyTime="00:00:00.2000000" Value="#00FFFFFF"/>
+                            </ColorAnimationUsingKeyFrames>
+                            <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Selection_Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)">
+                                <SplineColorKeyFrame KeyTime="00:00:00.2000000" Value="#00FFFFFF"/>
+                            </ColorAnimationUsingKeyFrames>
+                            <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Selection_Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)">
+                                <SplineColorKeyFrame KeyTime="00:00:00.2000000" Value="#00FFFFFF"/>
+                            </ColorAnimationUsingKeyFrames>
+                        </Storyboard>
+                        <Storyboard x:Key="ItemSelected">
+                            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="SelectedRect" Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[2].(GradientStop.Offset)">
+                                <SplineDoubleKeyFrame KeyTime="00:00:00.2000000" Value="0.5"/>
+                            </DoubleAnimationUsingKeyFrames>
+                            <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="SelectedRect" Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[0].(GradientStop.Color)">
+                                <SplineColorKeyFrame KeyTime="00:00:00.2000000" Value="#59FFFFFF"/>
+                            </ColorAnimationUsingKeyFrames>
+                            <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="SelectedRect" Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[2].(GradientStop.Color)">
+                                <SplineColorKeyFrame KeyTime="00:00:00.2000000" Value="#0CFFFFFF"/>
+                            </ColorAnimationUsingKeyFrames>
+                            <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="SelectedRect" Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[1].(GradientStop.Color)">
+                                <SplineColorKeyFrame KeyTime="00:00:00.2000000" Value="#33FFFFFF"/>
+                            </ColorAnimationUsingKeyFrames>
+                        </Storyboard>
+                        <Storyboard x:Key="ItemDeselected">
+                            <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="SelectedRect" Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[0].(GradientStop.Color)">
+                                <SplineColorKeyFrame KeyTime="00:00:00.2000000" Value="#00FFFFFF"/>
+                            </ColorAnimationUsingKeyFrames>
+                            <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="SelectedRect" Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[2].(GradientStop.Color)">
+                                <SplineColorKeyFrame KeyTime="00:00:00.2000000" Value="#00FFFFFF"/>
+                            </ColorAnimationUsingKeyFrames>
+                            <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="SelectedRect" Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[1].(GradientStop.Color)">
+                                <SplineColorKeyFrame KeyTime="00:00:00.2000000" Value="#00FFFFFF"/>
+                            </ColorAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </ControlTemplate.Resources>
+                    <DockPanel SnapsToDevicePixels="True">
+                        <Grid x:Name="HeaderContainer" Background="Transparent" DockPanel.Dock="Top">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Column="0" x:Name="Selection_Border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" Grid.ColumnSpan="2" Grid.Row="0" Grid.RowSpan="1" Opacity="1">
+                                <Border.Background>
+                                    <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                        <GradientStop Color="#00FFFFFF" Offset="0"/>
+                                        <GradientStop Color="#00FFFFFF" Offset="1"/>
+                                        <GradientStop Color="#00FFFFFF" Offset="0.5"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                            <Rectangle Stroke="{x:Null}" HorizontalAlignment="Stretch" Width="Auto" Grid.Column="0" Grid.RowSpan="1" Grid.ColumnSpan="2" x:Name="SelectedRect">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                        <GradientStop Color="#00FFFFFF" Offset="0"/>
+                                        <GradientStop Color="#00FFFFFF" Offset="1"/>
+                                        <GradientStop Color="#00FFFFFF" Offset="0.533"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <ContentPresenter x:Name="PART_Header" ContentSource="Header" Width="Auto" VerticalAlignment="Center" Grid.ColumnSpan="1" Grid.Column="1" Margin="3,0,0,0"/>
+                            <ToggleButton x:Name="Expander"  Style="{StaticResource TreeViewItemToggleButton}" IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press" VerticalAlignment="Center" Margin="0,3,0,3"/>
+                        </Grid>
+                        <ItemsPresenter x:Name="ItemsHost" HorizontalAlignment="Stretch" Height="Auto" Opacity="0" Margin="14,1,0,0"/>
+                    </DockPanel>
+                    <ControlTemplate.Triggers>
+
+                        <DataTrigger Binding="{Binding Path=Parent.Parent, RelativeSource={RelativeSource TemplatedParent}}" Value="{x:Null}">
+                            <Setter TargetName="ItemsHost" Property="Margin" Value="15,1,0,0" />
+                        </DataTrigger>
+
+                        <Trigger SourceName="HeaderContainer" Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource MouseOver}" x:Name="MouseOver_BeginStoryboard_HitTestArea"/>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard Storyboard="{StaticResource MouseOut}" x:Name="MouseOut_BeginStoryboard_HitTestArea"/>
+                            </Trigger.ExitActions>
+                        </Trigger>
+
+
+                        <Trigger Property="IsExpanded" Value="false">
+                            <Setter Property="Visibility" Value="Collapsed" TargetName="ItemsHost"/>
+                        </Trigger>
+                        <Trigger Property="IsExpanded" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource TreeItemIsExpanded}" x:Name="TreeItemIsExpanded_BeginStoryboard"/>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <StopStoryboard BeginStoryboardName="TreeItemIsExpanded_BeginStoryboard"/>
+                            </Trigger.ExitActions>
+                            <Setter Property="Margin" Value="0,0,0,0"/>
+                            <Setter Property="Grid.RowSpan" TargetName="Selection_Border" Value="1"/>
+                        </Trigger>
+                        <Trigger Property="HasItems" Value="false">
+                            <Setter Property="Visibility" Value="Hidden" TargetName="Expander"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="true">
+                            <Trigger.ExitActions>
+                                <BeginStoryboard x:Name="ItemDeselected_BeginStoryboard1" Storyboard="{StaticResource ItemDeselected}"/>
+                            </Trigger.ExitActions>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource ItemSelected}" x:Name="ItemSelected_BeginStoryboard"/>
+                            </Trigger.EnterActions>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="true"/>
+                                <Condition Property="IsSelectionActive" Value="false"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" Value="{StaticResource SelectedFill}"/>
+                            <Setter Property="Foreground" Value="{StaticResource ForegroundHighlightFill}"/>
+                        </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Margin" Value="0,0,0,1"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundFill}"/>
+    </Style>
+
+</ResourceDictionary>
