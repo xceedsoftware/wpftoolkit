@@ -512,6 +512,10 @@ namespace Microsoft.Windows.Controls
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Button button = e.OriginalSource as Button;
+
+            if (button == null)
+                return;
+
             switch (button.Name)
             {
                 case "PART_NoButton":
