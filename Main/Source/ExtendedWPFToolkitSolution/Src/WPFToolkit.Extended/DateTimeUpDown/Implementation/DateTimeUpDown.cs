@@ -15,6 +15,7 @@ namespace Microsoft.Windows.Controls
         private List<DateTimeInfo> _dateTimeInfoList = new List<DateTimeInfo>();
         private DateTimeInfo _selectedDateTimeInfo;
         private bool _fireSelectionChangedEvent = true;
+        private bool _processTextChanged = true;
 
         private DateTimeParser _dateTimeParser;
 
@@ -55,10 +56,7 @@ namespace Microsoft.Windows.Controls
         {
             _dateTimeParser.Format = GetFormatString(newValue);
             InitializeDateTimeInfoListAndParseValue();
-
-            //I forgot why I set the text here. I believe it had to deal with databinding to the format. Either way we need to make sure there is a value before we try to set the text.
-            if (Value.HasValue)
-                Text = ConvertValueToText();
+            UpdateTextFormatting();
         }
 
         #endregion //Format
@@ -86,6 +84,7 @@ namespace Microsoft.Windows.Controls
 
             _dateTimeParser.Format = newValue;
             InitializeDateTimeInfoListAndParseValue();
+            UpdateTextFormatting();
         }
 
         #endregion //FormatString
@@ -178,6 +177,9 @@ namespace Microsoft.Windows.Controls
 
         protected override void OnTextChanged(string previousValue, string currentValue)
         {
+            if (!_processTextChanged)
+                return;
+
             //TODO: clean this up and make sure it doesn't fire recursively
             if (String.IsNullOrEmpty(currentValue))
             {
@@ -556,6 +558,16 @@ namespace Microsoft.Windows.Controls
             //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event
             TextBox.Select(info.StartPosition, info.Length);
             _fireSelectionChangedEvent = true;
+        }
+
+        private void UpdateTextFormatting()
+        {
+            _processTextChanged = false;
+
+            if (Value.HasValue)
+                Text = ConvertValueToText();
+
+            _processTextChanged = true;
         }
 
         #endregion //Methods
