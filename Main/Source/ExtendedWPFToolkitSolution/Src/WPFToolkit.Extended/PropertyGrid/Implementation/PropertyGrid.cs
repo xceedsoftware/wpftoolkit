@@ -24,6 +24,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #region Properties
 
+        #region AdvancedOptionsMenu
+
+        public static readonly DependencyProperty AdvancedOptionsMenuProperty = DependencyProperty.Register("AdvancedOptionsMenu", typeof(ContextMenu), typeof(PropertyGrid), new UIPropertyMetadata(null));
+        public ContextMenu AdvancedOptionsMenu
+        {
+            get { return (ContextMenu)GetValue(AdvancedOptionsMenuProperty); }
+            set { SetValue(AdvancedOptionsMenuProperty, value); }
+        }
+        
+        #endregion //AdvancedOptionsMenu
+
         #region CustomTypeEditors
 
         public static readonly DependencyProperty CustomTypeEditorsProperty = DependencyProperty.Register("CustomTypeEditors", typeof(CustomTypeEditorCollection), typeof(PropertyGrid), new UIPropertyMetadata(new CustomTypeEditorCollection()));

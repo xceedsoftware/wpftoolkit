@@ -249,6 +249,10 @@
         </Setter>
     </Style>
 
+    <ContextMenu x:Key="DefaultAdvancedOptionsMenu">
+        <MenuItem Header="Reset Value" Command="commands:PropertyItemCommands.ResetValue" />
+    </ContextMenu>
+
     <Style TargetType="{x:Type local:PropertyItem}">
         <Setter Property="BorderBrush" Value="#FFF0F0F0" />
         <Setter Property="BorderThickness" Value="1" />
@@ -257,12 +261,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:PropertyItem}">
-                    <ControlTemplate.Resources>
-                        <ContextMenu x:Key="ContextMenu">
-                            <MenuItem Header="Reset Value" Command="commands:PropertyItemCommands.ResetValue" />
-                        </ContextMenu>
-                    </ControlTemplate.Resources>
-                    <Border Background="White" ContextMenu="{StaticResource ContextMenu}" ContextMenuService.Placement="Bottom">
+                    <Border Background="White" ContextMenu="{Binding AdvancedOptionsMenu, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:PropertyGrid}}" ContextMenuService.Placement="Bottom">
                         <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="{Binding NameColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGrid}}}"/>
@@ -280,7 +279,7 @@
 
                                     <Grid Grid.Column="1" HorizontalAlignment="Right" Margin="5,0,5,0"  Visibility="{Binding ShowAdvancedOptions, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:PropertyGrid}, Converter={StaticResource BooleanToVisibilityConverter}}"
                                           utilities:ContextMenuUtilities.OpenOnMouseLeftButtonClick="True"
-                                          ContextMenu="{StaticResource ContextMenu}" >
+                                          ContextMenu="{Binding AdvancedOptionsMenu, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:PropertyGrid}}" >
 
                                         <Image x:Name="_optionsImage" Width="11" Height="11"
                                                Source="{Binding ValueSource, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ValueSourceToImagePathConverter}}"
@@ -321,6 +320,7 @@
     </Style>
 
     <Style TargetType="{x:Type local:PropertyGrid}">
+        <Setter Property="AdvancedOptionsMenu" Value="{StaticResource DefaultAdvancedOptionsMenu}" />
         <Setter Property="Background" Value="#CED4DF" />
         <Setter Property="BorderBrush" Value="#43577B" />
         <Setter Property="BorderThickness" Value="1" />
