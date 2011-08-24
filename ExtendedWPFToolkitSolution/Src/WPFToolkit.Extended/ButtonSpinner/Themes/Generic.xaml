@@ -10,14 +10,7 @@
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
     <SolidColorBrush x:Key="SpinButtonGlyphNormalForegroundFillKey" Color="#FF000000" />
-
-    <DataTemplate x:Key="IncreaseGlyph">
-        <Path Width="7" Height="4" Data="M 0,3 C0,3 0,4 0,4 0,4 3,4 3,4 3,4 3,3 3,3 3,3 4,3 4,3 4,3 4,4 4,4 4,4 7,4 7,4 7,4 7,3 7,3 7,3 6,3 6,3 6,3 6,2 6,2 6,2 5,2 5,2 5,2 5,1 5,1 5,1 4,1 4,1 4,1 4,0 4,0 4,0 3,0 3,0 3,0 3,1 3,1 3,1 2,1 2,1 2,1 2,2 2,2 2,2 1,2 1,2 1,2 1,3 1,3 1,3 0,3 0,3 z" Fill="{StaticResource SpinButtonGlyphNormalForegroundFillKey}"/>
-    </DataTemplate>
-
-    <DataTemplate x:Key="DecreaseGlyph">
-        <Path Width="7" Height="4" Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z" Fill="{StaticResource SpinButtonGlyphNormalForegroundFillKey}"/>
-    </DataTemplate>
+    <SolidColorBrush x:Key="SpinButtonGlyphDisabledForegroundFillKey" Color="DarkGray" />
 
     <Style TargetType="{x:Type local:ButtonSpinner}">
         <Setter Property="Focusable" Value="False" />
@@ -59,7 +52,9 @@
                                                                  RenderEnabled="{TemplateBinding IsEnabled}"
                                                                  RenderMouseOver="{Binding IsMouseOver, ElementName=IncreaseButton}"
                                                                  RenderPressed="{Binding IsPressed, ElementName=IncreaseButton}">
-                                                <ContentControl ContentTemplate="{StaticResource IncreaseGlyph}" Margin="5,1" Focusable="False" />
+                                                <Path x:Name="_increaseGlyph" Width="7" Height="4" Data="M 0,3 C0,3 0,4 0,4 0,4 3,4 3,4 3,4 3,3 3,3 3,3 4,3 4,3 4,3 4,4 4,4 4,4 7,4 7,4 7,4 7,3 7,3 7,3 6,3 6,3 6,3 6,2 6,2 6,2 5,2 5,2 5,2 5,1 5,1 5,1 4,1 4,1 4,1 4,0 4,0 4,0 3,0 3,0 3,0 3,1 3,1 3,1 2,1 2,1 2,1 2,2 2,2 2,2 1,2 1,2 1,2 1,3 1,3 1,3 0,3 0,3 z" 
+                                                      Fill="{StaticResource SpinButtonGlyphNormalForegroundFillKey}"
+                                                      Margin="5,1" Focusable="False" />
                                             </chrome:ButtonChrome>
                                         </Grid>
                                     </RepeatButton>
@@ -74,7 +69,9 @@
                                                                  RenderEnabled="{TemplateBinding IsEnabled}"
                                                                  RenderMouseOver="{Binding IsMouseOver, ElementName=DecreaseButton}"
                                                                  RenderPressed="{Binding IsPressed, ElementName=DecreaseButton}" >
-                                                <ContentControl ContentTemplate="{StaticResource DecreaseGlyph}" Margin="5,1" Focusable="False" />
+                                                <Path x:Name="_decreaseGlyph" Width="7" Height="4" Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z" 
+                                                      Fill="{StaticResource SpinButtonGlyphNormalForegroundFillKey}"
+                                                      Margin="5,1" Focusable="False" />
                                             </chrome:ButtonChrome>
                                         </Grid>
                                     </RepeatButton>
@@ -86,6 +83,12 @@
                             </DockPanel>
                         </Border>
                     </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="_increaseGlyph" Property="Fill" Value="{StaticResource SpinButtonGlyphDisabledForegroundFillKey}" />
+                            <Setter TargetName="_decreaseGlyph" Property="Fill" Value="{StaticResource SpinButtonGlyphDisabledForegroundFillKey}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
