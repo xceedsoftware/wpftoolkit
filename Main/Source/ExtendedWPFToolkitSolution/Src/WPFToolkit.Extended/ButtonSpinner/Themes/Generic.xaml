@@ -41,7 +41,7 @@
                                         <RowDefinition Height="1" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <RepeatButton x:Name="IncreaseButton" SnapsToDevicePixels="True" Grid.Row="0" ClickMode="Press" IsTabStop="{Binding IsTabStop, RelativeSource={RelativeSource TemplatedParent}}" Focusable="{Binding IsTabStop, RelativeSource={RelativeSource TemplatedParent}}" >
+                                    <RepeatButton x:Name="IncreaseButton" SnapsToDevicePixels="True" Grid.Row="0" ClickMode="Press" IsTabStop="{Binding IsTabStop, RelativeSource={RelativeSource TemplatedParent}}" >
                                         <RepeatButton.Template>
                                             <ControlTemplate TargetType="RepeatButton">
                                                 <ContentPresenter />
@@ -58,7 +58,7 @@
                                             </chrome:ButtonChrome>
                                         </Grid>
                                     </RepeatButton>
-                                    <RepeatButton x:Name="DecreaseButton" SnapsToDevicePixels="True" Grid.Row="2" ClickMode="Press" IsTabStop="{Binding IsTabStop, RelativeSource={RelativeSource TemplatedParent}}" Focusable="{Binding IsTabStop, RelativeSource={RelativeSource TemplatedParent}}">
+                                    <RepeatButton x:Name="DecreaseButton" SnapsToDevicePixels="True" Grid.Row="2" ClickMode="Press" IsTabStop="{Binding IsTabStop, RelativeSource={RelativeSource TemplatedParent}}" >
                                         <RepeatButton.Template>
                                             <ControlTemplate TargetType="RepeatButton">
                                                 <ContentPresenter />
