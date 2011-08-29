@@ -83,8 +83,8 @@ namespace Microsoft.Windows.Controls
 
         protected override void OnPreviewMouseUp(MouseButtonEventArgs e)
         {
-            if (Mouse.Captured is CalendarItem) 
-                Mouse.Capture(null);  
+            if (Mouse.Captured is CalendarItem)
+                Mouse.Capture(null);
         }
 
         protected override void OnValueChanged(DateTime? oldValue, DateTime? newValue)
@@ -96,6 +96,13 @@ namespace Microsoft.Windows.Controls
             }
 
             base.OnValueChanged(oldValue, newValue);
+        }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            //if the calendar is open then we don't want to modify the behavior of navigating the calendar control with the Up/Down keys.
+            if (!IsOpen)
+                base.OnPreviewKeyDown(e);
         }
 
         #endregion //Base Class Overrides
