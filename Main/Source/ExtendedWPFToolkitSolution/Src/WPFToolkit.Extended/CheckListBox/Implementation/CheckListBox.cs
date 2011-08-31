@@ -64,7 +64,7 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnCheckedItemChanged(object oldValue, object newValue)
         {
-            
+
         }
 
         #endregion //CheckedItem
@@ -115,18 +115,32 @@ namespace Microsoft.Windows.Controls
 
         #endregion //Events
 
-        void CheckListBox_Checked(object sender, RoutedEventArgs e)
+        #region Methods
+
+        private void CheckListBox_Checked(object sender, RoutedEventArgs e)
         {
-            SetCheckedItem(e.OriginalSource);
-            CheckedItems.Add(CheckedItem);
+            var item = GetDataContextItem(e.OriginalSource);
+            SetCheckedItem(item);
+            CheckedItems.Add(item);
             OnCheckedChanged();
         }
 
-        void CheckListBox_Unchecked(object sender, RoutedEventArgs e)
+        private void CheckListBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            SetCheckedItem(e.OriginalSource);
-            CheckedItems.Remove(CheckedItem);
+            var item = GetDataContextItem(e.OriginalSource);
+            SetCheckedItem(item);
+            CheckedItems.Remove(item);
             OnCheckedChanged();
+        }
+
+        private object GetDataContextItem(object source)
+        {
+            var selectedCheckListBoxItem = source as FrameworkElement;
+
+            if (selectedCheckListBoxItem != null)
+                return selectedCheckListBoxItem.DataContext;
+            else
+                return null;
         }
 
         private void SetCheckedItem(object source)
@@ -134,9 +148,7 @@ namespace Microsoft.Windows.Controls
             if (_surpressSelectionChanged)
                 return;
 
-            var selectedCheckListBoxItem = source as FrameworkElement;
-            if (selectedCheckListBoxItem != null)
-                CheckedItem = selectedCheckListBoxItem.DataContext;
+            CheckedItem = source;
         }
 
         private void OnCheckedChanged()
@@ -149,5 +161,7 @@ namespace Microsoft.Windows.Controls
             if (Command != null)
                 Command.Execute(CheckedItem);
         }
+
+        #endregion //Methods
     }
 }
