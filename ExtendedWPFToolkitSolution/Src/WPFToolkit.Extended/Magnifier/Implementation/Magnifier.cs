@@ -14,33 +14,69 @@ namespace Microsoft.Windows.Controls
         {
             get
             {
-                return new Size(2 * Radius, 2 * Radius);
+                switch (FrameType)
+                {
+                    case FrameType.Circle:
+                        return new Size(2 * Radius, 2 * Radius);
+                    case FrameType.Rectangle:
+                        return new Size(Width, Height);
+                    default:
+                        return Size.Empty;
+                }
             }
         }
 
         #endregion //DefaultSize
 
-        #region MagnifierWidth
+        #region FrameWidth
 
-        public static readonly DependencyProperty MagnifierWidthProperty = DependencyProperty.Register("MagnifierWidth", typeof(double), typeof(Magnifier), new UIPropertyMetadata(50.0));
-        internal double MagnifierWidth
+        public static readonly DependencyProperty FrameWidthProperty = DependencyProperty.Register("FrameWidth", typeof(double), typeof(Magnifier), new UIPropertyMetadata(50.0));
+        internal double FrameWidth
         {
-            get { return (double)GetValue(MagnifierWidthProperty); }
-            set { SetValue(MagnifierWidthProperty, value); }
+            get { return (double)GetValue(FrameWidthProperty); }
+            set { SetValue(FrameWidthProperty, value); }
         }
 
         #endregion //MagnifierWidth
 
-        #region MagnifierHeight
+        #region FrameHeight
 
-        public static readonly DependencyProperty MagnifierHeightProperty = DependencyProperty.Register("MagnifierHeight", typeof(double), typeof(Magnifier), new UIPropertyMetadata(50.0));
-        internal double MagnifierHeight
+        public static readonly DependencyProperty FrameHeightProperty = DependencyProperty.Register("FrameHeight", typeof(double), typeof(Magnifier), new UIPropertyMetadata(50.0));
+        internal double FrameHeight
         {
-            get { return (double)GetValue(MagnifierHeightProperty); }
-            set { SetValue(MagnifierHeightProperty, value); }
+            get { return (double)GetValue(FrameHeightProperty); }
+            set { SetValue(FrameHeightProperty, value); }
         }
 
-        #endregion //MagnifierWidth
+        #endregion //FrameHeight
+
+        #region FrameType
+
+        public static readonly DependencyProperty FrameTypeProperty = DependencyProperty.Register("FrameType", typeof(FrameType), typeof(Magnifier), new UIPropertyMetadata(FrameType.Circle, OnFrameTypeChanged));
+        public FrameType FrameType
+        {
+            get { return (FrameType)GetValue(FrameTypeProperty); }
+            set { SetValue(FrameTypeProperty, value); }
+        }
+
+        private static void OnFrameTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Magnifier m = (Magnifier)d;
+            m.OnFrameTypeChanged((FrameType)e.OldValue, (FrameType)e.NewValue);
+        }
+
+        protected virtual void OnFrameTypeChanged(FrameType oldValue, FrameType newValue)
+        {
+            if (newValue == Controls.FrameType.Circle)
+            {
+                Height = DefaultSize.Height;
+                Width = DefaultSize.Width;
+            }
+
+            ResolveViewBox();
+        }
+
+        #endregion //FrameType
 
         #region Radius
 
@@ -136,6 +172,8 @@ namespace Microsoft.Windows.Controls
         static Magnifier()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Magnifier), new FrameworkPropertyMetadata(typeof(Magnifier)));
+            HeightProperty.OverrideMetadata(typeof(Magnifier), new FrameworkPropertyMetadata(100.0));
+            WidthProperty.OverrideMetadata(typeof(Magnifier), new FrameworkPropertyMetadata(100.0));
         }
 
         public Magnifier()
@@ -145,17 +183,37 @@ namespace Microsoft.Windows.Controls
 
         #endregion
 
+        #region Base Class Overrides
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            if (FrameType == Controls.FrameType.Circle)
+            {
+                Height = DefaultSize.Height;
+                Width = DefaultSize.Width;
+            }
+
+            ResolveViewBox();
+        }
+
+        #endregion // Base Class Overrides
+
         #region Methods
 
         private void ResolveViewBox()
         {
+            if (!IsInitialized)
+                return;
+
             double correction = (BorderThickness.Bottom + BorderThickness.Left + BorderThickness.Right + BorderThickness.Top == 0) ? 1 : 0;
 
             double width = DefaultSize.Width * ZoomFactor;
             double height = DefaultSize.Height * ZoomFactor;
 
-            MagnifierWidth = DefaultSize.Width - correction;
-            MagnifierHeight = DefaultSize.Height - correction;
+            FrameWidth = DefaultSize.Width - correction;
+            FrameHeight = DefaultSize.Height - correction;
 
             ViewBox = new Rect(ViewBox.Location, new Size(width, height));
         }

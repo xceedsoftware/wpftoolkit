@@ -208,6 +208,7 @@
     <Compile Include="DateTimeUpDown\Implementation\DateTimeUpDown.cs" />
     <Compile Include="DateTimeUpDown\Implementation\DateTimeParser.cs" />
     <Compile Include="DropDownButton\Implementation\DropDownButton.cs" />
+    <Compile Include="Magnifier\Implementation\FrameType.cs" />
     <Compile Include="MultiLineTextEditor\Implementation\MultiLineTextEditor.cs" />
     <Compile Include="NumericUpDown\Implementation\DecimalUpDown.cs" />
     <Compile Include="NumericUpDown\Implementation\DoubleUpDown.cs" />
