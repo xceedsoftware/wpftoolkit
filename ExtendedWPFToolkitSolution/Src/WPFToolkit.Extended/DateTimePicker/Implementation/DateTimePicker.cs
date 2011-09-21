@@ -101,6 +101,7 @@ namespace Microsoft.Windows.Controls
             _calendar = (Calendar)GetTemplateChild("Part_Calendar");
             _calendar.SelectedDatesChanged += Calendar_SelectedDatesChanged;
             _calendar.SelectedDate = Value ?? null;
+            _calendar.DisplayDate = Value ?? DateTime.Now;
         }
 
         protected override void OnPreviewMouseUp(MouseButtonEventArgs e)
