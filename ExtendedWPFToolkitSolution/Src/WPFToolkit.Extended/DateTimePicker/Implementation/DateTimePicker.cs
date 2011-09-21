@@ -31,6 +31,28 @@ namespace Microsoft.Windows.Controls
 
         #endregion //IsOpen
 
+        #region TimeFormat
+
+        public static readonly DependencyProperty TimeFormatProperty = DependencyProperty.Register("TimeFormat", typeof(TimeFormat), typeof(DateTimePicker), new UIPropertyMetadata(TimeFormat.ShortTime));
+        public TimeFormat TimeFormat
+        {
+            get { return (TimeFormat)GetValue(TimeFormatProperty); }
+            set { SetValue(TimeFormatProperty, value); }
+        }        
+
+        #endregion //TimeFormat
+
+        #region TimeFormatString
+
+        public static readonly DependencyProperty TimeFormatStringProperty = DependencyProperty.Register("TimeFormatString", typeof(string), typeof(DateTimePicker), new UIPropertyMetadata(default(String)));
+        public string TimeFormatString
+        {
+            get { return (string)GetValue(TimeFormatStringProperty); }
+            set { SetValue(TimeFormatStringProperty, value); }
+        }
+
+        #endregion //TimeFormatString
+
         #region TimeWatermark
 
         public static readonly DependencyProperty TimeWatermarkProperty = DependencyProperty.Register("TimeWatermark", typeof(object), typeof(DateTimePicker), new UIPropertyMetadata(null));
