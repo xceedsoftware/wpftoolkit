@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace Microsoft.Windows.Controls.PropertyGrid.Converters
 {
-    class ValueSourceToToolTipConverter : IValueConverter
+    public class ValueSourceToToolTipConverter : IValueConverter
     {
         #region IValueConverter Members
 
