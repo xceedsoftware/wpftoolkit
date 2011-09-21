@@ -13,7 +13,6 @@ namespace Microsoft.Windows.Controls
     {
         #region Members
 
-        private Popup _colorPickerCanvasPopup;
         private ListBox _availableColors;
         private ListBox _standardColors;
         private ListBox _recentColors;
@@ -227,27 +226,31 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            _colorPickerCanvasPopup = (Popup)GetTemplateChild("PART_ColorPickerPalettePopup");
-            //_colorPickerCanvasPopup.Opened += ColorPickerCanvasPopup_Opened;
+            if (_availableColors != null)
+                _availableColors.SelectionChanged -= Color_SelectionChanged;
 
             _availableColors = (ListBox)GetTemplateChild("PART_AvailableColors");
-            _availableColors.SelectionChanged += Color_SelectionChanged;
+            if (_availableColors != null)
+                _availableColors.SelectionChanged += Color_SelectionChanged;
+
+            if (_standardColors != null)
+                _standardColors.SelectionChanged -= Color_SelectionChanged;
 
             _standardColors = (ListBox)GetTemplateChild("PART_StandardColors");
-            _standardColors.SelectionChanged += Color_SelectionChanged;
+            if (_standardColors != null)
+                _standardColors.SelectionChanged += Color_SelectionChanged;
+
+            if (_recentColors != null)
+                _recentColors.SelectionChanged -= Color_SelectionChanged;
 
             _recentColors = (ListBox)GetTemplateChild("PART_RecentColors");
-            _recentColors.SelectionChanged += Color_SelectionChanged;
+            if (_recentColors != null)
+                _recentColors.SelectionChanged += Color_SelectionChanged;
         }
 
         #endregion //Base Class Overrides
 
         #region Event Handlers
-
-        void ColorPickerCanvasPopup_Opened(object sender, EventArgs e)
-        {
-
-        }
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
