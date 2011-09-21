@@ -194,17 +194,33 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
 
+            if (_colorShadingCanvas != null)
+            {
+                _colorShadingCanvas.MouseLeftButtonDown -= ColorShadingCanvas_MouseLeftButtonDown;
+                _colorShadingCanvas.MouseLeftButtonUp -= ColorShadingCanvas_MouseLeftButtonUp;
+                _colorShadingCanvas.MouseMove -= ColorShadingCanvas_MouseMove;
+                _colorShadingCanvas.SizeChanged -= ColorShadingCanvas_SizeChanged;
+            }
+
             _colorShadingCanvas = (Canvas)GetTemplateChild("PART_ColorShadingCanvas");
-            _colorShadingCanvas.MouseLeftButtonDown += ColorShadingCanvas_MouseLeftButtonDown;
-            _colorShadingCanvas.MouseLeftButtonUp += ColorShadingCanvas_MouseLeftButtonUp;
-            _colorShadingCanvas.MouseMove += ColorShadingCanvas_MouseMove;
-            _colorShadingCanvas.SizeChanged += ColorShadingCanvas_SizeChanged;
+            if (_colorShadingCanvas != null)
+            {
+                _colorShadingCanvas.MouseLeftButtonDown += ColorShadingCanvas_MouseLeftButtonDown;
+                _colorShadingCanvas.MouseLeftButtonUp += ColorShadingCanvas_MouseLeftButtonUp;
+                _colorShadingCanvas.MouseMove += ColorShadingCanvas_MouseMove;
+                _colorShadingCanvas.SizeChanged += ColorShadingCanvas_SizeChanged;
+            }
 
             _colorShadeSelector = (Canvas)GetTemplateChild("PART_ColorShadeSelector");
-            _colorShadeSelector.RenderTransform = _colorShadeSelectorTransform;
+            if (_colorShadeSelector != null)
+                _colorShadeSelector.RenderTransform = _colorShadeSelectorTransform;
 
+            if (_spectrumSlider != null)
+                _spectrumSlider.ValueChanged -= SpectrumSlider_ValueChanged;
+            
             _spectrumSlider = (ColorSpectrumSlider)GetTemplateChild("PART_SpectrumSlider");
-            _spectrumSlider.ValueChanged += SpectrumSlider_ValueChanged;
+            if (_spectrumSlider != null)
+                _spectrumSlider.ValueChanged += SpectrumSlider_ValueChanged;            
 
             UpdateRGBValues(SelectedColor);
             UpdateColorShadeSelectorPosition(SelectedColor);
