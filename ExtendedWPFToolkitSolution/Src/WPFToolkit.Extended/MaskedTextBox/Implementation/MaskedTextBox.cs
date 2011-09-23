@@ -163,7 +163,7 @@ namespace Microsoft.Windows.Controls
         protected virtual void OnValueChanged(object oldValue, object newValue)
         {
             if (_isInitialized)
-                SyncTextAndValueProperties(DateTimeUpDown.ValueProperty, newValue);
+                SyncTextAndValueProperties(MaskedTextBox.ValueProperty, newValue);
 
             RoutedPropertyChangedEventArgs<object> args = new RoutedPropertyChangedEventArgs<object>(oldValue, newValue);
             args.RoutedEvent = MaskedTextBox.ValueChangedEvent;
