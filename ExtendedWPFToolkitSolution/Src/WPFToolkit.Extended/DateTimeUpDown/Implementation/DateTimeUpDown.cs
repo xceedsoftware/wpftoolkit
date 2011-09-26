@@ -155,7 +155,7 @@ namespace Microsoft.Windows.Controls
             {
                 case Key.Enter:
                     {
-                        if (IsEditable)
+                        if (!IsReadOnly)
                         {
                             _fireSelectionChangedEvent = false;
                             BindingExpression binding = BindingOperations.GetBindingExpression(TextBox, System.Windows.Controls.TextBox.TextProperty);

@@ -20,16 +20,16 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #endregion //CultureInfo
 
-        #region IsEditable
+        #region IsReadOnly
 
-        public static readonly DependencyProperty IsEditableProperty = DependencyProperty.Register("IsEditable", typeof(bool), typeof(InputBase), new PropertyMetadata(true));
-        public bool IsEditable
+        public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register("IsReadOnly", typeof(bool), typeof(InputBase), new UIPropertyMetadata(false));
+        public bool IsReadOnly
         {
-            get { return (bool)GetValue(IsEditableProperty); }
-            set { SetValue(IsEditableProperty, value); }
+            get { return (bool)GetValue(IsReadOnlyProperty); }
+            set { SetValue(IsReadOnlyProperty, value); }
         }
 
-        #endregion //IsEditable
+        #endregion //IsReadOnly        
 
         #region Text
 
@@ -62,7 +62,7 @@ namespace Microsoft.Windows.Controls.Primitives
             get { return (TextAlignment)GetValue(TextAlignmentProperty); }
             set { SetValue(TextAlignmentProperty, value); }
         }
-        
+
 
         #endregion //TextAlignment
 
