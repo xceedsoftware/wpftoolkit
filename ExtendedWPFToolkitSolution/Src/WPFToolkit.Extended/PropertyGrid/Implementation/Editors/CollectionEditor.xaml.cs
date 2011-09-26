@@ -17,16 +17,6 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
             InitializeComponent();
         }
 
-        public void Attach(PropertyItem propertyItem)
-        {
-            _item = propertyItem;
-        }
-
-        public FrameworkElement ResolveEditor()
-        {
-            return this;
-        }
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             CollectionEditorDialog editor = new CollectionEditorDialog(_item.PropertyType);
@@ -35,6 +25,12 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
             binding.Mode = _item.IsWriteable ? BindingMode.TwoWay : BindingMode.OneWay;
             BindingOperations.SetBinding(editor, CollectionEditorDialog.ItemsSourceProperty, binding);
             editor.ShowDialog();
+        }
+
+        public FrameworkElement ResolveEditor(PropertyItem propertyItem)
+        {
+            _item = propertyItem;
+            return this;
         }
     }
 }

@@ -10,10 +10,10 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
             ValueProperty = ComboBox.SelectedItemProperty;
         }
 
-        public override void Attach(PropertyItem propertyItem)
+        protected override void ResolveValueBinding(PropertyItem propertyItem)
         {
             SetItemsSource(propertyItem);
-            base.Attach(propertyItem);
+            base.ResolveValueBinding(propertyItem);
         }
 
         protected abstract IList<object> CreateItemsSource(PropertyItem propertyItem);

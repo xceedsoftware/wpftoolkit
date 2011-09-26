@@ -14,26 +14,14 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 
         #endregion //Properties
 
-        #region Constructors
+        #region ITypeEditor Members
 
-        public TypeEditor()
+        public virtual FrameworkElement ResolveEditor(PropertyItem propertyItem)
         {
             Editor = new T();
             SetValueDependencyProperty();
             SetControlProperties();
-        }
-
-        #endregion //Constructors
-
-        #region ITypeEditor Members
-
-        public virtual void Attach(PropertyItem propertyItem)
-        {
             ResolveValueBinding(propertyItem);
-        }
-
-        public virtual FrameworkElement ResolveEditor()
-        {
             return Editor;
         }
 
@@ -63,7 +51,6 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
         }
 
         protected abstract void SetValueDependencyProperty();
-
 
         #endregion //Methods
     }

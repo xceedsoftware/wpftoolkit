@@ -15,11 +15,11 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
             ValueProperty = Microsoft.Windows.Controls.PrimitiveTypeCollectionEditor.ItemsSourceProperty;
         }
 
-        public override void Attach(PropertyItem propertyItem)
+        protected override void ResolveValueBinding(PropertyItem propertyItem)
         {
             Editor.ItemsSourceType = propertyItem.PropertyType;
             Editor.ItemType = propertyItem.PropertyType.GetGenericArguments()[0];
-            base.Attach(propertyItem);
+            base.ResolveValueBinding(propertyItem);
         }
     }
 }
