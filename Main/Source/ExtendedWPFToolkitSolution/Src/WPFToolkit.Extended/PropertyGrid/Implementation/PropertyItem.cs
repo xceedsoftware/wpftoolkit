@@ -41,17 +41,33 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         {
             get { return (string)GetValue(DisplayNameProperty); }
             set { SetValue(DisplayNameProperty, value); }
-        }        
+        }
 
         #endregion //DisplayName
 
         #region Editor
 
-        public static readonly DependencyProperty EditorProperty = DependencyProperty.Register("Editor", typeof(FrameworkElement), typeof(PropertyItem), new UIPropertyMetadata(null));
+        public static readonly DependencyProperty EditorProperty = DependencyProperty.Register("Editor", typeof(FrameworkElement), typeof(PropertyItem), new UIPropertyMetadata(null, OnEditorChanged));
         public FrameworkElement Editor
         {
             get { return (FrameworkElement)GetValue(EditorProperty); }
             set { SetValue(EditorProperty, value); }
+        }
+
+        private static void OnEditorChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            PropertyItem propertyItem = o as PropertyItem;
+            if (propertyItem != null)
+                propertyItem.OnEditorChanged((FrameworkElement)e.OldValue, (FrameworkElement)e.NewValue);
+        }
+
+        protected virtual void OnEditorChanged(FrameworkElement oldValue, FrameworkElement newValue)
+        {
+            if (oldValue != null)
+                oldValue.DataContext = null;
+
+            if (newValue != null)
+                newValue.DataContext = this;
         }
 
         #endregion //Editor

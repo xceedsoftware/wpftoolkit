@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using Microsoft.Windows.Controls.PropertyGrid.Editors;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
-    public class CustomTypeEditorCollection : ObservableCollection<ICustomTypeEditor>
+    public class EditorDefinitionCollection : ObservableCollection<IEditorDefinition>
     {
-        public ICustomTypeEditor this[string propertyName]
+        public IEditorDefinition this[string propertyName]
         {
             get
             {
@@ -20,7 +19,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             }
         }
 
-        public ICustomTypeEditor this[Type targetType]
+        public IEditorDefinition this[Type targetType]
         {
             get
             {

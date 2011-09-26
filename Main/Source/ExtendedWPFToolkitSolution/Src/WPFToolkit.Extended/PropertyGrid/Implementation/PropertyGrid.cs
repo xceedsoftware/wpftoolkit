@@ -35,17 +35,6 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //AdvancedOptionsMenu
 
-        #region CustomTypeEditors
-
-        public static readonly DependencyProperty CustomTypeEditorsProperty = DependencyProperty.Register("CustomTypeEditors", typeof(CustomTypeEditorCollection), typeof(PropertyGrid), new UIPropertyMetadata(new CustomTypeEditorCollection()));
-        public CustomTypeEditorCollection CustomTypeEditors
-        {
-            get { return (CustomTypeEditorCollection)GetValue(CustomTypeEditorsProperty); }
-            set { SetValue(CustomTypeEditorsProperty, value); }
-        }
-
-        #endregion //CustomTypeEditors
-
         #region DisplaySummary
 
         public static readonly DependencyProperty DisplaySummaryProperty = DependencyProperty.Register("DisplaySummary", typeof(bool), typeof(PropertyGrid), new UIPropertyMetadata(true));
@@ -56,6 +45,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         }
 
         #endregion //DisplaySummary
+
+        #region EditorDefinitions
+
+        public static readonly DependencyProperty EditorDefinitionsProperty = DependencyProperty.Register("EditorDefinitions", typeof(EditorDefinitionCollection), typeof(PropertyGrid), new UIPropertyMetadata(new EditorDefinitionCollection()));
+        public EditorDefinitionCollection EditorDefinitions
+        {
+            get { return (EditorDefinitionCollection)GetValue(EditorDefinitionsProperty); }
+            set { SetValue(EditorDefinitionsProperty, value); }
+        }
+
+        #endregion //EditorDefinitions
 
         #region Filter
 
@@ -117,10 +117,10 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #region Properties
 
-        public static readonly DependencyProperty PropertiesProperty = DependencyProperty.Register("Properties", typeof(PropertyCollection), typeof(PropertyGrid), new UIPropertyMetadata(null));
-        public PropertyCollection Properties
+        public static readonly DependencyProperty PropertiesProperty = DependencyProperty.Register("Properties", typeof(PropertyItemCollection), typeof(PropertyGrid), new UIPropertyMetadata(null));
+        public PropertyItemCollection Properties
         {
-            get { return (PropertyCollection)GetValue(PropertiesProperty); }
+            get { return (PropertyItemCollection)GetValue(PropertiesProperty); }
             private set { SetValue(PropertiesProperty, value); }
         }
 
@@ -406,24 +406,99 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             };
             propertyItem.SetBinding(PropertyItem.ValueProperty, binding);
 
-            ITypeEditor editor = GetTypeEditor(propertyItem);
-            propertyItem.Editor = editor.ResolveEditor(propertyItem);
+            propertyItem.Editor = GetTypeEditor(propertyItem);            
 
             return propertyItem;
         }
 
-        private static PropertyCollection GetCategorizedProperties(List<PropertyItem> propertyItems)
+        private FrameworkElement GetTypeEditor(PropertyItem propertyItem)
         {
-            PropertyCollection propertyCollection = new PropertyCollection(propertyItems);
+            FrameworkElement editor = GetCustomEditor(propertyItem, EditorDefinitions);
+
+            if (editor == null)
+                editor = CreateDefaultEditor(propertyItem);
+
+            return editor;
+        }
+
+        private FrameworkElement GetCustomEditor(PropertyItem propertyItem, EditorDefinitionCollection customTypeEditors)
+        {
+            FrameworkElement editor = null;
+
+            //check for custom editor
+            if (customTypeEditors.Count > 0)
+            {
+                //first check if the custom editor is type based
+                IEditorDefinition customEditor = customTypeEditors[propertyItem.PropertyType];
+                if (customEditor == null)
+                {
+                    //must be property based
+                    customEditor = customTypeEditors[propertyItem.Name];
+                }
+
+                if (customEditor != null)
+                {
+                    if (customEditor.EditorTemplate != null)
+                        editor = customEditor.EditorTemplate.LoadContent() as FrameworkElement;
+                }
+            }
+
+            return editor;
+        }
+
+        private FrameworkElement CreateDefaultEditor(PropertyItem propertyItem)
+        {
+            ITypeEditor editor = null;
+
+            if (propertyItem.IsReadOnly)
+                editor = new TextBlockEditor();
+            else if (propertyItem.PropertyType == typeof(bool) || propertyItem.PropertyType == typeof(bool?))
+                editor = new CheckBoxEditor();
+            else if (propertyItem.PropertyType == typeof(decimal) || propertyItem.PropertyType == typeof(decimal?))
+                editor = new DecimalUpDownEditor();
+            else if (propertyItem.PropertyType == typeof(double) || propertyItem.PropertyType == typeof(double?))
+                editor = new DoubleUpDownEditor();
+            else if (propertyItem.PropertyType == typeof(int) || propertyItem.PropertyType == typeof(int?))
+                editor = new IntegerUpDownEditor();
+            else if (propertyItem.PropertyType == typeof(DateTime) || propertyItem.PropertyType == typeof(DateTime?))
+                editor = new DateTimeUpDownEditor();
+            else if ((propertyItem.PropertyType == typeof(Color)))
+                editor = new ColorEditor();
+            else if (propertyItem.PropertyType.IsEnum)
+                editor = new EnumComboBoxEditor();
+            else if (propertyItem.PropertyType == typeof(FontFamily) || propertyItem.PropertyType == typeof(FontWeight) || propertyItem.PropertyType == typeof(FontStyle) || propertyItem.PropertyType == typeof(FontStretch))
+                editor = new FontComboBoxEditor();
+            else if (propertyItem.PropertyType.IsGenericType)
+            {
+                if (propertyItem.PropertyType.GetInterface("IList") != null)
+                {
+                    var t = propertyItem.PropertyType.GetGenericArguments()[0];
+                    if (!t.IsPrimitive && !t.Equals(typeof(String)))
+                        editor = new Microsoft.Windows.Controls.PropertyGrid.Editors.CollectionEditor();
+                    else
+                        editor = new Microsoft.Windows.Controls.PropertyGrid.Editors.PrimitiveTypeCollectionEditor();
+                }
+                else
+                    editor = new TextBlockEditor();
+            }
+            else
+                editor = new TextBoxEditor();
+
+            return editor.ResolveEditor(propertyItem);
+        }
+
+        private static PropertyItemCollection GetCategorizedProperties(List<PropertyItem> propertyItems)
+        {
+            PropertyItemCollection propertyCollection = new PropertyItemCollection(propertyItems);
             propertyCollection.GroupBy("Category");
             propertyCollection.SortBy("Category", ListSortDirection.Ascending);
             propertyCollection.SortBy("Name", ListSortDirection.Ascending);
             return propertyCollection;
         }
 
-        private static PropertyCollection GetAlphabetizedProperties(List<PropertyItem> propertyItems)
+        private static PropertyItemCollection GetAlphabetizedProperties(List<PropertyItem> propertyItems)
         {
-            PropertyCollection propertyCollection = new PropertyCollection(propertyItems);
+            PropertyItemCollection propertyCollection = new PropertyItemCollection(propertyItems);
             propertyCollection.SortBy("Name", ListSortDirection.Ascending);
             return propertyCollection;
         }
@@ -470,81 +545,5 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         }
 
         #endregion //Methods
-
-
-        private ITypeEditor GetTypeEditor(PropertyItem propertyItem)
-        {
-            ITypeEditor editor = null;
-
-            editor = CreateCustomEditor(propertyItem, CustomTypeEditors);
-
-            if (editor == null)
-                editor = CreateDefaultEditor(propertyItem);
-
-            return editor;
-        }
-
-        private ITypeEditor CreateCustomEditor(PropertyItem propertyItem, CustomTypeEditorCollection customTypeEditors)
-        {
-            ITypeEditor editor = null;
-
-            //check for custom editor
-            if (customTypeEditors.Count > 0)
-            {
-                //first check if the custom editor is type based
-                ICustomTypeEditor customEditor = customTypeEditors[propertyItem.PropertyType];
-                if (customEditor == null)
-                {
-                    //must be property based
-                    customEditor = customTypeEditors[propertyItem.Name];
-                }
-
-                if (customEditor != null)
-                    editor = customEditor.Editor;
-            }
-
-            return editor;
-        }
-
-        private ITypeEditor CreateDefaultEditor(PropertyItem propertyItem)
-        {
-            ITypeEditor editor = null;
-
-            if (propertyItem.IsReadOnly)
-                editor = new TextBlockEditor();
-            else if (propertyItem.PropertyType == typeof(bool) || propertyItem.PropertyType == typeof(bool?))
-                editor = new CheckBoxEditor();
-            else if (propertyItem.PropertyType == typeof(decimal) || propertyItem.PropertyType == typeof(decimal?))
-                editor = new DecimalUpDownEditor();
-            else if (propertyItem.PropertyType == typeof(double) || propertyItem.PropertyType == typeof(double?))
-                editor = new DoubleUpDownEditor();
-            else if (propertyItem.PropertyType == typeof(int) || propertyItem.PropertyType == typeof(int?))
-                editor = new IntegerUpDownEditor();
-            else if (propertyItem.PropertyType == typeof(DateTime) || propertyItem.PropertyType == typeof(DateTime?))
-                editor = new DateTimeUpDownEditor();
-            else if ((propertyItem.PropertyType == typeof(Color)))
-                editor = new ColorEditor();
-            else if (propertyItem.PropertyType.IsEnum)
-                editor = new EnumComboBoxEditor();
-            else if (propertyItem.PropertyType == typeof(FontFamily) || propertyItem.PropertyType == typeof(FontWeight) || propertyItem.PropertyType == typeof(FontStyle) || propertyItem.PropertyType == typeof(FontStretch))
-                editor = new FontComboBoxEditor();
-            else if (propertyItem.PropertyType.IsGenericType)
-            {
-                if (propertyItem.PropertyType.GetInterface("IList") != null)
-                {
-                    var t = propertyItem.PropertyType.GetGenericArguments()[0];
-                    if (!t.IsPrimitive && !t.Equals(typeof(String)))
-                        editor = new Microsoft.Windows.Controls.PropertyGrid.Editors.CollectionEditor();
-                    else
-                        editor = new Microsoft.Windows.Controls.PropertyGrid.Editors.PrimitiveTypeCollectionEditor();
-                }
-                else
-                    editor = new TextBlockEditor();
-            }
-            else
-                editor = new TextBoxEditor();
-
-            return editor;
-        }
     }
 }
