@@ -249,14 +249,14 @@
     </Compile>
     <Compile Include="PropertyGrid\Implementation\Editors\ColorEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\ComboBoxEditor.cs" />
-    <Compile Include="PropertyGrid\Implementation\Editors\CustomTypeEditor.cs" />
-    <Compile Include="PropertyGrid\Implementation\CustomTypeEditorCollection.cs" />
+    <Compile Include="PropertyGrid\Implementation\EditorDefinition.cs" />
+    <Compile Include="PropertyGrid\Implementation\EditorDefinitionCollection.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\DateTimeUpDownEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\DecimalUpDownEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\DoubleUpDownEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\EnumComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\FontComboBoxEditor.cs" />
-    <Compile Include="PropertyGrid\Implementation\Editors\ICustomTypeEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\IEditorDefinition.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\IntegerUpDownEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\ITypeEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\PrimitiveTypeCollectionEditor.cs" />
@@ -264,7 +264,7 @@
     <Compile Include="PropertyGrid\Implementation\Editors\TextBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\TypeEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyGrid.cs" />
-    <Compile Include="PropertyGrid\Implementation\PropertyCollection.cs" />
+    <Compile Include="PropertyGrid\Implementation\PropertyItemCollection.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyItem.cs" />
     <Compile Include="PropertyGrid\Implementation\Commands\PropertyItemCommands.cs" />
     <Compile Include="RichTextBoxFormatBar\IRichTextBoxFormatBar.cs" />

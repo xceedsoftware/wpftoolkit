@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.Windows;
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Editors
+namespace Microsoft.Windows.Controls.PropertyGrid
 {
-    public class CustomTypeEditor : ICustomTypeEditor
+    public class EditorDefinition : IEditorDefinition
     {
-        public ITypeEditor Editor { get; set; }
+        public DataTemplate EditorTemplate { get; set; }
 
         private IList<string> _properties = new List<string>();
         public IList<string> Properties

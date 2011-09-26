@@ -6,19 +6,19 @@ using System.Windows.Data;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
-    public class PropertyCollection : ObservableCollection<PropertyItem>
+    public class PropertyItemCollection : ObservableCollection<PropertyItem>
     {
-        public PropertyCollection()
+        public PropertyItemCollection()
         {
             
         }
 
-        public PropertyCollection(List<PropertyItem> list)
+        public PropertyItemCollection(List<PropertyItem> list)
             : base(list)
         {
             
         }
-        public PropertyCollection(IEnumerable<PropertyItem> collection)
+        public PropertyItemCollection(IEnumerable<PropertyItem> collection)
             : base(collection)
         {
                         
