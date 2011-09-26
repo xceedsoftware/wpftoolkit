@@ -13,7 +13,8 @@
         
         <extToolkit:CollectionEditor x:Name="_propertyGrid"
                                      ItemsSourceType="{Binding ItemsSourceType, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                     ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
+                                     ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                     NewItemTypes="{Binding NewItemTypes, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right" Margin="5" >
             <Button Width="75" Margin="2" Click="OkButton_Click" IsDefault="True">OK</Button>

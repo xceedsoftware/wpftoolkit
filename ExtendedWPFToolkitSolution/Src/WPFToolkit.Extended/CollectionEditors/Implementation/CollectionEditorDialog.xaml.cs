@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Microsoft.Windows.Controls
 {
@@ -23,6 +24,13 @@ namespace Microsoft.Windows.Controls
         {
             get { return (Type)GetValue(ItemsSourceTypeProperty); }
             set { SetValue(ItemsSourceTypeProperty, value); }
+        }
+
+        public static readonly DependencyProperty NewItemTypesProperty = DependencyProperty.Register("NewItemTypes", typeof(IList), typeof(CollectionEditorDialog), new UIPropertyMetadata(null));
+        public IList<Type> NewItemTypes
+        {
+            get { return (IList<Type>)GetValue(NewItemTypesProperty); }
+            set { SetValue(NewItemTypesProperty, value); }
         }
 
         #endregion //Properties
