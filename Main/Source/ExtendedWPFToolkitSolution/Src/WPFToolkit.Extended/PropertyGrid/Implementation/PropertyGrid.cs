@@ -466,6 +466,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                 editor = new ColorEditor();
             else if (propertyItem.PropertyType.IsEnum)
                 editor = new EnumComboBoxEditor();
+            else if (propertyItem.PropertyType == typeof(TimeSpan))
+                editor = new TimeSpanEditor();
             else if (propertyItem.PropertyType == typeof(FontFamily) || propertyItem.PropertyType == typeof(FontWeight) || propertyItem.PropertyType == typeof(FontStyle) || propertyItem.PropertyType == typeof(FontStretch))
                 editor = new FontComboBoxEditor();
             else if (propertyItem.PropertyType.IsGenericType)
