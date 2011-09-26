@@ -4,7 +4,6 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 {
     public interface ITypeEditor
     {
-        void Attach(PropertyItem propertyItem);
-        FrameworkElement ResolveEditor();
+        FrameworkElement ResolveEditor(PropertyItem propertyItem);
     }
 }
