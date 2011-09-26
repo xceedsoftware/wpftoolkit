@@ -138,21 +138,21 @@ namespace Microsoft.Windows.Controls.Primitives
             {
                 case Key.Up:
                     {
-                        if (AllowSpin)
+                        if (AllowSpin && !IsReadOnly)
                             DoIncrement();
                         e.Handled = true;
                         break;
                     }
                 case Key.Down:
                     {
-                        if (AllowSpin)
+                        if (AllowSpin && !IsReadOnly)
                             DoDecrement();
                         e.Handled = true;
                         break;
                     }
                 case Key.Enter:
                     {
-                        if (IsEditable)
+                        if (!IsReadOnly)
                         {
                             var binding = BindingOperations.GetBindingExpression(TextBox, System.Windows.Controls.TextBox.TextProperty);
                             binding.UpdateSource();
@@ -166,7 +166,7 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             base.OnMouseWheel(e);
 
-            if (!e.Handled && AllowSpin && ((TextBox.IsFocused && MouseWheelActiveOnFocus) || !MouseWheelActiveOnFocus))
+            if (!e.Handled && AllowSpin && !IsReadOnly && ((TextBox.IsFocused && MouseWheelActiveOnFocus) || !MouseWheelActiveOnFocus))
             {
                 if (e.Delta < 0)
                 {
@@ -192,7 +192,7 @@ namespace Microsoft.Windows.Controls.Primitives
 
         private void OnSpinnerSpin(object sender, SpinEventArgs e)
         {
-            if (AllowSpin)
+            if (AllowSpin && !IsReadOnly)
                 OnSpin(e);
         }
 
