@@ -54,7 +54,7 @@
         </DrawingBrush.Drawing>
     </DrawingBrush>
 
-    <Style x:Key="ColorPaletteLisBoxStyle" TargetType="{x:Type ListBoxItem}">
+    <Style x:Key="ColorItemContainerStyle" TargetType="{x:Type ListBoxItem}">
         <Setter Property="ToolTip" Value="{Binding Name}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -143,6 +143,21 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    
+    <Style x:Key="ColorListStyle" TargetType="ListBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" /> 
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <WrapPanel Width="200" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ItemContainerStyle" Value="{StaticResource ColorItemContainerStyle}" />
+        <Setter Property="ItemTemplate" Value="{StaticResource ColorItemTemplate}" />
+        <Setter Property="SelectionMode" Value="Single" />
+    </Style>
 
     <Style TargetType="{x:Type local:ColorPicker}">
         <Setter Property="Background" Value="White" />
@@ -202,17 +217,9 @@
                                                     <RowDefinition />
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Text="{TemplateBinding AvailableColorsHeader}" Background="AliceBlue" Padding="2" Margin="0,0,0,1" />
-                                                <ListBox x:Name="PART_AvailableColors" Grid.Row="1" Background="Transparent" BorderThickness="0" SelectionMode="Single"
-                                                         ItemsSource="{Binding AvailableColors, RelativeSource={RelativeSource TemplatedParent}}"                                                      
-                                                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                                                         ItemContainerStyle="{StaticResource ColorPaletteLisBoxStyle}"
-                                                         Style="{x:Null}">
-                                                    <ListBox.ItemsPanel>
-                                                        <ItemsPanelTemplate>
-                                                            <WrapPanel Width="200" />
-                                                        </ItemsPanelTemplate>
-                                                    </ListBox.ItemsPanel>
-                                                </ListBox>
+                                                <ListBox x:Name="PART_AvailableColors" Grid.Row="1"
+                                                         ItemsSource="{Binding AvailableColors, RelativeSource={RelativeSource TemplatedParent}}"
+                                                         Style="{StaticResource ColorListStyle}" />
                                             </Grid>
                                         </Grid>
 
@@ -224,17 +231,9 @@
                                                     <RowDefinition Height="Auto" />
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Text="{TemplateBinding StandardColorsHeader}" Background="AliceBlue" Padding="2" Margin="0,1,0,1"/>
-                                                <ListBox x:Name="PART_StandardColors" Grid.Row="1" SelectionMode="Single" Background="Transparent" BorderThickness="0"
+                                                <ListBox x:Name="PART_StandardColors" Grid.Row="1"
                                                          ItemsSource="{Binding StandardColors, RelativeSource={RelativeSource TemplatedParent}}"                                                      
-                                                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                                                         ItemContainerStyle="{StaticResource ColorPaletteLisBoxStyle}"
-                                                         Style="{x:Null}">
-                                                    <ListBox.ItemsPanel>
-                                                        <ItemsPanelTemplate>
-                                                            <WrapPanel Width="200" />
-                                                        </ItemsPanelTemplate>
-                                                    </ListBox.ItemsPanel>
-                                                </ListBox>
+                                                         Style="{StaticResource ColorListStyle}" />
                                             </Grid>
                                         </Grid>
 
@@ -246,17 +245,9 @@
                                                     <RowDefinition Height="Auto" />
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Text="{TemplateBinding RecentColorsHeader}" Background="AliceBlue" Padding="2" Margin="0,1,0,1"/>
-                                                <ListBox x:Name="PART_RecentColors" Grid.Row="1"  SelectionMode="Single" Background="Transparent" BorderThickness="0"
-                                                         ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}"                                                     
-                                                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                                                         ItemContainerStyle="{StaticResource ColorPaletteLisBoxStyle}"
-                                                         Style="{x:Null}">
-                                                    <ListBox.ItemsPanel>
-                                                        <ItemsPanelTemplate>
-                                                            <WrapPanel Width="200" />
-                                                        </ItemsPanelTemplate>
-                                                    </ListBox.ItemsPanel>
-                                                </ListBox>
+                                                <ListBox x:Name="PART_RecentColors" Grid.Row="1"
+                                                         ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}"
+                                                         Style="{StaticResource ColorListStyle}" />
                                             </Grid>
                                         </Grid>
                                     </Grid>

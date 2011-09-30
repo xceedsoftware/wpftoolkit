@@ -7,7 +7,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
     public interface IEditorDefinition
     {
         DataTemplate EditorTemplate { get; set; }
-        IList<string> Properties { get; set; }
+        List<string> Properties { get; set; }
         Type TargetType { get; set; }
     }
 }

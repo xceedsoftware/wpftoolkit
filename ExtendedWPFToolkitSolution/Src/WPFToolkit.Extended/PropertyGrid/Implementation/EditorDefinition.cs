@@ -8,8 +8,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
     {
         public DataTemplate EditorTemplate { get; set; }
 
-        private IList<string> _properties = new List<string>();
-        public IList<string> Properties
+        private List<string> _properties = new List<string>();
+        public List<string> Properties
         {
             get { return _properties; }
             set { _properties = value; }
