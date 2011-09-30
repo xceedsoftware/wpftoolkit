@@ -532,6 +532,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             SelectedObjectName = String.Empty;
             SelectedObjectType = null;
             _propertyItemsCache = null;
+            SelectedProperty = null;
             Properties = null;
         }
 
