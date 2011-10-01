@@ -340,8 +340,9 @@ namespace Microsoft.Windows.Controls
             }
 
             //if all text is selected and the user begins to type, we want to delete all selected text and continue typing the new values
-            //but only if the user is not tabbing / shift tabbing
-            if (SelectionLength == Text.Length && (e.Key != Key.Tab && e.Key != Key.LeftShift && e.Key != Key.RightShift))
+            //but only if the user is not tabbing / shift tabbing or copying/pasting
+            if (SelectionLength == Text.Length && (e.Key != Key.Tab && e.Key != Key.LeftShift && e.Key != Key.RightShift && 
+                                                   (Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.Control))
             {
                 if (provider.RemoveAt(position, endposition))
                     UpdateText(provider, position);
