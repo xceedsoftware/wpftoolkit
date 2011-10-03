@@ -333,6 +333,9 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Magnifier\Implementation\Converters\RadiusConverter.cs">
       <Link>Magnifier\Implementation\Converters\RadiusConverter.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Magnifier\Implementation\FrameType.cs">
+      <Link>Magnifier\Implementation\FrameType.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Magnifier\Implementation\Magnifier.cs">
       <Link>Magnifier\Implementation\Magnifier.cs</Link>
     </Compile>
@@ -378,8 +381,11 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Converters\ValueSourceToToolTipConverter.cs">
       <Link>PropertyGrid\Implementation\Converters\ValueSourceToToolTipConverter.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\CustomTypeEditorCollection.cs">
-      <Link>PropertyGrid\Implementation\CustomTypeEditorCollection.cs</Link>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\EditorDefinition.cs">
+      <Link>PropertyGrid\Implementation\EditorDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\EditorDefinitionCollection.cs">
+      <Link>PropertyGrid\Implementation\EditorDefinitionCollection.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\CheckBoxEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\CheckBoxEditor.cs</Link>
@@ -393,9 +399,6 @@
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\ComboBoxEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\ComboBoxEditor.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\CustomTypeEditor.cs">
-      <Link>PropertyGrid\Implementation\Editors\CustomTypeEditor.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\DateTimeUpDownEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\DateTimeUpDownEditor.cs</Link>
@@ -412,9 +415,6 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\FontComboBoxEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\FontComboBoxEditor.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\ICustomTypeEditor.cs">
-      <Link>PropertyGrid\Implementation\Editors\ICustomTypeEditor.cs</Link>
-    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\IntegerUpDownEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\IntegerUpDownEditor.cs</Link>
     </Compile>
@@ -430,17 +430,23 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\TextBoxEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\TextBoxEditor.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\TimeSpanEditor.cs">
+      <Link>PropertyGrid\Implementation\Editors\TimeSpanEditor.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\TypeEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\TypeEditor.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\PropertyCollection.cs">
-      <Link>PropertyGrid\Implementation\PropertyCollection.cs</Link>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\IEditorDefinition.cs">
+      <Link>PropertyGrid\Implementation\IEditorDefinition.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\PropertyGrid.cs">
       <Link>PropertyGrid\Implementation\PropertyGrid.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\PropertyItem.cs">
       <Link>PropertyGrid\Implementation\PropertyItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\PropertyItemCollection.cs">
+      <Link>PropertyGrid\Implementation\PropertyItemCollection.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\RichTextBoxFormatBar\IRichTextBoxFormatBar.cs">
       <Link>RichTextBoxFormatBar\IRichTextBoxFormatBar.cs</Link>
