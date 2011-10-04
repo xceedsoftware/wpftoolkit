@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using Microsoft.Windows.Controls.PropertyGrid.Editors;
 using Microsoft.Windows.Controls.PropertyGrid.Commands;
+using Microsoft.Windows.Controls.PropertyGrid.Attributes;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
@@ -413,15 +414,42 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         private FrameworkElement GetTypeEditor(PropertyItem propertyItem)
         {
-            FrameworkElement editor = GetCustomEditor(propertyItem, EditorDefinitions);
+            //first check for any attribute editor
+            FrameworkElement editor = GetAttibuteEditor(propertyItem);
 
+            //now look for a custom editor based on editor definitions
+            if (editor == null)
+                editor = GetCustomEditor(propertyItem, EditorDefinitions);
+
+            //guess we have to use the default editor
             if (editor == null)
                 editor = CreateDefaultEditor(propertyItem);
 
             return editor;
         }
 
-        private FrameworkElement GetCustomEditor(PropertyItem propertyItem, EditorDefinitionCollection customTypeEditors)
+        private static FrameworkElement GetAttibuteEditor(PropertyItem propertyItem)
+        {
+            FrameworkElement editor = null;
+
+            var attribute = GetAttribute<ItemsSourceAttribute>(propertyItem.PropertyDescriptor);
+            if (attribute != null)
+                editor = new ItemsSourceEditor(attribute).ResolveEditor(propertyItem);
+
+            return editor;
+        }
+
+        public static T GetAttribute<T>(PropertyDescriptor property) where T : Attribute
+        {
+            foreach (Attribute att in property.Attributes)
+            {
+                var tAtt = att as T;
+                if (tAtt != null) return tAtt;
+            }
+            return null;
+        }
+
+        private static FrameworkElement GetCustomEditor(PropertyItem propertyItem, EditorDefinitionCollection customTypeEditors)
         {
             FrameworkElement editor = null;
 
@@ -446,7 +474,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             return editor;
         }
 
-        private FrameworkElement CreateDefaultEditor(PropertyItem propertyItem)
+        private static FrameworkElement CreateDefaultEditor(PropertyItem propertyItem)
         {
             ITypeEditor editor = null;
 
