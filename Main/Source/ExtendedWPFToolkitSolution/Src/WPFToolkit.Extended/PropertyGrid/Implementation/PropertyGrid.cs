@@ -414,7 +414,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         private FrameworkElement GetTypeEditor(PropertyItem propertyItem)
         {
-            //first check for any attribute editor
+            //first check for an attribute editor
             FrameworkElement editor = GetAttibuteEditor(propertyItem);
 
             //now look for a custom editor based on editor definitions
@@ -432,9 +432,16 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         {
             FrameworkElement editor = null;
 
-            var attribute = GetAttribute<ItemsSourceAttribute>(propertyItem.PropertyDescriptor);
-            if (attribute != null)
-                editor = new ItemsSourceEditor(attribute).ResolveEditor(propertyItem);
+            var itemsSourceAttribute = GetAttribute<ItemsSourceAttribute>(propertyItem.PropertyDescriptor);
+            if (itemsSourceAttribute != null)
+                editor = new ItemsSourceEditor(itemsSourceAttribute).ResolveEditor(propertyItem);
+
+            var editorAttribute = GetAttribute<TypeEditorAttribute>(propertyItem.PropertyDescriptor);
+            if (editorAttribute != null)
+            {
+                var instance = Activator.CreateInstance(editorAttribute.Type);
+                editor = (instance as ITypeEditor).ResolveEditor(propertyItem);
+            }
 
             return editor;
         }
