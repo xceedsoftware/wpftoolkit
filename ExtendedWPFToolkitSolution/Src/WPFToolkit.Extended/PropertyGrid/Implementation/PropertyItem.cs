@@ -232,21 +232,12 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
             CommandBindings.Add(new CommandBinding(PropertyItemCommands.ResetValue, ExecuteResetValueCommand, CanExecuteResetValueCommand));
 
-            AddHandler(Mouse.MouseDownEvent, new MouseButtonEventHandler(PropertyItem_MouseDown), true);
             AddHandler(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(PropertyItem_PreviewMouseDown), true);
         }
 
         #endregion //Constructor
 
         #region Event Handlers
-
-        void PropertyItem_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (Editor != null)
-                Editor.Focus();
-
-            e.Handled = true;
-        }
 
         void PropertyItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
