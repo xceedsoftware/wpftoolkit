@@ -237,6 +237,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="BusyIndicator\Implementation\VisualStates.BusyIndicator.cs" />
+    <Compile Include="PropertyGrid\Implementation\Attributes\IItemsSource.cs" />
+    <Compile Include="PropertyGrid\Implementation\Attributes\ItemsSourceAttribute.cs" />
     <Compile Include="PropertyGrid\Implementation\Commands\PropertyGridCommands.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\ValueSourceToImagePathConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\ValueSourceToToolTipConverter.cs" />
@@ -256,6 +258,7 @@
     <Compile Include="PropertyGrid\Implementation\Editors\DoubleUpDownEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\EnumComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\FontComboBoxEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\ItemsSourceEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\TimeSpanEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\IEditorDefinition.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\IntegerUpDownEditor.cs" />
