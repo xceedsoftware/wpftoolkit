@@ -251,10 +251,6 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         void PropertyItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             IsSelected = true;
-
-            //if it is a comboBox then the selection will not take when Focus is called
-            if (!(e.Source is ComboBox))
-                Focus();
         }
 
         #endregion  //Event Handlers
