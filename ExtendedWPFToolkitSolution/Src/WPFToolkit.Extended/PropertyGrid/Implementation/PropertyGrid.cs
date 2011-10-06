@@ -529,14 +529,14 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             PropertyItemCollection propertyCollection = new PropertyItemCollection(propertyItems);
             propertyCollection.GroupBy("Category");
             propertyCollection.SortBy("Category", ListSortDirection.Ascending);
-            propertyCollection.SortBy("Name", ListSortDirection.Ascending);
+            propertyCollection.SortBy("DisplayName", ListSortDirection.Ascending);
             return propertyCollection;
         }
 
         private static PropertyItemCollection GetAlphabetizedProperties(List<PropertyItem> propertyItems)
         {
             PropertyItemCollection propertyCollection = new PropertyItemCollection(propertyItems);
-            propertyCollection.SortBy("Name", ListSortDirection.Ascending);
+            propertyCollection.SortBy("DisplayName", ListSortDirection.Ascending);
             return propertyCollection;
         }
 
