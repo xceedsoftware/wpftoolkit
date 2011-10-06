@@ -59,6 +59,13 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             return descriptors;
         }
 
+        internal static PropertyItem CreatePropertyItem(PropertyDescriptor property, object instance, PropertyGrid grid, string bindingPath, int level)
+        {
+            PropertyItem item = CreatePropertyItem(property, instance, grid, bindingPath);
+            item.Level = level;
+            return item;
+        }
+
         internal static PropertyItem CreatePropertyItem(PropertyDescriptor property, object instance, PropertyGrid grid, string bindingPath)
         {
             PropertyItem propertyItem = new PropertyItem(instance, property, grid, bindingPath);

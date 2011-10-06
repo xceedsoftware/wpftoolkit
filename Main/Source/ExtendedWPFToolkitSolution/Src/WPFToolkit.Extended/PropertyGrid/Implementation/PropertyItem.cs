@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using Microsoft.Windows.Controls.PropertyGrid.Commands;
 using System.Windows.Markup.Primitives;
-using System.Collections.Generic;
+using Microsoft.Windows.Controls.PropertyGrid.Commands;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
@@ -187,9 +187,9 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #region IsReadOnly
 
-        public bool IsReadOnly 
-        { 
-            get { return PropertyDescriptor.IsReadOnly; } 
+        public bool IsReadOnly
+        {
+            get { return PropertyDescriptor.IsReadOnly; }
         }
 
         #endregion //IsReadOnly
@@ -217,6 +217,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         }
 
         #endregion //IsSelected
+
+        #region Level
+
+        public static readonly DependencyProperty LevelProperty = DependencyProperty.Register("Level", typeof(int), typeof(PropertyItem), new UIPropertyMetadata(0));
+        public int Level
+        {
+            get { return (int)GetValue(LevelProperty); }
+            set { SetValue(LevelProperty, value); }
+        }
+
+        #endregion //Level
 
         #region Properties
 
@@ -387,7 +398,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                 foreach (PropertyDescriptor descriptor in descriptors)
                 {
                     if (descriptor.IsBrowsable)
-                        propertyItems.Add(PropertyGridUtilities.CreatePropertyItem(descriptor, Instance, PropertyGrid, String.Format("{0}.{1}", BindingPath, descriptor.Name)));
+                        propertyItems.Add(PropertyGridUtilities.CreatePropertyItem(descriptor, Instance, PropertyGrid, String.Format("{0}.{1}", BindingPath, descriptor.Name), Level + 1));
                 }
             }
             catch (Exception ex)
