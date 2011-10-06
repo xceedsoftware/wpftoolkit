@@ -407,7 +407,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             };
             propertyItem.SetBinding(PropertyItem.ValueProperty, binding);
 
-            propertyItem.Editor = GetTypeEditor(propertyItem);            
+            propertyItem.Editor = GetTypeEditor(propertyItem);
 
             return propertyItem;
         }
@@ -436,11 +436,13 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             if (itemsSourceAttribute != null)
                 editor = new ItemsSourceEditor(itemsSourceAttribute).ResolveEditor(propertyItem);
 
-            var editorAttribute = GetAttribute<TypeEditorAttribute>(propertyItem.PropertyDescriptor);
+            var editorAttribute = GetAttribute<EditorAttribute>(propertyItem.PropertyDescriptor);
             if (editorAttribute != null)
             {
-                var instance = Activator.CreateInstance(editorAttribute.Type);
-                editor = (instance as ITypeEditor).ResolveEditor(propertyItem);
+                Type type = Type.GetType(editorAttribute.EditorTypeName);
+                var instance = Activator.CreateInstance(type);
+                if (instance is ITypeEditor)
+                    editor = (instance as ITypeEditor).ResolveEditor(propertyItem);
             }
 
             return editor;
