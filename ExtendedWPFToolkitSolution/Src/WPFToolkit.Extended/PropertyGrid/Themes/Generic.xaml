@@ -249,11 +249,7 @@
         </Setter>
     </Style>
 
-    <ContextMenu x:Key="DefaultAdvancedOptionsMenu">
-        <MenuItem Header="Reset Value" Command="commands:PropertyItemCommands.ResetValue" />
-    </ContextMenu>
-
-    <Style x:Key="SubExpanderStyle" TargetType="{x:Type Expander}">
+    <Style x:Key="PropertyExpanderStyle" TargetType="{x:Type Expander}">
         <Setter Property="Padding" Value="10 0 0 0"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -277,186 +273,9 @@
         </Setter>
     </Style>
 
-    <ControlTemplate x:Key="ExtendedPropertyItemTemplate" TargetType="{x:Type local:PropertyItem}">
-        <ControlTemplate.Resources>
-            <ContextMenu x:Key="ContextMenu">
-                <MenuItem Header="Reset Value" Command="commands:PropertyItemCommands.ResetValue"/>
-            </ContextMenu>
-        </ControlTemplate.Resources>
-        <Border ContextMenu="{StaticResource ContextMenu}"
-				ContextMenuService.Placement="Bottom">
-            <Grid VerticalAlignment="Center"
-				  HorizontalAlignment="Stretch">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{Binding NameColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGrid}}}" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <Border BorderThickness="0.5"
-						Padding="{Binding Padding, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}}}"
-						BorderBrush="#FFF0F0F0"
-						x:Name="PART_Name">
-                    
-                    <Grid Margin="7,2,2,2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="15" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        
-                        <Border Grid.Column="0" Padding="5 0 0 0">
-                            <ToggleButton Template="{StaticResource ExpanderToggleButton}"
-								  IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
-								  OverridesDefaultStyle="True" />
-                        </Border>
-                        <TextBlock Grid.Column="1" Text="{Binding DisplayName, RelativeSource={RelativeSource TemplatedParent}}"
-								   HorizontalAlignment="Stretch"
-								   TextTrimming="CharacterEllipsis" />
-                        <Grid Grid.Column="2"
-							  HorizontalAlignment="Right"
-							  Margin="5,0,5,0"
-							  utilities:ContextMenuUtilities.OpenOnMouseLeftButtonClick="True"
-							  ContextMenu="{StaticResource ContextMenu}">
-                            <Image x:Name="_optionsImage"
-								   Width="11"
-								   Height="11"
-                                   Stretch="None"
-								   Source="{Binding ValueSource, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ValueSourceToImagePathConverter}}"
-								   ToolTip="{Binding ValueSource, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ValueSourceToToolTipConverter}}" />
-                        </Grid>
-                    </Grid>
-                </Border>
-                <Border BorderThickness="0.5"
-						BorderBrush="#FFF0F0F0"
-						x:Name="PART_Editor"
-						Grid.Column="2"
-						Background="Transparent">
-                    <ContentControl Content="{TemplateBinding Editor}"
-									VerticalAlignment="Center"
-									Focusable="False"
-									IsTabStop="False" />
-                </Border>
-                <Expander x:Name="ChildPropertyExpander"
-						  Grid.ColumnSpan="3"
-						  Grid.Row="1"
-						  IsExpanded="{TemplateBinding IsExpanded}"
-						  Style="{StaticResource SubExpanderStyle}"
-						  IsEnabled="True">
-                    <ItemsControl ItemsSource="{Binding Properties, RelativeSource={RelativeSource TemplatedParent}}"
-								  IsTabStop="False"
-								  Focusable="False">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                    </ItemsControl>
-                </Expander>
-            </Grid>
-        </Border>
-        <ControlTemplate.Triggers>
-            <DataTrigger Binding="{Binding IsDataBound, RelativeSource={RelativeSource Self}}" Value="True">
-                <Setter TargetName="_optionsImage" Property="Source" Value="/WPFToolkit.Extended;component/PropertyGrid/Images/Database11.png"/>
-                <Setter TargetName="_optionsImage" Property="ToolTip" Value="Databinding"/>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsDynamicResource, RelativeSource={RelativeSource Self}}" Value="True">
-                <Setter TargetName="_optionsImage" Property="Source" Value="/WPFToolkit.Extended;component/PropertyGrid/Images/Resource11.png"/>
-                <Setter TargetName="_optionsImage" Property="ToolTip" Value="Resource"/>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding HasResourceApplied, RelativeSource={RelativeSource Self}}" Value="True">
-                <Setter TargetName="_optionsImage" Property="Source" Value="/WPFToolkit.Extended;component/PropertyGrid/Images/Resource11.png"/>
-                <Setter TargetName="_optionsImage" Property="ToolTip" Value="Resource"/>
-            </DataTrigger>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="PART_Name" Property="Background" Value="#CED4DF"/>
-            </Trigger>
-            <Trigger Property="IsSelected" Value="True">
-                <Setter TargetName="PART_Name" Property="Background" Value="#43577B"/>
-                <Setter TargetName="PART_Name" Property="TextElement.Foreground" Value="White"/>
-            </Trigger>
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
-    
-    <ControlTemplate x:Key="BasicPropertyItemTemplate" TargetType="{x:Type local:PropertyItem}">
-        <ControlTemplate.Resources>
-            <ContextMenu x:Key="ContextMenu">
-                <MenuItem Header="Reset Value" Command="commands:PropertyItemCommands.ResetValue"/>
-            </ContextMenu>
-        </ControlTemplate.Resources>
-        <Border ContextMenu="{StaticResource ContextMenu}" ContextMenuService.Placement="Bottom">
-            <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{Binding NameColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGrid}}}" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Border BorderThickness="0.5"
-						Padding="{Binding Padding, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}}}"
-						BorderBrush="#FFF0F0F0"
-						Grid.Column="0"
-						x:Name="PART_Name">
-                    <Grid Margin="7,2,2,2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="15" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="1" Text="{Binding DisplayName, RelativeSource={RelativeSource TemplatedParent}}"
-								   HorizontalAlignment="Stretch"
-								   TextTrimming="CharacterEllipsis" />
-                        <Grid Grid.Column="2" HorizontalAlignment="Right" Margin="5,0,5,0" 
-                              utilities:ContextMenuUtilities.OpenOnMouseLeftButtonClick="True" 
-                              ContextMenu="{StaticResource ContextMenu}">
-                            <Image x:Name="_optionsImage" Width="11" Height="11" Stretch="None" 
-                                   Source="{Binding ValueSource, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ValueSourceToImagePathConverter}}" 
-                                   ToolTip="{Binding ValueSource, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ValueSourceToToolTipConverter}}"/>
-                        </Grid>
-                    </Grid>
-                </Border>
-                <Border x:Name="PART_Editor" BorderThickness="0.5" BorderBrush="#FFF0F0F0" Grid.Column="1" Background="Transparent">
-                    <ContentControl Content="{TemplateBinding Editor}" VerticalAlignment="Center" Focusable="False" IsTabStop="False"/>
-                </Border>
-            </Grid>
-        </Border>
-        <ControlTemplate.Triggers>
-            <DataTrigger Binding="{Binding IsDataBound, RelativeSource={RelativeSource Self}}" Value="True">
-                <Setter TargetName="_optionsImage" Property="Source" Value="/WPFToolkit.Extended;component/PropertyGrid/Images/Database11.png"/>
-                <Setter TargetName="_optionsImage" Property="ToolTip" Value="Databinding"/>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsDynamicResource, RelativeSource={RelativeSource Self}}" Value="True">
-                <Setter TargetName="_optionsImage" Property="Source" Value="/WPFToolkit.Extended;component/PropertyGrid/Images/Resource11.png"/>
-                <Setter TargetName="_optionsImage" Property="ToolTip" Value="Resource"/>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding HasResourceApplied, RelativeSource={RelativeSource Self}}" Value="True">
-                <Setter TargetName="_optionsImage" Property="Source" Value="/WPFToolkit.Extended;component/PropertyGrid/Images/Resource11.png"/>
-                <Setter TargetName="_optionsImage" Property="ToolTip" Value="Resource"/>
-            </DataTrigger>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="PART_Name" Property="Background" Value="#CED4DF"/>
-            </Trigger>
-            <Trigger Property="IsSelected" Value="True">
-                <Setter TargetName="PART_Name" Property="Background" Value="#43577B"/>
-                <Setter TargetName="PART_Name" Property="TextElement.Foreground" Value="White"/>
-            </Trigger>
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
-    
-    <!--<Style TargetType="{x:Type local:PropertyItem}">
-        <Setter Property="BorderBrush" Value="#FFF0F0F0"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Focusable" Value="True"/>
-        <Setter Property="IsTabStop" Value="False"/>
-        <Style.Triggers>
-            <Trigger Property="HasChildProperties" Value="True">
-                <Setter Property="Template" Value="{StaticResource ExtendedPropertyItemTemplate}"/>
-            </Trigger>
-            <Trigger Property="HasChildProperties" Value="False">
-                <Setter Property="Template" Value="{StaticResource BasicPropertyItemTemplate}"/>
-            </Trigger>
-        </Style.Triggers>
-    </Style>-->
+    <ContextMenu x:Key="DefaultAdvancedOptionsMenu">
+        <MenuItem Header="Reset Value" Command="commands:PropertyItemCommands.ResetValue" />
+    </ContextMenu>
 
     <Style TargetType="{x:Type local:PropertyItem}">
         <Setter Property="BorderBrush" Value="#FFF0F0F0" />
@@ -485,7 +304,7 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <Border Grid.Column="0" Padding="0">
+                                    <Border Grid.Column="0" >
                                         <ToggleButton Template="{StaticResource ExpanderToggleButton}" OverridesDefaultStyle="True"
                                               IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
                                               Visibility="{Binding HasChildProperties, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
@@ -508,8 +327,8 @@
                                 <ContentControl Content="{TemplateBinding Editor}" VerticalAlignment="Center" Focusable="False" IsTabStop="False" />
                             </Border>
 
-                            <Expander x:Name="ChildPropertyExpander" Grid.ColumnSpan="2" Grid.Row="1" IsExpanded="{TemplateBinding IsExpanded}" Style="{StaticResource SubExpanderStyle}" IsEnabled="True">
-                                <ItemsControl ItemsSource="{Binding Properties, RelativeSource={RelativeSource TemplatedParent}}" IsTabStop="False" Focusable="False">
+                            <Expander x:Name="_propertyExpander" Grid.ColumnSpan="2" Grid.Row="1" IsExpanded="{TemplateBinding IsExpanded}" Style="{StaticResource PropertyExpanderStyle}" IsEnabled="True">
+                                <ItemsControl ItemsSource="{Binding Properties, RelativeSource={RelativeSource TemplatedParent}}" IsTabStop="False" Focusable="False" Margin="15,0,0,0" >
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <VirtualizingStackPanel />
