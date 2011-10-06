@@ -7,6 +7,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Microsoft.Windows.Controls.PropertyGrid.Commands;
 using System.Windows.Markup.Primitives;
+using System.Collections.Generic;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
@@ -21,6 +22,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #region Properties
 
+        public string BindingPath { get; private set; }
+
         #region Category
 
         public static readonly DependencyProperty CategoryProperty = DependencyProperty.Register("Category", typeof(string), typeof(PropertyItem), new UIPropertyMetadata(string.Empty));
@@ -32,7 +35,14 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //Category
 
-        public string Description { get { return PropertyDescriptor.Description; } }
+        #region Desription
+
+        public string Description
+        {
+            get { return PropertyDescriptor.Description; }
+        }
+
+        #endregion //Desription
 
         #region DisplayName
 
@@ -72,19 +82,22 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //Editor
 
+        #region Instance
+
         private object _instance;
         public object Instance
         {
-            get
-            {
-                return _instance;
-            }
+            get { return _instance; }
             private set
             {
                 _instance = value;
                 _markupObject = MarkupWriter.GetMarkupObjectFor(_instance);
             }
         }
+
+        #endregion //Instance
+
+        #region IsDataBound
 
         /// <summary>
         /// Gets if the property is data bound
@@ -101,6 +114,10 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             }
         }
 
+        #endregion //IsDataBound
+
+        #region IsDynamicResource
+
         public bool IsDynamicResource
         {
             get
@@ -111,6 +128,47 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                 return false;
             }
         }
+
+        #endregion //IsDynamicResource
+
+        #region IsExpanded
+
+        public static readonly DependencyProperty IsExpandedProperty = DependencyProperty.Register("IsExpanded", typeof(bool), typeof(PropertyItem), new UIPropertyMetadata(false, OnIsExpandedChanged));
+        public bool IsExpanded
+        {
+            get { return (bool)GetValue(IsExpandedProperty); }
+            set { SetValue(IsExpandedProperty, value); }
+        }
+
+        private static void OnIsExpandedChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            PropertyItem propertyItem = o as PropertyItem;
+            if (propertyItem != null)
+                propertyItem.OnIsExpandedChanged((bool)e.OldValue, (bool)e.NewValue);
+        }
+
+        protected virtual void OnIsExpandedChanged(bool oldValue, bool newValue)
+        {
+            if (newValue && (Properties == null || Properties.Count == 0))
+            {
+                GetChildProperties();
+            }
+        }
+
+        #endregion IsExpanded
+
+        #region HasChildProperties
+
+        public static readonly DependencyProperty HasChildPropertiesProperty = DependencyProperty.Register("HasChildProperties", typeof(bool), typeof(PropertyItem), new UIPropertyMetadata(false));
+        public bool HasChildProperties
+        {
+            get { return (bool)GetValue(HasChildPropertiesProperty); }
+            set { SetValue(HasChildPropertiesProperty, value); }
+        }
+
+        #endregion HasChildProperties
+
+        #region HasResourceApplied
 
         public bool HasResourceApplied
         {
@@ -125,7 +183,16 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             }
         }
 
-        public bool IsReadOnly { get { return PropertyDescriptor.IsReadOnly; } }
+        #endregion //HasResourceApplied
+
+        #region IsReadOnly
+
+        public bool IsReadOnly 
+        { 
+            get { return PropertyDescriptor.IsReadOnly; } 
+        }
+
+        #endregion //IsReadOnly
 
         #region IsSelected
 
@@ -151,7 +218,18 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //IsSelected
 
-        public bool IsWriteable { get { return !IsReadOnly; } }
+        #region Properties
+
+        public static readonly DependencyProperty PropertiesProperty = DependencyProperty.Register("Properties", typeof(PropertyItemCollection), typeof(PropertyItem), new UIPropertyMetadata(null));
+        public PropertyItemCollection Properties
+        {
+            get { return (PropertyItemCollection)GetValue(PropertiesProperty); }
+            set { SetValue(PropertiesProperty, value); }
+        }
+
+        #endregion //Properties
+
+        #region PropertyDescriptor
 
         private PropertyDescriptor _propertyDescriptor;
         public PropertyDescriptor PropertyDescriptor
@@ -170,9 +248,18 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             }
         }
 
+        #endregion //PropertyDescriptor
+
         public PropertyGrid PropertyGrid { get; private set; }
 
-        public Type PropertyType { get { return PropertyDescriptor.PropertyType; } }
+        #region PropertyType
+
+        public Type PropertyType
+        {
+            get { return PropertyDescriptor.PropertyType; }
+        }
+
+        #endregion //PropertyType
 
         public ICommand ResetValueCommand { get; private set; }
 
@@ -199,6 +286,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //Value
 
+        #region ValueSource
+
         /// <summary>
         /// Gets the value source.
         /// </summary>
@@ -214,28 +303,38 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             }
         }
 
+        #endregion //ValueSource
+
         #endregion //Properties
 
-        #region Constructor
+        #region Constructors
 
         static PropertyItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(PropertyItem), new FrameworkPropertyMetadata(typeof(PropertyItem)));
         }
 
-        public PropertyItem(object instance, PropertyDescriptor property, PropertyGrid propertyGrid)
+        public PropertyItem(object instance, PropertyDescriptor property, PropertyGrid propertyGrid, string bindingPath)
         {
-
             PropertyDescriptor = property;
             PropertyGrid = propertyGrid;
             Instance = instance;
+            BindingPath = bindingPath;
+
+            if (!IsReadOnly)
+            {
+                TypeConverter converter = PropertyDescriptor.Converter;
+                if (converter is ExpandableObjectConverter && PropertyDescriptor.GetValue(Instance) != null)
+                {
+                    HasChildProperties = true;
+                }
+            }
 
             CommandBindings.Add(new CommandBinding(PropertyItemCommands.ResetValue, ExecuteResetValueCommand, CanExecuteResetValueCommand));
-
             AddHandler(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(PropertyItem_PreviewMouseDown), true);
         }
 
-        #endregion //Constructor
+        #endregion //Constructors
 
         #region Event Handlers
 
@@ -269,5 +368,36 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         }
 
         #endregion //Commands
+
+        #region Methods
+
+        private void GetChildProperties()
+        {
+            TypeConverter converter = PropertyDescriptor.Converter;
+
+            PropertyDescriptorCollection descriptors = null;
+
+            if (converter is ExpandableObjectConverter)
+                descriptors = PropertyDescriptor.GetChildProperties();
+
+            var propertyItems = new List<PropertyItem>();
+
+            try
+            {
+                foreach (PropertyDescriptor descriptor in descriptors)
+                {
+                    if (descriptor.IsBrowsable)
+                        propertyItems.Add(PropertyGridUtilities.CreatePropertyItem(descriptor, Instance, PropertyGrid, String.Format("{0}.{1}", BindingPath, descriptor.Name)));
+                }
+            }
+            catch (Exception ex)
+            {
+                //TODO: handle this some how
+            }
+
+            Properties = PropertyGridUtilities.GetAlphabetizedProperties(propertyItems);
+        }
+
+        #endregion //Methods
     }
 }

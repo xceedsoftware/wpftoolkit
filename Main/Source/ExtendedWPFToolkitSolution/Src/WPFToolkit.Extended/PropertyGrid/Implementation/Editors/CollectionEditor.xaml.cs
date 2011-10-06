@@ -22,7 +22,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
             CollectionEditorDialog editor = new CollectionEditorDialog(_item.PropertyType);
             Binding binding = new Binding("Value");
             binding.Source = _item;
-            binding.Mode = _item.IsWriteable ? BindingMode.TwoWay : BindingMode.OneWay;
+            binding.Mode = _item.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay;
             BindingOperations.SetBinding(editor, CollectionEditorDialog.ItemsSourceProperty, binding);
             editor.ShowDialog();
         }

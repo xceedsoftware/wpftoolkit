@@ -271,6 +271,7 @@
     <Compile Include="PropertyGrid\Implementation\PropertyItemCollection.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyItem.cs" />
     <Compile Include="PropertyGrid\Implementation\Commands\PropertyItemCommands.cs" />
+    <Compile Include="PropertyGrid\Implementation\PropertyGridUtilities.cs" />
     <Compile Include="RichTextBoxFormatBar\IRichTextBoxFormatBar.cs" />
     <Compile Include="RichTextBoxFormatBar\RichTextBoxFormatBar.xaml.cs">
       <DependentUpon>RichTextBoxFormatBar.xaml</DependentUpon>
