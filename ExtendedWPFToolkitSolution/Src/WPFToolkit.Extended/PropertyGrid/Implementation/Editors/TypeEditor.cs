@@ -40,7 +40,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
             _binding.Source = propertyItem;
             _binding.ValidatesOnExceptions = true;
             _binding.ValidatesOnDataErrors = true;
-            _binding.Mode = propertyItem.IsWriteable ? BindingMode.TwoWay : BindingMode.OneWay;
+            _binding.Mode = propertyItem.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay;
             _binding.Converter = CreateValueConverter();
             BindingOperations.SetBinding(Editor, ValueProperty, _binding);
         }
