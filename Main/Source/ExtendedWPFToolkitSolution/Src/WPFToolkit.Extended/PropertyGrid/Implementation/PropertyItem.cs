@@ -8,6 +8,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Markup.Primitives;
 using Microsoft.Windows.Controls.PropertyGrid.Commands;
+using Microsoft.Windows.Controls.PropertyGrid.Attributes;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
@@ -334,8 +335,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
             if (!IsReadOnly)
             {
-                TypeConverter converter = PropertyDescriptor.Converter;
-                if (converter is ExpandableObjectConverter && PropertyDescriptor.GetValue(Instance) != null)
+                var attribute = PropertyGridUtilities.GetAttribute<ExpandableObjectAttribute>(PropertyDescriptor);
+                if (attribute != null && PropertyDescriptor.GetValue(Instance) != null)
                 {
                     HasChildProperties = true;
                 }
@@ -384,12 +385,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         private void GetChildProperties()
         {
-            TypeConverter converter = PropertyDescriptor.Converter;
-
-            PropertyDescriptorCollection descriptors = null;
-
-            if (converter is ExpandableObjectConverter)
-                descriptors = PropertyDescriptor.GetChildProperties();
+            PropertyDescriptorCollection descriptors = PropertyDescriptor.GetChildProperties();
 
             var propertyItems = new List<PropertyItem>();
 

@@ -237,6 +237,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="BusyIndicator\Implementation\VisualStates.BusyIndicator.cs" />
+    <Compile Include="PropertyGrid\Implementation\Attributes\ExpandableObjectAttribute.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\IItemsSource.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\ItemsSourceAttribute.cs" />
     <Compile Include="PropertyGrid\Implementation\Commands\PropertyGridCommands.cs" />
