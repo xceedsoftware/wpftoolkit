@@ -1,0 +1,9 @@
+﻿<UserControl x:Class="Samples.Modules.PropertyGrid.LastNameUserControlEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="_uc">
+        <StackPanel>
+            <TextBox Text="{Binding Value, ElementName=_uc}" Background="YellowGreen"  />
+            <Button Click="Button_Click">Clear</Button>
+        </StackPanel>
+</UserControl>

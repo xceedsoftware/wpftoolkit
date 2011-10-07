@@ -8,4 +8,14 @@
         <Style TargetType="views:NavigationView" BasedOn="{StaticResource {x:Type TreeViewItem}}" />
     </TreeViewItem.Resources>
 
+    <TreeViewItem Header="Editors">
+        <TreeViewItem Header="Default Editors" Tag="{x:Type views:DefaultEditors}"  />
+        <TreeViewItem Header="Custom Editors" Tag="{x:Type views:CustomEditors}"/>
+    </TreeViewItem>
+    <TreeViewItem Header="Properties">
+        <TreeViewItem Header="Expandable Properties" Tag="{x:Type views:ExpandableProperties}"/>
+        <TreeViewItem Header="Specifying Properties" Tag="{x:Type views:SpecifyingProperties}"/>
+        <TreeViewItem Header="Providing an ItemsSource" Tag="{x:Type views:CustomItemsSource}"/>
+    </TreeViewItem>
+
 </TreeViewItem>
