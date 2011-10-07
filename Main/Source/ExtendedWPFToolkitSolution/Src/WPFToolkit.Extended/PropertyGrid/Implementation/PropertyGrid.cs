@@ -8,6 +8,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using Microsoft.Windows.Controls.PropertyGrid.Commands;
+using System.Reflection;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
@@ -33,6 +34,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //AdvancedOptionsMenu
 
+        #region AutoGenerateProperties
+
+        public static readonly DependencyProperty AutoGeneratePropertiesProperty = DependencyProperty.Register("AutoGenerateProperties", typeof(bool), typeof(PropertyGrid), new UIPropertyMetadata(true));
+        public bool AutoGenerateProperties
+        {
+            get { return (bool)GetValue(AutoGeneratePropertiesProperty); }
+            set { SetValue(AutoGeneratePropertiesProperty, value); }
+        }
+
+        #endregion //AutoGenerateProperties
+
         #region DisplaySummary
 
         public static readonly DependencyProperty DisplaySummaryProperty = DependencyProperty.Register("DisplaySummary", typeof(bool), typeof(PropertyGrid), new UIPropertyMetadata(true));
@@ -46,7 +58,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #region EditorDefinitions
 
-        public static readonly DependencyProperty EditorDefinitionsProperty = DependencyProperty.Register("EditorDefinitions", typeof(EditorDefinitionCollection), typeof(PropertyGrid), new UIPropertyMetadata(new EditorDefinitionCollection()));
+        public static readonly DependencyProperty EditorDefinitionsProperty = DependencyProperty.Register("EditorDefinitions", typeof(EditorDefinitionCollection), typeof(PropertyGrid), new UIPropertyMetadata(null));
         public EditorDefinitionCollection EditorDefinitions
         {
             get { return (EditorDefinitionCollection)GetValue(EditorDefinitionsProperty); }
@@ -123,6 +135,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         }
 
         #endregion //Properties
+
+        #region PropertyDefinitions
+
+        public static readonly DependencyProperty PropertyDefinitionsProperty = DependencyProperty.Register("PropertyDefinitions", typeof(PropertyDefinitionCollection), typeof(PropertyGrid), new UIPropertyMetadata(null));
+        public PropertyDefinitionCollection PropertyDefinitions
+        {
+            get { return (PropertyDefinitionCollection)GetValue(PropertyDefinitionsProperty); }
+            set { SetValue(PropertyDefinitionsProperty, value); }
+        }
+
+        #endregion //PropertyDefinitions
 
         #region SelectedObject
 
@@ -275,6 +298,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         public PropertyGrid()
         {
+            EditorDefinitions = new EditorDefinitionCollection();
+            PropertyDefinitions = new PropertyDefinitionCollection();
             CommandBindings.Add(new CommandBinding(PropertyGridCommands.ClearFilter, ClearFilter, CanClearFilter));
         }
 
@@ -286,8 +311,11 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         {
             base.OnApplyTemplate();
 
-            _dragThumb = (Thumb)GetTemplateChild("PART_DragThumb");
-            _dragThumb.DragDelta += DragThumb_DragDelta;
+            if (_dragThumb != null)
+                _dragThumb.DragDelta -= DragThumb_DragDelta;
+            _dragThumb = GetTemplateChild("PART_DragThumb") as Thumb;
+            if (_dragThumb != null)
+                _dragThumb.DragDelta += DragThumb_DragDelta;
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -355,7 +383,26 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
             try
             {
-                var descriptors = PropertyGridUtilities.GetPropertyDescriptors(instance);
+                PropertyDescriptorCollection descriptors = PropertyGridUtilities.GetPropertyDescriptors(instance);
+
+                if (!AutoGenerateProperties)
+                {
+                    List<PropertyDescriptor> specificProperties = new List<PropertyDescriptor>();
+                    foreach (PropertyDefinition pd in PropertyDefinitions)
+                    {
+                        foreach (PropertyDescriptor descriptor in descriptors)
+                        {
+                            if (descriptor.Name == pd.Name)
+                            {
+                                specificProperties.Add(descriptor);
+                                break;
+                            }
+                        }
+                    }
+
+                    descriptors = new PropertyDescriptorCollection(specificProperties.ToArray());                 
+                }
+
                 foreach (PropertyDescriptor descriptor in descriptors)
                 {
                     if (descriptor.IsBrowsable)

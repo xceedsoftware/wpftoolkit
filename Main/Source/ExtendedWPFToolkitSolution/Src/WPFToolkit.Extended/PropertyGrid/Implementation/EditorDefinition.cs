@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
 using System.Windows;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
@@ -8,8 +7,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
     {
         public DataTemplate EditorTemplate { get; set; }
 
-        private List<string> _properties = new List<string>();
-        public List<string> Properties
+        private PropertyDefinitionCollection _properties = new PropertyDefinitionCollection();
+        public PropertyDefinitionCollection PropertiesDefinitions
         {
             get { return _properties; }
             set { _properties = value; }
