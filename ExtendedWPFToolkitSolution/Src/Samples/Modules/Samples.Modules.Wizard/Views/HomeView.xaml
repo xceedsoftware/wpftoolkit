@@ -5,6 +5,20 @@
              xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
                       Title="Wizard">
     <Grid>
-        <TextBlock Text="Wizard View" />
+        <extToolkit:Wizard FinishButtonClosesWindow="True">
+            <extToolkit:WizardPage x:Name="IntroPage" 
+                                   Title="Welcome to my Wizard"
+                                   Description="This Wizard will walk you though how to do something." />
+            <extToolkit:WizardPage x:Name="Page1" PageType="Interior"
+                                   Title="Page 1"
+                                   Description="This is the first page in the process."/>
+            <extToolkit:WizardPage x:Name="Page2" PageType="Interior"
+                                   Title="Page 2"
+                                   Description="This is the second page in the process"/>
+            <extToolkit:WizardPage x:Name="LastPage" PageType="Interior"
+                                   Title="Last Page"
+                                   Description="This is the last page in the process"
+                                   CanFinish="True"/>
+        </extToolkit:Wizard>
     </Grid>
 </infControls:DemoView>

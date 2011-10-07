@@ -307,7 +307,7 @@ namespace Microsoft.Windows.Controls
                     //no previous page defined so use index
                     var currentIndex = Items.IndexOf(CurrentPage);
                     var previousPageIndex = currentIndex - 1;
-                    if (previousPageIndex > 0 && previousPageIndex < Items.Count)
+                    if (previousPageIndex >= 0 && previousPageIndex < Items.Count)
                         previousPage = Items[previousPageIndex] as WizardPage;
                 }
             }
@@ -416,7 +416,7 @@ namespace Microsoft.Windows.Controls
                 //lets use an index to find the next page
                 var currentIndex = Items.IndexOf(CurrentPage);
                 var previousPageIndex = currentIndex - 1;
-                if (previousPageIndex > 0 && previousPageIndex < Items.Count)
+                if (previousPageIndex >= 0 && previousPageIndex < Items.Count)
                     exists = true;
             }
 
