@@ -20,6 +20,11 @@ namespace Samples.Modules.PropertyGrid
         protected override void RegisterViewsAndTypes()
         {
             Container.RegisterNavigationType(typeof(HomeView));
+            Container.RegisterNavigationType(typeof(CustomEditors));
+            Container.RegisterNavigationType(typeof(CustomItemsSource));
+            Container.RegisterNavigationType(typeof(DefaultEditors));
+            Container.RegisterNavigationType(typeof(ExpandableProperties));
+            Container.RegisterNavigationType(typeof(SpecifyingProperties));
         }
     }
 }

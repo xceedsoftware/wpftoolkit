@@ -36,14 +36,14 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //Category
 
-        #region Desription
+        #region Description
 
         public string Description
         {
             get { return PropertyDescriptor.Description; }
         }
 
-        #endregion //Desription
+        #endregion //Description
 
         #region DisplayName
 

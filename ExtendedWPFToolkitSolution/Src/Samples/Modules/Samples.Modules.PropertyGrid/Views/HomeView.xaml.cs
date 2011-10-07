@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Microsoft.Practices.Prism.Regions;
 using Samples.Infrastructure.Controls;
-using Microsoft.Practices.Prism.Regions;
 
 namespace Samples.Modules.PropertyGrid.Views
 {
