@@ -128,7 +128,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             if (customTypeEditors.Count > 0)
             {
                 //first check if the custom editor is type based
-                IEditorDefinition customEditor = customTypeEditors[propertyItem.PropertyType];
+                EditorDefinition customEditor = customTypeEditors[propertyItem.PropertyType];
                 if (customEditor == null)
                 {
                     //must be property based
