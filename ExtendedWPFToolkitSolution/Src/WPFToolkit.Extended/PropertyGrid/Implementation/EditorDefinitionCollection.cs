@@ -4,9 +4,9 @@ using System.Collections.ObjectModel;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
-    public class EditorDefinitionCollection : ObservableCollection<IEditorDefinition>
+    public class EditorDefinitionCollection : ObservableCollection<EditorDefinition>
     {
-        public IEditorDefinition this[string propertyName]
+        public EditorDefinition this[string propertyName]
         {
             get
             {
@@ -20,7 +20,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             }
         }
 
-        public IEditorDefinition this[Type targetType]
+        public EditorDefinition this[Type targetType]
         {
             get
             {

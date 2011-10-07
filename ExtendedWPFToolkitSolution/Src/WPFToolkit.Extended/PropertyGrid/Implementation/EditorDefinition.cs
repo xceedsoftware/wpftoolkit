@@ -3,7 +3,7 @@ using System.Windows;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
-    public class EditorDefinition : IEditorDefinition
+    public class EditorDefinition
     {
         public DataTemplate EditorTemplate { get; set; }
 
