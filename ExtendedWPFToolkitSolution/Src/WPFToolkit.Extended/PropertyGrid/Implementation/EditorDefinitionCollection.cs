@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.ObjectModel;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
@@ -11,7 +12,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             {
                 foreach (var item in Items)
                 {
-                    if (item.Properties.Contains(propertyName))
+                    if (item.PropertiesDefinitions.Where(x => x.Name == propertyName).Any())
                         return item;
                 }
 

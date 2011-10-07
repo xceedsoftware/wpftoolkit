@@ -268,6 +268,8 @@
     <Compile Include="PropertyGrid\Implementation\Editors\TextBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\TypeEditor.cs" />
     <Compile Include="Core\Converters\ExpandableObjectMarginConverter.cs" />
+    <Compile Include="PropertyGrid\Implementation\PropertyDefinition.cs" />
+    <Compile Include="PropertyGrid\Implementation\PropertyDefinitionCollection.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyGrid.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyItemCollection.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyItem.cs" />
