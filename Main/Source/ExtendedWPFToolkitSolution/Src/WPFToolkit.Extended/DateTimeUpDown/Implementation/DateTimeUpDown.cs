@@ -17,13 +17,9 @@ namespace Microsoft.Windows.Controls
         private bool _fireSelectionChangedEvent = true;
         private bool _processTextChanged = true;
 
-        private DateTimeParser _dateTimeParser;
-
         #endregion //Members
 
         #region Properties
-
-        private DateTimeFormatInfo DateTimeFormatInfo { get; set; }
 
         #region DefaultValue
 
@@ -54,7 +50,6 @@ namespace Microsoft.Windows.Controls
 
         protected virtual void OnFormatChanged(DateTimeFormat oldValue, DateTimeFormat newValue)
         {
-            _dateTimeParser.Format = GetFormatString(newValue);
             InitializeDateTimeInfoListAndParseValue();
             UpdateTextFormatting();
         }
@@ -82,7 +77,6 @@ namespace Microsoft.Windows.Controls
             if (string.IsNullOrEmpty(newValue))
                 throw new ArgumentException("FormatString should be specified.", "newValue");
 
-            _dateTimeParser.Format = newValue;
             InitializeDateTimeInfoListAndParseValue();
             UpdateTextFormatting();
         }
@@ -112,8 +106,6 @@ namespace Microsoft.Windows.Controls
 
         public DateTimeUpDown()
         {
-            DateTimeFormatInfo = DateTimeFormatInfo.GetInstance(CultureInfo);
-            _dateTimeParser = new DateTimeParser(DateTimeFormatInfo, GetFormatString(Format));
             InitializeDateTimeInfoList();
         }
 
@@ -125,6 +117,11 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
             TextBox.SelectionChanged += TextBox_SelectionChanged;
+        }
+
+        protected override void OnCultureInfoChanged(CultureInfo oldValue, CultureInfo newValue)
+        {
+            InitializeDateTimeInfoList();
         }
 
         protected override DateTime? CoerceValue(DateTime? value)
@@ -187,11 +184,11 @@ namespace Microsoft.Windows.Controls
                 return;
             }
 
-            DateTime current = Value.HasValue ? Value.Value : DateTime.Now;
+            DateTime current = Value.HasValue ? Value.Value : DateTime.Parse(DateTime.Now.ToString(), CultureInfo.DateTimeFormat);
             DateTime result;
-            var success = _dateTimeParser.TryParse(currentValue, out result, current);
+            var success = DateTimeParser.TryParse(currentValue, GetFormatString(Format), current, CultureInfo, out result);
 
-            SyncTextAndValueProperties(InputBase.TextProperty, result.ToString());
+            SyncTextAndValueProperties(InputBase.TextProperty, result.ToString(CultureInfo));
         }
 
         protected override DateTime? ConvertTextToValue(string text)
@@ -199,15 +196,16 @@ namespace Microsoft.Windows.Controls
             if (string.IsNullOrEmpty(text))
                 return null;
 
-            return DateTime.Parse(text, CultureInfo.CurrentCulture);
+            return DateTime.Parse(text, CultureInfo);
         }
 
         protected override string ConvertValueToText()
         {
             if (Value == null) return string.Empty;
 
-            DateTime dt = DateTime.Parse(Value.ToString(), CultureInfo);
-            return dt.ToString(GetFormatString(Format), CultureInfo);
+            var test = Value.Value.ToString(CultureInfo);
+            
+            return Value.Value.ToString(GetFormatString(Format), CultureInfo);
         }
 
         protected override void SetValidSpinDirection()
@@ -437,7 +435,7 @@ namespace Microsoft.Windows.Controls
                 {
                     DateTime date = DateTime.Parse(Value.ToString());
                     info.StartPosition = text.Length;
-                    info.Content = date.ToString(info.Format, DateTimeFormatInfo);
+                    info.Content = date.ToString(info.Format, CultureInfo.DateTimeFormat);
                     info.Length = info.Content.Length;
                     text += info.Content;
                 }
@@ -469,25 +467,25 @@ namespace Microsoft.Windows.Controls
             switch (dateTimeFormat)
             {
                 case DateTimeFormat.ShortDate:
-                    return DateTimeFormatInfo.ShortDatePattern;
+                    return CultureInfo.DateTimeFormat.ShortDatePattern;
                 case DateTimeFormat.LongDate:
-                    return DateTimeFormatInfo.LongDatePattern;
+                    return CultureInfo.DateTimeFormat.LongDatePattern;
                 case DateTimeFormat.ShortTime:
-                    return DateTimeFormatInfo.ShortTimePattern;
+                    return CultureInfo.DateTimeFormat.ShortTimePattern;
                 case DateTimeFormat.LongTime:
-                    return DateTimeFormatInfo.LongTimePattern;
+                    return CultureInfo.DateTimeFormat.LongTimePattern;
                 case DateTimeFormat.FullDateTime:
-                    return DateTimeFormatInfo.FullDateTimePattern;
+                    return CultureInfo.DateTimeFormat.FullDateTimePattern;
                 case DateTimeFormat.MonthDay:
-                    return DateTimeFormatInfo.MonthDayPattern;
+                    return CultureInfo.DateTimeFormat.MonthDayPattern;
                 case DateTimeFormat.RFC1123:
-                    return DateTimeFormatInfo.RFC1123Pattern;
+                    return CultureInfo.DateTimeFormat.RFC1123Pattern;
                 case DateTimeFormat.SortableDateTime:
-                    return DateTimeFormatInfo.SortableDateTimePattern;
+                    return CultureInfo.DateTimeFormat.SortableDateTimePattern;
                 case DateTimeFormat.UniversalSortableDateTime:
-                    return DateTimeFormatInfo.UniversalSortableDateTimePattern;
+                    return CultureInfo.DateTimeFormat.UniversalSortableDateTimePattern;
                 case DateTimeFormat.YearMonth:
-                    return DateTimeFormatInfo.YearMonthPattern;
+                    return CultureInfo.DateTimeFormat.YearMonthPattern;
                 case DateTimeFormat.Custom:
                     return FormatString;
                 default:

@@ -11,11 +11,23 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #region CultureInfo
 
-        public static readonly DependencyProperty CultureInfoProperty = DependencyProperty.Register("CultureInfo", typeof(CultureInfo), typeof(InputBase), new UIPropertyMetadata(CultureInfo.CurrentCulture));
+        public static readonly DependencyProperty CultureInfoProperty = DependencyProperty.Register("CultureInfo", typeof(CultureInfo), typeof(InputBase), new UIPropertyMetadata(CultureInfo.CurrentCulture, OnCultureInfoChanged));
         public CultureInfo CultureInfo
         {
             get { return (CultureInfo)GetValue(CultureInfoProperty); }
             set { SetValue(CultureInfoProperty, value); }
+        }
+
+        private static void OnCultureInfoChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            InputBase inputBase = o as InputBase;
+            if (inputBase != null)
+                inputBase.OnCultureInfoChanged((CultureInfo)e.OldValue, (CultureInfo)e.NewValue);
+        }
+
+        protected virtual void OnCultureInfoChanged(CultureInfo oldValue, CultureInfo newValue)
+        {
+
         }
 
         #endregion //CultureInfo
