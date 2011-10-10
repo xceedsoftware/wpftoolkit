@@ -5,12 +5,14 @@ using System;
 using System.Windows.Media;
 using System.Windows;
 using Microsoft.Windows.Controls.PropertyGrid.Attributes;
+using Microsoft.Practices.Prism.Regions;
 
 namespace Samples.Modules.PropertyGrid.Views
 {
     /// <summary>
     /// Interaction logic for CustomItemsSource.xaml
     /// </summary>
+    [RegionMemberLifetime(KeepAlive = false)]
     public partial class CustomItemsSource : DemoView
     {
         public CustomItemsSource()

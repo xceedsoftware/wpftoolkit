@@ -25,6 +25,7 @@ namespace Samples.Modules.PropertyGrid
             Container.RegisterNavigationType(typeof(DefaultEditors));
             Container.RegisterNavigationType(typeof(ExpandableProperties));
             Container.RegisterNavigationType(typeof(SpecifyingProperties));
+            Container.RegisterNavigationType(typeof(BindingToStructs));
         }
     }
 }

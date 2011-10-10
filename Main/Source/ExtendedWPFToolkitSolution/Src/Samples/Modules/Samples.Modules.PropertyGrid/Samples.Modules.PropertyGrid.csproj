@@ -78,6 +78,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Views\BindingToStructs.xaml.cs">
+      <DependentUpon>BindingToStructs.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\CustomEditors.xaml.cs">
       <DependentUpon>CustomEditors.xaml</DependentUpon>
     </Compile>
@@ -121,6 +124,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Resources\LastNameUserControlEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BindingToStructs.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
