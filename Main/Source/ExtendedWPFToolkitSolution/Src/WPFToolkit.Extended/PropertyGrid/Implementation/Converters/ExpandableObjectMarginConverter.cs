@@ -2,7 +2,7 @@ using System;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Microsoft.Windows.Controls.Core.Converters
+namespace Microsoft.Windows.Controls.PropertyGrid.Converters
 {
     public class ExpandableObjectMarginConverter : IValueConverter
     {
