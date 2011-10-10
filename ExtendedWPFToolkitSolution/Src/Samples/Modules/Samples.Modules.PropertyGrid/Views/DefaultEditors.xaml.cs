@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Windows.Media;
 using System.ComponentModel;
 using System.Windows;
+using Microsoft.Practices.Prism.Regions;
 
 namespace Samples.Modules.PropertyGrid.Views
 {
     /// <summary>
     /// Interaction logic for DefaultEditors.xaml
     /// </summary>
+    [RegionMemberLifetime(KeepAlive = false)]
     public partial class DefaultEditors : DemoView
     {
         public DefaultEditors()

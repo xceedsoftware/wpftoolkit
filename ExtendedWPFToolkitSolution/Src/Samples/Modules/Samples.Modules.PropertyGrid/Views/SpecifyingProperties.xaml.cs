@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System;
 using System.Windows.Media;
 using System.Windows;
+using Microsoft.Practices.Prism.Regions;
 
 namespace Samples.Modules.PropertyGrid.Views
 {
     /// <summary>
     /// Interaction logic for SpecifyingProperties.xaml
     /// </summary>
+    [RegionMemberLifetime(KeepAlive = false)]
     public partial class SpecifyingProperties : DemoView
     {
         public SpecifyingProperties()

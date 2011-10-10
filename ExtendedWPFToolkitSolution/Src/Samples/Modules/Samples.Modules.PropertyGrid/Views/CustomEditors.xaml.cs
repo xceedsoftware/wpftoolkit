@@ -6,12 +6,14 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Microsoft.Practices.Prism.Regions;
 
 namespace Samples.Modules.PropertyGrid.Views
 {
     /// <summary>
     /// Interaction logic for CustomEditors.xaml
     /// </summary>
+    [RegionMemberLifetime(KeepAlive = false)]
     public partial class CustomEditors : DemoView
     {
         public CustomEditors()

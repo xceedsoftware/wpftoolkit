@@ -13,9 +13,10 @@
         <TreeViewItem Header="Custom Editors" Tag="{x:Type views:CustomEditors}"/>
     </TreeViewItem>
     <TreeViewItem Header="Properties">
+        <TreeViewItem Header="Binding to Structs" Tag="{x:Type views:BindingToStructs}"/>
         <TreeViewItem Header="Expandable Properties" Tag="{x:Type views:ExpandableProperties}"/>
-        <TreeViewItem Header="Specifying Properties" Tag="{x:Type views:SpecifyingProperties}"/>
         <TreeViewItem Header="Providing an ItemsSource" Tag="{x:Type views:CustomItemsSource}"/>
+        <TreeViewItem Header="Specifying Properties" Tag="{x:Type views:SpecifyingProperties}"/>
     </TreeViewItem>
 
 </TreeViewItem>
