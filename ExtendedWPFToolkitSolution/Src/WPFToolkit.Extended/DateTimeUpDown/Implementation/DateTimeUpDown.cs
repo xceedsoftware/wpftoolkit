@@ -202,8 +202,6 @@ namespace Microsoft.Windows.Controls
         protected override string ConvertValueToText()
         {
             if (Value == null) return string.Empty;
-
-            var test = Value.Value.ToString(CultureInfo);
             
             return Value.Value.ToString(GetFormatString(Format), CultureInfo);
         }
