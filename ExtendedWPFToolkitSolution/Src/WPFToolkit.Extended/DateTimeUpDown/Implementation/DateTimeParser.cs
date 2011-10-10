@@ -1,51 +1,24 @@
 ﻿using System;
-using System.Linq;
-using System.Globalization;
-using System.Text;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using System.Globalization;
+using System.Linq;
 
 namespace Microsoft.Windows.Controls
 {
     internal class DateTimeParser
     {
-        #region Properties
-
-        private DateTimeFormatInfo DateTimeFormatInfo { get; set; }
-
-        public string Format { get; set; }
-
-        #endregion //Properties
-
-        #region Constructors
-
-        public DateTimeParser(DateTimeFormatInfo dateTimeFormatInfo)
-        {
-            DateTimeFormatInfo = dateTimeFormatInfo;
-        }
-
-        public DateTimeParser(DateTimeFormatInfo dateTimeFormatInfo, string format)
-        {
-            DateTimeFormatInfo = dateTimeFormatInfo;
-            Format = format;
-        }
-
-        #endregion //Constructors
-
-        #region Methods
-
-        public bool TryParse(string value, out DateTime result, DateTime currentDate)
+        public static bool TryParse(string value, string format, DateTime currentDate, CultureInfo cultureInfo, out DateTime result)
         {
             bool success = false;
             result = currentDate;
 
-            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(Format))
+            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(format))
                 return false;
 
-            var dateTimeString = ResolveDateTimeString(value, currentDate);
+            var dateTimeString = ResolveDateTimeString(value, format, currentDate, cultureInfo).Trim();
 
             if (!String.IsNullOrEmpty(dateTimeString))
-                success = DateTime.TryParse(dateTimeString, DateTimeFormatInfo, DateTimeStyles.None, out result);
+                success = DateTime.TryParse(dateTimeString, cultureInfo.DateTimeFormat, DateTimeStyles.None, out result);
 
             if (!success)
                 result = currentDate;
@@ -53,15 +26,15 @@ namespace Microsoft.Windows.Controls
             return success;
         }
 
-        private string ResolveDateTimeString(string dateTime, DateTime currentDate)
+        private static string ResolveDateTimeString(string dateTime, string format, DateTime currentDate, CultureInfo cultureInfo)
         {
-            Dictionary<string, string> dateParts = GetDateParts(currentDate);
+            Dictionary<string, string> dateParts = GetDateParts(currentDate, cultureInfo);
             string[] timeParts = new string[3] { currentDate.Hour.ToString(), currentDate.Minute.ToString(), currentDate.Second.ToString() };
             string designator = "";
-            string[] dateTimeSeparators = new string[] { ",", " ", "-", ".", DateTimeFormatInfo.DateSeparator, DateTimeFormatInfo.TimeSeparator };
+            string[] dateTimeSeparators = new string[] { ",", " ", "-", ".", "/", cultureInfo.DateTimeFormat.DateSeparator, cultureInfo.DateTimeFormat.TimeSeparator };
 
             var dateTimeParts = dateTime.Split(dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries).ToList();
-            var formats = Format.Split(dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var formats = format.Split(dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries).ToList();
 
             //something went wrong
             if (dateTimeParts.Count != formats.Count)
@@ -69,41 +42,41 @@ namespace Microsoft.Windows.Controls
 
             for (int i = 0; i < formats.Count; i++)
             {
-                var format = formats[i];
-                if (!format.Contains("ddd") && !format.Contains("GMT"))
+                var f = formats[i];
+                if (!f.Contains("ddd") && !f.Contains("GMT"))
                 {
-                    if (format.Contains("M"))
+                    if (f.Contains("M"))
                         dateParts["Month"] = dateTimeParts[i];
-                    else if (format.Contains("d"))
+                    else if (f.Contains("d"))
                         dateParts["Day"] = dateTimeParts[i];
-                    else if (format.Contains("y"))
+                    else if (f.Contains("y"))
                     {
                         dateParts["Year"] = dateTimeParts[i];
 
                         if (dateParts["Year"].Length == 2)
                             dateParts["Year"] = string.Format("{0}{1}", currentDate.Year / 100, dateParts["Year"]);
                     }
-                    else if (format.Contains("h") || format.Contains("H"))
+                    else if (f.Contains("h") || f.Contains("H"))
                         timeParts[0] = dateTimeParts[i];
-                    else if (format.Contains("m"))
+                    else if (f.Contains("m"))
                         timeParts[1] = dateTimeParts[i];
-                    else if (format.Contains("s"))
+                    else if (f.Contains("s"))
                         timeParts[2] = dateTimeParts[i];
-                    else if (format.Contains("t"))
+                    else if (f.Contains("t"))
                         designator = dateTimeParts[i];
                 }
             }
 
-            var date = string.Join(DateTimeFormatInfo.DateSeparator, dateParts.Select(x => x.Value).ToArray());
-            var time = string.Join(DateTimeFormatInfo.TimeSeparator, timeParts);
+            var date = string.Join(cultureInfo.DateTimeFormat.DateSeparator, dateParts.Select(x => x.Value).ToArray());
+            var time = string.Join(cultureInfo.DateTimeFormat.TimeSeparator, timeParts);
 
             return String.Format("{0} {1} {2}", date, time, designator);
         }
 
-        private Dictionary<string, string> GetDateParts(DateTime currentDate)
+        private static Dictionary<string, string> GetDateParts(DateTime currentDate, CultureInfo cultureInfo)
         {
             Dictionary<string, string> dateParts = new Dictionary<string, string>();
-            var dateFormatParts = DateTimeFormatInfo.ShortDatePattern.Split(new string[] { DateTimeFormatInfo.DateSeparator }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var dateFormatParts = cultureInfo.DateTimeFormat.ShortDatePattern.Split(new string[] { cultureInfo.DateTimeFormat.DateSeparator }, StringSplitOptions.RemoveEmptyEntries).ToList();
             dateFormatParts.ForEach(item =>
             {
                 string key = string.Empty;
@@ -128,7 +101,5 @@ namespace Microsoft.Windows.Controls
             });
             return dateParts;
         }
-
-        #endregion // Methods
     }
 }
