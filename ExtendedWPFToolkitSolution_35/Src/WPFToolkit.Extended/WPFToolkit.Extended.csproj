@@ -369,11 +369,23 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\NumericUpDown\Implementation\NumericUpDown.cs">
       <Link>NumericUpDown\Implementation\NumericUpDown.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Attributes\ExpandableObjectAttribute.cs">
+      <Link>PropertyGrid\Implementation\Attributes\ExpandableObjectAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Attributes\IItemsSource.cs">
+      <Link>PropertyGrid\Implementation\Attributes\IItemsSource.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Attributes\ItemsSourceAttribute.cs">
+      <Link>PropertyGrid\Implementation\Attributes\ItemsSourceAttribute.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Commands\PropertyGridCommands.cs">
       <Link>PropertyGrid\Implementation\Commands\PropertyGridCommands.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Commands\PropertyItemCommands.cs">
       <Link>PropertyGrid\Implementation\Commands\PropertyItemCommands.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Converters\ExpandableObjectMarginConverter.cs">
+      <Link>PropertyGrid\Implementation\Converters\ExpandableObjectMarginConverter.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Converters\ValueSourceToImagePathConverter.cs">
       <Link>PropertyGrid\Implementation\Converters\ValueSourceToImagePathConverter.cs</Link>
@@ -418,6 +430,9 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\IntegerUpDownEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\IntegerUpDownEditor.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\ItemsSourceEditor.cs">
+      <Link>PropertyGrid\Implementation\Editors\ItemsSourceEditor.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\ITypeEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\ITypeEditor.cs</Link>
     </Compile>
@@ -436,11 +451,17 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Editors\TypeEditor.cs">
       <Link>PropertyGrid\Implementation\Editors\TypeEditor.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\IEditorDefinition.cs">
-      <Link>PropertyGrid\Implementation\IEditorDefinition.cs</Link>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\PropertyDefinition.cs">
+      <Link>PropertyGrid\Implementation\PropertyDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\PropertyDefinitionCollection.cs">
+      <Link>PropertyGrid\Implementation\PropertyDefinitionCollection.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\PropertyGrid.cs">
       <Link>PropertyGrid\Implementation\PropertyGrid.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\PropertyGridUtilities.cs">
+      <Link>PropertyGrid\Implementation\PropertyGridUtilities.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\PropertyItem.cs">
       <Link>PropertyGrid\Implementation\PropertyItem.cs</Link>

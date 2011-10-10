@@ -13,7 +13,7 @@
 
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
-    <converters:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
+    <pgConverters:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
     <pgConverters:ValueSourceToImagePathConverter x:Key="ValueSourceToImagePathConverter" />
     <pgConverters:ValueSourceToToolTipConverter x:Key="ValueSourceToToolTipConverter" />
 

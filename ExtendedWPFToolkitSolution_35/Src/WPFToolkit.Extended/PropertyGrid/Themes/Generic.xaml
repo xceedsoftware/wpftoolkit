@@ -13,6 +13,7 @@
 
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+    <pgConverters:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
     <pgConverters:ValueSourceToImagePathConverter x:Key="ValueSourceToImagePathConverter" />
     <pgConverters:ValueSourceToToolTipConverter x:Key="ValueSourceToToolTipConverter" />
 
@@ -249,6 +250,30 @@
         </Setter>
     </Style>
 
+    <Style x:Key="PropertyExpanderStyle" TargetType="{x:Type Expander}">
+        <Setter Property="Padding" Value="10 0 0 0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Expander}">
+                    <Grid>
+                        <Border Visibility="Collapsed" Grid.Row="1" x:Name="ExpandSite" Padding="0 0 0 0">
+                            <Border BorderThickness="0" Margin="0" Padding="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+												  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+												  Focusable="false" />
+                            </Border>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsExpanded" Value="True">
+                            <Setter Property="Visibility" Value="Visible" TargetName="ExpandSite"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <ContextMenu x:Key="DefaultAdvancedOptionsMenu">
         <MenuItem Header="Reset Value" Command="commands:PropertyItemCommands.ResetValue" />
     </ContextMenu>
@@ -267,15 +292,32 @@
                                 <ColumnDefinition Width="{Binding NameColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGrid}}}"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
 
                             <Border BorderThickness="0.5" BorderBrush="#FFF0F0F0" x:Name="PART_Name">
-                                <Grid Margin="7,2,2,2">
+                                <Grid Margin="2,2,2,2">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Text="{Binding DisplayName, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Stretch" TextTrimming="CharacterEllipsis"/>
+                                    <Grid Margin="{Binding Level, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ExpandableObjectMarginConverter}}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="15" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Grid.Column="0" >
+                                            <ToggleButton Template="{StaticResource ExpanderToggleButton}" OverridesDefaultStyle="True"
+                                              IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                              Visibility="{Binding HasChildProperties, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                        </Border>
+
+                                        <TextBlock Grid.Column="1" Text="{Binding DisplayName, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Stretch" TextTrimming="CharacterEllipsis"/>
+                                    </Grid>
 
                                     <Grid Grid.Column="1" HorizontalAlignment="Right" Margin="5,0,5,0"  Visibility="{Binding ShowAdvancedOptions, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:PropertyGrid}, Converter={StaticResource BooleanToVisibilityConverter}}"
                                           utilities:ContextMenuUtilities.OpenOnMouseLeftButtonClick="True"
@@ -291,6 +333,16 @@
                             <Border BorderThickness="0.5" BorderBrush="#FFF0F0F0" x:Name="PART_Editor"  Grid.Column="1" Background="Transparent">
                                 <ContentControl Content="{TemplateBinding Editor}" VerticalAlignment="Center" Focusable="False" IsTabStop="False" />
                             </Border>
+
+                            <Expander x:Name="_propertyExpander" Grid.ColumnSpan="2" Grid.Row="1" IsExpanded="{TemplateBinding IsExpanded}" Style="{StaticResource PropertyExpanderStyle}" IsEnabled="True">
+                                <ItemsControl ItemsSource="{Binding Properties, RelativeSource={RelativeSource TemplatedParent}}" IsTabStop="False" Focusable="False" >
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Expander>
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
