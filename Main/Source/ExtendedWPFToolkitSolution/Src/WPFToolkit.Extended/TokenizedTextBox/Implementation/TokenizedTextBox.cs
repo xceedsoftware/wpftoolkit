@@ -281,7 +281,7 @@ namespace Microsoft.Windows.Controls
         {
             var para = _rtb.CaretPosition.Paragraph;
 
-            Inline inlineToRemove = para.Inlines.SingleOrDefault(x => ((x as InlineUIContainer).Child as TokenItem).TokenKey.Equals(e.Parameter));
+            Inline inlineToRemove = para.Inlines.Where(inline => inline is InlineUIContainer && ((inline as InlineUIContainer).Child as TokenItem).TokenKey.Equals(e.Parameter)).FirstOrDefault();
 
             if (inlineToRemove != null)
                 para.Inlines.Remove(inlineToRemove);
