@@ -26,8 +26,7 @@ namespace Microsoft.Windows.Controls
         {
             get { return (string)GetValue(SearchMemberPathProperty); }
             set { SetValue(SearchMemberPathProperty, value); }
-        }
-        
+        }        
 
         public static readonly DependencyProperty TokenDelimiterProperty = DependencyProperty.Register("TokenDelimiter", typeof(string), typeof(TokenizedTextBox), new UIPropertyMetadata(";"));
         public string TokenDelimiter
@@ -42,6 +41,8 @@ namespace Microsoft.Windows.Controls
             get { return (DataTemplate)GetValue(TokenTemplateProperty); }
             set { SetValue(TokenTemplateProperty, value); }
         }
+
+        #region Text
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(TokenizedTextBox), new UIPropertyMetadata(null, OnTextChanged));
         public string Text
@@ -61,7 +62,11 @@ namespace Microsoft.Windows.Controls
         {
             if (_rtb == null || _surpressTextChanged)
                 return;
+
+            //TODO: when text changes update tokens
         }
+
+        #endregion //Text
 
         public static readonly DependencyProperty ValueMemberPathProperty = DependencyProperty.Register("ValueMemberPath", typeof(string), typeof(TokenizedTextBox), new UIPropertyMetadata(String.Empty));
         public string ValueMemberPath
@@ -127,45 +132,62 @@ namespace Microsoft.Windows.Controls
         {
             if (!String.IsNullOrEmpty(Text))
             {
-                string[] tokens = Text.Split(new string[] { TokenDelimiter }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string token in tokens)
+                string[] tokenKeys = Text.Split(new string[] { TokenDelimiter }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string tokenKey in tokenKeys)
                 {
                     var para = _rtb.CaretPosition.Paragraph;
-                    para.Inlines.Add(CreateTokenContainer(String.Format("{0}{1}", token, TokenDelimiter), ResolveTokenFromItemsSource(token)));
+                    var token = new Token(TokenDelimiter) 
+                    { 
+                        TokenKey = tokenKey,
+                        Item = ResolveItemByTokenKey(tokenKey)
+                    };
+                    para.Inlines.Add(CreateTokenContainer(token));
                 }
             }
         }
 
-        private object ResolveToken(string text)
+        private Token ResolveToken(string text)
         {
             if (text.EndsWith(TokenDelimiter))
-                return ResolveTokenFromItemsSource(text.Substring(0, text.Length - 1).Trim());
+                return ResolveTokenBySearchMemberPath(text.Substring(0, text.Length - 1).Trim());
 
             return null;
         }
 
-        private object ResolveTokenBySearchMemberPath(string searchText)
+        private Token ResolveTokenBySearchMemberPath(string searchText)
         {
+            //create a new token and default the settings to the search text
+            var token = new Token(TokenDelimiter) 
+            {
+                TokenKey = searchText,
+                Item = searchText
+            };
+
             if (ItemsSource != null)
             {
                 foreach (object item in ItemsSource)
                 {
-                    var property = item.GetType().GetProperty(SearchMemberPath);
-                    if (property != null)
+                    var searchProperty = item.GetType().GetProperty(SearchMemberPath);
+                    if (searchProperty != null)
                     {
-                        var value = property.GetValue(item, null);
-                        if (searchText.Equals(value.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                        var searchValue = searchProperty.GetValue(item, null);
+                        if (searchText.Equals(searchValue.ToString(), StringComparison.InvariantCultureIgnoreCase))
                         {
-                            return item;
+                            var valueProperty = item.GetType().GetProperty(ValueMemberPath);
+                            if (valueProperty != null)
+                                token.TokenKey = valueProperty.GetValue(item, null).ToString();
+
+                            token.Item = item;
+                            break;
                         }
                     }
                 }
             }
 
-            return searchText;
+            return token;
         }
 
-        private object ResolveTokenFromItemsSource(string tokenKey)
+        private object ResolveItemByTokenKey(string tokenKey)
         {
             if (ItemsSource != null)
             {
@@ -184,7 +206,7 @@ namespace Microsoft.Windows.Controls
             return tokenKey;
         }
 
-        private void ReplaceTextWithToken(string inputText, object token)
+        private void ReplaceTextWithToken(string inputText, Token token)
         {
             _surpressTextChangedEvent = true;
 
@@ -198,7 +220,7 @@ namespace Microsoft.Windows.Controls
 
             if (matchedRun != null) // Found a Run that matched the inputText
             {
-                var tokenContainer = CreateTokenContainer(inputText, token);
+                var tokenContainer = CreateTokenContainer(token);
                 para.Inlines.InsertBefore(matchedRun, tokenContainer);
 
                 // Remove only if the Text in the Run is the same as inputText, else split up
@@ -214,34 +236,38 @@ namespace Microsoft.Windows.Controls
                     para.Inlines.Remove(matchedRun);
                 }
 
-                //now append the Text
-                SetTextInternal(Text + inputText);
+                //now append the Text with the token key
+                SetTextInternal(Text + token.TokenKey);
             }
 
             _surpressTextChangedEvent = false;
         }
 
-        private InlineUIContainer CreateTokenContainer(string tokenKey, object token)
+        private InlineUIContainer CreateTokenContainer(Token token)
         {
-            return new InlineUIContainer(CreateTokenItem(tokenKey, token)) { BaselineAlignment = BaselineAlignment.Center };
+            return new InlineUIContainer(CreateTokenItem(token)) { BaselineAlignment = BaselineAlignment.Center };
         }
 
-        private TokenItem CreateTokenItem(string tokenKey, object token)
+        private TokenItem CreateTokenItem(Token token)
         {
-            var tokenItem = new TokenItem();
-            tokenItem.TokenKey = tokenKey;
-            tokenItem.Content = token;
-            tokenItem.ContentTemplate = TokenTemplate;
+            object item = token.Item;
+
+            var tokenItem = new TokenItem() 
+            { 
+                TokenKey = token.TokenKey, 
+                Content = item, 
+                ContentTemplate = TokenTemplate 
+            };
 
             if (TokenTemplate == null)
             {
                 //if no template was supplied let's try to get a value from the object using the DisplayMemberPath
                 if (!String.IsNullOrEmpty(DisplayMemberPath))
                 {
-                    var property = token.GetType().GetProperty(DisplayMemberPath);
+                    var property = item.GetType().GetProperty(DisplayMemberPath);
                     if (property != null)
                     {
-                        var value = property.GetValue(token, null);
+                        var value = property.GetValue(item, null);
                         if (value != null)
                             tokenItem.Content = value;
                     }

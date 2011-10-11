@@ -295,6 +295,7 @@
     <Compile Include="TimePicker\Implementation\TimeFormat.cs" />
     <Compile Include="TimePicker\Implementation\TimeItem.cs" />
     <Compile Include="TimePicker\Implementation\TimePicker.cs" />
+    <Compile Include="TokenizedTextBox\Implementation\Token.cs" />
     <Compile Include="TokenizedTextBox\Implementation\TokenItem.cs" />
     <Compile Include="TokenizedTextBox\Implementation\TokenizedTextBox.cs" />
     <Compile Include="TokenizedTextBox\Implementation\TokenizedTextBoxCommands.cs" />
