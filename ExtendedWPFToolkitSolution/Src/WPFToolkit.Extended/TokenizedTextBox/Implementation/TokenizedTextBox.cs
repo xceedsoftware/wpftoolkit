@@ -1,0 +1,276 @@
+﻿//Based of the code written by Pavan Podila
+//http://blog.pixelingene.com/2010/10/tokenizing-control-convert-text-to-tokens/
+using System;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
+
+namespace Microsoft.Windows.Controls
+{
+    public class TokenizedTextBox : ItemsControl
+    {
+        #region Members
+
+        private System.Windows.Controls.RichTextBox _rtb = null;
+        private bool _surpressTextChanged = false;
+        private bool _surpressTextChangedEvent = false;
+
+        #endregion //Members
+
+        #region Properties
+
+        public static readonly DependencyProperty SearchMemberPathProperty = DependencyProperty.Register("SearchMemberPath", typeof(string), typeof(TokenizedTextBox), new UIPropertyMetadata(String.Empty));
+        public string SearchMemberPath
+        {
+            get { return (string)GetValue(SearchMemberPathProperty); }
+            set { SetValue(SearchMemberPathProperty, value); }
+        }
+        
+
+        public static readonly DependencyProperty TokenDelimiterProperty = DependencyProperty.Register("TokenDelimiter", typeof(string), typeof(TokenizedTextBox), new UIPropertyMetadata(";"));
+        public string TokenDelimiter
+        {
+            get { return (string)GetValue(TokenDelimiterProperty); }
+            set { SetValue(TokenDelimiterProperty, value); }
+        }
+
+        public static readonly DependencyProperty TokenTemplateProperty = DependencyProperty.Register("TokenTemplate", typeof(DataTemplate), typeof(TokenizedTextBox), new UIPropertyMetadata(null));
+        public DataTemplate TokenTemplate
+        {
+            get { return (DataTemplate)GetValue(TokenTemplateProperty); }
+            set { SetValue(TokenTemplateProperty, value); }
+        }
+
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(TokenizedTextBox), new UIPropertyMetadata(null, OnTextChanged));
+        public string Text
+        {
+            get { return (string)GetValue(TextProperty); }
+            set { SetValue(TextProperty, value); }
+        }
+
+        private static void OnTextChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            TokenizedTextBox tokenizedTextBox = o as TokenizedTextBox;
+            if (tokenizedTextBox != null)
+                tokenizedTextBox.OnTextChanged((string)e.OldValue, (string)e.NewValue);
+        }
+
+        protected virtual void OnTextChanged(string oldValue, string newValue)
+        {
+            if (_rtb == null || _surpressTextChanged)
+                return;
+        }
+
+        public static readonly DependencyProperty ValueMemberPathProperty = DependencyProperty.Register("ValueMemberPath", typeof(string), typeof(TokenizedTextBox), new UIPropertyMetadata(String.Empty));
+        public string ValueMemberPath
+        {
+            get { return (string)GetValue(ValueMemberPathProperty); }
+            set { SetValue(ValueMemberPathProperty, value); }
+        }
+        
+
+        #endregion //Properties
+
+        #region Constructors
+
+        static TokenizedTextBox()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TokenizedTextBox), new FrameworkPropertyMetadata(typeof(TokenizedTextBox)));
+        }
+
+        public TokenizedTextBox()
+        {
+            CommandBindings.Add(new CommandBinding(TokenizedTextBoxCommands.Delete, DeleteToken));
+        }
+
+        #endregion //Constructors
+
+        #region Base Class Overrides
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            if (_rtb != null)
+                _rtb.TextChanged -= OnTextChanged;
+            _rtb = GetTemplateChild("PART_ContentHost") as System.Windows.Controls.RichTextBox;
+            if (_rtb != null)
+                _rtb.TextChanged += OnTextChanged;
+
+            InitializeTokensFromText();
+        }
+
+        #endregion //Base Class Overrides
+
+        #region Event Handlers
+
+        private void OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_surpressTextChangedEvent)
+                return;
+
+            var text = _rtb.CaretPosition.GetTextInRun(LogicalDirection.Backward);
+            var token = ResolveToken(text);
+            if (token != null)
+            {
+                ReplaceTextWithToken(text.Trim(), token);
+            }
+        }
+
+        #endregion //Event Handlers
+
+        #region Methods
+
+        private void InitializeTokensFromText()
+        {
+            if (!String.IsNullOrEmpty(Text))
+            {
+                string[] tokens = Text.Split(new string[] { TokenDelimiter }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string token in tokens)
+                {
+                    var para = _rtb.CaretPosition.Paragraph;
+                    para.Inlines.Add(CreateTokenContainer(String.Format("{0}{1}", token, TokenDelimiter), ResolveTokenFromItemsSource(token)));
+                }
+            }
+        }
+
+        private object ResolveToken(string text)
+        {
+            if (text.EndsWith(TokenDelimiter))
+                return ResolveTokenFromItemsSource(text.Substring(0, text.Length - 1).Trim());
+
+            return null;
+        }
+
+        private object ResolveTokenBySearchMemberPath(string searchText)
+        {
+            if (ItemsSource != null)
+            {
+                foreach (object item in ItemsSource)
+                {
+                    var property = item.GetType().GetProperty(SearchMemberPath);
+                    if (property != null)
+                    {
+                        var value = property.GetValue(item, null);
+                        if (searchText.Equals(value.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            return item;
+                        }
+                    }
+                }
+            }
+
+            return searchText;
+        }
+
+        private object ResolveTokenFromItemsSource(string tokenKey)
+        {
+            if (ItemsSource != null)
+            {
+                foreach (object item in ItemsSource)
+                {
+                    var property = item.GetType().GetProperty(ValueMemberPath);
+                    if (property != null)
+                    {
+                        var value = property.GetValue(item, null);
+                        if (tokenKey.Equals(value.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                            return item;
+                    }
+                }
+            }
+
+            return tokenKey;
+        }
+
+        private void ReplaceTextWithToken(string inputText, object token)
+        {
+            _surpressTextChangedEvent = true;
+
+            var para = _rtb.CaretPosition.Paragraph;
+
+            var matchedRun = para.Inlines.FirstOrDefault(inline =>
+            {
+                var run = inline as Run;
+                return (run != null && run.Text.EndsWith(inputText));
+            }) as Run;
+
+            if (matchedRun != null) // Found a Run that matched the inputText
+            {
+                var tokenContainer = CreateTokenContainer(inputText, token);
+                para.Inlines.InsertBefore(matchedRun, tokenContainer);
+
+                // Remove only if the Text in the Run is the same as inputText, else split up
+                if (matchedRun.Text == inputText)
+                {
+                    para.Inlines.Remove(matchedRun);
+                }
+                else // Split up
+                {
+                    var index = matchedRun.Text.IndexOf(inputText) + inputText.Length;
+                    var tailEnd = new Run(matchedRun.Text.Substring(index));
+                    para.Inlines.InsertAfter(matchedRun, tailEnd);
+                    para.Inlines.Remove(matchedRun);
+                }
+
+                //now append the Text
+                SetTextInternal(Text + inputText);
+            }
+
+            _surpressTextChangedEvent = false;
+        }
+
+        private InlineUIContainer CreateTokenContainer(string tokenKey, object token)
+        {
+            return new InlineUIContainer(CreateTokenItem(tokenKey, token)) { BaselineAlignment = BaselineAlignment.Center };
+        }
+
+        private TokenItem CreateTokenItem(string tokenKey, object token)
+        {
+            var tokenItem = new TokenItem();
+            tokenItem.TokenKey = tokenKey;
+            tokenItem.Content = token;
+            tokenItem.ContentTemplate = TokenTemplate;
+
+            if (TokenTemplate == null)
+            {
+                //if no template was supplied let's try to get a value from the object using the DisplayMemberPath
+                if (!String.IsNullOrEmpty(DisplayMemberPath))
+                {
+                    var property = token.GetType().GetProperty(DisplayMemberPath);
+                    if (property != null)
+                    {
+                        var value = property.GetValue(token, null);
+                        if (value != null)
+                            tokenItem.Content = value;
+                    }
+                }
+            }
+
+            return tokenItem;
+        }
+
+        private void DeleteToken(object sender, ExecutedRoutedEventArgs e)
+        {
+            var para = _rtb.CaretPosition.Paragraph;
+
+            Inline inlineToRemove = para.Inlines.SingleOrDefault(x => ((x as InlineUIContainer).Child as TokenItem).TokenKey.Equals(e.Parameter));
+
+            if (inlineToRemove != null)
+                para.Inlines.Remove(inlineToRemove);
+
+            //update Text to remove delimited value
+            SetTextInternal(Text.Replace(e.Parameter.ToString(), ""));
+        }
+
+        private void SetTextInternal(string text)
+        {
+            _surpressTextChanged = true;
+            Text = text;
+            _surpressTextChanged = false;
+        }
+
+        #endregion //Methods
+    }
+}
