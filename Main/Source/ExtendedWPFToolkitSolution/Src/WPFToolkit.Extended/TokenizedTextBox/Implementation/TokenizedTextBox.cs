@@ -26,7 +26,7 @@ namespace Microsoft.Windows.Controls
         {
             get { return (string)GetValue(SearchMemberPathProperty); }
             set { SetValue(SearchMemberPathProperty, value); }
-        }        
+        }
 
         public static readonly DependencyProperty TokenDelimiterProperty = DependencyProperty.Register("TokenDelimiter", typeof(string), typeof(TokenizedTextBox), new UIPropertyMetadata(";"));
         public string TokenDelimiter
@@ -74,7 +74,7 @@ namespace Microsoft.Windows.Controls
             get { return (string)GetValue(ValueMemberPathProperty); }
             set { SetValue(ValueMemberPathProperty, value); }
         }
-        
+
 
         #endregion //Properties
 
@@ -99,10 +99,16 @@ namespace Microsoft.Windows.Controls
             base.OnApplyTemplate();
 
             if (_rtb != null)
-                _rtb.TextChanged -= OnTextChanged;
+            {
+                _rtb.TextChanged -= RichTextBox_TextChanged;
+                _rtb.PreviewKeyDown -= RichTextBox_PreviewKeyDown;
+            }
             _rtb = GetTemplateChild("PART_ContentHost") as System.Windows.Controls.RichTextBox;
             if (_rtb != null)
-                _rtb.TextChanged += OnTextChanged;
+            {
+                _rtb.TextChanged += RichTextBox_TextChanged;
+                _rtb.PreviewKeyDown += RichTextBox_PreviewKeyDown;
+            }
 
             InitializeTokensFromText();
         }
@@ -111,7 +117,7 @@ namespace Microsoft.Windows.Controls
 
         #region Event Handlers
 
-        private void OnTextChanged(object sender, TextChangedEventArgs e)
+        private void RichTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (_surpressTextChangedEvent)
                 return;
@@ -121,6 +127,39 @@ namespace Microsoft.Windows.Controls
             if (token != null)
             {
                 ReplaceTextWithToken(text.Trim(), token);
+            }
+        }
+
+        void RichTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            InlineUIContainer container = null;
+
+            if (e.Key == Key.Back)
+            {
+                container = _rtb.CaretPosition.GetAdjacentElement(LogicalDirection.Backward) as InlineUIContainer;
+            }
+            else if (e.Key == Key.Delete)
+            {
+                //if the selected text is a blank space, I will assume that a token item is selected.
+                //if a token item is selected, we need to move the caret position to the left of the element so we can grab the InlineUIContainer
+                if (_rtb.Selection.Text == " ")
+                {
+                    TextPointer moveTo = _rtb.CaretPosition.GetNextInsertionPosition(LogicalDirection.Backward);
+                    _rtb.CaretPosition = moveTo;
+                }
+
+                //the cursor is to the left of a token item
+                container = _rtb.CaretPosition.GetAdjacentElement(LogicalDirection.Forward) as InlineUIContainer;
+            }
+
+            //if the container is not null that means we have something to delete
+            if (container != null)
+            {
+                var token = (container as InlineUIContainer).Child as TokenItem;
+                if (token != null)
+                {
+                    SetTextInternal(Text.Replace(token.TokenKey, ""));
+                }
             }
         }
 
@@ -136,8 +175,8 @@ namespace Microsoft.Windows.Controls
                 foreach (string tokenKey in tokenKeys)
                 {
                     var para = _rtb.CaretPosition.Paragraph;
-                    var token = new Token(TokenDelimiter) 
-                    { 
+                    var token = new Token(TokenDelimiter)
+                    {
                         TokenKey = tokenKey,
                         Item = ResolveItemByTokenKey(tokenKey)
                     };
@@ -157,7 +196,7 @@ namespace Microsoft.Windows.Controls
         private Token ResolveTokenBySearchMemberPath(string searchText)
         {
             //create a new token and default the settings to the search text
-            var token = new Token(TokenDelimiter) 
+            var token = new Token(TokenDelimiter)
             {
                 TokenKey = searchText,
                 Item = searchText
@@ -252,11 +291,11 @@ namespace Microsoft.Windows.Controls
         {
             object item = token.Item;
 
-            var tokenItem = new TokenItem() 
-            { 
-                TokenKey = token.TokenKey, 
-                Content = item, 
-                ContentTemplate = TokenTemplate 
+            var tokenItem = new TokenItem()
+            {
+                TokenKey = token.TokenKey,
+                Content = item,
+                ContentTemplate = TokenTemplate
             };
 
             if (TokenTemplate == null)
