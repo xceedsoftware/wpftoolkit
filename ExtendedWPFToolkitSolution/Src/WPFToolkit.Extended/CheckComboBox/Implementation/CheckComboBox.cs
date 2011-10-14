@@ -103,12 +103,17 @@ namespace Microsoft.Windows.Controls
 
         private void UpdateText(string text)
         {
+            if (String.IsNullOrEmpty(Text))
+                Text = string.Empty;
+
             if (!Text.Equals(text))
                 Text = text;
         }
 
         private void UpdateTextFromSelectedValue()
         {
+            UpdateText(String.Empty);
+
             if (!String.IsNullOrEmpty(SelectedValue))
             {
                 string[] values = SelectedValue.Split(new string[] { Delimiter }, StringSplitOptions.RemoveEmptyEntries);

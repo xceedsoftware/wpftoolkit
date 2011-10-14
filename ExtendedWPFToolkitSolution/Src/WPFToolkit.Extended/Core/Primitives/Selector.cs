@@ -13,6 +13,7 @@ namespace Microsoft.Windows.Controls.Primitives
     {
         #region Members
 
+        private bool _ignoreSetSelectedValue;
         private bool _surpressSelectionChanged;
         private bool _surpressSelectedValueChanged;
 
@@ -117,11 +118,12 @@ namespace Microsoft.Windows.Controls.Primitives
 
         protected virtual void OnSelectedValueChanged(string oldValue, string newValue)
         {
-            //if (_surpressSelectedValueChanged)
-            //    return;
+            if (_surpressSelectedValueChanged)
+                return;
 
-            //if (ItemContainerGenerator.Status == System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
-            //    UpdateSelectedItemsFromSelectedValue();
+            //if we are controling the selections from the SelectedValue we can only update the IsSelected property of the items if the containers have been generated
+            if (ItemContainerGenerator.Status == System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
+                UpdateSelectedItemsFromSelectedValue();
         }
 
         #endregion //SelectedValue
@@ -140,9 +142,6 @@ namespace Microsoft.Windows.Controls.Primitives
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-
-            //if item containers are generated
-            //UpdateSelectedItemsFromDelimiterValue();
         }
 
         protected override bool IsItemItsOwnContainerOverride(object item)
@@ -255,10 +254,10 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             var item = GetDataContextItem(source);
             Update(item, remove);
-            RaiseSelectionItemChangedEvent(item, !remove); //inverse the remove paramter to correctly reflect the IsSelected state
+            RaiseSelectedItemChangedEvent(item, !remove); //inverse the remove paramter to correctly reflect the IsSelected state
         }
 
-        protected virtual void RaiseSelectionItemChangedEvent(object item, bool isSelected)
+        protected virtual void RaiseSelectedItemChangedEvent(object item, bool isSelected)
         {
             if (_surpressSelectionChanged)
                 return;
@@ -323,6 +322,10 @@ namespace Microsoft.Windows.Controls.Primitives
 
         private void UpdateSelectedValue(string value)
         {
+            //get out of here if we don't want to set the SelectedValue
+            if (_ignoreSetSelectedValue)
+                return;
+
             _surpressSelectedValueChanged = true;
 
             if (!SelectedValue.Equals(value))
@@ -331,27 +334,48 @@ namespace Microsoft.Windows.Controls.Primitives
             _surpressSelectedValueChanged = false;
         }
 
-        //private void UpdateSelectedItemsFromSelectedValue()
-        //{
-        //    //if we have a SelectedMemberPath we will rely on Databinding to select items
-        //    if (!String.IsNullOrEmpty(SelectedMemberPath))
-        //        return;
+        private void UpdateSelectedItemsFromSelectedValue()
+        {
+            _surpressSelectionChanged = true;
 
-        //    if (!String.IsNullOrEmpty(SelectedValue))
-        //    {
-        //        string[] values = SelectedValue.Split(new string[] { Delimiter }, StringSplitOptions.RemoveEmptyEntries);
-        //        foreach (string value in values)
-        //        {
-        //            var item = ResolveItemByValue(value);
-        //            var selectorItem = ItemContainerGenerator.ContainerFromItem(item) as SelectorItem;
-        //            if (selectorItem != null)
-        //            {
-        //                if (!selectorItem.IsSelected)
-        //                    selectorItem.IsSelected = true;
-        //            }
-        //        }
-        //    }
-        //}
+            if (!String.IsNullOrEmpty(SelectedValue))
+            {
+                //first we have to unselect everything
+                UnselectAll();
+
+
+                string[] values = SelectedValue.Split(new string[] { Delimiter }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string value in values)
+                {
+                    var item = ResolveItemByValue(value);
+                    var selectorItem = ItemContainerGenerator.ContainerFromItem(item) as SelectorItem;
+                    if (selectorItem != null)
+                    {
+                        if (!selectorItem.IsSelected)
+                            selectorItem.IsSelected = true;
+                    }
+                }
+            }
+
+            _surpressSelectionChanged = true;
+        }
+
+        private void UnselectAll()
+        {
+            _ignoreSetSelectedValue = true;
+
+            foreach (object item in ItemsSource)
+            {
+                var selectorItem = ItemContainerGenerator.ContainerFromItem(item) as SelectorItem;
+                if (selectorItem != null)
+                {
+                    if (selectorItem.IsSelected)
+                        selectorItem.IsSelected = false;
+                }
+            }
+
+            _ignoreSetSelectedValue = false;
+        }
 
         protected object ResolveItemByValue(string value)
         {
