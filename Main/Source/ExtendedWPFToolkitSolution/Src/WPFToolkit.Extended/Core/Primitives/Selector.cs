@@ -200,7 +200,7 @@ namespace Microsoft.Windows.Controls.Primitives
         public static readonly RoutedEvent UnSelectedEvent = EventManager.RegisterRoutedEvent("UnSelectedEvent", RoutingStrategy.Bubble, typeof(SelectedItemChangedEventHandler), typeof(Selector));
 
         public static readonly RoutedEvent SelectedItemChangedEvent = EventManager.RegisterRoutedEvent("SelectedItemChanged", RoutingStrategy.Bubble, typeof(SelectedItemChangedEventHandler), typeof(Selector));
-        public event SelectedItemChangedEventHandler SelectionItemChanged
+        public event SelectedItemChangedEventHandler SelectedItemChanged
         {
             add { AddHandler(SelectedItemChangedEvent, value); }
             remove { RemoveHandler(SelectedItemChangedEvent, value); }
@@ -255,15 +255,15 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             var item = GetDataContextItem(source);
             Update(item, remove);
-            RaiseSelectionItemChangedEvent(item);
+            RaiseSelectionItemChangedEvent(item, !remove); //inverse the remove paramter to correctly reflect the IsSelected state
         }
 
-        protected virtual void RaiseSelectionItemChangedEvent(object item)
+        protected virtual void RaiseSelectionItemChangedEvent(object item, bool isSelected)
         {
             if (_surpressSelectionChanged)
                 return;
 
-            RaiseEvent(new SelectedItemChangedEventArgs(Selector.SelectedItemChangedEvent, this, item));
+            RaiseEvent(new SelectedItemChangedEventArgs(Selector.SelectedItemChangedEvent, this, item, isSelected));
 
             if (Command != null)
                 Command.Execute(SelectedItem);
@@ -381,12 +381,14 @@ namespace Microsoft.Windows.Controls.Primitives
     public delegate void SelectedItemChangedEventHandler(object sender, SelectedItemChangedEventArgs e);
     public class SelectedItemChangedEventArgs : RoutedEventArgs
     {
+        public bool IsSelected {get;private set;}
         public object Item { get; private set; }
 
-        public SelectedItemChangedEventArgs(RoutedEvent routedEvent, object source, object item)
+        public SelectedItemChangedEventArgs(RoutedEvent routedEvent, object source, object item, bool isSelected)
             : base(routedEvent, source)
         {
             Item = item;
+            IsSelected = isSelected;
         }
     }
 }
