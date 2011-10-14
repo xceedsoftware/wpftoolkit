@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Controls;
-using System.Windows;
-using System.Windows.Data;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.ComponentModel;
+using System.Windows.Input;
 
 namespace Microsoft.Windows.Controls.Primitives
 {
-    public class Selector : ItemsControl
+    public class Selector : ItemsControl //should probably make this control an ICommandSource
     {
         #region Members
 
@@ -25,12 +24,20 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             SelectedItems = new ObservableCollection<object>();
             AddHandler(Selector.SelectedEvent, new RoutedEventHandler(Selector_ItemSelected));
-            AddHandler(Selector.UnSelectedEvent, new RoutedEventHandler(Selector_ItemUnSelected));
+            AddHandler(Selector.UnSelectedEvent, new RoutedEventHandler(Selector_ItemUnselected));
         }
 
         #endregion //Constructors
 
         #region Properties
+
+        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register("Command", typeof(ICommand), typeof(CheckListBox), new PropertyMetadata((ICommand)null));
+        [TypeConverter(typeof(CommandConverter))]
+        public ICommand Command
+        {
+            get { return (ICommand)GetValue(CommandProperty); }
+            set { SetValue(CommandProperty, value); }
+        }
 
         public static readonly DependencyProperty DelimiterProperty = DependencyProperty.Register("Delimiter", typeof(string), typeof(Selector), new UIPropertyMetadata(","));
         public string Delimiter
@@ -189,14 +196,14 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #region Events
 
-        public static readonly RoutedEvent SelectedEvent = EventManager.RegisterRoutedEvent("SelectedEvent", RoutingStrategy.Bubble, typeof(SelectionChangedEventHandler), typeof(Selector));
-        public static readonly RoutedEvent UnSelectedEvent = EventManager.RegisterRoutedEvent("UnSelectedEvent", RoutingStrategy.Bubble, typeof(SelectionChangedEventHandler), typeof(Selector));
+        public static readonly RoutedEvent SelectedEvent = EventManager.RegisterRoutedEvent("SelectedEvent", RoutingStrategy.Bubble, typeof(SelectedItemChangedEventHandler), typeof(Selector));
+        public static readonly RoutedEvent UnSelectedEvent = EventManager.RegisterRoutedEvent("UnSelectedEvent", RoutingStrategy.Bubble, typeof(SelectedItemChangedEventHandler), typeof(Selector));
 
-        public static readonly RoutedEvent SelectionChangedEvent = EventManager.RegisterRoutedEvent("SelectionChanged", RoutingStrategy.Bubble, typeof(SelectionChangedEventHandler), typeof(Selector));
-        public event SelectionChangedEventHandler SelectionChanged
+        public static readonly RoutedEvent SelectedItemChangedEvent = EventManager.RegisterRoutedEvent("SelectedItemChanged", RoutingStrategy.Bubble, typeof(SelectedItemChangedEventHandler), typeof(Selector));
+        public event SelectedItemChangedEventHandler SelectionItemChanged
         {
-            add { AddHandler(SelectionChangedEvent, value); }
-            remove { RemoveHandler(SelectionChangedEvent, value); }
+            add { AddHandler(SelectedItemChangedEvent, value); }
+            remove { RemoveHandler(SelectedItemChangedEvent, value); }
         }
 
         #endregion //Events
@@ -208,7 +215,7 @@ namespace Microsoft.Windows.Controls.Primitives
             OnItemSelected(e.OriginalSource, false);
         }
 
-        protected virtual void Selector_ItemUnSelected(object sender, RoutedEventArgs e)
+        protected virtual void Selector_ItemUnselected(object sender, RoutedEventArgs e)
         {
             OnItemSelected(e.OriginalSource, true);
         }
@@ -248,19 +255,18 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             var item = GetDataContextItem(source);
             Update(item, remove);
-
-            if (remove)
-                OnSelectionChanged(new List<object>() { item }, new List<object>());
-            else
-                OnSelectionChanged(new List<object>(), new List<object>() { item });
+            RaiseSelectionItemChangedEvent(item);
         }
 
-        private void OnSelectionChanged(IList removedItems, IList addedItems)
+        protected virtual void RaiseSelectionItemChangedEvent(object item)
         {
             if (_surpressSelectionChanged)
                 return;
 
-            RaiseEvent(new SelectionChangedEventArgs(Selector.SelectionChangedEvent, removedItems, addedItems));
+            RaiseEvent(new SelectedItemChangedEventArgs(Selector.SelectedItemChangedEvent, this, item));
+
+            if (Command != null)
+                Command.Execute(SelectedItem);
         }
 
         protected virtual void Update(object item, bool remove)
@@ -370,5 +376,17 @@ namespace Microsoft.Windows.Controls.Primitives
         }
 
         #endregion //Methods
+    }
+
+    public delegate void SelectedItemChangedEventHandler(object sender, SelectedItemChangedEventArgs e);
+    public class SelectedItemChangedEventArgs : RoutedEventArgs
+    {
+        public object Item { get; private set; }
+
+        public SelectedItemChangedEventArgs(RoutedEvent routedEvent, object source, object item)
+            : base(routedEvent, source)
+        {
+            Item = item;
+        }
     }
 }
