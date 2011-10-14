@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.ComponentModel;
 using System.Windows.Input;
+using System.Collections.Specialized;
 
 namespace Microsoft.Windows.Controls.Primitives
 {
@@ -88,17 +89,43 @@ namespace Microsoft.Windows.Controls.Primitives
 
         protected virtual void OnSelectedItemsChanged(IList oldValue, IList newValue)
         {
-            
-        }        
+            if (oldValue != null)
+            {
+                var collection = oldValue as INotifyCollectionChanged;
+                if (collection != null)
+                    collection.CollectionChanged -= SelectedItems_CollectionChanged;
+            }
+
+            if (newValue != null)
+            {
+                var collection = newValue as INotifyCollectionChanged;
+                if (collection != null)
+                    collection.CollectionChanged += SelectedItems_CollectionChanged;
+            }
+        }
+
+        void SelectedItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                var item = e.NewItems[0];
+                OnSelectedItemsCollectionChanged(item, false);
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                var item = e.OldItems[0];
+                OnSelectedItemsCollectionChanged(item, true);
+            }
+        }
+
+        protected virtual void OnSelectedItemsCollectionChanged(object item, bool remove)
+        {
+            //var selectorItem = ItemContainerGenerator.ContainerFromItem(item) as SelectorItem;
+            //selectorItem.IsSelected = !remove;
+            UpdateSelectedValue(item, remove);
+        }
 
         #endregion SelectedItems
-
-        public static readonly DependencyProperty SelectedMemberPathProperty = DependencyProperty.Register("SelectedMemberPath", typeof(string), typeof(Selector), new UIPropertyMetadata(null));
-        public string SelectedMemberPath
-        {
-            get { return (string)GetValue(SelectedMemberPathProperty); }
-            set { SetValue(SelectedMemberPathProperty, value); }
-        }
 
         #region SelectedValue
 
@@ -157,35 +184,40 @@ namespace Microsoft.Windows.Controls.Primitives
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
             _surpressSelectionChanged = true;
+            bool isSelected = false;
             var selectorItem = element as FrameworkElement;
+            var value = item;
 
-            //first try resolving SelectorItem.IsSelected by data binding to the SelectedMemeberPath property
-            if (!String.IsNullOrEmpty(SelectedMemberPath))
+            //let's check if we can find a value on the item using the SelectedValuePath property
+            if (!String.IsNullOrEmpty(SelectedValuePath))
             {
-                Binding selectedBinding = new Binding(SelectedMemberPath);
-                selectedBinding.Mode = BindingMode.TwoWay;
-                selectedBinding.Source = item;
-                selectorItem.SetBinding(SelectorItem.IsSelectedProperty, selectedBinding);
-            }
-            else
-            {
-                //if the SelectedMemberPath property is not set, then default to the value of the item
-                var value = item;
-
-                //now let's check if we can find a value on the item using the SelectedValuePath property
-                if (!String.IsNullOrEmpty(SelectedValuePath))
+                var property = item.GetType().GetProperty(SelectedValuePath);
+                if (property != null)
                 {
-                    var property = item.GetType().GetProperty(SelectedValuePath);
-                    if (property != null)
+                    value = property.GetValue(item, null);
+                }
+            }
+
+            //now check to see if the SelectedValue string contains our value.  If it does then set Selector.IsSelected to true
+            if (!String.IsNullOrEmpty(SelectedValue) && SelectedValue.Contains(GetDelimitedValue(value)))
+            {
+                isSelected = true;
+            }
+            else if (SelectedItems != null)
+            {
+                //if we get here we could find the value in the SelectedValue property, so lets search the SelectedItems for a match
+                foreach (object selectedItem in SelectedItems)
+                {
+                    //a match was found so select it and get the hell out of here
+                    if (value.Equals(GetItemValue(selectedItem)))
                     {
-                        value = property.GetValue(item, null);
+                        isSelected = true;
+                        break;
                     }
                 }
-
-                //now check to see if the SelectedValue string contains our value.  If it does then set Selector.IsSelected to true
-                if (!String.IsNullOrEmpty(SelectedValue) && SelectedValue.Contains(GetDelimitedValue(value)))
-                    selectorItem.SetValue(SelectorItem.IsSelectedProperty, true);
             }
+
+            selectorItem.SetValue(SelectorItem.IsSelectedProperty, isSelected);
 
             base.PrepareContainerForItemOverride(element, item);
             _surpressSelectionChanged = false;
@@ -405,7 +437,7 @@ namespace Microsoft.Windows.Controls.Primitives
     public delegate void SelectedItemChangedEventHandler(object sender, SelectedItemChangedEventArgs e);
     public class SelectedItemChangedEventArgs : RoutedEventArgs
     {
-        public bool IsSelected {get;private set;}
+        public bool IsSelected { get; private set; }
         public object Item { get; private set; }
 
         public SelectedItemChangedEventArgs(RoutedEvent routedEvent, object source, object item, bool isSelected)
