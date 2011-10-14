@@ -99,6 +99,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="CheckComboBox\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DateTimePicker\Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -190,6 +194,7 @@
     <Compile Include="ButtonSpinner\Implementation\ValidSpinDirections.cs" />
     <Compile Include="Chromes\Implementation\ButtonChrome.cs" />
     <Compile Include="CollectionEditors\Implementation\CollectionEditor.cs" />
+    <Compile Include="CheckComboBox\Implementation\CheckComboBox.cs" />
     <Compile Include="Core\Converters\ObjectTypeToNameConverter.cs" />
     <Compile Include="ColorCanvas\Implementation\ColorCanvas.cs" />
     <Compile Include="Core\Converters\CalculatorMemoryToVisibilityConverter.cs" />
@@ -198,6 +203,8 @@
     <Compile Include="Core\Primitives\HsvColor.cs" />
     <Compile Include="ColorPicker\Implementation\ColorItem.cs" />
     <Compile Include="ColorPicker\Implementation\ColorPicker.cs" />
+    <Compile Include="Core\Primitives\Selector.cs" />
+    <Compile Include="Core\Primitives\SelectorItem.cs" />
     <Compile Include="Core\Utilities\CalculatorUtilities.cs" />
     <Compile Include="Core\Utilities\ColorUtilities.cs" />
     <Compile Include="ColorCanvas\Implementation\ColorSpectrumSlider.cs" />
@@ -387,6 +394,7 @@
   <ItemGroup>
     <Resource Include="TokenizedTextBox\Images\delete8.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
