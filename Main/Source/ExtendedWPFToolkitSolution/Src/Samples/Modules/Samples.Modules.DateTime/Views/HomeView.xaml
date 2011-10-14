@@ -5,6 +5,6 @@
                       xmlns:infControls="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                       Title="DateTime Controls">
     <Grid>
-        <TextBlock Text="DateTime controls" /> 
+        <extToolkit:DateTimePicker IsReadOnly="False"  />
     </Grid>
 </infControls:DemoView>
