@@ -48,84 +48,20 @@ namespace Microsoft.Windows.Controls.Primitives
             set { SetValue(DelimiterProperty, value); }
         }
 
-        #region SelectedItem
-
-        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register("SelectedItem", typeof(object), typeof(Selector), new UIPropertyMetadata(null, OnSelectedItemChanged));
+        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register("SelectedItem", typeof(object), typeof(Selector), new UIPropertyMetadata(null));
         public object SelectedItem
         {
             get { return (object)GetValue(SelectedItemProperty); }
             set { SetValue(SelectedItemProperty, value); }
         }
 
-        private static void OnSelectedItemChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            Selector selector = o as Selector;
-            if (selector != null)
-                selector.OnSelectedItemChanged((object)e.OldValue, (object)e.NewValue);
-        }
-
-        protected virtual void OnSelectedItemChanged(object oldValue, object newValue)
-        {
-            // TODO: Add your property changed side-effects. Descendants can override as well.
-        }
-
-        #endregion //SelectedItem
-
-        #region SelectedItems
-
-        public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.Register("SelectedItems", typeof(IList), typeof(Selector), new UIPropertyMetadata(null, OnSelectedItemsChanged));
+        //Make Read Only
+        public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.Register("SelectedItems", typeof(IList), typeof(Selector), new UIPropertyMetadata(null));
         public IList SelectedItems
         {
             get { return (IList)GetValue(SelectedItemsProperty); }
             set { SetValue(SelectedItemsProperty, value); }
         }
-
-        private static void OnSelectedItemsChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            Selector selector = o as Selector;
-            if (selector != null)
-                selector.OnSelectedItemsChanged((IList)e.OldValue, (IList)e.NewValue);
-        }
-
-        protected virtual void OnSelectedItemsChanged(IList oldValue, IList newValue)
-        {
-            if (oldValue != null)
-            {
-                var collection = oldValue as INotifyCollectionChanged;
-                if (collection != null)
-                    collection.CollectionChanged -= SelectedItems_CollectionChanged;
-            }
-
-            if (newValue != null)
-            {
-                var collection = newValue as INotifyCollectionChanged;
-                if (collection != null)
-                    collection.CollectionChanged += SelectedItems_CollectionChanged;
-            }
-        }
-
-        void SelectedItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                var item = e.NewItems[0];
-                OnSelectedItemsCollectionChanged(item, false);
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                var item = e.OldItems[0];
-                OnSelectedItemsCollectionChanged(item, true);
-            }
-        }
-
-        protected virtual void OnSelectedItemsCollectionChanged(object item, bool remove)
-        {
-            //var selectorItem = ItemContainerGenerator.ContainerFromItem(item) as SelectorItem;
-            //selectorItem.IsSelected = !remove;
-            UpdateSelectedValue(item, remove);
-        }
-
-        #endregion SelectedItems
 
         #region SelectedValue
 
@@ -155,21 +91,16 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #endregion //SelectedValue
 
-        public static readonly DependencyProperty SelectedValuePathProperty = DependencyProperty.Register("SelectedValuePath", typeof(string), typeof(Selector), new UIPropertyMetadata(null));
-        public string SelectedValuePath
+        public static readonly DependencyProperty ValueMemberPathProperty = DependencyProperty.Register("ValueMemberPath", typeof(string), typeof(Selector), new UIPropertyMetadata(null));
+        public string ValueMemberPath
         {
-            get { return (string)GetValue(SelectedValuePathProperty); }
-            set { SetValue(SelectedValuePathProperty, value); }
+            get { return (string)GetValue(ValueMemberPathProperty); }
+            set { SetValue(ValueMemberPathProperty, value); }
         }
 
         #endregion //Properties
 
         #region Base Class Overrides
-
-        public override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-        }
 
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
@@ -189,9 +120,9 @@ namespace Microsoft.Windows.Controls.Primitives
             var value = item;
 
             //let's check if we can find a value on the item using the SelectedValuePath property
-            if (!String.IsNullOrEmpty(SelectedValuePath))
+            if (!String.IsNullOrEmpty(ValueMemberPath))
             {
-                var property = item.GetType().GetProperty(SelectedValuePath);
+                var property = item.GetType().GetProperty(ValueMemberPath);
                 if (property != null)
                 {
                     value = property.GetValue(item, null);
@@ -253,13 +184,14 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #endregion //Event Handlers
 
+
         #region Methods
 
         protected object GetItemValue(object item)
         {
-            if (!String.IsNullOrEmpty(SelectedValuePath))
+            if (!String.IsNullOrEmpty(ValueMemberPath))
             {
-                var property = item.GetType().GetProperty(SelectedValuePath);
+                var property = item.GetType().GetProperty(ValueMemberPath);
                 if (property != null)
                     return property.GetValue(item, null);
             }
@@ -309,9 +241,6 @@ namespace Microsoft.Windows.Controls.Primitives
 
         private void UpdateSelectedItem(object item)
         {
-            if (_surpressSelectionChanged)
-                return;
-
             SelectedItem = item;
         }
 
@@ -331,8 +260,9 @@ namespace Microsoft.Windows.Controls.Primitives
 
         private void UpdateSelectedValue(object item, bool remove)
         {
-            if (SelectedValue == null)
-                SelectedValue = String.Empty;
+            //make sure we have a selected value, or we will get an exception
+            if (String.IsNullOrEmpty(SelectedValue))
+                UpdateSelectedValue(String.Empty);
 
             var value = GetItemValue(item);
             var resolvedValue = GetDelimitedValue(value);
@@ -349,7 +279,9 @@ namespace Microsoft.Windows.Controls.Primitives
                     updateValue = SelectedValue + resolvedValue;
             }
 
-            UpdateSelectedValue(updateValue);
+            //if the SelectedValue is the same as the updated value then just ignore it
+            if (!SelectedValue.Equals(value))
+                UpdateSelectedValue(updateValue);
         }
 
         private void UpdateSelectedValue(string value)
@@ -360,8 +292,7 @@ namespace Microsoft.Windows.Controls.Primitives
 
             _surpressSelectedValueChanged = true;
 
-            if (!SelectedValue.Equals(value))
-                SelectedValue = value;
+            SelectedValue = value;
 
             _surpressSelectedValueChanged = false;
         }
@@ -370,12 +301,11 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             _surpressSelectionChanged = true;
 
+            //first we have to unselect everything
+            UnselectAll();
+
             if (!String.IsNullOrEmpty(SelectedValue))
             {
-                //first we have to unselect everything
-                UnselectAll();
-
-
                 string[] values = SelectedValue.Split(new string[] { Delimiter }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string value in values)
                 {
@@ -389,7 +319,7 @@ namespace Microsoft.Windows.Controls.Primitives
                 }
             }
 
-            _surpressSelectionChanged = true;
+            _surpressSelectionChanged = false;
         }
 
         private void UnselectAll()
@@ -411,13 +341,13 @@ namespace Microsoft.Windows.Controls.Primitives
 
         protected object ResolveItemByValue(string value)
         {
-            if (!String.IsNullOrEmpty(SelectedValuePath))
+            if (!String.IsNullOrEmpty(ValueMemberPath))
             {
                 if (ItemsSource != null)
                 {
                     foreach (object item in ItemsSource)
                     {
-                        var property = item.GetType().GetProperty(SelectedValuePath);
+                        var property = item.GetType().GetProperty(ValueMemberPath);
                         if (property != null)
                         {
                             var propertyValue = property.GetValue(item, null);

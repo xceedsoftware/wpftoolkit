@@ -6,8 +6,6 @@ namespace Microsoft.Windows.Controls
 {
     public class CheckComboBox : Selector
     {
-        private bool _surpressTextUpdateFromSelectedValueChanged;
-
         #region Constructors
 
         static CheckComboBox()
@@ -66,25 +64,7 @@ namespace Microsoft.Windows.Controls
         protected override void OnSelectedValueChanged(string oldValue, string newValue)
         {
             base.OnSelectedValueChanged(oldValue, newValue);
-
-            if (!_surpressTextUpdateFromSelectedValueChanged)
-                UpdateTextFromSelectedValue();
-        }
-
-        protected override void OnSelectedItemsCollectionChanged(object item, bool remove)
-        {
-            _surpressTextUpdateFromSelectedValueChanged = true;
-            base.OnSelectedItemsCollectionChanged(item, remove);
-            UpdateDisplayText(item, remove);
-            _surpressTextUpdateFromSelectedValueChanged = false;
-        }
-
-        protected override void Update(object item, bool remove)
-        {
-            _surpressTextUpdateFromSelectedValueChanged = true;
-            base.Update(item, remove);
-            UpdateDisplayText(item, remove);
-            _surpressTextUpdateFromSelectedValueChanged = false;
+            UpdateTextFromSelectedValue();
         }
 
         #endregion //Base Class Overrides
@@ -125,6 +105,8 @@ namespace Microsoft.Windows.Controls
 
         private void UpdateTextFromSelectedValue()
         {
+            UpdateText(String.Empty);
+
             if (!String.IsNullOrEmpty(SelectedValue))
             {
                 string[] values = SelectedValue.Split(new string[] { Delimiter }, StringSplitOptions.RemoveEmptyEntries);
