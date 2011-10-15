@@ -34,9 +34,9 @@ namespace Samples.Modules.Color.Views
 
             List<Person> colors = new List<Person>();
             colors.Add(new Person(System.Windows.Media.Colors.Red, 0));
-            colors.Add(new Person(System.Windows.Media.Colors.Purple, 1));
+            colors.Add(new Person(System.Windows.Media.Colors.Purple, 1) { IsSelected = true });
             colors.Add(new Person(System.Windows.Media.Colors.Coral, 2));
-            colors.Add(new Person(System.Windows.Media.Colors.MidnightBlue, 3));
+            colors.Add(new Person(System.Windows.Media.Colors.MidnightBlue, 3) { IsSelected = true });
             colors.Add(new Person(System.Windows.Media.Colors.Green, 4));
             colors.Add(new Person(System.Windows.Media.Colors.Red, 5));
             colors.Add(new Person(System.Windows.Media.Colors.Purple, 6));
@@ -60,14 +60,19 @@ namespace Samples.Modules.Color.Views
             //_combo.SelectedValue = "1,3,5,7,9,";
 
             _listBox.ItemsSource = colors;
-            //_listBox.DelimitedValue = "1,3,5,7,9,";
+            //_listBox.SelectedValue = "1,3,5,7,9,";
+        }
+
+        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            (DataContext as Data).SelectedValue = "1,3,5,7,9,";
         }
     }
 
-    public class Data
+    public class Data: INotifyPropertyChanged
     {
         private string _selectedValues;// = "1,3,5,7,9,";
-        public string SelectedValues
+        public string SelectedValue
         {
             get
             {
@@ -76,23 +81,31 @@ namespace Samples.Modules.Color.Views
             set
             {
                 _selectedValues = value;
+                OnPropertyChanged("SelectedValue");
             }
         }
 
-        private ObservableCollection<Person> _selectedItems = new ObservableCollection<Person>()
-        { 
-            new Person(System.Windows.Media.Colors.Red, 0),
-            new Person(System.Windows.Media.Colors.Coral, 2)            
-        };
-
+        private ObservableCollection<Person> _selectedItems = new ObservableCollection<Person>();
         public ObservableCollection<Person> SelectedItems
         {
             get { return _selectedItems; }
             set
             {
                 _selectedItems = value;
+                OnPropertyChanged("SelectedItems");
             }
-        }        
+        }
+
+        public Data()
+        {
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     public class Person : INotifyPropertyChanged

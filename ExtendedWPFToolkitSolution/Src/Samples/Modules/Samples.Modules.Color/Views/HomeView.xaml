@@ -25,9 +25,10 @@
 
         <StackPanel>
             <extToolkit:CheckComboBox x:Name="_combo" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                 DisplayMemberPath="Color"
-                                 SelectedValuePath="Level"
-                                 SelectedItems="{Binding SelectedItems}" />
+                                      DisplayMemberPath="Color"
+                                      ValueMemberPath="Level"
+                                      SelectedValue="{Binding SelectedValue}"
+                                      SelectedItems="{Binding SelectedItems}"/>
 
             <!--<extToolkit:CheckComboBox x:Name="_combo" HorizontalAlignment="Center" VerticalAlignment="Center"
                                       SelectedValue="{Binding SelectedValues}" />-->
@@ -39,12 +40,20 @@
 
             <extToolkit:CheckListBox x:Name="_listBox" Height="250"
                                       DisplayMemberPath="Color"
-                                      SelectedValuePath="Level"
-                                     SelectedItems="{Binding SelectedItems}" />
+                                      ValueMemberPath="Level" 
+                                     SelectedMemberPath="IsSelected"
+                                     SelectedValue="{Binding SelectedValue}"
+                                     SelectedItems="{Binding SelectedItems}"/>
 
             <!--<extToolkit:CheckListBox x:Name="_listBox" Height="250"
                                      SelectedValue="{Binding SelectedValues}"
                                      />-->
+            
+            <TextBlock Text="{Binding SelectedValue}" />
+            <ListBox ItemsSource="{Binding SelectedItems}" Height="50" />
+            
+            <Button Click="Button_Click">Set</Button>
+            
         </StackPanel>
     </Grid>
 </infControls:DemoView>

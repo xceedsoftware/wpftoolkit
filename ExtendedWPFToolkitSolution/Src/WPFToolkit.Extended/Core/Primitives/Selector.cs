@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.ComponentModel;
 using System.Windows.Input;
-using System.Collections.Specialized;
 
 namespace Microsoft.Windows.Controls.Primitives
 {
@@ -63,6 +62,13 @@ namespace Microsoft.Windows.Controls.Primitives
             set { SetValue(SelectedItemsProperty, value); }
         }
 
+        public static readonly DependencyProperty SelectedMemberPathProperty = DependencyProperty.Register("SelectedMemberPath", typeof(string), typeof(Selector), new UIPropertyMetadata(null));
+        public string SelectedMemberPath
+        {
+            get { return (string)GetValue(SelectedMemberPathProperty); }
+            set { SetValue(SelectedMemberPathProperty, value); }
+        }
+
         #region SelectedValue
 
         public static readonly DependencyProperty SelectedValueProperty = DependencyProperty.Register("SelectedValue", typeof(string), typeof(Selector), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedValueChanged));
@@ -117,38 +123,52 @@ namespace Microsoft.Windows.Controls.Primitives
             _surpressSelectionChanged = true;
             bool isSelected = false;
             var selectorItem = element as FrameworkElement;
-            var value = item;
 
-            //let's check if we can find a value on the item using the SelectedValuePath property
-            if (!String.IsNullOrEmpty(ValueMemberPath))
+            //first try resolving SelectorItem.IsSelected by data binding to the SelectedMemeberPath property
+            if (!String.IsNullOrEmpty(SelectedMemberPath))
             {
-                var property = item.GetType().GetProperty(ValueMemberPath);
-                if (property != null)
-                {
-                    value = property.GetValue(item, null);
-                }
+                Binding selectedBinding = new Binding(SelectedMemberPath) 
+                { 
+                    Mode = BindingMode.TwoWay, 
+                    Source = item 
+                };
+                selectorItem.SetBinding(SelectorItem.IsSelectedProperty, selectedBinding);
             }
+            else
+            {
+                var value = item;
 
-            //now check to see if the SelectedValue string contains our value.  If it does then set Selector.IsSelected to true
-            if (!String.IsNullOrEmpty(SelectedValue) && SelectedValue.Contains(GetDelimitedValue(value)))
-            {
-                isSelected = true;
-            }
-            else if (SelectedItems != null)
-            {
-                //if we get here we could find the value in the SelectedValue property, so lets search the SelectedItems for a match
-                foreach (object selectedItem in SelectedItems)
+                //let's check if we can find a value on the item using the SelectedValuePath property
+                if (!String.IsNullOrEmpty(ValueMemberPath))
                 {
-                    //a match was found so select it and get the hell out of here
-                    if (value.Equals(GetItemValue(selectedItem)))
+                    var property = item.GetType().GetProperty(ValueMemberPath);
+                    if (property != null)
                     {
-                        isSelected = true;
-                        break;
+                        value = property.GetValue(item, null);
                     }
                 }
-            }
 
-            selectorItem.SetValue(SelectorItem.IsSelectedProperty, isSelected);
+                //now check to see if the SelectedValue string contains our value.  If it does then set Selector.IsSelected to true
+                if (!String.IsNullOrEmpty(SelectedValue) && SelectedValue.Contains(GetDelimitedValue(value)))
+                {
+                    isSelected = true;
+                }
+                else if (SelectedItems != null)
+                {
+                    //if we get here we could find the value in the SelectedValue property, so lets search the SelectedItems for a match
+                    foreach (object selectedItem in SelectedItems)
+                    {
+                        //a match was found so select it and get the hell out of here
+                        if (value.Equals(GetItemValue(selectedItem)))
+                        {
+                            isSelected = true;
+                            break;
+                        }
+                    }
+                }
+
+                selectorItem.SetValue(SelectorItem.IsSelectedProperty, isSelected);
+            }
 
             base.PrepareContainerForItemOverride(element, item);
             _surpressSelectionChanged = false;
@@ -183,7 +203,6 @@ namespace Microsoft.Windows.Controls.Primitives
         }
 
         #endregion //Event Handlers
-
 
         #region Methods
 
@@ -261,7 +280,7 @@ namespace Microsoft.Windows.Controls.Primitives
         private void UpdateSelectedValue(object item, bool remove)
         {
             //make sure we have a selected value, or we will get an exception
-            if (String.IsNullOrEmpty(SelectedValue))
+            if (SelectedValue == null)
                 UpdateSelectedValue(String.Empty);
 
             var value = GetItemValue(item);
@@ -280,7 +299,7 @@ namespace Microsoft.Windows.Controls.Primitives
             }
 
             //if the SelectedValue is the same as the updated value then just ignore it
-            if (!SelectedValue.Equals(value))
+            if (!SelectedValue.Equals(updateValue))
                 UpdateSelectedValue(updateValue);
         }
 
