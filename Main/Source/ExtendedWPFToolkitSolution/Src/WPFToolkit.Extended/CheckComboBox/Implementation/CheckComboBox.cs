@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using Microsoft.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace Microsoft.Windows.Controls
 {
@@ -69,7 +70,11 @@ namespace Microsoft.Windows.Controls
 
         private void UpdateText()
         {
+#if VS2008
+            string newValue = String.Join(Delimiter, SelectedItems.Cast<object>().Select(x => GetItemDisplayValue(x).ToString()).ToArray()); 
+#else
             string newValue = String.Join(Delimiter, SelectedItems.Cast<object>().Select(x => GetItemDisplayValue(x)));
+#endif
 
             if (String.IsNullOrEmpty(Text) || !Text.Equals(newValue))
                 Text = newValue;
