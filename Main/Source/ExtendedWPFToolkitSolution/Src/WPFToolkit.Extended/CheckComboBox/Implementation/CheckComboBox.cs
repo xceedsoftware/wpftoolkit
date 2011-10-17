@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using Microsoft.Windows.Controls.Primitives;
 
@@ -56,66 +57,22 @@ namespace Microsoft.Windows.Controls
 
         #region Base Class Overrides
 
-        public override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-        }
-
         protected override void OnSelectedValueChanged(string oldValue, string newValue)
         {
             base.OnSelectedValueChanged(oldValue, newValue);
-            UpdateTextFromSelectedValue();
+            UpdateText();
         }
 
         #endregion //Base Class Overrides
 
         #region Methods
 
-        private void UpdateDisplayText(object item, bool remove)
+        private void UpdateText()
         {
-            if (Text == null)
-                Text = String.Empty;
+            string newValue = String.Join(Delimiter, SelectedItems.Cast<object>().Select(x => GetItemDisplayValue(x)));
 
-            var displayText = GetItemDisplayValue(item);
-            var resolvedDisplayText = GetDelimitedValue(displayText);
-            string updatedText = Text;
-
-            if (remove)
-            {
-                if (Text.Contains(resolvedDisplayText))
-                    updatedText = Text.Replace(resolvedDisplayText, "");
-            }
-            else
-            {
-                if (!Text.Contains(resolvedDisplayText))
-                    updatedText = Text + resolvedDisplayText;
-            }
-
-            UpdateText(updatedText);
-        }
-
-        private void UpdateText(string text)
-        {
-            if (String.IsNullOrEmpty(Text))
-                Text = string.Empty;
-
-            if (!Text.Equals(text))
-                Text = text;
-        }
-
-        private void UpdateTextFromSelectedValue()
-        {
-            UpdateText(String.Empty);
-
-            if (!String.IsNullOrEmpty(SelectedValue))
-            {
-                string[] values = SelectedValue.Split(new string[] { Delimiter }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string value in values)
-                {
-                    var item = ResolveItemByValue(value);
-                    UpdateDisplayText(item, false);
-                }
-            }
+            if (String.IsNullOrEmpty(Text) || !Text.Equals(newValue))
+                Text = newValue;
         }
 
         protected object GetItemDisplayValue(object item)
