@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -24,9 +25,18 @@ namespace Microsoft.Windows.Controls.Primitives
         public Selector()
         {
             SelectedItems = new ObservableCollection<object>();
+            //ItemContainerGenerator.StatusChanged += new EventHandler(ItemContainerGenerator_StatusChanged);
             AddHandler(Selector.SelectedEvent, new RoutedEventHandler(Selector_ItemSelected));
             AddHandler(Selector.UnSelectedEvent, new RoutedEventHandler(Selector_ItemUnselected));
         }
+
+        //void ItemContainerGenerator_StatusChanged(object sender, EventArgs e)
+        //{
+        //    if (ItemContainerGenerator.Status == System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
+        //    {
+        //        UpdateSelectedItemsFromSelectedValue();
+        //    }
+        //}
 
         #endregion //Constructors
 
@@ -54,7 +64,8 @@ namespace Microsoft.Windows.Controls.Primitives
             set { SetValue(SelectedItemProperty, value); }
         }
 
-        //Make Read Only
+        //Since you cannot data bind to ReadOnly DependencyProperty, I am leaving this a public get/set DP.  This will allow you to data bind to the SelectedItems from a ViewModel, but it is
+        //intended to be ReadOnly.  So you MUST set the binding Mode=OneWayToSource.  Otherwise it will not behave as expected.
         public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.Register("SelectedItems", typeof(IList), typeof(Selector), new UIPropertyMetadata(null));
         public IList SelectedItems
         {
@@ -90,9 +101,7 @@ namespace Microsoft.Windows.Controls.Primitives
             if (_surpressSelectedValueChanged)
                 return;
 
-            //if we are controling the selections from the SelectedValue we can only update the IsSelected property of the items if the containers have been generated
-            if (ItemContainerGenerator.Status == System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
-                UpdateSelectedItemsFromSelectedValue();
+            UpdateSelectedItemsFromSelectedValue();
         }
 
         #endregion //SelectedValue
@@ -121,53 +130,31 @@ namespace Microsoft.Windows.Controls.Primitives
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
             _surpressSelectionChanged = true;
-            bool isSelected = false;
             var selectorItem = element as FrameworkElement;
 
             //first try resolving SelectorItem.IsSelected by data binding to the SelectedMemeberPath property
             if (!String.IsNullOrEmpty(SelectedMemberPath))
             {
-                Binding selectedBinding = new Binding(SelectedMemberPath) 
-                { 
-                    Mode = BindingMode.TwoWay, 
-                    Source = item 
+                Binding selectedBinding = new Binding(SelectedMemberPath)
+                {
+                    Mode = BindingMode.TwoWay,
+                    Source = item
                 };
                 selectorItem.SetBinding(SelectorItem.IsSelectedProperty, selectedBinding);
             }
-            else
+
+            //now let's search the SelectedItems for the current item.  If it's there then mark it as selected
+            if (SelectedItems != null)
             {
-                var value = item;
-
-                //let's check if we can find a value on the item using the SelectedValuePath property
-                if (!String.IsNullOrEmpty(ValueMemberPath))
+                foreach (object selectedItem in SelectedItems)
                 {
-                    var property = item.GetType().GetProperty(ValueMemberPath);
-                    if (property != null)
+                    //a match was found so select it and get the hell out of here
+                    if (item.Equals(selectedItem))
                     {
-                        value = property.GetValue(item, null);
+                        selectorItem.SetValue(SelectorItem.IsSelectedProperty, true);
+                        break;
                     }
                 }
-
-                //now check to see if the SelectedValue string contains our value.  If it does then set Selector.IsSelected to true
-                if (!String.IsNullOrEmpty(SelectedValue) && SelectedValue.Contains(GetDelimitedValue(value)))
-                {
-                    isSelected = true;
-                }
-                else if (SelectedItems != null)
-                {
-                    //if we get here we could find the value in the SelectedValue property, so lets search the SelectedItems for a match
-                    foreach (object selectedItem in SelectedItems)
-                    {
-                        //a match was found so select it and get the hell out of here
-                        if (value.Equals(GetItemValue(selectedItem)))
-                        {
-                            isSelected = true;
-                            break;
-                        }
-                    }
-                }
-
-                selectorItem.SetValue(SelectorItem.IsSelectedProperty, isSelected);
             }
 
             base.PrepareContainerForItemOverride(element, item);
@@ -255,7 +242,7 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             UpdateSelectedItem(item);
             UpdateSelectedItems(item, remove);
-            UpdateSelectedValue(item, remove);
+            UpdateSelectedValue();
         }
 
         private void UpdateSelectedItem(object item)
@@ -277,33 +264,7 @@ namespace Microsoft.Windows.Controls.Primitives
             }
         }
 
-        private void UpdateSelectedValue(object item, bool remove)
-        {
-            //make sure we have a selected value, or we will get an exception
-            if (SelectedValue == null)
-                UpdateSelectedValue(String.Empty);
-
-            var value = GetItemValue(item);
-            var resolvedValue = GetDelimitedValue(value);
-            string updateValue = SelectedValue;
-
-            if (remove)
-            {
-                if (SelectedValue.Contains(resolvedValue))
-                    updateValue = SelectedValue.Replace(resolvedValue, "");
-            }
-            else
-            {
-                if (!SelectedValue.Contains(resolvedValue))
-                    updateValue = SelectedValue + resolvedValue;
-            }
-
-            //if the SelectedValue is the same as the updated value then just ignore it
-            if (!SelectedValue.Equals(updateValue))
-                UpdateSelectedValue(updateValue);
-        }
-
-        private void UpdateSelectedValue(string value)
+        private void UpdateSelectedValue()
         {
             //get out of here if we don't want to set the SelectedValue
             if (_ignoreSetSelectedValue)
@@ -311,7 +272,10 @@ namespace Microsoft.Windows.Controls.Primitives
 
             _surpressSelectedValueChanged = true;
 
-            SelectedValue = value;
+            string newValue = String.Join(Delimiter, SelectedItems.Cast<object>().Select(x => GetItemValue(x)));
+
+            if (String.IsNullOrEmpty(SelectedValue) || !SelectedValue.Equals(newValue))
+                SelectedValue = newValue;
 
             _surpressSelectedValueChanged = false;
         }
@@ -321,7 +285,7 @@ namespace Microsoft.Windows.Controls.Primitives
             _surpressSelectionChanged = true;
 
             //first we have to unselect everything
-            UnselectAll();
+            ClearSelectedItems();
 
             if (!String.IsNullOrEmpty(SelectedValue))
             {
@@ -329,11 +293,18 @@ namespace Microsoft.Windows.Controls.Primitives
                 foreach (string value in values)
                 {
                     var item = ResolveItemByValue(value);
-                    var selectorItem = ItemContainerGenerator.ContainerFromItem(item) as SelectorItem;
-                    if (selectorItem != null)
+
+                    if (item != null)
                     {
-                        if (!selectorItem.IsSelected)
-                            selectorItem.IsSelected = true;
+                        SelectedItems.Add(item);
+
+                        //now try to select it in the list
+                        var selectorItem = ItemContainerGenerator.ContainerFromItem(item) as SelectorItem;
+                        if (selectorItem != null)
+                        {
+                            if (!selectorItem.IsSelected)
+                                selectorItem.IsSelected = true;
+                        }
                     }
                 }
             }
@@ -341,7 +312,17 @@ namespace Microsoft.Windows.Controls.Primitives
             _surpressSelectionChanged = false;
         }
 
-        private void UnselectAll()
+        private void ClearSelectedItems()
+        {
+            if (SelectedItems != null)
+                SelectedItems.Clear();
+            else
+                SelectedItems = new ObservableCollection<object>();
+
+            UnselectAllInternal();
+        }
+
+        private void UnselectAllInternal()
         {
             _ignoreSetSelectedValue = true;
 
