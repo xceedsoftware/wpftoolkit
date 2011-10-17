@@ -109,6 +109,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="CheckComboBox\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CheckListBox\Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -181,6 +185,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="TokenizedTextBox\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WatermarkTextBox\Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -221,14 +229,11 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Calculator\Implementation\CalculatorCommands.cs">
       <Link>Calculator\Implementation\CalculatorCommands.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CheckComboBox\Implementation\CheckComboBox.cs">
+      <Link>CheckComboBox\Implementation\CheckComboBox.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CheckListBox\Implementation\CheckListBox.cs">
       <Link>CheckListBox\Implementation\CheckListBox.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CheckListBox\Implementation\CheckListBoxCheckedChangedEventArgs.cs">
-      <Link>CheckListBox\Implementation\CheckListBoxCheckedChangedEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CheckListBox\Implementation\CheckListBoxItem.cs">
-      <Link>CheckListBox\Implementation\CheckListBoxItem.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ChildWindow\Implementation\ChildWindow.cs">
       <Link>ChildWindow\Implementation\ChildWindow.cs</Link>
@@ -290,6 +295,12 @@
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Primitives\InputBase.cs">
       <Link>Core\Primitives\InputBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Primitives\Selector.cs">
+      <Link>Core\Primitives\Selector.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Primitives\SelectorItem.cs">
+      <Link>Core\Primitives\SelectorItem.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\Core\Primitives\UpDownBase.cs">
       <Link>Core\Primitives\UpDownBase.cs</Link>
@@ -506,6 +517,18 @@
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\TimePicker\Implementation\TimePicker.cs">
       <Link>TimePicker\Implementation\TimePicker.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\TokenizedTextBox\Implementation\Token.cs">
+      <Link>TokenizedTextBox\Implementation\Token.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\TokenizedTextBox\Implementation\TokenItem.cs">
+      <Link>TokenizedTextBox\Implementation\TokenItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\TokenizedTextBox\Implementation\TokenizedTextBox.cs">
+      <Link>TokenizedTextBox\Implementation\TokenizedTextBox.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\TokenizedTextBox\Implementation\TokenizedTextBoxCommands.cs">
+      <Link>TokenizedTextBox\Implementation\TokenizedTextBoxCommands.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\VisualStates.cs">
       <Link>VisualStates.cs</Link>
     </Compile>
@@ -607,6 +630,9 @@
   <ItemGroup>
     <Resource Include="CollectionEditors\Images\Delete16.png" />
     <Resource Include="MultiLineTextEditor\Images\Notes16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="TokenizedTextBox\Images\delete8.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -25,18 +25,9 @@ namespace Microsoft.Windows.Controls.Primitives
         public Selector()
         {
             SelectedItems = new ObservableCollection<object>();
-            //ItemContainerGenerator.StatusChanged += new EventHandler(ItemContainerGenerator_StatusChanged);
             AddHandler(Selector.SelectedEvent, new RoutedEventHandler(Selector_ItemSelected));
             AddHandler(Selector.UnSelectedEvent, new RoutedEventHandler(Selector_ItemUnselected));
         }
-
-        //void ItemContainerGenerator_StatusChanged(object sender, EventArgs e)
-        //{
-        //    if (ItemContainerGenerator.Status == System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
-        //    {
-        //        UpdateSelectedItemsFromSelectedValue();
-        //    }
-        //}
 
         #endregion //Constructors
 
@@ -235,7 +226,7 @@ namespace Microsoft.Windows.Controls.Primitives
             RaiseEvent(new SelectedItemChangedEventArgs(Selector.SelectedItemChangedEvent, this, item, isSelected));
 
             if (Command != null)
-                Command.Execute(SelectedItem);
+                Command.Execute(item);
         }
 
         protected virtual void Update(object item, bool remove)
@@ -252,6 +243,9 @@ namespace Microsoft.Windows.Controls.Primitives
 
         private void UpdateSelectedItems(object item, bool remove)
         {
+            if (SelectedItems == null)
+                SelectedItems = new ObservableCollection<object>();
+
             if (remove)
             {
                 if (SelectedItems.Contains(item))
@@ -272,8 +266,11 @@ namespace Microsoft.Windows.Controls.Primitives
 
             _surpressSelectedValueChanged = true;
 
+#if VS2008
+            string newValue = String.Join(Delimiter, SelectedItems.Cast<object>().Select(x => GetItemValue(x).ToString()).ToArray());
+#else
             string newValue = String.Join(Delimiter, SelectedItems.Cast<object>().Select(x => GetItemValue(x)));
-
+#endif
             if (String.IsNullOrEmpty(SelectedValue) || !SelectedValue.Equals(newValue))
                 SelectedValue = newValue;
 
