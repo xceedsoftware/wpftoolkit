@@ -33,7 +33,7 @@ namespace Microsoft.Windows.Controls.Primitives
 
         #region Properties
 
-        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register("Command", typeof(ICommand), typeof(CheckListBox), new PropertyMetadata((ICommand)null));
+        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register("Command", typeof(ICommand), typeof(Selector), new PropertyMetadata((ICommand)null));
         [TypeConverter(typeof(CommandConverter))]
         public ICommand Command
         {

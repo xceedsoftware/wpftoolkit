@@ -17,7 +17,7 @@ namespace Microsoft.Windows.Controls
 
         public CheckComboBox()
         {
-
+            Mouse.AddPreviewMouseDownOutsideCapturedElementHandler(this, OnMouseDownOutsideCapturedElement);
         }
 
         #endregion //Constructors
@@ -66,6 +66,15 @@ namespace Microsoft.Windows.Controls
 
         #endregion //Base Class Overrides
 
+        #region Event Handlers
+
+        private void OnMouseDownOutsideCapturedElement(object sender, MouseButtonEventArgs e)
+        {
+            CloseDropDown();
+        }
+
+        #endregion //Event Handlers
+
         #region Methods
 
         private void UpdateText()
@@ -90,6 +99,13 @@ namespace Microsoft.Windows.Controls
             }
 
             return item;
+        }
+
+        private void CloseDropDown()
+        {
+            if (IsDropDownOpen)
+                IsDropDownOpen = false;
+            ReleaseMouseCapture();
         }
 
         #endregion //Methods
