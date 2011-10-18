@@ -33,6 +33,8 @@ namespace Microsoft.Windows.Controls
             string designator = "";
             string[] dateTimeSeparators = new string[] { ",", " ", "-", ".", "/", cultureInfo.DateTimeFormat.DateSeparator, cultureInfo.DateTimeFormat.TimeSeparator };
 
+            ResolveSortableDateTimeString(ref dateTime, ref format, cultureInfo);
+
             var dateTimeParts = dateTime.Split(dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries).ToList();
             var formats = format.Split(dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -71,6 +73,20 @@ namespace Microsoft.Windows.Controls
             var time = string.Join(cultureInfo.DateTimeFormat.TimeSeparator, timeParts);
 
             return String.Format("{0} {1} {2}", date, time, designator);
+        }
+
+        private static void ResolveSortableDateTimeString(ref string dateTime, ref string format, CultureInfo cultureInfo)
+        {
+            if (format == cultureInfo.DateTimeFormat.SortableDateTimePattern)
+            {
+                format = format.Replace("'", "").Replace("T", " ");
+                dateTime = dateTime.Replace("'", "").Replace("T", " ");
+            }
+            else if (format == cultureInfo.DateTimeFormat.UniversalSortableDateTimePattern)
+            {
+                format = format.Replace("'", "").Replace("Z", "");
+                dateTime = dateTime.Replace("'", "").Replace("Z", "");
+            }
         }
 
         private static Dictionary<string, string> GetDateParts(DateTime currentDate, CultureInfo cultureInfo)
