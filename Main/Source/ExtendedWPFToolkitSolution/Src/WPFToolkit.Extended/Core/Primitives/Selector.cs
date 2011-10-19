@@ -323,13 +323,16 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             _ignoreSetSelectedValue = true;
 
-            foreach (object item in ItemsSource)
+            if (ItemsSource != null)
             {
-                var selectorItem = ItemContainerGenerator.ContainerFromItem(item) as SelectorItem;
-                if (selectorItem != null)
+                foreach (object item in ItemsSource)
                 {
-                    if (selectorItem.IsSelected)
-                        selectorItem.IsSelected = false;
+                    var selectorItem = ItemContainerGenerator.ContainerFromItem(item) as SelectorItem;
+                    if (selectorItem != null)
+                    {
+                        if (selectorItem.IsSelected)
+                            selectorItem.IsSelected = false;
+                    }
                 }
             }
 
