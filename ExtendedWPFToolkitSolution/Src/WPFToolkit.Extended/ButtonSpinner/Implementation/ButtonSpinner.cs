@@ -9,9 +9,14 @@ namespace Microsoft.Windows.Controls
     /// <summary>
     /// Represents a spinner control that includes two Buttons.
     /// </summary>
+    [TemplatePart(Name = PART_IncreaseButton, Type = typeof(ButtonBase))]
+    [TemplatePart(Name = PART_DecreaseButton, Type = typeof(ButtonBase))]
     [ContentProperty("Content")]
     public class ButtonSpinner : Spinner
     {
+        private const string PART_IncreaseButton = "PART_IncreaseButton";
+        private const string PART_DecreaseButton = "PART_DecreaseButton";
+
         #region Properties
 
         #region AllowSpin
@@ -132,8 +137,8 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            IncreaseButton = GetTemplateChild("IncreaseButton") as ButtonBase;
-            DecreaseButton = GetTemplateChild("DecreaseButton") as ButtonBase;
+            IncreaseButton = GetTemplateChild(PART_IncreaseButton) as ButtonBase;
+            DecreaseButton = GetTemplateChild(PART_DecreaseButton) as ButtonBase;
 
             SetButtonUsage();
         }
