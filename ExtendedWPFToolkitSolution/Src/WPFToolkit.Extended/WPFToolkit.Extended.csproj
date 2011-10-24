@@ -151,21 +151,29 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Themes\Aero\Brushes.xaml">
+    <Page Include="Themes\Aero.NormalColor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Themes\Aero\Buttons.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Common\Generic_Common.xaml">
+    <Page Include="Themes\Aero\Brushes_NormalColor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Generic\Brushes.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Generic\Buttons.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Generic\Common.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="TimePicker\Themes\Generic.xaml">
       <SubType>Designer</SubType>
@@ -211,6 +219,7 @@
     <Compile Include="ColorPicker\Implementation\ColorPicker.cs" />
     <Compile Include="Core\Primitives\Selector.cs" />
     <Compile Include="Core\Primitives\SelectorItem.cs" />
+    <Compile Include="Core\Themes\StaticResourceKey.cs" />
     <Compile Include="Core\Utilities\CalculatorUtilities.cs" />
     <Compile Include="Core\Utilities\ColorUtilities.cs" />
     <Compile Include="ColorCanvas\Implementation\ColorSpectrumSlider.cs" />
@@ -305,6 +314,7 @@
     <Compile Include="RichTextBox\RichTextBox.cs" />
     <Compile Include="Core\Primitives\UpDownBase.cs" />
     <Compile Include="SplitButton\Implementation\SplitButton.cs" />
+    <Compile Include="Core\Themes\ResourceKeys.cs" />
     <Compile Include="TimePicker\Implementation\TimeFormat.cs" />
     <Compile Include="TimePicker\Implementation\TimeItem.cs" />
     <Compile Include="TimePicker\Implementation\TimePicker.cs" />
