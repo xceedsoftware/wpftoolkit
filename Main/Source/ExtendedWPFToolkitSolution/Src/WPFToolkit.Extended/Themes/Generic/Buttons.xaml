@@ -1,0 +1,60 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:themes="clr-namespace:Microsoft.Windows.Controls.Themes">
+
+    <DataTemplate x:Key="IncreaseGlyphKey">
+        <Path
+			Width="7"
+			Height="4"
+			Data="M 0,3 C0,3 0,4 0,4 0,4 3,4 3,4 3,4 3,3 3,3 3,3 4,3 4,3 4,3 4,4 4,4 4,4 7,4 7,4 7,4 7,3 7,3 7,3 6,3 6,3 6,3 6,2 6,2 6,2 5,2 5,2 5,2 5,1 5,1 5,1 4,1 4,1 4,1 4,0 4,0 4,0 3,0 3,0 3,0 3,1 3,1 3,1 2,1 2,1 2,1 2,2 2,2 2,2 1,2 1,2 1,2 1,3 1,3 1,3 0,3 0,3 z"
+			Fill="{DynamicResource {x:Static themes:ResourceKeys.GlyphNormalForegroundKey}}"
+            SnapsToDevicePixels="True"
+             HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False" />
+    </DataTemplate>
+
+    <DataTemplate x:Key="DecreaseGlyphKey">
+        <Path
+			Width="7"
+			Height="4"
+			Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z"
+			Fill="{DynamicResource {x:Static themes:ResourceKeys.GlyphNormalForegroundKey}}"
+            SnapsToDevicePixels="True"
+             HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False" />
+    </DataTemplate>
+
+    <Style x:Key="SpinnerButtonStyle" TargetType="RepeatButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="4,2"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RepeatButton">
+                    <Border x:Name="Bd" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" CornerRadius="{DynamicResource {x:Static themes:ResourceKeys.SpinButtonCornerRadiusKey}}" >
+                        <Grid>
+                            <!--<Border x:Name="innerBd" BorderBrush="{StaticResource DropdownBtnNormalInnerBorderFillKey}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{DynamicResource {x:Static themes:ResourceKeys.SpinButtonCornerRadiusKey}}"/>-->
+                            <Border x:Name="innerBd" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{DynamicResource {x:Static themes:ResourceKeys.SpinButtonCornerRadiusKey}}"/>
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonMouseOverBackgroundKey}}"/>
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonMouseOverOuterBorderKey}}"/>
+                            <Setter Property="BorderBrush" TargetName="innerBd" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonMouseOverInnerBorderKey}}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonPressedOuterBorderKey}}"/>
+                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonPressedBackgroundKey}}"/>
+                            <Setter Property="BorderBrush" TargetName="innerBd" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonPressedInnerBorderKey}}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlDisabledBackgroundKey}}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

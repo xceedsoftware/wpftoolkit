@@ -1,10 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Microsoft.Windows.Controls"
-                    xmlns:chrome="clr-namespace:Microsoft.Windows.Controls.Chromes">
+                    xmlns:chrome="clr-namespace:Microsoft.Windows.Controls.Chromes"
+                    xmlns:themes="clr-namespace:Microsoft.Windows.Controls.Themes">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="../../Themes/Aero/Buttons.xaml" />
+        <ResourceDictionary Source="../../Themes/Generic/Buttons.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <!-- =============================================================================== -->
@@ -14,12 +15,12 @@
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     
     <Style TargetType="{x:Type local:ButtonSpinner}">
-        <Setter Property="Background" Value="{StaticResource ControlNormalBackgroundKey}" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBackgroundKey}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Focusable" Value="False" />
         <Setter Property="IsTabStop" Value="True" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="BorderBrush" Value="{StaticResource ControlNormalBorderFillKey}" />
-        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
@@ -51,7 +52,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background" Value="{StaticResource ControlDisabledBackgroundKey}"/>
+                            <Setter Property="Background" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlDisabledBackgroundKey}}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
