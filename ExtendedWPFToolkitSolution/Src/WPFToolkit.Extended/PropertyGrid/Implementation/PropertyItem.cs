@@ -385,12 +385,15 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         private void GetChildProperties()
         {
-            PropertyDescriptorCollection descriptors = PropertyDescriptor.GetChildProperties();
+            if (Value == null)
+                return;
 
             var propertyItems = new List<PropertyItem>();
 
             try
             {
+                PropertyDescriptorCollection descriptors = PropertyGridUtilities.GetPropertyDescriptors(Value);
+
                 foreach (PropertyDescriptor descriptor in descriptors)
                 {
                     if (descriptor.IsBrowsable)
