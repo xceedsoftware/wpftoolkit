@@ -333,13 +333,10 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             Instance = instance;
             BindingPath = bindingPath;
 
-            if (!IsReadOnly)
+            var attribute = PropertyGridUtilities.GetAttribute<ExpandableObjectAttribute>(PropertyDescriptor);
+            if (attribute != null && PropertyDescriptor.GetValue(Instance) != null)
             {
-                var attribute = PropertyGridUtilities.GetAttribute<ExpandableObjectAttribute>(PropertyDescriptor);
-                if (attribute != null && PropertyDescriptor.GetValue(Instance) != null)
-                {
-                    HasChildProperties = true;
-                }
+                HasChildProperties = true;
             }
 
             CommandBindings.Add(new CommandBinding(PropertyItemCommands.ResetValue, ExecuteResetValueCommand, CanExecuteResetValueCommand));
