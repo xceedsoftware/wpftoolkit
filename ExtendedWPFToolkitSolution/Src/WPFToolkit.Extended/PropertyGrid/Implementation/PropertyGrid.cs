@@ -366,6 +366,9 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         private void LoadProperties(bool isCategorized)
         {
+            if (_propertyItemsCache == null)
+                return;
+
             //clear any filters first
             Filter = String.Empty;
 
