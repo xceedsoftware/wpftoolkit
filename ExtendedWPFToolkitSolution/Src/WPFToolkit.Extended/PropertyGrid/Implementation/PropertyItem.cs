@@ -186,14 +186,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //HasResourceApplied
 
-        #region IsReadOnly
-
-        public bool IsReadOnly
-        {
-            get { return PropertyDescriptor.IsReadOnly; }
-        }
-
-        #endregion //IsReadOnly
+        public bool IsReadOnly { get; private set; }
 
         #region IsSelected
 
@@ -253,9 +246,6 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             private set
             {
                 _propertyDescriptor = value;
-                Name = _propertyDescriptor.Name;
-                DisplayName = _propertyDescriptor.DisplayName;
-                Category = _propertyDescriptor.Category;
                 _dpDescriptor = DependencyPropertyDescriptor.FromProperty(_propertyDescriptor);
             }
         }
@@ -333,11 +323,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             Instance = instance;
             BindingPath = bindingPath;
 
-            var attribute = PropertyGridUtilities.GetAttribute<ExpandableObjectAttribute>(PropertyDescriptor);
-            if (attribute != null && PropertyDescriptor.GetValue(Instance) != null)
-            {
-                HasChildProperties = true;
-            }
+            SetPropertyDescriptorProperties();
+            ResolveExpandableObject();
 
             CommandBindings.Add(new CommandBinding(PropertyItemCommands.ResetValue, ExecuteResetValueCommand, CanExecuteResetValueCommand));
             AddHandler(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(PropertyItem_PreviewMouseDown), true);
@@ -403,6 +390,24 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             }
 
             Properties = PropertyGridUtilities.GetAlphabetizedProperties(propertyItems);
+        }
+
+        private void ResolveExpandableObject()
+        {
+            var attribute = PropertyGridUtilities.GetAttribute<ExpandableObjectAttribute>(PropertyDescriptor);
+            if (attribute != null && PropertyDescriptor.GetValue(Instance) != null)
+            {
+                HasChildProperties = true;
+                IsReadOnly = true;
+            }
+        }
+
+        private void SetPropertyDescriptorProperties()
+        {
+            Name = PropertyDescriptor.Name;
+            DisplayName = PropertyDescriptor.DisplayName;
+            Category = PropertyDescriptor.Category;
+            IsReadOnly = PropertyDescriptor.IsReadOnly;
         }
 
         #endregion //Methods
