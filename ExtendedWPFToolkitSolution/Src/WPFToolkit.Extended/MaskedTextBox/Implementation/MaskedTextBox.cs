@@ -313,7 +313,7 @@ namespace Microsoft.Windows.Controls
             else if (e.Key == Key.Space)
             {
                 if (provider.InsertAt(" ", position))
-                    UpdateText(provider, position);
+                    UpdateText(provider, ++position);
                 e.Handled = true;
             }
             else if (e.Key == Key.Back)//handle the back space
@@ -341,7 +341,7 @@ namespace Microsoft.Windows.Controls
 
             //if all text is selected and the user begins to type, we want to delete all selected text and continue typing the new values
             //but only if the user is not tabbing / shift tabbing or copying/pasting
-            if (SelectionLength == Text.Length && (e.Key != Key.Tab && e.Key != Key.LeftShift && e.Key != Key.RightShift && 
+            if (SelectionLength == Text.Length && (e.Key != Key.Tab && e.Key != Key.LeftShift && e.Key != Key.RightShift &&
                                                    (Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.Control))
             {
                 if (provider.RemoveAt(position, endposition))
@@ -395,14 +395,15 @@ namespace Microsoft.Windows.Controls
             {
                 IncludePrompt = this.IncludePrompt,
                 IncludeLiterals = this.IncludeLiterals,
-                PromptChar = this.PromptChar
+                PromptChar = this.PromptChar,
+                ResetOnSpace = false //should make this a property
             };
         }
 
         private object ConvertTextToValue(string text)
         {
             object convertedValue = null;
-            
+
             Type dataType = ValueType;
 
             string valueToConvert = MaskProvider.ToString().Trim();
