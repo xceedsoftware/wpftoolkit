@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 
 namespace Microsoft.Windows.Controls
 {
@@ -108,7 +109,7 @@ namespace Microsoft.Windows.Controls
             get { return (double)GetValue(ExteriorPanelMinWidthProperty); }
             set { SetValue(ExteriorPanelMinWidthProperty, value); }
         }
-        
+
 
         public static readonly DependencyProperty FinishButtonClosesWindowProperty = DependencyProperty.Register("FinishButtonClosesWindow", typeof(bool), typeof(Wizard), new UIPropertyMetadata(true));
         public bool FinishButtonClosesWindow
@@ -370,20 +371,11 @@ namespace Microsoft.Windows.Controls
             Window window = Window.GetWindow(this);
             if (window != null)
             {
-                try
-                {
+                //we can only set the DialogResult if the window was opened as modal with the ShowDialog() method. Otherwise an exception would occur
+                if (ComponentDispatcher.IsThreadModal)
                     window.DialogResult = dialogResult;
-                }
-                catch (InvalidOperationException)
-                {
-                    //DialogResult can be set only after Window is created and shown as dialog.
-                    //So if the Window is not shown as a dialog then an exception would occur. Therefore
-                    //let's just swallow the exception
-                }
-                finally
-                {
-                    window.Close();
-                }
+
+                window.Close();
             }
         }
 
