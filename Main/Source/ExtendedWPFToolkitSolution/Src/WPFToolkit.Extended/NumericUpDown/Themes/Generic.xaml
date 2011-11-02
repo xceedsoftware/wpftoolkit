@@ -22,8 +22,8 @@
                 <ControlTemplate TargetType="Control">
                     <local:ButtonSpinner x:Name="Spinner" IsTabStop="False" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
                                          AllowSpin="{Binding AllowSpin, RelativeSource={RelativeSource TemplatedParent}}" ShowButtonSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}">
-                        <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0" 
-                                                Background="{TemplateBinding Background}"
+                        <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0"
+                                                Background="Transparent"
                                                 ContextMenu="{TemplateBinding ContextMenu}"
                                                 FontFamily="{TemplateBinding FontFamily}" 
                                                 FontSize="{TemplateBinding FontSize}" 
@@ -33,7 +33,8 @@
                                                 Foreground="{TemplateBinding Foreground}" 
                                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                 IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
-                                                MinWidth="20" AcceptsReturn="False" 
+                                                MinWidth="20" AcceptsReturn="False"
+                                                Padding="0"
                                                 SelectAllOnGotFocus="{Binding SelectAllOnGotFocus, RelativeSource={RelativeSource TemplatedParent}}"
                                                 TextAlignment="{Binding TextAlignment, RelativeSource={RelativeSource TemplatedParent}}"
                                                 TextWrapping="NoWrap" 

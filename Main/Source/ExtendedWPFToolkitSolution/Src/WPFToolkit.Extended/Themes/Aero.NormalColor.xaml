@@ -3,6 +3,7 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/WPFToolkit.Extended;component/Themes/Aero/Brushes_NormalColor.xaml" />
+        <ResourceDictionary Source="/WPFToolkit.Extended;component/Themes/Aero/Buttons_NormalColor.xaml" />
     </ResourceDictionary.MergedDictionaries>    
 
 </ResourceDictionary>

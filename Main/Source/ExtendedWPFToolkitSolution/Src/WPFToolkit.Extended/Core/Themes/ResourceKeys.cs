@@ -25,10 +25,19 @@ namespace Microsoft.Windows.Controls.Themes
         public static readonly ResourceKey ButtonPressedInnerBorderKey = new StaticResourceKey(typeof(ResourceKeys), "ButtonPressedInnerBorderKey");
         public static readonly ResourceKey ButtonPressedBackgroundKey = new StaticResourceKey(typeof(ResourceKeys), "ButtonPressedBackgroundKey");
 
+        public static readonly ResourceKey ButtonDisabledOuterBorderKey = new StaticResourceKey(typeof(ResourceKeys), "ButtonDisabledOuterBorderKey");
+
         #endregion //Brush Keys
 
         public static readonly ResourceKey GlyphNormalForegroundKey = new StaticResourceKey(typeof(ResourceKeys), "GlyphNormalForegroundKey");
+        public static readonly ResourceKey GlyphDisabledForegroundKey = new StaticResourceKey(typeof(ResourceKeys), "GlyphDisabledForegroundKey");
+
+
 
         public static readonly ResourceKey SpinButtonCornerRadiusKey = new StaticResourceKey(typeof(ResourceKeys), "SpinButtonCornerRadiusKey");
+
+
+
+        public static readonly ResourceKey SpinnerButtonStyleKey = new StaticResourceKey(typeof(ResourceKeys), "SpinnerButtonStyleKey");
     }
 }

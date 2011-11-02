@@ -3,14 +3,16 @@
                     xmlns:themes="clr-namespace:Microsoft.Windows.Controls.Themes">
 
     <Style x:Key="{x:Static themes:ResourceKeys.SpinnerButtonStyleKey}" TargetType="RepeatButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="2,2"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="RepeatButton">
-                    <Border x:Name="Bd" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" CornerRadius="{DynamicResource {x:Static themes:ResourceKeys.SpinButtonCornerRadiusKey}}" SnapsToDevicePixels="True" >
+                    <Border x:Name="Bd" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" CornerRadius="{DynamicResource {x:Static themes:ResourceKeys.SpinButtonCornerRadiusKey}}" >
                         <Grid>
-                            <Border x:Name="innerBd" BorderBrush="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalInnerBorderKey}}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{DynamicResource {x:Static themes:ResourceKeys.SpinButtonCornerRadiusKey}}"/>
+                            <Border x:Name="innerBd" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{DynamicResource {x:Static themes:ResourceKeys.SpinButtonCornerRadiusKey}}"/>
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}"/>
                         </Grid>
                     </Border>
@@ -24,11 +26,6 @@
                             <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonPressedOuterBorderKey}}"/>
                             <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonPressedBackgroundKey}}"/>
                             <Setter Property="BorderBrush" TargetName="innerBd" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonPressedInnerBorderKey}}"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlDisabledBackgroundKey}}" />
-                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonDisabledOuterBorderKey}}"/>
-                            <Setter Property="BorderBrush" TargetName="innerBd" Value="{x:Null}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
