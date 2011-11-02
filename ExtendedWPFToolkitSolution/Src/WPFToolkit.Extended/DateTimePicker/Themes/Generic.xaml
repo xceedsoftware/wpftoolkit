@@ -83,7 +83,7 @@
                                 <local:ButtonSpinner x:Name="Spinner" IsTabStop="False" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
                                          AllowSpin="{TemplateBinding AllowSpin}" ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
                                     <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0" 
-                                                Background="{TemplateBinding Background}"
+                                                Background="Transparent"
                                                 FontFamily="{TemplateBinding FontFamily}" 
                                                 FontSize="{TemplateBinding FontSize}" 
                                                 FontStretch="{TemplateBinding FontStretch}"
@@ -93,6 +93,7 @@
                                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                 IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
                                                 MinWidth="20" AcceptsReturn="False" 
+                                                Padding="0"
                                                 TextAlignment="{TemplateBinding TextAlignment}"
                                                 TextWrapping="NoWrap" 
                                                 TabIndex="{TemplateBinding TabIndex}"
