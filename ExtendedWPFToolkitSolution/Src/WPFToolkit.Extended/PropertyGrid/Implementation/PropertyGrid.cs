@@ -8,7 +8,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using Microsoft.Windows.Controls.PropertyGrid.Commands;
-using System.Reflection;
 
 namespace Microsoft.Windows.Controls.PropertyGrid
 {
@@ -90,6 +89,17 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         }
 
         #endregion //Filter
+
+        #region FilterWatermark
+
+        public static readonly DependencyProperty FilterWatermarkProperty = DependencyProperty.Register("FilterWatermark", typeof(string), typeof(PropertyGrid), new UIPropertyMetadata("Search"));
+        public string FilterWatermark
+        {
+            get { return (string)GetValue(FilterWatermarkProperty); }
+            set { SetValue(FilterWatermarkProperty, value); }
+        }
+
+        #endregion //FilterWatermark
 
         #region IsCategorized
 
@@ -403,7 +413,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                         }
                     }
 
-                    descriptors = new PropertyDescriptorCollection(specificProperties.ToArray());                 
+                    descriptors = new PropertyDescriptorCollection(specificProperties.ToArray());
                 }
 
                 foreach (PropertyDescriptor descriptor in descriptors)

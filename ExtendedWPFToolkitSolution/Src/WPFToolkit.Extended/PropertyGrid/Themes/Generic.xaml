@@ -420,7 +420,7 @@
                                         </Grid.ColumnDefinitions>
                                         <extToolkit:WatermarkTextBox x:Name="_txtFilter" Background="Transparent" 
                                                                  Text="{Binding Filter, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"
-                                                                 Watermark="Search">
+                                                                 Watermark="{TemplateBinding FilterWatermark}">
                                             <extToolkit:WatermarkTextBox.Style>
                                                 <Style TargetType="Control">
                                                     <Setter Property="BorderThickness" Value="0" />
