@@ -165,7 +165,7 @@
         <Setter Property="BorderThickness" Value="1,1,0,1" />
         <Setter Property="ButtonStyle" Value="{StaticResource ColorPickerToggleButtonStyle}" />
         <Setter Property="Focusable" Value="False" />
-        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
