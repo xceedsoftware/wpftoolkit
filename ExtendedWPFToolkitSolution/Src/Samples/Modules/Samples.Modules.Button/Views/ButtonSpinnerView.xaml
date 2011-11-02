@@ -42,7 +42,7 @@
                                       AllowSpin="{Binding IsChecked, ElementName=_allowSpin}"
                                       ShowButtonSpinner="{Binding IsChecked, ElementName=_showButtonSpinner}"
                                       Spin="ButtonSpinner_Spin" >
-                <TextBox Text="0" HorizontalContentAlignment="Right" />
+                <TextBox Text="0" BorderThickness="0" HorizontalContentAlignment="Right" />
             </extToolkit:ButtonSpinner>
         </StackPanel>
     </Grid>
