@@ -42,6 +42,7 @@
                             </ToggleButton.Template>
                             <Grid>
                                 <chrome:ButtonChrome x:Name="ToggleButtonChrome"
+                                                     CornerRadius="2.75"
                                                     RenderChecked="{TemplateBinding IsOpen}"
                                                     RenderEnabled="{TemplateBinding IsEnabled}"
 											        RenderMouseOver="{Binding IsMouseOver, ElementName=PART_DropDownButton}"
