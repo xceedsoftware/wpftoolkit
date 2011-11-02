@@ -103,5 +103,16 @@
             </GradientStopCollection>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
+    
+    <LinearGradientBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonFocusedOuterBorderKey}" StartPoint="0.5,0" EndPoint="0.5,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#FF3d7bad" Offset="0" />
+                <GradientStop Color="#FFa4c9e3" Offset="0.05000000074505806" />
+                <GradientStop Color="#FFa4c9e3" Offset="0.949999988079071" />
+                <GradientStop Color="#FFb7d9ed" Offset="1" />
+            </GradientStopCollection>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
 
 </ResourceDictionary>

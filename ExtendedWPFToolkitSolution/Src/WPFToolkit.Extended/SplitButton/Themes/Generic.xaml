@@ -36,7 +36,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:SplitButton}">
                     <Grid x:Name="MainGrid" SnapsToDevicePixels="True">
-                        <chrome:ButtonChrome x:Name="ControlChrome" RenderEnabled="{TemplateBinding IsEnabled}">
+                        <chrome:ButtonChrome x:Name="ControlChrome" RenderEnabled="{TemplateBinding IsEnabled}" CornerRadius="2.75">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />

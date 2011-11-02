@@ -31,9 +31,7 @@
             </GradientStopCollection>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
-
-
-
+    
 
     <SolidColorBrush x:Key="{x:Static themes:ResourceKeys.ButtonNormalOuterBorderKey}" Color="#FF707070" PresentationOptions:Freeze="true"/>
     <LinearGradientBrush x:Key="{x:Static themes:ResourceKeys.ButtonNormalInnerBorderKey}" EndPoint="0,1" StartPoint="0,0" PresentationOptions:Freeze="true">
@@ -90,16 +88,24 @@
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
+    <SolidColorBrush x:Key="{x:Static themes:ResourceKeys.ButtonFocusedOuterBorderKey}" Color="#FF707070" PresentationOptions:Freeze="true"/>
+    <SolidColorBrush x:Key="{x:Static themes:ResourceKeys.ButtonFocusedInnerBorderKey}" Color="#F900CCFF" PresentationOptions:Freeze="true"/>
+    <LinearGradientBrush x:Key="{x:Static themes:ResourceKeys.ButtonFocusedBackgroundKey}" EndPoint="0,1" StartPoint="0,0" PresentationOptions:Freeze="true">
+        <GradientStop Color="#FFEAF6FD" Offset="0"/>
+        <GradientStop Color="#FFD9F0FC" Offset="0.50"/>
+        <GradientStop Color="#FFBEE6FD" Offset="0.50"/>
+        <GradientStop Color="#FFA7D9F5" Offset="1"/>
+    </LinearGradientBrush>
+
     <SolidColorBrush x:Key="{x:Static themes:ResourceKeys.ButtonDisabledOuterBorderKey}" Color="#ADB2B5" PresentationOptions:Freeze="true"/>
-
-    <SolidColorBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.GlyphNormalForegroundKey}" Color="#FF000000" />
-    <SolidColorBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.GlyphDisabledForegroundKey}" Color="#A9A9A9" />
-    <CornerRadius x:Key="{x:Static themes:ResourceKeys.SpinButtonCornerRadiusKey}" TopLeft="0" TopRight="0" BottomRight="0" BottomLeft="0" PresentationOptions:Freeze="true" />
-
-    <!-- not used yet -->
-    <LinearGradientBrush x:Key="ButtonInnerBorderDisabledKey" EndPoint="0,1" StartPoint="0,0" PresentationOptions:Freeze="true">
+    <LinearGradientBrush x:Key="{x:Static themes:ResourceKeys.ButtonInnerBorderDisabledKey}" EndPoint="0,1" StartPoint="0,0" PresentationOptions:Freeze="true">
         <GradientStop Color="#FAFFFFFF" Offset="0"/>
         <GradientStop Color="#85FFFFFF" Offset="1"/>
     </LinearGradientBrush>
+
+    <SolidColorBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.GlyphNormalForegroundKey}" Color="#FF000000" />
+    <SolidColorBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.GlyphDisabledForegroundKey}" Color="#A9A9A9" />
+    
+    <CornerRadius x:Key="{x:Static themes:ResourceKeys.SpinButtonCornerRadiusKey}" TopLeft="0" TopRight="0" BottomRight="0" BottomLeft="0" PresentationOptions:Freeze="true" />
 
 </ResourceDictionary>

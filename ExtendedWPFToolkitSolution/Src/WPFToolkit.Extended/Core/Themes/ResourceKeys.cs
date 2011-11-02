@@ -25,7 +25,12 @@ namespace Microsoft.Windows.Controls.Themes
         public static readonly ResourceKey ButtonPressedInnerBorderKey = new StaticResourceKey(typeof(ResourceKeys), "ButtonPressedInnerBorderKey");
         public static readonly ResourceKey ButtonPressedBackgroundKey = new StaticResourceKey(typeof(ResourceKeys), "ButtonPressedBackgroundKey");
 
+        public static readonly ResourceKey ButtonFocusedOuterBorderKey = new StaticResourceKey(typeof(ResourceKeys), "ButtonFocusedOuterBorderKey");
+        public static readonly ResourceKey ButtonFocusedInnerBorderKey = new StaticResourceKey(typeof(ResourceKeys), "ButtonFocusedInnerBorderKey");
+        public static readonly ResourceKey ButtonFocusedBackgroundKey = new StaticResourceKey(typeof(ResourceKeys), "ButtonFocusedBackgroundKey");
+
         public static readonly ResourceKey ButtonDisabledOuterBorderKey = new StaticResourceKey(typeof(ResourceKeys), "ButtonDisabledOuterBorderKey");
+        public static readonly ResourceKey ButtonInnerBorderDisabledKey = new StaticResourceKey(typeof(ResourceKeys), "ButtonInnerBorderDisabledKey");
 
         #endregion //Brush Keys
 
