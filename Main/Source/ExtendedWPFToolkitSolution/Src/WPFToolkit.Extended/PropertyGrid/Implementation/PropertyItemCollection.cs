@@ -41,6 +41,9 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         public void Filter(string text)
         {
+            if (text == null)
+                return;
+
             GetDefaultView().Filter = (item) => 
             {
                 var property = item as PropertyItem;
