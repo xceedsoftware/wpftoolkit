@@ -395,7 +395,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         private void ResolveExpandableObject()
         {
             var attribute = PropertyGridUtilities.GetAttribute<ExpandableObjectAttribute>(PropertyDescriptor);
-            if (attribute != null && PropertyDescriptor.GetValue(Instance) != null)
+            if (attribute != null)
             {
                 HasChildProperties = true;
                 IsReadOnly = true;
