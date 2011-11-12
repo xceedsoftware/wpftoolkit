@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.Windows.Controls.Core.Utilities;
+using System.Collections.Generic;
 
 namespace Microsoft.Windows.Controls
 {
@@ -12,13 +14,11 @@ namespace Microsoft.Windows.Controls
         #region Members
 
         private ContentControl _buttonPanel;
-        private readonly DispatcherTimer _timer;
-        private Button _calculatorButton;
-
         private bool _showNewNumber = true;
         private decimal _previousValue;
         private Operation _lastOperation = Operation.None;
         private CalculatorButtonType _lastButtonPressed;
+        private readonly Dictionary<Button, DispatcherTimer> _timers = new Dictionary<Button, DispatcherTimer>();
 
         #endregion //Members
 
@@ -187,10 +187,6 @@ namespace Microsoft.Windows.Controls
 
         public Calculator()
         {
-            _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromMilliseconds(100);
-            _timer.Tick += Timer_Tick;
-
             CommandBindings.Add(new CommandBinding(CalculatorCommands.CalculatorButtonClick, ExecuteCalculatorButtonClick));
             AddHandler(MouseDownEvent, new MouseButtonEventHandler(Calculator_OnMouseDown), true);
         }
@@ -231,8 +227,19 @@ namespace Microsoft.Windows.Controls
 
         void Timer_Tick(object sender, EventArgs e)
         {
-            VisualStateManager.GoToState(_calculatorButton, _calculatorButton.IsMouseOver ? "MouseOver" : "Normal", true);
-            _timer.Stop();
+            DispatcherTimer timer = (DispatcherTimer)sender;
+            timer.Stop();
+            timer.Tick -= Timer_Tick;
+
+            if (_timers.ContainsValue(timer))
+            {
+                var button = _timers.Where(x => x.Value == timer).Select(x => x.Key).FirstOrDefault();
+                if (button != null)
+                {
+                    VisualStateManager.GoToState(button, button.IsMouseOver ? "MouseOver" : "Normal", true);
+                    _timers.Remove(button);
+                }
+            }
         }
 
         #endregion //Event Handlers
@@ -438,9 +445,26 @@ namespace Microsoft.Windows.Controls
 
         private void SimulateCalculatorButtonClick(CalculatorButtonType buttonType)
         {
-            _calculatorButton = CalculatorUtilities.FindButtonByCalculatorButtonType(_buttonPanel, buttonType);
-            VisualStateManager.GoToState(_calculatorButton, "Pressed", true);
-            _timer.Start();
+            var button = CalculatorUtilities.FindButtonByCalculatorButtonType(_buttonPanel, buttonType);
+            if (button != null)
+            {
+                VisualStateManager.GoToState(button, "Pressed", true);
+                DispatcherTimer timer;
+                if (_timers.ContainsKey(button))
+                {
+                    timer = _timers[button];
+                    timer.Stop();
+                }
+                else
+                {
+                    timer = new DispatcherTimer();
+                    timer.Interval = TimeSpan.FromMilliseconds(100);
+                    timer.Tick += Timer_Tick;
+                    _timers.Add(button, timer);
+                }
+
+                timer.Start();
+            }
         }
 
         #endregion //Methods
