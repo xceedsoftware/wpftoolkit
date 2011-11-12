@@ -106,7 +106,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
             var itemsSourceAttribute = GetAttribute<ItemsSourceAttribute>(propertyItem.PropertyDescriptor);
             if (itemsSourceAttribute != null)
-                editor = new ItemsSourceEditor(itemsSourceAttribute).ResolveEditor(propertyItem);
+                editor = new ItemsSourceAttributeEditor(itemsSourceAttribute).ResolveEditor(propertyItem);
 
             var editorAttribute = GetAttribute<EditorAttribute>(propertyItem.PropertyDescriptor);
             if (editorAttribute != null)

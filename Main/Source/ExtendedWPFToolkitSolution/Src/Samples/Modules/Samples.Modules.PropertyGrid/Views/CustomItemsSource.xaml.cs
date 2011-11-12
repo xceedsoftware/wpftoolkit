@@ -1,11 +1,10 @@
-﻿using Samples.Infrastructure.Controls;
+﻿using System;
 using System.ComponentModel;
-using System.Collections.Generic;
-using System;
-using System.Windows.Media;
 using System.Windows;
-using Microsoft.Windows.Controls.PropertyGrid.Attributes;
+using System.Windows.Media;
 using Microsoft.Practices.Prism.Regions;
+using Microsoft.Windows.Controls.PropertyGrid.Attributes;
+using Samples.Infrastructure.Controls;
 
 namespace Samples.Modules.PropertyGrid.Views
 {
@@ -70,12 +69,25 @@ namespace Samples.Modules.PropertyGrid.Views
 
     public class FontSizeItemsSource : IItemsSource
     {
-        public IList<object> GetValues()
+        public ItemCollection GetValues()
         {
-            List<object> sizes = new List<object>()
-            {
-                5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,12.0,14.0,16.0,18.0,20.0
-            };
+            ItemCollection sizes = new ItemCollection();
+            sizes.Add(5.0, "Five");
+            sizes.Add(5.5);
+            sizes.Add(6.0, "Six");
+            sizes.Add(6.5);
+            sizes.Add(7.0, "Seven");
+            sizes.Add(7.5);
+            sizes.Add(8.0, "Eight");
+            sizes.Add(8.5);
+            sizes.Add(9.0, "Nine");
+            sizes.Add(9.5);
+            sizes.Add(10.0);
+            sizes.Add(12.0, "Twelve");
+            sizes.Add(14.0);
+            sizes.Add(16.0);
+            sizes.Add(18.0);
+            sizes.Add(20.0);
             return sizes;
         }
     }
