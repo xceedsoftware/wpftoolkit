@@ -112,7 +112,7 @@ namespace Microsoft.Windows.Controls
 
         protected override void OnValueChanged(DateTime? oldValue, DateTime? newValue)
         {
-            if (_calendar != null && _calendar.SelectedDate.HasValue && newValue.HasValue && _calendar.SelectedDate.Value != newValue.Value)
+            if (_calendar != null && _calendar.SelectedDate != newValue)
             {
                 _calendar.SelectedDate = newValue;
                 _calendar.DisplayDate = newValue.Value;
