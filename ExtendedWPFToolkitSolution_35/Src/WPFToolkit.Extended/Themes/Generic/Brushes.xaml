@@ -1,0 +1,111 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Microsoft.Windows.Controls"
+                    xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+                    xmlns:themes="clr-namespace:Microsoft.Windows.Controls.Themes">
+
+    <SolidColorBrush x:Key="{x:Static themes:ResourceKeys.ControlNormalBackgroundKey}" Color="#FFFFFFFF" PresentationOptions:Freeze="true"/>
+    <SolidColorBrush x:Key="{x:Static themes:ResourceKeys.ControlDisabledBackgroundKey}" Color="#F4F4F4" PresentationOptions:Freeze="true"/>
+
+
+    <LinearGradientBrush x:Key="{x:Static themes:ResourceKeys.ControlNormalBorderKey}" EndPoint="0,20" MappingMode="Absolute" StartPoint="0,0"  PresentationOptions:Freeze="true">
+        <GradientStop Color="#ABADB3" Offset="0.05"/>
+        <GradientStop Color="#E2E3EA" Offset="0.07"/>
+        <GradientStop Color="#E3E9EF" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="{x:Static themes:ResourceKeys.ControlMouseOverBorderKey}" StartPoint="0,0" EndPoint="0,1" PresentationOptions:Freeze="true" >
+        <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#5794BF" Offset="0.05"/>
+                <GradientStop Color="#B7D5EA" Offset="0.07"/>
+                <GradientStop Color="#C7E2F1" Offset="1"/>
+            </GradientStopCollection>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>       
+    <LinearGradientBrush x:Key="{x:Static themes:ResourceKeys.ControlFocusedBorderKey}" StartPoint="0,0" EndPoint="0,1" PresentationOptions:Freeze="true">
+        <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#3D7BAD" Offset="0.05"/>
+                <GradientStop Color="#A4C9E3" Offset="0.07"/>
+                <GradientStop Color="#B7D9ED" Offset="1"/>
+            </GradientStopCollection>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+    
+
+    <SolidColorBrush x:Key="{x:Static themes:ResourceKeys.ButtonNormalOuterBorderKey}" Color="#FF707070" PresentationOptions:Freeze="true"/>
+    <LinearGradientBrush x:Key="{x:Static themes:ResourceKeys.ButtonNormalInnerBorderKey}" EndPoint="0,1" StartPoint="0,0" PresentationOptions:Freeze="true">
+        <GradientStop Color="#FAFFFFFF" Offset="0"/>
+        <GradientStop Color="#85FFFFFF" Offset="1"/>
+    </LinearGradientBrush>    
+    <LinearGradientBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonNormalBackgroundKey}" StartPoint="0,0" EndPoint="0,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#F3F3F3" Offset="0"/>
+                <GradientStop Color="#EBEBEB" Offset="0.5"/>
+                <GradientStop Color="#DDDDDD" Offset="0.5"/>
+                <GradientStop Color="#CDCDCD" Offset="1"/>
+            </GradientStopCollection>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <SolidColorBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonMouseOverOuterBorderKey}" Color="#3C7FB1"/>
+    <LinearGradientBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonMouseOverInnerBorderKey}" StartPoint="0,0" EndPoint="0,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#FAFFFFFF" Offset="0"/>
+                <GradientStop Color="#85FFFFFF" Offset="1"/>
+            </GradientStopCollection>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+    <LinearGradientBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonMouseOverBackgroundKey}" StartPoint="0,0" EndPoint="0,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#FFEAF6FD" Offset="0"/>
+                <GradientStop Color="#FFD9F0FC" Offset="0.50"/>
+                <GradientStop Color="#FFBEE6FD" Offset="0.50"/>
+                <GradientStop Color="#FFA7D9F5" Offset="1"/>
+            </GradientStopCollection>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <SolidColorBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonPressedOuterBorderKey}" Color="#2C628B"/>
+    <LinearGradientBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonPressedInnerBorderKey}" StartPoint="0,0" EndPoint="0,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#FAFFFFFF" Offset="0"/>
+                <GradientStop Color="#85FFFFFF" Offset="1"/>
+            </GradientStopCollection>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+    <LinearGradientBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonPressedBackgroundKey}" StartPoint="0.5,0" EndPoint="0.5,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#C2E4F6" Offset="0.5"/>
+                <GradientStop Color="#ABDAF3" Offset="0.5"/>
+                <GradientStop Color="#90CBEB" Offset="1"/>
+            </GradientStopCollection>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="{x:Static themes:ResourceKeys.ButtonFocusedOuterBorderKey}" Color="#FF707070" PresentationOptions:Freeze="true"/>
+    <SolidColorBrush x:Key="{x:Static themes:ResourceKeys.ButtonFocusedInnerBorderKey}" Color="#F900CCFF" PresentationOptions:Freeze="true"/>
+    <LinearGradientBrush x:Key="{x:Static themes:ResourceKeys.ButtonFocusedBackgroundKey}" EndPoint="0,1" StartPoint="0,0" PresentationOptions:Freeze="true">
+        <GradientStop Color="#FFEAF6FD" Offset="0"/>
+        <GradientStop Color="#FFD9F0FC" Offset="0.50"/>
+        <GradientStop Color="#FFBEE6FD" Offset="0.50"/>
+        <GradientStop Color="#FFA7D9F5" Offset="1"/>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="{x:Static themes:ResourceKeys.ButtonDisabledOuterBorderKey}" Color="#ADB2B5" PresentationOptions:Freeze="true"/>
+    <LinearGradientBrush x:Key="{x:Static themes:ResourceKeys.ButtonInnerBorderDisabledKey}" EndPoint="0,1" StartPoint="0,0" PresentationOptions:Freeze="true">
+        <GradientStop Color="#FAFFFFFF" Offset="0"/>
+        <GradientStop Color="#85FFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+
+    <SolidColorBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.GlyphNormalForegroundKey}" Color="#FF000000" />
+    <SolidColorBrush PresentationOptions:Freeze="true" x:Key="{x:Static themes:ResourceKeys.GlyphDisabledForegroundKey}" Color="#A9A9A9" />
+    
+    <CornerRadius x:Key="{x:Static themes:ResourceKeys.SpinButtonCornerRadiusKey}" TopLeft="0" TopRight="0" BottomRight="0" BottomLeft="0" PresentationOptions:Freeze="true" />
+
+</ResourceDictionary>
