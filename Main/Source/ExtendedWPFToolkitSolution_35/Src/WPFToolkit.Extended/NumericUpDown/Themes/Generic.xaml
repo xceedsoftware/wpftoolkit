@@ -13,17 +13,17 @@
     <Style x:Key="NumericUpDown" TargetType="Control">
         <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Focusable" Value="False" />
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
         <Setter Property="HorizontalContentAlignment" Value="Right" />
+        <Setter Property="IsTabStop" Value="False" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Control">
                     <local:ButtonSpinner x:Name="Spinner" IsTabStop="False" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
                                          AllowSpin="{Binding AllowSpin, RelativeSource={RelativeSource TemplatedParent}}" ShowButtonSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}">
-                        <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0" 
-                                                Background="{TemplateBinding Background}"
+                        <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0"
+                                                Background="Transparent"
                                                 ContextMenu="{TemplateBinding ContextMenu}"
                                                 FontFamily="{TemplateBinding FontFamily}" 
                                                 FontSize="{TemplateBinding FontSize}" 
@@ -32,8 +32,9 @@
                                                 FontWeight="{TemplateBinding FontWeight}" 
                                                 Foreground="{TemplateBinding Foreground}" 
                                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
-                                                MinWidth="20" AcceptsReturn="False" 
+                                                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
+                                                MinWidth="20" AcceptsReturn="False"
+                                                Padding="0"
                                                 SelectAllOnGotFocus="{Binding SelectAllOnGotFocus, RelativeSource={RelativeSource TemplatedParent}}"
                                                 TextAlignment="{Binding TextAlignment, RelativeSource={RelativeSource TemplatedParent}}"
                                                 TextWrapping="NoWrap" 
@@ -43,6 +44,11 @@
                                                 Watermark="{Binding Watermark, RelativeSource={RelativeSource TemplatedParent}}"
                                                 WatermarkTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}}"/>
                     </local:ButtonSpinner>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

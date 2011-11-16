@@ -32,7 +32,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:DropDownButton}">
                     <Grid x:Name="MainGrid" SnapsToDevicePixels="True">
-                        <ToggleButton x:Name="PART_DropDownButton" Grid.Column="1" IsTabStop="False"
+                        <ToggleButton x:Name="PART_DropDownButton" Grid.Column="1"
                                       IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                                       IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}" >
                             <ToggleButton.Template>
@@ -42,6 +42,7 @@
                             </ToggleButton.Template>
                             <Grid>
                                 <chrome:ButtonChrome x:Name="ToggleButtonChrome"
+                                                     CornerRadius="2.75"
                                                     RenderChecked="{TemplateBinding IsOpen}"
                                                     RenderEnabled="{TemplateBinding IsEnabled}"
 											        RenderMouseOver="{Binding IsMouseOver, ElementName=PART_DropDownButton}"
