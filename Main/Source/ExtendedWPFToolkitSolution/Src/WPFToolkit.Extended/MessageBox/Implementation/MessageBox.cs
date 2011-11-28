@@ -500,7 +500,14 @@ namespace Microsoft.Windows.Controls
         /// <param name="e">The <see cref="System.Windows.Controls.Primitives.DragDeltaEventArgs"/> instance containing the event data.</param>
         private void ProcessMove(DragDeltaEventArgs e)
         {
-            Container.Left = Container.Left + e.HorizontalChange;
+            double left = 0.0;
+
+            if (FlowDirection == System.Windows.FlowDirection.RightToLeft)
+                left = Container.Left - e.HorizontalChange;
+            else
+                left = Container.Left + e.HorizontalChange;
+
+            Container.Left = left;
             Container.Top = Container.Top + e.VerticalChange;
         }
 
