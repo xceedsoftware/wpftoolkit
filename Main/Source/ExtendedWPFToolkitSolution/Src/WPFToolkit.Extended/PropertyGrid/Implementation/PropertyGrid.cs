@@ -297,6 +297,28 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         #endregion //ShowAdvancedOptions
 
+        #region ShowSearchBox
+
+        public static readonly DependencyProperty ShowSearchBoxProperty = DependencyProperty.Register("ShowSearchBox", typeof(bool), typeof(PropertyGrid), new UIPropertyMetadata(true));
+        public bool ShowSearchBox
+        {
+            get { return (bool)GetValue(ShowSearchBoxProperty); }
+            set { SetValue(ShowSearchBoxProperty, value); }
+        }
+
+        #endregion //ShowSearchBox
+
+        #region ShowSortOptions
+
+        public static readonly DependencyProperty ShowSortOptionsProperty = DependencyProperty.Register("ShowSortOptions", typeof(bool), typeof(PropertyGrid), new UIPropertyMetadata(true));
+        public bool ShowSortOptions
+        {
+            get { return (bool)GetValue(ShowSortOptionsProperty); }
+            set { SetValue(ShowSortOptionsProperty, value); }
+        }
+
+        #endregion //ShowSortOptions
+
         #endregion //Properties
 
         #region Constructors
