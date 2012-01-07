@@ -505,55 +505,64 @@ namespace Microsoft.Windows.Controls
             if (info == null)
                 info = _dateTimeInfoList[0];
 
-            switch (info.Type)
+            try
             {
-                case DateTimePart.Year:
-                    {
-                        Value = ((DateTime)Value).AddYears(value);
-                        break;
-                    }
-                case DateTimePart.Month:
-                case DateTimePart.MonthName:
-                    {
-                        Value = ((DateTime)Value).AddMonths(value);
-                        break;
-                    }
-                case DateTimePart.Day:
-                case DateTimePart.DayName:
-                    {
-                        Value = ((DateTime)Value).AddDays(value);
-                        break;
-                    }
-                case DateTimePart.Hour12:
-                case DateTimePart.Hour24:
-                    {
-                        Value = ((DateTime)Value).AddHours(value);
-                        break;
-                    }
-                case DateTimePart.Minute:
-                    {
-                        Value = ((DateTime)Value).AddMinutes(value);
-                        break;
-                    }
-                case DateTimePart.Second:
-                    {
-                        Value = ((DateTime)Value).AddSeconds(value);
-                        break;
-                    }
-                case DateTimePart.Millisecond:
-                    {
-                        Value = ((DateTime)Value).AddMilliseconds(value);
-                        break;
-                    }
-                case DateTimePart.AmPmDesignator:
-                    {
-                        Value = ((DateTime)Value).AddHours(value * 12);
-                        break;
-                    }
-                default:
-                    {
-                        break;
-                    }
+                switch (info.Type)
+                {
+                    case DateTimePart.Year:
+                        {
+                            Value = ((DateTime)Value).AddYears(value);
+                            break;
+                        }
+                    case DateTimePart.Month:
+                    case DateTimePart.MonthName:
+                        {
+                            Value = ((DateTime)Value).AddMonths(value);
+                            break;
+                        }
+                    case DateTimePart.Day:
+                    case DateTimePart.DayName:
+                        {
+                            Value = ((DateTime)Value).AddDays(value);
+                            break;
+                        }
+                    case DateTimePart.Hour12:
+                    case DateTimePart.Hour24:
+                        {
+                            Value = ((DateTime)Value).AddHours(value);
+                            break;
+                        }
+                    case DateTimePart.Minute:
+                        {
+                            Value = ((DateTime)Value).AddMinutes(value);
+                            break;
+                        }
+                    case DateTimePart.Second:
+                        {
+                            Value = ((DateTime)Value).AddSeconds(value);
+                            break;
+                        }
+                    case DateTimePart.Millisecond:
+                        {
+                            Value = ((DateTime)Value).AddMilliseconds(value);
+                            break;
+                        }
+                    case DateTimePart.AmPmDesignator:
+                        {
+                            Value = ((DateTime)Value).AddHours(value * 12);
+                            break;
+                        }
+                    default:
+                        {
+                            break;
+                        }
+                }
+            }
+            catch
+            {
+                //this can occur if the date/time = 1/1/0001 12:00:00 AM which is the smallest date allowed.
+                //I could write code that would validate the date each and everytime but I think that it would be more
+                //efficient if I just handle the edge case and allow an exeption to occur and swallow it instead.
             }
 
             //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event
