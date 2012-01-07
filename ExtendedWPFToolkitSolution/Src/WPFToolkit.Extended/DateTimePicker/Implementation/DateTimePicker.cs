@@ -124,7 +124,7 @@ namespace Microsoft.Windows.Controls
             if (_calendar != null && _calendar.SelectedDate != newValue)
             {
                 _calendar.SelectedDate = newValue;
-                _calendar.DisplayDate = newValue.Value;
+                _calendar.DisplayDate = newValue ?? DateTime.Now;
             }
 
             base.OnValueChanged(oldValue, newValue);
