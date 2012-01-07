@@ -274,6 +274,7 @@
     <Compile Include="PropertyGrid\Implementation\Attributes\ExpandableObjectAttribute.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\IItemsSource.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\ItemsSourceAttribute.cs" />
+    <Compile Include="PropertyGrid\Implementation\Attributes\PropertyOrderAttribute.cs" />
     <Compile Include="PropertyGrid\Implementation\Commands\PropertyGridCommands.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\ValueSourceToImagePathConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\ValueSourceToToolTipConverter.cs" />

@@ -254,6 +254,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         public PropertyGrid PropertyGrid { get; private set; }
 
+        public int PropertyOrder { get; set; } //maybe make a DP
+
         #region PropertyType
 
         public Type PropertyType
@@ -325,6 +327,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
             SetPropertyDescriptorProperties();
             ResolveExpandableObject();
+            ResolvePropertyOrder();
 
             CommandBindings.Add(new CommandBinding(PropertyItemCommands.ResetValue, ExecuteResetValueCommand, CanExecuteResetValueCommand));
             AddHandler(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(PropertyItem_PreviewMouseDown), true);
@@ -400,6 +403,15 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                 HasChildProperties = true;
                 IsReadOnly = true;
             }
+        }
+
+        private void ResolvePropertyOrder()
+        {
+            var attrs = PropertyDescriptor.Attributes.OfType<PropertyOrderAttribute>();
+            if (attrs.Any())
+                PropertyOrder = attrs.First().Order;
+            else
+                PropertyOrder = 0;
         }
 
         private void SetPropertyDescriptorProperties()
