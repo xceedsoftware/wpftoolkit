@@ -33,6 +33,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             PropertyItemCollection propertyCollection = new PropertyItemCollection(propertyItems);
             propertyCollection.GroupBy("Category");
             propertyCollection.SortBy("Category", ListSortDirection.Ascending);
+            propertyCollection.SortBy("PropertyOrder", ListSortDirection.Ascending);
             propertyCollection.SortBy("DisplayName", ListSortDirection.Ascending);
             return propertyCollection;
         }
