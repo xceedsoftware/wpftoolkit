@@ -199,7 +199,7 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            _buttonPanel = (ContentControl)GetTemplateChild("PART_CalculatorButtonPanel");
+            _buttonPanel = GetTemplateChild("PART_CalculatorButtonPanel") as ContentControl;
         }
 
         protected override void OnTextInput(TextCompositionEventArgs e)

@@ -317,9 +317,16 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            _timeListBox = (ListBox)GetTemplateChild("PART_TimeListItems");
-            _timeListBox.ItemsSource = GenerateTimeListItemsSource();
-            _timeListBox.SelectionChanged += TimeListBox_SelectionChanged;
+            if (_timeListBox != null)
+                _timeListBox.SelectionChanged -= TimeListBox_SelectionChanged;
+
+            _timeListBox = GetTemplateChild("PART_TimeListItems") as ListBox;
+
+            if (_timeListBox != null)
+            {
+                _timeListBox.SelectionChanged += TimeListBox_SelectionChanged;
+                _timeListBox.ItemsSource = GenerateTimeListItemsSource();
+            }
         }
 
         #endregion //Base Class Overrides

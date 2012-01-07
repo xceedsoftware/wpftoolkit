@@ -39,7 +39,10 @@ namespace Microsoft.Windows.Controls
         }
 
         internal MessageBox()
-        { /*user cannot create instance */ }
+        { 
+            /*user cannot create instance */
+            AddHandler(ButtonBase.ClickEvent, new RoutedEventHandler(Button_Click));
+        }
 
         #endregion //Constructors
 
@@ -156,11 +159,13 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
 
+            if (DragWidget != null)
+                DragWidget.DragDelta -= (o, e) => ProcessMove(e);
+
             DragWidget = GetTemplateChild("PART_DragWidget") as Thumb;
+
             if (DragWidget != null)
                 DragWidget.DragDelta += (o, e) => ProcessMove(e);
-
-            AddHandler(ButtonBase.ClickEvent, new RoutedEventHandler(Button_Click));
 
             ChangeVisualState(_button.ToString(), true);
 

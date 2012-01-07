@@ -105,10 +105,16 @@ namespace Microsoft.Windows.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _calculatorPopup = (Popup)GetTemplateChild("PART_CalculatorPopup");
-            _calculatorPopup.Opened += CalculatorPopup_Opened;
 
-            _calculator = (Calculator)GetTemplateChild("PART_Calculator");
+            if (_calculatorPopup != null)
+                _calculatorPopup.Opened -= CalculatorPopup_Opened;
+
+            _calculatorPopup = GetTemplateChild("PART_CalculatorPopup") as Popup;
+
+            if (_calculatorPopup != null)
+                _calculatorPopup.Opened += CalculatorPopup_Opened;
+
+            _calculator = GetTemplateChild("PART_Calculator") as Calculator;
         }
 
         #endregion //Base Class Overrides

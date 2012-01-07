@@ -202,7 +202,8 @@ namespace Microsoft.Windows.Controls
                 _colorShadingCanvas.SizeChanged -= ColorShadingCanvas_SizeChanged;
             }
 
-            _colorShadingCanvas = (Canvas)GetTemplateChild("PART_ColorShadingCanvas");
+            _colorShadingCanvas = GetTemplateChild("PART_ColorShadingCanvas") as Canvas;
+
             if (_colorShadingCanvas != null)
             {
                 _colorShadingCanvas.MouseLeftButtonDown += ColorShadingCanvas_MouseLeftButtonDown;
@@ -211,14 +212,16 @@ namespace Microsoft.Windows.Controls
                 _colorShadingCanvas.SizeChanged += ColorShadingCanvas_SizeChanged;
             }
 
-            _colorShadeSelector = (Canvas)GetTemplateChild("PART_ColorShadeSelector");
+            _colorShadeSelector = GetTemplateChild("PART_ColorShadeSelector") as Canvas;
+
             if (_colorShadeSelector != null)
                 _colorShadeSelector.RenderTransform = _colorShadeSelectorTransform;
 
             if (_spectrumSlider != null)
                 _spectrumSlider.ValueChanged -= SpectrumSlider_ValueChanged;
             
-            _spectrumSlider = (ColorSpectrumSlider)GetTemplateChild("PART_SpectrumSlider");
+            _spectrumSlider = GetTemplateChild("PART_SpectrumSlider") as ColorSpectrumSlider;
+
             if (_spectrumSlider != null)
                 _spectrumSlider.ValueChanged += SpectrumSlider_ValueChanged;            
 

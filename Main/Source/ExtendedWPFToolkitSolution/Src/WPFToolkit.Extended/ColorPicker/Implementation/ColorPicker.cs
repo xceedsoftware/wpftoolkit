@@ -228,21 +228,21 @@ namespace Microsoft.Windows.Controls
             if (_availableColors != null)
                 _availableColors.SelectionChanged -= Color_SelectionChanged;
 
-            _availableColors = (ListBox)GetTemplateChild("PART_AvailableColors");
+            _availableColors = GetTemplateChild("PART_AvailableColors") as ListBox;
             if (_availableColors != null)
                 _availableColors.SelectionChanged += Color_SelectionChanged;
 
             if (_standardColors != null)
                 _standardColors.SelectionChanged -= Color_SelectionChanged;
 
-            _standardColors = (ListBox)GetTemplateChild("PART_StandardColors");
+            _standardColors = GetTemplateChild("PART_StandardColors") as ListBox;
             if (_standardColors != null)
                 _standardColors.SelectionChanged += Color_SelectionChanged;
 
             if (_recentColors != null)
                 _recentColors.SelectionChanged -= Color_SelectionChanged;
 
-            _recentColors = (ListBox)GetTemplateChild("PART_RecentColors");
+            _recentColors = GetTemplateChild("PART_RecentColors") as ListBox;
             if (_recentColors != null)
                 _recentColors.SelectionChanged += Color_SelectionChanged;
         }
