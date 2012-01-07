@@ -38,7 +38,7 @@ namespace Microsoft.Windows.Controls
         {
             get { return (TimeFormat)GetValue(TimeFormatProperty); }
             set { SetValue(TimeFormatProperty, value); }
-        }        
+        }
 
         #endregion //TimeFormat
 
@@ -98,10 +98,19 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            _calendar = (Calendar)GetTemplateChild("Part_Calendar");
-            _calendar.SelectedDatesChanged += Calendar_SelectedDatesChanged;
-            _calendar.SelectedDate = Value ?? null;
-            _calendar.DisplayDate = Value ?? DateTime.Now;
+            if (_calendar != null)
+            {
+                _calendar.SelectedDatesChanged -= Calendar_SelectedDatesChanged;
+            }
+
+            _calendar = GetTemplateChild("Part_Calendar") as Calendar;
+
+            if (_calendar != null)
+            {
+                _calendar.SelectedDatesChanged += Calendar_SelectedDatesChanged;
+                _calendar.SelectedDate = Value ?? null;
+                _calendar.DisplayDate = Value ?? DateTime.Now;
+            }
         }
 
         protected override void OnPreviewMouseUp(MouseButtonEventArgs e)

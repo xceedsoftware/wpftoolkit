@@ -51,7 +51,7 @@ namespace Microsoft.Windows.Controls.Primitives
         {
             get { return (bool)GetValue(MouseWheelActiveOnFocusProperty); }
             set { SetValue(MouseWheelActiveOnFocusProperty, value); }
-        }        
+        }
 
         #endregion //MouseWheelActiveOnFocus
 
@@ -120,8 +120,14 @@ namespace Microsoft.Windows.Controls.Primitives
             base.OnApplyTemplate();
 
             TextBox = GetTemplateChild(ElementTextName) as TextBox;
+
+            if (Spinner != null)
+                Spinner.Spin -= OnSpinnerSpin;
+
             Spinner = GetTemplateChild(ElementSpinnerName) as Spinner;
-            Spinner.Spin += OnSpinnerSpin;
+
+            if (Spinner != null)
+                Spinner.Spin += OnSpinnerSpin;
 
             SetValidSpinDirection();
         }

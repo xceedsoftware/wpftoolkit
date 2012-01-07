@@ -205,6 +205,15 @@ namespace Microsoft.Windows.Controls
             TextProperty.OverrideMetadata(typeof(MaskedTextBox), new FrameworkPropertyMetadata(OnTextChanged));
         }
 
+        public MaskedTextBox()
+        {
+            PreviewTextInput += TextBox_PreviewTextInput;
+            PreviewKeyDown += TextBox_PreviewKeyDown;
+
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, Paste)); //handle paste
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, null, CanCut)); //surpress cut
+        }
+
         #endregion //Constructors
 
         #region Base Class Overrides
@@ -212,12 +221,6 @@ namespace Microsoft.Windows.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-
-            PreviewTextInput += TextBox_PreviewTextInput;
-            PreviewKeyDown += TextBox_PreviewKeyDown;
-
-            CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, Paste)); //handle paste
-            CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, null, CanCut)); //surpress cut
 
             UpdateText(MaskProvider, 0);
         }

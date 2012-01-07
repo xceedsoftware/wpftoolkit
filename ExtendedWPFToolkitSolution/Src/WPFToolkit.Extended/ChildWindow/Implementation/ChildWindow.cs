@@ -395,7 +395,15 @@ namespace Microsoft.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            _dragWidget = (Border)GetTemplateChild("PART_DragWidget");
+            if (_dragWidget != null)
+            {
+                _dragWidget.RemoveHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(HeaderLeftMouseButtonDown));
+                _dragWidget.RemoveHandler(UIElement.MouseLeftButtonUpEvent, new MouseButtonEventHandler(HeaderMouseLeftButtonUp));
+                _dragWidget.MouseMove -= (o, e) => HeaderMouseMove(e);
+            }
+
+            _dragWidget = GetTemplateChild("PART_DragWidget") as Border;
+
             if (_dragWidget != null)
             {
                 _dragWidget.AddHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(HeaderLeftMouseButtonDown), true);
@@ -403,7 +411,11 @@ namespace Microsoft.Windows.Controls
                 _dragWidget.MouseMove += (o, e) => HeaderMouseMove(e);
             }
 
-            CloseButton = (Button)GetTemplateChild("PART_CloseButton");
+            if (CloseButton != null)
+                CloseButton.Click -= (o, e) => Close();
+
+            CloseButton = GetTemplateChild("PART_CloseButton") as Button;
+
             if (CloseButton != null)
                 CloseButton.Click += (o, e) => Close();
 

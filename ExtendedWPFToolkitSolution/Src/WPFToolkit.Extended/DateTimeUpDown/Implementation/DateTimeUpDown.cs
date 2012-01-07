@@ -115,8 +115,13 @@ namespace Microsoft.Windows.Controls
 
         public override void OnApplyTemplate()
         {
+            if (TextBox != null)
+                TextBox.SelectionChanged -= TextBox_SelectionChanged;
+
             base.OnApplyTemplate();
-            TextBox.SelectionChanged += TextBox_SelectionChanged;
+
+            if (TextBox != null)
+                TextBox.SelectionChanged += TextBox_SelectionChanged;
         }
 
         protected override void OnCultureInfoChanged(CultureInfo oldValue, CultureInfo newValue)
@@ -202,7 +207,7 @@ namespace Microsoft.Windows.Controls
         protected override string ConvertValueToText()
         {
             if (Value == null) return string.Empty;
-            
+
             return Value.Value.ToString(GetFormatString(Format), CultureInfo);
         }
 

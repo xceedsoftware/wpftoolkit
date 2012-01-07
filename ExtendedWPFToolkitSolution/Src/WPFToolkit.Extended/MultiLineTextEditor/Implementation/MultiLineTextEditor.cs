@@ -124,11 +124,11 @@ namespace Microsoft.Windows.Controls
 
             if (_resizeThumb != null)
                 _resizeThumb.DragDelta -= ResizeThumb_DragDelta;
-            _resizeThumb = (Thumb)GetTemplateChild("PART_ResizeThumb");
+
+            _resizeThumb = GetTemplateChild("PART_ResizeThumb") as Thumb;
 
             if (_resizeThumb != null)
                 _resizeThumb.DragDelta += ResizeThumb_DragDelta;
-
         }
 
         #endregion //Bass Class Overrides
