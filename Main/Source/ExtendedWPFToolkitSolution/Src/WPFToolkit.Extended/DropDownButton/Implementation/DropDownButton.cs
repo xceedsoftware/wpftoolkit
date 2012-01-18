@@ -154,6 +154,15 @@ namespace Microsoft.Windows.Controls
 
         void CanExecuteChanged(object sender, EventArgs e)
         {
+            CanExecuteChanged();
+        }
+
+        #endregion //Event Handlers
+
+        #region Methods
+
+        private void CanExecuteChanged()
+        {
             if (Command != null)
             {
                 RoutedCommand command = Command as RoutedCommand;
@@ -166,10 +175,6 @@ namespace Microsoft.Windows.Controls
                     IsEnabled = Command.CanExecute(CommandParameter) ? true : false;
             }
         }
-
-        #endregion //Event Handlers
-
-        #region Methods
 
         /// <summary>
         /// Closes the drop down.
@@ -267,6 +272,8 @@ namespace Microsoft.Windows.Controls
                 UnhookCommand(oldValue, newValue);
 
             HookUpCommand(oldValue, newValue);
+
+            CanExecuteChanged(); //may need to call this when changing the command parameter or target.
         }
 
         #endregion //Command
