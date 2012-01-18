@@ -8,7 +8,7 @@ using Microsoft.Windows.Controls.Core.Utilities;
 
 namespace Microsoft.Windows.Controls
 {
-    internal class ColorSpectrumSlider : Slider
+    public class ColorSpectrumSlider : Slider
     {
         #region Private Members
 
