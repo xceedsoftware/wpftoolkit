@@ -285,7 +285,8 @@ namespace Microsoft.Windows.Controls.PropertyGrid
 
         protected virtual void OnValueChanged(object oldValue, object newValue)
         {
-            // TODO: Add your property changed side-effects. Descendants can override as well.
+            if (IsInitialized)
+                RaiseEvent(new PropertyValueChangedEventArgs(PropertyGrid.PropertyValueChangedEvent, this, oldValue, newValue));
         }
 
         #endregion //Value
@@ -334,6 +335,12 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         }
 
         #endregion //Constructors
+
+        #region Events
+
+        public static readonly RoutedEvent PropertyValueChangedEvent = PropertyGrid.PropertyValueChangedEvent.AddOwner(typeof(PropertyItem));
+
+        #endregion //Events
 
         #region Event Handlers
 
