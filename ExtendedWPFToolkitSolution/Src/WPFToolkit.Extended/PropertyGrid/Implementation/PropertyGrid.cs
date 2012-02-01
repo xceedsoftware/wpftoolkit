@@ -280,8 +280,10 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             if (oldValue != null)
                 oldValue.IsSelected = false;
 
-            if (newValue != null)
-                newValue.IsSelected = true;
+            //if (newValue != null)
+            //    newValue.IsSelected = true;
+
+            RaiseEvent(new RoutedEventArgs(PropertyGrid.SelectedPropertyItemChangedEvent, newValue));
         }
 
         #endregion //SelectedProperty
@@ -504,10 +506,15 @@ namespace Microsoft.Windows.Controls.PropertyGrid
             add { AddHandler(PropertyValueChangedEvent, value); }
             remove { RemoveHandler(PropertyValueChangedEvent, value); }
         }
+        
+        public static readonly RoutedEvent SelectedPropertyItemChangedEvent = EventManager.RegisterRoutedEvent("SelectedPropertyItemChanged", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(PropertyGrid));
+        public event RoutedEventHandler SelectedPropertyItemChanged
+        {
+            add { AddHandler(SelectedPropertyItemChangedEvent, value); }
+            remove { RemoveHandler(SelectedPropertyItemChangedEvent, value); }
+        }
 
-        //TODO: add SelectedPropertyItemChanged event
-
-        #endregion
+        #endregion //Events
     }
 
     public delegate void PropertyValueChangedEventHandler(object sender, PropertyValueChangedEventArgs e);
