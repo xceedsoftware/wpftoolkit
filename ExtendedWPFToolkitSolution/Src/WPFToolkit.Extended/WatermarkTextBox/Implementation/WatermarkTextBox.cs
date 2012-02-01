@@ -60,9 +60,7 @@ namespace Microsoft.Windows.Controls
             base.OnGotKeyboardFocus(e);
 
             if (SelectAllOnGotFocus)
-                SelectAll();
-            else
-                SelectionLength = 0;                
+                SelectAll();              
         }
 
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
