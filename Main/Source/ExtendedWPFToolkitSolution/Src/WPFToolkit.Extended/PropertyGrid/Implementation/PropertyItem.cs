@@ -207,7 +207,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         protected virtual void OnIsSelectedChanged(bool oldValue, bool newValue)
         {
             if (newValue)
-                PropertyGrid.SelectedProperty = this;
+                PropertyGrid.SelectedProperty = this; 
         }
 
         #endregion //IsSelected
@@ -286,7 +286,9 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         protected virtual void OnValueChanged(object oldValue, object newValue)
         {
             if (IsInitialized)
-                RaiseEvent(new PropertyValueChangedEventArgs(PropertyGrid.PropertyValueChangedEvent, this, oldValue, newValue));
+            {
+                PropertyGrid.RaiseEvent(new PropertyValueChangedEventArgs(PropertyGrid.PropertyValueChangedEvent, this, oldValue, newValue));
+            }
         }
 
         #endregion //Value
@@ -335,12 +337,6 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         }
 
         #endregion //Constructors
-
-        #region Events
-
-        public static readonly RoutedEvent PropertyValueChangedEvent = PropertyGrid.PropertyValueChangedEvent.AddOwner(typeof(PropertyItem));
-
-        #endregion //Events
 
         #region Event Handlers
 
