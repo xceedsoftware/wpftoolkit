@@ -495,5 +495,32 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         }
 
         #endregion //Methods
+
+        #region Events
+
+        public static readonly RoutedEvent PropertyValueChangedEvent = EventManager.RegisterRoutedEvent("PropertyValueChanged", RoutingStrategy.Bubble, typeof(PropertyValueChangedEventHandler), typeof(PropertyGrid));
+        public event PropertyValueChangedEventHandler PropertyValueChanged
+        {
+            add { AddHandler(PropertyValueChangedEvent, value); }
+            remove { RemoveHandler(PropertyValueChangedEvent, value); }
+        }
+
+        //TODO: add SelectedPropertyItemChanged event
+
+        #endregion
+    }
+
+    public delegate void PropertyValueChangedEventHandler(object sender, PropertyValueChangedEventArgs e);
+    public class PropertyValueChangedEventArgs : RoutedEventArgs
+    {
+        public object NewValue { get; set; }
+        public object OldValue { get; set; }
+
+        public PropertyValueChangedEventArgs(RoutedEvent routedEvent, object source, object oldValue, object newValue)
+            : base(routedEvent, source)
+        {
+            NewValue = newValue;
+            OldValue = oldValue;
+        }
     }
 }
