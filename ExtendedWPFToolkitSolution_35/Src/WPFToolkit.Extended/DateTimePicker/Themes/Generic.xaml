@@ -81,7 +81,7 @@
                                 <local:ButtonSpinner x:Name="Spinner" IsTabStop="False" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
                                          AllowSpin="{TemplateBinding AllowSpin}" ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
                                     <local:WatermarkTextBox x:Name="TextBox" BorderThickness="0" 
-                                                Background="{TemplateBinding Background}"
+                                                Background="Transparent"
                                                 FontFamily="{TemplateBinding FontFamily}" 
                                                 FontSize="{TemplateBinding FontSize}" 
                                                 FontStretch="{TemplateBinding FontStretch}"
@@ -89,8 +89,10 @@
                                                 FontWeight="{TemplateBinding FontWeight}" 
                                                 Foreground="{TemplateBinding Foreground}" 
                                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                IsReadOnly="{Binding IsEditable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
-                                                MinWidth="20" AcceptsReturn="False" 
+                                                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
+                                                MinWidth="20" 
+                                                AcceptsReturn="False"
+                                                Padding="0"
                                                 TextAlignment="{TemplateBinding TextAlignment}"
                                                 TextWrapping="NoWrap" 
                                                 TabIndex="{TemplateBinding TabIndex}"
@@ -101,14 +103,18 @@
                                 <ToggleButton x:Name="_calendarToggleButton" Grid.Column="1" Background="White"
                                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                               Style="{StaticResource DateTimePickerToggleButtonStyle}"
-                                              IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"/>
+                                              IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                                              IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"/>
                             </Grid>
                             <Popup IsOpen="{Binding IsChecked, ElementName=_calendarToggleButton}" StaysOpen="False">
                                 <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" Padding="3">
                                     <StackPanel>
                                         <toolkit:Calendar x:Name="Part_Calendar" BorderThickness="0" />
                                         <local:TimePicker x:Name="Part_TimeUpDown" 
-                                                          Format="ShortTime" 
+                                                          Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+                                                          Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" 
+                                                          Format="{TemplateBinding TimeFormat}"
+                                                          FormatString="{TemplateBinding TimeFormatString}"
                                                           Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
                                                           Watermark="{TemplateBinding TimeWatermark}"
                                                           WatermarkTemplate="{TemplateBinding TimeWatermarkTemplate}"/>

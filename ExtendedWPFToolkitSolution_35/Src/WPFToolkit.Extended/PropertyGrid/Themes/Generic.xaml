@@ -399,7 +399,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Grid Background="#BCC7D8" Margin="4">
+                                <Grid Background="#BCC7D8" Margin="4" Visibility="{Binding ShowSortOptions, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                     <StackPanel Orientation="Horizontal" Margin="1" >
                                         <RadioButton IsChecked="{Binding IsCategorized, RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" 
                                                      Style="{StaticResource OptionsToggleButtonStyle}" ToolTip="Categorized">
@@ -412,7 +412,7 @@
                                     </StackPanel>
                                 </Grid>
 
-                                <Border Grid.Column="1" Margin="4,4,0,4" Background="White" BorderBrush="Gray" BorderThickness="1"  >
+                                <Border Grid.Column="1" Margin="4,4,0,4" Background="White" BorderBrush="Gray" BorderThickness="1" Visibility="{Binding ShowSearchBox, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
@@ -420,7 +420,7 @@
                                         </Grid.ColumnDefinitions>
                                         <extToolkit:WatermarkTextBox x:Name="_txtFilter" Background="Transparent" 
                                                                  Text="{Binding Filter, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"
-                                                                 Watermark="Search">
+                                                                 Watermark="{TemplateBinding FilterWatermark}">
                                             <extToolkit:WatermarkTextBox.Style>
                                                 <Style TargetType="Control">
                                                     <Setter Property="BorderThickness" Value="0" />

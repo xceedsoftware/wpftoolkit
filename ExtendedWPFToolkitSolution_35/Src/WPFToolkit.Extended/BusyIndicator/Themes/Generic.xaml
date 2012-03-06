@@ -101,7 +101,7 @@
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <ContentControl x:Name="content" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" IsTabStop="False" Focusable="False" />
+                        <ContentControl x:Name="content" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" IsTabStop="False" Focusable="False"/>
                         <Rectangle x:Name="overlay" Style="{TemplateBinding OverlayStyle}"/>
                         <ContentPresenter x:Name="busycontent">
                             <ContentPresenter.Content>
