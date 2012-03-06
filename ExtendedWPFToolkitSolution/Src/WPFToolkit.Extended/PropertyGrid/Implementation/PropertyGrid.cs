@@ -446,7 +446,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                         propertyItems.Add(PropertyGridUtilities.CreatePropertyItem(descriptor, instance, this, descriptor.Name));
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //TODO: handle this some how
             }

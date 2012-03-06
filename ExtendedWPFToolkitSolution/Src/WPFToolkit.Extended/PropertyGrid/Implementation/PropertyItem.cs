@@ -390,7 +390,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid
                         propertyItems.Add(PropertyGridUtilities.CreatePropertyItem(descriptor, Instance, PropertyGrid, String.Format("{0}.{1}", BindingPath, descriptor.Name), Level + 1));
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //TODO: handle this some how
             }
