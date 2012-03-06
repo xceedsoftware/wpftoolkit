@@ -101,7 +101,10 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <local:DateTimeUpDown x:Name="PART_TimeUpDown" BorderThickness="1,1,0,1"  
+                                <local:DateTimeUpDown x:Name="PART_TimeUpDown" 
+                                                      BorderThickness="1,1,0,1"
+                                                      Background="{TemplateBinding Background}"
+                                                      Foreground="{TemplateBinding Foreground}"
                                                       ContextMenu="{TemplateBinding ContextMenu}"
                                                       AllowSpin="{TemplateBinding AllowSpin}"
                                                       Format="{TemplateBinding Format, Converter={StaticResource TimeFormatToDateTimeFormatConverter}}"

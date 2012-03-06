@@ -3,37 +3,61 @@
                     xmlns:local="clr-namespace:Microsoft.Windows.Controls"
                     xmlns:magConverters="clr-namespace:Microsoft.Windows.Controls.Mag.Converters">
 
-    <!-- =============================================================================== -->
-    <!-- Magnifier                                                                       -->
-    <!-- =============================================================================== -->
+   <!-- =============================================================================== -->
+   <!-- Magnifier                                                                       -->
+   <!-- =============================================================================== -->
 
-    <magConverters:RadiusConverter x:Key="RadiusConverter"/>
-    <magConverters:BorderThicknessToStrokeThicknessConverter x:Key="BorderThicknessToStrokeThicknessConverter"/>
+   <magConverters:RadiusConverter x:Key="RadiusConverter"/>
+   <magConverters:BorderThicknessToStrokeThicknessConverter x:Key="BorderThicknessToStrokeThicknessConverter"/>
 
-    <Style TargetType="{x:Type local:Magnifier}">
-        <Setter Property="IsHitTestVisible" Value="False"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:Magnifier}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{Binding Path=Radius, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource RadiusConverter}}"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="{Binding Path=Radius, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource RadiusConverter}}"/>
-                        </Grid.RowDefinitions>
-                        <Ellipse Width="{Binding Path=MagnifierWidth, RelativeSource={RelativeSource TemplatedParent}}" Height="{Binding Path=MagnifierHeight, RelativeSource={RelativeSource TemplatedParent}}" Fill="{TemplateBinding Background}"/>
-                        <Ellipse Stroke="{Binding Path=BorderBrush, RelativeSource={RelativeSource TemplatedParent}}" StrokeThickness="{Binding Path=BorderThickness, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BorderThicknessToStrokeThicknessConverter}}">
-                            <Ellipse.Fill>
-                                <VisualBrush Viewbox="{Binding Path=ViewBox, RelativeSource={RelativeSource TemplatedParent}}" 
-                                             ViewboxUnits="Absolute"
-                                             Visual="{Binding Path=Target, RelativeSource={RelativeSource TemplatedParent}}"/>
-                            </Ellipse.Fill>
-                        </Ellipse>
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+   <ControlTemplate x:Key="CircleTemplate" TargetType="{x:Type local:Magnifier}">
+      <Grid>
+         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding Path=Radius, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource RadiusConverter}}"/>
+         </Grid.ColumnDefinitions>
+         <Grid.RowDefinitions>
+            <RowDefinition Height="{Binding Path=Radius, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource RadiusConverter}}"/>
+         </Grid.RowDefinitions>
+         <Ellipse Width="{Binding Path=FrameWidth, RelativeSource={RelativeSource TemplatedParent}}" 
+                  Height="{Binding Path=FrameHeight, RelativeSource={RelativeSource TemplatedParent}}" 
+                  Fill="{TemplateBinding Background}"/>
+         <Ellipse Stroke="{Binding Path=BorderBrush, RelativeSource={RelativeSource TemplatedParent}}" 
+                  StrokeThickness="{Binding Path=BorderThickness, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BorderThicknessToStrokeThicknessConverter}}">
+            <Ellipse.Fill>
+               <VisualBrush Viewbox="{Binding Path=ViewBox, RelativeSource={RelativeSource TemplatedParent}}" 
+                            ViewboxUnits="Absolute"
+                            Visual="{Binding Path=Target, RelativeSource={RelativeSource TemplatedParent}}"/>
+            </Ellipse.Fill>
+         </Ellipse>
+      </Grid>
+   </ControlTemplate>
+
+   <ControlTemplate x:Key="RectangleTemplate" TargetType="{x:Type local:Magnifier}">
+      <Canvas Background="{TemplateBinding Background}"
+              Width="{Binding Path=FrameWidth, RelativeSource={RelativeSource TemplatedParent}}" 
+              Height="{Binding Path=FrameHeight, RelativeSource={RelativeSource TemplatedParent}}">
+         <Rectangle Width="{Binding Path=Width, RelativeSource={RelativeSource TemplatedParent}}" 
+                    Height="{Binding Path=Height, RelativeSource={RelativeSource TemplatedParent}}"
+                    Stroke="{Binding Path=BorderBrush, RelativeSource={RelativeSource TemplatedParent}}"
+                    StrokeThickness="{Binding Path=BorderThickness, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BorderThicknessToStrokeThicknessConverter}}">
+            <Rectangle.Fill>
+               <VisualBrush Viewbox="{Binding Path=ViewBox, RelativeSource={RelativeSource TemplatedParent}}" ViewboxUnits="Absolute"
+                            Visual="{Binding Path=Target, RelativeSource={RelativeSource TemplatedParent}}"/>
+            </Rectangle.Fill>
+         </Rectangle>
+      </Canvas>
+   </ControlTemplate>
+
+   <Style TargetType="{x:Type local:Magnifier}">
+      <Setter Property="IsHitTestVisible" Value="False"/>
+      <Style.Triggers>
+         <Trigger Property="FrameType" Value="Circle">
+            <Setter Property="Template" Value="{StaticResource CircleTemplate}"/>
+         </Trigger>
+         <Trigger Property="FrameType" Value="Rectangle">
+            <Setter Property="Template" Value="{StaticResource RectangleTemplate}"/>
+         </Trigger>
+      </Style.Triggers>
+   </Style>
 
 </ResourceDictionary>
