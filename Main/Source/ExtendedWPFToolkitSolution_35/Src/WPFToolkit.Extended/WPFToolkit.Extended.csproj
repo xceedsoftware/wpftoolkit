@@ -177,11 +177,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Themes\Areo\Brushes_NormalColor.xaml">
+    <Page Include="Themes\Aero\Brushes_NormalColor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Themes\Areo\Buttons_NormalColor.xaml">
+    <Page Include="Themes\Aero\Buttons_NormalColor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -418,6 +418,9 @@
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Attributes\ItemsSourceAttribute.cs">
       <Link>PropertyGrid\Implementation\Attributes\ItemsSourceAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Attributes\PropertyOrderAttribute.cs">
+      <Link>PropertyGrid\Implementation\Attributes\PropertyOrderAttribute.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\PropertyGrid\Implementation\Commands\PropertyGridCommands.cs">
       <Link>PropertyGrid\Implementation\Commands\PropertyGridCommands.cs</Link>
