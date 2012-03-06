@@ -79,7 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CollectionEditors\Implementation\CollectionEditorDialog.xaml">
-      <Link>CollectionEditor\Implementation\CollectionEditorDialog.xaml</Link>
+      <Link>CollectionEditors\Implementation\CollectionEditorDialog.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -272,14 +272,14 @@
       <Link>Chromes\Implementation\ButtonChrome.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CollectionEditors\Implementation\CollectionEditor.cs">
-      <Link>CollectionEditor\Implementation\CollectionEditor.cs</Link>
+      <Link>CollectionEditors\Implementation\CollectionEditor.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CollectionEditors\Implementation\CollectionEditorDialog.xaml.cs">
-      <Link>CollectionEditor\Implementation\CollectionEditorDialog.xaml.cs</Link>
+      <Link>CollectionEditors\Implementation\CollectionEditorDialog.xaml.cs</Link>
       <DependentUpon>CollectionEditorDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\CollectionEditors\Implementation\PrimitiveTypeCollectionEditor.cs">
-      <Link>CollectionEditor\Implementation\PrimitiveTypeCollectionEditor.cs</Link>
+      <Link>CollectionEditors\Implementation\PrimitiveTypeCollectionEditor.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\ColorCanvas\Implementation\ColorCanvas.cs">
       <Link>ColorCanvas\Implementation\ColorCanvas.cs</Link>
@@ -668,7 +668,7 @@
     <Resource Include="TokenizedTextBox\Images\delete8.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="CollectionEditor\" />
+    <Folder Include="CollectionEditor\Implementation\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
