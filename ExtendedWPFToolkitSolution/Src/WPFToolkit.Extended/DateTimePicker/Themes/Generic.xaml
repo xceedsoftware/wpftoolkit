@@ -111,7 +111,9 @@
                                 <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" Padding="3">
                                     <StackPanel>
                                         <Calendar x:Name="Part_Calendar" BorderThickness="0" />
-                                        <local:TimePicker x:Name="Part_TimeUpDown" 
+                                        <local:TimePicker x:Name="Part_TimeUpDown"
+                                                          Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+                                                          Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" 
                                                           Format="{TemplateBinding TimeFormat}"
                                                           FormatString="{TemplateBinding TimeFormatString}"
                                                           Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
