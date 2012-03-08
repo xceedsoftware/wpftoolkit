@@ -1,23 +1,41 @@
-﻿<infControls:DemoView x:Class="Samples.Modules.PropertyGrid.Views.CustomItemsSource"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:infControls="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
+﻿<!--*********************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2010-2012 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Reciprocal
+   License (Ms-RL) as published at http://wpftoolkit.codeplex.com/license 
+
+   This program can be provided to you by Xceed Software Inc. under a
+   proprietary commercial license agreement for use in non-Open Source
+   projects. The commercial version of Extended WPF Toolkit also includes
+   priority technical support, commercial updates, and many additional 
+   useful WPF controls if you license Xceed Business Suite for WPF.
+
+   Visit http://xceed.com and follow @datagrid on Twitter.
+
+  ********************************************************************-->
+<infControls:DemoView x:Class="Samples.Modules.PropertyGrid.Views.CustomItemsSource"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:infControls="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                       xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
                       Title="Custom ItemsSource">
-    <Grid>
+   <Grid>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
 
-        <TextBlock Text="Sometimes it is desirable to want to provide a collection of values represented by a ComboBox for a given property.  The PropertyGrid supports this scenario by create a class that implements IItemsSource and decorating your property with the ItemsSourceAttribute."
-                   TextWrapping="Wrap" />
+      <TextBlock Text="Sometimes it is desirable to want to provide a collection of values represented by a ComboBox for a given property.  The PropertyGrid supports this scenario by create a class that implements IItemsSource and decorating your property with the ItemsSourceAttribute."
+                 TextWrapping="Wrap" />
 
-        <StackPanel Grid.Row="1" Margin="10">
-            <TextBlock Text="Providing a Custom ItemsSource:" Style="{StaticResource Header}" />
-            <TextBlock Text="This example uses a collection of Doubles to represent the available options for the WritingFontSize property." TextWrapping="Wrap"/>
-            <extToolkit:PropertyGrid x:Name="_propertyGrid" Width="450" Margin="10"/>
-        </StackPanel>
-    </Grid>
-    </infControls:DemoView>
+      <StackPanel Grid.Row="1" Margin="10">
+         <TextBlock Text="Providing a Custom ItemsSource:" Style="{StaticResource Header}" />
+         <TextBlock Text="This example uses a collection of Doubles to represent the available options for the WritingFontSize property." TextWrapping="Wrap" />
+         <extToolkit:PropertyGrid x:Name="_propertyGrid" Width="450" Margin="10" />
+      </StackPanel>
+   </Grid>
+</infControls:DemoView>
