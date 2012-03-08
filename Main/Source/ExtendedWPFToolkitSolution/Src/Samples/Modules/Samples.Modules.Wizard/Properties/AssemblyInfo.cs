@@ -23,12 +23,12 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Samples.Modules.Wizard" )]
+[assembly: AssemblyTitle( "Extended WPF Toolkit Wizard Sample" )]
 [assembly: AssemblyDescription( "" )]
 [assembly: AssemblyConfiguration( "" )]
-[assembly: AssemblyCompany( "" )]
-[assembly: AssemblyProduct( "Samples.Modules.Wizard" )]
-[assembly: AssemblyCopyright( "Copyright ©  2011" )]
+[assembly: AssemblyCompany( "Xceed Software Inc." )]
+[assembly: AssemblyProduct( "Extended WPF Toolkit Wizard Sample" )]
+[assembly: AssemblyCopyright( "Copyright © Xceed Software Inc. 2010-2012" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
