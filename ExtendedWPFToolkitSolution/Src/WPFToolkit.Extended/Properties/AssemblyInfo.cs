@@ -29,9 +29,9 @@ using System.Windows.Markup;
 [assembly: AssemblyTitle( "Extended WPF Toolkit" )]
 [assembly: AssemblyDescription( "" )]
 [assembly: AssemblyConfiguration( "" )]
-[assembly: AssemblyCompany( "" )]
+[assembly: AssemblyCompany( "Xceed Software Inc." )]
 [assembly: AssemblyProduct( "Extended WPF Toolkit" )]
-[assembly: AssemblyCopyright( "Copyright ©  2010" )]
+[assembly: AssemblyCopyright( "Copyright © Xceed Software Inc. 2010-2012" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
