@@ -309,8 +309,6 @@ namespace Microsoft.Windows.Controls
 
     protected override void OnPreviewKeyDown( KeyEventArgs e )
     {
-      e.Handled |= IsReadOnly;
-
       if( !e.Handled )
       {
         HandlePreviewKeyDown( e );
@@ -321,8 +319,6 @@ namespace Microsoft.Windows.Controls
 
     protected override void OnPreviewTextInput( TextCompositionEventArgs e )
     {
-      e.Handled |= IsReadOnly;
-
       if( !e.Handled )
       {
         HandlePreviewTextInput( e );
@@ -473,7 +469,10 @@ namespace Microsoft.Windows.Controls
 
     private void HandlePreviewTextInput( TextCompositionEventArgs e )
     {
-      this.InsertText( e.Text );
+      if( !IsReadOnly )
+      {
+        this.InsertText( e.Text );
+      }
 
       e.Handled = true;
     }
@@ -482,21 +481,26 @@ namespace Microsoft.Windows.Controls
     {
       if( e.Key == Key.Delete )
       {
-        e.Handled = HandleKeyDownDelete();
+        e.Handled = IsReadOnly
+                 || HandleKeyDownDelete();
       }
       else if( e.Key == Key.Back )
       {
-        e.Handled = HandleKeyDownBack();
+        e.Handled = IsReadOnly
+                 || HandleKeyDownBack();
       }
       else if( e.Key == Key.Space )
       {
-        InsertText( " " );
+        if( !IsReadOnly )
+        {
+          InsertText( " " );
+        }
 
         e.Handled = true;
       }
       else if( e.Key == Key.Return || e.Key == Key.Enter )
       {
-        if( AcceptsReturn )
+        if( !IsReadOnly && AcceptsReturn )
         {
           this.InsertText( "\r" );
         }
@@ -514,7 +518,10 @@ namespace Microsoft.Windows.Controls
       {
         if( AcceptsTab )
         {
-          this.InsertText( "\t" );
+          if( !IsReadOnly )
+          {
+            this.InsertText( "\t" );
+          }
 
           e.Handled = true;
         }
@@ -690,16 +697,15 @@ namespace Microsoft.Windows.Controls
       if( IsReadOnly )
         return;
 
-      MaskedTextProvider provider = MaskProvider;
-      int position = SelectionStart;
-
       object data = Clipboard.GetData( DataFormats.Text );
       if( data != null )
       {
         string text = data.ToString().Trim();
         if( text.Length > 0 )
         {
-          provider.Set( text );
+          int position = SelectionStart;
+
+          MaskProvider.Set( text );
 
           UpdateText( position );
         }
