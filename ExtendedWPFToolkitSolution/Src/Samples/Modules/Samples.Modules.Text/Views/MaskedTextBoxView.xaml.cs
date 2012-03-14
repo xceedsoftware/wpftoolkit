@@ -17,30 +17,19 @@
 
   **********************************************************************/
 using Microsoft.Practices.Prism.Regions;
-using Microsoft.Practices.Unity;
-using Samples.Infrastructure;
-using Samples.Infrastructure.Extensions;
-using Samples.Modules.Text.Views;
+using Samples.Infrastructure.Controls;
 
-namespace Samples.Modules.Text
+namespace Samples.Modules.Text.Views
 {
-  public class TextModule : ModuleBase
+  /// <summary>
+  /// Interaction logic for MaskedTextBoxView.xaml
+  /// </summary>
+  [RegionMemberLifetime( KeepAlive = false )]
+  public partial class MaskedTextBoxView : DemoView
   {
-    public TextModule( IUnityContainer container, IRegionManager regionManager )
-      : base( container, regionManager )
+    public MaskedTextBoxView()
     {
-    }
-
-    protected override void InitializeModule()
-    {
-      RegionManager.RegisterViewWithRegion( RegionNames.NavigationRegion, typeof( NavigationView ) );
-    }
-
-    protected override void RegisterViewsAndTypes()
-    {
-      Container.RegisterNavigationType( typeof( HomeView ) );
-      Container.RegisterNavigationType( typeof( MaskedTextBoxView ) );
-      Container.RegisterNavigationType( typeof( WatermarkTextBoxView ) );
+      InitializeComponent();
     }
   }
 }

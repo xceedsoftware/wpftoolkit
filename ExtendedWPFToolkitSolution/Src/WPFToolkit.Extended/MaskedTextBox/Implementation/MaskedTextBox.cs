@@ -128,7 +128,7 @@ namespace Microsoft.Windows.Controls
     protected virtual void OnMaskChanged( string oldValue, string newValue )
     {
       ResolveMaskProvider( newValue );
-      UpdateText( MaskProvider, 0 );
+      UpdateText( 0 );
     }
 
     #endregion //Mask
@@ -271,9 +271,6 @@ namespace Microsoft.Windows.Controls
 
     public MaskedTextBox()
     {
-      PreviewTextInput += TextBox_PreviewTextInput;
-      PreviewKeyDown += TextBox_PreviewKeyDown;
-
       CommandBindings.Add( new CommandBinding( ApplicationCommands.Paste, Paste ) ); //handle paste
       CommandBindings.Add( new CommandBinding( ApplicationCommands.Cut, null, CanCut ) ); //surpress cut
     }
@@ -286,7 +283,7 @@ namespace Microsoft.Windows.Controls
     {
       base.OnApplyTemplate();
 
-      UpdateText( MaskProvider, 0 );
+      UpdateText( 0 );
     }
 
     protected override void OnInitialized( EventArgs e )
@@ -303,122 +300,38 @@ namespace Microsoft.Windows.Controls
     protected override void OnGotKeyboardFocus( KeyboardFocusChangedEventArgs e )
     {
       if( SelectAllOnGotFocus )
+      {
         SelectAll();
+      }
 
       base.OnGotKeyboardFocus( e );
     }
 
-    protected override void OnPreviewMouseLeftButtonDown( MouseButtonEventArgs e )
+    protected override void OnPreviewKeyDown( KeyEventArgs e )
     {
-      if( !IsKeyboardFocused )
+      e.Handled |= IsReadOnly;
+
+      if( !e.Handled )
       {
-        e.Handled = true;
-        Focus();
-      }
-
-      base.OnPreviewMouseLeftButtonDown( e );
-    }
-
-    #endregion //Base Class Overrides
-
-    #region Event Handlers
-
-    void TextBox_PreviewTextInput( object sender, TextCompositionEventArgs e )
-    {
-      //if the text is readonly do not add the text
-      if( IsReadOnly )
-      {
-        e.Handled = true;
-        return;
-      }
-
-      int position = SelectionStart;
-      MaskedTextProvider provider = MaskProvider;
-
-      if( position < Text.Length )
-      {
-        position = GetNextCharacterPosition( position );
-
-        if( Keyboard.IsKeyToggled( Key.Insert ) )
-        {
-          if( provider.Replace( e.Text, position ) )
-            position++;
-        }
-        else
-        {
-          if( provider.InsertAt( e.Text, position ) )
-            position++;
-        }
-
-        position = GetNextCharacterPosition( position );
-      }
-
-      UpdateText( provider, position );
-      e.Handled = true;
-
-      base.OnPreviewTextInput( e );
-    }
-
-    void TextBox_PreviewKeyDown( object sender, KeyEventArgs e )
-    {
-      if( IsReadOnly )
-        return;
-
-      MaskedTextProvider provider = MaskProvider;
-      int position = SelectionStart;
-      int selectionlength = SelectionLength;
-      // If no selection use the start position else use end position
-      int endposition = ( selectionlength == 0 ) ? position : position + selectionlength - 1;
-
-      if( e.Key == Key.Delete && position < Text.Length )//handle the delete key
-      {
-        if( provider.RemoveAt( position, endposition ) )
-          UpdateText( provider, position );
-
-        e.Handled = true;
-      }
-      else if( e.Key == Key.Space )
-      {
-        if( provider.InsertAt( " ", position ) )
-          UpdateText( provider, ++position );
-        e.Handled = true;
-      }
-      else if( e.Key == Key.Back )//handle the back space
-      {
-        if( ( position > 0 ) && ( selectionlength == 0 ) )
-        {
-          position--;
-          if( provider.RemoveAt( position ) )
-            UpdateText( provider, position );
-        }
-
-        if( selectionlength != 0 )
-        {
-          if( provider.RemoveAt( position, endposition ) )
-          {
-            if( position > 0 )
-              position--;
-
-            UpdateText( provider, position );
-          }
-        }
-
-        e.Handled = true;
-      }
-
-      //if all text is selected and the user begins to type, we want to delete all selected text and continue typing the new values
-      //but only if the user is not tabbing / shift tabbing or copying/pasting
-      if( SelectionLength == Text.Length && ( e.Key != Key.Tab && e.Key != Key.LeftShift && e.Key != Key.RightShift && e.Key != Key.Left && e.Key != Key.Right && e.Key != Key.Up && e.Key != Key.Down &&
-                                             ( Keyboard.Modifiers & ModifierKeys.Control ) != ModifierKeys.Control ) )
-      {
-        if( provider.RemoveAt( position, endposition ) )
-          UpdateText( provider, position );
+        HandlePreviewKeyDown( e );
       }
 
       base.OnPreviewKeyDown( e );
     }
 
-    #endregion //Event Handlers
+    protected override void OnPreviewTextInput( TextCompositionEventArgs e )
+    {
+      e.Handled |= IsReadOnly;
+
+      if( !e.Handled )
+      {
+        HandlePreviewTextInput( e );
+      }
+
+      base.OnPreviewTextInput( e );
+    }
+
+    #endregion //Base Class Overrides
 
     #region Events
 
@@ -441,13 +354,19 @@ namespace Microsoft.Windows.Controls
 
     #region Private
 
-    private void UpdateText( MaskedTextProvider provider, int position )
+    private void UpdateText()
     {
+      UpdateText( SelectionStart );
+    }
+
+    private void UpdateText( int position )
+    {
+      MaskedTextProvider provider = MaskProvider;
       if( provider == null )
-        throw new ArgumentNullException( "MaskedTextProvider", "Mask cannot be null." );
+        throw new InvalidOperationException();
 
       Text = provider.ToDisplayString();
-
+      SelectionLength = 0;
       SelectionStart = position;
     }
 
@@ -552,6 +471,214 @@ namespace Microsoft.Windows.Controls
       _isSyncingTextAndValueProperties = false;
     }
 
+    private void HandlePreviewTextInput( TextCompositionEventArgs e )
+    {
+      this.InsertText( e.Text );
+
+      e.Handled = true;
+    }
+
+    private void HandlePreviewKeyDown( KeyEventArgs e )
+    {
+      if( e.Key == Key.Delete )
+      {
+        e.Handled = HandleKeyDownDelete();
+      }
+      else if( e.Key == Key.Back )
+      {
+        e.Handled = HandleKeyDownBack();
+      }
+      else if( e.Key == Key.Space )
+      {
+        InsertText( " " );
+
+        e.Handled = true;
+      }
+      else if( e.Key == Key.Return || e.Key == Key.Enter )
+      {
+        if( AcceptsReturn )
+        {
+          this.InsertText( "\r" );
+        }
+
+        // We don't want the OnPreviewTextInput to be triggered for the Return/Enter key
+        // when it is not accepted.
+        e.Handled = true;
+      }
+      else if( e.Key == Key.Escape )
+      {
+        // We don't want the OnPreviewTextInput to be triggered at all for the Escape key.
+        e.Handled = true;
+      }
+      else if( e.Key == Key.Tab )
+      {
+        if( AcceptsTab )
+        {
+          this.InsertText( "\t" );
+
+          e.Handled = true;
+        }
+      }
+    }
+
+    private bool HandleKeyDownDelete()
+    {
+      ModifierKeys modifiers = Keyboard.Modifiers;
+      bool handled = true;
+
+      if( modifiers == ModifierKeys.None )
+      {
+        if( !RemoveSelectedText() )
+        {
+          int position = SelectionStart;
+
+          if( position < Text.Length )
+          {
+            RemoveText( position, 1 );
+            UpdateText( position );
+          }
+        }
+        else
+        {
+          UpdateText();
+        }
+      }
+      else if( modifiers == ModifierKeys.Control )
+      {
+        if( !RemoveSelectedText() )
+        {
+          int position = SelectionStart;
+
+          RemoveTextToEnd( position );
+          UpdateText( position );
+        }
+        else
+        {
+          UpdateText();
+        }
+      }
+      else if( modifiers == ModifierKeys.Shift )
+      {
+        if( RemoveSelectedText() )
+        {
+          UpdateText();
+        }
+        else
+        {
+          handled = false;
+        }
+      }
+      else
+      {
+        handled = false;
+      }
+
+      return handled;
+    }
+
+    private bool HandleKeyDownBack()
+    {
+      ModifierKeys modifiers = Keyboard.Modifiers;
+      bool handled = true;
+
+      if( modifiers == ModifierKeys.None || modifiers == ModifierKeys.Shift )
+      {
+        if( !RemoveSelectedText() )
+        {
+          int position = SelectionStart;
+
+          if( position > 0 )
+          {
+            int newPosition = position - 1;
+
+            RemoveText( newPosition, 1 );
+            UpdateText( newPosition );
+          }
+        }
+        else
+        {
+          UpdateText();
+        }
+      }
+      else if( modifiers == ModifierKeys.Control )
+      {
+        if( !RemoveSelectedText() )
+        {
+          RemoveTextFromStart( SelectionStart );
+          UpdateText( 0 );
+        }
+        else
+        {
+          UpdateText();
+        }
+      }
+      else
+      {
+        handled = false;
+      }
+
+      return handled;
+    }
+
+    private void InsertText( string text )
+    {
+      int position = SelectionStart;
+      MaskedTextProvider provider = MaskProvider;
+
+      bool textRemoved = this.RemoveSelectedText();
+
+      position = GetNextCharacterPosition( position );
+
+      if( !textRemoved && Keyboard.IsKeyToggled( Key.Insert ) )
+      {
+        if( provider.Replace( text, position ) )
+        {
+          position += text.Length;
+        }
+      }
+      else
+      {
+        if( provider.InsertAt( text, position ) )
+        {
+          position += text.Length;
+        }
+      }
+
+      position = GetNextCharacterPosition( position );
+
+      this.UpdateText( position );
+    }
+
+    private void RemoveTextFromStart( int endPosition )
+    {
+      RemoveText( 0, endPosition );
+    }
+
+    private void RemoveTextToEnd( int startPosition )
+    {
+      RemoveText( startPosition, Text.Length - startPosition );
+    }
+
+    private void RemoveText( int position, int length )
+    {
+      if( length == 0 )
+        return;
+
+      MaskProvider.RemoveAt( position, position + length - 1 );
+    }
+
+    private bool RemoveSelectedText()
+    {
+      int length = SelectionLength;
+
+      if( length == 0 )
+        return false;
+
+      int position = SelectionStart;
+
+      return MaskProvider.RemoveAt( position, position + length - 1 );
+    }
+
     #endregion //Private
 
     #endregion //Methods
@@ -573,7 +700,8 @@ namespace Microsoft.Windows.Controls
         if( text.Length > 0 )
         {
           provider.Set( text );
-          UpdateText( provider, position );
+
+          UpdateText( position );
         }
       }
     }
