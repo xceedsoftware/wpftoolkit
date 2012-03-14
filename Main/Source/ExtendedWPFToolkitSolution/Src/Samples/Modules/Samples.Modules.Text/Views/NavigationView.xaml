@@ -26,7 +26,7 @@
       <Style TargetType="views:NavigationView" BasedOn="{StaticResource {x:Type TreeViewItem}}" />
    </TreeViewItem.Resources>
 
-   <TreeViewItem Header="MaskedTextBox" />
+   <TreeViewItem Header="MaskedTextBox" Tag="{x:Type views:MaskedTextBoxView}" />
    <TreeViewItem Header="MultiLineTextEditor" />
    <TreeViewItem Header="RichTextBox" />
    <TreeViewItem Header="WatermarkTextBox" Tag="{x:Type views:WatermarkTextBoxView}" />
