@@ -16,8 +16,10 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 //Based of the code written by Pavan Podila
 //http://blog.pixelingene.com/2010/10/tokenizing-control-convert-text-to-tokens/
+
 using System;
 using System.Linq;
 using System.Windows;
@@ -25,7 +27,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class TokenizedTextBox : ItemsControl
   {

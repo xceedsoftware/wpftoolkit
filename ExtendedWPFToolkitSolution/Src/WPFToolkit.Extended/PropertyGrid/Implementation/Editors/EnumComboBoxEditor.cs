@@ -16,13 +16,14 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Editors
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class EnumComboBoxEditor : ComboBoxEditor
   {

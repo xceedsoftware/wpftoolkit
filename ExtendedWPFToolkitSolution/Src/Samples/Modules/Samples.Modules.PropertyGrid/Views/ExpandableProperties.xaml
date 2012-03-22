@@ -16,12 +16,12 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   ********************************************************************-->
-<infControls:DemoView x:Class="Samples.Modules.PropertyGrid.Views.ExpandableProperties"
-                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:infControls="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
-                      xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
-                      Title="Exandable Properties">
+<sample:DemoView x:Class="Samples.Modules.PropertyGrid.Views.ExpandableProperties"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 Title="Exandable Properties">
    <Grid>
 
       <Grid.RowDefinitions>
@@ -35,7 +35,7 @@
       <StackPanel Grid.Row="1" Margin="10">
          <TextBlock Text="Expandable Properties:" Style="{StaticResource Header}" />
          <TextBlock Text="In this example the Spouse property has been decorated with the ExpandableObject attribute.  Notice how you can drill down into the Spouse properties." TextWrapping="Wrap" />
-         <extToolkit:PropertyGrid x:Name="_propertyGrid" Width="450" Margin="10"  />
+         <xctk:PropertyGrid x:Name="_propertyGrid" Width="450" Margin="10"  />
       </StackPanel>
    </Grid>
-</infControls:DemoView>
+</sample:DemoView>

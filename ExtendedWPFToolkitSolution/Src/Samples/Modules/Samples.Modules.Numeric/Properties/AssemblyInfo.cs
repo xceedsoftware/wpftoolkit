@@ -16,6 +16,7 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;

@@ -16,11 +16,12 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Converters
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
 {
   public class ExpandableObjectMarginConverter : IValueConverter
   {

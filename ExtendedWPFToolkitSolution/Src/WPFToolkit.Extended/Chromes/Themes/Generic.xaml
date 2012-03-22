@@ -18,9 +18,8 @@
   ********************************************************************-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:chrome="clr-namespace:Microsoft.Windows.Controls.Chromes"
-                    xmlns:local="clr-namespace:Microsoft.Windows.Controls"
-                    xmlns:themes="clr-namespace:Microsoft.Windows.Controls.Themes">
+                    xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes"
+                    xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes">
 
    <!-- =============================================================================== -->
    <!-- ButtonChrome                                                                    -->

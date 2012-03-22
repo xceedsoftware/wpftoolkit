@@ -16,6 +16,7 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,9 +24,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Microsoft.Windows.Controls.Core.Utilities;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class Calculator : Control
   {

@@ -16,9 +16,10 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Windows.Input;
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Commands
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Commands
 {
   public class PropertyGridCommands
   {

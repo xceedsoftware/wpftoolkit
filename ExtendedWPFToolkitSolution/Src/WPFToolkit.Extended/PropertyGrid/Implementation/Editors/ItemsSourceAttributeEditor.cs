@@ -16,10 +16,11 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
-using System;
-using Microsoft.Windows.Controls.PropertyGrid.Attributes;
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Editors
+using System;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class ItemsSourceAttributeEditor : TypeEditor<System.Windows.Controls.ComboBox>
   {

@@ -8,7 +8,7 @@
     <ProjectGuid>{72E591D6-8F83-4D8C-8F67-9C325E623234}</ProjectGuid>
     <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.Windows.Controls</RootNamespace>
+    <RootNamespace>Xceed.Wpf.Toolkit</RootNamespace>
     <AssemblyName>WPFToolkit.Extended</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>

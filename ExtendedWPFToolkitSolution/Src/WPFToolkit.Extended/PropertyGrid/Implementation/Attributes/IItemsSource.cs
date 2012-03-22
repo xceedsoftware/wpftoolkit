@@ -16,9 +16,10 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Collections.Generic;
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Attributes
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Attributes
 {
   public interface IItemsSource
   {
@@ -56,6 +57,5 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Attributes
       newItem.Value = value;
       base.Add( newItem );
     }
-
   }
 }

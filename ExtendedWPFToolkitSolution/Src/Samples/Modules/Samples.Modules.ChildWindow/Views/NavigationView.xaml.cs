@@ -16,6 +16,7 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Windows.Controls;
 
 namespace Samples.Modules.ChildWindow.Views

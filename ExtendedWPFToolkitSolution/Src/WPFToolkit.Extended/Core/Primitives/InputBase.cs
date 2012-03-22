@@ -21,7 +21,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Microsoft.Windows.Controls.Primitives
+namespace Xceed.Wpf.Toolkit.Primitives
 {
   public abstract class InputBase : Control
   {

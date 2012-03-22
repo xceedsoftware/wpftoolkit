@@ -16,12 +16,13 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Converters
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
 {
   public class ValueSourceToImagePathConverter : IValueConverter
   {

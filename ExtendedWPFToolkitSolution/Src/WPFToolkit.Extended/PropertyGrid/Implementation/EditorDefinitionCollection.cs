@@ -16,11 +16,12 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Microsoft.Windows.Controls.PropertyGrid
+namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
   public class EditorDefinitionCollection : ObservableCollection<EditorDefinition>
   {

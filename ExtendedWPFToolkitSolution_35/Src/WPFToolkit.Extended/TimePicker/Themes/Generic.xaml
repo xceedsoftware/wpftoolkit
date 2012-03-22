@@ -18,16 +18,16 @@
   ********************************************************************-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:Microsoft.Windows.Controls"
-                    xmlns:chrome="clr-namespace:Microsoft.Windows.Controls.Chromes"
-                    xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters">
+                    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
+                    xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes"
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
 
    <!-- =============================================================================== -->
    <!-- ResourceDictionary for TimePicker and related controls                          -->
    <!-- =============================================================================== -->
 
-   <coreConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
-   <coreConverters:TimeFormatToDateTimeFormatConverter x:Key="TimeFormatToDateTimeFormatConverter" />
+   <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+   <conv:TimeFormatToDateTimeFormatConverter x:Key="TimeFormatToDateTimeFormatConverter" />
 
    <DataTemplate x:Key="DefaultWatermarkTemplate">
       <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />

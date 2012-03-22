@@ -16,12 +16,13 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Globalization;
 using System.Windows;
-using Microsoft.Windows.Controls.Primitives;
+using Xceed.Wpf.Toolkit.Primitives;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public abstract class NumericUpDown<T> : UpDownBase<T>
   {

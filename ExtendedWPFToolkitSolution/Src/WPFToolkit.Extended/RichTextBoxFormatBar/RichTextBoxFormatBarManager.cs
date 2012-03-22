@@ -16,14 +16,15 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
-using Microsoft.Windows.Controls.Core;
+using Xceed.Wpf.Toolkit.Core;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class RichTextBoxFormatBarManager : DependencyObject
   {

@@ -16,10 +16,11 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Microsoft.Windows.Controls.PropertyGrid.Editors;
+using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
 namespace Samples.Modules.PropertyGrid
 {
@@ -51,7 +52,7 @@ namespace Samples.Modules.PropertyGrid
       Value = string.Empty;
     }
 
-    public FrameworkElement ResolveEditor( Microsoft.Windows.Controls.PropertyGrid.PropertyItem propertyItem )
+    public FrameworkElement ResolveEditor( Xceed.Wpf.Toolkit.PropertyGrid.PropertyItem propertyItem )
     {
       Binding binding = new Binding( "Value" );
       binding.Source = propertyItem;

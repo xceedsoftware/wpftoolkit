@@ -16,15 +16,16 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using Microsoft.Windows.Controls.Core.Utilities;
-using Microsoft.Windows.Controls.Primitives;
+using Xceed.Wpf.Toolkit.Core.Utilities;
+using Xceed.Wpf.Toolkit.Primitives;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class ColorCanvas : Control
   {

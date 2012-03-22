@@ -17,7 +17,7 @@
 
   **********************************************************************/
 
-namespace Microsoft.Windows.Controls.Primitives
+namespace Xceed.Wpf.Toolkit.Primitives
 {
   internal struct HsvColor
   {

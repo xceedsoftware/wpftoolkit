@@ -16,11 +16,12 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace Microsoft.Windows.Controls.Core.Converters
+namespace Xceed.Wpf.Toolkit.Core.Converters
 {
   public class ColorToSolidColorBrushConverter : IValueConverter
   {

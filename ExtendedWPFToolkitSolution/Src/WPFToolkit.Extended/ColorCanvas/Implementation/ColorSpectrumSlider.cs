@@ -16,15 +16,16 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Microsoft.Windows.Controls.Core.Utilities;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class ColorSpectrumSlider : Slider
   {
