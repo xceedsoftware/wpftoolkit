@@ -16,6 +16,7 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using Microsoft.Practices.Prism.Regions;
 using Samples.Infrastructure.Controls;
 

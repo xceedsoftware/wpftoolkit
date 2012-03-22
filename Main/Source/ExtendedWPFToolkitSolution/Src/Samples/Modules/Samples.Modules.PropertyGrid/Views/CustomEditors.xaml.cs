@@ -16,6 +16,7 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -225,9 +226,9 @@ namespace Samples.Modules.PropertyGrid.Views
   }
 
   //Custom editors that are used as attributes MUST implement the ITypeEditor interface.
-  public class FirstNameEditor : Microsoft.Windows.Controls.PropertyGrid.Editors.ITypeEditor
+  public class FirstNameEditor : Xceed.Wpf.Toolkit.PropertyGrid.Editors.ITypeEditor
   {
-    public FrameworkElement ResolveEditor( Microsoft.Windows.Controls.PropertyGrid.PropertyItem propertyItem )
+    public FrameworkElement ResolveEditor( Xceed.Wpf.Toolkit.PropertyGrid.PropertyItem propertyItem )
     {
       TextBox textBox = new TextBox();
       textBox.Background = new SolidColorBrush( Colors.Red );

@@ -16,6 +16,7 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;

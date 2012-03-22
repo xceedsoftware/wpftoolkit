@@ -16,12 +16,13 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Collections;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace Microsoft.Windows.Controls.Core
+namespace Xceed.Wpf.Toolkit.Core
 {
   /// <summary>
   /// An adorner that can display one and only one UIElement.  

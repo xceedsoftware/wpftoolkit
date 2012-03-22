@@ -18,22 +18,22 @@
   ********************************************************************-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:extToolkit="clr-namespace:Microsoft.Windows.Controls"
-                    xmlns:local="clr-namespace:Microsoft.Windows.Controls.PropertyGrid"
-                    xmlns:converters="clr-namespace:Microsoft.Windows.Controls.Core.Converters"
-                    xmlns:pgConverters="clr-namespace:Microsoft.Windows.Controls.PropertyGrid.Converters"
-                    xmlns:utilities="clr-namespace:Microsoft.Windows.Controls.Core.Utilities"
-                    xmlns:commands="clr-namespace:Microsoft.Windows.Controls.PropertyGrid.Commands">
+                    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
+                    xmlns:pg="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid"
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
+                    xmlns:pgconv="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid.Converters"
+                    xmlns:utilities="clr-namespace:Xceed.Wpf.Toolkit.Core.Utilities"
+                    xmlns:commands="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid.Commands">
 
    <!-- =============================================================================== -->
    <!-- PropertyGrid                                                                    -->
    <!-- =============================================================================== -->
 
    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-   <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
-   <pgConverters:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
-   <pgConverters:ValueSourceToImagePathConverter x:Key="ValueSourceToImagePathConverter" />
-   <pgConverters:ValueSourceToToolTipConverter x:Key="ValueSourceToToolTipConverter" />
+   <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+   <pgconv:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
+   <pgconv:ValueSourceToImagePathConverter x:Key="ValueSourceToImagePathConverter" />
+   <pgconv:ValueSourceToToolTipConverter x:Key="ValueSourceToToolTipConverter" />
 
    <SolidColorBrush x:Key="MouseOverBorderBrush" Color="#FFFFB700" />
    <LinearGradientBrush x:Key="MouseOverBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
@@ -298,18 +298,18 @@
       <MenuItem Header="Reset Value" Command="commands:PropertyItemCommands.ResetValue" />
    </ContextMenu>
 
-   <Style TargetType="{x:Type local:PropertyItem}">
+   <Style TargetType="{x:Type pg:PropertyItem}">
       <Setter Property="BorderBrush" Value="#FFF0F0F0" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="Focusable" Value="True" />
       <Setter Property="IsTabStop" Value="False" />
       <Setter Property="Template">
          <Setter.Value>
-            <ControlTemplate TargetType="{x:Type local:PropertyItem}">
-               <Border Background="White" ContextMenu="{Binding AdvancedOptionsMenu, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:PropertyGrid}}" ContextMenuService.Placement="Bottom">
+            <ControlTemplate TargetType="{x:Type pg:PropertyItem}">
+               <Border Background="White" ContextMenu="{Binding AdvancedOptionsMenu, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}}" ContextMenuService.Placement="Bottom">
                   <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch">
                      <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{Binding NameColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGrid}}}" />
+                        <ColumnDefinition Width="{Binding NameColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type pg:PropertyGrid}}}" />
                         <ColumnDefinition Width="*" />
                      </Grid.ColumnDefinitions>
                      <Grid.RowDefinitions>
@@ -343,9 +343,9 @@
                            <Grid Grid.Column="1"
                                  HorizontalAlignment="Right"
                                  Margin="5,0,5,0"
-                                 Visibility="{Binding ShowAdvancedOptions, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:PropertyGrid}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                 Visibility="{Binding ShowAdvancedOptions, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}, Converter={StaticResource BooleanToVisibilityConverter}}"
                                  utilities:ContextMenuUtilities.OpenOnMouseLeftButtonClick="True"
-                                 ContextMenu="{Binding AdvancedOptionsMenu, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:PropertyGrid}}">
+                                 ContextMenu="{Binding AdvancedOptionsMenu, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}}">
 
                               <Image x:Name="_optionsImage"
                                      Width="11"
@@ -397,14 +397,14 @@
       </Setter>
    </Style>
 
-   <Style TargetType="{x:Type local:PropertyGrid}">
+   <Style TargetType="{x:Type pg:PropertyGrid}">
       <Setter Property="AdvancedOptionsMenu" Value="{StaticResource DefaultAdvancedOptionsMenu}" />
       <Setter Property="Background" Value="#CED4DF" />
       <Setter Property="BorderBrush" Value="#43577B" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="Template">
          <Setter.Value>
-            <ControlTemplate TargetType="{x:Type local:PropertyGrid}">
+            <ControlTemplate TargetType="{x:Type pg:PropertyGrid}">
                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                   <Grid>
                      <Grid.RowDefinitions>
@@ -448,11 +448,11 @@
                                  <ColumnDefinition Width="*" />
                                  <ColumnDefinition Width="Auto" />
                               </Grid.ColumnDefinitions>
-                              <extToolkit:WatermarkTextBox x:Name="_txtFilter"
-                                                           Background="Transparent" 
-                                                           Text="{Binding Filter, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"
-                                                           Watermark="{TemplateBinding FilterWatermark}">
-                                 <extToolkit:WatermarkTextBox.Style>
+                              <local:WatermarkTextBox x:Name="_txtFilter"
+                                                      Background="Transparent" 
+                                                      Text="{Binding Filter, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"
+                                                      Watermark="{TemplateBinding FilterWatermark}">
+                                 <local:WatermarkTextBox.Style>
                                     <Style TargetType="Control">
                                        <Setter Property="BorderThickness" Value="0" />
                                        <Style.Triggers>
@@ -461,9 +461,9 @@
                                           </Trigger>
                                        </Style.Triggers>
                                     </Style>
-                                 </extToolkit:WatermarkTextBox.Style>
+                                 </local:WatermarkTextBox.Style>
 
-                              </extToolkit:WatermarkTextBox>
+                              </local:WatermarkTextBox>
 
                               <Button Grid.Column="1"
                                       Command="commands:PropertyGridCommands.ClearFilter"
@@ -511,7 +511,7 @@
 
                         <Thumb x:Name="PART_DragThumb" HorizontalAlignment="Left" Width="5" Margin="6,0,0,0" Cursor="SizeWE">
                            <Thumb.RenderTransform>
-                              <TranslateTransform X="{Binding NameColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGrid}}}" />
+                              <TranslateTransform X="{Binding NameColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type pg:PropertyGrid}}}" />
                            </Thumb.RenderTransform>
                            <Thumb.Template>
                               <ControlTemplate>

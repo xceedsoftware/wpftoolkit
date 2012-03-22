@@ -16,10 +16,11 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows;
 
-namespace Microsoft.Windows.Controls.PropertyGrid
+namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
   public class EditorDefinition
   {

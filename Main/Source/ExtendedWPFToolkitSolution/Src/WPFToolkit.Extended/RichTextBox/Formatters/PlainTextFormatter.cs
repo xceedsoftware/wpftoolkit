@@ -16,9 +16,10 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Windows.Documents;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   /// <summary>
   /// Formats the RichTextBox text as plain text

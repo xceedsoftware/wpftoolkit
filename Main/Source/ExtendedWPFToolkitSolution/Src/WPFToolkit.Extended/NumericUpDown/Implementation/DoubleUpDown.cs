@@ -16,10 +16,11 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class DoubleUpDown : NumericUpDown<double?>
   {

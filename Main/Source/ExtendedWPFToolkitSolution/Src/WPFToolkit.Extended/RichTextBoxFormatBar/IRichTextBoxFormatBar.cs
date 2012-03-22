@@ -17,14 +17,14 @@
 
   **********************************************************************/
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public interface IRichTextBoxFormatBar
   {
     /// <summary>
     /// Represents the RichTextBox that will be the target for all text manipulations in the format bar.
     /// </summary>
-    global::System.Windows.Controls.RichTextBox Target
+    System.Windows.Controls.RichTextBox Target
     {
       get;
       set;

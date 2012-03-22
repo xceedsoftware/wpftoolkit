@@ -16,13 +16,14 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using Microsoft.Practices.Prism.Regions;
-using Microsoft.Windows.Controls.PropertyGrid.Attributes;
 using Samples.Infrastructure.Controls;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace Samples.Modules.PropertyGrid.Views
 {

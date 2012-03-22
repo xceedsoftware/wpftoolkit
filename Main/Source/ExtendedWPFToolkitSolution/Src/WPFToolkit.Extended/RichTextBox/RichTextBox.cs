@@ -16,12 +16,13 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Threading;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class RichTextBox : System.Windows.Controls.RichTextBox
   {

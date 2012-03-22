@@ -16,9 +16,10 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Windows;
 
-namespace Microsoft.Windows.Controls.Core.Utilities
+namespace Xceed.Wpf.Toolkit.Core.Utilities
 {
   public class ContextMenuUtilities
   {

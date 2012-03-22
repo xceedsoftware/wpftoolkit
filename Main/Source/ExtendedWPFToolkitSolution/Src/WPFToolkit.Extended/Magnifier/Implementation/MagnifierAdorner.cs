@@ -16,12 +16,13 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class MagnifierAdorner : Adorner
   {

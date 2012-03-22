@@ -22,7 +22,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace Microsoft.Windows.Controls.Primitives
+namespace Xceed.Wpf.Toolkit.Primitives
 {
   public abstract class UpDownBase<T> : InputBase
   {

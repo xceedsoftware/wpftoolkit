@@ -26,7 +26,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace Microsoft.Windows.Controls.Primitives
+namespace Xceed.Wpf.Toolkit.Primitives
 {
   public class Selector : ItemsControl //should probably make this control an ICommandSource
   {

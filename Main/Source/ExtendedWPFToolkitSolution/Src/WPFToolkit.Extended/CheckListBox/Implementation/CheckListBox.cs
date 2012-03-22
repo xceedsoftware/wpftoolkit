@@ -16,10 +16,11 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
-using System.Windows;
-using Microsoft.Windows.Controls.Primitives;
 
-namespace Microsoft.Windows.Controls
+using System.Windows;
+using Xceed.Wpf.Toolkit.Primitives;
+
+namespace Xceed.Wpf.Toolkit
 {
   public class CheckListBox : Selector
   {

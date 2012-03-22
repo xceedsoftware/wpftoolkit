@@ -16,6 +16,7 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.ComponentModel;
 using System.Windows;
@@ -23,7 +24,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class DropDownButton : ContentControl, ICommandSource
   {

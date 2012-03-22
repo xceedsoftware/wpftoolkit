@@ -16,10 +16,11 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Editors
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class CheckBoxEditor : TypeEditor<CheckBox>
   {

@@ -16,13 +16,12 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   ********************************************************************-->
-<infControls:DemoView x:Class="Samples.Modules.Color.Views.HomeView"
-                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:infControls="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
-                      xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
-                      xmlns:System="clr-namespace:System;assembly=mscorlib"
-                      Title="Color Controls">
+<sample:DemoView x:Class="Samples.Modules.Color.Views.HomeView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 Title="Color Controls">
    <Grid Margin="25">
       <!--<DataGrid x:Name="_dataGrid"
             AutoGenerateColumns="False"
@@ -34,7 +33,7 @@
                 <DataGridTemplateColumn Header="Color">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <extToolkit:ColorPicker DisplayColorAndName="True" SelectedColor="{Binding Color, UpdateSourceTrigger=PropertyChanged}" />
+                            <xctk:ColorPicker DisplayColorAndName="True" SelectedColor="{Binding Color, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -42,15 +41,15 @@
         </DataGrid>-->
 
       <StackPanel>
-         <extToolkit:CheckComboBox x:Name="_combo" 
-                                   HorizontalAlignment="Center" 
-                                   VerticalAlignment="Center" 
-                                   DisplayMemberPath="Color"
-                                   ValueMemberPath="Level"
-                                   SelectedValue="{Binding SelectedValue}"
-                                   SelectedItems="{Binding SelectedItems}" />
+         <xctk:CheckComboBox x:Name="_combo" 
+                             HorizontalAlignment="Center" 
+                             VerticalAlignment="Center" 
+                             DisplayMemberPath="Color"
+                             ValueMemberPath="Level"
+                             SelectedValue="{Binding SelectedValue}"
+                             SelectedItems="{Binding SelectedItems}" />
 
-         <!--<extToolkit:CheckComboBox x:Name="_combo" HorizontalAlignment="Center" VerticalAlignment="Center"
+         <!--<xctk:CheckComboBox x:Name="_combo" HorizontalAlignment="Center" VerticalAlignment="Center"
                                       SelectedValue="{Binding SelectedValues}" />-->
 
          <!--<ComboBox x:Name="_combo2" HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -58,15 +57,15 @@
                       DisplayMemberPath="Color"
                       />-->
 
-         <extToolkit:CheckListBox x:Name="_listBox" 
-                                  Height="250"
-                                  DisplayMemberPath="Color"
-                                  ValueMemberPath="Level" 
-                                  SelectedMemberPath="IsSelected"
-                                  SelectedValue="{Binding SelectedValue}"
-                                  SelectedItems="{Binding SelectedItems}" />
+         <xctk:CheckListBox x:Name="_listBox" 
+                            Height="250"
+                            DisplayMemberPath="Color"
+                            ValueMemberPath="Level" 
+                            SelectedMemberPath="IsSelected"
+                            SelectedValue="{Binding SelectedValue}"
+                            SelectedItems="{Binding SelectedItems}" />
 
-         <!--<extToolkit:CheckListBox x:Name="_listBox" Height="250"
+         <!--<xctk:CheckListBox x:Name="_listBox" Height="250"
                                      SelectedValue="{Binding SelectedValues}"
                                      />-->
 
@@ -77,4 +76,4 @@
 
       </StackPanel>
    </Grid>
-</infControls:DemoView>
+</sample:DemoView>

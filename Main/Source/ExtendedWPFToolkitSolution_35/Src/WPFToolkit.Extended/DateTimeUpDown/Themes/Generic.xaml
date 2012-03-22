@@ -18,7 +18,7 @@
   ********************************************************************-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:Microsoft.Windows.Controls">
+                    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit">
 
    <DataTemplate x:Key="DefaultWatermarkTemplate">
       <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />

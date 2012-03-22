@@ -16,13 +16,14 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Microsoft.Windows.Controls.Primitives;
+using Xceed.Wpf.Toolkit.Primitives;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class CheckComboBox : Selector
   {

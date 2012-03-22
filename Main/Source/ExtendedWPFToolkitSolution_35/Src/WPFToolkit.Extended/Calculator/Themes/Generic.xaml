@@ -18,10 +18,10 @@
   ********************************************************************-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:Microsoft.Windows.Controls"
-                    xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters">
+                    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
 
-   <coreConverters:CalculatorMemoryToVisibilityConverter x:Key="CalculatorMemoryToVisibilityConverter" />
+   <conv:CalculatorMemoryToVisibilityConverter x:Key="CalculatorMemoryToVisibilityConverter" />
 
    <Style x:Key="CalculatorOperatorButtonStyle" TargetType="{x:Type Button}">
       <Setter Property="Focusable" Value="False" />

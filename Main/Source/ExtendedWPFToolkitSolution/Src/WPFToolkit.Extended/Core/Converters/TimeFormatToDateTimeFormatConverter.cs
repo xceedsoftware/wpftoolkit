@@ -16,10 +16,11 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows.Data;
 
-namespace Microsoft.Windows.Controls.Core.Converters
+namespace Xceed.Wpf.Toolkit.Core.Converters
 {
   public class TimeFormatToDateTimeFormatConverter : IValueConverter
   {

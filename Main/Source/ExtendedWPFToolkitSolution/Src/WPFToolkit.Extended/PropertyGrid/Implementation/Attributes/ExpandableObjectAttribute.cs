@@ -16,9 +16,10 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Attributes
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Attributes
 {
   public class ExpandableObjectAttribute : Attribute
   {

@@ -16,13 +16,14 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Microsoft.Windows.Controls.Core.Utilities
+namespace Xceed.Wpf.Toolkit.Core.Utilities
 {
   static class CalculatorUtilities
   {

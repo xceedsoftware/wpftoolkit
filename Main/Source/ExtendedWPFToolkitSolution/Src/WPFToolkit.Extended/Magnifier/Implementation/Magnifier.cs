@@ -16,10 +16,11 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class Magnifier : Control
   {
@@ -102,7 +103,7 @@ namespace Microsoft.Windows.Controls
 
     protected virtual void OnFrameTypeChanged( FrameType oldValue, FrameType newValue )
     {
-      if( newValue == Controls.FrameType.Circle )
+      if( newValue == Xceed.Wpf.Toolkit.FrameType.Circle )
       {
         Height = DefaultSize.Height;
         Width = DefaultSize.Width;
@@ -248,7 +249,7 @@ namespace Microsoft.Windows.Controls
     {
       base.OnApplyTemplate();
 
-      if( FrameType == Controls.FrameType.Circle )
+      if( FrameType == Xceed.Wpf.Toolkit.FrameType.Circle )
       {
         Height = DefaultSize.Height;
         Width = DefaultSize.Width;

@@ -16,11 +16,11 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   ********************************************************************-->
-<UserControl x:Class="Microsoft.Windows.Controls.RichTextBoxFormatBar"
+<UserControl x:Class="Xceed.Wpf.Toolkit.RichTextBoxFormatBar"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:extToolkit="clr-namespace:Microsoft.Windows.Controls"
-             xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters"
+             xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
+             xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
              Background="Transparent"
              IsTabStop="False"
              x:Name="_window">
@@ -30,7 +30,7 @@
 
    <UserControl.Resources>
 
-      <coreConverters:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
+      <conv:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
 
       <Style TargetType="{x:Type Separator}" BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
 
@@ -197,7 +197,7 @@
                                  <Rectangle Grid.Row="1"
                                             Height="4"
                                             Margin="0,12,0,0"
-                                            Fill="{Binding SelectedColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=extToolkit:ColorPicker}, Converter={StaticResource ColorToSolidColorBrushConverter}}" />
+                                            Fill="{Binding SelectedColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:ColorPicker}, Converter={StaticResource ColorToSolidColorBrushConverter}}" />
                               </Grid>
 
                               <Path Grid.Column="1"
@@ -292,7 +292,7 @@
                                  <Rectangle Grid.Row="1"
                                             Height="4"
                                             Margin="0,12,0,0"
-                                            Fill="{Binding SelectedColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=extToolkit:ColorPicker}, Converter={StaticResource ColorToSolidColorBrushConverter}}" />
+                                            Fill="{Binding SelectedColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:ColorPicker}, Converter={StaticResource ColorToSolidColorBrushConverter}}" />
                               </Grid>
 
                               <Path Grid.Column="1"
@@ -457,17 +457,17 @@
 
                <Separator />
 
-               <extToolkit:ColorPicker x:Name="_cmbFontBackgroundColor"
-                                       BorderThickness="0" 
-                                       ButtonStyle="{StaticResource FontBackgrounColorButtonStyle}"
-                                       SelectedColorChanged="FontBackgroundColor_SelectedColorChanged"
-                                       ToolTip="Text Highlight Color" />
+               <local:ColorPicker x:Name="_cmbFontBackgroundColor"
+                                  BorderThickness="0" 
+                                  ButtonStyle="{StaticResource FontBackgrounColorButtonStyle}"
+                                  SelectedColorChanged="FontBackgroundColor_SelectedColorChanged"
+                                  ToolTip="Text Highlight Color" />
 
-               <extToolkit:ColorPicker x:Name="_cmbFontColor"
-                                       BorderThickness="0" 
-                                       ButtonStyle="{StaticResource FontColorButtonStyle}"
-                                       SelectedColorChanged="FontColor_SelectedColorChanged"
-                                       ToolTip="Font Color" />
+               <local:ColorPicker x:Name="_cmbFontColor"
+                                  BorderThickness="0" 
+                                  ButtonStyle="{StaticResource FontColorButtonStyle}"
+                                  SelectedColorChanged="FontColor_SelectedColorChanged"
+                                  ToolTip="Font Color" />
 
             </StackPanel>
 
