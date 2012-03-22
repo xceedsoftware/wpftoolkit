@@ -18,6 +18,7 @@
   **********************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
@@ -192,7 +193,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         editor = new FontComboBoxEditor();
       else if( propertyItem.PropertyType.IsGenericType )
       {
-        if( propertyItem.PropertyType.GetInterface( "IList" ) != null )
+        if( propertyItem.PropertyType.GetInterface( typeof( IList ).FullName ) != null )
         {
           var t = propertyItem.PropertyType.GetGenericArguments()[ 0 ];
           if( !t.IsPrimitive && !t.Equals( typeof( String ) ) )

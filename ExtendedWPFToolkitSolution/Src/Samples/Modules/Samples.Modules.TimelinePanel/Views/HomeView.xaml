@@ -1,0 +1,184 @@
+﻿<!--*********************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2010-2012 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Reciprocal
+   License (Ms-RL) as published at http://wpftoolkit.codeplex.com/license 
+
+   This program can be provided to you by Xceed Software Inc. under a
+   proprietary commercial license agreement for use in non-Open Source
+   projects. The commercial version of Extended WPF Toolkit also includes
+   priority technical support, commercial updates, and many additional 
+   useful WPF controls if you license Xceed Business Suite for WPF.
+
+   Visit http://xceed.com and follow @datagrid on Twitter.
+
+  ********************************************************************-->
+<sample:DemoView x:Class="Samples.Modules.TimelinePanel.Views.HomeView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 xmlns:pf="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                 Title="TimelinePanel">
+   <sample:DemoView.Resources>
+      <ObjectDataProvider x:Key="Orientations" MethodName="GetValues"
+                          ObjectType="{x:Type sys:Enum}">
+         <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="Orientation" />
+         </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+      <ObjectDataProvider x:Key="OverlapBehaviors" MethodName="GetValues"
+                          ObjectType="{x:Type sys:Enum}">
+         <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="xctk:OverlapBehavior" />
+         </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+
+      <ControlTemplate x:Key="TimelineItemTemplate"
+                       TargetType="ContentControl">
+         <xctk:DropDownButton DataContext="{Binding ., RelativeSource={RelativeSource TemplatedParent}}"
+                              Content="{TemplateBinding Content}">
+            <xctk:DropDownButton.ContentTemplate>
+               <DataTemplate>
+                  <TextBlock Text="{TemplateBinding Content}" 
+                             TextTrimming="WordEllipsis" 
+                             VerticalAlignment="Center" />
+               </DataTemplate>
+            </xctk:DropDownButton.ContentTemplate>
+
+            <xctk:DropDownButton.DropDownContent>
+               <Border Background="Lavender"
+                       Padding="5">
+                  <Grid>
+                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                     </Grid.RowDefinitions>
+                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                     </Grid.ColumnDefinitions>
+
+                     <TextBox Text="{Binding Content, Mode=TwoWay}"
+                           Grid.Row="0"
+                           Grid.Column="0"
+                           Grid.ColumnSpan="2"
+                           VerticalAlignment="Center"
+                           HorizontalContentAlignment="Center" />
+
+                     <TextBlock Text="From"
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Margin="0,0,5,0" />
+                     <xctk:DateTimePicker Value="{Binding (xctk:TimelinePanel.Date), Mode=TwoWay}"
+                                          Grid.Row="1"
+                                          Grid.Column="1"
+                                          VerticalAlignment="Center"
+                                          Format="ShortDate" />
+
+                     <TextBlock Text="To"
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Margin="0,0,5,0" />
+                     <xctk:DateTimePicker Value="{Binding (xctk:TimelinePanel.DateEnd), Mode=TwoWay}"
+                                          Grid.Row="2"
+                                          Grid.Column="1"
+                                          VerticalAlignment="Center"
+                                          Format="ShortDate" />
+                  </Grid>
+               </Border>
+            </xctk:DropDownButton.DropDownContent>
+         </xctk:DropDownButton>
+      </ControlTemplate>
+   </sample:DemoView.Resources>
+
+   <Grid>
+
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <TextBlock Text="The TimelinePanel arrange elements on a timeline."
+                 TextWrapping="Wrap" />
+
+      <GroupBox Header="Features" Grid.Row="1" Margin="5">
+         <Grid>
+            <Grid.RowDefinitions>
+               <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+               <ColumnDefinition Width="Auto" />
+               <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Orientation:" VerticalAlignment="Center" Margin="2" />
+            <ComboBox Name="_cboOrientation" Grid.Column="1" ItemsSource="{Binding Source={StaticResource Orientations}}" SelectedIndex="0" VerticalAlignment="Center" Margin="5" />
+
+            <TextBlock Text="Overlap behavior:" Grid.Row="1" VerticalAlignment="Center" Margin="2" />
+            <ComboBox Name="_cboOverlap" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Source={StaticResource OverlapBehaviors}}" SelectedIndex="0" VerticalAlignment="Center" Margin="5" />
+
+            <TextBlock Text="Keep original order:" Grid.Row="2" VerticalAlignment="Center" Margin="2" />
+            <CheckBox x:Name="_keepOrder" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="5" IsChecked="True" />
+         </Grid>
+      </GroupBox>
+
+      <xctk:TimelinePanel x:Name="_panel"
+                          Grid.Row="2"
+                          Orientation="{Binding SelectedItem, ElementName=_cboOrientation}"
+                          OverlapBehavior="{Binding SelectedItem, ElementName=_cboOverlap}"
+                          KeepOriginalOrderForOverlap="{Binding IsChecked, ElementName=_keepOrder}">
+
+         <ContentControl xctk:TimelinePanel.Date="2012-01-01T00:00:00"
+                         xctk:TimelinePanel.DateEnd="2012-01-16T00:00:00"
+                         Content="Event #1"
+                         Template="{StaticResource TimelineItemTemplate}" />
+
+         <ContentControl xctk:TimelinePanel.Date="2012-02-02T00:00:00"
+                         xctk:TimelinePanel.DateEnd="2012-02-26T00:00:00"
+                         Content="Event #2"
+                         Template="{StaticResource TimelineItemTemplate}" />
+
+         <ContentControl xctk:TimelinePanel.Date="2012-02-14T00:00:00"
+                         xctk:TimelinePanel.DateEnd="2012-03-14T00:00:00"
+                         Content="Event #3"
+                         Template="{StaticResource TimelineItemTemplate}" />
+
+         <ContentControl xctk:TimelinePanel.Date="2012-02-21T00:00:00"
+                         xctk:TimelinePanel.DateEnd="2012-03-10T00:00:00"
+                         Content="Event #4"
+                         Template="{StaticResource TimelineItemTemplate}" />
+
+         <ContentControl xctk:TimelinePanel.Date="2012-05-17T00:00:00"
+                         xctk:TimelinePanel.DateEnd="2012-06-23T00:00:00"
+                         Content="Event #5"
+                         Template="{StaticResource TimelineItemTemplate}" />
+
+         <ContentControl xctk:TimelinePanel.Date="2012-06-06T00:00:00"
+                         xctk:TimelinePanel.DateEnd="2012-08-13T00:00:00"
+                         Content="Event #6"
+                         Template="{StaticResource TimelineItemTemplate}" />
+
+         <ContentControl xctk:TimelinePanel.Date="2012-08-13T00:00:00"
+                         xctk:TimelinePanel.DateEnd="2012-09-29T00:00:00"
+                         Content="Event #7"
+                         Template="{StaticResource TimelineItemTemplate}" />
+
+         <ContentControl xctk:TimelinePanel.Date="2012-11-01T00:00:00"
+                         xctk:TimelinePanel.DateEnd="2012-12-01T00:00:00"
+                         Content="Event #8"
+                         Template="{StaticResource TimelineItemTemplate}" />
+
+      </xctk:TimelinePanel>
+   </Grid>
+</sample:DemoView>

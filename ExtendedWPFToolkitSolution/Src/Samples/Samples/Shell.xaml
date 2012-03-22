@@ -32,7 +32,7 @@
          </Grid.RowDefinitions>
 
          <Grid Margin="10,0,10,10">
-            <TextBlock Text="Extended WPF Toolkit" Foreground="WHite" FontSize="28" FontWeight="Bold" />
+            <TextBlock Text="Extended WPF Toolkit" Foreground="White" FontSize="28" FontWeight="Bold" />
          </Grid>
 
          <Grid Grid.Row="1">
@@ -43,9 +43,9 @@
 
             <Border CornerRadius="5" BorderBrush="#FF666666" BorderThickness="1">
                <TreeView prism:RegionManager.RegionName="{x:Static inf:RegionNames.NavigationRegion}" 
-                              infCommands:TreeViewSelected.Command="{Binding NavigateCommand}" 
-                              BorderBrush="{x:Null}" MinWidth="225" Margin="3"
-                              Loaded="TreeView_Loaded">
+                         infCommands:TreeViewSelected.Command="{Binding NavigateCommand}" 
+                         BorderBrush="{x:Null}" MinWidth="225" Margin="3"
+                         Loaded="TreeView_Loaded">
                   <TreeView.Background>
                      <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                         <GradientStop Color="#A1000000" Offset="0" />

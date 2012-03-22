@@ -8,7 +8,7 @@
     <ProjectGuid>{72E591D6-8F83-4D8C-8F67-9C325E623234}</ProjectGuid>
     <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.Windows.Controls</RootNamespace>
+    <RootNamespace>Xceed.Wpf.Toolkit</RootNamespace>
     <AssemblyName>WPFToolkit.Extended</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -324,6 +324,9 @@
     <Compile Include="Core\Primitives\UpDownBase.cs" />
     <Compile Include="SplitButton\Implementation\SplitButton.cs" />
     <Compile Include="Core\Themes\ResourceKeys.cs" />
+    <Compile Include="TimelinePanel\Implementation\DateElement.cs" />
+    <Compile Include="TimelinePanel\Implementation\OverlapBehavior.cs" />
+    <Compile Include="TimelinePanel\Implementation\TimelinePanel.cs" />
     <Compile Include="TimePicker\Implementation\TimeFormat.cs" />
     <Compile Include="TimePicker\Implementation\TimeItem.cs" />
     <Compile Include="TimePicker\Implementation\TimePicker.cs" />
