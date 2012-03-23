@@ -16,9 +16,10 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Collections.Generic;
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Editors
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public abstract class ComboBoxEditor : TypeEditor<System.Windows.Controls.ComboBox>
   {

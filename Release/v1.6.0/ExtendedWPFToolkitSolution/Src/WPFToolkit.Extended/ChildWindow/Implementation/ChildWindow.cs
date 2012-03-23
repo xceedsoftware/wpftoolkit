@@ -16,6 +16,7 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.ComponentModel;
 using System.Windows;
@@ -26,7 +27,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class ChildWindow : ContentControl
   {
@@ -207,7 +208,7 @@ namespace Microsoft.Windows.Controls
     {
       if( DesignerProperties.GetIsInDesignMode( this ) )
       {
-        Visibility = newValue == Controls.WindowState.Open ? Visibility.Visible : Visibility.Collapsed;
+        Visibility = newValue == Xceed.Wpf.Toolkit.WindowState.Open ? Visibility.Visible : Visibility.Collapsed;
       }
     }
 
@@ -497,7 +498,7 @@ namespace Microsoft.Windows.Controls
       }
       else
       {
-        Visibility = DesignerWindowState == Controls.WindowState.Open ? Visibility.Visible : System.Windows.Visibility.Collapsed;
+        Visibility = DesignerWindowState == Xceed.Wpf.Toolkit.WindowState.Open ? Visibility.Visible : System.Windows.Visibility.Collapsed;
       }
     }
 
@@ -516,7 +517,7 @@ namespace Microsoft.Windows.Controls
 
     public ChildWindow()
     {
-      DesignerWindowState = Controls.WindowState.Open;
+      DesignerWindowState = Xceed.Wpf.Toolkit.WindowState.Open;
 
       IsVisibleChanged += ChildWindow_IsVisibleChanged;
 
@@ -795,7 +796,7 @@ namespace Microsoft.Windows.Controls
     {
       _dialogResult = null; //reset the dialogResult to null each time the window is opened
 
-      if( WindowStartupLocation == Controls.WindowStartupLocation.Center )
+      if( WindowStartupLocation == Xceed.Wpf.Toolkit.WindowStartupLocation.Center )
         CenterChildWindow();
 
       BringToFront();

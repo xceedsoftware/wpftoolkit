@@ -16,12 +16,13 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Editors
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class FontComboBoxEditor : ComboBoxEditor
   {

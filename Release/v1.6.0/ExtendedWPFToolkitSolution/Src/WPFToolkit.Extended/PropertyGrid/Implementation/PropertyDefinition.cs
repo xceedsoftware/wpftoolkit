@@ -17,7 +17,7 @@
 
   **********************************************************************/
 
-namespace Microsoft.Windows.Controls.PropertyGrid
+namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
   public class PropertyDefinition
   {

@@ -16,12 +16,13 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
 
-namespace Microsoft.Windows.Controls.PropertyGrid
+namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
   public class PropertyItemCollection : ObservableCollection<PropertyItem>
   {

@@ -17,7 +17,7 @@
 
   **********************************************************************/
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Editors
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class IntegerUpDownEditor : TypeEditor<IntegerUpDown>
   {

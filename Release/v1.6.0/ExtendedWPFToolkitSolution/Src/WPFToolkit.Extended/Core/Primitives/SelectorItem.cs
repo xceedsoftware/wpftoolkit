@@ -20,7 +20,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Microsoft.Windows.Controls.Primitives
+namespace Xceed.Wpf.Toolkit.Primitives
 {
   public class SelectorItem : ContentControl
   {

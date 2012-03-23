@@ -18,11 +18,11 @@
   ********************************************************************-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-                    xmlns:local="clr-namespace:Microsoft.Windows.Controls"
-                    xmlns:chrome="clr-namespace:Microsoft.Windows.Controls.Chromes"
-                    xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters">
+                    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
+                    xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes"
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
 
-   <coreConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
+   <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
 
    <DataTemplate x:Key="DefaultWatermarkTemplate">
       <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
@@ -136,8 +136,8 @@
                      <Popup IsOpen="{Binding IsChecked, ElementName=_calendarToggleButton}" StaysOpen="False">
                         <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" Padding="3">
                            <StackPanel>
-                              <Calendar x:Name="Part_Calendar" BorderThickness="0" />
-                              <local:TimePicker x:Name="Part_TimeUpDown"
+                              <Calendar x:Name="PART_Calendar" BorderThickness="0" />
+                              <local:TimePicker x:Name="PART_TimeUpDown"
                                                 Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
                                                 Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" 
                                                 Format="{TemplateBinding TimeFormat}"

@@ -16,14 +16,15 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Media;
-using Microsoft.Windows.Controls.Primitives;
+using Xceed.Wpf.Toolkit.Primitives;
 
-namespace Microsoft.Windows.Controls.Core.Utilities
+namespace Xceed.Wpf.Toolkit.Core.Utilities
 {
   static class ColorUtilities
   {

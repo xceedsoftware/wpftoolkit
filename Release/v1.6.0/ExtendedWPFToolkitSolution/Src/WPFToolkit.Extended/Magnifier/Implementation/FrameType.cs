@@ -17,7 +17,7 @@
 
   **********************************************************************/
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public enum FrameType
   {

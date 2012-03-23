@@ -16,9 +16,10 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Attributes
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Attributes
 {
   public class ItemsSourceAttribute : Attribute
   {
@@ -30,7 +31,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Attributes
 
     public ItemsSourceAttribute( Type type )
     {
-      var valueSourceInterface = type.GetInterface( "Microsoft.Windows.Controls.PropertyGrid.Attributes.IItemsSource" );
+      var valueSourceInterface = type.GetInterface( typeof( IItemsSource ).FullName );
       if( valueSourceInterface == null )
         throw new ArgumentException( "Type must implement the IItemsSource interface.", "type" );
 

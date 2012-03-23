@@ -18,10 +18,10 @@
   ********************************************************************-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:Microsoft.Windows.Controls"
-                    xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters">
+                    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
 
-   <coreConverters:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
+   <conv:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
 
    <LinearGradientBrush x:Key="ColorPickerDarkBorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
       <GradientStop Color="#FFA3AEB9" Offset="0" />

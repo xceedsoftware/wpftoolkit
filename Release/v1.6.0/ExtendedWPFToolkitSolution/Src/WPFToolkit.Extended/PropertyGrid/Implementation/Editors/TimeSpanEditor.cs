@@ -16,11 +16,12 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Editors
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class TimeSpanEditor : DateTimeUpDownEditor
   {

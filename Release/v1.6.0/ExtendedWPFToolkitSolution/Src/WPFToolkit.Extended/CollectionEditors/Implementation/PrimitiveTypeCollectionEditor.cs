@@ -16,6 +16,7 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class PrimitiveTypeCollectionEditor : ContentControl
   {

@@ -8,7 +8,7 @@
     <ProjectGuid>{72E591D6-8F83-4D8C-8F67-9C325E623234}</ProjectGuid>
     <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.Windows.Controls</RootNamespace>
+    <RootNamespace>Xceed.Wpf.Toolkit</RootNamespace>
     <AssemblyName>WPFToolkit.Extended</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -536,6 +536,15 @@
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\SplitButton\Implementation\SplitButton.cs">
       <Link>SplitButton\Implementation\SplitButton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\TimelinePanel\Implementation\DateElement.cs">
+      <Link>TimelinePanel\Implementation\DateElement.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\TimelinePanel\Implementation\OverlapBehavior.cs">
+      <Link>TimelinePanel\Implementation\OverlapBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\TimelinePanel\Implementation\TimelinePanel.cs">
+      <Link>TimelinePanel\Implementation\TimelinePanel.cs</Link>
     </Compile>
     <Compile Include="..\..\..\ExtendedWPFToolkitSolution\Src\WPFToolkit.Extended\TimePicker\Implementation\TimeFormat.cs">
       <Link>TimePicker\Implementation\TimeFormat.cs</Link>

@@ -17,7 +17,7 @@
 
   **********************************************************************/
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   /// <summary>
   /// Represents spin directions that could be initiated by the end-user.

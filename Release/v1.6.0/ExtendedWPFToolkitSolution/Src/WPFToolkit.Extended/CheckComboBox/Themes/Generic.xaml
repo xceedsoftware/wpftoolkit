@@ -18,12 +18,11 @@
   ********************************************************************-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:Microsoft.Windows.Controls"
-                    xmlns:coreConverters="clr-namespace:Microsoft.Windows.Controls.Core.Converters"
-                    xmlns:chrome="clr-namespace:Microsoft.Windows.Controls.Chromes"
-                    xmlns:primitives="clr-namespace:Microsoft.Windows.Controls.Primitives">
+                    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
+                    xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes">
 
-   <coreConverters:InverseBoolConverter x:Key="InverseBoolConverter" />
+   <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
 
    <SolidColorBrush x:Key="ButtonNormalBorder" Color="#FF707070" />
 

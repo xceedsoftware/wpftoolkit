@@ -16,13 +16,14 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   [TemplateVisualState( Name = VisualStates.OK, GroupName = VisualStates.MessageBoxButtonsGroup )]
   [TemplateVisualState( Name = VisualStates.OKCancel, GroupName = VisualStates.MessageBoxButtonsGroup )]

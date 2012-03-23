@@ -16,6 +16,7 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -77,6 +78,11 @@ using System.Windows.Markup;
 [assembly: AssemblyVersion( "1.6.0.0" )]
 [assembly: AssemblyFileVersion( "1.6.0.0" )]
 
-[assembly: XmlnsPrefix( "http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended", "extToolkit" )]
-[assembly: XmlnsDefinition( "http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended", "Microsoft.Windows.Controls" )]
-[assembly: XmlnsDefinition( "http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended", "Microsoft.Windows.Controls.PropertyGrid" )]
+[assembly: XmlnsPrefix( "http://schemas.xceed.com/wpf/xaml/toolkit", "xctk" )]
+[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit" )]
+[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Primitives" )]
+[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid" )]
+[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid.Attributes" )]
+[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid.Commands" )]
+[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid.Converters" )]
+[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid.Editors" )]

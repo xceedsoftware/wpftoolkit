@@ -17,9 +17,9 @@
 
   **********************************************************************/
 
-namespace Microsoft.Windows.Controls.PropertyGrid.Editors
+namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
-  public class PrimitiveTypeCollectionEditor : TypeEditor<Microsoft.Windows.Controls.PrimitiveTypeCollectionEditor>
+  public class PrimitiveTypeCollectionEditor : TypeEditor<Xceed.Wpf.Toolkit.PrimitiveTypeCollectionEditor>
   {
     protected override void SetControlProperties()
     {
@@ -29,7 +29,7 @@ namespace Microsoft.Windows.Controls.PropertyGrid.Editors
 
     protected override void SetValueDependencyProperty()
     {
-      ValueProperty = Microsoft.Windows.Controls.PrimitiveTypeCollectionEditor.ItemsSourceProperty;
+      ValueProperty = Xceed.Wpf.Toolkit.PrimitiveTypeCollectionEditor.ItemsSourceProperty;
     }
 
     protected override void ResolveValueBinding( PropertyItem propertyItem )

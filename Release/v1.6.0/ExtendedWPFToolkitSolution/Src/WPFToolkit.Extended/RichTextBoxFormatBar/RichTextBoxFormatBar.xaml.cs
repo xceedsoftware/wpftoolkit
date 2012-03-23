@@ -16,14 +16,15 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Media;
-using Microsoft.Windows.Controls.Core;
+using Xceed.Wpf.Toolkit.Core;
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   /// <summary>
   /// Interaction logic for RichTextBoxFormatBar.xaml

@@ -16,16 +16,18 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
-using Microsoft.Windows.Controls.PropertyGrid.Attributes;
-using Microsoft.Windows.Controls.PropertyGrid.Editors;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
-namespace Microsoft.Windows.Controls.PropertyGrid
+namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
   internal class PropertyGridUtilities
   {
@@ -191,13 +193,13 @@ namespace Microsoft.Windows.Controls.PropertyGrid
         editor = new FontComboBoxEditor();
       else if( propertyItem.PropertyType.IsGenericType )
       {
-        if( propertyItem.PropertyType.GetInterface( "IList" ) != null )
+        if( propertyItem.PropertyType.GetInterface( typeof( IList ).FullName ) != null )
         {
           var t = propertyItem.PropertyType.GetGenericArguments()[ 0 ];
           if( !t.IsPrimitive && !t.Equals( typeof( String ) ) )
-            editor = new Microsoft.Windows.Controls.PropertyGrid.Editors.CollectionEditor();
+            editor = new Xceed.Wpf.Toolkit.PropertyGrid.Editors.CollectionEditor();
           else
-            editor = new Microsoft.Windows.Controls.PropertyGrid.Editors.PrimitiveTypeCollectionEditor();
+            editor = new Xceed.Wpf.Toolkit.PropertyGrid.Editors.PrimitiveTypeCollectionEditor();
         }
         else
           editor = new TextBlockEditor();

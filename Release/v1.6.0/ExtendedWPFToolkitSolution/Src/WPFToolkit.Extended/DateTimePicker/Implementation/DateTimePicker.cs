@@ -16,17 +16,19 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 #if VS2008
+using Microsoft.Windows.Controls;
 using Microsoft.Windows.Controls.Primitives;
 #else
 using System.Windows.Controls.Primitives;
 #endif
 
-namespace Microsoft.Windows.Controls
+namespace Xceed.Wpf.Toolkit
 {
   public class DateTimePicker : DateTimeUpDown
   {
@@ -151,7 +153,7 @@ namespace Microsoft.Windows.Controls
         _calendar.SelectedDatesChanged -= Calendar_SelectedDatesChanged;
       }
 
-      _calendar = GetTemplateChild( "Part_Calendar" ) as Calendar;
+      _calendar = GetTemplateChild( "PART_Calendar" ) as Calendar;
 
       if( _calendar != null )
       {

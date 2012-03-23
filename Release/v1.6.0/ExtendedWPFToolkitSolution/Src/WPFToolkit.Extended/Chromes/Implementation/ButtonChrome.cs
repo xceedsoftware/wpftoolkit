@@ -16,11 +16,12 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Microsoft.Windows.Controls.Chromes
+namespace Xceed.Wpf.Toolkit.Chromes
 {
   public class ButtonChrome : ContentControl
   {

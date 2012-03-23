@@ -16,11 +16,12 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Microsoft.Windows.Controls.Mag.Converters
+namespace Xceed.Wpf.Toolkit.Mag.Converters
 {
   internal class BorderThicknessToStrokeThicknessConverter : IValueConverter
   {

@@ -16,11 +16,12 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using System;
 using System.Windows.Controls;
 using Microsoft.Practices.Prism.Regions;
-using Microsoft.Windows.Controls;
 using Samples.Infrastructure.Controls;
+using Xceed.Wpf.Toolkit;
 
 namespace Samples.Modules.Button.Views
 {
@@ -35,7 +36,7 @@ namespace Samples.Modules.Button.Views
       InitializeComponent();
     }
 
-    private void ButtonSpinner_Spin( object sender, Microsoft.Windows.Controls.SpinEventArgs e )
+    private void ButtonSpinner_Spin( object sender, SpinEventArgs e )
     {
       ButtonSpinner spinner = ( ButtonSpinner )sender;
       TextBox txtBox = ( TextBox )spinner.Content;
@@ -43,7 +44,7 @@ namespace Samples.Modules.Button.Views
       try
       {
         int value = String.IsNullOrEmpty( txtBox.Text ) ? 0 : Convert.ToInt32( txtBox.Text );
-        if( e.Direction == Microsoft.Windows.Controls.SpinDirection.Increase )
+        if( e.Direction == SpinDirection.Increase )
           value++;
         else
           value--;

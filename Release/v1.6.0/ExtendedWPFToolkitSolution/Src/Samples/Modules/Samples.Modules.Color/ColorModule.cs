@@ -16,12 +16,12 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   **********************************************************************/
+
 using Microsoft.Practices.Prism.Regions;
 using Microsoft.Practices.Unity;
 using Samples.Infrastructure;
 using Samples.Infrastructure.Extensions;
 using Samples.Modules.Color.Views;
-
 
 namespace Samples.Modules.Color
 {
