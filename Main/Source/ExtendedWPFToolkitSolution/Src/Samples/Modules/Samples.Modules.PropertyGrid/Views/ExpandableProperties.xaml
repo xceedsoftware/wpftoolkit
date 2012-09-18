@@ -21,21 +21,11 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-                 Title="Exandable Properties">
-   <Grid>
-
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-
-      <TextBlock Text="Sometimes it is neccessary to show the properties of a complex object.  The PropertyGrid supports this scenario and allows you to drill down into a property's heirarchy.  To enable this behavior you must decorate your property with the ExpandableObject attribute."
-                 TextWrapping="Wrap" />
-
-      <StackPanel Grid.Row="1" Margin="10">
-         <TextBlock Text="Expandable Properties:" Style="{StaticResource Header}" />
-         <TextBlock Text="In this example the Spouse property has been decorated with the ExpandableObject attribute.  Notice how you can drill down into the Spouse properties." TextWrapping="Wrap" />
-         <xctk:PropertyGrid x:Name="_propertyGrid" Width="450" Margin="10"  />
-      </StackPanel>
-   </Grid>
+                 Title="Exandable Properties"
+                 Description="Sometimes it is neccessary to show the properties of a complex object.  The PropertyGrid supports this scenario and allows you to drill down into a property's heirarchy.  To enable this behavior you must decorate your property with the ExpandableObject attribute.">
+   <StackPanel Margin="10">
+      <TextBlock Text="Expandable Properties:" Style="{StaticResource Header}" />
+      <TextBlock Text="In this example the Spouse property has been decorated with the ExpandableObject attribute.  Notice how you can drill down into the Spouse properties." TextWrapping="Wrap" />
+      <xctk:PropertyGrid x:Name="_propertyGrid" Width="450" Margin="10"  />
+   </StackPanel>
 </sample:DemoView>

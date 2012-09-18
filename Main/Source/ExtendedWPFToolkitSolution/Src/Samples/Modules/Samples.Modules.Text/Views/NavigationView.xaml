@@ -27,8 +27,8 @@
    </TreeViewItem.Resources>
 
    <TreeViewItem Header="MaskedTextBox" Tag="{x:Type views:MaskedTextBoxView}" />
-   <TreeViewItem Header="MultiLineTextEditor" />
-   <TreeViewItem Header="RichTextBox" />
+    <TreeViewItem Header="MultiLineTextEditor" Tag="{x:Type views:MultiLineTextEditorView}" />
+   <TreeViewItem Header="RichTextBox" Tag="{x:Type views:RichTextBoxView}"/>
    <TreeViewItem Header="WatermarkTextBox" Tag="{x:Type views:WatermarkTextBoxView}" />
 
 </TreeViewItem>

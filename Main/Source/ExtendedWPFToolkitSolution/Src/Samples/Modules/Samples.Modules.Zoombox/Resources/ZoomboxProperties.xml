@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Properties xmlns="">
+<AnimationAccelerationRatio>Gets or sets the acceleration ratio used for scale and pan animations.
+
+By default, transitions from one view to another are animated. This property determines the acceleration ratio of that animation.</AnimationAccelerationRatio>
+<AnimationDecelerationRatio>Gets or sets the deceleration ratio used for scale and pan animations.
+
+By default, transitions from one view to another are animated. This property determines the deceleration ratio of that animation.</AnimationDecelerationRatio>
+<AnimationDuration>Gets or sets the duration used for scale and pan animations.
+
+By default, transitions from one view to another are animated. This property determines the duration of that animation.</AnimationDuration>
+<AreDragModifiersActive>Gets a Boolean value that specifies whether the keys in the DragModifiers collection are currently pressed. It is updated only when the Zoombox has keyboard or cursor focus.
+
+This value is intended for use as a trigger within the Zoombox style. It can be used to change the appearance of the cursor to show that it’s possible to drag (or pan) the content.
+
+This value is not updated in partial trust.</AreDragModifiersActive>
+<AreRelativeZoomModifiersActive>Gets a Boolean value that specifies whether the keys in the RelativeZoomModifiers collection are currently pressed. It is updated only when the Zoombox has keyboard or cursor focus.
+
+This value is intended for use as a trigger within the Zoombox style. It can be used to change the appearance of the cursor to show that it’s possible to scale the content relative to the cursor position. This allows the user to zoom in on a specific point within the content.
+
+This value is not updated in partial trust.</AreRelativeZoomModifiersActive>
+<AreZoomModifiersActive>Gets a Boolean value that specifies whether the keys in the ZoomModifiers collection are currently pressed. It is updated only when the Zoombox has keyboard or cursor focus.
+
+This value is intended for use as a trigger within the Zoombox style. It can be used within the Zoombox control’s style to change the appearance of the cursor to show that it’s possible to zoom in or out using the mouse wheel. The zoom operation occurs relative to the ZoomOrigin point (by default, the center of the content).
+
+This value is not updated in partial trust.</AreZoomModifiersActive>
+<AreZoomToSelectionModifiersActive>Gets a Boolean value that specifies whether the keys in the ZoomToSelectionModifiers collection are currently pressed. It is updated only when the Zoombox has keyboard or cursor focus.
+
+This value is intended for use as a trigger within the Zoombox style. It can be used to show that it’s possible to select a zoom region by pressing the left mouse button and dragging the mouse. Upon release of the mouse button, the Zoombox control will zoom in to the selected region.
+
+By default, the selected region will be centered within the Zoombox control, but this can be changed by altering the HorizontalContentAlignment and VerticalContentAlignment properties.
+
+This value is not updated in partial trust.</AreZoomToSelectionModifiersActive>
+<AutoWrapContentWithViewbox>Gets or sets a Boolean value that determines if the content of the Zoombox is wrapped in a Viewbox.
+
+By default, the content of the Zoombox control will be wrapped within a Viewbox element (unless the content is already a Viewbox). The viewbox ensures that the content does not get clipped by its parent and that it renders correctly within the visual brush used in the view finder.
+
+Some elements, like Image, have built-in viewbox behaviors. This property can be set to False for such elements to prevent the extra wrapping layer. However, if this causes the content to appear incorrectly in the view finder, try setting this property back to True.</AutoWrapContentWithViewbox>
+<CurrentView>Gets the current view for the Zoombox. This is an object of type ZoomboxView.
+
+This property may return an absolute view (given by a position and/or scale value), a region-based view (given by a Rect within the content), or a predefined view, given by one of the static ZoomboxView properties: Center, Empty, Fill, or Fit.</CurrentView>
+<CurrentViewIndex>Gets the index of the current view (see the CurrentView property) within the Zoombox control's view stack (see the ViewStack property).
+
+If the current view is not a member of the view stack, the CurrentViewIndex property returns -1. This will happen if the Zoombox control has a manual view stack (see the ViewStackMode property) and the control has been zoomed or panned away from the selected view. In this case, the ViewStackIndex property can be used to get the index of the selected view. Also, the RefocusView() method can be used to zoom back to the selected view.
+
+If the view stack is disabled, the CurrentViewIndex property always returns -1.</CurrentViewIndex>
+<DragModifiers>Gets or sets a collection of KeyModifier values representing keys that must be pressed to pan the content by dragging it.
+
+All keys must be pressed in order for the operation to occur. If None is specified, the content will be dragged without any modifier keys. If the collection includes Blocked, the content cannot be dragged.
+
+The default value includes only the Ctrl key.</DragModifiers>
+<DragOnPreview>Gets or sets a Boolean value that specifies whether the Zoombox responds to tunneled mouse events (PreviewMouseDown, PreviewMouseMove, and PreviewMouseUp) to pan the content via a mouse drag. If false, panning occurs in response to the bubbled events (MouseDown, MouseMove, and MouseUp).
+
+The default value is false.</DragOnPreview>
+<EffectiveViewStackMode>Gets a ZoomboxViewStackMode value representing the mode that is currently in effect for the view stack. The effective mode will be either Auto, Manual, or Disabled.
+
+For more information, see the ViewStackMode property.</EffectiveViewStackMode>
+<HasBackStack>Gets a Boolean value that specifies whether there are views on the back side of the view stack (see the ViewStack property).</HasBackStack>
+<HasForwardStack>Gets a Boolean value that specifies whether there are views on the forward side of the view stack (see the ViewStack property).</HasForwardStack>
+<IsAnimated>Gets or sets a Boolean value specifying whether transitions between views (scale and pan operations) are animated.
+
+The default value is true.</IsAnimated>
+<IsDraggingContent>Gets a Boolean value that specifies whether the content is currently being panned via a drag operation.</IsDraggingContent>
+<IsSelectingRegion>Gets a Boolean value that specifies whether a zoom region is currently being selected.</IsSelectingRegion>
+<MaxScale>Gets or sets a Double value representing the maximum scale factor (or zoom level) that can be applied to the content.</MaxScale>
+<MinScale>Gets or sets a Double value representing the minimum scale factor (or zoom level) that can be applied to the content.</MinScale>
+<NavigateOnPreview>Gets or sets a Boolean value that specifies whether the Zoombox responds to tunneled mouse events (PreviewMouseDown) to navigate through the view stack. If false, navigation occurs in response to bubbled mouse events (MouseDown).
+
+The default value is false.
+
+This setting only impacts the control's response to the forward (XButton2) and back (XButton1) mouse buttons. Note that the control will also navigate in response to the forward (BrowserForward) and back (BrowserBack or Backspace) keyboard keys, but this is enabled via key bindings in an InputBindingCollection within the Resources section of the Zoombox template.</NavigateOnPreview>
+<PanDistance>Gets or sets a Double value that is used to determine how many pixels the content will pan using the PanLeft, PanUp, PanRight, or PanDown Zoombox commands.
+
+The pan commands are hooked up to key strokes using an InputBindingCollection within the Resources section of the Zoombox template. The default key bindings map Shift+Ctrl+Left, Shift+Ctrl+Up, Shift+Ctrl+Right, and Shift+Ctrl+Down to their respective Pan commands.
+
+The keyboard focus must be within the Zoombox to pan the content via the key bindings.
+
+The default value is 5 pixels.</PanDistance>
+<Position>Gets or sets the top-left point of the content within the Zoombox control.
+
+The Position is expressed as a Point within the coordinate space of the Zoombox control.</Position>
+<RelativeZoomModifiers>Gets or sets a collection of KeyModifier values representing keys that must be pressed to zoom the content relative to the current mouse position using the mouse wheel.
+
+All keys must be pressed in order for the operation to occur. If None is specified, the content will be zoomed without any modifier keys. If the collection includes Blocked, the content cannot be zoomed.
+
+The default value is the Ctrl+Alt combination.</RelativeZoomModifiers>
+<Scale>Gets or sets a Double value representing the scale factor (or zoom level) for the content.
+
+A scale value of 1.0 represents the actual content size.</Scale>
+<ViewFinder>Gets a reference to the view finder element within the visual tree of the Zoombox.
+
+The view finder element typically serves as the root of a subtree that contains a ViewFinderDisplay element and several command buttons for changing views. The ViewFinderDisplay element is the element that renders the thumbnail image of the Zoombox content.
+
+The view finder element, if present in the control template, must be named "ViewFinder". The visibility of the view finder element is typically bound to the ViewFinderVisibility attached property.</ViewFinder>
+<ViewFinderVisibility>Gets a Visibility value for the ViewFinder.
+
+This property is typically leveraged by the Zoombox template to control the visibility of the view finder element. In the default Zoombox template, this property is also bound to a toggle button that is used to show and hide the view finder.
+
+This is an attached property because the Zoombox control, itself, does not directly use the property.</ViewFinderVisibility>
+<Viewport>Gets a Rect identifying the portion of the content that is visible in the Zoombox. The viewport is expressed in the coordinate space of the content.</Viewport>
+<ViewStack>Gets the view stack for the Zoombox. This stack can be manually specified, automatically maintained, or disabled entirely, depending on the ViewStackMode property.
+
+The view stack is maintained in an instance of the ZoomboxViewStack class.</ViewStack>
+<ViewStackCount>Gets an integer value representing the number of views in the view stack.</ViewStackCount>
+<ViewStackIndex>Gets or sets the index of the selected view within the view stack.
+
+For a manual stack, a positive ViewStackIndex value does not necessarily indicate that the specified view is the current view. The user may have zoomed or panned away from the view represented by the ViewStackIndex property. The CurrentView property can be used to determine the actual current view. In this case, the CurrentViewIndex will be -1 but the ViewStackIndex will be a positive value. The Refocus command or the RefocusView() method can be used to refocus the selected view on the stack.</ViewStackIndex>
+<ViewStackMode>Gets or sets the mode for the view stack.
+
+The ViewStackMode property determines how the Zoombox will maintain its stack of views for back and forward view navigation. It can be set to any of the following values from the ZoomboxViewStackMode enumeration:
+
+Auto: The control automatically tracks view changes and adds them to the view stack. In this case, every view selected is added to the view stack (in the same manner that visited URLs are added to a browser stack).
+
+Manual: The control uses a manually specified view stack. The views can be directly added to the ViewStack in markup or programmatically. They can also be bound to the Zoombox using the ViewStackSource property.
+
+Default: The control will use one of the other ZoomboxViewStackMode values at runtime. The EffectiveViewStackMode property can be used to determine which mode is actually in effect. If the views in the stack come from a ViewStackSource, then the default mode is Manual; otherwise, the default mode is Auto.
+
+Disabled: The view stack is disabled altogether. In this mode, the ViewStack property will return null. An attempt to add views manually will result in an exception.</ViewStackMode>
+<ViewStackSource>Gets or sets an IEnumerable value representing a collection used to generate a view stack for the Zoombox.
+
+The view stack of a Zoombox is either explicitly set using the ViewStack property or auto-generated based on members of the ViewStackSource collection. In this sense, the ViewStackSource property is analogous to the ItemsSource property for an ItemsControl.
+
+This property can be used to bind the view stack to an observable collection of ZoomboxView objects (or a collection of objects of type string, Point, double, or Rect, which can be directly converted to ZoomboxView objects via the ZoomboxViewConverter class).
+
+When the ViewStackSource property is in use, the ViewStack property is effectively read-only. An attempt to directly modify the ViewStack will result in an exception.
+
+When the ViewStackSource property is set to a non-null collection, the contents of the ViewStack collection is replaced with the views generated from the ViewStackSource.
+
+If the ViewStackSource property is already set, explicitly setting it to null will remove the auto-generated collection of views and the Zoombox will have an empty ViewStack collection. If ViewStackSource is already null, setting it to null has no effect.</ViewStackSource>
+<ZoomModifiers>Gets or sets a collection of KeyModifier values representing keys that must be pressed to zoom the content relative to its ZoomOrigin (by default, the center of the content) using the mouse wheel.
+
+All specified keys must be pressed in order for the operation to occur. If None is specified, the relative zoom will occur without any modifier keys. If the collection includes Blocked, a zoom cannot be performed.
+
+The default value includes only the Ctrl key.</ZoomModifiers>
+<ZoomOnPreview>Gets or sets a Boolean value that specifies whether the Zoombox responds to tunneled mouse events (PreviewMouseWheel) to zoom the content via the mouse wheel. If false, zooming occurs in response to the bubbled events (MouseWheel).
+
+The default value is true.</ZoomOnPreview>
+<ZoomOrigin>Gets or sets the relative position within the content around which Zoom operations occur by default.
+
+This value is used when zooming via the mouse wheel, ZoomIn or ZoomOut commands, or the Zoom() method.</ZoomOrigin>
+<ZoomPercentage>Gets or sets a Double value that is used to determine how much the content will zoom when using the ZoomIn or ZoomOut commands or when zooming via the mouse wheel.
+
+The zoom commands are hooked up to key strokes using an InputBindingCollection within the Resources section of the Zoombox template. The default key bindings map Ctrl+Left and Ctrl+Up to the ZoomOut command and Ctrl+Right and Ctrl+Down to the ZoomIn command.
+
+Keyboard focus must be within the Zoombox to scale the content via the key bindings.
+
+The default value is 5%.</ZoomPercentage>
+<ZoomToSelectionModifiers>Gets or sets a collection of KeyModifier values representing keys that must be pressed to select and zoom to a location of the content using the mouse.
+
+All specified keys must be pressed in order for the operation to occur. If None is specified, the zoom operation will occur without any modifier keys. If the collection includes Blocked, the zoom operation cannot be performed.
+
+The default value includes only the Alt key.</ZoomToSelectionModifiers>
+</Properties>

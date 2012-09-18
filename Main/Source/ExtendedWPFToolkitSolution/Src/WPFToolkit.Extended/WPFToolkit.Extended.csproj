@@ -15,10 +15,6 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,12 +32,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -187,10 +177,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="TokenizedTextBox\Themes\Generic.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="WatermarkTextBox\Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -199,8 +185,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Zoombox\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyVersionInfo.cs" />
+    <Compile Include="AssemblyVersionInfoCommon.cs" />
     <Compile Include="BusyIndicator\Implementation\BusyIndicator.cs" />
     <Compile Include="ButtonSpinner\Implementation\ButtonSpinner.cs" />
     <Compile Include="CalculatorUpDown\Implementation\CalculatorUpDown.cs" />
@@ -220,13 +212,26 @@
     <Compile Include="Core\Converters\ObjectTypeToNameConverter.cs" />
     <Compile Include="ColorCanvas\Implementation\ColorCanvas.cs" />
     <Compile Include="Core\Converters\CalculatorMemoryToVisibilityConverter.cs" />
+    <Compile Include="Core\Converters\RoundedValueConverter.cs" />
     <Compile Include="Core\Converters\TimeFormatToDateTimeFormatConverter.cs" />
+    <Compile Include="Core\Converters\VisibilityToBoolConverter.cs" />
     <Compile Include="Core\Converters\WizardPageButtonVisibilityConverter.cs" />
+    <Compile Include="Core\ErrorMessages.cs" />
+    <Compile Include="Core\IndexChangedEventArgs.cs" />
+    <Compile Include="Core\IndexChangedEventHandler.cs" />
+    <Compile Include="Core\Input\KeyModifier.cs" />
+    <Compile Include="Core\Input\KeyModifierCollection.cs" />
+    <Compile Include="Core\Input\KeyModifierCollectionConverter.cs" />
+    <Compile Include="Core\InvalidContentException.cs" />
+    <Compile Include="Core\InvalidTemplateException.cs" />
     <Compile Include="Core\Primitives\HsvColor.cs" />
     <Compile Include="ColorPicker\Implementation\ColorItem.cs" />
     <Compile Include="ColorPicker\Implementation\ColorPicker.cs" />
     <Compile Include="Core\Primitives\Selector.cs" />
     <Compile Include="Core\Primitives\SelectorItem.cs" />
+    <Compile Include="Core\Primitives\ShapeBase.cs" />
+    <Compile Include="Core\PropertyChangedEventArgs.cs" />
+    <Compile Include="Core\PropertyChangedEventHandler.cs" />
     <Compile Include="Core\Themes\StaticResourceKey.cs" />
     <Compile Include="Core\Utilities\CalculatorUtilities.cs" />
     <Compile Include="Core\Utilities\ColorUtilities.cs" />
@@ -235,6 +240,13 @@
     <Compile Include="Core\Converters\InverseBoolConverter.cs" />
     <Compile Include="Core\Converters\SolidColorBrushToColorConverter.cs" />
     <Compile Include="Core\Utilities\ContextMenuUtilities.cs" />
+    <Compile Include="Core\Utilities\DoubleHelper.cs" />
+    <Compile Include="Core\Utilities\EllipseHelper.cs" />
+    <Compile Include="Core\Utilities\PointHelper.cs" />
+    <Compile Include="Core\Utilities\RectHelper.cs" />
+    <Compile Include="Core\Utilities\ResourceHelper.cs" />
+    <Compile Include="Core\Utilities\Segment.cs" />
+    <Compile Include="Core\Utilities\VisualTreeHelperEx.cs" />
     <Compile Include="DateTimePicker\Implementation\DateTimePicker.cs" />
     <Compile Include="DateTimeUpDown\Implementation\DateTimeFormat.cs" />
     <Compile Include="DateTimeUpDown\Implementation\DateTimeInfo.cs" />
@@ -257,18 +269,10 @@
     <Compile Include="MessageBox\Implementation\MessageBox.cs" />
     <Compile Include="NumericUpDown\Implementation\NumericUpDown.cs" />
     <Compile Include="CollectionEditors\Implementation\PrimitiveTypeCollectionEditor.cs" />
+    <Compile Include="Pie\Implementation\Pie.cs" />
+    <Compile Include="Pie\Implementation\PieModeEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="BusyIndicator\Implementation\VisualStates.BusyIndicator.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\ExpandableObjectAttribute.cs" />
@@ -330,10 +334,6 @@
     <Compile Include="TimePicker\Implementation\TimeFormat.cs" />
     <Compile Include="TimePicker\Implementation\TimeItem.cs" />
     <Compile Include="TimePicker\Implementation\TimePicker.cs" />
-    <Compile Include="TokenizedTextBox\Implementation\Token.cs" />
-    <Compile Include="TokenizedTextBox\Implementation\TokenItem.cs" />
-    <Compile Include="TokenizedTextBox\Implementation\TokenizedTextBox.cs" />
-    <Compile Include="TokenizedTextBox\Implementation\TokenizedTextBoxCommands.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\Implementation\VisualStates.MessageBox.cs" />
     <Compile Include="WatermarkTextBox\Implementation\WatermarkTextBox.cs" />
@@ -342,16 +342,19 @@
     <Compile Include="Wizard\Implementation\Wizard.cs" />
     <Compile Include="Wizard\Implementation\WizardPageButtonVisibility.cs" />
     <Compile Include="Wizard\Implementation\WizardPageType.cs" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <AppDesigner Include="Properties\" />
-    <None Include="sn.snk" />
+    <Compile Include="Zoombox\Zoombox.cs" />
+    <Compile Include="Zoombox\ZoomboxCursors.cs" />
+    <Compile Include="Zoombox\ZoomboxView.cs" />
+    <Compile Include="Zoombox\ZoomboxViewChangedEventArgs.cs" />
+    <Compile Include="Zoombox\ZoomboxViewChangedEventHandler.cs" />
+    <Compile Include="Zoombox\ZoomboxViewConverter.cs" />
+    <Compile Include="Zoombox\ZoomboxViewException.cs" />
+    <Compile Include="Zoombox\ZoomboxViewFinderDisplay.cs" />
+    <Compile Include="Zoombox\ZoomboxViewKind.cs" />
+    <Compile Include="Zoombox\ZoomboxViewStack.cs" />
+    <Compile Include="Zoombox\ZoomboxViewStackMode.cs" />
+    <Compile Include="Zoombox\ZoomboxZoomOn.cs" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="MessageBox\Icons\Error48.png" />
@@ -420,9 +423,15 @@
     <Resource Include="MultiLineTextEditor\Images\Notes16.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="TokenizedTextBox\Images\delete8.png" />
+    <Resource Include="Zoombox\Resources\Zoom.cur" />
+    <Resource Include="Zoombox\Resources\ZoomRelative.cur" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Core\ErrorMessages.resx">
+      <DependentUpon>ErrorMessages.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -21,18 +21,29 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-                 Title="ButtonSpinner">
+                 xmlns:s="clr-namespace:System;assembly=mscorlib"
+                 Title="ButtonSpinner"
+                 Description="The ButtonSpinner control allows you to add button spinners to any element and then respond to the Spin event to manipulate that element. The Spin event lets the developer know which direction the buttons are spinning; SpinDirection.Increase indicates an increment, SpinDirection.Decrease indicates a decrement.">
+   <sample:DemoView.Resources>
+      <x:Array x:Key="names" Type="s:String">
+         <s:String>John Smith</s:String>
+         <s:String>Janel Leverling</s:String>
+         <s:String>Laura Callahan</s:String>
+         <s:String>Robert King</s:String>
+         <s:String>Margaret Peacock</s:String>
+         <s:String>Andrew Fuller</s:String>
+         <s:String>Anne Dodsworth</s:String>
+         <s:String>Nancy Davolio</s:String>
+         <s:String>Naomi Suyama</s:String>
+      </x:Array>
+   </sample:DemoView.Resources>
    <Grid>
       <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
          <RowDefinition Height="Auto" />
          <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <TextBlock Text="The ButtonSpinner control allows you to add button spinners to any element and then respond to the Spin event to manipulate that element. The Spin event lets the developer know which direction the buttons are spinning; SpinDirection.Increase indicates an increment, SpinDirection.Decrease indicates a decrement."
-                 TextWrapping="Wrap" />
-
-      <GroupBox Header="Features" Grid.Row="1" Margin="5">
+      <GroupBox Header="Features" Grid.Row="0" Margin="5">
          <Grid Margin="5">
             <Grid.RowDefinitions>
                <RowDefinition Height="Auto" />
@@ -51,9 +62,9 @@
          </Grid>
       </GroupBox>
 
-      <StackPanel Grid.Row="2" Margin="10">
+      <StackPanel Grid.Row="1" Margin="10">
          <TextBlock Text="Usage:" Style="{StaticResource Header}" />
-         <TextBlock Text="You can wrap any element by placing it inside the content area of the ButtonSpinner control. As an example, lets create our own simple numeric up/down control"
+         <TextBlock Text="You can wrap any element by placing it inside the content area of the ButtonSpinner control."
                     TextWrapping="Wrap" />
 
          <xctk:ButtonSpinner Margin="10" 
@@ -62,7 +73,7 @@
                              AllowSpin="{Binding IsChecked, ElementName=_allowSpin}"
                              ShowButtonSpinner="{Binding IsChecked, ElementName=_showButtonSpinner}"
                              Spin="ButtonSpinner_Spin">
-            <TextBox Text="0" BorderThickness="0" HorizontalContentAlignment="Right" />
+            <TextBox Text="John Smith" IsReadOnly="True" BorderThickness="0" HorizontalContentAlignment="Right" />
          </xctk:ButtonSpinner>
       </StackPanel>
    </Grid>

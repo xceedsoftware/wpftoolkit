@@ -35,6 +35,22 @@ namespace Samples.Infrastructure.Controls
 
     #region Properties
 
+
+
+    public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register( "Description", typeof( string ), typeof( DemoView ), new UIPropertyMetadata( String.Empty ) );
+    public string Description
+    {
+      get
+      {
+        return ( string )GetValue( DescriptionProperty );
+      }
+      set
+      {
+        SetValue( DescriptionProperty, value );
+      }
+    }
+
+
     public static readonly DependencyProperty CSharpTextProperty = DependencyProperty.Register( "CSharpText", typeof( string ), typeof( DemoView ), new UIPropertyMetadata( null ) );
     public string CSharpText
     {

@@ -209,13 +209,22 @@ namespace Samples.Infrastructure.Core.CodeFormatting
       if( match.Groups[ 1 ].Success ) //comment
       {
         StringReader reader = new StringReader( match.ToString() );
-        string line;
         StringBuilder sb = new StringBuilder();
+        string line;
+        bool firstLineRead = false;
         while( ( line = reader.ReadLine() ) != null )
         {
-          Run r = new Run( line );
-          r.Foreground = new SolidColorBrush( Color.FromRgb( 0, 128, 0 ) );
+          if( firstLineRead )
+            sb.Append( "\r" );
 
+          sb.Append( line );
+          firstLineRead = true;
+        }
+
+        if( !string.IsNullOrEmpty( sb.ToString() ) )
+        {
+          Run r = new Run( sb.ToString() );
+          r.Foreground = new SolidColorBrush( Color.FromRgb( 0, 128, 0 ) );
           CodeParagraphGlobal.Add( r );
         }
         return "::::::";

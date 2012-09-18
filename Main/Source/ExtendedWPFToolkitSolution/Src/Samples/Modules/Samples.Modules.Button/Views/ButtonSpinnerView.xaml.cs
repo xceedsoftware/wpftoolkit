@@ -38,22 +38,23 @@ namespace Samples.Modules.Button.Views
 
     private void ButtonSpinner_Spin( object sender, SpinEventArgs e )
     {
+      String[] names = (String[])this.Resources[ "names" ];
+
       ButtonSpinner spinner = ( ButtonSpinner )sender;
       TextBox txtBox = ( TextBox )spinner.Content;
 
-      try
-      {
-        int value = String.IsNullOrEmpty( txtBox.Text ) ? 0 : Convert.ToInt32( txtBox.Text );
-        if( e.Direction == SpinDirection.Increase )
-          value++;
-        else
-          value--;
-        txtBox.Text = value.ToString();
-      }
-      catch
-      {
-        txtBox.Text = "0";
-      }
+      int value = Array.IndexOf( names, txtBox.Text );
+      if( e.Direction == SpinDirection.Increase )
+        value++;
+      else
+        value--;
+
+      if( value < 0 )
+        value = names.Length - 1;
+      else if( value >= names.Length )
+        value = 0;
+
+      txtBox.Text = names[ value ];
     }
   }
 }

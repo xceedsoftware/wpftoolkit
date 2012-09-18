@@ -1,4 +1,4 @@
-﻿<!--*********************************************************************
+﻿<!--************************************************************************
 
    Extended WPF Toolkit
 
@@ -15,7 +15,8 @@
 
    Visit http://xceed.com and follow @datagrid on Twitter.
 
-  ********************************************************************-->
+  **********************************************************************-->
+
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
@@ -37,15 +38,15 @@
       <Setter Property="Template">
          <Setter.Value>
             <ControlTemplate TargetType="Control">
-               <local:ButtonSpinner x:Name="Spinner"
+               <local:ButtonSpinner x:Name="PART_Spinner"
                                     IsTabStop="False"
                                     Background="{TemplateBinding Background}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     AllowSpin="{Binding AllowSpin, RelativeSource={RelativeSource TemplatedParent}}"
                                     ShowButtonSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}">
-                  <local:WatermarkTextBox x:Name="TextBox"
+                  <local:WatermarkTextBox x:Name="PART_TextBox"
                                           BorderThickness="0"
-                                          Background="Transparent"
+                                          Background="{TemplateBinding Background}"
                                           ContextMenu="{TemplateBinding ContextMenu}"
                                           FontFamily="{TemplateBinding FontFamily}" 
                                           FontSize="{TemplateBinding FontSize}" 
@@ -62,7 +63,7 @@
                                           TextAlignment="{Binding TextAlignment, RelativeSource={RelativeSource TemplatedParent}}"
                                           TextWrapping="NoWrap" 
                                           TabIndex="{TemplateBinding TabIndex}"
-                                          Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"
                                           VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                           Watermark="{Binding Watermark, RelativeSource={RelativeSource TemplatedParent}}"
                                           WatermarkTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}}" />

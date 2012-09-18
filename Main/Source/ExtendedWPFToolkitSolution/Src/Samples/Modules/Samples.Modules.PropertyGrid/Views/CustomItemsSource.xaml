@@ -21,21 +21,11 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-                 Title="Custom ItemsSource">
-   <Grid>
-
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-
-      <TextBlock Text="Sometimes it is desirable to want to provide a collection of values represented by a ComboBox for a given property.  The PropertyGrid supports this scenario by create a class that implements IItemsSource and decorating your property with the ItemsSourceAttribute."
-                 TextWrapping="Wrap" />
-
-      <StackPanel Grid.Row="1" Margin="10">
-         <TextBlock Text="Providing a Custom ItemsSource:" Style="{StaticResource Header}" />
-         <TextBlock Text="This example uses a collection of Doubles to represent the available options for the WritingFontSize property." TextWrapping="Wrap" />
-         <xctk:PropertyGrid x:Name="_propertyGrid" Width="450" Margin="10" />
-      </StackPanel>
-   </Grid>
+                 Title="Custom ItemsSource"
+                 Description="Sometimes it is desirable to want to provide a collection of values represented by a ComboBox for a given property.  The PropertyGrid supports this scenario by create a class that implements IItemsSource and decorating your property with the ItemsSourceAttribute.">
+   <StackPanel Margin="10">
+      <TextBlock Text="Providing a Custom ItemsSource:" Style="{StaticResource Header}" />
+      <TextBlock Text="This example uses a collection of Doubles to represent the available options for the WritingFontSize property." TextWrapping="Wrap" />
+      <xctk:PropertyGrid x:Name="_propertyGrid" Width="450" Margin="10" />
+   </StackPanel>
 </sample:DemoView>

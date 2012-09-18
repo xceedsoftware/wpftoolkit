@@ -139,7 +139,14 @@
                      <TabControl TabStripPlacement="Top" Style="{StaticResource TabControlStyle}" >
                         <TabItem Header="Sample" Style="{StaticResource TabItemStyle}">
                            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                              <ContentPresenter Margin="10" ScrollViewer.CanContentScroll="True" />
+                              <Grid>
+                                 <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                 </Grid.RowDefinitions>
+                                 <TextBlock Grid.Row="0" TextWrapping="Wrap" Margin="10,10,10,0" Text="{TemplateBinding Description}"/>
+                                 <ContentPresenter Grid.Row="1"  Margin="10" ScrollViewer.CanContentScroll="True" />
+                              </Grid>
                            </ScrollViewer>
                         </TabItem>
                         <TabItem Header="XAML" Style="{StaticResource TabItemStyle}">

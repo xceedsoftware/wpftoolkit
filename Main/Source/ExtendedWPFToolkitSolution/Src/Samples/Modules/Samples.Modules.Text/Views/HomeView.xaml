@@ -22,13 +22,6 @@
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                  Title="Text Controls">
-   <Grid>
-      <xctk:TokenizedTextBox x:Name="_textBox"
-                             DisplayMemberPath="FullName"
-                             SearchMemberPath="FirstName"
-                             ValueMemberPath="Id" 
-                             HorizontalAlignment="Center" 
-                             VerticalAlignment="Center" 
-                             Width="250" />
+   <Grid x:Name="layoutRoot">
    </Grid>
 </sample:DemoView>

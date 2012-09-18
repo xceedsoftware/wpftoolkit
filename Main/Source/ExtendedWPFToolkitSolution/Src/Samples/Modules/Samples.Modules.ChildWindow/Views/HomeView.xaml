@@ -22,7 +22,8 @@
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                  xmlns:sys="clr-namespace:System;assembly=mscorlib"
-                 Title="ChildWindow">
+                 Title="ChildWindow"
+                 Description="The ChildWindow can be used to create a window that is displayed within the bounds of a specific parent container.">
 
    <sample:DemoView.Resources>
       <ObjectDataProvider x:Key="WindowStates" MethodName="GetValues"
@@ -42,14 +43,10 @@
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
-         <RowDefinition Height="Auto" />
          <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <TextBlock Text="ChildWindow description goes here."
-                 TextWrapping="Wrap" />
-
-      <GroupBox Header="Features" Grid.Row="1" Margin="5">
+      <GroupBox Header="Features" Grid.Row="0" Margin="5">
          <Grid Margin="5">
             <Grid.RowDefinitions>
                <RowDefinition Height="Auto" />
@@ -85,7 +82,7 @@
          </Grid>
       </GroupBox>
 
-      <Grid Grid.Row="2" Margin="10">
+      <Grid Grid.Row="1" Margin="10">
          <xctk:ChildWindow Width="350"
                            Caption="{Binding Text, ElementName=_txtCaption}"
                            IsModal="{Binding IsChecked, ElementName=_chkIsModal}"

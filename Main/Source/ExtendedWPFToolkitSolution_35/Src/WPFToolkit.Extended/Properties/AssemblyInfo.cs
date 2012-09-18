@@ -17,24 +17,31 @@
 
   **********************************************************************/
 
+#region Using directives
+
 using System;
+using System.Globalization;
 using System.Reflection;
+using System.Resources;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Windows;
 using System.Windows.Markup;
 
+#endregion
+
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Extended WPF Toolkit" )]
-[assembly: AssemblyDescription( "" )]
-[assembly: AssemblyConfiguration( "" )]
-[assembly: AssemblyCompany( "Xceed Software Inc." )]
-[assembly: AssemblyProduct( "Extended WPF Toolkit" )]
+[assembly: AssemblyTitle( "Xceed Extended WPF Toolkit" )]
+[assembly: AssemblyDescription("This assembly implements various Windows Presentation Framework controls.")]
+
+[assembly: AssemblyCompany("Xceed Software Inc.")]
+[assembly: AssemblyProduct( "Xceed Extended WPF Toolkit" )]
 [assembly: AssemblyCopyright( "Copyright © Xceed Software Inc. 2010-2012" )]
-[assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
+
 
 // Needed to enable xbap scenarios
 [assembly: AllowPartiallyTrustedCallers]
@@ -42,8 +49,8 @@ using System.Windows.Markup;
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible( false )]
-[assembly: CLSCompliant( true )]
+[assembly: ComVisible(false)]
+[assembly: CLSCompliant(true)]
 
 //In order to begin building localizable applications, set 
 //<UICulture>CultureYouAreCodingWith</UICulture> in your .csproj file
@@ -56,33 +63,31 @@ using System.Windows.Markup;
 
 
 [assembly: ThemeInfo(
-    ResourceDictionaryLocation.None, //where theme specific resource dictionaries are located
-  //(used if a resource is not found in the page, 
-  // or application resource dictionaries)
+    ResourceDictionaryLocation.SourceAssembly, //where theme specific resource dictionaries are located
+    //(used if a resource is not found in the page, 
+    // or application resource dictionaries)
     ResourceDictionaryLocation.SourceAssembly //where the generic resource dictionary is located
-  //(used if a resource is not found in the page, 
-  // app, or any theme specific resource dictionaries)
+    //(used if a resource is not found in the page, 
+    // app, or any theme specific resource dictionaries)
 )]
 
+[assembly: XmlnsPrefix("http://schemas.xceed.com/wpf/xaml/toolkit", "xctk")]
+[assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit")]
+[assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Core.Converters" )]
+[assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Core.Input" )]
+[assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Primitives")]
+[assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid")]
+[assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid.Attributes")]
+[assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid.Commands")]
+[assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid.Converters")]
+[assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid.Editors")]
+[assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Zoombox" )]
 
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion( "1.6.0.0" )]
-[assembly: AssemblyFileVersion( "1.6.0.0" )]
 
-[assembly: XmlnsPrefix( "http://schemas.xceed.com/wpf/xaml/toolkit", "xctk" )]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit" )]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Primitives" )]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid" )]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid.Attributes" )]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid.Commands" )]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid.Converters" )]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.PropertyGrid.Editors" )]
+#pragma warning disable 1699
+[assembly: AssemblyDelaySign( false )]
+[assembly: AssemblyKeyFile( @"sn.snk" )]
+[assembly: AssemblyKeyName( "" )]
+#pragma warning restore 1699
+
+
