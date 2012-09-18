@@ -21,19 +21,16 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-                 Title="MaskedTextBox">
+                 Title="MaskedTextBox"
+                 Description="The MaskedTextBox control lets you display and edit values based on a mask.">
    <Grid>
 
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
-         <RowDefinition Height="Auto" />
          <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <TextBlock Text="The MaskedTextBox control lets you display and edit values based on a mask."
-                 TextWrapping="Wrap" />
-
-      <GroupBox Header="Features" Grid.Row="1" Margin="5">
+      <GroupBox Header="Features" Grid.Row="0" Margin="5">
          <StackPanel Margin="5">
             <Grid>
                <Grid.RowDefinitions>
@@ -74,7 +71,7 @@
          </StackPanel>
       </GroupBox>
 
-      <StackPanel Grid.Row="2" Margin="10">
+      <StackPanel Grid.Row="1" Margin="10">
          <xctk:MaskedTextBox IncludeLiterals="{Binding IsChecked, ElementName=_literals, Mode=TwoWay}"
                              IncludePrompt="{Binding IsChecked, ElementName=_prompt, Mode=TwoWay}"
                              Mask="{Binding Text, ElementName=_mask}"

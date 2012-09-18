@@ -1,4 +1,4 @@
-﻿<!--*********************************************************************
+﻿<!--************************************************************************
 
    Extended WPF Toolkit
 
@@ -15,13 +15,15 @@
 
    Visit http://xceed.com and follow @datagrid on Twitter.
 
-  ********************************************************************-->
+  **********************************************************************-->
+
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
 
    <conv:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
+   <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
    <LinearGradientBrush x:Key="ColorPickerDarkBorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
       <GradientStop Color="#FFA3AEB9" Offset="0" />
@@ -341,7 +343,8 @@
                            <TextBlock Grid.Row="3"
                                       Grid.Column="0"
                                       Text="A"
-                                      VerticalAlignment="Center" />
+                                      VerticalAlignment="Center"
+                                      Visibility="{Binding Path=UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                            <Slider x:Name="PART_OpacitySlider"
                                    Grid.Row="3"
                                    Grid.Column="1"
@@ -349,13 +352,15 @@
                                    Margin="4,6,4,6"
                                    Style="{StaticResource ColorCanvasSliderStyle}"
                                    Value="{Binding Path=A, RelativeSource={RelativeSource TemplatedParent}}"
-                                   VerticalAlignment="Center" />
+                                   VerticalAlignment="Center"
+                                   Visibility="{Binding Path=UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                            <TextBox Grid.Row="3"
                                     Grid.Column="3"
                                     Text="{Binding Value, ElementName=PART_OpacitySlider}"
                                     VerticalAlignment="Center"
-                                    Style="{StaticResource ColorCanvasTextBoxStyle}" />
-                        </Grid>
+                                    Style="{StaticResource ColorCanvasTextBoxStyle}" 
+                                    Visibility="{Binding Path=UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                         </Grid>
                      </Border>
                   </Grid>
                </Border>

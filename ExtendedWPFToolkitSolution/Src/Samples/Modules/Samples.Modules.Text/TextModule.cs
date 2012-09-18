@@ -41,6 +41,8 @@ namespace Samples.Modules.Text
     {
       Container.RegisterNavigationType( typeof( HomeView ) );
       Container.RegisterNavigationType( typeof( MaskedTextBoxView ) );
+      Container.RegisterNavigationType( typeof( MultiLineTextEditorView ) );
+      Container.RegisterNavigationType( typeof( RichTextBoxView ) );
       Container.RegisterNavigationType( typeof( WatermarkTextBoxView ) );
     }
   }

@@ -22,18 +22,15 @@
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                  xmlns:sys="clr-namespace:System;assembly=mscorlib"
-                 Title="Custom Editors">
+                 Title="Custom Editors"
+                 Description="This example demonstrates the various methods of creating and using custom editors.  You can supply your own editor based on a Type, a property name, or both.  To supply your own editor for a property you have to create an EditorDefinition for the PropertyGrid.">
    <Grid>
       <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
          <RowDefinition Height="*" />
          <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <TextBlock Text="This example demonstrates the various methods of creating and using custom editors.  You can supply your own editor based on a Type, a property name, or both.  To supply your own editor for a property you have to create an EditorDefinition for the PropertyGrid."
-                 TextWrapping="Wrap" />
-
-      <StackPanel Grid.Row="1" Margin="10">
+      <StackPanel Grid.Row="0" Margin="10">
          <TextBlock Text="Custom Editors with a DataTemplate:" Style="{StaticResource Header}" />
          <TextBlock Text="You can override the default editors with your own custom editors with a DataTemplate.  Simply define an EditorDefinition that either targets a Type, property name, or both and set the EditorDefinition.EditorTemplate to an instance of a DataTemplate.  Be sure to bind your custom editor to the bound property item's Value property." TextWrapping="Wrap" />
          <xctk:PropertyGrid x:Name="_propertyGrid1" Width="450"  Margin="10">
@@ -63,7 +60,7 @@
                   </xctk:EditorDefinition.EditorTemplate>
                </xctk:EditorDefinition>
 
-               <!-- This EditorDefinition will provide a TextBox to any property that is of type Boolean and that has any of the defined property names, replacing the default editor. -->
+               <!-- This EditorDefinition will provide a TextBox to any property that is of type Boolean or that has any of the defined property names, replacing the default editor. -->
                <xctk:EditorDefinition TargetType="{x:Type sys:Boolean}">
                   <xctk:EditorDefinition.PropertiesDefinitions>
                      <xctk:PropertyDefinition Name="DateOfBirth" />
@@ -80,7 +77,7 @@
          </xctk:PropertyGrid>
       </StackPanel>
 
-      <StackPanel Grid.Row="2" Margin="10">
+      <StackPanel Grid.Row="1" Margin="10">
          <TextBlock Text="Custom Editors with an Attribute:" Style="{StaticResource Header}" />
          <TextBlock Text="You can supply editors for a property by using the System.ComponentModel.EditorAttribute.  In order to provide an editor with an attribute, the editor MUST implement the ITypeEditor interface.  Your editor can be a simple class or a complex UserControl." TextWrapping="Wrap" />
          <xctk:PropertyGrid x:Name="_propertyGrid2" Width="450" Margin="10" />

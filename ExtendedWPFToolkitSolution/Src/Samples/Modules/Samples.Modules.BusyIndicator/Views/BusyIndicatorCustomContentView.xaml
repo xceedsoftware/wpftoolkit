@@ -21,7 +21,8 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-                 Title="BusyIndicator">
+                 Title="BusyIndicator"
+                 Description="This example demonstrates how to define your own custom content. This is done by setting the BusyContent property.">
    <sample:DemoView.Resources>
       <ResourceDictionary>
          <ResourceDictionary.MergedDictionaries>
@@ -30,30 +31,19 @@
       </ResourceDictionary>
    </sample:DemoView.Resources>
 
-   <Grid>
-
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-
-      <TextBlock Text="This example demonstrates how to define your own custom content. This is done by setting the BusyContent property."
-                 TextWrapping="Wrap" />
-
-      <StackPanel Grid.Row="1" Margin="10">
-         <TextBlock Text="Custom Content:" Style="{StaticResource Header}" />
-         <xctk:BusyIndicator IsBusy="True">
-            <xctk:BusyIndicator.BusyContent>
-               <StackPanel Orientation="Horizontal">
-                  <Image Source="/Samples.Modules.BusyIndicator;component/Images/CdBurning32.png" />
-                  <StackPanel Margin="5,0">
-                     <TextBlock Text="Burning CD..." VerticalAlignment="Center" />
-                     <TextBlock Text="Madonna - Like a Virgin" VerticalAlignment="Center" Margin="8,0" />
-                  </StackPanel>
+   <StackPanel Margin="10">
+      <TextBlock Text="Custom Content:" Style="{StaticResource Header}" />
+      <xctk:BusyIndicator IsBusy="True">
+         <xctk:BusyIndicator.BusyContent>
+            <StackPanel Orientation="Horizontal">
+               <Image Source="/Samples.Modules.BusyIndicator;component/Images/CdBurning32.png" />
+               <StackPanel Margin="5,0">
+                  <TextBlock Text="Burning CD..." VerticalAlignment="Center" />
+                  <TextBlock Text="Madonna - Like a Virgin" VerticalAlignment="Center" Margin="8,0" />
                </StackPanel>
-            </xctk:BusyIndicator.BusyContent>
-            <ContentControl ContentTemplate="{StaticResource SampleContent}" />
-         </xctk:BusyIndicator>
-      </StackPanel>
-   </Grid>
+            </StackPanel>
+         </xctk:BusyIndicator.BusyContent>
+         <ContentControl ContentTemplate="{StaticResource SampleContent}" />
+      </xctk:BusyIndicator>
+   </StackPanel>
 </sample:DemoView>

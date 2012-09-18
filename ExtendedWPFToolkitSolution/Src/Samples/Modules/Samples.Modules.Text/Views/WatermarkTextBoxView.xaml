@@ -21,17 +21,15 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-                 Title="WatermarkTextBox">
+                 Title="WatermarkTextBox"
+                 Description="The WatermarkTextBox is simply a TextBox that allows you to sepcify an object, usually a String, to represent null or missing text.">
    <Grid>
       <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
          <RowDefinition Height="Auto" />
          <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <TextBlock Text="The WatermarkTextBox is simply a TextBox that allows you to sepcify an object, usually a String, to represent null or missing text." />
-
-      <GroupBox Header="Features" Grid.Row="1">
+      <GroupBox Header="Features" Grid.Row="0">
          <Grid Margin="5">
             <CheckBox x:Name="_selectAll" Content="SelectAllOnGotFocus" VerticalAlignment="Center" Margin="5" ToolTip="Selects all text in the WatermarkTextBox when it receives focus." />
          </Grid>
@@ -51,7 +49,7 @@
             </xctk:WatermarkTextBox.Watermark>
          </xctk:WatermarkTextBox>
 
-         <TextBlock Grid.Row="2" Text="Custom WatermarkTemplate:" Style="{StaticResource Header}" />
+         <TextBlock Grid.Row="1" Text="Custom WatermarkTemplate:" Style="{StaticResource Header}" />
          <xctk:WatermarkTextBox Grid.Row="2" Grid.Column="1" Margin="5" Watermark="Enter Text" SelectAllOnGotFocus="{Binding IsChecked, ElementName=_selectAll}">
             <xctk:WatermarkTextBox.WatermarkTemplate>
                <DataTemplate>

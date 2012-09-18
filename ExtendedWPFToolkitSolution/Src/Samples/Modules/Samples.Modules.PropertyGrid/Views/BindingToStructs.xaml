@@ -22,48 +22,38 @@
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                  xmlns:local="clr-namespace:Samples.Modules.PropertyGrid.Views"
-                 Title="Binding to Structs">
+                 Title="Binding to Structs"
+                 Description="When the SelectedObject contains properties of type Struct youmay find that edits performed in the PropertyGrid do not function properly.  This is because Structs are passed by value.  Meaning that the PropertyGrid receives a copy of the Struct and not a reference.  When this happens, the data binding expressions end up binding to and modifying that copy rather than the original values.">
 
    <sample:DemoView.Resources>
       <local:DimensionsConverter x:Key="DimensionsConverter" />
    </sample:DemoView.Resources>
-   <Grid>
-
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-
-      <TextBlock Text="When the SelectedObject contains properties of type Struct youmay find that edits performed in the PropertyGrid do not function properly.  This is because Structs are passed by value.  Meaning that the PropertyGrid receives a copy of the Struct and not a reference.  When this happens, the data binding expressions end up binding to and modifying that copy rather than the original values."
-                 TextWrapping="Wrap" />
-
-      <StackPanel Grid.Row="1" Margin="10">
-         <TextBlock Text="Binding to Structs:" Style="{StaticResource Header}" />
-         <TextBlock Text="The solution to this problem is to create a custom editor and provide an IValueConverter to handle the proper conversion of the Struct values." TextWrapping="Wrap" />
-         <xctk:PropertyGrid x:Name="_propertyGrid" Width="450" Margin="10">
-            <xctk:PropertyGrid.EditorDefinitions>
-               <xctk:EditorDefinition TargetType="{x:Type local:Dimension}">
-                  <xctk:EditorDefinition.EditorTemplate>
-                     <DataTemplate>
-                        <Grid Margin="5">
-                           <Grid.RowDefinitions>
-                              <RowDefinition Height="Auto" />
-                              <RowDefinition Height="Auto" />
-                           </Grid.RowDefinitions>
-                           <Grid.ColumnDefinitions>
-                              <ColumnDefinition Width="Auto" />
-                              <ColumnDefinition Width="*" />
-                           </Grid.ColumnDefinitions>
-                           <TextBlock Text="Height: " />
-                           <TextBox Grid.Column="1" Text="{Binding Path=Value, Converter={StaticResource DimensionsConverter},ConverterParameter=Height}" />
-                           <TextBlock Grid.Row="1" Text="Weight: " />
-                           <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Value, Converter={StaticResource DimensionsConverter},ConverterParameter=Weight}" />
-                        </Grid>
-                     </DataTemplate>
-                  </xctk:EditorDefinition.EditorTemplate>
-               </xctk:EditorDefinition>
-            </xctk:PropertyGrid.EditorDefinitions>
-         </xctk:PropertyGrid>
-      </StackPanel>
-   </Grid>
+   <StackPanel Grid.Row="1" Margin="10">
+      <TextBlock Text="Binding to Structs:" Style="{StaticResource Header}" />
+      <TextBlock Text="The solution to this problem is to create a custom editor and provide an IValueConverter to handle the proper conversion of the Struct values." TextWrapping="Wrap" />
+      <xctk:PropertyGrid x:Name="_propertyGrid" Width="450" Margin="10">
+         <xctk:PropertyGrid.EditorDefinitions>
+            <xctk:EditorDefinition TargetType="{x:Type local:Dimension}">
+               <xctk:EditorDefinition.EditorTemplate>
+                  <DataTemplate>
+                     <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                           <RowDefinition Height="Auto" />
+                           <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                           <ColumnDefinition Width="Auto" />
+                           <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Height: " />
+                        <TextBox Grid.Column="1" Text="{Binding Path=Value, Converter={StaticResource DimensionsConverter},ConverterParameter=Height}" />
+                        <TextBlock Grid.Row="1" Text="Weight: " />
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Value, Converter={StaticResource DimensionsConverter},ConverterParameter=Weight}" />
+                     </Grid>
+                  </DataTemplate>
+               </xctk:EditorDefinition.EditorTemplate>
+            </xctk:EditorDefinition>
+         </xctk:PropertyGrid.EditorDefinitions>
+      </xctk:PropertyGrid>
+   </StackPanel>
 </sample:DemoView>

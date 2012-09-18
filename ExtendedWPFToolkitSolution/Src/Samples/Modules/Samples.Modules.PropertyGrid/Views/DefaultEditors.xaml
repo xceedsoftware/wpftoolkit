@@ -21,19 +21,10 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-                 Title="Default Editors">
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-
-      <TextBlock Text="This example demonstrates the default editors provided by the PropertyGrid."
-                 TextWrapping="Wrap" />
-
-      <StackPanel Grid.Row="1" Margin="10">
-         <TextBlock Text="Default Editors:" Style="{StaticResource Header}" />
-         <xctk:PropertyGrid x:Name="_propertyGrid" Width="450" Margin="10" />
-      </StackPanel>
-   </Grid>
+                 Title="Default Editors"
+                 Description="This example demonstrates the default editors provided by the PropertyGrid.">
+   <StackPanel Margin="10">
+      <TextBlock Text="Default Editors:" Style="{StaticResource Header}" />
+      <xctk:PropertyGrid x:Name="_propertyGrid" Width="450" Margin="10" />
+   </StackPanel>
 </sample:DemoView>

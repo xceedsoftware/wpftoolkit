@@ -1,4 +1,4 @@
-﻿<!--*********************************************************************
+﻿<!--************************************************************************
 
    Extended WPF Toolkit
 
@@ -15,7 +15,8 @@
 
    Visit http://xceed.com and follow @datagrid on Twitter.
 
-  ********************************************************************-->
+  **********************************************************************-->
+
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
