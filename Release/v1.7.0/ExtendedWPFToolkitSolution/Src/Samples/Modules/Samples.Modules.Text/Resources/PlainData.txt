@@ -1,0 +1,2 @@
+﻿This is the RichTextBox
+in Plain Format

@@ -1,0 +1,46 @@
+﻿<!--************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2010-2012 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   This program can be provided to you by Xceed Software Inc. under a
+   proprietary commercial license agreement for use in non-Open Source
+   projects. The commercial version of Extended WPF Toolkit also includes
+   priority technical support, commercial updates, and many additional 
+   useful WPF controls if you license Xceed Business Suite for WPF.
+
+   Visit http://xceed.com and follow @datagrid on Twitter.
+
+  **********************************************************************-->
+
+<Window x:Class="Xceed.Wpf.Toolkit.CollectionEditorDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
+        Title="Collection Editor" 
+        Height="400" 
+        Width="600" 
+        WindowStartupLocation="CenterScreen">
+
+   <Grid Margin="10">
+      <Grid.RowDefinitions>
+         <RowDefinition Height="*" />
+         <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <local:CollectionEditor x:Name="_propertyGrid"
+                              ItemsSourceType="{Binding ItemsSourceType, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                              ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                              NewItemTypes="{Binding NewItemTypes, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
+
+      <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right" Margin="5">
+         <Button Width="75" Margin="2" Click="OkButton_Click" IsDefault="True">OK</Button>
+         <Button Width="75" Margin="2" IsCancel="True">Cancel</Button>
+      </StackPanel>
+
+   </Grid>
+</Window>
