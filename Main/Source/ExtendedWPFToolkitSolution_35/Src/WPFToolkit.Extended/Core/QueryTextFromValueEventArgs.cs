@@ -18,38 +18,40 @@
   **********************************************************************/
 
 using System;
-using System.Windows;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Xceed.Wpf.Toolkit
+namespace Xceed.Wpf.Toolkit.Core
 {
-  public class IntegerUpDown : CommonNumericUpDown<int>
+  public class QueryTextFromValueEventArgs : EventArgs
   {
-    #region Constructors
-
-    static IntegerUpDown()
+    public QueryTextFromValueEventArgs( object value, string text )
     {
-      UpdateMetadata( typeof( IntegerUpDown ), 0, 1, int.MinValue, int.MaxValue );
+      m_value = value;
+      m_text = text;
     }
 
-    public IntegerUpDown()
-      : base( Int32.Parse, Decimal.ToInt32 )
+    #region Value Property
+
+    private object m_value;
+
+    public object Value
     {
+      get { return m_value; }
     }
 
-    #endregion //Constructors
+    #endregion Value Property
 
-    #region Base Class Overrides
+    #region Text Property
 
-    protected override int IncrementValue( int value, int increment )
+    private string m_text;
+
+    public string Text
     {
-      return value + increment;
+      get { return m_text; }
+      set { m_text = value; }
     }
 
-    protected override int DecrementValue( int value, int increment )
-    {
-      return value - increment;
-    }
-
-    #endregion //Base Class Overrides
+    #endregion Text Property
   }
 }

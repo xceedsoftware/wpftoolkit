@@ -153,6 +153,71 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    public static readonly DependencyProperty ButtonRegionBackgroundProperty = DependencyProperty.Register( "ButtonRegionBackground", typeof( Brush ), typeof( MessageBox ), new PropertyMetadata( null ) );
+    public Brush ButtonRegionBackground
+    {
+      get
+      {
+        return ( Brush )GetValue( ButtonRegionBackgroundProperty );
+      }
+      set
+      {
+        SetValue( ButtonRegionBackgroundProperty, value );
+      }
+    }
+
+    public static readonly DependencyProperty OkButtonStyleProperty = DependencyProperty.Register( "OkButtonStyle", typeof( Style ), typeof( MessageBox ), new PropertyMetadata( null ) );
+    public Style OkButtonStyle
+    {
+      get
+      {
+        return ( Style )GetValue( OkButtonStyleProperty );
+      }
+      set
+      {
+        SetValue( OkButtonStyleProperty, value );
+      }
+    }
+
+    public static readonly DependencyProperty CancelButtonStyleProperty = DependencyProperty.Register( "CancelButtonStyle", typeof( Style ), typeof( MessageBox ), new PropertyMetadata( null ) );
+    public Style CancelButtonStyle
+    {
+      get
+      {
+        return ( Style )GetValue( CancelButtonStyleProperty );
+      }
+      set
+      {
+        SetValue( CancelButtonStyleProperty, value );
+      }
+    }
+
+    public static readonly DependencyProperty YesButtonStyleProperty = DependencyProperty.Register( "YesButtonStyle", typeof( Style ), typeof( MessageBox ), new PropertyMetadata( null ) );
+    public Style YesButtonStyle
+    {
+      get
+      {
+        return ( Style )GetValue( YesButtonStyleProperty );
+      }
+      set
+      {
+        SetValue( YesButtonStyleProperty, value );
+      }
+    }
+
+    public static readonly DependencyProperty NoButtonStyleProperty = DependencyProperty.Register( "NoButtonStyle", typeof( Style ), typeof( MessageBox ), new PropertyMetadata( null ) );
+    public Style NoButtonStyle
+    {
+      get
+      {
+        return ( Style )GetValue( NoButtonStyleProperty );
+      }
+      set
+      {
+        SetValue( NoButtonStyleProperty, value );
+      }
+    }
+
     public static readonly DependencyProperty ImageSourceProperty = DependencyProperty.Register( "ImageSource", typeof( ImageSource ), typeof( MessageBox ), new UIPropertyMetadata( default( ImageSource ) ) );
     public ImageSource ImageSource
     {
@@ -280,6 +345,14 @@ namespace Xceed.Wpf.Toolkit
 
       ChangeVisualState( _button.ToString(), true );
 
+      Button closeButton = GetMessageBoxButton( PART_CloseButton );
+      if( closeButton != null )
+        closeButton.IsEnabled = !object.Equals( _button, MessageBoxButton.YesNo );
+
+      Button okButton = GetMessageBoxButton( PART_OkButton );
+      if( okButton != null )
+        okButton.IsCancel = object.Equals( _button, MessageBoxButton.OK );
+
       SetDefaultResult();
     }
 
@@ -318,7 +391,6 @@ namespace Xceed.Wpf.Toolkit
     /// </summary>
     /// <param name="messageText">A System.String that specifies the text to display.</param>
     /// <param name="caption">A System.String that specifies the title bar caption to display.</param>
-    /// <param name="messageBoxStyle">A Style that will be applied to the MessageBox instance.</param>
     /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
     public static MessageBoxResult Show( string messageText, string caption )
     {
@@ -696,6 +768,10 @@ namespace Xceed.Wpf.Toolkit
           MessageBoxResult = MessageBoxResult.Yes;
           break;
         case PART_CloseButton:
+          MessageBoxResult = object.Equals( _button, MessageBoxButton.OK )
+                              ? MessageBoxResult.OK
+                              : MessageBoxResult.Cancel;
+          break;
         case PART_CancelButton:
           MessageBoxResult = MessageBoxResult.Cancel;
           break;
@@ -703,6 +779,8 @@ namespace Xceed.Wpf.Toolkit
           MessageBoxResult = MessageBoxResult.OK;
           break;
       }
+
+      e.Handled = true;
 
       Close();
     }

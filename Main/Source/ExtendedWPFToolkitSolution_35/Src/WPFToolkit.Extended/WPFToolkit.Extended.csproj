@@ -193,6 +193,9 @@
   <ItemGroup>
     <Compile Include="AssemblyVersionInfo.cs" />
     <Compile Include="AssemblyVersionInfoCommon.cs" />
+    <Compile Include="AutoSelectTextBox\Implementation\AutoSelectBehaviorEnum.cs" />
+    <Compile Include="AutoSelectTextBox\Implementation\AutoSelectTextBox.cs" />
+    <Compile Include="AutoSelectTextBox\Implementation\QueryMoveFocusEventArgs.cs" />
     <Compile Include="BusyIndicator\Implementation\BusyIndicator.cs" />
     <Compile Include="ButtonSpinner\Implementation\ButtonSpinner.cs" />
     <Compile Include="CalculatorUpDown\Implementation\CalculatorUpDown.cs" />
@@ -209,6 +212,9 @@
     <Compile Include="Chromes\Implementation\ButtonChrome.cs" />
     <Compile Include="CollectionEditors\Implementation\CollectionEditor.cs" />
     <Compile Include="CheckComboBox\Implementation\CheckComboBox.cs" />
+    <Compile Include="Core\Input\IValidateInput.cs" />
+    <Compile Include="Core\Input\InputValidationErrorEventArgs.cs" />
+    <Compile Include="Core\Primitives\CachedTextInfo.cs" />
     <Compile Include="Core\Converters\ObjectTypeToNameConverter.cs" />
     <Compile Include="ColorCanvas\Implementation\ColorCanvas.cs" />
     <Compile Include="Core\Converters\CalculatorMemoryToVisibilityConverter.cs" />
@@ -230,8 +236,11 @@
     <Compile Include="Core\Primitives\Selector.cs" />
     <Compile Include="Core\Primitives\SelectorItem.cs" />
     <Compile Include="Core\Primitives\ShapeBase.cs" />
+    <Compile Include="Core\Primitives\ValueRangeTextBox.cs" />
     <Compile Include="Core\PropertyChangedEventArgs.cs" />
     <Compile Include="Core\PropertyChangedEventHandler.cs" />
+    <Compile Include="Core\QueryTextFromValueEventArgs.cs" />
+    <Compile Include="Core\QueryValueFromTextEventArgs.cs" />
     <Compile Include="Core\Themes\StaticResourceKey.cs" />
     <Compile Include="Core\Utilities\CalculatorUtilities.cs" />
     <Compile Include="Core\Utilities\ColorUtilities.cs" />
@@ -240,10 +249,14 @@
     <Compile Include="Core\Converters\InverseBoolConverter.cs" />
     <Compile Include="Core\Converters\SolidColorBrushToColorConverter.cs" />
     <Compile Include="Core\Utilities\ContextMenuUtilities.cs" />
+    <Compile Include="Core\Utilities\TreeHelper.cs" />
+    <Compile Include="Core\Utilities\ValueChangeHelper.cs" />
     <Compile Include="Core\Utilities\DoubleHelper.cs" />
     <Compile Include="Core\Utilities\EllipseHelper.cs" />
+    <Compile Include="Core\Utilities\NotifyPropertyChangedHelper.cs" />
     <Compile Include="Core\Utilities\PointHelper.cs" />
     <Compile Include="Core\Utilities\RectHelper.cs" />
+    <Compile Include="Core\Utilities\ReflectionHelper.cs" />
     <Compile Include="Core\Utilities\ResourceHelper.cs" />
     <Compile Include="Core\Utilities\Segment.cs" />
     <Compile Include="Core\Utilities\VisualTreeHelperEx.cs" />
@@ -255,9 +268,19 @@
     <Compile Include="DateTimeUpDown\Implementation\DateTimeParser.cs" />
     <Compile Include="DropDownButton\Implementation\DropDownButton.cs" />
     <Compile Include="Magnifier\Implementation\FrameType.cs" />
+    <Compile Include="MaskedTextBox\Implementation\AutoCompletingMaskEventArgs.cs" />
+    <Compile Include="MaskedTextBox\Implementation\InsertKeyModeEnum.cs" />
+    <Compile Include="MaskedTextBox\Implementation\MaskedTextBox.cs" />
+    <Compile Include="MaskedTextBox\Implementation\MaskFormatEnum.cs" />
     <Compile Include="MultiLineTextEditor\Implementation\MultiLineTextEditor.cs" />
+    <Compile Include="NumericUpDown\Implementation\ByteUpDown.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NumericUpDown\Implementation\CommonNumericUpDown.cs" />
     <Compile Include="NumericUpDown\Implementation\DecimalUpDown.cs" />
     <Compile Include="NumericUpDown\Implementation\DoubleUpDown.cs" />
+    <Compile Include="NumericUpDown\Implementation\SByteUpDown.cs" />
+    <Compile Include="NumericUpDown\Implementation\SingleUpDown.cs" />
     <Compile Include="NumericUpDown\Implementation\IntegerUpDown.cs" />
     <Compile Include="Magnifier\Implementation\Converters\BorderThicknessToStrokeThicknessConverter.cs" />
     <Compile Include="Magnifier\Implementation\Converters\RadiusConverter.cs" />
@@ -265,10 +288,19 @@
     <Compile Include="Magnifier\Implementation\MagnifierAdorner.cs" />
     <Compile Include="Magnifier\Implementation\MagnifierManager.cs" />
     <Compile Include="Core\Primitives\InputBase.cs" />
-    <Compile Include="MaskedTextBox\Implementation\MaskedTextBox.cs" />
+    <Compile Include="Obselete\MaskedTextBox\Implementation\MaskedTextBox.cs" />
     <Compile Include="MessageBox\Implementation\MessageBox.cs" />
+    <Compile Include="NumericUpDown\Implementation\LongUpDown.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="NumericUpDown\Implementation\NumericUpDown.cs" />
     <Compile Include="CollectionEditors\Implementation\PrimitiveTypeCollectionEditor.cs" />
+    <Compile Include="NumericUpDown\Implementation\ShortUpDown.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NumericUpDown\Implementation\UIntegerUpDown.cs" />
+    <Compile Include="NumericUpDown\Implementation\ULongUpDown.cs" />
+    <Compile Include="NumericUpDown\Implementation\UShortUpDown.cs" />
     <Compile Include="Pie\Implementation\Pie.cs" />
     <Compile Include="Pie\Implementation\PieModeEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -280,6 +312,7 @@
     <Compile Include="PropertyGrid\Implementation\Attributes\ItemsSourceAttribute.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\PropertyOrderAttribute.cs" />
     <Compile Include="PropertyGrid\Implementation\Commands\PropertyGridCommands.cs" />
+    <Compile Include="PropertyGrid\Implementation\Converters\SelectedObjectConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\ValueSourceToImagePathConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\ValueSourceToToolTipConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\CheckBoxEditor.cs" />
@@ -293,20 +326,18 @@
     <Compile Include="PropertyGrid\Implementation\Editors\ComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\EditorDefinition.cs" />
     <Compile Include="PropertyGrid\Implementation\EditorDefinitionCollection.cs" />
-    <Compile Include="PropertyGrid\Implementation\Editors\DateTimeUpDownEditor.cs" />
-    <Compile Include="PropertyGrid\Implementation\Editors\DecimalUpDownEditor.cs" />
-    <Compile Include="PropertyGrid\Implementation\Editors\DoubleUpDownEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\EnumComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\FontComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\ItemsSourceAttributeEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\UpDownEditors.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\TimeSpanEditor.cs" />
-    <Compile Include="PropertyGrid\Implementation\Editors\IntegerUpDownEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\ITypeEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\PrimitiveTypeCollectionEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\TextBlockEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\TextBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\TypeEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\ExpandableObjectMarginConverter.cs" />
+    <Compile Include="PropertyGrid\Implementation\IPropertyParent.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyDefinition.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyDefinitionCollection.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyGrid.cs" />
@@ -334,7 +365,6 @@
     <Compile Include="TimePicker\Implementation\TimeFormat.cs" />
     <Compile Include="TimePicker\Implementation\TimeItem.cs" />
     <Compile Include="TimePicker\Implementation\TimePicker.cs" />
-    <Compile Include="Utils\Exceptions\ThrowException.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\Implementation\VisualStates.MessageBox.cs" />
     <Compile Include="WatermarkTextBox\Implementation\WatermarkTextBox.cs" />
@@ -433,6 +463,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
   </PropertyGroup>

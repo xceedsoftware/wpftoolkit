@@ -18,38 +18,29 @@
   **********************************************************************/
 
 using System;
-using System.Windows;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace Xceed.Wpf.Toolkit
+namespace Xceed.Wpf.Toolkit.Core.Input
 {
-  public class IntegerUpDown : CommonNumericUpDown<int>
+  public delegate void InputValidationErrorEventHandler( object sender, InputValidationErrorEventArgs e );
+
+  public class InputValidationErrorEventArgs : EventArgs
   {
-    #region Constructors
-
-    static IntegerUpDown()
+    public InputValidationErrorEventArgs( string errorMsg )
     {
-      UpdateMetadata( typeof( IntegerUpDown ), 0, 1, int.MinValue, int.MaxValue );
+      _errorMessage = errorMsg;
     }
 
-    public IntegerUpDown()
-      : base( Int32.Parse, Decimal.ToInt32 )
+    public string ErrorMessage
     {
+      get
+      {
+        return _errorMessage;
+      }
     }
 
-    #endregion //Constructors
-
-    #region Base Class Overrides
-
-    protected override int IncrementValue( int value, int increment )
-    {
-      return value + increment;
-    }
-
-    protected override int DecrementValue( int value, int increment )
-    {
-      return value - increment;
-    }
-
-    #endregion //Base Class Overrides
+    private string _errorMessage;
   }
 }

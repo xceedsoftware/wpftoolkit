@@ -64,9 +64,9 @@ namespace Xceed.Wpf.Toolkit.Primitives
     protected virtual void OnIsSelectedChanged( bool oldValue, bool newValue )
     {
       if( newValue )
-        RaiseSelectionChangedEvent( new RoutedEventArgs( Selector.SelectedEvent, this ) );
+        this.RaiseEvent( new RoutedEventArgs( Selector.SelectedEvent, this ) );
       else
-        RaiseSelectionChangedEvent( new RoutedEventArgs( Selector.UnSelectedEvent, this ) );
+        this.RaiseEvent( new RoutedEventArgs( Selector.UnSelectedEvent, this ) );
     }
 
     internal Selector ParentSelector
@@ -95,13 +95,5 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #endregion //Event Hanlders
 
-    #region Methods
-
-    private void RaiseSelectionChangedEvent( RoutedEventArgs e )
-    {
-      base.RaiseEvent( e );
-    }
-
-    #endregion //Methods
   }
 }

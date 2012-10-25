@@ -22,17 +22,17 @@ using System.Windows;
 
 namespace Xceed.Wpf.Toolkit
 {
-  public class IntegerUpDown : CommonNumericUpDown<int>
+  internal class UIntegerUpDown : CommonNumericUpDown<uint>
   {
     #region Constructors
 
-    static IntegerUpDown()
+    static UIntegerUpDown()
     {
-      UpdateMetadata( typeof( IntegerUpDown ), 0, 1, int.MinValue, int.MaxValue );
+      UpdateMetadata( typeof( UIntegerUpDown ), default( uint ), ( uint )1, uint.MinValue, uint.MaxValue );
     }
 
-    public IntegerUpDown()
-      : base( Int32.Parse, Decimal.ToInt32 )
+    public UIntegerUpDown()
+      : base( uint.Parse, Decimal.ToUInt32 )
     {
     }
 
@@ -40,14 +40,14 @@ namespace Xceed.Wpf.Toolkit
 
     #region Base Class Overrides
 
-    protected override int IncrementValue( int value, int increment )
+    protected override uint IncrementValue( uint value, uint increment )
     {
-      return value + increment;
+      return ( uint )( value + increment );
     }
 
-    protected override int DecrementValue( int value, int increment )
+    protected override uint DecrementValue( uint value, uint increment )
     {
-      return value - increment;
+      return ( uint )( value - increment );
     }
 
     #endregion //Base Class Overrides
