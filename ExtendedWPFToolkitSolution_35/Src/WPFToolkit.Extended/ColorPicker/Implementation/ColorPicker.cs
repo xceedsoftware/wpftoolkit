@@ -343,7 +343,7 @@ namespace Xceed.Wpf.Toolkit
       {
         return ( bool )GetValue( UsingAlphaChannelProperty );
       }
-      protected set
+      set
       {
         SetValue( UsingAlphaChannelProperty, value );
       }

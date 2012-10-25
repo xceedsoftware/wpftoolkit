@@ -18,38 +18,19 @@
   **********************************************************************/
 
 using System;
-using System.Windows;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace Xceed.Wpf.Toolkit
+namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
-  public class IntegerUpDown : CommonNumericUpDown<int>
+  internal interface IPropertyParent
   {
-    #region Constructors
+    bool IsReadOnly { get; }
 
-    static IntegerUpDown()
-    {
-      UpdateMetadata( typeof( IntegerUpDown ), 0, 1, int.MinValue, int.MaxValue );
-    }
+    object ValueInstance { get; }
 
-    public IntegerUpDown()
-      : base( Int32.Parse, Decimal.ToInt32 )
-    {
-    }
-
-    #endregion //Constructors
-
-    #region Base Class Overrides
-
-    protected override int IncrementValue( int value, int increment )
-    {
-      return value + increment;
-    }
-
-    protected override int DecrementValue( int value, int increment )
-    {
-      return value - increment;
-    }
-
-    #endregion //Base Class Overrides
+    EditorDefinitionCollection EditorDefinitions { get; }
   }
 }

@@ -22,11 +22,14 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Primitives;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
   public class CheckComboBox : Selector
   {
+    private ValueChangeHelper _displayMemberPathValuesChangeHelper;
+
     #region Constructors
 
     static CheckComboBox()
@@ -37,6 +40,7 @@ namespace Xceed.Wpf.Toolkit
     public CheckComboBox()
     {
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );
+      _displayMemberPathValuesChangeHelper = new ValueChangeHelper( this.OnDisplayMemberPathValuesChanged );
     }
 
     #endregion //Constructors
@@ -98,7 +102,13 @@ namespace Xceed.Wpf.Toolkit
     protected override void OnDisplayMemberPathChanged( string oldDisplayMemberPath, string newDisplayMemberPath )
     {
       base.OnDisplayMemberPathChanged( oldDisplayMemberPath, newDisplayMemberPath );
-      UpdateText();
+      this.UpdateDisplayMemberPathValuesBindings();
+    }
+
+    protected override void OnItemsSourceChanged( System.Collections.IEnumerable oldValue, System.Collections.IEnumerable newValue )
+    {
+      base.OnItemsSourceChanged( oldValue, newValue );
+      this.UpdateDisplayMemberPathValuesBindings();
     }
 
     #endregion //Base Class Overrides
@@ -113,6 +123,16 @@ namespace Xceed.Wpf.Toolkit
     #endregion //Event Handlers
 
     #region Methods
+
+    private void UpdateDisplayMemberPathValuesBindings()
+    {
+      _displayMemberPathValuesChangeHelper.UpdateValueSource( ItemsCollection, this.DisplayMemberPath );
+    }
+
+    private void OnDisplayMemberPathValuesChanged()
+    {
+      this.UpdateText();
+    }
 
     private void UpdateText()
     {

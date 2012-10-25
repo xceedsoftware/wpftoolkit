@@ -171,21 +171,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region Methods
 
-    protected static decimal ParseDecimal( string text, IFormatProvider cultureInfo )
-    {
-      return Decimal.Parse( text, NumberStyles.Any, cultureInfo );
-    }
-
-    protected static double ParseDouble( string text, IFormatProvider cultureInfo )
-    {
-      return Double.Parse( text, NumberStyles.Any, cultureInfo );
-    }
-
-    protected static int ParseInt( string text, IFormatProvider cultureInfo )
-    {
-      return Int32.Parse( text, NumberStyles.Any, cultureInfo );
-    }
-
     protected static decimal ParsePercent( string text, IFormatProvider cultureInfo )
     {
       NumberFormatInfo info = NumberFormatInfo.GetInstance( cultureInfo );

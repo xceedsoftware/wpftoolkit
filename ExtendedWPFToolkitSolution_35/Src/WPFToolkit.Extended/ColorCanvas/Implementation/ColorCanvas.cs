@@ -25,17 +25,20 @@ using System.Windows.Media;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 using Xceed.Wpf.Toolkit.Primitives;
 using System.IO;
+using System;
 
 namespace Xceed.Wpf.Toolkit
 {
   [TemplatePart( Name = PART_ColorShadingCanvas, Type = typeof( Canvas ) )]
   [TemplatePart( Name = PART_ColorShadeSelector, Type = typeof( Canvas ) )]
   [TemplatePart( Name = PART_SpectrumSlider, Type = typeof( ColorSpectrumSlider ) )]
+  [TemplatePart( Name = PART_HexadecimalTextBox, Type = typeof( TextBox ) )]
   public class ColorCanvas : Control
   {
     private const string PART_ColorShadingCanvas = "PART_ColorShadingCanvas";
     private const string PART_ColorShadeSelector = "PART_ColorShadeSelector";
     private const string PART_SpectrumSlider = "PART_SpectrumSlider";
+    private const string PART_HexadecimalTextBox = "PART_HexadecimalTextBox";
 
     #region Private Members
 
@@ -43,6 +46,7 @@ namespace Xceed.Wpf.Toolkit
     private Canvas _colorShadingCanvas;
     private Canvas _colorShadeSelector;
     private ColorSpectrumSlider _spectrumSlider;
+    private TextBox _hexadecimalTextBox;
     private Point? _currentColorPosition;
     private bool _surpressPropertyChanged;
 
@@ -74,7 +78,7 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnSelectedColorChanged( Color oldValue, Color newValue )
     {
-      HexadecimalString = GetFormatedColorString( newValue );
+      SetHexadecimalStringProperty( GetFormatedColorString( newValue ), false );
       UpdateRGBValues( newValue );
       UpdateColorShadeSelectorPosition( newValue );
 
@@ -237,6 +241,8 @@ namespace Xceed.Wpf.Toolkit
       string currentColorString = GetFormatedColorString( SelectedColor );
       if( !currentColorString.Equals( newColorString ) )
         UpdateSelectedColor( ( Color )ColorConverter.ConvertFromString( newColorString ) );
+
+      SetHexadecimalTextBoxTextProperty( newValue );
     }
 
     private static object OnCoerceHexadecimalString( DependencyObject d, object basevalue )
@@ -251,16 +257,19 @@ namespace Xceed.Wpf.Toolkit
     private object OnCoerceHexadecimalString( object newValue )
     {
       var value = newValue as string;
+      string retValue = value;
+
       try
       {
         ColorConverter.ConvertFromString( value );
       }
       catch
       {
+        //When HexadecimalString is changed via Code-Behind and hexadecimal format is bad, throw.
         throw new InvalidDataException( "Color provided is not in the correct format." );
       }
 
-      return value;
+      return retValue;
     }
 
     #endregion //HexadecimalString
@@ -289,7 +298,7 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnUsingAlphaChannelChanged()
     {
-      HexadecimalString = GetFormatedColorString( SelectedColor );
+      SetHexadecimalStringProperty( GetFormatedColorString( SelectedColor ), false );
     }
 
     #endregion //UsingAlphaChannel
@@ -342,17 +351,31 @@ namespace Xceed.Wpf.Toolkit
       if( _spectrumSlider != null )
         _spectrumSlider.ValueChanged += SpectrumSlider_ValueChanged;
 
+      if( _hexadecimalTextBox != null )
+        _hexadecimalTextBox.LostFocus -= new RoutedEventHandler( HexadecimalTextBox_LostFocus );
+
+      _hexadecimalTextBox = GetTemplateChild( PART_HexadecimalTextBox ) as TextBox;
+
+      if( _hexadecimalTextBox != null )
+        _hexadecimalTextBox.LostFocus += new RoutedEventHandler( HexadecimalTextBox_LostFocus );
+
       UpdateRGBValues( SelectedColor );
       UpdateColorShadeSelectorPosition( SelectedColor );
+
+      // When changing theme, HexadecimalString needs to be set since it is not binded.
+      SetHexadecimalTextBoxTextProperty( GetFormatedColorString( SelectedColor ) );
     }
 
-    protected override void OnPreviewKeyDown( KeyEventArgs e )
+    protected override void OnKeyDown( KeyEventArgs e )
     {
-      //hitting enter on textbox will update value of underlying source
+      base.OnKeyDown( e );
+
+      //hitting enter on textbox will update Hexadecimal string
       if( e.Key == Key.Enter && e.OriginalSource is TextBox )
       {
-        BindingExpression be = ( ( TextBox )e.OriginalSource ).GetBindingExpression( TextBox.TextProperty );
-        be.UpdateSource();
+        TextBox textBox = ( TextBox )e.OriginalSource;
+        if( textBox.Name == PART_HexadecimalTextBox )
+          SetHexadecimalStringProperty( textBox.Text, true );
       }
     }
 
@@ -402,6 +425,12 @@ namespace Xceed.Wpf.Toolkit
       {
         CalculateColor( ( Point )_currentColorPosition );
       }
+    }
+
+    void HexadecimalTextBox_LostFocus( object sender, RoutedEventArgs e )
+    {
+      TextBox textbox = sender as TextBox;
+      SetHexadecimalStringProperty( textbox.Text, true );
     }
 
     #endregion //Event Handlers
@@ -503,7 +532,7 @@ namespace Xceed.Wpf.Toolkit
       var currentColor = ColorUtilities.ConvertHsvToRgb( hsv.H, hsv.S, hsv.V );
       currentColor.A = A;
       SelectedColor = currentColor;
-      HexadecimalString = GetFormatedColorString( SelectedColor );
+      SetHexadecimalStringProperty( GetFormatedColorString( SelectedColor ), false );
     }
 
     private string GetFormatedColorString( Color colorToFormat )
@@ -514,6 +543,34 @@ namespace Xceed.Wpf.Toolkit
     private string GetFormatedColorString( string stringToFormat )
     {
       return ColorUtilities.FormatColorString( stringToFormat, UsingAlphaChannel );
+    }
+
+    private void SetHexadecimalStringProperty( string newValue, bool modifyFromUI )
+    {
+      if( modifyFromUI )
+      {
+        try
+        {
+          ColorConverter.ConvertFromString( newValue );
+          HexadecimalString = newValue;
+        }
+        catch
+        {
+          //When HexadecimalString is changed via UI and hexadecimal format is bad, keep the previous HexadecimalString.
+          SetHexadecimalTextBoxTextProperty( HexadecimalString );
+        }
+      }
+      else
+      {
+        //When HexadecimalString is changed via Code-Behind, hexadecimal format will be evaluated in OnCoerceHexadecimalString()
+        HexadecimalString = newValue;
+      }
+    }
+
+    private void SetHexadecimalTextBoxTextProperty( string newValue )
+    {
+      if( _hexadecimalTextBox != null )
+        _hexadecimalTextBox.Text = newValue;
     }
 
     #endregion //Methods

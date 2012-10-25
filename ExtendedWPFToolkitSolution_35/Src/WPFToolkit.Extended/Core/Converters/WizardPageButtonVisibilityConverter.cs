@@ -28,7 +28,9 @@ namespace Xceed.Wpf.Toolkit.Core.Converters
     public object Convert( object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture )
     {
       Visibility wizardVisibility = ( Visibility )values[ 0 ];
-      WizardPageButtonVisibility wizardPageVisibility = ( WizardPageButtonVisibility )values[ 1 ];
+      WizardPageButtonVisibility wizardPageVisibility = ( (values[ 1 ] == null) || (values[ 1 ] == DependencyProperty.UnsetValue) )
+                                                        ? WizardPageButtonVisibility.Hidden
+                                                        : ( WizardPageButtonVisibility )values[ 1 ];
 
       Visibility visibility = Visibility.Visible;
 
