@@ -22,12 +22,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using Xceed.Wpf.Toolkit.Core;
+using Xceed.Wpf.Toolkit.Core.Input;
 
 namespace Xceed.Wpf.Toolkit.Primitives
 {
   [TemplatePart( Name = PART_TextBox, Type = typeof( TextBox ) )]
   [TemplatePart( Name = PART_Spinner, Type = typeof( Spinner ) )]
-  public abstract class UpDownBase<T> : InputBase
+  public abstract class UpDownBase<T> : InputBase, IValidateInput
   {
     #region Members
 
@@ -45,6 +47,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     /// Flags if the Text and Value properties are in the process of being sync'd
     /// </summary>
     private bool _isSyncingTextAndValueProperties;
+    private bool _isTextChangedFromUI;
 
     #endregion //Members
 
@@ -114,7 +117,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #region Value
 
-    public static readonly DependencyProperty ValueProperty = DependencyProperty.Register( "Value", typeof( T ), typeof( UpDownBase<T> ), new FrameworkPropertyMetadata( default( T ), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, null, false, UpdateSourceTrigger.LostFocus ) );
+    public static readonly DependencyProperty ValueProperty = DependencyProperty.Register( "Value", typeof( T ), typeof( UpDownBase<T> ), new FrameworkPropertyMetadata( default( T ), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue, false, UpdateSourceTrigger.LostFocus ) );
     public T Value
     {
       get
@@ -127,6 +130,16 @@ namespace Xceed.Wpf.Toolkit.Primitives
       }
     }
 
+    private static object OnCoerceValue( DependencyObject o, object basevalue )
+    {
+      return ( ( UpDownBase<T> )o ).OnCoerceValue( basevalue );
+    }
+
+    protected virtual object OnCoerceValue( object newValue )
+    {
+      return newValue;
+    }
+
     private static void OnValueChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
       UpDownBase<T> upDownBase = o as UpDownBase<T>;
@@ -136,9 +149,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     protected virtual void OnValueChanged( T oldValue, T newValue )
     {
-      ValidateValue( newValue );
-
-      SyncTextAndValueProperties( ValueProperty, string.Empty );
+      SyncTextAndValueProperties( false, null );
 
       SetValidSpinDirection();
 
@@ -174,6 +185,12 @@ namespace Xceed.Wpf.Toolkit.Primitives
       base.OnApplyTemplate();
 
       TextBox = GetTemplateChild( PART_TextBox ) as TextBox;
+      if( TextBox != null )
+      {
+        TextBox.Text = Text;
+        TextBox.LostFocus += new RoutedEventHandler( TextBox_LostFocus );
+        TextBox.TextChanged += new TextChangedEventHandler( TextBox_TextChanged );
+      }
 
       if( Spinner != null )
         Spinner.Spin -= OnSpinnerSpin;
@@ -213,6 +230,20 @@ namespace Xceed.Wpf.Toolkit.Primitives
       }
     }
 
+    protected override void OnKeyDown( KeyEventArgs e )
+    {
+      switch( e.Key )
+      {
+        case Key.Enter:
+          {
+            // Commit Text on "Enter" to raise Error event 
+            CommitInput();
+            e.Handled = true;
+            break;
+          }
+      }
+    }
+
     protected override void OnMouseWheel( MouseWheelEventArgs e )
     {
       base.OnMouseWheel( e );
@@ -234,7 +265,10 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     protected override void OnTextChanged( string oldValue, string newValue )
     {
-      SyncTextAndValueProperties( InputBase.TextProperty, newValue );
+      if( !_isTextChangedFromUI )
+      {
+        SyncTextAndValueProperties( true, Text );
+      }
     }
 
     #endregion //Base Class Overrides
@@ -251,6 +285,10 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #region Events
 
+    public event InputValidationErrorEventHandler InputValidationError;
+
+    #region ValueChanged Event
+
     //Due to a bug in Visual Studio, you cannot create event handlers for generic T args in XAML, so I have to use object instead.
     public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent( "ValueChanged", RoutingStrategy.Bubble, typeof( RoutedPropertyChangedEventHandler<object> ), typeof( UpDownBase<T> ) );
     public event RoutedPropertyChangedEventHandler<object> ValueChanged
@@ -264,6 +302,8 @@ namespace Xceed.Wpf.Toolkit.Primitives
         RemoveHandler( ValueChangedEvent, value );
       }
     }
+
+    #endregion
 
     #endregion //Events
 
@@ -302,37 +342,64 @@ namespace Xceed.Wpf.Toolkit.Primitives
       }
     }
 
-    protected void SyncTextAndValueProperties( DependencyProperty p, string text )
+    private void TextBox_TextChanged( object sender, TextChangedEventArgs e )
     {
-      //prevents recursive syncing properties
+      _isTextChangedFromUI = true;
+
+      TextBox textBox = sender as TextBox;
+      Text = textBox.Text;
+
+      _isTextChangedFromUI = false;
+    }
+
+    private void TextBox_LostFocus( object sender, RoutedEventArgs e )
+    {
+      CommitInput();
+    }
+
+    public void CommitInput()
+    {
+      this.SyncTextAndValueProperties( true, Text );
+    }
+
+    protected void SyncTextAndValueProperties(bool updateValueFromText, string text )
+    {
       if( _isSyncingTextAndValueProperties )
         return;
 
       _isSyncingTextAndValueProperties = true;
+      Exception error = null;
 
-      //this only occures when the user typed in the value
-      if( InputBase.TextProperty == p )
+      if( updateValueFromText )
       {
-        Value = ConvertTextToValue( text );
+        try
+        {
+          Value = ConvertTextToValue( Text );
+        }
+        catch( Exception e )
+        {
+          error = e;
+        }
       }
 
       Text = ConvertValueToText();
 
-#if VS2008
-      //there is a bug in .NET 3.5 which will not correctly update the textbox text through binding.
-      if ( TextBox != null )
+      if( TextBox != null )
         TextBox.Text = Text;
-#endif
+
+      if( updateValueFromText )
+      {
+        if( ( error != null ) && ( InputValidationError != null ) )
+        {
+          InputValidationErrorEventArgs args = new InputValidationErrorEventArgs( error.Message );
+          InputValidationError( this, args );
+        }
+      }
 
       _isSyncingTextAndValueProperties = false;
     }
 
     #region Abstract
-
-    /// <summary>
-    /// Coerces the value.
-    /// </summary>
-    protected abstract T CoerceValue( T value );
 
     /// <summary>
     /// Converts the formatted text to a value.
@@ -359,12 +426,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
     /// Sets the valid spin directions.
     /// </summary>
     protected abstract void SetValidSpinDirection();
-
-    /// <summary>
-    /// Validates the value and keeps it between the Min and Max values.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    protected abstract void ValidateValue( T value );
 
     #endregion //Abstract
 

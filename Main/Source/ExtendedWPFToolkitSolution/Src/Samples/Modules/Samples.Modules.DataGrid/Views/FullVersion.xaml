@@ -1,0 +1,103 @@
+﻿<!--*********************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2010-2012 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   This program can be provided to you by Xceed Software Inc. under a
+   proprietary commercial license agreement for use in non-Open Source
+   projects. The commercial version of Extended WPF Toolkit also includes
+   priority technical support, commercial updates, and many additional 
+   useful WPF controls if you license Xceed Business Suite for WPF.
+
+   Visit http://xceed.com and follow @datagrid on Twitter.
+
+  ********************************************************************-->
+<sample:DemoView x:Class="Samples.Modules.DataGrid.Views.FullVersion"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"  
+                 xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
+                 xmlns:compModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+                 Title="Full Version" >
+   <StackPanel>
+      <RichTextBox IsReadOnly="True" IsDocumentEnabled="False" BorderThickness="0">
+         <FlowDocument>
+            <Paragraph>
+               The full featured version of the DataGrid available commercially will provide
+               you with extended features like:
+            </Paragraph>
+            <List>
+               <ListItem>
+                  <Paragraph>Master Details</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>Filter Row</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>Insertion Row</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>Excel Auto-Filtering</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>Column Chooser</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>CardView, CompactCardView</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>3DView, MultiSurfaceView</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>Statistical Functions and Summary row</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>Print, Print Preview</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>Export to Excel</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>Fixed Column Splitter UI element</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>Persist User Settings</Paragraph>
+               </ListItem>               
+               <ListItem>
+                  <Paragraph>Design time support in Visual Studio and Expression Blend</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>Comprehensive documentation fully integrated into Visual Studio</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>Includes a variety of VB.NET and C# sample applications to get you started</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>Office 2007 Themes: Blue, Black, and Silver</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>The Xceed Live Explorer theme</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>Includes Xceed 3D Views for WPF</Paragraph>
+               </ListItem>
+               <ListItem>
+                  <Paragraph>And many more....</Paragraph>
+               </ListItem>
+            </List>
+         </FlowDocument>
+      </RichTextBox>
+
+      <TextBlock Margin="0,20,0,0">
+         <Hyperlink NavigateUri="http://www.xceed.com/Grid_WPF_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
+            Click here for more details about the full featured DataGrid control.
+         </Hyperlink>
+      </TextBlock>
+   </StackPanel>
+
+</sample:DemoView>

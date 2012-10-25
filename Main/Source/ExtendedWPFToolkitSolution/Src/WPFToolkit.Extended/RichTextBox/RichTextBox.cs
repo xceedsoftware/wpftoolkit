@@ -37,7 +37,6 @@ namespace Xceed.Wpf.Toolkit
 
     public RichTextBox()
     {
-      Loaded += RichTextBox_Loaded;
     }
 
     public RichTextBox( System.Windows.Documents.FlowDocument document )
@@ -126,6 +125,12 @@ namespace Xceed.Wpf.Toolkit
 
     #region Methods
 
+    protected override void OnTextChanged( System.Windows.Controls.TextChangedEventArgs e )
+    {
+      base.OnTextChanged( e );
+      UpdateText();
+    }
+
     private void UpdateText()
     {
       _textSetInternally = true;
@@ -145,26 +150,5 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //Methods
-
-    #region Event Hanlders
-
-    private void RichTextBox_Loaded( object sender, RoutedEventArgs e )
-    {
-      Binding binding = BindingOperations.GetBinding( this, TextProperty );
-
-      if( binding != null )
-      {
-        if( binding.UpdateSourceTrigger == UpdateSourceTrigger.Default || binding.UpdateSourceTrigger == UpdateSourceTrigger.LostFocus )
-        {
-          PreviewLostKeyboardFocus += ( o, ea ) => UpdateText();
-        }
-        else
-        {
-          TextChanged += ( o, ea ) => UpdateText();
-        }
-      }
-    }
-
-    #endregion //Event Hanlders
   }
 }

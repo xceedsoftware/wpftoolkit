@@ -163,12 +163,6 @@ namespace Xceed.Wpf.Toolkit
       InitializeDateTimeInfoList();
     }
 
-    protected override DateTime? CoerceValue( DateTime? value )
-    {
-      //TODO: implement Minimum and Maximum
-      return value;
-    }
-
     protected override void OnIncrement()
     {
       if( Value.HasValue )
@@ -216,18 +210,15 @@ namespace Xceed.Wpf.Toolkit
       if( !_processTextChanged )
         return;
 
-      //TODO: clean this up and make sure it doesn't fire recursively
-      if( String.IsNullOrEmpty( currentValue ) )
+      if( !String.IsNullOrEmpty( currentValue ) )
       {
-        Value = null;
-        return;
+        DateTime current = Value.HasValue ? Value.Value : DateTime.Parse( DateTime.Now.ToString(), CultureInfo.DateTimeFormat );
+        DateTime result;
+        var success = DateTimeParser.TryParse( currentValue, GetFormatString( Format ), current, CultureInfo, out result );
+        currentValue = result.ToString();
       }
 
-      DateTime current = Value.HasValue ? Value.Value : DateTime.Parse( DateTime.Now.ToString(), CultureInfo.DateTimeFormat );
-      DateTime result;
-      var success = DateTimeParser.TryParse( currentValue, GetFormatString( Format ), current, CultureInfo, out result );
-
-      SyncTextAndValueProperties( InputBase.TextProperty, result.ToString( CultureInfo ) );
+      SyncTextAndValueProperties( true, currentValue );
     }
 
     protected override DateTime? ConvertTextToValue( string text )
@@ -259,11 +250,6 @@ namespace Xceed.Wpf.Toolkit
         ParseValueIntoDateTimeInfo();
 
       base.OnValueChanged( oldValue, newValue );
-    }
-
-    protected override void ValidateValue( DateTime? value )
-    {
-      //TODO: implement min/max
     }
 
     #endregion //Base Class Overrides

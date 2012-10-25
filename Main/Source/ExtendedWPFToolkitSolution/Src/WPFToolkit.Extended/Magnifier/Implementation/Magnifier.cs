@@ -224,8 +224,8 @@ namespace Xceed.Wpf.Toolkit
 
       VisualBrush newBrush = GetTemplateChild( PART_VisualBrush ) as VisualBrush;
 
-      // Just create a brush as placeholder even if there is no such brush
-      // this avoid having to "if" each access to the _visualBrush member.
+      // Just create a brush as placeholder even if there is no such brush.
+      // This avoids having to "if" each access to the _visualBrush member.
       // Do not keep the current _visualBrush whatsoever to avoid memory leaks.
       if( newBrush == null )
       {

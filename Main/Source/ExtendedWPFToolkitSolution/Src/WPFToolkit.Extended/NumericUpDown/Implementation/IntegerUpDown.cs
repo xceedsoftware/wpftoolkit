@@ -22,99 +22,32 @@ using System.Windows;
 
 namespace Xceed.Wpf.Toolkit
 {
-  public class IntegerUpDown : NumericUpDown<int?>
+  public class IntegerUpDown : CommonNumericUpDown<int>
   {
     #region Constructors
 
     static IntegerUpDown()
     {
-      DefaultStyleKeyProperty.OverrideMetadata( typeof( IntegerUpDown ), new FrameworkPropertyMetadata( typeof( IntegerUpDown ) ) );
-      DefaultValueProperty.OverrideMetadata( typeof( IntegerUpDown ), new FrameworkPropertyMetadata( 0 ) );
-      IncrementProperty.OverrideMetadata( typeof( IntegerUpDown ), new FrameworkPropertyMetadata( 1 ) );
-      MaximumProperty.OverrideMetadata( typeof( IntegerUpDown ), new FrameworkPropertyMetadata( int.MaxValue ) );
-      MinimumProperty.OverrideMetadata( typeof( IntegerUpDown ), new FrameworkPropertyMetadata( int.MinValue ) );
+      UpdateMetadata( typeof( IntegerUpDown ), 0, 1, int.MinValue, int.MaxValue );
+    }
+
+    public IntegerUpDown()
+      : base( Int32.Parse, Decimal.ToInt32 )
+    {
     }
 
     #endregion //Constructors
 
     #region Base Class Overrides
 
-    protected override int? CoerceValue( int? value )
+    protected override int IncrementValue( int value, int increment )
     {
-      if( value < Minimum )
-        return Minimum;
-      else if( value > Maximum )
-        return Maximum;
-      else
-        return value;
+      return value + increment;
     }
 
-    protected override void OnIncrement()
+    protected override int DecrementValue( int value, int increment )
     {
-      if( Value.HasValue )
-        Value += Increment;
-      else
-        Value = DefaultValue;
-    }
-
-    protected override void OnDecrement()
-    {
-      if( Value.HasValue )
-        Value -= Increment;
-      else
-        Value = DefaultValue;
-    }
-
-    protected override int? ConvertTextToValue( string text )
-    {
-      int? result = null;
-
-      if( String.IsNullOrEmpty( text ) )
-        return result;
-
-      try
-      {
-        //don't know why someone would format an integer as %, but just in case they do.
-        result = FormatString.Contains( "P" ) ? Decimal.ToInt32( ParsePercent( text, CultureInfo ) ) : ParseInt( text, CultureInfo );
-        result = CoerceValue( result );
-      }
-      catch
-      {
-        Text = ConvertValueToText();
-        return Value;
-      }
-
-      return result;
-    }
-
-    protected override string ConvertValueToText()
-    {
-      if( Value == null )
-        return string.Empty;
-
-      return Value.Value.ToString( FormatString, CultureInfo );
-    }
-
-    protected override void SetValidSpinDirection()
-    {
-      ValidSpinDirections validDirections = ValidSpinDirections.None;
-
-      if( Value < Maximum || !Value.HasValue )
-        validDirections = validDirections | ValidSpinDirections.Increase;
-
-      if( Value > Minimum || !Value.HasValue )
-        validDirections = validDirections | ValidSpinDirections.Decrease;
-
-      if( Spinner != null )
-        Spinner.ValidSpinDirection = validDirections;
-    }
-
-    protected override void ValidateValue( int? value )
-    {
-      if( value < Minimum )
-        Value = Minimum;
-      else if( value > Maximum )
-        Value = Maximum;
+      return value - increment;
     }
 
     #endregion //Base Class Overrides

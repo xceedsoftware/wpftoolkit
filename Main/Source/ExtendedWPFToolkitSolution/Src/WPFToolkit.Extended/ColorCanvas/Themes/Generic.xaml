@@ -260,7 +260,7 @@
                               <Border Background="{StaticResource CheckerBrush}" Height="22" Margin="2,0,2,0" BorderThickness="1" BorderBrush="#FFC9CACA">
                                  <Rectangle x:Name="SelectedColor" Fill="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ColorToSolidColorBrushConverter}}" />
                               </Border>
-                              <TextBox Grid.Column="1" Text="{Binding HexadecimalString, RelativeSource={RelativeSource TemplatedParent}}" Margin="2,0,2,0" VerticalAlignment="Center" Style="{StaticResource ColorCanvasTextBoxStyle}" />
+                                  <TextBox x:Name="PART_HexadecimalTextBox" Grid.Column="1" Margin="2,0,2,0" VerticalAlignment="Center" Style="{StaticResource ColorCanvasTextBoxStyle}" />
                            </Grid>
                         </Border>
 

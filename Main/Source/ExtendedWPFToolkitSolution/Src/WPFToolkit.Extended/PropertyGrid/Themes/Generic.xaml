@@ -24,7 +24,8 @@
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
                     xmlns:pgconv="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid.Converters"
                     xmlns:utilities="clr-namespace:Xceed.Wpf.Toolkit.Core.Utilities"
-                    xmlns:commands="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid.Commands">
+                    xmlns:commands="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid.Commands"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
    <!-- =============================================================================== -->
    <!-- PropertyGrid                                                                    -->
@@ -35,6 +36,8 @@
    <pgconv:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
    <pgconv:ValueSourceToImagePathConverter x:Key="ValueSourceToImagePathConverter" />
    <pgconv:ValueSourceToToolTipConverter x:Key="ValueSourceToToolTipConverter" />
+
+   <x:Static x:Key="EmptyString" Member="sys:String.Empty" />
 
    <SolidColorBrush x:Key="MouseOverBorderBrush" Color="#FFFFB700" />
    <LinearGradientBrush x:Key="MouseOverBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
@@ -358,7 +361,7 @@
                      </Border>
 
                      <Border BorderThickness="0.5" BorderBrush="#FFF0F0F0" x:Name="PART_Editor" Grid.Column="1" Background="Transparent">
-                        <ContentControl Content="{TemplateBinding Editor}" VerticalAlignment="Center" Focusable="False" IsTabStop="False" />
+                        <ContentControl x:Name="content" Content="{TemplateBinding Editor}" VerticalAlignment="Center" Focusable="False" IsTabStop="False" />
                      </Border>
 
                      <Expander x:Name="_propertyExpander" Grid.ColumnSpan="2" Grid.Row="1" IsExpanded="{TemplateBinding IsExpanded}" Style="{StaticResource PropertyExpanderStyle}" IsEnabled="True">
@@ -392,18 +395,27 @@
                      <Setter TargetName="PART_Name" Property="Background" Value="#43577B" />
                      <Setter TargetName="PART_Name" Property="TextElement.Foreground" Value="White" />
                   </Trigger>
-               </ControlTemplate.Triggers>
+                  <Trigger Property="IsEnabled" Value="False">
+                     <Setter Property="Foreground" TargetName="content"  Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"  />
+                  </Trigger>
+                </ControlTemplate.Triggers>
             </ControlTemplate>
          </Setter.Value>
       </Setter>
    </Style>
 
    <Style TargetType="{x:Type pg:PropertyGrid}">
+      <Style.Resources>
+         <pgconv:SelectedObjectConverter x:Key="objectConverter" />
+      </Style.Resources>
       <Setter Property="AdvancedOptionsMenu" Value="{StaticResource DefaultAdvancedOptionsMenu}" />
       <Setter Property="Background" Value="#CED4DF" />
       <Setter Property="BorderBrush" Value="#43577B" />
       <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="Template">
+      <Setter Property="SelectedObjectType" Value="{Binding RelativeSource={RelativeSource Self}, Path=SelectedObject, Converter={StaticResource objectConverter}, ConverterParameter=Type}" />
+      <Setter Property="SelectedObjectTypeName" Value="{Binding RelativeSource={RelativeSource Self}, Path=SelectedObject, Converter={StaticResource objectConverter}, ConverterParameter=TypeName}" />
+        <Setter Property="SelectedObjectName" Value="{Binding RelativeSource={RelativeSource Self}, Path=SelectedObject.Name, FallbackValue={StaticResource EmptyString}}" />
+        <Setter Property="Template">
          <Setter.Value>
             <ControlTemplate TargetType="{x:Type pg:PropertyGrid}">
                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
@@ -416,17 +428,18 @@
                         <RowDefinition Height="Auto"/>
                      </Grid.RowDefinitions>
 
-                     <StackPanel Orientation="Horizontal" Margin="6,2,0,4">
-                        <TextBlock Text="{TemplateBinding SelectedObjectTypeName}" FontWeight="Bold" Visibility="{Binding ShowTitle, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                        <TextBlock Text="{TemplateBinding SelectedObjectName}" Margin="5,0,0,0" Visibility="{Binding ShowTitle, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                     <StackPanel Orientation="Horizontal" Margin="6,2,0,4"
+                                 Visibility="{Binding ShowTitle, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Text="{TemplateBinding SelectedObjectTypeName}" FontWeight="Bold" />
+                        <TextBlock Text="{TemplateBinding SelectedObjectName}" Margin="5,0,0,0" />
                      </StackPanel>
 
-                     <Grid Grid.Row="1" Margin="4,0,4,4">
+                     <Grid x:Name="toolsContainer" Grid.Row="1" Margin="4,0,4,4">
                         <Grid.ColumnDefinitions>
                            <ColumnDefinition Width="Auto" />
                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Grid Background="#BCC7D8" Margin="4" Visibility="{Binding ShowSortOptions, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid x:Name="sortButtonContainer" Background="#BCC7D8" Margin="4" Visibility="{Binding ShowSortOptions, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
                            <StackPanel Orientation="Horizontal" Margin="1" >
                               <RadioButton IsChecked="{Binding IsCategorized, RelativeSource={RelativeSource TemplatedParent}}"
                                            VerticalAlignment="Center"
@@ -443,7 +456,7 @@
                            </StackPanel>
                         </Grid>
 
-                        <Border Grid.Column="1" Margin="4,4,0,4" Background="White" BorderBrush="Gray" BorderThickness="1" Visibility="{Binding ShowSearchBox, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Border x:Name="searchBoxContainer" Grid.Column="1" Margin="4,4,0,4" Background="White" BorderBrush="Gray" BorderThickness="1" Visibility="{Binding ShowSearchBox, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
                            <Grid>
                               <Grid.ColumnDefinitions>
                                  <ColumnDefinition Width="*" />
@@ -527,6 +540,15 @@
                      </StackPanel>
                   </Grid>
                </Border>
+               <ControlTemplate.Triggers>
+                  <MultiTrigger>
+                     <MultiTrigger.Conditions>
+                        <Condition SourceName="searchBoxContainer" Property="Visibility" Value="Collapsed"/>
+                        <Condition SourceName="sortButtonContainer" Property="Visibility" Value="Collapsed"/>
+                     </MultiTrigger.Conditions>
+                     <Setter TargetName="toolsContainer" Property="Visibility" Value="Collapsed" />
+                  </MultiTrigger>
+               </ControlTemplate.Triggers>
             </ControlTemplate>
          </Setter.Value>
       </Setter>

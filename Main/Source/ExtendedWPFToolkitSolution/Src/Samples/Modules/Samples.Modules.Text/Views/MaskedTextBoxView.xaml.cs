@@ -31,6 +31,12 @@ namespace Samples.Modules.Text.Views
     public MaskedTextBoxView()
     {
       InitializeComponent();
+      _mask.TextChanged += new System.Windows.Controls.TextChangedEventHandler( _mask_TextChanged );
+    }
+
+    void _mask_TextChanged( object sender, System.Windows.Controls.TextChangedEventArgs e )
+    {
+      _maskedTextBox.Value = null;
     }
   }
 }

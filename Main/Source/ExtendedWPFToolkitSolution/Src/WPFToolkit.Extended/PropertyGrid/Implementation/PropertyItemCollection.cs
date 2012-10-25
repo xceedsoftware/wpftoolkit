@@ -21,26 +21,23 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
+using System;
+using System.Collections.Specialized;
+using System.Diagnostics;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
-  public class PropertyItemCollection : ObservableCollection<PropertyItem>
+  public class PropertyItemCollection : ReadOnlyObservableCollection<PropertyItem>
   {
-    public PropertyItemCollection()
-    {
+    private bool _preventNotification;
 
+    public PropertyItemCollection(ObservableCollection<PropertyItem> editableCollection)
+      :base(editableCollection)
+    {
+      EditableCollection = editableCollection;
     }
 
-    public PropertyItemCollection( List<PropertyItem> list )
-      : base( list )
-    {
-
-    }
-    public PropertyItemCollection( IEnumerable<PropertyItem> collection )
-      : base( collection )
-    {
-
-    }
+    public ObservableCollection<PropertyItem> EditableCollection { get; private set; }
 
     private ICollectionView GetDefaultView()
     {
@@ -67,6 +64,53 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         var property = item as PropertyItem;
         return property.DisplayName.ToLower().StartsWith( text.ToLower() );
       };
+    }
+
+    protected override void OnCollectionChanged( NotifyCollectionChangedEventArgs args )
+    {
+      if( _preventNotification )
+        return;
+
+      base.OnCollectionChanged( args );
+    }
+
+    internal void Update( IEnumerable<PropertyItem> newItems, bool isCategorized, string filter )
+    {
+      using( GetDefaultView().DeferRefresh() )
+      {
+        _preventNotification = true;
+
+        // Replace the collection content with the new items.
+        if( newItems != null )
+        {
+          EditableCollection.Clear();
+          foreach( var item in newItems )
+          {
+            this.EditableCollection.Add( item );
+          }
+        }
+
+        // Clear view values
+        ICollectionView view = this.GetDefaultView();
+        view.GroupDescriptions.Clear();
+        view.SortDescriptions.Clear();
+        view.Filter = null;
+
+        // Update view values
+        if( isCategorized )
+        {
+          GroupBy( "Category" );
+          SortBy( "Category", ListSortDirection.Ascending );
+        }
+
+        SortBy( "PropertyOrder", ListSortDirection.Ascending );
+        SortBy( "DisplayName", ListSortDirection.Ascending );
+
+        Filter( filter );
+
+        _preventNotification = false;
+        OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
+      }
     }
   }
 }

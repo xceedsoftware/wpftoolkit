@@ -24,7 +24,6 @@
                  xmlns:local="clr-namespace:Samples.Modules.Pie.Views"
                  Title="Progress"
                  Description="The Pie control properties can be animated to create various effects and controls like this circular progress bar">
-   <!--TODODOC See description above and remove this comment-->
 
    <sample:DemoView.Resources>
       <ControlTemplate x:Key="PieProgressTemplate"

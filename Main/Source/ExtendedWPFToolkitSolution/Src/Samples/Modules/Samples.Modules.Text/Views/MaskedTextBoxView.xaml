@@ -21,6 +21,8 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 xmlns:osb="clr-namespace:Xceed.Wpf.Toolkit.Obselete;assembly=WPFToolkit.Extended"
+                 xmlns:s="clr-namespace:System;assembly=mscorlib"
                  Title="MaskedTextBox"
                  Description="The MaskedTextBox control lets you display and edit values based on a mask.">
    <Grid>
@@ -43,10 +45,12 @@
                </Grid.ColumnDefinitions>
 
                <TextBlock Text="Include literals:" VerticalAlignment="Center" Margin="2" />
-               <CheckBox x:Name="_literals" Grid.Column="1" VerticalAlignment="Center" Margin="5" />
+               <CheckBox x:Name="_literals" Grid.Column="1" VerticalAlignment="Center" Margin="5" 
+                         IsChecked="{Binding IncludeLiteralsInValue, ElementName=_maskedTextBox, Mode=TwoWay}"/>
 
                <TextBlock Text="Include prompt:" Grid.Row="1" VerticalAlignment="Center" Margin="2" />
-               <CheckBox x:Name="_prompt" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="5" />
+               <CheckBox x:Name="_prompt" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="5" 
+                         IsChecked="{Binding IncludePromptInValue, ElementName=_maskedTextBox, Mode=TwoWay}"/>
             </Grid>
             <Grid Margin="0,5,0,0">
                <Grid.RowDefinitions>
@@ -60,23 +64,25 @@
                </Grid.ColumnDefinitions>
 
                <TextBlock Text="Mask:" VerticalAlignment="Center" Margin="2" />
-               <TextBox x:Name="_mask" Grid.Column="1" VerticalAlignment="Center" Margin="5" Text="(000) 000-0000" />
+               <TextBox x:Name="_mask" Grid.Column="1" VerticalAlignment="Center" Margin="5" 
+                        Text="{Binding Mask, ElementName=_maskedTextBox, ValidatesOnExceptions=True}" />
 
                <TextBlock Text="Value:" Grid.Row="1" VerticalAlignment="Center" Margin="2" />
-               <TextBox x:Name="_value" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="5" Text="1234567890" />
+               <TextBox x:Name="_value" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="5"
+                        Text="{Binding Value, ElementName=_maskedTextBox, ValidatesOnExceptions=True}"  />
 
                <TextBlock Text="Text:" Grid.Row="2" VerticalAlignment="Center" Margin="2" />
-               <TextBox x:Name="_text" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="5" />
+               <TextBox x:Name="_text" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="5" 
+                        Text="{Binding Text, ElementName=_maskedTextBox, ValidatesOnExceptions=True}"/>
             </Grid>
          </StackPanel>
       </GroupBox>
 
       <StackPanel Grid.Row="1" Margin="10">
-         <xctk:MaskedTextBox IncludeLiterals="{Binding IsChecked, ElementName=_literals, Mode=TwoWay}"
-                             IncludePrompt="{Binding IsChecked, ElementName=_prompt, Mode=TwoWay}"
-                             Mask="{Binding Text, ElementName=_mask}"
-                             Value="{Binding Text, ElementName=_value, Mode=TwoWay}"
-                             Text="{Binding Text, ElementName=_text, Mode=TwoWay}" />
+         <xctk:MaskedTextBox x:Name="_maskedTextBox"
+                             Mask="(000) 000-0000"
+                             ValueDataType="{x:Type s:String}" />
+
       </StackPanel>
    </Grid>
 </sample:DemoView>

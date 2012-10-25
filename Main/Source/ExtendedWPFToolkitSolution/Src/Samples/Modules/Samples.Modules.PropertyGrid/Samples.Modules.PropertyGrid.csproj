@@ -84,6 +84,11 @@
     <Compile Include="Views\DefaultEditors.xaml.cs">
       <DependentUpon>DefaultEditors.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\DisplayLocalizationRes.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DisplayLocalizationRes.resx</DependentUpon>
+    </Compile>
     <Compile Include="Views\ExpandableProperties.xaml.cs">
       <DependentUpon>ExpandableProperties.xaml</DependentUpon>
     </Compile>
@@ -136,9 +141,21 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\DisplayLocalizationRes.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DisplayLocalizationRes.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\DisplayLocalizationRes.fr.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetDir)*.*" "$(SolutionDir)Src\Samples\Samples\bin\$(ConfigurationName)\" /Y
+    <PostBuildEvent>xcopy "$(TargetDir)*.*" "$(SolutionDir)Src\Samples\Samples\bin\$(ConfigurationName)\" /Y /S
 xcopy "$(ProjectDir)Views" "$(SolutionDir)Src\Samples\Samples\bin\$(ConfigurationName)\Samples\$(ProjectName)\" /s /Y /I</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
