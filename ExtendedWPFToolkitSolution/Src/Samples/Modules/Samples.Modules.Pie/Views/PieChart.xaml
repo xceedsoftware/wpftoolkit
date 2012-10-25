@@ -24,7 +24,6 @@
                  xmlns:local="clr-namespace:Samples.Modules.Pie.Views"
                  Title="Chart"
                  Description="Obviously, the Pie control can be used to create a pie chart.">
-   <!--TODODOC See description above and remove this comment-->
 
    <sample:DemoView.Resources>
       <XmlDataProvider x:Key="XMLData">

@@ -16,7 +16,7 @@
    Visit http://xceed.com and follow @datagrid on Twitter.
 
   ********************************************************************-->
-    <!--//#TODODOC for description -->
+
 <sample:DemoView x:Class="Samples.Modules.DateTime.Views.HomeView"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -25,7 +25,7 @@
                  xmlns:sys="clr-namespace:System;assembly=mscorlib"
                  xmlns:conv="clr-namespace:Samples.Modules.DateTime.Converters"
                  Title="DateTime Controls"
-                 Description="DateTimePicker and TimePicker controls let you the date and time with many possibilities. The TimePicker is included in the DateTimePicker.">
+                 Description="The DateTimePicker and TimePicker controls let you select the date and the time in several ways. The TimePicker is used in the DateTimePicker.">
     <sample:DemoView.Resources>
         <conv:DateTimeToTimeSpanConverter x:Key="dateTimeToTimeSpanConverter" />
 
@@ -45,7 +45,6 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- TODODOC: Common Features -->
         <GroupBox Header="Features" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" >
             <Grid>
                 <Grid.RowDefinitions>
@@ -67,20 +66,17 @@
             </Grid>
         </GroupBox>
 
-        <!--TODODOC: DateTimePicker -->
         <StackPanel Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left">
             <TextBlock Text="DateTimePicker Usage: " Margin="0,10,0,0" Style="{StaticResource Header}" />
             <xctk:DateTimePicker x:Name="_datetimePicker"
                                  Width="300"
                                  VerticalAlignment="Top"
-                                 IsReadOnly="False" 
-                                 BorderBrush="Black"
+                                 IsReadOnly="False"
                                  TimeFormat="{Binding Source={x:Reference _timeFormat}, Path=SelectedItem}"
                                  TimeWatermark="{Binding  Source={x:Reference _timeWatermark}, Path=Text}"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch">
-            <!-- TODODOC TimePicker Features-->
             <GroupBox Header="TimePicker Features" Margin="0,15,0,0">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -102,7 +98,6 @@
                 </Grid>
             </GroupBox>
 
-            <!--TODODOC: TimePicker -->
             <StackPanel>
                 <TextBlock Text="TimePicker Usage: " Style="{StaticResource Header}" />
                 <xctk:TimePicker x:Name="_timePicker"

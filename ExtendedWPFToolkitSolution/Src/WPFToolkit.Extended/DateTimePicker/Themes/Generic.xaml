@@ -36,7 +36,14 @@
       <GradientStop Color="#FF617584" Offset="1" />
    </LinearGradientBrush>
 
-   <LinearGradientBrush x:Key="PopupBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+    <LinearGradientBrush x:Key="DarkBorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FF617584" Offset="0" />
+        <GradientStop Color="#FF718597" Offset="0.375" />
+        <GradientStop Color="#FF8399A9" Offset="0.375" />
+        <GradientStop Color="#FFA3AEB9" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="PopupBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
       <LinearGradientBrush.GradientStops>
          <GradientStopCollection>
             <GradientStop Offset="0" Color="#FFffffff" />
@@ -88,6 +95,7 @@
    <Style TargetType="{x:Type local:DateTimePicker}">
       <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
       <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}" />
       <Setter Property="Focusable" Value="False" />
       <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
       <Setter Property="HorizontalContentAlignment" Value="Right" />

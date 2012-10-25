@@ -246,4 +246,18 @@
       <Setter Property="Foreground" Value="{StaticResource ForegroundFill}" />
    </Style>
 
+   <Style x:Key="newFeature" TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}" >
+      <Setter Property="HeaderTemplate">
+         <Setter.Value>
+            <DataTemplate>
+               <StackPanel Orientation="Horizontal">
+                  <TextBlock Text="{Binding}" />
+                  <TextBlock Margin="5,0,0,0" Text="New" FontStyle="Italic" FontSize="8" BaselineOffset="7" Foreground="Red" />
+               </StackPanel>
+            </DataTemplate>
+         </Setter.Value>
+      </Setter>
+   </Style>
+
+
 </ResourceDictionary>

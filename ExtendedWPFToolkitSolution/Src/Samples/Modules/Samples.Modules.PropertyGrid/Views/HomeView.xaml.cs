@@ -19,6 +19,7 @@
 
 using Microsoft.Practices.Prism.Regions;
 using Samples.Infrastructure.Controls;
+using System;
 
 namespace Samples.Modules.PropertyGrid.Views
 {
@@ -31,6 +32,11 @@ namespace Samples.Modules.PropertyGrid.Views
     public HomeView()
     {
       InitializeComponent();
+    }
+
+    private void OnButtonClick( object sender, EventArgs e )
+    {
+      _propertyGrid.SelectedObject = sender;
     }
   }
 }

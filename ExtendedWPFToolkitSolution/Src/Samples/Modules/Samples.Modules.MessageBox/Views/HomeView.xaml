@@ -24,8 +24,48 @@
                  Title="MessageBox"
                  Description="This extended MessageBox allows you to customize and style various aspects of the control.">
    <sample:DemoView.Resources>
-      <SolidColorBrush x:Key="MyButtonHoverBrush" Color="YellowGreen" />
-      <SolidColorBrush x:Key="MyButtonPressedBrush" Color="Maroon" />
+      <LinearGradientBrush x:Key="buttonRegionBackground" StartPoint="0,0" EndPoint="1,1">
+         <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+               <GradientStop Offset="0" Color="#FF3D3D3D" />
+               <GradientStop Offset="1" Color="#FF000000" />
+            </GradientStopCollection>
+         </LinearGradientBrush.GradientStops>
+      </LinearGradientBrush>
+
+      <SolidColorBrush x:Key="MyButtonHoverBrush" Color="#FFD23C93" />
+      <SolidColorBrush x:Key="MyButtonPressedBrush" Color="#FF841B5D" />
+
+      <LinearGradientBrush x:Key="WindowDarkBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="#FFA3AEB9" Offset="0" />
+            <GradientStop Color="#FF8399A9" Offset="0.375" />
+            <GradientStop Color="#FF718597" Offset="0.375" />
+            <GradientStop Color="#FF617584" Offset="1" />
+        </LinearGradientBrush>
+
+      <LinearGradientBrush x:Key="WindowButtonHoverBrush" StartPoint="0,0" EndPoint="0,1">
+            <LinearGradientBrush.GradientStops>
+                <GradientStopCollection>
+                    <GradientStop Offset="0" Color="#FFb5bdc8" />
+                    <GradientStop Offset="0.370" Color="#FF8399a9" />
+                    <GradientStop Offset="0.370" Color="#FF718597" />
+                    <GradientStop Offset="0.906" Color="#FFb9c1ca" />
+                    <GradientStop Offset="1" Color="#FFb9c1ca" />
+                </GradientStopCollection>
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+
+      <LinearGradientBrush x:Key="WindowButtonPressedBrush" StartPoint="0,0" EndPoint="0,1">
+            <LinearGradientBrush.GradientStops>
+                <GradientStopCollection>
+                    <GradientStop Offset="0" Color="#FF6b7c8d" />
+                    <GradientStop Offset="0.370" Color="#FF4d606f" />
+                    <GradientStop Offset="0.370" Color="#FF465460" />
+                    <GradientStop Offset="0.906" Color="#FF262d33" />
+                    <GradientStop Offset="1" Color="#FF262d33" />
+                </GradientStopCollection>
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
 
       <Style x:Key="MyCloseButtonStyle" TargetType="Button">
          <Setter Property="Template">
@@ -49,9 +89,15 @@
                                  </ObjectAnimationUsingKeyFrames>
                               </Storyboard>
                            </VisualState>
+                            <VisualState x:Name="Disabled">
+                                <Storyboard>
+                                    <DoubleAnimation Duration="0" Storyboard.TargetName="contentPresenter" Storyboard.TargetProperty="Opacity" To=".3"/>
+                                    <DoubleAnimation Duration="0" Storyboard.TargetName="Background" Storyboard.TargetProperty="Opacity" To=".3"/>
+                                </Storyboard>
+                            </VisualState>
                         </VisualStateGroup>
                      </VisualStateManager.VisualStateGroups>
-                     <Border x:Name="Background" CornerRadius="0,0,2,0" Background="Green">
+                     <Border x:Name="Background" CornerRadius="0,0,2,0" Background="#FF565456">
                         <Border Margin="1,0,1,1" BorderBrush="#59FFFFFF" BorderThickness="1" CornerRadius="0,0,1,0"/>
                      </Border>
                      <ContentPresenter x:Name="contentPresenter" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"/>
@@ -67,24 +113,70 @@
          </Setter>
       </Style>
 
+      <Style x:Key="WindowButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#FFFFFFFF" />
+            <Setter Property="Padding" Value="3" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="MouseOver">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
+                                                <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource WindowButtonHoverBrush}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
+                                                <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource WindowButtonPressedBrush}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Border x:Name="Background" CornerRadius="0,0,2,0" Background="{StaticResource WindowDarkBrush}">
+                                <Border Margin="1,0,1,1" BorderBrush="#59FFFFFF" BorderThickness="1" CornerRadius="0,0,1,0" />
+                            </Border>
+                            <ContentPresenter x:Name="contentPresenter" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
       <Style x:Key="messageBoxStyle" TargetType="{x:Type xctk:MessageBox}">
-         <Setter Property="Background" Value="Aquamarine" />
-         <Setter Property="BorderBrush" Value="Red" />
-         <Setter Property="CaptionForeground" Value="Orange" />
-         <Setter Property="WindowBorderBrush" Value="Blue" />
-         <Setter Property="WindowBackground" Value="Green" />
-         <Setter Property="WindowOpacity" Value="0.3" />
-         <Setter Property="Foreground" Value="Purple"/>
+         <Setter Property="Background" Value="Black" />
+         <Setter Property="BorderBrush" Value="Pink" />
+         <Setter Property="CaptionForeground" Value="White" />
+         <Setter Property="WindowBorderBrush" Value="Black" />
+         <Setter Property="WindowBackground" Value="#FF7304A2" />
+         <Setter Property="WindowOpacity" Value="0.65" />
+         <Setter Property="Foreground" Value="White"/>
+         <Setter Property="ButtonRegionBackground" Value="{StaticResource buttonRegionBackground}" />
+         <Setter Property="OkButtonStyle" Value="{StaticResource WindowButtonStyle}" />
+         <Setter Property="CancelButtonStyle" Value="{StaticResource WindowButtonStyle}" />
+         <Setter Property="YesButtonStyle" Value="{StaticResource WindowButtonStyle}" />
+         <Setter Property="NoButtonStyle" Value="{StaticResource WindowButtonStyle}" />
          <Setter Property="CloseButtonStyle" Value="{StaticResource MyCloseButtonStyle}"/>
       </Style>
    </sample:DemoView.Resources>
 
-   <Grid >
-      <Button Width="300"
+   <StackPanel Orientation="Horizontal"
+               HorizontalAlignment="Center">
+      <Button Width="150"
               Height="100"
-              VerticalAlignment="Center" 
-              HorizontalAlignment="Center"
-              Content="Show me that ugly styled MessageBox!"
-              Click="Button_Click"/>
-   </Grid>
+              Margin="10"
+              Content="Standard MessageBox"
+              Click="StandardMessageBoxButton_Click"/>
+      <Button Width="150"
+              Height="100"
+              Content="Styled MessageBox"
+              Click="StyledMessageBoxButton_Click"/>
+   </StackPanel>
 </sample:DemoView>

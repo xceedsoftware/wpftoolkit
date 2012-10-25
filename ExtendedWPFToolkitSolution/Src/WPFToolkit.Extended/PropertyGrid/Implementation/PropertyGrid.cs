@@ -30,20 +30,23 @@ using Xceed.Wpf.Toolkit.PropertyGrid.Commands;
 using System.Collections.Specialized;
 using System.Windows.Media;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+using System.Collections.ObjectModel;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
   [TemplatePart( Name = PART_DragThumb, Type = typeof( Thumb ) )]
-  public class PropertyGrid : Control, ISupportInitialize
+  public class PropertyGrid : Control, ISupportInitialize, IPropertyParent
   {
     private const string PART_DragThumb = "PART_DragThumb";
 
     #region Members
 
     private Thumb _dragThumb;
-    private List<PropertyItem> _propertyItemsCache;
     private bool _hasPendingSelectedObjectChanged;
     private int _initializationCount;
+    private PropertyItemCollection _properties;
+    private PropertyDefinitionCollection _propertyDefinitions;
+    private EditorDefinitionCollection _editorDefinitions;
 
     #endregion //Members
 
@@ -68,7 +71,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region AutoGenerateProperties
 
-    public static readonly DependencyProperty AutoGeneratePropertiesProperty = DependencyProperty.Register( "AutoGenerateProperties", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( true ) );
+    public static readonly DependencyProperty AutoGeneratePropertiesProperty = DependencyProperty.Register( "AutoGenerateProperties", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( true, OnAutoGeneratePropertiesChanged ) );
     public bool AutoGenerateProperties
     {
       get
@@ -81,7 +84,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
+    private static void OnAutoGeneratePropertiesChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      ( ( PropertyGrid )o ).UpdateProperties( true );
+    }
+
     #endregion //AutoGenerateProperties
+
+
+
 
     #region ShowSummary
 
@@ -102,24 +113,18 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region EditorDefinitions
 
-    public static readonly DependencyProperty EditorDefinitionsProperty = DependencyProperty.Register( "EditorDefinitions", typeof( EditorDefinitionCollection ), typeof( PropertyGrid ), new UIPropertyMetadata( null, OnEditorDefinitionsChanged) );
     public EditorDefinitionCollection EditorDefinitions
     {
       get
       {
-        return ( EditorDefinitionCollection )GetValue( EditorDefinitionsProperty );
+        return _editorDefinitions;
       }
       set
       {
-        SetValue( EditorDefinitionsProperty, value );
+        EditorDefinitionCollection oldValue = _editorDefinitions;
+        _editorDefinitions = value;
+        this.OnEditorDefinitionsChanged( oldValue, value );
       }
-    }
-
-    private static void OnEditorDefinitionsChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      PropertyGrid propertyGrid = o as PropertyGrid;
-      if( propertyGrid != null )
-        propertyGrid.OnEditorDefinitionsChanged( ( EditorDefinitionCollection )e.OldValue, ( EditorDefinitionCollection )e.NewValue );
     }
 
     protected virtual void OnEditorDefinitionsChanged( EditorDefinitionCollection oldValue, EditorDefinitionCollection newValue )
@@ -130,7 +135,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( newValue != null )
         newValue.CollectionChanged += new NotifyCollectionChangedEventHandler( OnEditorDefinitionsCollectionChanged );
 
-      RefreshPropertyGrid();
+      UpdateProperties( true );
+    }
+
+    private void OnEditorDefinitionsCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
+    {
+      UpdateProperties( true );
     }
 
     #endregion //EditorDefinitions
@@ -159,8 +169,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected virtual void OnFilterChanged( string oldValue, string newValue )
     {
-      if( Properties != null )
-        Properties.Filter( newValue );
+      Properties.Filter( newValue );
     }
 
     #endregion //Filter
@@ -206,7 +215,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected virtual void OnIsCategorizedChanged( bool oldValue, bool newValue )
     {
-      InitializePropertyGrid( newValue );
+      this.UpdateProperties( false );
+      this.UpdateThumb();
+
     }
 
     #endregion //IsCategorized
@@ -235,23 +246,19 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected virtual void OnNameColumnWidthChanged( double oldValue, double newValue )
     {
-      ( ( TranslateTransform )_dragThumb.RenderTransform ).X = newValue;
+      if( _dragThumb != null )
+        ( ( TranslateTransform )_dragThumb.RenderTransform ).X = newValue;
     }
 
     #endregion //NameColumnWidth
 
     #region Properties
 
-    private static readonly DependencyPropertyKey PropertiesPropertyKey = DependencyProperty.RegisterReadOnly( "Properties", typeof( PropertyItemCollection ), typeof( PropertyGrid ), new UIPropertyMetadata( null ) );
     public PropertyItemCollection Properties
     {
       get
       {
-        return ( PropertyItemCollection )GetValue( PropertiesPropertyKey.DependencyProperty );
-      }
-      private set
-      {
-        SetValue( PropertiesPropertyKey, value );
+        return _properties;
       }
     }
 
@@ -259,24 +266,18 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region PropertyDefinitions
 
-    public static readonly DependencyProperty PropertyDefinitionsProperty = DependencyProperty.Register( "PropertyDefinitions", typeof( PropertyDefinitionCollection ), typeof( PropertyGrid ), new UIPropertyMetadata( null, OnPropertyDefinitionsChanged ) );
     public PropertyDefinitionCollection PropertyDefinitions
     {
       get
       {
-        return ( PropertyDefinitionCollection )GetValue( PropertyDefinitionsProperty );
+        return _propertyDefinitions;
       }
       set
       {
-        SetValue( PropertyDefinitionsProperty, value );
+        PropertyDefinitionCollection oldValue = _propertyDefinitions;
+        _propertyDefinitions = value;
+        this.OnPropertyDefinitionsChanged( oldValue, value );
       }
-    }
-
-    private static void OnPropertyDefinitionsChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      PropertyGrid propertyGrid = o as PropertyGrid;
-      if( propertyGrid != null )
-        propertyGrid.OnPropertyDefinitionsChanged( ( PropertyDefinitionCollection )e.OldValue, ( PropertyDefinitionCollection )e.NewValue );
     }
 
     protected virtual void OnPropertyDefinitionsChanged( PropertyDefinitionCollection oldValue, PropertyDefinitionCollection newValue )
@@ -287,10 +288,44 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( newValue != null )
         newValue.CollectionChanged += new NotifyCollectionChangedEventHandler( OnPropertyDefinitionsCollectionChanged );
 
-      RefreshPropertyGrid();
+      UpdateProperties( true );
+    }
+
+    private void OnPropertyDefinitionsCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
+    {
+      UpdateProperties( true );
     }
 
     #endregion //PropertyDefinitions
+
+    #region IsReadOnly
+
+    public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register( "IsReadOnly", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( false, OnIsReadOnlyChanged ) );
+    public bool IsReadOnly
+    {
+      get
+      {
+        return ( bool )GetValue( IsReadOnlyProperty );
+      }
+      set
+      {
+        SetValue( IsReadOnlyProperty, value );
+      }
+    }
+
+    private static void OnIsReadOnlyChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      PropertyGrid propertyGrid = o as PropertyGrid;
+      if( propertyGrid != null )
+      {
+        foreach( PropertyItem propertyItem in propertyGrid.Properties )
+        {
+          propertyItem.Editor.IsEnabled = !propertyGrid.IsReadOnly;
+        }
+      }
+    }
+
+    #endregion //ReadOnly
 
     #region SelectedObject
 
@@ -317,20 +352,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     protected virtual void OnSelectedObjectChanged( object oldValue, object newValue )
     {
       // We do not want to process the change now if the grid is initializing (ie. BeginInit/EndInit).
-      _hasPendingSelectedObjectChanged = IsInitializing();
-
-      if( IsInitializing() )
-        return;
-
-      if( newValue == null )
-        ResetPropertyGrid();
-      else
+      if( _initializationCount != 0 )
       {
-        SetSelectedObjectNameBinding( newValue );
-        SelectedObjectType = newValue.GetType();
-        _propertyItemsCache = GetObjectProperties( newValue );
-        InitializePropertyGrid( IsCategorized );
+        _hasPendingSelectedObjectChanged = true;
+        return;
       }
+
+      this.UpdateProperties( true );
+
+      RaiseEvent( new RoutedPropertyChangedEventArgs<object>( oldValue, newValue, PropertyGrid.SelectedObjectChangedEvent ) );
     }
 
     #endregion //SelectedObject
@@ -344,7 +374,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         return ( Type )GetValue( SelectedObjectTypeProperty );
       }
-      private set
+      set
       {
         SetValue( SelectedObjectTypeProperty, value );
       }
@@ -359,13 +389,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected virtual void OnSelectedObjectTypeChanged( Type oldValue, Type newValue )
     {
-      if( newValue == null )
-        SelectedObjectTypeName = string.Empty;
-      else
-      {
-        DisplayNameAttribute displayNameAttribute = newValue.GetCustomAttributes( false ).OfType<DisplayNameAttribute>().FirstOrDefault();
-        SelectedObjectTypeName = displayNameAttribute == null ? newValue.Name : displayNameAttribute.DisplayName;
-      }
     }
 
     #endregion //SelectedObjectType
@@ -379,7 +402,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         return ( string )GetValue( SelectedObjectTypeNameProperty );
       }
-      private set
+      set
       {
         SetValue( SelectedObjectTypeNameProperty, value );
       }
@@ -389,17 +412,29 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region SelectedObjectName
 
-    public static readonly DependencyProperty SelectedObjectNameProperty = DependencyProperty.Register( "SelectedObjectName", typeof( string ), typeof( PropertyGrid ), new UIPropertyMetadata( string.Empty, OnSelectedObjectNameChanged ) );
+    public static readonly DependencyProperty SelectedObjectNameProperty = DependencyProperty.Register( "SelectedObjectName", typeof( string ), typeof( PropertyGrid ), new UIPropertyMetadata( string.Empty, OnSelectedObjectNameChanged, OnCoerceSelectedObjectName ) );
     public string SelectedObjectName
     {
       get
       {
         return ( string )GetValue( SelectedObjectNameProperty );
       }
-      private set
+      set
       {
         SetValue( SelectedObjectNameProperty, value );
       }
+    }
+
+    private static object OnCoerceSelectedObjectName( DependencyObject o, object baseValue )
+    {
+      PropertyGrid propertyGrid = o as PropertyGrid;
+      if( propertyGrid != null )
+      {
+        if( (propertyGrid.SelectedObject is FrameworkElement) && ( String.IsNullOrEmpty( ( String )baseValue ) ))
+          return "<no name>";
+      }
+
+      return baseValue;
     }
 
     private static void OnSelectedObjectNameChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
@@ -411,7 +446,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected virtual void SelectedObjectNameChanged( string oldValue, string newValue )
     {
-
     }
 
     #endregion //SelectedObjectName
@@ -443,10 +477,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( oldValue != null )
         oldValue.IsSelected = false;
 
-      //if (newValue != null)
-      //    newValue.IsSelected = true;
+      if( newValue != null )
+        newValue.IsSelected = true;
 
-      RaiseEvent( new RoutedEventArgs( PropertyGrid.SelectedPropertyItemChangedEvent, newValue ) );
+      RaiseEvent( new RoutedPropertyChangedEventArgs<PropertyItem>( oldValue, newValue, PropertyGrid.SelectedPropertyItemChangedEvent ) );
     }
 
     #endregion //SelectedPropertyItem
@@ -530,8 +564,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public PropertyGrid()
     {
+      _properties = new PropertyItemCollection( new ObservableCollection<PropertyItem>() );
       EditorDefinitions = new EditorDefinitionCollection();
       PropertyDefinitions = new PropertyDefinitionCollection();
+
+      AddHandler( PropertyItem.ItemSelectionChangedEvent, new RoutedEventHandler( OnItemSelectionChanged ) );
       CommandBindings.Add( new CommandBinding( PropertyGridCommands.ClearFilter, ClearFilter, CanClearFilter ) );
     }
 
@@ -560,6 +597,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       TranslateTransform _moveTransform = new TranslateTransform();
       _moveTransform.X = NameColumnWidth;
       _dragThumb.RenderTransform = _moveTransform;
+
+      this.UpdateThumb();
     }
 
     protected override void OnPreviewKeyDown( KeyEventArgs e )
@@ -579,7 +618,23 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region Event Handlers
 
-    void DragThumb_DragDelta( object sender, DragDeltaEventArgs e )
+    private void OnItemSelectionChanged( object sender, RoutedEventArgs args )
+    {
+      PropertyItem item = ( PropertyItem )args.OriginalSource;
+      if( item.IsSelected )
+      {
+        SelectedPropertyItem = item;
+      }
+      else
+      {
+        if( object.ReferenceEquals( item, SelectedPropertyItem ) )
+        {
+          SelectedPropertyItem = null;
+        }
+      }
+    }
+
+    private void DragThumb_DragDelta( object sender, DragDeltaEventArgs e )
     {
       NameColumnWidth = Math.Max( 0, NameColumnWidth + e.HorizontalChange );
     }
@@ -602,121 +657,75 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region Methods
 
-    private void InitializePropertyGrid( bool isCategorized )
+    private void UpdateProperties( bool regenerateItems )
     {
-      LoadProperties( isCategorized );
-      SetDragThumbMargin( isCategorized );
+      IEnumerable<PropertyItem> newProperties = null;
+      if( regenerateItems )
+      {
+        newProperties = this.GeneratePropertyItems( this.SelectedObject );
+
+        string defaultPropertyName = PropertyGridUtilities.GetDefaultPropertyName( this.SelectedObject );
+        this.SelectedPropertyItem = newProperties.FirstOrDefault( ( prop ) => prop.Name.Equals( defaultPropertyName ) );
+      }
+
+      Properties.Update( newProperties, IsCategorized, Filter );
     }
 
-    private void LoadProperties( bool isCategorized )
-    {
-      if( _propertyItemsCache == null )
-        return;
-
-      //clear any filters first
-      Filter = String.Empty;
-
-      if( isCategorized )
-        Properties = PropertyGridUtilities.GetCategorizedProperties( _propertyItemsCache );
-      else
-        Properties = PropertyGridUtilities.GetAlphabetizedProperties( _propertyItemsCache );
-    }
-
-    private List<PropertyItem> GetObjectProperties( object instance )
+    private List<PropertyItem> GeneratePropertyItems(object instance)
     {
       var propertyItems = new List<PropertyItem>();
-      if( instance == null )
-        return propertyItems;
 
-      try
+      if( instance != null )
       {
-        PropertyDescriptorCollection descriptors = PropertyGridUtilities.GetPropertyDescriptors( instance );
-
-        if( !AutoGenerateProperties )
+        try
         {
-          List<PropertyDescriptor> specificProperties = new List<PropertyDescriptor>();
-          if( PropertyDefinitions != null )
+          PropertyDescriptorCollection descriptors = PropertyGridUtilities.GetPropertyDescriptors( instance );
+
+          if( !AutoGenerateProperties )
           {
-            foreach( PropertyDefinition pd in PropertyDefinitions )
+            List<PropertyDescriptor> specificProperties = new List<PropertyDescriptor>();
+            if( PropertyDefinitions != null )
             {
-              foreach( PropertyDescriptor descriptor in descriptors )
+              foreach( PropertyDefinition pd in PropertyDefinitions )
               {
-                if( descriptor.Name == pd.Name )
+                foreach( PropertyDescriptor descriptor in descriptors )
                 {
-                  specificProperties.Add( descriptor );
-                  break;
+                  if( descriptor.Name == pd.Name )
+                  {
+                    specificProperties.Add( descriptor );
+                    break;
+                  }
                 }
               }
             }
+
+            descriptors = new PropertyDescriptorCollection( specificProperties.ToArray() );
           }
 
-          descriptors = new PropertyDescriptorCollection( specificProperties.ToArray() );
+          foreach( PropertyDescriptor descriptor in descriptors )
+          {
+            if( descriptor.IsBrowsable )
+              propertyItems.Add( PropertyGridUtilities.CreatePropertyItem( descriptor, this ) );
+          }
         }
-
-        foreach( PropertyDescriptor descriptor in descriptors )
+        catch( Exception )
         {
-          if( descriptor.IsBrowsable )
-            propertyItems.Add( PropertyGridUtilities.CreatePropertyItem( descriptor, instance, this, descriptor.Name ) );
+          //TODO: handle this some how
         }
-      }
-      catch( Exception )
-      {
-        //TODO: handle this some how
       }
 
       return propertyItems;
     }
 
-    private void SetSelectedObjectNameBinding( object selectedObject )
+    private void UpdateThumb()
     {
-      if( selectedObject is FrameworkElement )
+      if( _dragThumb != null )
       {
-        var binding = new Binding( "Name" );
-        binding.Source = selectedObject;
-        binding.Mode = BindingMode.OneWay;
-        BindingOperations.SetBinding( this, PropertyGrid.SelectedObjectNameProperty, binding );
+        if( IsCategorized )
+          _dragThumb.Margin = new Thickness( 6, 0, 0, 0 );
+        else
+          _dragThumb.Margin = new Thickness( -1, 0, 0, 0 );
       }
-    }
-
-    private void SetDragThumbMargin( bool isCategorized )
-    {
-      if( _dragThumb == null )
-        return;
-
-      if( isCategorized )
-        _dragThumb.Margin = new Thickness( 6, 0, 0, 0 );
-      else
-        _dragThumb.Margin = new Thickness( -1, 0, 0, 0 );
-    }
-
-    private void ResetPropertyGrid()
-    {
-      SelectedObjectName = String.Empty;
-      SelectedObjectType = null;
-      _propertyItemsCache = null;
-      SelectedPropertyItem = null;
-      Properties = null;
-    }
-
-    private void OnEditorDefinitionsCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
-    {
-      RefreshPropertyGrid();
-    }
-
-    private void OnPropertyDefinitionsCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
-    {
-      RefreshPropertyGrid();
-    }
-
-    private void RefreshPropertyGrid()
-    {
-      _propertyItemsCache = GetObjectProperties( SelectedObject );
-      InitializePropertyGrid( IsCategorized );
-    }
-
-    private bool IsInitializing()
-    {
-      return _initializationCount != 0;
     }
 
     /// <summary>
@@ -747,8 +756,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
-    public static readonly RoutedEvent SelectedPropertyItemChangedEvent = EventManager.RegisterRoutedEvent( "SelectedPropertyItemChanged", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( PropertyGrid ) );
-    public event RoutedEventHandler SelectedPropertyItemChanged
+    public static readonly RoutedEvent SelectedPropertyItemChangedEvent = EventManager.RegisterRoutedEvent( "SelectedPropertyItemChanged", RoutingStrategy.Bubble, typeof( RoutedPropertyChangedEventHandler<PropertyItem> ), typeof( PropertyGrid ) );
+    public event RoutedPropertyChangedEventHandler<PropertyItem> SelectedPropertyItemChanged
     {
       add
       {
@@ -757,6 +766,19 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       remove
       {
         RemoveHandler( SelectedPropertyItemChangedEvent, value );
+      }
+    }
+
+    public static readonly RoutedEvent SelectedObjectChangedEvent = EventManager.RegisterRoutedEvent( "SelectedObjectChanged", RoutingStrategy.Bubble, typeof( RoutedPropertyChangedEventHandler<object> ), typeof( PropertyGrid ) );
+    public event RoutedPropertyChangedEventHandler<object> SelectedObjectChanged
+    {
+      add
+      {
+        AddHandler( SelectedObjectChangedEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( SelectedObjectChangedEvent, value );
       }
     }
 
@@ -786,8 +808,28 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( _hasPendingSelectedObjectChanged )
       {
         //This will update SelectedObject, Type, Name based on the actual config.
-        OnSelectedObjectChanged( SelectedObject, SelectedObject );
+        this.UpdateProperties( true );
+        _hasPendingSelectedObjectChanged = false;
       }
+    }
+
+    #endregion
+
+    #region IPropertyParent Members
+
+    bool IPropertyParent.IsReadOnly
+    {
+      get { return this.IsReadOnly; }
+    }
+
+    object IPropertyParent.ValueInstance
+    {
+      get { return this.SelectedObject; }
+    }
+
+    EditorDefinitionCollection IPropertyParent.EditorDefinitions
+    {
+      get { return this.EditorDefinitions; }
     }
 
     #endregion

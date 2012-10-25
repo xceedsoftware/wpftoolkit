@@ -184,7 +184,7 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
 
       }
 
-      return Color.FromArgb( 255, ( byte )( r * 255 ), ( byte )( g * 255 ), ( byte )( b * 255 ) );
+      return Color.FromArgb( 255, ( byte )(  Math.Round(r * 255) ), ( byte )(  Math.Round(g * 255) ), ( byte )(  Math.Round(b * 255) ) );
     }
 
     /// <summary>

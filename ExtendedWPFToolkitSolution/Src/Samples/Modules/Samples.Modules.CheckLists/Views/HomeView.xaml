@@ -129,7 +129,6 @@
             <ColumnDefinition Width="*" />
          </Grid.ColumnDefinitions>
 
-
          <TextBlock Text="CheckListBox Usage:" Margin="5" Style="{StaticResource Header}" />
          <xctk:CheckListBox x:Name="_checkListBox"
                             Grid.Column="0"
@@ -152,34 +151,7 @@
                              ValueMemberPath="{Binding ElementName=_valueMemberPath, Path=SelectedItem}"
                              SelectedMemberPath="{Binding ElementName=_selectedMemberPath, Path=Text}"
                              DisplayMemberPath="{Binding ElementName=_displayMemberPath, Path=SelectedItem}" 
-                              IsDropDownOpen="{Binding ElementName=_isDropDownOpen, Path=IsChecked, Mode=TwoWay}"
-                             />
-         <!---->
+                             IsDropDownOpen="{Binding ElementName=_isDropDownOpen, Path=IsChecked, Mode=TwoWay}" />
       </Grid>
-
-
-      <!--<StackPanel>
-         <xctk:CheckComboBox x:Name="_combo" 
-                             HorizontalAlignment="Center" 
-                             VerticalAlignment="Center" 
-                             DisplayMemberPath="Color"
-                             ValueMemberPath="Level"
-                             SelectedItems="{Binding SelectedItems}"
-                             SelectedValue="{Binding SelectedValue}" />
-
-         <xctk:CheckListBox x:Name="_listBox" Visibility="Collapsed"
-                            Height="250"
-                            DisplayMemberPath="Color"
-                            ValueMemberPath="Level" 
-                            SelectedMemberPath="IsSelected"
-                            SelectedItems="{Binding SelectedItems}"
-                            SelectedValue="{Binding SelectedValue}" />
-
-         <TextBlock Text="{Binding SelectedValue}" />
-         <ListBox ItemsSource="{Binding SelectedItems}" Height="50" Visibility="Collapsed"/>
-
-         <Button Click="Button_Click">Set</Button>
-
-      </StackPanel>-->
    </Grid>
 </sample:DemoView>

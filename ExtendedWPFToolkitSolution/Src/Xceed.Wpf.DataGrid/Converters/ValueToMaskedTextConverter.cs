@@ -1,0 +1,115 @@
+﻿/************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2010-2012 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   This program can be provided to you by Xceed Software Inc. under a
+   proprietary commercial license agreement for use in non-Open Source
+   projects. The commercial version of Extended WPF Toolkit also includes
+   priority technical support, commercial updates, and many additional 
+   useful WPF controls if you license Xceed Business Suite for WPF.
+
+   Visit http://xceed.com and follow @datagrid on Twitter.
+
+  **********************************************************************/
+
+using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
+using System.ComponentModel;
+using System.Reflection;
+using Xceed.Wpf.Toolkit;
+
+namespace Xceed.Wpf.DataGrid.Converters
+{
+  public class ValueToMaskedTextConverter : IValueConverter
+  {
+    #region IValueConverter Members
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1800:DoNotCastUnnecessarily" )]
+    public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
+    {
+      if( !targetType.IsAssignableFrom( typeof( string ) ) )
+        return DependencyProperty.UnsetValue;
+
+      string workingText = ( value == null ) ? string.Empty : value.ToString();
+
+      string mask = null; // Defaults to no mask when no parameter is specified.
+
+      if( parameter != null )
+      {
+        Type parameterType = parameter.GetType();
+        if( parameterType == typeof( string ) )
+        {
+          string stringParameter = ( string )parameter;
+
+          if( !string.IsNullOrEmpty( stringParameter ) )
+            mask = stringParameter;
+        }
+        else
+        {
+          return DependencyProperty.UnsetValue;
+        }
+      }
+
+      if( !string.IsNullOrEmpty( mask ) )
+      {
+        try
+        {
+          string rawText = string.Empty;
+
+          CultureInfo currentCulture = CultureInfo.CurrentCulture;
+
+          if( value != null )
+          {
+            try
+            {
+              Type valueDataType = value.GetType();
+
+              MethodInfo valueToStringMethodInfo =
+                valueDataType.GetMethod( "ToString", new Type[] { typeof( string ), typeof( IFormatProvider ) } );
+
+              string formatSpecifier = MaskedTextBox.GetFormatSpecifierFromMask( mask, currentCulture );
+
+              if( valueToStringMethodInfo != null )
+              {
+                rawText = ( string )valueToStringMethodInfo.Invoke( value, new object[] { formatSpecifier, currentCulture } );
+              }
+              else
+              {
+                rawText = value.ToString();
+              }
+            }
+            catch
+            {
+              rawText = value.ToString();
+            }
+          }
+
+          MaskedTextProvider maskedTextProvider = new MaskedTextProvider( mask, currentCulture );
+
+          maskedTextProvider.Set( rawText );
+
+          return maskedTextProvider.ToString( false, true );
+        }
+        catch
+        {
+        }
+      }
+
+      return value.ToString();
+    }
+
+    public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
+    {
+      return Binding.DoNothing;
+    }
+
+    #endregion
+  }
+}

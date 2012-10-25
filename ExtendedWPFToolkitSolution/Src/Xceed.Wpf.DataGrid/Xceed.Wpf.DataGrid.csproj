@@ -1,0 +1,966 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{63648392-6CE9-4A60-96D4-F9FD718D29B0}</ProjectGuid>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <RootNamespace>Xceed.Wpf.DataGrid</RootNamespace>
+    <AssemblyName>Xceed.Wpf.DataGrid</AssemblyName>
+    <WarningLevel>4</WarningLevel>
+    <OutputType>library</OutputType>
+    <!-- Most people will use Publish dialog in Visual Studio to increment this -->
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>.\bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;XBAP_FRIENDLY</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <NoWarn>1699</NoWarn>
+    <BaseAddress>125829120</BaseAddress>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>.\bin\Release\</OutputPath>
+    <DefineConstants>TRACE;CODE_ANALYSIS;XBAP_FRIENDLY</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <NoWarn>1699</NoWarn>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRules>
+    </CodeAnalysisRules>
+    <BaseAddress>125829120</BaseAddress>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Entity">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Printing" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="PresentationCore">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="PresentationFramework">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="UIAutomationProvider">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="UIAutomationTypes" />
+    <Reference Include="ReachFramework" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.IdentityModel" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="%28CollectionView%29\%28DataVirtualization%29\VirtualList.cs" />
+    <Compile Include="%28CollectionView%29\%28DataVirtualization%29\VirtualListEnumerator.cs" />
+    <Compile Include="%28CollectionView%29\%28DataVirtualization%29\VirtualListTableOfContent.cs" />
+    <Compile Include="%28CollectionView%29\%28DataVirtualization%29\VirtualPage.cs" />
+    <Compile Include="%28CollectionView%29\%28DataVirtualization%29\VirtualPageManager.cs" />
+    <Compile Include="%28CollectionView%29\AsyncCommitInfo.cs" />
+    <Compile Include="%28CollectionView%29\AsyncQueryInfo.cs" />
+    <Compile Include="%28CollectionView%29\AsyncQueryInfoWeakComparer.cs" />
+    <Compile Include="%28CollectionView%29\AutoFilterValuesChangedEventArgs.cs" />
+    <Compile Include="%28CollectionView%29\BindingPathValueExtractor.cs" />
+    <Compile Include="%28CollectionView%29\CollectionViewGroupExtensions.cs" />
+    <Compile Include="%28CollectionView%29\CommitItemsEvent.cs" />
+    <Compile Include="%28CollectionView%29\CustomDistinctValueItemConfiguration.cs" />
+    <Compile Include="%28CollectionView%29\CustomDistinctValueItemConfigurationCollection.cs" />
+    <Compile Include="%28CollectionView%29\CustomDistinctValueItemFilterEventArgs.cs" />
+    <Compile Include="%28CollectionView%29\DataGridCollectionViewBase.cs" />
+    <Compile Include="%28CollectionView%29\DataGridCollectionViewBaseDataProvider.cs" />
+    <Compile Include="%28CollectionView%29\DataGridCollectionViewSourceBase.cs" />
+    <Compile Include="%28CollectionView%29\DataGridGroupInfo.cs" />
+    <Compile Include="%28CollectionView%29\%28ForeignKeys%29\DataGridForeignKeyDescription.cs" />
+    <Compile Include="%28CollectionView%29\DataGridItemProperty.PropertyDescriptorFromItemProperty.cs" />
+    <Compile Include="%28CollectionView%29\DataGridItemPropertyBase.cs" />
+    <Compile Include="%28CollectionView%29\DataGridItemPropertyDictionary.cs" />
+    <Compile Include="%28CollectionView%29\DataGridLINQPageManager.cs" />
+    <Compile Include="%28CollectionView%29\DataGridPageManager.cs" />
+    <Compile Include="%28CollectionView%29\DataGridVirtualizingCollectionView.cs" />
+    <Compile Include="%28CollectionView%29\DataGridVirtualizingCollectionViewBase.cs" />
+    <Compile Include="%28CollectionView%29\DataGridItemPropertyQueryValueEvent.cs" />
+    <Compile Include="%28CollectionView%29\DataGridItemPropertyCommittingValue.cs" />
+    <Compile Include="%28CollectionView%29\DataGridUnboundItemProperty.cs" />
+    <Compile Include="%28CollectionView%29\DataGridVirtualizingCollectionViewDataProvider.cs" />
+    <Compile Include="%28CollectionView%29\DataGridVirtualizingCollectionViewGroup.cs" />
+    <Compile Include="%28CollectionView%29\DataGridVirtualizingCollectionViewGroupBase.cs" />
+    <Compile Include="%28CollectionView%29\DataGridPageManagerBase.cs" />
+    <Compile Include="%28CollectionView%29\DataGridVirtualizingCollectionViewGroupRoot.cs" />
+    <Compile Include="%28CollectionView%29\DataGridVirtualizingCollectionViewSource.cs" />
+    <Compile Include="%28CollectionView%29\%28ForeignKeys%29\DataTableForeignKeyDescription.cs" />
+    <Compile Include="%28CollectionView%29\DataGridVirtualizingCollectionViewSourceBase.cs" />
+    <Compile Include="%28CollectionView%29\DataGridVirtualizingQueryableCollectionView.cs" />
+    <Compile Include="%28CollectionView%29\DataGridVirtualizingQueryableCollectionViewDataProvider.cs" />
+    <Compile Include="%28CollectionView%29\DataGridVirtualizingQueryableCollectionViewGroup.cs" />
+    <Compile Include="%28CollectionView%29\DataGridVirtualizingQueryableCollectionViewGroupRoot.cs" />
+    <Compile Include="%28CollectionView%29\DataGridVirtualizingQueryableCollectionViewSource.cs" />
+    <Compile Include="%28CollectionView%29\DeferredOperationManager.cs" />
+    <Compile Include="%28CollectionView%29\DataGridCommittingNewItemEvent.cs" />
+    <Compile Include="%28CollectionView%29\DataGridCreatingNewItemEvent.cs" />
+    <Compile Include="%28CollectionView%29\DataGridCollectionView.cs" />
+    <Compile Include="%28CollectionView%29\DataGridCollectionViewDataProvider.cs" />
+    <Compile Include="%28CollectionView%29\DataGridCollectionViewEnumerator.cs" />
+    <Compile Include="%28CollectionView%29\DataGridCollectionViewGroup.cs" />
+    <Compile Include="%28CollectionView%29\DataGridCollectionViewGroupRoot.cs" />
+    <Compile Include="%28CollectionView%29\DataGridCollectionViewGroupSort.cs" />
+    <Compile Include="%28CollectionView%29\DataGridCollectionViewSort.cs" />
+    <Compile Include="%28CollectionView%29\DataGridCollectionViewSource.cs" />
+    <Compile Include="%28CollectionView%29\DataGridGroupDescription.cs" />
+    <Compile Include="%28CollectionView%29\DataGridItemPropertyBase.PropertyDescriptorFromItemPropertyBase.cs" />
+    <Compile Include="%28CollectionView%29\DataGridItemPropertyCollection.cs" />
+    <Compile Include="%28CollectionView%29\DataGridItemCancelEvent.cs" />
+    <Compile Include="%28CollectionView%29\DataGridItemEvent.cs" />
+    <Compile Include="%28CollectionView%29\DataGridItemHandledEvent.cs" />
+    <Compile Include="%28CollectionView%29\DataGridItemRemovedEvent.cs" />
+    <Compile Include="%28CollectionView%29\EmptyDataItemSafePropertyDescriptor.cs" />
+    <Compile Include="%28CollectionView%29\EntityDetailDescription.cs" />
+    <Compile Include="%28CollectionView%29\OptimizedReadOnlyObservableCollection.cs" />
+    <Compile Include="%28CollectionView%29\QueryEntityDetailsEventArgs.cs" />
+    <Compile Include="%28CollectionView%29\QueryDistinctValueEventArgs.cs" />
+    <Compile Include="%28CollectionView%29\%28DataVirtualization%29\EmptyDataItem.cs" />
+    <Compile Include="%28CollectionView%29\GroupDescriptionCollection.cs" />
+    <Compile Include="%28CollectionView%29\GroupNameCountPair.cs" />
+    <Compile Include="%28CollectionView%29\ListSourceDetailDescription.cs" />
+    <Compile Include="%28CollectionView%29\PropertyRelationAttribute.cs" />
+    <Compile Include="%28CollectionView%29\DataGridSortDescriptionCollection.cs" />
+    <Compile Include="%28CollectionView%29\DataRelationDetailDescription.cs" />
+    <Compile Include="%28CollectionView%29\DataRowColumnPropertyDescriptor.cs" />
+    <Compile Include="%28CollectionView%29\DeferredOperation.cs" />
+    <Compile Include="%28CollectionView%29\DataGridItemProperty.cs" />
+    <Compile Include="%28CollectionView%29\DistinctValuesDictionary.cs" />
+    <Compile Include="%28CollectionView%29\EnumerableDetailDescription.cs" />
+    <Compile Include="%28CollectionView%29\PropertyDetailDescription.cs" />
+    <Compile Include="%28CollectionView%29\DataGridRemovingItemEvent.cs" />
+    <Compile Include="%28CollectionView%29\QueryableExtensions.cs" />
+    <Compile Include="%28CollectionView%29\QueryAutoFilterDistinctValuesEvent.cs" />
+    <Compile Include="%28CollectionView%29\QueryGroupsEventArgs.cs" />
+    <Compile Include="%28CollectionView%29\QueryItemCountEvent.cs" />
+    <Compile Include="%28CollectionView%29\QueryItemsEvent.cs" />
+    <Compile Include="%28CollectionView%29\SortDescriptionsSyncContext.cs" />
+    <Compile Include="%28CollectionView%29\%28DataVirtualization%29\VirtualizedItemInfo.cs" />
+    <Compile Include="%28CollectionView%29\%28DataVirtualization%29\VirtualizedItemValueCollection.cs" />
+    <Compile Include="%28CollectionView%29\StatResultComparer.cs" />
+    <Compile Include="%28CollectionView%29\UnboundDataItem.cs" />
+    <Compile Include="%28enums%29\CommitModeEnum.cs" />
+    <Compile Include="%28enums%29\DataGridConnectionStateEnum.cs" />
+    <Compile Include="%28enums%29\DataGridUpdateSourceTriggerEnum.cs" />
+    <Compile Include="%28enums%29\DeletingSelectedItemErrorActionEnum.cs" />
+    <Compile Include="%28enums%29\DistinctValuesUpdateModeEnum.cs" />
+    <Compile Include="%28enums%29\FilterCriteriaModeEnum.cs" />
+    <Compile Include="%28enums%29\FilterTokenPriorityEnum.cs" />
+    <Compile Include="%28enums%29\InsertionModeEnum.cs" />
+    <Compile Include="%28enums%29\ScrollDirectionEnum.cs" />
+    <Compile Include="%28enums%29\SelectionUnitEnum.cs" />
+    <Compile Include="%28ForeignKeys%29\ForeignKeyGroupContentControl.cs" />
+    <Compile Include="%28ForeignKeys%29\DataTableForeignKeyConverter.cs" />
+    <Compile Include="%28ForeignKeys%29\ForeignKeyConverter.cs" />
+    <Compile Include="%28ForeignKeys%29\ForeignKeyScrollTipContentControl.cs" />
+    <Compile Include="%28Generator%29\IInhibitGenPosToIndexUpdating.cs" />
+    <Compile Include="%28Generator%29\StickyContainerGeneratedComparer.cs" />
+    <Compile Include="%28Generator%29\StickyContainerGeneratedReverseComparer.cs" />
+    <Compile Include="%28Generator%29\StickyContainerGeneratedStruct.cs" />
+    <Compile Include="Automation\AutomationPeerExtensions.cs" />
+    <Compile Include="CanBeCurrentWhenReadOnlyChangedEventManager.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CellContentTemplateChangedEventManager.cs" />
+    <Compile Include="ValidateInputWrapper.cs" />
+    <Compile Include="CellEditorDisplayConditionsChangedEventManager.cs" />
+    <Compile Include="DataGridCheckBox.cs" />
+    <Compile Include="Converters\SortingDirectionToBooleanConverter.cs" />
+    <Compile Include="DataGridControlSelectionChangedWeakEventManager.cs" />
+    <Compile Include="DataGridCurrentChangedEvent.cs" />
+    <Compile Include="DataGridCurrentChangingEvent.cs" />
+    <Compile Include="DataGridDatePicker.cs" />
+    <Compile Include="DataGridFocusException.cs" />
+    <Compile Include="DataGridSelectionChangingEvent.cs" />
+    <Compile Include="ForeignKeyConfigurationChangedEventManager.cs" />
+    <Compile Include="GroupNavigationButton.cs" />
+    <Compile Include="CellEditorContext.cs" />
+    <Compile Include="Converters\FilterCriterionToForeignKeyConverter.cs" />
+    <Compile Include="Converters\EmptyStringToBooleanConverter.cs" />
+    <Compile Include="ColumnBase.cs" />
+    <Compile Include="FilterCriteria\EndsWithFilterCriterion.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FilterCriteria\StartsWithFilterCriterion.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GroupNavigationControl.cs" />
+    <Compile Include="GroupNavigationControlItem.cs" />
+    <Compile Include="HashedLinkedList.cs" />
+    <Compile Include="InnerCellContentPresenter.cs" />
+    <Compile Include="ItemPropertiesChangedEventManager.cs" />
+    <Compile Include="Log.cs" />
+    <Compile Include="ObjectComparer.cs" />
+    <Compile Include="FrameworkElementUnloadedEventManager.cs" />
+    <Compile Include="Print\IPrintInfo.cs" />
+    <Compile Include="ScrollChangedWeakEventManager.cs" />
+    <Compile Include="SelectedCellsStorage.cs" />
+    <Compile Include="SelectionCellRange.cs" />
+    <Compile Include="SelectionCellRangeCollection.cs" />
+    <Compile Include="SelectionCellRangeWithItems.cs" />
+    <Compile Include="SelectionItemCollection.cs" />
+    <Compile Include="SelectionRange.cs" />
+    <Compile Include="SelectionItemRangeCollection.cs" />
+    <Compile Include="SelectionRangeWithItems.cs" />
+    <Compile Include="UnboundColumn.cs" />
+    <Compile Include="SelectionInfo.cs" />
+    <Compile Include="DataGridSelectionChangedEvent.cs" />
+    <Compile Include="FilterCriteria\AndFilterCriterion.cs" />
+    <Compile Include="%28enums%29\CompareResultEnum.cs" />
+    <Compile Include="FilterCriteria\RelationalFilterCriterion.cs" />
+    <Compile Include="FilterCriteria\ContainsFilterCriterion.cs" />
+    <Compile Include="FilterCriteria\CriterionDescriptorAttribute.cs" />
+    <Compile Include="FilterCriteria\DifferentThanFilterCriterion.cs" />
+    <Compile Include="FilterCriteria\EqualToFilterCriterion.cs" />
+    <Compile Include="FilterCriteria\FilterCriterion.cs" />
+    <Compile Include="%28enums%29\FilterOperatorPrecedenceEnum.cs" />
+    <Compile Include="Converters\FilterCriterionToNullableBoolConverter.cs" />
+    <Compile Include="FilterParser.cs" />
+    <Compile Include="FilterParserTestWindow.cs" />
+    <Compile Include="FilterParser_UnitTests.cs" />
+    <Compile Include="FilterCriteria\GreaterThanOrEqualToFilterCriterion.cs" />
+    <Compile Include="FilterCriteria\GreaterThanFilterCriterion.cs" />
+    <Compile Include="FilterCriteria\LessThanOrEqualToFilterCriterion.cs" />
+    <Compile Include="FilterCriteria\LessThanFilterCriterion.cs" />
+    <Compile Include="FilterCriteria\NotFilterCriterion.cs" />
+    <Compile Include="FilterCriteria\OrFilterCriterion.cs" />
+    <Compile Include="MaxGroupLevelsChangedEventManager.cs" />
+    <Compile Include="MaxSortLevelsChangedEventManager.cs" />
+    <Compile Include="Utils\WeakEventHandler.cs" />
+    <Compile Include="Utils\Wpf\DragDrop\DragDropHelper.cs" />
+    <Compile Include="ValidationRules\FilterExpressionValidationRule.cs" />
+    <Compile Include="Automation\ColumnManagerCellAutomationPeer.cs" />
+    <Compile Include="Automation\ColumnManagerRowAutomationPeer.cs" />
+    <Compile Include="Automation\DataGridItemCellAutomationPeer.cs" />
+    <Compile Include="Automation\HeaderFooterItemAutomationPeer.cs" />
+    <Compile Include="Automation\AutomationQueryEvents.cs" />
+    <Compile Include="Automation\QueryAutomationIdRoutedEventArgs.cs" />
+    <Compile Include="Automation\QueryHelpTextRoutedEventArgs.cs" />
+    <Compile Include="Automation\QueryItemStatusRoutedEventArgs.cs" />
+    <Compile Include="Automation\QueryItemTypeRoutedEventArgs.cs" />
+    <Compile Include="Automation\QueryNameRoutedEventArgs.cs" />
+    <Compile Include="Column.GenericContentTemplateSelectorResources.cs" />
+    <Compile Include="%28ForeignKeys%29\ForeignKeyContentControl.cs" />
+    <Compile Include="Export\%28Clipboard%29\ClipboardExporterBase.cs" />
+    <Compile Include="Export\%28Clipboard%29\CsvClipboardExporter.cs" />
+    <Compile Include="Export\FormatSettingsBase.cs" />
+    <Compile Include="%28ForeignKeys%29\ForeignKeyConfiguration.cs" />
+    <Compile Include="GroupExtensions.cs" />
+    <Compile Include="Views\%28TableflowView%29\AnimatedDraggedElementAdorner.cs" />
+    <Compile Include="Views\%28TableflowView%29\PointAnimation.cs" />
+    <Compile Include="Views\%28TableflowView%29\TableflowView.cs" />
+    <Compile Include="Views\%28TableflowView%29\TableflowViewAnimationHelper.cs" />
+    <Compile Include="Views\%28TableflowView%29\TableflowViewItemsHost.cs" />
+    <Compile Include="Views\%28TableflowView%29\TableflowViewUIElementCollection.cs" />
+    <Compile Include="Views\%28TableflowView%29\ColumnReorderingDragSourceManager.cs" />
+    <Compile Include="Views\%28TableflowView%29\IAnimatedScrollInfo.cs" />
+    <Compile Include="Views\%28TableflowView%29\LayoutedContainerInfo.cs" />
+    <Compile Include="Views\%28TableflowView%29\LayoutedContainerInfoList.cs" />
+    <Compile Include="Views\%28TableflowView%29\OffsetAnimation.cs" />
+    <Compile Include="Views\%28TableflowView%29\StickyContainerInfo.cs" />
+    <Compile Include="Views\%28TableflowView%29\StickyContainerInfoComparer.cs" />
+    <Compile Include="Views\%28TableflowView%29\StickyContainerInfoList.cs" />
+    <Compile Include="Views\%28TableflowView%29\StickyContainerInfoReverseComparer.cs" />
+    <Compile Include="Views\%28TableflowView%29\ZOrderHelper.cs" />
+    <Compile Include="%28enums%29\NavigationBehaviorEnum.cs" />
+    <Compile Include="%28Generator%29\GroupNamesTreeKey.cs" />
+    <Compile Include="%28Generator%29\NamesTreeGroupFinderVisitor.cs" />
+    <Compile Include="CancelRoutedEvent.cs" />
+    <Compile Include="CellValidationErrorRoutedEvent.cs" />
+    <Compile Include="ContainerSizeState.cs" />
+    <Compile Include="Converters\CurrencyConverter.cs" />
+    <Compile Include="Converters\SynchronizedScrollViewerMultiConverter.cs" />
+    <Compile Include="Converters\TypeToVisibilityConverter.cs" />
+    <Compile Include="CurrencyManager.cs" />
+    <Compile Include="DeletingSelectedItemErrorRoutedEventArgs.cs" />
+    <Compile Include="DetailVisibilityChangedEventManager.cs" />
+    <Compile Include="Export\%28Clipboard%29\XceedDataObject.cs" />
+    <Compile Include="Export\CsvFormatSettings.cs" />
+    <Compile Include="Export\FormatHelper.cs" />
+    <Compile Include="RowValidationError.cs" />
+    <Compile Include="RowValidationErrorRoutedEvent.cs" />
+    <Compile Include="SelectedItemsStorage.cs" />
+    <Compile Include="SelectionChanger.cs" />
+    <Compile Include="SelectionManager.cs" />
+    <Compile Include="Settings\UserSettingsEnum.cs" />
+    <Compile Include="Settings\XmlColumnWidthStruct.cs" />
+    <Compile Include="Automation\CellAutomationPeer.cs" />
+    <Compile Include="Automation\DataGridContextAutomationPeer.cs" />
+    <Compile Include="Automation\DataGridControlAutomationPeer.cs" />
+    <Compile Include="Automation\DataGridGroupAutomationPeer.cs" />
+    <Compile Include="Automation\DataGridItemAutomationPeer.cs" />
+    <Compile Include="Automation\RowAutomationPeer.cs" />
+    <Compile Include="Utils\Collections\ReadOnlyDictionary.cs" />
+    <Compile Include="Utils\XmlSerialization\XmlSerializableBaseType.cs" />
+    <Compile Include="ValidationRules\CellContentBindingValidationRule.cs" />
+    <Compile Include="ValidationRules\CellEditorValidationRule.cs" />
+    <Compile Include="ValidationRules\CellEditorErrorValidationRule.cs" />
+    <Compile Include="Views\FixedCellPanel.cs" />
+    <Compile Include="Views\%28ColumnVirtualization%29\UpdateMeasureRequiredEventArgs.cs" />
+    <Compile Include="Views\%28ColumnVirtualization%29\UpdateMeasureRequiredEventManager.cs" />
+    <Compile Include="Views\DataGridControlBackgroundBrushes.cs" />
+    <Compile Include="Views\DataGridControlBackgroundBrushesResources.xaml.cs">
+      <DependentUpon>DataGridControlBackgroundBrushesResources.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ColumnStretchingManager.cs" />
+    <Compile Include="Views\%28Enums%29\ColumnStretchModeEnum.cs" />
+    <Compile Include="%28enums%29\ColumnWidthUnitTypeEnum.cs" />
+    <Compile Include="%28enums%29\DataGridContextVisitorTypeEnum.cs" />
+    <Compile Include="%28Generator%29\ColumnActualWidthChangedHandler.cs" />
+    <Compile Include="%28Generator%29\ContainersRemovedEventArgs.cs" />
+    <Compile Include="%28Generator%29\ColumnActualWidthEventManager.cs" />
+    <Compile Include="ColumnVisibilePositionChangedEventArgs.cs" />
+    <Compile Include="ColumnWidth.cs" />
+    <Compile Include="Converters\ColumnWidthConverter.cs" />
+    <Compile Include="Converters\ValueToMaskedTextConverter.cs" />
+    <Compile Include="DataGridBindingInfo.cs" />
+    <Compile Include="DataGridControlTemplateChangedEventManager.cs" />
+    <Compile Include="IDataGridItemContainer.cs" />
+    <Compile Include="ItemsHostUIElementCollection.cs" />
+    <Compile Include="RecyclingManager.cs" />
+    <Compile Include="CellContentPresenter.cs" />
+    <Compile Include="SelectionChangedEventManager.cs" />
+    <Compile Include="Views\%28ColumnVirtualization%29\VirtualizingFixedCellSubPanel.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\%28ColumnVirtualization%29\VirtualizingUICellCollection.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\%28ColumnVirtualization%29\TableViewColumnVirtualizationManager.cs" />
+    <Compile Include="Views\%28ColumnVirtualization%29\ColumnVirtualizationManager.cs" />
+    <Compile Include="Views\IVirtualizingCellsHost.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ThemeChangedEventManager.cs" />
+    <Compile Include="Views\TableViewHeaderFooterPanel.cs" />
+    <Compile Include="Views\%28Enums%29\ViewPropertyModeEnum.cs" />
+    <Compile Include="%28Generator%29\WeakDataGridContextKey.cs" />
+    <Compile Include="%28Generator%29\DistinctValuesRequestedEventArgs.cs" />
+    <Compile Include="%28Generator%29\DistinctValuesRequestedEventManager.cs" />
+    <Compile Include="%28Generator%29\CurrentColumnChangedEventManager.cs" />
+    <Compile Include="%28Generator%29\CustomGeneratorChangedEventArgs.cs" />
+    <Compile Include="%28Generator%29\DetailGeneratorNode.cs" />
+    <Compile Include="%28Generator%29\SaveRestoreDataGridContextStateVisitor.cs" />
+    <Compile Include="%28Generator%29\ItemContextVisitor.cs" />
+    <Compile Include="%28Generator%29\SaveRestoreStateVisitor.cs" />
+    <Compile Include="%28Generator%29\SaveRestoreGlobalStateVisitor.cs" />
+    <Compile Include="%28Generator%29\SelectAllVisitor.cs" />
+    <Compile Include="AllowDetailToggleChangedEventManager.cs" />
+    <Compile Include="Converters\TreeViewLineConverter.cs" />
+    <Compile Include="DefaultDetailConfiguration.cs" />
+    <Compile Include="DetailIndicator.cs" />
+    <Compile Include="HierarchicalGroupByControlNode.cs" />
+    <Compile Include="HierarchicalGroupByItem.cs" />
+    <Compile Include="FieldNameGroupConfigurationSelectorItemCollection.cs" />
+    <Compile Include="FieldNameGroupConfigurationSelectorItem.cs" />
+    <Compile Include="FieldNameGroupConfigurationSelector.cs" />
+    <Compile Include="GroupByControl.cs" />
+    <Compile Include="GroupByItem.cs" />
+    <Compile Include="GroupConfigurationSelector.cs" />
+    <Compile Include="GroupConfigurationSelectorChangedEventManager.cs" />
+    <Compile Include="GroupingHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GroupLevelConfiguration.cs" />
+    <Compile Include="GroupLevelConfigurationCollection.cs" />
+    <Compile Include="HierarchicalGroupByControl.cs" />
+    <Compile Include="IDataGridContextVisitable.cs" />
+    <Compile Include="IDataGridContextVisitor.cs" />
+    <Compile Include="%28Generator%29\RangeSelectionVisitor.cs" />
+    <Compile Include="%28Generator%29\RealizedContainersRequestedEventArgs.cs" />
+    <Compile Include="%28Generator%29\RealizedContainersRequestedEventManager.cs" />
+    <Compile Include="%28Generator%29\VisibilityChangedEventManager.cs" />
+    <Compile Include="%28Generator%29\VisibleColumnsUpdatedEventManager.cs" />
+    <Compile Include="Converters\TypeToBooleanConverter.cs" />
+    <Compile Include="DetailConfiguration.cs" />
+    <Compile Include="DetailConfigurationCollection.cs" />
+    <Compile Include="%28CollectionView%29\GroupSortComparer.cs" />
+    <Compile Include="%28CollectionView%29\JaggedArrayPropertyDescriptor.cs" />
+    <Compile Include="%28CollectionView%29\RawItem.cs" />
+    <Compile Include="%28CollectionView%29\RawItemIndexComparer.cs" />
+    <Compile Include="%28CollectionView%29\RawItemSortComparer.cs" />
+    <Compile Include="%28CollectionView%29\SelfPropertyDescriptor.cs" />
+    <Compile Include="%28CollectionView%29\SortedDescriptionInfo.cs" />
+    <Compile Include="%28CollectionView%29\SourceItemCollection.cs" />
+    <Compile Include="%28CollectionView%29\UnboundDataRowPropertyDescriptor.cs" />
+    <Compile Include="%28enums%29\CellEditorDisplayConditionsEnum.cs" />
+    <Compile Include="%28enums%29\ConnectionLineAlignmentEnum.cs" />
+    <Compile Include="Converters\ImageConverter.cs" />
+    <Compile Include="LevelGroupConfigurationSelectorItemCollection.cs" />
+    <Compile Include="LevelGroupConfigurationSelectorItem.cs" />
+    <Compile Include="LevelGroupConfigurationSelector.cs" />
+    <Compile Include="HierarchicalGroupLevelIndicatorPane.cs" />
+    <Compile Include="Markup\ClearGroupLevelConfigurations.cs" />
+    <Compile Include="SortingHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utils\Collections\ReadOnlyObservableHashList.cs" />
+    <Compile Include="Views\%28Enums%29\PassiveLayoutAxisEnum.cs" />
+    <Compile Include="%28enums%29\DistinctValuesConstraintEnum.cs" />
+    <Compile Include="%28enums%29\DropMarkAlignmentEnum.cs" />
+    <Compile Include="Views\%28Enums%29\DropMarkOrientationEnum.cs" />
+    <Compile Include="%28enums%29\EditTriggersEnum.cs" />
+    <Compile Include="%28enums%29\AutoFilterModeEnum.cs" />
+    <Compile Include="%28enums%29\GeneratorNodeTypeEnum.cs" />
+    <Compile Include="%28enums%29\ItemScrollingBehaviorEnum.cs" />
+    <Compile Include="%28enums%29\PagingBehaviorEnum.cs" />
+    <Compile Include="%28enums%29\PrimaryAxisEnum.cs" />
+    <Compile Include="%28enums%29\ScrollOrientationEnum.cs" />
+    <Compile Include="%28enums%29\SortDirectionEnum.cs" />
+    <Compile Include="%28Generator%29\CollectionGeneratorNode.cs" />
+    <Compile Include="DataGridContext.cs" />
+    <Compile Include="%28Generator%29\ExpansionStateEventArgs.cs" />
+    <Compile Include="%28Generator%29\GroupHeaderFooterItem.cs" />
+    <Compile Include="%28Generator%29\NotifyCollectionChangedGeneratorNode.cs" />
+    <Compile Include="%28Generator%29\GroupGeneratorNode.cs" />
+    <Compile Include="%28Generator%29\HeadersFootersGeneratorNode.cs" />
+    <Compile Include="%28Generator%29\ItemsGeneratorNode.cs" />
+    <Compile Include="%28Generator%29\GroupHeaderFooterItemTemplate.cs" />
+    <Compile Include="ColumnReorderingEvent.cs" />
+    <Compile Include="Converters\GreaterThanZeroConverter.cs" />
+    <Compile Include="Converters\IndexToOddConverter.cs" />
+    <Compile Include="Converters\InverseBooleanConverter.cs" />
+    <Compile Include="Converters\DefaultDataConverter.cs" />
+    <Compile Include="Converters\MultimodalResultConverter.cs" />
+    <Compile Include="Converters\SourceDataConverter.cs" />
+    <Compile Include="Converters\StatResultConverter.cs" />
+    <Compile Include="Converters\StringFormatConverter.cs" />
+    <Compile Include="%28CollectionView%29\DataGridDetailDescription.cs" />
+    <Compile Include="%28CollectionView%29\DataGridDetailDescriptionCollection.cs" />
+    <Compile Include="DetailsChangedEventManager.cs" />
+    <Compile Include="GroupHeaderFooterCollection.cs" />
+    <Compile Include="GroupConfiguration.cs" />
+    <Compile Include="ItemsSourceChangedEventManager.cs" />
+    <Compile Include="ScrollTip.cs" />
+    <Compile Include="Stats\StatFunction.cs" />
+    <Compile Include="Utils\Collections\EnumerableWrapper.cs" />
+    <Compile Include="Utils\Collections\ObservableHashList.cs" />
+    <Compile Include="Utils\Collections\ObservableList.cs" />
+    <Compile Include="DataRowEditableWrapper.cs" />
+    <Compile Include="%28Generator%29\GeneratorNode.cs" />
+    <Compile Include="%28Generator%29\GeneratorNodeFactory.cs" />
+    <Compile Include="%28Generator%29\GeneratorNodeHelper.cs" />
+    <Compile Include="ValidationRules\SourceDataConverterValidationRule.cs" />
+    <Compile Include="Stats\InvalidSourcePropertyNameException.cs" />
+    <Compile Include="Stats\InvalidValueException.cs" />
+    <Compile Include="Stats\StatFunctionCollection.cs" />
+    <Compile Include="Stats\StatFunctionComparer.cs" />
+    <Compile Include="Stats\StatResult.cs" />
+    <Compile Include="Utils\Collections\IndexWeakHeapSort.cs" />
+    <Compile Include="Utils\Collections\ListChangedEventManager.cs" />
+    <Compile Include="Utils\Data\BoolDataStore.cs" />
+    <Compile Include="Utils\Data\DataStore.cs" />
+    <Compile Include="Utils\Data\ObjectDataStore.cs" />
+    <Compile Include="Utils\Data\StringDataStore.cs" />
+    <Compile Include="Utils\Data\ValueTypeDataStore.cs" />
+    <Compile Include="Utils\Wpf\DispatcherHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utils\Wpf\DragDrop\DraggedElementAdorner.cs" />
+    <Compile Include="Utils\Wpf\DragDrop\DragSourceManager.cs" />
+    <Compile Include="Utils\Wpf\DragDrop\IDropTarget.cs" />
+    <Compile Include="Utils\Wpf\Markup\XceedResourceDictionary.cs" />
+    <Compile Include="Utils\Wpf\TreeHelper.cs" />
+    <Compile Include="ViewChangedEventManager.cs" />
+    <Compile Include="Views\DataGridScrollViewer.cs" />
+    <Compile Include="IDeferableScrollInfoRefresh.cs" />
+    <Compile Include="Views\PassiveLayoutDecorator.cs" />
+    <Compile Include="Views\ScrollingCellsDecorator.cs" />
+    <Compile Include="Views\FixedCellSubPanel.cs">
+    </Compile>
+    <Compile Include="Views\FixedColumnSplitter.cs" />
+    <Compile Include="Views\%28Enums%29\SynchronizedScrollViewerPositionEnum.cs" />
+    <Compile Include="%28enums%29\ValidationModeEnum.cs" />
+    <Compile Include="ActivationGesture.cs" />
+    <Compile Include="AddingNewDataItemEvent.cs" />
+    <Compile Include="AssemblyVersionInfo.cs" />
+    <Compile Include="AssemblyVersionInfoCommon.cs" />
+    <Compile Include="ActivationGestureCollection.cs" />
+    <Compile Include="Markup\CellEditorBindingExtension.cs" />
+    <Compile Include="CellState.cs" />
+    <Compile Include="CellValidatingEvent.cs" />
+    <Compile Include="CellValidationContext.cs" />
+    <Compile Include="CellValidationError.cs" />
+    <Compile Include="ValidationRules\CellValidationRule.cs" />
+    <Compile Include="Markup\ClearHeadersFooters.cs" />
+    <Compile Include="Markup\CellContentBindingExtension.cs" />
+    <Compile Include="Column.cs" />
+    <Compile Include="Cell.cs" />
+    <Compile Include="CellEditor.cs" />
+    <Compile Include="Converters\IntAdditionConverter.cs" />
+    <Compile Include="Converters\LevelToOpacityConverter.cs" />
+    <Compile Include="Converters\NegativeDoubleConverter.cs" />
+    <Compile Include="Converters\NullToBooleanConverter.cs" />
+    <Compile Include="Converters\ThicknessConverter.cs" />
+    <Compile Include="%28Generator%29\CustomItemContainerGenerator.cs" />
+    <Compile Include="DataGridCommands.cs" />
+    <Compile Include="DataGridControl.cs" />
+    <Compile Include="DataGridInternalException.cs" />
+    <Compile Include="DataGridVirtualizingPanel.cs" />
+    <Compile Include="DropMarkAdorner.cs" />
+    <Compile Include="ValidationRules\EventCellValidationRule.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="DataGridException.cs" />
+    <Compile Include="Group.cs" />
+    <Compile Include="GroupHeaderControl.cs" />
+    <Compile Include="GroupLevelDescription.cs" />
+    <Compile Include="GroupLevelDescriptionCollection.cs" />
+    <Compile Include="GroupLevelIndicator.cs" />
+    <Compile Include="GroupLevelIndicatorPane.cs" />
+    <Compile Include="ColumnCollection.cs" />
+    <Compile Include="ColumnManagerCell.cs" />
+    <Compile Include="ColumnManagerRow.cs" />
+    <Compile Include="DataCell.cs" />
+    <Compile Include="DataRow.cs" />
+    <Compile Include="DefaultCellEditorSelector.xaml.cs" />
+    <Compile Include="DataGridValidationException.cs" />
+    <Compile Include="HeaderFooterItem.cs" />
+    <Compile Include="%28Generator%29\ICustomItemContainerGenerator.cs" />
+    <Compile Include="ICustomVirtualizingPanel.cs" />
+    <Compile Include="ItemsSourceHelper.cs" />
+    <Compile Include="KeyActivationGesture.cs" />
+    <Compile Include="ValidationRules\PassthroughCellValidationRule.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CellCollection.cs" />
+    <Compile Include="ReadOnlyColumnCollection.cs" />
+    <Compile Include="Row.cs" />
+    <Compile Include="RowSelector.cs" />
+    <Compile Include="RowSelectorPane.cs" />
+    <Compile Include="RowState.cs" />
+    <Compile Include="ScrollViewerHelper.cs" />
+    <Compile Include="StaircasePanel.cs" />
+    <Compile Include="Views\SynchronizedScrollViewer.cs" />
+    <Compile Include="Views\TableView.cs" />
+    <Compile Include="Views\TableViewScrollViewer.cs" />
+    <Compile Include="Views\TargetViewAttribute.cs" />
+    <Compile Include="TextInputActivationGesture.cs" />
+    <Compile Include="Views\Theme.cs" />
+    <Compile Include="Markup\ThemeConverter.cs" />
+    <Compile Include="Markup\ThemeKey.cs" />
+    <Compile Include="Utils\Math\DoubleUtil.cs" />
+    <Compile Include="Views\UICellCollection.cs" />
+    <Compile Include="Views\UIViewBase.cs" />
+    <Compile Include="Views\ViewBase.cs" />
+    <Compile Include="Markup\ViewBindingExtension.cs" />
+    <Compile Include="Markup\ViewConverter.cs" />
+    <Compile Include="Views\ViewPropertyAttribute.cs" />
+    <Compile Include="DataGridItemsHost.cs" />
+    <Compile Include="Views\TableViewItemsHost.cs" />
+    <Compile Include="VirtualizingCellCollection.cs" />
+    <Compile Include="VirtualizingCellCollectionChangedEventManager.cs" />
+    <Compile Include="VirtualizingStackPanel.cs" />
+    <Compile Include="VisibleColumnsUpdatingEventManager.cs" />
+    <Compile Include="WatermarkAdorner.cs" />
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Column.GenericContentTemplateSelectorResources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DefaultCellEditorSelector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\aero.normalcolor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Aero\TableflowView.Aero.normalcolor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Aero\Resources\Aero.normalcolor.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Aero\Resources\Aero.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Aero\Resources\TableView.Aero.Graphics.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Aero\TableView.Aero.normalcolor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\classic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Classic\TableflowView.Classic.systemcolor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Classic\Resources\Classic.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Classic\Resources\Classic.systemcolor.Graphics.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Classic\Resources\Classic.systemcolor.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Classic\TableView.Classic.systemcolor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Common\TableflowView.GridElementTemplates.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Common\Common.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Common\Graphics.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Common\TableView.GridElementTemplates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Controls\FixedColumnSplitter.generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Controls\TableViewScrollViewer.generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Luna\TableflowView.Luna.homestead.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Luna\TableflowView.Luna.metallic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Luna\TableflowView.Luna.normalcolor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Royale\TableflowView.Royale.normalcolor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Windows7\Resources\TableView.Windows7.Graphics.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Windows7\Resources\Windows7.Controls.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Windows7\Resources\Windows7.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Windows7\TableflowView.Windows7.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Windows7\TableView.Windows7.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\zune.normalcolor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Zune\TableflowView.Zune.normalcolor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Zune\Resources\Zune.normalcolor.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Zune\Resources\Zune.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Zune\Resources\TableView.Zune.Graphics.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Zune\TableView.Zune.normalcolor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\luna.homestead.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\luna.metallic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\luna.normalcolor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Luna\Resources\Luna.homestead.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Luna\Resources\Luna.metallic.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Luna\Resources\Luna.normalcolor.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Luna\Resources\Luna.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Luna\Resources\TableView.Luna.Graphics.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Luna\TableView.Luna.homestead.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Luna\TableView.Luna.metallic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Luna\TableView.Luna.normalcolor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\royale.normalcolor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Royale\Resources\Royale.normalcolor.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Royale\Resources\Royale.Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Royale\Resources\TableView.Royale.Graphics.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Royale\TableView.Royale.normalcolor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\DataGridControlBackgroundBrushesResources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="NoDrop.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DataGridControl.icon.16x16.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Watermark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.VisualBasic.PowerPacks.10.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft Visual Basic PowerPacks 10.0</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WPFToolkit.Extended\WPFToolkit.Extended.csproj">
+      <Project>{72E591D6-8F83-4D8C-8F67-9C325E623234}</Project>
+      <Name>WPFToolkit.Extended</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Target Name="GenSerializationAssembly" DependsOnTargets="AssignTargetPaths;Compile;ResolveKeySource" Inputs="$(MSBuildAllProjects);@(IntermediateAssembly)" Outputs="$(OutputPath)$(_SGenDllName)">
+    <SGen BuildAssemblyName="$(TargetFileName)" BuildAssemblyPath="$(OutputPath)" References="@(ReferencePath)" ShouldGenerateSerializer="true" UseProxyTypes="false" KeyContainer="$(KeyContainerName)" KeyFile="..\SolutionItems\Xceed.snk" DelaySign="$(DelaySign)" ToolPath="$(SGenToolPath)">
+      <Output TaskParameter="SerializationAssembly" ItemName="SerializationAssembly" />
+    </SGen>
+    <CreateItem Include="$(TargetDir)$(TargetName)*.*;">
+      <Output TaskParameter="Include" ItemName="FilesToCopy" />
+    </CreateItem>
+    <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(SolutionDir)\Bin\$(ConfigurationName)" />
+    <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(SolutionDir)\Installer\DataGrid\Sources\Xceed\Xceed DataGrid for WPF Professional Edition\Bin" />
+  </Target>
+  <Target Name="AfterBuild" Condition="Exists('C:\Program Files\Microsoft SDKs\Windows\v7.0A\Bin\sgen.exe') AND '$(Revision)'!=''" DependsOnTargets="GenSerializationAssembly" />
+</Project>

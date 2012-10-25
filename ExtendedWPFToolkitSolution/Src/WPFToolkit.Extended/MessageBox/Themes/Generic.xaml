@@ -87,7 +87,13 @@
                               </ObjectAnimationUsingKeyFrames>
                            </Storyboard>
                         </VisualState>
-                     </VisualStateGroup>
+                        <VisualState x:Name="Disabled">
+                            <Storyboard>
+                                <DoubleAnimation Duration="0" Storyboard.TargetName="contentPresenter" Storyboard.TargetProperty="Opacity" To=".3"/>
+                                <DoubleAnimation Duration="0" Storyboard.TargetName="Background" Storyboard.TargetProperty="Opacity" To=".3"/>
+                            </Storyboard>
+                        </VisualState>
+                    </VisualStateGroup>
                   </VisualStateManager.VisualStateGroups>
                   <Border x:Name="Background" CornerRadius="0,0,2,0" Background="{StaticResource WindowDarkBrush}">
                      <Border Margin="1,0,1,1" BorderBrush="#59FFFFFF" BorderThickness="1" CornerRadius="0,0,1,0" />
@@ -122,6 +128,7 @@
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CaptionForeground" Value="#FF000000" />
       <Setter Property="CloseButtonStyle" Value="{StaticResource WindowCloseButtonStyle}" />
+      <Setter Property="ButtonRegionBackground" Value="#FFF0F0F0" />
       <Setter Property="Focusable" Value="False" />
       <Setter Property="HorizontalAlignment" Value="Left" />
       <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -218,10 +225,10 @@
 
                   <!-- Borders -->
                   <Grid  x:Name="MessageBoxWindowGrid">
-                     <Border BorderBrush="{TemplateBinding WindowBorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5,5,0,0" Opacity="{TemplateBinding WindowOpacity}" />
+                     <Border BorderBrush="{TemplateBinding WindowBorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5,5,5,5" Opacity="{TemplateBinding WindowOpacity}" />
                      <Grid Margin="0" Background="{x:Null}">
-                        <Border x:Name="MessageBoxWindow" Margin="1,1,1,1" Background="{TemplateBinding WindowBackground}" CornerRadius="4,4,0,0" Opacity="{TemplateBinding WindowOpacity}" />
-                        <Border BorderBrush="White" BorderThickness="1" CornerRadius="4,4,0,0" Margin="1" Opacity="0.7" />
+                        <Border x:Name="MessageBoxWindow" Margin="1,1,1,1" Background="{TemplateBinding WindowBackground}" CornerRadius="4,4,4,4" Opacity="{TemplateBinding WindowOpacity}" />
+                        <Border BorderBrush="White" BorderThickness="1" CornerRadius="4,4,4,4" Margin="1" Opacity="0.7" />
                      </Grid>
                   </Grid>
 
@@ -272,18 +279,20 @@
                               </Grid>
 
                               <!-- Buttons -->
-                              <Grid Grid.Row="1" HorizontalAlignment="Right" Margin="12,0,12,12">
-                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                 </Grid.ColumnDefinitions>
-                                 <Button Grid.Column="0" x:Name="PART_YesButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed" Content="{TemplateBinding YesButtonContent}" />
-                                 <Button Grid.Column="1" x:Name="PART_NoButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed" Content="{TemplateBinding NoButtonContent}" />
-                                 <Button Grid.Column="2" x:Name="PART_OkButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed" Content="{TemplateBinding OkButtonContent}" />
-                                 <Button Grid.Column="3" x:Name="PART_CancelButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed" Content="{TemplateBinding CancelButtonContent}" IsCancel="True" />
-                              </Grid>
+                              <Border Grid.Row="1" Background="{TemplateBinding ButtonRegionBackground}" >
+                                <Grid HorizontalAlignment="Right" Margin="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" x:Name="PART_YesButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed" Content="{TemplateBinding YesButtonContent}" Style="{TemplateBinding YesButtonStyle}"/>
+                                    <Button Grid.Column="1" x:Name="PART_NoButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed" Content="{TemplateBinding NoButtonContent}" Style="{TemplateBinding NoButtonStyle}"/>
+                                    <Button Grid.Column="2" x:Name="PART_OkButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed" Content="{TemplateBinding OkButtonContent}" Style="{TemplateBinding OkButtonStyle}"/>
+                                    <Button Grid.Column="3" x:Name="PART_CancelButton" MinWidth="65" Margin="6,0,0,0" Visibility="Collapsed" Content="{TemplateBinding CancelButtonContent}" Style="{TemplateBinding CancelButtonStyle}" IsCancel="True" />
+                                </Grid>
+                              </Border>
                            </Grid>
                         </Border>
                      </Grid>
@@ -310,7 +319,7 @@
 
                   <!-- Close Button -->
                   <Border BorderBrush="#A5FFFFFF" BorderThickness="1,0,1,1" CornerRadius="0,0,3,3" VerticalAlignment="Top" Margin="0,1,7,0" HorizontalAlignment="Right">
-                     <Button x:Name="PART_CloseButton" Style="{TemplateBinding CloseButtonStyle}" Height="17" Width="43" IsTabStop="False" IsCancel="True">
+                     <Button x:Name="PART_CloseButton" Style="{TemplateBinding CloseButtonStyle}" Height="17" Width="43" IsTabStop="False">
                         <Path Height="10"
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center"

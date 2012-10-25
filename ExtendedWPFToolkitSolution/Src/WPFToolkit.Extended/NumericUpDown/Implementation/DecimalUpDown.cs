@@ -22,98 +22,32 @@ using System.Windows;
 
 namespace Xceed.Wpf.Toolkit
 {
-  public class DecimalUpDown : NumericUpDown<decimal?>
+  public class DecimalUpDown : CommonNumericUpDown<decimal>
   {
     #region Constructors
 
     static DecimalUpDown()
     {
-      DefaultStyleKeyProperty.OverrideMetadata( typeof( DecimalUpDown ), new FrameworkPropertyMetadata( typeof( DecimalUpDown ) ) );
-      DefaultValueProperty.OverrideMetadata( typeof( DecimalUpDown ), new FrameworkPropertyMetadata( default( decimal ) ) );
-      IncrementProperty.OverrideMetadata( typeof( DecimalUpDown ), new FrameworkPropertyMetadata( 1m ) );
-      MaximumProperty.OverrideMetadata( typeof( DecimalUpDown ), new FrameworkPropertyMetadata( decimal.MaxValue ) );
-      MinimumProperty.OverrideMetadata( typeof( DecimalUpDown ), new FrameworkPropertyMetadata( decimal.MinValue ) );
+      UpdateMetadata( typeof( DecimalUpDown ), default( decimal ), 1m, decimal.MinValue, decimal.MaxValue );
+    }
+
+    public DecimalUpDown()
+      : base( Decimal.Parse, (d) => d )
+    {
     }
 
     #endregion //Constructors
 
     #region Base Class Overrides
 
-    protected override decimal? CoerceValue( decimal? value )
+    protected override decimal IncrementValue( decimal value, decimal increment )
     {
-      if( value < Minimum )
-        return Minimum;
-      else if( value > Maximum )
-        return Maximum;
-      else
-        return value;
+      return value + increment;
     }
 
-    protected override void OnIncrement()
+    protected override decimal DecrementValue( decimal value, decimal increment )
     {
-      if( Value.HasValue )
-        Value += Increment;
-      else
-        Value = DefaultValue;
-    }
-
-    protected override void OnDecrement()
-    {
-      if( Value.HasValue )
-        Value -= Increment;
-      else
-        Value = DefaultValue;
-    }
-
-    protected override decimal? ConvertTextToValue( string text )
-    {
-      decimal? result = null;
-
-      if( String.IsNullOrEmpty( text ) )
-        return result;
-
-      try
-      {
-        result = FormatString.Contains( "P" ) ? ParsePercent( text, CultureInfo ) : ParseDecimal( text, CultureInfo );
-        result = CoerceValue( result );
-      }
-      catch
-      {
-        Text = ConvertValueToText();
-        return Value;
-      }
-
-      return result;
-    }
-
-    protected override string ConvertValueToText()
-    {
-      if( Value == null )
-        return string.Empty;
-
-      return Value.Value.ToString( FormatString, CultureInfo );
-    }
-
-    protected override void SetValidSpinDirection()
-    {
-      ValidSpinDirections validDirections = ValidSpinDirections.None;
-
-      if( Value < Maximum || !Value.HasValue )
-        validDirections = validDirections | ValidSpinDirections.Increase;
-
-      if( Value > Minimum || !Value.HasValue )
-        validDirections = validDirections | ValidSpinDirections.Decrease;
-
-      if( Spinner != null )
-        Spinner.ValidSpinDirection = validDirections;
-    }
-
-    protected override void ValidateValue( decimal? value )
-    {
-      if( value < Minimum )
-        Value = Minimum;
-      else if( value > Maximum )
-        Value = Maximum;
+      return value - increment;
     }
 
     #endregion //Base Class Overrides

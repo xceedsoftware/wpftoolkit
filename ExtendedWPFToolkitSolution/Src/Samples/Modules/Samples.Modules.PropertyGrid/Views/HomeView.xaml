@@ -34,6 +34,7 @@
             <Grid.RowDefinitions>
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="Auto" />
@@ -57,6 +58,8 @@
 
             <TextBlock Text="Show Advanced Options:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="2" />
             <CheckBox x:Name="_showAdvancedOptions" Grid.Row="1" Grid.Column="3" IsChecked="True" VerticalAlignment="Center" Margin="5" ToolTip="Shows/Hides the advanced options menu next to a property." />
+            <TextBlock Text="IsReadOnly:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
+            <CheckBox x:Name="_isReadOnly" Grid.Row="2" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5" ToolTip="Set the IsReadOnly property to true or false" />            
          </Grid>
       </GroupBox>
 
@@ -70,14 +73,18 @@
                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Button x:Name="_button" Height="200" Width="200" Margin="25" HorizontalAlignment="Center" VerticalAlignment="Center">Inspect Me</Button>
+            <StackPanel>
+                <Button x:Name="_button1" Click="OnButtonClick" Height="200" Width="200" Margin="25" HorizontalAlignment="Center" VerticalAlignment="Center">Inspect Me</Button>
+                <Button x:Name="_button2" Click="OnButtonClick" Foreground="Red" FontSize="22" FontFamily="Bell MT" Height="50" Width="200" Margin="25" HorizontalAlignment="Center" VerticalAlignment="Center">Inspect That</Button>
+            </StackPanel>
 
             <xctk:PropertyGrid Grid.Column="1"
+                               x:Name="_propertyGrid"
                                ShowSummary="{Binding IsChecked, ElementName=_showSummary}"
                                Filter="{Binding Text, ElementName=_filter, Mode=TwoWay}"
                                IsCategorized="{Binding IsChecked, ElementName=_isCategorized, Mode=TwoWay}"
-                               ShowAdvancedOptions="{Binding IsChecked, ElementName=_showAdvancedOptions}"
-                               SelectedObject="{Binding ElementName=_button}" />
+                               ShowAdvancedOptions="{Binding IsChecked, ElementName=_showAdvancedOptions}" 
+                               IsReadOnly="{Binding IsChecked, ElementName=_isReadOnly}"/>
          </Grid>
       </StackPanel>
    </Grid>

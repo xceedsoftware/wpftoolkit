@@ -21,58 +21,71 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-                 Title="Numeric Controls"
-                 Description="The DecimalUpDown, DoubleUpDown and IntegerUpDown provides a TextBox with button spinners that allow incrementing and decrementing numeric values by using the spinner buttons, keyboard up/down arrows, or mouse wheel.">
-   <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+                 Title="Numeric Controls">
+   <StackPanel>
+      <RichTextBox IsReadOnly="True" BorderThickness="0">
+         <FlowDocument>
+            <Paragraph>
+               Numeric up-down controls provides a TextBox with button spinners that allow incrementing 
+               and decrementing numeric values by using the spinner buttons, keyboard up/down arrows, or mouse wheel
+            </Paragraph>
+            <Paragraph>
+               The following controls are present to support various native numeric types: 
+               ByteUpDown, ShortUpDown, IntegerUpDown, LongUpDown, SingleUpDown, DoubleUpDown, DecimalUpDown.
+            </Paragraph>
+         </FlowDocument>
+      </RichTextBox>
+      <Grid>
+           <Grid.RowDefinitions>
+               <RowDefinition Height="Auto" />
+               <RowDefinition Height="*" />
+           </Grid.RowDefinitions>
 
-        <GroupBox Header="Features" Grid.Row="0" Margin="5">
-            <Grid Margin="5" HorizontalAlignment="Left">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="FormatString:" VerticalAlignment="Center" />
-                <ComboBox x:Name="_formatString" SelectedIndex="0" Grid.Column="1" Width="150" Margin="5">
-                    <ComboBoxItem Tag="C2">Currency</ComboBoxItem>
-                    <ComboBoxItem Tag="F2">Fixed Point</ComboBoxItem>
-                    <ComboBoxItem Tag="G">General</ComboBoxItem>
-                    <ComboBoxItem Tag="N">Number</ComboBoxItem>
-                    <ComboBoxItem Tag="P2">Percent</ComboBoxItem>
-                </ComboBox>
-                <TextBlock Text="Watermark:" Grid.Row="1" VerticalAlignment="Center" />
-                <TextBox x:Name="_watermark" Grid.Row="1" Grid.Column="1" Width="150" Margin="5" Text="Enter Value" />
-                <TextBlock Text="Show Button Spinner:" Grid.Row="2" VerticalAlignment="Center" />
-                <CheckBox x:Name="_showButtonSpinner" Grid.Row="2" Grid.Column="1" IsChecked="True" ClickMode="Press" Margin="5" VerticalAlignment="Center" />
-                <TextBlock Grid.Column="2" Text="Increment" VerticalAlignment="Center" />
-                <TextBlock Grid.Column="2" Grid.Row="1" Text="Minimum" VerticalAlignment="Center" />
-                <TextBlock Grid.Column="2" Grid.Row="2" Text="Maximum" VerticalAlignment="Center" />
-                <xctk:DecimalUpDown Grid.Column="3" Name="_increment" Minimum="0" Value="0.5" VerticalAlignment="Center" Margin="5" Width="150" />
-                <xctk:DecimalUpDown Grid.Column="3" Grid.Row="1" Name="_minimum" Value="-100" VerticalAlignment="Center" Margin="5" Width="150" />
-                <xctk:DecimalUpDown Grid.Column="3" Grid.Row="2" Name="_maximum" Value="100" VerticalAlignment="Center" Margin="5" Width="150" />
-            </Grid>
-        </GroupBox>
+           <GroupBox Header="Features" Grid.Row="0" Margin="5">
+               <Grid Margin="5" HorizontalAlignment="Left">
+                   <Grid.RowDefinitions>
+                       <RowDefinition Height="Auto" />
+                       <RowDefinition Height="Auto" />
+                       <RowDefinition Height="Auto" />
+                   </Grid.RowDefinitions>
+                   <Grid.ColumnDefinitions>
+                       <ColumnDefinition Width="Auto" />
+                       <ColumnDefinition Width="*" />
+                       <ColumnDefinition Width="*" />
+                       <ColumnDefinition Width="*" />
+                   </Grid.ColumnDefinitions>
+                   <TextBlock Text="FormatString:" VerticalAlignment="Center" />
+                   <ComboBox x:Name="_formatString" SelectedIndex="0" Grid.Column="1" Width="150" Margin="5">
+                       <ComboBoxItem Tag="C2">Currency</ComboBoxItem>
+                       <ComboBoxItem Tag="F2">Fixed Point</ComboBoxItem>
+                       <ComboBoxItem Tag="G">General</ComboBoxItem>
+                       <ComboBoxItem Tag="N">Number</ComboBoxItem>
+                       <ComboBoxItem Tag="P2">Percent</ComboBoxItem>
+                   </ComboBox>
+                   <TextBlock Text="Watermark:" Grid.Row="1" VerticalAlignment="Center" />
+                   <TextBox x:Name="_watermark" Grid.Row="1" Grid.Column="1" Width="150" Margin="5" Text="Enter Value" />
+                   <TextBlock Text="Show Button Spinner:" Grid.Row="2" VerticalAlignment="Center" />
+                   <CheckBox x:Name="_showButtonSpinner" Grid.Row="2" Grid.Column="1" IsChecked="True" ClickMode="Press" Margin="5" VerticalAlignment="Center" />
+                   <TextBlock Grid.Column="2" Text="Increment" VerticalAlignment="Center" />
+                   <TextBlock Grid.Column="2" Grid.Row="1" Text="Minimum" VerticalAlignment="Center" />
+                   <TextBlock Grid.Column="2" Grid.Row="2" Text="Maximum" VerticalAlignment="Center" />
+                   <xctk:DecimalUpDown Grid.Column="3" Name="_increment" Minimum="0" Value="0.5" VerticalAlignment="Center" Margin="5" Width="150" />
+                   <xctk:DecimalUpDown Grid.Column="3" Grid.Row="1" Name="_minimum" Value="-100" VerticalAlignment="Center" Margin="5" Width="150" />
+                   <xctk:DecimalUpDown Grid.Column="3" Grid.Row="2" Name="_maximum" Value="100" VerticalAlignment="Center" Margin="5" Width="150" />
+               </Grid>
+           </GroupBox>
 
-        <StackPanel Grid.Row="1" Margin="10" HorizontalAlignment="Left">
-            <TextBlock Text="Usage:" Style="{StaticResource Header}" />
-            <xctk:DecimalUpDown Margin="10" Width="250" 
-                                Increment="{Binding Value, ElementName=_increment}"
-                                Maximum="{Binding Value, ElementName=_maximum}"
-                                Minimum="{Binding Value, ElementName=_minimum}"
-                                FormatString="{Binding SelectedItem.Tag, ElementName=_formatString}" 
-                                Watermark="{Binding Text, ElementName=_watermark}"
-                                ShowButtonSpinner="{Binding IsChecked, ElementName=_showButtonSpinner, Mode=TwoWay}"/>
-        </StackPanel>
+           <StackPanel Grid.Row="1" Margin="10" HorizontalAlignment="Left">
+               <TextBlock Text="Usage:" Style="{StaticResource Header}" />
+               <xctk:DecimalUpDown Margin="10" Width="250" 
+                                   Increment="{Binding Value, ElementName=_increment}"
+                                   Maximum="{Binding Value, ElementName=_maximum}"
+                                   Minimum="{Binding Value, ElementName=_minimum}"
+                                   FormatString="{Binding SelectedItem.Tag, ElementName=_formatString}" 
+                                   Watermark="{Binding Text, ElementName=_watermark}"
+                                   ShowButtonSpinner="{Binding IsChecked, ElementName=_showButtonSpinner, Mode=TwoWay}"/>
+           </StackPanel>
 
-    </Grid>
+       </Grid>
+   </StackPanel>
 </sample:DemoView>
