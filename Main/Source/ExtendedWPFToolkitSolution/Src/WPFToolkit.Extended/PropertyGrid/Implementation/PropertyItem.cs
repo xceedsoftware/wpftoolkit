@@ -556,8 +556,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private string ResolveDescription()
     {
       //We do not simply rely on the "Description" property of PropertyDescriptor
-      //since this value is cached bye PropertyDescriptor and the localized version 
-      //(eg. LocalizedDescriptionAttribute) value can dynamicaly change
+      //since this value is cached by PropertyDescriptor and the localized version 
+      //(e.g., LocalizedDescriptionAttribute) value can dynamicaly change.
       DescriptionAttribute descriptionAtt = GetAttribute<DescriptionAttribute>();
       return ( descriptionAtt != null )
         ? descriptionAtt.Description

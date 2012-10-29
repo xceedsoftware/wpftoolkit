@@ -25,7 +25,7 @@ using System.Windows.Input;
 
 namespace Xceed.Wpf.Toolkit.Obselete
 {
-  [Obsolete("Legacy implementation of MaskedTextBox. Use Xceed.Wpf.Toolkit.MaskedTextBox instead", false)]
+  [Obsolete("Legacy implementation of MaskedTextBox. Use Xceed.Wpf.Toolkit.MaskedTextBox instead.", false)]
   public class MaskedTextBox : TextBox
   {
     #region Members

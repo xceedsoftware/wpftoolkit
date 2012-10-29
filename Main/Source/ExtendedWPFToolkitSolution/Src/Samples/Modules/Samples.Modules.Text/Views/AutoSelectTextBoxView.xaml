@@ -22,7 +22,7 @@
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                  Title="AutoSelectTextBox"
-                 Description="The AutoSelectTextBox allow to select the text content when the control get the focus. It also allow to affect the Focus navigation behavior winthin the control">
+                 Description="The AutoSelectTextBox allows the text content to be selected when the control get the focus. It also allows the Focus navigation behavior within the control to be affected.">
    <StackPanel>
       <StackPanel.Resources>
          <Style TargetType="{x:Type xctk:AutoSelectTextBox}">
@@ -60,7 +60,7 @@
                <Paragraph>
                   <Bold>AutoSelectBehavior:</Bold>
                   <LineBreak/>
-                  Controled by the "AutoSelectBehavior" property, the content of the AutoSelectTextBox will be selected or not when the control get the focus.
+                  The value of the "AutoSelectBehavior" property determines whether the content of the AutoSelectTextBox will be selected or not when the control gets the focus.
                   <LineBreak/>
                   <LineBreak/>
                   <Bold>AutoMoveFocus:</Bold>
@@ -68,8 +68,8 @@
                   <Italic>Effect with "MaxLength" property:</Italic>
                   <LineBreak/>
                   <LineBreak/>
-                  Setting the "MaxLenght" of the text box allow the focus to move from the AutoSelectTextBox once the max lenght has been reached.
-               In the following "Telephone Number" fields, the "MaxLenght" property of the control has been set to 3, 3 and 4, respectively
+                  Setting the "MaxLength" of the text box allows the focus to move from the AutoSelectTextBox once the max length has been reached.
+               In the following "Telephone Number" fields, the "MaxLength" properties of the controls have been set to 3, 3, and 4.
                </Paragraph>
             </FlowDocument>
          </RichTextBox>
@@ -89,8 +89,8 @@
                   <Italic>Effect with Arrow keys</Italic>
                   <LineBreak/>
                   <LineBreak/>
-                  The "AutoMoveFocus" at true also allow to navigate the focus thru the controls using the arrow keys to move the focus up, down, left or right. 
-               You are no longer limited to the "left-right" scenario of the "Tab, Shift-Tab" keys.
+                  Setting "AutoMoveFocus" to true also allows navigating the focus through the controls using the arrow keys to move the focus up, down, left, or right. 
+               You are no longer limited to the "left-right" navigation of the "Tab, Shift-Tab" keys.
                </Paragraph>
             </FlowDocument>
          </RichTextBox>

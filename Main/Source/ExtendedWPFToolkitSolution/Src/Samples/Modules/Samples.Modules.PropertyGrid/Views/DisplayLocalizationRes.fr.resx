@@ -121,22 +121,22 @@
     <value>Détails</value>
   </data>
   <data name="FavoriteActor1" xml:space="preserve">
-    <value>Acteur Favori 1 (Aucun DisplayName)</value>
+    <value>Acteur favori 1 (aucun DisplayName)</value>
   </data>
   <data name="FavoriteActor1Desc" xml:space="preserve">
-    <value>Le type de cette propriété est un enum où les valeurs n'ont aucun attribut "DisplayName". Les valeur affiché sont retourné par la méthode ToString()</value>
+    <value>Le type de cette propriété est un enum où les valeurs n'ont aucun attribut "DisplayName". Les valeurs affichées sont retournées par la méthode ToString().</value>
   </data>
   <data name="FavoriteActor2" xml:space="preserve">
-    <value>Acteur Favori 2 (Avec DisplayName)</value>
+    <value>Acteur favori 2 (avec DisplayName)</value>
   </data>
   <data name="FavoriteActor2Desc" xml:space="preserve">
-    <value>Le type de cette propriété est un enum où les valeurs sont décoré avec l'attribut "DisplayName". Les valeurs affichées sont celles spécifié par l'attribut ExtendedDisplayName</value>
+    <value>Le type de cette propriété est un enum où les valeurs sont décorés avec l'attribut "DisplayName". Les valeurs affichées sont celles spécifiées par l'attribut ExtendedDisplayName.</value>
   </data>
   <data name="FavoriteActor3" xml:space="preserve">
-    <value>Acteur Favori 3</value>
+    <value>Acteur favori 3</value>
   </data>
   <data name="FavoriteActor3Desc" xml:space="preserve">
-    <value>La valeur "(Non proposé)" démontre que les valeur des enum peuvent aussi être localisée</value>
+    <value>La valeur "(Non proposé)" démontre que les valeurs des enums peuvent aussi être localisées.</value>
   </data>
   <data name="FirstName" xml:space="preserve">
     <value>Prénom</value>

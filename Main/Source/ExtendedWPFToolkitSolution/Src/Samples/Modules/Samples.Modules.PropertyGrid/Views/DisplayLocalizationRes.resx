@@ -121,25 +121,25 @@
     <value>Details</value>
   </data>
   <data name="FavoriteActor1" xml:space="preserve">
-    <value>Favorite Actor 1 (No DisplayName)</value>
+    <value>Favorite actor 1 (no DisplayName)</value>
   </data>
   <data name="FavoriteActor1Desc" xml:space="preserve">
-    <value>This property type is an enum where values has no DisplayName attributes. Theses values display are provided by ToString() method</value>
+    <value>This property's type is an enum whose values have no DisplayName attributes. These values displayed are provided by the ToString() method.</value>
   </data>
   <data name="FavoriteActor2" xml:space="preserve">
-    <value>Favorite Actor 2 (With DisplayName)</value>
+    <value>Favorite actor 2 (with DisplayName)</value>
   </data>
   <data name="FavoriteActor2Desc" xml:space="preserve">
-    <value>This property type is an enum where values are decorated with the ExtendedDisplayName attribute. Combined with the EnumDisplayNameConverter, this allow to customize display values</value>
+    <value>This property's type is an enum whose values are decorated with the ExtendedDisplayName attribute. Combined with the EnumDisplayNameConverter, this allows display values to be customized.</value>
   </data>
   <data name="FavoriteActor3" xml:space="preserve">
-    <value>Favorite Actor 3</value>
+    <value>Favorite actor 3</value>
   </data>
   <data name="FavoriteActor3Desc" xml:space="preserve">
-    <value>"(Not listed)" enum value show that enum values can also be localized</value>
+    <value>"(Not listed)" enum value shows that enum values can also be localized.</value>
   </data>
   <data name="FirstName" xml:space="preserve">
-    <value>First Name</value>
+    <value>First name</value>
   </data>
   <data name="FirstNameDesc" xml:space="preserve">
     <value>First name of that person</value>
@@ -148,12 +148,12 @@
     <value>Information</value>
   </data>
   <data name="LastName" xml:space="preserve">
-    <value>Last Name</value>
+    <value>Last name</value>
   </data>
   <data name="LastNameDesc" xml:space="preserve">
-    <value>Usualy the Familly name of the person</value>
+    <value>Usually the familly name of the person</value>
   </data>
   <data name="NotListed" xml:space="preserve">
-    <value>(No listed)</value>
+    <value>(Not listed)</value>
   </data>
 </root>

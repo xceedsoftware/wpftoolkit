@@ -104,13 +104,13 @@ namespace Xceed.Wpf.DataGrid
     {
       if( e.Key == Key.Enter )
       {
-        // The DatePicker (and UpDownBase<T> OnValidationError) sets this as handled, which breaks the DataGrid commit
+        // The DatePicker (and UpDownBase<T> OnValidationError) sets this as handled, which breaks the DataGrid commit.
         e.Handled = false;
       }
       if( e.Key == Key.Tab )
       {
         // We must commit the value before the tab is handled by the 
-        // DataGrid, or the ValidationError event won't be triggered
+        // DataGrid, or the ValidationError event won't be triggered.
         IValidateInput validationElement = this.Child as IValidateInput;
         if( validationElement != null )
         {

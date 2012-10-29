@@ -59,7 +59,7 @@
             <TextBlock Text="Show Advanced Options:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="2" />
             <CheckBox x:Name="_showAdvancedOptions" Grid.Row="1" Grid.Column="3" IsChecked="True" VerticalAlignment="Center" Margin="5" ToolTip="Shows/Hides the advanced options menu next to a property." />
             <TextBlock Text="IsReadOnly:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
-            <CheckBox x:Name="_isReadOnly" Grid.Row="2" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5" ToolTip="Set the IsReadOnly property to true or false" />            
+            <CheckBox x:Name="_isReadOnly" Grid.Row="2" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5" ToolTip="Set the IsReadOnly property to true or false." />            
          </Grid>
       </GroupBox>
 

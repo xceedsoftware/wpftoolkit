@@ -70,7 +70,7 @@ namespace Samples.Modules.PropertyGrid.Views {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Favorite Actor 1 (No DisplayName).
+        ///   Looks up a localized string similar to Favorite actor 1 (no DisplayName).
         /// </summary>
         internal static string FavoriteActor1 {
             get {
@@ -79,7 +79,7 @@ namespace Samples.Modules.PropertyGrid.Views {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to This property type is an enum where values has no DisplayName attributes. Theses values display are provided by ToString() method.
+        ///   Looks up a localized string similar to This property&apos;s type is an enum whose values have no DisplayName attributes. These values displayed are provided by the ToString() method..
         /// </summary>
         internal static string FavoriteActor1Desc {
             get {
@@ -88,7 +88,7 @@ namespace Samples.Modules.PropertyGrid.Views {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Favorite Actor 2 (With DisplayName).
+        ///   Looks up a localized string similar to Favorite actor 2 (with DisplayName).
         /// </summary>
         internal static string FavoriteActor2 {
             get {
@@ -97,7 +97,7 @@ namespace Samples.Modules.PropertyGrid.Views {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to This property type is an enum where values are decorated with the ExtendedDisplayName attribute. Combined with the EnumDisplayNameConverter, this allow to customize display values.
+        ///   Looks up a localized string similar to This property&apos;s type is an enum whose values are decorated with the ExtendedDisplayName attribute. Combined with the EnumDisplayNameConverter, this allows display values to be customized..
         /// </summary>
         internal static string FavoriteActor2Desc {
             get {
@@ -106,7 +106,7 @@ namespace Samples.Modules.PropertyGrid.Views {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Favorite Actor 3.
+        ///   Looks up a localized string similar to Favorite actor 3.
         /// </summary>
         internal static string FavoriteActor3 {
             get {
@@ -115,7 +115,7 @@ namespace Samples.Modules.PropertyGrid.Views {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to &quot;(Not listed)&quot; enum value show that enum values can also be localized.
+        ///   Looks up a localized string similar to &quot;(Not listed)&quot; enum value shows that enum values can also be localized..
         /// </summary>
         internal static string FavoriteActor3Desc {
             get {
@@ -124,7 +124,7 @@ namespace Samples.Modules.PropertyGrid.Views {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to First Name.
+        ///   Looks up a localized string similar to First name.
         /// </summary>
         internal static string FirstName {
             get {
@@ -151,7 +151,7 @@ namespace Samples.Modules.PropertyGrid.Views {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Last Name.
+        ///   Looks up a localized string similar to Last name.
         /// </summary>
         internal static string LastName {
             get {
@@ -160,7 +160,7 @@ namespace Samples.Modules.PropertyGrid.Views {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Usualy the Familly name of the person.
+        ///   Looks up a localized string similar to Usually the familly name of the person.
         /// </summary>
         internal static string LastNameDesc {
             get {
@@ -169,7 +169,7 @@ namespace Samples.Modules.PropertyGrid.Views {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to (No listed).
+        ///   Looks up a localized string similar to (Not listed).
         /// </summary>
         internal static string NotListed {
             get {

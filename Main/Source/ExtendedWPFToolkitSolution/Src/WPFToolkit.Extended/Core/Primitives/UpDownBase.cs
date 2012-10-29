@@ -265,6 +265,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     protected override void OnTextChanged( string oldValue, string newValue )
     {
+      //If Text was changed in code-behind.
       if( !_isTextChangedFromUI )
       {
         SyncTextAndValueProperties( true, Text );
@@ -374,7 +375,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       {
         try
         {
-          Value = ConvertTextToValue( Text );
+          Value = ConvertTextToValue( text );
         }
         catch( Exception e )
         {

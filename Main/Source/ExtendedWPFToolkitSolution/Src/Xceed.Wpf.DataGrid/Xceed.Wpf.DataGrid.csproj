@@ -953,7 +953,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="GenSerializationAssembly" DependsOnTargets="AssignTargetPaths;Compile;ResolveKeySource" Inputs="$(MSBuildAllProjects);@(IntermediateAssembly)" Outputs="$(OutputPath)$(_SGenDllName)">
-    <SGen BuildAssemblyName="$(TargetFileName)" BuildAssemblyPath="$(OutputPath)" References="@(ReferencePath)" ShouldGenerateSerializer="true" UseProxyTypes="false" KeyContainer="$(KeyContainerName)" KeyFile="..\SolutionItems\Xceed.snk" DelaySign="$(DelaySign)" ToolPath="$(SGenToolPath)">
+    <SGen BuildAssemblyName="$(TargetFileName)" BuildAssemblyPath="$(OutputPath)" References="@(ReferencePath)" ShouldGenerateSerializer="true" UseProxyTypes="false" KeyContainer="$(KeyContainerName)" KeyFile="..\..\SolutionItems\Xceed.snk" DelaySign="$(DelaySign)" ToolPath="$(SGenToolPath)">
       <Output TaskParameter="SerializationAssembly" ItemName="SerializationAssembly" />
     </SGen>
     <CreateItem Include="$(TargetDir)$(TargetName)*.*;">

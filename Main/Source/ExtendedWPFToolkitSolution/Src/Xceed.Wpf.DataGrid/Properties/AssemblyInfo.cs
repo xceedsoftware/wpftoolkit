@@ -34,12 +34,12 @@ using System.Windows.Markup;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Xceed DataGrid for WPF" )]
+[assembly: AssemblyTitle( "Xceed Extended WPF Toolkit - DataGrid" )]
 [assembly: AssemblyDescription( "This assembly implements the Xceed.Wpf.DataGrid namespace, a data grid control for the Windows Presentation Framework." )]
 
 [assembly: AssemblyCompany( "Xceed Software Inc." )]
-[assembly: AssemblyProduct( "Xceed DataGrid for WPF" )]
-[assembly: AssemblyCopyright( "Copyright � Xceed Software Inc. 2007-2011" )]
+[assembly: AssemblyProduct( "Xceed Extended WPF Toolkit - DataGrid" )]
+[assembly: AssemblyCopyright( "Copyright � Xceed Software Inc. 2010-2012" )]
 
 
 [assembly: CLSCompliant( true )]
@@ -50,8 +50,6 @@ using System.Windows.Markup;
 [assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.Converters")]
 [assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.Markup")]
 [assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.Views")]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.Print")]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.Stats")]
 [assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.Automation")]
 [assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.ValidationRules")]
 [assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.FilterCriteria")]
