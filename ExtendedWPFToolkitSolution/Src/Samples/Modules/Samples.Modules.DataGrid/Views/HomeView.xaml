@@ -25,30 +25,32 @@
                  xmlns:compModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
                  Title="DataGrid" 
                  x:Name="_demo">
-   <sample:DemoView.Description>
-The experience Xceed DataGrid for WPF provides centers on its Tableflow view, which lets you take advantage of a stunning, shaded appearance and capabilities such as inertial smooth scrolling and animated full-column reordering—which mimic the physics of real-life movement. Add to that the datagrid’s zero-lag data virtualization, and you have the fastest WPF datagrid around—in performance and feel.
+    <sample:DemoView.Description>
+        The experience that Xceed DataGrid for WPF provides centers on its Tableflow view, which lets you take advantage of a stunning, shaded appearance and capabilities such as inertial smooth scrolling and animated full-column reordering—which mimics the physics of real-life movement. Add to that the datagrid’s zero-lag data virtualization, and you have the fastest WPF datagrid around—in performance and feel.
 
 It's rock-solid and time-tested, so you can trust it in your most important applications. Constantly evolving—no other datagrid is updated as often—it has more features than any other offering and a flexible, extensible object model. It also provides unbeatable performance by handling millions of rows and thousands of columns, and integrates easily into any WPF app. It’s easy to understand why it’s the most-adopted WPF datagrid available and used by Microsoft in Visual Studio 2010 and by IBM U2 in SystemBuilder 4GL (SB+)!
 
-   </sample:DemoView.Description>
-   <Grid>
-      <Grid.Resources>
-         <xcdg:DataGridCollectionViewSource x:Key="cvsOrders"
-                                            Source="{Binding ElementName=_demo, Path=Orders}">
-            <xcdg:DataGridCollectionViewSource.GroupDescriptions>
-               <PropertyGroupDescription PropertyName="ShipCountry" />
-               <PropertyGroupDescription PropertyName="ShipCity" />
-            </xcdg:DataGridCollectionViewSource.GroupDescriptions>
-         </xcdg:DataGridCollectionViewSource>         
-      </Grid.Resources>
+Note: The datagrid included in Xceed Extended WPF Toolkit Plus contains a subset of the features of Xceed DataGrid for WPF.
 
-      <xcdg:DataGridControl x:Name="_dataGrid" 
+    </sample:DemoView.Description>
+    <Grid>
+        <Grid.Resources>
+            <xcdg:DataGridCollectionViewSource x:Key="cvsOrders"
+                                            Source="{Binding ElementName=_demo, Path=Orders}">
+                <xcdg:DataGridCollectionViewSource.GroupDescriptions>
+                    <PropertyGroupDescription PropertyName="ShipCountry" />
+                    <PropertyGroupDescription PropertyName="ShipCity" />
+                </xcdg:DataGridCollectionViewSource.GroupDescriptions>
+            </xcdg:DataGridCollectionViewSource>
+        </Grid.Resources>
+
+        <xcdg:DataGridControl x:Name="_dataGrid" 
                             MaxHeight="400"
                             ItemsSource="{Binding Source={StaticResource cvsOrders}}" >
-         <xcdg:DataGridControl.View>
-            <xcdg:TableflowView FixedColumnCount="2" />
-         </xcdg:DataGridControl.View>
-      </xcdg:DataGridControl>
-   </Grid>
+            <xcdg:DataGridControl.View>
+                <xcdg:TableflowView FixedColumnCount="2" />
+            </xcdg:DataGridControl.View>
+        </xcdg:DataGridControl>
+    </Grid>
 
 </sample:DemoView>

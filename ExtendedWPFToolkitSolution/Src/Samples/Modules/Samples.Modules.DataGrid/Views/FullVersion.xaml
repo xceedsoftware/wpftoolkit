@@ -24,80 +24,80 @@
                  xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
                  xmlns:compModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
                  Title="Full Version" >
-   <StackPanel>
-      <RichTextBox IsReadOnly="True" IsDocumentEnabled="False" BorderThickness="0">
-         <FlowDocument>
-            <Paragraph>
-               The full featured version of the DataGrid available commercially will provide
-               you with extended features like:
-            </Paragraph>
-            <List>
-               <ListItem>
-                  <Paragraph>Master Details</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>Filter Row</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>Insertion Row</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>Excel Auto-Filtering</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>Column Chooser</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>CardView, CompactCardView</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>3DView, MultiSurfaceView</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>Statistical Functions and Summary row</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>Print, Print Preview</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>Export to Excel</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>Fixed Column Splitter UI element</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>Persist User Settings</Paragraph>
-               </ListItem>               
-               <ListItem>
-                  <Paragraph>Design time support in Visual Studio and Expression Blend</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>Comprehensive documentation fully integrated into Visual Studio</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>Includes a variety of VB.NET and C# sample applications to get you started</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>Office 2007 Themes: Blue, Black, and Silver</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>The Xceed Live Explorer theme</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>Includes Xceed 3D Views for WPF</Paragraph>
-               </ListItem>
-               <ListItem>
-                  <Paragraph>And many more....</Paragraph>
-               </ListItem>
-            </List>
-         </FlowDocument>
-      </RichTextBox>
+    <StackPanel>
+        <RichTextBox IsReadOnly="True" IsDocumentEnabled="False" BorderThickness="0">
+            <FlowDocument>
+                <Paragraph>
+                    The full-featured version of the DataGrid available commercially provides
+               additional features such as the following:
+                </Paragraph>
+                <List>
+                    <ListItem>
+                        <Paragraph>Master-Detail</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>Filter row</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>Insertion row</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>Excel auto-filtering</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>Column chooser</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>CardView, CompactCardView</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>3DView, MultiSurfaceView</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>Statistical functions and summary row</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>Print, print preview</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>Export to Excel</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>Fixed column splitter UI element</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>Persist user settings</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>Design-time support in Visual Studio and Expression Blend</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>Comprehensive documentation fully integrated into Visual Studio</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>A variety of VB.NET and C# sample applications to get you started</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>Office 2007 themes: Blue, Black, and Silver</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>The Xceed Live Explorer theme</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>Xceed 3D Views for WPF is included</Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>And much more!</Paragraph>
+                    </ListItem>
+                </List>
+            </FlowDocument>
+        </RichTextBox>
 
-      <TextBlock Margin="0,20,0,0">
+        <TextBlock Margin="0,20,0,0">
          <Hyperlink NavigateUri="http://www.xceed.com/Grid_WPF_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
-            Click here for more details about the full featured DataGrid control.
+            Click here for more details about the full-featured DataGrid control.
          </Hyperlink>
-      </TextBlock>
-   </StackPanel>
+        </TextBlock>
+    </StackPanel>
 
 </sample:DemoView>

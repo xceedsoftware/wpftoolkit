@@ -76,12 +76,12 @@ namespace Xceed.Wpf.DataGrid
     {
       try
       {
-        // Null or empty string is an null date;
+        // Null or empty string is a null date;
         DateTime? dateTime = ( !string.IsNullOrEmpty( Text ) )
           ? DateTime.Parse( Text, DateTimeFormatInfo.GetInstance( CultureInfo.CurrentCulture ) )
           : ( DateTime? )null;
 
-        // This may throw an exception either if the typed date is 
+        // This may throw an exception if the typed date is 
         // part of the blackout dates.
         this.SelectedDate = dateTime;
       }
@@ -89,7 +89,7 @@ namespace Xceed.Wpf.DataGrid
       {
         _commitException = e;
         // Return the TextField to the appropritate value for the current SelectedDate.
-        // Setting the "Text" property to an invalid content for a date was the
+        // Setting the "Text" property to invalid content for a date was the
         // observed behavior for the DatePicker. 
         // "Invalid" is expected to be an invalid content.
         // This will raise the "DateValidationError" event from the datepicker

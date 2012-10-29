@@ -26,11 +26,11 @@
       <RichTextBox IsReadOnly="True" BorderThickness="0">
          <FlowDocument>
             <Paragraph>
-               Numeric up-down controls provides a TextBox with button spinners that allow incrementing 
-               and decrementing numeric values by using the spinner buttons, keyboard up/down arrows, or mouse wheel
+               Numeric up-down controls provide a TextBox with button spinners that allow incrementing 
+               and decrementing numeric values by using the spinner buttons, keyboard up/down arrows, or mouse wheel.
             </Paragraph>
             <Paragraph>
-               The following controls are present to support various native numeric types: 
+               The following controls are available to support various native numeric types: 
                ByteUpDown, ShortUpDown, IntegerUpDown, LongUpDown, SingleUpDown, DoubleUpDown, DecimalUpDown.
             </Paragraph>
          </FlowDocument>
