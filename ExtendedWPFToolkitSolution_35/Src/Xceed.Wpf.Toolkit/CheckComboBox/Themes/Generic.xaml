@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************-->
 
@@ -82,13 +79,13 @@
                   </Grid.ColumnDefinitions>
                   <Popup x:Name="PART_Popup" AllowsTransparency="true" Grid.ColumnSpan="2" IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" StaysOpen="False" Margin="1" PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}" Placement="Bottom">
                      <Grid MinWidth="{Binding ActualWidth, ElementName=MainGrid}">
-                        <Border x:Name="DropDownBorder" BorderBrush="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" BorderThickness="1" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
+                        <Border x:Name="DropDownBorder" MaxHeight="{Binding MaxDropDownHeight,  RelativeSource={RelativeSource TemplatedParent}}"  BorderBrush="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" BorderThickness="1" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
                            <ScrollViewer x:Name="DropDownScrollViewer">
                               <Grid>
                                  <Canvas HorizontalAlignment="Left" Height="0" VerticalAlignment="Top" Width="0">
                                     <Rectangle x:Name="OpaqueRect" Fill="{Binding Background, ElementName=DropDownBorder}" Height="{Binding ActualHeight, ElementName=DropDownBorder}" Width="{Binding ActualWidth, ElementName=DropDownBorder}" />
                                  </Canvas>
-                                 <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Contained" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                 <ItemsPresenter x:Name="PART_ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Contained" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                               </Grid>
                            </ScrollViewer>
                         </Border>
@@ -97,7 +94,7 @@
 
                   <Border Grid.ColumnSpan="2" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
                   <TextBox Text="{TemplateBinding Text}" IsReadOnly="True" BorderThickness="0" Background="Transparent" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
-                  <ToggleButton x:Name="PART_DropDownButton" Grid.Column="1" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxToggleButton}"
+                  <ToggleButton x:Name="PART_DropDownButton" Grid.Column="1" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" Focusable="False" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxToggleButton}"
                                 IsHitTestVisible="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}" />
                </Grid>
             </ControlTemplate>

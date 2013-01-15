@@ -93,7 +93,9 @@ namespace Samples.Modules.PropertyGrid.Views
         person.Spouse = new Person()
         {
           FirstName = "Jane",
-          LastName = "Doe"
+          LastName = "Doe",
+          WritingFont = new FontFamily( "Arial" ),
+          WritingFontSize = 10.5
         };
         return person;
       }

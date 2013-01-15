@@ -46,17 +46,18 @@
                <RowDefinition />
                <RowDefinition />
                <RowDefinition />
+               <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-               <ColumnDefinition />
-               <ColumnDefinition />
-               <ColumnDefinition />
-               <ColumnDefinition />
+               <ColumnDefinition Width="Auto"/>
+               <ColumnDefinition Width="*"/>
+               <ColumnDefinition Width="Auto"/>
+               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" 
                        Text="Delimiter:" 
-                       Margin="2"/>
+                       Margin="5"/>
             <TextBox x:Name="_delimiter" 
                      Grid.Row="0" Grid.Column="1"
                      Margin="5"
@@ -65,7 +66,7 @@
 
             <TextBlock Grid.Row="1" Grid.Column="0" 
                        Text="ValueMemberPath:" 
-                       Margin="2"/>
+                       Margin="5"/>
             <ComboBox x:Name="_valueMemberPath" 
                      Grid.Row="1" Grid.Column="1"
                      HorizontalAlignment="Stretch"
@@ -75,7 +76,7 @@
 
             <TextBlock Grid.Row="2" Grid.Column="0" 
                        Text="SelectedValue:" 
-                       Margin="2"/>
+                       Margin="5"/>
             <TextBox x:Name="_selectedValue" 
                      Grid.Row="2" Grid.Column="1"
                      Margin="5"
@@ -84,7 +85,7 @@
 
             <TextBlock Grid.Row="0" Grid.Column="2" 
                        Text="SelectedMemberPath:" 
-                       Margin="2"/>
+                       Margin="5"/>
             <TextBox x:Name="_selectedMemberPath" 
                      Grid.Row="0" Grid.Column="3"
                      Margin="5"
@@ -94,7 +95,7 @@
 
             <TextBlock Grid.Row="1" Grid.Column="2" 
                        Text="DisplayMemberPath:" 
-                       Margin="2"/>
+                       Margin="5"/>
             <ComboBox x:Name="_displayMemberPath" 
                      Grid.Row="1" Grid.Column="3"
                      Margin="5"
@@ -103,14 +104,30 @@
                      SelectedIndex="1"/>
             <TextBlock Grid.Row="2" Grid.Column="2" 
                        Text="IsDropDownOpen:" 
-                       Margin="2"/>
+                       Margin="5"/>
             <CheckBox x:Name="_isDropDownOpen" 
                      Grid.Row="2" Grid.Column="3"
                      Margin="5"
                      HorizontalAlignment="Stretch"
-                     Content="(CheckListBox only)"
+                     Content="(CheckComboBox only)"
                      ClickMode="Press"
-                     IsChecked="false" />
+                     IsChecked="{Binding IsDropDownOpen, ElementName=_checkComboBox}" />
+            <TextBlock Grid.Row="3" Grid.Column="2" 
+                       Text="MaxDropDownHeight:" 
+                       Margin="5"/>
+            <StackPanel Orientation="Horizontal"
+                        Grid.Row="3" Grid.Column="3"
+                        HorizontalAlignment="Stretch"
+                        Margin="5">
+                <xctk:DoubleUpDown x:Name="_maxDropDownHeight"
+                                   Width="45" 
+                                   Value="{Binding MaxDropDownHeight, ElementName=_checkComboBox}"
+                                   DefaultValue="150"
+                                   AllowInputSpecialValues="PositiveInfinity"
+                                   Minimum="0"/>
+                <TextBlock Text="(CheckComboBox only)" 
+                           Margin="4"/>
+            </StackPanel>
          </Grid>
       </GroupBox>
 
@@ -143,6 +160,7 @@
 
          <TextBlock Text="CheckComboBox Usage:" Grid.Column="1" Margin="5" Style="{StaticResource Header}"/>
          <xctk:CheckComboBox Grid.Column="1"
+                             x:Name="_checkComboBox"
                              Grid.Row="1"
                              Margin="5"
                              VerticalAlignment="Top"
@@ -151,7 +169,8 @@
                              ValueMemberPath="{Binding ElementName=_valueMemberPath, Path=SelectedItem}"
                              SelectedMemberPath="{Binding ElementName=_selectedMemberPath, Path=Text}"
                              DisplayMemberPath="{Binding ElementName=_displayMemberPath, Path=SelectedItem}" 
-                             IsDropDownOpen="{Binding ElementName=_isDropDownOpen, Path=IsChecked, Mode=TwoWay}" />
-      </Grid>
+                             IsDropDownOpen="false"
+                             MaxDropDownHeight="100"/>
+        </Grid>
    </Grid>
 </sample:DemoView>

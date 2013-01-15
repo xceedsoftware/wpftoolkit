@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -23,12 +20,25 @@ using System.Windows;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Primitives;
 using Xceed.Wpf.Toolkit.Core.Utilities;
+using System.Windows.Controls;
+using System.Collections;
+using System.Collections.Generic;
+using System.Windows.Controls.Primitives;
 
 namespace Xceed.Wpf.Toolkit
 {
-  public class CheckComboBox : Selector
+  [TemplatePart( Name = PART_Popup, Type = typeof( Popup ) )]
+  public class CheckComboBox : Xceed.Wpf.Toolkit.Primitives.Selector
   {
+    private const string PART_Popup = "PART_Popup";
+
+    #region Members
+
     private ValueChangeHelper _displayMemberPathValuesChangeHelper;
+    private Popup _popup;
+    private List<object> _initialValue = new List<object>();
+
+    #endregion
 
     #region Constructors
 
@@ -39,6 +49,7 @@ namespace Xceed.Wpf.Toolkit
 
     public CheckComboBox()
     {
+      Keyboard.AddKeyDownHandler( this, OnKeyDown );
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );
       _displayMemberPathValuesChangeHelper = new ValueChangeHelper( this.OnDisplayMemberPathValuesChanged );
     }
@@ -46,6 +57,8 @@ namespace Xceed.Wpf.Toolkit
     #endregion //Constructors
 
     #region Properties
+
+    #region Text
 
     public static readonly DependencyProperty TextProperty = DependencyProperty.Register( "Text", typeof( string ), typeof( CheckComboBox ), new UIPropertyMetadata( null ) );
     public string Text
@@ -59,6 +72,8 @@ namespace Xceed.Wpf.Toolkit
         SetValue( TextProperty, value );
       }
     }
+
+    #endregion
 
     #region IsDropDownOpen
 
@@ -84,10 +99,50 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnIsDropDownOpenChanged( bool oldValue, bool newValue )
     {
+      if( newValue )
+      {
+        _initialValue.Clear();
+        foreach( object o in SelectedItems )
+          _initialValue.Add( o );
+      }
+      else
+      {
+        _initialValue.Clear();
+      }
+
       // TODO: Add your property changed side-effects. Descendants can override as well.
     }
 
     #endregion //IsDropDownOpen
+
+    #region MaxDropDownHeight
+
+    public static readonly DependencyProperty MaxDropDownHeightProperty = DependencyProperty.Register( "MaxDropDownHeight", typeof( double ), typeof( CheckComboBox ), new UIPropertyMetadata( SystemParameters.PrimaryScreenHeight / 3.0, OnMaxDropDownHeightChanged ) );
+    public double MaxDropDownHeight
+    {
+      get
+      {
+        return ( double )GetValue( MaxDropDownHeightProperty );
+      }
+      set
+      {
+        SetValue( MaxDropDownHeightProperty, value );
+      }
+    }
+
+    private static void OnMaxDropDownHeightChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      CheckComboBox comboBox = o as CheckComboBox;
+      if( comboBox != null )
+        comboBox.OnMaxDropDownHeightChanged( ( double )e.OldValue, ( double )e.NewValue );
+    }
+
+    protected virtual void OnMaxDropDownHeightChanged( double oldValue, double newValue )
+    {
+      // TODO: Add your property changed side-effects. Descendants can override as well.
+    }
+
+    #endregion
 
     #endregion //Properties
 
@@ -111,13 +166,69 @@ namespace Xceed.Wpf.Toolkit
       this.UpdateDisplayMemberPathValuesBindings();
     }
 
+    public override void OnApplyTemplate()
+    {
+      base.OnApplyTemplate();
+
+      if( _popup != null )
+        _popup.Opened -= Popup_Opened;
+
+      _popup = GetTemplateChild( PART_Popup ) as Popup;
+
+      if( _popup != null )
+        _popup.Opened += Popup_Opened;
+    }
+
     #endregion //Base Class Overrides
 
     #region Event Handlers
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      CloseDropDown();
+      CloseDropDown( false );
+    }
+
+    private void OnKeyDown( object sender, KeyEventArgs e )
+    {
+      if( !IsDropDownOpen )
+      {
+        if( KeyboardUtilities.IsKeyModifyingPopupState( e ) )
+        {
+          IsDropDownOpen = true;
+          // Popup_Opened() will Focus on ComboBoxItem.
+          e.Handled = true;
+        }
+      }
+      else
+      {
+        if( KeyboardUtilities.IsKeyModifyingPopupState( e ) )
+        {
+          CloseDropDown( true );
+          e.Handled = true;
+        }
+        else if( e.Key == Key.Enter )
+        {
+          CloseDropDown( true );
+          e.Handled = true;
+        }
+        else if( e.Key == Key.Escape )
+        {
+          SelectedItems.Clear();
+          foreach( object o in _initialValue )
+            SelectedItems.Add( o );
+          CloseDropDown( true );
+          e.Handled = true;
+        }
+      }
+    }
+
+    private void Popup_Opened( object sender, EventArgs e )
+    {
+      UIElement item = ItemContainerGenerator.ContainerFromItem( SelectedItem ) as UIElement;
+      if( (item == null) && (Items.Count > 0) )
+        item = ItemContainerGenerator.ContainerFromItem( Items[0] ) as UIElement;
+      if( item != null )
+        item.Focus();
     }
 
     #endregion //Event Handlers
@@ -158,11 +269,14 @@ namespace Xceed.Wpf.Toolkit
       return item;
     }
 
-    private void CloseDropDown()
+    private void CloseDropDown( bool isFocusOnComboBox )
     {
       if( IsDropDownOpen )
         IsDropDownOpen = false;
       ReleaseMouseCapture();
+
+      if( isFocusOnComboBox )
+        Focus();
     }
 
     #endregion //Methods

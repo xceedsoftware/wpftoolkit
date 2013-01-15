@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -71,7 +68,7 @@ namespace Xceed.Wpf.Toolkit.Obselete
 
     protected virtual void OnIncludePromptChanged( bool oldValue, bool newValue )
     {
-      ResolveMaskProvider( Mask );
+      UpdateMaskProvider( Mask );
     }
 
     #endregion //IncludePrompt
@@ -100,7 +97,7 @@ namespace Xceed.Wpf.Toolkit.Obselete
 
     protected virtual void OnIncludeLiteralsChanged( bool oldValue, bool newValue )
     {
-      ResolveMaskProvider( Mask );
+      UpdateMaskProvider( Mask );
     }
 
     #endregion //IncludeLiterals
@@ -129,7 +126,7 @@ namespace Xceed.Wpf.Toolkit.Obselete
 
     protected virtual void OnMaskChanged( string oldValue, string newValue )
     {
-      ResolveMaskProvider( newValue );
+      UpdateMaskProvider( newValue );
       UpdateText( 0 );
     }
 
@@ -159,7 +156,7 @@ namespace Xceed.Wpf.Toolkit.Obselete
 
     protected virtual void OnPromptCharChanged( char oldValue, char newValue )
     {
-      ResolveMaskProvider( Mask );
+      UpdateMaskProvider( Mask );
     }
 
     #endregion //PromptChar
@@ -285,7 +282,7 @@ namespace Xceed.Wpf.Toolkit.Obselete
     {
       base.OnApplyTemplate();
 
-      ResolveMaskProvider( Mask );
+      UpdateMaskProvider( Mask );
       UpdateText( 0 );
     }
 
@@ -375,7 +372,7 @@ namespace Xceed.Wpf.Toolkit.Obselete
       return position == -1 ? startPosition : position;
     }
 
-    private void ResolveMaskProvider( string mask )
+    private void UpdateMaskProvider( string mask )
     {
       //do not create a mask provider if the Mask is empty, which can occur if the IncludePrompt and IncludeLiterals properties
       //are set prior to the Mask.

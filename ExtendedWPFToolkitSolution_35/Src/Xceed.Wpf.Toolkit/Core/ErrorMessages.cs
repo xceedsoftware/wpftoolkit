@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -42,7 +39,33 @@ namespace Xceed.Wpf.Toolkit.Core
     public const string UnableToConvertToZoomboxView = "UnableToConvertToZoomboxView";
     public const string ViewStackCannotBeManipulatedNow = "ViewStackCannotBeManipulatedNow";
 
+
     public const string SuppliedValueWasNotVisibility = "SuppliedValueWasNotVisibility";
+    public const string NegativeTimeSpanNotSupported = "NegativeTimeSpanNotSupported";
+    public const string NegativeSpeedNotSupported = "NegativeSpeedNotSupported";
+    public const string InvalidRatePropertyAccessed = "InvalidRatePropertyAccessed";
+
+    public const string AlreadyInColumnCollection = "Value already belongs to another 'ColumnDefinitionCollection'.";
+    public const string AlreadyInRowCollection = "Value already belongs to another 'RowDefinitionCollection'.";
+    public const string AlreadyInStackDefinition = "Value already belongs to another 'StackDefinitionCollection'.";
+    public const string ArrayDestTooShort = "'array' destination not long enough.";
+    public const string CollectionDisposed = "Collection was disposed, enumerator operations not valid.";
+    public const string CollectionModified = "Collection was modified; enumeration operation may not execute.";
+    public const string ColumnValueIsReadOnly = "Cannot modify 'ColumnDefinitionCollection' in read-only state.";
+    public const string DefaultAnimatorCantAnimate = "DefaultAnimatorCantAnimate";
+    public const string DefaultAnimationRateAnimationRateDefault = "DefaultAnimationRateAnimationRateDefault";
+    public const string DefaultAnimatorIterativeAnimationDefault = "DefaultAnimatorIterativeAnimationDefault";
+    public const string DestMultidimensional = "Destination is multidimensional. Expected array of rank 1.";
+    public const string EnumerationFinished = "Enumeration already finished.";
+    public const string EnumerationNotStarted = "Enumeration has not started. Call MoveNext.";
+    public const string InvalidDefaultStackLength = "The default stack length must be Auto or an explicit value.";
+    public const string MustBeColumnDefinition = "'ColumnDefinitionCollection' must be type 'ColumnDefinition'.";
+    public const string MustBeRowDefinition = "'RowDefinitionCollection' must be type 'RowDefinition'.";
+    public const string MustBeStackDefinition = "'StackDefinitionCollection' must be type 'StackDefinition'.";
+    public const string RowValueIsReadOnly = "Cannot modify 'StackDefinitionCollection' in read-only state.";
+    public const string StackValueIsReadOnly = "Cannot modify 'StackDefinitionCollection' in read-only state.";
+    public const string UnexpectedType = "Expected type '{0}', got '{1}'.";
+
 
     private static readonly ResourceManager _resourceManager;
 

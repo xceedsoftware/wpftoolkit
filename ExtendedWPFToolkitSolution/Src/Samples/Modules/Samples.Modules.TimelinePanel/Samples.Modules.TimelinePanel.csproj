@@ -38,9 +38,9 @@
     <Reference Include="Microsoft.Practices.Unity">
       <HintPath>..\..\..\..\Libs\Prism\Microsoft.Practices.Unity.dll</HintPath>
     </Reference>
-    <ProjectReference Include="..\..\..\WPFToolkit.Extended\WPFToolkit.Extended.csproj">
+    <ProjectReference Include="..\..\..\Xceed.Wpf.Toolkit\Xceed.Wpf.Toolkit.csproj">
       <Project>{72E591D6-8F83-4D8C-8F67-9C325E623234}</Project>
-      <Name>WPFToolkit.Extended</Name>
+      <Name>Xceed.Wpf.Toolkit</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Samples.Infrastructure\Samples.Infrastructure.csproj">
       <Project>{A4A049A4-665A-4651-9046-7D06E9D0CCDC}</Project>

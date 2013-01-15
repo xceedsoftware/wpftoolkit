@@ -7,63 +7,66 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Markup.Primitives;
-using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using Xceed.Wpf.Toolkit.PropertyGrid.Commands;
-using System.Collections.ObjectModel;
-using Xceed.Wpf.Toolkit.Core.Utilities;
+using System.Windows.Media;
+using System.Windows.Data;
+using Xceed.Wpf.Toolkit.PropertyGrid.Implementation;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
-  public class PropertyItem : Control, INotifyPropertyChanged, IPropertyParent
+  public class PropertyItem : Control
   {
-    #region Members
-
-    private readonly DependencyPropertyDescriptor _dpDescriptor;
-    private readonly MarkupObject _markupObject;
-    private readonly NotifyPropertyChangedHelper _propertyChangedHelper;
-
-    private string _displayName;
-    private string _description;
-    private string _category;
-    private int _categoryOrder;
-    private int _propertyOrder;
-
-    #endregion //Members
-
     #region Properties
 
+    #region AdvancedOptionsIcon
+
+    public static readonly DependencyProperty AdvancedOptionsIconProperty =
+        DependencyProperty.Register( "AdvancedOptionsIcon", typeof( ImageSource ), typeof( PropertyItem ), new UIPropertyMetadata( null ) );
+
+    public ImageSource AdvancedOptionsIcon
+    {
+      get { return ( ImageSource )GetValue( AdvancedOptionsIconProperty ); }
+      set { SetValue( AdvancedOptionsIconProperty, value ); }
+    }
+
+    #endregion //AdvancedOptionsIcon
+
+    #region AdvancedOptionsTooltip
+
+    public static readonly DependencyProperty AdvancedOptionsTooltipProperty =
+        DependencyProperty.Register( "AdvancedOptionsTooltip", typeof( object ), typeof( PropertyItem ), new UIPropertyMetadata( null ) );
+
+    public object AdvancedOptionsTooltip
+    {
+      get { return ( object )GetValue( AdvancedOptionsTooltipProperty ); }
+      set { SetValue( AdvancedOptionsTooltipProperty, value ); }
+    }
+
+    #endregion //AdvancedOptionsTooltip
 
     #region Category
 
+    public static readonly DependencyProperty CategoryProperty =
+        DependencyProperty.Register( "Category", typeof( string ), typeof( PropertyItem ), new UIPropertyMetadata( null ) );
+
     public string Category
     {
-      get
-      {
-        return _category;
-      }
-      set
-      {
-        _propertyChangedHelper.HandleEqualityChanged( () => Category, ref _category, value );
-      }
+      get { return ( string )GetValue( CategoryProperty ); }
+      set { SetValue( CategoryProperty, value ); }
     }
 
     #endregion //Category
@@ -72,46 +75,44 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public int CategoryOrder
     {
-      get
-      {
-        return _categoryOrder;
-      }
-      set
-      {
-        _propertyChangedHelper.HandleEqualityChanged( () => CategoryOrder, ref _categoryOrder, value );
-      }
+      get;
+      internal set;
     }
 
-    #endregion // CategoryOrder
+    #endregion //CategoryOrder
+
+    #region ChildrenDefinitions
+
+    internal IEnumerable<IPropertyDefinition> ChildrenDefinitions
+    {
+      get;
+      set;
+    }
+
+    #endregion
 
     #region Description
 
+    public static readonly DependencyProperty DescriptionProperty =
+        DependencyProperty.Register( "Description", typeof( string ), typeof( PropertyItem ), new UIPropertyMetadata( null ) );
+
     public string Description
     {
-      get
-      {
-        return _description;
-      }
-      set
-      {
-        _propertyChangedHelper.HandleEqualityChanged( () => Description, ref _description, value );
-      }
+      get { return ( string )GetValue( DescriptionProperty ); }
+      set { SetValue( DescriptionProperty, value ); }
     }
 
     #endregion //Description
 
     #region DisplayName
 
+    public static readonly DependencyProperty DisplayNameProperty =
+        DependencyProperty.Register( "DisplayName", typeof( string ), typeof( PropertyItem ), new UIPropertyMetadata( null ) );
+
     public string DisplayName
     {
-      get
-      {
-        return _displayName;
-      }
-      set
-      {
-        _propertyChangedHelper.HandleEqualityChanged( () => DisplayName, ref _displayName, value );
-      }
+      get { return ( string )GetValue( DisplayNameProperty ); }
+      set { SetValue( DisplayNameProperty, value ); }
     }
 
     #endregion //DisplayName
@@ -154,44 +155,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     public object Instance
     {
       get;
-      private set;
+      internal set;
     }
 
     #endregion //Instance
-
-    #region IsDataBound
-
-    /// <summary>
-    /// Gets if the property is data bound
-    /// </summary>
-    public bool IsDataBound
-    {
-      get
-      {
-        var dependencyObject = PropertyParent.ValueInstance as DependencyObject;
-        if( dependencyObject != null && _dpDescriptor != null )
-          return BindingOperations.GetBindingExpressionBase( dependencyObject, _dpDescriptor.DependencyProperty ) != null;
-
-        return false;
-      }
-    }
-
-    #endregion //IsDataBound
-
-    #region IsDynamicResource
-
-    public bool IsDynamicResource
-    {
-      get
-      {
-        var markupProperty = _markupObject.Properties.Where( p => p.Name == PropertyDescriptor.Name ).FirstOrDefault();
-        if( markupProperty != null )
-          return markupProperty.Value is DynamicResourceExtension;
-        return false;
-      }
-    }
-
-    #endregion //IsDynamicResource
 
     #region IsExpanded
 
@@ -217,55 +184,49 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected virtual void OnIsExpandedChanged( bool oldValue, bool newValue )
     {
-      if( newValue && Properties.Count == 0 )
+      if( newValue && Properties.Count == 0 && ( this.ChildrenDefinitions != null ) )
       {
-        GetChildProperties();
+        IEnumerable<PropertyItem> children = this.ChildrenDefinitions
+          .Select( 
+          ( def ) => 
+            {
+              PropertyItem subProperty = PropertyGridUtilities.CreatePropertyItem( def );
+              subProperty.Level = Level + 1;
+              return subProperty;
+            });
+
+        Properties.Update( children, false, null );
       }
     }
 
     #endregion IsExpanded
 
-    #region HasChildProperties
+    #region IsExpandable
 
-    public static readonly DependencyProperty HasChildPropertiesProperty = DependencyProperty.Register( "HasChildProperties", typeof( bool ), typeof( PropertyItem ), new UIPropertyMetadata( false ) );
-    public bool HasChildProperties
+    public static readonly DependencyProperty IsExpandableProperty =
+        DependencyProperty.Register( "IsExpandable", typeof( bool ), typeof( PropertyItem ), new UIPropertyMetadata( false ) );
+
+    public bool IsExpandable
     {
-      get
-      {
-        return ( bool )GetValue( HasChildPropertiesProperty );
-      }
-      set
-      {
-        SetValue( HasChildPropertiesProperty, value );
-      }
+      get { return ( bool )GetValue( IsExpandableProperty ); }
+      set { SetValue( IsExpandableProperty, value ); }
     }
 
-    #endregion HasChildProperties
+    #endregion //IsExpandable
 
-    #region HasResourceApplied
-
-    public bool HasResourceApplied
-    {
-      //TODO: need to find a better way to determine if a StaticResource has been applied to any property not just a style
-      get
-      {
-        var markupProperty = _markupObject.Properties.Where( p => p.Name == PropertyDescriptor.Name ).FirstOrDefault();
-        if( markupProperty != null )
-          return markupProperty.Value is Style;
-
-        return false;
-      }
-    }
-
-    #endregion //HasResourceApplied
+    #region IsReadOnly
 
     public bool IsReadOnly
     {
       get
       {
-        return PropertyDescriptor.IsReadOnly;
+        return ( PropertyDescriptor != null )
+        ? PropertyDescriptor.IsReadOnly
+        : false;
       }
     }
+
+    #endregion
 
     #region IsSelected
 
@@ -301,7 +262,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     public int Level
     {
       get;
-      private set;
+      internal set;
     }
 
     #endregion //Level
@@ -321,36 +282,36 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     public PropertyDescriptor PropertyDescriptor
     {
       get;
-      private set;
+      internal set;
     }
 
     #endregion //PropertyDescriptor
 
-    #region PropertyParent
+    #region PropertyName
 
-    internal IPropertyParent PropertyParent
-    {
-      get;
-      private set;
-    }
-
-    #endregion
-
-    #region PropertyOrder
-
-    public int PropertyOrder
+    internal string PropertyName
     {
       get
       {
-        return _propertyOrder;
-      }
-      set
-      {
-        _propertyChangedHelper.HandleEqualityChanged( () => PropertyOrder, ref _propertyOrder, value );
+        PropertyDescriptor descriptor = this.PropertyDescriptor;
+        return ( descriptor != null ) ? descriptor.Name : null;
       }
     }
 
-    #endregion
+    #endregion //PropertyDescriptor
+
+    #region PropertyOrder
+
+    public static readonly DependencyProperty PropertyOrderProperty =
+        DependencyProperty.Register( "PropertyOrder", typeof( int ), typeof( PropertyItem ), new UIPropertyMetadata( 0 ) );
+
+    public int PropertyOrder
+    {
+      get { return ( int )GetValue( PropertyOrderProperty ); }
+      set { SetValue( PropertyOrderProperty, value ); }
+    }
+
+    #endregion //PropertyOrder
 
     #region PropertyType
 
@@ -358,25 +319,17 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       get
       {
-        return PropertyDescriptor.PropertyType;
+        return ( PropertyDescriptor != null )
+          ? PropertyDescriptor.PropertyType
+          : null;
       }
     }
 
     #endregion //PropertyType
 
-    #region ResetValueCommand
-
-    public ICommand ResetValueCommand
-    {
-      get;
-      private set;
-    }
-
-    #endregion
-
     #region Value
 
-    public static readonly DependencyProperty ValueProperty = DependencyProperty.Register( "Value", typeof( object ), typeof( PropertyItem ), new UIPropertyMetadata( null, OnValueChanged ) );
+    public static readonly DependencyProperty ValueProperty = DependencyProperty.Register( "Value", typeof( object ), typeof( PropertyItem ), new UIPropertyMetadata( null, OnValueChanged, OnCoerceValueChanged ) );
     public object Value
     {
       get
@@ -387,6 +340,32 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         SetValue( ValueProperty, value );
       }
+    }
+
+    private static object OnCoerceValueChanged( DependencyObject o, object baseValue )
+    {
+      PropertyItem prop = o as PropertyItem;
+      if( prop != null )
+        return prop.OnCoerceValueChanged( baseValue );
+
+      return baseValue;
+    }
+
+    protected virtual object OnCoerceValueChanged( object baseValue )
+    {
+      // Propagate error from DescriptorPropertyDefinitionBase to PropertyItem.Value
+      // to see the red error rectangle in te propertyGrid.
+      BindingExpression be = GetBindingExpression( PropertyItem.ValueProperty );
+      if( ( be != null ) && be.DataItem is DescriptorPropertyDefinitionBase )
+      {
+        DescriptorPropertyDefinitionBase descriptor = be.DataItem as DescriptorPropertyDefinitionBase;
+        if( Validation.GetHasError( descriptor ) )
+        {
+          ReadOnlyObservableCollection<ValidationError> errors = Validation.GetErrors( descriptor );
+          Validation.MarkInvalid( be, errors[ 0 ] );
+        }
+      }
+      return baseValue;
     }
 
     private static void OnValueChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
@@ -408,37 +387,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //Value
 
-    #region ValueSource
-
-    /// <summary>
-    /// Gets the value source.
-    /// </summary>
-    public BaseValueSource ValueSource
-    {
-      get
-      {
-        var dependencyObject = PropertyParent.ValueInstance as DependencyObject;
-        if( _dpDescriptor != null && dependencyObject != null )
-          return DependencyPropertyHelper.GetValueSource( dependencyObject, _dpDescriptor.DependencyProperty ).BaseValueSource;
-
-        return BaseValueSource.Unknown;
-      }
-    }
-
-    #endregion //ValueSource
-
     #endregion //Properties
 
     #region Events
 
-    public event PropertyChangedEventHandler PropertyChanged;
-
     #region ItemSelectionChanged
 
     internal static readonly RoutedEvent ItemSelectionChangedEvent = EventManager.RegisterRoutedEvent(
-        "ItemSelectedEvent", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( PropertyItem ) );
+        "ItemSelectionChangedEvent", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( PropertyItem ) );
 
-    // This method raises the Tap event 
     private void RaiseItemSelectionChangedEvent()
     {
       RaiseEvent( new RoutedEventArgs( PropertyItem.ItemSelectionChangedEvent ) );
@@ -446,7 +403,19 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion
 
+    #region ItemOrderingChanged
+
+    internal static readonly RoutedEvent ItemOrderingChangedEvent = EventManager.RegisterRoutedEvent(
+        "ItemOrderingChangedEvent", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( PropertyItem ) );
+
+    private void RaiseItemOrderingChangedEvent()
+    {
+      RaiseEvent( new RoutedEventArgs( PropertyItem.ItemOrderingChangedEvent ) );
+    }
+
     #endregion
+
+    #endregion //Events
 
     #region Constructors
 
@@ -455,184 +424,46 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       DefaultStyleKeyProperty.OverrideMetadata( typeof( PropertyItem ), new FrameworkPropertyMetadata( typeof( PropertyItem ) ) );
     }
 
-    internal PropertyItem( PropertyDescriptor property, IPropertyParent propertyParent, int level )
+    internal PropertyItem()
     {
-      _propertyChangedHelper = new NotifyPropertyChangedHelper( this, RaisePropertyChanged );
       Properties = new PropertyItemCollection( new ObservableCollection<PropertyItem>() );
-      PropertyParent = propertyParent;
-      PropertyDescriptor = property;
-      Level = level;
-
-
-      Name = PropertyDescriptor.Name;
-      Category = PropertyDescriptor.Category;
-      CategoryOrder = 0;
-
-      Description = ResolveDescription();
-      DisplayName = ResolveDisplayName();
-      HasChildProperties = ResolveExpandableObject();
-      PropertyOrder = ResolvePropertyOrder();
-
-      _dpDescriptor = DependencyPropertyDescriptor.FromProperty( PropertyDescriptor );
-      _markupObject = MarkupWriter.GetMarkupObjectFor( PropertyParent.ValueInstance );
-
-      CommandBindings.Add( new CommandBinding( PropertyItemCommands.ResetValue, ExecuteResetValueCommand, CanExecuteResetValueCommand ) );
       AddHandler( Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler( PropertyItem_PreviewMouseDown ), true );
+      AddHandler( PropertyItem.ItemOrderingChangedEvent, new RoutedEventHandler( OnItemOrderingChanged ), false );
     }
 
     #endregion //Constructors
 
     #region Event Handlers
 
-    void PropertyItem_PreviewMouseDown( object sender, MouseButtonEventArgs e )
+    private void PropertyItem_PreviewMouseDown( object sender, MouseButtonEventArgs e )
     {
       IsSelected = true;
     }
 
-    #endregion  //Event Handlers
-
-    #region Commands
-
-    private void ExecuteResetValueCommand( object sender, ExecutedRoutedEventArgs e )
+    private void OnItemOrderingChanged( object sender, RoutedEventArgs args )
     {
-      if( PropertyDescriptor.CanResetValue( PropertyParent.ValueInstance ) )
-        PropertyDescriptor.ResetValue( PropertyParent.ValueInstance );
-
-      //TODO: notify UI that the ValueSource may have changed to update the icon
-    }
-
-    private void CanExecuteResetValueCommand( object sender, CanExecuteRoutedEventArgs e )
-    {
-      bool canExecute = false;
-
-      if( PropertyDescriptor.CanResetValue( PropertyParent.ValueInstance ) && !PropertyDescriptor.IsReadOnly )
+      if( args.OriginalSource != this )
       {
-        canExecute = true;
+        //If the OriginalSource is not ourself, it comes from one of our children.
+        Properties.RefreshView();
+        args.Handled = true;
       }
-
-      e.CanExecute = canExecute;
     }
 
-    #endregion //Commands
+    #endregion  //Event Handlers
 
     #region Methods
 
-    private void RaisePropertyChanged( string propertyName )
+    protected override void OnPropertyChanged( DependencyPropertyChangedEventArgs e )
     {
-      if( this.PropertyChanged != null )
+      base.OnPropertyChanged( e );
+
+      if( PropertyItemCollection.IsItemOrderingProperty( e.Property.Name ) )
       {
-        this.PropertyChanged( this, new PropertyChangedEventArgs( propertyName ) );
+        this.RaiseItemOrderingChangedEvent();
       }
-    }
-
-    private void GetChildProperties()
-    {
-      if( Value == null )
-        return;
-
-      var propertyItems = new List<PropertyItem>();
-
-      try
-      {
-        PropertyDescriptorCollection descriptors = PropertyGridUtilities.GetPropertyDescriptors( Value );
-
-        foreach( PropertyDescriptor descriptor in descriptors )
-        {
-          if( descriptor.IsBrowsable )
-          {
-            PropertyItem childPropertyItem = PropertyGridUtilities.CreatePropertyItem( descriptor, this, Level + 1 );
-            propertyItems.Add( childPropertyItem );
-          }
-        }
-      }
-      catch( Exception )
-      {
-        //TODO: handle this some how
-      }
-
-      Properties.Update( propertyItems, false, null );
-    }
-
-    private string ResolveDescription()
-    {
-      //We do not simply rely on the "Description" property of PropertyDescriptor
-      //since this value is cached by PropertyDescriptor and the localized version 
-      //(e.g., LocalizedDescriptionAttribute) value can dynamicaly change.
-      DescriptionAttribute descriptionAtt = GetAttribute<DescriptionAttribute>();
-      return ( descriptionAtt != null )
-        ? descriptionAtt.Description
-        : PropertyDescriptor.Description;
-    }
-
-
-
-
-
-
-
-
-    private string ResolveDisplayName()
-    {
-      string displayName = PropertyDescriptor.DisplayName;
-      var attribute = GetAttribute<ParenthesizePropertyNameAttribute>();
-      if( (attribute != null) && attribute.NeedParenthesis )
-      {
-        displayName = "(" + displayName + ")";
-      }
-
-      return displayName;
-    }
-
-    private bool ResolveExpandableObject()
-    {
-      bool isExpandable = false;
-      var attribute = GetAttribute<ExpandableObjectAttribute>();
-      if( attribute != null )
-      {
-        isExpandable = true;
-      }
-
-      return isExpandable;
-    }
-
-    private int ResolvePropertyOrder()
-    {
-      var attribute = GetAttribute<PropertyOrderAttribute>();
-
-      // Max Value. Properties with no order will be displayed last.
-      return ( attribute != null )
-        ? attribute.Order
-        : int.MaxValue;
-    }
-
-    private T GetAttribute<T>() where T : Attribute
-    {
-      return PropertyGridUtilities.GetAttribute<T>( PropertyDescriptor );
     }
 
     #endregion //Methods
-
-    #region Interfaces
-
-    #region IPropertyParent Members
-
-    bool IPropertyParent.IsReadOnly
-    {
-      get { return PropertyParent.IsReadOnly; }
-    }
-
-    object IPropertyParent.ValueInstance
-    {
-      get { return Value; }
-    }
-
-    EditorDefinitionCollection IPropertyParent.EditorDefinitions
-    {
-      get { return PropertyParent.EditorDefinitions; }
-    }
-
-    #endregion
-
-    #endregion
   }
 }

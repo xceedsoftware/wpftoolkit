@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -22,6 +19,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -201,14 +199,23 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnKeyDown( object sender, KeyEventArgs e )
     {
-      switch( e.Key )
+      if( !IsOpen )
       {
-        case Key.Escape:
-        case Key.Tab:
-          {
-            CloseEditor();
-            break;
-          }
+        if( KeyboardUtilities.IsKeyModifyingPopupState( e ) )
+        {
+          IsOpen = true;
+          e.Handled = true;
+        }
+      }
+      else
+      {
+        if( KeyboardUtilities.IsKeyModifyingPopupState( e )
+          || ( e.Key == Key.Escape )
+          || ( e.Key == Key.Tab ) )
+        {
+          CloseEditor();
+          e.Handled = true;
+        }
       }
     }
 

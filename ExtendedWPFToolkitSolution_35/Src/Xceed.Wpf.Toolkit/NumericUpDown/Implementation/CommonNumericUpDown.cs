@@ -7,19 +7,17 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
 using System;
 using System.Windows;
 using System.Globalization;
+using System.IO;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -30,8 +28,26 @@ namespace Xceed.Wpf.Toolkit
 
     private FromText _fromText;
     private FromDecimal _fromDecimal;
+    private Func<T, T, bool> _fromLowerThan;
+    private Func<T, T, bool> _fromGreaterThan;
 
-    protected CommonNumericUpDown( FromText fromText, FromDecimal fromDecimal )
+
+
+    #region ParsingNumberStyle
+
+    public static readonly DependencyProperty ParsingNumberStyleProperty =
+        DependencyProperty.Register( "ParsingNumberStyle", typeof( NumberStyles ), typeof( CommonNumericUpDown<T> ), new UIPropertyMetadata( NumberStyles.Any ) );
+
+    public NumberStyles ParsingNumberStyle
+    {
+      get { return ( NumberStyles )GetValue( ParsingNumberStyleProperty ); }
+      set { SetValue( ParsingNumberStyleProperty, value ); }
+    }
+
+    #endregion //ParsingNumberStyle
+
+
+    protected CommonNumericUpDown( FromText fromText, FromDecimal fromDecimal, Func<T, T, bool> fromLowerThan, Func<T, T, bool> fromGreaterThan )
     {
       if( fromText == null )
         throw new ArgumentNullException( "parseMethod" );
@@ -39,17 +55,40 @@ namespace Xceed.Wpf.Toolkit
       if( fromDecimal == null )
         throw new ArgumentNullException( "fromDecimal" );
 
+      if( fromLowerThan == null )
+        throw new ArgumentNullException( "fromLowerThan" );
+
+      if( fromGreaterThan == null )
+        throw new ArgumentNullException( "fromGreaterThan" );
+
       _fromText = fromText;
       _fromDecimal = fromDecimal;
+      _fromLowerThan = fromLowerThan;
+      _fromGreaterThan = fromGreaterThan;
     }
 
-    protected static void UpdateMetadata( Type type, T? defaultValue, T? increment, T? minValue, T? maxValue )
+    protected static void UpdateMetadata( Type type, T? increment, T? minValue, T? maxValue )
     {
       DefaultStyleKeyProperty.OverrideMetadata( type, new FrameworkPropertyMetadata( type ) );
-      DefaultValueProperty.OverrideMetadata( type, new FrameworkPropertyMetadata( defaultValue ) );
       IncrementProperty.OverrideMetadata( type, new FrameworkPropertyMetadata( increment ) );
       MaximumProperty.OverrideMetadata( type, new FrameworkPropertyMetadata( maxValue ) );
       MinimumProperty.OverrideMetadata( type, new FrameworkPropertyMetadata( minValue ) );
+    }
+
+    protected void TestInputSpecialValue( AllowedSpecialValues allowedValues, AllowedSpecialValues valueToCompare )
+    {
+      if( ( allowedValues & valueToCompare ) != valueToCompare )
+      {
+        switch( valueToCompare )
+        {
+          case AllowedSpecialValues.NaN :
+            throw new InvalidDataException( "Value to parse shouldn't be NaN." );
+          case AllowedSpecialValues.PositiveInfinity:
+            throw new InvalidDataException( "Value to parse shouldn't be Positive Infinity." );
+          case AllowedSpecialValues.NegativeInfinity:
+            throw new InvalidDataException( "Value to parse shouldn't be Negative Infinity." );
+        }
+      }
     }
 
     private bool IsLowerThan( T? value1, T? value2 )
@@ -57,7 +96,7 @@ namespace Xceed.Wpf.Toolkit
       if( value1 == null || value2 == null )
         return false;
 
-      return ( value1.Value.CompareTo( value2.Value ) < 0 );
+      return _fromLowerThan( value1.Value, value2.Value );
     }
 
     private bool IsGreaterThan( T? value1, T? value2 )
@@ -65,14 +104,19 @@ namespace Xceed.Wpf.Toolkit
       if( value1 == null || value2 == null )
         return false;
 
-      return ( value1.Value.CompareTo( value2.Value ) > 0 );
+      return _fromGreaterThan( value1.Value, value2.Value );
     }
 
     private bool HandleNullSpin()
     {
       if( !Value.HasValue )
       {
-        Value = DefaultValue;
+        T forcedValue = ( DefaultValue.HasValue )
+          ? DefaultValue.Value
+          : default( T );
+
+        Value = CoerceValueMinMax( forcedValue );
+
         return true;
       }
       else if( !Increment.HasValue )
@@ -83,7 +127,7 @@ namespace Xceed.Wpf.Toolkit
       return false;
     }
 
-    private T? CoerceValue( T value )
+    private T? CoerceValueMinMax( T value )
     {
       if( IsLowerThan( value, Minimum ) )
         return Minimum;
@@ -95,22 +139,12 @@ namespace Xceed.Wpf.Toolkit
 
     #region Base Class Overrides
 
-
-    protected override object OnCoerceValue( object newValue )
-    {
-      ValidateMinMax( ( T? )newValue );
-
-      return newValue;
-    }
-
-
-
     protected override void OnIncrement()
     {
       if( !HandleNullSpin() )
       {
         T result = IncrementValue( Value.Value, Increment.Value );
-        Value = CoerceValue( result );
+        Value = CoerceValueMinMax( result );
       }
     }
 
@@ -119,7 +153,7 @@ namespace Xceed.Wpf.Toolkit
       if( !HandleNullSpin() )
       {
         T result = DecrementValue( Value.Value, Increment.Value );
-        Value = CoerceValue( result );
+        Value = CoerceValueMinMax( result );
       }
     }
 
@@ -130,12 +164,18 @@ namespace Xceed.Wpf.Toolkit
       if( String.IsNullOrEmpty( text ) )
         return result;
 
+      // Since the convertion from Value to text using a FormartString may not be parsable
+      // we verify that the already existing text is not the exact same value.
+      string currentValueText = ConvertValueToText();
+      if( object.Equals( currentValueText, text ) )
+        return this.Value;
+
       //don't know why someone would format a T as %, but just in case they do.
       result = FormatString.Contains( "P" )
         ? _fromDecimal( ParsePercent( text, CultureInfo ) )
-        : _fromText( text, NumberStyles.Any, CultureInfo );
+        : _fromText( text, this.ParsingNumberStyle, CultureInfo );
 
-      ValidateMinMax( result );
+      ValidateDefaultMinMax( result );
 
       return result;
     }
@@ -152,18 +192,26 @@ namespace Xceed.Wpf.Toolkit
     {
       ValidSpinDirections validDirections = ValidSpinDirections.None;
 
-      if( IsLowerThan( Value, Maximum ) || !Value.HasValue )
-        validDirections = validDirections | ValidSpinDirections.Increase;
+      // Null increment always prevent spin
+      if( (this.Increment != null) && !IsReadOnly )
+      {
+        if( IsLowerThan( Value, Maximum ) || !Value.HasValue )
+          validDirections = validDirections | ValidSpinDirections.Increase;
 
-      if( IsGreaterThan( Value, Minimum ) || !Value.HasValue )
-        validDirections = validDirections | ValidSpinDirections.Decrease;
+        if( IsGreaterThan( Value, Minimum ) || !Value.HasValue )
+          validDirections = validDirections | ValidSpinDirections.Decrease;
+      }
 
       if( Spinner != null )
         Spinner.ValidSpinDirection = validDirections;
     }
 
-    private void ValidateMinMax( T? value )
+    private void ValidateDefaultMinMax( T? value )
     {
+      // DefaultValue is always accepted
+      if( object.Equals( value, DefaultValue ) )
+        return;
+
       if( IsLowerThan( value, Minimum ) )
         throw new ArgumentOutOfRangeException( "Minimum", String.Format( "Value must be greater than MinValue of {0}", Minimum ) );
       else if( IsGreaterThan( value, Maximum ) )

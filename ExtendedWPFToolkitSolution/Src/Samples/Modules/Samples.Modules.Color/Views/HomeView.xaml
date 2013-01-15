@@ -23,6 +23,16 @@
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                  Title="Color Controls"
                  Description="The ColorCanvas and ColorPicker controls allow the user to input a color. Not shown in the sample are the ColorPicker's Available, Standard and Recent color lists, which are entirely customizable.">
+    <sample:DemoView.Resources>
+         <Style x:Key="controlInError" TargetType="xctk:IntegerUpDown">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self},
+                            Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </sample:DemoView.Resources>
    <Grid >
       <Grid.ColumnDefinitions>
          <ColumnDefinition Width="*"/>
@@ -68,13 +78,13 @@
                            HorizontalAlignment="Stretch"
                            Orientation="Horizontal" >
                   <TextBlock Text="R:"/>
-                  <xctk:IntegerUpDown x:Name="_R" Value="{Binding ElementName=_colorCanvas, Path=R, Mode=TwoWay}" />
+                  <xctk:IntegerUpDown x:Name="_R" Value="{Binding ElementName=_colorCanvas, Path=R, Mode=TwoWay}" Minimum="0" Maximum="255" Style="{StaticResource controlInError}"/>
                   <TextBlock Text="G:" Margin="5"/>
-                  <xctk:IntegerUpDown x:Name="_G" Value="{Binding ElementName=_colorCanvas, Path=G, Mode=TwoWay}"/>
+                  <xctk:IntegerUpDown x:Name="_G" Value="{Binding ElementName=_colorCanvas, Path=G, Mode=TwoWay}" Minimum="0" Maximum="255" Style="{StaticResource controlInError}"/>
                   <TextBlock Text="B:" Margin="5"/>
-                  <xctk:IntegerUpDown x:Name="_B" Value="{Binding ElementName=_colorCanvas, Path=B, Mode=TwoWay}"/>
+                  <xctk:IntegerUpDown x:Name="_B" Value="{Binding ElementName=_colorCanvas, Path=B, Mode=TwoWay}" Minimum="0" Maximum="255" Style="{StaticResource controlInError}"/>
                   <TextBlock Text="A:" Margin="5"/>
-                  <xctk:IntegerUpDown x:Name="_A" Value="{Binding ElementName=_colorCanvas, Path=A, Mode=TwoWay}"/>                  
+                  <xctk:IntegerUpDown x:Name="_A" Value="{Binding ElementName=_colorCanvas, Path=A, Mode=TwoWay}" Minimum="0" Maximum="255" Style="{StaticResource controlInError}"/>
                </StackPanel>
 
                <TextBlock Grid.Column="0" Grid.Row="1" Text="UsingAlphaChannel: " />

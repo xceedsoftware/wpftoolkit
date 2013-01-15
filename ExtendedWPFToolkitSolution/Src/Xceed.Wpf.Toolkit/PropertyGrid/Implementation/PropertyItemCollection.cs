@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -24,12 +21,30 @@ using System.Windows.Data;
 using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+using System.Linq;
+using System.Collections;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
   public class PropertyItemCollection : ReadOnlyObservableCollection<PropertyItem>
   {
+    private static readonly string CategoryPropertyName;
+    private static readonly string CategoryOrderPropertyName;
+    private static readonly string PropertyOrderPropertyName;
+    private static readonly string DisplayNamePropertyName;
+
     private bool _preventNotification;
+
+    static PropertyItemCollection()
+    {
+      PropertyItem p = null;
+      CategoryPropertyName = ReflectionHelper.GetPropertyOrFieldName( () => p.Category );
+      CategoryOrderPropertyName = ReflectionHelper.GetPropertyOrFieldName( () => p.CategoryOrder );
+      PropertyOrderPropertyName = ReflectionHelper.GetPropertyOrFieldName( () => p.PropertyOrder );
+      DisplayNamePropertyName = ReflectionHelper.GetPropertyOrFieldName( () => p.DisplayName );
+    }
 
     public PropertyItemCollection(ObservableCollection<PropertyItem> editableCollection)
       :base(editableCollection)
@@ -74,7 +89,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       base.OnCollectionChanged( args );
     }
 
-    internal void Update( IEnumerable<PropertyItem> newItems, bool isCategorized, string filter )
+    internal void Update( IEnumerable<PropertyItem> newItems,  bool isCategorized, string filter )
     {
       using( GetDefaultView().DeferRefresh() )
       {
@@ -99,18 +114,31 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         // Update view values
         if( isCategorized )
         {
-          GroupBy( "Category" );
-          SortBy( "Category", ListSortDirection.Ascending );
+          GroupBy( CategoryPropertyName );
+          SortBy( CategoryPropertyName, ListSortDirection.Ascending );
         }
 
-        SortBy( "PropertyOrder", ListSortDirection.Ascending );
-        SortBy( "DisplayName", ListSortDirection.Ascending );
+        SortBy( PropertyOrderPropertyName, ListSortDirection.Ascending );
+        SortBy( DisplayNamePropertyName, ListSortDirection.Ascending );
 
         Filter( filter );
 
         _preventNotification = false;
         OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
       }
+    }
+
+    internal void RefreshView()
+    {
+      GetDefaultView().Refresh();
+    }
+
+    internal static bool IsItemOrderingProperty( string propertyName )
+    {
+      return string.Equals( propertyName, DisplayNamePropertyName )
+        || string.Equals( propertyName, CategoryPropertyName )
+        || string.Equals( propertyName, CategoryOrderPropertyName )
+        || string.Equals( propertyName, PropertyOrderPropertyName );
     }
   }
 }

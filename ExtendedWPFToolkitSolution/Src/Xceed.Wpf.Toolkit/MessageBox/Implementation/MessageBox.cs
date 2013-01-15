@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -22,6 +19,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Input;
+using System.Text;
+using System.Security.Permissions;
+using System.Security;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -73,6 +74,8 @@ namespace Xceed.Wpf.Toolkit
     {
       /*user cannot create instance */
       AddHandler( ButtonBase.ClickEvent, new RoutedEventHandler( Button_Click ) );
+
+      CommandBindings.Add( new CommandBinding( ApplicationCommands.Copy, new ExecutedRoutedEventHandler( ExecuteCopy ) ) );
     }
 
     #endregion //Constructors
@@ -643,7 +646,7 @@ namespace Xceed.Wpf.Toolkit
     /// Resolves the owner Window of the MessageBox.
     /// </summary>
     /// <returns>the owner Window</returns>
-    private static Window ResolveOwnerWindow()
+    private static Window ComputeOwnerWindow()
     {
       Window owner = null;
       if( Application.Current != null )
@@ -697,7 +700,7 @@ namespace Xceed.Wpf.Toolkit
           }
       }
 
-      ImageSource = ( ImageSource )new ImageSourceConverter().ConvertFromString( String.Format( "pack://application:,,,/WPFToolkit.Extended;component/MessageBox/Icons/{0}", iconName ) );
+      ImageSource = ( ImageSource )new ImageSourceConverter().ConvertFromString( String.Format( "pack://application:,,,/Xceed.Wpf.Toolkit;component/MessageBox/Icons/{0}", iconName ) );
     }
 
     /// <summary>
@@ -710,7 +713,7 @@ namespace Xceed.Wpf.Toolkit
       newWindow.AllowsTransparency = true;
       newWindow.Background = Brushes.Transparent;
       newWindow.Content = this;
-      newWindow.Owner = _owner ?? ResolveOwnerWindow();
+      newWindow.Owner = _owner ?? ComputeOwnerWindow();
 
       if( newWindow.Owner != null )
         newWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
@@ -794,5 +797,51 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //Event Handlers
+
+    #region COMMANDS
+
+    private void ExecuteCopy( object sender, ExecutedRoutedEventArgs e )
+    {
+      StringBuilder sb = new StringBuilder();
+      sb.Append( "---------------------------" );
+      sb.AppendLine();
+      sb.Append( Caption );
+      sb.AppendLine();
+      sb.Append( "---------------------------" );
+      sb.AppendLine();
+      sb.Append( Text );
+      sb.AppendLine();
+      sb.Append( "---------------------------" );
+      sb.AppendLine();
+      switch( _button )
+      {
+        case MessageBoxButton.OK:
+          sb.Append( OkButtonContent.ToString() );
+          break;
+        case MessageBoxButton.OKCancel:
+          sb.Append( OkButtonContent + "     " + CancelButtonContent );
+          break;
+        case MessageBoxButton.YesNo:
+          sb.Append( YesButtonContent + "     " + NoButtonContent );
+          break;
+        case MessageBoxButton.YesNoCancel:
+          sb.Append( YesButtonContent + "     " + NoButtonContent + "     " + CancelButtonContent );
+          break;
+      }
+      sb.AppendLine();
+      sb.Append( "---------------------------" );
+
+      try
+      {
+        new UIPermission( UIPermissionClipboard.AllClipboard ).Demand();
+        Clipboard.SetText( sb.ToString() );
+      }
+      catch( SecurityException )
+      {
+        throw new SecurityException();
+      }
+    }
+
+    #endregion COMMANDS
   }
 }

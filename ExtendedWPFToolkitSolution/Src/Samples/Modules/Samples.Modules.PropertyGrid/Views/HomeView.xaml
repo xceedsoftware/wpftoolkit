@@ -65,7 +65,7 @@
 
       <StackPanel Grid.Row="1" Margin="10">
          <TextBlock Text="Usage:" Style="{StaticResource Header}" />
-         <TextBlock Text="To inspect an object simply set the PropertyGrid.SelectedObject property to an instance of the object you want to inspect."
+         <TextBlock Text="To inspect an object simply set the PropertyGrid.SelectedObject property to an instance of the object you want to inspect. Click the button to inspect"
                        TextWrapping="Wrap" />
          <Grid Height="400" Margin="10">
             <Grid.ColumnDefinitions>
@@ -74,7 +74,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel>
-                <Button x:Name="_button1" Click="OnButtonClick" Height="200" Width="200" Margin="25" HorizontalAlignment="Center" VerticalAlignment="Center">Inspect Me</Button>
+                <Button x:Name="_button1" Click="OnButtonClick" Height="200" Width="200" Margin="25" HorizontalAlignment="Center" VerticalAlignment="Center">Inspect This</Button>
                 <Button x:Name="_button2" Click="OnButtonClick" Foreground="Red" FontSize="22" FontFamily="Bell MT" Height="50" Width="200" Margin="25" HorizontalAlignment="Center" VerticalAlignment="Center">Inspect That</Button>
             </StackPanel>
 

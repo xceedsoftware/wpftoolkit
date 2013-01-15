@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -31,6 +28,7 @@ using System.Collections.Specialized;
 using System.Windows.Media;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using System.Collections.ObjectModel;
+using System.Collections;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -90,9 +88,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
     #endregion //AutoGenerateProperties
-
-
-
 
     #region ShowSummary
 
@@ -300,7 +295,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region IsReadOnly
 
-    public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register( "IsReadOnly", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( false, OnIsReadOnlyChanged ) );
+    public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register( "IsReadOnly", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( false ) );
     public bool IsReadOnly
     {
       get
@@ -310,18 +305,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       set
       {
         SetValue( IsReadOnlyProperty, value );
-      }
-    }
-
-    private static void OnIsReadOnlyChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      PropertyGrid propertyGrid = o as PropertyGrid;
-      if( propertyGrid != null )
-      {
-        foreach( PropertyItem propertyItem in propertyGrid.Properties )
-        {
-          propertyItem.Editor.IsEnabled = !propertyGrid.IsReadOnly;
-        }
       }
     }
 
@@ -450,6 +433,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //SelectedObjectName
 
+
+
+
+
+
+
+
+
+
+
     #region SelectedPropertyItem
 
     public static readonly DependencyProperty SelectedPropertyItemProperty = DependencyProperty.Register( "SelectedPropertyItem", typeof( PropertyItem ), typeof( PropertyGrid ), new UIPropertyMetadata( null, OnSelectedPropertyItemChanged ) );
@@ -569,6 +562,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       PropertyDefinitions = new PropertyDefinitionCollection();
 
       AddHandler( PropertyItem.ItemSelectionChangedEvent, new RoutedEventHandler( OnItemSelectionChanged ) );
+      AddHandler( PropertyItem.ItemOrderingChangedEvent, new RoutedEventHandler( OnItemOrderingChanged ) );
       CommandBindings.Add( new CommandBinding( PropertyGridCommands.ClearFilter, ClearFilter, CanClearFilter ) );
     }
 
@@ -609,7 +603,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         if( !( e.OriginalSource as TextBox ).AcceptsReturn )
         {
           BindingExpression be = ( ( TextBox )e.OriginalSource ).GetBindingExpression( TextBox.TextProperty );
-          be.UpdateSource();
+          if( be != null )
+            be.UpdateSource();
         }
       }
     }
@@ -632,6 +627,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           SelectedPropertyItem = null;
         }
       }
+    }
+
+    private void OnItemOrderingChanged( object sender, RoutedEventArgs args )
+    {
+      Properties.RefreshView();
+      args.Handled = true;
     }
 
     private void DragThumb_DragDelta( object sender, DragDeltaEventArgs e )
@@ -660,15 +661,29 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private void UpdateProperties( bool regenerateItems )
     {
       IEnumerable<PropertyItem> newProperties = null;
+      string defaultPropertyName = null;
+
       if( regenerateItems )
       {
-        newProperties = this.GeneratePropertyItems( this.SelectedObject );
+        newProperties = GeneratePropertyItems();
+        defaultPropertyName = GetDefaultPropertyName();
 
-        string defaultPropertyName = PropertyGridUtilities.GetDefaultPropertyName( this.SelectedObject );
-        this.SelectedPropertyItem = newProperties.FirstOrDefault( ( prop ) => prop.Name.Equals( defaultPropertyName ) );
-      }
+        this.SelectedPropertyItem = ( defaultPropertyName != null )
+                                    ? newProperties.FirstOrDefault( ( prop ) => defaultPropertyName.Equals( prop.PropertyName ) )
+                                    : null;
+    }
 
       Properties.Update( newProperties, IsCategorized, Filter );
+    }
+
+    private List<PropertyItem> GeneratePropertyItems()
+    {
+        return GeneratePropertyItems( SelectedObject );
+    }
+
+    private string GetDefaultPropertyName()
+    {
+        return GetDefaultPropertyName( SelectedObject );
     }
 
     private List<PropertyItem> GeneratePropertyItems(object instance)
@@ -705,7 +720,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           foreach( PropertyDescriptor descriptor in descriptors )
           {
             if( descriptor.IsBrowsable )
+            {
               propertyItems.Add( PropertyGridUtilities.CreatePropertyItem( descriptor, this ) );
+            }
           }
         }
         catch( Exception )
@@ -716,6 +733,31 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       return propertyItems;
     }
+
+    private string GetDefaultPropertyName( object selectedObject )
+    {
+      return PropertyGridUtilities.GetDefaultPropertyName( selectedObject );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private void UpdateThumb()
     {
@@ -817,11 +859,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region IPropertyParent Members
 
-    bool IPropertyParent.IsReadOnly
-    {
-      get { return this.IsReadOnly; }
-    }
-
     object IPropertyParent.ValueInstance
     {
       get { return this.SelectedObject; }
@@ -832,7 +869,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       get { return this.EditorDefinitions; }
     }
 
+
     #endregion
+
+
+
+
 
     #endregion
   }

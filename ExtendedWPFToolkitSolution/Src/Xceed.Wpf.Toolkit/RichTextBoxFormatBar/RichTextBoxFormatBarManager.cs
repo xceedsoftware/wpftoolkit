@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -23,6 +20,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Core;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -33,6 +31,9 @@ namespace Xceed.Wpf.Toolkit
     private global::System.Windows.Controls.RichTextBox _richTextBox;
     private UIElementAdorner<Control> _adorner;
     private IRichTextBoxFormatBar _toolbar;
+    private Window _parentWindow;
+
+    private const double _hideAdornerDistance = 150d;
 
     #endregion //Members
 
@@ -95,19 +96,47 @@ namespace Xceed.Wpf.Toolkit
         HideAdorner();
     }
 
-    void RichTextBox_PreviewMouseMove( object sender, MouseEventArgs e )
+    private void OnPreviewMouseMoveParentWindow( object sender, MouseEventArgs e )
     {
-      //if the mouse moves outside the richtextbox bounds hide the adorner
-      //though this deosn't always work, especially if the user moves the mouse very quickly.
-      //need to find a better solution, but this will work for now.
-      Point p = e.GetPosition( _richTextBox );
-      if( p.X <= 5.0 || p.X >= _richTextBox.ActualWidth - 5 || p.Y <= 3.0 || p.Y >= _richTextBox.ActualHeight - 3 )
+      Point p = e.GetPosition( _adorner );
+      double maxDist = 0d;
+
+      //Mouse is inside FormatBar: Nothing to do.
+      if( ( p.X >= 0 ) && ( p.X <= _adorner.ActualWidth ) && ( p.Y >= 0 ) && ( p.Y <= _adorner.ActualHeight ) )
+      {
+        return;
+      }
+      //Mouse is too much outside FormatBar: Close it.
+      else if( ( p.X < -_hideAdornerDistance ) || ( p.X > _adorner.ActualWidth + _hideAdornerDistance ) || ( p.Y < -_hideAdornerDistance ) || ( p.Y > _adorner.ActualHeight + _hideAdornerDistance ) )
+      {
         HideAdorner();
+      }
+      //Mouse is just outside FormatBar: Vary its opacity.
+      else
+      {
+        if( p.X < 0 )
+          maxDist = -p.X;
+        else if( p.X > _adorner.ActualWidth )
+          maxDist = p.X - _adorner.ActualWidth;
+
+        if( p.Y < 0 )
+          maxDist = Math.Max( maxDist, -p.Y );
+        else if( p.Y > _adorner.ActualHeight )
+          maxDist = Math.Max( maxDist, p.Y - _adorner.ActualHeight );
+
+        _adorner.Opacity = 1d - ( Math.Min( maxDist, 100d ) / 100d );
+      }
+    }
+
+    private void OnMouseLeaveParentWindow( object sender, MouseEventArgs e )
+    {
+      // Mouse is outside parent Window: Close it.
+      HideAdorner();
     }
 
     void RichTextBox_TextChanged( object sender, TextChangedEventArgs e )
     {
-      //this fixes the bug when applying text transformations the text would lose it's highlight.  That was because the RichTextBox was losing focus
+      //This fixes the bug when applying text transformations the text would lose it's highlight. That was because the RichTextBox was losing focus,
       //so we just give it focus again and it seems to do the trick of re-highlighting it.
       if( !_richTextBox.IsFocused && !_richTextBox.Selection.IsEmpty )
         _richTextBox.Focus();
@@ -125,7 +154,6 @@ namespace Xceed.Wpf.Toolkit
     private void AttachFormatBarToRichtextBox( global::System.Windows.Controls.RichTextBox richTextBox, IRichTextBoxFormatBar formatBar )
     {
       _richTextBox = richTextBox;
-      _richTextBox.PreviewMouseMove += RichTextBox_PreviewMouseMove;
       //we cannot use the PreviewMouseLeftButtonUp event because of selection bugs.
       //we cannot use the MouseLeftButtonUp event because it is handled by the RichTextBox and does not bubble up to here, so we must
       //add a hander to the MouseUpEvent using the Addhandler syntax, and specify to listen for handled events too.
@@ -158,6 +186,13 @@ namespace Xceed.Wpf.Toolkit
       _adorner.Visibility = Visibility.Visible;
 
       PositionFormatBar( adorningEditor );
+
+      _parentWindow = TreeHelper.FindParent<Window>( _adorner );
+      if( _parentWindow != null )
+      {
+        Mouse.AddMouseMoveHandler( _parentWindow, OnPreviewMouseMoveParentWindow );
+        Mouse.AddMouseLeaveHandler( _parentWindow, OnMouseLeaveParentWindow );
+      }
     }
 
     /// <summary>
@@ -212,6 +247,11 @@ namespace Xceed.Wpf.Toolkit
       {
         _adorner.Visibility = Visibility.Collapsed;
         //_adorner.Child = null;
+        if( _parentWindow != null )
+        {
+          Mouse.RemoveMouseMoveHandler( _parentWindow, OnPreviewMouseMoveParentWindow );
+          Mouse.RemoveMouseLeaveHandler( _parentWindow, OnMouseLeaveParentWindow );
+        }
       }
     }
 

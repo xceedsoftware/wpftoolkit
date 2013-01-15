@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -21,6 +18,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -35,6 +33,7 @@ namespace Xceed.Wpf.Toolkit
 
     private Popup _calculatorPopup;
     private Calculator _calculator;
+    private Decimal? _initialValue;
 
     #endregion //Members
 
@@ -98,7 +97,8 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnIsOpenChanged( bool oldValue, bool newValue )
     {
-
+      if( newValue )
+        _initialValue = Value;
     }
 
     #endregion //IsOpen
@@ -177,47 +177,70 @@ namespace Xceed.Wpf.Toolkit
 
     void CalculatorPopup_Opened( object sender, EventArgs e )
     {
-      _calculator.Focus();
+      if( _calculator != null )
+      {
+        _calculator.InitializeToValue( this.Value );
+        _calculator.Focus();
+      }
+    }
+
+    protected override void OnTextInput( TextCompositionEventArgs e )
+    {
+      if( IsOpen && EnterClosesCalculator )
+      {
+        var buttonType = CalculatorUtilities.GetCalculatorButtonTypeFromText( e.Text );
+        if( buttonType == Calculator.CalculatorButtonType.Equal )
+        {
+          CloseCalculatorUpDown( true );
+        }
+      }
     }
 
     private void OnKeyDown( object sender, KeyEventArgs e )
     {
-      switch( e.Key )
+      if( !IsOpen )
       {
-        case Key.Enter:
-          {
-            if( EnterClosesCalculator && IsOpen )
-              CloseCalculatorUpDown();
-            break;
-          }
-        case Key.Escape:
-          {
-            CloseCalculatorUpDown();
-            e.Handled = true;
-            break;
-          }
-        case Key.Tab:
-          {
-            CloseCalculatorUpDown();
-            break;
-          }
+        if( KeyboardUtilities.IsKeyModifyingPopupState( e ) )
+        {
+          IsOpen = true;
+          // Calculator will get focus in CalculatorPopup_Opened().
+          e.Handled = true;
+        }
+      }
+      else
+      {
+        if( KeyboardUtilities.IsKeyModifyingPopupState( e ) )
+        {
+          CloseCalculatorUpDown( true );
+          e.Handled = true;
+        }
+        else if( e.Key == Key.Escape )
+        {
+          if( EnterClosesCalculator )
+            Value = _initialValue;
+          CloseCalculatorUpDown( true );
+          e.Handled = true;
+        }
       }
     }
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      CloseCalculatorUpDown();
+      CloseCalculatorUpDown( false );
     }
 
     #endregion //Event Handlers
 
     #region Methods
 
-    private void CloseCalculatorUpDown()
+    private void CloseCalculatorUpDown( bool isFocusOnTextBox )
     {
       if( IsOpen )
         IsOpen = false;
       ReleaseMouseCapture();
+
+      if( isFocusOnTextBox && ( TextBox != null ) )
+        TextBox.Focus();
     }
 
     #endregion //Methods

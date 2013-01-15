@@ -22,8 +22,13 @@
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                  Title="CalculatorUpDown"
+                 xmlns:conv="clr-namespace:Samples.Modules.Calculator.Converters"
                  Description="The CalculatorUpDown provides a TextBox with button spinners that allow incrementing and decrementing numeric values by using the spinner buttons, keyboard up/down arrows, or mouse wheel. It also provides a Calculator dropdown which allows you to perform mathematical calculations.">
-   <Grid>
+    <sample:DemoView.Resources>
+        <conv:FormatStringToVisibilityConverter x:Key="formatStringToVisibilityConverter" />
+    </sample:DemoView.Resources>
+
+    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
          <RowDefinition Height="*" />
@@ -35,6 +40,7 @@
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="Auto" />
@@ -42,21 +48,26 @@
                <ColumnDefinition Width="*" />
                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBlock Text="Precision: " VerticalAlignment="Center" />
-            <xctk:IntegerUpDown x:Name="_precision" Grid.Column="1" Width="75" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="5" Minimum="0" Value="2" ToolTip="Gets/Sets the maximum number of digits displayed to the right of the decimal point." />
-            <TextBlock Text="FormatString:" Grid.Row="1" VerticalAlignment="Center" />
-            <ComboBox x:Name="_formatString" SelectedIndex="0" Grid.Row="1" Grid.Column="1" Width="150" Margin="5">
-               <ComboBoxItem Tag="C2">Currency</ComboBoxItem>
-               <ComboBoxItem Tag="F2">Fixed Point</ComboBoxItem>
+
+            <TextBlock Text="Enter Closes Calculator:" VerticalAlignment="Center" />
+            <CheckBox x:Name="_enterClosesCalculator" Grid.Column="1" VerticalAlignment="Center" Margin="5" />
+            <TextBlock Text="Watermark:" Grid.Row="1" VerticalAlignment="Center" />
+            <TextBox x:Name="_watermark" Grid.Row="1" Grid.Column="1" Width="150" Margin="5" Text="Enter Value" />
+            <TextBlock Text="FormatString:" Grid.Row="2" VerticalAlignment="Center" />
+            <ComboBox x:Name="_formatString" SelectedIndex="0" Grid.Row="2" Grid.Column="1" Width="150" Margin="5">
+               <ComboBoxItem Tag="">None</ComboBoxItem>
+               <ComboBoxItem Tag="C">Currency</ComboBoxItem>
+               <ComboBoxItem Tag="F">Fixed Point</ComboBoxItem>
                <ComboBoxItem Tag="G">General</ComboBoxItem>
                <ComboBoxItem Tag="N">Number</ComboBoxItem>
-               <ComboBoxItem Tag="P2">Percent</ComboBoxItem>
+               <ComboBoxItem Tag="P">Percent</ComboBoxItem>
             </ComboBox>
-            <TextBlock Text="Watermakr:" Grid.Row="2" VerticalAlignment="Center" />
-            <TextBox x:Name="_watermark" Grid.Row="2" Grid.Column="1" Width="150" Margin="5" Text="Enter Value" />
-            <TextBlock Grid.Column="2" Text="Increment" VerticalAlignment="Center" />
-            <TextBlock Grid.Column="2" Grid.Row="1" Text="Minimum" VerticalAlignment="Center" />
-            <TextBlock Grid.Column="2" Grid.Row="2" Text="Maximum" VerticalAlignment="Center" />
+            <TextBlock Text="Precision: " Grid.Row="3" VerticalAlignment="Center"  Visibility="{Binding SelectedItem.Tag, ElementName=_formatString, Converter={StaticResource formatStringToVisibilityConverter}}" />
+            <xctk:IntegerUpDown x:Name="_precision" Grid.Row="3" Grid.Column="1" Width="75" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="5" Minimum="0" Value="2" Visibility="{Binding SelectedItem.Tag, ElementName=_formatString, Converter={StaticResource formatStringToVisibilityConverter}}" ToolTip="Gets/Sets the maximum number of digits displayed to the right of the decimal point." />
+
+            <TextBlock Grid.Column="2" Text="Increment:" VerticalAlignment="Center" Margin="20,0,0,0"/>
+            <TextBlock Grid.Column="2" Grid.Row="1" Text="Minimum:" VerticalAlignment="Center" Margin="20,0,0,0"/>
+            <TextBlock Grid.Column="2" Grid.Row="2" Text="Maximum:" VerticalAlignment="Center" Margin="20,0,0,0"/>
             <xctk:IntegerUpDown Grid.Column="3" Name="_increment" Minimum="0" Value="1" VerticalAlignment="Center" Margin="5" Width="150" />
             <xctk:IntegerUpDown Grid.Column="3" Grid.Row="1" Name="_minimum" Value="-100" VerticalAlignment="Center" Margin="5" Width="150" />
             <xctk:IntegerUpDown Grid.Column="3" Grid.Row="2" Name="_maximum" Value="5000" VerticalAlignment="Center" Margin="5" Width="150" />
@@ -71,7 +82,8 @@
                                 Minimum="{Binding Value, ElementName=_minimum}"
                                 Precision="{Binding Value, ElementName=_precision}" 
                                 FormatString="{Binding SelectedItem.Tag, ElementName=_formatString}" 
-                                Watermark="{Binding Text, ElementName=_watermark}" />
+                                Watermark="{Binding Text, ElementName=_watermark}"
+                                EnterClosesCalculator="{Binding IsChecked, ElementName=_enterClosesCalculator}"/>
       </StackPanel>
    </Grid>
 </sample:DemoView>

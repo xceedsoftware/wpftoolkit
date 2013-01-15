@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -78,8 +75,14 @@ namespace Xceed.Wpf.Toolkit
       offsetX = element.X - adorner.X;
       offsetY = element.Y - adorner.Y;
 
-      double left = _currentMousePosition.X - ( ( _magnifier.ViewBox.Width / 2 ) + offsetX );
-      double top = _currentMousePosition.Y - ( ( _magnifier.ViewBox.Height / 2 ) + offsetY );
+      //An element will use the offset from its parent (StackPanel, Grid, etc.) to be rendered.
+      //When this element is put in a VisualBrush, the element will draw with that offset applied. 
+      //To fix this: we add that parent offset to Magnifier location.
+      Vector parentOffsetVector = VisualTreeHelper.GetOffset( _magnifier.Target );
+      Point parentOffset = new Point( parentOffsetVector.X, parentOffsetVector.Y );
+
+      double left = _currentMousePosition.X - ( ( _magnifier.ViewBox.Width / 2 ) + offsetX ) + parentOffset.X;
+      double top = _currentMousePosition.Y - ( ( _magnifier.ViewBox.Height / 2 ) + offsetY ) + parentOffset.Y;
       return new Point( left, top );
     }
 

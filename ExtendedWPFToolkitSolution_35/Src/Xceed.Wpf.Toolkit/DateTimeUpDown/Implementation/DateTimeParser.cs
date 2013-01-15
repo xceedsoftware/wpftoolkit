@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -34,7 +31,7 @@ namespace Xceed.Wpf.Toolkit
       if( string.IsNullOrEmpty( value ) || string.IsNullOrEmpty( format ) )
         return false;
 
-      var dateTimeString = ResolveDateTimeString( value, format, currentDate, cultureInfo ).Trim();
+      var dateTimeString = ComputeDateTimeString( value, format, currentDate, cultureInfo ).Trim();
 
       if( !String.IsNullOrEmpty( dateTimeString ) )
         success = DateTime.TryParse( dateTimeString, cultureInfo.DateTimeFormat, DateTimeStyles.None, out result );
@@ -45,14 +42,14 @@ namespace Xceed.Wpf.Toolkit
       return success;
     }
 
-    private static string ResolveDateTimeString( string dateTime, string format, DateTime currentDate, CultureInfo cultureInfo )
+    private static string ComputeDateTimeString( string dateTime, string format, DateTime currentDate, CultureInfo cultureInfo )
     {
       Dictionary<string, string> dateParts = GetDateParts( currentDate, cultureInfo );
       string[] timeParts = new string[ 3 ] { currentDate.Hour.ToString(), currentDate.Minute.ToString(), currentDate.Second.ToString() };
       string designator = "";
       string[] dateTimeSeparators = new string[] { ",", " ", "-", ".", "/", cultureInfo.DateTimeFormat.DateSeparator, cultureInfo.DateTimeFormat.TimeSeparator };
 
-      ResolveSortableDateTimeString( ref dateTime, ref format, cultureInfo );
+      UpdateSortableDateTimeString( ref dateTime, ref format, cultureInfo );
 
       var dateTimeParts = dateTime.Split( dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries ).ToList();
       var formats = format.Split( dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries ).ToList();
@@ -94,7 +91,7 @@ namespace Xceed.Wpf.Toolkit
       return String.Format( "{0} {1} {2}", date, time, designator );
     }
 
-    private static void ResolveSortableDateTimeString( ref string dateTime, ref string format, CultureInfo cultureInfo )
+    private static void UpdateSortableDateTimeString( ref string dateTime, ref string format, CultureInfo cultureInfo )
     {
       if( format == cultureInfo.DateTimeFormat.SortableDateTimePattern )
       {

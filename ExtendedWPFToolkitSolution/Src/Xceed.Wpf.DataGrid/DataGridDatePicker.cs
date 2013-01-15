@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -61,10 +58,14 @@ namespace Xceed.Wpf.DataGrid
       if( InputValidationError != null )
       {
         InputValidationErrorEventArgs args = ( _commitException != null )
-          ? new InputValidationErrorEventArgs( _commitException.Message )
-          : new InputValidationErrorEventArgs( e.Text );
+          ? new InputValidationErrorEventArgs( _commitException )
+          : new InputValidationErrorEventArgs( e.Exception );
 
         InputValidationError( this, args );
+        if( args.ThrowException )
+        {
+          throw args.Exception;
+        }
       }
     }
 
@@ -72,8 +73,9 @@ namespace Xceed.Wpf.DataGrid
 
     #region Method
 
-    public void CommitInput()
+    public bool CommitInput()
     {
+      bool returnValue = true;
       try
       {
         // Null or empty string is a null date;
@@ -95,7 +97,10 @@ namespace Xceed.Wpf.DataGrid
         // This will raise the "DateValidationError" event from the datepicker
         Text = "Invalid";
         _commitException = null;
+        returnValue = false;
       }
+
+      return returnValue;
     }
 
     #endregion

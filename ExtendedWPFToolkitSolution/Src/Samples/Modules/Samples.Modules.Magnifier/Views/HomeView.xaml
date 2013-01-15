@@ -58,7 +58,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Zoom Factor:" VerticalAlignment="Center" Margin="5" />
-                <xctk:DoubleUpDown x:Name="_zoomFactor" Grid.Column="1" Value="0.4" Minimum="0" Increment="0.1" Width="150" Margin="5" />
+                <xctk:DoubleUpDown x:Name="_zoomFactor" Grid.Column="1" Value="0.4" Minimum="0" Increment="0.1" Maximum="3" FormatString="N1" Width="150" Margin="5" />
                 <TextBlock Text="Border Thickness:" Grid.Row="1" VerticalAlignment="Center" Margin="5" />
                 <xctk:IntegerUpDown x:Name="_borderThickness" Grid.Row="1" Grid.Column="1" Value="2" Minimum="0" Maximum="20" Width="150" Margin="5" />
                 <TextBlock Text="Border Brush:" Grid.Row="2" VerticalAlignment="Center" Margin="5"/>
@@ -76,7 +76,6 @@
 
         <StackPanel Grid.Row="1" Margin="10" HorizontalAlignment="Left" >
             <TextBlock Text="Usage:" Style="{StaticResource Header}"/>
-            <Grid>
             <xctk:RichTextBox x:Name="_txtContent"
                               IsReadOnly="True" 
                               TextFormatter="{StaticResource rtfFormatter}" 
@@ -93,7 +92,6 @@
                                         Height="{Binding Source={x:Reference _height}, Path=Value, Mode=TwoWay}" />
                     </xctk:MagnifierManager.Magnifier>
             </xctk:RichTextBox>
-            </Grid>
         </StackPanel>
     </Grid>
 </sample:DemoView>

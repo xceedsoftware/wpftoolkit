@@ -21,7 +21,7 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-                 xmlns:osb="clr-namespace:Xceed.Wpf.Toolkit.Obselete;assembly=WPFToolkit.Extended"
+                 xmlns:osb="clr-namespace:Xceed.Wpf.Toolkit.Obselete;assembly=Xceed.Wpf.Toolkit"
                  xmlns:s="clr-namespace:System;assembly=mscorlib"
                  Title="MaskedTextBox"
                  Description="The MaskedTextBox control lets you display and edit values based on a mask.">
@@ -79,6 +79,7 @@
       </GroupBox>
 
       <StackPanel Grid.Row="1" Margin="10">
+         <TextBlock Text="Usage:" Style="{StaticResource Header}" />
          <xctk:MaskedTextBox x:Name="_maskedTextBox"
                              Mask="(000) 000-0000"
                              ValueDataType="{x:Type s:String}" />

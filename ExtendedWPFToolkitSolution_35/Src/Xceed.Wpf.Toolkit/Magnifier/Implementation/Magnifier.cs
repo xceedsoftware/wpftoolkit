@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -129,7 +126,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region ZoomFactor
 
-    public static readonly DependencyProperty ZoomFactorProperty = DependencyProperty.Register( "ZoomFactor", typeof( double ), typeof( Magnifier ), new FrameworkPropertyMetadata( 0.5, OnZoomFactorPropertyChanged, OnCoerceZoomFactorProperty ) );
+    public static readonly DependencyProperty ZoomFactorProperty = DependencyProperty.Register( "ZoomFactor", typeof( double ), typeof( Magnifier ), new FrameworkPropertyMetadata( 0.5, OnZoomFactorPropertyChanged), OnValidationCallback );
     public double ZoomFactor
     {
       get
@@ -142,6 +139,12 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    private static bool OnValidationCallback( object baseValue )
+    {
+      double zoomFactor = ( double )baseValue;
+      return ( zoomFactor >= 0 );
+    }
+
     private static void OnZoomFactorPropertyChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       Magnifier m = ( Magnifier )d;
@@ -150,25 +153,7 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnZoomFactorChanged( DependencyPropertyChangedEventArgs e )
     {
-      ResolveViewBox();
-    }
-
-    private static object OnCoerceZoomFactorProperty( DependencyObject d, object value )
-    {
-      Magnifier m = ( Magnifier )d;
-      return m.OnCoerceZoomFactor( value );
-    }
-
-    protected virtual object OnCoerceZoomFactor( object value )
-    {
-      double zoomFactor = ( double )value;
-
-      if( zoomFactor > 1 )
-        zoomFactor = 1;
-      else if( zoomFactor < 0 )
-        zoomFactor = 0;
-
-      return zoomFactor;
+      UpdateViewBox();
     }
 
     #endregion //ZoomFactor
@@ -194,7 +179,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnSizeChangedEvent( object sender, SizeChangedEventArgs e )
     {
-      ResolveViewBox();
+      UpdateViewBox();
     }
 
     private void UpdateSizeFromRadius()
@@ -240,7 +225,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region Methods
 
-    private void ResolveViewBox()
+    private void UpdateViewBox()
     {
       if( !IsInitialized )
         return;

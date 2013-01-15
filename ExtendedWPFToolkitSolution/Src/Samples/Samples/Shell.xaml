@@ -22,7 +22,7 @@
         xmlns:infCommands="clr-namespace:Samples.Infrastructure.Commands;assembly=Samples.Infrastructure"
         xmlns:prism="http://www.codeplex.com/CompositeWPF"
         Background="Black"
-        Title="Extended WPF Toolkit - Samples" Height="768" Width="1024" >
+        Title="Extended WPF Toolkit - Samples" Height="768" Width="1050" >
    <Grid>
       <Image Source="/Images/Background.png" Stretch="None" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.RowSpan="2" />
       <Grid Margin="15" >
