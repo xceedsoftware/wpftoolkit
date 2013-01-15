@@ -132,11 +132,23 @@
   <data name="ContainerModelAlreadyRemoved" xml:space="preserve">
     <value>Container model was already removed from children collection.</value>
   </data>
+  <data name="DefaultAnimationRateAnimationRateDefault" xml:space="preserve">
+    <value>The DefaultAnimationRate property cannot be set to AnimationRate.Default.  It must have a valid AnimationRate value.</value>
+  </data>
+  <data name="DefaultAnimatorCantAnimate" xml:space="preserve">
+    <value>The DefaultAnimator cannot actually be used for animation.</value>
+  </data>
+  <data name="DefaultAnimatorIterativeAnimationDefault" xml:space="preserve">
+    <value>The DefaultAnimator property cannot be set to IterativeAnimation.Default.  It must be a valid IterativeAnimator value or null.</value>
+  </data>
   <data name="EndAngleCannotBeSetDirectlyInSlice" xml:space="preserve">
     <value>The EndAngle property cannot be set directly while a Pie's Mode is Slice. You must set the Slice property instead.</value>
   </data>
   <data name="GlassEnabledNeedsFullTrust" xml:space="preserve">
     <value>GlassEnabled can be set only in Full Trust enviornments</value>
+  </data>
+  <data name="InvalidRatePropertyAccessed" xml:space="preserve">
+    <value>Unable to return a {0} value for an AnimationRate value of '{1}'. This AnimationRate is represented as a {2} value.</value>
   </data>
   <data name="ItemMustBeAVisual" xml:space="preserve">
     <value>item must be a Visual</value>
@@ -146,6 +158,12 @@
   </data>
   <data name="MethodNotImplemented" xml:space="preserve">
     <value>The method or operation is not implemented.</value>
+  </data>
+  <data name="NegativeSpeedNotSupported" xml:space="preserve">
+    <value>Speed must be greater than or equal to zero.</value>
+  </data>
+  <data name="NegativeTimeSpanNotSupported" xml:space="preserve">
+    <value>Duration (TimeSpan) must be greater than or equal to zero.</value>
   </data>
   <data name="OperationNotSupported" xml:space="preserve">
     <value>Operation not supported on the platform</value>

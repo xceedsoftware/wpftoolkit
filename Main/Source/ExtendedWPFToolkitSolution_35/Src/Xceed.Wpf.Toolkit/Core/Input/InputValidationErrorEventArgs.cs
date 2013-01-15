@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -28,19 +25,49 @@ namespace Xceed.Wpf.Toolkit.Core.Input
 
   public class InputValidationErrorEventArgs : EventArgs
   {
-    public InputValidationErrorEventArgs( string errorMsg )
+    #region Constructors
+
+    public InputValidationErrorEventArgs( Exception e )
     {
-      _errorMessage = errorMsg;
+      Exception = e;
     }
 
-    public string ErrorMessage
+    #endregion
+
+    #region Exception Property
+
+    public Exception Exception
     {
       get
       {
-        return _errorMessage;
+        return exception;
+      }
+      private set
+      {
+        exception = value;
       }
     }
 
-    private string _errorMessage;
+    private Exception exception;
+
+    #endregion
+
+    #region ThrowException Property
+
+    public bool ThrowException
+    {
+      get
+      {
+        return _throwException;
+      }
+      set
+      {
+        _throwException = value;
+      }
+    }
+
+    private bool _throwException;
+
+    #endregion
   }
 }

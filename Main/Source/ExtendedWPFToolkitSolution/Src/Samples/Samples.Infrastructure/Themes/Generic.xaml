@@ -138,7 +138,7 @@
                   <Grid>
                      <TabControl TabStripPlacement="Top" Style="{StaticResource TabControlStyle}" >
                         <TabItem Header="Sample" Style="{StaticResource TabItemStyle}">
-                           <ScrollViewer VerticalScrollBarVisibility="Auto">
+                           <ScrollViewer VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}">
                               <Grid>
                                  <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>

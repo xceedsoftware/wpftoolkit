@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -23,13 +20,27 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using Xceed.Wpf.Toolkit.Primitives;
+using System.Windows.Media;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
   [TemplatePart( Name = PART_DropDownButton, Type = typeof( ToggleButton ) )]
+  [TemplatePart( Name = PART_ContentPresenter, Type = typeof( ContentPresenter ) )]
+  [TemplatePart( Name = PART_Popup, Type = typeof( Popup ) )]
   public class DropDownButton : ContentControl, ICommandSource
   {
     private const string PART_DropDownButton = "PART_DropDownButton";
+    private const string PART_ContentPresenter = "PART_ContentPresenter";
+    private const string PART_Popup = "PART_Popup";
+
+    #region Members 
+
+    private ContentPresenter _contentPresenter;
+    private Popup _popup;
+
+    #endregion
 
     #region Constructors
 
@@ -136,6 +147,16 @@ namespace Xceed.Wpf.Toolkit
     {
       base.OnApplyTemplate();
       Button = GetTemplateChild( PART_DropDownButton ) as ToggleButton;
+
+      _contentPresenter = GetTemplateChild( PART_ContentPresenter ) as ContentPresenter;
+
+      if( _popup != null )
+        _popup.Opened -= Popup_Opened;
+
+      _popup = GetTemplateChild( PART_Popup ) as Popup;
+
+      if( _popup != null )
+        _popup.Opened += Popup_Opened;
     }
 
     #endregion //Base Class Overrides
@@ -187,19 +208,33 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnKeyDown( object sender, KeyEventArgs e )
     {
-      switch( e.Key )
+      if( !IsOpen )
       {
-        case Key.Escape:
-          {
-            CloseDropDown();
-            break;
-          }
+        if( KeyboardUtilities.IsKeyModifyingPopupState( e ) )
+        {
+          IsOpen = true;
+          // ContentPresenter items will get focus in Popup_Opened().
+          e.Handled = true;
+        }
+      }
+      else
+      {
+        if( KeyboardUtilities.IsKeyModifyingPopupState( e ) )
+        {
+          CloseDropDown( true );
+          e.Handled = true;
+        }
+        else if( e.Key == Key.Escape )
+        {
+          CloseDropDown( true );
+          e.Handled = true;
+        }
       }
     }
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      CloseDropDown();
+      CloseDropDown( false );
     }
 
     private void DropDownButton_Click( object sender, RoutedEventArgs e )
@@ -210,6 +245,26 @@ namespace Xceed.Wpf.Toolkit
     void CanExecuteChanged( object sender, EventArgs e )
     {
       CanExecuteChanged();
+    }
+
+    private void Popup_Opened( object sender, EventArgs e )
+    {
+      // Set the focus on the content of the ContentPresenter
+      if( _contentPresenter != null )
+      {
+        DependencyObject o = _contentPresenter.Content as DependencyObject;
+        while( o != null && ( VisualTreeHelper.GetChildrenCount(o) > 0 ) )
+        {
+          if( o is UIElement )
+          {
+            if( ( ( UIElement )o ).Focusable )
+              break;
+          }
+          o = VisualTreeHelper.GetChild( o, 0 );
+        }
+
+        ( ( UIElement )o ).Focus();
+      }
     }
 
     #endregion //Event Handlers
@@ -234,11 +289,14 @@ namespace Xceed.Wpf.Toolkit
     /// <summary>
     /// Closes the drop down.
     /// </summary>
-    private void CloseDropDown()
+    private void CloseDropDown( bool isFocusOnButton )
     {
       if( IsOpen )
         IsOpen = false;
       ReleaseMouseCapture();
+
+      if( isFocusOnButton )
+        Button.Focus();
     }
 
     protected virtual void OnClick()

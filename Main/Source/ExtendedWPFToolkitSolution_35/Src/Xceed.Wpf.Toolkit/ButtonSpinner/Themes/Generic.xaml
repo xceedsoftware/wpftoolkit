@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************-->
 
@@ -39,38 +36,37 @@
       <Setter Property="Focusable" Value="False" />
       <Setter Property="HorizontalContentAlignment" Value="Stretch" />
       <Setter Property="IsTabStop" Value="True" />
-      <Setter Property="Padding" Value="2" />
+      <Setter Property="Padding" Value="1" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="Template">
          <Setter.Value>
             <ControlTemplate TargetType="{x:Type local:ButtonSpinner}">
-               <Grid SnapsToDevicePixels="True">
-                  <Grid.ColumnDefinitions>
-                     <ColumnDefinition Width="*" />
-                     <ColumnDefinition Width="Auto" />
-                  </Grid.ColumnDefinitions>
+               <Border x:Name="Border" SnapsToDevicePixels="True" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" >
+                  <Grid>
+                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                     </Grid.ColumnDefinitions>
+                     <ContentPresenter Focusable="False" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
 
-                  <Border x:Name="Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Grid.ColumnSpan="2" />
+                     <Grid Grid.Column="1" Visibility="{TemplateBinding ShowButtonSpinner, Converter={StaticResource BooleanToVisibilityConverter}}" Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}">
+                        <Grid.RowDefinitions>
+                           <RowDefinition Height="*" />
+                           <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
 
-                  <ContentPresenter Focusable="False" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-
-                  <Grid Grid.Column="1" Visibility="{TemplateBinding ShowButtonSpinner, Converter={StaticResource BooleanToVisibilityConverter}}" Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}">
-                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                     </Grid.RowDefinitions>
-
-                     <RepeatButton x:Name="PART_IncreaseButton"
+                        <RepeatButton x:Name="PART_IncreaseButton"
                                    Style="{DynamicResource {x:Static themes:ResourceKeys.SpinnerButtonStyleKey}}"
                                    IsTabStop="{TemplateBinding IsTabStop}" ContentTemplate="{StaticResource IncreaseGlyphNormalKey}" />
 
-                     <RepeatButton x:Name="PART_DecreaseButton"
+                        <RepeatButton x:Name="PART_DecreaseButton"
                                    Grid.Row="1"
                                    Style="{DynamicResource {x:Static themes:ResourceKeys.SpinnerButtonStyleKey}}"
                                    IsTabStop="{TemplateBinding IsTabStop}" ContentTemplate="{StaticResource DecreaseGlyphNormalKey}" />
 
+                     </Grid>
                   </Grid>
-               </Grid>
+               </Border>
                <ControlTemplate.Triggers>
                   <Trigger Property="IsEnabled" Value="False">
                      <Setter Property="Background" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlDisabledBackgroundKey}}" />

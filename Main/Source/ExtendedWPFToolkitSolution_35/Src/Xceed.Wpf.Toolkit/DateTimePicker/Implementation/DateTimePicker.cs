@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -21,23 +18,27 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Controls.Primitives;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 #if VS2008
 using Microsoft.Windows.Controls;
 using Microsoft.Windows.Controls.Primitives;
-#else
-using System.Windows.Controls.Primitives;
 #endif
 
 namespace Xceed.Wpf.Toolkit
 {
   [TemplatePart( Name = PART_Calendar, Type = typeof( Calendar ) )]
+  [TemplatePart( Name = PART_Popup, Type = typeof( Popup ) )]
   public class DateTimePicker : DateTimeUpDown
   {
     private const string PART_Calendar = "PART_Calendar";
+    private const string PART_Popup = "PART_Popup";
 
     #region Members
 
     private Calendar _calendar;
+    private Popup _popup;
+    private DateTime? _initialValue;
 
     #endregion //Members
 
@@ -45,7 +46,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region IsOpen
 
-    public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register( "IsOpen", typeof( bool ), typeof( DateTimePicker ), new UIPropertyMetadata( false ) );
+    public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register( "IsOpen", typeof( bool ), typeof( DateTimePicker ), new UIPropertyMetadata( false, OnIsOpenChanged ) );
     public bool IsOpen
     {
       get
@@ -56,6 +57,19 @@ namespace Xceed.Wpf.Toolkit
       {
         SetValue( IsOpenProperty, value );
       }
+    }
+
+    private static void OnIsOpenChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      DateTimePicker dateTimePicker = ( DateTimePicker )d;
+      if( dateTimePicker != null )
+        dateTimePicker.OnIsOpenChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+    }
+
+    private void OnIsOpenChanged( bool oldValue, bool newValue )
+    {
+      if( newValue )
+        _initialValue = Value;
     }
 
     #endregion //IsOpen
@@ -79,7 +93,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region TimeFormatString
 
-    public static readonly DependencyProperty TimeFormatStringProperty = DependencyProperty.Register( "TimeFormatString", typeof( string ), typeof( DateTimePicker ), new UIPropertyMetadata( default( String ) ) );
+    public static readonly DependencyProperty TimeFormatStringProperty = DependencyProperty.Register( "TimeFormatString", typeof( string ), typeof( DateTimePicker ), new UIPropertyMetadata( default( String ) ), IsTimeFormatStringValid );
     public string TimeFormatString
     {
       get
@@ -90,6 +104,11 @@ namespace Xceed.Wpf.Toolkit
       {
         SetValue( TimeFormatStringProperty, value );
       }
+    }
+
+    private static bool IsTimeFormatStringValid(object value)
+    {
+      return DateTimeUpDown.IsFormatStringValid( value );
     }
 
     #endregion //TimeFormatString
@@ -139,7 +158,7 @@ namespace Xceed.Wpf.Toolkit
 
     public DateTimePicker()
     {
-      Keyboard.AddKeyDownHandler( this, OnKeyDown );
+      AddHandler( UIElement.KeyDownEvent, new KeyEventHandler( OnKeyDown ), true );
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );
     }
 
@@ -151,10 +170,16 @@ namespace Xceed.Wpf.Toolkit
     {
       base.OnApplyTemplate();
 
+      if( _popup != null )
+        _popup.Opened -= Popup_Opened;
+
+      _popup = GetTemplateChild( PART_Popup ) as Popup;
+
+      if( _popup != null )
+        _popup.Opened += Popup_Opened;
+
       if( _calendar != null )
-      {
         _calendar.SelectedDatesChanged -= Calendar_SelectedDatesChanged;
-      }
 
       _calendar = GetTemplateChild( PART_Calendar ) as Calendar;
 
@@ -196,45 +221,80 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnKeyDown( object sender, KeyEventArgs e )
     {
-      switch( e.Key )
+      if( !IsOpen )
       {
-        case Key.Escape:
-        case Key.Tab:
+        if( KeyboardUtilities.IsKeyModifyingPopupState( e ) )
+        {
+          IsOpen = true;
+          // Calendar will get focus in Calendar_Loaded().
+          e.Handled = true;
+        }
+      }
+      else
+      {
+        if( _calendar.IsKeyboardFocusWithin )
+        {
+          if( KeyboardUtilities.IsKeyModifyingPopupState( e ) )
           {
-            CloseDateTimePicker();
-            break;
+            CloseDateTimePicker( true );
+            e.Handled = true;
           }
+          else if( e.Key == Key.Enter )
+          {
+            CloseDateTimePicker( true );
+            e.Handled = true;
+          }
+          else if( e.Key == Key.Escape )
+          {
+            Value = _initialValue;
+            CloseDateTimePicker( true );
+            e.Handled = true;
+          }
+        }
       }
     }
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      CloseDateTimePicker();
+      CloseDateTimePicker( false );
     }
 
-    void Calendar_SelectedDatesChanged( object sender, SelectionChangedEventArgs e )
+    private void Calendar_SelectedDatesChanged( object sender, SelectionChangedEventArgs e )
     {
       if( e.AddedItems.Count > 0 )
       {
         var newDate = ( DateTime? )e.AddedItems[ 0 ];
 
-        if( (Value != null) && (newDate != null) && newDate.HasValue )
-          newDate = new DateTime( newDate.Value.Year, newDate.Value.Month, newDate.Value.Day, Value.Value.Hour, Value.Value.Minute, Value.Value.Second );
+        if( ( Value != null ) && ( newDate != null ) && newDate.HasValue )
+        {
+          // Only change the year, month and Day part of the value. Keep everything to the last "tick".
+          // No, "miliseconds" aren't precise enought. Use a mathematical sceme instead
+          newDate = newDate.Value.Date + Value.Value.TimeOfDay;
+        }
 
         if( !object.Equals( newDate, Value ) )
           Value = newDate;
       }
     }
 
+    private void Popup_Opened( object sender, EventArgs e )
+    {
+      if( _calendar != null )
+        _calendar.Focus();
+    }
+
     #endregion //Event Handlers
 
     #region Methods
 
-    private void CloseDateTimePicker()
+    private void CloseDateTimePicker( bool isFocusOnTextBox )
     {
       if( IsOpen )
         IsOpen = false;
       ReleaseMouseCapture();
+
+      if( isFocusOnTextBox && ( TextBox != null ) )
+        TextBox.Focus();
     }
 
     #endregion //Methods

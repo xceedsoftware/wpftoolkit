@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -23,22 +20,28 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Controls.Primitives;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
   [TemplatePart( Name = PART_TimeListItems, Type = typeof( ListBox ) )]
+  [TemplatePart( Name = PART_Popup, Type = typeof( Popup ) )]
   public class TimePicker : Control
   {
     private const string PART_TimeListItems = "PART_TimeListItems";
+    private const string PART_Popup = "PART_Popup";
 
     #region Members
 
-    ListBox _timeListBox;
+    private ListBox _timeListBox;
+    private Popup _popup;
     private DateTimeFormatInfo DateTimeFormatInfo
     {
       get;
       set;
     }
+    private DateTime? _initialValue;
     internal static readonly TimeSpan EndTimeDefaultValue = new TimeSpan( 23, 59, 0 );
     internal static readonly TimeSpan StartTimeDefaultValue = new TimeSpan( 0, 0, 0 );
     internal static readonly TimeSpan TimeIntervalDefaultValue = new TimeSpan( 1, 0, 0 );
@@ -86,19 +89,17 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual TimeSpan OnCoerceEndTime( TimeSpan value )
     {
-      // TODO: Keep the proposed value within the desired range.
+      ValidateTime( value );
       return value;
     }
 
     protected virtual void OnEndTimeChanged( TimeSpan oldValue, TimeSpan newValue )
     {
-      if( _timeListBox != null )
-        _timeListBox.ItemsSource = GenerateTimeListItemsSource();
+      UpdateListBoxItems();
     }
 
     public TimeSpan EndTime
     {
-      // IMPORTANT: To maintain parity between setting a property in XAML and procedural code, do not touch the getter and setter inside this dependency property!
       get
       {
         return ( TimeSpan )GetValue( EndTimeProperty );
@@ -136,14 +137,14 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnFormatChanged( TimeFormat oldValue, TimeFormat newValue )
     {
-
+      UpdateListBoxItems();
     }
 
     #endregion //Format
 
     #region FormatString
 
-    public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register( "FormatString", typeof( string ), typeof( TimePicker ), new UIPropertyMetadata( default( String ), OnFormatStringChanged ) );
+    public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register( "FormatString", typeof( string ), typeof( TimePicker ), new UIPropertyMetadata( default( string ), OnFormatStringChanged ), IsFormatStringValid );
     public string FormatString
     {
       get
@@ -156,6 +157,11 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    internal static bool IsFormatStringValid( object value )
+    {
+      return DateTimeUpDown.IsFormatStringValid( value );
+    }
+
     private static void OnFormatStringChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
       TimePicker timePicker = o as TimePicker;
@@ -165,15 +171,17 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnFormatStringChanged( string oldValue, string newValue )
     {
-      if( string.IsNullOrEmpty( newValue ) )
-        throw new ArgumentException( "CustomFormat should be specified.", FormatString );
+      if( this.Format == TimeFormat.Custom )
+      {
+        UpdateListBoxItems();
+      }
     }
 
     #endregion //FormatString
 
     #region IsOpen
 
-    public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register( "IsOpen", typeof( bool ), typeof( TimePicker ), new UIPropertyMetadata( false ) );
+    public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register( "IsOpen", typeof( bool ), typeof( TimePicker ), new UIPropertyMetadata( false, OnIsOpenChanged ) );
     public bool IsOpen
     {
       get
@@ -184,6 +192,19 @@ namespace Xceed.Wpf.Toolkit
       {
         SetValue( IsOpenProperty, value );
       }
+    }
+
+    private static void OnIsOpenChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      TimePicker timePicker = ( TimePicker )d;
+      if( timePicker != null )
+        timePicker.OnIsOpenChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+    }
+
+    private void OnIsOpenChanged( bool oldValue, bool newValue )
+    {
+      if( newValue )
+        _initialValue = Value;
     }
 
     #endregion //IsOpen
@@ -227,19 +248,17 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual TimeSpan OnCoerceStartTime( TimeSpan value )
     {
-      // TODO: Keep the proposed value within the desired range.
+      ValidateTime( value );
       return value;
     }
 
     protected virtual void OnStartTimeChanged( TimeSpan oldValue, TimeSpan newValue )
     {
-      if( _timeListBox != null )
-        _timeListBox.ItemsSource = GenerateTimeListItemsSource();
+      UpdateListBoxItems();
     }
 
     public TimeSpan StartTime
     {
-      // IMPORTANT: To maintain parity between setting a property in XAML and procedural code, do not touch the getter and setter inside this dependency property!
       get
       {
         return ( TimeSpan )GetValue( StartTimeProperty );
@@ -252,6 +271,24 @@ namespace Xceed.Wpf.Toolkit
 
 
     #endregion //StartTime
+
+    #region TextAlignment
+
+    public static readonly DependencyProperty TextAlignmentProperty = DependencyProperty.Register( "TextAlignment", typeof( TextAlignment ), typeof( TimePicker ), new UIPropertyMetadata( TextAlignment.Left ) );
+    public TextAlignment TextAlignment
+    {
+      get
+      {
+        return ( TextAlignment )GetValue( TextAlignmentProperty );
+      }
+      set
+      {
+        SetValue( TextAlignmentProperty, value );
+      }
+    }
+
+
+    #endregion //TextAlignment
 
     #region TimeInterval
 
@@ -268,6 +305,15 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    private static object OnCoerceTimeInterval( DependencyObject o, object value )
+    {
+      TimePicker timePicker = o as TimePicker;
+      if( timePicker != null )
+        return timePicker.OnCoerceTimeInterval( ( TimeSpan )value );
+      else
+        return value;
+    }
+
     private static void OnTimeIntervalChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
       TimePicker timePicker = o as TimePicker;
@@ -275,10 +321,20 @@ namespace Xceed.Wpf.Toolkit
         timePicker.OnTimeIntervalChanged( ( TimeSpan )e.OldValue, ( TimeSpan )e.NewValue );
     }
 
+    protected virtual TimeSpan OnCoerceTimeInterval( TimeSpan value )
+    {
+      ValidateTime( value );
+
+      if( value.Ticks == 0L )
+        throw new ArgumentException( "TimeInterval must be greater than zero" );
+
+      return value;
+    }
+
+
     protected virtual void OnTimeIntervalChanged( TimeSpan oldValue, TimeSpan newValue )
     {
-      if( _timeListBox != null )
-        _timeListBox.ItemsSource = GenerateTimeListItemsSource();
+      UpdateListBoxItems();
     }
 
     #endregion //TimeInterval
@@ -307,21 +363,7 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnValueChanged( DateTime? oldValue, DateTime? newValue )
     {
-      //TODO: refactor this
-      if( newValue.HasValue && _timeListBox != null )
-      {
-        var items = _timeListBox.ItemsSource;
-        foreach( TimeItem item in items )
-        {
-          if( item.Time == newValue.Value.TimeOfDay )
-          {
-            int index = _timeListBox.Items.IndexOf( item );
-            if( _timeListBox.SelectedIndex != index )
-              _timeListBox.SelectedIndex = index;
-            break;
-          }
-        }
-      }
+      UpdateListBoxSelectedItem();
 
       RoutedPropertyChangedEventArgs<object> args = new RoutedPropertyChangedEventArgs<object>( oldValue, newValue );
       args.RoutedEvent = ValueChangedEvent;
@@ -388,15 +430,28 @@ namespace Xceed.Wpf.Toolkit
     {
       base.OnApplyTemplate();
 
+      if( _popup != null )
+        _popup.Opened -= Popup_Opened;
+
+      _popup = GetTemplateChild( PART_Popup ) as Popup;
+
+      if( _popup != null )
+        _popup.Opened += Popup_Opened;
+
       if( _timeListBox != null )
+      {
         _timeListBox.SelectionChanged -= TimeListBox_SelectionChanged;
+        _timeListBox.MouseUp -= TimeListBox_MouseUp;
+      }
 
       _timeListBox = GetTemplateChild( PART_TimeListItems ) as ListBox;
 
       if( _timeListBox != null )
       {
         _timeListBox.SelectionChanged += TimeListBox_SelectionChanged;
-        _timeListBox.ItemsSource = GenerateTimeListItemsSource();
+        _timeListBox.MouseUp += TimeListBox_MouseUp;
+
+        UpdateListBoxItems();
       }
     }
 
@@ -406,35 +461,74 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnKeyDown( object sender, KeyEventArgs e )
     {
-      switch( e.Key )
+      if( !IsOpen )
       {
-        case Key.Escape:
-        case Key.Tab:
-          {
-            CloseTimePicker();
-            break;
-          }
+        if( KeyboardUtilities.IsKeyModifyingPopupState( e ) )
+        {
+          IsOpen = true;
+          // TimeListBox_Loaded() will focus on ListBoxItem.
+          e.Handled = true;
+        }
+      }
+      else
+      {
+        if( KeyboardUtilities.IsKeyModifyingPopupState( e ) )
+        {
+          CloseTimePicker( true );
+          e.Handled = true;
+        }
+        else if( e.Key == Key.Enter )
+        {
+          CloseTimePicker( true );
+          e.Handled = true;
+        }
+        else if( e.Key == Key.Escape )
+        {
+          Value = _initialValue;
+          CloseTimePicker( true );
+          e.Handled = true;
+        }
       }
     }
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      CloseTimePicker();
+      CloseTimePicker( false );
     }
 
-    void TimeListBox_SelectionChanged( object sender, SelectionChangedEventArgs e )
+    private void TimeListBox_SelectionChanged( object sender, SelectionChangedEventArgs e )
     {
       if( e.AddedItems.Count > 0 )
       {
         TimeItem selectedTimeListItem = ( TimeItem )e.AddedItems[ 0 ];
         var time = selectedTimeListItem.Time;
-        ;
         var date = Value ?? DateTime.MinValue;
 
         Value = new DateTime( date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds );
       }
+    }
 
-      CloseTimePicker();
+    private void TimeListBox_MouseUp( object sender, MouseButtonEventArgs e )
+    {
+       CloseTimePicker( true );
+    }
+
+    private void Popup_Opened( object sender, EventArgs e )
+    {
+      if( _timeListBox != null )
+      {
+        TimeSpan time = ( Value != null ) ? Value.Value.TimeOfDay : StartTimeDefaultValue;
+        TimeItem nearestItem = this.GetNearestTimeItem( time );
+        if( nearestItem != null )
+        {
+          _timeListBox.ScrollIntoView( nearestItem );
+          ListBoxItem listBoxItem = ( ListBoxItem )_timeListBox.ItemContainerGenerator.ContainerFromItem( nearestItem );
+          if( listBoxItem != null )
+          {
+            listBoxItem.Focus();
+          }
+        }
+      }
     }
 
     #endregion //Event Handlers
@@ -459,11 +553,20 @@ namespace Xceed.Wpf.Toolkit
 
     #region Methods
 
-    private void CloseTimePicker()
+    private void ValidateTime( TimeSpan time )
+    {
+      if( time.TotalHours >= 24d )
+        throw new ArgumentException( "Time value cannot be greater than or equal to 24 hours." );
+    }
+
+    private void CloseTimePicker( bool isFocusOnTimePicker )
     {
       if( IsOpen )
         IsOpen = false;
       ReleaseMouseCapture();
+
+      if( isFocusOnTimePicker )
+        Focus();
     }
 
     public IEnumerable GenerateTimeListItemsSource()
@@ -483,11 +586,16 @@ namespace Xceed.Wpf.Toolkit
       {
         while( time <= endTime )
         {
-          yield return new TimeItem( DateTime.MinValue.Add( time ).ToString( GetTimeFormat(), CultureInfo.CurrentCulture ), time );
+          yield return this.CreateTimeItem( time );
           time = time.Add( timeInterval );
         }
         yield break;
       }
+    }
+
+    private TimeItem CreateTimeItem( TimeSpan time )
+    {
+      return new TimeItem( DateTime.MinValue.Add( time ).ToString( GetTimeFormat(), CultureInfo.CurrentCulture ), time );
     }
 
     private string GetTimeFormat()
@@ -503,6 +611,58 @@ namespace Xceed.Wpf.Toolkit
         default:
           return DateTimeFormatInfo.ShortTimePattern;
       }
+    }
+
+    private void UpdateListBoxSelectedItem()
+    {
+      if(_timeListBox != null)
+      {
+        TimeItem time = null;
+        if(Value != null)
+        {
+          time = this.CreateTimeItem( Value.Value.TimeOfDay );
+          if(!_timeListBox.Items.Contains( time ))
+          {
+            time = null;
+          }
+        }
+
+        _timeListBox.SelectedItem = time;
+      }
+    }
+
+    private void UpdateListBoxItems()
+    {
+      if( _timeListBox != null )
+      {
+        _timeListBox.ItemsSource = GenerateTimeListItemsSource();
+      }
+    }
+
+    private TimeItem GetNearestTimeItem(TimeSpan time)
+    {
+      if( _timeListBox != null )
+      {
+        int itemCount = _timeListBox.Items.Count;
+        for( int i = 0; i < itemCount; i++ )
+        {
+          TimeItem timeItem = _timeListBox.Items[ i ] as TimeItem;
+          if( timeItem != null )
+          {
+            if( timeItem.Time >= time )
+              return timeItem;
+          }
+        }
+
+        //They are all less than the searched time. 
+        //Return the last one. (Should also be the greater one.)
+        if( itemCount > 0 )
+        {
+          return _timeListBox.Items[ itemCount - 1 ] as TimeItem;
+        }
+      }
+
+      return null;
     }
 
     #endregion //Methods

@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************-->
 
@@ -115,7 +112,8 @@
 
    <Style TargetType="{x:Type local:TimePicker}">
       <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
-      <Setter Property="Template">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
          <Setter.Value>
             <ControlTemplate TargetType="{x:Type local:TimePicker}">
                <Border>
@@ -136,14 +134,17 @@
                                               ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
                                               Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
                                               Watermark="{TemplateBinding Watermark}"
-                                              WatermarkTemplate="{TemplateBinding WatermarkTemplate}" />
+                                              WatermarkTemplate="{TemplateBinding WatermarkTemplate}" 
+                                              TextAlignment="{TemplateBinding TextAlignment}"/>
                         <ToggleButton x:Name="_timePickerToggleButton"
                                       Grid.Column="1"
+                                      Focusable="False"
                                       IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                       Style="{StaticResource TimePickerToggleButtonStyle}"
                                       IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}" />
                      </Grid>
-                     <Popup IsOpen="{Binding IsChecked, ElementName=_timePickerToggleButton}"
+                     <Popup x:Name="PART_Popup"
+                            IsOpen="{Binding IsChecked, ElementName=_timePickerToggleButton}"
                             StaysOpen="False">
                         <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}">
                            <Grid>

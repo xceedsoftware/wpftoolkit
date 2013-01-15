@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -273,6 +270,13 @@ namespace Xceed.Wpf.DataGrid.Views
 
       base.ProcessMouseLeftButtonDown( e );
 
+      //When the grid is hosted in a popup window, it is not possible to know the position of the popup in certain scenarios (e.g. fullscreen, popup openning upward).
+      //Thus we must use a regular system adorner instead of the ghost window, so that the dragged adorner will appear correctly under the mouse pointer.
+      if( this.ParentWindowIsPopup )
+      {
+        this.SetPopupDragAdorner( e.Source as ColumnManagerCell );
+      }
+
       if( !this.IsAnimatedColumnReorderingEnabled )
       {
         this.AutoScrollInterval = 50;
@@ -315,6 +319,13 @@ namespace Xceed.Wpf.DataGrid.Views
     public override void ProcessMouseLeftButtonUp( MouseButtonEventArgs e )
     {
       base.ProcessMouseLeftButtonUp( e );
+
+      //If in a popup, we are using a system adorner, and we need to hide it when releasing the mouse button.
+      if( this.ParentWindowIsPopup )
+      {
+        m_popupDraggedElementAdorner.AdornedElementImage.Opacity = 0;
+        m_popupDraggedElementAdorner.SetOffset( ColumnReorderingDragSourceManager.EmptyPoint );
+      }
 
       if( !this.IsAnimatedColumnReorderingEnabled )
         return;
@@ -450,10 +461,14 @@ namespace Xceed.Wpf.DataGrid.Views
         dropTargetPosition = null;
       }
 
-      //Flag used to reduce the number of column anitmations, to speed up the scrolling on ColumnManagerCell dragging.
+      //Flag used to reduce the number of column animations, to speed up the scrolling on ColumnManagerCell dragging.
       if( returnedDropTarget == null && this.CurrentDropTarget == null )
       {
         m_noColumnsReorderingNeeded = true;
+        if( this.ParentWindowIsPopup )
+        {
+          m_popupDraggedElementAdorner.AdornedElementImage.Opacity = 0;
+        }
       }
       else
       {
@@ -488,11 +503,23 @@ namespace Xceed.Wpf.DataGrid.Views
 
     protected override void UpdateDraggedElementGhostOnDrag( MouseEventArgs e )
     {
-      //If no animation, or if the dragged object is beyond the edge of the grid,
-      //no need to do anything in this override, simply call base.
-      //This will be suficient to update the DraggedElementGhost positon.
-      //The result is a much faster scrolling of the grid via the CheckForAutoScroll() method.
-      if( this.IsAnimatedColumnReorderingEnabled && !m_noColumnsReorderingNeeded )
+      //If in TableView and the grid is hosted in a Popup window.
+      if( !this.IsAnimatedColumnReorderingEnabled && this.ParentWindowIsPopup )
+      {
+        this.ShowDraggedElementGhost = false;
+
+        Point draggedElementToMouse = e.GetPosition( this.DraggedElement );
+        // Correct it according to initial mouse position over the dragged element
+        draggedElementToMouse.X -= this.InitialMousePositionToDraggedElement.GetValueOrDefault().X;
+        draggedElementToMouse.Y -= this.InitialMousePositionToDraggedElement.GetValueOrDefault().Y;
+
+        this.ApplyContainerClip( m_popupDraggedElementAdorner );
+        m_popupDraggedElementAdorner.AdornedElementImage.Opacity = 1;
+        m_popupDraggedElementAdorner.SetOffset( draggedElementToMouse );
+      }
+      //If no animation, or if the dragged object is beyond the edge of the grid, no need to do anything in this override, simply call base.
+      //This will be suficient to update the DraggedElementGhost positon. The result is a much faster scrolling of the grid via the CheckForAutoScroll() method.
+      else if( this.IsAnimatedColumnReorderingEnabled && !m_noColumnsReorderingNeeded )
       {
         // We are reverting every animation before detaching from the manager
         // so do not update the ghost position
@@ -501,13 +528,10 @@ namespace Xceed.Wpf.DataGrid.Views
           return;
         }
 
-        ColumnManagerCell draggedOverCell = this.CurrentDropTarget as ColumnManagerCell;
-
-        bool dragOverCell = ( draggedOverCell != null );
-        bool dragOverRow = ( this.CurrentDropTarget as ColumnManagerRow ) != null;
+        bool dragOverRowOrCell = ( this.CurrentDropTarget as ColumnManagerRow ) != null || ( this.CurrentDropTarget as ColumnManagerCell ) != null;
 
         // We are dragging over an object that will handle the drop itself
-        if( !( dragOverCell || dragOverRow ) )
+        if( !dragOverRowOrCell && !this.ParentWindowIsPopup )
         {
           // Ensure to pause every other animations before
           this.PauseGhostToMousePositionAnimation();
@@ -518,8 +542,37 @@ namespace Xceed.Wpf.DataGrid.Views
 
           this.MoveGhostToTargetColumn( e.GetPosition( this.DraggedElement ) );
         }
+        //If dragging over an object that will handle the drop itself and the grid is hosted in a Popup window.
+        else if( !dragOverRowOrCell && this.ParentWindowIsPopup )
+        {
+          // Ensure to pause every other animations before
+          this.PauseGhostToMousePositionAnimation();
+          this.PauseDraggedElementFadeInAnimation();
+
+          this.RollbackReordering();
+          this.ShowDraggedElementGhost = false;
+
+          this.MoveGhostToTargetColumn( e.GetPosition( this.DraggedElement ) );
+
+          Point draggedElementToMouse = e.GetPosition( this.DraggedElement );
+          // Correct it according to initial mouse position over the dragged element
+          draggedElementToMouse.X -= this.InitialMousePositionToDraggedElement.GetValueOrDefault().X;
+          draggedElementToMouse.Y -= this.InitialMousePositionToDraggedElement.GetValueOrDefault().Y;
+
+          this.ApplyContainerClip( m_popupDraggedElementAdorner );
+          m_popupDraggedElementAdorner.AdornedElementImage.Opacity = 1;
+          m_popupDraggedElementAdorner.SetOffset( draggedElementToMouse );
+        }
+        //If animations are required.
         else
         {
+          //If in a popup, hide the dragged element adorner.
+          if( this.ParentWindowIsPopup )
+          {
+            m_popupDraggedElementAdorner.AdornedElementImage.Opacity = 0;
+            m_popupDraggedElementAdorner.SetOffset( ColumnReorderingDragSourceManager.EmptyPoint );
+          }
+
           // Pause animations that are moving ghosts to target Column
           this.PauseMoveGhostToTargetColumnAnimation();
           this.PauseDraggedElementFadeInAnimation();
@@ -602,6 +655,42 @@ namespace Xceed.Wpf.DataGrid.Views
       this.CommitSplitterReordering( reorderingInfoManager.InitialColumnVisiblePosition,
         animationState.DraggedColumnNewVisiblePosition,
         reorderingInfoManager.InitialFixedColumnCount );
+    }
+
+    private void SetPopupDragAdorner( ColumnManagerCell columnManagerCell )
+    {
+      if( columnManagerCell == null )
+        return;
+
+      if( m_popupDraggedElementAdorner != null )
+      {
+        this.AdornerLayerInsideDragContainer.Remove( m_popupDraggedElementAdorner );
+        m_popupDraggedElementAdorner = null;
+      }
+
+      // Get the Rect for the DataGridControl
+      DataGridControl dataGridControl = this.DraggedDataGridContext.DataGridControl;
+
+      Rect dataGridControlRect = new Rect( 0, 0, dataGridControl.ActualWidth, dataGridControl.ActualHeight );
+
+      Point elementToDataGridControl = columnManagerCell.TranslatePoint( ColumnReorderingDragSourceManager.EmptyPoint, dataGridControl );
+
+      // Get the Rect for the element that request a ghost
+      Rect elementRect = new Rect( elementToDataGridControl, columnManagerCell.RenderSize );
+
+      // This is a special case with the current Element that is always be layouted, but can be out of view
+      if( !elementRect.IntersectsWith( dataGridControlRect ) )
+        return;
+
+      AnimatedDraggedElementAdorner adorner = new AnimatedDraggedElementAdorner( columnManagerCell, this.AdornerLayerInsideDragContainer, true );
+
+      adorner.AdornedElementImage.Opacity = 0;
+
+      this.ApplyContainerClip( adorner );
+
+      this.AdornerLayerInsideDragContainer.Add( adorner );
+
+      m_popupDraggedElementAdorner = adorner;
     }
 
     private static IDropTarget GetDropTargetAtPoint( UIElement dragContainer, UIElement draggedElement, Point point )
@@ -1725,6 +1814,12 @@ namespace Xceed.Wpf.DataGrid.Views
       }
 
       m_elementToDraggedElementAdorner.Clear();
+
+      if( m_popupDraggedElementAdorner != null )
+      {
+        this.AdornerLayerInsideDragContainer.Remove( m_popupDraggedElementAdorner );
+        m_popupDraggedElementAdorner = null;
+      }
     }
 
     private void ShowDraggedColumnGhosts()
@@ -1846,6 +1941,7 @@ namespace Xceed.Wpf.DataGrid.Views
     private Dictionary<AnimationClock, string> m_clockToFieldName = new Dictionary<AnimationClock, string>();
 
     private Dictionary<UIElement, DraggedElementAdorner> m_elementToDraggedElementAdorner = new Dictionary<UIElement, DraggedElementAdorner>();
+    private DraggedElementAdorner m_popupDraggedElementAdorner;
 
     private HorizontalMouseDragDirection m_horizontalMouseDragDirection = HorizontalMouseDragDirection.None;
 

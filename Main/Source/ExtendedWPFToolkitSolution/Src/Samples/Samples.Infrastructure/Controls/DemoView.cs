@@ -90,6 +90,19 @@ namespace Samples.Infrastructure.Controls
       }
     }
 
+    public static readonly DependencyProperty VerticalScrollBarVisibilityProperty = DependencyProperty.Register( "VerticalScrollBarVisibility", typeof( ScrollBarVisibility ), typeof( DemoView ), new UIPropertyMetadata( ScrollBarVisibility.Auto ) );
+    public ScrollBarVisibility VerticalScrollBarVisibility
+    {
+      get 
+      { 
+        return ( ScrollBarVisibility )GetValue( VerticalScrollBarVisibilityProperty ); 
+      }
+      set 
+      { 
+        SetValue( VerticalScrollBarVisibilityProperty, value ); 
+      }
+    }
+
     #endregion //Properties
 
     #region Constructors
@@ -112,14 +125,14 @@ namespace Samples.Infrastructure.Controls
     {
       base.OnContentChanged( oldContent, newContent );
       //the parent of the content will be the View
-      ResolveContentCode( ( newContent as FrameworkElement ).Parent );
+      UpdateContentCode( ( newContent as FrameworkElement ).Parent );
     }
 
     #endregion //Base Class Overrides
 
     #region Methods
 
-    private void ResolveContentCode( object newContent )
+    private void UpdateContentCode( object newContent )
     {
       //get the type of the content loaded in the ContentRegion
       var type = newContent.GetType();

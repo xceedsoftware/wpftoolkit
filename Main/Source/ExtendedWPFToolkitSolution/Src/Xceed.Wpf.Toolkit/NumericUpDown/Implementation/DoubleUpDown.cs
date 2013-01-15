@@ -7,18 +7,17 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
 using System;
 using System.Windows;
+using System.Globalization;
+using System.IO;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -28,17 +27,59 @@ namespace Xceed.Wpf.Toolkit
 
     static DoubleUpDown()
     {
-      UpdateMetadata( typeof( DoubleUpDown ), default( double ), 1d, double.MinValue, double.MaxValue );
+      UpdateMetadata( typeof( DoubleUpDown ), 1d, double.NegativeInfinity, double.PositiveInfinity );
     }
 
     public DoubleUpDown()
-      : base( Double.Parse, Decimal.ToDouble )
+      : base( Double.Parse, Decimal.ToDouble, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
     {
     }
 
     #endregion //Constructors
 
+    #region Properties
+
+
+    #region AllowInputSpecialValues
+
+    public static readonly DependencyProperty AllowInputSpecialValuesProperty =
+        DependencyProperty.Register( "AllowInputSpecialValues", typeof( AllowedSpecialValues ), typeof( DoubleUpDown ), new UIPropertyMetadata( AllowedSpecialValues.None ) );
+
+    public AllowedSpecialValues AllowInputSpecialValues
+    {
+      get { return ( AllowedSpecialValues )GetValue( AllowInputSpecialValuesProperty ); }
+      set { SetValue( AllowInputSpecialValuesProperty, value ); }
+    }
+
+    #endregion //AllowInputSpecialValues
+
+    #endregion
+
     #region Base Class Overrides
+
+    protected override double? OnCoerceIncrement( double? baseValue )
+    {
+      if( baseValue.HasValue && double.IsNaN( baseValue.Value ) )
+        throw new ArgumentException( "NaN is invalid for Increment." );
+
+      return base.OnCoerceIncrement( baseValue );
+    }
+
+    protected override double? OnCoerceMaximum( double? baseValue )
+    {
+      if( baseValue.HasValue && double.IsNaN( baseValue.Value ) )
+        throw new ArgumentException( "NaN is invalid for Maximum." );
+
+      return base.OnCoerceMaximum( baseValue );
+    }
+
+    protected override double? OnCoerceMinimum( double? baseValue )
+    {
+      if( baseValue.HasValue && double.IsNaN( baseValue.Value ) )
+        throw new ArgumentException( "NaN is for Minimum." );
+
+      return base.OnCoerceMinimum( baseValue );
+    }
 
     protected override double IncrementValue( double value, double increment )
     {
@@ -50,6 +91,34 @@ namespace Xceed.Wpf.Toolkit
       return value - increment;
     }
 
-    #endregion //Base Class Overrides
+    protected override void SetValidSpinDirection()
+    {
+      if( Value.HasValue && double.IsInfinity( Value.Value ) && ( Spinner != null ) )
+      {
+        Spinner.ValidSpinDirection = ValidSpinDirections.None;
+      }
+      else
+      {
+        base.SetValidSpinDirection();
+      }
+    }
+
+    protected override double? ConvertTextToValue( string text )
+    {
+      double? result = base.ConvertTextToValue( text );
+      if( result != null )
+      {
+        if( double.IsNaN( result.Value ) )
+          TestInputSpecialValue( this.AllowInputSpecialValues, AllowedSpecialValues.NaN );
+        else if( double.IsPositiveInfinity( result.Value ) )
+          TestInputSpecialValue( this.AllowInputSpecialValues, AllowedSpecialValues.PositiveInfinity );
+        else if( double.IsNegativeInfinity( result.Value ) )
+          TestInputSpecialValue( this.AllowInputSpecialValues, AllowedSpecialValues.NegativeInfinity );
+      }
+
+      return result;
+    }
+
+    #endregion
   }
 }

@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -27,23 +24,6 @@ namespace Xceed.Wpf.Toolkit
   public abstract class NumericUpDown<T> : UpDownBase<T>
   {
     #region Properties
-
-    #region DefaultValue
-
-    public static readonly DependencyProperty DefaultValueProperty = DependencyProperty.Register( "DefaultValue", typeof( T ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( default( T ) ) );
-    public T DefaultValue
-    {
-      get
-      {
-        return ( T )GetValue( DefaultValueProperty );
-      }
-      set
-      {
-        SetValue( DefaultValueProperty, value );
-      }
-    }
-
-    #endregion //DefaultValue
 
     #region FormatString
 
@@ -70,14 +50,16 @@ namespace Xceed.Wpf.Toolkit
     protected virtual void OnFormatStringChanged( string oldValue, string newValue )
     {
       if( IsInitialized )
-        Text = ConvertValueToText();
+      {
+        this.SyncTextAndValueProperties( false, null );
+      }
     }
 
     #endregion //FormatString
 
     #region Increment
 
-    public static readonly DependencyProperty IncrementProperty = DependencyProperty.Register( "Increment", typeof( T ), typeof( NumericUpDown<T> ), new PropertyMetadata( default( T ) ) );
+    public static readonly DependencyProperty IncrementProperty = DependencyProperty.Register( "Increment", typeof( T ), typeof( NumericUpDown<T> ), new PropertyMetadata( default( T ), OnIncrementChanged, OnCoerceIncrement ) );
     public T Increment
     {
       get
@@ -90,11 +72,40 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    private static void OnIncrementChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      NumericUpDown<T> numericUpDown = o as NumericUpDown<T>;
+      if( numericUpDown != null )
+        numericUpDown.OnIncrementChanged( ( T )e.OldValue, ( T )e.NewValue );
+    }
+
+    protected virtual void OnIncrementChanged( T oldValue, T newValue )
+    {
+      if( this.IsInitialized )
+      {
+        SetValidSpinDirection();
+      }
+    }
+
+    private static object OnCoerceIncrement( DependencyObject d, object baseValue )
+    {
+      NumericUpDown<T> numericUpDown = d as NumericUpDown<T>;
+      if( numericUpDown != null )
+        return numericUpDown.OnCoerceIncrement( ( T )baseValue );
+
+      return baseValue;
+    }
+
+    protected virtual T OnCoerceIncrement( T baseValue )
+    {
+      return baseValue;
+    }
+
     #endregion
 
     #region Maximum
 
-    public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register( "Maximum", typeof( T ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( default( T ), OnMaximumChanged ) );
+    public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register( "Maximum", typeof( T ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( default( T ), OnMaximumChanged, OnCoerceMaximum ) );
     public T Maximum
     {
       get
@@ -116,14 +127,31 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnMaximumChanged( T oldValue, T newValue )
     {
-      SetValidSpinDirection();
+      if( this.IsInitialized )
+      {
+        SetValidSpinDirection();
+      }
+    }
+
+    private static object OnCoerceMaximum( DependencyObject d, object baseValue )
+    {
+      NumericUpDown<T> numericUpDown = d as NumericUpDown<T>;
+      if( numericUpDown != null )
+        return numericUpDown.OnCoerceMaximum( ( T )baseValue );
+
+      return baseValue;
+    }
+
+    protected virtual T OnCoerceMaximum( T baseValue )
+    {
+      return baseValue;
     }
 
     #endregion //Maximum
 
     #region Minimum
 
-    public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register( "Minimum", typeof( T ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( default( T ), OnMinimumChanged ) );
+    public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register( "Minimum", typeof( T ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( default( T ), OnMinimumChanged, OnCoerceMinimum ) );
     public T Minimum
     {
       get
@@ -145,14 +173,31 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnMinimumChanged( T oldValue, T newValue )
     {
-      SetValidSpinDirection();
+      if( this.IsInitialized )
+      {
+        SetValidSpinDirection();
+      }
+    }
+
+    private static object OnCoerceMinimum( DependencyObject d, object baseValue )
+    {
+      NumericUpDown<T> numericUpDown = d as NumericUpDown<T>;
+      if( numericUpDown != null )
+        return numericUpDown.OnCoerceMinimum( ( T )baseValue );
+
+      return baseValue;
+    }
+
+    protected virtual T OnCoerceMinimum( T baseValue )
+    {
+      return baseValue;
     }
 
     #endregion //Minimum
 
     #region SelectAllOnGotFocus
 
-    public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register( "SelectAllOnGotFocus", typeof( bool ), typeof( NumericUpDown<T> ), new PropertyMetadata( false ) );
+    public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register( "SelectAllOnGotFocus", typeof( bool ), typeof( NumericUpDown<T> ), new PropertyMetadata( true ) );
     public bool SelectAllOnGotFocus
     {
       get

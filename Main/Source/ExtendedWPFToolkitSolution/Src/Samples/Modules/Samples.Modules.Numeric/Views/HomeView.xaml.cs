@@ -19,6 +19,9 @@
 
 using Microsoft.Practices.Prism.Regions;
 using Samples.Infrastructure.Controls;
+using System.Collections.Generic;
+using System.Globalization;
+using System;
 
 namespace Samples.Modules.Numeric.Views
 {
@@ -30,7 +33,36 @@ namespace Samples.Modules.Numeric.Views
   {
     public HomeView()
     {
+      this.Cultures = new List<CultureInfo>() { new CultureInfo( "en-US" ),
+                                                new CultureInfo("en-GB"),
+                                                new CultureInfo("fr-FR"),
+                                                new CultureInfo("ar-DZ"),
+                                                new CultureInfo("zh-CN"),
+                                                new CultureInfo("cs-CZ") };
+
       InitializeComponent();
+    }
+
+    public List<CultureInfo> Cultures
+    {
+      get;
+      private set;
+    }
+  }
+
+
+  public class FormatObject
+  {
+    public string Value
+    {
+      get;
+      set;
+    }
+
+    public string DisplayValue
+    {
+      get;
+      set;
     }
   }
 }

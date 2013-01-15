@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************-->
 
@@ -110,7 +107,7 @@
                                           ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
                         <local:WatermarkTextBox x:Name="PART_TextBox"
                                                 BorderThickness="0" 
-                                                Background="Transparent"
+                                                Background="{TemplateBinding Background}"
                                                 ContextMenu="{TemplateBinding ContextMenu}"
                                                 FontFamily="{TemplateBinding FontFamily}" 
                                                 FontSize="{TemplateBinding FontSize}" 
@@ -123,15 +120,17 @@
                                                 MinWidth="20"
                                                 AcceptsReturn="False"
                                                 Padding="0"
+                                                SelectAllOnGotFocus="{TemplateBinding SelectAllOnGotFocus}"
                                                 TextAlignment="{TemplateBinding TextAlignment}"
                                                 TextWrapping="NoWrap" 
                                                 TabIndex="{TemplateBinding TabIndex}"
-                                                Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
+                                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                                 Watermark="{TemplateBinding Watermark}"
                                                 WatermarkTemplate="{TemplateBinding WatermarkTemplate}" />
                      </local:ButtonSpinner>
                      <ToggleButton x:Name="_calculatorToggleButton"
                                    Grid.Column="1"
+                                   Focusable="False"
                                    IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                    Style="{StaticResource CalculatorToggleButtonStyle}"
                                    IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}" />

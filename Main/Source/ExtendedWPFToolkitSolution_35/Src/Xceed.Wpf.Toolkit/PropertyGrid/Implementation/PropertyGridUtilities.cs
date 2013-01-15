@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -27,6 +24,11 @@ using System.Windows.Data;
 using System.Windows.Media;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
+using System.Linq.Expressions;
+using System.Windows.Input;
+using Xceed.Wpf.Toolkit.Core.Utilities;
+using Xceed.Wpf.Toolkit.PropertyGrid.Implementation;
+using System.Windows.Controls;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -36,6 +38,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       return property.Attributes.OfType<T>().FirstOrDefault();
     }
+
+
+
+
+
+
+
 
 
     internal static string GetDefaultPropertyName( object instance )
@@ -52,7 +61,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       TypeConverter tc = TypeDescriptor.GetConverter( instance );
       if( tc == null || !tc.GetPropertiesSupported() )
       {
-
         if( instance is ICustomTypeDescriptor )
           descriptors = ( ( ICustomTypeDescriptor )instance ).GetProperties();
         else
@@ -66,144 +74,130 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return descriptors;
     }
 
+
+
+
+
+
+
+
+
     internal static PropertyItem CreatePropertyItem( PropertyDescriptor property, IPropertyParent propertyParent )
     {
-      return CreatePropertyItem( property, propertyParent, 0 );
-    }
-
-    internal static PropertyItem CreatePropertyItem( PropertyDescriptor property, IPropertyParent propertyParent, int level )
-    {
-      PropertyItem propertyItem = new PropertyItem( property, propertyParent, level );
-
-      var binding = new Binding( property.Name )
-      {
-        Source = propertyParent.ValueInstance,
-        ValidatesOnExceptions = true,
-        ValidatesOnDataErrors = true,
-        Mode = propertyItem.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay
-      };
-      propertyItem.SetBinding( PropertyItem.ValueProperty, binding );
-
-      propertyItem.Editor = PropertyGridUtilities.GetTypeEditor( propertyItem, propertyParent.EditorDefinitions );
+      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property, propertyParent );
+      definition.InitProperties();
+      PropertyItem propertyItem = new PropertyItem();
+      propertyItem.PropertyDescriptor = property;
+      propertyItem.Instance = propertyParent.ValueInstance;
+      PropertyGridUtilities.InitializePropertyItem( propertyItem, definition );
       return propertyItem;
     }
 
-    internal static FrameworkElement GetTypeEditor( 
+    internal static PropertyItem CreatePropertyItem( IPropertyDefinition pd )
+    {
+      PropertyItem propertyItem = new PropertyItem();
+
+      var descriptorBase = pd as DescriptorPropertyDefinitionBase;
+      propertyItem.PropertyDescriptor = ( descriptorBase != null ) ? descriptorBase.GetPropertyDescriptor() : null;
+      propertyItem.Instance = ( descriptorBase != null ) ? descriptorBase.PropertyParent.ValueInstance : null;
+      PropertyGridUtilities.InitializePropertyItem( propertyItem, pd );
+      return propertyItem;
+    }
+
+    private static void InitializePropertyItem( PropertyItem propertyItem, IPropertyDefinition pd )
+    {
+      propertyItem.ChildrenDefinitions = pd.ChildrenDefinitions;
+
+
+      // Assign a shorter name, for code clarity only.
+      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.DisplayNameProperty, pd, () => pd.DisplayName );
+      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.DescriptionProperty, pd, () => pd.Description );
+      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.CategoryProperty, pd, () => pd.Category );
+      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.PropertyOrderProperty, pd, () => pd.DisplayOrder );
+      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.AdvancedOptionsIconProperty, pd, () => pd.AdvancedOptionsIcon );
+      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.AdvancedOptionsTooltipProperty, pd, () => pd.AdvancedOptionsTooltip );
+      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.IsExpandableProperty, pd, () => pd.IsExpandable );
+
+      Binding valueBinding = new Binding( "Value" )
+      {
+        Source = pd,
+        Mode = BindingMode.TwoWay
+      };
+      propertyItem.SetBinding( PropertyItem.ValueProperty, valueBinding );
+
+      propertyItem.Editor = pd.GenerateEditorElement( propertyItem );
+
+      if( pd.CommandBindings != null )
+      {
+        foreach( CommandBinding commandBinding in pd.CommandBindings )
+        {
+          propertyItem.CommandBindings.Add( commandBinding );
+        }
+      }
+    }
+
+    private static void SetupDefinitionBinding<T>( 
       PropertyItem propertyItem, 
-      EditorDefinitionCollection editorDefinitions )
+      DependencyProperty itemProperty, 
+      IPropertyDefinition pd,
+      Expression<Func<T>> definitionProperty )
     {
-      FrameworkElement editor = null;
-
-      //first check for an attribute editor
-      if( editor == null )
-        editor = PropertyGridUtilities.GetAttibuteEditor( propertyItem );
-
-      //now look for a custom editor based on editor definitions
-      if( editor == null )
-        editor = PropertyGridUtilities.GetCustomEditor( propertyItem, editorDefinitions );
-
-      //guess we have to use the default editor
-      if( editor == null )
-        editor = PropertyGridUtilities.CreateDefaultEditor( propertyItem );
-
-      editor.IsEnabled = !propertyItem.PropertyParent.IsReadOnly;
-      return editor;
-    }
-
-    internal static FrameworkElement GetAttibuteEditor( PropertyItem propertyItem )
-    {
-      FrameworkElement editor = null;
-
-      var itemsSourceAttribute = GetAttribute<ItemsSourceAttribute>( propertyItem.PropertyDescriptor );
-      if( itemsSourceAttribute != null )
-        editor = new ItemsSourceAttributeEditor( itemsSourceAttribute ).ResolveEditor( propertyItem );
-
-      var editorAttribute = GetAttribute<EditorAttribute>( propertyItem.PropertyDescriptor );
-      if( editorAttribute != null )
+      string sourceProperty = ReflectionHelper.GetPropertyOrFieldName( definitionProperty );
+      Binding binding = new Binding( sourceProperty )
       {
-        Type type = Type.GetType( editorAttribute.EditorTypeName );
-        var instance = Activator.CreateInstance( type );
-        if( instance is ITypeEditor )
-          editor = ( instance as ITypeEditor ).ResolveEditor( propertyItem );
-      }
+        Source = pd,
+        Mode = BindingMode.OneWay
+      };
 
-      return editor;
+      propertyItem.SetBinding( itemProperty, binding );
     }
 
-    internal static FrameworkElement GetCustomEditor( PropertyItem propertyItem, EditorDefinitionCollection customTypeEditors )
-    {
-      FrameworkElement editor = null;
-
-      //check for custom editor
-      if( (customTypeEditors != null) && (customTypeEditors.Count > 0) )
-      {
-        //first check if the custom editor is type based
-        EditorDefinition customEditor = customTypeEditors[ propertyItem.PropertyType ];
-        if( customEditor == null )
-        {
-          //must be property based
-          customEditor = customTypeEditors[ propertyItem.Name ];
-        }
-
-        if( customEditor != null )
-        {
-          if( customEditor.EditorTemplate != null )
-            editor = customEditor.EditorTemplate.LoadContent() as FrameworkElement;
-        }
-      }
-
-      return editor;
-    }
-
-    internal static FrameworkElement CreateDefaultEditor( PropertyItem propertyItem )
+    internal static ITypeEditor CreateDefaultEditor( Type propertyType, TypeConverter typeConverter )
     {
       ITypeEditor editor = null;
 
-
-      if( propertyItem.IsReadOnly )
-        editor = new TextBlockEditor();
-      else if( propertyItem.PropertyType == typeof( bool ) || propertyItem.PropertyType == typeof( bool? ) )
+      if( propertyType == typeof( bool ) || propertyType == typeof( bool? ) )
         editor = new CheckBoxEditor();
-      else if( propertyItem.PropertyType == typeof( decimal ) || propertyItem.PropertyType == typeof( decimal? ) )
+      else if( propertyType == typeof( decimal ) || propertyType == typeof( decimal? ) )
         editor = new DecimalUpDownEditor();
-      else if( propertyItem.PropertyType == typeof( double ) || propertyItem.PropertyType == typeof( double? ) )
+      else if( propertyType == typeof( double ) || propertyType == typeof( double? ) )
         editor = new DoubleUpDownEditor();
-      else if( propertyItem.PropertyType == typeof( int ) || propertyItem.PropertyType == typeof( int? ) )
+      else if( propertyType == typeof( int ) || propertyType == typeof( int? ) )
         editor = new IntegerUpDownEditor();
-      else if( propertyItem.PropertyType == typeof( short ) || propertyItem.PropertyType == typeof( short? ) )
+      else if( propertyType == typeof( short ) || propertyType == typeof( short? ) )
         editor = new ShortUpDownEditor();
-      else if( propertyItem.PropertyType == typeof( long ) || propertyItem.PropertyType == typeof( long? ) )
+      else if( propertyType == typeof( long ) || propertyType == typeof( long? ) )
         editor = new LongUpDownEditor();
-      else if( propertyItem.PropertyType == typeof( float ) || propertyItem.PropertyType == typeof( float? ) )
+      else if( propertyType == typeof( float ) || propertyType == typeof( float? ) )
         editor = new SingleUpDownEditor();
-      else if( propertyItem.PropertyType == typeof( byte ) || propertyItem.PropertyType == typeof( byte? ) )
+      else if( propertyType == typeof( byte ) || propertyType == typeof( byte? ) )
         editor = new ByteUpDownEditor();
-      else if( propertyItem.PropertyType == typeof( sbyte ) || propertyItem.PropertyType == typeof( sbyte? ) )
+      else if( propertyType == typeof( sbyte ) || propertyType == typeof( sbyte? ) )
         editor = new UpDownEditor<SByteUpDown,sbyte?>();
-      else if( propertyItem.PropertyType == typeof( uint ) || propertyItem.PropertyType == typeof( uint? ) )
+      else if( propertyType == typeof( uint ) || propertyType == typeof( uint? ) )
         editor = new UpDownEditor<UIntegerUpDown, uint?>();
-      else if( propertyItem.PropertyType == typeof( ulong ) || propertyItem.PropertyType == typeof( ulong? ) )
+      else if( propertyType == typeof( ulong ) || propertyType == typeof( ulong? ) )
         editor = new UpDownEditor<ULongUpDown, ulong?>();
-      else if( propertyItem.PropertyType == typeof( ushort ) || propertyItem.PropertyType == typeof( ushort? ) )
+      else if( propertyType == typeof( ushort ) || propertyType == typeof( ushort? ) )
         editor = new UpDownEditor<UShortUpDown, ushort?>();
-      else if( propertyItem.PropertyType == typeof( DateTime ) || propertyItem.PropertyType == typeof( DateTime? ) )
+      else if( propertyType == typeof( DateTime ) || propertyType == typeof( DateTime? ) )
         editor = new DateTimeUpDownEditor();
-      else if( ( propertyItem.PropertyType == typeof( Color ) ) )
+      else if( ( propertyType == typeof( Color ) ) )
         editor = new ColorEditor();
-      else if( propertyItem.PropertyType.IsEnum )
+      else if( propertyType.IsEnum )
         editor = new EnumComboBoxEditor();
-      else if( propertyItem.PropertyType == typeof( TimeSpan ) )
+      else if( propertyType == typeof( TimeSpan ) )
         editor = new TimeSpanEditor();
-      else if( propertyItem.PropertyType == typeof( FontFamily ) || propertyItem.PropertyType == typeof( FontWeight ) || propertyItem.PropertyType == typeof( FontStyle ) || propertyItem.PropertyType == typeof( FontStretch ) )
+      else if( propertyType == typeof( FontFamily ) || propertyType == typeof( FontWeight ) || propertyType == typeof( FontStyle ) || propertyType == typeof( FontStretch ) )
         editor = new FontComboBoxEditor();
-      else if( propertyItem.PropertyType == typeof( object ) )
+      else if( propertyType == typeof( object ) )
         // If any type of object is possible in the property, default to the TextBoxEditor.
         // Useful in some case (e.g., Button.Content).
         // Can be reconsidered but was the legacy behavior on the PropertyGrid.
         editor = new TextBoxEditor();
       else
       {
-        Type listType = CollectionEditor.GetListItemType( propertyItem.PropertyType );
+        Type listType = CollectionControl.GetListItemType( propertyType );
 
         if( listType != null )
         {
@@ -217,14 +211,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           // If the type is not supported, check if there is a converter that supports
           // string conversion to the object type. Use TextBox in theses cases.
           // Otherwise, return a TextBlock editor since no valid editor exists.
-          TypeConverter typeConverter = propertyItem.PropertyDescriptor.Converter;
           editor = ( typeConverter != null && typeConverter.CanConvertFrom( typeof( string ) ) )
             ? ( ITypeEditor )new TextBoxEditor()
             : ( ITypeEditor )new TextBlockEditor();
         }
       }
 
-      return editor.ResolveEditor( propertyItem );
+      return editor;
     }
   }
 }

@@ -21,7 +21,49 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:sample="clr-namespace:Samples.Infrastructure.Controls;assembly=Samples.Infrastructure"
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-                 Title="Numeric Controls">
+                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                 xmlns:local="clr-namespace:Samples.Modules.Numeric.Views"
+                 Title="Numeric Controls"
+                 x:Name="_demo">
+    <sample:DemoView.Resources>
+        <x:Array x:Key="FormatStringComboBox" Type="local:FormatObject">
+            <local:FormatObject Value="C2" DisplayValue="Currency" />
+            <local:FormatObject Value="F2" DisplayValue="Fixed Point" />
+            <local:FormatObject Value="G" DisplayValue="General" />
+            <local:FormatObject Value="N" DisplayValue="Number" />
+            <local:FormatObject Value="P2" DisplayValue="Percent" />
+        </x:Array>
+
+        <DataTemplate x:Key="FormatStringItemTemplate">
+            <TextBlock Text="{Binding DisplayValue}" />
+        </DataTemplate>
+
+        <ObjectDataProvider x:Key="AllowInputSpecialValuesComboBox" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="xctk:AllowedSpecialValues" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
+        <ObjectDataProvider x:Key="ParsingNumberStyleComboBox" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="sys:Globalization.NumberStyles" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
+        <Style x:Key="ControlInError" TargetType="Control">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self},
+                            Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <sys:String x:Key="allowInputSpecialValuesTooltip">Infinity and -Infinity input will not be accepted if Maximum and/or Minimum values does not allow them.</sys:String>
+        <sys:String x:Key="parsingNumberStyleTooltip">HexNumber is not a valid choice when used with a DoubleUpDown (current control used in this sample). It will work with the following controls: IntegerUpDown, ByteUpDown, LongUpDown, and ShortUpDown.</sys:String>
+
+    </sample:DemoView.Resources>
+
    <StackPanel>
       <RichTextBox IsReadOnly="True" BorderThickness="0">
          <FlowDocument>
@@ -47,44 +89,87 @@
                        <RowDefinition Height="Auto" />
                        <RowDefinition Height="Auto" />
                        <RowDefinition Height="Auto" />
-                   </Grid.RowDefinitions>
+                       <RowDefinition Height="Auto" />
+                       <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
                    <Grid.ColumnDefinitions>
                        <ColumnDefinition Width="Auto" />
-                       <ColumnDefinition Width="*" />
-                       <ColumnDefinition Width="*" />
-                       <ColumnDefinition Width="*" />
+                       <ColumnDefinition Width="Auto" />
+                       <ColumnDefinition Width="Auto" />
+                       <ColumnDefinition Width="Auto" />
+                       <ColumnDefinition Width="Auto" />
+                       <ColumnDefinition Width="Auto" />
                    </Grid.ColumnDefinitions>
-                   <TextBlock Text="FormatString:" VerticalAlignment="Center" />
-                   <ComboBox x:Name="_formatString" SelectedIndex="0" Grid.Column="1" Width="150" Margin="5">
-                       <ComboBoxItem Tag="C2">Currency</ComboBoxItem>
-                       <ComboBoxItem Tag="F2">Fixed Point</ComboBoxItem>
-                       <ComboBoxItem Tag="G">General</ComboBoxItem>
-                       <ComboBoxItem Tag="N">Number</ComboBoxItem>
-                       <ComboBoxItem Tag="P2">Percent</ComboBoxItem>
-                   </ComboBox>
-                   <TextBlock Text="Watermark:" Grid.Row="1" VerticalAlignment="Center" />
-                   <TextBox x:Name="_watermark" Grid.Row="1" Grid.Column="1" Width="150" Margin="5" Text="Enter Value" />
+
+                   <!-- 1st column -->
+                   <TextBlock Text="Allow Input Special Values:" VerticalAlignment="Center" />
+                   <ComboBox Grid.Column="1" ItemsSource="{Binding Source={StaticResource AllowInputSpecialValuesComboBox}}" SelectedValue="{Binding AllowInputSpecialValues, ElementName=_doubleUpDown}" ToolTip="{StaticResource allowInputSpecialValuesTooltip}" Margin="5" Width="108"/>
+
+                   <TextBlock Text="Mouse Wheel:" Grid.Row="1" VerticalAlignment="Center" />
+                   <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding MouseWheelActiveOnFocus, ElementName=_doubleUpDown}" ClickMode="Press" Margin="5" VerticalAlignment="Center" />
+
                    <TextBlock Text="Show Button Spinner:" Grid.Row="2" VerticalAlignment="Center" />
-                   <CheckBox x:Name="_showButtonSpinner" Grid.Row="2" Grid.Column="1" IsChecked="True" ClickMode="Press" Margin="5" VerticalAlignment="Center" />
-                   <TextBlock Grid.Column="2" Text="Increment" VerticalAlignment="Center" />
-                   <TextBlock Grid.Column="2" Grid.Row="1" Text="Minimum" VerticalAlignment="Center" />
-                   <TextBlock Grid.Column="2" Grid.Row="2" Text="Maximum" VerticalAlignment="Center" />
-                   <xctk:DecimalUpDown Grid.Column="3" Name="_increment" Minimum="0" Value="0.5" VerticalAlignment="Center" Margin="5" Width="150" />
-                   <xctk:DecimalUpDown Grid.Column="3" Grid.Row="1" Name="_minimum" Value="-100" VerticalAlignment="Center" Margin="5" Width="150" />
-                   <xctk:DecimalUpDown Grid.Column="3" Grid.Row="2" Name="_maximum" Value="100" VerticalAlignment="Center" Margin="5" Width="150" />
-               </Grid>
+                   <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding ShowButtonSpinner, ElementName=_doubleUpDown}"  ClickMode="Press" Margin="5" VerticalAlignment="Center" />
+
+                   <TextBlock Text="Allow Spin:" Grid.Row="3" VerticalAlignment="Center" />
+                   <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding AllowSpin, ElementName=_doubleUpDown}" ClickMode="Press" Margin="5" VerticalAlignment="Center" />
+
+                   <TextBlock Text="Is Read Only:" Grid.Row="4" VerticalAlignment="Center" />
+                   <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding IsReadOnly, ElementName=_doubleUpDown}"  ClickMode="Press" Margin="5" VerticalAlignment="Center" />
+
+                    <!-- 2nd column -->
+                   <TextBlock Grid.Column="2" Text="CultureInfo:" VerticalAlignment="Center" Margin="10,0,0,0" />
+                   <ComboBox Grid.Column="3" ItemsSource="{Binding Cultures, ElementName=_demo}" SelectedValue="{Binding CultureInfo, ElementName=_doubleUpDown}" Width="65" Margin="5" />
+
+                   <TextBlock Grid.Column="2" Grid.Row="1" Text="FormatString:" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <ComboBox Grid.Column="3" Grid.Row="1" ItemsSource="{Binding Source={StaticResource FormatStringComboBox}}" Text="{Binding FormatString, ElementName=_doubleUpDown, ValidatesOnExceptions=True}" ItemTemplate="{StaticResource FormatStringItemTemplate}" Style="{StaticResource ControlInError}" IsEditable="True" TextSearch.TextPath="Value" Width="65" Margin="5" />
+
+                   <TextBlock Grid.Column="2" Grid.Row="2" Text="Increment" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <xctk:DoubleUpDown Grid.Column="3" Grid.Row="2" Minimum="0" Value="{Binding Increment, ElementName=_doubleUpDown}" AllowInputSpecialValues="None" VerticalAlignment="Center" Margin="5" Width="65" />
+
+                   <TextBlock Grid.Column="2" Grid.Row="3" Text="Minimum" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <xctk:DoubleUpDown Grid.Column="3" Grid.Row="3" Value="{Binding Minimum, ElementName=_doubleUpDown}" AllowInputSpecialValues="NegativeInfinity" VerticalAlignment="Center" Margin="5" Width="65" />
+
+                   <TextBlock Grid.Column="2" Grid.Row="4" Text="Maximum" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <xctk:DoubleUpDown Grid.Column="3" Grid.Row="4" Value="{Binding Maximum, ElementName=_doubleUpDown}" AllowInputSpecialValues="PositiveInfinity" VerticalAlignment="Center" Margin="5" Width="65" />
+
+                   <!-- 3rd column -->
+                   <TextBlock Grid.Column="4" Text="ParsingNumberStyle:" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <ComboBox Grid.Column="5" ItemsSource="{Binding Source={StaticResource ParsingNumberStyleComboBox}}" SelectedValue="{Binding ParsingNumberStyle, ElementName=_doubleUpDown}" ToolTip="{StaticResource parsingNumberStyleTooltip}" Width="135" Margin="5" />
+
+                   <TextBlock Text="Watermark:" Grid.Column="4" Grid.Row="1" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <TextBox Grid.Column="5" Grid.Row="1" Width="135" Margin="5" Text="{Binding Watermark, ElementName=_doubleUpDown}" />
+
+                   <TextBlock Text="Default Value:" Grid.Column="4" Grid.Row="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <xctk:DoubleUpDown Grid.Column="5" Grid.Row="2" Value="{Binding DefaultValue, ElementName=_doubleUpDown}" AllowInputSpecialValues="Any" VerticalAlignment="Center" Margin="5" Width="135" />
+
+                   <TextBlock Text="Value:" Grid.Column="4" Grid.Row="3" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <xctk:DoubleUpDown Grid.Column="5" Grid.Row="3" Value="{Binding Value, ElementName=_doubleUpDown, ValidatesOnExceptions=True}" AllowInputSpecialValues="Any" Style="{StaticResource ControlInError}" VerticalAlignment="Center" Margin="5" Width="135" />
+
+                   <TextBlock Text="Text:" Grid.Column="4" Grid.Row="4" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <TextBox Grid.Column="5" Grid.Row="4" Text="{Binding Text, ElementName=_doubleUpDown}" VerticalAlignment="Center" Margin="5" Width="135" />
+                </Grid>
            </GroupBox>
 
            <StackPanel Grid.Row="1" Margin="10" HorizontalAlignment="Left">
                <TextBlock Text="Usage:" Style="{StaticResource Header}" />
-               <xctk:DecimalUpDown Margin="10" Width="250" 
-                                   Increment="{Binding Value, ElementName=_increment}"
-                                   Maximum="{Binding Value, ElementName=_maximum}"
-                                   Minimum="{Binding Value, ElementName=_minimum}"
-                                   FormatString="{Binding SelectedItem.Tag, ElementName=_formatString}" 
-                                   Watermark="{Binding Text, ElementName=_watermark}"
-                                   ShowButtonSpinner="{Binding IsChecked, ElementName=_showButtonSpinner, Mode=TwoWay}"/>
-           </StackPanel>
+               <xctk:DoubleUpDown x:Name="_doubleUpDown"
+                                  Margin="10" Width="250" 
+                                  AllowInputSpecialValues="Any"
+                                  ShowButtonSpinner="True" 
+                                  AllowSpin="True"
+                                  IsReadOnly="False" 
+                                  MouseWheelActiveOnFocus="True"
+                                  CultureInfo="en-US"
+                                  FormatString="C2"
+                                  Increment="0.5"
+                                  Maximum="100"
+                                  Minimum="0"
+                                  ParsingNumberStyle="Any"
+                                  Watermark="Enter Text"
+                                  DefaultValue="10"
+                                  Value="25" />
+         </StackPanel>
 
        </Grid>
    </StackPanel>

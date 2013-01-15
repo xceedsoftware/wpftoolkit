@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -40,23 +37,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region Properties
 
-    #region DefaultValue
-
-    public static readonly DependencyProperty DefaultValueProperty = DependencyProperty.Register( "DefaultValue", typeof( DateTime ), typeof( DateTimeUpDown ), new UIPropertyMetadata( DateTime.Now ) );
-    public DateTime DefaultValue
-    {
-      get
-      {
-        return ( DateTime )GetValue( DefaultValueProperty );
-      }
-      set
-      {
-        SetValue( DefaultValueProperty, value );
-      }
-    }
-
-    #endregion //DefaultValue
-
     #region Format
 
     public static readonly DependencyProperty FormatProperty = DependencyProperty.Register( "Format", typeof( DateTimeFormat ), typeof( DateTimeUpDown ), new UIPropertyMetadata( DateTimeFormat.FullDateTime, OnFormatChanged ) );
@@ -81,15 +61,14 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnFormatChanged( DateTimeFormat oldValue, DateTimeFormat newValue )
     {
-      InitializeDateTimeInfoListAndParseValue();
-      UpdateTextFormatting();
-    }
+        FormatUpdated();
+     }
 
     #endregion //Format
 
     #region FormatString
 
-    public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register( "FormatString", typeof( string ), typeof( DateTimeUpDown ), new UIPropertyMetadata( default( String ), OnFormatStringChanged ) );
+    public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register( "FormatString", typeof( string ), typeof( DateTimeUpDown ), new UIPropertyMetadata( default( String ), OnFormatStringChanged ), IsFormatStringValid );
     public string FormatString
     {
       get
@@ -102,6 +81,21 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    internal static bool IsFormatStringValid( object value )
+    {
+      try
+      {
+        // Test the format string if it be used
+        DateTime.MinValue.ToString( ( string )value, CultureInfo.CurrentCulture );
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
+    }
+
     private static void OnFormatStringChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
       DateTimeUpDown dateTimeUpDown = o as DateTimeUpDown;
@@ -111,23 +105,10 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnFormatStringChanged( string oldValue, string newValue )
     {
-      InitializeDateTimeInfoListAndParseValue();
-      UpdateTextFormatting();
+        FormatUpdated();
     }
 
     #endregion //FormatString
-
-    #region Maximum
-
-
-
-    #endregion //Maximum
-
-    #region Minimum
-
-
-
-    #endregion //Minimum
 
     #endregion //Properties
 
@@ -160,7 +141,7 @@ namespace Xceed.Wpf.Toolkit
 
     protected override void OnCultureInfoChanged( CultureInfo oldValue, CultureInfo newValue )
     {
-      InitializeDateTimeInfoList();
+      FormatUpdated();
     }
 
     protected override void OnIncrement()
@@ -168,7 +149,7 @@ namespace Xceed.Wpf.Toolkit
       if( Value.HasValue )
         UpdateDateTime( 1 );
       else
-        Value = DefaultValue;
+        Value = DefaultValue ?? DateTime.Now;
     }
 
     protected override void OnDecrement()
@@ -176,7 +157,7 @@ namespace Xceed.Wpf.Toolkit
       if( Value.HasValue )
         UpdateDateTime( -1 );
       else
-        Value = DefaultValue;
+        Value = DefaultValue ?? DateTime.Now;
     }
 
     protected override void OnPreviewKeyDown( KeyEventArgs e )
@@ -210,15 +191,7 @@ namespace Xceed.Wpf.Toolkit
       if( !_processTextChanged )
         return;
 
-      if( !String.IsNullOrEmpty( currentValue ) )
-      {
-        DateTime current = Value.HasValue ? Value.Value : DateTime.Parse( DateTime.Now.ToString(), CultureInfo.DateTimeFormat );
-        DateTime result;
-        var success = DateTimeParser.TryParse( currentValue, GetFormatString( Format ), current, CultureInfo, out result );
-        currentValue = result.ToString();
-      }
-
-      SyncTextAndValueProperties( true, currentValue );
+      base.OnTextChanged( previousValue, currentValue );
     }
 
     protected override DateTime? ConvertTextToValue( string text )
@@ -226,7 +199,11 @@ namespace Xceed.Wpf.Toolkit
       if( string.IsNullOrEmpty( text ) )
         return null;
 
-      return DateTime.Parse( text, CultureInfo );
+      DateTime current = Value.HasValue ? Value.Value : DateTime.Parse( DateTime.Now.ToString(), CultureInfo.DateTimeFormat );
+      DateTime result;
+      var success = DateTimeParser.TryParse( text, GetFormatString( Format ), current, CultureInfo, out result );
+
+      return result;
     }
 
     protected override string ConvertValueToText()
@@ -244,10 +221,10 @@ namespace Xceed.Wpf.Toolkit
 
     protected override void OnValueChanged( DateTime? oldValue, DateTime? newValue )
     {
-      //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
+        //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
       //but only if it is not null
-      if( newValue != null )
-        ParseValueIntoDateTimeInfo();
+        if( newValue != null )
+          ParseValueIntoDateTimeInfo();
 
       base.OnValueChanged( oldValue, newValue );
     }
@@ -268,16 +245,25 @@ namespace Xceed.Wpf.Toolkit
 
     #region Methods
 
-    private void InitializeDateTimeInfoListAndParseValue()
+    private void FormatUpdated()
     {
       InitializeDateTimeInfoList();
       if( Value != null )
         ParseValueIntoDateTimeInfo();
+
+      // Update the Text representation of the value.
+      _processTextChanged = false;
+
+      this.SyncTextAndValueProperties( false, null );
+
+      _processTextChanged = true;
+
     }
 
     private void InitializeDateTimeInfoList()
     {
       _dateTimeInfoList.Clear();
+      _selectedDateTimeInfo = null;
 
       string format = GetFormatString( Format );
 
@@ -672,16 +658,6 @@ namespace Xceed.Wpf.Toolkit
       //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event
       TextBox.Select( info.StartPosition, info.Length );
       _fireSelectionChangedEvent = true;
-    }
-
-    private void UpdateTextFormatting()
-    {
-      _processTextChanged = false;
-
-      if( Value.HasValue )
-        Text = ConvertValueToText();
-
-      _processTextChanged = true;
     }
 
     #endregion //Methods

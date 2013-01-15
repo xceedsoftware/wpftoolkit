@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************-->
 
@@ -34,8 +31,6 @@
    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
    <pgconv:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
-   <pgconv:ValueSourceToImagePathConverter x:Key="ValueSourceToImagePathConverter" />
-   <pgconv:ValueSourceToToolTipConverter x:Key="ValueSourceToToolTipConverter" />
 
    <x:Static x:Key="EmptyString" Member="sys:String.Empty" />
 
@@ -338,7 +333,7 @@
                                  <ToggleButton Template="{StaticResource ExpanderToggleButton}"
                                                OverridesDefaultStyle="True"
                                                IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
-                                               Visibility="{Binding HasChildProperties, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                               Visibility="{Binding IsExpandable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                               </Border>
 
                               <TextBlock Grid.Column="1" Text="{Binding DisplayName, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Stretch" TextTrimming="CharacterEllipsis" />
@@ -354,14 +349,15 @@
                               <Image x:Name="_optionsImage"
                                      Width="11"
                                      Height="11"
-                                     Source="{Binding ValueSource, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ValueSourceToImagePathConverter}}"
-                                     ToolTip="{Binding ValueSource, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ValueSourceToToolTipConverter}}" />
+                                     Source="{Binding AdvancedOptionsIcon, RelativeSource={RelativeSource TemplatedParent}}"
+                                     ToolTip="{Binding AdvancedOptionsTooltip, RelativeSource={RelativeSource TemplatedParent}}" />
                            </Grid>
                         </Grid>
                      </Border>
 
                      <Border BorderThickness="0.5" BorderBrush="#FFF0F0F0" x:Name="PART_Editor" Grid.Column="1" Background="Transparent">
-                        <ContentControl x:Name="content" Content="{TemplateBinding Editor}" VerticalAlignment="Center" Focusable="False" IsTabStop="False" />
+                        <ContentControl x:Name="content" Content="{TemplateBinding Editor}" VerticalAlignment="Center" Focusable="False" IsTabStop="False" 
+                                        IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}, Converter={StaticResource InverseBoolConverter}}"/>
                      </Border>
 
                      <Expander x:Name="_propertyExpander" Grid.ColumnSpan="2" Grid.Row="1" IsExpanded="{TemplateBinding IsExpanded}" Style="{StaticResource PropertyExpanderStyle}" IsEnabled="True">
@@ -376,18 +372,6 @@
                   </Grid>
                </Border>
                <ControlTemplate.Triggers>
-                  <DataTrigger Binding="{Binding IsDataBound, RelativeSource={RelativeSource Self}}" Value="True">
-                     <Setter TargetName="_optionsImage" Property="Source" Value="/WPFToolkit.Extended;component/PropertyGrid/Images/Database11.png" />
-                     <Setter TargetName="_optionsImage" Property="ToolTip" Value="Databinding" />
-                  </DataTrigger>
-                  <DataTrigger Binding="{Binding IsDynamicResource, RelativeSource={RelativeSource Self}}" Value="True">
-                     <Setter TargetName="_optionsImage" Property="Source" Value="/WPFToolkit.Extended;component/PropertyGrid/Images/Resource11.png" />
-                     <Setter TargetName="_optionsImage" Property="ToolTip" Value="Resource" />
-                  </DataTrigger>
-                  <DataTrigger Binding="{Binding HasResourceApplied, RelativeSource={RelativeSource Self}}" Value="True">
-                     <Setter TargetName="_optionsImage" Property="Source" Value="/WPFToolkit.Extended;component/PropertyGrid/Images/Resource11.png" />
-                     <Setter TargetName="_optionsImage" Property="ToolTip" Value="Resource" />
-                  </DataTrigger>
                   <Trigger Property="IsMouseOver" Value="True">
                      <Setter TargetName="PART_Name" Property="Background" Value="#CED4DF" />
                   </Trigger>
@@ -398,7 +382,11 @@
                   <Trigger Property="IsEnabled" Value="False">
                      <Setter Property="Foreground" TargetName="content"  Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"  />
                   </Trigger>
-                </ControlTemplate.Triggers>
+                  <Trigger Property="Validation.HasError" Value="true">
+                        <Setter Property="ToolTip"
+                                Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors).CurrentItem.ErrorContent}"/>
+                  </Trigger>
+               </ControlTemplate.Triggers>
             </ControlTemplate>
          </Setter.Value>
       </Setter>
@@ -445,13 +433,13 @@
                                            VerticalAlignment="Center"
                                            Style="{StaticResource OptionsToggleButtonStyle}"
                                            ToolTip="Categorized">
-                                 <Image Source="/WPFToolkit.Extended;component/PropertyGrid/Images/Categorize16.png" Width="16" Height="16" />
+                                 <Image Source="/Xceed.Wpf.Toolkit;component/PropertyGrid/Images/Categorize16.png" Width="16" Height="16" />
                               </RadioButton>
                               <RadioButton IsChecked="{Binding IsCategorized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}"
                                            VerticalAlignment="Center"
                                            Style="{StaticResource OptionsToggleButtonStyle}"
                                            ToolTip="Alphabetical">
-                                 <Image Source="/WPFToolkit.Extended;component/PropertyGrid/Images/SortAscending16.png" Width="16" Height="16" />
+                                 <Image Source="/Xceed.Wpf.Toolkit;component/PropertyGrid/Images/SortAscending16.png" Width="16" Height="16" />
                               </RadioButton>
                            </StackPanel>
                         </Grid>
@@ -483,7 +471,7 @@
                                       Command="commands:PropertyGridCommands.ClearFilter"
                                       Style="{StaticResource ClearFilterButtonStyle}"
                                       HorizontalAlignment="Left">
-                                 <Image Source="/WPFToolkit.Extended;component/PropertyGrid/Images/ClearFilter16.png" Width="16" Height="16" />
+                                 <Image Source="/Xceed.Wpf.Toolkit;component/PropertyGrid/Images/ClearFilter16.png" Width="16" Height="16" />
                               </Button>
                            </Grid>
                         </Border>

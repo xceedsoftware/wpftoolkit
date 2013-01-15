@@ -58,7 +58,7 @@
 
             <TextBlock Text="DisplayAfter:" Grid.Row="1" VerticalAlignment="Center" Margin="2" />
             <StackPanel Grid.Row="1" Grid.Column="1" Margin="5" HorizontalAlignment="Left" Orientation="Horizontal">
-               <xctk:IntegerUpDown x:Name="_displayAfter" Width="65" VerticalAlignment="Center" Minimum="0" Increment="100" Value="0" ToolTip="Sets the TimeSpan to wait until the BusyIndicator is displayed." />
+               <xctk:IntegerUpDown x:Name="_displayAfter" Width="65" VerticalAlignment="Center" Minimum="0" Increment="100" Text="0" DefaultValue="0" ToolTip="Sets the TimeSpan to wait until the BusyIndicator is displayed." />
                <TextBlock Text="milliseconds" Margin="5,0"  VerticalAlignment="Center" />
             </StackPanel>
          </Grid>

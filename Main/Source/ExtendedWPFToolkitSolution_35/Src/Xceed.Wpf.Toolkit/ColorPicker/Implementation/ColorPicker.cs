@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -24,23 +21,30 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Xceed.Wpf.Toolkit.Core.Utilities;
+using System.Windows.Controls.Primitives;
 
 namespace Xceed.Wpf.Toolkit
 {
   [TemplatePart( Name = PART_AvailableColors, Type = typeof( ListBox ) )]
   [TemplatePart( Name = PART_StandardColors, Type = typeof( ListBox ) )]
   [TemplatePart( Name = PART_RecentColors, Type = typeof( ListBox ) )]
+  [TemplatePart( Name = PART_ColorPickerToggleButton, Type = typeof( ToggleButton ) )]
+  [TemplatePart( Name = PART_ColorPickerPalettePopup, Type = typeof( Popup ) )]
   public class ColorPicker : Control
   {
     private const string PART_AvailableColors = "PART_AvailableColors";
     private const string PART_StandardColors = "PART_StandardColors";
     private const string PART_RecentColors = "PART_RecentColors";
+    private const string PART_ColorPickerToggleButton = "PART_ColorPickerToggleButton";
+    private const string PART_ColorPickerPalettePopup = "PART_ColorPickerPalettePopup";
 
     #region Members
 
     private ListBox _availableColors;
     private ListBox _standardColors;
     private ListBox _recentColors;
+    private ToggleButton _toggleButton;
+    private Popup _popup;
 
     #endregion //Members
 
@@ -407,6 +411,15 @@ namespace Xceed.Wpf.Toolkit
       _recentColors = GetTemplateChild( PART_RecentColors ) as ListBox;
       if( _recentColors != null )
         _recentColors.SelectionChanged += Color_SelectionChanged;
+
+      if( _popup != null )
+        _popup.Opened -= Popup_Opened;
+
+      _popup = GetTemplateChild( PART_ColorPickerPalettePopup ) as Popup;
+      if( _popup != null )
+        _popup.Opened += Popup_Opened;
+
+      _toggleButton = GetTemplateChild( PART_ColorPickerToggleButton ) as ToggleButton;
     }
 
     #endregion //Base Class Overrides
@@ -415,20 +428,33 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnKeyDown( object sender, KeyEventArgs e )
     {
-      switch( e.Key )
+      if( !IsOpen )
       {
-        case Key.Escape:
-        case Key.Tab:
-          {
-            CloseColorPicker();
-            break;
-          }
+        if( KeyboardUtilities.IsKeyModifyingPopupState( e ) )
+        {
+          IsOpen = true;
+          // Focus will be on ListBoxItem in Popup_Opened().
+          e.Handled = true;
+        }
+      }
+      else
+      {
+        if( KeyboardUtilities.IsKeyModifyingPopupState( e ) )
+        {
+          CloseColorPicker( true );
+          e.Handled = true;
+        }
+        else if( e.Key == Key.Escape )
+        {
+          CloseColorPicker( true );
+          e.Handled = true;
+        }
       }
     }
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      CloseColorPicker();
+      CloseColorPicker( false );
     }
 
     private void Color_SelectionChanged( object sender, SelectionChangedEventArgs e )
@@ -440,9 +466,28 @@ namespace Xceed.Wpf.Toolkit
         var colorItem = ( ColorItem )e.AddedItems[ 0 ];
         SelectedColor = colorItem.Color;
         UpdateRecentColors( colorItem );
-        CloseColorPicker();
+        CloseColorPicker( true );
         lb.SelectedIndex = -1; //for now I don't care about keeping track of the selected color
       }
+    }
+
+    private void Popup_Opened( object sender, EventArgs e )
+    {
+      if( ( _availableColors != null ) && ShowAvailableColors )
+        FocusOnListBoxItem( _availableColors );
+      else if( ( _standardColors != null ) && ShowStandardColors )
+        FocusOnListBoxItem( _standardColors );
+      else if( ( _recentColors != null ) && ShowRecentColors )
+        FocusOnListBoxItem( _recentColors );
+    }
+
+    private void FocusOnListBoxItem( ListBox listBox )
+    {
+      ListBoxItem listBoxItem = ( ListBoxItem )listBox.ItemContainerGenerator.ContainerFromItem( listBox.SelectedItem );
+      if( ( listBoxItem == null ) && ( listBox.Items.Count > 0 ) )
+        listBoxItem = ( ListBoxItem )listBox.ItemContainerGenerator.ContainerFromItem( listBox.Items[ 0 ] );
+      if( listBoxItem != null )
+        listBoxItem.Focus();
     }
 
     #endregion //Event Handlers
@@ -466,11 +511,14 @@ namespace Xceed.Wpf.Toolkit
 
     #region Methods
 
-    private void CloseColorPicker()
+    private void CloseColorPicker( bool isFocusOnColorPicker )
     {
       if( IsOpen )
         IsOpen = false;
       ReleaseMouseCapture();
+
+      if( isFocusOnColorPicker && ( _toggleButton != null) )
+        _toggleButton.Focus();
     }
 
     private void UpdateRecentColors( ColorItem colorItem )

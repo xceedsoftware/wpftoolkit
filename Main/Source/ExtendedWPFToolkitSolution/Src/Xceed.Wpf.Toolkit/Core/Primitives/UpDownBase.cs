@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -24,6 +21,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Core;
 using Xceed.Wpf.Toolkit.Core.Input;
+using System.Globalization;
 
 namespace Xceed.Wpf.Toolkit.Primitives
 {
@@ -81,6 +79,36 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #endregion //AllowSpin
 
+    #region DefaultValue
+
+    public static readonly DependencyProperty DefaultValueProperty = DependencyProperty.Register( "DefaultValue", typeof( T ), typeof( UpDownBase<T> ), new UIPropertyMetadata( default( T ), OnDefaultValueChanged ) );
+    public T DefaultValue
+    {
+      get
+      {
+        return ( T )GetValue( DefaultValueProperty );
+      }
+      set
+      {
+        SetValue( DefaultValueProperty, value );
+      }
+    }
+
+    private static void OnDefaultValueChanged( DependencyObject source, DependencyPropertyChangedEventArgs args )
+    {
+      ( ( UpDownBase<T> )source ).OnDefaultValueChanged( ( T )args.OldValue, ( T )args.NewValue );
+    }
+
+    private void OnDefaultValueChanged( T oldValue, T newValue )
+    {
+      if( this.IsInitialized && string.IsNullOrEmpty( Text ))
+      {
+        this.SyncTextAndValueProperties( true, Text );
+      }
+    }
+
+    #endregion //DefaultValue
+
     #region MouseWheelActiveOnFocus
 
     public static readonly DependencyProperty MouseWheelActiveOnFocusProperty = DependencyProperty.Register( "MouseWheelActiveOnFocus", typeof( bool ), typeof( UpDownBase<T> ), new UIPropertyMetadata( true ) );
@@ -117,7 +145,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #region Value
 
-    public static readonly DependencyProperty ValueProperty = DependencyProperty.Register( "Value", typeof( T ), typeof( UpDownBase<T> ), new FrameworkPropertyMetadata( default( T ), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue, false, UpdateSourceTrigger.LostFocus ) );
+    public static readonly DependencyProperty ValueProperty = DependencyProperty.Register( "Value", typeof( T ), typeof( UpDownBase<T> ), new FrameworkPropertyMetadata( default( T ), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue, false, UpdateSourceTrigger.PropertyChanged ) );
     public T Value
     {
       get
@@ -149,7 +177,10 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     protected virtual void OnValueChanged( T oldValue, T newValue )
     {
-      SyncTextAndValueProperties( false, null );
+      if( this.IsInitialized )
+      {
+        SyncTextAndValueProperties( false, null );
+      }
 
       SetValidSpinDirection();
 
@@ -237,8 +268,9 @@ namespace Xceed.Wpf.Toolkit.Primitives
         case Key.Enter:
           {
             // Commit Text on "Enter" to raise Error event 
-            CommitInput();
-            e.Handled = true;
+            bool commitSuccess = CommitInput();
+            //Only handle if an exception is detected (Commit fails)
+            e.Handled = !commitSuccess;
             break;
           }
       }
@@ -248,7 +280,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       base.OnMouseWheel( e );
 
-      if( !e.Handled && AllowSpin && !IsReadOnly && ( ( TextBox.IsFocused && MouseWheelActiveOnFocus ) || !MouseWheelActiveOnFocus ) )
+      if( !e.Handled && AllowSpin && !IsReadOnly && ( TextBox.IsFocused && MouseWheelActiveOnFocus ) )
       {
         if( e.Delta < 0 )
         {
@@ -265,11 +297,23 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     protected override void OnTextChanged( string oldValue, string newValue )
     {
-      //If Text was changed in code-behind.
-      if( !_isTextChangedFromUI )
+      if( this.IsInitialized )
       {
         SyncTextAndValueProperties( true, Text );
       }
+    }
+
+    protected override void OnCultureInfoChanged( CultureInfo oldValue, CultureInfo newValue )
+    {
+      if( IsInitialized )
+      {
+        SyncTextAndValueProperties( false, null );
+      }
+    }
+
+    protected override void OnReadOnlyChanged( bool oldValue, bool newValue )
+    {
+      SetValidSpinDirection();
     }
 
     #endregion //Base Class Overrides
@@ -321,6 +365,14 @@ namespace Xceed.Wpf.Toolkit.Primitives
         DoDecrement();
     }
 
+    protected override void OnInitialized( EventArgs e )
+    {
+      base.OnInitialized( e );
+      // When both Value and Text are initialized, Value has priority.
+      bool updateValueFromText = ( this.Value == null );
+      this.SyncTextAndValueProperties( updateValueFromText, Text );
+    }
+
     /// <summary>
     /// Performs an increment if conditions allow it.
     /// </summary>
@@ -345,12 +397,15 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     private void TextBox_TextChanged( object sender, TextChangedEventArgs e )
     {
-      _isTextChangedFromUI = true;
-
-      TextBox textBox = sender as TextBox;
-      Text = textBox.Text;
-
-      _isTextChangedFromUI = false;
+      try
+      {
+        _isTextChangedFromUI = true;
+        Text = ( ( TextBox )sender ).Text;
+      }
+      finally
+      {
+        _isTextChangedFromUI = false;
+      }
     }
 
     private void TextBox_LostFocus( object sender, RoutedEventArgs e )
@@ -358,46 +413,96 @@ namespace Xceed.Wpf.Toolkit.Primitives
       CommitInput();
     }
 
-    public void CommitInput()
+    private void RaiseInputValidationError( Exception e )
     {
-      this.SyncTextAndValueProperties( true, Text );
+      if( InputValidationError != null )
+      {
+        InputValidationErrorEventArgs args = new InputValidationErrorEventArgs( e );
+        InputValidationError( this, args );
+        if( args.ThrowException )
+        {
+          throw args.Exception;
+        }
+      }
     }
 
-    protected void SyncTextAndValueProperties(bool updateValueFromText, string text )
+    public bool CommitInput()
+    {
+      return this.SyncTextAndValueProperties( true, Text );
+    }
+
+    protected bool SyncTextAndValueProperties(bool updateValueFromText, string text )
     {
       if( _isSyncingTextAndValueProperties )
-        return;
+        return true;
 
       _isSyncingTextAndValueProperties = true;
-      Exception error = null;
-
-      if( updateValueFromText )
+      bool parsedTextIsValid = true;
+      try
       {
-        try
+        if( updateValueFromText )
         {
-          Value = ConvertTextToValue( text );
+          if( string.IsNullOrEmpty( text ) )
+          {
+            // An empty input sets the value to the default value.
+            Value = this.DefaultValue;
+          }
+          else
+          {
+            try
+            {
+              Value = this.ConvertTextToValue( text );
+            }
+            catch( Exception e )
+            {
+              parsedTextIsValid = false;
+
+              // From the UI, just allow any input.
+              if( !_isTextChangedFromUI )
+              {
+                // This call may throw an exception. 
+                // See RaiseInputValidationError() implementation.
+                this.RaiseInputValidationError( e );
+              }
+            }
+          }
         }
-        catch( Exception e )
+
+        // Do not touch the ongoing text input from user.
+        if(!_isTextChangedFromUI)
         {
-          error = e;
+          // Don't replace the empty Text with the non-empty representation of DefaultValue.
+          bool shouldKeepEmpty = string.IsNullOrEmpty( Text ) && object.Equals( Value, DefaultValue );
+          if( !shouldKeepEmpty )
+          {
+            Text = ConvertValueToText();
+          }
+
+          // Sync Text and textBox
+          if( TextBox != null )
+            TextBox.Text = Text;
+        }
+
+        if( _isTextChangedFromUI && !parsedTextIsValid )
+        {
+          // Text input was made from the user and the text
+          // repesents an invalid value. Disable the spinner
+          // in this case.
+          if( Spinner != null )
+          {
+            Spinner.ValidSpinDirection = ValidSpinDirections.None;
+          }
+        }
+        else
+        {
+          this.SetValidSpinDirection();
         }
       }
-
-      Text = ConvertValueToText();
-
-      if( TextBox != null )
-        TextBox.Text = Text;
-
-      if( updateValueFromText )
+      finally
       {
-        if( ( error != null ) && ( InputValidationError != null ) )
-        {
-          InputValidationErrorEventArgs args = new InputValidationErrorEventArgs( error.Message );
-          InputValidationError( this, args );
-        }
+        _isSyncingTextAndValueProperties = false;
       }
-
-      _isSyncingTextAndValueProperties = false;
+      return parsedTextIsValid;
     }
 
     #region Abstract

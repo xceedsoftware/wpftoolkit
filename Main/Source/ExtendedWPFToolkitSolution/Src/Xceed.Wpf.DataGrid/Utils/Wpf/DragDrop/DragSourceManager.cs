@@ -7,13 +7,10 @@
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
-   This program can be provided to you by Xceed Software Inc. under a
-   proprietary commercial license agreement for use in non-Open Source
-   projects. The commercial version of Extended WPF Toolkit also includes
-   priority technical support, commercial updates, and many additional 
-   useful WPF controls if you license Xceed Business Suite for WPF.
+   For more features, controls, and fast professional support,
+   pick up the Plus edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter.
+   Visit http://xceed.com and follow @datagrid on Twitter
 
   **********************************************************************/
 
@@ -31,6 +28,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using Xceed.Wpf.DataGrid;
 using System.Windows.Navigation;
+using System.Windows.Controls.Primitives;
 
 namespace Xceed.Utils.Wpf.DragDrop
 {
@@ -298,6 +296,16 @@ namespace Xceed.Utils.Wpf.DragDrop
 
     #endregion
 
+    #region ParentIsPopup Property
+
+    internal bool ParentWindowIsPopup
+    {
+      get;
+      private set;
+    }
+
+    #endregion
+
     public event QueryCursorEventHandler DragOutsideQueryCursor;
 
     public event EventHandler DroppedOutside;
@@ -336,14 +344,21 @@ namespace Xceed.Utils.Wpf.DragDrop
 
         this.InitialMousePositionToDraggedElement = e.GetPosition( this.DraggedElement );
 
-        //Get the current window on which the drag is happening
-        Window currentWindow = this.GetDraggedElementWindow();
+        //Get the current window (which can be a popup) on which the drag is happening
+        Visual parent = this.GetDraggedElementWindow();
+
+        //Set the flag because the dragged ghost in the case of a popup is different, and return because DraggedElementGhost will not be used.
+        if( parent is Popup )
+        {
+          this.ParentWindowIsPopup = true;
+          return;
+        }
 
         //Get the starting position of the gost window, so it can be used to correct the mouse position while dragging it.  
         Point ghostPostion = new Point( -this.InitialMousePositionToDraggedElement.Value.X, -this.InitialMousePositionToDraggedElement.Value.Y );
-        if( currentWindow != null )
+        if( parent != null )
         {
-          m_ghostInitialScreenPositon = currentWindow.PointToScreen( ghostPostion );
+          m_ghostInitialScreenPositon = parent.PointToScreen( ghostPostion );
         }
         else
         {
@@ -413,6 +428,10 @@ namespace Xceed.Utils.Wpf.DragDrop
 
     protected virtual void UpdateDraggedElementGhostOnDrag( MouseEventArgs e )
     {
+      //DraggedElementGhost is not used in the case of a popup window.
+      if( this.ParentWindowIsPopup )
+        return;
+
       Window ghost = this.DraggedElementGhost;
 
       if( ghost == null )
@@ -437,16 +456,9 @@ namespace Xceed.Utils.Wpf.DragDrop
 
     protected virtual IDropTarget GetDropTargetOnDrag( MouseEventArgs e, out Nullable<Point> dropTargetPosition, out IDropTarget lastFoundDropTarget )
     {
-      IDropTarget dropTarget =
-        DragDropHelper.GetDropTargetAtPoint( this.DraggedElement,
-                                             this.DragContainer,
-                                             e,
-                                             out dropTargetPosition,
-                                             out lastFoundDropTarget );
+      IDropTarget dropTarget = DragDropHelper.GetDropTargetAtPoint( this.DraggedElement, this.DragContainer, e, out dropTargetPosition, out lastFoundDropTarget );
 
-      // ColumnManagerRow was defined as IDropTarget only
-      // because Animated Column Reordering required it, ignore it in
-      // base class
+      // ColumnManagerRow was defined as IDropTarget only because Animated Column Reordering required it, ignore it in base class
       if( dropTarget is ColumnManagerRow )
       {
         dropTarget = null;
@@ -478,10 +490,8 @@ namespace Xceed.Utils.Wpf.DragDrop
 
       if( this.CurrentDropTarget != null )
       {
-        // Always use the Mouse Position relative to DraggedElement
-        // and not the DraggedContainer
-        this.CurrentDropTarget.DragOver( this.DraggedElement,
-          Mouse.GetPosition( this.CurrentDropTarget as IInputElement ) );
+        // Always use the Mouse Position relative to DraggedElement and not the DraggedContainer
+        this.CurrentDropTarget.DragOver( this.DraggedElement, Mouse.GetPosition( this.CurrentDropTarget as IInputElement ) );
       }
     }
 
@@ -615,6 +625,8 @@ namespace Xceed.Utils.Wpf.DragDrop
       rectangle.Fill = brush;
 
       Window draggedWindow = new Window();
+      //Make sure it stay on top of all other windows.
+      draggedWindow.Topmost = true;
       //This will hide borders
       draggedWindow.WindowStyle = WindowStyle.None;
       //This will hide everything except what is explicitly set as content, that is, the rectangle defined up here.
@@ -679,17 +691,23 @@ namespace Xceed.Utils.Wpf.DragDrop
       }
     }
 
-    private Window GetDraggedElementWindow()
+    private Visual GetDraggedElementWindow()
     {
       DependencyObject current = this.DraggedElement;
       while( current != null )
       {
+        Popup popup = current as Popup;
+
+        //If the grid is in a popup, this becomes the owning window, so return it.
+        if( popup != null )
+          return popup;
+
         Window window = current as Window;
 
         if( window != null )
           return window;
 
-        current = VisualTreeHelper.GetParent( current );
+        current = TreeHelper.GetParent( current );
       }
 
       // The dragged element's window was not found.

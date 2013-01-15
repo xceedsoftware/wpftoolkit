@@ -19,6 +19,8 @@
 
 using Microsoft.Practices.Prism.Regions;
 using Samples.Infrastructure.Controls;
+using System.Windows.Controls;
+using Xceed.Wpf.Toolkit;
 
 namespace Samples.Modules.ChildWindow.Views
 {

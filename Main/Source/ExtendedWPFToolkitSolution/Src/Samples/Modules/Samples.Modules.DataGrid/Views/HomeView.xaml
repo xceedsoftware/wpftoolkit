@@ -23,6 +23,7 @@
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                  xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
                  xmlns:compModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+                 xmlns:local="clr-namespace:Samples.Modules.DataGrid"
                  Title="DataGrid" 
                  x:Name="_demo">
     <sample:DemoView.Description>
@@ -50,6 +51,16 @@ Note: The datagrid included in Xceed Extended WPF Toolkit Plus contains a subset
             <xcdg:DataGridControl.View>
                 <xcdg:TableflowView FixedColumnCount="2" />
             </xcdg:DataGridControl.View>
+
+            <xcdg:DataGridControl.Columns>
+                <!--Preconfigure the OrderID Column of the grid with CellValidationRule. -->
+                <xcdg:Column FieldName="OrderID"
+                         IsMainColumn="True">
+                    <xcdg:Column.CellValidationRules>
+                        <local:UniqueIDCellValidationRule />
+                    </xcdg:Column.CellValidationRules>
+                </xcdg:Column>
+            </xcdg:DataGridControl.Columns>
         </xcdg:DataGridControl>
     </Grid>
 
