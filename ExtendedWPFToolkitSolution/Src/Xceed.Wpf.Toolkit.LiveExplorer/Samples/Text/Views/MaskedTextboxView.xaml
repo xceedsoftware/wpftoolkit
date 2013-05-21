@@ -1,0 +1,90 @@
+﻿<!--**************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ************************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Text.Views.MaskedTextboxView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 xmlns:s="clr-namespace:System;assembly=mscorlib"
+                 Title="MaskedTextBox">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+           The MaskedTextBox control lets you display and edit values based on a mask.
+        </Paragraph>
+    </local:DemoView.Description>
+
+   <Grid>
+
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <GroupBox Header="Features" Grid.Row="0" Margin="5">
+         <StackPanel Margin="5">
+            <Grid>
+               <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+               </Grid.RowDefinitions>
+               <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+               </Grid.ColumnDefinitions>
+
+               <TextBlock Text="Include literals:" VerticalAlignment="Center" Margin="2" />
+               <CheckBox x:Name="_literals" Grid.Column="1" VerticalAlignment="Center" Margin="5" 
+                         IsChecked="{Binding IncludeLiteralsInValue, ElementName=_maskedTextBox, Mode=TwoWay}"/>
+
+               <TextBlock Text="Include prompt:" Grid.Row="1" VerticalAlignment="Center" Margin="2" />
+               <CheckBox x:Name="_prompt" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="5" 
+                         IsChecked="{Binding IncludePromptInValue, ElementName=_maskedTextBox, Mode=TwoWay}"/>
+            </Grid>
+            <Grid Margin="0,5,0,0">
+               <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+               </Grid.RowDefinitions>
+               <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+               </Grid.ColumnDefinitions>
+
+               <TextBlock Text="Mask:" VerticalAlignment="Center" Margin="2" />
+               <TextBox x:Name="_mask" Grid.Column="1" VerticalAlignment="Center" Margin="5" 
+                        Text="{Binding Mask, ElementName=_maskedTextBox, ValidatesOnExceptions=True}" />
+
+               <TextBlock Text="Value:" Grid.Row="1" VerticalAlignment="Center" Margin="2" />
+               <TextBox x:Name="_value" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="5"
+                        Text="{Binding Value, ElementName=_maskedTextBox, ValidatesOnExceptions=True}"  />
+
+               <TextBlock Text="Text:" Grid.Row="2" VerticalAlignment="Center" Margin="2" />
+               <TextBox x:Name="_text" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="5" 
+                        Text="{Binding Text, ElementName=_maskedTextBox, ValidatesOnExceptions=True}"/>
+            </Grid>
+         </StackPanel>
+      </GroupBox>
+
+      <StackPanel Grid.Row="1" Margin="10">
+         <TextBlock Text="Usage:" Style="{StaticResource Header}" />
+         <xctk:MaskedTextBox x:Name="_maskedTextBox"
+                             Mask="(000) 000-0000"
+                             ValueDataType="{x:Type s:String}" />
+
+      </StackPanel>
+   </Grid>
+</local:DemoView>

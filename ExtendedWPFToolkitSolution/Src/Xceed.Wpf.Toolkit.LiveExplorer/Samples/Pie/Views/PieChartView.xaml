@@ -1,0 +1,240 @@
+﻿<!--*************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Pie.Views.PieChartView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Pie.Converters"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 Title="Pie Chart">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+            Obviously, the Pie control can be used to create a pie chart.
+        </Paragraph>
+    </local:DemoView.Description>
+
+
+   <local:DemoView.Resources>
+      <XmlDataProvider x:Key="XMLData">
+         <x:XData>
+            <Milks xmlns="">
+               <Milk Type="Human"
+                     Fat=".040"
+                     Protein=".011"
+                     Lactose=".068"
+                     Water=".88" />
+               <Milk Type="Cow"
+                     Fat=".037"
+                     Protein=".034"
+                     Lactose=".048"
+                     Water=".87" />
+               <Milk Type="Cow Holstein Friesian"
+                     Fat=".036"
+                     Protein=".034"
+                     Lactose=".049"
+                     Water=".87" />
+               <Milk Type="Cow Brown Swiss"
+                     Fat=".040"
+                     Protein=".036"
+                     Lactose=".047"
+                     Water=".87" />
+               <Milk Type="Cow Jersey"
+                     Fat=".052"
+                     Protein=".039"
+                     Lactose=".049"
+                     Water=".85" />
+               <Milk Type="Cow Zebu"
+                     Fat=".047"
+                     Protein=".033"
+                     Lactose=".049"
+                     Water=".86" />
+               <Milk Type="Water Buffalo"
+                     Fat=".069"
+                     Protein=".038"
+                     Lactose=".051"
+                     Water=".83" />
+               <Milk Type="Yak"
+                     Fat=".065"
+                     Protein=".058"
+                     Lactose=".046"
+                     Water=".82" />
+               <Milk Type="Goat"
+                     Fat=".040"
+                     Protein=".034"
+                     Lactose=".045"
+                     Water=".88" />
+               <Milk Type="Sheep"
+                     Fat=".075"
+                     Protein=".060"
+                     Lactose=".048"
+                     Water=".80" />
+               <Milk Type="Camel"
+                     Fat=".029"
+                     Protein=".039"
+                     Lactose=".054"
+                     Water=".87" />
+               <Milk Type="Reindeer"
+                     Fat=".017"
+                     Protein=".011"
+                     Lactose=".028"
+                     Water=".68" />
+               <Milk Type="Horse"
+                     Fat=".012"
+                     Protein=".020"
+                     Lactose=".063"
+                     Water=".90" />
+               <Milk Type="Fin Whale"
+                     Fat=".042"
+                     Protein=".012"
+                     Lactose=".013"
+                     Water=".43" />
+            </Milks>
+         </x:XData>
+      </XmlDataProvider>
+
+      <conv:SliceLabelConverter x:Key="sliceLabelConverter" />
+
+      <DataTemplate x:Key="MilkTemplate">
+         <StackPanel Orientation="Horizontal">
+            <TextBlock Width="135"
+                       Text="{Binding XPath=@Type}" />
+            <TextBlock Width="100"
+                       Text="{Binding XPath=@Fat}" />
+            <TextBlock Width="100"
+                       Text="{Binding XPath=@Protein}" />
+            <TextBlock Width="100"
+                       Text="{Binding XPath=@Lactose}" />
+            <TextBlock Width="100"
+                       Text="{Binding XPath=@Water}" />
+         </StackPanel>
+      </DataTemplate>
+   </local:DemoView.Resources>
+   <Grid x:Name="LayoutRoot"
+         DataContext="{Binding Source={StaticResource XMLData}, XPath=/Milks/Milk}"
+         HorizontalAlignment="Center"
+         VerticalAlignment="Center">
+      <Control />
+      <ListBox x:Name="PieDataListBox"
+               VerticalAlignment="Top"
+               Height="150"
+               ItemTemplate="{StaticResource MilkTemplate}"
+               ItemsSource="{Binding}"
+               IsSynchronizedWithCurrentItem="True"
+               HorizontalAlignment="Center"
+               Width="503"
+               ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
+      <Viewbox x:Name="PiesViewbox"
+               HorizontalAlignment="Center"
+               Margin="20,270,20,0"
+               VerticalAlignment="Top"
+               Width="250"
+               Height="250"
+               Stretch="Fill">
+         <Grid Width="192"
+               x:Name="PiesGrid"
+               Height="192">
+
+            <xctk:Pie x:Name="WaterPie"
+                      Fill="#FFCFDCFA"
+                      Stroke="#FF000000"
+                      Opacity="0.5"
+                      Slice="{Binding XPath=@Water}" />
+
+            <xctk:Pie x:Name="LactosePie"
+                      Fill="#FFEBFF68"
+                      Stroke="#FF000000"
+                      Opacity="0.5"
+                      StartAngle="{Binding EndAngle, ElementName=WaterPie, Mode=OneWay}"
+                      Slice="{Binding XPath=@Lactose}" />
+
+            <xctk:Pie x:Name="FatPie"
+                      Fill="#FF6EFA6E"
+                      Stroke="#FF000000"
+                      Opacity="0.5"
+                      StartAngle="{Binding EndAngle, ElementName=LactosePie, Mode=OneWay}"
+                      Slice="{Binding XPath=@Fat}" />
+
+            <xctk:Pie x:Name="ProteinPie"
+                      Fill="#FFFF8676"
+                      Stroke="#FF000000"
+                      Opacity="0.5"
+                      StartAngle="{Binding EndAngle, ElementName=FatPie, Mode=OneWay}"
+                      Slice="{Binding XPath=@Protein}" />
+
+            <TextBlock RenderTransformOrigin="0.5,0.5"
+                       VerticalAlignment="Center"
+                       Text="{Binding ElementName=WaterPie, Path=Slice, Converter={StaticResource sliceLabelConverter}, ConverterParameter=Water}"
+                       HorizontalAlignment="Left"
+                       Margin="60,0,0,0"
+                       FontFamily="Segoe UI"
+                       FontSize="9">
+					<TextBlock.RenderTransform>
+						<TransformGroup>
+							<TranslateTransform X="135" Y="0" />
+							<RotateTransform Angle="{Binding EndAngle, ElementName=WaterPie}" />
+						</TransformGroup>
+					</TextBlock.RenderTransform>
+            </TextBlock>
+
+            <TextBlock RenderTransformOrigin="0.5,0.5"
+                       VerticalAlignment="Center"
+                       Text="{Binding ElementName=LactosePie, Path=Slice, Converter={StaticResource sliceLabelConverter}, ConverterParameter=Lactose}"
+                       HorizontalAlignment="Left"
+                       Margin="60,0,0,0"
+                       FontFamily="Segoe UI"
+                       FontSize="9">
+					<TextBlock.RenderTransform>
+						<TransformGroup>
+							<TranslateTransform X="135" Y="0" />
+							<RotateTransform Angle="{Binding EndAngle, ElementName=LactosePie}" />
+						</TransformGroup>
+					</TextBlock.RenderTransform>
+            </TextBlock>
+
+            <TextBlock RenderTransformOrigin="0.5,0.5"
+                       VerticalAlignment="Center"
+                       Text="{Binding ElementName=FatPie, Path=Slice, Converter={StaticResource sliceLabelConverter}, ConverterParameter=Fat}"
+                       HorizontalAlignment="Left"
+                       Margin="60,0,0,0"
+                       FontFamily="Segoe UI"
+                       FontSize="9">
+					<TextBlock.RenderTransform>
+						<TransformGroup>
+							<TranslateTransform X="135" Y="0" />
+							<RotateTransform Angle="{Binding EndAngle, ElementName=FatPie}" />
+						</TransformGroup>
+					</TextBlock.RenderTransform>
+            </TextBlock>
+
+            <TextBlock RenderTransformOrigin="0.5,0.5"
+                       VerticalAlignment="Center"
+                       Text="{Binding ElementName=ProteinPie, Path=Slice, Converter={StaticResource sliceLabelConverter}, ConverterParameter=Protein}"
+                       HorizontalAlignment="Left"
+                       Margin="60,0,0,0"
+                       FontFamily="Segoe UI"
+                       FontSize="9">
+					<TextBlock.RenderTransform>
+						<TransformGroup>
+							<TranslateTransform X="135" Y="0" />
+							<RotateTransform Angle="{Binding EndAngle, ElementName=ProteinPie}" />
+						</TransformGroup>
+					</TextBlock.RenderTransform>
+            </TextBlock>
+
+         </Grid>
+      </Viewbox>
+   </Grid>
+</local:DemoView>

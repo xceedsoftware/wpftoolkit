@@ -1,0 +1,12 @@
+﻿
+<xctk:PropertyGrid >
+    <xctk:PropertyGrid.EditorDefinitions>
+
+      <!-- This EditorDefinition will be used for FirstName and LastName -->
+      <xctk:EditorTextDefinition TargetProperties="nameType" 
+                                 FontStyle="Italic" 
+                                 FontWeight="Bold" />
+
+    </xctk:PropertyGrid.EditorDefinitions>
+</xctk:PropertyGrid>
+

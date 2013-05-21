@@ -1,0 +1,168 @@
+﻿<!--***********************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
+                    xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
+                    xmlns:prim="clr-namespace:Xceed.Wpf.Toolkit.Primitives"
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
+
+    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+
+    <DataTemplate x:Key="DefaultWatermarkTemplate">
+        <ContentControl Content="{Binding}" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Focusable="False" Margin="0,0,3,0" />
+    </DataTemplate>
+
+    <Style x:Key="NumericUpDown" TargetType="{x:Type prim:InputBase}">
+        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="HorizontalContentAlignment" Value="Right" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="TextAlignment" Value="Right" />
+        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Control">
+                    <local:ButtonSpinner x:Name="PART_Spinner"
+                                    IsTabStop="False"
+                                    Background="{TemplateBinding Background}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    AllowSpin="{Binding AllowSpin, RelativeSource={RelativeSource TemplatedParent}}"
+                                    ShowButtonSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}">
+                        <local:WatermarkTextBox x:Name="PART_TextBox"
+                                          BorderThickness="0"
+                                          Background="{TemplateBinding Background}"
+                                          ContextMenu="{TemplateBinding ContextMenu}"
+                                          FontFamily="{TemplateBinding FontFamily}" 
+                                          FontSize="{TemplateBinding FontSize}" 
+                                          FontStretch="{TemplateBinding FontStretch}"
+                                          FontStyle="{TemplateBinding FontStyle}" 
+                                          FontWeight="{TemplateBinding FontWeight}" 
+                                          Foreground="{TemplateBinding Foreground}" 
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
+                                          MinWidth="20"
+                                          AcceptsReturn="False"
+                                          Padding="{TemplateBinding Padding}"
+                                          SelectAllOnGotFocus="{Binding SelectAllOnGotFocus, RelativeSource={RelativeSource TemplatedParent}}"
+                                          TextAlignment="{Binding TextAlignment, RelativeSource={RelativeSource TemplatedParent}}"
+                                          TextWrapping="NoWrap" 
+                                          TabIndex="{TemplateBinding TabIndex}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Watermark="{Binding Watermark, RelativeSource={RelativeSource TemplatedParent}}"
+                                          WatermarkTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}}" />
+                    </local:ButtonSpinner>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                        </Trigger>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter TargetName="PART_TextBox" Property="FocusManager.FocusedElement" Value="{Binding ElementName=PART_TextBox}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <!-- =============================================================================== -->
+    <!-- DecimalUpDown                                                                   -->
+    <!-- =============================================================================== -->
+    <Style TargetType="{x:Type local:DecimalUpDown}" BasedOn="{StaticResource NumericUpDown}" />
+
+    <!-- =============================================================================== -->
+    <!-- DoubleUpDown                                                                    -->
+    <!-- =============================================================================== -->
+    <Style TargetType="{x:Type local:DoubleUpDown}" BasedOn="{StaticResource NumericUpDown}" />
+
+    <!-- =============================================================================== -->
+    <!-- IntegerUpDown                                                                   -->
+    <!-- =============================================================================== -->
+    <Style TargetType="{x:Type local:IntegerUpDown}" BasedOn="{StaticResource NumericUpDown}" />
+
+    <!-- =============================================================================== -->
+    <!-- ShortUpDown                                                                     -->
+    <!-- =============================================================================== -->
+    <Style TargetType="{x:Type local:ShortUpDown}" BasedOn="{StaticResource NumericUpDown}" />
+
+    <!-- =============================================================================== -->
+    <!-- LongUpDown                                                                      -->
+    <!-- =============================================================================== -->
+    <Style TargetType="{x:Type local:LongUpDown}" BasedOn="{StaticResource NumericUpDown}" />
+
+    <!-- =============================================================================== -->
+    <!-- ByteUpDown                                                                      -->
+    <!-- =============================================================================== -->
+    <Style TargetType="{x:Type local:ByteUpDown}" BasedOn="{StaticResource NumericUpDown}" />
+
+    <!-- =============================================================================== -->
+    <!-- SingleUpDown                                                                    -->
+    <!-- =============================================================================== -->
+    <Style TargetType="{x:Type local:SingleUpDown}" BasedOn="{StaticResource NumericUpDown}" />
+
+   <!-- =============================================================================== -->
+   <!-- Style for all internal derived types of NumericUpDown must have a               -->
+   <!-- ComponentResourceKey key to allow external theme to redefine the default style  -->
+   <!-- (ex. Office2007 theme)                                                          -->
+   <!-- =============================================================================== -->
+
+   <!-- =============================================================================== -->
+   <!-- SByteUpDown                                                                     -->
+   <!-- =============================================================================== -->
+   <Style x:Key="{ComponentResourceKey 
+                  TypeInTargetAssembly={x:Type prim:InputBase}, 
+                  ResourceId=SByteUpDown}" 
+          TargetType="{x:Type prim:InputBase}" BasedOn="{StaticResource NumericUpDown}" />
+
+   <!-- =============================================================================== -->
+   <!-- UIntegerUpDown                                                                  -->
+   <!-- =============================================================================== -->
+   <Style x:Key="{ComponentResourceKey 
+                  TypeInTargetAssembly={x:Type prim:InputBase}, 
+                  ResourceId=UIntegerUpDown}" 
+          TargetType="{x:Type prim:InputBase}" BasedOn="{StaticResource NumericUpDown}" />
+
+   <!-- =============================================================================== -->
+   <!-- ULongUpDown                                                                     -->
+   <!-- =============================================================================== -->
+   <Style x:Key="{ComponentResourceKey 
+                  TypeInTargetAssembly={x:Type prim:InputBase}, 
+                  ResourceId=ULongUpDown}" 
+          TargetType="{x:Type prim:InputBase}" BasedOn="{StaticResource NumericUpDown}" />
+
+   <!-- =============================================================================== -->
+   <!-- UShortUpDown                                                                    -->
+   <!-- =============================================================================== -->
+   <Style x:Key="{ComponentResourceKey 
+                  TypeInTargetAssembly={x:Type prim:InputBase}, 
+                  ResourceId=UShortUpDown}" 
+          TargetType="{x:Type prim:InputBase}" BasedOn="{StaticResource NumericUpDown}" />
+
+
+</ResourceDictionary>

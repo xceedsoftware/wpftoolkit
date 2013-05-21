@@ -1,0 +1,6 @@
+﻿
+private class MyData
+{
+  public string MyName { get; set; }
+  public object MyValue { get; set; }
+}

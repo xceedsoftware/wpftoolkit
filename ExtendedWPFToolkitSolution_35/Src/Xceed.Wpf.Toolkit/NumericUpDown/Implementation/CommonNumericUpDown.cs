@@ -1,23 +1,24 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Windows;
 using System.Globalization;
 using System.IO;
+using Xceed.Wpf.Toolkit.Primitives;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -70,6 +71,21 @@ namespace Xceed.Wpf.Toolkit
     protected static void UpdateMetadata( Type type, T? increment, T? minValue, T? maxValue )
     {
       DefaultStyleKeyProperty.OverrideMetadata( type, new FrameworkPropertyMetadata( type ) );
+      UpdateMetadataCommon( type, increment, minValue, maxValue );
+    }
+
+    internal static void UpdateMetadataInternal( Type type, T? increment, T? minValue, T? maxValue )
+    {
+      // DefaultStyleKey for internal type (eg. UShortUpDown) must be a ComponentResourceKey instead
+      // of the type itself to allow external theme (ex. Office2007 theme) to redefine the default
+      // style of the control.
+      DefaultStyleKeyProperty.OverrideMetadata( type,
+        new FrameworkPropertyMetadata( new ComponentResourceKey( typeof( InputBase ), type.Name ) ) );
+      UpdateMetadataCommon( type, increment, minValue, maxValue );
+    }
+
+    private static void UpdateMetadataCommon( Type type, T? increment, T? minValue, T? maxValue )
+    {
       IncrementProperty.OverrideMetadata( type, new FrameworkPropertyMetadata( increment ) );
       MaximumProperty.OverrideMetadata( type, new FrameworkPropertyMetadata( maxValue ) );
       MinimumProperty.OverrideMetadata( type, new FrameworkPropertyMetadata( minValue ) );
@@ -127,6 +143,11 @@ namespace Xceed.Wpf.Toolkit
       return false;
     }
 
+    internal bool IsValid( T? value )
+    {
+      return !IsLowerThan( value, Minimum ) && !IsGreaterThan( value, Maximum );
+    }
+
     private T? CoerceValueMinMax( T value )
     {
       if( IsLowerThan( value, Minimum ) )
@@ -164,16 +185,21 @@ namespace Xceed.Wpf.Toolkit
       if( String.IsNullOrEmpty( text ) )
         return result;
 
-      // Since the convertion from Value to text using a FormartString may not be parsable
+      // Since the conversion from Value to text using a FormartString may not be parsable,
       // we verify that the already existing text is not the exact same value.
       string currentValueText = ConvertValueToText();
       if( object.Equals( currentValueText, text ) )
         return this.Value;
 
-      //don't know why someone would format a T as %, but just in case they do.
+      //Don't know why someone would format a T as %, but just in case they do.
       result = FormatString.Contains( "P" )
         ? _fromDecimal( ParsePercent( text, CultureInfo ) )
         : _fromText( text, this.ParsingNumberStyle, CultureInfo );
+
+      if( this.ClipValueToMinMax )
+      {
+        return this.GetClippedMinMaxValue();
+      }
 
       ValidateDefaultMinMax( result );
 
@@ -192,7 +218,7 @@ namespace Xceed.Wpf.Toolkit
     {
       ValidSpinDirections validDirections = ValidSpinDirections.None;
 
-      // Null increment always prevent spin
+      // Null increment always prevents spin.
       if( (this.Increment != null) && !IsReadOnly )
       {
         if( IsLowerThan( Value, Maximum ) || !Value.HasValue )
@@ -206,9 +232,22 @@ namespace Xceed.Wpf.Toolkit
         Spinner.ValidSpinDirection = validDirections;
     }
 
+    private T? GetClippedMinMaxValue()
+    {
+      T? result = FormatString.Contains( "P" )
+                ? _fromDecimal( ParsePercent( this.Text, CultureInfo ) )
+                : _fromText( this.Text, this.ParsingNumberStyle, CultureInfo );
+
+      if( this.IsGreaterThan( result, this.Maximum ) )
+        return this.Maximum;
+      else if( this.IsLowerThan( result, this.Minimum ) )
+        return this.Minimum;
+      return result;
+    }
+
     private void ValidateDefaultMinMax( T? value )
     {
-      // DefaultValue is always accepted
+      // DefaultValue is always accepted.
       if( object.Equals( value, DefaultValue ) )
         return;
 

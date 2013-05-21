@@ -1,23 +1,22 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.IO;
 
 namespace Xceed.Wpf.Toolkit.Panels
 {
@@ -27,8 +26,10 @@ namespace Xceed.Wpf.Toolkit.Panels
 
     public static readonly DependencyProperty MinimumWidthProperty =
       DependencyProperty.Register( "MinimumWidth", typeof( double ), typeof( RandomPanel ),
-        new FrameworkPropertyMetadata( 10d,
-          new PropertyChangedCallback( RandomPanel.OnInvalidateMeasure ) ) );
+        new FrameworkPropertyMetadata(
+          10d,
+          new PropertyChangedCallback( RandomPanel.OnMinimumWidthChanged ),
+          new CoerceValueCallback( RandomPanel.CoerceMinimumWidth ) ) );
 
     public double MinimumWidth
     {
@@ -42,14 +43,39 @@ namespace Xceed.Wpf.Toolkit.Panels
       }
     }
 
+    private static void OnMinimumWidthChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      RandomPanel panel = ( RandomPanel )d;
+
+      panel.CoerceValue( RandomPanel.MaximumWidthProperty );
+      panel.InvalidateMeasure();
+    }
+
+    private static object CoerceMinimumWidth( DependencyObject d, object baseValue )
+    {
+      RandomPanel panel = ( RandomPanel )d;
+      double value = ( double )baseValue;
+
+      if( double.IsNaN( value ) || double.IsInfinity( value ) || ( value < 0d ) )
+        return DependencyProperty.UnsetValue;
+
+      double maximum = panel.MaximumWidth;
+      if( value > maximum )
+        return maximum;
+
+      return baseValue;
+    }
+
     #endregion
 
     #region MinimumHeight Property
 
     public static readonly DependencyProperty MinimumHeightProperty =
       DependencyProperty.Register( "MinimumHeight", typeof( double ), typeof( RandomPanel ),
-        new FrameworkPropertyMetadata( 10d,
-          new PropertyChangedCallback( RandomPanel.OnInvalidateMeasure ) ) );
+        new FrameworkPropertyMetadata(
+          10d,
+          new PropertyChangedCallback( RandomPanel.OnMinimumHeightChanged ),
+          new CoerceValueCallback( RandomPanel.CoerceMinimumHeight ) ) );
 
     public double MinimumHeight
     {
@@ -63,14 +89,39 @@ namespace Xceed.Wpf.Toolkit.Panels
       }
     }
 
+    private static void OnMinimumHeightChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      RandomPanel panel = ( RandomPanel )d;
+
+      panel.CoerceValue( RandomPanel.MaximumHeightProperty );
+      panel.InvalidateMeasure();
+    }
+
+    private static object CoerceMinimumHeight( DependencyObject d, object baseValue )
+    {
+      RandomPanel panel = ( RandomPanel )d;
+      double value = ( double )baseValue;
+
+      if( double.IsNaN( value ) || double.IsInfinity( value ) || ( value < 0d ) )
+        return DependencyProperty.UnsetValue;
+
+      double maximum = panel.MaximumHeight;
+      if( value > maximum )
+        return maximum;
+
+      return baseValue;
+    }
+
     #endregion
 
     #region MaximumWidth Property
 
     public static readonly DependencyProperty MaximumWidthProperty =
       DependencyProperty.Register( "MaximumWidth", typeof( double ), typeof( RandomPanel ),
-        new FrameworkPropertyMetadata( 100d,
-          new PropertyChangedCallback( RandomPanel.OnInvalidateMeasure ) ) );
+        new FrameworkPropertyMetadata(
+          100d,
+          new PropertyChangedCallback( RandomPanel.OnMaximumWidthChanged ),
+          new CoerceValueCallback( RandomPanel.CoerceMaximumWidth ) ) );
 
     public double MaximumWidth
     {
@@ -84,14 +135,39 @@ namespace Xceed.Wpf.Toolkit.Panels
       }
     }
 
+    private static void OnMaximumWidthChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      RandomPanel panel = ( RandomPanel )d;
+
+      panel.CoerceValue( RandomPanel.MinimumWidthProperty );
+      panel.InvalidateMeasure();
+    }
+
+    private static object CoerceMaximumWidth( DependencyObject d, object baseValue )
+    {
+      RandomPanel panel = ( RandomPanel )d;
+      double value = ( double )baseValue;
+
+      if( double.IsNaN( value ) || double.IsInfinity( value ) || ( value < 0d ) )
+        return DependencyProperty.UnsetValue;
+
+      double minimum = panel.MinimumWidth;
+      if( value < minimum )
+        return minimum;
+
+      return baseValue;
+    }
+
     #endregion
 
     #region MaximumHeight Property
 
     public static readonly DependencyProperty MaximumHeightProperty =
       DependencyProperty.Register( "MaximumHeight", typeof( double ), typeof( RandomPanel ),
-        new FrameworkPropertyMetadata( 100d,
-          new PropertyChangedCallback( RandomPanel.OnInvalidateMeasure ) ) );
+        new FrameworkPropertyMetadata(
+          100d,
+          new PropertyChangedCallback( RandomPanel.OnMaximumHeightChanged ),
+          new CoerceValueCallback( RandomPanel.CoerceMaximumHeight ) ) );
 
     public double MaximumHeight
     {
@@ -105,13 +181,36 @@ namespace Xceed.Wpf.Toolkit.Panels
       }
     }
 
+    private static void OnMaximumHeightChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      RandomPanel panel = ( RandomPanel )d;
+
+      panel.CoerceValue( RandomPanel.MinimumHeightProperty );
+      panel.InvalidateMeasure();
+    }
+
+    private static object CoerceMaximumHeight( DependencyObject d, object baseValue )
+    {
+      RandomPanel panel = ( RandomPanel )d;
+      double value = ( double )baseValue;
+
+      if( double.IsNaN( value ) || double.IsInfinity( value ) || ( value < 0d ) )
+        return DependencyProperty.UnsetValue;
+
+      double minimum = panel.MinimumHeight;
+      if( value < minimum )
+        return minimum;
+
+      return baseValue;
+    }
+
     #endregion
 
     #region Seed Property
 
     public static readonly DependencyProperty SeedProperty =
       DependencyProperty.Register( "Seed", typeof( int ), typeof( RandomPanel ),
-        new FrameworkPropertyMetadata( 0, 
+        new FrameworkPropertyMetadata( 0,
           new PropertyChangedCallback( RandomPanel.SeedChanged ) ) );
 
     public int Seed
@@ -142,7 +241,7 @@ namespace Xceed.Wpf.Toolkit.Panels
 
     // Using a DependencyProperty as the backing store for ActualSize.  This enables animation, styling, binding, etc...
     private static readonly DependencyProperty ActualSizeProperty =
-      DependencyProperty.RegisterAttached( "ActualSize", typeof( Size ), typeof( RandomPanel ), 
+      DependencyProperty.RegisterAttached( "ActualSize", typeof( Size ), typeof( RandomPanel ),
         new UIPropertyMetadata( new Size() ) );
 
     private static Size GetActualSize( DependencyObject obj )
@@ -167,7 +266,8 @@ namespace Xceed.Wpf.Toolkit.Panels
           continue;
 
         Size childSize = new Size( 1d * _random.Next( Convert.ToInt32( MinimumWidth ), Convert.ToInt32( MaximumWidth ) ),
-                                    1d * _random.Next( Convert.ToInt32( MinimumHeight ), Convert.ToInt32( MaximumHeight ) ) );
+                                   1d * _random.Next( Convert.ToInt32( MinimumHeight ), Convert.ToInt32( MaximumHeight ) ) );
+
         child.Measure( childSize );
         RandomPanel.SetActualSize( child, childSize );
       }
@@ -192,17 +292,6 @@ namespace Xceed.Wpf.Toolkit.Panels
         this.ArrangeChild( child, new Rect( new Point( x, y ), new Size( width, height ) ) );
       }
       return finalSize;
-    }
-
-    private static void OnInvalidateMeasure( DependencyObject d, DependencyPropertyChangedEventArgs e )
-    {
-      RandomPanel panel = d as RandomPanel;
-      if( panel.MinimumWidth > panel.MaximumWidth )
-        throw new InvalidDataException( "MinWidth can't be greater than MaxWidth." );
-      else if( panel.MinimumHeight > panel.MaximumHeight )
-        throw new InvalidDataException( "MinHeight can't be greater than MaxHeight." );
-      else
-        ( ( AnimationPanel )d ).InvalidateMeasure();
     }
 
     #region Private Fields

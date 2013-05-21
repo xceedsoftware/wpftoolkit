@@ -1,0 +1,161 @@
+﻿<!--***********************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
+                    xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes"
+                    xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+
+    <Image x:Key="DefaultContent" x:Shared="False" Height="16" Width="18" Source="./../Images/Notes16.png" />
+
+    <Style x:Key="ToggleButtonStyle" TargetType="ToggleButton">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid SnapsToDevicePixels="True">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+                                <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                            </Border>
+
+                            <chrome:ButtonChrome x:Name="ToggleButtonChrome"
+                                          Grid.Column="1"
+                                          CornerRadius="0"
+                                          RenderChecked="{Binding IsOpen, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MultiLineTextEditor}}"
+                                          RenderEnabled="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MultiLineTextEditor}}"
+											         RenderMouseOver="{TemplateBinding IsMouseOver}"
+											         RenderPressed="{TemplateBinding IsPressed}">
+                                <Grid x:Name="arrowGlyph" IsHitTestVisible="False" Grid.Column="1" Margin="5">
+                                    <Path x:Name="Arrow"  Width="7" Height="4" Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z" Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                                </Grid>
+                            </chrome:ButtonChrome>
+                        </Grid>
+
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Fill" TargetName="Arrow" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <!-- =============================================================================== -->
+    <!-- MultiLineTextEditor                                                             -->
+    <!-- =============================================================================== -->
+
+    <Style TargetType="{x:Type local:MultiLineTextEditor}">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
+        <Setter Property="BorderThickness" Value="1,1,0,1" />
+        <Setter Property="Content" Value="{StaticResource DefaultContent}" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Padding" Value="2,0,0,0" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:MultiLineTextEditor}">
+                    <Grid x:Name="Root">
+                        <ToggleButton x:Name="PART_DropDownButton"
+                                Grid.Column="1"
+                                IsTabStop="True"
+                                MinHeight="22"
+                                SnapsToDevicePixels="True"
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Padding="{TemplateBinding Padding}"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                Style="{StaticResource ToggleButtonStyle}"
+                                IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                        <Popup IsOpen="{Binding IsChecked, ElementName=PART_DropDownButton}"
+                         StaysOpen="False"
+                         Placement="Bottom"
+                         SnapsToDevicePixels="True"
+                         AllowsTransparency="True"
+                         Focusable="False"
+                         PopupAnimation="Slide"
+                         Width="{TemplateBinding DropDownWidth}"
+                         Height="{TemplateBinding DropDownHeight}">
+                            <Border BorderThickness="1" Background="White" BorderBrush="{StaticResource PopupDarkBorderBrush}">
+                                <Grid>
+                                    <TextBox x:Name="PART_TextBox"
+                                    AcceptsReturn="true"
+                                    TextWrapping="{TemplateBinding TextWrapping}"
+                                    Padding="{TemplateBinding Padding}"
+                                    VerticalScrollBarVisibility="Auto"
+                                    HorizontalScrollBarVisibility="Auto"
+                                    SpellCheck.IsEnabled="{TemplateBinding IsSpellCheckEnabled}"
+                                    IsReadOnly="{TemplateBinding IsReadOnly}"
+                                    Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
+                                    TextAlignment="{TemplateBinding TextAlignment}"
+                                    Margin="3" />
+                                    <Thumb x:Name="PART_ResizeThumb" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="{x:Type Thumb}">
+                                                <Grid Background="Transparent">
+                                                    <Path Data="M0.5,6.5 L6.5,0.5 M6.5,3.5 L3.5,6.5" Stroke="Black" StrokeThickness="1" />
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Grid>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

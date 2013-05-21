@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Collections;
@@ -49,6 +49,7 @@ using System.Windows.Markup;
 using System.Printing;
 using System.Windows.Media.Imaging;
 using Xceed.Wpf.DataGrid.Utils;
+using Xceed.Wpf.Toolkit.Core;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -4731,28 +4732,7 @@ namespace Xceed.Wpf.DataGrid
       if( this.TemplateApplied != null )
         this.TemplateApplied( this, EventArgs.Empty );
 
-      this.UpdateDataGridAdorner();
     }
-
-    private void UpdateDataGridAdorner()
-    {
-      Xceed.Wpf.DataGrid.Views.ViewBase view = this.GetView();
-      bool needAdorner = !view.UseDefaultHeadersFooters;
-      if( needAdorner && (m_mainAdorner == null) )
-      {
-        AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer( this );
-        m_mainAdorner = new DataGridMainAdorner( this );
-        adornerLayer.Add( m_mainAdorner );
-      }
-      else if( !needAdorner && ( m_mainAdorner != null ) )
-      {
-        AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer( this );
-        adornerLayer.Remove( m_mainAdorner );
-        m_mainAdorner = null;
-      }
-    }
-
-
 
     public void ExpandGroup( CollectionViewGroup group )
     {
@@ -6309,43 +6289,6 @@ namespace Xceed.Wpf.DataGrid
       #endregion
 
       private DataGridControl m_gridControl; // = null
-    }
-
-    #endregion
-
-    #region DataGridMainAdorner Private Class
-
-    private DataGridMainAdorner m_mainAdorner;
-    private class DataGridMainAdorner : Adorner
-    {
-      static DataGridMainAdorner()
-      {
-        string c = Char.ConvertFromUtf32( 169 );
-        m_sDisplayText = new FormattedText( c + " \u0058\u0063\u0065\u0065\u0064",
-          System.Globalization.CultureInfo.InvariantCulture,
-          FlowDirection.LeftToRight,
-          new Typeface( "Verdana" ),
-          12, new SolidColorBrush( Color.FromArgb( 150, 250, 100, 0 ) ) );
-      }
-
-      private static FormattedText m_sDisplayText;
-
-      public DataGridMainAdorner( UIElement adornedElement )
-        : base( adornedElement )
-      {
-        this.IsHitTestVisible = false;
-      }
-
-      protected override void OnRender( System.Windows.Media.DrawingContext drawingContext )
-      {
-        base.OnRender( drawingContext );
-
-        drawingContext.PushTransform( new RotateTransform( -90 ) );
-        drawingContext.PushTransform( new TranslateTransform( -this.ActualHeight, 0d ) );
-        drawingContext.DrawText( m_sDisplayText, new System.Windows.Point( 32, 2 ) );
-        drawingContext.Pop();
-        drawingContext.Pop();
-      }
     }
 
     #endregion

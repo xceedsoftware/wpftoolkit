@@ -1,0 +1,47 @@
+﻿<!--*************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************-->
+
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.ListBox.Views.ListBoxView" 
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer" 
+                xmlns:xclb="http://schemas.xceed.com/wpf/xaml/listbox"
+                xmlns:xclt="http://schemas.xceed.com/wpf/xaml/listbox/themes"
+                xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.ListBox.Converters"
+                xmlns:sys="clr-namespace:System;assembly=mscorlib" 
+                VerticalScrollBarVisibility="Disabled"
+                Title="Data Sources">
+   <local:DemoView.Description>
+      <Paragraph FontSize="14" FontFamily="Segoe">
+         <Run>Local Data Sources of Any Kind</Run>
+         <LineBreak />
+         <LineBreak />
+         <Run>The listbox supports any local source implementing IEnumerable, and generics too! Factor in its full support of remote data sources, and you have a listbox compatible with all data-binding scenarios.</Run>
+            <LineBreak />
+            <LineBreak />
+            <Run>The listBox items can be animated, dragged-and-dropped, filtered, grouped, selected in various ways, and sorted. Plus, all of the ListBox components can be styled or themed. In addition, different ways of presenting the listBox items are available, such as horizontal or vertical scrolling and following specific or circle paths.</Run>
+            <Run>This feature is only available in the "Plus" version.</Run>
+            <LineBreak />
+            <Hyperlink NavigateUri="http://www.xceed.com/Extended_WPF_Toolkit_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
+               Click here for more details about Extended WPF Toolkit Plus.
+            </Hyperlink>
+      </Paragraph>
+   </local:DemoView.Description>
+
+
+
+    <Image Source="..\OpenSourceImages\ListBox.png" Width="600" Height="400"/>
+</local:DemoView>

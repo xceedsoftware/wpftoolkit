@@ -1,0 +1,51 @@
+﻿<!--**************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ************************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Chart.Views.ChartSeriesBasicTypesView"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                xmlns:xctkconv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters;assembly=Xceed.Wpf.Toolkit"
+                xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Chart.Converters"
+                xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                Title="Chart Series Basic Types">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+            <Run>A series contains DataPoint objects and are layed out in an area (Area class) of a chart. They can be displayed with predefined layouts, such as column (bar), line, area, or pie, or they can be displayed using a custom layout (not implemented in this sample).</Run>
+            <LineBreak />
+            <Run>This feature is only available in the "Plus" version.</Run>
+            <LineBreak />
+            <Hyperlink NavigateUri="http://www.xceed.com/Extended_WPF_Toolkit_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
+               Click here for more details about Xceed Extended WPF Toolkit Plus.
+            </Hyperlink>
+        </Paragraph>
+    </local:DemoView.Description>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <Image Source="..\OpenSourceImages\ChartBasicTypes.png" Width="600" Height="400"/>
+</local:DemoView>

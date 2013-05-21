@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B3FC3E21-5F2D-4581-AEA2-59F671CFFC21}</ProjectGuid>
+    <OutputType>library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Xceed.Wpf.AvalonDock.Themes</RootNamespace>
+    <AssemblyName>Xceed.Wpf.AvalonDock.Themes.VS2010</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <Utf8Output>true</Utf8Output>
+    <ExpressionBlendVersion>4.0.20901.0</ExpressionBlendVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Brushes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Theme.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyVersionInfo.cs" />
+    <Compile Include="AssemblyVersionInfoCommon.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="VS2010Theme.cs" />
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\DockAnchorableBottom.png" />
+    <Resource Include="Images\DockAnchorableLeft.png" />
+    <Resource Include="Images\DockAnchorableRight.png" />
+    <Resource Include="Images\DockAnchorableTop.png" />
+    <Resource Include="Images\DockDocumentAsAnchorableBottom.png" />
+    <Resource Include="Images\DockDocumentAsAnchorableLeft.png" />
+    <Resource Include="Images\DockDocumentAsAnchorableRight.png" />
+    <Resource Include="Images\DockDocumentAsAnchorableTop.png" />
+    <Resource Include="Images\DockDocumentBottom.png" />
+    <Resource Include="Images\DockDocumentInside.png" />
+    <Resource Include="Images\DockDocumentLeft.png" />
+    <Resource Include="Images\DockDocumentRight.png" />
+    <Resource Include="Images\DockDocumentTop.png" />
+    <Resource Include="Images\DockPaneEmpty.png" />
+    <Resource Include="Images\DockPaneLargeEmpty.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\HTabGroup.png" />
+    <Resource Include="Images\Locked.png" />
+    <Resource Include="Images\PinAutoHide.png" />
+    <Resource Include="Images\PinClose.png" />
+    <Resource Include="Images\PinDocMenu.png" />
+    <Resource Include="Images\PinMenu.png" />
+    <Resource Include="Images\VTabGroup.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PinAutoHide_Dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PinClose_Dark.png" />
+    <Resource Include="Images\PinMenu_Dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PinMaximize.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PinRestore.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PinMaximize_Dark.png" />
+    <Resource Include="Images\PinRestore_Dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.csproj">
+      <Project>{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}</Project>
+      <Name>Xceed.Wpf.AvalonDock</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PinDocMenu_Black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PinAutoHide_Black.png" />
+    <Resource Include="Images\PinClose_Black.png" />
+    <Resource Include="Images\PinMaximize_Black.png" />
+    <Resource Include="Images\PinMenu_Black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PinRestore_Black.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

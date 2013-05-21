@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System.Windows;
 using System.Windows.Controls;
@@ -21,6 +21,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using Xceed.Wpf.Toolkit.Core;
 using System.Linq;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -76,7 +77,7 @@ namespace Xceed.Wpf.Toolkit
       InitializeComponent();
       Loaded += FormatToolbar_Loaded;
 
-      _cmbFontFamilies.ItemsSource = Fonts.SystemFontFamilies.OrderBy( fontFamily => fontFamily.Source );
+      _cmbFontFamilies.ItemsSource = FontUtilities.Families.OrderBy( fontFamily => fontFamily.Source );
       _cmbFontSizes.ItemsSource = FontSizes;
     }
 
@@ -166,14 +167,24 @@ namespace Xceed.Wpf.Toolkit
 
     void UpdateItemCheckedState( ToggleButton button, DependencyProperty formattingProperty, object expectedValue )
     {
-      object currentValue = Target.Selection.GetPropertyValue( formattingProperty );
-      button.IsChecked = ( currentValue == DependencyProperty.UnsetValue ) ? false : currentValue != null && currentValue.Equals( expectedValue );
+      object currentValue = DependencyProperty.UnsetValue;
+      if( (Target != null) && (Target.Selection != null) )
+      {
+        currentValue = Target.Selection.GetPropertyValue( formattingProperty );
+      }
+      button.IsChecked = ( (currentValue == null) || ( currentValue == DependencyProperty.UnsetValue ) )
+                          ? false 
+                          : currentValue != null && currentValue.Equals( expectedValue );
     }
 
     private void UpdateSelectedFontFamily()
     {
-      object value = Target.Selection.GetPropertyValue( TextElement.FontFamilyProperty );
-      FontFamily currentFontFamily = ( FontFamily )( ( value == DependencyProperty.UnsetValue ) ? null : value );
+      object value = DependencyProperty.UnsetValue;
+      if( ( Target != null ) && ( Target.Selection != null ) )
+      {
+        value = Target.Selection.GetPropertyValue( TextElement.FontFamilyProperty );
+      }
+      FontFamily currentFontFamily = ( FontFamily )( ( ( value == null) || ( value == DependencyProperty.UnsetValue ) ) ? null : value );
       if( currentFontFamily != null )
       {
         _cmbFontFamilies.SelectedItem = currentFontFamily;
@@ -182,21 +193,39 @@ namespace Xceed.Wpf.Toolkit
 
     private void UpdateSelectedFontSize()
     {
-      object value = Target.Selection.GetPropertyValue( TextElement.FontSizeProperty );
-      _cmbFontSizes.SelectedValue = ( value == DependencyProperty.UnsetValue ) ? null : value;
+      object value = DependencyProperty.UnsetValue;
+      if( ( Target != null ) && ( Target.Selection != null ) )
+      {
+        value = Target.Selection.GetPropertyValue( TextElement.FontSizeProperty );
+      }
+
+      _cmbFontSizes.SelectedValue = ( ( value == null ) || ( value == DependencyProperty.UnsetValue ) ) ? null : value;
     }
 
     private void UpdateFontColor()
     {
-      object value = Target.Selection.GetPropertyValue( TextElement.ForegroundProperty );
-      Color currentColor = ( Color )( ( value == DependencyProperty.UnsetValue ) ? Colors.Black : ( ( SolidColorBrush )value ).Color );
+      object value = DependencyProperty.UnsetValue;
+      if( ( Target != null ) && ( Target.Selection != null ) )
+      {
+        value = Target.Selection.GetPropertyValue( TextElement.ForegroundProperty );
+      }
+
+      Color currentColor = ( Color )( ( (value == null) || ( value == DependencyProperty.UnsetValue ) )
+                                    ? Colors.Black 
+                                    : ( ( SolidColorBrush )value ).Color );
       _cmbFontColor.SelectedColor = currentColor;
     }
 
     private void UpdateFontBackgroundColor()
     {
-      object value = Target.Selection.GetPropertyValue( TextElement.BackgroundProperty );
-      Color currentColor = ( Color )( ( value == null || value == DependencyProperty.UnsetValue ) ? Colors.Transparent : ( ( SolidColorBrush )value ).Color );
+      object value = DependencyProperty.UnsetValue;
+      if( ( Target != null ) && ( Target.Selection != null ) )
+      {
+        value = Target.Selection.GetPropertyValue( TextElement.BackgroundProperty );
+      }
+      Color currentColor = ( Color )( ( (value == null ) || (value == DependencyProperty.UnsetValue) )
+                                      ? Colors.Transparent 
+                                      : ( ( SolidColorBrush )value ).Color );
       _cmbFontBackgroundColor.SelectedColor = currentColor;
     }
 
@@ -209,8 +238,12 @@ namespace Xceed.Wpf.Toolkit
       _btnBullets.IsChecked = false;
       _btnNumbers.IsChecked = false;
 
-      Paragraph startParagraph = Target.Selection.Start.Paragraph;
-      Paragraph endParagraph = Target.Selection.End.Paragraph;
+      Paragraph startParagraph = ( ( Target != null ) && ( Target.Selection != null ) ) 
+                                  ? Target.Selection.Start.Paragraph 
+                                  : null;
+      Paragraph endParagraph = ( ( Target != null ) && ( Target.Selection != null ) )
+                                ? Target.Selection.End.Paragraph
+                                : null;
       if( startParagraph != null && endParagraph != null && ( startParagraph.Parent is ListItem ) && ( endParagraph.Parent is ListItem ) && object.ReferenceEquals( ( ( ListItem )startParagraph.Parent ).List, ( ( ListItem )endParagraph.Parent ).List ) )
       {
         TextMarkerStyle markerStyle = ( ( ListItem )startParagraph.Parent ).List.MarkerStyle;
@@ -236,7 +269,7 @@ namespace Xceed.Wpf.Toolkit
 
     void ApplyPropertyValueToSelectedText( DependencyProperty formattingProperty, object value )
     {
-      if( value == null )
+      if( ( value == null ) || ( Target == null ) || ( Target.Selection == null ) )
         return;
 
       Target.Selection.ApplyPropertyValue( formattingProperty, value );

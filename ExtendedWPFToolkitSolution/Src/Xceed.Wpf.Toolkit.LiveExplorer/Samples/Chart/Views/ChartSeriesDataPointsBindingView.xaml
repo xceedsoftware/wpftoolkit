@@ -1,0 +1,42 @@
+﻿<!--**************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ************************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Chart.Views.ChartSeriesDataPointsBindingView"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                xmlns:xctkconv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters;assembly=Xceed.Wpf.Toolkit"
+                xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Chart.Converters"
+                xmlns:sample="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Chart"
+                xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                Title="Chart Series DataPoints Binding">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+            <Run>The DataPoint objects of a chart's series can be set by binding with the Series.DataPointsSource property. From there, a DataPointBinding can be set on the X, Y, or Label property of a DataPoint.</Run>
+            <LineBreak />
+            <Run>This feature is only available in the "Plus" version.</Run>
+            <LineBreak />
+            <Hyperlink NavigateUri="http://www.xceed.com/Extended_WPF_Toolkit_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
+               Click here for more details about Xced Extended WPF Toolkit Plus.
+            </Hyperlink>
+        </Paragraph>
+    </local:DemoView.Description>
+
+
+
+
+    <Image Source="..\OpenSourceImages\ChartSeriesDataPointsBinding.png" Width="600" Height="400"/>
+</local:DemoView>

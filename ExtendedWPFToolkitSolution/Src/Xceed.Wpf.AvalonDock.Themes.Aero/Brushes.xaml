@@ -1,0 +1,171 @@
+﻿<!--***********************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:at="clr-namespace:Xceed.Wpf.AvalonDock.Themes">
+
+
+
+   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor1Key}"
+                        StartPoint="0,0"
+                        EndPoint="1,0">
+      <LinearGradientBrush.GradientStops>
+         <GradientStop Color="#EBEEFA" Offset="0" />
+         <GradientStop Color="#F4F7FC" Offset="1" />
+      </LinearGradientBrush.GradientStops>
+   </LinearGradientBrush>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor2Key}" 
+                     Color="White"/>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor3Key}" 
+                     Color="Black"/>
+
+   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor4Key}"
+                         StartPoint="0,0"
+                         EndPoint="0,1">
+      <LinearGradientBrush.GradientStops>
+         <GradientStop Color="#CFCFCF" Offset="0" />
+         <GradientStop Color="#F2F2F2" Offset="1" />
+      </LinearGradientBrush.GradientStops>
+   </LinearGradientBrush>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor5Key}" 
+                     Color="#898C95"/>
+
+
+   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor6Key}"
+                         StartPoint="0,0"
+                         EndPoint="0,1">
+      <LinearGradientBrush.GradientStops>
+         <GradientStop Color="#FCFDFE" Offset="0" />
+         <GradientStop Color="#D2E6FA" Offset="1" />
+      </LinearGradientBrush.GradientStops>
+   </LinearGradientBrush>
+
+   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor7Key}"
+                         StartPoint="0,0"
+                         EndPoint="0,1">
+      <LinearGradientBrush.GradientStops>
+         <GradientStop Color="#ECF5FC" Offset="0" />
+         <GradientStop Color="#98B4D2" Offset="1" />
+      </LinearGradientBrush.GradientStops>
+   </LinearGradientBrush>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor8Key}"
+                     Color="#D2E6FA"/>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor9Key}"
+                     Color="#FFF5F4EA"/>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor10Key}" 
+                     Color="Black"/>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor11Key}" 
+                     Color="#FFBBC0C7" />
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor12Key}"
+                     Color="#555564"/>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor13Key}"
+                     Color="White"/>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor14Key}"
+                     Color="#69A1BF"/>
+
+   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor15Key}"
+                         StartPoint="0,0"
+                         EndPoint="0,1">
+      <GradientStop Color="#8FADCE" Offset="0" />
+      <GradientStop Color="#BDD3EF" Offset="1" />
+   </LinearGradientBrush>
+
+
+   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor16Key}"
+                         StartPoint="0,0"
+                         EndPoint="0,1">
+      <GradientStop Color="#B7CAE0" Offset="0" />
+      <GradientStop Color="#E8F0FF" Offset="1" />
+   </LinearGradientBrush>
+   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor17Key}"
+                         StartPoint="0,0"
+                         EndPoint="0,1">
+      <GradientStop Color="#F7FCFE" Offset="0" />
+      <GradientStop Color="#81D0F1" Offset="1" />
+   </LinearGradientBrush>
+   <!--
+    <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor18Key}" 
+        Color="Black"/>
+
+    <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor20Key}" 
+                     Color="White"/>
+
+    <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor21Key}" 
+        Color="White"/>
+
+    <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor22Key}" 
+        Color="Black"/>
+
+    <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor23Key}" 
+        Color="Black"/>-->
+
+
+   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor24Key}" StartPoint="0,0" EndPoint="0,1">
+      <GradientStop Color="#FBFCFC" Offset="0" />
+      <GradientStop Color="#D7DCE4" Offset="0.5" />
+      <GradientStop Color="#CED4DF" Offset="0.5" />
+      <GradientStop Color="#CED4DF" Offset="1" />
+   </LinearGradientBrush>
+
+   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor25Key}" StartPoint="0,0" EndPoint="0,1">
+      <GradientStop Color="#FFFCF2" Offset="0" />
+      <GradientStop Color="#FFEDBA" Offset="0.5" />
+      <GradientStop Color="#FFE8A6" Offset="0.5" />
+      <GradientStop Color="#FFE8A6" Offset="1" />
+   </LinearGradientBrush>
+
+   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor26Key}"
+                         StartPoint="0,0"
+                         EndPoint="0,1">
+      <GradientStop Color="#F2F2F2" Offset="0" />
+      <GradientStop Color="#CFCFCF" Offset="1" />
+   </LinearGradientBrush>
+
+   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor27Key}"
+                         StartPoint="0,0"
+                         EndPoint="0,1">
+      <GradientStop Color="#A7D9F5" Offset="0" />
+      <GradientStop Color="#BEE6FD" Offset="0.5" />
+      <GradientStop Color="#D9F0FC" Offset="0.5" />
+      <GradientStop Color="#FAFDFE" Offset="1" />
+   </LinearGradientBrush>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor28Key}"
+                         Color="White"/>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor30Key}" 
+        Color="#CED4DF"/>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor31Key}" 
+        Color="#FFE8A6"/>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor32Key}"
+                     Color="#3C7FB1"/>
+
+   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor33Key}"
+        Color="#3D5277"/>
+</ResourceDictionary>

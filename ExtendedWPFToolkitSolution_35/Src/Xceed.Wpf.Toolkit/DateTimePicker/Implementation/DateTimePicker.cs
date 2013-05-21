@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Windows;
@@ -29,20 +29,40 @@ namespace Xceed.Wpf.Toolkit
 {
   [TemplatePart( Name = PART_Calendar, Type = typeof( Calendar ) )]
   [TemplatePart( Name = PART_Popup, Type = typeof( Popup ) )]
+  [TemplatePart( Name = PART_TimeUpDown, Type = typeof( TimePicker ) )]
   public class DateTimePicker : DateTimeUpDown
   {
     private const string PART_Calendar = "PART_Calendar";
     private const string PART_Popup = "PART_Popup";
+    private const string PART_TimeUpDown = "PART_TimeUpDown";
 
     #region Members
 
     private Calendar _calendar;
     private Popup _popup;
     private DateTime? _initialValue;
+    private TimePicker _timePicker;
 
     #endregion //Members
 
     #region Properties
+
+    #region AutoCloseCalendar
+
+    public static readonly DependencyProperty AutoCloseCalendarProperty = DependencyProperty.Register( "AutoCloseCalendar", typeof( bool ), typeof( DateTimePicker ), new UIPropertyMetadata( false ) );
+    public bool AutoCloseCalendar
+    {
+      get
+      {
+        return ( bool )GetValue( AutoCloseCalendarProperty );
+      }
+      set
+      {
+        SetValue( AutoCloseCalendarProperty, value );
+      }
+    }
+
+    #endregion //AutoCloseCalendar
 
     #region IsOpen
 
@@ -189,12 +209,21 @@ namespace Xceed.Wpf.Toolkit
         _calendar.SelectedDate = Value ?? null;
         _calendar.DisplayDate = Value ?? DateTime.Now;
       }
+
+      _timePicker = GetTemplateChild( PART_TimeUpDown ) as TimePicker;
     }
 
     protected override void OnPreviewMouseUp( MouseButtonEventArgs e )
     {
       if( Mouse.Captured is CalendarItem )
+      {
         Mouse.Capture( null );
+
+        if( AutoCloseCalendar )
+        {
+          CloseDateTimePicker( true );
+        }
+      }
     }
 
     protected override void OnValueChanged( DateTime? oldValue, DateTime? newValue )
@@ -239,17 +268,14 @@ namespace Xceed.Wpf.Toolkit
             CloseDateTimePicker( true );
             e.Handled = true;
           }
-          else if( e.Key == Key.Enter )
+          else
           {
-            CloseDateTimePicker( true );
-            e.Handled = true;
+            this.ManageEnterEscapeKeys( e );
           }
-          else if( e.Key == Key.Escape )
-          {
-            Value = _initialValue;
-            CloseDateTimePicker( true );
-            e.Handled = true;
-          }
+        }
+        else if( _timePicker.IsKeyboardFocusWithin && !_timePicker.IsOpen && !e.Handled)
+        {
+          this.ManageEnterEscapeKeys( e );
         }
       }
     }
@@ -267,8 +293,8 @@ namespace Xceed.Wpf.Toolkit
 
         if( ( Value != null ) && ( newDate != null ) && newDate.HasValue )
         {
-          // Only change the year, month and Day part of the value. Keep everything to the last "tick".
-          // No, "miliseconds" aren't precise enought. Use a mathematical sceme instead
+          // Only change the year, month, and day part of the value. Keep everything to the last "tick."
+          // "Milliseconds" aren't precise enough. Use a mathematical scheme instead.
           newDate = newDate.Value.Date + Value.Value.TimeOfDay;
         }
 
@@ -295,6 +321,27 @@ namespace Xceed.Wpf.Toolkit
 
       if( isFocusOnTextBox && ( TextBox != null ) )
         TextBox.Focus();
+    }
+
+    private void ManageEnterEscapeKeys( KeyEventArgs e )
+    {
+      if( e.Key == Key.Enter )
+      {
+        this.CloseDateTimePicker( true );
+        e.Handled = true;
+      }
+      else if( e.Key == Key.Escape )
+      {
+        // Avoid setting the "Value" property when no change has occurred.
+        // The original value may not be a local value. Setting
+        // it, even with the same value, will override a one-way binding.
+        if( !object.Equals( this.Value, _initialValue ) )
+        {
+          this.Value = _initialValue;
+        }
+        this.CloseDateTimePicker( true );
+        e.Handled = true;
+      }
     }
 
     #endregion //Methods

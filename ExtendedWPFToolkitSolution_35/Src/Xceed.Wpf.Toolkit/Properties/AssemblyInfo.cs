@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 #region Using directives
 
@@ -36,7 +36,7 @@ using System.Windows.Markup;
 
 [assembly: AssemblyCompany("Xceed Software Inc.")]
 [assembly: AssemblyProduct( "Xceed Extended WPF Toolkit" )]
-[assembly: AssemblyCopyright( "Copyright © Xceed Software Inc. 2010-2012" )]
+[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2013" )]
 [assembly: AssemblyCulture( "" )]
 
 
@@ -72,6 +72,7 @@ using System.Windows.Markup;
 [assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit")]
 [assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Core.Converters" )]
 [assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Core.Input" )]
+[assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Core.Media")]
 [assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Core.Utilities")]
 [assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Chromes")]
 [assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Primitives")]
@@ -86,7 +87,7 @@ using System.Windows.Markup;
 
 #pragma warning disable 1699
 [assembly: AssemblyDelaySign( false )]
-[assembly: AssemblyKeyFile( @"sn.snk" )]
+[assembly: AssemblyKeyFile( @"..\..\sn.snk" )]
 [assembly: AssemblyKeyName( "" )]
 #pragma warning restore 1699
 

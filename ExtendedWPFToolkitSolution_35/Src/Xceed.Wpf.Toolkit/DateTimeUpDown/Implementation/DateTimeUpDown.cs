@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -21,6 +21,8 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Primitives;
+using System.Windows.Controls;
+using System.Linq;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -85,7 +87,7 @@ namespace Xceed.Wpf.Toolkit
     {
       try
       {
-        // Test the format string if it be used
+        // Test the format string if it is used.
         DateTime.MinValue.ToString( ( string )value, CultureInfo.CurrentCulture );
       }
       catch
@@ -130,13 +132,19 @@ namespace Xceed.Wpf.Toolkit
 
     public override void OnApplyTemplate()
     {
-      if( TextBox != null )
-        TextBox.SelectionChanged -= TextBox_SelectionChanged;
+      if( this.TextBox != null )
+      {
+        this.TextBox.SelectionChanged -= this.TextBox_SelectionChanged;
+        this.TextBox.GotFocus -= new RoutedEventHandler( this.TextBox_GotFocus );
+      }
 
       base.OnApplyTemplate();
 
       if( TextBox != null )
-        TextBox.SelectionChanged += TextBox_SelectionChanged;
+      {
+        this.TextBox.SelectionChanged += this.TextBox_SelectionChanged;
+        this.TextBox.GotFocus += new RoutedEventHandler(this.TextBox_GotFocus);
+      }
     }
 
     protected override void OnCultureInfoChanged( CultureInfo oldValue, CultureInfo newValue )
@@ -146,22 +154,31 @@ namespace Xceed.Wpf.Toolkit
 
     protected override void OnIncrement()
     {
-      if( Value.HasValue )
-        UpdateDateTime( 1 );
-      else
-        Value = DefaultValue ?? DateTime.Now;
+      if( this.IsCurrentValueValid() )
+      {
+        if( Value.HasValue )
+          UpdateDateTime( 1 );
+        else
+          Value = DefaultValue ?? DateTime.Now;
+      }
     }
 
     protected override void OnDecrement()
     {
-      if( Value.HasValue )
-        UpdateDateTime( -1 );
-      else
-        Value = DefaultValue ?? DateTime.Now;
+      if( this.IsCurrentValueValid() )
+      {
+        if( Value.HasValue )
+          UpdateDateTime( -1 );
+        else
+          Value = DefaultValue ?? DateTime.Now;
+      }
     }
 
     protected override void OnPreviewKeyDown( KeyEventArgs e )
-    {
+    {      
+      int selectionStart = (_selectedDateTimeInfo != null) ? _selectedDateTimeInfo.StartPosition : 0;
+      int selectionLength = ( _selectedDateTimeInfo != null ) ? _selectedDateTimeInfo.Length : 0;
+
       switch( e.Key )
       {
         case Key.Enter:
@@ -172,11 +189,56 @@ namespace Xceed.Wpf.Toolkit
               BindingExpression binding = BindingOperations.GetBindingExpression( TextBox, System.Windows.Controls.TextBox.TextProperty );
               binding.UpdateSource();
               _fireSelectionChangedEvent = true;
-              e.Handled = true;
             }
             return;
           }
-        default:
+        case Key.Add:
+          if( this.AllowSpin && !this.IsReadOnly )
+          {
+            this.DoIncrement();
+            e.Handled = true;
+          }
+          _fireSelectionChangedEvent = false;
+          break;
+        case Key.Subtract:
+          if( this.AllowSpin && !this.IsReadOnly )
+          {
+            this.DoDecrement();
+            e.Handled = true;
+          }
+          _fireSelectionChangedEvent = false;
+          break;
+        case Key.OemSemicolon:
+          if( this.IsCurrentValueValid() && ( Keyboard.Modifiers == ModifierKeys.Shift ) )
+          {
+            this.PerformKeyboardSelection( selectionStart + selectionLength );
+            e.Handled = true;
+          }
+          _fireSelectionChangedEvent = false;
+          break;
+        case Key.OemPeriod:
+        case Key.OemComma:
+        case Key.OemQuotes:
+        case Key.OemMinus:
+        case Key.Divide:
+        case Key.Decimal: 
+        case Key.Right:
+          if( this.IsCurrentValueValid() )
+          {
+            this.PerformKeyboardSelection( selectionStart + selectionLength );
+            e.Handled = true;
+          }
+          _fireSelectionChangedEvent = false;
+          break;
+        case Key.Left:
+          if( this.IsCurrentValueValid() )
+          {
+            this.PerformKeyboardSelection( selectionStart > 0 ? selectionStart - 1 : 0 );
+            e.Handled = true;
+          }
+          _fireSelectionChangedEvent = false;
+          break;
+         default:
           {
             _fireSelectionChangedEvent = false;
             break;
@@ -199,9 +261,8 @@ namespace Xceed.Wpf.Toolkit
       if( string.IsNullOrEmpty( text ) )
         return null;
 
-      DateTime current = Value.HasValue ? Value.Value : DateTime.Parse( DateTime.Now.ToString(), CultureInfo.DateTimeFormat );
       DateTime result;
-      var success = DateTimeParser.TryParse( text, GetFormatString( Format ), current, CultureInfo, out result );
+      this.TryParseDateTime( text, out result );
 
       return result;
     }
@@ -233,7 +294,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region Event Hanlders
 
-    void TextBox_SelectionChanged( object sender, RoutedEventArgs e )
+    private void TextBox_SelectionChanged( object sender, RoutedEventArgs e )
     {
       if( _fireSelectionChangedEvent )
         PerformMouseSelection();
@@ -241,9 +302,21 @@ namespace Xceed.Wpf.Toolkit
         _fireSelectionChangedEvent = true;
     }
 
+    private void TextBox_GotFocus( object sender, RoutedEventArgs e )
+    {
+      this.Select( this.GetDateTimeInfo( 0 ) );
+    }
+
     #endregion //Event Hanlders
 
     #region Methods
+
+    public void SelectAll()
+    {
+      _fireSelectionChangedEvent = false;
+      TextBox.SelectAll();
+      _fireSelectionChangedEvent = true;
+    }
 
     private void FormatUpdated()
     {
@@ -537,22 +610,88 @@ namespace Xceed.Wpf.Toolkit
 
     private void PerformMouseSelection()
     {
-      _dateTimeInfoList.ForEach( info =>
+      this.Select( this.GetDateTimeInfo( TextBox.SelectionStart ) );
+    }
+
+    private void PerformKeyboardSelection( int nextSelectionStart )
+    {
+      this.TextBox.Focus();
+
+      this.CommitInput();
+
+      int selectedDateStartPosition = ( _selectedDateTimeInfo != null ) ? _selectedDateTimeInfo.StartPosition : 0;
+      int direction = nextSelectionStart - selectedDateStartPosition;
+      if( direction > 0 )
       {
-        if( ( info.StartPosition <= TextBox.SelectionStart ) && ( TextBox.SelectionStart < ( info.StartPosition + info.Length ) ) )
+        this.Select( this.GetNextDateTimeInfo( nextSelectionStart ) );
+      }
+      else
+      {
+        this.Select( this.GetPreviousDateTimeInfo( nextSelectionStart - 1) );
+      }
+    }
+
+    private DateTimeInfo GetDateTimeInfo( int selectionStart )
+    {
+      return _dateTimeInfoList.FirstOrDefault( (info) =>
+                              ( info.StartPosition <= selectionStart ) && ( selectionStart < ( info.StartPosition + info.Length ) ) );
+    }
+
+    private DateTimeInfo GetNextDateTimeInfo( int nextSelectionStart )
+    {
+      DateTimeInfo nextDateTimeInfo = this.GetDateTimeInfo( nextSelectionStart );
+      if( nextDateTimeInfo == null )
+      {
+        nextDateTimeInfo = _dateTimeInfoList.First();
+      }
+
+      DateTimeInfo initialDateTimeInfo = nextDateTimeInfo;
+
+      while( nextDateTimeInfo.Type == DateTimePart.Other )
+      {
+        nextDateTimeInfo = this.GetDateTimeInfo( nextDateTimeInfo.StartPosition + nextDateTimeInfo.Length );
+        if( nextDateTimeInfo == null )
         {
-          Select( info );
-          return;
+          nextDateTimeInfo = _dateTimeInfoList.First();
         }
-      } );
+        if( object.Equals( nextDateTimeInfo, initialDateTimeInfo ) )
+          throw new InvalidOperationException( "Couldn't find a valid DateTimeInfo." );
+      }
+      return nextDateTimeInfo;
+    }
+
+    private DateTimeInfo GetPreviousDateTimeInfo( int previousSelectionStart )
+    {
+      DateTimeInfo previousDateTimeInfo = this.GetDateTimeInfo( previousSelectionStart );
+      if( previousDateTimeInfo == null )
+      {
+        previousDateTimeInfo = _dateTimeInfoList.Last();
+      }
+
+      DateTimeInfo initialDateTimeInfo = previousDateTimeInfo;
+
+      while( previousDateTimeInfo.Type == DateTimePart.Other )
+      {
+        previousDateTimeInfo = this.GetDateTimeInfo( previousDateTimeInfo.StartPosition - 1 );
+        if( previousDateTimeInfo == null )
+        {
+          previousDateTimeInfo = _dateTimeInfoList.Last();
+        }
+        if( object.Equals( previousDateTimeInfo, initialDateTimeInfo ) )
+          throw new InvalidOperationException( "Couldn't find a valid DateTimeInfo." );
+      }
+      return previousDateTimeInfo;
     }
 
     private void Select( DateTimeInfo info )
     {
-      _fireSelectionChangedEvent = false;
-      TextBox.Select( info.StartPosition, info.Length );
-      _fireSelectionChangedEvent = true;
-      _selectedDateTimeInfo = info;
+      if( info != null )
+      {
+        _fireSelectionChangedEvent = false;
+        TextBox.Select( info.StartPosition, info.Length );
+        _fireSelectionChangedEvent = true;
+        _selectedDateTimeInfo = info;
+      }
     }
 
     private string GetFormatString( DateTimeFormat dateTimeFormat )
@@ -580,7 +719,39 @@ namespace Xceed.Wpf.Toolkit
         case DateTimeFormat.YearMonth:
           return CultureInfo.DateTimeFormat.YearMonthPattern;
         case DateTimeFormat.Custom:
-          return FormatString;
+          {
+            switch( this.FormatString )
+            {
+              case "d":
+                return CultureInfo.DateTimeFormat.ShortDatePattern;
+              case "t":
+                return CultureInfo.DateTimeFormat.ShortTimePattern;
+              case "T":
+                return CultureInfo.DateTimeFormat.LongTimePattern;
+              case "D":
+                return CultureInfo.DateTimeFormat.LongDatePattern;
+              case "f":
+                return CultureInfo.DateTimeFormat.LongDatePattern + " " + CultureInfo.DateTimeFormat.ShortTimePattern;
+              case "F":
+                return CultureInfo.DateTimeFormat.FullDateTimePattern;
+              case "g":
+                return CultureInfo.DateTimeFormat.ShortDatePattern + " " + CultureInfo.DateTimeFormat.ShortTimePattern;
+              case "G":
+                return CultureInfo.DateTimeFormat.ShortDatePattern + " " + CultureInfo.DateTimeFormat.LongTimePattern;
+              case "m":
+                return CultureInfo.DateTimeFormat.MonthDayPattern;
+              case "y":
+                return CultureInfo.DateTimeFormat.YearMonthPattern;
+              case "r":
+                return CultureInfo.DateTimeFormat.RFC1123Pattern;
+              case "s":
+                return CultureInfo.DateTimeFormat.SortableDateTimePattern;
+              case "u":
+                return CultureInfo.DateTimeFormat.UniversalSortableDateTimePattern;
+              default:
+                return FormatString;
+            }
+          }
         default:
           throw new ArgumentException( "Not a supported format" );
       }
@@ -658,6 +829,31 @@ namespace Xceed.Wpf.Toolkit
       //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event
       TextBox.Select( info.StartPosition, info.Length );
       _fireSelectionChangedEvent = true;
+    }
+
+    private bool TryParseDateTime( string text, out DateTime result )
+    {
+      bool isValid;
+
+      DateTime current = this.Value.HasValue ? this.Value.Value : DateTime.Parse( DateTime.Now.ToString(), this.CultureInfo.DateTimeFormat );
+      isValid = DateTimeParser.TryParse( text, this.GetFormatString( Format ), current, this.CultureInfo, out result );
+
+      if( !isValid && ( this.Format == DateTimeFormat.Custom ) )
+      {
+        isValid = DateTime.TryParseExact( text, this.GetFormatString( this.Format ), this.CultureInfo, DateTimeStyles.None, out result );
+      }
+
+      return isValid;
+    }
+
+    private bool IsCurrentValueValid()
+    {
+      DateTime result;
+
+      if( string.IsNullOrEmpty( this.TextBox.Text ) )
+        return true;
+
+      return this.TryParseDateTime( this.TextBox.Text, out result );
     }
 
     #endregion //Methods

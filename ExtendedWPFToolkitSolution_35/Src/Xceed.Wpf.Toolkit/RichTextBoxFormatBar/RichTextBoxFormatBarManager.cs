@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Windows;
@@ -101,17 +101,17 @@ namespace Xceed.Wpf.Toolkit
       Point p = e.GetPosition( _adorner );
       double maxDist = 0d;
 
-      //Mouse is inside FormatBar : Nothing to do
+      //Mouse is inside FormatBar: Nothing to do.
       if( ( p.X >= 0 ) && ( p.X <= _adorner.ActualWidth ) && ( p.Y >= 0 ) && ( p.Y <= _adorner.ActualHeight ) )
       {
         return;
       }
-      //Mouse is too much outside FormatBar : Close it
+      //Mouse is too much outside FormatBar: Close it.
       else if( ( p.X < -_hideAdornerDistance ) || ( p.X > _adorner.ActualWidth + _hideAdornerDistance ) || ( p.Y < -_hideAdornerDistance ) || ( p.Y > _adorner.ActualHeight + _hideAdornerDistance ) )
       {
         HideAdorner();
       }
-      //Mouse is just outside FormatBar : Vary its Opacity
+      //Mouse is just outside FormatBar: Vary its opacity.
       else
       {
         if( p.X < 0 )
@@ -130,13 +130,13 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnMouseLeaveParentWindow( object sender, MouseEventArgs e )
     {
-      // Mouse is outside parent Window : Close it
+      // Mouse is outside parent Window: Close it.
       HideAdorner();
     }
 
     void RichTextBox_TextChanged( object sender, TextChangedEventArgs e )
     {
-      //this fixes the bug when applying text transformations the text would lose it's highlight.  That was because the RichTextBox was losing focus
+      //This fixes the bug when applying text transformations the text would lose it's highlight. That was because the RichTextBox was losing focus,
       //so we just give it focus again and it seems to do the trick of re-highlighting it.
       if( !_richTextBox.IsFocused && !_richTextBox.Selection.IsEmpty )
         _richTextBox.Focus();

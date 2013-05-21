@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Windows;
@@ -25,8 +25,8 @@ namespace Xceed.Wpf.Toolkit
   {
     #region Private Members
 
-    private bool _textSetInternally;
-    bool _surpressGetText;
+    private bool _preventDocumentUpdate;
+    private bool _preventTextUpdate;
 
     #endregion //Private Members
 
@@ -63,24 +63,7 @@ namespace Xceed.Wpf.Toolkit
 
     private static void OnTextPropertyChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
-      RichTextBox rtb = ( RichTextBox )d;
-
-      // if the text is not being set internally then load the text into the RichTextBox
-      if( !rtb._textSetInternally )
-      {
-        //to help with performance this is placed on the dispatcher for processing. For some reason when this is done the TextChanged event is fired multiple times
-        //forcing the UpdateText method to be called multiple times and the setter of the source property to be set multiple times. To fix this, we simply set the _surpressGetText
-        //member to true before the operation and set it to false when the operation completes. This will prevent the Text property from being set multiple times.
-        rtb._surpressGetText = true;
-        DispatcherOperation dop = Dispatcher.CurrentDispatcher.BeginInvoke( new Action( delegate()
-            {
-              rtb.TextFormatter.SetText( rtb.Document, ( string )e.NewValue );
-            } ), DispatcherPriority.Background );
-        dop.Completed += ( sender, ea ) =>
-            {
-              rtb._surpressGetText = false;
-            };
-      }
+      ( ( RichTextBox )d ).UpdateDocumentFromText();
     }
 
     private static object CoerceTextProperty( DependencyObject d, object value )
@@ -92,28 +75,29 @@ namespace Xceed.Wpf.Toolkit
 
     #region TextFormatter
 
-    private ITextFormatter _textFormatter;
-    /// <summary>
-    /// The ITextFormatter the is used to format the text of the RichTextBox.
-    /// Deafult formatter is the RtfFormatter
-    /// </summary>
+    public static readonly DependencyProperty TextFormatterProperty = DependencyProperty.Register( "TextFormatter", typeof( ITextFormatter ), typeof( RichTextBox ), new FrameworkPropertyMetadata( new RtfFormatter(), OnTextFormatterPropertyChanged ) );
     public ITextFormatter TextFormatter
     {
       get
       {
-        if( _textFormatter == null )
-          _textFormatter = new RtfFormatter(); //default is rtf
-
-        return _textFormatter;
+        return ( ITextFormatter )GetValue( TextFormatterProperty );
       }
       set
       {
-        if( _textFormatter != value )
-        {
-          _textFormatter = value;
-          _textFormatter.SetText( Document, Text );
-        }
+        SetValue( TextFormatterProperty, value );
       }
+    }
+
+    private static void OnTextFormatterPropertyChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      RichTextBox richTextBox = d as RichTextBox;
+      if( richTextBox != null )
+        richTextBox.OnTextFormatterPropertyChanged( ( ITextFormatter )e.OldValue, ( ITextFormatter )e.NewValue );
+    }
+
+    protected virtual void OnTextFormatterPropertyChanged( ITextFormatter oldValue, ITextFormatter newValue )
+    {
+      this.UpdateTextFromDocument();
     }
 
     #endregion //TextFormatter
@@ -125,17 +109,27 @@ namespace Xceed.Wpf.Toolkit
     protected override void OnTextChanged( System.Windows.Controls.TextChangedEventArgs e )
     {
       base.OnTextChanged( e );
-      UpdateText();
+      UpdateTextFromDocument();
     }
 
-    private void UpdateText()
+    private void UpdateTextFromDocument()
     {
-      _textSetInternally = true;
+      if( _preventTextUpdate )
+        return;
 
-      if( !_surpressGetText )
-        Text = TextFormatter.GetText( Document );
+      _preventDocumentUpdate = true;
+      Text = TextFormatter.GetText( Document );
+      _preventDocumentUpdate = false;
+    }
 
-      _textSetInternally = false;
+    private void UpdateDocumentFromText()
+    {
+      if( _preventDocumentUpdate )
+        return;
+
+      _preventTextUpdate = true;
+      TextFormatter.SetText( Document, Text );
+      _preventTextUpdate = false;
     }
 
     /// <summary>
@@ -144,6 +138,28 @@ namespace Xceed.Wpf.Toolkit
     public void Clear()
     {
       Document.Blocks.Clear();
+    }
+
+    public override void BeginInit()
+    {
+      base.BeginInit();
+      // Do not update anything while initializing. See EndInit
+      _preventTextUpdate = true;
+      _preventDocumentUpdate = true;
+    }
+
+    public override void EndInit()
+    {
+      base.EndInit();
+      _preventTextUpdate = false;
+      _preventDocumentUpdate = false;
+      // Possible conflict here if the user specifies 
+      // the document AND the text at the same time 
+      // in XAML. Text has priority.
+      if( !string.IsNullOrEmpty( Text ) )
+        UpdateDocumentFromText();
+      else
+        UpdateTextFromDocument();
     }
 
     #endregion //Methods

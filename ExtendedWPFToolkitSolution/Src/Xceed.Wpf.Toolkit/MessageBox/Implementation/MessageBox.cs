@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Windows;
@@ -23,6 +23,9 @@ using System.Windows.Input;
 using System.Text;
 using System.Security.Permissions;
 using System.Security;
+using Xceed.Wpf.Toolkit.Primitives;
+using System.Diagnostics;
+using System.Windows.Media.Imaging;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -30,19 +33,19 @@ namespace Xceed.Wpf.Toolkit
   [TemplateVisualState( Name = VisualStates.OKCancel, GroupName = VisualStates.MessageBoxButtonsGroup )]
   [TemplateVisualState( Name = VisualStates.YesNo, GroupName = VisualStates.MessageBoxButtonsGroup )]
   [TemplateVisualState( Name = VisualStates.YesNoCancel, GroupName = VisualStates.MessageBoxButtonsGroup )]
-  [TemplatePart( Name = PART_DragWidget, Type = typeof( Thumb ) )]
   [TemplatePart( Name = PART_CancelButton, Type = typeof( Button ) )]
   [TemplatePart( Name = PART_NoButton, Type = typeof( Button ) )]
   [TemplatePart( Name = PART_OkButton, Type = typeof( Button ) )]
   [TemplatePart( Name = PART_YesButton, Type = typeof( Button ) )]
-  public class MessageBox : Control
+  [TemplatePart( Name = PART_WindowControl, Type = typeof( WindowControl ) )]
+  public class MessageBox : WindowControl
   {
-    private const string PART_DragWidget = "PART_DragWidget";
     private const string PART_CancelButton = "PART_CancelButton";
     private const string PART_NoButton = "PART_NoButton";
     private const string PART_OkButton = "PART_OkButton";
     private const string PART_YesButton = "PART_YesButton";
     private const string PART_CloseButton = "PART_CloseButton";
+    private const string PART_WindowControl = "PART_WindowControl";
 
     #region Private Members
 
@@ -57,9 +60,16 @@ namespace Xceed.Wpf.Toolkit
     private MessageBoxResult _defaultResult = MessageBoxResult.None;
 
     /// <summary>
+    /// Will contain the result when the messagebox is shown inside a WindowContainer
+    /// </summary>
+    private MessageBoxResult _dialogResult = MessageBoxResult.None;
+
+    /// <summary>
     /// Tracks the owner of the MessageBox
     /// </summary>
     private Window _owner;
+
+    private WindowControl _windowControl;
 
     #endregion //Private Members
 
@@ -70,12 +80,10 @@ namespace Xceed.Wpf.Toolkit
       DefaultStyleKeyProperty.OverrideMetadata( typeof( MessageBox ), new FrameworkPropertyMetadata( typeof( MessageBox ) ) );
     }
 
-    internal MessageBox()
+    public MessageBox()
     {
-      /*user cannot create instance */
-      AddHandler( ButtonBase.ClickEvent, new RoutedEventHandler( Button_Click ) );
-
-      CommandBindings.Add( new CommandBinding( ApplicationCommands.Copy, new ExecutedRoutedEventHandler( ExecuteCopy ) ) );
+      this.Visibility = Visibility.Collapsed;
+      this.InitHandlers();
     }
 
     #endregion //Constructors
@@ -84,77 +92,16 @@ namespace Xceed.Wpf.Toolkit
 
     #region Protected Properties
 
-    /// <summary>
-    /// A System.Windows.MessageBoxResult value that specifies which message box button was clicked by the user.
-    /// </summary>
-    protected MessageBoxResult MessageBoxResult = MessageBoxResult.None;
-
     protected Window Container
     {
-      get;
-      private set;
-    }
-    protected Thumb DragWidget
-    {
-      get;
-      private set;
+      get { return ( this.Parent as Window ); }
     }
 
     #endregion //Protected Properties
 
     #region Dependency Properties
 
-    public static readonly DependencyProperty CaptionProperty = DependencyProperty.Register( "Caption", typeof( string ), typeof( MessageBox ), new UIPropertyMetadata( String.Empty ) );
-    public string Caption
-    {
-      get
-      {
-        return ( string )GetValue( CaptionProperty );
-      }
-      set
-      {
-        SetValue( CaptionProperty, value );
-      }
-    }
-
-    public static readonly DependencyProperty CaptionForegroundProperty = DependencyProperty.Register( "CaptionForeground", typeof( Brush ), typeof( MessageBox ), new UIPropertyMetadata( null ) );
-    public Brush CaptionForeground
-    {
-      get
-      {
-        return ( Brush )GetValue( CaptionForegroundProperty );
-      }
-      set
-      {
-        SetValue( CaptionForegroundProperty, value );
-      }
-    }
-
-    public static readonly DependencyProperty CancelButtonContentProperty = DependencyProperty.Register( "CancelButtonContent", typeof( object ), typeof( MessageBox ), new UIPropertyMetadata( "Cancel" ) );
-    public object CancelButtonContent
-    {
-      get
-      {
-        return ( object )GetValue( CancelButtonContentProperty );
-      }
-      set
-      {
-        SetValue( CancelButtonContentProperty, value );
-      }
-    }
-
-    public static readonly DependencyProperty CloseButtonStyleProperty = DependencyProperty.Register( "CloseButtonStyle", typeof( Style ), typeof( MessageBox ), new PropertyMetadata( null ) );
-    public Style CloseButtonStyle
-    {
-      get
-      {
-        return ( Style )GetValue( CloseButtonStyleProperty );
-      }
-      set
-      {
-        SetValue( CloseButtonStyleProperty, value );
-      }
-    }
+    #region ButtonRegionBackground
 
     public static readonly DependencyProperty ButtonRegionBackgroundProperty = DependencyProperty.Register( "ButtonRegionBackground", typeof( Brush ), typeof( MessageBox ), new PropertyMetadata( null ) );
     public Brush ButtonRegionBackground
@@ -169,18 +116,26 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    public static readonly DependencyProperty OkButtonStyleProperty = DependencyProperty.Register( "OkButtonStyle", typeof( Style ), typeof( MessageBox ), new PropertyMetadata( null ) );
-    public Style OkButtonStyle
+    #endregion //ButtonRegionBackground
+
+    #region CancelButtonContent
+
+    public static readonly DependencyProperty CancelButtonContentProperty = DependencyProperty.Register( "CancelButtonContent", typeof( object ), typeof( MessageBox ), new UIPropertyMetadata( "Cancel" ) );
+    public object CancelButtonContent
     {
       get
       {
-        return ( Style )GetValue( OkButtonStyleProperty );
+        return ( object )GetValue( CancelButtonContentProperty );
       }
       set
       {
-        SetValue( OkButtonStyleProperty, value );
+        SetValue( CancelButtonContentProperty, value );
       }
     }
+
+    #endregion //CancelButtonContent
+
+    #region CancelButtonStyle
 
     public static readonly DependencyProperty CancelButtonStyleProperty = DependencyProperty.Register( "CancelButtonStyle", typeof( Style ), typeof( MessageBox ), new PropertyMetadata( null ) );
     public Style CancelButtonStyle
@@ -195,31 +150,9 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    public static readonly DependencyProperty YesButtonStyleProperty = DependencyProperty.Register( "YesButtonStyle", typeof( Style ), typeof( MessageBox ), new PropertyMetadata( null ) );
-    public Style YesButtonStyle
-    {
-      get
-      {
-        return ( Style )GetValue( YesButtonStyleProperty );
-      }
-      set
-      {
-        SetValue( YesButtonStyleProperty, value );
-      }
-    }
+    #endregion //CancelButtonStyle
 
-    public static readonly DependencyProperty NoButtonStyleProperty = DependencyProperty.Register( "NoButtonStyle", typeof( Style ), typeof( MessageBox ), new PropertyMetadata( null ) );
-    public Style NoButtonStyle
-    {
-      get
-      {
-        return ( Style )GetValue( NoButtonStyleProperty );
-      }
-      set
-      {
-        SetValue( NoButtonStyleProperty, value );
-      }
-    }
+    #region ImageSource
 
     public static readonly DependencyProperty ImageSourceProperty = DependencyProperty.Register( "ImageSource", typeof( ImageSource ), typeof( MessageBox ), new UIPropertyMetadata( default( ImageSource ) ) );
     public ImageSource ImageSource
@@ -234,18 +167,9 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    public static readonly DependencyProperty NoButtonContentProperty = DependencyProperty.Register( "NoButtonContent", typeof( object ), typeof( MessageBox ), new UIPropertyMetadata( "No" ) );
-    public object NoButtonContent
-    {
-      get
-      {
-        return ( object )GetValue( NoButtonContentProperty );
-      }
-      set
-      {
-        SetValue( NoButtonContentProperty, value );
-      }
-    }
+    #endregion //ImageSource
+
+    #region OkButtonContent
 
     public static readonly DependencyProperty OkButtonContentProperty = DependencyProperty.Register( "OkButtonContent", typeof( object ), typeof( MessageBox ), new UIPropertyMetadata( "OK" ) );
     public object OkButtonContent
@@ -260,6 +184,73 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    #endregion //OkButtonContent
+
+    #region OkButtonStyle
+
+    public static readonly DependencyProperty OkButtonStyleProperty = DependencyProperty.Register( "OkButtonStyle", typeof( Style ), typeof( MessageBox ), new PropertyMetadata( null ) );
+    public Style OkButtonStyle
+    {
+      get
+      {
+        return ( Style )GetValue( OkButtonStyleProperty );
+      }
+      set
+      {
+        SetValue( OkButtonStyleProperty, value );
+      }
+    }
+
+    #endregion //OkButtonStyle
+
+    #region MessageBoxResult
+
+    /// <summary>
+    /// Gets the MessageBox result, which is set when the "Closed" event is raised.
+    /// </summary>
+    public MessageBoxResult MessageBoxResult
+    {
+      get { return _dialogResult; }
+    }
+
+    #endregion //MessageBoxResult
+
+    #region NoButtonContent
+
+    public static readonly DependencyProperty NoButtonContentProperty = DependencyProperty.Register( "NoButtonContent", typeof( object ), typeof( MessageBox ), new UIPropertyMetadata( "No" ) );
+    public object NoButtonContent
+    {
+      get
+      {
+        return ( object )GetValue( NoButtonContentProperty );
+      }
+      set
+      {
+        SetValue( NoButtonContentProperty, value );
+      }
+    }
+
+    #endregion //NoButtonContent
+
+    #region NoButtonStyle
+
+    public static readonly DependencyProperty NoButtonStyleProperty = DependencyProperty.Register( "NoButtonStyle", typeof( Style ), typeof( MessageBox ), new PropertyMetadata( null ) );
+    public Style NoButtonStyle
+    {
+      get
+      {
+        return ( Style )GetValue( NoButtonStyleProperty );
+      }
+      set
+      {
+        SetValue( NoButtonStyleProperty, value );
+      }
+    }
+
+    #endregion //NoButtonStyle
+
+    #region Text
+
     public static readonly DependencyProperty TextProperty = DependencyProperty.Register( "Text", typeof( string ), typeof( MessageBox ), new UIPropertyMetadata( String.Empty ) );
     public string Text
     {
@@ -273,44 +264,9 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    public static readonly DependencyProperty WindowBackgroundProperty = DependencyProperty.Register( "WindowBackground", typeof( Brush ), typeof( MessageBox ), new PropertyMetadata( null ) );
-    public Brush WindowBackground
-    {
-      get
-      {
-        return ( Brush )GetValue( WindowBackgroundProperty );
-      }
-      set
-      {
-        SetValue( WindowBackgroundProperty, value );
-      }
-    }
+    #endregion //Text
 
-    public static readonly DependencyProperty WindowBorderBrushProperty = DependencyProperty.Register( "WindowBorderBrush", typeof( Brush ), typeof( MessageBox ), new PropertyMetadata( null ) );
-    public Brush WindowBorderBrush
-    {
-      get
-      {
-        return ( Brush )GetValue( WindowBorderBrushProperty );
-      }
-      set
-      {
-        SetValue( WindowBorderBrushProperty, value );
-      }
-    }
-
-    public static readonly DependencyProperty WindowOpacityProperty = DependencyProperty.Register( "WindowOpacity", typeof( double ), typeof( MessageBox ), new PropertyMetadata( null ) );
-    public double WindowOpacity
-    {
-      get
-      {
-        return ( double )GetValue( WindowOpacityProperty );
-      }
-      set
-      {
-        SetValue( WindowOpacityProperty, value );
-      }
-    }
+    #region YesButtonContent
 
     public static readonly DependencyProperty YesButtonContentProperty = DependencyProperty.Register( "YesButtonContent", typeof( object ), typeof( MessageBox ), new UIPropertyMetadata( "Yes" ) );
     public object YesButtonContent
@@ -325,11 +281,35 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    #endregion //YesButtonContent
+
+    #region YesButtonStyle
+
+    public static readonly DependencyProperty YesButtonStyleProperty = DependencyProperty.Register( "YesButtonStyle", typeof( Style ), typeof( MessageBox ), new PropertyMetadata( null ) );
+    public Style YesButtonStyle
+    {
+      get
+      {
+        return ( Style )GetValue( YesButtonStyleProperty );
+      }
+      set
+      {
+        SetValue( YesButtonStyleProperty, value );
+      }
+    }
+
+    #endregion //YesButtonStyle
+
     #endregion //Dependency Properties
 
     #endregion //Properties
 
     #region Base Class Overrides
+
+    internal override bool AllowPublicIsActiveChange
+    {
+      get { return false; }
+    }
 
     /// <summary>
     /// Overrides the OnApplyTemplate method.
@@ -338,13 +318,20 @@ namespace Xceed.Wpf.Toolkit
     {
       base.OnApplyTemplate();
 
-      if( DragWidget != null )
-        DragWidget.DragDelta -= ( o, e ) => ProcessMove( e );
-
-      DragWidget = GetTemplateChild( PART_DragWidget ) as Thumb;
-
-      if( DragWidget != null )
-        DragWidget.DragDelta += ( o, e ) => ProcessMove( e );
+      if( _windowControl != null )
+      {
+        _windowControl.HeaderDragDelta -= ( o, e ) => this.OnHeaderDragDelta( e );
+        _windowControl.HeaderIconDoubleClicked -= ( o, e ) => this.OnHeaderIconDoubleClicked( e );
+        _windowControl.CloseButtonClicked -= ( o, e ) => this.OnCloseButtonClicked( e );
+      }
+      _windowControl = this.GetTemplateChild( PART_WindowControl ) as WindowControl;
+      if( _windowControl != null )
+      {
+        _windowControl.HeaderDragDelta += ( o, e ) => this.OnHeaderDragDelta( e );
+        _windowControl.HeaderIconDoubleClicked += ( o, e ) => this.OnHeaderIconDoubleClicked( e );
+        _windowControl.CloseButtonClicked += ( o, e ) => this.OnCloseButtonClicked( e );
+      }
+      this.UpdateBlockMouseInputsPanel();
 
       ChangeVisualState( _button.ToString(), true );
 
@@ -358,6 +345,29 @@ namespace Xceed.Wpf.Toolkit
 
       SetDefaultResult();
     }
+
+    protected override object OnCoerceCloseButtonVisibility( Visibility newValue )
+    {
+      if( newValue != Visibility.Visible )
+        throw new InvalidOperationException( "Close button on MessageBox is always Visible." );
+      return newValue;
+    }
+
+    protected override object OnCoerceWindowStyle( WindowStyle newValue )
+    {
+      if( newValue != WindowStyle.SingleBorderWindow )
+        throw new InvalidOperationException( "Window style on MessageBox is not available." );
+      return newValue;
+    }
+
+    internal override void UpdateBlockMouseInputsPanel()
+    {
+      if( _windowControl != null )
+      {
+        _windowControl.IsBlockMouseInputsPanelActive = this.IsBlockMouseInputsPanelActive;
+      }
+    }
+
 
     #endregion //Base Class Overrides
 
@@ -502,16 +512,89 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Public Static
 
-    #region Protected
-
+    #region Public Methods
     /// <summary>
-    /// Shows the container which contains the MessageBox.
+    /// Displays this message box when embedded in a WindowContainer parent.
+    /// Note that this call is not blocking and that you must register to the Closed event in order to handle the dialog result, if any.
     /// </summary>
-    protected void Show()
+    public void ShowMessageBox()
     {
-      Container.ShowDialog();
+      if( this.Container != null || this.Parent == null )
+        throw new InvalidOperationException(
+          "This method is not intended to be called while displaying a MessageBox outside of a WindowContainer. Use ShowDialog() instead in that case." );
+
+      if( !( this.Parent is WindowContainer ) )
+        throw new InvalidOperationException(
+          "The MessageBox instance is not intended to be displayed in a container other than a WindowContainer." );
+
+      _dialogResult = System.Windows.MessageBoxResult.None;
+      this.Visibility = Visibility.Visible;
     }
 
+    /// <summary>
+    /// Displays this message box when embedded in a WindowContainer parent.
+    /// Note that this call is not blocking and that you must register to the Closed event in order to handle the dialog result, if any.
+    /// </summary>
+    public void ShowMessageBox( string messageText )
+    {
+      this.ShowMessageBoxCore( messageText, string.Empty, MessageBoxButton.OK, MessageBoxImage.None, MessageBoxResult.None );
+    }
+
+    /// <summary>
+    /// Displays this message box when embedded in a WindowContainer parent.
+    /// Note that this call is not blocking and that you must register to the Closed event in order to handle the dialog result, if any.
+    /// </summary>
+    public void ShowMessageBox( string messageText, string caption )
+    {
+      this.ShowMessageBoxCore( messageText, caption, MessageBoxButton.OK, MessageBoxImage.None, MessageBoxResult.None );
+    }
+
+    /// <summary>
+    /// Displays this message box when embedded in a WindowContainer parent.
+    /// Note that this call is not blocking and that you must register to the Closed event in order to handle the dialog result, if any.
+    /// </summary>
+    public void ShowMessageBox( string messageText, string caption, MessageBoxButton button )
+    {
+      this.ShowMessageBoxCore( messageText, caption, button, MessageBoxImage.None, MessageBoxResult.None );
+    }
+
+    /// <summary>
+    /// Displays this message box when embedded in a WindowContainer parent.
+    /// Note that this call is not blocking and that you must register to the Closed event in order to handle the dialog result, if any.
+    /// </summary>
+    public void ShowMessageBox( string messageText, string caption, MessageBoxButton button, MessageBoxImage icon )
+    {
+      this.ShowMessageBoxCore( messageText, caption, button, icon, MessageBoxResult.None );
+    }
+
+    /// <summary>
+    /// Displays this message box when embedded in a WindowContainer parent.
+    /// Note that this call is not blocking and that you must register to the Closed event in order to handle the dialog result, if any.
+    /// </summary>
+    public void ShowMessageBox( string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult )
+    {
+      this.ShowMessageBoxCore( messageText, caption, button, icon, defaultResult );
+    }
+
+    /// <summary>
+    /// Display the MessageBox window and returns only when this MessageBox closes.
+    /// </summary>
+    public bool? ShowDialog()
+    {
+      if( this.Parent != null )
+        throw new InvalidOperationException(
+          "This method is not intended to be called while displaying a Message Box inside a WindowContainer. Use 'ShowMessageBox()' instead." );
+
+      _dialogResult = System.Windows.MessageBoxResult.None;
+      this.Visibility = Visibility.Visible;
+      this.CreateContainer();
+
+      return this.Container.ShowDialog();
+    }
+
+    #endregion
+
+    #region Protected
     /// <summary>
     /// Initializes the MessageBox.
     /// </summary>
@@ -527,7 +610,6 @@ namespace Xceed.Wpf.Toolkit
       _defaultResult = defaultResult;
       _owner = owner;
       SetImageSource( image );
-      Container = CreateContainer();
     }
 
     /// <summary>
@@ -542,7 +624,32 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Protected
 
+
+
+
+
     #region Private
+
+    private bool IsCurrentWindow( object windowtoTest )
+    {
+      return object.Equals( _windowControl, windowtoTest );
+    }
+
+    /// <summary>
+    /// Closes the MessageBox.
+    /// </summary>
+    private void Close()
+    {
+      if( this.Container != null )
+      {
+        // The Window.Closed event callback will call "OnClose"
+        this.Container.Close();
+      }
+      else
+      {
+        this.OnClose();
+      }
+    }
 
     /// <summary>
     /// Sets the button that represents the _defaultResult to the default button and gives it focus.
@@ -618,6 +725,19 @@ namespace Xceed.Wpf.Toolkit
       return button;
     }
 
+    private void ShowMessageBoxCore( string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult )
+    {
+      this.InitializeMessageBox( null, messageText, caption, button, icon, defaultResult );
+      this.ShowMessageBox();
+    }
+
+    private void InitHandlers()
+    {
+      AddHandler( ButtonBase.ClickEvent, new RoutedEventHandler( this.Button_Click ) );
+
+      CommandBindings.Add( new CommandBinding( ApplicationCommands.Copy, new ExecutedRoutedEventHandler( ExecuteCopy ) ) );
+    }
+
     /// <summary>
     /// Shows the MessageBox.
     /// </summary>
@@ -629,6 +749,11 @@ namespace Xceed.Wpf.Toolkit
     /// <returns></returns>
     private static MessageBoxResult ShowCore( Window owner, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult, Style messageBoxStyle )
     {
+      if( System.Windows.Interop.BrowserInteropHelper.IsBrowserHosted )
+      {
+        throw new InvalidOperationException( "Static methods for MessageBoxes are not available in XBAP. Use the instance ShowMessageBox methods instead." );
+      }
+
       MessageBox msgBox = new MessageBox();
       msgBox.InitializeMessageBox( owner, messageText, caption, button, icon, defaultResult );
 
@@ -638,7 +763,7 @@ namespace Xceed.Wpf.Toolkit
         msgBox.Style = messageBoxStyle;
       }
 
-      msgBox.Show();
+      msgBox.ShowDialog();
       return msgBox.MessageBoxResult;
     }
 
@@ -700,7 +825,7 @@ namespace Xceed.Wpf.Toolkit
           }
       }
 
-      ImageSource = ( ImageSource )new ImageSourceConverter().ConvertFromString( String.Format( "pack://application:,,,/Xceed.Wpf.Toolkit;component/MessageBox/Icons/{0}", iconName ) );
+      this.ImageSource = new BitmapImage( new Uri( String.Format("../Icons/{0}", iconName), UriKind.Relative ) );
     }
 
     /// <summary>
@@ -724,6 +849,7 @@ namespace Xceed.Wpf.Toolkit
       newWindow.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;
       newWindow.ResizeMode = System.Windows.ResizeMode.NoResize;
       newWindow.WindowStyle = System.Windows.WindowStyle.None;
+      newWindow.Closed += new EventHandler( OnContainerClosed );
       return newWindow;
     }
 
@@ -737,17 +863,91 @@ namespace Xceed.Wpf.Toolkit
     /// Processes the move of a drag operation on the header.
     /// </summary>
     /// <param name="e">The <see cref="System.Windows.Controls.Primitives.DragDeltaEventArgs"/> instance containing the event data.</param>
-    private void ProcessMove( DragDeltaEventArgs e )
+    protected virtual void OnHeaderDragDelta( DragDeltaEventArgs e )
     {
-      double left = 0.0;
+      if( !this.IsCurrentWindow( e.OriginalSource ) )
+        return;
 
-      if( FlowDirection == System.Windows.FlowDirection.RightToLeft )
-        left = Container.Left - e.HorizontalChange;
-      else
-        left = Container.Left + e.HorizontalChange;
+      e.Handled = true;
 
-      Container.Left = left;
-      Container.Top = Container.Top + e.VerticalChange;
+      DragDeltaEventArgs args = new DragDeltaEventArgs( e.HorizontalChange, e.VerticalChange );
+      args.RoutedEvent = HeaderDragDeltaEvent;
+      args.Source = this;
+      this.RaiseEvent( args );
+
+      if( !args.Handled )
+      {
+        if( this.Container == null )
+        {
+          double left = 0.0;
+
+          if( this.FlowDirection == System.Windows.FlowDirection.RightToLeft )
+            left = this.Left - e.HorizontalChange;
+          else
+            left = this.Left + e.HorizontalChange;
+
+          this.Left = left;
+          this.Top += e.VerticalChange;
+        }
+        else
+        {
+          double left = 0.0;
+
+          if( this.FlowDirection == System.Windows.FlowDirection.RightToLeft )
+            left = Container.Left - e.HorizontalChange;
+          else
+            left = Container.Left + e.HorizontalChange;
+
+          Container.Left = left;
+          Container.Top += e.VerticalChange;
+        }
+      }
+    }
+
+    /// <summary>
+    /// Processes the double-click on the header.
+    /// </summary>
+    /// <param name="e">The <see cref="System.Windows.Input.Primitives.MouseButtonEventArgs"/> instance containing the event data.</param>
+    protected virtual void OnHeaderIconDoubleClicked( MouseButtonEventArgs e )
+    {
+      if( !this.IsCurrentWindow( e.OriginalSource ) )
+        return;
+
+      e.Handled = true;
+
+      MouseButtonEventArgs args = new MouseButtonEventArgs( Mouse.PrimaryDevice, 0, MouseButton.Left );
+      args.RoutedEvent = HeaderIconDoubleClickedEvent;
+      args.Source = this;
+      this.RaiseEvent( args );
+
+      if( !args.Handled )
+      {
+        this.Close();
+      }
+    }
+
+    /// <summary>
+    /// Processes the close button click.
+    /// </summary>
+    /// <param name="e">The <see cref="System.Windows.RoutedEventArgs"/> instance containing the event data.</param>
+    protected virtual void OnCloseButtonClicked( RoutedEventArgs e )
+    {
+      if( !this.IsCurrentWindow( e.OriginalSource ) )
+        return;
+
+      e.Handled = true;
+
+      _dialogResult = object.Equals( _button, MessageBoxButton.OK )
+                             ? MessageBoxResult.OK
+                             : MessageBoxResult.Cancel;
+
+      RoutedEventArgs args = new RoutedEventArgs( CloseButtonClickedEvent, this );
+      this.RaiseEvent( args );
+
+      if( !args.Handled )
+      {
+        this.Close();
+      }
     }
 
     /// <summary>
@@ -765,38 +965,61 @@ namespace Xceed.Wpf.Toolkit
       switch( button.Name )
       {
         case PART_NoButton:
-          MessageBoxResult = MessageBoxResult.No;
+          _dialogResult = MessageBoxResult.No;
+          this.Close();
           break;
         case PART_YesButton:
-          MessageBoxResult = MessageBoxResult.Yes;
-          break;
-        case PART_CloseButton:
-          MessageBoxResult = object.Equals( _button, MessageBoxButton.OK )
-                              ? MessageBoxResult.OK
-                              : MessageBoxResult.Cancel;
+          _dialogResult = MessageBoxResult.Yes;
+          this.Close();
           break;
         case PART_CancelButton:
-          MessageBoxResult = MessageBoxResult.Cancel;
+          _dialogResult = MessageBoxResult.Cancel;
+          this.Close();
           break;
         case PART_OkButton:
-          MessageBoxResult = MessageBoxResult.OK;
+          _dialogResult = MessageBoxResult.OK;
+          this.Close();
           break;
       }
 
       e.Handled = true;
-
-      Close();
     }
 
     /// <summary>
-    /// Closes the MessageBox.
+    /// Callack to the Container.Closed event
     /// </summary>
-    private void Close()
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void OnContainerClosed( object sender, EventArgs e )
     {
-      Container.Close();
+      this.Container.Closed -= this.OnContainerClosed;
+      this.Container.Content = null;
+      Debug.Assert( this.Container == null );
+      this.OnClose();
+    }
+
+    private void OnClose()
+    {
+      this.Visibility = Visibility.Collapsed;
+      this.OnClosed( EventArgs.Empty );
     }
 
     #endregion //Event Handlers
+
+    #region Events
+
+    /// <summary>
+    /// Occurs when the MessageBox is closed.
+    /// </summary>
+    public event EventHandler Closed;
+    protected virtual void OnClosed( EventArgs e )
+    {
+      if( Closed != null )
+        Closed( this, e );
+    }
+
+
+    #endregion
 
     #region COMMANDS
 

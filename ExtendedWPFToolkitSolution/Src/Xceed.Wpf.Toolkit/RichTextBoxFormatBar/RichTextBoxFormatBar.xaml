@@ -1,18 +1,18 @@
-﻿<!--************************************************************************
+﻿<!--***********************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************-->
+  **********************************************************************************-->
 
 <UserControl x:Class="Xceed.Wpf.Toolkit.RichTextBoxFormatBar"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -191,7 +191,7 @@
                               </Grid.ColumnDefinitions>
 
                               <Grid>
-                                 <Image Source="/Xceed.Wpf.Toolkit;component/RichTextBoxFormatBar/Images/FontColorPicker16.png" Width="16" Height="16" />
+                                 <Image Source="./Images/FontColorPicker16.png" Width="16" Height="16" />
                                  <Rectangle Grid.Row="1"
                                             Height="4"
                                             Margin="0,12,0,0"
@@ -286,7 +286,7 @@
                               </Grid.ColumnDefinitions>
 
                               <Grid>
-                                 <Image Source="/Xceed.Wpf.Toolkit;component/RichTextBoxFormatBar/Images/TextHighlightColorPicker16.png" Width="16" Height="16" />
+                                 <Image Source="./Images/TextHighlightColorPicker16.png" Width="16" Height="16" />
                                  <Rectangle Grid.Row="1"
                                             Height="4"
                                             Margin="0,12,0,0"
@@ -392,7 +392,7 @@
                              CommandTarget="{Binding ElementName=_window, Path=Target}"
                              Click="Bullets_Clicked"
                              ToolTip="Bullets">
-                  <Image Source="/Xceed.Wpf.Toolkit;component/RichTextBoxFormatBar/Images/Bullets16.png" />
+                  <Image Source="./Images/Bullets16.png" />
                </ToggleButton>
 
                <ToggleButton x:Name="_btnNumbers"
@@ -401,7 +401,7 @@
                              CommandTarget="{Binding ElementName=_window, Path=Target}"
                              Click="Numbers_Clicked"
                              ToolTip="Numbering">
-                  <Image Source="/Xceed.Wpf.Toolkit;component/RichTextBoxFormatBar/Images/Numbering16.png" />
+                  <Image Source="./Images/Numbering16.png" />
                </ToggleButton>
 
             </StackPanel>
@@ -412,21 +412,21 @@
                              Command="EditingCommands.ToggleBold"
                              CommandTarget="{Binding ElementName=_window, Path=Target}"
                              ToolTip="Bold">
-                  <Image Source="/Xceed.Wpf.Toolkit;component/RichTextBoxFormatBar/Images/Bold16.png" />
+                  <Image Source="./Images/Bold16.png" />
                </ToggleButton>
                <ToggleButton x:Name="_btnItalic"
                              Style="{StaticResource FormatBarToggleButtonStyle}"
                              Command="{x:Static EditingCommands.ToggleItalic}"
                              CommandTarget="{Binding ElementName=_window, Path=Target}"
                              ToolTip="Italic">
-                  <Image Source="/Xceed.Wpf.Toolkit;component/RichTextBoxFormatBar/Images/Italic16.png" />
+                  <Image Source="./Images/Italic16.png" />
                </ToggleButton>
                <ToggleButton x:Name="_btnUnderline"
                              Style="{StaticResource FormatBarToggleButtonStyle}"
                              Command="{x:Static EditingCommands.ToggleUnderline}"
                              CommandTarget="{Binding ElementName=_window, Path=Target}"
                              ToolTip="Underline">
-                  <Image Source="/Xceed.Wpf.Toolkit;component/RichTextBoxFormatBar/Images/Underline16.png" />
+                  <Image Source="./Images/Underline16.png" />
                </ToggleButton>
 
                <Separator />
@@ -436,21 +436,21 @@
                             Command="{x:Static EditingCommands.AlignLeft}"
                             CommandTarget="{Binding ElementName=_window, Path=Target}"
                             ToolTip="Align Left">
-                  <Image Source="/Xceed.Wpf.Toolkit;component/RichTextBoxFormatBar/Images/LeftAlign16.png" />
+                  <Image Source="./Images/LeftAlign16.png" />
                </RadioButton>
                <RadioButton x:Name="_btnAlignCenter"
                             Style="{StaticResource FormatBarToggleButtonStyle}"
                             Command="{x:Static EditingCommands.AlignCenter}"
                             CommandTarget="{Binding ElementName=_window, Path=Target}"
                             ToolTip="Align Center">
-                  <Image Source="/Xceed.Wpf.Toolkit;component/RichTextBoxFormatBar/Images/CenterAlign16.png" />
+                  <Image Source="./Images/CenterAlign16.png" />
                </RadioButton>
                <RadioButton x:Name="_btnAlignRight"
                             Style="{StaticResource FormatBarToggleButtonStyle}"
                             Command="{x:Static EditingCommands.AlignRight}"
                             CommandTarget="{Binding ElementName=_window, Path=Target}"
                             ToolTip="Align Right">
-                  <Image Source="/Xceed.Wpf.Toolkit;component/RichTextBoxFormatBar/Images/RightAlign16.png" />
+                  <Image Source="./Images/RightAlign16.png" />
                </RadioButton>
 
                <Separator />

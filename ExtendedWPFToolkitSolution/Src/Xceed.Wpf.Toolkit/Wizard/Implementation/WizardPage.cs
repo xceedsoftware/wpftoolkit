@@ -1,22 +1,23 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -280,6 +281,63 @@ namespace Xceed.Wpf.Toolkit
       DefaultStyleKeyProperty.OverrideMetadata( typeof( WizardPage ), new FrameworkPropertyMetadata( typeof( WizardPage ) ) );
     }
 
+    public WizardPage()
+    {
+      this.Loaded += new RoutedEventHandler( WizardPage_Loaded );
+      this.Unloaded += new RoutedEventHandler( WizardPage_Unloaded );
+    }
+
+    void WizardPage_Unloaded( object sender, RoutedEventArgs e )
+    {
+      base.RaiseEvent( new RoutedEventArgs( WizardPage.LeaveEvent, this ) );
+    }
+
+    void WizardPage_Loaded( object sender, RoutedEventArgs e )
+    {
+      if( this.IsVisible )
+      {
+        base.RaiseEvent( new RoutedEventArgs( WizardPage.EnterEvent, this ) );
+      }
+    }
+
     #endregion //Constructors
+
+    #region Events
+
+    #region Enter Event
+
+    public static readonly RoutedEvent EnterEvent = EventManager.RegisterRoutedEvent( "Enter", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( WizardPage ) );
+    public event RoutedEventHandler Enter
+    {
+      add
+      {
+        AddHandler( EnterEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( EnterEvent, value );
+      }
+    }
+
+    #endregion //Enter Event
+
+    #region Leave Event
+
+    public static readonly RoutedEvent LeaveEvent = EventManager.RegisterRoutedEvent( "Leave", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( WizardPage ) );
+    public event RoutedEventHandler Leave
+    {
+      add
+      {
+        AddHandler( LeaveEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( LeaveEvent, value );
+      }
+    }
+
+    #endregion //Leave Event
+
+    #endregion  //Events
   }
 }

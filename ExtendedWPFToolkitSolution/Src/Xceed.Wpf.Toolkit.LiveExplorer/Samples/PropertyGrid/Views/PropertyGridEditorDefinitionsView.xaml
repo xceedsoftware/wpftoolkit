@@ -1,0 +1,86 @@
+﻿<!--**************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ************************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views.PropertyGridEditorDefinitionsView"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:s="clr-namespace:System;assembly=mscorlib"
+                xmlns:sm="clr-namespace:System.Windows.Media;assembly=PresentationCore"
+                xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                xmlns:v="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views"
+                xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                VerticalScrollBarVisibility="Disabled"
+                Title="Ready-to-use EditorDefinitions">
+
+
+
+
+   <local:DemoView.Description>
+      <Paragraph FontSize="14" FontFamily="Segoe">
+         Using the various EditorDefinitions provided with the PropertyGrid, you can easily customize and reuse the existing default editor to suit your needs. Style the editing element or use one of the common properties directly provided on the editor definition class. The provided editor definitions are the following:
+         <LineBreak/>
+         <LineBreak/>
+         EditorCheckBoxDefinition
+         <LineBreak/>
+         EditorColorPickerDefinition
+         <LineBreak/>
+         EditorComboBoxDefinition
+         <LineBreak/>
+         EditorDateTimeUpDownDefinition
+         <LineBreak/>
+         EditorTextDefinition
+         <LineBreak/>
+         EditorTemplateDefinition
+         <LineBreak/>
+         <LineBreak/>
+         And all numeric editor definitions:
+         <LineBreak />
+         <LineBreak />
+         EditorIntegerUpDownDefinition
+         <LineBreak />
+         EditorDoubleUpDownDefinition
+            <LineBreak />
+         <LineBreak />
+            <Run>This feature is only available in the "Plus" version.</Run>
+            <LineBreak />
+            <Hyperlink NavigateUri="http://www.xceed.com/Extended_WPF_Toolkit_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
+               Click here for more details about Extended WPF Toolkit Plus.
+            </Hyperlink>
+         etc.
+      </Paragraph>
+   </local:DemoView.Description>
+
+   <DockPanel>
+      <StackPanel DockPanel.Dock="Top">
+         <TextBlock Text="Each of the displayed properties has their display or behavior affected by an different EditorDefinition "
+                 TextWrapping="Wrap"/>
+      </StackPanel>
+      <ScrollViewer VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Auto">
+         <StackPanel>
+            <TextBlock Text="Xaml :" Margin="0,10,0,0" />
+            <local:XamlBox CodeSource="/Samples/PropertyGrid/OpenSourceImages/EditorDefinitions.xaml.txt" />
+         </StackPanel>
+      </ScrollViewer>      
+
+
+
+
+
+
+   </DockPanel>
+
+
+</local:DemoView>

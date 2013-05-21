@@ -1,0 +1,138 @@
+﻿<!--*************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************-->
+
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.DateTime.Views.DateTimeView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                 xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.DateTime.Converters"
+                 Title="DateTime">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+            The DateTimePicker and TimePicker controls let you select the date and the time in several ways. The TimePicker is used in the DateTimePicker.
+        </Paragraph>
+    </local:DemoView.Description>
+
+    <local:DemoView.Resources>
+        <conv:DateTimeToTimeSpanConverter x:Key="dateTimeToTimeSpanConverter" />
+
+        <ObjectDataProvider x:Key="enumTimeFormatData" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="xctk:TimeFormat"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+      <ObjectDataProvider x:Key="enumDateFormatData" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+         <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="xctk:DateTimeFormat"/>
+         </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+   </local:DemoView.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+      <GroupBox Header="Features" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" >
+         <Grid>
+            <Grid.RowDefinitions>
+               <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+               <ColumnDefinition Width="Auto"/>
+               <ColumnDefinition Width="Auto"/>
+               <ColumnDefinition Width="Auto"/>
+               <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Format:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" />
+            <ComboBox x:Name="_format" Grid.Row="0" Grid.Column="1" SelectedIndex="1" ItemsSource="{Binding Source={StaticResource enumDateFormatData}}" Width="190" Margin="5,5,25,5"/>
+            <TextBlock Text="FormatString:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" />
+            <TextBox x:Name="_formatString" Grid.Row="1" Grid.Column="1" Text="yy MMM dd" Width="190" Margin="5,5,25,5"/>
+            <TextBlock Text="Watermark:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"/>
+            <TextBox x:Name="_watermark" Grid.Row="2" Grid.Column="1" Text="Enter Text" Width="190" VerticalAlignment="Center" Margin="5,5,25,5"/>  
+            <TextBlock Text="AutoCloseCalendar:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="_autoCloseCalendar" Grid.Row="3" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5,5,25,5"/>    
+
+            <TextBlock Text="TimeFormat:" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" />
+            <ComboBox x:Name="_timeFormat" Grid.Row="0" Grid.Column="3" SelectedIndex="1" ItemsSource="{Binding Source={StaticResource enumTimeFormatData}}" Width="190" Margin="5"/>
+            <TextBlock Text="Time FormatString:" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" />
+            <TextBox x:Name="_timeFormatString" Grid.Row="1" Grid.Column="3" Text="H:mm" Width="190" Margin="5"/>            
+            <TextBlock Text="TimeWatermark:" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center"/>
+            <TextBox x:Name="_timeWatermark" Grid.Row="2" Grid.Column="3" Text="Enter Text" Width="190" VerticalAlignment="Center" Margin="5"/>
+         </Grid>
+      </GroupBox>
+
+      <StackPanel Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left">
+            <TextBlock Text="DateTimePicker Usage: " Margin="0,10,0,0" Style="{StaticResource Header}" />
+            <xctk:DateTimePicker x:Name="_datetimePicker"
+                                 Width="300"
+                                 VerticalAlignment="Top"
+                                 IsReadOnly="False"
+                                 Format="{Binding Source={x:Reference _format}, Path=SelectedItem}"
+                                 FormatString="{Binding Text, ElementName=_formatString}"
+                                 Watermark="{Binding  Source={x:Reference _watermark}, Path=Text}"
+                                 TimeFormat="{Binding Source={x:Reference _timeFormat}, Path=SelectedItem}"
+                                 TimeFormatString="{Binding Text, ElementName=_timeFormatString}"
+                                 TimeWatermark="{Binding  Source={x:Reference _timeWatermark}, Path=Text}"
+                                 AutoCloseCalendar="{Binding IsChecked, ElementName=_autoCloseCalendar}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch">
+            <GroupBox Header="TimePicker Features" Margin="0,15,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="StartTime:" VerticalAlignment="Center" />
+                    <xctk:DateTimeUpDown x:Name="_startTime" Grid.Column="1" Format="ShortTime" Value="9:00" Width="100" Margin="5"/>
+                    <TextBlock Text="EndTime:" Grid.Row="1" VerticalAlignment="Center" />
+                    <xctk:DateTimeUpDown x:Name="_endTime" Grid.Row="1" Grid.Column="1" Format="ShortTime" Value="17:00" Width="100" Margin="5"/>
+                    <TextBlock Text="TimeInterval:" Grid.Row="2" VerticalAlignment="Center" />
+                    <xctk:DateTimeUpDown x:Name="_timeInterval" Grid.Row="2" Grid.Column="1" Format="Custom" FormatString="H:mm" Value="0:30" Width="100" Margin="5"/>
+                </Grid>
+            </GroupBox>
+
+            <StackPanel>
+                <TextBlock Text="TimePicker Usage: " Style="{StaticResource Header}" />
+                <xctk:TimePicker x:Name="_timePicker"
+                                 VerticalAlignment="Top"
+                                 Format="{Binding Source={x:Reference _timeFormat}, Path=SelectedItem}"
+                                 FormatString="{Binding Text, ElementName=_timeFormatString}"
+                                 Watermark="{Binding Source={x:Reference _timeWatermark}, Path=Text}"
+                                 StartTime="{Binding Source={x:Reference _startTime}, Path=Value, Converter={StaticResource dateTimeToTimeSpanConverter}}"
+                                 EndTime="{Binding Source={x:Reference _endTime}, Path=Value, Converter={StaticResource dateTimeToTimeSpanConverter}}"
+                                 TimeInterval="{Binding Source={x:Reference _timeInterval}, Path=Value, Converter={StaticResource dateTimeToTimeSpanConverter}}"/>
+         </StackPanel>
+        </StackPanel>
+    </Grid>
+</local:DemoView>

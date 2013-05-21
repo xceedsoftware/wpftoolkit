@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Windows;
@@ -109,19 +109,60 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #endregion //DefaultValue
 
+    #region MouseWheelActiveTrigger
+
+    /// <summary>
+    /// Identifies the MouseWheelActiveTrigger dependency property
+    /// </summary>
+    public static readonly DependencyProperty MouseWheelActiveTriggerProperty = DependencyProperty.Register( "MouseWheelActiveTrigger", typeof( MouseWheelActiveTrigger ), typeof( UpDownBase<T> ), new UIPropertyMetadata( MouseWheelActiveTrigger.Focused ) );
+
+    /// <summary>
+    /// Get or set when the mouse wheel event should affect the value.
+    /// </summary>
+    public MouseWheelActiveTrigger MouseWheelActiveTrigger
+    {
+      get
+      {
+        return ( MouseWheelActiveTrigger )GetValue( MouseWheelActiveTriggerProperty );
+      }
+      set
+      {
+        SetValue( MouseWheelActiveTriggerProperty, value );
+      }
+    }
+
+    #endregion //MouseWheelActiveTrigger
+
+
     #region MouseWheelActiveOnFocus
 
-    public static readonly DependencyProperty MouseWheelActiveOnFocusProperty = DependencyProperty.Register( "MouseWheelActiveOnFocus", typeof( bool ), typeof( UpDownBase<T> ), new UIPropertyMetadata( true ) );
+    [Obsolete("Use MouseWheelActiveTrigger property instead")]
+    public static readonly DependencyProperty MouseWheelActiveOnFocusProperty = DependencyProperty.Register( "MouseWheelActiveOnFocus", typeof( bool ), typeof( UpDownBase<T> ), new UIPropertyMetadata( true, OnMouseWheelActiveOnFocusChanged ) );
+
+    [Obsolete( "Use MouseWheelActiveTrigger property instead" )]
     public bool MouseWheelActiveOnFocus
     {
       get
       {
+#pragma warning disable 618
         return ( bool )GetValue( MouseWheelActiveOnFocusProperty );
+#pragma warning restore 618
       }
       set
       {
+#pragma warning disable 618
         SetValue( MouseWheelActiveOnFocusProperty, value );
+#pragma warning restore 618
       }
+    }
+
+    private static void OnMouseWheelActiveOnFocusChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      UpDownBase<T> upDownBase = o as UpDownBase<T>;
+      if( upDownBase != null )
+        upDownBase.MouseWheelActiveTrigger = (( bool )e.NewValue) 
+          ? MouseWheelActiveTrigger.Focused
+          : MouseWheelActiveTrigger.MouseOver;
     }
 
     #endregion //MouseWheelActiveOnFocus
@@ -234,33 +275,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
       SetValidSpinDirection();
     }
 
-    protected override void OnGotFocus( RoutedEventArgs e )
-    {
-      if( TextBox != null )
-        TextBox.Focus();
-    }
-
-    protected override void OnPreviewKeyDown( KeyEventArgs e )
-    {
-      switch( e.Key )
-      {
-        case Key.Up:
-          {
-            if( AllowSpin && !IsReadOnly )
-              DoIncrement();
-            e.Handled = true;
-            break;
-          }
-        case Key.Down:
-          {
-            if( AllowSpin && !IsReadOnly )
-              DoDecrement();
-            e.Handled = true;
-            break;
-          }
-      }
-    }
-
     protected override void OnKeyDown( KeyEventArgs e )
     {
       switch( e.Key )
@@ -273,25 +287,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
             e.Handled = !commitSuccess;
             break;
           }
-      }
-    }
-
-    protected override void OnMouseWheel( MouseWheelEventArgs e )
-    {
-      base.OnMouseWheel( e );
-
-      if( !e.Handled && AllowSpin && !IsReadOnly && ( TextBox.IsFocused && MouseWheelActiveOnFocus ) )
-      {
-        if( e.Delta < 0 )
-        {
-          DoDecrement();
-        }
-        else if( 0 < e.Delta )
-        {
-          DoIncrement();
-        }
-
-        e.Handled = true;
       }
     }
 
@@ -323,7 +318,17 @@ namespace Xceed.Wpf.Toolkit.Primitives
     private void OnSpinnerSpin( object sender, SpinEventArgs e )
     {
       if( AllowSpin && !IsReadOnly )
-        OnSpin( e );
+      {
+        var activeTrigger = this.MouseWheelActiveTrigger;
+        bool spin = !e.UsingMouseWheel;
+        spin |= (activeTrigger == MouseWheelActiveTrigger.MouseOver);
+        spin |= ( TextBox.IsFocused && ( activeTrigger == MouseWheelActiveTrigger.Focused ) );
+
+        if( spin )
+        {
+          OnSpin( e );
+        }
+      }
     }
 
     #endregion //Event Handlers
@@ -369,14 +374,20 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       base.OnInitialized( e );
       // When both Value and Text are initialized, Value has priority.
-      bool updateValueFromText = ( this.Value == null );
-      this.SyncTextAndValueProperties( updateValueFromText, Text );
+      // To be sure that the value is not initialized, it should
+      // have no local value, no binding, and equal to the default value.
+      bool updateValueFromText =
+        ( this.ReadLocalValue( ValueProperty ) == DependencyProperty.UnsetValue )
+        && ( BindingOperations.GetBinding( this, ValueProperty ) == null )
+        && ( object.Equals(this.Value, ValueProperty.DefaultMetadata.DefaultValue) );
+
+      this.SyncTextAndValueProperties( updateValueFromText, Text, !updateValueFromText );
     }
 
     /// <summary>
     /// Performs an increment if conditions allow it.
     /// </summary>
-    private void DoDecrement()
+    internal void DoDecrement()
     {
       if( Spinner == null || ( Spinner.ValidSpinDirection & ValidSpinDirections.Decrease ) == ValidSpinDirections.Decrease )
       {
@@ -387,7 +398,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     /// <summary>
     /// Performs a decrement if conditions allow it.
     /// </summary>
-    private void DoIncrement()
+    internal void DoIncrement()
     {
       if( Spinner == null || ( Spinner.ValidSpinDirection & ValidSpinDirections.Increase ) == ValidSpinDirections.Increase )
       {
@@ -431,7 +442,12 @@ namespace Xceed.Wpf.Toolkit.Primitives
       return this.SyncTextAndValueProperties( true, Text );
     }
 
-    protected bool SyncTextAndValueProperties(bool updateValueFromText, string text )
+    protected bool SyncTextAndValueProperties( bool updateValueFromText, string text )
+    {
+      return this.SyncTextAndValueProperties( updateValueFromText, text, false );
+    }
+
+    private bool SyncTextAndValueProperties(bool updateValueFromText, string text, bool forceTextUpdate )
     {
       if( _isSyncingTextAndValueProperties )
         return true;
@@ -444,7 +460,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
         {
           if( string.IsNullOrEmpty( text ) )
           {
-            // An empty input set the value to the default value.
+            // An empty input sets the value to the default value.
             Value = this.DefaultValue;
           }
           else
@@ -472,8 +488,8 @@ namespace Xceed.Wpf.Toolkit.Primitives
         if(!_isTextChangedFromUI)
         {
           // Don't replace the empty Text with the non-empty representation of DefaultValue.
-          bool shouldKeepEmpty = string.IsNullOrEmpty( Text ) && object.Equals( Value, DefaultValue );
-          if( !shouldKeepEmpty )
+          bool shouldKeepEmpty = !forceTextUpdate && string.IsNullOrEmpty( Text ) && object.Equals( Value, DefaultValue );
+          if(  !shouldKeepEmpty )
           {
             Text = ConvertValueToText();
           }
@@ -486,8 +502,8 @@ namespace Xceed.Wpf.Toolkit.Primitives
         if( _isTextChangedFromUI && !parsedTextIsValid )
         {
           // Text input was made from the user and the text
-          // repesent an invalid value. Make the spinner "disable" 
-          // in these case.
+          // repesents an invalid value. Disable the spinner
+          // in this case.
           if( Spinner != null )
           {
             Spinner.ValidSpinDirection = ValidSpinDirections.None;

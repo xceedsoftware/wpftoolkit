@@ -1,0 +1,21 @@
+﻿
+<xctk:PropertyGrid >
+    <xctk:PropertyGrid.Properties>
+
+      <xctk:CustomPropertyItem DisplayName="First Name" 
+                               Value="Nancy" 
+                               Category="Name" />
+
+      <xctk:CustomPropertyItem DisplayName="Age" 
+                               Value="29" 
+                               Category="Other" 
+                               DefinitionKey="{x:Type s:Int32}" />
+            
+      <xctk:CustomPropertyItem DisplayName="Picture" Category="Other">
+          <xctk:CustomPropertyItem.Editor>
+            <Image Source="/Samples/PropertyGrid/Resources/woman.png" />
+          </xctk:CustomPropertyItem.Editor>
+      </xctk:CustomPropertyItem>
+
+    </xctk:PropertyGrid.Properties>
+</xctk:PropertyGrid>

@@ -1,0 +1,137 @@
+﻿<!--***********************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Xceed.Wpf.DataGrid"
+                    xmlns:markup="clr-namespace:Xceed.Wpf.DataGrid.Markup"
+                    xmlns:views="clr-namespace:Xceed.Wpf.DataGrid.Views">
+
+    <ResourceDictionary.MergedDictionaries>
+        <!-- Style definitions for specific controls (things that are not grid elements) -->
+
+        <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Controls/FixedColumnSplitter.generic.xaml"/>
+        <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Controls/TableViewScrollViewer.generic.xaml"/>
+
+        <!-- For each specific systeme theme ResourceDictionary, we only need to include 
+           the xaml associated to the theme (to make the "BasedOn" work). However, here 
+           we have include all xaml theme files of the product to make the forcing of a 
+           theme work. And it works because, when the DefaultStyleKey is not found in the 
+           specific ResourceDictionary, WPF looks in the generic.xaml ResourceDictionary. 
+           That way, we don't have to maintain this list in all the xaml files. -->
+
+        <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Windows8/TableflowView.Windows8.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!-- Generic theme for TableflowView -->
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView}"
+          TargetType="views:TableflowView"
+          BasedOn="{StaticResource tableflowViewWindows8DefaultValues}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:DataGridControl}"
+          TargetType="local:DataGridControl"
+          BasedOn="{StaticResource tableflowViewWindows8GridControlStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:RowSelectorPane}"
+          TargetType="local:RowSelectorPane"
+          BasedOn="{StaticResource tableflowViewWindows8RowSelectorPaneStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:RowSelector}"
+          TargetType="local:RowSelector"
+          BasedOn="{StaticResource tableflowViewWindows8RowSelectorStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:Row}"
+          TargetType="local:Row"
+          BasedOn="{StaticResource tableflowViewWindows8RowStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:DataRow}"
+          TargetType="local:DataRow"
+          BasedOn="{StaticResource tableflowViewWindows8DataRowStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:ColumnManagerRow}"
+          TargetType="local:ColumnManagerRow"
+          BasedOn="{StaticResource tableflowViewWindows8ColumnManagerRowStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:Cell}"
+          TargetType="local:Cell"
+          BasedOn="{StaticResource tableflowViewWindows8CellStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:DataCell}"
+          TargetType="local:DataCell"
+          BasedOn="{StaticResource tableflowViewWindows8DataCellStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:ColumnManagerCell}"
+          TargetType="local:ColumnManagerCell"
+          BasedOn="{StaticResource tableflowViewWindows8ColumnManagerCellStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupByControl}"
+          TargetType="local:GroupByControl"
+          BasedOn="{StaticResource tableflowViewWindows8GroupByControlStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupByItem}"
+          TargetType="local:GroupByItem"
+          BasedOn="{StaticResource tableflowViewWindows8GroupByItemStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupHeaderControl}"
+          TargetType="local:GroupHeaderControl"
+          BasedOn="{StaticResource tableflowViewWindows8GroupHeaderControlStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupLevelIndicator}"
+          TargetType="local:GroupLevelIndicator"
+          BasedOn="{StaticResource tableflowViewWindows8GroupLevelIndicatorStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:DetailIndicator}"
+          TargetType="local:DetailIndicator"
+          BasedOn="{StaticResource tableflowViewWindows8DetailIndicatorStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupLevelIndicatorPane}"
+          TargetType="local:GroupLevelIndicatorPane"
+          BasedOn="{StaticResource tableflowViewWindows8GroupLevelIndicatorPaneStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:HierarchicalGroupLevelIndicatorPane}"
+          TargetType="local:HierarchicalGroupLevelIndicatorPane"
+          BasedOn="{StaticResource tableflowViewWindows8HierarchicalGroupLevelIndicatorPaneStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:ScrollTip}"
+          TargetType="local:ScrollTip"
+          BasedOn="{StaticResource tableflowViewWindows8ScrollTipStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:HierarchicalGroupByControlNode}"
+          TargetType="local:HierarchicalGroupByControlNode"
+          BasedOn="{StaticResource tableflowViewWindows8HierarchicalGroupByControlNodeStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:HierarchicalGroupByControl}"
+          TargetType="local:HierarchicalGroupByControl"
+          BasedOn="{StaticResource tableflowViewWindows8HierarchicalGroupByControlStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:HierarchicalGroupByItem}"
+          TargetType="local:HierarchicalGroupByItem"
+          BasedOn="{StaticResource tableflowViewWindows8HierarchicalGroupByItemStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationButton}"
+          TargetType="{x:Type local:GroupNavigationButton}"
+          BasedOn="{StaticResource tableflowViewWindows8GroupNavigationButtonStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationControl}"
+          TargetType="{x:Type local:GroupNavigationControl}"
+          BasedOn="{StaticResource tableflowViewWindows8GroupNavigationControlStyle}" />
+
+    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationControlItem}"
+          TargetType="{x:Type local:GroupNavigationControlItem}"
+          BasedOn="{StaticResource tableflowViewWindows8GroupNavigationControlItemStyle}" />
+
+</ResourceDictionary>

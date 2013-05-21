@@ -1,0 +1,20 @@
+﻿
+<xctk:PropertyGrid PropertyNameBinding="{Binding Name}"
+                   SelectedObjectName="Meeting" >
+  
+  <xctk:PropertyGrid.Properties>
+      <v:Employee Name="Tom" IsConfirmed="True" Department="Sales"/>
+      <v:Employee Name="John" IsConfirmed="false" Department="Management"/>
+      <v:Employee Name="Sean" IsConfirmed="True" Department="Sales"/>
+  </xctk:PropertyGrid.Properties>
+
+  <xctk:PropertyGrid.DefaultEditorDefinition>
+      <xctk:EditorCheckBoxDefinition Binding="{Binding IsConfirmed}"/>
+  </xctk:PropertyGrid.DefaultEditorDefinition>
+
+  <xctk:PropertyGrid.CategoryGroupDescription>
+      <PropertyGroupDescription PropertyName="Department" />
+  </xctk:PropertyGrid.CategoryGroupDescription>
+
+  </xctk:PropertyGrid.EditorDefinitions>
+</xctk:PropertyGrid>
