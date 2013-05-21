@@ -1,0 +1,74 @@
+﻿<!--*************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Button.Views.DropDownSplitButtonView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 Title="DropDown and Split Buttons">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+            <Run>The DropDownButton control is a button that when clicked displays a drop down in which you can place any custom content within.</Run>
+            <LineBreak />
+            <LineBreak />
+            <Run>The SplitButton control is a button that can be clicked and also provides a drop down in which you can place any custom content within.</Run>
+        </Paragraph>
+    </local:DemoView.Description>
+
+   <Grid>
+        <Grid.RowDefinitions>
+           <RowDefinition Height="Auto" />
+           <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+         <TextBlock Text="DropDownButton Usage:" Style="{StaticResource Header}" />
+         <xctk:DropDownButton x:Name="_dropDownButton"
+                              Grid.Row="1"
+                              Margin="10"
+                              Width="150"
+                              HorizontalAlignment="Left"
+                              Content="Click Me"
+                              Click="DropDownButton_Click">
+            <xctk:DropDownButton.DropDownContent>
+               <StackPanel>
+                  <xctk:ColorCanvas />
+                  <Button Click="Button_Click" Margin="10">OK</Button>
+               </StackPanel>
+            </xctk:DropDownButton.DropDownContent>
+         </xctk:DropDownButton>
+
+         <TextBlock Text="SplitButton Usage:" Grid.Column="1" Style="{StaticResource Header}" />
+         <xctk:SplitButton x:Name="_splitButton"
+                           Grid.Row="1"
+                           Grid.Column="1"
+                           Margin="10"
+                           Width="150"
+                           HorizontalAlignment="Left"
+                           Content="Click Me"
+                           Click="SplitButton_Click">
+            <xctk:SplitButton.DropDownContent>
+               <StackPanel>
+                  <xctk:ColorCanvas />
+                  <Button Click="Button_Click" Margin="10">OK</Button>
+               </StackPanel>
+            </xctk:SplitButton.DropDownContent>
+         </xctk:SplitButton>
+   </Grid>
+</local:DemoView>

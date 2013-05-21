@@ -1,24 +1,25 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using Xceed.Wpf.Toolkit.Core;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -394,6 +395,11 @@ namespace Xceed.Wpf.Toolkit
 
       if( CurrentPage != null )
       {
+        var eventArgs = new CancelRoutedEventArgs( NextEvent );
+        this.RaiseEvent( eventArgs );
+        if( eventArgs.Cancel )
+          return;
+
         //check next page
         if( CurrentPage.NextPage != null )
           nextPage = CurrentPage.NextPage;
@@ -430,6 +436,11 @@ namespace Xceed.Wpf.Toolkit
 
       if( CurrentPage != null )
       {
+        var eventArgs = new CancelRoutedEventArgs( PreviousEvent );
+        this.RaiseEvent( eventArgs );
+        if( eventArgs.Cancel )
+          return;
+
         //check previous page
         if( CurrentPage.PreviousPage != null )
           previousPage = CurrentPage.PreviousPage;
@@ -464,6 +475,8 @@ namespace Xceed.Wpf.Toolkit
 
     #region Events
 
+    #region Cancel Event
+
     public static readonly RoutedEvent CancelEvent = EventManager.RegisterRoutedEvent( "Cancel", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( Wizard ) );
     public event RoutedEventHandler Cancel
     {
@@ -476,6 +489,10 @@ namespace Xceed.Wpf.Toolkit
         RemoveHandler( CancelEvent, value );
       }
     }
+
+    #endregion //Cancel Event
+
+    #region PageChanged Event
 
     public static readonly RoutedEvent PageChangedEvent = EventManager.RegisterRoutedEvent( "PageChanged", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( Wizard ) );
     public event RoutedEventHandler PageChanged
@@ -490,6 +507,10 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    #endregion //PageChanged Event
+
+    #region Finish Event
+
     public static readonly RoutedEvent FinishEvent = EventManager.RegisterRoutedEvent( "Finish", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( Wizard ) );
     public event RoutedEventHandler Finish
     {
@@ -503,6 +524,10 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    #endregion //Finish Event
+
+    #region Help Event
+
     public static readonly RoutedEvent HelpEvent = EventManager.RegisterRoutedEvent( "Help", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( Wizard ) );
     public event RoutedEventHandler Help
     {
@@ -515,6 +540,60 @@ namespace Xceed.Wpf.Toolkit
         RemoveHandler( HelpEvent, value );
       }
     }
+
+    #endregion //Help Event
+
+    #region Next Event
+
+    public delegate void NextRoutedEventHandler( object sender, CancelRoutedEventArgs e );
+
+    /// <summary>
+    /// Identifies the Next routed event.
+    /// </summary>
+    public static readonly RoutedEvent NextEvent = EventManager.RegisterRoutedEvent( "Next", RoutingStrategy.Bubble, typeof( NextRoutedEventHandler ), typeof( Wizard ) );
+    /// <summary>
+    /// Raised when WizardCommands.NextPage command is executed.
+    /// This cancellable event can prevent the command execution from continuing.
+    /// </summary>
+    public event NextRoutedEventHandler Next
+    {
+      add
+      {
+        AddHandler( NextEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( NextEvent, value );
+      }
+    }
+
+    #endregion //Next Event
+
+    #region Previous Event
+
+    public delegate void PreviousRoutedEventHandler( object sender, CancelRoutedEventArgs e );
+
+    /// <summary>
+    /// Identifies the Previous routed event.
+    /// </summary>
+    public static readonly RoutedEvent PreviousEvent = EventManager.RegisterRoutedEvent( "Previous", RoutingStrategy.Bubble, typeof( PreviousRoutedEventHandler ), typeof( Wizard ) );
+    /// <summary>
+    /// Raised when WizardCommands.PreviousPage command is executed.
+    /// This cancellable event can prevent the command execution from continuing.
+    /// </summary>
+    public event PreviousRoutedEventHandler Previous
+    {
+      add
+      {
+        AddHandler( PreviousEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( PreviousEvent, value );
+      }
+    }
+
+    #endregion //Previous Event
 
     #endregion //Events
 

@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Collections;
@@ -27,13 +27,117 @@ using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 using System.Linq.Expressions;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Core.Utilities;
-using Xceed.Wpf.Toolkit.PropertyGrid.Implementation;
 using System.Windows.Controls;
+using System.Reflection;
+using System.Windows.Controls.Primitives;
+using Xceed.Wpf.Toolkit.PropertyGrid.Converters;
+using Xceed.Wpf.Toolkit.Primitives;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
   internal class PropertyGridUtilities
   {
+    #region DefaultNoBorderControlStyle Static Property
+    private static Style _noBorderControlStyle;
+    internal static Style NoBorderControlStyle
+    {
+      get
+      {
+        if( _noBorderControlStyle == null )
+        {
+          var style = new Style( typeof( Control ) );
+          var trigger = new MultiTrigger();
+          trigger.Conditions.Add( new Condition( Control.IsKeyboardFocusWithinProperty, false ) );
+          trigger.Conditions.Add( new Condition( Control.IsMouseOverProperty, false ) );
+          trigger.Setters.Add(
+            new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
+          style.Triggers.Add( trigger );
+
+          _noBorderControlStyle = style;
+        }
+
+        return _noBorderControlStyle;
+      }
+    }
+    #endregion
+
+    #region PropertyGridComboBoxStyle Static Property
+    private static Style _propertyGridComboBoxStyle;
+    internal static Style ComboBoxStyle
+    {
+      get
+      {
+        if( _propertyGridComboBoxStyle == null )
+        {
+          var style = new Style( typeof( Control ) );
+          var trigger = new MultiTrigger();
+          trigger.Conditions.Add( new Condition( Control.IsKeyboardFocusWithinProperty, false ) );
+          trigger.Conditions.Add( new Condition( Control.IsMouseOverProperty, false ) );
+          trigger.Setters.Add( new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
+          trigger.Setters.Add( new Setter( Control.BackgroundProperty, new SolidColorBrush( Colors.Transparent ) ) );
+          style.Triggers.Add( trigger );
+
+          _propertyGridComboBoxStyle = style;
+        }
+        return _propertyGridComboBoxStyle;
+      }
+    }
+    #endregion
+
+    #region ColorPickerStyle Static Property
+    private static Style _colorPickerStyle;
+    internal static Style ColorPickerStyle
+    {
+      get
+      {
+        if( _colorPickerStyle == null )
+        {
+          Style defaultColorPickerStyle = Application.Current.TryFindResource( typeof( ColorPicker ) ) as Style;
+          var style = new Style( typeof( ColorPicker ), defaultColorPickerStyle );
+          var trigger = new MultiTrigger();
+          trigger.Conditions.Add( new Condition( Control.IsKeyboardFocusWithinProperty, false ) );
+          trigger.Conditions.Add( new Condition( Control.IsMouseOverProperty, false ) );
+          trigger.Setters.Add( new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
+          trigger.Setters.Add( new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
+          trigger.Setters.Add( new Setter( ColorPicker.ShowDropDownButtonProperty, false ) );
+          style.Triggers.Add( trigger );
+
+          _colorPickerStyle = style;
+        }
+
+        return _colorPickerStyle;
+      }
+    }
+    #endregion
+
+    #region UpDownBaseStyle Static Getter
+    private static Dictionary<Type, Style> _upDownStyles;
+    internal static Style GetUpDownBaseStyle<T>()
+    {
+      if( _upDownStyles == null )
+      {
+        _upDownStyles = new Dictionary<Type, Style>();
+      }
+
+      Style style;
+      if( !_upDownStyles.TryGetValue( typeof( T ), out style ) )
+      {
+        style = new Style( typeof( UpDownBase<T> ) );
+        var trigger = new MultiTrigger();
+        trigger.Conditions.Add( new Condition( Control.IsKeyboardFocusWithinProperty, false ) );
+        trigger.Conditions.Add( new Condition( Control.IsMouseOverProperty, false ) );
+        trigger.Setters.Add(
+          new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
+        trigger.Setters.Add(
+          new Setter( UpDownBase<T>.ShowButtonSpinnerProperty, false ) );
+        style.Triggers.Add( trigger );
+
+        _upDownStyles.Add( typeof( T ), style );
+      }
+      return style;
+    }
+    #endregion
+
     internal static T GetAttribute<T>( PropertyDescriptor property ) where T : Attribute
     {
       return property.Attributes.OfType<T>().FirstOrDefault();
@@ -42,121 +146,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
-
-
-
-
-
-    internal static string GetDefaultPropertyName( object instance )
-    {
-      AttributeCollection attributes = TypeDescriptor.GetAttributes( instance );
-      DefaultPropertyAttribute defaultPropertyAttribute =( DefaultPropertyAttribute )attributes[ typeof( DefaultPropertyAttribute ) ];
-      return defaultPropertyAttribute != null ? defaultPropertyAttribute.Name : null;
-    }
-
-    internal static PropertyDescriptorCollection GetPropertyDescriptors( object instance )
-    {
-      PropertyDescriptorCollection descriptors;
-
-      TypeConverter tc = TypeDescriptor.GetConverter( instance );
-      if( tc == null || !tc.GetPropertiesSupported() )
-      {
-        if( instance is ICustomTypeDescriptor )
-          descriptors = ( ( ICustomTypeDescriptor )instance ).GetProperties();
-        else
-          descriptors = TypeDescriptor.GetProperties( instance.GetType() );
-      }
-      else
-      {
-        descriptors = tc.GetProperties( instance );
-      }
-
-      return descriptors;
-    }
-
-
-
-
-
-
-
-
-
-    internal static PropertyItem CreatePropertyItem( PropertyDescriptor property, IPropertyParent propertyParent )
-    {
-      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property, propertyParent );
-      definition.InitProperties();
-      PropertyItem propertyItem = new PropertyItem();
-      propertyItem.PropertyDescriptor = property;
-      propertyItem.Instance = propertyParent.ValueInstance;
-      PropertyGridUtilities.InitializePropertyItem( propertyItem, definition );
-      return propertyItem;
-    }
-
-    internal static PropertyItem CreatePropertyItem( IPropertyDefinition pd )
-    {
-      PropertyItem propertyItem = new PropertyItem();
-
-      var descriptorBase = pd as DescriptorPropertyDefinitionBase;
-      propertyItem.PropertyDescriptor = ( descriptorBase != null ) ? descriptorBase.GetPropertyDescriptor() : null;
-      propertyItem.Instance = ( descriptorBase != null ) ? descriptorBase.PropertyParent.ValueInstance : null;
-      PropertyGridUtilities.InitializePropertyItem( propertyItem, pd );
-      return propertyItem;
-    }
-
-    private static void InitializePropertyItem( PropertyItem propertyItem, IPropertyDefinition pd )
-    {
-      propertyItem.ChildrenDefinitions = pd.ChildrenDefinitions;
-
-
-      // Assign a shorter name, for code clarity only.
-      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.DisplayNameProperty, pd, () => pd.DisplayName );
-      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.DescriptionProperty, pd, () => pd.Description );
-      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.CategoryProperty, pd, () => pd.Category );
-      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.PropertyOrderProperty, pd, () => pd.DisplayOrder );
-      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.AdvancedOptionsIconProperty, pd, () => pd.AdvancedOptionsIcon );
-      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.AdvancedOptionsTooltipProperty, pd, () => pd.AdvancedOptionsTooltip );
-      PropertyGridUtilities.SetupDefinitionBinding( propertyItem, PropertyItem.IsExpandableProperty, pd, () => pd.IsExpandable );
-
-      Binding valueBinding = new Binding( "Value" )
-      {
-        Source = pd,
-        Mode = BindingMode.TwoWay
-      };
-      propertyItem.SetBinding( PropertyItem.ValueProperty, valueBinding );
-
-      propertyItem.Editor = pd.GenerateEditorElement( propertyItem );
-
-      if( pd.CommandBindings != null )
-      {
-        foreach( CommandBinding commandBinding in pd.CommandBindings )
-        {
-          propertyItem.CommandBindings.Add( commandBinding );
-        }
-      }
-    }
-
-    private static void SetupDefinitionBinding<T>( 
-      PropertyItem propertyItem, 
-      DependencyProperty itemProperty, 
-      IPropertyDefinition pd,
-      Expression<Func<T>> definitionProperty )
-    {
-      string sourceProperty = ReflectionHelper.GetPropertyOrFieldName( definitionProperty );
-      Binding binding = new Binding( sourceProperty )
-      {
-        Source = pd,
-        Mode = BindingMode.OneWay
-      };
-
-      propertyItem.SetBinding( itemProperty, binding );
-    }
-
     internal static ITypeEditor CreateDefaultEditor( Type propertyType, TypeConverter typeConverter )
     {
       ITypeEditor editor = null;
 
-      if( propertyType == typeof( bool ) || propertyType == typeof( bool? ) )
+      if( propertyType == typeof( string )  )
+        editor = new TextBoxEditor();
+      else if( propertyType == typeof( bool ) || propertyType == typeof( bool? ) )
         editor = new CheckBoxEditor();
       else if( propertyType == typeof( decimal ) || propertyType == typeof( decimal? ) )
         editor = new DecimalUpDownEditor();
@@ -197,7 +193,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         editor = new TextBoxEditor();
       else
       {
-        Type listType = CollectionControl.GetListItemType( propertyType );
+        Type listType = ListUtilities.GetListItemType( propertyType );
 
         if( listType != null )
         {
@@ -219,5 +215,18 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       return editor;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
   }
 }

@@ -1,0 +1,146 @@
+﻿<!--****************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  *************************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views.ChildWindowView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                 xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Converters"
+                 xmlns:xctkconv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters;assembly=Xceed.Wpf.Toolkit"
+                 Title="ChildWindow">
+     <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+            <Run>The ChildWindow control can be used to create a window that is displayed within the bounds of a specific parent container.</Run>
+            <LineBreak />
+            <LineBreak />
+            <Run>In addition to the following features, the "Plus" version allows ChildWindow to be resizable and to use a Maximize/Restore button.</Run>
+            <LineBreak />
+            <Hyperlink NavigateUri="http://www.xceed.com/Extended_WPF_Toolkit_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
+               Click here for more details about Xceed Extended WPF Toolkit Plus.
+            </Hyperlink>
+        </Paragraph>
+    </local:DemoView.Description>
+
+   <local:DemoView.Resources>
+      <conv:IntToBoolConverter x:Key="IntToBoolConverter" />
+      <xctkconv:VisibilityToBoolConverter x:Key="VisibilityToBoolConverter" Inverted="True"/>
+
+      <ObjectDataProvider x:Key="WindowStates" MethodName="GetValues"
+                          ObjectType="{x:Type sys:Enum}">
+         <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="xctk:WindowState" />
+         </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+      <ObjectDataProvider x:Key="WindowStartupLocations" MethodName="GetValues"
+                          ObjectType="{x:Type sys:Enum}">
+         <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="xctk:WindowStartupLocation" />
+         </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+   </local:DemoView.Resources>
+
+
+   <Grid>
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <GroupBox Header="Features" Grid.Row="0" Margin="5">
+         <Grid Margin="5">
+            <Grid.RowDefinitions>
+               <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+               <ColumnDefinition Width="Auto" />
+               <ColumnDefinition Width="Auto" />
+               <ColumnDefinition Width="Auto" />
+               <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Caption:" Margin="2" VerticalAlignment="Center" />
+            <TextBox Name="_txtCaption" Grid.Column="1" Margin="5" Text="ChildWindow" Width="150" VerticalAlignment="Center" />
+
+            <TextBlock Grid.Row="1" Name="textBlock2" Text="Left:" Margin="2" VerticalAlignment="Center" />
+            <xctk:DoubleUpDown x:Name="_txtLeft" Grid.Column="1" Grid.Row="1" Value="0" Minimum="0" VerticalAlignment="Center" Margin="5" IsEnabled="{Binding SelectedIndex, ElementName=_cboWindowStartupLocations}"/>
+
+            <TextBlock Grid.Row="2" Name="textBlock3" Text="Top:" Margin="2" VerticalAlignment="Center" />
+            <xctk:DoubleUpDown x:Name="_txtTop" Grid.Column="1" Grid.Row="2" Value="0" Minimum="0" VerticalAlignment="Center" Margin="5" IsEnabled="{Binding SelectedIndex, ElementName=_cboWindowStartupLocations}"/>
+
+            <TextBlock Text="IsModal:" VerticalAlignment="Center" Margin="10,2,2,2" Grid.Column="2" />
+            <CheckBox x:Name="_chkIsModal" Grid.Column="3" VerticalAlignment="Center" Margin="5" IsChecked="True" />
+
+            <TextBlock Grid.Row="1" Text="WindowStartupLocation:" VerticalAlignment="Center" Margin="10,2,2,2" Grid.Column="2" />
+            <ComboBox Grid.Column="3" Grid.Row="1" Name="_cboWindowStartupLocations" ItemsSource="{Binding Source={StaticResource WindowStartupLocations}}" SelectedIndex="1" VerticalAlignment="Center" Width="70" Margin="5" IsEnabled="{Binding SelectedIndex, ElementName=_cboWindowState, Converter={StaticResource IntToBoolConverter}}"/>
+
+            <TextBlock Grid.Row="2" Text="WindowState:" VerticalAlignment="Center" Margin="10,2,2,2" Grid.Column="2" />
+            <ComboBox Grid.Column="3" Grid.Row="2" Name="_cboWindowState" ItemsSource="{Binding Source={StaticResource WindowStates}}" SelectedIndex="1" VerticalAlignment="Center" Margin="5" />
+         </Grid>
+      </GroupBox>
+
+      <Grid Grid.Row="1" Margin="10">
+        <xctk:WindowContainer Background="Transparent" ModalBackgroundBrush="LightGray">
+            <xctk:ChildWindow x:Name="_childWindow"
+                           Width="350"
+                           Height="220"
+                           Caption="{Binding Text, ElementName=_txtCaption}"
+                           IsModal="{Binding IsChecked, ElementName=_chkIsModal}"
+                           Left="{Binding Value, ElementName=_txtLeft, Mode=TwoWay}"
+                           Top="{Binding Value, ElementName=_txtTop, Mode=TwoWay}"
+                           WindowStartupLocation="{Binding SelectedItem, ElementName=_cboWindowStartupLocations}" 
+                           WindowState="{Binding SelectedItem, ElementName=_cboWindowState}">
+            <Grid Margin="10" >
+               <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+               </Grid.RowDefinitions>
+               <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+               </Grid.ColumnDefinitions>
+
+               <TextBlock Grid.Row="0" Text="First Name:" Margin="2" VerticalAlignment="Center" />
+               <xctk:WatermarkTextBox Grid.Row="0" Grid.Column="1" Margin="2" VerticalAlignment="Center" Watermark="Enter First Name" />
+
+               <TextBlock Grid.Row="1" Text="Last Name:" Margin="2" VerticalAlignment="Center" />
+               <xctk:WatermarkTextBox Grid.Row="1" Grid.Column="1" Margin="2" VerticalAlignment="Center" Watermark="Enter Last Name" />
+
+               <TextBlock Grid.Row="2" Text="Date of Birth:" Margin="2" VerticalAlignment="Center" />
+               <xctk:DateTimeUpDown Grid.Row="2" Grid.Column="1" Format="ShortDate" Margin="2" VerticalAlignment="Center" Watermark="Enter Date of Birth" />
+
+               <TextBlock Grid.Row="3" Text="Salary:" Margin="2" VerticalAlignment="Center" />
+               <xctk:IntegerUpDown Grid.Row="3" Grid.Column="1" FormatString="C2" Margin="2" VerticalAlignment="Center" Watermark="Enter Salary" />
+
+               <TextBlock Grid.Row="4" Text="Favorite Color:" Margin="2" VerticalAlignment="Center" />
+               <xctk:ColorPicker Grid.Row="4" Grid.Column="1" Margin="2" VerticalAlignment="Center" />
+
+               <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                  <Button Width="65" Margin="2">OK</Button>
+                  <Button Width="65" Margin="2">Cancel</Button>
+               </StackPanel>
+            </Grid>
+         </xctk:ChildWindow>
+        </xctk:WindowContainer>
+      </Grid>
+   </Grid>
+</local:DemoView>

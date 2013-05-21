@@ -1,0 +1,169 @@
+﻿<!--**************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **************************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views.StylableWindowView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:view="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views"
+                 xmlns:res="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Resources"
+                 xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Converters"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 Title="StylableWindows" >
+   <local:DemoView.Description>
+      <Paragraph FontSize="14" FontFamily="Segoe">
+         <Run>It is possible to style ChildWindow controls as well as MessageBox controls. All the chrome of their window can be styled (color, thickness, opacity); their action buttons can also be styled.</Run>
+         <LineBreak />
+         <LineBreak />
+         <Run>The "Plus" version provides a new control called StylableWindow, which consists of a window that has all the functions of a normal window, but which can be styled in the same way as ChildWindow or MessageBox.</Run>
+            <LineBreak />
+            <Hyperlink NavigateUri="http://www.xceed.com/Extended_WPF_Toolkit_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
+               Click here for more details about Xceed Extended WPF Toolkit Plus.
+            </Hyperlink>
+
+      </Paragraph>
+   </local:DemoView.Description>
+
+   <local:DemoView.Resources>
+      <ResourceDictionary>
+         <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="/Samples/Window/Resources/FancyStyles.xaml"/>
+         </ResourceDictionary.MergedDictionaries>
+
+         <conv:WindowStateToBoolConverter x:Key="windowStateBoolConv" />
+
+         <!--Base style for ChildWindowStyle and MessageBoxStyle-->
+         <Style x:Key="windowControlStyle" TargetType="{x:Type xctk:WindowControl}">
+            <Setter Property="WindowBackground" Value="{Binding WindowBackground}" />
+            <Setter Property="WindowBorderBrush" Value="{Binding WindowBorderBrush}" />
+            <Setter Property="WindowBorderThickness" Value="{Binding WindowBorderThickness}" />
+            <Setter Property="WindowInactiveBackground" Value="{Binding WindowInactiveBackground}" />
+            <Setter Property="WindowOpacity" Value="{Binding WindowOpacity}" />
+            <Setter Property="CaptionForeground" Value="{Binding TitleForeground}" />
+            <Setter Property="CaptionShadowBrush" Value="{Binding TitleShadowBrush}" />
+            <Setter Property="CloseButtonStyle" Value="{Binding CloseButtonStyle}" />
+         </Style>
+
+         <!--Style for the MessageBox-->
+         <Style x:Key="messageBoxStyle" TargetType="{x:Type xctk:MessageBox}" BasedOn="{StaticResource windowControlStyle}">
+            <Setter Property="ButtonRegionBackground" Value="{StaticResource FancyButtonRegionBackground}" />
+            <Setter Property="OkButtonStyle" Value="{StaticResource FancyButtonStyle}" />
+            <Setter Property="CancelButtonStyle" Value="{StaticResource FancyButtonStyle}" />
+            <Setter Property="YesButtonStyle" Value="{StaticResource FancyButtonStyle}" />
+            <Setter Property="NoButtonStyle" Value="{StaticResource FancyButtonStyle}" />
+         </Style>
+
+      </ResourceDictionary>
+   </local:DemoView.Resources>
+
+
+
+   <local:DemoView.DataContext>
+      <!--A model containing the brushes and other properties was created to share theses values
+      between ChildWindow, MessageBox, and StylableWindow.-->
+      <view:WindowModel
+         WindowBackground="#FFEFAC27"
+         WindowBorderBrush="Black"
+         WindowBorderThickness="2"
+         WindowInactiveBackground="LightGray"
+         WindowOpacity="0.75"
+         WindowStyle="SingleBorderWindow"
+         TitleForeground="Brown"
+         TitleShadowBrush="White"
+         ResizeMode="CanResize"
+         CloseButtonVisibility="Visible" 
+         CloseButtonStyle="{StaticResource FancyButtonCloseStyle}"
+         MinimizeButtonStyle="{StaticResource FancyButtonMinimizeStyle}"
+         MaximizeButtonStyle="{StaticResource FancyButtonMaximizeStyle}"
+         RestoreButtonStyle="{StaticResource FancyButtonRestoreStyle}"/>
+   </local:DemoView.DataContext>
+
+   <Grid>
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+      </StackPanel>
+
+      <Grid Grid.Row="1">
+         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*"/>
+         </Grid.ColumnDefinitions>
+
+         <GroupBox Header="Features" Margin="5" VerticalAlignment="Stretch">
+            <StackPanel HorizontalAlignment="Center">
+               <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                  <TextBlock Text="Show ChildWindow:" VerticalAlignment="Center" Width="120"/>
+                  <CheckBox IsChecked="{Binding WindowState, ElementName=_childWindow, Converter={StaticResource windowStateBoolConv}}"
+                            Margin="5,0,0,0"
+                            VerticalAlignment="Center"/>
+               </StackPanel>
+               <StackPanel Orientation="Horizontal" Margin="0,5,0,25">
+                  <TextBlock Text="Enable Styling:" VerticalAlignment="Center" Width="120"/>
+                  <CheckBox x:Name="_enableStyleCheckBox" IsChecked="True" Margin="5,0,0,0" Click="UpdateWindowsStyles" />
+               </StackPanel>
+               <!--This is a custom control that modifies the underlying model. It is defined elsewhere to avoid cluttering this XAML. -->
+               <res:WindowModelEditor IsStyleEnabled="{Binding ElementName=_enableStyleCheckBox, Path=IsChecked}"/>
+            </StackPanel>
+         </GroupBox>
+
+         <DockPanel Grid.Column="1" Margin="5" >
+            <GroupBox Header="MessageBox" DockPanel.Dock="Top" Margin="5" HorizontalAlignment="Stretch">
+               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                  <Button Content="Show System MessageBox" Click="StandardMessageBoxButton_Click" Width="150" Height="30" Margin="10"/>
+                  <Button Content="Show Toolkit MessageBox" Click="StyledMessageBoxButton_Click" Margin="10" Width="150" Height="30"/>
+               </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Stylable Window" DockPanel.Dock="Top" Margin="5" HorizontalAlignment="Stretch" >
+               <Button Width="160" Height="30" Margin="10" HorizontalAlignment="Center"
+                       Content="Show" Click="OnStylableWindow_Click" >
+                  <Button.ContentTemplate>
+                     <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                           <TextBlock Text="{Binding}" />
+                           <TextBlock Text=" (Plus Only)" 
+                                Foreground="#06b025" 
+                                FontWeight="SemiBold" 
+                                FontStyle="Oblique" />
+                        </StackPanel>
+                     </DataTemplate>
+                  </Button.ContentTemplate>
+               </Button>
+            </GroupBox>
+            <GroupBox Header="ChildWindow" Margin="5">
+               <Border BorderThickness="1" 
+                        BorderBrush="Black" >
+                  <xctk:WindowContainer >
+                     <xctk:ChildWindow x:Name="_childWindow" Width="325" Height="100"
+                                    Caption="Extended WPF Toolkit ChildWindow"
+                                    WindowStartupLocation="Center"
+                                    IsModal="True"
+                                    WindowState="Open" 
+                                    CloseButtonVisibility="{Binding CloseButtonVisibility}"
+                                    WindowStyle="{Binding WindowStyle}" >
+                        <TextBlock>
+                           This is the content of the child window.
+                        </TextBlock>
+                     </xctk:ChildWindow>
+                  </xctk:WindowContainer>
+               </Border>
+            </GroupBox>
+         </DockPanel>
+      </Grid>
+   </Grid>
+</local:DemoView>

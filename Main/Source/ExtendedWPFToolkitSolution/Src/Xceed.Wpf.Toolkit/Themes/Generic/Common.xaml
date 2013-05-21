@@ -1,152 +1,245 @@
-﻿<!--************************************************************************
+﻿<!--***********************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************-->
+  **********************************************************************************-->
 
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:media="clr-namespace:Xceed.Wpf.Toolkit.Core.Media"
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
                     xmlns:primitives="clr-namespace:Xceed.Wpf.Toolkit.Primitives">
-
-   <!-- =============================================================================== -->
-   <!-- Common Styles                                                                   -->
-   <!-- Need to find a way to share these for ChildWIndow and MessageBox                -->
-   <!-- =============================================================================== -->
-
-   <LinearGradientBrush x:Key="WindowDarkBrush" EndPoint="0.5,1" StartPoint="0.5,0">
-      <GradientStop Color="#FFA3AEB9" Offset="0" />
-      <GradientStop Color="#FF8399A9" Offset="0.375" />
-      <GradientStop Color="#FF718597" Offset="0.375" />
-      <GradientStop Color="#FF617584" Offset="1" />
-   </LinearGradientBrush>
-
-   <LinearGradientBrush x:Key="WindowBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
-      <LinearGradientBrush.GradientStops>
-         <GradientStopCollection>
-            <GradientStop Offset="0" Color="#FFffffff" />
-            <GradientStop Offset="0.479" Color="#FFf4f5f6" />
-            <GradientStop Offset="1" Color="#FFd0d6db" />
-         </GradientStopCollection>
-      </LinearGradientBrush.GradientStops>
-   </LinearGradientBrush>
-
-   <LinearGradientBrush x:Key="WindowButtonHoverBrush" StartPoint="0,0" EndPoint="0,1">
-      <LinearGradientBrush.GradientStops>
-         <GradientStopCollection>
-            <GradientStop Offset="0" Color="#FFb5bdc8" />
-            <GradientStop Offset="0.370" Color="#FF8399a9" />
-            <GradientStop Offset="0.370" Color="#FF718597" />
-            <GradientStop Offset="0.906" Color="#FFb9c1ca" />
-            <GradientStop Offset="1" Color="#FFb9c1ca" />
-         </GradientStopCollection>
-      </LinearGradientBrush.GradientStops>
-   </LinearGradientBrush>
-
-   <LinearGradientBrush x:Key="WindowButtonPressedBrush" StartPoint="0,0" EndPoint="0,1">
-      <LinearGradientBrush.GradientStops>
-         <GradientStopCollection>
-            <GradientStop Offset="0" Color="#FF6b7c8d" />
-            <GradientStop Offset="0.370" Color="#FF4d606f" />
-            <GradientStop Offset="0.370" Color="#FF465460" />
-            <GradientStop Offset="0.906" Color="#FF262d33" />
-            <GradientStop Offset="1" Color="#FF262d33" />
-         </GradientStopCollection>
-      </LinearGradientBrush.GradientStops>
-   </LinearGradientBrush>
-
-   <Style x:Key="WindowCloseButtonStyle" TargetType="Button">
-      <Setter Property="Foreground" Value="#FF000000" />
-      <Setter Property="Padding" Value="3" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="Template">
-         <Setter.Value>
-            <ControlTemplate TargetType="Button">
-               <Grid>
-                  <VisualStateManager.VisualStateGroups>
-                     <VisualStateGroup x:Name="CommonStates">
-                        <VisualState x:Name="Normal" />
-                        <VisualState x:Name="MouseOver">
-                           <Storyboard>
-                              <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
-                                 <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource WindowButtonHoverBrush}" />
-                              </ObjectAnimationUsingKeyFrames>
-                           </Storyboard>
-                        </VisualState>
-                        <VisualState x:Name="Pressed">
-                           <Storyboard>
-                              <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
-                                 <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource WindowButtonPressedBrush}" />
-                              </ObjectAnimationUsingKeyFrames>
-                           </Storyboard>
-                        </VisualState>
-                     </VisualStateGroup>
-                  </VisualStateManager.VisualStateGroups>
-                  <Border x:Name="Background" CornerRadius="0,0,2,0" Background="{StaticResource WindowDarkBrush}">
-                     <Border Margin="1,0,1,1" BorderBrush="#59FFFFFF" BorderThickness="1" CornerRadius="0,0,1,0" />
-                  </Border>
-                  <ContentPresenter x:Name="contentPresenter" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
-                  <Path x:Name="path"
-                        Height="6"
-                        Width="7"
-                        Stretch="Fill"
-                        Opacity="1"
-                        Data="M 2,6 C2,6 3,6 3,6 3,6 3,5 3,5 3,5 4,5 4,5 4,5 4,6 4,6 4,6 5,6 5,6 5,6 7,6 7,6 7,6 7,5 7,5 7,5 6,5 6,5 6,5 6,4 6,4 6,4 5,4 5,4 5,4 5,2 5,2 5,2 6,2 6,2 6,2 6,1 6,1 6,1 7,1 7,1 7,1 7,0 7,0 7,0 5,0 5,0 5,0 4,0 4,0 4,0 4,1 4,1 4,1 3,1 3,1 3,1 3,0 3,0 3,0 2,0 2,0 2,0 0,0 0,0 0,0 0,1 0,1 0,1 1,1 1,1 1,1 1,2 1,2 1,2 2,2 2,2 2,2 2,4 2,4 2,4 1,4 1,4 1,4 1,5 1,5 1,5 0,5 0,5 0,5 0,6 0,6 0,6 2,6 2,6 z"
-                        Fill="White"
-                        Margin="0,0,0,1"
-                        Visibility="Collapsed" />
-               </Grid>
-            </ControlTemplate>
-         </Setter.Value>
-      </Setter>
-   </Style>
 
 
     <!-- =============================================================================== -->
-   <!-- SelectorItem                                                                    -->
-   <!-- =============================================================================== -->
+    <!-- Images for the buttons and their various states                                 -->
+    <!-- =============================================================================== -->
 
-   <Style TargetType="{x:Type primitives:SelectorItem}">
-        <Setter Property="Background"
-           Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
+    <!-- ResizeGrip -->
+    <ImageBrush x:Key="resize_grip" 
+                ImageSource="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/resize_grip.png" />
 
-        <Setter Property="IsTabStop"
-               Value="False" />
-
-        <Setter Property="Template">
-         <Setter.Value>
-            <ControlTemplate TargetType="{x:Type primitives:SelectorItem}">
-               <Border x:Name="_background"
-                       Background="{TemplateBinding Background}"
-                       BorderBrush="{TemplateBinding BorderBrush}"
-                       BorderThickness="{TemplateBinding BorderThickness}">
-                    <CheckBox Foreground="{TemplateBinding Foreground}"
-                              IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}}"
-                              Content="{TemplateBinding Content}"
-                              ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
-                </Border>
-               <ControlTemplate.Triggers>
-                 <Trigger Property="IsMouseOver" Value="true">
-                    <Setter TargetName="_background" Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
-                </Trigger>
-                <Trigger Property="IsKeyboardFocusWithin" Value="true">
-                    <Setter TargetName="_background" Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
-                </Trigger>
-            </ControlTemplate.Triggers>
-            </ControlTemplate>
-         </Setter.Value>
-      </Setter>
+   <Style x:Key="buttonImageStyle" TargetType="Image">
+      <Setter Property="Stretch" Value="None" />
+      <Setter Property="UseLayoutRounding" Value="True" />
+      <Setter Property="RenderOptions.EdgeMode" Value="Aliased" />
+      <Setter Property="RenderOptions.BitmapScalingMode" Value="NearestNeighbor" />
    </Style>
+
+    <!-- Minimize -->
+   <Image x:Key="minimize_normal"
+               Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/minimize_normal.png" />
+   <Image x:Key="minimize_hover"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/minimize_hover.png" />
+   <Image x:Key="minimize_pressed"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/minimize_pressed.png" />
+   <Image x:Key="minimize_inactive"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/minimize_inactive.png" />
+
+    <!-- Maximize -->
+   <Image x:Key="maximize_normal"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/maximize_normal.png" />
+   <Image x:Key="maximize_hover"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/maximize_hover.png" />
+   <Image x:Key="maximize_pressed"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/maximize_pressed.png" />
+   <Image x:Key="maximize_inactive"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/maximize_inactive.png" />
+   <Image x:Key="maximize_disabled"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/maximize_disabled.png" />
+
+    <!-- Restore -->
+   <Image x:Key="restore_normal"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/restore_normal.png" />
+   <Image x:Key="restore_hover"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/restore_hover.png" />
+   <Image x:Key="restore_pressed"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/restore_pressed.png" />
+   <Image x:Key="restore_inactive"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/restore_inactive.png" />
+   <Image x:Key="restore_disabled"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/restore_disabled.png" />
+
+    <!-- Close -->
+   <Image x:Key="close_normal"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_normal.png" />
+   <Image x:Key="close_hover"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_hover.png" />
+   <Image x:Key="close_pressed"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_pressed.png" />
+   <Image x:Key="close_inactive"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_inactive.png" />
+
+    <!-- Close (with 2 rounded corners) -->
+   <Image x:Key="close_rounded_normal"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_rounded_normal.png" />
+   <Image x:Key="close_rounded_hover"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_rounded_hover.png" />
+   <Image x:Key="close_rounded_pressed"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_rounded_pressed.png" />
+   <Image x:Key="close_rounded_inactive"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_rounded_inactive.png" />
+
+    <!-- Close (for ToolWindow) -->
+   <Image x:Key="close_toolwindow_normal"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_toolwindow_normal.png" />
+   <Image x:Key="close_toolwindow_hover"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_toolwindow_hover.png" />
+   <Image x:Key="close_toolwindow_pressed"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_toolwindow_pressed.png" />
+   <Image x:Key="close_toolwindow_inactive"
+                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_toolwindow_inactive.png" />
+
+
+    <!-- =============================================================================== -->
+    <!-- Common Styles                                                                   -->
+    <!-- Need to find a way to share these for WindowControl and StylableWindow          -->
+    <!-- =============================================================================== -->
+
+    <!-- Button template -->
+    <ControlTemplate x:Key="buttonTemplate" TargetType="Button">
+        <Border Name="outerBorder" 
+                Background="{TemplateBinding Background}" 
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}">
+            <ContentPresenter />
+        </Border>
+    </ControlTemplate>
+
+   <Style x:Key="windowButtonBaseStyle" TargetType="Button">
+      <Setter Property="IsTabStop" Value="False" />
+      <Setter Property="Margin" Value="0,-1,0,0" />
+      <Setter Property="OverridesDefaultStyle" Value="True" />
+      <Setter Property="Template" Value="{StaticResource buttonTemplate}" />
+   </Style>
+
+    <!--Default Close button style-->
+   <Style x:Key="{ComponentResourceKey 
+                  TypeInTargetAssembly={x:Type primitives:WindowControl}, 
+                  ResourceId=DefaultCloseButtonStyle}"
+           TargetType="Button" 
+          BasedOn="{StaticResource windowButtonBaseStyle}">
+      <Setter Property="ToolTip" Value="Close" />
+      <Setter Property="Content" Value="{StaticResource close_normal}" />
+        <Style.Triggers>
+            <!-- Regular Window -->
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource TemplatedParent},Path=IsActive}" Value="False">
+                <Setter Property="Content" Value="{StaticResource close_inactive}" />
+            </DataTrigger>
+            <Trigger Property="IsMouseOver" Value="True">
+            <Setter Property="Content" Value="{StaticResource close_hover}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+            <Setter Property="Content" Value="{StaticResource close_pressed}" />
+            </Trigger>
+
+            <!-- NoResize (Close button with 2 rounded corners) -->
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource TemplatedParent},Path=IsActive}" Value="False" />
+                </MultiDataTrigger.Conditions>
+            <Setter Property="Content" Value="{StaticResource close_rounded_inactive}" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource self},Path=IsMouseOver}" Value="True" />
+                </MultiDataTrigger.Conditions>
+            <Setter Property="Content" Value="{StaticResource close_rounded_hover}" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource self},Path=IsPressed}" Value="True" />
+                </MultiDataTrigger.Conditions>
+            <Setter Property="Content" Value="{StaticResource close_rounded_pressed}" />
+            </MultiDataTrigger>
+
+            <!-- Tool Window -->
+            <Trigger Property="Name" Value="PART_ToolWindowCloseButton">
+            <Setter Property="Content" Value="{StaticResource close_toolwindow_normal}" />
+            </Trigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource self},Path=Name}" Value="PART_ToolWindowCloseButton" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource TemplatedParent},Path=IsActive}" Value="False" />
+                </MultiDataTrigger.Conditions>
+            <Setter Property="Content" Value="{StaticResource close_toolwindow_inactive}" />
+            </MultiDataTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="Name" Value="PART_ToolWindowCloseButton" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+            <Setter Property="Content" Value="{StaticResource close_toolwindow_hover}" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="Name" Value="PART_ToolWindowCloseButton" />
+                    <Condition Property="IsPressed" Value="True" />
+                </MultiTrigger.Conditions>
+            <Setter Property="Content" Value="{StaticResource close_toolwindow_pressed}" />
+            </MultiTrigger>
+
+        </Style.Triggers>
+    </Style>
+
+
+
+
+
+
+   <SolidColorBrush x:Key="Window_WindowBorderBrush" Color="#FF252C33" />
+
+   <conv:ColorBlendConverter x:Key="Window_WindowBackground_converter" BlendedColor="#FFA0A0A0" BlendedColorRatio="0.35" />
+   <SolidColorBrush x:Key="Window_WindowBackground" 
+                    Color="{Binding 
+                        Source={x:Static media:WindowColors.ColorizationColor}, 
+                        Converter={StaticResource Window_WindowBackground_converter}}" 
+                    Opacity="0.85"/>
+
+   <SolidColorBrush x:Key="Window_Background"  Color="White"/>
+
+   <conv:ColorBlendConverter x:Key="Window_WindowInactiveBackground_converter" BlendedColor="#FFF0F0F0" BlendedColorRatio="0.67" />
+   <SolidColorBrush x:Key="Window_WindowInactiveBackground" 
+                    Color="{Binding 
+                        Source={x:Static media:WindowColors.ColorizationColor}, 
+                        Converter={StaticResource Window_WindowInactiveBackground_converter}}" 
+                    Opacity="0.85"/>
+
+   <SolidColorBrush x:Key="Window_CaptionForeground" Color="Black"/>
+
+   <Thickness x:Key="Window_WindowBorderThickness">1</Thickness>
+
+   <!-- ========================================================================= -->
+   <!-- Used by ColorPicker and ColorCanvas                                       -->
+   <!-- ========================================================================= -->
+   <DrawingBrush  x:Key="CheckerBrush" Viewport="0,0,10,10" ViewportUnits="Absolute" TileMode="Tile">
+      <DrawingBrush.Drawing>
+         <DrawingGroup>
+            <GeometryDrawing Brush="White">
+               <GeometryDrawing.Geometry>
+                  <RectangleGeometry Rect="0,0 100,100" />
+               </GeometryDrawing.Geometry>
+            </GeometryDrawing>
+            <GeometryDrawing Brush="LightGray">
+               <GeometryDrawing.Geometry>
+                  <GeometryGroup>
+                     <RectangleGeometry Rect="0,0 50,50" />
+                     <RectangleGeometry Rect="50,50 50,50" />
+                  </GeometryGroup>
+               </GeometryDrawing.Geometry>
+            </GeometryDrawing>
+         </DrawingGroup>
+      </DrawingBrush.Drawing>
+   </DrawingBrush>
 
 </ResourceDictionary>

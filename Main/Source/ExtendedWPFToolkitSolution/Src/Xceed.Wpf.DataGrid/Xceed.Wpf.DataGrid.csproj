@@ -17,7 +17,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
@@ -317,7 +317,6 @@
     <Compile Include="%28enums%29\NavigationBehaviorEnum.cs" />
     <Compile Include="%28Generator%29\GroupNamesTreeKey.cs" />
     <Compile Include="%28Generator%29\NamesTreeGroupFinderVisitor.cs" />
-    <Compile Include="CancelRoutedEvent.cs" />
     <Compile Include="CellValidationErrorRoutedEvent.cs" />
     <Compile Include="ContainerSizeState.cs" />
     <Compile Include="Converters\CurrencyConverter.cs" />
@@ -624,6 +623,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="themes\aero2.normalcolor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="themes\Aero\TableflowView.Aero.normalcolor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -769,6 +772,18 @@
     <Page Include="themes\Windows7\TableView.Windows7.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Windows8\Resources\TableView.Windows8.Graphics.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="themes\Windows8\Resources\Windows8.Resources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="themes\Windows8\TableflowView.Windows8.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="themes\zune.normalcolor.xaml">
       <Generator>MSBuild:Compile</Generator>

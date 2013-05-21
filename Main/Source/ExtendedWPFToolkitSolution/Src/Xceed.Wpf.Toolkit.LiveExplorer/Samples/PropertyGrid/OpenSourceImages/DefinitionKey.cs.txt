@@ -1,0 +1,10 @@
+﻿
+private class Person
+{
+  [DefinitionKey( "nameType" )]
+  public string FirstName { get; set; }
+  [DefinitionKey( "nameType" )]
+  public string LastName { get; set; }
+  [DefinitionKey( typeof( int? ) )]
+  public object ReferenceNo { get; set; }
+}

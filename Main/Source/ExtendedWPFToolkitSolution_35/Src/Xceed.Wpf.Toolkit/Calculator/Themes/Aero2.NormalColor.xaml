@@ -1,0 +1,259 @@
+﻿<!--***********************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
+                    xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <conv:CalculatorMemoryToVisibilityConverter x:Key="CalculatorMemoryToVisibilityConverter" />
+
+    <Style x:Key="CalculatorOperatorButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Focusable" Value="False" />
+    </Style>
+
+    <Style x:Key="CalculatorClearButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Background" Value="Pink" />
+    </Style>
+
+    <Style x:Key="CalculatorDigitButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Background" Value="#FFE8E8E8" />
+    </Style>
+
+
+    <ControlTemplate x:Key="CalculatorButtonPanel" TargetType="{x:Type ContentControl}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="3" />
+                <RowDefinition />
+                <RowDefinition Height="3" />
+                <RowDefinition />
+                <RowDefinition Height="3" />
+                <RowDefinition />
+                <RowDefinition Height="3" />
+                <RowDefinition />
+                <RowDefinition Height="3" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Button Grid.Column="0" Grid.Row="0" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="MC"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" />
+
+            <Button Grid.Column="2" Grid.Row="0" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="MR" 
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" />
+
+            <Button Grid.Column="0" Grid.Row="2" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Back" 
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" Grid.RowSpan="1" />
+
+            <Button Grid.Column="2" Grid.Row="2" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Cancel" 
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorClearButtonStyle}" />
+
+            <Button Grid.Column="4" Grid.Row="2" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Clear"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorClearButtonStyle}" Grid.ColumnSpan="1" Grid.RowSpan="1" />
+
+            <Button Grid.Column="4" Grid.Row="0" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="MS"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" />
+
+            <Button Grid.Column="6" Grid.Row="0" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="MAdd"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" Margin="0" />
+
+            <Button Grid.Column="8" Grid.Row="0" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="MSub"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" />
+
+            <Button Grid.Column="6" Grid.Row="2" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Negate"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" />
+
+            <Button Grid.Column="8" Grid.Row="2" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Sqrt"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" />
+
+            <Button Grid.Column="0" Grid.Row="4" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Seven"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorDigitButtonStyle}" />
+
+            <Button Grid.Column="2" Grid.Row="4" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Eight"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorDigitButtonStyle}" />
+
+            <Button Grid.Column="4" Grid.Row="4" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Nine"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorDigitButtonStyle}" />
+
+            <Button Grid.Column="6" Grid.Row="4" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Divide"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" />
+
+            <Button Grid.Column="8" Grid.Row="4" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Percent"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" />
+
+            <Button Grid.Column="0" Grid.Row="6" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Four"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorDigitButtonStyle}" />
+
+            <Button Grid.Column="2" Grid.Row="6" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Five"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorDigitButtonStyle}" />
+
+            <Button Grid.Column="4" Grid.Row="6" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Six"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorDigitButtonStyle}" />
+
+            <Button Grid.Column="6" Grid.Row="6" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Multiply"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" />
+
+            <Button Grid.Column="8" Grid.Row="6" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Fraction"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" />
+
+            <Button Grid.Column="0" Grid.Row="8" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="One"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"                                    
+					  Style="{StaticResource CalculatorDigitButtonStyle}" />
+
+            <Button Grid.Column="2" Grid.Row="8" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Two"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorDigitButtonStyle}" />
+
+            <Button Grid.Column="4" Grid.Row="8" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Three"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorDigitButtonStyle}" />
+
+            <Button Grid.Column="6" Grid.Row="8" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Subtract"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" />
+
+            <Button Grid.Column="8" Grid.Row="8" Grid.RowSpan="3" MinWidth="28" MinHeight="55"
+					  local:Calculator.CalculatorButtonType="Equal"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" />
+
+            <Button Grid.Column="0" Grid.Row="10" Grid.ColumnSpan="3" MinWidth="59" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Zero"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorDigitButtonStyle}" />
+
+            <Button Grid.Column="4" Grid.Row="10" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Decimal"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorDigitButtonStyle}" />
+
+            <Button Grid.Column="6" Grid.Row="10" MinWidth="28" MinHeight="26"
+					  local:Calculator.CalculatorButtonType="Add"
+					  Command="local:CalculatorCommands.CalculatorButtonClick"
+					  Style="{StaticResource CalculatorOperatorButtonStyle}" />
+        </Grid>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type local:Calculator}">
+        <Setter Property="Background" Value="{StaticResource PanelBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:Calculator}">
+                    <Border Background="{TemplateBinding Background}"
+                       BorderBrush="{TemplateBinding BorderBrush}"
+                       BorderThickness="{TemplateBinding BorderThickness}"
+                       CornerRadius="0">
+                        <Grid Margin="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border x:Name="PART_Display" Margin="0,0,0,10" Background="White" BorderBrush="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" BorderThickness="1">
+                                <StackPanel>
+                                    <Path Stretch="Fill"
+                                 Height="9"
+                                 Width="9"
+                                 Fill="DarkGray"
+                                 Data="F1 M 508.172,390L 506.031,390L 504.612,393.385C 504.174,394.477 503.788,395.533 503.453,396.555L 503.417,396.555C 503.334,395.528 503.206,394.471 503.035,393.385L 502.454,390L 500.301,390L 498.637,399L 500.226,399L 500.807,395.537C 500.903,394.973 501,394.379 501.099,393.756C 501.198,393.133 501.287,392.534 501.367,391.957L 501.402,391.957C 501.444,392.514 501.499,393.08 501.567,393.655C 501.635,394.231 501.712,394.776 501.8,395.292L 502.382,398.871L 503.7,398.871L 505.231,395.233C 505.445,394.724 505.663,394.187 505.884,393.622C 506.105,393.057 506.313,392.502 506.508,391.957L 506.543,391.957C 506.411,393.11 506.304,394.292 506.223,395.502L 505.979,399L 507.637,399L 508.172,390 Z "
+                                 HorizontalAlignment="Left"
+                                 VerticalAlignment="Top"                                              
+                                 Margin="4,4,0,0"
+                                 Visibility="{Binding Memory, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource CalculatorMemoryToVisibilityConverter}}" />
+                                    <TextBlock FontSize="18"
+                                      HorizontalAlignment="Right"
+                                      Margin="0,0,4,0"
+                                      Text="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}" />
+                                </StackPanel>
+                            </Border>
+                            <ContentControl x:Name="PART_CalculatorButtonPanel" Grid.Row="1" Template="{StaticResource CalculatorButtonPanel}" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter TargetName="PART_Display" Property="Background" Value="Azure" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

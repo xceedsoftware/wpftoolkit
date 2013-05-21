@@ -1,0 +1,103 @@
+﻿<!--*************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Pie.Views.PieProgressView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 Title="Pie Progress">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+            The Pie control properties can be animated to create various effects and controls like this circular progress bar.
+        </Paragraph>
+    </local:DemoView.Description>
+
+   <local:DemoView.Resources>
+      <ControlTemplate x:Key="PieProgressTemplate"
+                       TargetType="{x:Type ProgressBar}">
+         <Grid>
+            <xctk:Pie x:Name="Pie"
+                      Fill="#FFEFAC27"
+                      HorizontalAlignment="Stretch"
+                      Width="Auto"
+                      StrokeThickness="4"
+                      Slice="{TemplateBinding Value}"
+                      RenderTransformOrigin="0.5,0.5">
+               <xctk:Pie.RenderTransform>
+                  <RotateTransform Angle="-90" />
+               </xctk:Pie.RenderTransform>
+            </xctk:Pie>
+            <Ellipse Fill="White"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     Width="100"
+                     Height="100" />
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal">
+               <TextBlock  FontSize="24"
+                           FontWeight="Bold"
+                           Foreground="Black"
+                           Text="{Binding ElementName=Pie, Path=Slice, StringFormat=#%}" />
+            </StackPanel>
+         </Grid>
+      </ControlTemplate>
+      <Storyboard x:Key="SimulateProgressStoryboard"
+                  Duration="00:00:04"
+                  AccelerationRatio="0.5"
+                  DecelerationRatio="0.5">
+         <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
+                                        Storyboard.TargetName="progressBar"
+                                        Storyboard.TargetProperty="(RangeBase.Value)">
+            <SplineDoubleKeyFrame KeyTime="00:00:00"
+                                  Value="0" />
+            <SplineDoubleKeyFrame KeyTime="00:00:04"
+                                  Value="1" />
+         </DoubleAnimationUsingKeyFrames>
+      </Storyboard>
+   </local:DemoView.Resources>
+
+   <local:DemoView.Triggers>
+      <EventTrigger RoutedEvent="ButtonBase.Click"
+                    SourceName="SimulateProgressButton">
+         <BeginStoryboard Storyboard="{StaticResource SimulateProgressStoryboard}" />
+      </EventTrigger>
+   </local:DemoView.Triggers>
+
+   <Grid x:Name="LayoutRoot"
+         HorizontalAlignment="Center"
+         VerticalAlignment="Center">
+      <Grid.RowDefinitions>
+         <RowDefinition Height="0.66*" />
+         <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <ProgressBar x:Name="progressBar"
+                   Template="{StaticResource PieProgressTemplate}"
+                   Value="0"
+                   Height="200"
+                   Width="200"
+                   Minimum="0"
+                   Maximum="1" />
+      <Button x:Name="SimulateProgressButton"
+              Content="Simulate Progress"
+              HorizontalAlignment="Center"
+              Margin="0,20,0,0"
+              VerticalAlignment="Center"
+              Width="200"
+              Height="50"
+              Grid.Row="1" />
+   </Grid>
+</local:DemoView>

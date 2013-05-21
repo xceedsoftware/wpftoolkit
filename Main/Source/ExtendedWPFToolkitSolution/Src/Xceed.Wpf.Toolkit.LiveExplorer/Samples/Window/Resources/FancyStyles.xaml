@@ -1,0 +1,189 @@
+﻿<!--*************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ************************************************************************************-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+   <!--This file contains some "fancy" styles used by the StylableWindow sample. They are placed 
+   here to avoid cluttering the XAML view of the sample. -->
+
+   <LinearGradientBrush x:Key="FancyButtonRegionBackground" StartPoint="0,0" EndPoint="0,1">
+      <LinearGradientBrush.GradientStops>
+         <GradientStopCollection>
+                <GradientStop Color="Peru" Offset="0" />
+                <GradientStop Color="SaddleBrown" Offset="1" />
+         </GradientStopCollection>
+      </LinearGradientBrush.GradientStops>
+   </LinearGradientBrush>
+
+   <LinearGradientBrush x:Key="WindowButtonHoverBrush" StartPoint="0,0" EndPoint="0,1">
+      <LinearGradientBrush.GradientStops>
+         <GradientStopCollection>
+                <GradientStop Color="Chocolate" Offset="0" />
+                <GradientStop Color="SaddleBrown" Offset="1" />
+         </GradientStopCollection>
+      </LinearGradientBrush.GradientStops>
+   </LinearGradientBrush>
+
+   <LinearGradientBrush x:Key="WindowButtonPressedBrush" StartPoint="0,0" EndPoint="0,1">
+      <LinearGradientBrush.GradientStops>
+         <GradientStopCollection>
+                <GradientStop Color="Chocolate" Offset="0" />
+                <GradientStop Color="Maroon" Offset="1" />
+         </GradientStopCollection>
+      </LinearGradientBrush.GradientStops>
+   </LinearGradientBrush>
+
+   <Style x:Key="FancyButtonStyle" TargetType="Button">
+      <Setter Property="Foreground" Value="#FFFFFFFF" />
+      <Setter Property="Padding" Value="3" />
+      <Setter Property="IsTabStop" Value="False" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Width" Value="30" />
+      <Setter Property="Height" Value="20" />
+      <Setter Property="Margin" Value="2,-1,2,0" />
+      <Setter Property="Template">
+         <Setter.Value>
+            <ControlTemplate TargetType="Button">
+               <Grid>
+                  <VisualStateManager.VisualStateGroups>
+                     <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="MouseOver">
+                           <Storyboard>
+                              <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
+                                 <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource WindowButtonHoverBrush}" />
+                              </ObjectAnimationUsingKeyFrames>
+                           </Storyboard>
+                        </VisualState>
+                        <VisualState x:Name="Pressed">
+                           <Storyboard>
+                              <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="Background" Storyboard.TargetProperty="(Border.Background)">
+                                 <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{StaticResource WindowButtonPressedBrush}" />
+                              </ObjectAnimationUsingKeyFrames>
+                           </Storyboard>
+                        </VisualState>
+                     </VisualStateGroup>
+                  </VisualStateManager.VisualStateGroups>
+                  <Border x:Name="Background" CornerRadius="0,0,2,0" Background="{StaticResource FancyButtonRegionBackground}">
+                     <Border Margin="1,0,1,1" BorderBrush="#59FFFFFF" BorderThickness="1" CornerRadius="0,0,1,0" />
+                  </Border>
+                  <ContentPresenter x:Name="contentPresenter" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+               </Grid>
+               <ControlTemplate.Triggers>
+                  <Trigger Property="IsEnabled" Value="False">
+                     <Setter TargetName="contentPresenter" Property="Opacity" Value="0.5" />
+                  </Trigger>
+               </ControlTemplate.Triggers>
+            </ControlTemplate>
+         </Setter.Value>
+      </Setter>
+   </Style>
+
+    <Geometry x:Key="closeGeometry">
+        M0,0 L6,0 6,6 0,6 z
+    </Geometry>
+    <Geometry x:Key="minimizeGeometry">
+        M0,0 L4,4 8,0 z
+    </Geometry>
+    <Geometry x:Key="maximizeGeometry">
+        M0,5 L5,0 10,5 z
+    </Geometry>
+    <Geometry x:Key="restoreGeometry">
+        M0,0 L4,4 3,5 0,5 4,9 5,9 9,5 6,5 5,4 9,0 z
+    </Geometry>
+
+    <Style x:Key="FancyButtonCloseStyle" TargetType="Button" BasedOn="{StaticResource FancyButtonStyle}">
+      <Setter Property="ToolTip" Value="Close" />
+      <Setter Property="ContentTemplate">
+         <Setter.Value>
+            <DataTemplate>
+                <Path Height="7"
+                   SnapsToDevicePixels="False"
+                   RenderOptions.EdgeMode="Aliased"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Width="7"
+                   Fill="#FFFF6400"
+                   Stretch="None"
+                   Stroke="#FFFF6400" 
+                   StrokeThickness="1"
+                   Data="{StaticResource closeGeometry}" />
+            </DataTemplate>
+         </Setter.Value>
+      </Setter>
+   </Style>
+
+   <Style x:Key="FancyButtonMaximizeStyle" TargetType="Button" BasedOn="{StaticResource FancyButtonStyle}">
+      <Setter Property="ToolTip" Value="Maximize" />
+      <Setter Property="ContentTemplate">
+         <Setter.Value>
+            <DataTemplate>
+                  <Path Height="6"
+                     SnapsToDevicePixels="False"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     Width="11"
+                     Fill="LightGreen"
+                     Stretch="None"
+                     Stroke="Transparent" 
+                     StrokeThickness="1"
+                     Data="{StaticResource maximizeGeometry}" />
+               </DataTemplate>
+         </Setter.Value>
+      </Setter>
+   </Style>
+
+    <Style x:Key="FancyButtonMinimizeStyle" TargetType="Button" BasedOn="{StaticResource FancyButtonStyle}">
+      <Setter Property="ToolTip" Value="Minimize" />
+      <Setter Property="ContentTemplate">
+         <Setter.Value>
+            <DataTemplate>
+                  <Path Height="5"
+                     SnapsToDevicePixels="False"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Bottom"
+                     Width="9"
+                     Fill="Yellow"
+                     Stretch="None"
+                     Stroke="Yellow"
+                     StrokeThickness="1"
+                     Data="{StaticResource minimizeGeometry}" />
+               </DataTemplate>
+         </Setter.Value>
+      </Setter>
+   </Style>
+
+    <Style x:Key="FancyButtonRestoreStyle" TargetType="Button" BasedOn="{StaticResource FancyButtonStyle}">
+        <Setter Property="ToolTip" Value="Restore Down" />
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <Path Height="10"
+                        SnapsToDevicePixels="False"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Width="10"
+                        Fill="LightGreen"
+                        Stretch="None"
+                        Stroke="LightGreen" 
+                        Data="{StaticResource restoreGeometry}" />
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+</ResourceDictionary>

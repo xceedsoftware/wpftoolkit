@@ -1,0 +1,819 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5E7DC9C8-3E27-400C-B84C-29FF9E710CB3}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Xceed.Wpf.Toolkit.LiveExplorer</RootNamespace>
+    <AssemblyName>Xceed.Wpf.Toolkit.LiveExplorer</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ProductName>Xceed Extended WPF Toolkit LiveExplorer</ProductName>
+    <PublisherName>Xceed Software Inc.</PublisherName>
+    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationVersion>2.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>App.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Services.Client" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="Xceed.Wpf.Samples.SampleData">
+      <HintPath>..\..\Libs\Xceed.Wpf.Samples.SampleData.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Xceed.Wpf.AvalonDock.Themes.Aero\Xceed.Wpf.AvalonDock.Themes.Aero.csproj">
+      <Project>{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}</Project>
+      <Name>Xceed.Wpf.AvalonDock.Themes.Aero</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Xceed.Wpf.AvalonDock.Themes.Metro\Xceed.Wpf.AvalonDock.Themes.Metro.csproj">
+      <Project>{89286EB4-B4A1-418C-839A-067B00F442D8}</Project>
+      <Name>Xceed.Wpf.AvalonDock.Themes.Metro</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Xceed.Wpf.AvalonDock.Themes.VS2010\Xceed.Wpf.AvalonDock.Themes.VS2010.csproj">
+      <Project>{B3FC3E21-5F2D-4581-AEA2-59F671CFFC21}</Project>
+      <Name>Xceed.Wpf.AvalonDock.Themes.VS2010</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.csproj">
+      <Project>{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}</Project>
+      <Name>Xceed.Wpf.AvalonDock</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Xceed.Wpf.DataGrid\Xceed.Wpf.DataGrid.csproj">
+      <Project>{63648392-6CE9-4A60-96D4-F9FD718D29B0}</Project>
+      <Name>Xceed.Wpf.DataGrid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Xceed.Wpf.Toolkit\Xceed.Wpf.Toolkit.csproj">
+      <Project>{72E591D6-8F83-4D8C-8F67-9C325E623234}</Project>
+      <Name>Xceed.Wpf.Toolkit</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="CodeBox.cs" />
+    <Compile Include="Core\CSharpFormatter.cs" />
+    <Compile Include="Core\XamlFormatter.cs" />
+    <Compile Include="HomeView.xaml.cs">
+      <DependentUpon>HomeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\AvalonDock\Views\AvalonDockView.xaml.cs">
+      <DependentUpon>AvalonDockView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\BusyIndicator\Converters\IntegerToTimespanConverter.cs" />
+    <Compile Include="Samples\BusyIndicator\Views\BusyIndicatorCustomContentTemplateView.xaml.cs">
+      <DependentUpon>BusyIndicatorCustomContentTemplateView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\BusyIndicator\Views\BusyIndicatorCustomContentView.xaml.cs">
+      <DependentUpon>BusyIndicatorCustomContentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\BusyIndicator\Views\BusyIndicatorView.xaml.cs">
+      <DependentUpon>BusyIndicatorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Button\Views\ButtonSpinnerView.xaml.cs">
+      <DependentUpon>ButtonSpinnerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Button\Views\DropDownSplitButtonView.xaml.cs">
+      <DependentUpon>DropDownSplitButtonView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Calculator\Views\CalculatorView.xaml.cs">
+      <DependentUpon>CalculatorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Chart\Converters\GraduationModeToComboBoxConverter.cs" />
+    <Compile Include="Samples\Chart\Views\ChartAxisView.xaml.cs">
+      <DependentUpon>ChartAxisView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Chart\Views\ChartLegendView.xaml.cs">
+      <DependentUpon>ChartLegendView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Chart\Views\ChartSeriesBasicTypesView.xaml.cs">
+      <DependentUpon>ChartSeriesBasicTypesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Chart\Views\ChartSeriesDataPointsBindingView.xaml.cs">
+      <DependentUpon>ChartSeriesDataPointsBindingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Chart\Views\ChartStylingAxesGridView.xaml.cs">
+      <DependentUpon>ChartStylingAxesGridView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Chart\Views\ChartStylingColumnSeriesView.xaml.cs">
+      <DependentUpon>ChartStylingColumnSeriesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Chart\Views\ChartStylingLineSeriesView.xaml.cs">
+      <DependentUpon>ChartStylingLineSeriesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Chart\Views\ChartStylingPieSeriesView.xaml.cs">
+      <DependentUpon>ChartStylingPieSeriesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\CheckLists\Views\CheckListsView.xaml.cs">
+      <DependentUpon>CheckListsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Color\Views\ColorView.xaml.cs">
+      <DependentUpon>ColorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\DataGrid\Converters\FlagPathConverter.cs" />
+    <Compile Include="Samples\DataGrid\UniqueIDCellValidationRule.cs" />
+    <Compile Include="Samples\DataGrid\Views\DataGridView.xaml.cs">
+      <DependentUpon>DataGridView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\DataGrid\Views\MultiColumnComboBoxView.xaml.cs">
+      <DependentUpon>MultiColumnComboBoxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\DateTime\Converters\DateTimeToTimeSpanConverter.cs" />
+    <Compile Include="Samples\DateTime\Views\DateTimeView.xaml.cs">
+      <DependentUpon>DateTimeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\ListBox\Converters\BoxArtImageSourceConverter.cs" />
+    <Compile Include="Samples\ListBox\Views\ListBoxView.xaml.cs">
+      <DependentUpon>ListBoxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Magnifier\Converters\ColorConverter.cs" />
+    <Compile Include="Samples\Magnifier\Converters\VisibilityConverter.cs" />
+    <Compile Include="Samples\Magnifier\Views\MagnifierView.xaml.cs">
+      <DependentUpon>MagnifierView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Numeric\Views\NumericView.xaml.cs">
+      <DependentUpon>NumericView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Panels\Converters\ComboBoxToVisibilityConverter.cs" />
+    <Compile Include="Samples\Panels\Views\SwitchPanelView.xaml.cs">
+      <DependentUpon>SwitchPanelView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Pie\Converters\SliceLabelConverter.cs" />
+    <Compile Include="Samples\Pie\Views\PieChartView.xaml.cs">
+      <DependentUpon>PieChartView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Pie\Views\PieProgressView.xaml.cs">
+      <DependentUpon>PieProgressView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Pie\Views\PieView.xaml.cs">
+      <DependentUpon>PieView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PileFlowPanel\Converters\FullNameStringConverter.cs" />
+    <Compile Include="Samples\PileFlowPanel\Views\PileFlowPanelView.xaml.cs">
+      <DependentUpon>PileFlowPanelView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Converters\DimensionConverter.cs" />
+    <Compile Include="Samples\PropertyGrid\Resources\LastNameUserControlEditor.xaml.cs">
+      <DependentUpon>LastNameUserControlEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridPropertyItemStyleView.xaml.cs">
+      <DependentUpon>PropertyGridPropertyItemStyleView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridDefinitionKeyView.xaml.cs">
+      <DependentUpon>PropertyGridDefinitionKeyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridEditorDefinitionsView.xaml.cs">
+      <DependentUpon>PropertyGridEditorDefinitionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridAttributesView.xaml.cs">
+      <DependentUpon>PropertyGridAttributesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridSelectedObjectView.xaml.cs">
+      <DependentUpon>PropertyGridSelectedObjectView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridCustomPropertyView.xaml.cs">
+      <DependentUpon>PropertyGridCustomPropertyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridPropertiesView.xaml.cs">
+      <DependentUpon>PropertyGridPropertiesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridPropertiesSourceView.xaml.cs">
+      <DependentUpon>PropertyGridPropertiesSourceView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\DisplayLocalizationRes.Designer.cs">
+      <DependentUpon>DisplayLocalizationRes.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridBindingToStructsView.xaml.cs">
+      <DependentUpon>PropertyGridBindingToStructsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridCategoryOrderView.xaml.cs">
+      <DependentUpon>PropertyGridCategoryOrderView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridCustomEditorsView.xaml.cs">
+      <DependentUpon>PropertyGridCustomEditorsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridDefaultEditorsView.xaml.cs">
+      <DependentUpon>PropertyGridDefaultEditorsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridDisplayLocalizationView.xaml.cs">
+      <DependentUpon>PropertyGridDisplayLocalizationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridMultiSelectedObjectsView.xaml.cs">
+      <DependentUpon>PropertyGridMultiSelectedObjectsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridSpecifyingPropertiesView.xaml.cs">
+      <DependentUpon>PropertyGridSpecifyingPropertiesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridView.xaml.cs">
+      <DependentUpon>PropertyGridView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Text\Views\AutoSelectTextboxView.xaml.cs">
+      <DependentUpon>AutoSelectTextboxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Text\Views\MaskedTextboxView.xaml.cs">
+      <DependentUpon>MaskedTextboxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Text\Views\MultiLineTextEditorView.xaml.cs">
+      <DependentUpon>MultiLineTextEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Text\Views\RichTextboxView.xaml.cs">
+      <DependentUpon>RichTextboxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Text\Views\WatermarkTextboxView.xaml.cs">
+      <DependentUpon>WatermarkTextboxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Theming\Converters\FlagPathConverter.cs" />
+    <Compile Include="Samples\Theming\Views\ThemingCoreWPFView.xaml.cs">
+      <DependentUpon>ThemingCoreWPFView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Theming\Views\ThemingDataGridView.xaml.cs">
+      <DependentUpon>ThemingDataGridView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Theming\Views\ThemingExtendedToolkitView.xaml.cs">
+      <DependentUpon>ThemingExtendedToolkitView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Theming\Views\ThemingListBoxView.xaml.cs">
+      <DependentUpon>ThemingListBoxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\TimelinePanel\Views\TimelinePanelView.xaml.cs">
+      <DependentUpon>TimelinePanelView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Window\Converters\IntToBoolConverter.cs" />
+    <Compile Include="Samples\Window\Converters\WindowStateToBoolConverter.cs" />
+    <Compile Include="Samples\Window\Resources\WindowModelEditor.xaml.cs">
+      <DependentUpon>WindowModelEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Window\Views\ChildWindowView.xaml.cs">
+      <DependentUpon>ChildWindowView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Window\Views\StylableWindowView.xaml.cs">
+      <DependentUpon>StylableWindowView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Window\Views\WindowContainerView.xaml.cs">
+      <DependentUpon>WindowContainerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Wizard\Views\WizardView.xaml.cs">
+      <DependentUpon>WizardView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Zoombox\Converters\PointConverter.cs" />
+    <Compile Include="Samples\Zoombox\Converters\RectConverter.cs" />
+    <Compile Include="Samples\Zoombox\Converters\SimpleConverter.cs" />
+    <Compile Include="Samples\Zoombox\Converters\ViewFinderConverter.cs" />
+    <Compile Include="Samples\Zoombox\Converters\ViewNameConverter.cs" />
+    <Compile Include="Samples\Zoombox\Converters\ViewStackCountConverter.cs" />
+    <Compile Include="Samples\Zoombox\Views\ZoomboxView.xaml.cs">
+      <DependentUpon>ZoomboxView.xaml</DependentUpon>
+    </Compile>
+    <Page Include="HomeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Core\CodeFormatting\CSharpFormat.cs" />
+    <Compile Include="Core\CodeFormatting\XamlFormat.cs" />
+    <Compile Include="Core\LiveExplorerTreeViewItem.cs" />
+    <Compile Include="DemoView.cs" />
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Resources\LiveExplorerScrollViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\TextBlockStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\AvalonDock\Views\AvalonDockView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\BusyIndicator\Resources\Common.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\BusyIndicator\Views\BusyIndicatorCustomContentTemplateView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\BusyIndicator\Views\BusyIndicatorCustomContentView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\BusyIndicator\Views\BusyIndicatorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Button\Views\ButtonSpinnerView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Button\Views\DropDownSplitButtonView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\Calculator\Views\CalculatorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Chart\Views\ChartAxisView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\Chart\Views\ChartLegendView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\Chart\Views\ChartSeriesBasicTypesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\Chart\Views\ChartSeriesDataPointsBindingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\Chart\Views\ChartStylingAxesGridView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\Chart\Views\ChartStylingColumnSeriesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\Chart\Views\ChartStylingLineSeriesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\Chart\Views\ChartStylingPieSeriesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\CheckLists\Views\CheckListsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Color\Views\ColorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\DataGrid\Views\DataGridView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\DataGrid\Views\MultiColumnComboBoxView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\DateTime\Views\DateTimeView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\ListBox\Views\ListBoxView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\Magnifier\Views\MagnifierView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Numeric\Views\NumericView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Panels\Views\SwitchPanelView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Pie\Views\PieChartView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Pie\Views\PieProgressView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Pie\Views\PieView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PileFlowPanel\Views\PileFlowPanelView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Resources\LastNameUserControlEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridPropertyItemStyleView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridDefinitionKeyView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridEditorDefinitionsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridAttributesView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridSelectedObjectView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridCustomPropertyView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridPropertiesView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridPropertiesSourceView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridBindingToStructsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridCategoryOrderView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridCustomEditorsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridDefaultEditorsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridDisplayLocalizationView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridMultiSelectedObjectsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridSpecifyingPropertiesView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Text\Views\AutoSelectTextboxView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Text\Views\MaskedTextboxView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Text\Views\MultiLineTextEditorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Text\Views\RichTextboxView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Text\Views\WatermarkTextboxView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Theming\Views\ThemingCoreWPFView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Theming\Views\ThemingDataGridView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Theming\Views\ThemingExtendedToolkitView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Theming\Views\ThemingListBoxView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\TimelinePanel\Views\TimelinePanelView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Window\Resources\FancyStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\Window\Resources\WindowModelEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\Window\Views\ChildWindowView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Window\Views\StylableWindowView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Window\Views\WindowContainerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\Wizard\Views\WizardView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Zoombox\Views\ZoomboxView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\PropertyGrid\Views\DisplayLocalizationRes.fr.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\PropertyGrid\Views\DisplayLocalizationRes.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DisplayLocalizationRes.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="Properties\app.manifest">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+    <Resource Include="Samples\Magnifier\Resources\SampleText.rtf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\xceed_logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\BusyIndicator\Images\CdBurning32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\Images\NoPicture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\Images\NoPictureA.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\Images\NoPictureB.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\Images\NoPictureC.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\Images\NoPictureD.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\Images\Working.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Zoombox\Resources\Default.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Zoombox\Resources\ZoomboxProperties.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Window\Resources\xceed_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\DataGrid\OpenSourceImages\MultiColumnsComboBox.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Panels\OpenSourceImages\AnimatedTimelinePanel.png" />
+    <Resource Include="Samples\Panels\OpenSourceImages\AutoStretchStackPanel.png" />
+    <Resource Include="Samples\Panels\OpenSourceImages\CameraPanel.png" />
+    <Resource Include="Samples\Panels\OpenSourceImages\Canvas.png" />
+    <Resource Include="Samples\Panels\OpenSourceImages\Carousel.png" />
+    <Resource Include="Samples\Panels\OpenSourceImages\DockPanel.png" />
+    <Resource Include="Samples\Panels\OpenSourceImages\Grid.png" />
+    <Resource Include="Samples\Panels\OpenSourceImages\PerspectivePanel.png" />
+    <Resource Include="Samples\Panels\OpenSourceImages\RadialCanvas.png" />
+    <Resource Include="Samples\Panels\OpenSourceImages\RelativeCanvas.png" />
+    <Resource Include="Samples\Panels\OpenSourceImages\StackedStackPanel.png" />
+    <Resource Include="Samples\Panels\OpenSourceImages\StackPanel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\OpenSourceImages\ExtendedWPFToolkitControls.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\OpenSourceImages\CoreWPFControls.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\DataGridControls.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\OpenSourceImages\Localization.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\OpenSourceImages\CategoryOrdering.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\OpenSourceImages\MultiSelectedObjects.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Chart\OpenSourceImages\ChartAxis.png" />
+    <Resource Include="Samples\Chart\OpenSourceImages\ChartBasicTypes.png" />
+    <Resource Include="Samples\Chart\OpenSourceImages\ChartLegend.png" />
+    <Resource Include="Samples\Chart\OpenSourceImages\ChartSeriesDataPointsBinding.png" />
+    <Resource Include="Samples\Chart\OpenSourceImages\ChartStylingAxesGrid.png" />
+    <Resource Include="Samples\Chart\OpenSourceImages\ChartStylingColumnSeries.png" />
+    <Resource Include="Samples\Chart\OpenSourceImages\ChartStylingLineSeries.png" />
+    <Resource Include="Samples\Chart\OpenSourceImages\ChartStylingPieSeries.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\AvalonDock\Images\address-book--pencil.png" />
+    <Resource Include="Samples\AvalonDock\Images\address-book-open.png" />
+    <Resource Include="Samples\AvalonDock\Images\alarm-clock-blue.png" />
+    <Resource Include="Samples\AvalonDock\Images\document.png" />
+    <Resource Include="Samples\AvalonDock\Images\property-blue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PileFlowPanel\OpenSourceImages\PileFlowPanel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\ListBox\Resources\Netflix_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\Resources\woman.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\OpenSourceImages\ListBoxControls.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\ListBox\OpenSourceImages\ListBox.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\OpenSourceImages\EditorDefinitions.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\OpenSourceImages\DefinitionKey.cs.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\OpenSourceImages\DefinitionKey.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\OpenSourceImages\PropertiesSource.cs.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\OpenSourceImages\PropertiesSource.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\OpenSourceImages\Properties.cs.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\OpenSourceImages\Properties.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\OpenSourceImages\CustomProperty.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="App.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Chart\Photo\1.bmp" />
+    <Resource Include="Samples\Chart\Photo\2.bmp" />
+    <Resource Include="Samples\Chart\Photo\3.bmp" />
+    <Resource Include="Samples\Chart\Photo\4.bmp" />
+    <Resource Include="Samples\Chart\Photo\5.bmp" />
+    <Resource Include="Samples\Chart\Photo\6.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Text\Resources\PencilTool16.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>for /d /r "$(ProjectDir)Samples" %25%25a in (Views) do @if exist "%25%25a" xcopy "%25%25a" "$(SolutionDir)Src\Xceed.Wpf.Toolkit.LiveExplorer\bin\$(ConfigurationName)\Samples" /s /Y /I
+</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

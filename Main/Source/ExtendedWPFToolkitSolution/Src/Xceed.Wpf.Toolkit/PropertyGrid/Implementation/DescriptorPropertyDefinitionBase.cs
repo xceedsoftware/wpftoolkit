@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -31,35 +31,28 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
+namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
-  internal class DescriptorPropertyDefinitionBase : DependencyObject, IPropertyDefinition, IPropertyParent
+  internal abstract class DescriptorPropertyDefinitionBase : DependencyObject
   {
     #region Members
 
-    internal readonly IPropertyParent _propertyParent;
     private string _category;
     private string _categoryValue;
     private string _description;
     private string _displayName;
     private int _displayOrder;
     private bool _isExpandable;
+    private bool _isReadOnly;
+    private IList<Type> _newItemTypes;
     private IEnumerable<CommandBinding> _commandBindings;
-    private IEnumerable<IPropertyDefinition> _children;
 
     #endregion
 
-    #region Constructors
-
-    internal DescriptorPropertyDefinitionBase( IPropertyParent propertyParent )
+    internal abstract PropertyDescriptor PropertyDescriptor
     {
-      if( propertyParent == null )
-        throw new ArgumentNullException( "propertyParent" );
-
-      _propertyParent = propertyParent;
+      get;
     }
-
-    #endregion
 
     #region Virtual Methods
 
@@ -77,7 +70,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
     {
       return null;
     }
-
     protected virtual int ComputeDisplayOrder()
     {
       return int.MaxValue;
@@ -88,22 +80,19 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
       return false;
     }
 
-    protected virtual void ResetValue()
+    protected virtual IList<Type> ComputeNewItemTypes()
     {
+      return null;
     }
 
-    protected virtual void SetBinding()
+    protected virtual bool ComputeIsReadOnly()
     {
+      return false;
     }
 
     protected virtual bool ComputeCanResetValue()
     {
       return false;
-    }
-
-    protected virtual IEnumerable<IPropertyDefinition> GenerateChildrenProperties()
-    {
-      return null;
     }
 
     protected virtual AdvancedOptionsValues ComputeAdvancedOptionsValues()
@@ -115,45 +104,25 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
       };
     }
 
-    protected virtual ITypeEditor GetAttributeEditor()
+    protected virtual void ResetValue()
     {
-      return null;
     }
 
-    protected virtual string GetPropertyName()
-    {
-      return null;
-    }
-
-    protected virtual Type GetPropertyType()
-    {
-      return null;
-    }
-
-    protected virtual string GetPropertyDisplayName()
-    {
-      return null;
-    }
-
-    protected virtual bool IsPropertyDescriptorReadOnly()
-    {
-      return false;
-    }
-
-    protected virtual ITypeEditor CreateDefaultEditor()
-    {
-      return null;
-    }
-
-    internal virtual PropertyDescriptor GetPropertyDescriptor()
-    {
-      return null;
-    }
-
+    protected abstract BindingBase CreateValueBinding();
 
     #endregion
 
     #region Internal Methods
+
+    internal virtual ITypeEditor CreateDefaultEditor()
+    {
+      return null;
+    }
+
+    internal virtual ITypeEditor CreateAttributeEditor()
+    {
+      return null;
+    }
 
     internal void UpdateAdvanceOptionsForItem( MarkupObject markupObject, DependencyObject dependencyObject, DependencyPropertyDescriptor dpDescriptor, 
                                                 out string imageName, out object tooltip )
@@ -164,7 +133,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
       bool isResource = false;
       bool isDynamicResource = false;
 
-      var markupProperty = markupObject.Properties.Where( p => p.Name == GetPropertyName() ).FirstOrDefault();
+      var markupProperty = markupObject.Properties.Where( p => p.Name == PropertyName ).FirstOrDefault();
       if( markupProperty != null )
       {
         //TODO: need to find a better way to determine if a StaticResource has been applied to any property not just a style
@@ -220,11 +189,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
 
     internal AdvancedOptionsValues CreateAdvanceOptionValues( string imageName, object tooltip )
     {
-      string uriPrefix = "/Xceed.Wpf.Toolkit;component/PropertyGrid/Images/";
+      string uriPrefix = "../Images/";
 
       AdvancedOptionsValues values = new AdvancedOptionsValues();
       values.Tooltip = tooltip;
-      values.ImageSource = new BitmapImage( new Uri( String.Format( "{0}{1}.png", uriPrefix, imageName ), UriKind.RelativeOrAbsolute ) );
+      values.ImageSource = new BitmapImage( new Uri( String.Format( "{0}{1}.png", uriPrefix, imageName ), UriKind.Relative ) );
 
       return values;
     }
@@ -234,6 +203,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
       AdvancedOptionsValues advancedOptions = ComputeAdvancedOptionsValues();
       AdvancedOptionsIcon = advancedOptions.ImageSource;
       AdvancedOptionsTooltip = advancedOptions.Tooltip;
+    }
+
+    internal void UpdateValueFromSource()
+    {
+      BindingOperations.GetBindingExpressionBase( this, DescriptorPropertyDefinitionBase.ValueProperty ).UpdateTarget();
     }
 
 
@@ -250,6 +224,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
       return ( descriptionAtt != null )
               ? descriptionAtt.Description
               : pd.Description;
+    }
+
+    internal object ComputeNewItemTypesForItem( object item )
+    {
+      PropertyDescriptor pd = item as PropertyDescriptor;
+      var attribute = PropertyGridUtilities.GetAttribute<NewItemTypesAttribute>( pd );
+
+      return ( attribute != null ) 
+              ? attribute.Types 
+              : null;
     }
 
     internal object ComputeDisplayOrderForItem( object item )
@@ -280,8 +264,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
 
     private string ComputeDisplayName()
     {
-      string displayName = GetPropertyDisplayName();
-      var attribute = PropertyGridUtilities.GetAttribute<ParenthesizePropertyNameAttribute>( GetPropertyDescriptor() );
+      string displayName = PropertyDescriptor.DisplayName;
+      var attribute = PropertyGridUtilities.GetAttribute<ParenthesizePropertyNameAttribute>( PropertyDescriptor );
       if( ( attribute != null ) && attribute.NeedParenthesis )
       {
         displayName = "(" + displayName + ")";
@@ -290,16 +274,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
       return displayName;
     }
 
-     private FrameworkElement CreateCustomEditor( EditorDefinition customEditor )
-    {
-      return ( customEditor != null && customEditor.EditorTemplate != null )
-        ? customEditor.EditorTemplate.LoadContent() as FrameworkElement
-        : null;
-    }
-
     #endregion
-
-    #region IPropertyDefinition Properties
 
     #region AdvancedOptionsIcon (DP)
 
@@ -355,19 +330,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
       }
     }
 
-    public IEnumerable<IPropertyDefinition> ChildrenDefinitions
-    {
-      get
-      {
-        if( _children == null )
-        {
-          _children = GenerateChildrenProperties();
-        }
-
-        return _children;
-      }
-    }
-
     public IEnumerable<CommandBinding> CommandBindings
     {
       get
@@ -383,7 +345,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
         return _displayName;
       }
     }
-
     public string Description
     {
       get
@@ -408,11 +369,36 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
       }
     }
 
-    public IPropertyParent PropertyParent
+    public bool IsReadOnly
     {
       get
       {
-        return _propertyParent;
+        return _isReadOnly;
+      }
+    }
+
+    public IList<Type> NewItemTypes
+    {
+      get
+      {
+        return _newItemTypes;
+      }
+    }
+
+    public string PropertyName
+    {
+      get
+      {
+        // A common property which is present in all selectedObjects will always have the same name.
+        return PropertyDescriptor.Name;
+      }
+    }
+
+    public Type PropertyType
+    {
+      get
+      {
+        return PropertyDescriptor.PropertyType;
       }
     }
 
@@ -446,89 +432,24 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Implementation
 
     #endregion //Value Property
 
-    #endregion IPropertyDefinition Properties
-
-    #region IPropertyParent Properties
-
-    public object ValueInstance
-    {
-      get
-      {
-        return this.Value;
-      }
-    }
-
-    public EditorDefinitionCollection EditorDefinitions
-    {
-      get
-      {
-        return PropertyParent.EditorDefinitions;
-      }
-    }
-
-    #endregion
-
-    #region IPropertyDefinition Methods
-
-    public FrameworkElement GenerateEditorElement( PropertyItem propertyItem )
-    {
-      FrameworkElement editorElement = null;
-
-      // Priority #1: CustomEditors based on the Attribute.
-      ITypeEditor editor = GetAttributeEditor();
-      if( editor != null )
-        editorElement = editor.ResolveEditor( propertyItem );
-
-      if( _propertyParent.EditorDefinitions != null )
-      {
-        // Priority #2: Custom Editors based on the name (same for all PropertyDescriptors).
-        if( editorElement == null )
-          editorElement = CreateCustomEditor( _propertyParent.EditorDefinitions[ GetPropertyName() ] );
-
-        // Priority #3: Custom Editors based on the type (same for all PropertyDescriptors).
-        if( editorElement == null )
-          editorElement = CreateCustomEditor( _propertyParent.EditorDefinitions[ GetPropertyType() ] );
-      }
-
-      if( editorElement == null )
-      {
-        // Priority #4: Default Editor. Read-only properties use a TextBox.
-        if( IsPropertyDescriptorReadOnly() )
-          editor = new TextBlockEditor();
-
-        // Fallback: Use a default type editor.
-        if( editor == null )
-        {
-          editor = CreateDefaultEditor();
-        }
-
-        Debug.Assert( editor != null );
-
-        editorElement = editor.ResolveEditor( propertyItem );
-      }
-
-      return editorElement;
-    }
-
     public void InitProperties()
     {
+      // Do "IsReadOnly" and PropertyName first since the others may need that value.
+      _isReadOnly = ComputeIsReadOnly();
       _category = ComputeCategory();
       _categoryValue = ComputeCategoryValue();
       _description = ComputeDescription();
       _displayName = ComputeDisplayName();
       _displayOrder = ComputeDisplayOrder();
       _isExpandable = ComputeIsExpandable();
+      _newItemTypes = ComputeNewItemTypes();
       _commandBindings = new CommandBinding[] { new CommandBinding( PropertyItemCommands.ResetValue, ExecuteResetValueCommand, CanExecuteResetValueCommand ) };
 
       UpdateAdvanceOptions();
 
-      SetBinding();
+      BindingBase valueBinding = this.CreateValueBinding();
+      BindingOperations.SetBinding( this, DescriptorPropertyDefinitionBase.ValueProperty, valueBinding );
     }
-
-    #endregion IPropertyDefinition Methods
-
-
-
 
     #region AdvancedOptionsValues struct (Internal )
 

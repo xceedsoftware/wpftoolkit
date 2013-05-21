@@ -1,0 +1,229 @@
+﻿<!--*************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Pie.Views.PieView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 Title="Pie"
+                 x:Name="demo">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+            The Pie shape is a WPF shape that represents a portion of an ellipse.  It is in the same shape as a slice of pie (hence the name).  More precisely, the Pie shape is represented as either a full ellipse (Slice = 1.0), nothing (Slice = 0.0), or an arc of an ellipse joined to its center by two line segments.
+        </Paragraph>
+    </local:DemoView.Description>
+
+   <local:DemoView.Resources>
+      <xctk:ColorToSolidColorBrushConverter x:Key="colorConverter" />
+   </local:DemoView.Resources>
+
+   <Grid HorizontalAlignment="Stretch"
+         VerticalAlignment="Stretch">
+      <Grid.ColumnDefinitions>
+         <ColumnDefinition Width="Auto"/>
+         <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <GroupBox Header="Features"
+                 HorizontalAlignment="Left"
+                 VerticalAlignment="Stretch"
+                 Margin="20,0,0,0">
+         <Grid DataContext="{Binding ElementName=pie}"
+            Width="337">
+
+            <Grid.ColumnDefinitions>
+               <ColumnDefinition Width="113" />
+               <ColumnDefinition Width="145" />
+               <ColumnDefinition Width="79" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+               <RowDefinition Height="45" />
+               <RowDefinition Height="45" />
+               <RowDefinition Height="45" />
+               <RowDefinition Height="45" />
+               <RowDefinition Height="45" />
+               <RowDefinition Height="45" />
+               <RowDefinition Height="45" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                    Grid.Column="0"
+                    Text="Mode"
+                    VerticalAlignment="Center"
+                    Height="Auto"
+                    HorizontalAlignment="Left"
+                    Margin="20,0,0,0" 
+                    />
+            <ComboBox  Grid.Row="0"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="1"
+                    HorizontalAlignment="Stretch"
+                    Height="26"
+                    Width="Auto"
+                    Margin="10,5,10,5"
+                    SelectedItem="{Binding Mode}"
+                    SelectionChanged="ComboBox_SelectionChanged">
+               <x:StaticExtension Member="xctk:PieMode.Manual" />
+               <x:StaticExtension Member="xctk:PieMode.EndAngle" />
+               <x:StaticExtension Member="xctk:PieMode.Slice" />
+            </ComboBox>
+
+            <TextBlock Grid.Row="1"
+                    Grid.Column="0"
+                    Text="Start Angle"
+                    VerticalAlignment="Center"
+                    Height="Auto"
+                    HorizontalAlignment="Left"
+                    Margin="20,0,0,0" />
+            <Slider    Grid.Row="1"
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Minimum="0"
+                    Maximum="360"
+                    Width="Auto"
+                    Value="{Binding StartAngle}"
+                    Height="Auto"
+                    HorizontalAlignment="Stretch"
+                    Margin="10,5,10,5"
+                    Grid.ColumnSpan="1" />
+            <TextBlock Grid.Row="1"
+                    Grid.Column="2"
+                    Width="50"
+                    Text="{Binding StartAngle}"
+                    VerticalAlignment="Center"
+                    Height="Auto"
+                    TextTrimming="CharacterEllipsis" />
+
+            <TextBlock Grid.Row="2"
+                    Grid.Column="0"
+                    Text="End Angle"
+                    VerticalAlignment="Center"
+                    Height="Auto"
+                    HorizontalAlignment="Left"
+                    Margin="20,0,0,0" />
+            <Slider    x:Name="endAngleSlider"
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Minimum="0"
+                    Maximum="360"
+                    Width="Auto"
+                    Value="{Binding EndAngle}"
+                    Height="Auto"
+                    HorizontalAlignment="Stretch"
+                    Margin="10,5,10,5"
+                    Grid.ColumnSpan="1" />
+            <TextBlock Grid.Row="2"
+                    Grid.Column="2"
+                    Width="50"
+                    Text="{Binding EndAngle}"
+                    VerticalAlignment="Center"
+                    Height="Auto"
+                    TextTrimming="CharacterEllipsis" />
+
+            <TextBlock Grid.Row="3"
+                    Grid.Column="0"
+                    Text="Slice"
+                    VerticalAlignment="Center"
+                    Height="Auto"
+                    HorizontalAlignment="Left"
+                    Margin="20,0,0,0" />
+            <Slider x:Name="sliceSlider"
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Minimum="0"
+                    Maximum="1"
+                    Width="Auto"
+                    Value="{Binding Slice}"
+                    Height="Auto"
+                    HorizontalAlignment="Stretch"
+                    Margin="10,5,10,5"
+                    Grid.ColumnSpan="1" />
+            <TextBlock Grid.Row="3"
+                    Grid.Column="2"
+                    Width="50"
+                    Text="{Binding Slice}"
+                    VerticalAlignment="Center"
+                    Height="Auto"
+                    TextTrimming="CharacterEllipsis" />
+
+            <TextBlock Grid.Row="4"
+                    Grid.Column="0"
+                    Margin="20,5,0,5"
+                    Text="Sweep Direction"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center" />
+            <ComboBox  Grid.Row="4"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="1"
+                    HorizontalAlignment="Stretch"
+                    Height="26"
+                    Width="Auto"
+                    Margin="10,5,10,5"
+                    SelectedValue="{Binding SweepDirection}"
+                    SelectedValuePath="Content">
+               <ComboBoxItem Content="{x:Static SweepDirection.Clockwise}" />
+               <ComboBoxItem Content="{x:Static SweepDirection.Counterclockwise}" />
+            </ComboBox>
+
+            <TextBlock Grid.Row="5"
+                    Grid.Column="0"
+                    Margin="20,5,0,5"
+                    Text="Fill Color"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center" />
+            <xctk:ColorPicker x:Name="FillSelector"
+                    Grid.Row="5"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="1"
+                    HorizontalAlignment="Stretch"
+                    SelectedColor="#FFEFAC27"
+                    Height="26"
+                    Margin="10,5,10,5"
+                    Width="Auto" />            
+            <TextBlock Grid.Row="6"
+                    Grid.Column="0"
+                    Margin="20,5,0,5"
+                    Text="Stroke Color"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center" />
+            <xctk:ColorPicker  x:Name="StrokeSelector"
+                    Grid.Row="6"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="1"
+                    HorizontalAlignment="Stretch"
+                    SelectedColor="Black"
+                    Height="26"
+                    Margin="10,5,10,5"
+                    Width="Auto" />            
+         </Grid>
+      </GroupBox>
+      <xctk:Pie x:Name="pie"
+                Grid.Column="1"
+                Height="{Binding ElementName=pie, Path=ActualWidth}"
+                Fill="{Binding ElementName=FillSelector, Path=SelectedColor, Mode=OneWay, Converter={StaticResource colorConverter}}"
+                Stroke="{Binding ElementName=StrokeSelector, Path=SelectedColor, Mode=OneWay, Converter={StaticResource colorConverter}}"
+                StrokeThickness="2"
+                StartAngle="180"
+                SweepDirection="Clockwise"
+                Margin="20,0,0,0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center" />
+
+   </Grid>
+</local:DemoView>

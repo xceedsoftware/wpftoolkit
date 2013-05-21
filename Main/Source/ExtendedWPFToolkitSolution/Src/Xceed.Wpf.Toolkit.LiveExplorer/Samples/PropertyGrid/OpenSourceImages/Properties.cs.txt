@@ -1,0 +1,8 @@
+﻿
+public class Employee
+{
+  public string Name { get; set; }
+  public bool IsConfirmed { get; set; }
+  public string Department { get; set; }
+}
+

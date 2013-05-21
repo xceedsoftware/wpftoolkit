@@ -1,0 +1,141 @@
+﻿<!--***********************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
+                    xmlns:media="clr-namespace:Xceed.Wpf.Toolkit.Core.Media"
+                    xmlns:primitives="clr-namespace:Xceed.Wpf.Toolkit.Primitives">
+
+    <!-- =============================================================================== -->
+    <!-- Geometry for Close/Minimize/Maximize buttons                                    -->
+    <!-- =============================================================================== -->
+    <Geometry x:Key="closeGeometry">
+        M1,0 L0,1 3,4 0,7 1,8 2,8 2,7 4,5 7,8 8,8 8,7 5,4 8,1 7,0 5,2 5,3 4,3 1,0
+    </Geometry>
+    <Geometry x:Key="minimizeGeometry">
+        M0,0 L8,0 8,1 8,2 0,2 0,1 z
+    </Geometry>
+    <Geometry x:Key="maximizeGeometry">
+        M0,0 L8,0 8,1 0,1 z M0,0 L8,0 8,8 0,8 z
+    </Geometry>
+
+
+    <!-- =============================================================================== -->
+    <!-- Common Styles                                                                   -->
+    <!-- Need to find a way to share these for WindowControl and StylableWindow          -->
+    <!-- =============================================================================== -->
+
+    <!-- ResizeGrip -->
+    <ImageBrush x:Key="resize_grip"
+                ImageSource="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/resize_grip.png" />
+
+    <!-- New Button Template without MouseOver and Pressed triggers -->
+    <ControlTemplate x:Key="WindowButtonTemplate" TargetType="Button">
+        <Border Name="border" 
+                Padding="1" 
+                BorderThickness="0"
+                Background="{TemplateBinding Background}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+    </ControlTemplate>
+
+    <!--Default Close button style-->
+   <Style x:Key="{ComponentResourceKey 
+                  TypeInTargetAssembly={x:Type primitives:WindowControl}, 
+                  ResourceId=DefaultCloseButtonStyle}" TargetType="Button" >
+        <Setter Property="Background" Value="#FFC75050" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Template" Value="{StaticResource WindowButtonTemplate}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource TemplatedParent},Path=IsActive}" Value="False">
+                <Setter Property="Background" Value="#FFBCBCBC" />
+            </DataTrigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#FFE04343" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="#FF993D3D" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+
+
+
+    <SolidColorBrush x:Key="Window_WindowBorderBrush" Color="Gray" />
+
+    <SolidColorBrush x:Key="Window_WindowBackground" Color="{x:Static media:WindowColors.ColorizationColor}" />
+
+    <SolidColorBrush x:Key="Window_Background"  Color="White"/>
+
+    <SolidColorBrush x:Key="Window_WindowInactiveBackground" Color="#FFEBEBEB" />
+
+    <SolidColorBrush x:Key="Window_CaptionForeground" Color="Black"/>
+
+    <SolidColorBrush x:Key="Window_CaptionShadowBrush" Color="Transparent" />
+
+    <Thickness x:Key="Window_WindowBorderThickness">1</Thickness>
+
+    <!-- Panel Background -->
+    <LinearGradientBrush x:Key="PanelBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Offset="0" Color="#FFF0F0F0" />
+                <GradientStop Offset="1" Color="#FFE5E5E5" />
+            </GradientStopCollection>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <!-- Popup Background -->
+    <LinearGradientBrush x:Key="PopupBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Offset="0" Color="#FFF0F0F0" />
+                <GradientStop Offset="1" Color="#FFE5E5E5" />
+            </GradientStopCollection>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <!-- Popup Border -->
+    <SolidColorBrush x:Key="PopupDarkBorderBrush" Color="#FFABADB3" />
+
+
+    <!-- =============================================================================== -->
+    <!-- ColorCanvas, ColorPicker                                                        -->
+    <!-- =============================================================================== -->
+
+    <DrawingBrush  x:Key="CheckerBrush" Viewport="0,0,10,10" ViewportUnits="Absolute" TileMode="Tile">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="White">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0 100,100" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="LightGray">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                            <RectangleGeometry Rect="0,0 50,50" />
+                            <RectangleGeometry Rect="50,50 50,50" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+</ResourceDictionary>

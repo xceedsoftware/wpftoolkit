@@ -1,0 +1,361 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}</ProjectGuid>
+    <OutputType>library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Xceed.Wpf.AvalonDock</RootNamespace>
+    <AssemblyName>Xceed.Wpf.AvalonDock</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyVersionInfo.cs" />
+    <Compile Include="AssemblyVersionInfoCommon.cs" />
+    <Compile Include="Commands\RelayCommand.cs" />
+    <Compile Include="Controls\AnchorablePaneControlOverlayArea.cs" />
+    <Compile Include="Controls\AnchorablePaneDropTarget.cs" />
+    <Compile Include="Controls\AnchorablePaneTabPanel.cs" />
+    <Compile Include="Controls\AnchorablePaneTitle.cs" />
+    <Compile Include="Controls\AutoHideWindowManager.cs" />
+    <Compile Include="Controls\BindingHelper.cs" />
+    <Compile Include="Controls\ContextMenuEx.cs" />
+    <Compile Include="Controls\FullWeakDictionary.cs" />
+    <Compile Include="Controls\DocumentPaneDropAsAnchorableTarget.cs" />
+    <Compile Include="Controls\DocumentPaneGroupDropTarget.cs" />
+    <Compile Include="Controls\DropDownButton.cs" />
+    <Compile Include="Controls\DropDownControlArea.cs" />
+    <Compile Include="Controls\DropTargetBase.cs" />
+    <Compile Include="Controls\WeakDictionary.cs" />
+    <Compile Include="Controls\WindowActivateEventArgs.cs" />
+    <Compile Include="Controls\WindowHookHandler.cs" />
+    <Compile Include="Controls\FocusElementManager.cs" />
+    <Compile Include="Controls\LayoutAnchorableItem.cs" />
+    <Compile Include="Controls\LayoutDocumentItem.cs" />
+    <Compile Include="Controls\LayoutItem.cs" />
+    <Compile Include="Controls\MenuItemEx.cs" />
+    <Compile Include="Controls\NavigatorWindow.cs" />
+    <Compile Include="Controls\ReentrantFlag.cs" />
+    <Compile Include="Controls\Shell\Standard\ComGuids.cs" />
+    <Compile Include="Controls\Shell\Standard\Debug.cs" />
+    <Compile Include="Controls\Shell\Standard\DoubleUtil.cs" />
+    <Compile Include="Controls\Shell\Standard\DpiHelper.cs" />
+    <Compile Include="Controls\Shell\Standard\ErrorCodes.cs" />
+    <Compile Include="Controls\Shell\Standard\MessageWindow.cs" />
+    <Compile Include="Controls\Shell\Standard\NativeMethods.cs" />
+    <Compile Include="Controls\Shell\Standard\ShellProvider.cs" />
+    <Compile Include="Controls\Shell\Standard\StreamHelper.cs" />
+    <Compile Include="Controls\Shell\Standard\Utilities.cs" />
+    <Compile Include="Controls\Shell\Standard\Verify.cs" />
+    <Compile Include="Controls\Shell\SystemCommands.cs" />
+    <Compile Include="Controls\Shell\SystemParameters2.cs" />
+    <Compile Include="Controls\Shell\WindowChrome.cs" />
+    <Compile Include="Controls\Shell\WindowChromeWorker.cs" />
+    <Compile Include="Converters\ActivateCommandLayoutItemFromLayoutModelConverter.cs" />
+    <Compile Include="Converters\AutoHideCommandLayoutItemFromLayoutModelConverter.cs" />
+    <Compile Include="Converters\HideCommandLayoutItemFromLayoutModelConverter.cs" />
+    <Compile Include="Converters\InverseBoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\LayoutItemFromLayoutModelConverter.cs" />
+    <Compile Include="Converters\NullToDoNothingConverter.cs" />
+    <Compile Include="Converters\UriSourceToBitmapImageConverter.cs" />
+    <Compile Include="DocumentClosedEventArgs.cs" />
+    <Compile Include="DocumentClosingEventArgs.cs" />
+    <Compile Include="Extentions.cs" />
+    <Compile Include="LayoutEventArgs.cs" />
+    <Compile Include="Layout\AnchorableShowStrategy.cs" />
+    <Compile Include="Layout\AnchorSide.cs" />
+    <Compile Include="Controls\DockingManagerDropTarget.cs" />
+    <Compile Include="Controls\DockingManagerOverlayArea.cs" />
+    <Compile Include="Controls\DocumentPaneControlOverlayArea.cs" />
+    <Compile Include="Controls\DocumentPaneDropTarget.cs" />
+    <Compile Include="Controls\DocumentPaneTabPanel.cs" />
+    <Compile Include="Controls\DragService.cs" />
+    <Compile Include="Controls\DropArea.cs" />
+    <Compile Include="Controls\DropTarget.cs" />
+    <Compile Include="Controls\DropTargetType.cs" />
+    <Compile Include="Controls\Extentions.cs" />
+    <Compile Include="Controls\IDropTarget.cs" />
+    <Compile Include="Controls\LayoutAnchorableControl.cs" />
+    <Compile Include="Controls\LayoutAnchorableFloatingWindowControl.cs" />
+    <Compile Include="Controls\LayoutAnchorablePaneControl.cs" />
+    <Compile Include="Controls\LayoutAnchorablePaneGroupControl.cs" />
+    <Compile Include="Controls\LayoutAnchorableTabItem.cs" />
+    <Compile Include="Controls\LayoutAnchorControl.cs" />
+    <Compile Include="Controls\LayoutAnchorGroupControl.cs" />
+    <Compile Include="Controls\LayoutAnchorSideControl.cs" />
+    <Compile Include="Controls\LayoutDocumentControl.cs" />
+    <Compile Include="Controls\LayoutDocumentFloatingWindowControl.cs" />
+    <Compile Include="Controls\LayoutDocumentPaneControl.cs" />
+    <Compile Include="Controls\LayoutDocumentPaneGroupControl.cs" />
+    <Compile Include="Controls\LayoutDocumentTabItem.cs" />
+    <Compile Include="Controls\LayoutFloatingWindowControl.cs" />
+    <Compile Include="Controls\LayoutGridControl.cs" />
+    <Compile Include="Controls\LayoutGridResizerControl.cs" />
+    <Compile Include="Controls\LayoutPanelControl.cs" />
+    <Compile Include="Controls\OverlayArea.cs" />
+    <Compile Include="Controls\OverlayWindow.cs" />
+    <Compile Include="Controls\OverlayWindowDropTarget.cs" />
+    <Compile Include="Controls\OverlayWindowDropTargetType.cs" />
+    <Compile Include="Controls\TransformExtentions.cs" />
+    <Compile Include="Converters\AnchorSideToAngleConverter.cs" />
+    <Compile Include="Converters\AnchorSideToOrientationConverter.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="DockingManager.cs" />
+    <Compile Include="Layout\ChildrenTreeChangedEventArgs.cs" />
+    <Compile Include="Layout\Extentions.cs" />
+    <Compile Include="Layout\ILayoutAnchorablePane.cs" />
+    <Compile Include="Layout\ILayoutContainer.cs" />
+    <Compile Include="Layout\ILayoutContentSelector.cs" />
+    <Compile Include="Layout\ILayoutControl.cs" />
+    <Compile Include="Layout\ILayoutDocumentPane.cs" />
+    <Compile Include="Layout\ILayoutElement.cs" />
+    <Compile Include="Layout\ILayoutElementWithVisibility.cs" />
+    <Compile Include="Layout\ILayoutGroup.cs" />
+    <Compile Include="Layout\ILayoutOrientableElement.cs" />
+    <Compile Include="Layout\ILayoutPane.cs" />
+    <Compile Include="Layout\ILayoutPanelElement.cs" />
+    <Compile Include="Layout\ILayoutPaneSerializable.cs" />
+    <Compile Include="Layout\ILayoutPositionableElement.cs" />
+    <Compile Include="Layout\ILayoutPreviousContainer.cs" />
+    <Compile Include="Layout\ILayoutRoot.cs" />
+    <Compile Include="Controls\IOverlayWindow.cs" />
+    <Compile Include="Controls\IOverlayWindowArea.cs" />
+    <Compile Include="Controls\IOverlayWindowDropTarget.cs" />
+    <Compile Include="Controls\IOverlayWindowHost.cs" />
+    <Compile Include="Layout\ILayoutUpdateStrategy.cs" />
+    <Compile Include="Layout\LayoutAnchorable.cs" />
+    <Compile Include="Layout\LayoutAnchorableFloatingWindow.cs" />
+    <Compile Include="Layout\LayoutAnchorablePane.cs" />
+    <Compile Include="Layout\LayoutAnchorablePaneGroup.cs" />
+    <Compile Include="Layout\LayoutAnchorGroup.cs" />
+    <Compile Include="Layout\LayoutAnchorSide.cs" />
+    <Compile Include="Controls\LayoutAutoHideWindowControl.cs" />
+    <Compile Include="Layout\LayoutContent.cs" />
+    <Compile Include="Layout\LayoutDocument.cs" />
+    <Compile Include="Layout\LayoutDocumentFloatingWindow.cs" />
+    <Compile Include="Layout\LayoutDocumentPane.cs" />
+    <Compile Include="Layout\LayoutDocumentPaneGroup.cs" />
+    <Compile Include="Layout\LayoutElement.cs" />
+    <Compile Include="Layout\LayoutElementEventArgs.cs" />
+    <Compile Include="Layout\LayoutFloatingWindow.cs" />
+    <Compile Include="Layout\LayoutGroup.cs" />
+    <Compile Include="Layout\LayoutGroupBase.cs" />
+    <Compile Include="Layout\LayoutPanel.cs" />
+    <Compile Include="Layout\LayoutPositionableGroup.cs" />
+    <Compile Include="Layout\LayoutRoot.cs" />
+    <Compile Include="Layout\Serialization\LayoutSerializationCallbackEventArgs.cs" />
+    <Compile Include="Layout\Serialization\LayoutSerializer.cs" />
+    <Compile Include="Layout\Serialization\XmlLayoutSerializer.cs" />
+    <Compile Include="MathHelper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.de.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.de.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.es.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.es.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.fr.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.fr.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.hu.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.hu.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.it.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.it.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.pt-BR.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.pt-BR.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.ro.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.ro.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.ru.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.ru.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.sv.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.sv.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.zh-Hans.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.zh-Hans.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Themes\GenericTheme.cs" />
+    <Compile Include="Themes\Theme.cs" />
+    <Compile Include="Win32Helper.cs" />
+    <Compile Include="WindowHelper.cs" />
+    <EmbeddedResource Include="Properties\Resources.hu.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.hu.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.it.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.it.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.fr.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.fr.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.es.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.es.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.pt-BR.resx">
+      <SubType>Designer</SubType>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.pt-BR.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.ru.resx">
+      <SubType>Designer</SubType>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.ru.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.de.resx">
+      <SubType>Designer</SubType>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.de.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.sv.resx">
+      <SubType>Designer</SubType>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.sv.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.zh-Hans.resx">
+      <SubType>Designer</SubType>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.zh-Hans.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.ro.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.ro.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Themes\Generic\Images\DockBottom.PNG" />
+    <Resource Include="Themes\Generic\Images\DockLeft.PNG" />
+    <Resource Include="Themes\Generic\Images\DockPane.PNG" />
+    <Resource Include="Themes\Generic\Images\DockPaneEmpty.png" />
+    <Resource Include="Themes\Generic\Images\DockRight.PNG" />
+    <Resource Include="Themes\Generic\Images\DockTop.PNG" />
+    <Resource Include="Themes\Generic\Images\HTabGroup.png" />
+    <Resource Include="Themes\Generic\Images\InnerDockDocPaneBottom.png" />
+    <Resource Include="Themes\Generic\Images\InnerDockDocPaneLeft.png" />
+    <Resource Include="Themes\Generic\Images\InnerDockDocPaneRight.png" />
+    <Resource Include="Themes\Generic\Images\InnerDockDocPaneTop.png" />
+    <Resource Include="Themes\Generic\Images\InnerDockPaneBottom.png" />
+    <Resource Include="Themes\Generic\Images\InnerDockPaneInside.png" />
+    <Resource Include="Themes\Generic\Images\InnerDockPaneLeft.png" />
+    <Resource Include="Themes\Generic\Images\InnerDockPaneRight.png" />
+    <Resource Include="Themes\Generic\Images\InnerDockPaneTop.png" />
+    <Resource Include="Themes\Generic\Images\Locked.png" />
+    <Resource Include="Themes\Generic\Images\PinAutoHide.png" />
+    <Resource Include="Themes\Generic\Images\PinClose.png" />
+    <Resource Include="Themes\Generic\Images\PinDocMenu.png" />
+    <Resource Include="Themes\Generic\Images\PinMenu.png" />
+    <Resource Include="Themes\Generic\Images\VTabGroup.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Themes\Generic\Images\PinMaximize.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Themes\Generic\Images\PinRestore.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Themes\generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

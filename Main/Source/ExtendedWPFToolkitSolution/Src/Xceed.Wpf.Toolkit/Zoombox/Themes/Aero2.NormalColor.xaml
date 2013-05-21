@@ -1,0 +1,598 @@
+﻿<!--***********************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
+    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.Zoombox">
+
+    <conv:RoundedValueConverter x:Key="RoundedValueConverter" Precision="2" />
+    <conv:VisibilityToBoolConverter x:Key="TrueIfVisibleConverter"
+      Inverted="False" Not="False" />
+    <conv:VisibilityToBoolConverter x:Key="TrueIfNotVisibleConverter"
+      Inverted="False" Not="True" />
+    <conv:VisibilityToBoolConverter x:Key="VisibleIfTrueConverter"
+      Inverted="True" Not="False" />
+    <conv:VisibilityToBoolConverter x:Key="VisibleIfNotTrueConverter"
+      Inverted="True" Not="True" />
+
+    <SolidColorBrush x:Key="GlyphBrush" Color="white" />
+
+    <Style x:Key="TransparentButton" TargetType="{x:Type ButtonBase}"
+      BasedOn="{x:Null}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Background" Value="#333333" />
+        <Setter Property="Foreground" Value="#cccccc" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ButtonBase}">
+                    <Grid Background="Transparent" Cursor="Hand">
+                        <Rectangle Fill="{TemplateBinding Background}"
+                Stroke="{TemplateBinding Foreground}" RadiusX="3" RadiusY="3"
+                x:Name="BackgroundTextBoxRectangle" Opacity="0" />
+                        <ContentPresenter />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.4" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="BackgroundTextBoxRectangle" Property="Opacity"
+                  Value="1" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="BackgroundTextBoxRectangle" Property="Opacity"
+                  Value="1" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ViewFinderToggleButtonStyle" BasedOn="{StaticResource TransparentButton}" TargetType="{x:Type ToggleButton}">
+        <Setter Property="Visibility" Value="Visible" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Zoombox}}, Path=ViewFinderVisibility}" Value="Hidden">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <DrawingImage x:Key="ShowViewFinderGlyph" >
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <DrawingGroup>
+                    <DrawingGroup.Transform>
+                        <MatrixTransform Matrix="0.707,0.707,-0.707,0.707,11.533,0.664" />
+                    </DrawingGroup.Transform>
+                    <GeometryDrawing Brush="#FF000000" Geometry="M8.823,9.895 
+              L12.440,13.460 10.784,15.092 15.347,15.092 15.347,15.125 
+              9.651,15.125 11.306,13.493 8.239,10.470 8.823,9.895 z 
+              M15.347,9.511 L15.347,10.595 14.842,11.093 14.292,10.551
+              15.347,9.511 z M0,9.481 L1.133,10.598 1.133,15.092 
+              5.694,15.092 5.727,15.125 0,15.125 0,9.481 z M14.842,3.963 
+              L15.347,4.461 15.347,5.611 14.258,4.538 14.842,3.963 z 
+              M2.793,3.952 L6.410,7.517 2.793,11.082 2.243,10.540 
+              5.276,7.551 2.209,4.527 2.793,3.952 z M9.653,0 L10.821,0 
+              12.429,1.585 8.812,5.150 8.262,4.608 11.296,1.618 9.653,0 z
+              M0,0 L1.133,0 1.133,4.504 0,5.621 0,0 z"/>
+                </DrawingGroup>
+                <DrawingGroup>
+                    <DrawingGroup.Transform>
+                        <MatrixTransform Matrix="0.707,0.707,-0.707,0.707,12.048,1.182"/>
+                    </DrawingGroup.Transform>
+                    <GeometryDrawing Brush="#4B5F5F5F" Geometry="M0,0 L5.703,0 
+              4.061,1.618 7.678,5.183 11.295,1.618 9.653,0 15.347,0 15.347,5.611
+              13.704,3.996 10.091,7.561 13.708,11.126 15.347,9.511 15.347,15.125 
+              9.651,15.125 11.306,13.493 7.689,9.928 4.071,13.493 5.727,15.125 
+              0,15.125 0,9.480 1.659,11.115 5.276,7.551 1.659,3.986 0,5.621 0,0 z"/>
+                </DrawingGroup>
+                <DrawingGroup>
+                    <DrawingGroup.Transform>
+                        <MatrixTransform Matrix="0.707,0.707,-0.707,0.707,12.186,1.538"/>
+                    </DrawingGroup.Transform>
+                    <GeometryDrawing Brush="#FFFFFFFF" Geometry="M6.867,9.820 L7.334,10.280 
+              4.072,13.494 5.727,15.126 0,15.126 0,15.016 4.906,15.016 3.250,13.384
+              6.867,9.820 z M15.347,9.512 L15.347,15.126 9.651,15.126 9.762,15.016
+              14.525,15.016 14.525,10.322 15.347,9.512 z M0,9.481 L1.193 ,10.657 
+              0.837,11.007 0,10.182 0,9.481 z M12.887,3.888 L13.353,4.347 
+              10.091,7.56 13.242,10.667 12.887,11.018 9.270,7.453 12.887,3.888 z
+              M0.837,3.878 L1.303,4.337 0,5.621 0,4.703 0.837,3.878 z M14.525,0 
+              L15.347,0 15.347,5.612 14.525,4.802 14.525,0 z M4.772,0 L5.703,0
+              4.061,1.617 7.212,4.724 6.857,5.075 3.239,1.511 4.772,0 z"/>
+                </DrawingGroup>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <DrawingImage x:Key="FillToBoundsGlyph">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <DrawingGroup.Children>
+                    <GeometryDrawing Geometry="F1 M 218.138,210.145L 255.599,210.145L
+              255.599,246.628L 218.138,246.628L 218.138,210.145 Z">
+                        <GeometryDrawing.Pen>
+                            <Pen Thickness="1.2" LineJoin="Round"
+                  Brush="{StaticResource GlyphBrush}"/>
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}"
+              Geometry="F1 M 249.378,215.741L 249.378,215.743L 249.383,215.743L 
+              249.383,219.159L 249.378,219.159L 249.378,224.598L 245.962,224.598L 
+              245.962,219.159L 240.525,219.159L 240.525,215.743L 245.962,215.743L 
+              245.962,215.741L 249.378,215.741 Z"/>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}"
+              Geometry="F1 M 249.383,240.726L 249.381,240.726L 249.381,240.73L 
+              245.965,240.73L 245.965,240.726L 240.526,240.726L 240.526,237.31L 
+              245.965,237.31L 245.965,231.873L 249.381,231.873L 249.381,237.31L 
+              249.383,237.31L 249.383,240.726 Z"/>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}"
+              Geometry="F1 M 247.539,220.321L 239.801,228.059L 247.539,235.796L 
+              244.962,238.373L 237.224,230.635L 229.487,238.373L 226.91,235.796L 
+              234.648,228.059L 226.91,220.321L 229.487,217.744L 237.224,225.482L 
+              244.962,217.744L 247.539,220.321 Z"/>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}"
+              Geometry="F1 M 224.879,240.73L 224.879,240.729L 224.874,240.729L 
+              224.874,237.312L 224.879,237.312L 224.879,231.873L 228.295,231.873L 
+              228.295,237.312L 233.732,237.312L 233.732,240.729L 228.295,240.729L 
+              228.295,240.73L 224.879,240.73 Z"/>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}"
+              Geometry="F1 M 224.874,215.746L 224.876,215.746L 224.876,215.741L 
+              228.292,215.741L 228.292,215.746L 233.731,215.746L 233.731,219.162L 
+              228.292,219.162L 228.292,224.598L 224.876,224.598L 224.876,219.162L 
+              224.874,219.162L 224.874,215.746 Z"/>
+                </DrawingGroup.Children>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <DrawingImage x:Key="FitContentGlyph">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <DrawingGroup.Children>
+                    <GeometryDrawing Geometry="F1 M 267.334,210.477L 304.795,210.477L 
+              304.795,246.96L 267.334,246.96L 267.334,210.477 Z">
+                        <GeometryDrawing.Pen>
+                            <Pen Thickness="1.2" LineJoin="Round"
+                  Brush="{StaticResource GlyphBrush}"/>
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}"
+              Geometry="F1 M 298.574,216.073L 298.574,216.075L 298.579,216.075L 
+              298.579,219.491L 298.574,219.491L 298.574,224.93L 295.158,224.93L 
+              295.158,219.491L 289.721,219.491L 289.721,216.075L 295.158,216.075L 
+              295.158,216.073L 298.574,216.073 Z"/>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}"
+              Geometry="F1 M 298.579,241.058L 298.577,241.058L 298.577,241.062L 
+              295.161,241.062L 295.161,241.058L 289.722,241.058L 289.722,237.642L 
+              295.161,237.642L 295.161,232.205L 298.577,232.205L 298.577,237.642L 
+              298.579,237.642L 298.579,241.058 Z"/>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}"
+              Geometry="F1 M 274.075,241.062L 274.075,241.061L 274.07,241.061L 
+              274.07,237.644L 274.075,237.644L 274.075,232.205L 277.491,232.205L 
+              277.491,237.644L 282.928,237.644L 282.928,241.061L 277.491,241.061L 
+              277.491,241.062L 274.075,241.062 Z"/>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}"
+              Geometry="F1 M 274.07,216.078L 274.072,216.078L 274.072,216.073L 
+              277.488,216.073L 277.488,216.078L 282.927,216.078L 282.927,219.494L 
+              277.488,219.494L 277.488,224.93L 274.072,224.93L 274.072,219.494L 
+              274.07,219.494L 274.07,216.078 Z"/>
+                </DrawingGroup.Children>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <DrawingImage x:Key="CenterGlyph">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <DrawingGroup.Children>
+                    <GeometryDrawing Geometry="F1 M 315.334,209.944L 352.795,209.944L 
+              352.795,246.427L 315.334,246.427L 315.334,209.944 Z">
+                        <GeometryDrawing.Pen>
+                            <Pen Thickness="1.2" LineJoin="Round"
+                  Brush="{StaticResource GlyphBrush}"/>
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}"
+              Geometry="F1 M 328.878,223.652L 338.19,223.652C 338.27,223.652 
+              338.334,223.716 338.334,223.796L 338.334,233.108C 338.334,233.188 
+              338.27,233.252 338.19,233.252L 328.878,233.252C 328.799,233.252 
+              328.734,233.188 328.734,233.108L 328.734,223.796C 328.734,223.716 
+              328.799,223.652 328.878,223.652 Z"/>
+                </DrawingGroup.Children>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <DrawingImage x:Key="RefocusGlyph" >
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <DrawingGroup>
+                    <DrawingGroup.Transform>
+                        <MatrixTransform Matrix="1,0,0,1,0.667,1.667"/>
+                    </DrawingGroup.Transform>
+                    <GeometryDrawing Brush="#FFFFFFFF" Geometry="M6.624,0 C10.281,0 
+              13.247,2.836 13.247,6.334 13.247,7.176 13.075,7.980 12.734,8.703
+              L14.666,10.550 14.666,10.631 8.989,10.631 8.989,5.202 9.072,5.202
+              10.971,7.018 C11.095,6.810 11.116,6.573 11.116,6.331 11.116,3.959
+              9.104,2.034 6.622,2.034 4.139,2.034 2.127,3.959 2.127,6.331
+              2.127,8.575 3.925,10.417 6.224,10.552 L8.220,12.461 C7.712,12.602
+              7.176,12.667 6.624,12.667 2.966,12.667 0,9.831 0,6.334 0,2.836
+              2.966,0 6.624,0 z"/>
+                </DrawingGroup>
+                <GeometryDrawing Brush="#00FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry RadiusX="0" RadiusY="0" Rect="0,0,16,16"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <DrawingImage x:Key="HomeGlyph">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <DrawingGroup.Children>
+                    <GeometryDrawing Geometry="F1 M 414.001,209.411L 451.462,209.411L 
+              451.462,245.893L 414.001,245.893L 414.001,209.411 Z">
+                        <GeometryDrawing.Pen>
+                            <Pen Thickness="1.2" LineJoin="Round" Brush="transparent"/>
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}"
+              Geometry="F1 M 442.009,240.438C 442.009,240.534 441.886,240.612 
+              441.735,240.612L 423.992,240.612C 423.841,240.612 423.718,240.534 
+              423.718,240.438L 423.718,229.595L 418.991,229.595C 418.874,229.479 
+              418.874,229.289 418.991,229.173L 432.652,215.511C 432.769,215.395 
+              432.958,215.395 433.075,215.511L 446.736,229.173C 446.853,229.289 
+              446.853,229.479 446.736,229.595L 442.009,229.595L 442.009,240.438 Z"/>
+                </DrawingGroup.Children>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <DrawingImage x:Key="PreviousGlyph">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <DrawingGroup.Children>
+                    <GeometryDrawing Brush="#00000000" Geometry="F1 M 8.47772,268.99L 
+              75.1444,268.99L 75.1444,335.657L 8.47772,335.657L 8.47772,268.99 Z">
+                        <GeometryDrawing.Pen>
+                            <Pen Thickness="1" LineJoin="Round" Brush="Transparent"/>
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}" Geometry="F1 M 
+              57.2513,286.303L 57.2513,318.344L 26.3707,302.323L 57.2513,286.303 Z">
+                        <GeometryDrawing.Pen>
+                            <Pen Thickness="1" LineJoin="Round"
+                  Brush="{StaticResource GlyphBrush}"/>
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                </DrawingGroup.Children>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <DrawingImage x:Key="NextGlyph">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <DrawingGroup.Children>
+                    <GeometryDrawing Brush="#00000000" Geometry="F1 M 75.1444,415.886L 
+              8.47772,415.886L 8.47772,349.219L 75.1444,349.219L 75.1444,415.886 Z">
+                        <GeometryDrawing.Pen>
+                            <Pen Thickness="1" LineJoin="Round" Brush="#00FFFFFF"/>
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}"
+              Geometry="F1 M 26.3708,398.573L 26.3708,366.532L 57.2514,382.553L 
+              26.3708,398.573 Z">
+                        <GeometryDrawing.Pen>
+                            <Pen Thickness="1" LineJoin="Round"
+                  Brush="{StaticResource GlyphBrush}"/>
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                </DrawingGroup.Children>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <DrawingImage x:Key="CloseXDrawingImage">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <DrawingGroup.Children>
+                    <GeometryDrawing Brush="{StaticResource GlyphBrush}"
+              Geometry="F1 M 470.57,422.952C 470.414,423.109 470.161,423.109 
+              470.005,422.952L 451.714,404.662C 451.558,404.506 451.558,404.252 
+              451.714,404.096L 489.144,366.667L 451.714,329.237C 451.558,329.081 
+              451.558,328.828 451.714,328.671L 470.005,310.381C 470.161,310.225 
+              470.414,310.225 470.57,310.381L 508,347.81L 545.43,310.381C 
+              545.586,310.225 545.839,310.225 545.995,310.381L 564.286,328.671C 
+              564.442,328.828 564.442,329.081 564.286,329.237L 526.856,366.667L 
+              564.286,404.096C 564.442,404.252 564.442,404.506 564.286,404.662L 
+              545.995,422.952C 545.839,423.109 545.586,423.109 545.43,422.952L 
+              508,385.523L 470.57,422.952 Z"/>
+                </DrawingGroup.Children>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <Style x:Key="{x:Type local:Zoombox}" TargetType="{x:Type local:Zoombox}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="PanDistance" Value="5.0" />
+        <Setter Property="ZoomOrigin" Value="0.5,0.5" />
+        <Setter Property="ZoomPercentage" Value="5.0" />
+        <Setter Property="DragModifiers" Value="Ctrl,Exact" />
+        <Setter Property="DragOnPreview" Value="False" />
+        <Setter Property="ZoomModifiers" Value="Shift,Exact" />
+        <Setter Property="ZoomOnPreview" Value="True" />
+        <Setter Property="RelativeZoomModifiers" Value="Ctrl,Alt,Exact" />
+        <Setter Property="ZoomToSelectionModifiers" Value="Alt,Exact" />
+        <Setter Property="NavigateOnPreview" Value="False" />
+        <Setter Property="ViewFinderVisibility" Value="Collapsed" />
+        <Setter Property="MinScale" Value="0.01" />
+        <Setter Property="MaxScale" Value="100.0" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:Zoombox}">
+                    <ControlTemplate.Resources>
+                        <SolidColorBrush x:Key="SelectionBrush" Color="Transparent" />
+                        <Pen x:Key="SelectionPen" Thickness="2.0" Brush="#7F3F3F3F" />
+                        <Pen x:Key="ViewportPen" Thickness="1.0" Brush="Red" />
+                        <InputBindingCollection x:Key="InputBindings">
+                            <KeyBinding Command="local:Zoombox.ZoomOut" Key="Left"
+                  Modifiers="Control" />
+                            <KeyBinding Command="local:Zoombox.ZoomOut" Key="Up"
+                  Modifiers="Control" />
+                            <KeyBinding Command="local:Zoombox.ZoomIn" Key="Right"
+                  Modifiers="Control" />
+                            <KeyBinding Command="local:Zoombox.ZoomIn" Key="Down"
+                  Modifiers="Control" />
+                            <KeyBinding Command="local:Zoombox.PanLeft" Key="Left"
+                  Modifiers="Shift+Control" />
+                            <KeyBinding Command="local:Zoombox.PanUp" Key="Up"
+                  Modifiers="Shift+Control" />
+                            <KeyBinding Command="local:Zoombox.PanRight" Key="Right"
+                  Modifiers="Shift+Control" />
+                            <KeyBinding Command="local:Zoombox.PanDown" Key="Down"
+                  Modifiers="Shift+Control" />
+                            <KeyBinding Command="local:Zoombox.Forward" Key="BrowserForward" />
+                            <KeyBinding Command="local:Zoombox.Back" Key="BrowserBack" />
+                            <KeyBinding Command="local:Zoombox.Back" Key="Back" />
+                        </InputBindingCollection>
+                    </ControlTemplate.Resources>
+                    <Grid Name="BackgroundGrid" Background="{TemplateBinding Background}">
+                        <ContentPresenter />
+                        <Border Name="ViewFinder" RenderTransformOrigin="1,1"
+                Background="#b0666666" BorderBrush="{TemplateBinding Foreground}"
+                BorderThickness="2" Opacity="0" Width="200" Height="190"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10"
+                CornerRadius="0" >
+                            <Border.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform x:Name="LayoutScaleTransform"
+                      ScaleX="0" ScaleY="0"/>
+                                </TransformGroup>
+                            </Border.RenderTransform>
+                            <Grid Margin="4">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                    <Button x:Name="BackButton" Command="local:Zoombox.Back"
+                      ToolTip="Go Back" Width="20px" Height="20px"
+                      Style="{StaticResource TransparentButton}">
+                                        <Image Source="{StaticResource PreviousGlyph}" />
+                                    </Button>
+                                    <Button x:Name="ForwardButton" Command="local:Zoombox.Forward"
+                      ToolTip="Go Forward" Width="20px" Height="20px"
+                      Style="{StaticResource TransparentButton}">
+                                        <Image Source="{StaticResource NextGlyph}"  />
+                                    </Button>
+                                    <Button x:Name="HomeButton" Command="local:Zoombox.Home"
+                      ToolTip="Go Home" Width="20px" Height="20px"
+                      Style="{StaticResource TransparentButton}">
+                                        <Image Source="{StaticResource HomeGlyph}" Margin="2"/>
+                                    </Button>
+                                    <Button x:Name="FitButton" Command="local:Zoombox.Fit"
+                      ToolTip="Fit Content within Bounds" Width="20px" Height="20px"
+                      Margin="2,0"  Style="{StaticResource TransparentButton}">
+                                        <Image Source="{StaticResource FitContentGlyph}" Margin="2"/>
+                                    </Button>
+                                    <Button x:Name="FillButton" Command="local:Zoombox.Fill"
+                      ToolTip="Fill Bounds with Content" Width="20px" Height="20px"
+                      Margin="2,0"  Style="{StaticResource TransparentButton}">
+                                        <Image Source="{StaticResource FillToBoundsGlyph}" Margin="2"/>
+                                    </Button>
+                                    <Button x:Name="CenterButton" Command="local:Zoombox.Center"
+                      ToolTip="Center Content" Width="20px" Height="20px"
+                      Margin="2,0" Style="{StaticResource TransparentButton}">
+                                        <Image Source="{StaticResource CenterGlyph}" Margin="2"/>
+                                    </Button>
+                                    <Button x:Name="RefocusButton" Command="local:Zoombox.Refocus"
+                      Visibility="Collapsed" ToolTip="Refocus View"
+                      Width="20px" Height="20px" Margin="2,0"
+                      Style="{StaticResource TransparentButton}">
+                                        <Image Source="{StaticResource RefocusGlyph}" Margin="2"/>
+                                    </Button>
+                                </StackPanel>
+                                <ToggleButton x:Name="ToggleViewFinderButton"
+                    ToolTip="Hide View Finder" Height="13" Width="13"
+                    Margin="0,2,0,0" HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Style="{StaticResource TransparentButton}" Foreground="White"
+                    IsChecked="{Binding ElementName=ShowViewFinder, Path=IsChecked}" >
+                                    <Image Source="{StaticResource CloseXDrawingImage}" Margin="2" />
+                                </ToggleButton>
+                                <Border Grid.Row="1" BorderBrush="{StaticResource GlyphBrush}"
+                    BorderThickness="2" Background="#80FFFFFF" />
+                                <local:ZoomboxViewFinderDisplay Grid.Row="1" Name="ViewFinderDisplay"
+                    ClipToBounds="True" Background="#C0FFFFFF" Margin="2" 
+                    ShadowBrush="#80FFFFFF" ViewportBrush="Transparent"
+                    ViewportPen="{StaticResource ViewportPen}" />
+                            </Grid>
+                        </Border>
+                        <ToggleButton Name="ShowViewFinder" IsTabStop="False"
+                ToolTip="Show View Finder" HorizontalAlignment="Right"
+                VerticalAlignment="Bottom" Margin="5" Height="22" Width="22"
+                FocusVisualStyle="{x:Null}"
+                Style="{StaticResource ViewFinderToggleButtonStyle}"
+                Foreground="Transparent" Background="Transparent"
+                IsChecked="{Binding Path=ViewFinderVisibility, 
+                    Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent},
+                    Converter={StaticResource TrueIfVisibleConverter}}">
+                            <Grid Name="ShowViewFinderGlyph" Opacity="0">
+                                <Image x:Name="ShowViewFinderGlyphImage" 
+                    Source="{StaticResource ShowViewFinderGlyph}" />
+                            </Grid>
+                        </ToggleButton>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="EffectiveViewStackMode" Value="Manual">
+                            <Setter TargetName="RefocusButton" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="ShowViewFinderGlyph"
+                        Storyboard.TargetProperty="Opacity"
+                        DecelerationRatio="1"  Duration="0:0:0.3" From="0" To="1"
+                        FillBehavior="HoldEnd" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="ShowViewFinderGlyph"
+                        Storyboard.TargetProperty="Opacity"
+                        DecelerationRatio="1"  Duration="0:0:0.3" From="1" To="0"
+                        FillBehavior="HoldEnd" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="False" SourceName="ShowViewFinder">
+                            <Setter Property="Focusable" Value="False" TargetName="BackButton" />
+                            <Setter Property="Focusable" Value="False"
+                  TargetName="ForwardButton" />
+                            <Setter Property="Focusable" Value="False" TargetName="HomeButton" />
+                            <Setter Property="Focusable" Value="False" TargetName="FitButton" />
+                            <Setter Property="Focusable" Value="False" TargetName="FillButton" />
+                            <Setter Property="Focusable" Value="False" TargetName="CenterButton" />
+                            <Setter Property="Focusable" Value="False"
+                  TargetName="ToggleViewFinderButton" />
+                        </Trigger>
+                        <EventTrigger RoutedEvent="ToggleButton.Checked"
+                SourceName="ShowViewFinder">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="ViewFinder"
+                      Storyboard.TargetProperty="Opacity"
+                      DecelerationRatio="1"  Duration="0:0:0.3" From="0" To="1"
+                      FillBehavior="HoldEnd" />
+                                    <DoubleAnimation Storyboard.TargetName="ShowViewFinder"
+                      Storyboard.TargetProperty="Opacity"
+                      DecelerationRatio="1"  Duration="0:0:0.3" From="1" To="0"
+                      FillBehavior="HoldEnd" />
+                                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
+                      Storyboard.TargetProperty="(ScaleTransform.ScaleY)"
+                      Storyboard.TargetName="LayoutScaleTransform"
+                      AccelerationRatio="1">
+                                        <SplineDoubleKeyFrame KeySpline="0.5,0.5,0.5,0.5" Value="1"
+                      KeyTime="00:00:00.3"/>
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
+                      Storyboard.TargetProperty="(ScaleTransform.ScaleX)"
+                      Storyboard.TargetName="LayoutScaleTransform"
+                      AccelerationRatio="1">
+                                        <SplineDoubleKeyFrame  KeySpline="0.5,0.5,0.5,0.5" Value="1"
+                      KeyTime="00:00:00.3"/>
+                                    </DoubleAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="ToggleButton.Unchecked"
+                SourceName="ShowViewFinder">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
+                      Storyboard.TargetProperty="(ScaleTransform.ScaleY)"
+                      Storyboard.TargetName="LayoutScaleTransform"
+                      AccelerationRatio="1">
+                                        <SplineDoubleKeyFrame KeySpline="0.5,0.5,0.5,0.5" Value="0"
+                        KeyTime="00:00:00.3"/>
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
+                      Storyboard.TargetProperty="(ScaleTransform.ScaleX)"
+                      Storyboard.TargetName="LayoutScaleTransform"
+                      AccelerationRatio="1">
+                                        <SplineDoubleKeyFrame  KeySpline="0.5,0.5,0.5,0.5" Value="0"
+                        KeyTime="00:00:00.3"/>
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <DoubleAnimation Storyboard.TargetName="ViewFinder"
+                      Storyboard.TargetProperty="Opacity"
+                      DecelerationRatio="1"  Duration="0:0:0.3" From="1" To="0"
+                      FillBehavior="HoldEnd" />
+                                    <DoubleAnimation Storyboard.TargetName="ShowViewFinder"
+                      Storyboard.TargetProperty="Opacity"
+                      DecelerationRatio="1"  Duration="0:0:0.3" From="0" To="1"
+                      FillBehavior="HoldEnd" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <!-- NOTE:  Order matters!
+          These triggers should be ordered according to the KeyModifiers assigned to 
+          each operation. If one operation requires Ctrl and another requires 
+          Ctrl+Shift, the trigger for the operation requiring both modifier keys 
+          should appear *after* the trigger for the operation requiring only one. -->
+            <Trigger Property="AreDragModifiersActive" Value="True">
+                <Setter Property="Cursor" Value="SizeAll" />
+            </Trigger>
+            <Trigger Property="AreZoomToSelectionModifiersActive" Value="True">
+                <Setter Property="Cursor" Value="Cross" />
+            </Trigger>
+            <Trigger Property="AreZoomModifiersActive" Value="True">
+                <Setter Property="Cursor" Value="{x:Static local:ZoomboxCursors.Zoom}" />
+            </Trigger>
+            <Trigger Property="AreRelativeZoomModifiersActive" Value="True">
+                <Setter Property="Cursor" Value="{x:Static local:ZoomboxCursors.ZoomRelative}" />
+            </Trigger>
+            <!-- The IsDraggingContent and IsSelectingRegion triggers should 
+           always be last. -->
+            <Trigger Property="IsDraggingContent" Value="True">
+                <Setter Property="Cursor" Value="SizeAll" />
+            </Trigger>
+            <Trigger Property="IsSelectingRegion" Value="True">
+                <Setter Property="Cursor" Value="Cross" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+
+</ResourceDictionary>

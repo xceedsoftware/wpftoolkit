@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.ComponentModel;
@@ -23,141 +23,43 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Xceed.Wpf.Toolkit.Primitives;
+using System.Diagnostics;
+using Xceed.Wpf.Toolkit.Core;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
-  [TemplatePart( Name = PART_DragWidget, Type = typeof( Border ) )]
-  [TemplatePart( Name = PART_CloseButton, Type = typeof( Button ) )]
-  [TemplatePart( Name = PART_WindowRoot, Type = typeof( Grid ) )]
-  [TemplatePart( Name = PART_Root, Type = typeof( Grid ) )]
-  public class ChildWindow : ContentControl
+#pragma warning disable 0809
+#pragma warning disable 0618 
+
+  [TemplatePart( Name = PART_WindowRoot, Type = typeof( Grid ) )]  
+  [TemplatePart( Name = PART_Root, Type = typeof( Grid ) )]   
+  [TemplatePart( Name = PART_WindowControl, Type = typeof( WindowControl ) )]
+  public class ChildWindow : WindowControl
   {
-    private const string PART_DragWidget = "PART_DragWidget";
-    private const string PART_CloseButton = "PART_CloseButton";
-    private const string PART_WindowRoot = "PART_WindowRoot";
-    private const string PART_Root = "PART_Root";
+    private const string PART_WindowRoot = "PART_WindowRoot";  
+    private const string PART_Root = "PART_Root";   
+    private const string PART_WindowControl = "PART_WindowControl";
+    private const int _horizontalOffset = 3;
+    private const int _verticalOffset = 3;
 
     #region Private Members
 
-    private Grid _root;
-    private TranslateTransform _moveTransform = new TranslateTransform();
-    private bool _startupPositionInitialized;
-    private bool _isMouseCaptured;
-    private Point _clickPoint;
-    private Point _oldPosition;
-    private Border _dragWidget;
-    private FrameworkElement _parentContainer;
-    private Rectangle _modalLayer = new Rectangle();
-    private Canvas _modalLayerPanel = new Canvas();
-
-    private const int _horizaontalOffset = 3;
-    private const int _verticalOffset = 3;
-
-    bool _ignorePropertyChanged;
+    private Grid _root; 
+    private TranslateTransform _moveTransform = new TranslateTransform();  
+    private bool _startupPositionInitialized;  
+    private FrameworkElement _parentContainer;  
+    private Rectangle _modalLayer = new Rectangle();  
+    private Canvas _modalLayerPanel = new Canvas();  
+    private Grid _windowRoot;  
+    private WindowControl _windowControl;
+    private bool _ignorePropertyChanged;
+    private bool _hasWindowContainer;  
 
     #endregion //Private Members
 
-    #region Properties
-
-    #region Internal Properties
-
-    internal Grid WindowRoot
-    {
-      get;
-      private set;
-    }
-    internal Thumb DragWidget
-    {
-      get;
-      private set;
-    }
-    internal Button MinimizeButton
-    {
-      get;
-      private set;
-    }
-    internal Button MaximizeButton
-    {
-      get;
-      private set;
-    }
-    internal Button CloseButton
-    {
-      get;
-      private set;
-    }
-
-    #endregion //Internal Properties
-
     #region Public Properties
-
-    #region Caption
-
-    public static readonly DependencyProperty CaptionProperty = DependencyProperty.Register( "Caption", typeof( object ), typeof( ChildWindow ), new UIPropertyMetadata( String.Empty ) );
-    public object Caption
-    {
-      get
-      {
-        return ( object )GetValue( CaptionProperty );
-      }
-      set
-      {
-        SetValue( CaptionProperty, value );
-      }
-    }
-
-    #endregion //Caption
-
-    #region CaptionForeground
-
-    public static readonly DependencyProperty CaptionForegroundProperty = DependencyProperty.Register( "CaptionForeground", typeof( Brush ), typeof( ChildWindow ), new UIPropertyMetadata( null ) );
-    public Brush CaptionForeground
-    {
-      get
-      {
-        return ( Brush )GetValue( CaptionForegroundProperty );
-      }
-      set
-      {
-        SetValue( CaptionForegroundProperty, value );
-      }
-    }
-
-    #endregion //CaptionForeground
-
-    #region CloseButtonStyle
-
-    public static readonly DependencyProperty CloseButtonStyleProperty = DependencyProperty.Register( "CloseButtonStyle", typeof( Style ), typeof( ChildWindow ), new PropertyMetadata( null ) );
-    public Style CloseButtonStyle
-    {
-      get
-      {
-        return ( Style )GetValue( CloseButtonStyleProperty );
-      }
-      set
-      {
-        SetValue( CloseButtonStyleProperty, value );
-      }
-    }
-
-    #endregion //CloseButtonStyle
-
-    #region CloseButtonVisibility
-
-    public static readonly DependencyProperty CloseButtonVisibilityProperty = DependencyProperty.Register( "CloseButtonVisibility", typeof( Visibility ), typeof( ChildWindow ), new PropertyMetadata( Visibility.Visible ) );
-    public Visibility CloseButtonVisibility
-    {
-      get
-      {
-        return ( Visibility )GetValue( CloseButtonVisibilityProperty );
-      }
-      set
-      {
-        SetValue( CloseButtonVisibilityProperty, value );
-      }
-    }
-
-    #endregion //CloseButtonVisibility
 
     #region DialogResult
 
@@ -181,7 +83,7 @@ namespace Xceed.Wpf.Toolkit
         if( _dialogResult != value )
         {
           _dialogResult = value;
-          Close();
+          this.Close();
         }
       }
     }
@@ -259,55 +161,38 @@ namespace Xceed.Wpf.Toolkit
         childWindow.OnIsModalChanged( ( bool )e.OldValue, ( bool )e.NewValue );
     }
 
+    internal event EventHandler<EventArgs> IsModalChanged;
+
     private void OnIsModalChanged( bool oldValue, bool newValue )
     {
-      if( newValue )
+      EventHandler<EventArgs> handler = IsModalChanged;
+      if( handler != null )
       {
-        KeyboardNavigation.SetTabNavigation( this, KeyboardNavigationMode.Cycle );
-        ShowModalLayer();
+        handler( this, EventArgs.Empty );
       }
-      else
+
+      if( !_hasWindowContainer )
       {
-        KeyboardNavigation.SetTabNavigation( this, KeyboardNavigationMode.Continue );
-        HideModalLayer();
+        if( newValue )
+        {
+          KeyboardNavigation.SetTabNavigation( this, KeyboardNavigationMode.Cycle );
+          ShowModalLayer();
+        }
+        else
+        {
+          KeyboardNavigation.SetTabNavigation( this, KeyboardNavigationMode.Continue );
+          HideModalLayer();
+        }
       }
     }
 
     #endregion //IsModal
 
-    #region Left
+    #region OverlayBrush (Obsolete)
 
-    public static readonly DependencyProperty LeftProperty = DependencyProperty.Register( "Left", typeof( double ), typeof( ChildWindow ), new PropertyMetadata( 0.0, new PropertyChangedCallback( OnLeftPropertyChanged ) ) );
-    public double Left
-    {
-      get
-      {
-        return ( double )GetValue( LeftProperty );
-      }
-      set
-      {
-        SetValue( LeftProperty, value );
-      }
-    }
-
-    private static void OnLeftPropertyChanged( DependencyObject obj, DependencyPropertyChangedEventArgs e )
-    {
-      ChildWindow childWindow = obj as ChildWindow;
-      if( childWindow != null )
-        childWindow.OnLeftPropertyChanged( ( double )e.OldValue, ( double )e.NewValue );
-    }
-
-    private void OnLeftPropertyChanged( double oldValue, double newValue )
-    {
-      Left = GetRestrictedLeft();
-      ProcessMove( newValue - oldValue, 0 );
-    }
-
-    #endregion //Left
-
-    #region OverlayBrush
-
+    [Obsolete( "This property is obsolete and should no longer be used. Use WindowContainer.ModalBackgroundBrushProperty instead." )]
     public static readonly DependencyProperty OverlayBrushProperty = DependencyProperty.Register( "OverlayBrush", typeof( Brush ), typeof( ChildWindow ), new PropertyMetadata( Brushes.Gray, OnOverlayBrushChanged ) );
+    [Obsolete( "This property is obsolete and should no longer be used. Use WindowContainer.ModalBackgroundBrushProperty instead." )]
     public Brush OverlayBrush
     {
       get
@@ -327,6 +212,7 @@ namespace Xceed.Wpf.Toolkit
         childWindow.OnOverlayBrushChanged( ( Brush )e.OldValue, ( Brush )e.NewValue );
     }
 
+    [Obsolete( "This method is obsolete and should no longer be used. Use WindowContainer.ModalBackgroundBrushProperty instead." )]
     protected virtual void OnOverlayBrushChanged( Brush oldValue, Brush newValue )
     {
       _modalLayer.Fill = newValue;
@@ -334,9 +220,11 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //OverlayBrush
 
-    #region OverlayOpacity
+    #region OverlayOpacity (Obsolete)
 
+    [Obsolete( "This property is obsolete and should no longer be used. Use WindowContainer.ModalBackgroundBrushProperty instead." )]
     public static readonly DependencyProperty OverlayOpacityProperty = DependencyProperty.Register( "OverlayOpacity", typeof( double ), typeof( ChildWindow ), new PropertyMetadata( 0.5, OnOverlayOpacityChanged ) );
+    [Obsolete( "This property is obsolete and should no longer be used. Use WindowContainer.ModalBackgroundBrushProperty instead." )]
     public double OverlayOpacity
     {
       get
@@ -356,93 +244,13 @@ namespace Xceed.Wpf.Toolkit
         childWindow.OnOverlayOpacityChanged( ( double )e.OldValue, ( double )e.NewValue );
     }
 
+    [Obsolete( "This method is obsolete and should no longer be used. Use WindowContainer.ModalBackgroundBrushProperty instead." )]
     protected virtual void OnOverlayOpacityChanged( double oldValue, double newValue )
     {
       _modalLayer.Opacity = newValue;
     }
 
-    #endregion //OverlayOpacity
-
-    #region Top
-
-    public static readonly DependencyProperty TopProperty = DependencyProperty.Register( "Top", typeof( double ), typeof( ChildWindow ), new PropertyMetadata( 0.0, new PropertyChangedCallback( OnTopPropertyChanged ) ) );
-    public double Top
-    {
-      get
-      {
-        return ( double )GetValue( TopProperty );
-      }
-      set
-      {
-        SetValue( TopProperty, value );
-      }
-    }
-
-    private static void OnTopPropertyChanged( DependencyObject obj, DependencyPropertyChangedEventArgs e )
-    {
-      ChildWindow childWindow = obj as ChildWindow;
-      if( childWindow != null )
-        childWindow.OnTopPropertyChanged( ( double )e.OldValue, ( double )e.NewValue );
-    }
-
-    private void OnTopPropertyChanged( double oldValue, double newValue )
-    {
-      Top = GetRestrictedTop();
-      ProcessMove( 0, newValue - oldValue );
-    }
-
-    #endregion //TopProperty
-
-    #region WindowBackground
-
-    public static readonly DependencyProperty WindowBackgroundProperty = DependencyProperty.Register( "WindowBackground", typeof( Brush ), typeof( ChildWindow ), new PropertyMetadata( null ) );
-    public Brush WindowBackground
-    {
-      get
-      {
-        return ( Brush )GetValue( WindowBackgroundProperty );
-      }
-      set
-      {
-        SetValue( WindowBackgroundProperty, value );
-      }
-    }
-
-    #endregion //WindowBackground
-
-    #region WindowBorderBrush
-
-    public static readonly DependencyProperty WindowBorderBrushProperty = DependencyProperty.Register( "WindowBorderBrush", typeof( Brush ), typeof( ChildWindow ), new PropertyMetadata( null ) );
-    public Brush WindowBorderBrush
-    {
-      get
-      {
-        return ( Brush )GetValue( WindowBorderBrushProperty );
-      }
-      set
-      {
-        SetValue( WindowBorderBrushProperty, value );
-      }
-    }
-
-    #endregion //WindowBorderBrush
-
-    #region WindowOpacity
-
-    public static readonly DependencyProperty WindowOpacityProperty = DependencyProperty.Register( "WindowOpacity", typeof( double ), typeof( ChildWindow ), new PropertyMetadata( null ) );
-    public double WindowOpacity
-    {
-      get
-      {
-        return ( double )GetValue( WindowOpacityProperty );
-      }
-      set
-      {
-        SetValue( WindowOpacityProperty, value );
-      }
-    }
-
-    #endregion //WindowOpacity
+    #endregion //OverlayOpacity  
 
     #region WindowStartupLocation
 
@@ -512,8 +320,6 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Public Properties
 
-    #endregion //Properties
-
     #region Constructors
 
     static ChildWindow()
@@ -525,8 +331,6 @@ namespace Xceed.Wpf.Toolkit
     {
       DesignerWindowState = Xceed.Wpf.Toolkit.WindowState.Open;
 
-      IsVisibleChanged += ChildWindow_IsVisibleChanged;
-
       _modalLayer.Fill = OverlayBrush;
       _modalLayer.Opacity = OverlayOpacity;
     }
@@ -535,73 +339,81 @@ namespace Xceed.Wpf.Toolkit
 
     #region Base Class Overrides
 
+    internal override bool AllowPublicIsActiveChange
+    {
+      get { return false; }
+    }
+
     public override void OnApplyTemplate()
     {
       base.OnApplyTemplate();
 
-      if( _dragWidget != null )
+      if( _windowControl != null )
       {
-        _dragWidget.RemoveHandler( UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler( HeaderLeftMouseButtonDown ) );
-        _dragWidget.RemoveHandler( UIElement.MouseLeftButtonUpEvent, new MouseButtonEventHandler( HeaderMouseLeftButtonUp ) );
-        _dragWidget.MouseMove -= ( o, e ) => HeaderMouseMove( e );
+        _windowControl.HeaderDragDelta -= ( o, e ) => this.OnHeaderDragDelta( e );
+        _windowControl.HeaderIconDoubleClicked -= ( o, e ) => this.OnHeaderIconDoubleClick( e );
+        _windowControl.CloseButtonClicked -= ( o, e ) => this.OnCloseButtonClicked( e );
+      }
+      _windowControl = this.GetTemplateChild( PART_WindowControl ) as WindowControl;
+      if( _windowControl != null )
+      {
+        _windowControl.HeaderDragDelta += ( o, e ) => this.OnHeaderDragDelta( e );
+        _windowControl.HeaderIconDoubleClicked += ( o, e ) => this.OnHeaderIconDoubleClick( e );
+        _windowControl.CloseButtonClicked += ( o, e ) => this.OnCloseButtonClicked( e );
       }
 
-      _dragWidget = GetTemplateChild( PART_DragWidget ) as Border;
+      this.UpdateBlockMouseInputsPanel();
 
-      if( _dragWidget != null )
+      _windowRoot = this.GetTemplateChild( PART_WindowRoot ) as Grid;
+      _windowRoot.RenderTransform = _moveTransform;
+      _hasWindowContainer = ( VisualTreeHelper.GetParent( this ) as WindowContainer ) != null;
+
+      if( !_hasWindowContainer )
       {
-        _dragWidget.AddHandler( UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler( HeaderLeftMouseButtonDown ), true );
-        _dragWidget.AddHandler( UIElement.MouseLeftButtonUpEvent, new MouseButtonEventHandler( HeaderMouseLeftButtonUp ), true );
-        _dragWidget.MouseMove += ( o, e ) => HeaderMouseMove( e );
-      }
+        _parentContainer = VisualTreeHelper.GetParent( this ) as FrameworkElement;
+        if( _parentContainer != null )
+        {
+          _parentContainer.LayoutUpdated += ParentContainer_LayoutUpdated;
+          _parentContainer.SizeChanged += ParentContainer_SizeChanged;
 
-      if( CloseButton != null )
-        CloseButton.Click -= ( o, e ) => Close();
-
-      CloseButton = GetTemplateChild( PART_CloseButton ) as Button;
-
-      if( CloseButton != null )
-        CloseButton.Click += ( o, e ) => Close();
-
-      WindowRoot = GetTemplateChild( PART_WindowRoot ) as Grid;
-      WindowRoot.RenderTransform = _moveTransform;
-
-      _parentContainer = VisualTreeHelper.GetParent( this ) as FrameworkElement;
-      _parentContainer.LayoutUpdated += ParentContainer_LayoutUpdated;
-      _parentContainer.SizeChanged += ParentContainer_SizeChanged;
-
-      //initialize our modal background width/height
-      _modalLayer.Height = _parentContainer.ActualHeight;
-      _modalLayer.Width = _parentContainer.ActualWidth;
-
-      //this is for XBAP applications only. When inside an XBAP the parent container has no height or width until it has loaded. Therefore
-      //we need to handle the loaded event and reposition the window.
-      if( System.Windows.Interop.BrowserInteropHelper.IsBrowserHosted )
-      {
-        _parentContainer.Loaded += ( o, e ) =>
+          //this is for XBAP applications only. When inside an XBAP the parent container has no height or width until it has loaded. Therefore
+          //we need to handle the loaded event and reposition the window.
+          if( System.Windows.Interop.BrowserInteropHelper.IsBrowserHosted )
+          {
+            _parentContainer.Loaded += ( o, e ) =>
             {
               ExecuteOpen();
             };
-      }
+          }
+        }
 
-      _root = GetTemplateChild( PART_Root ) as Grid;
+        this.Unloaded += new RoutedEventHandler( ChildWindow_Unloaded );
+
+        //initialize our modal background width/height
+        _modalLayer.Height = _parentContainer.ActualHeight;
+        _modalLayer.Width = _parentContainer.ActualWidth;
+
+        _root = this.GetTemplateChild( PART_Root ) as Grid;
 
 #if VS2008
       FocusVisualStyle = null;
 #else
-      Style focusStyle = _root.Resources[ "FocusVisualStyle" ] as Style;
-      if( focusStyle != null )
-      {
-        Setter focusStyleDataContext = new Setter( Control.DataContextProperty, this );
-        focusStyle.Setters.Add( focusStyleDataContext );
-        FocusVisualStyle = focusStyle;
-      }
+        Style focusStyle = _root.Resources[ "FocusVisualStyle" ] as Style;
+        if( focusStyle != null )
+        {
+          Setter focusStyleDataContext = new Setter( Control.DataContextProperty, this );
+          focusStyle.Setters.Add( focusStyleDataContext );
+          FocusVisualStyle = focusStyle;
+        }
 #endif
-      _root.Children.Add( _modalLayerPanel );
+        _root.Children.Add( _modalLayerPanel );
+      }
     }
 
     protected override void OnGotFocus( RoutedEventArgs e )
     {
+      base.OnGotFocus( e );
+
       Action action = () =>
       {
         if( FocusedElement != null )
@@ -620,12 +432,12 @@ namespace Xceed.Wpf.Toolkit
         switch( e.Key )
         {
           case Key.Left:
-            this.Left -= _horizaontalOffset;
+            this.Left -= _horizontalOffset;
             e.Handled = true;
             break;
 
           case Key.Right:
-            this.Left += _horizaontalOffset;
+            this.Left += _horizontalOffset;
             e.Handled = true;
             break;
 
@@ -642,54 +454,118 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    protected override void OnLeftPropertyChanged( double oldValue, double newValue )
+    {
+      base.OnLeftPropertyChanged( oldValue, newValue );
+
+      _hasWindowContainer = ( VisualTreeHelper.GetParent( this ) as WindowContainer ) != null;
+      if( !_hasWindowContainer )
+      {
+          Left = GetRestrictedLeft();
+        ProcessMove( newValue - oldValue, 0 );
+      }
+    }
+
+    protected override void OnTopPropertyChanged( double oldValue, double newValue )
+    {
+      base.OnTopPropertyChanged( oldValue, newValue );
+
+      _hasWindowContainer = ( VisualTreeHelper.GetParent( this ) as WindowContainer ) != null;
+      if( !_hasWindowContainer )
+      {
+          Top = GetRestrictedTop();
+        ProcessMove( 0, newValue - oldValue );
+      }
+    }
+
+    internal override void UpdateBlockMouseInputsPanel()
+    {
+      if( _windowControl != null )
+      {
+        _windowControl.IsBlockMouseInputsPanelActive = this.IsBlockMouseInputsPanelActive;
+      }
+    }
+
     #endregion //Base Class Overrides
 
     #region Event Handlers
 
-    void ChildWindow_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )
+    protected virtual void OnHeaderDragDelta( DragDeltaEventArgs e )
     {
-      if( ( bool )e.NewValue )
-        Focus();
-    }
+      if( !this.IsCurrentWindow( e.OriginalSource ) )
+        return;
 
-    void HeaderLeftMouseButtonDown( object sender, MouseButtonEventArgs e )
-    {
       e.Handled = true;
-      Focus();
-      _dragWidget.CaptureMouse();
-      _isMouseCaptured = true;
-      _clickPoint = e.GetPosition( null ); //save off the mouse position
-      _oldPosition = new Point( Left, Top ); //save off our original window position
-    }
 
-    private void HeaderMouseLeftButtonUp( object sender, MouseButtonEventArgs e )
-    {
-      e.Handled = true;
-      _dragWidget.ReleaseMouseCapture();
-      _isMouseCaptured = false;
-    }
+      DragDeltaEventArgs args = new DragDeltaEventArgs( e.HorizontalChange, e.VerticalChange );
+      args.RoutedEvent = HeaderDragDeltaEvent;
+      args.Source = this;
+      this.RaiseEvent( args );
 
-    private void HeaderMouseMove( MouseEventArgs e )
-    {
-      if( _isMouseCaptured && Visibility == Visibility.Visible )
+      if( !args.Handled )
       {
-        Point currentPosition = e.GetPosition( null ); //our current mouse position
-
-        Left = _oldPosition.X + ( currentPosition.X - _clickPoint.X );
-        Top = _oldPosition.Y + ( currentPosition.Y - _clickPoint.Y );
-
-        //this helps keep our mouse position in sync with the drag widget position
-        Point dragWidgetPosition = e.GetPosition( _dragWidget );
-        if( dragWidgetPosition.X < 0 || dragWidgetPosition.X > _dragWidget.ActualWidth || dragWidgetPosition.Y < 0 || dragWidgetPosition.Y > _dragWidget.ActualHeight )
+        if( object.Equals( e.OriginalSource, _windowControl ) )
         {
-          return;
-        }
+          double left = 0.0;
 
-        _oldPosition = new Point( Left, Top );
-        _clickPoint = e.GetPosition( Window.GetWindow( this ) ); //store the point where we are relative to the window
+          if( this.FlowDirection == FlowDirection.RightToLeft )
+            left = this.Left - e.HorizontalChange;
+          else
+            left = this.Left + e.HorizontalChange;
+
+          this.Left = left;
+          this.Top += e.VerticalChange;
+        }
       }
     }
 
+    protected virtual void OnHeaderIconDoubleClick( MouseButtonEventArgs e )
+    {
+      if( !this.IsCurrentWindow( e.OriginalSource ) )
+        return;
+
+      e.Handled = true;
+
+      MouseButtonEventArgs args = new MouseButtonEventArgs( Mouse.PrimaryDevice, 0, MouseButton.Left );
+      args.RoutedEvent = HeaderIconDoubleClickedEvent;
+      args.Source = this;
+      this.RaiseEvent( args );
+
+      if( !args.Handled )
+      {
+        this.Close();
+      }
+    }
+
+    protected virtual void OnCloseButtonClicked( RoutedEventArgs e )
+    {
+      if( !this.IsCurrentWindow( e.OriginalSource ) )
+        return;
+
+      e.Handled = true;
+
+      RoutedEventArgs args = new RoutedEventArgs( CloseButtonClickedEvent, this );
+      this.RaiseEvent( args );
+
+      if( !args.Handled )
+      {
+        this.Close();
+      }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    [Obsolete( "This method is obsolete and should no longer be used." )]
     private void ParentContainer_LayoutUpdated( object sender, EventArgs e )
     {
       if( DesignerProperties.GetIsInDesignMode( this ) )
@@ -703,6 +579,27 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    [Obsolete( "This method is obsolete and should no longer be used." )]
+    private void ChildWindow_Unloaded( object sender, RoutedEventArgs e )
+    {
+      if( _parentContainer != null )
+      {
+        _parentContainer.LayoutUpdated -= ParentContainer_LayoutUpdated;
+        _parentContainer.SizeChanged -= ParentContainer_SizeChanged;        
+
+        //this is for XBAP applications only. When inside an XBAP the parent container has no height or width until it has loaded. Therefore
+        //we need to handle the loaded event and reposition the window.
+        if( System.Windows.Interop.BrowserInteropHelper.IsBrowserHosted )
+        {
+          _parentContainer.Loaded -= ( o, ev ) =>
+          {
+            ExecuteOpen();
+          };
+        }
+      }
+    }
+
+    [Obsolete( "This method is obsolete and should no longer be used." )]
     void ParentContainer_SizeChanged( object sender, SizeChangedEventArgs e )
     {
       //resize our modal layer
@@ -714,12 +611,17 @@ namespace Xceed.Wpf.Toolkit
       Top = GetRestrictedTop();
     }
 
+
+
     #endregion //Event Handlers
 
     #region Methods
 
     #region Private
 
+
+
+    [Obsolete( "This method is obsolete and should no longer be used. Use WindowContainer.GetRestrictedLeft() instead." )]
     private double GetRestrictedLeft()
     {
       if( Left < 0 )
@@ -727,9 +629,9 @@ namespace Xceed.Wpf.Toolkit
 
       if( _parentContainer != null )
       {
-        if( Left + WindowRoot.ActualWidth > _parentContainer.ActualWidth && _parentContainer.ActualWidth != 0 )
+        if( Left + _windowRoot.ActualWidth > _parentContainer.ActualWidth && _parentContainer.ActualWidth != 0 )
         {
-          double left = _parentContainer.ActualWidth - WindowRoot.ActualWidth;
+          double left = _parentContainer.ActualWidth - _windowRoot.ActualWidth;
           return left < 0 ? 0 : left;
         }
       }
@@ -737,6 +639,7 @@ namespace Xceed.Wpf.Toolkit
       return Left;
     }
 
+    [Obsolete( "This method is obsolete and should no longer be used. Use WindowContainer.GetRestrictedTop() instead." )]
     private double GetRestrictedTop()
     {
       if( Top < 0 )
@@ -744,9 +647,9 @@ namespace Xceed.Wpf.Toolkit
 
       if( _parentContainer != null )
       {
-        if( Top + WindowRoot.ActualHeight > _parentContainer.ActualHeight && _parentContainer.ActualHeight != 0 )
+        if( Top + _windowRoot.ActualHeight > _parentContainer.ActualHeight && _parentContainer.ActualHeight != 0 )
         {
-          double top = _parentContainer.ActualHeight - WindowRoot.ActualHeight;
+          double top = _parentContainer.ActualHeight - _windowRoot.ActualHeight;
           return top < 0 ? 0 : top;
         }
       }
@@ -802,12 +705,20 @@ namespace Xceed.Wpf.Toolkit
     {
       _dialogResult = null; //reset the dialogResult to null each time the window is opened
 
-      if( WindowStartupLocation == Xceed.Wpf.Toolkit.WindowStartupLocation.Center )
-        CenterChildWindow();
+      if( !_hasWindowContainer )
+        if( WindowStartupLocation == Xceed.Wpf.Toolkit.WindowStartupLocation.Center )
+          CenterChildWindow(); 
 
-      BringToFront();
+      if( !_hasWindowContainer )
+        BringToFront();
     }
 
+    private bool IsCurrentWindow( object windowtoTest )
+    {
+      return object.Equals( _windowControl, windowtoTest );
+    }
+
+    [Obsolete( "This method is obsolete and should no longer be used. Use WindowContainer.BringToFront() instead." )]
     private void BringToFront()
     {
       int index = 0;
@@ -821,15 +732,17 @@ namespace Xceed.Wpf.Toolkit
         Canvas.SetZIndex( _modalLayerPanel, index - 2 );
     }
 
+    [Obsolete( "This method is obsolete and should no longer be used. Use WindowContainer.CenterChild() instead." )]
     private void CenterChildWindow()
     {
       if( _parentContainer != null )
       {
-        Left = ( _parentContainer.ActualWidth - WindowRoot.ActualWidth ) / 2.0;
-        Top = ( _parentContainer.ActualHeight - WindowRoot.ActualHeight ) / 2.0;
+        Left = ( _parentContainer.ActualWidth - _windowRoot.ActualWidth ) / 2.0;
+        Top = ( _parentContainer.ActualHeight - _windowRoot.ActualHeight ) / 2.0;
       }
     }
 
+    [Obsolete( "This method is obsolete and should no longer be used." )]
     private void ShowModalLayer()
     {
       if( !DesignerProperties.GetIsInDesignMode( this ) )
@@ -841,11 +754,13 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    [Obsolete( "This method is obsolete and should no longer be used." )]
     private void HideModalLayer()
     {
       _modalLayer.Visibility = System.Windows.Visibility.Collapsed;
     }
 
+    [Obsolete( "This method is obsolete and should no longer be used. Use the ChildWindow in a WindowContainer instead." )]
     private void ProcessMove( double x, double y )
     {
       _moveTransform.X += x;
@@ -895,5 +810,9 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //Events
+
   }
+
+#pragma warning restore 0809
+#pragma warning restore 0618
 }

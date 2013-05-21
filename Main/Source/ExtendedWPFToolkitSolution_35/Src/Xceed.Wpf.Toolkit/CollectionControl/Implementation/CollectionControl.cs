@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Collections;
@@ -26,9 +26,37 @@ using System.Windows.Input;
 
 namespace Xceed.Wpf.Toolkit
 {
+  [TemplatePart( Name = PART_NewItemTypesComboBox, Type = typeof( ComboBox ) )]
   public class CollectionControl : Control
   {
+    private const string PART_NewItemTypesComboBox = "PART_NewItemTypesComboBox";
+
+    #region Private Members
+
+    private ComboBox _newItemTypesComboBox;
+
+    #endregion
+
     #region Properties
+
+    #region IsReadOnly Property
+
+    public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register( "IsReadOnly", typeof( bool ), typeof( CollectionControl ), new UIPropertyMetadata( false ) );
+    public bool IsReadOnly
+    {
+      get
+      {
+        return ( bool )GetValue( IsReadOnlyProperty );
+      }
+      set
+      {
+        SetValue( IsReadOnlyProperty, value );
+      }
+    }
+
+    #endregion  //Items
+
+    #region Items Property
 
     public static readonly DependencyProperty ItemsProperty = DependencyProperty.Register( "Items", typeof( ObservableCollection<object> ), typeof( CollectionControl ), new UIPropertyMetadata( null ) );
     public ObservableCollection<object> Items
@@ -42,6 +70,10 @@ namespace Xceed.Wpf.Toolkit
         SetValue( ItemsProperty, value );
       }
     }
+
+    #endregion  //Items
+
+    #region ItemsSource Property
 
     public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register( "ItemsSource", typeof( IList ), typeof( CollectionControl ), new UIPropertyMetadata( null, OnItemsSourceChanged ) );
     public IList ItemsSource
@@ -72,7 +104,11 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    public static readonly DependencyProperty ItemsSourceTypeProperty = DependencyProperty.Register( "ItemsSourceType", typeof( Type ), typeof( CollectionControl ), new UIPropertyMetadata( null, new PropertyChangedCallback( ItemsSourceTypeChanged ) ) );
+    #endregion  //ItemsSource
+
+    #region ItemsSourceType Property
+
+    public static readonly DependencyProperty ItemsSourceTypeProperty = DependencyProperty.Register( "ItemsSourceType", typeof( Type ), typeof( CollectionControl ), new UIPropertyMetadata( null ) );
     public Type ItemsSourceType
     {
       get
@@ -85,25 +121,9 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    private static void ItemsSourceTypeChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
-    {
-      CollectionControl CollectionControl = ( CollectionControl )d;
-      if( CollectionControl != null )
-        CollectionControl.ItemsSourceTypeChanged( ( Type )e.OldValue, ( Type )e.NewValue );
-    }
+    #endregion //ItemsSourceType
 
-    protected virtual void ItemsSourceTypeChanged( Type oldValue, Type newValue )
-    {
-      List<Type> types = new List<Type>();
-      Type listType = GetListItemType( newValue );
-
-      if( listType != null )
-      {
-        types.Add( listType );
-      }
-
-      NewItemTypes = types;
-    }
+    #region NewItemType Property
 
     public static readonly DependencyProperty NewItemTypesProperty = DependencyProperty.Register( "NewItemTypes", typeof( IList ), typeof( CollectionControl ), new UIPropertyMetadata( null ) );
     public IList<Type> NewItemTypes
@@ -118,6 +138,10 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    #endregion  //NewItemType
+
+    #region SelectedItem Property
+
     public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register( "SelectedItem", typeof( object ), typeof( CollectionControl ), new UIPropertyMetadata( null ) );
     public object SelectedItem
     {
@@ -131,7 +155,26 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    #endregion  //SelectedItem
+
     #endregion //Properties
+
+    #region Override Methods
+
+    public override void OnApplyTemplate()
+    {
+      base.OnApplyTemplate();
+
+      if( _newItemTypesComboBox != null )
+        _newItemTypesComboBox.Loaded -= new RoutedEventHandler( this.NewItemTypesComboBox_Loaded );
+
+      _newItemTypesComboBox = GetTemplateChild( PART_NewItemTypesComboBox ) as ComboBox;
+
+      if( _newItemTypesComboBox != null )
+        _newItemTypesComboBox.Loaded += new RoutedEventHandler( this.NewItemTypesComboBox_Loaded );
+    }
+
+    #endregion
 
     #region Constructors
 
@@ -151,30 +194,137 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Constructors
 
+    #region Events
+
+    #region ItemDeleting Event
+
+    public delegate void ItemDeletingRoutedEventHandler( object sender, ItemDeletingEventArgs e );
+
+    public static readonly RoutedEvent ItemDeletingEvent = EventManager.RegisterRoutedEvent( "ItemDeleting", RoutingStrategy.Bubble, typeof( ItemDeletingRoutedEventHandler ), typeof( CollectionControl ) );
+    public event ItemDeletingRoutedEventHandler ItemDeleting
+    {
+      add
+      {
+        AddHandler( ItemDeletingEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( ItemDeletingEvent, value );
+      }
+    }
+
+    #endregion //ItemDeleting Event
+
+    #region ItemDeleted Event
+
+    public delegate void ItemDeletedRoutedEventHandler( object sender, ItemEventArgs e );
+
+    public static readonly RoutedEvent ItemDeletedEvent = EventManager.RegisterRoutedEvent( "ItemDeleted", RoutingStrategy.Bubble, typeof( ItemDeletedRoutedEventHandler ), typeof( CollectionControl ) );
+    public event ItemDeletedRoutedEventHandler ItemDeleted
+    {
+      add
+      {
+        AddHandler( ItemDeletedEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( ItemDeletedEvent, value );
+      }
+    }
+
+    #endregion //ItemDeleted Event
+
+    #region ItemAdding Event
+
+    public delegate void ItemAddingRoutedEventHandler( object sender, ItemAddingEventArgs e );
+
+    public static readonly RoutedEvent ItemAddingEvent = EventManager.RegisterRoutedEvent( "ItemAdding", RoutingStrategy.Bubble, typeof( ItemAddingRoutedEventHandler ), typeof( CollectionControl ) );
+    public event ItemAddingRoutedEventHandler ItemAdding
+    {
+      add
+      {
+        AddHandler( ItemAddingEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( ItemAddingEvent, value );
+      }
+    }
+
+    #endregion //ItemAdding Event
+
+    #region ItemAdded Event
+
+    public delegate void ItemAddedRoutedEventHandler( object sender, ItemEventArgs e );
+
+    public static readonly RoutedEvent ItemAddedEvent = EventManager.RegisterRoutedEvent( "ItemAdded", RoutingStrategy.Bubble, typeof( ItemAddedRoutedEventHandler ), typeof( CollectionControl ) );
+    public event ItemAddedRoutedEventHandler ItemAdded
+    {
+      add
+      {
+        AddHandler( ItemAddedEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( ItemAddedEvent, value );
+      }
+    }
+
+    #endregion //ItemAdded Event
+
+    #endregion
+
+    #region EventHandlers
+
+    void NewItemTypesComboBox_Loaded( object sender, RoutedEventArgs e )
+    {
+      if( _newItemTypesComboBox != null )
+        _newItemTypesComboBox.SelectedIndex = 0;
+    }
+
+    #endregion
+
     #region Commands
 
     private void AddNew( object sender, ExecutedRoutedEventArgs e )
     {
       var newItem = CreateNewItem( ( Type )e.Parameter );
+
+      var eventArgs = new ItemAddingEventArgs( ItemAddingEvent, newItem );
+      this.RaiseEvent( eventArgs );
+      if( eventArgs.Cancel )
+        return;
+      newItem = eventArgs.Item;
+
       Items.Add( newItem );
+
+      this.RaiseEvent( new ItemEventArgs( ItemAddedEvent, newItem ) );
+
       SelectedItem = newItem;
     }
 
     private void CanAddNew( object sender, CanExecuteRoutedEventArgs e )
     {
       Type t = e.Parameter as Type;
-      if( t != null && t.GetConstructor( Type.EmptyTypes ) != null )
+      if( t != null && t.GetConstructor( Type.EmptyTypes ) != null && !IsReadOnly)
         e.CanExecute = true;
     }
 
     private void Delete( object sender, ExecutedRoutedEventArgs e )
     {
+      var eventArgs = new ItemDeletingEventArgs( ItemDeletingEvent, e.Parameter );
+      this.RaiseEvent( eventArgs );
+      if( eventArgs.Cancel )
+        return;
+
       Items.Remove( e.Parameter );
+
+      this.RaiseEvent( new ItemEventArgs( ItemDeletedEvent, e.Parameter ) );
     }
 
     private void CanDelete( object sender, CanExecuteRoutedEventArgs e )
     {
-      e.CanExecute = e.Parameter != null;
+      e.CanExecute = e.Parameter != null && !IsReadOnly;
     }
 
     private void MoveDown( object sender, ExecutedRoutedEventArgs e )
@@ -188,7 +338,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void CanMoveDown( object sender, CanExecuteRoutedEventArgs e )
     {
-      if( e.Parameter != null && Items.IndexOf( e.Parameter ) < ( Items.Count - 1 ) )
+      if( e.Parameter != null && Items.IndexOf( e.Parameter ) < ( Items.Count - 1 ) && !IsReadOnly )
         e.CanExecute = true;
     }
 
@@ -203,7 +353,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void CanMoveUp( object sender, CanExecuteRoutedEventArgs e )
     {
-      if( e.Parameter != null && Items.IndexOf( e.Parameter ) > 0 )
+      if( e.Parameter != null && Items.IndexOf( e.Parameter ) > 0 && !IsReadOnly )
         e.CanExecute = true;
     }
 
@@ -213,10 +363,17 @@ namespace Xceed.Wpf.Toolkit
 
     private static void CopyValues( object source, object destination )
     {
-      FieldInfo[] myObjectFields = source.GetType().GetFields( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance );
-      foreach( FieldInfo fi in myObjectFields )
+      Type currentType = source.GetType();
+
+      while( currentType != null )
       {
-        fi.SetValue( destination, fi.GetValue( source ) );
+        FieldInfo[] myObjectFields = currentType.GetFields( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance );
+        foreach( FieldInfo fi in myObjectFields )
+        {
+          fi.SetValue( destination, fi.GetValue( source ) );
+        }
+
+        currentType = currentType.BaseType;
       }
     }
 
@@ -247,16 +404,6 @@ namespace Xceed.Wpf.Toolkit
     private object CreateNewItem( Type type )
     {
       return Activator.CreateInstance( type );
-    }
-
-    internal static Type GetListItemType(Type listType)
-    {
-      Type iListOfT = listType.GetInterfaces().FirstOrDefault(
-        ( i ) => i.IsGenericType && i.GetGenericTypeDefinition() == typeof( IList<> ) );
-
-      return ( iListOfT != null )
-        ? iListOfT.GetGenericArguments()[ 0 ]
-        : null;
     }
 
     public void PersistChanges()

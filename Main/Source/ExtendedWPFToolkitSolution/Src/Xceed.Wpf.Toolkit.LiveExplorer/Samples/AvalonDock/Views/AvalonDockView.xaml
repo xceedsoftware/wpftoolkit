@@ -1,0 +1,137 @@
+﻿<!--*************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.AvalonDock.Views.AvalonDockView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+                 xmlns:s="clr-namespace:System;assembly=mscorlib"
+                 Title="ButtonSpinner">
+   <local:DemoView.Description>
+      <Paragraph FontSize="14" FontFamily="Segoe">
+         The AvalonDock layout system allows developers to create customizable layouts using a window docking system similar to what is found in many popular integrated development environements.
+      </Paragraph>
+   </local:DemoView.Description>
+   <Grid>
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+       <GroupBox Header="Features"
+                  Grid.Row="0"
+                  Margin="5">
+           <StackPanel Orientation="Horizontal" Margin="5">
+               <TextBlock Text="Theme:" Margin="0,0,10,0" VerticalAlignment="Center"/>
+               <ComboBox x:Name="_themeCombo" SelectedIndex="0" Width="125">
+                  <ComboBoxItem Content="Generic" />
+                  <ComboBoxItem Content="Aero">
+                     <ComboBoxItem.Tag>
+                        <xcad:AeroTheme />
+                     </ComboBoxItem.Tag>
+                  </ComboBoxItem>
+                  <ComboBoxItem Content="VS2010">
+                     <ComboBoxItem.Tag>
+                        <xcad:VS2010Theme />
+                     </ComboBoxItem.Tag>
+                  </ComboBoxItem>
+                  <ComboBoxItem Content="Metro">
+                     <ComboBoxItem.Tag>
+                        <xcad:MetroTheme />
+                     </ComboBoxItem.Tag>
+                  </ComboBoxItem>
+               </ComboBox>
+          </StackPanel>
+       </GroupBox>
+
+     <TextBlock Grid.Row="1" Text="Usage:" Style="{StaticResource Header}" />
+
+      <xcad:DockingManager Grid.Row="2" MaxHeight="425"
+                           AllowMixedOrientation="True"
+                           BorderBrush="Black"
+                           BorderThickness="1"
+                           Theme="{Binding ElementName=_themeCombo, Path=SelectedItem.Tag}">
+         <xcad:DockingManager.DocumentHeaderTemplate>
+            <DataTemplate>
+               <StackPanel Orientation="Horizontal">
+                  <Image Source="{Binding IconSource}" Margin="0,0,4,0"/>
+                  <TextBlock Text="{Binding Title}" />
+               </StackPanel>
+            </DataTemplate>
+         </xcad:DockingManager.DocumentHeaderTemplate>
+         <xcad:LayoutRoot x:Name="_layoutRoot">
+            <xcad:LayoutPanel Orientation="Horizontal">
+               <xcad:LayoutAnchorablePane DockWidth="200">
+                  <xcad:LayoutAnchorable ContentId="properties" Title="Properties" CanHide="False" CanClose="False"
+                                            AutoHideWidth="240"
+                                         IconSource="../Images/property-blue.png">
+                     <xctk:PropertyGrid NameColumnWidth="110"
+                        SelectedObject="{Binding ElementName=_layoutRoot, Path=LastFocusedDocument.Content}"/>
+                  </xcad:LayoutAnchorable>
+               </xcad:LayoutAnchorablePane>
+               <xcad:LayoutDocumentPaneGroup >
+                  <xcad:LayoutDocumentPane>
+                     <xcad:LayoutDocument ContentId="document1" Title="Document 1" IconSource="../Images/document.png" >
+                           <Button Content="Document 1 Content" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                     </xcad:LayoutDocument>
+                     <xcad:LayoutDocument ContentId="document2" Title="Document 2" IconSource="../Images/document.png">
+                        <TextBox Text="Document 2 Content" AcceptsReturn="True"/>
+                     </xcad:LayoutDocument>
+                  </xcad:LayoutDocumentPane>
+               </xcad:LayoutDocumentPaneGroup >
+               <xcad:LayoutAnchorablePaneGroup DockWidth="125">
+                  <xcad:LayoutAnchorablePane>
+                     <xcad:LayoutAnchorable ContentId="alarms" Title="Alarms" IconSource="../Images/alarm-clock-blue.png" >
+                        <ListBox>
+                           <s:String>Alarm 1</s:String>
+                           <s:String>Alarm 2</s:String>
+                           <s:String>Alarm 3</s:String>
+                        </ListBox>
+                     </xcad:LayoutAnchorable>
+                     <xcad:LayoutAnchorable ContentId="journal" Title="Journal" >
+                        <RichTextBox>
+                           <FlowDocument>
+                              <Paragraph FontSize="14" FontFamily="Segoe">
+                                 This is the content of the Journal Pane.
+                                 <LineBreak/>
+                                 A
+                                 <Bold>RichTextBox</Bold> has been added here
+                              </Paragraph>
+                           </FlowDocument>
+                        </RichTextBox>
+                     </xcad:LayoutAnchorable>
+                  </xcad:LayoutAnchorablePane>
+               </xcad:LayoutAnchorablePaneGroup>
+            </xcad:LayoutPanel>
+
+            <xcad:LayoutRoot.LeftSide>
+               <xcad:LayoutAnchorSide>
+                  <xcad:LayoutAnchorGroup>
+                     <xcad:LayoutAnchorable Title="Agenda" ContentId="agenda" IconSource="../Images/address-book-open.png">
+                        <TextBlock Text="Agenda Content" Margin="10" FontSize="18" FontWeight="Black" TextWrapping="Wrap"/>
+                     </xcad:LayoutAnchorable>
+                     <xcad:LayoutAnchorable Title="Contacts" ContentId="contacts" IconSource="../Images/address-book--pencil.png" >
+                        <TextBlock Text="Contacts Content" Margin="10" FontSize="18" FontWeight="Black" TextWrapping="Wrap"/>
+                     </xcad:LayoutAnchorable>
+                  </xcad:LayoutAnchorGroup>
+               </xcad:LayoutAnchorSide>
+            </xcad:LayoutRoot.LeftSide>
+         </xcad:LayoutRoot>
+      </xcad:DockingManager>
+   </Grid>
+</local:DemoView>

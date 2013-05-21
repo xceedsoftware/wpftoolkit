@@ -1,0 +1,69 @@
+﻿<!--**************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  *************************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views.PropertyGridBindingToStructsView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Converters"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 xmlns:propertyGrid="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views"
+                 VerticalScrollBarVisibility="Disabled"
+                 Title="PropertyGrid Binding to Structs">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+            When the SelectedObject contains properties of type Struct youmay find that edits performed in the PropertyGrid do not function properly.  This is because Structs are passed by value.  Meaning that the PropertyGrid receives a copy of the Struct and not a reference.  When this happens, the data binding expressions end up binding to and modifying that copy rather than the original values.
+        </Paragraph>
+    </local:DemoView.Description>
+
+   <local:DemoView.Resources>
+      <conv:DimensionsConverter x:Key="DimensionsConverter" />
+   </local:DemoView.Resources>
+
+   <Grid>
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <TextBlock Text="Binding to Structs:" Style="{StaticResource Header}" Margin="10"/>
+      <TextBlock Grid.Row="1" Text="The solution to this problem is to create a custom editor and provide an IValueConverter to handle the proper conversion of the Struct values." TextWrapping="Wrap" />
+      <xctk:PropertyGrid x:Name="_propertyGrid" Grid.Row="2" Width="450" MaxHeight="250" Margin="10">
+         <xctk:PropertyGrid.EditorDefinitions>
+            <xctk:EditorTemplateDefinition TargetProperties="{x:Type propertyGrid:Dimension}">
+               <xctk:EditorTemplateDefinition.EditingTemplate>
+                  <DataTemplate>
+                     <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                           <RowDefinition Height="Auto" />
+                           <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                           <ColumnDefinition Width="Auto" />
+                           <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Height: " />
+                        <TextBox Grid.Column="1" Text="{Binding Path=Value, Converter={StaticResource DimensionsConverter},ConverterParameter=Height}" />
+                        <TextBlock Grid.Row="1" Text="Weight: " />
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Value, Converter={StaticResource DimensionsConverter},ConverterParameter=Weight}" />
+                     </Grid>
+                  </DataTemplate>
+               </xctk:EditorTemplateDefinition.EditingTemplate>
+            </xctk:EditorTemplateDefinition>
+         </xctk:PropertyGrid.EditorDefinitions>
+      </xctk:PropertyGrid>
+   </Grid>
+</local:DemoView>

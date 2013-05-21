@@ -1,0 +1,23 @@
+
+<xctk:PropertyGrid>
+  <xctk:PropertyGrid.EditorDefinitions>
+
+    <xctk:EditorComboBoxDefinition TargetProperties="..."
+                                   ItemsSource="{StaticResource comboSource}"
+                                   SelectedItemBinding="{Binding Value}" />
+
+    <xctk:EditorTextDefinition TargetProperties="..."
+                               FontStyle="Italic" 
+                               FontWeight="Bold" 
+                               EditingElementStyle="{StaticResource textBoxStyle}"  />
+
+    <xctk:EditorDateTimeUpDownDefinition TargetProperties="..."
+                                         Format="Custom" 
+                                         FormatString="yyyy-MM" />
+
+    <xctk:EditorCheckBoxDefinition TargetProperties="..."
+                                   IsThreeState="True"  />
+
+  </xctk:PropertyGrid.EditorDefinitions>
+</xctk:PropertyGrid>
+

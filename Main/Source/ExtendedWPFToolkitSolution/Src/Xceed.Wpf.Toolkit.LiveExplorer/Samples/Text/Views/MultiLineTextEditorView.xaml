@@ -1,0 +1,61 @@
+﻿<!--**************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ************************************************************************************-->
+
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Text.Views.MultiLineTextEditorView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 Title="MultiLineTextEditor">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+           The MultiLineTextEditor is a TextBox that allows you to edit text that is too long to display in a regular TextBox. The popup is resizable to accommodate any text.
+        </Paragraph>
+    </local:DemoView.Description>
+
+    <local:DemoView.Resources>
+        <DataTemplate x:Key="multiLineTextEditorStyle" >
+            <xctk:MultiLineTextEditor
+               TextWrapping="Wrap" 
+               Text="{Binding Path=Review}" 
+               Content="{Binding Text, RelativeSource={RelativeSource Self}}" 
+               HorizontalContentAlignment="Left" 
+               VerticalContentAlignment="Center"
+               Height="24" />
+        </DataTemplate>
+    </local:DemoView.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="1" Margin="10">
+            <TextBlock Text="Usage:" Style="{StaticResource Header}" />
+            <DataGrid x:Name="_dataGrid" ItemsSource="{Binding}" AutoGenerateColumns="False" CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Title" Binding="{Binding Path=Title}" IsReadOnly="True"/>
+                    <DataGridTemplateColumn Header="Review" Width="150" CellTemplate ="{StaticResource multiLineTextEditorStyle}"/>
+                    <DataGridTextColumn Header="Rating" Binding="{Binding Path=Rating}" IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+         </StackPanel>
+    </Grid>
+</local:DemoView>

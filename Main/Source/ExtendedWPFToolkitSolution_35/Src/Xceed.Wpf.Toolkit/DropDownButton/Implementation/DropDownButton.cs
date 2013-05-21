@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.ComponentModel;
@@ -249,21 +249,10 @@ namespace Xceed.Wpf.Toolkit
 
     private void Popup_Opened( object sender, EventArgs e )
     {
-      // Set the focus on the content of the ContentPresenter
+      // Set the focus on the content of the ContentPresenter.
       if( _contentPresenter != null )
       {
-        DependencyObject o = _contentPresenter.Content as DependencyObject;
-        while( o != null && ( VisualTreeHelper.GetChildrenCount(o) > 0 ) )
-        {
-          if( o is UIElement )
-          {
-            if( ( ( UIElement )o ).Focusable )
-              break;
-          }
-          o = VisualTreeHelper.GetChild( o, 0 );
-        }
-
-        ( ( UIElement )o ).Focus();
+        _contentPresenter.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
       }
     }
 

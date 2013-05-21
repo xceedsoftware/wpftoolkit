@@ -1,0 +1,40 @@
+﻿<!--**************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ************************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views.PropertyGridDefaultEditorsView"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                VerticalScrollBarVisibility="Disabled"
+                Title="PropertyGrid Default Editors">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+           This example demonstrates the default editors provided by the PropertyGrid. A different editor exists for each
+           of the following types (C# name): string, bool, decimal, int, short, long, float, byte, sbyte, uint, ulong, ushort, 
+           DateTime, TimeSpan, Color, Enums, FontFamily, FontWeight, FontStyle, FontStretch, 
+           IList&lt;T&gt; (primtive type), IList&lt;T&gt; (custom type),
+      </Paragraph>
+    </local:DemoView.Description>
+
+   <DockPanel>
+      <TextBlock DockPanel.Dock="Top" 
+                 Text="Click on each property and see the description for details on the underlying editor."
+                 TextWrapping="Wrap"/>
+      <xctk:PropertyGrid x:Name="_propertyGrid" SelectedObject="{Binding}"  Width="450" Margin="10,30,0,0" />
+   </DockPanel>
+
+
+</local:DemoView>

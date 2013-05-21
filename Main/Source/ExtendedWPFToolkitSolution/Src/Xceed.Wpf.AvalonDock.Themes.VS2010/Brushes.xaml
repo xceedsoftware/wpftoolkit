@@ -1,0 +1,195 @@
+﻿<!--***********************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+    <DrawingBrush x:Key="AvalonDock_ThemeVS2010_BaseColor1" 
+                  TileMode="Tile"  
+                Viewport="0 0 5 5" 
+				ViewportUnits="Absolute" 
+				Stretch="None">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#2C3D5A">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,10,10"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing>
+                    <GeometryDrawing.Pen>
+                        <Pen Thickness="1" Brush="#35496A" />
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                            <LineGeometry StartPoint="0,0" EndPoint="10,10" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing>
+                    <GeometryDrawing.Pen>
+                        <Pen Thickness="1" Brush="#293955" />
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                            <LineGeometry StartPoint="1,0" EndPoint="10,9" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor2" 
+                     Color="White"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor3" 
+                     Color="Black"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor4" 
+                     Color="Transparent"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor5" 
+                     Color="#293955"/>
+
+    <LinearGradientBrush x:Key="AvalonDock_ThemeVS2010_BaseColor6"
+                         StartPoint="0,0"
+                         EndPoint="0,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Color="#50FFE8A6" Offset="0" />
+            <GradientStop Color="#50FFE8A6" Offset="0.5" />
+            <GradientStop Color="#50FFEDBA" Offset="0.5" />
+            <GradientStop Color="#50FFFCF2" Offset="1" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="AvalonDock_ThemeVS2010_BaseColor7"
+                         StartPoint="0,1"
+                         EndPoint="0,0">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Color="#FFCED4DB" Offset="0" />
+            <GradientStop Color="#FFD4DBE4" Offset="0.1" />
+            <GradientStop Color="#FFD4DDEA" Offset="0.5" />
+            <GradientStop Color="#FFC8D5E8" Offset="1" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor8"
+                     Color="White"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor9"
+                     Color="#FFF5F4EA"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor10" 
+                     Color="White"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor11" 
+                     Color="#FFBBC0C7" />
+
+    <!--<SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor12"
+                     Color="White"/>-->
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor13"
+                     Color="White"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor14"
+                     Color="White"/>
+
+    <LinearGradientBrush x:Key="AvalonDock_ThemeVS2010_BaseColor15"
+                         StartPoint="0,0"
+                         EndPoint="0,1">
+        <GradientStop Color="#FFFCF2" Offset="0" />
+        <GradientStop Color="#FFEDBA" Offset="0.5" />
+        <GradientStop Color="#FFE8A6" Offset="0.5" />
+        <GradientStop Color="#FFE8A6" Offset="1" />
+    </LinearGradientBrush>
+
+
+    <LinearGradientBrush x:Key="AvalonDock_ThemeVS2010_BaseColor16"
+                         StartPoint="0,0"
+                         EndPoint="0,1">
+        <GradientStop Color="#4D6082" Offset="0" />
+        <GradientStop Color="#3D5277" Offset="1" />
+    </LinearGradientBrush>
+
+    <!--<SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor17" 
+        Color="White"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor18" 
+        Color="Black"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor20" 
+                     Color="White"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor21" 
+        Color="White"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor22" 
+        Color="Black"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor23" 
+        Color="Black"/>-->
+
+
+    <LinearGradientBrush x:Key="AvalonDock_ThemeVS2010_BaseColor24" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FBFCFC" Offset="0" />
+        <GradientStop Color="#D7DCE4" Offset="0.5" />
+        <GradientStop Color="#CED4DF" Offset="0.5" />
+        <GradientStop Color="#CED4DF" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="AvalonDock_ThemeVS2010_BaseColor25" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFFCF2" Offset="0" />
+        <GradientStop Color="#FFEDBA" Offset="0.5" />
+        <GradientStop Color="#FFE8A6" Offset="0.5" />
+        <GradientStop Color="#FFE8A6" Offset="1" />
+    </LinearGradientBrush>
+
+    <!--<LinearGradientBrush x:Key="AvalonDock_ThemeVS2010_BaseColor26" StartPoint="0,0" EndPoint="0,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Color="#50FFE8A6" Offset="0" />
+            <GradientStop Color="#50FFE8A6" Offset="0.5" />
+            <GradientStop Color="#50FFEDBA" Offset="0.5" />
+            <GradientStop Color="#50FFFCF2" Offset="1" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="AvalonDock_ThemeVS2010_BaseColor27"
+                         StartPoint="0,0" EndPoint="0,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Color="#50FFE8A6" Offset="0" />
+            <GradientStop Color="#50FFE8A6" Offset="0.5" />
+            <GradientStop Color="#50FFEDBA" Offset="0.5" />
+            <GradientStop Color="#50FFFCF2" Offset="1" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>-->
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor28"
+                         Color="White"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor30" 
+        Color="#CED4DF"/>
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor31" 
+        Color="#FFE8A6"/>
+
+    <!--<SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor32"
+                     Color="Transparent"/>-->
+
+    <SolidColorBrush x:Key="AvalonDock_ThemeVS2010_BaseColor33"
+        Color="#3D5277"/>    
+</ResourceDictionary>

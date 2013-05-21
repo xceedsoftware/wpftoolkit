@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System;
 using System.Windows;
@@ -36,6 +36,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region Properties
 
+    #region DropDownHeight
     public static readonly DependencyProperty DropDownHeightProperty = DependencyProperty.Register( "DropDownHeight", typeof( double ), typeof( MultiLineTextEditor ), new UIPropertyMetadata( 150.0 ) );
     public double DropDownHeight
     {
@@ -48,7 +49,9 @@ namespace Xceed.Wpf.Toolkit
         SetValue( DropDownHeightProperty, value );
       }
     }
+    #endregion DropDownHeight
 
+    #region DropDownWidth
     public static readonly DependencyProperty DropDownWidthProperty = DependencyProperty.Register( "DropDownWidth", typeof( double ), typeof( MultiLineTextEditor ), new UIPropertyMetadata( 200.0 ) );
     public double DropDownWidth
     {
@@ -61,6 +64,7 @@ namespace Xceed.Wpf.Toolkit
         SetValue( DropDownWidthProperty, value );
       }
     }
+    #endregion DropDownWidth
 
     #region IsOpen
 
@@ -91,6 +95,7 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //IsOpen
 
+    #region IsSpellCheckEnabled
     public static readonly DependencyProperty IsSpellCheckEnabledProperty = DependencyProperty.Register( "IsSpellCheckEnabled", typeof( bool ), typeof( MultiLineTextEditor ), new UIPropertyMetadata( false ) );
     public bool IsSpellCheckEnabled
     {
@@ -103,7 +108,22 @@ namespace Xceed.Wpf.Toolkit
         SetValue( IsSpellCheckEnabledProperty, value );
       }
     }
+    #endregion IsSpellCheckEnabled
 
+    #region IsReadOnly
+    public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register( "IsReadOnly", typeof( bool ), typeof( MultiLineTextEditor ), new UIPropertyMetadata( false ) );
+    public bool IsReadOnly
+    {
+      get
+      {
+        return ( bool )GetValue( IsReadOnlyProperty );
+      }
+      set
+      {
+        SetValue( IsReadOnlyProperty, value );
+      }
+    }
+    #endregion IsReadOnly
 
     #region Text
 
@@ -134,6 +154,7 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Text
 
+    #region TextAlignment
     public static readonly DependencyProperty TextAlignmentProperty = DependencyProperty.Register( "TextAlignment", typeof( TextAlignment ), typeof( MultiLineTextEditor ), new UIPropertyMetadata( TextAlignment.Left ) );
     public TextAlignment TextAlignment
     {
@@ -146,7 +167,9 @@ namespace Xceed.Wpf.Toolkit
         SetValue( TextAlignmentProperty, value );
       }
     }
+    #endregion TextAlignment
 
+    #region TextWrapping
     public static readonly DependencyProperty TextWrappingProperty = DependencyProperty.Register( "TextWrapping", typeof( TextWrapping ), typeof( MultiLineTextEditor ), new UIPropertyMetadata( TextWrapping.NoWrap ) );
     public TextWrapping TextWrapping
     {
@@ -159,7 +182,7 @@ namespace Xceed.Wpf.Toolkit
         SetValue( TextWrappingProperty, value );
       }
     }
-
+    #endregion TextWrapping
 
     #endregion //Properties
 

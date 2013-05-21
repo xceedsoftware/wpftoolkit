@@ -1,18 +1,18 @@
-﻿/************************************************************************
+﻿/*************************************************************************************
 
    Extended WPF Toolkit
 
-   Copyright (C) 2010-2012 Xceed Software Inc.
+   Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
 
-   Visit http://xceed.com and follow @datagrid on Twitter
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  **********************************************************************/
+  ***********************************************************************************/
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,10 +30,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
   public class PropertyItemCollection : ReadOnlyObservableCollection<PropertyItem>
   {
-    private static readonly string CategoryPropertyName;
-    private static readonly string CategoryOrderPropertyName;
-    private static readonly string PropertyOrderPropertyName;
-    private static readonly string DisplayNamePropertyName;
+    internal static readonly string CategoryPropertyName;
+    internal static readonly string CategoryOrderPropertyName;
+    internal static readonly string PropertyOrderPropertyName;
+    internal static readonly string DisplayNamePropertyName;
 
     private bool _preventNotification;
 
@@ -50,6 +50,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       :base(editableCollection)
     {
       EditableCollection = editableCollection;
+    }
+
+    internal Predicate<object> FilterPredicate
+    {
+      get { return GetDefaultView().Filter; }
+      set { GetDefaultView().Filter = value; }
     }
 
     public ObservableCollection<PropertyItem> EditableCollection { get; private set; }
@@ -71,14 +77,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public void Filter( string text )
     {
-      if( text == null )
-        return;
-
-      GetDefaultView().Filter = ( item ) =>
-      {
-        var property = item as PropertyItem;
-        return property.DisplayName.ToLower().StartsWith( text.ToLower() );
-      };
+      Predicate<object> filter = PropertyItemCollection.CreateFilter( text );
+      GetDefaultView().Filter = filter;
     }
 
     protected override void OnCollectionChanged( NotifyCollectionChangedEventArgs args )
@@ -89,42 +89,42 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       base.OnCollectionChanged( args );
     }
 
-    internal void Update( IEnumerable<PropertyItem> newItems,  bool isCategorized, string filter )
+    internal void UpdateItems( IEnumerable<PropertyItem> newItems )
     {
+      if( newItems == null )
+        throw new ArgumentNullException( "newItems" );
+
+      _preventNotification = true;
       using( GetDefaultView().DeferRefresh() )
       {
-        _preventNotification = true;
-
-        // Replace the collection content with the new items.
-        if( newItems != null )
+        EditableCollection.Clear();
+        foreach( var item in newItems )
         {
-          EditableCollection.Clear();
-          foreach( var item in newItems )
-          {
-            this.EditableCollection.Add( item );
-          }
+          this.EditableCollection.Add( item );
         }
+      }
+      _preventNotification = false;
+      OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
+    }
 
-        // Clear view values
-        ICollectionView view = this.GetDefaultView();
+    internal void UpdateCategorization( GroupDescription groupDescription )
+    {
+      // Clear view values
+      ICollectionView view = this.GetDefaultView();
+      using( view.DeferRefresh() )
+      {
         view.GroupDescriptions.Clear();
         view.SortDescriptions.Clear();
-        view.Filter = null;
 
         // Update view values
-        if( isCategorized )
+        if( groupDescription != null )
         {
-          GroupBy( CategoryPropertyName );
+          view.GroupDescriptions.Add( groupDescription );
           SortBy( CategoryPropertyName, ListSortDirection.Ascending );
         }
 
         SortBy( PropertyOrderPropertyName, ListSortDirection.Ascending );
         SortBy( DisplayNamePropertyName, ListSortDirection.Ascending );
-
-        Filter( filter );
-
-        _preventNotification = false;
-        OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
       }
     }
 
@@ -133,12 +133,25 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       GetDefaultView().Refresh();
     }
 
-    internal static bool IsItemOrderingProperty( string propertyName )
+    internal static Predicate<object> CreateFilter( string text )
     {
-      return string.Equals( propertyName, DisplayNamePropertyName )
-        || string.Equals( propertyName, CategoryPropertyName )
-        || string.Equals( propertyName, CategoryOrderPropertyName )
-        || string.Equals( propertyName, PropertyOrderPropertyName );
+      Predicate<object> filter = null;
+
+      if( !string.IsNullOrEmpty( text ) )
+      {
+        filter = ( item ) =>
+        {
+          var property = item as PropertyItem;
+          if( property.DisplayName != null )
+          {
+            return property.DisplayName.ToLower().StartsWith( text.ToLower() );
+          }
+
+          return false;
+        };
+      }
+
+      return filter;
     }
   }
 }

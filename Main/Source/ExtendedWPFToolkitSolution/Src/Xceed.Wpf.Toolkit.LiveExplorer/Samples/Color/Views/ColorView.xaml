@@ -1,0 +1,187 @@
+﻿<!--*************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Color.Views.ColorView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 Title="Color">
+     <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+            The ColorCanvas and ColorPicker controls allow the user to input a color. Not shown in the sample are the ColorPicker's Available, Standard and Recent color lists, which are entirely customizable.
+        </Paragraph>
+    </local:DemoView.Description>
+
+    <local:DemoView.Resources>
+         <Style x:Key="controlInError" TargetType="xctk:IntegerUpDown">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self},
+                            Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </local:DemoView.Resources>
+   <Grid >
+      <Grid.ColumnDefinitions>
+         <ColumnDefinition Width="*"/>
+         <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <Grid Grid.Column="0" Margin="5">
+         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+         </Grid.RowDefinitions>
+
+         <GroupBox Grid.Column="0" Grid.Row="0"
+            Header="ColorCanvas Features"
+            HorizontalAlignment="Stretch" >
+            <Grid>
+               <Grid.Resources>
+                  <Style x:Key="alignStyle" TargetType="{x:Type FrameworkElement}">
+                     <Setter Property="Margin" Value="5"/>
+                  </Style>
+
+                  <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource alignStyle}"/>
+                  <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource alignStyle}"/>
+                  <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource alignStyle}" />                  
+                  <Style TargetType="{x:Type xctk:IntegerUpDown}" BasedOn="{StaticResource alignStyle}">
+                     <Setter Property="Width" Value="45"/>
+                     <Setter Property="Minimum" Value="0" />
+                     <Setter Property="Maximum" Value="255" />
+                  </Style>                     
+               </Grid.Resources>
+               <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+               </Grid.RowDefinitions>
+               <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="*"/>
+               </Grid.ColumnDefinitions>
+
+               <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                           HorizontalAlignment="Stretch"
+                           Orientation="Horizontal" >
+                  <TextBlock Text="R:"/>
+                  <xctk:IntegerUpDown x:Name="_R" Value="{Binding ElementName=_colorCanvas, Path=R, Mode=TwoWay}" Minimum="0" Maximum="255" Style="{StaticResource controlInError}"/>
+                  <TextBlock Text="G:" Margin="5"/>
+                  <xctk:IntegerUpDown x:Name="_G" Value="{Binding ElementName=_colorCanvas, Path=G, Mode=TwoWay}" Minimum="0" Maximum="255" Style="{StaticResource controlInError}"/>
+                  <TextBlock Text="B:" Margin="5"/>
+                  <xctk:IntegerUpDown x:Name="_B" Value="{Binding ElementName=_colorCanvas, Path=B, Mode=TwoWay}" Minimum="0" Maximum="255" Style="{StaticResource controlInError}"/>
+                  <TextBlock Text="A:" Margin="5"/>
+                  <xctk:IntegerUpDown x:Name="_A" Value="{Binding ElementName=_colorCanvas, Path=A, Mode=TwoWay}" Minimum="0" Maximum="255" Style="{StaticResource controlInError}"/>
+               </StackPanel>
+
+               <TextBlock Grid.Column="0" Grid.Row="1" Text="UsingAlphaChannel: " />
+               <CheckBox Grid.Column="1" Grid.Row="1" x:Name="_usingAlphaChannel" 
+                         IsChecked="{Binding ElementName=_colorCanvas, Path=UsingAlphaChannel, Mode=TwoWay}" />
+               <TextBlock Grid.Column="0" Grid.Row="2" Text="HexadecimalString: " />
+               <TextBox Grid.Column="1" Grid.Row="2"  IsEnabled="False" 
+                        Text="{Binding ElementName=_colorCanvas, Path=HexadecimalString}"/>
+            </Grid>
+         </GroupBox>
+
+         <TextBlock Text="ColorCanvas Usage: " Grid.Row="1" Margin="0,10,0,0" Style="{StaticResource Header}" />
+         <xctk:ColorCanvas x:Name="_colorCanvas" Grid.Row="2" 
+                           VerticalAlignment="Top"
+                           HorizontalAlignment="Stretch" />
+
+      </Grid>
+
+      <Grid Grid.Column="1" Margin="5">
+         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+         </Grid.RowDefinitions>
+
+         <GroupBox Grid.Column="0" Grid.Row="0"
+            Header="ColorPicker Features"
+            HorizontalAlignment="Stretch"
+            Margin="10">
+            <Grid>
+               <Grid.Resources>
+                  <Style TargetType="{x:Type TextBlock}">
+                     <Setter Property="Margin" Value="3" />
+                     <Setter Property="VerticalAlignment" Value="Center" />
+                  </Style>
+                  <Style TargetType="{x:Type TextBox}">
+                     <Setter Property="Margin" Value="3"/>
+                  </Style>
+                  <Style TargetType="{x:Type CheckBox}">
+                     <Setter Property="Margin" Value="3"/>
+                  </Style>
+               </Grid.Resources>
+               <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+               </Grid.RowDefinitions>
+               <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="*"/>
+               </Grid.ColumnDefinitions>
+
+               <TextBlock Grid.Column="0" Grid.Row="0" Text="AvailableColorsHeader:" />
+               <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding ElementName=_colorPicker, Path=AvailableColorsHeader, Mode=TwoWay}" />
+               <TextBlock Grid.Column="0" Grid.Row="1" Text="RecentColorsHeader:" />
+               <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding ElementName=_colorPicker, Path=RecentColorsHeader, Mode=TwoWay}" />
+               <TextBlock Grid.Column="0" Grid.Row="2" Text="StandardColorsHeader:" />
+               <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding ElementName=_colorPicker, Path=StandardColorsHeader, Mode=TwoWay}" />
+
+               <CheckBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" 
+                         Content="DisplayColorAndName" 
+                         IsChecked="{Binding ElementName=_colorPicker, Path=DisplayColorAndName, Mode=TwoWay}"/>
+               <CheckBox Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" 
+                         Content="ShowAdvancedButton" 
+                         IsChecked="{Binding ElementName=_colorPicker, Path=ShowAdvancedButton, Mode=TwoWay}"/>
+               <CheckBox Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2" 
+                         Content="ShowAvailableColors" 
+                         IsChecked="{Binding ElementName=_colorPicker, Path=ShowAvailableColors, Mode=TwoWay}"/>
+               <CheckBox Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2" 
+                         Content="ShowDropDownButton" 
+                         IsChecked="{Binding ElementName=_colorPicker, Path=ShowDropDownButton, Mode=TwoWay}"/>
+               <CheckBox Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2" 
+                         Content="ShowRecentColors" 
+                         IsChecked="{Binding ElementName=_colorPicker, Path=ShowRecentColors, Mode=TwoWay}"/>
+               <CheckBox Grid.Column="0" Grid.Row="8" Grid.ColumnSpan="2" 
+                         Content="ShowStandardColors" 
+                         IsChecked="{Binding ElementName=_colorPicker, Path=ShowStandardColors, Mode=TwoWay}"/>
+               <CheckBox Grid.Column="0" Grid.Row="9" Grid.ColumnSpan="2" 
+                         Content="UsingAlphaChannel" 
+                         IsChecked="{Binding ElementName=_colorPicker, Path=UsingAlphaChannel, Mode=TwoWay}"/>
+               <TextBlock Grid.Column="0" Grid.Row="10" Text="SelectedColorText:" />
+               <TextBox Grid.Column="1" Grid.Row="10" IsEnabled="False" Text="{Binding ElementName=_colorPicker, Path=SelectedColorText}" />
+            </Grid>
+         </GroupBox>
+
+         <TextBlock Text="ColorPicker Usage: " Grid.Row="1"  Style="{StaticResource Header}" />
+         <xctk:ColorPicker x:Name="_colorPicker" Grid.Row="2" VerticalAlignment="Top"/>
+      </Grid>
+   </Grid>
+</local:DemoView>

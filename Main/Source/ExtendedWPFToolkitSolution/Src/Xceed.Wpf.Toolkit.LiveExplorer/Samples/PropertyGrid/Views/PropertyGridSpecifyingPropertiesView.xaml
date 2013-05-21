@@ -1,0 +1,51 @@
+﻿<!--**************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ************************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views.PropertyGridSpecifyingPropertiesView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 xmlns:s="clr-namespace:System;assembly=mscorlib"
+                 VerticalScrollBarVisibility="Disabled"
+                 Title="PropertyGrid Specifying Properties">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+           By default the propertyGrid will autogenerate all the properties for a given object.  You can override this behavior by setting the AutoGenerateProperties property to False, and then provide a collection of PropertyDefinitions of the properties you would like to show.
+        </Paragraph>
+    </local:DemoView.Description>
+
+   <Grid>
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <TextBlock Text="Specifying Properties:" Style="{StaticResource Header}" Margin="10"/>
+      <xctk:PropertyGrid x:Name="_propertyGrid" 
+                         Grid.Row="1"
+                         Width="450" 
+                         MaxHeight="245"
+                         Margin="10"
+                         AutoGenerateProperties="False">
+         <xctk:PropertyGrid.PropertyDefinitions>
+            <!-- The following properties will be displayed in the PropertyGrid -->
+            <xctk:PropertyDefinition TargetProperties="FirstName,FavoriteColor,PetNames" />
+            <!-- And all properties of type Boolean -->
+            <xctk:PropertyDefinition TargetProperties="{x:Type s:Boolean}" />
+         </xctk:PropertyGrid.PropertyDefinitions>
+      </xctk:PropertyGrid>
+   </Grid>
+</local:DemoView>

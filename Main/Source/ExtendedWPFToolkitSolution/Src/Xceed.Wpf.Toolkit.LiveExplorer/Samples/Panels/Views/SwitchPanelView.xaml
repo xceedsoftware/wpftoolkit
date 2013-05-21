@@ -1,0 +1,366 @@
+﻿<!--*************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ************************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Panels.Views.SwitchPanelView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 xmlns:panels="clr-namespace:Xceed.Wpf.Toolkit.Panels;assembly=Xceed.Wpf.Toolkit"
+                 xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Panels.Converters"
+                 xmlns:s="clr-namespace:System;assembly=mscorlib"
+                 VerticalScrollBarVisibility="Disabled"
+                 Title="SwitchPanel">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+            The SwitchPanel allows you to animate the children between different layouts.
+        </Paragraph>
+    </local:DemoView.Description>
+
+   <local:DemoView.Resources>
+      <Style x:Key="panelElement" TargetType="{x:Type TextBlock}">
+         <Setter Property="Background" Value="#FFEFAC27" />
+         <Setter Property="Foreground" Value="White" />
+         <Setter Property="Margin" Value="5" />
+         <Setter Property="Width" Value="100" />
+         <Setter Property="Height" Value="100" />
+         <Setter Property="TextAlignment" Value="Center" />
+      </Style>
+
+      <ObjectDataProvider x:Key="orientationCombo" MethodName="GetValues" ObjectType="{x:Type s:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="Orientation" />
+            </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+
+      <Style x:Key="controlInError" TargetType="Control">
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="true">
+                <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self},
+                        Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+            </Trigger>
+        </Style.Triggers>
+     </Style>
+
+      <Style x:Key="plusSuffix" TargetType="TextBlock">
+          <Setter Property="Margin" Value="5,0,0,0"/>
+          <Setter Property="Text" Value="Plus Only"/>
+          <Setter Property="FontStyle" Value="Italic"/>
+          <Setter Property="FontSize" Value="8"/>
+          <Setter Property="BaselineOffset" Value="7"/>
+          <Setter Property="Foreground" Value="#06b025"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding IsHighlighted, RelativeSource={RelativeSource AncestorType={x:Type ComboBoxItem}}}" Value="True">
+                <Setter Property="Foreground" Value="White"/>
+            </DataTrigger>
+          </Style.Triggers>
+      </Style>
+
+      <Style x:Key="plusItem" TargetType="ComboBoxItem" >
+         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+         <Setter Property="ContentTemplate">
+            <Setter.Value>
+               <DataTemplate>
+                  <DockPanel>
+                     <TextBlock DockPanel.Dock="Left" Text="{Binding}" />
+                     <TextBlock TextAlignment="Right" Style="{StaticResource plusSuffix}" />
+                  </DockPanel>
+               </DataTemplate>
+            </Setter.Value>
+         </Setter>
+      </Style>
+
+      <s:String x:Key="wrapPanelDescription">Positions elements from left to right or up to down depending on the orientation and the available space. Breaks the content at the end of the line to wrap items to the next line.</s:String>
+      <s:String x:Key="randomPanelDescription">This panel lays out its children with a random location and size.</s:String>
+      <s:String x:Key="canvasPanelDescription">Exactly like WPF's native Canvas panel, except that this panel can animate its children and be used inside a SwitchPanel.</s:String>
+      <s:String x:Key="carouselDescription">Positions the elements in a carousel mode with a centered element in front.</s:String>
+      <s:String x:Key="dockPanelDescription">Exactly like WPF's native DockPanel, except that this panel can animate its children and be used inside a SwitchPanel.</s:String>
+      <s:String x:Key="gridDescription">Exactly like WPF's native Grid panel, except that this panel can animate its children and be used inside a SwitchPanel.</s:String>
+      <s:String x:Key="stackPanelDescription">Exactly like WPF's native StackPanel, except this panel can animate its children and be used inside SwitchPanel.</s:String>
+      <s:String x:Key="stackedStackPanelDescription">Lays out children in a series of stacked stackpanels.</s:String>
+      <s:String x:Key="autoStretchStackPanelDescription">This panel stretches the children in the orientation direction so that they completely fill the panel area.</s:String>
+      <s:String x:Key="relativeCanvasDescription">A Panel which is similar to Canvas but it lays out its children relative to the panel's height and width.</s:String>
+      <s:String x:Key="radialCanvasDescription">Lays out its children in a circle based on panel size and/or properties set.</s:String>
+      <s:String x:Key="cameraPanelDescription">"CameraPanel lays out its children in a 3D-like space. You can give the children a 3D location and set the camera position for the panel.</s:String>
+      <s:String x:Key="perspectivePanelDescription">Perspective panel positions its children in a perspective view with the possibility of rotating the background children.</s:String>
+      <s:String x:Key="animatedTimelinePanelDescription">Defines an area where items are positioned on a timeline.</s:String>
+
+            <conv:ComboBoxToVisibilityConverter x:Key="comboBoxToVisibilityConverter" />
+
+
+
+
+
+
+
+
+
+
+
+
+   </local:DemoView.Resources>
+
+   <Grid>
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <GroupBox Header="Features" Grid.Row="0" Margin="5">
+         <Grid Margin="5">
+            <Grid.ColumnDefinitions>
+               <ColumnDefinition Width="Auto" />
+               <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Layout:" Margin="0,0,5,0" />
+            <ComboBox x:Name="layoutCombo" SelectedIndex="0" Width="250" SelectionChanged="OnLayoutComboSelectionChanged">
+               <ComboBoxItem>WrapPanel</ComboBoxItem>
+               <ComboBoxItem>RandomPanel</ComboBoxItem>
+               <ComboBoxItem Style="{StaticResource plusItem}">Canvas</ComboBoxItem>
+               <ComboBoxItem Style="{StaticResource plusItem}">Carousel</ComboBoxItem>
+               <ComboBoxItem Style="{StaticResource plusItem}">DockPanel</ComboBoxItem>
+               <ComboBoxItem Style="{StaticResource plusItem}">Grid</ComboBoxItem>
+               <ComboBoxItem Style="{StaticResource plusItem}">StackPanel</ComboBoxItem>
+               <ComboBoxItem Style="{StaticResource plusItem}">StackedStackPanel</ComboBoxItem>
+               <ComboBoxItem Style="{StaticResource plusItem}">AutoStretchStackPanel</ComboBoxItem>
+               <ComboBoxItem Style="{StaticResource plusItem}">RelativeCanvas</ComboBoxItem>
+               <ComboBoxItem Style="{StaticResource plusItem}">RadialCanvas</ComboBoxItem>
+               <ComboBoxItem Style="{StaticResource plusItem}">CameraPanel</ComboBoxItem>
+               <ComboBoxItem Style="{StaticResource plusItem}">PerspectivePanel</ComboBoxItem>
+               <ComboBoxItem Style="{StaticResource plusItem}">AnimatedTimelinePanel</ComboBoxItem>
+            </ComboBox>
+         </Grid>
+      </GroupBox>
+
+      <Grid Grid.Row="1" Margin="10">
+         <Grid.RowDefinitions >
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+         </Grid.RowDefinitions>
+
+         <TextBlock Grid.Row="0" Text="Usage:" Style="{StaticResource Header}" />
+        <TextBlock Grid.Row="1" Text="Resize the window to see the layout animation." />
+
+        <xctk:SwitchPanel x:Name="_switchPanel" Grid.Row="2" ActiveLayoutIndex="{Binding ElementName=layoutCombo, Path=SelectedIndex}" ActiveLayoutChanged="OnSwitchPanelLayoutChanged">
+            <xctk:SwitchPanel.Layouts>
+               <xctk:WrapPanel x:Name="_wrapPanel" ItemWidth="100" ItemHeight="100"/>
+               <xctk:RandomPanel x:Name="_randomPanel" />
+            </xctk:SwitchPanel.Layouts>
+            <TextBlock x:Name="_item1" Text="Item #1" Style="{StaticResource panelElement}"/>
+            <TextBlock x:Name="_item2" Text="Item #2" Style="{StaticResource panelElement}"/>
+            <TextBlock x:Name="_item3" Text="Item #3" Style="{StaticResource panelElement}"/>
+            <TextBlock x:Name="_item4" Text="Item #4" Style="{StaticResource panelElement}"/>
+            <TextBlock x:Name="_item5" Text="Item #5" Style="{StaticResource panelElement}"/>
+            <TextBlock x:Name="_item6" Text="Item #6" Style="{StaticResource panelElement}"/>
+            <TextBlock x:Name="_item7" Text="Item #7" Style="{StaticResource panelElement}"/>
+            <TextBlock x:Name="_item8" Text="Item #8" Style="{StaticResource panelElement}"/>
+         </xctk:SwitchPanel>
+
+         <Image x:Name="_openSourceScreenShot" Grid.Row="2" Height="250" Visibility="Collapsed" />
+         <TextBlock x:Name="_openSourceScreenShotDesc" Grid.Row="3" TextWrapping="Wrap" Visibility="Collapsed" />
+         <StackPanel x:Name="_openSourceTextHyperlink" Grid.Row="4" Orientation="Horizontal" Visibility="Collapsed">
+             <TextBlock Text="This Panel is only available in the &quot;Plus&quot; version. "/>
+             <TextBlock>
+                 <Hyperlink NavigateUri="http://www.xceed.com/Extended_WPF_Toolkit_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
+                    Click here for more details about Xceed Extended WPF Toolkit Plus.
+                 </Hyperlink>
+             </TextBlock>
+         </StackPanel>
+
+         <GroupBox Header="WrapPanel Toolbox" 
+                   Background="White"
+                   Grid.Row="3" 
+                   Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=0}" 
+                   Margin="10" >
+            <StackPanel>
+                <TextBlock TextWrapping="Wrap"
+                            Text="{StaticResource wrapPanelDescription}" 
+                            Margin="10,0" />
+                <TextBlock TextWrapping="Wrap"
+                            Text="Resize the Window to animate the WrapPanel." 
+                            Margin="10,0" />
+
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Orientation:" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Column="1"
+                              ItemsSource="{Binding Source={StaticResource orientationCombo}}" 
+                              SelectedItem="{Binding Orientation, ElementName=_wrapPanel}"
+                              Width="100"
+                              Height="22"
+                              VerticalAlignment="Center"
+                              Margin="5" />
+                    <TextBlock Grid.Row="1" Text="Is Child Order Reversed:" VerticalAlignment="Center"/>
+                    <CheckBox Grid.Row="1" 
+                              Grid.Column="1" 
+                              IsChecked="{Binding IsChildOrderReversed, ElementName=_wrapPanel}" 
+                              ClickMode="Press" 
+                              VerticalAlignment="Center"
+                              Margin="5"/>
+                    <TextBlock Grid.Column="2" Text="Item Width:" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                    <xctk:DoubleUpDown Grid.Column="3" 
+                                       Value="{Binding ItemWidth, ElementName=_wrapPanel}"
+                                       AllowInputSpecialValues="NaN"
+                                       Width="100"
+                                       Height="20"
+                                       Minimum="0"
+                                       Style="{StaticResource controlInError}"
+                                       VerticalAlignment="Center"
+                                       Margin="5"/>
+                    <TextBlock Grid.Column="2" Grid.Row="1" Text="Item Height:" VerticalAlignment="Center" Margin="10,0,0,0" />
+                    <xctk:DoubleUpDown Grid.Column="3" 
+                                       Grid.Row="1"
+                                       Value="{Binding ItemHeight, ElementName=_wrapPanel}" 
+                                       AllowInputSpecialValues="NaN"
+                                       Width="100"
+                                       Height="20"
+                                       Minimum="0"
+                                       Style="{StaticResource controlInError}"
+                                       VerticalAlignment="Center"
+                                       Margin="5"/>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+
+         <GroupBox Header="RandomPanel Toolbox" 
+                   Background="White"
+                   Grid.Row="3" 
+                   Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=1}" 
+                   Margin="10" >
+            <StackPanel>
+                <TextBlock TextWrapping="Wrap"
+                           Text="{StaticResource randomPanelDescription}" 
+                           Margin="10,0" />
+                <TextBlock TextWrapping="Wrap"
+                           Text="Modify the Minimum and Maximum values to affect the children size." 
+                           Margin="10,0" />
+
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Minimum Width:" VerticalAlignment="Center"/>
+                    <xctk:DoubleUpDown x:Name="_minimumWidth"
+                                       Grid.Column="1"
+                                       Value="{Binding MinimumWidth, ElementName=_randomPanel, ValidatesOnExceptions=True}"
+                                       AllowInputSpecialValues="None"
+                                       Minimum="0"
+                                       Maximum="{Binding Value, ElementName=_maximumWidth}"
+                                       Width="100"
+                                       Height="20"
+                                       Style="{StaticResource controlInError}"
+                                       VerticalAlignment="Center"
+                                       Margin="5" />
+                    <TextBlock Grid.Row="1" Text="Maximum Width:" VerticalAlignment="Center"/>
+                    <xctk:DoubleUpDown x:Name="_maximumWidth"
+                                       Grid.Column="1"
+                                       Grid.Row="1"
+                                       Value="{Binding MaximumWidth, ElementName=_randomPanel, ValidatesOnExceptions=True}"
+                                       AllowInputSpecialValues="None"
+                                       Minimum="{Binding Value, ElementName=_minimumWidth}"
+                                       Maximum="100"
+                                       Width="100"
+                                       Height="20"
+                                       Style="{StaticResource controlInError}"
+                                       VerticalAlignment="Center"
+                                       Margin="5" />
+                    <TextBlock Grid.Column="2" Text="Minimum Height:" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                    <xctk:DoubleUpDown x:Name="_minimumHeight"
+                                       Grid.Column="3" 
+                                       Value="{Binding MinimumHeight, ElementName=_randomPanel, ValidatesOnExceptions=True}"
+                                       AllowInputSpecialValues="None"
+                                       Minimum="0"
+                                       Maximum="{Binding Value, ElementName=_maximumHeight}"
+                                       Width="100"
+                                       Height="20"
+                                       Style="{StaticResource controlInError}"
+                                       VerticalAlignment="Center"
+                                       Margin="5"/>
+                    <TextBlock Grid.Column="2" Grid.Row="1" Text="Maximum Height:" VerticalAlignment="Center" Margin="10,0,0,0" />
+                    <xctk:DoubleUpDown x:Name="_maximumHeight"
+                                       Grid.Column="3" 
+                                       Grid.Row="1"
+                                       Value="{Binding MaximumHeight, ElementName=_randomPanel, ValidatesOnExceptions=True}" 
+                                       AllowInputSpecialValues="None"
+                                       Minimum="{Binding Value, ElementName=_minimumHeight}"
+                                       Maximum="100"
+                                       Width="100"
+                                       Height="20"
+                                       Style="{StaticResource controlInError}"
+                                       VerticalAlignment="Center"
+                                       Margin="5"/>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     </Grid>
+   </Grid>
+</local:DemoView>
