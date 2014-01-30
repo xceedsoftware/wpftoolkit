@@ -63,6 +63,8 @@
                                           AcceptsReturn="False"
                                           Padding="{TemplateBinding Padding}"
                                           SelectAllOnGotFocus="{Binding SelectAllOnGotFocus, RelativeSource={RelativeSource TemplatedParent}}"
+                                          AutoSelectBehavior="{Binding AutoSelectBehavior, RelativeSource={RelativeSource TemplatedParent}}"
+                                          AutoMoveFocus="{Binding AutoMoveFocus, RelativeSource={RelativeSource TemplatedParent}}"
                                           TextAlignment="{Binding TextAlignment, RelativeSource={RelativeSource TemplatedParent}}"
                                           TextWrapping="NoWrap" 
                                           TabIndex="{TemplateBinding TabIndex}"
@@ -118,43 +120,32 @@
    <!-- =============================================================================== -->
    <Style TargetType="{x:Type local:SingleUpDown}" BasedOn="{StaticResource NumericUpDown}" />
 
-   <!-- =============================================================================== -->
-   <!-- Style for all internal derived types of NumericUpDown must have a               -->
-   <!-- ComponentResourceKey key to allow external theme to redefine the default style  -->
-   <!-- (ex. Office2007 theme)                                                          -->
-   <!-- =============================================================================== -->
+   <!-- ===============================================================================   -->
+   <!-- Style for all internal derived types of NumericUpDown will be done in code-behind -->
+   <!-- for external themes to redefine the default style. The reason is that the         -->
+   <!-- toolkit.dll uses the InternalsVisibleTo attribute which makes internal data only  -->
+   <!-- available in code-behind(not xaml).                                               -->        
+   <!-- (ex. Office2007 theme)                                                            -->
+   <!-- ===============================================================================   -->
 
    <!-- =============================================================================== -->
    <!-- SByteUpDown                                                                     -->
    <!-- =============================================================================== -->
-   <Style x:Key="{ComponentResourceKey 
-                  TypeInTargetAssembly={x:Type prim:InputBase}, 
-                  ResourceId=SByteUpDown}" 
-          TargetType="{x:Type prim:InputBase}" BasedOn="{StaticResource NumericUpDown}" />
+   <Style TargetType="{x:Type local:SByteUpDown}" BasedOn="{StaticResource NumericUpDown}" />
 
    <!-- =============================================================================== -->
    <!-- UIntegerUpDown                                                                  -->
    <!-- =============================================================================== -->
-   <Style x:Key="{ComponentResourceKey 
-                  TypeInTargetAssembly={x:Type prim:InputBase}, 
-                  ResourceId=UIntegerUpDown}" 
-          TargetType="{x:Type prim:InputBase}" BasedOn="{StaticResource NumericUpDown}" />
+   <Style TargetType="{x:Type local:UIntegerUpDown}" BasedOn="{StaticResource NumericUpDown}" />
 
    <!-- =============================================================================== -->
    <!-- ULongUpDown                                                                     -->
    <!-- =============================================================================== -->
-   <Style x:Key="{ComponentResourceKey 
-                  TypeInTargetAssembly={x:Type prim:InputBase}, 
-                  ResourceId=ULongUpDown}" 
-          TargetType="{x:Type prim:InputBase}" BasedOn="{StaticResource NumericUpDown}" />
+   <Style TargetType="{x:Type local:ULongUpDown}" BasedOn="{StaticResource NumericUpDown}" />
 
    <!-- =============================================================================== -->
    <!-- UShortUpDown                                                                    -->
    <!-- =============================================================================== -->
-   <Style x:Key="{ComponentResourceKey 
-                  TypeInTargetAssembly={x:Type prim:InputBase}, 
-                  ResourceId=UShortUpDown}" 
-          TargetType="{x:Type prim:InputBase}" BasedOn="{StaticResource NumericUpDown}" />
-
+   <Style TargetType="{x:Type local:UShortUpDown}" BasedOn="{StaticResource NumericUpDown}" />
 
 </ResourceDictionary>

@@ -154,6 +154,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       this.RegenerateProperties();
     }
 
+
+
     private void UpdateFilter()
     {
       FilterInfo filterInfo = PropertyContainer.FilterInfo;
@@ -164,7 +166,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private void UpdateCategorization()
     {
-      _propertyItemCollection.UpdateCategorization( this.ComputeCategoryGroupDescription() );
+      _propertyItemCollection.UpdateCategorization( this.ComputeCategoryGroupDescription(), this.PropertyContainer.IsCategorized );
     }
 
     private GroupDescription ComputeCategoryGroupDescription()
@@ -254,6 +256,47 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         : null;
     }
 
+    internal void InitializeDescriptorDefinition(
+      DescriptorPropertyDefinitionBase descriptorDef,
+      PropertyDefinition propertyDefinition )
+    {
+      if( descriptorDef == null )
+        throw new ArgumentNullException( "descriptorDef" );
+
+      if( propertyDefinition == null )
+        return;
+
+      // Values defined on PropertyDefinition have priority on the attributes
+      if( propertyDefinition != null )
+      {
+        if( propertyDefinition.Category != null )
+        {
+          descriptorDef.Category = propertyDefinition.Category;
+          descriptorDef.CategoryValue = propertyDefinition.Category;
+        }
+
+        if( propertyDefinition.Description != null )
+        {
+          descriptorDef.Description = propertyDefinition.Description;
+        }
+
+        if( propertyDefinition.DisplayName != null )
+        {
+          descriptorDef.DisplayName = propertyDefinition.DisplayName;
+        }
+
+        if( propertyDefinition.DisplayOrder != null )
+        {
+          descriptorDef.DisplayOrder = propertyDefinition.DisplayOrder.Value;
+        }
+
+        if( propertyDefinition.IsExpandable != null )
+        {
+          descriptorDef.ExpandableAttribute = propertyDefinition.IsExpandable.Value;
+        }
+      }
+    }
+
     private void InitializePropertyItem( PropertyItem propertyItem )
     {
       DescriptorPropertyDefinitionBase pd = propertyItem.DescriptorDefinition;
@@ -264,9 +307,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       propertyItem.Description = pd.Description;
       propertyItem.Category = pd.Category;
       propertyItem.PropertyOrder = pd.DisplayOrder;
-      propertyItem.IsExpandable = pd.IsExpandable;
 
       //These properties can vary with the value. They need to be bound.
+      SetupDefinitionBinding( propertyItem, PropertyItemBase.IsExpandableProperty, pd, () => pd.IsExpandable, BindingMode.OneWay );
       SetupDefinitionBinding( propertyItem, PropertyItemBase.AdvancedOptionsIconProperty, pd, () => pd.AdvancedOptionsIcon, BindingMode.OneWay );
       SetupDefinitionBinding( propertyItem, PropertyItemBase.AdvancedOptionsTooltipProperty, pd, () => pd.AdvancedOptionsTooltip, BindingMode.OneWay );
       SetupDefinitionBinding( propertyItem, PropertyItem.ValueProperty, pd, () => pd.Value, BindingMode.TwoWay );
@@ -335,6 +378,24 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       return editorElement;
     }
+
+    internal PropertyDefinition GetPropertyDefinition( PropertyDescriptor descriptor )
+    {
+      PropertyDefinition def = null;
+
+      var propertyDefs = this.PropertyContainer.PropertyDefinitions;
+      if( propertyDefs != null )
+      {
+        def = propertyDefs[ descriptor.Name ];
+        if( def == null )
+        {
+          def = propertyDefs.GetRecursiveBaseTypes( descriptor.PropertyType );
+        }
+      }
+
+      return def;
+    }
+
 
     public override void PrepareChildrenPropertyItem( PropertyItemBase propertyItem, object item )
     {

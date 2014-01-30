@@ -415,6 +415,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
+
     Style IPropertyContainer.PropertyContainerStyle
     {
       get { return this.PropertyContainerStyle; }

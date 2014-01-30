@@ -140,7 +140,7 @@ namespace Xceed.Wpf.AvalonDock.Properties {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Close.
+        ///   Looks up a localized string similar to Hide.
         /// </summary>
         public static string Anchorable_Hide {
             get {

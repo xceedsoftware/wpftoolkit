@@ -19,7 +19,7 @@ using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit.Mag.Converters
 {
-  internal class RadiusConverter : IValueConverter
+  public class RadiusConverter : IValueConverter
   {
     #region IValueConverter Members
 

@@ -21,6 +21,7 @@
                  xmlns:panels="clr-namespace:Xceed.Wpf.Toolkit.Panels;assembly=Xceed.Wpf.Toolkit"
                  xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Panels.Converters"
                  xmlns:s="clr-namespace:System;assembly=mscorlib"
+                 xmlns:view="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Panels.Views"
                  VerticalScrollBarVisibility="Disabled"
                  Title="SwitchPanel">
     <local:DemoView.Description>

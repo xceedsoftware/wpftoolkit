@@ -51,7 +51,7 @@
             <conv:ViewStackCountConverter x:Key="viewStackCountConverter" />
 
             <XmlDataProvider x:Key="Props"
-                             Source="pack://application:,,,/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/Zoombox/Resources/ZoomboxProperties.xml"
+                             Source="../Resources/ZoomboxProperties.xml"
                              XPath="Properties" />
             <Style x:Key="PropertyList"
                    TargetType="{x:Type ItemsControl}">
@@ -484,7 +484,7 @@
          <xctk:Zoombox.ViewStack>
             <xctk:ZoomboxView>Fit</xctk:ZoomboxView>
          </xctk:Zoombox.ViewStack>
-         <Image Source="pack://application:,,,/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/Zoombox/Resources/Default.jpg" />
+         <Image Source="../Resources/Default.jpg" />
 
       </xctk:Zoombox>
    </Grid>

@@ -164,6 +164,11 @@ namespace Xceed.Wpf.AvalonDock
 
         internal const int WA_INACTIVE = 0x0000;
 
+        internal const int WM_SYSCOMMAND = 0x0112;
+        // These are the wParam of WM_SYSCOMMAND
+        internal const int SC_MAXIMIZE = 0xF030;
+        internal const int SC_RESTORE = 0xF120;
+
         internal const int
             WM_CREATE = 0x0001;
 

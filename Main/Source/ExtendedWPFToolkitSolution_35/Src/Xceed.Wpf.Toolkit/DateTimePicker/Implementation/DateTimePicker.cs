@@ -215,11 +215,11 @@ namespace Xceed.Wpf.Toolkit
 
     protected override void OnPreviewMouseUp( MouseButtonEventArgs e )
     {
-      if( Mouse.Captured is CalendarItem )
+      if( Mouse.Captured is CalendarItem)
       {
         Mouse.Capture( null );
 
-        if( AutoCloseCalendar )
+        if( AutoCloseCalendar && ( _calendar.DisplayMode == CalendarMode.Month ) )
         {
           CloseDateTimePicker( true );
         }

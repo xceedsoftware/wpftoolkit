@@ -83,8 +83,6 @@ namespace Xceed.Wpf.DataGrid
     public override void OnApplyTemplate()
     {
       base.OnApplyTemplate();
-
-      ChildCheckBox.Background = new System.Windows.Media.SolidColorBrush( System.Windows.Media.Colors.Blue );
     }
 
     public static readonly RoutedEvent CheckedEvent;

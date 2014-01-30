@@ -174,6 +174,8 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
 
 
+
+
     private void Child_LeftChanged( object sender, EventArgs e )
     {
       WindowControl windowControl = ( WindowControl )sender;
@@ -199,7 +201,12 @@ namespace Xceed.Wpf.Toolkit.Primitives
     private void Child_PreviewMouseLeftButtonDown( object sender, RoutedEventArgs e )
     {
       WindowControl windowControl = ( WindowControl )sender;
-      this.SetNextActiveWindow( windowControl );
+
+      WindowControl modalWindow = this.GetModalWindow();
+      if( modalWindow == null )
+      {
+        this.SetNextActiveWindow( windowControl );
+      }
     }
 
     private void Child_IsModalChanged( object sender, EventArgs e )
@@ -260,9 +267,20 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       foreach( WindowControl windowControl in this.Children )
       {
-        //reposition our windows
-        windowControl.Left = this.GetRestrictedLeft( windowControl );
-        windowControl.Top = this.GetRestrictedTop( windowControl );
+          //reposition our windows
+          windowControl.Left = this.GetRestrictedLeft( windowControl );
+          windowControl.Top = this.GetRestrictedTop( windowControl );
+      }
+    }
+
+    private void ExpandWindowControl( WindowControl windowControl )
+    {
+      if( windowControl != null )
+      {
+        windowControl.Left = 0;
+        windowControl.Top = 0;
+        windowControl.Width = Math.Min( this.ActualWidth, windowControl.MaxWidth );
+        windowControl.Height = Math.Min( this.ActualHeight, windowControl.MaxHeight );
       }
     }
 
@@ -300,19 +318,28 @@ namespace Xceed.Wpf.Toolkit.Primitives
       if( !this.IsLoaded )
         return;
 
-      WindowControl modalWindow = this.GetModalWindow();
-      // Modal window is always in front
-      if( modalWindow != null )
-      {
-        this.BringToFront( modalWindow );
-      }
-      else if( windowControl != null )
+      if( this.IsModalWindow( windowControl ) )
       {
         this.BringToFront( windowControl );
       }
       else
       {
-        this.BringToFront( this.Children.OfType<WindowControl>().FirstOrDefault( (x) => x.Visibility == Visibility.Visible ) );
+        WindowControl modalWindow = this.GetModalWindow();
+        // Modal window is always in front
+        if( modalWindow != null )
+        {
+          this.BringToFront( modalWindow );
+        }
+        else if( windowControl != null )
+        {
+          this.BringToFront( windowControl );
+        }
+        else
+        {
+          this.BringToFront( this.Children.OfType<WindowControl>()
+                            .OrderByDescending( ( x ) => Canvas.GetZIndex( x ) )
+                            .FirstOrDefault( ( x ) => x.Visibility == Visibility.Visible ) );
+        }
       }
     }
 
@@ -322,8 +349,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
       {
         int maxZIndez = this.Children.OfType<WindowControl>().Max( ( x ) => Canvas.GetZIndex( x ) );
         Canvas.SetZIndex( windowControl, maxZIndez + 1 );
-
-        windowControl.Focus();
 
         this.SetActiveWindow( windowControl );
       }
@@ -340,8 +365,8 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     private bool IsModalWindow( WindowControl windowControl )
     {
-      return ( ( windowControl is MessageBox )
-             || ( ( windowControl is ChildWindow ) && ( ( ChildWindow )windowControl ).IsModal ) );
+      return ( ( ( windowControl is MessageBox ) && (windowControl.Visibility == Visibility.Visible) )
+             || ( ( windowControl is ChildWindow ) && ( ( ChildWindow )windowControl ).IsModal && ( ( ChildWindow )windowControl).WindowState == WindowState.Open ) );
     }
 
     private WindowControl GetModalWindow()

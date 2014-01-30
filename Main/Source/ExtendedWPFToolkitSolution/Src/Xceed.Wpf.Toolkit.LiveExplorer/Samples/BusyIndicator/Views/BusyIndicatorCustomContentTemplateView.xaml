@@ -28,7 +28,7 @@
     <local:DemoView.Resources>
       <ResourceDictionary>
          <ResourceDictionary.MergedDictionaries>
-            <ResourceDictionary Source="/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/BusyIndicator/Resources/Common.xaml" />
+            <ResourceDictionary Source="../Resources/Common.xaml" />
          </ResourceDictionary.MergedDictionaries>
       </ResourceDictionary>
    </local:DemoView.Resources>

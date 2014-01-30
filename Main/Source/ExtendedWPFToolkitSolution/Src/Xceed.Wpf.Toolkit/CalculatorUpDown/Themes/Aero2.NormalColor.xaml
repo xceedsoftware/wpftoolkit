@@ -112,6 +112,8 @@
                                                 AcceptsReturn="False"
                                                 Padding="0"
                                                 SelectAllOnGotFocus="{TemplateBinding SelectAllOnGotFocus}"
+                                                AutoSelectBehavior="{TemplateBinding AutoSelectBehavior}"
+                                                AutoMoveFocus="{TemplateBinding AutoMoveFocus}"
                                                 TextAlignment="{TemplateBinding TextAlignment}"
                                                 TextWrapping="NoWrap" 
                                                 TabIndex="{TemplateBinding TabIndex}"

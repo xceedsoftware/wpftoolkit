@@ -68,6 +68,23 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //AllowSpin
 
+    #region ClipValueToMinMax
+
+    public static readonly DependencyProperty ClipValueToMinMaxProperty = DependencyProperty.Register( "ClipValueToMinMax", typeof( bool ), typeof( TimePicker ), new UIPropertyMetadata( false ) );
+    public bool ClipValueToMinMax
+    {
+      get
+      {
+        return ( bool )GetValue( ClipValueToMinMaxProperty );
+      }
+      set
+      {
+        SetValue( ClipValueToMinMaxProperty, value );
+      }
+    }
+
+    #endregion //ClipValueToMinMax
+
     #region EndTime
 
     public static readonly DependencyProperty EndTimeProperty = DependencyProperty.Register( "EndTime", typeof( TimeSpan ), typeof( TimePicker ), new UIPropertyMetadata( EndTimeDefaultValue, new PropertyChangedCallback( OnEndTimeChanged ), new CoerceValueCallback( OnCoerceEndTime ) ) );
@@ -209,6 +226,40 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //IsOpen
+
+    #region Maximum
+
+    public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register( "Maximum", typeof( DateTime? ), typeof( TimePicker ), new UIPropertyMetadata( DateTime.MaxValue ) );
+    public DateTime? Maximum
+    {
+      get
+      {
+        return ( DateTime? )GetValue( MaximumProperty );
+      }
+      set
+      {
+        SetValue( MaximumProperty, value );
+      }
+    }
+
+    #endregion //Maximum
+
+    #region Minimum
+
+    public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register( "Minimum", typeof( DateTime? ), typeof( TimePicker ), new UIPropertyMetadata( DateTime.MinValue ) );
+    public DateTime? Minimum
+    {
+      get
+      {
+        return ( DateTime? )GetValue( MinimumProperty );
+      }
+      set
+      {
+        SetValue( MinimumProperty, value );
+      }
+    }
+
+    #endregion //Minimum
 
     #region ShowButtonSpinner
 

@@ -14,22 +14,17 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Xceed.Wpf.Toolkit.PropertyGrid.Converters;
-using System.Windows;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
-  public abstract class PropertyDefinitionBase : DependencyObject
+  public abstract class PropertyDefinitionBase : DefinitionBase
   {
     private IList _targetProperties;
-    private bool _isLocked;
 
     internal PropertyDefinitionBase()
     {
@@ -42,22 +37,17 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       get { return _targetProperties; }
       set 
       {
-        if( this.IsLocked )
-          throw new InvalidOperationException( @"Cannot modify TargetProperties once the definition has beed added to a collection." );
-
+        this.ThrowIfLocked( () => this.TargetProperties );
         _targetProperties = value; 
       }
     }
 
-    internal bool IsLocked
-    {
-      get{ return _isLocked; }
-    }
-
-    internal virtual void Lock()
+    internal override void Lock()
     {
       if( this.IsLocked )
         return;
+
+      base.Lock();
 
       // Just create a new copy of the properties target to ensure 
       // that the list doesn't ever get modified.
@@ -79,7 +69,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
 
       _targetProperties = new ReadOnlyCollection<object>( newList );
-      _isLocked = true;
     }
   }
 }

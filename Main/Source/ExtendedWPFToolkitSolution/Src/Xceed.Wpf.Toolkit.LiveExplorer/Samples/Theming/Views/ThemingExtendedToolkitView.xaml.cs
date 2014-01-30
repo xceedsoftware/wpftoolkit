@@ -17,6 +17,10 @@
 using System.Diagnostics;
 using System.Windows;
 using System;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Documents;
+
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
 {
@@ -25,10 +29,25 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
   /// </summary>
   public partial class ThemingExtendedToolkitView : DemoView
   {
+
+
+
     public ThemingExtendedToolkitView()
     {
       InitializeComponent();
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

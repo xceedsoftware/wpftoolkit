@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -209,6 +212,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pie\Themes\Aero2.NormalColor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pie\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PropertyGrid\Implementation\Editors\CollectionEditor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -221,7 +232,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="RichTextBoxFormatBar\RichTextBoxFormatBar.xaml">
+    <Page Include="RichTextBoxFormatBar\Themes\Aero2.NormalColor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RichTextBoxFormatBar\Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -369,6 +384,7 @@
     <Compile Include="CollectionControl\Implementation\ItemEventArgs.cs" />
     <Compile Include="CollectionControl\Implementation\PrimitiveTypeCollectionControl.cs" />
     <Compile Include="Core\CancelRoutedEventArgs.cs" />
+    <Compile Include="Core\Converters\CenterTitleConverter.cs" />
     <Compile Include="Core\Converters\ColorBlendConverter.cs" />
     <Compile Include="Core\Converters\WindowContentBorderMarginConverter.cs" />
     <Compile Include="Core\Converters\WindowControlBackgroundConverter.cs" />
@@ -412,6 +428,7 @@
     <Compile Include="Core\Utilities\RoutedEventHelper.cs" />
     <Compile Include="Core\Utilities\WeakEventListener.cs" />
     <Compile Include="Core\Utilities\WindowUtilities.cs" />
+    <Compile Include="Core\VersionResourceDictionary.cs" />
     <Compile Include="Core\WeakCollectionChangedWrapper.cs" />
     <Compile Include="NumericUpDown\Implementation\AllowedSpecialValuesEnum.cs" />
     <Compile Include="Panels\AnimatorConverter.cs" />
@@ -435,7 +452,6 @@
     <Compile Include="Core\PropertyChangedEventHandler.cs" />
     <Compile Include="Core\QueryTextFromValueEventArgs.cs" />
     <Compile Include="Core\QueryValueFromTextEventArgs.cs" />
-    <Compile Include="Core\Themes\StaticResourceKey.cs" />
     <Compile Include="Core\Utilities\CalculatorUtilities.cs" />
     <Compile Include="Core\Utilities\ColorUtilities.cs" />
     <Compile Include="ColorCanvas\Implementation\ColorSpectrumSlider.cs" />
@@ -554,11 +570,10 @@
     <Compile Include="PropertyGrid\Implementation\Commands\PropertyItemCommands.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyGridUtilities.cs" />
     <Compile Include="PropertyGrid\Implementation\ObjectContainerHelper.cs" />
+    <Compile Include="PropertyGrid\Implementation\StringConstants.cs" />
     <Compile Include="PropertyGrid\Implementation\TargetPropertyType.cs" />
     <Compile Include="RichTextBoxFormatBar\IRichTextBoxFormatBar.cs" />
-    <Compile Include="RichTextBoxFormatBar\RichTextBoxFormatBar.xaml.cs">
-      <DependentUpon>RichTextBoxFormatBar.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="RichTextBoxFormatBar\RichTextBoxFormatBar.cs" />
     <Compile Include="RichTextBoxFormatBar\RichTextBoxFormatBarManager.cs" />
     <Compile Include="Core\UIElementAdorner.cs" />
     <Compile Include="RichTextBox\Formatters\ITextFormatter.cs" />
@@ -704,6 +719,9 @@
     <Resource Include="Themes\Generic\Images\restore_inactive.png" />
     <Resource Include="Themes\Generic\Images\restore_normal.png" />
     <Resource Include="Themes\Generic\Images\restore_pressed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PropertyGrid\Implementation\Definitions\DefinitionBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

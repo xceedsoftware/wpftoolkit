@@ -408,6 +408,9 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     private void TextBox_TextChanged( object sender, TextChangedEventArgs e )
     {
+      if( !this.IsKeyboardFocusWithin )
+        return;
+
       try
       {
         _isTextChangedFromUI = true;

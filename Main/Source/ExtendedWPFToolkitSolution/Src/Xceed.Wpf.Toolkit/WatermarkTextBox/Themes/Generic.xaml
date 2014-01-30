@@ -43,7 +43,7 @@
       <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" />
    </DataTemplate>
 
-   <Style TargetType="{x:Type local:WatermarkTextBox}">
+   <Style x:Key="WatermarkTextBox" TargetType="{x:Type local:WatermarkTextBox}">
       <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
       <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
       <Setter Property="BorderBrush" Value="{StaticResource TextBoxBorder}" />
@@ -99,5 +99,7 @@
          </Setter.Value>
       </Setter>
    </Style>
+
+   <Style TargetType="{x:Type local:WatermarkTextBox}" BasedOn="{StaticResource WatermarkTextBox}" />
 
 </ResourceDictionary>

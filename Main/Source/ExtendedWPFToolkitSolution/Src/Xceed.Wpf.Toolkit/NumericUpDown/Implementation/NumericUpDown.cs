@@ -23,24 +23,48 @@ namespace Xceed.Wpf.Toolkit
 {
   public abstract class NumericUpDown<T> : UpDownBase<T>
   {
+#pragma warning disable 0618
+
     #region Properties
 
-    #region ClipValueToMinMax
+    #region AutoMoveFocus
 
-    public static readonly DependencyProperty ClipValueToMinMaxProperty = DependencyProperty.Register( "ClipValueToMinMax", typeof( bool ), typeof( NumericUpDown<T> ), new UIPropertyMetadata(false ) );
-    public bool ClipValueToMinMax
+    public bool AutoMoveFocus
     {
       get
       {
-        return ( bool )GetValue( ClipValueToMinMaxProperty );
+        return ( bool )GetValue( AutoMoveFocusProperty );
       }
       set
       {
-        SetValue( ClipValueToMinMaxProperty, value );
+        SetValue( AutoMoveFocusProperty, value );
       }
     }
 
-    #endregion //ClipValueToMinMax
+    public static readonly DependencyProperty AutoMoveFocusProperty =
+        DependencyProperty.Register( "AutoMoveFocus", typeof( bool ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( false ) );
+
+    #endregion AutoMoveFocus
+
+    #region AutoSelectBehavior
+
+    public AutoSelectBehavior AutoSelectBehavior
+    {
+      get
+      {
+        return ( AutoSelectBehavior )GetValue( AutoSelectBehaviorProperty );
+      }
+      set
+      {
+        SetValue( AutoSelectBehaviorProperty, value );
+      }
+    }
+
+    public static readonly DependencyProperty AutoSelectBehaviorProperty =
+        DependencyProperty.Register( "AutoSelectBehavior", typeof( AutoSelectBehavior ), typeof( NumericUpDown<T> ),
+      new UIPropertyMetadata( AutoSelectBehavior.OnFocus ) );
+
+    #endregion AutoSelectBehavior PROPERTY
 
     #region FormatString
 
@@ -120,101 +144,11 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion
 
-    #region Maximum
+    #region SelectAllOnGotFocus (Obsolete)
 
-    public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register( "Maximum", typeof( T ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( default( T ), OnMaximumChanged, OnCoerceMaximum ) );
-    public T Maximum
-    {
-      get
-      {
-        return ( T )GetValue( MaximumProperty );
-      }
-      set
-      {
-        SetValue( MaximumProperty, value );
-      }
-    }
-
-    private static void OnMaximumChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      NumericUpDown<T> numericUpDown = o as NumericUpDown<T>;
-      if( numericUpDown != null )
-        numericUpDown.OnMaximumChanged( ( T )e.OldValue, ( T )e.NewValue );
-    }
-
-    protected virtual void OnMaximumChanged( T oldValue, T newValue )
-    {
-      if( this.IsInitialized )
-      {
-        SetValidSpinDirection();
-      }
-    }
-
-    private static object OnCoerceMaximum( DependencyObject d, object baseValue )
-    {
-      NumericUpDown<T> numericUpDown = d as NumericUpDown<T>;
-      if( numericUpDown != null )
-        return numericUpDown.OnCoerceMaximum( ( T )baseValue );
-
-      return baseValue;
-    }
-
-    protected virtual T OnCoerceMaximum( T baseValue )
-    {
-      return baseValue;
-    }
-
-    #endregion //Maximum
-
-    #region Minimum
-
-    public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register( "Minimum", typeof( T ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( default( T ), OnMinimumChanged, OnCoerceMinimum ) );
-    public T Minimum
-    {
-      get
-      {
-        return ( T )GetValue( MinimumProperty );
-      }
-      set
-      {
-        SetValue( MinimumProperty, value );
-      }
-    }
-
-    private static void OnMinimumChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      NumericUpDown<T> numericUpDown = o as NumericUpDown<T>;
-      if( numericUpDown != null )
-        numericUpDown.OnMinimumChanged( ( T )e.OldValue, ( T )e.NewValue );
-    }
-
-    protected virtual void OnMinimumChanged( T oldValue, T newValue )
-    {
-      if( this.IsInitialized )
-      {
-        SetValidSpinDirection();
-      }
-    }
-
-    private static object OnCoerceMinimum( DependencyObject d, object baseValue )
-    {
-      NumericUpDown<T> numericUpDown = d as NumericUpDown<T>;
-      if( numericUpDown != null )
-        return numericUpDown.OnCoerceMinimum( ( T )baseValue );
-
-      return baseValue;
-    }
-
-    protected virtual T OnCoerceMinimum( T baseValue )
-    {
-      return baseValue;
-    }
-
-    #endregion //Minimum
-
-    #region SelectAllOnGotFocus
-
+    [Obsolete( "This property is obsolete and should no longer be used. Use NumericUpDown.AutoSelectBehavior instead." )]
     public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register( "SelectAllOnGotFocus", typeof( bool ), typeof( NumericUpDown<T> ), new PropertyMetadata( true ) );
+    [Obsolete( "This property is obsolete and should no longer be used. Use NumericUpDown.AutoSelectBehavior instead." )]
     public bool SelectAllOnGotFocus
     {
       get
@@ -247,4 +181,6 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Methods
   }
+
+#pragma warning restore 0618
 }

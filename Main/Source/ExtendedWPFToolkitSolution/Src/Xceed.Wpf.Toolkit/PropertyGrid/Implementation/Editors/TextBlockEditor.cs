@@ -15,11 +15,17 @@
   ***********************************************************************************/
 
 using System.Windows.Controls;
+using System.Windows;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class TextBlockEditor : TypeEditor<TextBlock>
   {
+    protected override TextBlock CreateEditor()
+    {
+      return new PropertyGridEditorTextBlock();
+    }
+
     protected override void SetValueDependencyProperty()
     {
       ValueProperty = TextBlock.TextProperty;
@@ -28,6 +34,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     protected override void SetControlProperties()
     {
       Editor.Margin = new System.Windows.Thickness( 5, 0, 0, 0 );
+    }
+  }
+
+  public class PropertyGridEditorTextBlock : TextBlock
+  {
+    static PropertyGridEditorTextBlock()
+    {
+      DefaultStyleKeyProperty.OverrideMetadata( typeof( PropertyGridEditorTextBlock ), new FrameworkPropertyMetadata( typeof( PropertyGridEditorTextBlock ) ) );
     }
   }
 }

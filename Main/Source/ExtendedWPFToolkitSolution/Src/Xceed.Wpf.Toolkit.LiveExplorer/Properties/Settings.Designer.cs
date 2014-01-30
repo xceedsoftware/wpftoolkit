@@ -22,5 +22,17 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Properties {
                 return defaultInstance;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string lastSample {
+            get {
+                return ((string)(this["lastSample"]));
+            }
+            set {
+                this["lastSample"] = value;
+            }
+        }
     }
 }

@@ -47,6 +47,5 @@
 
 
 
-
     <Image Source="..\OpenSourceImages\ChartLegend.png" Width="600" Height="400"/>
 </local:DemoView>

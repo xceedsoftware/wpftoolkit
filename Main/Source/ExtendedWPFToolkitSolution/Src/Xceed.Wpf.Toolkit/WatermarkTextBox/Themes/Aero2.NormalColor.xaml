@@ -29,7 +29,7 @@
     <!-- WatermarkTextBox                                                                -->
     <!-- =============================================================================== -->
 
-    <Style TargetType="{x:Type local:WatermarkTextBox}">
+    <Style x:Key="WatermarkTextBox" TargetType="{x:Type local:WatermarkTextBox}">
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
         <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
         <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
@@ -81,5 +81,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+   <Style TargetType="{x:Type local:WatermarkTextBox}" BasedOn="{StaticResource WatermarkTextBox}" />
 
 </ResourceDictionary>

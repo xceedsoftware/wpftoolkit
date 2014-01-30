@@ -36,22 +36,31 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         #region Title
 
-        private string _title = null;
+        public static readonly DependencyProperty TitleProperty =
+            DependencyProperty.Register( "Title", typeof( string ), typeof( LayoutContent ), new UIPropertyMetadata( null, OnTitlePropertyChanged, CoerceTitleValue ) );
+
         public string Title
         {
-            get { return _title; }
-            set
-            {
-                if (_title != value)
-                {
-                    RaisePropertyChanging("Title");
-                    _title = value;
-                    RaisePropertyChanged("Title");
-                }
-            }
+          get { return ( string )GetValue( TitleProperty ); }
+          set { SetValue( TitleProperty, value ); }
         }
 
-        #endregion
+        private static object CoerceTitleValue( DependencyObject obj, object value )
+        {
+          var lc = ( LayoutContent )obj;
+          if( ( ( string )value ) != lc.Title )
+          {
+            lc.RaisePropertyChanging( LayoutContent.TitleProperty.Name );
+          }
+          return value;
+        }
+
+        private static void OnTitlePropertyChanged( DependencyObject obj, DependencyPropertyChangedEventArgs args )
+        {
+          ( ( LayoutContent )obj ).RaisePropertyChanged( LayoutContent.TitleProperty.Name );
+        }
+
+        #endregion //Title
 
         #region Content
         [NonSerialized]
@@ -326,20 +335,22 @@ namespace Xceed.Wpf.AvalonDock.Layout
             return true;
         }
 
+        internal void CloseInternal()
+        {
+          var root = Root;
+          var parentAsContainer = Parent as ILayoutContainer;
+          parentAsContainer.RemoveChild( this );
+          if( root != null )
+            root.CollectGarbage();
+
+          OnClosed();
+        }
+
         /// <summary>
         /// Close the content
         /// </summary>
         /// <remarks>Please note that usually the anchorable is only hidden (not closed). By default when user click the X button it only hides the content.</remarks>
-        public void Close()
-        {
-            var root = Root;
-            var parentAsContainer = Parent as ILayoutContainer;
-            parentAsContainer.RemoveChild(this);
-            if (root != null)
-                root.CollectGarbage();
-
-            OnClosed();
-        }
+        public abstract void Close();
 
         /// <summary>
         /// Event fired when the content is closed (i.e. removed definitely from the layout)

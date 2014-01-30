@@ -37,5 +37,5 @@
 
 
 
-    <Image Source="..\OpenSourceImages\MultiSelectedObjects.png" Width="700" Height="450"/>
+    <Image Source="..\OpenSourceImages\MultiSelectedObjects.png" Width="660" Height="430"/>
 </local:DemoView>

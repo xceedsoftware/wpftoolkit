@@ -77,16 +77,16 @@
             <TextBlock Text="Caption:" Margin="2" VerticalAlignment="Center" />
             <TextBox Name="_txtCaption" Grid.Column="1" Margin="5" Text="ChildWindow" Width="150" VerticalAlignment="Center" />
 
-            <TextBlock Grid.Row="1" Name="textBlock2" Text="Left:" Margin="2" VerticalAlignment="Center" />
+            <TextBlock Grid.Row="1" Name="textBlock2" Text="Left:" Margin="2" VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_txtLeft}" Style="{StaticResource DisableGrayText}"/>
             <xctk:DoubleUpDown x:Name="_txtLeft" Grid.Column="1" Grid.Row="1" Value="0" Minimum="0" VerticalAlignment="Center" Margin="5" IsEnabled="{Binding SelectedIndex, ElementName=_cboWindowStartupLocations}"/>
 
-            <TextBlock Grid.Row="2" Name="textBlock3" Text="Top:" Margin="2" VerticalAlignment="Center" />
+            <TextBlock Grid.Row="2" Name="textBlock3" Text="Top:" Margin="2" VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_txtTop}" Style="{StaticResource DisableGrayText}"/>
             <xctk:DoubleUpDown x:Name="_txtTop" Grid.Column="1" Grid.Row="2" Value="0" Minimum="0" VerticalAlignment="Center" Margin="5" IsEnabled="{Binding SelectedIndex, ElementName=_cboWindowStartupLocations}"/>
 
             <TextBlock Text="IsModal:" VerticalAlignment="Center" Margin="10,2,2,2" Grid.Column="2" />
             <CheckBox x:Name="_chkIsModal" Grid.Column="3" VerticalAlignment="Center" Margin="5" IsChecked="True" />
 
-            <TextBlock Grid.Row="1" Text="WindowStartupLocation:" VerticalAlignment="Center" Margin="10,2,2,2" Grid.Column="2" />
+            <TextBlock Grid.Row="1" Text="WindowStartupLocation:" VerticalAlignment="Center" Margin="10,2,2,2" Grid.Column="2"  IsEnabled="{Binding IsEnabled, ElementName=_cboWindowStartupLocations}" Style="{StaticResource DisableGrayText}"/>
             <ComboBox Grid.Column="3" Grid.Row="1" Name="_cboWindowStartupLocations" ItemsSource="{Binding Source={StaticResource WindowStartupLocations}}" SelectedIndex="1" VerticalAlignment="Center" Width="70" Margin="5" IsEnabled="{Binding SelectedIndex, ElementName=_cboWindowState, Converter={StaticResource IntToBoolConverter}}"/>
 
             <TextBlock Grid.Row="2" Text="WindowState:" VerticalAlignment="Center" Margin="10,2,2,2" Grid.Column="2" />
@@ -95,7 +95,7 @@
       </GroupBox>
 
       <Grid Grid.Row="1" Margin="10">
-        <xctk:WindowContainer Background="Transparent" ModalBackgroundBrush="LightGray">
+        <xctk:WindowContainer ModalBackgroundBrush="LightGray">
             <xctk:ChildWindow x:Name="_childWindow"
                            Width="350"
                            Height="220"

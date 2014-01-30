@@ -623,6 +623,13 @@ namespace Xceed.Wpf.AvalonDock.Layout
             base.WriteXml(writer);
         }
 
+        public override void Close()
+        {
+          var dockingManager = this.Root.Manager;
+          if( ( this.Root != null ) && ( this.Root.Manager != null ) )
+            dockingManager._ExecuteCloseCommand( this );
+        }
+
 
 #if TRACE
         public override void ConsoleDump(int tab)

@@ -21,9 +21,11 @@
                  xmlns:sys="clr-namespace:System;assembly=mscorlib"
                  xmlns:view="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views"
                  Title="Theming Core WPF Controls">
+
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-            <Run>Changes the themes of the WPF controls. The Xceed.Wpf.Themes.Office2007.dll and Xceed.Wpf.Themes.dll assemblies are necessary to use the themes.</Run>
+           <!--//# TODODOC -->
+            <Run>Changes the themes of the WPF controls. Available themes are System, Office2007 and Metro with accent color. The Xceed.Wpf.Themes.Office2007.dll or Xceed.Wpf.Themes.Metro.dll assemblies are necessary to use the themes.</Run>
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
@@ -32,6 +34,11 @@
             </Hyperlink>
         </Paragraph>
     </local:DemoView.Description>
+
+
+
+
+
 
 
 

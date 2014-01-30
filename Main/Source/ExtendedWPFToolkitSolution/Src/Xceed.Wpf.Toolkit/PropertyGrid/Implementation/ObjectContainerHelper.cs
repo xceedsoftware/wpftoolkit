@@ -56,53 +56,25 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         try
         {
           List<PropertyDescriptor> descriptors = ObjectContainerHelperBase.GetPropertyDescriptors( SelectedObject );
-          if( !PropertyContainer.AutoGenerateProperties )
+          foreach( var descriptor in descriptors )
           {
-            List<PropertyDescriptor> specificProperties = new List<PropertyDescriptor>();
-            if( PropertyContainer.PropertyDefinitions != null )
+            var propertyDef = this.GetPropertyDefinition( descriptor );
+            bool isBrowsable = descriptor.IsBrowsable && this.PropertyContainer.AutoGenerateProperties;
+            if( propertyDef != null )
             {
-              foreach( PropertyDefinition pd in PropertyContainer.PropertyDefinitions )
-              {
-                foreach( object targetProperty in pd.TargetProperties )
-                {
-                  PropertyDescriptor descriptor = null;
-                  // If the target is a string, compare it with the property name.
-                  var propName = targetProperty as string;
-                  if( propName != null )
-                  {
-                    descriptor = descriptors.FirstOrDefault( d => d.Name == propName );
-                  }
-
-                  // If the target is a Type, compare it with the property type.
-                  var propType = targetProperty as Type;
-                  if( propType != null )
-                  {
-                    descriptor = descriptors.FirstOrDefault( d => d.PropertyType == propType );
-                  }
-
-                  if( descriptor != null )
-                  {
-                    specificProperties.Add( descriptor );
-                    descriptors.Remove( descriptor );
-                  }
-                }
-              }
+              isBrowsable = propertyDef.IsBrowsable.GetValueOrDefault( isBrowsable );
             }
-
-            descriptors = specificProperties;
-          }
-
-          foreach( PropertyDescriptor descriptor in descriptors )
-          {
-            if( descriptor.IsBrowsable )
+            if( isBrowsable )
             {
-              propertyItems.Add( CreatePropertyItem( descriptor ) );
+              propertyItems.Add( this.CreatePropertyItem( descriptor, propertyDef ) );
             }
           }
         }
-        catch( Exception )
+        catch( Exception e )
         {
           //TODO: handle this some how
+          Debug.WriteLine( "Property creation failed" );
+          Debug.WriteLine( e.StackTrace );
         }
       }
 
@@ -110,20 +82,43 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
 
-    private PropertyItem CreatePropertyItem( PropertyDescriptor property )
+    private PropertyItem CreatePropertyItem( PropertyDescriptor property, PropertyDefinition propertyDef )
     {
-      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property, SelectedObject );
+      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property, SelectedObject, this.PropertyContainer.IsCategorized );
       definition.InitProperties();
+
+      this.InitializeDescriptorDefinition( definition, propertyDef );
+
       PropertyItem propertyItem = new PropertyItem( definition );
       Debug.Assert( SelectedObject != null );
       propertyItem.Instance = SelectedObject;
+      propertyItem.CategoryOrder = this.GetCategoryOrder( definition.CategoryValue );
+
       return propertyItem;
     }
 
+    private int GetCategoryOrder( object categoryValue )
+    {
+      Debug.Assert( SelectedObject != null );
 
+      if( categoryValue == null )
+        return int.MaxValue;
 
+      int order = int.MaxValue;
+        object selectedObject = SelectedObject;
+        CategoryOrderAttribute[] orderAttributes = ( selectedObject != null )
+          ? ( CategoryOrderAttribute[] )selectedObject.GetType().GetCustomAttributes( typeof( CategoryOrderAttribute ), true )
+          : new CategoryOrderAttribute[ 0 ];
 
+        var orderAttribute = orderAttributes
+          .FirstOrDefault( ( a ) => object.Equals( a.CategoryValue, categoryValue ) );
 
+        if( orderAttribute != null )
+        {
+          order = orderAttribute.Order;
+        }
 
+      return order;
+    }
   }
 }

@@ -52,7 +52,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private int _initializationCount;
     private ContainerHelperBase _containerHelper;
     private PropertyDefinitionCollection _propertyDefinitions;
-    private EditorDefinitionCollection _editorDefinitions;
+    private EditorDefinitionCollection _editorDefinitions;    
     private WeakEventListener<NotifyCollectionChangedEventArgs> _propertyDefinitionsListener;
     private WeakEventListener<NotifyCollectionChangedEventArgs> _editorDefinitionsListener;
 
@@ -224,6 +224,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
     #endregion //IsCategorized
+
+
+
 
 
 
@@ -510,6 +513,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
+
     #region SelectedPropertyItem
 
     private static readonly DependencyPropertyKey SelectedPropertyItemPropertyKey = DependencyProperty.RegisterReadOnly( "SelectedPropertyItem", typeof( PropertyItemBase ), typeof( PropertyGrid ), new UIPropertyMetadata( null, OnSelectedPropertyItemChanged ) );
@@ -668,10 +672,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     public PropertyGrid()
     {
       _propertyDefinitionsListener = new WeakEventListener<NotifyCollectionChangedEventArgs>( this.OnPropertyDefinitionsCollectionChanged );
-      _editorDefinitionsListener = new WeakEventListener<NotifyCollectionChangedEventArgs>( this.OnEditorDefinitionsCollectionChanged);
+      _editorDefinitionsListener = new WeakEventListener<NotifyCollectionChangedEventArgs>( this.OnEditorDefinitionsCollectionChanged);     
       UpdateContainerHelper();
       EditorDefinitions = new EditorDefinitionCollection();
-      PropertyDefinitions = new PropertyDefinitionCollection();
+      PropertyDefinitions = new PropertyDefinitionCollection();      
 
       AddHandler( PropertyItemBase.ItemSelectionChangedEvent, new RoutedEventHandler( OnItemSelectionChanged ) );
       AddHandler( PropertyItemsControl.PreparePropertyItemEvent, new PropertyItemEventHandler( OnPreparePropertyItemInternal ) );
@@ -826,6 +830,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       // will be different when the property parent is updated.
       this.Notify( this.PropertyChanged, () => this.Properties );
     }
+
+
 
 
 

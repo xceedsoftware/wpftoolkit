@@ -365,7 +365,10 @@ namespace Xceed.Wpf.Toolkit
       this.UpdateBlockMouseInputsPanel();
 
       _windowRoot = this.GetTemplateChild( PART_WindowRoot ) as Grid;
-      _windowRoot.RenderTransform = _moveTransform;
+      if( _windowRoot != null )
+      {
+        _windowRoot.RenderTransform = _moveTransform;
+      }
       _hasWindowContainer = ( VisualTreeHelper.GetParent( this ) as WindowContainer ) != null;
 
       if( !_hasWindowContainer )
@@ -398,7 +401,7 @@ namespace Xceed.Wpf.Toolkit
 #if VS2008
       FocusVisualStyle = null;
 #else
-        Style focusStyle = _root.Resources[ "FocusVisualStyle" ] as Style;
+        Style focusStyle = ( _root != null ) ? _root.Resources[ "FocusVisualStyle" ] as Style : null;
         if( focusStyle != null )
         {
           Setter focusStyleDataContext = new Setter( Control.DataContextProperty, this );
@@ -406,7 +409,10 @@ namespace Xceed.Wpf.Toolkit
           FocusVisualStyle = focusStyle;
         }
 #endif
-        _root.Children.Add( _modalLayerPanel );
+        if( _root != null )
+        {
+          _root.Children.Add( _modalLayerPanel );
+        }
       }
     }
 
@@ -627,7 +633,7 @@ namespace Xceed.Wpf.Toolkit
       if( Left < 0 )
         return 0;
 
-      if( _parentContainer != null )
+      if( ( _parentContainer != null ) && (_windowRoot != null) )
       {
         if( Left + _windowRoot.ActualWidth > _parentContainer.ActualWidth && _parentContainer.ActualWidth != 0 )
         {
@@ -645,7 +651,7 @@ namespace Xceed.Wpf.Toolkit
       if( Top < 0 )
         return 0;
 
-      if( _parentContainer != null )
+      if( ( _parentContainer != null ) && ( _windowRoot != null ) )
       {
         if( Top + _windowRoot.ActualHeight > _parentContainer.ActualHeight && _parentContainer.ActualHeight != 0 )
         {
@@ -735,7 +741,7 @@ namespace Xceed.Wpf.Toolkit
     [Obsolete( "This method is obsolete and should no longer be used. Use WindowContainer.CenterChild() instead." )]
     private void CenterChildWindow()
     {
-      if( _parentContainer != null )
+      if( ( _parentContainer != null ) && ( _windowRoot != null ) )
       {
         Left = ( _parentContainer.ActualWidth - _windowRoot.ActualWidth ) / 2.0;
         Top = ( _parentContainer.ActualHeight - _windowRoot.ActualHeight ) / 2.0;

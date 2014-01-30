@@ -478,24 +478,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
             return base.ArrangeOverride(finalSize);// new Size(_internalHostPresenter.ActualWidth, _internalHostPresenter.ActualHeight);
         }
 
-        WeakReference _lastFocusedElement = null;
-        protected override void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
-        {
-            base.OnGotKeyboardFocus(e);
-            if (!e.Handled && _internalHostPresenter != null)
-            {
-                if (e.NewFocus == _internalHostPresenter)
-                {
-                    var elementToFocus = _lastFocusedElement.GetValueOrDefault<IInputElement>();
-                    if (elementToFocus != null)
-                        Keyboard.Focus(elementToFocus);
-                    e.Handled = true;
-                }
-                else
-                    _lastFocusedElement = new WeakReference(e.NewFocus);
-            }
-        }
-
         #region Background
 
         /// <summary>

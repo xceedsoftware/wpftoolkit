@@ -23,7 +23,48 @@ namespace Xceed.Wpf.Toolkit
 {
   public abstract class NumericUpDown<T> : UpDownBase<T>
   {
+#pragma warning disable 0618
+
     #region Properties
+
+    #region AutoMoveFocus
+
+    public bool AutoMoveFocus
+    {
+      get
+      {
+        return ( bool )GetValue( AutoMoveFocusProperty );
+      }
+      set
+      {
+        SetValue( AutoMoveFocusProperty, value );
+      }
+    }
+
+    public static readonly DependencyProperty AutoMoveFocusProperty =
+        DependencyProperty.Register( "AutoMoveFocus", typeof( bool ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( false ) );
+
+    #endregion AutoMoveFocus
+
+    #region AutoSelectBehavior
+
+    public AutoSelectBehavior AutoSelectBehavior
+    {
+      get
+      {
+        return ( AutoSelectBehavior )GetValue( AutoSelectBehaviorProperty );
+      }
+      set
+      {
+        SetValue( AutoSelectBehaviorProperty, value );
+      }
+    }
+
+    public static readonly DependencyProperty AutoSelectBehaviorProperty =
+        DependencyProperty.Register( "AutoSelectBehavior", typeof( AutoSelectBehavior ), typeof( NumericUpDown<T> ),
+      new UIPropertyMetadata( AutoSelectBehavior.OnFocus ) );
+
+    #endregion AutoSelectBehavior PROPERTY
 
     #region ClipValueToMinMax
 
@@ -212,9 +253,11 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Minimum
 
-    #region SelectAllOnGotFocus
+    #region SelectAllOnGotFocus (Obsolete)
 
+    [Obsolete( "This property is obsolete and should no longer be used. Use NumericUpDown.AutoSelectBehavior instead." )]
     public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register( "SelectAllOnGotFocus", typeof( bool ), typeof( NumericUpDown<T> ), new PropertyMetadata( true ) );
+    [Obsolete( "This property is obsolete and should no longer be used. Use NumericUpDown.AutoSelectBehavior instead." )]
     public bool SelectAllOnGotFocus
     {
       get
@@ -247,4 +290,6 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Methods
   }
+
+#pragma warning restore 0618
 }

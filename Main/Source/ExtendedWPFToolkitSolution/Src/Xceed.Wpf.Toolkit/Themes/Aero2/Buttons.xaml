@@ -19,7 +19,8 @@
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
                     xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes">
 
-    <Style x:Key="{x:Static themes:ResourceKeys.SpinnerButtonStyleKey}" TargetType="RepeatButton">
+    <Style x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=SpinnerButtonStyleKey}" 
+           TargetType="RepeatButton">
         <Setter Property="Background" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalBackgroundKey}}" />
         <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalOuterBorderKey}}" />
         <Setter Property="BorderThickness" Value="1" />

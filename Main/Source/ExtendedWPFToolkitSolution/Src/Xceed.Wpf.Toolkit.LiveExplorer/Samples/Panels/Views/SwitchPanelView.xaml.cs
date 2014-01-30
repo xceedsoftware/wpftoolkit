@@ -150,11 +150,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Panels.Views
 
 
 
-
-
-
-
-
     #endregion 
 
     #region Methods (Private)
@@ -187,8 +182,27 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Panels.Views
 
 
 
-
     #endregion
 
+  }
+
+
+  public class Coordinates
+  {
+    public double X
+    {
+      get;
+      set;
+    }
+    public double Y
+    {
+      get;
+      set;
+    }
+
+    public override string ToString()
+    {
+      return "(" + this.X + ", " + this.Y + ")";
+    }
   }
 }

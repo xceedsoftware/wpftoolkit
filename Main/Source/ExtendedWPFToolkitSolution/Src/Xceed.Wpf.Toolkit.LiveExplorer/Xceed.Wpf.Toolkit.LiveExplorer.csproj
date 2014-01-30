@@ -181,6 +181,7 @@
     <Compile Include="Samples\DataGrid\Views\MultiColumnComboBoxView.xaml.cs">
       <DependentUpon>MultiColumnComboBoxView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Samples\DateTime\Converters\CustomFormatToBoolConverter.cs" />
     <Compile Include="Samples\DateTime\Converters\DateTimeToTimeSpanConverter.cs" />
     <Compile Include="Samples\DateTime\Views\DateTimeView.xaml.cs">
       <DependentUpon>DateTimeView.xaml</DependentUpon>
@@ -288,6 +289,9 @@
       <DependentUpon>WatermarkTextboxView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Samples\Theming\Converters\FlagPathConverter.cs" />
+    <Compile Include="Samples\Theming\Views\ThemingAvalonDockView.xaml.cs">
+      <DependentUpon>ThemingAvalonDockView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Samples\Theming\Views\ThemingCoreWPFView.xaml.cs">
       <DependentUpon>ThemingCoreWPFView.xaml</DependentUpon>
     </Compile>
@@ -328,6 +332,11 @@
     <Compile Include="Samples\Zoombox\Converters\ViewStackCountConverter.cs" />
     <Compile Include="Samples\Zoombox\Views\ZoomboxView.xaml.cs">
       <DependentUpon>ZoomboxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\NorthwindDataService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.datasvcmap</DependentUpon>
     </Compile>
     <Page Include="HomeView.xaml">
       <SubType>Designer</SubType>
@@ -561,6 +570,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Samples\Theming\Views\ThemingAvalonDockView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Samples\Theming\Views\ThemingCoreWPFView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -636,6 +649,7 @@
       <LastGenOutput>DisplayLocalizationRes.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <None Include="app.config" />
     <None Include="Properties\app.manifest">
       <SubType>Designer</SubType>
     </None>
@@ -644,6 +658,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Service References\NorthwindDataService\service.edmx" />
     <Resource Include="Samples\Magnifier\Resources\SampleText.rtf" />
   </ItemGroup>
   <ItemGroup>
@@ -705,9 +720,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\PropertyGrid\OpenSourceImages\Localization.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Samples\PropertyGrid\OpenSourceImages\CategoryOrdering.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\PropertyGrid\OpenSourceImages\MultiSelectedObjects.png" />
@@ -804,10 +816,182 @@
   <ItemGroup>
     <Resource Include="Samples\Text\Resources\PencilTool16.png" />
   </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ServiceReferenceMetadataStorage Include="Service References\NorthwindDataService\">
+      <Type>datasvcmap</Type>
+    </ServiceReferenceMetadataStorage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\NorthwindDataService\Reference.datasvcmap">
+      <Generator>DataServiceClientGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\AutoSelectTextboxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\AutoSelectTextboxView.xaml.txt" />
+    <Resource Include="CodeFiles\AvalonDockView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\AvalonDockView.xaml.txt" />
+    <Resource Include="CodeFiles\BusyIndicatorCustomContentTemplateView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\BusyIndicatorCustomContentTemplateView.xaml.txt" />
+    <Resource Include="CodeFiles\BusyIndicatorCustomContentView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\BusyIndicatorCustomContentView.xaml.txt" />
+    <Resource Include="CodeFiles\BusyIndicatorView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\BusyIndicatorView.xaml.txt" />
+    <Resource Include="CodeFiles\ButtonSpinnerView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ButtonSpinnerView.xaml.txt" />
+    <Resource Include="CodeFiles\CalculatorView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\CalculatorView.xaml.txt" />
+    <Resource Include="CodeFiles\ChartAxisView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ChartAxisView.xaml.txt" />
+    <Resource Include="CodeFiles\ChartLegendView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ChartLegendView.xaml.txt" />
+    <Resource Include="CodeFiles\ChartSeriesBasicTypesView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ChartSeriesBasicTypesView.xaml.txt" />
+    <Resource Include="CodeFiles\ChartSeriesDataPointsBindingView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ChartSeriesDataPointsBindingView.xaml.txt" />
+    <Resource Include="CodeFiles\ChartStylingAxesGridView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ChartStylingAxesGridView.xaml.txt" />
+    <Resource Include="CodeFiles\ChartStylingColumnSeriesView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ChartStylingColumnSeriesView.xaml.txt" />
+    <Resource Include="CodeFiles\ChartStylingLineSeriesView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ChartStylingLineSeriesView.xaml.txt" />
+    <Resource Include="CodeFiles\ChartStylingPieSeriesView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ChartStylingPieSeriesView.xaml.txt" />
+    <Resource Include="CodeFiles\CheckListsView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\CheckListsView.xaml.txt" />
+    <Resource Include="CodeFiles\ChildWindowView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ChildWindowView.xaml.txt" />
+    <Resource Include="CodeFiles\ColorView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ColorView.xaml.txt" />
+    <Resource Include="CodeFiles\DataGridView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\DataGridView.xaml.txt" />
+    <Resource Include="CodeFiles\DateTimeView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\DateTimeView.xaml.txt" />
+    <Resource Include="CodeFiles\DisplayLocalizationRes.Designer.cs.txt" />
+    <Resource Include="CodeFiles\DropDownSplitButtonView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\DropDownSplitButtonView.xaml.txt" />
+    <Resource Include="CodeFiles\ListBoxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ListBoxView.xaml.txt" />
+    <Resource Include="CodeFiles\MagnifierView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MagnifierView.xaml.txt" />
+    <Resource Include="CodeFiles\MaskedTextboxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaskedTextboxView.xaml.txt" />
+    <Resource Include="CodeFiles\MultiColumnComboBoxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MultiColumnComboBoxView.xaml.txt" />
+    <Resource Include="CodeFiles\MultiLineTextEditorView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MultiLineTextEditorView.xaml.txt" />
+    <Resource Include="CodeFiles\NumericView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\NumericView.xaml.txt" />
+    <Resource Include="CodeFiles\PieChartView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PieChartView.xaml.txt" />
+    <Resource Include="CodeFiles\PieProgressView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PieProgressView.xaml.txt" />
+    <Resource Include="CodeFiles\PieView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PieView.xaml.txt" />
+    <Resource Include="CodeFiles\PileFlowPanelView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PileFlowPanelView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridAttributesView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridAttributesView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridBindingToStructsView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridBindingToStructsView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridCategoryOrderView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridCategoryOrderView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridCustomEditorsView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridCustomEditorsView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridCustomPropertyView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridCustomPropertyView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridDefaultEditorsView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridDefaultEditorsView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridDefinitionKeyView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridDefinitionKeyView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridDisplayLocalizationView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridDisplayLocalizationView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridEditorDefinitionsView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridEditorDefinitionsView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridMultiSelectedObjectsView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridMultiSelectedObjectsView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridPropertiesSourceView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridPropertiesSourceView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridPropertiesView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridPropertiesView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridPropertyItemStyleView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridPropertyItemStyleView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridSelectedObjectView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridSelectedObjectView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridSpecifyingPropertiesView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridSpecifyingPropertiesView.xaml.txt" />
+    <Resource Include="CodeFiles\PropertyGridView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridView.xaml.txt" />
+    <Resource Include="CodeFiles\RichTextboxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\RichTextboxView.xaml.txt" />
+    <Resource Include="CodeFiles\StylableWindowView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\StylableWindowView.xaml.txt" />
+    <Resource Include="CodeFiles\SwitchPanelView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\SwitchPanelView.xaml.txt" />
+    <Resource Include="CodeFiles\ThemingCoreWPFView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ThemingCoreWPFView.xaml.txt" />
+    <Resource Include="CodeFiles\ThemingDataGridView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ThemingDataGridView.xaml.txt" />
+    <Resource Include="CodeFiles\ThemingExtendedToolkitView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ThemingExtendedToolkitView.xaml.txt" />
+    <Resource Include="CodeFiles\ThemingListBoxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ThemingListBoxView.xaml.txt" />
+    <Resource Include="CodeFiles\TimelinePanelView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\TimelinePanelView.xaml.txt" />
+    <Resource Include="CodeFiles\WatermarkTextboxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\WatermarkTextboxView.xaml.txt" />
+    <Resource Include="CodeFiles\WindowContainerView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\WindowContainerView.xaml.txt" />
+    <Resource Include="CodeFiles\WizardView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\WizardView.xaml.txt" />
+    <Resource Include="CodeFiles\ZoomboxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ZoomboxView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\Images\address-book--pencil.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\Images\property-blue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\Images\address-book-open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\Images\alarm-clock-blue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\Images\document.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\ThemingAvalonDockView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ThemingAvalonDockView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockMetroDark.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockMetroLight.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockOffice2007Black.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockOffice2007Blue.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockOffice2007Silver.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>for /d /r "$(ProjectDir)Samples" %25%25a in (Views) do @if exist "%25%25a" xcopy "%25%25a" "$(SolutionDir)Src\Xceed.Wpf.Toolkit.LiveExplorer\bin\$(ConfigurationName)\Samples" /s /Y /I
-</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>echo Deleting old CodeFiles directory...
+@if exist "$(ProjectDir)CodeFiles" rmdir /s /q "$(ProjectDir)CodeFiles"
+echo Copying sample code files...
+for /d /r "$(ProjectDir)Samples" %25%25a in (Views) do @if exist "%25%25a" xcopy "%25%25a" "$(ProjectDir)CodeFiles" /s /Y /I /q &gt; NUL
+echo Renaming sample code files...
+for /f "tokens=*" %25%25f in ('dir "$(ProjectDir)CodeFiles\*.*" /b') do ( 
+move /y "$(ProjectDir)CodeFiles\%25%25f" "$(ProjectDir)CodeFiles\%25%25f.txt" &gt; NUL
+)
+</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

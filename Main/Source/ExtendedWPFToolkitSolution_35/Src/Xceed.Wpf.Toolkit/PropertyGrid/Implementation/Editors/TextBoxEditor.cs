@@ -15,19 +15,28 @@
   ***********************************************************************************/
 
 using System.Windows.Controls;
+using System.Windows;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class TextBoxEditor : TypeEditor<WatermarkTextBox>
   {
-    protected override void SetControlProperties()
+    protected override WatermarkTextBox CreateEditor()
     {
-      Editor.Style = PropertyGridUtilities.NoBorderControlStyle;
+      return new PropertyGridEditorTextBox();
     }
 
     protected override void SetValueDependencyProperty()
     {
       ValueProperty = TextBox.TextProperty;
+    }
+  }
+
+  public class PropertyGridEditorTextBox : WatermarkTextBox
+  {
+    static PropertyGridEditorTextBox()
+    {
+      DefaultStyleKeyProperty.OverrideMetadata( typeof( PropertyGridEditorTextBox ), new FrameworkPropertyMetadata( typeof( PropertyGridEditorTextBox ) ) );
     }
   }
 }

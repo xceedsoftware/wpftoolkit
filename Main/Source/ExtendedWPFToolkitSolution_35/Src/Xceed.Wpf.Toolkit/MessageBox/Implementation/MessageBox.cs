@@ -825,7 +825,8 @@ namespace Xceed.Wpf.Toolkit
           }
       }
 
-      this.ImageSource = new BitmapImage( new Uri( String.Format("../Icons/{0}", iconName), UriKind.Relative ) );
+      // Use this syntax for other themes to get the icons
+      this.ImageSource = new BitmapImage( new Uri( String.Format( "/Xceed.Wpf.Toolkit;component/MessageBox/Icons/{0}", iconName ), UriKind.RelativeOrAbsolute ) );
     }
 
     /// <summary>

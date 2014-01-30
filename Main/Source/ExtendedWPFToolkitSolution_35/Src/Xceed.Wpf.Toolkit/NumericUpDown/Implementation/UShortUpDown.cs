@@ -25,7 +25,7 @@ namespace Xceed.Wpf.Toolkit
 
     static UShortUpDown()
     {
-      UpdateMetadataInternal( typeof( UShortUpDown ), ( ushort )1, ushort.MinValue, ushort.MaxValue );
+      UpdateMetadata( typeof( UShortUpDown ), ( ushort )1, ushort.MinValue, ushort.MaxValue );
     }
 
     public UShortUpDown()

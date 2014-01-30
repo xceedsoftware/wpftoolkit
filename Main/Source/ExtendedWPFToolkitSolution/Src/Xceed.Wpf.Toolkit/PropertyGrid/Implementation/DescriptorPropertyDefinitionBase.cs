@@ -42,7 +42,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private string _description;
     private string _displayName;
     private int _displayOrder;
-    private bool _isExpandable;
+    private bool _expandableAttribute;
     private bool _isReadOnly;
     private IList<Type> _newItemTypes;
     private IEnumerable<CommandBinding> _commandBindings;
@@ -53,6 +53,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       get;
     }
+
+    #region Initialization
+
+    internal DescriptorPropertyDefinitionBase( bool isPropertyGridCategorized )
+    {
+      this.IsPropertyGridCategorized = isPropertyGridCategorized;
+    }
+
+    #endregion
 
     #region Virtual Methods
 
@@ -70,15 +79,17 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       return null;
     }
-    protected virtual int ComputeDisplayOrder()
+    protected virtual int ComputeDisplayOrder( bool isPropertyGridCategorized )
     {
       return int.MaxValue;
     }
 
-    protected virtual bool ComputeIsExpandable()
+    protected virtual bool ComputeExpandableAttribute()
     {
       return false;
     }
+
+    protected abstract bool ComputeIsExpandable();
 
     protected virtual IList<Type> ComputeNewItemTypes()
     {
@@ -95,13 +106,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return false;
     }
 
-    protected virtual AdvancedOptionsValues ComputeAdvancedOptionsValues()
+    protected virtual object ComputeAdvancedOptionsTooltip()
     {
-      return new AdvancedOptionsValues()
-      {
-        ImageSource = null,
-        Tooltip = null
-      };
+      return null;
     }
 
     protected virtual void ResetValue()
@@ -114,6 +121,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region Internal Methods
 
+    internal abstract ObjectContainerHelperBase CreateContainerHelper( IPropertyContainer parent );
+
+    internal void RaiseContainerHelperInvalidated()
+    {
+      if( this.ContainerHelperInvalidated != null )
+      {
+        this.ContainerHelperInvalidated( this, EventArgs.Empty );
+      }
+    }
+
     internal virtual ITypeEditor CreateDefaultEditor()
     {
       return null;
@@ -125,17 +142,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
     internal void UpdateAdvanceOptionsForItem( MarkupObject markupObject, DependencyObject dependencyObject, DependencyPropertyDescriptor dpDescriptor, 
-                                                out string imageName, out object tooltip )
+                                                out object tooltip )
     {
-      imageName = "AdvancedProperties11";
-      tooltip = "Advanced Properties";
+      tooltip = StringConstants.AdvancedProperties;
 
       bool isResource = false;
       bool isDynamicResource = false;
 
       var markupProperty = markupObject.Properties.Where( p => p.Name == PropertyName ).FirstOrDefault();
-      if( markupProperty != null )
-      {
+      if( ( markupProperty != null ) && ( markupProperty.PropertyType != typeof( object ) ) && !markupProperty.PropertyType.IsEnum )
+      { 
         //TODO: need to find a better way to determine if a StaticResource has been applied to any property not just a style
         isResource = ( markupProperty.Value is Style );
         isDynamicResource = ( markupProperty.Value is DynamicResourceExtension );
@@ -143,8 +159,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       if( isResource || isDynamicResource )
       {
-        imageName = "Resource11";
-        tooltip = "Resource";
+        tooltip = StringConstants.Resource;
       }
       else
       {
@@ -152,8 +167,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         {
           if( BindingOperations.GetBindingExpressionBase( dependencyObject, dpDescriptor.DependencyProperty ) != null )
           {
-            imageName = "Database11";
-            tooltip = "Databinding";
+            tooltip = StringConstants.Databinding;
           }
           else
           {
@@ -167,19 +181,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
               case BaseValueSource.Inherited:
               case BaseValueSource.DefaultStyle:
               case BaseValueSource.ImplicitStyleReference:
-                imageName = "Inheritance11";
-                tooltip = "Inheritance";
+                tooltip = StringConstants.Inheritance;
                 break;
               case BaseValueSource.DefaultStyleTrigger:
                 break;
               case BaseValueSource.Style:
-                imageName = "Style11";
-                tooltip = "Style Setter";
+                tooltip = StringConstants.StyleSetter;
                 break;
 
               case BaseValueSource.Local:
-                imageName = "Local11";
-                tooltip = "Local";
+                tooltip = StringConstants.Local;
                 break;
             }
           }
@@ -187,22 +198,17 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
-    internal AdvancedOptionsValues CreateAdvanceOptionValues( string imageName, object tooltip )
-    {
-      string uriPrefix = "../Images/";
-
-      AdvancedOptionsValues values = new AdvancedOptionsValues();
-      values.Tooltip = tooltip;
-      values.ImageSource = new BitmapImage( new Uri( String.Format( "{0}{1}.png", uriPrefix, imageName ), UriKind.Relative ) );
-
-      return values;
-    }
-
     internal void UpdateAdvanceOptions()
     {
-      AdvancedOptionsValues advancedOptions = ComputeAdvancedOptionsValues();
-      AdvancedOptionsIcon = advancedOptions.ImageSource;
-      AdvancedOptionsTooltip = advancedOptions.Tooltip;
+      // Only set the Tooltip. the Icon will be added in XAML based on the Tooltip.
+      this.AdvancedOptionsTooltip = this.ComputeAdvancedOptionsTooltip();
+    }
+
+    internal void UpdateIsExpandable()
+    {
+      this.IsExpandable = 
+        this.ExpandableAttribute 
+        && this.ComputeIsExpandable();
     }
 
     internal void UpdateValueFromSource()
@@ -239,12 +245,42 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     internal object ComputeDisplayOrderForItem( object item )
     {
       PropertyDescriptor pd = item as PropertyDescriptor;
-      var attribute = PropertyGridUtilities.GetAttribute<PropertyOrderAttribute>( pd );
+      List<PropertyOrderAttribute> list = pd.Attributes.OfType<PropertyOrderAttribute>().ToList();
+
+      if( list.Count > 0 )
+      {
+        this.ValidatePropertyOrderAttributes( list );
+
+        if( this.IsPropertyGridCategorized )
+        {
+          var attribute = list.FirstOrDefault( x => ( ( x.UsageContext == UsageContextEnum.Categorized ) 
+                                                    || ( x.UsageContext == UsageContextEnum.Both ) ) );
+          if( attribute != null )
+            return attribute.Order;
+        }
+        else
+        {
+          var attribute = list.FirstOrDefault( x => ( ( x.UsageContext == UsageContextEnum.Alphabetical ) 
+                                                    || ( x.UsageContext == UsageContextEnum.Both ) ) );
+          if( attribute != null )
+            return attribute.Order;
+        }
+      }
 
       // Max Value. Properties with no order will be displayed last.
-      return ( attribute != null )
-              ? attribute.Order
-              : int.MaxValue;
+      return int.MaxValue;
+    }
+
+    internal object ComputeExpandableAttributeForItem( object item )
+    {
+      PropertyDescriptor pd = ( PropertyDescriptor )item;
+      var attribute = PropertyGridUtilities.GetAttribute<ExpandableObjectAttribute>( pd );
+      return ( attribute != null );
+    }
+
+    internal int ComputeDisplayOrderInternal( bool isPropertyGridCategorized )
+    {
+      return this.ComputeDisplayOrder( isPropertyGridCategorized );
     }
 
     #endregion
@@ -273,6 +309,22 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       return displayName;
     }
+
+    private void ValidatePropertyOrderAttributes( List<PropertyOrderAttribute> list )
+    {
+      if( list.Count > 0 )
+      {
+        PropertyOrderAttribute both = list.FirstOrDefault( x => x.UsageContext == UsageContextEnum.Both );
+        if( ( both != null ) && ( list.Count > 1 ) )
+          Debug.Assert( false, "A PropertyItem can't have more than 1 PropertyOrderAttribute when it has UsageContext : Both" );
+      }
+    }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler ContainerHelperInvalidated;
 
     #endregion
 
@@ -314,75 +366,67 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //AdvancedOptionsTooltip
 
-    public string Category
-    {
-      get
-      {
-        return _category;
-      }
-    }
+    #region IsExpandable (DP)
 
-    public string CategoryValue
-    {
-      get
-      {
-        return _categoryValue;
-      }
-    }
-
-    public IEnumerable<CommandBinding> CommandBindings
-    {
-      get
-      {
-        return _commandBindings;
-      }
-    }
-
-    public string DisplayName
-    {
-      get
-      {
-        return _displayName;
-      }
-    }
-    public string Description
-    {
-      get
-      {
-        return _description;
-      }
-    }
-
-    public int DisplayOrder
-    {
-      get
-      {
-        return _displayOrder;
-      }
-    }
+    public static readonly DependencyProperty IsExpandableProperty =
+        DependencyProperty.Register( "IsExpandable", typeof( bool ), typeof( DescriptorPropertyDefinitionBase ), new UIPropertyMetadata( false ) );
 
     public bool IsExpandable
     {
       get
       {
-        return _isExpandable;
+        return ( bool )GetValue( IsExpandableProperty );
       }
+      set
+      {
+        SetValue( IsExpandableProperty, value );
+      }
+    }
+
+    #endregion //IsExpandable
+
+    public string Category
+    {
+      get { return _category; }
+      internal set { _category = value; }
+    }
+
+    public string CategoryValue
+    {
+      get { return _categoryValue; }
+      internal set { _categoryValue = value; }
+    }
+
+    public IEnumerable<CommandBinding> CommandBindings
+    {
+      get { return _commandBindings; }
+    }
+
+    public string DisplayName
+    {
+      get { return _displayName; }
+      internal set { _displayName = value; }
+    }
+    public string Description
+    {
+      get { return _description; }
+      internal set { _description = value; }
+    }
+
+    public int DisplayOrder
+    {
+      get { return _displayOrder; }
+      internal set { _displayOrder = value; }
     }
 
     public bool IsReadOnly
     {
-      get
-      {
-        return _isReadOnly;
-      }
+      get { return _isReadOnly; }
     }
 
     public IList<Type> NewItemTypes
     {
-      get
-      {
-        return _newItemTypes;
-      }
+      get { return _newItemTypes; }
     }
 
     public string PropertyName
@@ -400,6 +444,22 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         return PropertyDescriptor.PropertyType;
       }
+    }
+
+    internal bool ExpandableAttribute
+    {
+      get { return _expandableAttribute; }
+      set 
+      { 
+        _expandableAttribute = value;
+        this.UpdateIsExpandable();
+      }
+    }
+
+    internal bool IsPropertyGridCategorized
+    {
+      get;
+      set;
     }
 
     #region Value Property (DP)
@@ -422,8 +482,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       ( ( DescriptorPropertyDefinitionBase )o ).OnValueChanged( e.OldValue, e.NewValue );
     }
 
-    private void OnValueChanged( object oldValue, object newValue )
+    internal virtual void OnValueChanged( object oldValue, object newValue )
     {
+      UpdateIsExpandable();
       UpdateAdvanceOptions();
 
       // Reset command also affected.
@@ -432,7 +493,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //Value Property
 
-    public void InitProperties()
+    public virtual void InitProperties()
     {
       // Do "IsReadOnly" and PropertyName first since the others may need that value.
       _isReadOnly = ComputeIsReadOnly();
@@ -440,25 +501,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       _categoryValue = ComputeCategoryValue();
       _description = ComputeDescription();
       _displayName = ComputeDisplayName();
-      _displayOrder = ComputeDisplayOrder();
-      _isExpandable = ComputeIsExpandable();
+      _displayOrder = ComputeDisplayOrder( this.IsPropertyGridCategorized );
+      _expandableAttribute = ComputeExpandableAttribute();
       _newItemTypes = ComputeNewItemTypes();
       _commandBindings = new CommandBinding[] { new CommandBinding( PropertyItemCommands.ResetValue, ExecuteResetValueCommand, CanExecuteResetValueCommand ) };
 
+      UpdateIsExpandable();
       UpdateAdvanceOptions();
 
       BindingBase valueBinding = this.CreateValueBinding();
       BindingOperations.SetBinding( this, DescriptorPropertyDefinitionBase.ValueProperty, valueBinding );
     }
-
-    #region AdvancedOptionsValues struct (Internal )
-
-    internal struct AdvancedOptionsValues
-    {
-      public ImageSource ImageSource;
-      public object Tooltip;
-    }
-
-    #endregion
   }
 }

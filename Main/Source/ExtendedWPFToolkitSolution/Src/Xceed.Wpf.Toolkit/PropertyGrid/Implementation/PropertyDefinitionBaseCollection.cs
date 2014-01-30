@@ -22,7 +22,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
   public class PropertyDefinitionCollection : PropertyDefinitionBaseCollection<PropertyDefinition> { }
   public class EditorDefinitionCollection : PropertyDefinitionBaseCollection<EditorDefinitionBase> { }
 
-  public abstract class PropertyDefinitionBaseCollection<T> : ObservableCollection<T> where T : PropertyDefinitionBase
+
+  public abstract class PropertyDefinitionBaseCollection<T> : DefinitionCollectionBase<T> where T : PropertyDefinitionBase
   {
     internal PropertyDefinitionBaseCollection() { }
 
@@ -39,6 +40,23 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         return null;
       }
     }
+
+    internal T GetRecursiveBaseTypes( Type type )
+    {
+      // If no definition for the current type, fall back on base type editor recursively.
+      T ret = null;
+      while( ret == null && type != null )
+      {
+        ret = this[ type ];
+        type = type.BaseType;
+      }
+      return ret;
+    }
+  }
+
+  public abstract class DefinitionCollectionBase<T> : ObservableCollection<T> where T : DefinitionBase
+  {
+    internal DefinitionCollectionBase() { }
 
     protected override void InsertItem( int index, T item )
     {

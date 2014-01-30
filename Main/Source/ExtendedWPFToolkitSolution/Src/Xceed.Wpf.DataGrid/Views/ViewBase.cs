@@ -40,6 +40,29 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       Type themeType = ( theme == null ) ? null : theme.GetType();
 
+      if( themeType != null )
+      {
+        Type metroThemeType = themeType.Assembly.GetType( "Xceed.Wpf.DataGrid.Themes.Metro.MetroTheme" );
+        if( ( metroThemeType != null ) && metroThemeType.IsAssignableFrom( themeType ) )
+        {
+          PropertyInfo trd = metroThemeType.GetProperty( "ThemeResourceDictionary" );
+          if( trd != null )
+          {
+            ResourceDictionary rd = ( ResourceDictionary )trd.GetValue( theme, null );
+            if( rd != null )
+            {
+              PropertyInfo ab = rd.GetType().GetProperty( "AccentBrush" );
+              if( ab != null )
+              {
+                Brush accentBrush = ( Brush )ab.GetValue( rd, null );
+                return new ThemeKey( viewType, themeType, elementType, accentBrush );
+              }
+            }
+          }
+          throw new InvalidOperationException( "MetroTheme found but AccentBrush was not found." );
+        }
+      }
+
       return new ThemeKey( viewType, themeType, elementType );
     }
 

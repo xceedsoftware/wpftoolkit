@@ -228,8 +228,9 @@ namespace Xceed.Wpf.Toolkit
             if( this.AllowSpin )
             {
               this.OnSpin( new SpinEventArgs( SpinDirection.Increase ) );
+              e.Handled = true;
             }
-            e.Handled = true;
+
             break;
           }
         case Key.Down:
@@ -237,8 +238,9 @@ namespace Xceed.Wpf.Toolkit
             if( this.AllowSpin )
             {
               this.OnSpin( new SpinEventArgs( SpinDirection.Decrease ) );
+              e.Handled = true;
             }
-            e.Handled = true;
+
             break;
           }
       }

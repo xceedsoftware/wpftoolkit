@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using System.Collections;
+using System.Windows;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
@@ -26,9 +27,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       ValueProperty = System.Windows.Controls.ComboBox.SelectedItemProperty;
     }
 
-    protected override void SetControlProperties()
+    protected override System.Windows.Controls.ComboBox CreateEditor()
     {
-      Editor.Style = PropertyGridUtilities.ComboBoxStyle;
+      return new PropertyGridEditorComboBox();
     }
 
     protected override void ResolveValueBinding( PropertyItem propertyItem )
@@ -42,6 +43,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     private void SetItemsSource( PropertyItem propertyItem )
     {
       Editor.ItemsSource = CreateItemsSource( propertyItem );
+    }
+  }
+
+  public class PropertyGridEditorComboBox : System.Windows.Controls.ComboBox
+  {
+    static PropertyGridEditorComboBox()
+    {
+      DefaultStyleKeyProperty.OverrideMetadata( typeof( PropertyGridEditorComboBox ), new FrameworkPropertyMetadata( typeof( PropertyGridEditorComboBox ) ) );
     }
   }
 }
