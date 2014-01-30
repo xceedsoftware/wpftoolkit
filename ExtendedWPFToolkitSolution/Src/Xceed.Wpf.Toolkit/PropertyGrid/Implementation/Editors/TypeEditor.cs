@@ -41,7 +41,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 
     public virtual FrameworkElement ResolveEditor( PropertyItem propertyItem )
     {
-      Editor = new T();
+      Editor = this.CreateEditor();
       SetValueDependencyProperty();
       SetControlProperties();
       ResolveValueBinding( propertyItem );
@@ -51,6 +51,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     #endregion //ITypeEditor Members
 
     #region Methods
+
+    protected virtual T CreateEditor()
+    {
+      return new T();
+    }
 
     protected virtual IValueConverter CreateValueConverter()
     {

@@ -20,12 +20,13 @@
                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                  xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
                  xmlns:s="clr-namespace:System;assembly=mscorlib"
-                 Title="ButtonSpinner">
+                 Title="AvalonDock">
    <local:DemoView.Description>
       <Paragraph FontSize="14" FontFamily="Segoe">
          The AvalonDock layout system allows developers to create customizable layouts using a window docking system similar to what is found in many popular integrated development environements.
       </Paragraph>
    </local:DemoView.Description>
+
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
@@ -33,39 +34,12 @@
          <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-       <GroupBox Header="Features"
-                  Grid.Row="0"
-                  Margin="5">
-           <StackPanel Orientation="Horizontal" Margin="5">
-               <TextBlock Text="Theme:" Margin="0,0,10,0" VerticalAlignment="Center"/>
-               <ComboBox x:Name="_themeCombo" SelectedIndex="0" Width="125">
-                  <ComboBoxItem Content="Generic" />
-                  <ComboBoxItem Content="Aero">
-                     <ComboBoxItem.Tag>
-                        <xcad:AeroTheme />
-                     </ComboBoxItem.Tag>
-                  </ComboBoxItem>
-                  <ComboBoxItem Content="VS2010">
-                     <ComboBoxItem.Tag>
-                        <xcad:VS2010Theme />
-                     </ComboBoxItem.Tag>
-                  </ComboBoxItem>
-                  <ComboBoxItem Content="Metro">
-                     <ComboBoxItem.Tag>
-                        <xcad:MetroTheme />
-                     </ComboBoxItem.Tag>
-                  </ComboBoxItem>
-               </ComboBox>
-          </StackPanel>
-       </GroupBox>
-
      <TextBlock Grid.Row="1" Text="Usage:" Style="{StaticResource Header}" />
 
-      <xcad:DockingManager Grid.Row="2" MaxHeight="425"
+      <xcad:DockingManager Grid.Row="2" MaxHeight="395"
                            AllowMixedOrientation="True"
                            BorderBrush="Black"
-                           BorderThickness="1"
-                           Theme="{Binding ElementName=_themeCombo, Path=SelectedItem.Tag}">
+                           BorderThickness="1">
          <xcad:DockingManager.DocumentHeaderTemplate>
             <DataTemplate>
                <StackPanel Orientation="Horizontal">
@@ -80,8 +54,17 @@
                   <xcad:LayoutAnchorable ContentId="properties" Title="Properties" CanHide="False" CanClose="False"
                                             AutoHideWidth="240"
                                          IconSource="../Images/property-blue.png">
-                     <xctk:PropertyGrid NameColumnWidth="110"
-                        SelectedObject="{Binding ElementName=_layoutRoot, Path=LastFocusedDocument.Content}"/>
+                     <xctk:PropertyGrid NameColumnWidth="110" SelectedObject="{Binding ElementName=_layoutRoot, Path=LastFocusedDocument.Content}" AutoGenerateProperties="False">
+                        <xctk:PropertyGrid.PropertyDefinitions>
+                           <xctk:PropertyDefinition TargetProperties="Background" />
+                           <xctk:PropertyDefinition TargetProperties="BorderBrush" />
+                           <xctk:PropertyDefinition TargetProperties="BorderThickness" />
+                           <xctk:PropertyDefinition TargetProperties="FontSize" />
+                           <xctk:PropertyDefinition TargetProperties="FontStyle" />
+                           <xctk:PropertyDefinition TargetProperties="Width" />
+                           <xctk:PropertyDefinition TargetProperties="Height" />
+                        </xctk:PropertyGrid.PropertyDefinitions>
+                     </xctk:PropertyGrid>
                   </xcad:LayoutAnchorable>
                </xcad:LayoutAnchorablePane>
                <xcad:LayoutDocumentPaneGroup >

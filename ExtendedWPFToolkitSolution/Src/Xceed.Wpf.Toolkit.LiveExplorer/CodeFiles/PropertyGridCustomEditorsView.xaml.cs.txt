@@ -1,0 +1,136 @@
+﻿/**************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  *************************************************************************************/
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Media;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+
+namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
+{
+  /// <summary>
+  /// Interaction logic for PropertyGridCustomEditorsView.xaml
+  /// </summary>
+  public partial class PropertyGridCustomEditorsView : DemoView
+  {
+    public PropertyGridCustomEditorsView()
+    {
+      InitializeComponent();
+
+      var person = new Person();
+      person.FirstName = "John";
+      person.LastName = "Doe";
+      person.DateOfBirth = new System.DateTime( 1975, 1, 23 );
+      person.Age = System.DateTime.Today.Year - person.DateOfBirth.Year;
+      person.GradePointAvg = 3.98;
+      person.IsMale = true;
+      person.FavoriteColor = Colors.Blue;
+      person.WritingFont = new FontFamily( "Arial" );
+      person.WritingHand = System.Windows.HorizontalAlignment.Right;
+      person.WritingFontSize = 12.5;
+
+
+      this.DataContext = person;
+    }
+
+    public class Person
+    {
+      [Category( "Information" )]
+      [Description( "This property uses the editor defined by EditorTemplateDefinition #2 because it targets the property named 'FirstName'." )]
+      public string FirstName
+      {
+        get;
+        set;
+      }
+
+      [Category( "Information" )]
+      [Description( "This property uses the editor defined by EditorTemplateDefinition #2 because it targets the property named 'LastName'." )]
+      public string LastName
+      {
+        get;
+        set;
+      }
+
+      [Category( "Information" )]
+      [Description( "This property uses the editor defined by EditorTemplateDefinition #3 because it targets all properties of Type 'DateTime'." )]
+      public System.DateTime DateOfBirth
+      {
+        get;
+        set;
+      }
+
+      [Category( "Information" )]
+      [Description( "This property uses the editor defined by EditorTemplateDefinition #1 because it targets all properties of Type 'Double'." )]
+      public double GradePointAvg
+      {
+        get;
+        set;
+      }
+
+      [Category( "Information" )]
+      [Description( "This property uses the editor defined by EditorTemplateDefinition #3 because it targets the property named 'Age'." )]
+      public int Age
+      {
+        get;
+        set;
+      }
+
+      [Category( "Information" )]
+      [Description( "This property uses the editor defined by EditorTemplateDefinition #4 because it targets all properties of Type 'Boolean'." )]
+      public bool IsMale
+      {
+        get;
+        set;
+      }
+
+      [Category( "Information" )]
+      [Description( "This property uses the default editor because no EditorDefinition targets this property name or type." )]
+      public System.Windows.Media.Color FavoriteColor
+      {
+        get;
+        set;
+      }
+
+      [Category( "Writing" )]
+      [Description( "This property uses the editor defined by EditorTemplateDefinition #4 because it targets all properties of Type 'HorizontalAlignment'." )]
+      public HorizontalAlignment WritingHand
+      {
+        get;
+        set;
+      }
+
+      [Category( "Writing" )]
+      [Description( "This property uses the editor defined by EditorTemplateDefinition #2 because it targets the property named 'WritingFont'. Although EditorTemplateDefinition #4 targets 'FontFamily' type, priority is given to the name." )]
+      public FontFamily WritingFont
+      {
+        get;
+        set;
+      }
+
+      [Category( "Writing" )]
+      [Description( "This property uses the editor defined by EditorTemplateDefinition #1 because it targets all properties of Type 'Double'." )]
+      public double WritingFontSize
+      {
+        get;
+        set;
+      }
+    }
+  }
+}

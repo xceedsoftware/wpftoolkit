@@ -30,6 +30,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
 {
     public class OverlayWindow : Window, IOverlayWindow
     {
+        private ResourceDictionary currentThemeResourceDictionary; // = null
+
         static OverlayWindow()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(OverlayWindow), new FrameworkPropertyMetadata(typeof(OverlayWindow)));
@@ -53,16 +55,35 @@ namespace Xceed.Wpf.AvalonDock.Controls
         {
             if (oldTheme != null)
             {
+              if( oldTheme is DictionaryTheme )
+              {
+                if( currentThemeResourceDictionary != null )
+                {
+                  Resources.MergedDictionaries.Remove( currentThemeResourceDictionary );
+                  currentThemeResourceDictionary = null;
+                }
+              }
+              else
+              {
                 var resourceDictionaryToRemove =
-                    Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
-                if (resourceDictionaryToRemove != null)
-                    Resources.MergedDictionaries.Remove(
-                        resourceDictionaryToRemove);
+                    Resources.MergedDictionaries.FirstOrDefault( r => r.Source == oldTheme.GetResourceUri() );
+                if( resourceDictionaryToRemove != null )
+                  Resources.MergedDictionaries.Remove(
+                      resourceDictionaryToRemove );
+              }
             }
 
             if (_host.Manager.Theme != null)
             {
+              if( _host.Manager.Theme is DictionaryTheme )
+              {
+                currentThemeResourceDictionary = ( ( DictionaryTheme )_host.Manager.Theme ).ThemeResourceDictionary;
+                Resources.MergedDictionaries.Add( currentThemeResourceDictionary );
+              }
+              else
+              {
                 Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = _host.Manager.Theme.GetResourceUri() });
+              }
             }
         }
 

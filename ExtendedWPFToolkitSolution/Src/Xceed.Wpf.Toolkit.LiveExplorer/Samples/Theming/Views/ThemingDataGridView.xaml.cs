@@ -25,6 +25,9 @@ using System;
 using Xceed.Wpf.Samples.SampleData;
 using System.Data;
 using System.Diagnostics;
+using System.Windows.Media;
+using Xceed.Wpf.DataGrid.Views;
+
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
 {
@@ -33,10 +36,21 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
   /// </summary>
   public partial class ThemingDataGridView : DemoView
   {
+
+
+
     public ThemingDataGridView()
     {
       InitializeComponent();
     }
+
+
+
+
+
+
+
+
 
   }
 }

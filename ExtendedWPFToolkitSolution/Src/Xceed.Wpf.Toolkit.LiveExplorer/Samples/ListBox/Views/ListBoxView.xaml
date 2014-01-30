@@ -19,17 +19,16 @@
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer" 
                 xmlns:xclb="http://schemas.xceed.com/wpf/xaml/listbox"
-                xmlns:xclt="http://schemas.xceed.com/wpf/xaml/listbox/themes"
                 xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.ListBox.Converters"
                 xmlns:sys="clr-namespace:System;assembly=mscorlib" 
                 VerticalScrollBarVisibility="Disabled"
-                Title="Data Sources">
+                Title="ListBox">
    <local:DemoView.Description>
       <Paragraph FontSize="14" FontFamily="Segoe">
-         <Run>Local Data Sources of Any Kind</Run>
+         <Run>Dress Up Your App in Style in Minutes</Run>
          <LineBreak />
          <LineBreak />
-         <Run>The listbox supports any local source implementing IEnumerable, and generics too! Factor in its full support of remote data sources, and you have a listbox compatible with all data-binding scenarios.</Run>
+         <Run>Supports implicit styles, so the entire listbox can be styled in minutes with a couple of lines of code. Also supports explicit styles and Expression Blend.</Run>
             <LineBreak />
             <LineBreak />
             <Run>The listBox items can be animated, dragged-and-dropped, filtered, grouped, selected in various ways, and sorted. Plus, all of the ListBox components can be styled or themed. In addition, different ways of presenting the listBox items are available, such as horizontal or vertical scrolling and following specific or circle paths.</Run>
@@ -41,7 +40,102 @@
       </Paragraph>
    </local:DemoView.Description>
 
-
-
     <Image Source="..\OpenSourceImages\ListBox.png" Width="600" Height="400"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </local:DemoView>

@@ -30,9 +30,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
         public DropDownButton()
         {
-            this.Unloaded += new RoutedEventHandler(DropDownButton_Unloaded);
+          this.Unloaded += new RoutedEventHandler(DropDownButton_Unloaded);
         }
-
 
         #region DropDownContextMenu
 
@@ -120,7 +119,12 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         void DropDownButton_Unloaded(object sender, RoutedEventArgs e)
         {
+          // When changing theme, Unloaded event is called, erasing the DropDownContextMenu.
+          // Prevent this on theme changes.
+          if( this.IsLoaded )
+          {
             DropDownContextMenu = null;
+          }
         }
 
 

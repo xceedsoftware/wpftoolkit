@@ -31,8 +31,18 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 
     protected override void ResolveValueBinding( PropertyItem propertyItem )
     {
-      Editor.ItemsSourceType = propertyItem.PropertyType;
-      Editor.ItemType = propertyItem.PropertyType.GetGenericArguments()[ 0 ];
+      var type = propertyItem.PropertyType;
+      Editor.ItemsSourceType = type;
+
+      if( type.BaseType == typeof( System.Array ) )
+      {
+        Editor.ItemType = type.GetElementType();
+      }
+      else
+      {
+        Editor.ItemType = type.GetGenericArguments()[ 0 ];
+      }
+
       base.ResolveValueBinding( propertyItem );
     }
   }

@@ -295,6 +295,10 @@ namespace Xceed.Wpf.DataGrid
             {
               groupLevelIndicatorStyleBinding = new Binding( "GroupLevelIndicatorStyle" );
               groupLevelIndicatorStyleBinding.Source = groupLevelConfig;
+              // Use a Converter to manage groupLevelConfig.GroupLevelIndicatorStyle == null
+              // so that an implicit syle won't be overriden by a null style.
+              groupLevelIndicatorStyleBinding.Converter = new GroupLevelIndicatorConverter();
+              groupLevelIndicatorStyleBinding.ConverterParameter = groupMargin;
               groupMargin.SetBinding( GroupLevelIndicator.StyleProperty, groupLevelIndicatorStyleBinding );
             }
           }
@@ -424,5 +428,29 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion
+
+    private class GroupLevelIndicatorConverter : IValueConverter
+    {
+      public object Convert( object value, Type targetType, object parameter, System.Globalization.CultureInfo culture )
+      {
+        // When groupLevelConfig.GroupLevelIndicatorStyle exists, return it.
+        if( value != null )
+          return value;
+
+        // When groupLevelConfig.GroupLevelIndicatorStyle is null, try to find an implicit style
+        // for the GroupLevelIndicator in the resource.
+        var gli = ( GroupLevelIndicator )parameter;
+        var style = gli.TryFindResource( gli.GetType() );
+        if( style != null )
+          return style;
+
+        return value;
+      }
+
+      public object ConvertBack( object value, Type targetType, object parameter, System.Globalization.CultureInfo culture )
+      {
+        throw new NotSupportedException();
+      }
+    }
   }
 }

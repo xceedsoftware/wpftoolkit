@@ -28,6 +28,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
 {
     public class NavigatorWindow : Window
     {
+        private ResourceDictionary currentThemeResourceDictionary; // = null
+
         static NavigatorWindow()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(NavigatorWindow), new FrameworkPropertyMetadata(typeof(NavigatorWindow)));
@@ -61,16 +63,35 @@ namespace Xceed.Wpf.AvalonDock.Controls
         {
             if (oldTheme != null)
             {
+              if( oldTheme is DictionaryTheme )
+              {
+                if( currentThemeResourceDictionary != null )
+                {
+                  Resources.MergedDictionaries.Remove( currentThemeResourceDictionary );
+                  currentThemeResourceDictionary = null;
+                }
+              }
+              else
+              {
                 var resourceDictionaryToRemove =
-                    Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
-                if (resourceDictionaryToRemove != null)
-                    Resources.MergedDictionaries.Remove(
-                        resourceDictionaryToRemove);
+                    Resources.MergedDictionaries.FirstOrDefault( r => r.Source == oldTheme.GetResourceUri() );
+                if( resourceDictionaryToRemove != null )
+                  Resources.MergedDictionaries.Remove(
+                      resourceDictionaryToRemove );
+              }
             }
 
             if (_manager.Theme != null)
             {
+              if( _manager.Theme is DictionaryTheme )
+              {
+                currentThemeResourceDictionary = ( ( DictionaryTheme )_manager.Theme ).ThemeResourceDictionary;
+                Resources.MergedDictionaries.Add( currentThemeResourceDictionary );
+              }
+              else
+              {
                 Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = _manager.Theme.GetResourceUri() });
+              }
             }
         }
 

@@ -49,6 +49,5 @@
 
 
 
-
     <Image Source="..\OpenSourceImages\ChartAxis.png" Width="600" Height="400"/>
 </local:DemoView>

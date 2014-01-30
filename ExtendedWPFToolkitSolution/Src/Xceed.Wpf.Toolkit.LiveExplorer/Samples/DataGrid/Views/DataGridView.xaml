@@ -112,7 +112,8 @@
                 <xcdg:Column FieldName="Employee"
                              Title="Employee"
                              Width="160"
-                             CellContentTemplate="{StaticResource employeeDataTemplate}" />
+                             CellContentTemplate="{StaticResource employeeDataTemplate}" 
+                             GroupValueTemplate="{StaticResource employeeDataTemplate}"/>
 
                 <xcdg:Column FieldName="Customer.CompanyName"
                              Title="Customer"

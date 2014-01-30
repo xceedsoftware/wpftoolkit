@@ -33,105 +33,105 @@
            specific ResourceDictionary, WPF looks in the generic.xaml ResourceDictionary. 
            That way, we don't have to maintain this list in all the xaml files. -->
 
-        <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Windows8/TableflowView.Windows8.xaml" />
+        <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Aero2/TableflowView.Aero2.normalcolor.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <!-- Generic theme for TableflowView -->
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView}"
           TargetType="views:TableflowView"
-          BasedOn="{StaticResource tableflowViewWindows8DefaultValues}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorDefaultValues}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:DataGridControl}"
           TargetType="local:DataGridControl"
-          BasedOn="{StaticResource tableflowViewWindows8GridControlStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorGridControlStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:RowSelectorPane}"
           TargetType="local:RowSelectorPane"
-          BasedOn="{StaticResource tableflowViewWindows8RowSelectorPaneStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorRowSelectorPaneStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:RowSelector}"
           TargetType="local:RowSelector"
-          BasedOn="{StaticResource tableflowViewWindows8RowSelectorStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorRowSelectorStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:Row}"
           TargetType="local:Row"
-          BasedOn="{StaticResource tableflowViewWindows8RowStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorRowStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:DataRow}"
           TargetType="local:DataRow"
-          BasedOn="{StaticResource tableflowViewWindows8DataRowStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorDataRowStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:ColumnManagerRow}"
           TargetType="local:ColumnManagerRow"
-          BasedOn="{StaticResource tableflowViewWindows8ColumnManagerRowStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorColumnManagerRowStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:Cell}"
           TargetType="local:Cell"
-          BasedOn="{StaticResource tableflowViewWindows8CellStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorCellStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:DataCell}"
           TargetType="local:DataCell"
-          BasedOn="{StaticResource tableflowViewWindows8DataCellStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorDataCellStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:ColumnManagerCell}"
           TargetType="local:ColumnManagerCell"
-          BasedOn="{StaticResource tableflowViewWindows8ColumnManagerCellStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorColumnManagerCellStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupByControl}"
           TargetType="local:GroupByControl"
-          BasedOn="{StaticResource tableflowViewWindows8GroupByControlStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorGroupByControlStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupByItem}"
           TargetType="local:GroupByItem"
-          BasedOn="{StaticResource tableflowViewWindows8GroupByItemStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorGroupByItemStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupHeaderControl}"
           TargetType="local:GroupHeaderControl"
-          BasedOn="{StaticResource tableflowViewWindows8GroupHeaderControlStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorGroupHeaderControlStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupLevelIndicator}"
           TargetType="local:GroupLevelIndicator"
-          BasedOn="{StaticResource tableflowViewWindows8GroupLevelIndicatorStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorGroupLevelIndicatorStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:DetailIndicator}"
           TargetType="local:DetailIndicator"
-          BasedOn="{StaticResource tableflowViewWindows8DetailIndicatorStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorDetailIndicatorStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupLevelIndicatorPane}"
           TargetType="local:GroupLevelIndicatorPane"
-          BasedOn="{StaticResource tableflowViewWindows8GroupLevelIndicatorPaneStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorGroupLevelIndicatorPaneStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:HierarchicalGroupLevelIndicatorPane}"
           TargetType="local:HierarchicalGroupLevelIndicatorPane"
-          BasedOn="{StaticResource tableflowViewWindows8HierarchicalGroupLevelIndicatorPaneStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorHierarchicalGroupLevelIndicatorPaneStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:ScrollTip}"
           TargetType="local:ScrollTip"
-          BasedOn="{StaticResource tableflowViewWindows8ScrollTipStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorScrollTipStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:HierarchicalGroupByControlNode}"
           TargetType="local:HierarchicalGroupByControlNode"
-          BasedOn="{StaticResource tableflowViewWindows8HierarchicalGroupByControlNodeStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorHierarchicalGroupByControlNodeStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:HierarchicalGroupByControl}"
           TargetType="local:HierarchicalGroupByControl"
-          BasedOn="{StaticResource tableflowViewWindows8HierarchicalGroupByControlStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorHierarchicalGroupByControlStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:HierarchicalGroupByItem}"
           TargetType="local:HierarchicalGroupByItem"
-          BasedOn="{StaticResource tableflowViewWindows8HierarchicalGroupByItemStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorHierarchicalGroupByItemStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationButton}"
           TargetType="{x:Type local:GroupNavigationButton}"
-          BasedOn="{StaticResource tableflowViewWindows8GroupNavigationButtonStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorGroupNavigationButtonStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationControl}"
           TargetType="{x:Type local:GroupNavigationControl}"
-          BasedOn="{StaticResource tableflowViewWindows8GroupNavigationControlStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorGroupNavigationControlStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationControlItem}"
           TargetType="{x:Type local:GroupNavigationControlItem}"
-          BasedOn="{StaticResource tableflowViewWindows8GroupNavigationControlItemStyle}" />
+          BasedOn="{StaticResource tableflowViewAero2NormalColorGroupNavigationControlItemStyle}" />
 
 </ResourceDictionary>

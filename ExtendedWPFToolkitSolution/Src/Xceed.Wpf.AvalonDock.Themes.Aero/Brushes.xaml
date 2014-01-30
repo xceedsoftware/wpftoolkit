@@ -20,7 +20,7 @@
 
 
 
-   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor1Key}"
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor1}"
                         StartPoint="0,0"
                         EndPoint="1,0">
       <LinearGradientBrush.GradientStops>
@@ -29,13 +29,13 @@
       </LinearGradientBrush.GradientStops>
    </LinearGradientBrush>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor2Key}" 
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor2}"
                      Color="White"/>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor3Key}" 
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor3}"
                      Color="Black"/>
 
-   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor4Key}"
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor4}"
                          StartPoint="0,0"
                          EndPoint="0,1">
       <LinearGradientBrush.GradientStops>
@@ -44,11 +44,11 @@
       </LinearGradientBrush.GradientStops>
    </LinearGradientBrush>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor5Key}" 
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor5}"
                      Color="#898C95"/>
 
 
-   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor6Key}"
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor6}"
                          StartPoint="0,0"
                          EndPoint="0,1">
       <LinearGradientBrush.GradientStops>
@@ -57,7 +57,7 @@
       </LinearGradientBrush.GradientStops>
    </LinearGradientBrush>
 
-   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor7Key}"
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor7}"
                          StartPoint="0,0"
                          EndPoint="0,1">
       <LinearGradientBrush.GradientStops>
@@ -66,28 +66,28 @@
       </LinearGradientBrush.GradientStops>
    </LinearGradientBrush>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor8Key}"
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor8}"
                      Color="#D2E6FA"/>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor9Key}"
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor9}"
                      Color="#FFF5F4EA"/>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor10Key}" 
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor10}"
                      Color="Black"/>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor11Key}" 
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor11}"
                      Color="#FFBBC0C7" />
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor12Key}"
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor12}"
                      Color="#555564"/>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor13Key}"
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor13}"
                      Color="White"/>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor14Key}"
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor14}"
                      Color="#69A1BF"/>
 
-   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor15Key}"
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor15}"
                          StartPoint="0,0"
                          EndPoint="0,1">
       <GradientStop Color="#8FADCE" Offset="0" />
@@ -95,57 +95,41 @@
    </LinearGradientBrush>
 
 
-   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor16Key}"
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor16}"
                          StartPoint="0,0"
                          EndPoint="0,1">
       <GradientStop Color="#B7CAE0" Offset="0" />
       <GradientStop Color="#E8F0FF" Offset="1" />
    </LinearGradientBrush>
-   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor17Key}"
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor17}"
                          StartPoint="0,0"
                          EndPoint="0,1">
       <GradientStop Color="#F7FCFE" Offset="0" />
       <GradientStop Color="#81D0F1" Offset="1" />
    </LinearGradientBrush>
-   <!--
-    <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor18Key}" 
-        Color="Black"/>
 
-    <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor20Key}" 
-                     Color="White"/>
-
-    <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor21Key}" 
-        Color="White"/>
-
-    <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor22Key}" 
-        Color="Black"/>
-
-    <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor23Key}" 
-        Color="Black"/>-->
-
-
-   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor24Key}" StartPoint="0,0" EndPoint="0,1">
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor24}" StartPoint="0,0" EndPoint="0,1">
       <GradientStop Color="#FBFCFC" Offset="0" />
       <GradientStop Color="#D7DCE4" Offset="0.5" />
       <GradientStop Color="#CED4DF" Offset="0.5" />
       <GradientStop Color="#CED4DF" Offset="1" />
    </LinearGradientBrush>
 
-   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor25Key}" StartPoint="0,0" EndPoint="0,1">
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor25}" StartPoint="0,0" EndPoint="0,1">
       <GradientStop Color="#FFFCF2" Offset="0" />
       <GradientStop Color="#FFEDBA" Offset="0.5" />
       <GradientStop Color="#FFE8A6" Offset="0.5" />
       <GradientStop Color="#FFE8A6" Offset="1" />
    </LinearGradientBrush>
 
-   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor26Key}"
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor26}"
                          StartPoint="0,0"
                          EndPoint="0,1">
       <GradientStop Color="#F2F2F2" Offset="0" />
       <GradientStop Color="#CFCFCF" Offset="1" />
    </LinearGradientBrush>
 
-   <LinearGradientBrush x:Key="{x:Static at:AeroColors.BaseColor27Key}"
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor27}"
                          StartPoint="0,0"
                          EndPoint="0,1">
       <GradientStop Color="#A7D9F5" Offset="0" />
@@ -154,18 +138,18 @@
       <GradientStop Color="#FAFDFE" Offset="1" />
    </LinearGradientBrush>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor28Key}"
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor28}"
                          Color="White"/>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor30Key}" 
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor30}"
         Color="#CED4DF"/>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor31Key}" 
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor31}"
         Color="#FFE8A6"/>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor32Key}"
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor32}"
                      Color="#3C7FB1"/>
 
-   <SolidColorBrush x:Key="{x:Static at:AeroColors.BaseColor33Key}"
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type at:AeroColors}, ResourceId=BaseColor33}"
         Color="#3D5277"/>
 </ResourceDictionary>

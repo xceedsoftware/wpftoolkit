@@ -100,9 +100,13 @@ namespace Xceed.Wpf.Toolkit
     {
       Point p = e.GetPosition( _adorner );
       double maxDist = 0d;
+      bool preventDisplayFadeOut = ( ( _adorner.Child != null ) && ( _adorner.Child is IRichTextBoxFormatBar ) ) ?
+                                  ( ( IRichTextBoxFormatBar )_adorner.Child ).PreventDisplayFadeOut :
+                                  false;
 
       //Mouse is inside FormatBar: Nothing to do.
-      if( ( p.X >= 0 ) && ( p.X <= _adorner.ActualWidth ) && ( p.Y >= 0 ) && ( p.Y <= _adorner.ActualHeight ) )
+      if( preventDisplayFadeOut ||
+        ( p.X >= 0 ) && ( p.X <= _adorner.ActualWidth ) && ( p.Y >= 0 ) && ( p.Y <= _adorner.ActualHeight ) )
       {
         return;
       }
@@ -126,12 +130,6 @@ namespace Xceed.Wpf.Toolkit
 
         _adorner.Opacity = 1d - ( Math.Min( maxDist, 100d ) / 100d );
       }
-    }
-
-    private void OnMouseLeaveParentWindow( object sender, MouseEventArgs e )
-    {
-      // Mouse is outside parent Window: Close it.
-      HideAdorner();
     }
 
     void RichTextBox_TextChanged( object sender, TextChangedEventArgs e )
@@ -176,12 +174,13 @@ namespace Xceed.Wpf.Toolkit
 
       VerifyAdornerLayer();
 
-      _toolbar.Update();
-
       Control adorningEditor = _toolbar as Control;
 
       if( _adorner.Child == null )
         _adorner.Child = adorningEditor;
+
+      adorningEditor.ApplyTemplate();
+      _toolbar.Update();
 
       _adorner.Visibility = Visibility.Visible;
 
@@ -191,7 +190,6 @@ namespace Xceed.Wpf.Toolkit
       if( _parentWindow != null )
       {
         Mouse.AddMouseMoveHandler( _parentWindow, OnPreviewMouseMoveParentWindow );
-        Mouse.AddMouseLeaveHandler( _parentWindow, OnMouseLeaveParentWindow );
       }
     }
 
@@ -250,7 +248,6 @@ namespace Xceed.Wpf.Toolkit
         if( _parentWindow != null )
         {
           Mouse.RemoveMouseMoveHandler( _parentWindow, OnPreviewMouseMoveParentWindow );
-          Mouse.RemoveMouseLeaveHandler( _parentWindow, OnMouseLeaveParentWindow );
         }
       }
     }

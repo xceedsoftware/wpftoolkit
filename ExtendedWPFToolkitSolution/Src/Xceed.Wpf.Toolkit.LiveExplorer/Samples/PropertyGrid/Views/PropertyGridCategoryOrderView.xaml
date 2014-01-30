@@ -29,20 +29,33 @@
             <Run>The PropertyGrid on the left displays non-ordered categories, where the important information is at the bottom of the PropertyGrid.</Run>
             <LineBreak />
             <Run>The PropertyGrid on the right uses the CategoryOrder attribute to order the categories in the desired order.</Run>
-            <LineBreak />
-            <Run>This feature is only available in the "Plus" version.</Run>
-            <LineBreak />
-            <Hyperlink NavigateUri="http://www.xceed.com/Extended_WPF_Toolkit_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
-               Click here for more details about Extended WPF Toolkit Plus.
-            </Hyperlink>
         </Paragraph>
     </local:DemoView.Description>
 
+   <Grid>
+      <Grid.ColumnDefinitions>
+         <ColumnDefinition Width="*" />
+         <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
 
+      <Grid HorizontalAlignment="Right">
+         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+         </Grid.RowDefinitions>
 
+         <TextBlock Text="Non-Ordered Categories:" FontSize="16" FontWeight="Bold" HorizontalAlignment="Stretch" Margin="10"/>
+         <xctk:PropertyGrid x:Name="_propertyGrid1" Grid.Row="1" Width="290" MaxHeight="350" VerticalAlignment="Top" Margin="10"/>
+      </Grid>
 
+      <Grid Grid.Column="1">
+         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+         </Grid.RowDefinitions>
 
-
-
-    <Image Source="..\OpenSourceImages\CategoryOrdering.png" Width="600" Height="400"/>
+         <TextBlock Grid.Column="1" Text="Ordered Categories:" FontSize="16" FontWeight="Bold" Margin="10"/>
+         <xctk:PropertyGrid x:Name="_propertyGrid2" Grid.Row="1" Grid.Column="1" Width="290" MaxHeight="350" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10"/>
+      </Grid>
+   </Grid>
 </local:DemoView>

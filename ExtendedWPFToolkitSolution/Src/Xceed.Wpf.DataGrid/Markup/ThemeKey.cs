@@ -21,6 +21,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Markup;
 using Xceed.Wpf.DataGrid.Views;
+using System.Windows.Media;
 
 namespace Xceed.Wpf.DataGrid.Markup
 {
@@ -31,7 +32,7 @@ namespace Xceed.Wpf.DataGrid.Markup
     {
     }
 
-    public ThemeKey( Type targetViewType, Type themeType, Type targetElementType )
+    public ThemeKey( Type targetViewType, Type themeType, Type targetElementType, Brush targetAccentBrush )
     {
       if( targetViewType == null )
         throw new ArgumentNullException( "targetViewType" );
@@ -45,12 +46,42 @@ namespace Xceed.Wpf.DataGrid.Markup
       m_themeTypeInitialized = true;
       m_targetElementType = targetElementType;
       m_targetElementTypeInitialized = true;
+      m_targetAccentBrush = targetAccentBrush;
+      m_targetAccentBrushInitialized = true;
     }
 
     public ThemeKey( Type targetViewType, Type targetElementType )
-      : this( targetViewType, null, targetElementType )
+      : this( targetViewType, null, targetElementType, null )
     {
     }
+
+    public ThemeKey( Type targetViewType, Type themeType, Type targetElementType )
+      : this( targetViewType, themeType, targetElementType, null )
+    {
+    }
+
+    #region TargetAccentBrush Property
+
+    public Brush TargetAccentBrush
+    {
+      get
+      {
+        return m_targetAccentBrush;
+      }
+      set
+      {
+        if( m_targetAccentBrushInitialized )
+          throw new InvalidOperationException( "An attempt was made to set the TargetAccentBrush property when it has already been initialized." );
+
+        m_targetAccentBrush = value;
+        m_targetAccentBrushInitialized = true;
+      }
+    }
+
+    private Brush m_targetAccentBrush; // = null;
+    private bool m_targetAccentBrushInitialized; // = false;
+
+    #endregion TargetAccentBrush Property
 
     #region TargetViewType Property
 
@@ -158,6 +189,9 @@ namespace Xceed.Wpf.DataGrid.Markup
       if( !( ( key.TargetElementType != null ) ? key.TargetElementType.Equals( this.TargetElementType ) : ( this.TargetElementType == null ) ) )
         return false;
 
+      if( !( ( key.TargetAccentBrush != null ) ? key.TargetAccentBrush.Equals( this.TargetAccentBrush ) : ( this.TargetAccentBrush == null ) ) )
+        return false;
+
       return true;
     }
 
@@ -165,7 +199,8 @@ namespace Xceed.Wpf.DataGrid.Markup
     {
       return ( ( ( this.TargetViewType != null ) ? this.TargetViewType.GetHashCode() : 0 )
         ^ ( ( this.ThemeType != null ) ? this.ThemeType.GetHashCode() : 0 )
-        ^ ( ( this.TargetElementType != null ) ? this.TargetElementType.GetHashCode() : 0 ) );
+        ^ ( ( this.TargetElementType != null ) ? this.TargetElementType.GetHashCode() : 0 ) 
+        ^ ( ( this.TargetAccentBrush != null ) ? this.TargetAccentBrush.GetHashCode() : 0 ) );
     }
   }
 }

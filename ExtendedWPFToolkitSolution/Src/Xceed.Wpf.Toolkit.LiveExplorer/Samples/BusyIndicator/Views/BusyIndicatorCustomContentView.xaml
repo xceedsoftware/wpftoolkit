@@ -28,7 +28,7 @@
    <local:DemoView.Resources>
       <ResourceDictionary>
          <ResourceDictionary.MergedDictionaries>
-            <ResourceDictionary Source="/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/BusyIndicator/Resources/Common.xaml" />
+            <ResourceDictionary Source="../Resources/Common.xaml" />
         </ResourceDictionary.MergedDictionaries>
       </ResourceDictionary>
    </local:DemoView.Resources>
@@ -38,7 +38,7 @@
       <xctk:BusyIndicator IsBusy="True">
          <xctk:BusyIndicator.BusyContent>
             <StackPanel Orientation="Horizontal">
-               <Image Source="pack://application:,,,/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/BusyIndicator/Images/CdBurning32.png" />
+               <Image Source="../Images/CdBurning32.png" />
                <StackPanel Margin="5,0">
                   <TextBlock Text="Burning CD..." VerticalAlignment="Center" />
                   <TextBlock Text="Madonna - Like a Virgin" VerticalAlignment="Center" Margin="8,0" />

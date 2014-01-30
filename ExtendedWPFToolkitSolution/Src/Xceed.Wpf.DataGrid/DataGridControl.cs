@@ -1467,12 +1467,10 @@ namespace Xceed.Wpf.DataGrid
       {
         newView = this.GetDefaultView();
       }
-      else
-      {
-        newView.ThemeChanged += new DependencyPropertyChangedEventHandler( this.View_ThemeChanged );
-        newView.FixedHeaders.CollectionChanged += new NotifyCollectionChangedEventHandler( this.View_FixedHeadersCollectionChanged );
-        newView.FixedFooters.CollectionChanged += new NotifyCollectionChangedEventHandler( this.View_FixedFootersCollectionChanged );
-      }
+
+      newView.ThemeChanged += new DependencyPropertyChangedEventHandler( this.View_ThemeChanged );
+      newView.FixedHeaders.CollectionChanged += new NotifyCollectionChangedEventHandler( this.View_FixedHeadersCollectionChanged );
+      newView.FixedFooters.CollectionChanged += new NotifyCollectionChangedEventHandler( this.View_FixedFootersCollectionChanged );
 
       // Cache if the view requires to preserve container size
       this.ViewPreservesContainerSize = ( newView != null )
@@ -2985,7 +2983,7 @@ namespace Xceed.Wpf.DataGrid
         } ), DispatcherPriority.Normal );
       }
 
-      Xceed.Wpf.DataGrid.Views.ViewBase view = this.GetView();
+      Xceed.Wpf.DataGrid.Views.ViewBase view = this.GetView();      
 
       this.SaveDataGridContextState( this.DataGridContext, true, int.MaxValue );
 

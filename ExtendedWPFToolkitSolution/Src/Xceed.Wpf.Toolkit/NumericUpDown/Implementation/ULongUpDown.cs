@@ -25,7 +25,7 @@ namespace Xceed.Wpf.Toolkit
 
     static ULongUpDown()
     {
-      UpdateMetadataInternal( typeof( ULongUpDown ), ( ulong )1, ulong.MinValue, ulong.MaxValue );
+      UpdateMetadata( typeof( ULongUpDown ), ( ulong )1, ulong.MinValue, ulong.MaxValue );
     }
 
     public ULongUpDown()

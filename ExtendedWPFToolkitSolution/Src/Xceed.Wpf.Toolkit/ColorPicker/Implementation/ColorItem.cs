@@ -36,5 +36,18 @@ namespace Xceed.Wpf.Toolkit
       Color = color;
       Name = name;
     }
+
+    public override bool Equals(object obj)
+    {
+      var ci = obj as ColorItem;
+      if (ci == null)
+          return false;
+      return ( ci.Color.Equals( Color ) && ci.Name.Equals( Name ) );
+    }
+
+    public override int GetHashCode()
+    {
+      return this.Color.GetHashCode() ^ this.Name.GetHashCode();
+    }
   }
 }

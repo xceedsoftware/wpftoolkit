@@ -1,0 +1,113 @@
+﻿<!--*************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  *************************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views.PropertyGridPropertiesSourceView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                xmlns:s="clr-namespace:System;assembly=mscorlib"
+                VerticalScrollBarVisibility="Disabled"
+                 Title="Custom Properties List">
+    <local:DemoView.Description>
+        <Paragraph FontSize="14" FontFamily="Segoe">
+           When setting the PropertiesSource or Properties property, you can provide your own data to be displayed in the PropertyGrid. This allows you to easily insert and remove properties at runtime. The usage scheme is similar to the one used for the standard ItemsControl.
+         <!--##INCLUDE_OPEN_SOURCE
+            <LineBreak />
+           <LineBreak />
+            <Run>This feature is only available in the "Plus" version.</Run>
+            <LineBreak />
+            <Hyperlink NavigateUri="http://www.xceed.com/Extended_WPF_Toolkit_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
+               Click here for more details about Xceed Extended WPF Toolkit Plus.
+            </Hyperlink>
+        ##END-->           
+        </Paragraph>
+    </local:DemoView.Description>
+    
+   <Grid>
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+      <StackPanel Grid.Row="0" Margin="10">
+         <TextBlock Text="This sample uses the 'PropertiesSource', 'PropertyNameBinding', and 'PropertyValueBinding', as well as collection of generic objects to display its properties."
+                    TextWrapping="Wrap"/>
+         <!--##EXCLUDE_OPEN_SOURCE-->
+         <TextBlock Text="(Click the XAML and Code tabs to see details.)" 
+                    FontStyle="Italic"
+                    Margin="0,10,0,0"/>
+         <!--##END-->
+      </StackPanel>
+      <!--##INCLUDE_OPEN_SOURCE
+      <ScrollViewer Grid.Row="2" 
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Auto">
+         <StackPanel>
+            <TextBlock Text="C# :" Margin="0,10,0,0" />
+            <local:CSharpBox CodeSource="/Samples/PropertyGrid/OpenSourceImages/PropertiesSource.cs.txt" />
+            <TextBlock Text="Xaml :" Margin="0,10,0,0" />
+            <local:XamlBox CodeSource="/Samples/PropertyGrid/OpenSourceImages/PropertiesSource.xaml.txt" />
+         </StackPanel>
+      </ScrollViewer>      
+      ##END-->
+      <!--##EXCLUDE_OPEN_SOURCE-->
+      
+      <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+         <Button Content="Insert new property" Click="InsertProperty" Margin="20" Padding="5"/>
+         <Button Content="Remove selected property" Click="RemoveProperty" Margin="20" Padding="5"/>
+      </StackPanel>
+      
+      
+      <!-- 
+      The PropertyNameBinding and PropertyValueBinding properties provide the bindings that will be used
+      on each item of the properties' source in order to provide the Name and Value of each property.
+      -->
+      <xctk:PropertyGrid x:Name="_propertyGrid" Grid.Row="2" Width="350" MaxHeight="600"
+                         IsCategorized="False"
+                         ShowSortOptions="False"
+                         PropertiesSource="{Binding}"
+                         PropertyNameBinding="{Binding MyName}"
+                         PropertyValueBinding="{Binding MyValue}" >
+         <xctk:PropertyGrid.Resources>
+            <xctk:EditorTimeSpanConverter x:Key="timeSpanConv"/>
+         </xctk:PropertyGrid.Resources>
+         
+         <xctk:PropertyGrid.EditorDefinitions>
+            <!-- The property with the name "SecondText" will have this special editor. -->
+            <xctk:EditorTextDefinition TargetProperties="Second string"
+                                       FontStyle="Italic"
+                                       FontWeight="Bold" >
+               <xctk:EditorTextDefinition.EditingElementStyle>
+                  <Style TargetType="{x:Type TextBox}"
+                        BasedOn="{StaticResource  {x:Type TextBox}}">
+                     <Setter Property="Background" Value="LightBlue"/>
+                  </Style>
+               </xctk:EditorTextDefinition.EditingElementStyle>
+               
+            </xctk:EditorTextDefinition>
+
+            <!-- All properties whose value type is TimeSpan will use this special editor. -->
+            <!--Here we use a DateTimeUpDown editor in conjunction with a built-in converter to 
+            create a TimeSpanEditor-->
+            <xctk:EditorDateTimeUpDownDefinition TargetProperties="{x:Type s:TimeSpan}"
+                                                 Format="Custom"
+                                                 FormatString="HH:mm"
+                                                 Binding="{Binding MyValue, Converter={StaticResource timeSpanConv}}" />
+         </xctk:PropertyGrid.EditorDefinitions>
+      </xctk:PropertyGrid>
+      <!--##END-->
+   </Grid>      
+</local:DemoView>

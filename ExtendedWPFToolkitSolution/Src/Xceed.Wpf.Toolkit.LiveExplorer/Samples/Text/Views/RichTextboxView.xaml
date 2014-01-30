@@ -64,7 +64,7 @@
                 </xctk:RichTextBoxFormatBarManager.FormatBar>
             <xctk:RichTextBox.Document>
                <FlowDocument>
-                  <Paragraph>This is the <Bold>RichTextBox</Bold> !</Paragraph>
+                  <Paragraph>This is the <Bold>RichTextBox </Bold>!</Paragraph>
                </FlowDocument>
             </xctk:RichTextBox.Document>
          </xctk:RichTextBox>

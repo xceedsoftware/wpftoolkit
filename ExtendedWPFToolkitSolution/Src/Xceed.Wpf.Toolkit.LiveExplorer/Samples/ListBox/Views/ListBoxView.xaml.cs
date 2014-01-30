@@ -12,13 +12,14 @@
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
-  *************************************************************************************/
+  ************************************************************************************/
 
 using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Resources;
-using System.Diagnostics;
+using Xceed.Wpf.Samples.SampleData;
+using System.ComponentModel;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.ListBox.Views
 {
@@ -33,6 +34,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.ListBox.Views
     {
 
       InitializeComponent();
+
     }
 
     #endregion

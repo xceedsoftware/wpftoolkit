@@ -44,7 +44,9 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
     public MainWindow()
     {
       InitializeComponent();
+      this.Loaded += new RoutedEventHandler( this.MainWindow_Loaded );
     }
+
 
     #region Properties
 
@@ -72,19 +74,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
 
     protected virtual void OnViewChanged( DemoView oldValue, DemoView newValue )
     {
-      if( _flowDocumentDesc != null )
-      {
-        _flowDocumentDesc.Blocks.Clear();
-        if( this.View.Description != null )
-        {
-          _flowDocumentDesc.Blocks.Add( this.View.Description );
-        }
-      }
-      if( _contentScrollViewer != null )
-      {
-      _contentScrollViewer.ScrollToHome();
-      }
-
+      this.InitView();
     }
 
     #endregion //View
@@ -92,6 +82,11 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
     #endregion //Properties
 
     #region Event Handler
+
+    void MainWindow_Loaded( object sender, RoutedEventArgs e )
+    {
+      this.InitView();
+    }
 
     private void OnTreeViewSelectionChanged( object sender, RoutedPropertyChangedEventArgs<Object> e )
     {
@@ -110,7 +105,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
           Assembly assembly = Assembly.Load( toolkitAssembly );
           Type sampleType = assembly.GetType( name );
 
-          this.View = (DemoView)Activator.CreateInstance( sampleType );
+          this.View = ( DemoView )Activator.CreateInstance( sampleType );
         }
       }
     }
@@ -128,6 +123,26 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
     }
 
     #endregion //EventHandler
+
+    #region Methods
+
+    private void InitView()
+    {
+      if( ( _flowDocumentDesc != null ) && ( this.View != null) )
+      {
+        _flowDocumentDesc.Blocks.Clear();
+        if( this.View.Description != null )
+        {
+          _flowDocumentDesc.Blocks.Add( this.View.Description );
+        }
+      }
+      if( _contentScrollViewer != null )
+      {
+        _contentScrollViewer.ScrollToHome();
+      }
+    }
+
+    #endregion
 
   }
 }

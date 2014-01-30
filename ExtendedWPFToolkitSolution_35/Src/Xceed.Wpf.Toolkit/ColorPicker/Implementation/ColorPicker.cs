@@ -25,11 +25,18 @@ using System.Windows.Controls.Primitives;
 
 namespace Xceed.Wpf.Toolkit
 {
+  public enum ColorMode
+  {
+    ColorPalette,
+    ColorCanvas
+  }
+
   [TemplatePart( Name = PART_AvailableColors, Type = typeof( ListBox ) )]
   [TemplatePart( Name = PART_StandardColors, Type = typeof( ListBox ) )]
   [TemplatePart( Name = PART_RecentColors, Type = typeof( ListBox ) )]
   [TemplatePart( Name = PART_ColorPickerToggleButton, Type = typeof( ToggleButton ) )]
   [TemplatePart( Name = PART_ColorPickerPalettePopup, Type = typeof( Popup ) )]
+  [TemplatePart( Name = PART_ColorModeButton, Type = typeof( Button ) )]
   public class ColorPicker : Control
   {
     private const string PART_AvailableColors = "PART_AvailableColors";
@@ -37,6 +44,7 @@ namespace Xceed.Wpf.Toolkit
     private const string PART_RecentColors = "PART_RecentColors";
     private const string PART_ColorPickerToggleButton = "PART_ColorPickerToggleButton";
     private const string PART_ColorPickerPalettePopup = "PART_ColorPickerPalettePopup";
+    private const string PART_ColorModeButton = "PART_ColorModeButton";
 
     #region Members
 
@@ -45,6 +53,7 @@ namespace Xceed.Wpf.Toolkit
     private ListBox _recentColors;
     private ToggleButton _toggleButton;
     private Popup _popup;
+    private Button _colorModeButton;
 
     #endregion //Members
 
@@ -117,6 +126,23 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //DisplayColorAndName
+
+    #region ColorMode
+
+    public static readonly DependencyProperty ColorModeProperty = DependencyProperty.Register( "ColorMode", typeof( ColorMode ), typeof( ColorPicker ), new UIPropertyMetadata( ColorMode.ColorPalette ) );
+    public ColorMode ColorMode
+    {
+      get
+      {
+        return ( ColorMode )GetValue( ColorModeProperty );
+      }
+      set
+      {
+        SetValue( ColorModeProperty, value );
+      }
+    }
+
+    #endregion //ColorMode
 
     #region IsOpen
 
@@ -419,8 +445,16 @@ namespace Xceed.Wpf.Toolkit
       if( _popup != null )
         _popup.Opened += Popup_Opened;
 
-      _toggleButton = GetTemplateChild( PART_ColorPickerToggleButton ) as ToggleButton;
-    }
+      _toggleButton = this.Template.FindName( PART_ColorPickerToggleButton, this ) as ToggleButton;
+
+      if( _colorModeButton != null )
+        _colorModeButton.Click -= new RoutedEventHandler( this.ColorModeButton_Clicked );
+
+      _colorModeButton = this.Template.FindName( PART_ColorModeButton, this ) as Button;
+
+      if( _colorModeButton != null )
+        _colorModeButton.Click += new RoutedEventHandler( this.ColorModeButton_Clicked );
+    }   
 
     #endregion //Base Class Overrides
 
@@ -488,6 +522,11 @@ namespace Xceed.Wpf.Toolkit
         listBoxItem = ( ListBoxItem )listBox.ItemContainerGenerator.ContainerFromItem( listBox.Items[ 0 ] );
       if( listBoxItem != null )
         listBoxItem.Focus();
+    }
+
+    private void ColorModeButton_Clicked( object sender, RoutedEventArgs e )
+    {
+      this.ColorMode = ( this.ColorMode == ColorMode.ColorPalette ) ? ColorMode.ColorCanvas : ColorMode.ColorPalette;
     }
 
     #endregion //Event Handlers

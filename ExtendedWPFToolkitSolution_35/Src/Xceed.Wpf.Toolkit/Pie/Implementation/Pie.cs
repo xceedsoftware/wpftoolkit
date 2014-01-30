@@ -30,6 +30,7 @@ namespace Xceed.Wpf.Toolkit
 
     static Pie()
     {
+      DefaultStyleKeyProperty.OverrideMetadata( typeof( Pie ), new FrameworkPropertyMetadata( typeof( Pie ) ) );
       // The default stretch mode of Pie is Fill
       Pie.StretchProperty.OverrideMetadata( typeof( Pie ), new FrameworkPropertyMetadata( Stretch.Fill ) );
       Pie.StrokeLineJoinProperty.OverrideMetadata( typeof( Pie ), new FrameworkPropertyMetadata( PenLineJoin.Round ) );

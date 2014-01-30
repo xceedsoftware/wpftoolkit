@@ -35,13 +35,11 @@
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
-         <RowDefinition Height="Auto" />
          <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <TextBlock Text="Binding to Structs:" Style="{StaticResource Header}" Margin="10"/>
-      <TextBlock Grid.Row="1" Text="The solution to this problem is to create a custom editor and provide an IValueConverter to handle the proper conversion of the Struct values." TextWrapping="Wrap" />
-      <xctk:PropertyGrid x:Name="_propertyGrid" Grid.Row="2" Width="450" MaxHeight="250" Margin="10">
+      <TextBlock Text="The solution to this problem is to create a custom editor and provide an IValueConverter to handle the proper conversion of the Struct values." TextWrapping="Wrap" />
+      <xctk:PropertyGrid x:Name="_propertyGrid" Grid.Row="1" Width="450" MaxHeight="250" Margin="10">
          <xctk:PropertyGrid.EditorDefinitions>
             <xctk:EditorTemplateDefinition TargetProperties="{x:Type propertyGrid:Dimension}">
                <xctk:EditorTemplateDefinition.EditingTemplate>

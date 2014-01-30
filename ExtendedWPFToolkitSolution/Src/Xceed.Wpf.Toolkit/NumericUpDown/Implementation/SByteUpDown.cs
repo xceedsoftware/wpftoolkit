@@ -25,7 +25,7 @@ namespace Xceed.Wpf.Toolkit
 
     static SByteUpDown()
     {
-      UpdateMetadataInternal( typeof( SByteUpDown ), ( sbyte )1, sbyte.MinValue, sbyte.MaxValue );
+      UpdateMetadata( typeof( SByteUpDown ), ( sbyte )1, sbyte.MinValue, sbyte.MaxValue );
     }
 
     public SByteUpDown()

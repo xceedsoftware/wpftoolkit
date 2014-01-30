@@ -107,8 +107,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
     }
 
-    internal void UpdateCategorization( GroupDescription groupDescription )
+    internal void UpdateCategorization( GroupDescription groupDescription, bool isPropertyGridCategorized )
     {
+      // Compute Display Order relative to PropertyOrderAttributes on PropertyItem
+      // which could be different in Alphabetical or Categorized mode.
+      foreach( PropertyItem item in this.Items )
+      {
+        item.DescriptorDefinition.DisplayOrder = item.DescriptorDefinition.ComputeDisplayOrderInternal( isPropertyGridCategorized );
+        item.PropertyOrder = item.DescriptorDefinition.DisplayOrder;
+      }
+
       // Clear view values
       ICollectionView view = this.GetDefaultView();
       using( view.DeferRefresh() )

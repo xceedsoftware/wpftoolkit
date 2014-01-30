@@ -45,14 +45,6 @@
             <x:Type TypeName="sample:GenderData" />
          </ObjectDataProvider.MethodParameters>
       </ObjectDataProvider>
-
-        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Foreground" Value="Gray" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
     </local:DemoView.Resources>
 
     <Grid>

@@ -28,6 +28,14 @@ namespace Xceed.Wpf.Toolkit
     }
 
     /// <summary>
+    /// Represents the property that will be used to know if the formatBar should fade when mouse goes away.
+    /// </summary>
+    bool PreventDisplayFadeOut
+    {
+      get;
+    }
+
+    /// <summary>
     /// Represents the Method that will be used to update the format bar values based on the Selection.
     /// </summary>
     void Update();

@@ -415,9 +415,17 @@ namespace Xceed.Wpf.Toolkit
       //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
       list.Clear();
 
-      foreach( var item in Items )
+      if( list.IsFixedSize )
       {
-        list.Add( item );
+        for( int i = 0; i < Items.Count; ++i )
+          list[ i ] = Items[ i ];
+      }
+      else
+      {
+        foreach( var item in Items )
+        {
+          list.Add( item );
+        }
       }
     }
 

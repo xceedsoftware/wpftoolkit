@@ -27,7 +27,7 @@
    <!-- DateTimeUpDown                                                                  -->
    <!-- =============================================================================== -->
 
-   <Style TargetType="{x:Type local:DateTimeUpDown}">
+   <Style x:Key="DateTimeUpDown" TargetType="{x:Type local:DateTimeUpDown}">
       <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
       <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
       <Setter Property="BorderThickness" Value="1" />
@@ -77,5 +77,7 @@
          </Setter.Value>
       </Setter>
    </Style>
+
+   <Style TargetType="{x:Type local:DateTimeUpDown}" BasedOn="{StaticResource DateTimeUpDown}" />
 
 </ResourceDictionary>

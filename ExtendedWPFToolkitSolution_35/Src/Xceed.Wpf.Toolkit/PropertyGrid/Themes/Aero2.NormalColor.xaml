@@ -20,6 +20,7 @@
                     xmlns:pg="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid"
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
                     xmlns:pgconv="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid.Converters"
+                    xmlns:editor="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid.Editors"
                     xmlns:utilities="clr-namespace:Xceed.Wpf.Toolkit.Core.Utilities"
                     xmlns:commands="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid.Commands"
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
@@ -27,6 +28,10 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
+        <ResourceDictionary Source="../../NumericUpDown/Themes/Aero2.NormalColor.xaml" />
+       <ResourceDictionary Source="../../DateTimeUpDown/Themes/Aero2.NormalColor.xaml" />
+       <ResourceDictionary Source="../../WatermarkTextBox/Themes/Aero2.NormalColor.xaml" />
+       <ResourceDictionary Source="../../ColorPicker/Themes/Aero2.NormalColor.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <!-- =============================================================================== -->
@@ -38,6 +43,225 @@
     <pgconv:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
 
     <x:Static x:Key="EmptyString" Member="sys:String.Empty" />
+
+   <!-- PropertyGrid numeric Editors -->  
+   <Style TargetType="{x:Type editor:PropertyGridEditorByteUpDown}" BasedOn="{StaticResource NumericUpDown}">
+      <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="ShowButtonSpinner" Value="False" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+   <Style TargetType="{x:Type editor:PropertyGridEditorDecimalUpDown}" BasedOn="{StaticResource NumericUpDown}">
+      <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="ShowButtonSpinner" Value="False" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+   <Style TargetType="{x:Type editor:PropertyGridEditorDoubleUpDown}" BasedOn="{StaticResource NumericUpDown}" >
+      <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="ShowButtonSpinner" Value="False" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+   <Style TargetType="{x:Type editor:PropertyGridEditorIntegerUpDown}" BasedOn="{StaticResource NumericUpDown}" >
+      <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="ShowButtonSpinner" Value="False" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+   <Style TargetType="{x:Type editor:PropertyGridEditorLongUpDown}" BasedOn="{StaticResource NumericUpDown}" >
+      <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="ShowButtonSpinner" Value="False" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+   <Style TargetType="{x:Type editor:PropertyGridEditorShortUpDown}" BasedOn="{StaticResource NumericUpDown}" >
+      <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="ShowButtonSpinner" Value="False" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+   <Style TargetType="{x:Type editor:PropertyGridEditorSingleUpDown}" BasedOn="{StaticResource NumericUpDown}" >
+      <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="ShowButtonSpinner" Value="False" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+    <!-- PropertyGrid DateTime Editors --> 
+   <Style TargetType="{x:Type editor:PropertyGridEditorDateTimeUpDown}" BasedOn="{StaticResource DateTimeUpDown}" >
+      <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="ShowButtonSpinner" Value="False" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+   <!-- PropertyGrid ComboBox Editors --> 
+   <Style TargetType="{x:Type editor:PropertyGridEditorComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" >
+      <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Background" Value="Transparent" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+   <!-- PropertyGrid CheckBox Editors --> 
+   <Style TargetType="{x:Type editor:PropertyGridEditorCheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}" >
+      <Setter Property="Margin" Value="5,0,0,0" />
+   </Style>
+
+   <!-- PropertyGrid TextBox Editors --> 
+   <Style TargetType="{x:Type editor:PropertyGridEditorTextBox}" BasedOn="{StaticResource WatermarkTextBox}" >
+       <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+   <!-- PropertyGrid TextBlock Editors --> 
+   <Style TargetType="{x:Type editor:PropertyGridEditorTextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}" />
+
+   <!-- PropertyGrid ColorPicker Editors --> 
+   <Style TargetType="{x:Type editor:PropertyGridEditorColorPicker}" BasedOn="{StaticResource ColorPicker}" >
+       <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="ShowDropDownButton" Value="False" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+   <!-- ===============================================================================   -->
+   <!-- Style for all internal derived types of NumericUpDown will be done in code-behind -->
+   <!-- for external themes to redefine the default style. The reason is that the         -->
+   <!-- toolkit.dll uses the InternalsVisibleTo attribute which makes internal data only  -->
+   <!-- available in code-behind(not xaml).                                               -->        
+   <!-- (ex. Office2007 theme)                                                            -->
+   <!-- ===============================================================================   -->  
+
+   <!-- Internal PropertyGrid numeric Editors -->  
+   <Style TargetType="{x:Type editor:PropertyGridEditorSByteUpDown}" BasedOn="{StaticResource NumericUpDown}" >
+      <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="ShowButtonSpinner" Value="False" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+   <Style TargetType="{x:Type editor:PropertyGridEditorUIntegerUpDown}" BasedOn="{StaticResource NumericUpDown}" >
+      <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="ShowButtonSpinner" Value="False" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+   <Style TargetType="{x:Type editor:PropertyGridEditorULongUpDown}" BasedOn="{StaticResource NumericUpDown}" >
+      <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="ShowButtonSpinner" Value="False" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+   <Style TargetType="{x:Type editor:PropertyGridEditorUShortUpDown}" BasedOn="{StaticResource NumericUpDown}" >
+      <Style.Triggers>
+         <MultiTrigger>
+            <MultiTrigger.Conditions>
+               <Condition Property="IsKeyboardFocusWithin" Value="False"/>
+               <Condition Property="IsMouseOver" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="ShowButtonSpinner" Value="False" />
+         </MultiTrigger>
+      </Style.Triggers>
+   </Style>
+
+
+
 
     <Style x:Key="OptionsToggleButtonStyle" TargetType="{x:Type RadioButton}">
         <Setter Property="Background" Value="Transparent" />
@@ -248,9 +472,7 @@
       <!-- Set the margin at 1 pixel bottom to let the horizontal "line" effect appear. -->       
       <Setter Property="Margin" Value="0,0,0,1" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
-      <Setter Property="Focusable" Value="True" />
       <Setter Property="SnapsToDevicePixels" Value="True"/>
-      <Setter Property="KeyboardNavigation.DirectionalNavigation" Value="None"/>
       <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type pg:PropertyItemBase}">
@@ -284,7 +506,8 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-                              <ToggleButton Grid.Column="0"
+                              <ToggleButton x:Name="_expandableButton"
+                                            Grid.Column="0"
                                             Template="{StaticResource ExpanderToggleButton}"
                                                OverridesDefaultStyle="True"
                                                IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
@@ -304,18 +527,18 @@
                                  ContextMenu="{Binding AdvancedOptionsMenu, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}}">
 
                                         <Image x:Name="_optionsImage"
-                                     Width="11"
-                                     Height="11"
-                                     Source="{Binding AdvancedOptionsIcon, RelativeSource={RelativeSource TemplatedParent}}"
-                                     ToolTip="{Binding AdvancedOptionsTooltip, RelativeSource={RelativeSource TemplatedParent}}" />
+                                                 Width="11"
+                                                 Height="11"
+                                                 ToolTip="{Binding AdvancedOptionsTooltip, RelativeSource={RelativeSource TemplatedParent}}" />
                                     </Grid>
                                 </Grid>
                             </Border>
 
                             <Border x:Name="PART_Editor" Grid.Column="1" 
-                                                               Background="{TemplateBinding Background}" 
-                           VerticalAlignment="Stretch" 
-                           HorizontalAlignment="Stretch">
+                                     Background="{TemplateBinding Background}"
+                                    KeyboardNavigation.DirectionalNavigation="None"
+                                    VerticalAlignment="Stretch" 
+                                    HorizontalAlignment="Stretch">
                         <ContentControl x:Name="PART_ValueContainer" 
                                           Content="{TemplateBinding Editor}" 
                                           Focusable="False" IsTabStop="False" 
@@ -351,6 +574,28 @@
                             <Setter Property="ToolTip"
                                 Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors).CurrentItem.ErrorContent}"/>
                         </Trigger>
+                        <Trigger Property="Visibility" Value="Visible" SourceName="_expandableButton">
+                           <Setter Property="Focusable" Value="False" />
+                        </Trigger>
+
+                       <DataTrigger Binding="{Binding ElementName=_optionsImage, Path=ToolTip}" Value="{x:Static pg:StringConstants.Local}">
+                           <Setter TargetName="_optionsImage" Property="Source" Value="../Images/Local11.png" />
+                        </DataTrigger>
+                       <DataTrigger Binding="{Binding ElementName=_optionsImage, Path=ToolTip}" Value="{x:Static pg:StringConstants.Resource}">
+                           <Setter TargetName="_optionsImage" Property="Source" Value="../Images/Resource11.png" />
+                        </DataTrigger>
+                       <DataTrigger Binding="{Binding ElementName=_optionsImage, Path=ToolTip}" Value="{x:Static pg:StringConstants.Databinding}">
+                           <Setter TargetName="_optionsImage" Property="Source" Value="../Images/Database11.png" />
+                        </DataTrigger>
+                       <DataTrigger Binding="{Binding ElementName=_optionsImage, Path=ToolTip}" Value="{x:Static pg:StringConstants.Inheritance}">
+                           <Setter TargetName="_optionsImage" Property="Source" Value="../Images/Inheritance11.png" />
+                        </DataTrigger>
+                       <DataTrigger Binding="{Binding ElementName=_optionsImage, Path=ToolTip}" Value="{x:Static pg:StringConstants.StyleSetter}">
+                           <Setter TargetName="_optionsImage" Property="Source" Value="../Images/Style11.png" />
+                        </DataTrigger>
+                       <DataTrigger Binding="{Binding ElementName=_optionsImage, Path=ToolTip}" Value="{x:Static pg:StringConstants.AdvancedProperties}">
+                           <Setter TargetName="_optionsImage" Property="Source" Value="../Images/AdvancedProperties11.png" />
+                        </DataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

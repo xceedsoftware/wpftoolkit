@@ -45,7 +45,7 @@ namespace Xceed.Wpf.Toolkit
     private static string ComputeDateTimeString( string dateTime, string format, DateTime currentDate, CultureInfo cultureInfo )
     {
       Dictionary<string, string> dateParts = GetDateParts( currentDate, cultureInfo );
-      string[] timeParts = new string[ 3 ] { currentDate.Hour.ToString(), currentDate.Minute.ToString(), currentDate.Second.ToString() };
+      string[] timeParts = new string[ 4 ] { currentDate.Hour.ToString(), currentDate.Minute.ToString(), currentDate.Second.ToString(), currentDate.Millisecond.ToString() };
       string designator = "";
       string[] dateTimeSeparators = new string[] { ",", " ", "-", ".", "/", cultureInfo.DateTimeFormat.DateSeparator, cultureInfo.DateTimeFormat.TimeSeparator };
 
@@ -81,6 +81,8 @@ namespace Xceed.Wpf.Toolkit
           else if( f.Contains( "s" ) )
             timeParts[ 2 ] = dateTimeParts[ i ];
           else if( f.Contains( "t" ) )
+            designator = dateTimeParts[ i ];
+          else if( f.Contains( "f" ) )
             designator = dateTimeParts[ i ];
         }
       }

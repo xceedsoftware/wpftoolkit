@@ -28,7 +28,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
 {
   public class SelectedObjectConverter : IValueConverter
   {
-    private const string ValidParameterMessage = @"parameter must be one of the following strings: 'Type', 'TypeName'";
+    private const string ValidParameterMessage = @"parameter must be one of the following strings: 'Type', 'TypeName', 'SelectedObjectName'";
     #region IValueConverter Members
 
     public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
@@ -46,6 +46,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
       else if( this.CompareParam( parameter, "TypeName" ) )
       {
         return this.ConvertToTypeName( value, culture );
+      }
+      else if( this.CompareParam( parameter, "SelectedObjectName" ) )
+      {
+        return this.ConvertToSelectedObjectName( value, culture );
       }
       else
       {
@@ -77,6 +81,22 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
       return (displayNameAttribute == null)
         ? newType.Name 
         : displayNameAttribute.DisplayName;
+    }
+
+    private object ConvertToSelectedObjectName( object value, CultureInfo culture )
+    {
+      if( value == null )
+        return String.Empty;
+
+      Type newType = value.GetType();
+      PropertyInfo[] properties = newType.GetProperties();
+      foreach( PropertyInfo property in properties )
+      {
+        if( property.Name == "Name" )
+          return property.GetValue( value, null );
+      }
+
+      return String.Empty;
     }
 
     public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )

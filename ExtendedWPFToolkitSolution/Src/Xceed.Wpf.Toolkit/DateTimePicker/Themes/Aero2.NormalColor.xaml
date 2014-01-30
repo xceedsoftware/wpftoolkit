@@ -139,6 +139,9 @@
                                                 Format="{TemplateBinding TimeFormat}"
                                                 FormatString="{TemplateBinding TimeFormatString}"
                                                 Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
+                                                Minimum="{Binding Minimum, RelativeSource={RelativeSource TemplatedParent}}"
+                                                Maximum="{Binding Maximum, RelativeSource={RelativeSource TemplatedParent}}"
+                                                ClipValueToMinMax="{Binding ClipValueToMinMax, RelativeSource={RelativeSource TemplatedParent}}"
                                                 Watermark="{TemplateBinding TimeWatermark}"
                                                 WatermarkTemplate="{TemplateBinding TimeWatermarkTemplate}" />
                                     </StackPanel>

@@ -119,9 +119,9 @@ namespace Xceed.Wpf.Toolkit.Primitives
       ( ( Selector )sender ).OnSelectedItemChanged( args.OldValue, args.NewValue );
     }
 
-    private void OnSelectedItemChanged( object oldValue, object newValue )
+    protected virtual void OnSelectedItemChanged( object oldValue, object newValue )
     {
-      if( _ignoreSelectedItemChanged )
+      if( !this.IsInitialized || _ignoreSelectedItemChanged )
         return;
 
       _ignoreSelectedItemsCollectionChanged++;
@@ -163,8 +163,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
         }
 
         _selectedItems = value;
-
-        this.UpdateFromSelectedItems();
       }
     }
 
@@ -191,12 +189,19 @@ namespace Xceed.Wpf.Toolkit.Primitives
       ( ( Selector )sender ).OnSelectedItemsOverrideChanged( ( IList )args.OldValue, ( IList )args.NewValue );
     }
 
-    private void OnSelectedItemsOverrideChanged( IList oldValue, IList newValue )
+    protected virtual void OnSelectedItemsOverrideChanged( IList oldValue, IList newValue )
     {
+      if( !this.IsInitialized )
+        return;
+
       this.SelectedItems = ( newValue != null ) ? newValue : new ObservableCollection<object>();
+      this.UpdateFromSelectedItems();
     }
 
     #endregion
+
+
+    #region SelectedMemberPath Property
 
     public static readonly DependencyProperty SelectedMemberPathProperty = DependencyProperty.Register( "SelectedMemberPath", typeof( string ), typeof( Selector ), new UIPropertyMetadata( null, OnSelectedMemberPathChanged ) );
     public string SelectedMemberPath
@@ -213,8 +218,19 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     private static void OnSelectedMemberPathChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
-      ( ( Selector )o ).UpdateSelectedMemberPathValuesBindings();
+      Selector sel = ( ( Selector )o );
+      sel.OnSelectedMemberPathChanged( (string)e.OldValue, (string)e.NewValue );
     }
+
+    protected virtual void OnSelectedMemberPathChanged( string oldValue, string newValue )
+    {
+      if( !this.IsInitialized )
+        return;
+
+      this.UpdateSelectedMemberPathValuesBindings();
+    }
+
+    #endregion //SelectedMemberPath
 
     #region SelectedValue
 
@@ -240,7 +256,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     protected virtual void OnSelectedValueChanged( string oldValue, string newValue )
     {
-      if( _ignoreSelectedValueChanged )
+      if( !this.IsInitialized || _ignoreSelectedValueChanged )
         return;
 
       UpdateFromSelectedValue();
@@ -265,8 +281,16 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     private static void OnValueMemberPathChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
+      Selector sel = ( ( Selector )o );
+      sel.OnValueMemberPathChanged( ( string )e.OldValue, ( string )e.NewValue );
+    }
 
-      ( ( Selector )o ).UpdateValueMemberPathValuesBindings();
+    protected virtual void OnValueMemberPathChanged( string oldValue, string newValue )
+    {
+      if( !this.IsInitialized )
+        return;
+
+      this.UpdateValueMemberPathValuesBindings();
     }
 
     #endregion
@@ -326,9 +350,42 @@ namespace Xceed.Wpf.Toolkit.Primitives
         CollectionChangedEventManager.AddListener( newCollection, this );
       }
 
+      if( !this.IsInitialized )
+        return;
+
       this.RemoveUnavailableSelectedItems();
       this.UpdateSelectedMemberPathValuesBindings();
       this.UpdateValueMemberPathValuesBindings();
+    }
+
+    // When a DataTemplate includes a CheckComboBox, some bindings are
+    // not working, like SelectedValue.
+    // We use a priority system to select the good items after initialization.
+    public override void EndInit()
+    {
+      base.EndInit();
+
+      if( this.SelectedItemsOverride != null )
+      {
+        this.OnSelectedItemsOverrideChanged( null, this.SelectedItemsOverride );
+      }
+      else if( this.SelectedMemberPath != null )
+      {
+        this.OnSelectedMemberPathChanged( null, this.SelectedMemberPath );
+      }
+      else if( this.SelectedValue != null )
+      {
+        this.OnSelectedValueChanged( null, this.SelectedValue );
+      }
+      else if( this.SelectedItem != null )
+      {
+        this.OnSelectedItemChanged( null, this.SelectedItem );
+      }
+
+      if( this.ValueMemberPath != null )
+      {
+        this.OnValueMemberPathChanged( null, this.ValueMemberPath );
+      }
     }
 
     #endregion //Base Class Overrides

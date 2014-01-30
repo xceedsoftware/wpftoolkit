@@ -346,6 +346,7 @@
     <Compile Include="ValidationRules\CellContentBindingValidationRule.cs" />
     <Compile Include="ValidationRules\CellEditorValidationRule.cs" />
     <Compile Include="ValidationRules\CellEditorErrorValidationRule.cs" />
+    <Compile Include="Views\DictionaryTheme.cs" />
     <Compile Include="Views\FixedCellPanel.cs" />
     <Compile Include="Views\%28ColumnVirtualization%29\UpdateMeasureRequiredEventArgs.cs" />
     <Compile Include="Views\%28ColumnVirtualization%29\UpdateMeasureRequiredEventManager.cs" />
@@ -773,15 +774,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="themes\Windows8\Resources\TableView.Windows8.Graphics.xaml">
+    <Page Include="themes\Aero2\Resources\TableView.Aero2.normalcolor.Graphics.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="themes\Windows8\Resources\Windows8.Resources.xaml">
+    <Page Include="themes\Aero2\Resources\Aero2.normalcolor.Resources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="themes\Windows8\TableflowView.Windows8.xaml">
+    <Page Include="themes\Aero2\TableflowView.Aero2.normalcolor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -972,7 +973,6 @@
       <Name>Xceed.Wpf.Toolkit</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="GenSerializationAssembly" DependsOnTargets="AssignTargetPaths;Compile;ResolveKeySource" Inputs="$(MSBuildAllProjects);@(IntermediateAssembly)" Outputs="$(OutputPath)$(_SGenDllName)">
     <SGen BuildAssemblyName="$(TargetFileName)" BuildAssemblyPath="$(OutputPath)" References="@(ReferencePath)" ShouldGenerateSerializer="true" UseProxyTypes="false" KeyContainer="$(KeyContainerName)" KeyFile="..\..\SolutionItems\Xceed.snk" DelaySign="$(DelaySign)" ToolPath="$(SGenToolPath)">

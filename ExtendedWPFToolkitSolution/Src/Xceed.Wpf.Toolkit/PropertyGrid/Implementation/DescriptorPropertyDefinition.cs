@@ -45,7 +45,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region Constructor
 
-    internal DescriptorPropertyDefinition( PropertyDescriptor propertyDescriptor, object selectedObject )
+    internal DescriptorPropertyDefinition( PropertyDescriptor propertyDescriptor, object selectedObject, bool isPropertyGridCategorized )
+      : base( isPropertyGridCategorized )
     {
       if( propertyDescriptor == null )
         throw new ArgumentNullException( "propertyDescriptor" );
@@ -83,6 +84,17 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region Override Methods
 
+    internal override ObjectContainerHelperBase CreateContainerHelper( IPropertyContainer parent )
+    {
+      return new ObjectContainerHelper( parent, this.Value );
+    }
+
+    internal override void OnValueChanged( object oldValue, object newValue )
+    {
+      base.OnValueChanged( oldValue, newValue );
+      this.RaiseContainerHelperInvalidated();
+    }
+
     protected override BindingBase CreateValueBinding()
     {
       //Bind the value property with the source object.
@@ -113,13 +125,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         && !PropertyDescriptor.IsReadOnly;
     }
 
-    protected override AdvancedOptionsValues ComputeAdvancedOptionsValues()
+    protected override object ComputeAdvancedOptionsTooltip()
     {
-      string imageName;
       object tooltip;
-      UpdateAdvanceOptionsForItem( _markupObject, SelectedObject as DependencyObject, _dpDescriptor, out imageName, out tooltip );
+      UpdateAdvanceOptionsForItem( _markupObject, SelectedObject as DependencyObject, _dpDescriptor, out tooltip );
 
-      return CreateAdvanceOptionValues( imageName, tooltip );
+      return tooltip;
     }
 
     protected override string ComputeCategory()
@@ -132,16 +143,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return PropertyDescriptor.Category;
     }
 
+    protected override bool ComputeExpandableAttribute()
+    {
+      return ( bool )this.ComputeExpandableAttributeForItem( PropertyDescriptor );
+    }
+
     protected override bool ComputeIsExpandable()
     {
-      bool isExpandable = false;
-      var attribute = GetAttribute<ExpandableObjectAttribute>();
-      if( attribute != null )
-      {
-        isExpandable = true;
-      }
-
-      return isExpandable;
+      return ( this.Value != null );
     }
 
     protected override IList<Type> ComputeNewItemTypes()
@@ -153,8 +162,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return ( string )ComputeDescriptionForItem( PropertyDescriptor );
     }
 
-    protected override int ComputeDisplayOrder()
+    protected override int ComputeDisplayOrder( bool isPropertyGridCategorized )
     {
+      this.IsPropertyGridCategorized = isPropertyGridCategorized;
       return ( int )ComputeDisplayOrderForItem( PropertyDescriptor );
     }
 

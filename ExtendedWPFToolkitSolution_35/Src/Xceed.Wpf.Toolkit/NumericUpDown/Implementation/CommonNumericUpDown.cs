@@ -33,7 +33,6 @@ namespace Xceed.Wpf.Toolkit
     private Func<T, T, bool> _fromGreaterThan;
 
 
-
     #region ParsingNumberStyle
 
     public static readonly DependencyProperty ParsingNumberStyleProperty =
@@ -47,6 +46,7 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //ParsingNumberStyle
 
+    #region Constructors
 
     protected CommonNumericUpDown( FromText fromText, FromDecimal fromDecimal, Func<T, T, bool> fromLowerThan, Func<T, T, bool> fromGreaterThan )
     {
@@ -68,19 +68,11 @@ namespace Xceed.Wpf.Toolkit
       _fromGreaterThan = fromGreaterThan;
     }
 
+    #endregion
+
     protected static void UpdateMetadata( Type type, T? increment, T? minValue, T? maxValue )
     {
       DefaultStyleKeyProperty.OverrideMetadata( type, new FrameworkPropertyMetadata( type ) );
-      UpdateMetadataCommon( type, increment, minValue, maxValue );
-    }
-
-    internal static void UpdateMetadataInternal( Type type, T? increment, T? minValue, T? maxValue )
-    {
-      // DefaultStyleKey for internal type (eg. UShortUpDown) must be a ComponentResourceKey instead
-      // of the type itself to allow external theme (ex. Office2007 theme) to redefine the default
-      // style of the control.
-      DefaultStyleKeyProperty.OverrideMetadata( type,
-        new FrameworkPropertyMetadata( new ComponentResourceKey( typeof( InputBase ), type.Name ) ) );
       UpdateMetadataCommon( type, increment, minValue, maxValue );
     }
 

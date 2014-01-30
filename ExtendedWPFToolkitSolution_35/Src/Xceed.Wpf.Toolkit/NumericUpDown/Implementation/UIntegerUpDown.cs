@@ -25,7 +25,7 @@ namespace Xceed.Wpf.Toolkit
 
     static UIntegerUpDown()
     {
-      UpdateMetadataInternal( typeof( UIntegerUpDown ), ( uint )1, uint.MinValue, uint.MaxValue );
+      UpdateMetadata( typeof( UIntegerUpDown ), ( uint )1, uint.MinValue, uint.MaxValue );
     }
 
     public UIntegerUpDown()

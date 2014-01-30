@@ -97,8 +97,7 @@ namespace Xceed.Wpf.Toolkit
       if( ItemType == null )
         ItemType = newValue.GetType().GetGenericArguments()[ 0 ];
 
-      if( newValue.Count > 0 )
-        SetText( newValue );
+      SetText( newValue );
     }
 
     #endregion //ItemsSource

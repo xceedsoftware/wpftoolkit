@@ -264,6 +264,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
                 writer.WriteAttributeString("FloatingLeft", FloatingLeft.ToString(CultureInfo.InvariantCulture));
             if (FloatingTop != 0.0)
                 writer.WriteAttributeString("FloatingTop", FloatingTop.ToString(CultureInfo.InvariantCulture));
+            if( IsMaximized )
+              writer.WriteAttributeString( "IsMaximized", IsMaximized.ToString() );
 
             base.WriteXml(writer);
         }
@@ -289,6 +291,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
                 _floatingLeft = double.Parse(reader.Value, CultureInfo.InvariantCulture);
             if (reader.MoveToAttribute("FloatingTop"))
                 _floatingTop = double.Parse(reader.Value, CultureInfo.InvariantCulture);
+            if( reader.MoveToAttribute( "IsMaximized" ) )
+              _isMaximized = bool.Parse( reader.Value );
 
             base.ReadXml(reader);
         }

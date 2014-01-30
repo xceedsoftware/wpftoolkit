@@ -32,7 +32,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
   /// </summary>
   public class CustomPropertyItem : PropertyItemBase
   {
-
     internal CustomPropertyItem() { }
 
     #region Category

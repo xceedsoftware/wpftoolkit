@@ -833,12 +833,14 @@ namespace Xceed.Wpf.Toolkit
 
     private bool TryParseDateTime( string text, out DateTime result )
     {
-      bool isValid;
+      bool isValid = false;
+      result = DateTime.Now;
+
 
       DateTime current = this.Value.HasValue ? this.Value.Value : DateTime.Parse( DateTime.Now.ToString(), this.CultureInfo.DateTimeFormat );
       isValid = DateTimeParser.TryParse( text, this.GetFormatString( Format ), current, this.CultureInfo, out result );
 
-      if( !isValid && ( this.Format == DateTimeFormat.Custom ) )
+      if( !isValid )
       {
         isValid = DateTime.TryParseExact( text, this.GetFormatString( this.Format ), this.CultureInfo, DateTimeStyles.None, out result );
       }

@@ -1,0 +1,85 @@
+﻿/***************************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  *************************************************************************************/
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Media;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+
+namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
+{
+  /// <summary>
+  /// Interaction logic for PropertyGridEditorDefinitionsView.xaml
+  /// </summary>
+  public partial class PropertyGridEditorDefinitionsView : DemoView
+  {
+    public PropertyGridEditorDefinitionsView()
+    {
+      InitializeComponent();
+#if !OPEN_SOURCE
+      var selectedObject = new EditorDefinitionsSampleObject();
+      selectedObject.Boolean = true;
+      selectedObject.Color = Colors.Red;
+      selectedObject.ColorCombo = Colors.Blue;
+      selectedObject.DateTime = System.DateTime.Now;
+      selectedObject.Int32 = 42;
+      selectedObject.PersonTemplate = new Person() { FirstName = "John", LastName = "Smith" };
+      selectedObject.String = "This is a string";
+      selectedObject.StringCombo = "String Value 1";
+
+      this.DataContext = selectedObject;
+#endif
+    }
+
+#if !OPEN_SOURCE
+    public class EditorDefinitionsSampleObject
+    {
+      [PropertyOrder( 0 )]
+      public string String { get; set; }
+      [PropertyOrder( 1 )]
+      public bool Boolean { get; set; }
+      [PropertyOrder( 2 )]
+      public int Int32 { get; set; }
+      [PropertyOrder( 3 )]
+      public System.DateTime DateTime { get; set; }
+      [PropertyOrder( 4 )]
+      public System.Windows.Media.Color Color { get; set; }
+      [PropertyOrder( 5 )]
+      public string StringCombo { get; set; }
+      [PropertyOrder( 6 )]
+      public System.Windows.Media.Color? ColorCombo { get; set; }
+      [PropertyOrder( 7 )]
+      public Person PersonTemplate { get; set; }
+    }
+
+    public class Person
+    {
+      public string FirstName { get; set; }
+      public string LastName { get; set; }
+    }
+#endif
+  }
+#if !OPEN_SOURCE
+  public class ColorSampleItem
+  {
+    public System.Windows.Media.Color? Color { get; set; }
+    public string DisplayString { get; set; }
+  }
+#endif
+
+}

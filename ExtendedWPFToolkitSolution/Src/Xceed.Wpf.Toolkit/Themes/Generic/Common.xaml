@@ -27,7 +27,7 @@
 
     <!-- ResizeGrip -->
     <ImageBrush x:Key="resize_grip" 
-                ImageSource="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/resize_grip.png" />
+                ImageSource="Images/resize_grip.png" />
 
    <Style x:Key="buttonImageStyle" TargetType="Image">
       <Setter Property="Stretch" Value="None" />
@@ -37,68 +37,68 @@
    </Style>
 
     <!-- Minimize -->
-   <Image x:Key="minimize_normal"
-               Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/minimize_normal.png" />
-   <Image x:Key="minimize_hover"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/minimize_hover.png" />
-   <Image x:Key="minimize_pressed"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/minimize_pressed.png" />
-   <Image x:Key="minimize_inactive"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/minimize_inactive.png" />
+   <BitmapImage x:Key="minimize_normal"
+                UriSource="Images/minimize_normal.png" />
+   <BitmapImage x:Key="minimize_hover"
+                UriSource="Images/minimize_hover.png" />
+   <BitmapImage x:Key="minimize_pressed"
+                UriSource="Images/minimize_pressed.png" />
+   <BitmapImage x:Key="minimize_inactive"
+                UriSource="Images/minimize_inactive.png" />
 
     <!-- Maximize -->
-   <Image x:Key="maximize_normal"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/maximize_normal.png" />
-   <Image x:Key="maximize_hover"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/maximize_hover.png" />
-   <Image x:Key="maximize_pressed"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/maximize_pressed.png" />
-   <Image x:Key="maximize_inactive"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/maximize_inactive.png" />
-   <Image x:Key="maximize_disabled"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/maximize_disabled.png" />
+   <BitmapImage x:Key="maximize_normal"
+                UriSource="Images/maximize_normal.png" />
+   <BitmapImage x:Key="maximize_hover"
+                UriSource="Images/maximize_hover.png" />
+   <BitmapImage x:Key="maximize_pressed"
+                UriSource="Images/maximize_pressed.png" />
+   <BitmapImage x:Key="maximize_inactive"
+                UriSource="Images/maximize_inactive.png" />
+   <BitmapImage x:Key="maximize_disabled"
+                UriSource="Images/maximize_disabled.png" />
 
     <!-- Restore -->
-   <Image x:Key="restore_normal"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/restore_normal.png" />
-   <Image x:Key="restore_hover"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/restore_hover.png" />
-   <Image x:Key="restore_pressed"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/restore_pressed.png" />
-   <Image x:Key="restore_inactive"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/restore_inactive.png" />
-   <Image x:Key="restore_disabled"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/restore_disabled.png" />
+   <BitmapImage x:Key="restore_normal"
+                UriSource="Images/restore_normal.png" />
+   <BitmapImage x:Key="restore_hover"
+                UriSource="Images/restore_hover.png" />
+   <BitmapImage x:Key="restore_pressed"
+                UriSource="Images/restore_pressed.png" />
+   <BitmapImage x:Key="restore_inactive"
+                UriSource="Images/restore_inactive.png" />
+   <BitmapImage x:Key="restore_disabled"
+                UriSource="Images/restore_disabled.png" />
 
     <!-- Close -->
-   <Image x:Key="close_normal"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_normal.png" />
-   <Image x:Key="close_hover"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_hover.png" />
-   <Image x:Key="close_pressed"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_pressed.png" />
-   <Image x:Key="close_inactive"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_inactive.png" />
+   <BitmapImage  x:Key="close_normal"
+                 UriSource="Images/close_normal.png" />
+   <BitmapImage  x:Key="close_hover"
+                 UriSource="Images/close_hover.png" />
+   <BitmapImage  x:Key="close_pressed"
+                 UriSource="Images/close_pressed.png" />
+   <BitmapImage  x:Key="close_inactive"
+                 UriSource="Images/close_inactive.png" />
 
     <!-- Close (with 2 rounded corners) -->
-   <Image x:Key="close_rounded_normal"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_rounded_normal.png" />
-   <Image x:Key="close_rounded_hover"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_rounded_hover.png" />
-   <Image x:Key="close_rounded_pressed"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_rounded_pressed.png" />
-   <Image x:Key="close_rounded_inactive"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_rounded_inactive.png" />
+   <BitmapImage x:Key="close_rounded_normal"
+                UriSource="Images/close_rounded_normal.png" />
+   <BitmapImage x:Key="close_rounded_hover"
+                UriSource="Images/close_rounded_hover.png" />
+   <BitmapImage x:Key="close_rounded_pressed"
+                UriSource="Images/close_rounded_pressed.png" />
+   <BitmapImage x:Key="close_rounded_inactive"
+                UriSource="Images/close_rounded_inactive.png" />
 
     <!-- Close (for ToolWindow) -->
-   <Image x:Key="close_toolwindow_normal"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_toolwindow_normal.png" />
-   <Image x:Key="close_toolwindow_hover"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_toolwindow_hover.png" />
-   <Image x:Key="close_toolwindow_pressed"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_toolwindow_pressed.png" />
-   <Image x:Key="close_toolwindow_inactive"
-                Style="{StaticResource buttonImageStyle}" Source="/Xceed.Wpf.Toolkit;component/Themes/Generic/Images/close_toolwindow_inactive.png" />
+   <BitmapImage x:Key="close_toolwindow_normal"
+                UriSource="Images/close_toolwindow_normal.png" />
+   <BitmapImage x:Key="close_toolwindow_hover"
+                UriSource="Images/close_toolwindow_hover.png" />
+   <BitmapImage x:Key="close_toolwindow_pressed"
+                UriSource="Images/close_toolwindow_pressed.png" />
+   <BitmapImage x:Key="close_toolwindow_inactive"
+                UriSource="Images/close_toolwindow_inactive.png" />
 
 
     <!-- =============================================================================== -->
@@ -112,7 +112,7 @@
                 Background="{TemplateBinding Background}" 
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}">
-            <ContentPresenter />
+            <Image Source="{TemplateBinding Content}" Style="{StaticResource buttonImageStyle}"/>
         </Border>
     </ControlTemplate>
 
@@ -144,24 +144,6 @@
             </Trigger>
 
             <!-- NoResize (Close button with 2 rounded corners) -->
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding RelativeSource={RelativeSource TemplatedParent},Path=IsActive}" Value="False" />
-                </MultiDataTrigger.Conditions>
-            <Setter Property="Content" Value="{StaticResource close_rounded_inactive}" />
-            </MultiDataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding RelativeSource={RelativeSource self},Path=IsMouseOver}" Value="True" />
-                </MultiDataTrigger.Conditions>
-            <Setter Property="Content" Value="{StaticResource close_rounded_hover}" />
-            </MultiDataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding RelativeSource={RelativeSource self},Path=IsPressed}" Value="True" />
-                </MultiDataTrigger.Conditions>
-            <Setter Property="Content" Value="{StaticResource close_rounded_pressed}" />
-            </MultiDataTrigger>
 
             <!-- Tool Window -->
             <Trigger Property="Name" Value="PART_ToolWindowCloseButton">

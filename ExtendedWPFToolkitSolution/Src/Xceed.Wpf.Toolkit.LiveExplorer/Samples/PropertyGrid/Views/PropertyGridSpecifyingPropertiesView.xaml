@@ -27,15 +27,8 @@
         </Paragraph>
     </local:DemoView.Description>
 
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-
-      <TextBlock Text="Specifying Properties:" Style="{StaticResource Header}" Margin="10"/>
-      <xctk:PropertyGrid x:Name="_propertyGrid" 
-                         Grid.Row="1"
+   <Grid>      
+      <xctk:PropertyGrid x:Name="_propertyGrid"
                          Width="450" 
                          MaxHeight="245"
                          Margin="10"

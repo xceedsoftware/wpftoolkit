@@ -50,6 +50,9 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     }
   }
 
+  [CategoryOrder("Information", 0)]
+  [CategoryOrder( "Conections", 1 )]
+  [CategoryOrder( "Other", 2 )]
   public abstract class Person
   {
     // All properties have their own "[Category(...)]" attribute to specify which category they

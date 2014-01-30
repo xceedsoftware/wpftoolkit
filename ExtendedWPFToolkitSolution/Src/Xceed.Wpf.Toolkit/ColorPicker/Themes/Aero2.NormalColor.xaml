@@ -19,6 +19,7 @@
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes">
 
     <ResourceDictionary.MergedDictionaries>
@@ -147,7 +148,7 @@
     <!-- ColorPicker                                                                     -->
     <!-- =============================================================================== -->
 
-    <Style TargetType="{x:Type local:ColorPicker}">
+    <Style x:Key="ColorPicker" TargetType="{x:Type local:ColorPicker}">
         <Setter Property="Background" Value="White" />
         <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
         <Setter Property="BorderThickness" Value="1,1,0,1" />
@@ -192,7 +193,7 @@
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
 
-                                    <Grid x:Name="_gridStandardColorsHost" Margin="4">
+                                    <Grid x:Name="_colorPaletteHost" Visibility="Collapsed" Margin="4">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
@@ -248,17 +249,16 @@
 
                                     <!-- ColorCanvas -->
                                     <Grid x:Name="_colorCanvasHost" Visibility="Collapsed">
-                                        <local:ColorCanvas x:Name="PART_ColorCanvas"
-                                                 Background="Transparent"
-                                                 BorderThickness="0"
-                                                 UsingAlphaChannel="{Binding UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}}"
-                                                 SelectedColor="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}" />
+                                        <local:ColorCanvas Background="Transparent"
+                                                          BorderThickness="0"
+                                                          UsingAlphaChannel="{Binding UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}}"
+                                                          SelectedColor="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}" />
                                     </Grid>
 
                                     <Separator Grid.Row="1" HorizontalAlignment="Stretch" Margin="5,0,5,0" />
 
                                     <!-- More Colors Button -->
-                                    <ToggleButton x:Name="_colorMode" Grid.Row="2" Content="Advanced" Margin="5" Visibility="{TemplateBinding ShowAdvancedButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <Button x:Name="PART_ColorModeButton" Grid.Row="2" Margin="5" Visibility="{TemplateBinding ShowAdvancedButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 </Grid>
                             </Border>
                         </Popup>
@@ -268,11 +268,22 @@
                             <Setter TargetName="ColorOnly" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="ColorAndName" Property="Visibility" Value="Visible" />
                         </Trigger>
-                        <Trigger SourceName="_colorMode" Property="IsChecked" Value="True">
-                            <Setter TargetName="_colorMode" Property="Content" Value="Standard" />
-                            <Setter TargetName="_colorCanvasHost" Property="Visibility" Value="Visible" />
-                            <Setter TargetName="_gridStandardColorsHost" Property="Visibility" Value="Collapsed" />
+
+                        <Trigger Property="ColorMode" Value="ColorPalette">
+                           <Setter TargetName="_colorPaletteHost" Property="Visibility" Value="Visible" />
+                           <Setter TargetName="_colorCanvasHost" Property="Visibility" Value="Collapsed" />
+                           <Setter TargetName="PART_ColorModeButton" Property="Content" Value="Advanced" />
                         </Trigger>
+
+                        <Trigger Property="ColorMode" Value="ColorCanvas">
+                           <Setter TargetName="_colorPaletteHost" Property="Visibility" Value="Collapsed" />
+                           <Setter TargetName="_colorCanvasHost" Property="Visibility" Value="Visible" />
+                           <Setter TargetName="PART_ColorModeButton" Property="Content" Value="Standard" />
+                        </Trigger>
+
+                       <Trigger Property="ShowDropDownButton" Value="False">
+                        <Setter Property="BorderThickness" Value="1" />
+                     </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -287,5 +298,7 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+
+   <Style TargetType="{x:Type local:ColorPicker}" BasedOn="{StaticResource ColorPicker}" />
 
 </ResourceDictionary>

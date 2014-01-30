@@ -35,9 +35,10 @@
                             BorderBrush="{TemplateBinding BorderBrush}" 
                             BorderThickness="{TemplateBinding BorderThickness}">
                   <CheckBox Foreground="{TemplateBinding Foreground}" 
-                                  IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}}" 
-                                  Content="{TemplateBinding Content}" 
-                                  ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+                           IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}}" 
+                           Content="{TemplateBinding Content}" 
+                           ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" 
+                           ContentTemplate="{TemplateBinding ContentTemplate}"/>
                </Border>
                <ControlTemplate.Triggers>
                   <Trigger Property="IsMouseOver" Value="true">

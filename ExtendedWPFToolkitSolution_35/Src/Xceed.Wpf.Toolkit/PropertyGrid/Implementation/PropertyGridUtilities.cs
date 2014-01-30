@@ -37,107 +37,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
   internal class PropertyGridUtilities
   {
-    #region DefaultNoBorderControlStyle Static Property
-    private static Style _noBorderControlStyle;
-    internal static Style NoBorderControlStyle
-    {
-      get
-      {
-        if( _noBorderControlStyle == null )
-        {
-          var style = new Style( typeof( Control ) );
-          var trigger = new MultiTrigger();
-          trigger.Conditions.Add( new Condition( Control.IsKeyboardFocusWithinProperty, false ) );
-          trigger.Conditions.Add( new Condition( Control.IsMouseOverProperty, false ) );
-          trigger.Setters.Add(
-            new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
-          style.Triggers.Add( trigger );
-
-          _noBorderControlStyle = style;
-        }
-
-        return _noBorderControlStyle;
-      }
-    }
-    #endregion
-
-    #region PropertyGridComboBoxStyle Static Property
-    private static Style _propertyGridComboBoxStyle;
-    internal static Style ComboBoxStyle
-    {
-      get
-      {
-        if( _propertyGridComboBoxStyle == null )
-        {
-          var style = new Style( typeof( Control ) );
-          var trigger = new MultiTrigger();
-          trigger.Conditions.Add( new Condition( Control.IsKeyboardFocusWithinProperty, false ) );
-          trigger.Conditions.Add( new Condition( Control.IsMouseOverProperty, false ) );
-          trigger.Setters.Add( new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
-          trigger.Setters.Add( new Setter( Control.BackgroundProperty, new SolidColorBrush( Colors.Transparent ) ) );
-          style.Triggers.Add( trigger );
-
-          _propertyGridComboBoxStyle = style;
-        }
-        return _propertyGridComboBoxStyle;
-      }
-    }
-    #endregion
-
-    #region ColorPickerStyle Static Property
-    private static Style _colorPickerStyle;
-    internal static Style ColorPickerStyle
-    {
-      get
-      {
-        if( _colorPickerStyle == null )
-        {
-          Style defaultColorPickerStyle = Application.Current.TryFindResource( typeof( ColorPicker ) ) as Style;
-          var style = new Style( typeof( ColorPicker ), defaultColorPickerStyle );
-          var trigger = new MultiTrigger();
-          trigger.Conditions.Add( new Condition( Control.IsKeyboardFocusWithinProperty, false ) );
-          trigger.Conditions.Add( new Condition( Control.IsMouseOverProperty, false ) );
-          trigger.Setters.Add( new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
-          trigger.Setters.Add( new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
-          trigger.Setters.Add( new Setter( ColorPicker.ShowDropDownButtonProperty, false ) );
-          style.Triggers.Add( trigger );
-
-          _colorPickerStyle = style;
-        }
-
-        return _colorPickerStyle;
-      }
-    }
-    #endregion
-
-    #region UpDownBaseStyle Static Getter
-    private static Dictionary<Type, Style> _upDownStyles;
-    internal static Style GetUpDownBaseStyle<T>()
-    {
-      if( _upDownStyles == null )
-      {
-        _upDownStyles = new Dictionary<Type, Style>();
-      }
-
-      Style style;
-      if( !_upDownStyles.TryGetValue( typeof( T ), out style ) )
-      {
-        style = new Style( typeof( UpDownBase<T> ) );
-        var trigger = new MultiTrigger();
-        trigger.Conditions.Add( new Condition( Control.IsKeyboardFocusWithinProperty, false ) );
-        trigger.Conditions.Add( new Condition( Control.IsMouseOverProperty, false ) );
-        trigger.Setters.Add(
-          new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
-        trigger.Setters.Add(
-          new Setter( UpDownBase<T>.ShowButtonSpinnerProperty, false ) );
-        style.Triggers.Add( trigger );
-
-        _upDownStyles.Add( typeof( T ), style );
-      }
-      return style;
-    }
-    #endregion
-
     internal static T GetAttribute<T>( PropertyDescriptor property ) where T : Attribute
     {
       return property.Attributes.OfType<T>().FirstOrDefault();
@@ -169,13 +68,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       else if( propertyType == typeof( byte ) || propertyType == typeof( byte? ) )
         editor = new ByteUpDownEditor();
       else if( propertyType == typeof( sbyte ) || propertyType == typeof( sbyte? ) )
-        editor = new UpDownEditor<SByteUpDown,sbyte?>();
+        editor = new SByteUpDownEditor();
       else if( propertyType == typeof( uint ) || propertyType == typeof( uint? ) )
-        editor = new UpDownEditor<UIntegerUpDown, uint?>();
+        editor = new UIntegerUpDownEditor();
       else if( propertyType == typeof( ulong ) || propertyType == typeof( ulong? ) )
-        editor = new UpDownEditor<ULongUpDown, ulong?>();
+        editor = new ULongUpDownEditor();
       else if( propertyType == typeof( ushort ) || propertyType == typeof( ushort? ) )
-        editor = new UpDownEditor<UShortUpDown, ushort?>();
+        editor = new UShortUpDownEditor();
       else if( propertyType == typeof( DateTime ) || propertyType == typeof( DateTime? ) )
         editor = new DateTimeUpDownEditor();
       else if( ( propertyType == typeof( Color ) ) )

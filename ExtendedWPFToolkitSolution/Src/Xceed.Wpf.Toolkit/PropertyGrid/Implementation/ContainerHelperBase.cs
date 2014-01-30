@@ -114,19 +114,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected FrameworkElement GenerateCustomEditingElement( Type definitionKey, PropertyItemBase propertyItem )
     {
-      FrameworkElement editor = null;
-
-      if( PropertyContainer.EditorDefinitions != null )
-      {
-        // If no editor for the current type, fall back on base type editor recursively.
-        while( editor == null && definitionKey != null )
-        {
-          editor = this.CreateCustomEditor( PropertyContainer.EditorDefinitions[ definitionKey ], propertyItem );
-          definitionKey = definitionKey.BaseType;
-        }
-      }
-
-      return editor;
+      return ( PropertyContainer.EditorDefinitions != null )
+        ? this.CreateCustomEditor( PropertyContainer.EditorDefinitions.GetRecursiveBaseTypes( definitionKey ), propertyItem )
+        : null;
     }
 
     protected FrameworkElement GenerateCustomEditingElement( object definitionKey, PropertyItemBase propertyItem )
@@ -178,6 +168,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     protected virtual void OnEditorDefinitionsChanged() { }
 
     protected virtual void OnPropertyDefinitionsChanged() { }
+
 
     public virtual void OnEndInit() { }
 

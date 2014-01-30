@@ -17,16 +17,21 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System;
 
 namespace Xceed.Wpf.Toolkit
 {
-  public class WatermarkTextBox : TextBox
+#pragma warning disable 0618
+
+  public class WatermarkTextBox : AutoSelectTextBox
   {
     #region Properties
 
-    #region SelectAllOnGotFocus
+    #region SelectAllOnGotFocus (Obsolete)
 
+    [Obsolete( "This property is obsolete and should no longer be used. Use AutoSelectTextBox.AutoSelectBehavior instead." )]
     public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register( "SelectAllOnGotFocus", typeof( bool ), typeof( WatermarkTextBox ), new PropertyMetadata( false ) );
+    [Obsolete( "This property is obsolete and should no longer be used. Use AutoSelectTextBox.AutoSelectBehavior instead." )]
     public bool SelectAllOnGotFocus
     {
       get
@@ -92,7 +97,7 @@ namespace Xceed.Wpf.Toolkit
     {
       base.OnGotFocus( e );
 
-       if( SelectAllOnGotFocus )
+      if( SelectAllOnGotFocus )
         SelectAll();
     }
 
@@ -109,4 +114,6 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Base Class Overrides
   }
+
+#pragma warning restore 0618
 }

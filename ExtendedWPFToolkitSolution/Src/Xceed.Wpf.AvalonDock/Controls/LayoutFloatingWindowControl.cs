@@ -34,6 +34,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
 {
     public abstract class LayoutFloatingWindowControl : Window, ILayoutControl
     {
+      private ResourceDictionary currentThemeResourceDictionary; // = null
+
         static LayoutFloatingWindowControl()
         {
             LayoutFloatingWindowControl.ContentProperty.OverrideMetadata(typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(null, null, new CoerceValueCallback(CoerceContentValue)));
@@ -177,17 +179,36 @@ namespace Xceed.Wpf.AvalonDock.Controls
         {
             if (oldTheme != null)
             {
+              if( oldTheme is DictionaryTheme )
+              {
+                if( currentThemeResourceDictionary != null )
+                {
+                  Resources.MergedDictionaries.Remove( currentThemeResourceDictionary );
+                  currentThemeResourceDictionary = null;
+                }
+              }
+              else
+              {
                 var resourceDictionaryToRemove =
-                    Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
-                if (resourceDictionaryToRemove != null)
-                    Resources.MergedDictionaries.Remove(
-                        resourceDictionaryToRemove);
+                    Resources.MergedDictionaries.FirstOrDefault( r => r.Source == oldTheme.GetResourceUri() );
+                if( resourceDictionaryToRemove != null )
+                  Resources.MergedDictionaries.Remove(
+                      resourceDictionaryToRemove );
+              }
             }
 
             var manager = _model.Root.Manager;
             if (manager.Theme != null)
             {
+              if( manager.Theme is DictionaryTheme )
+              {
+                currentThemeResourceDictionary = ( ( DictionaryTheme )manager.Theme ).ThemeResourceDictionary;
+                Resources.MergedDictionaries.Add( currentThemeResourceDictionary );
+              }
+              else
+              {
                 Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = manager.Theme.GetResourceUri() });
+              }
             }
         }
 
@@ -352,9 +373,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 posElement.FloatingTop = Top;
                 posElement.FloatingWidth = Width;
                 posElement.FloatingHeight = Height;
-                posElement.IsMaximized = this.WindowState == System.Windows.WindowState.Maximized;
             }
         }
+
+        void UpdateMaximizedState( bool isMaximized )
+        {
+          foreach( var posElement in Model.Descendents().OfType<ILayoutElementForFloatingWindow>() )
+          {
+            posElement.IsMaximized = isMaximized;
+          }
+        }
+
 
         protected virtual IntPtr FilterMessage(
             IntPtr hwnd,
@@ -405,6 +434,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
                         _dragService.Abort();
                         _dragService = null;
                         SetIsDragging(false);
+                    }
+                    break;
+              case Win32Helper.WM_SYSCOMMAND:
+                    IntPtr wMaximize = new IntPtr( Win32Helper.SC_MAXIMIZE );
+                    IntPtr wRestore = new IntPtr( Win32Helper.SC_RESTORE );
+                    if( wParam == wMaximize || wParam == wRestore )
+                    {
+                      UpdateMaximizedState( wParam == wMaximize );
                     }
                     break;
             }

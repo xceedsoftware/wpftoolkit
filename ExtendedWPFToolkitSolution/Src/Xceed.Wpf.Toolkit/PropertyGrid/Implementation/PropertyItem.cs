@@ -179,9 +179,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     protected override void OnValueChanged( object oldValue, object newValue )
     {
       base.OnValueChanged( oldValue, newValue );
+    }
 
-      // Update the ObjectContainerHelper this depends on 
-      var helper = new ObjectContainerHelper( this, newValue );
+    private void OnDefinitionContainerHelperInvalidated( object sender, EventArgs e )
+    {
+      var helper = this.DescriptorDefinition.CreateContainerHelper( this );
       this.ContainerHelper = helper;
       if( this.IsExpanded )
       {
@@ -200,6 +202,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         throw new ArgumentNullException( "definition" );
 
       this.DescriptorDefinition = definition;
+      this.ContainerHelper = definition.CreateContainerHelper( this );
+      definition.ContainerHelperInvalidated += new EventHandler( OnDefinitionContainerHelperInvalidated );
     }
 
     #endregion //Constructors

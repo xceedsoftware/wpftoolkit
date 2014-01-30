@@ -49,7 +49,7 @@
                                 <ColumnDefinition/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <avalonDockControls:DocumentPaneTabPanel x:Name="HeaderPanel" Grid.Column="0" IsItemsHost="true" Margin="2,2,2,0" Grid.Row="0" KeyboardNavigation.TabIndex="1"/>
+                            <avalonDockControls:DocumentPaneTabPanel x:Name="HeaderPanel" Grid.Column="0" IsItemsHost="true" Grid.Row="0" KeyboardNavigation.TabIndex="1"/>
                             <avalonDockControls:DropDownButton
                                 x:Name="MenuDropDownButton"
                                 Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
@@ -106,6 +106,49 @@
                     <Setter Property="Visibility" Value="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
                     <Setter Property="ToolTip" Value="{Binding ToolTip}"/>
+                    <Setter Property="Padding" Value="2,0,2,0"/>
+                    <Setter Property="Margin" Value="0,2,0,0"/>
+                    <Setter Property="Template">
+                  <Setter.Value>
+                     <ControlTemplate TargetType="{x:Type TabItem}">
+                        <Grid SnapsToDevicePixels="true">
+
+                           <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}"
+                                               Background="{TemplateBinding Background}" 
+							                          Padding="{TemplateBinding Padding}"
+   				                                BorderThickness="1,1,1,0" >
+                                 <ContentPresenter 
+								                x:Name="Content" 
+								                ContentSource="Header" 
+                                                HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
+                                                VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                RecognizesAccessKey="True" 
+                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                           </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                           <Trigger Property="Selector.IsSelected" Value="true">
+                              <Setter Property="Background" Value="White" />
+                              <Setter Property="Panel.ZIndex" Value="1" />
+                              <Setter Property="Margin" Value="0,0,0,-2"/>
+                              <Setter Property="Margin" TargetName="Content" Value="0,0,0,3"/>
+                           </Trigger>
+                           <MultiTrigger>
+                              <MultiTrigger.Conditions>
+                                 <Condition Property="IsMouseOver" Value="true"/>
+                                 <Condition Property="Selector.IsSelected" Value="false"/>
+                              </MultiTrigger.Conditions>
+                              <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" />
+                              <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                              <Setter Property="Panel.ZIndex" Value="0" />
+                           </MultiTrigger>
+                           <Trigger Property="IsEnabled" Value="false">
+                              <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                           </Trigger>
+                        </ControlTemplate.Triggers>
+                     </ControlTemplate>
+                  </Setter.Value>
+               </Setter>
                 </Style>
             </Setter.Value>
         </Setter>
@@ -170,10 +213,53 @@
         <Setter Property="ItemContainerStyle">
             <Setter.Value>
                 <Style TargetType="{x:Type TabItem}">
-                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
-                    <Setter Property="ToolTip" Value="{Binding ToolTip}"/>
+                   <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                   <Setter Property="ToolTip" Value="{Binding ToolTip}"/>
+                   <Setter Property="Template">
+                  <Setter.Value>
+                     <ControlTemplate TargetType="{x:Type TabItem}">
+                        <Grid SnapsToDevicePixels="true">
+                           <Border x:Name="Bd" 
+							              BorderBrush="{TemplateBinding BorderBrush}"
+                                   BorderThickness="1,0,1,1"
+							              Background="{TemplateBinding Background}" 
+							              Padding="{TemplateBinding Padding}">
+                              <ContentPresenter 
+								            x:Name="Content" 
+								            ContentSource="Header" 
+                                    HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
+                                    VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                    RecognizesAccessKey="True" 
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                           </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                           <Trigger Property="Selector.IsSelected"
+								        Value="true">
+                              <Setter Property="Background"
+									    Value="White" />
+                              <Setter Property="Panel.ZIndex" 
+                                        Value="1" />
+                              <Setter Property="Margin" Value="0,-1,-1,-2"/>
+                           </Trigger>
+                           <MultiTrigger>
+                              <MultiTrigger.Conditions>
+                                 <Condition Property="IsMouseOver" Value="true"/>
+                                 <Condition Property="Selector.IsSelected" Value="false"/>
+                              </MultiTrigger.Conditions>
+                              <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" />
+                              <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                              <Setter Property="Panel.ZIndex" Value="0" />
+                           </MultiTrigger>
+                           <Trigger Property="IsEnabled" Value="false">
+                              <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                           </Trigger>
+                        </ControlTemplate.Triggers>
+                     </ControlTemplate>
+                  </Setter.Value>
+               </Setter>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabControl}}, Path=Items.Count}" Value="1">
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabControl}}, Path=Items.Count, FallbackValue=1}" Value="1">
                             <Setter Property="Visibility" Value="Collapsed"/>
                         </DataTrigger>
                     </Style.Triggers>
@@ -426,7 +512,7 @@
         <MenuItem Header="{x:Static avalonDockProperties:Resources.Anchorable_AutoHide}" 
                 Command="{Binding Path=AutoHideCommand}"/>
         <MenuItem Header="{x:Static avalonDockProperties:Resources.Anchorable_Hide}" 
-                Command="{Binding Path=CloseCommand}"
+                Command="{Binding Path=HideCommand}"
                 Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
     </ContextMenu>
 

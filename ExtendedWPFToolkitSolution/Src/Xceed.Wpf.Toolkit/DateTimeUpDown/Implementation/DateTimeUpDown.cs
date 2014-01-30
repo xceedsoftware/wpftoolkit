@@ -119,6 +119,8 @@ namespace Xceed.Wpf.Toolkit
     static DateTimeUpDown()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( typeof( DateTimeUpDown ) ) );
+      MaximumProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( DateTime.MaxValue ) );
+      MinimumProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( DateTime.MinValue ) );
     }
 
     public DateTimeUpDown()
@@ -264,6 +266,13 @@ namespace Xceed.Wpf.Toolkit
       DateTime result;
       this.TryParseDateTime( text, out result );
 
+      if( this.ClipValueToMinMax )
+      {
+        return this.GetClippedMinMaxValue( result );
+      }
+
+      this.ValidateDefaultMinMax( result );
+
       return result;
     }
 
@@ -277,17 +286,38 @@ namespace Xceed.Wpf.Toolkit
 
     protected override void SetValidSpinDirection()
     {
-      //TODO: implement Minimum and Maximum
+      ValidSpinDirections validDirections = ValidSpinDirections.None;
+
+      if( !IsReadOnly )
+      {
+        if( this.IsLowerThan( this.Value, this.Maximum ) || !this.Value.HasValue )
+          validDirections = validDirections | ValidSpinDirections.Increase;
+
+        if( this.IsGreaterThan( this.Value, this.Minimum ) || !this.Value.HasValue )
+          validDirections = validDirections | ValidSpinDirections.Decrease;
+      }
+
+      if( this.Spinner != null )
+        this.Spinner.ValidSpinDirection = validDirections;
     }
 
     protected override void OnValueChanged( DateTime? oldValue, DateTime? newValue )
     {
-        //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
+      //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
       //but only if it is not null
-        if( newValue != null )
-          ParseValueIntoDateTimeInfo();
+      if( newValue != null )
+        ParseValueIntoDateTimeInfo();
 
       base.OnValueChanged( oldValue, newValue );
+    }
+
+    protected override void RaiseValueChangedEvent( DateTime? oldValue, DateTime? newValue )
+    {
+      if( ( this.TemplatedParent is TimePicker )
+        && ( ( TimePicker )this.TemplatedParent ).TemplatedParent is DateTimePicker )
+        return;
+
+      base.RaiseValueChangedEvent( oldValue, newValue );
     }
 
     #endregion //Base Class Overrides
@@ -304,7 +334,10 @@ namespace Xceed.Wpf.Toolkit
 
     private void TextBox_GotFocus( object sender, RoutedEventArgs e )
     {
-      this.Select( this.GetDateTimeInfo( 0 ) );
+      if( _selectedDateTimeInfo == null )
+      {
+        this.Select( this.GetDateTimeInfo( 0 ) );
+      }
     }
 
     #endregion //Event Hanlders
@@ -766,51 +799,53 @@ namespace Xceed.Wpf.Toolkit
       if( info == null )
         info = _dateTimeInfoList[ 0 ];
 
+      DateTime? result = null;
+
       try
       {
         switch( info.Type )
         {
           case DateTimePart.Year:
             {
-              Value = ( ( DateTime )Value ).AddYears( value );
+              result = ( ( DateTime )Value ).AddYears( value );
               break;
             }
           case DateTimePart.Month:
           case DateTimePart.MonthName:
             {
-              Value = ( ( DateTime )Value ).AddMonths( value );
+              result = ( ( DateTime )Value ).AddMonths( value );
               break;
             }
           case DateTimePart.Day:
           case DateTimePart.DayName:
             {
-              Value = ( ( DateTime )Value ).AddDays( value );
+              result = ( ( DateTime )Value ).AddDays( value );
               break;
             }
           case DateTimePart.Hour12:
           case DateTimePart.Hour24:
             {
-              Value = ( ( DateTime )Value ).AddHours( value );
+              result = ( ( DateTime )Value ).AddHours( value );
               break;
             }
           case DateTimePart.Minute:
             {
-              Value = ( ( DateTime )Value ).AddMinutes( value );
+              result = ( ( DateTime )Value ).AddMinutes( value );
               break;
             }
           case DateTimePart.Second:
             {
-              Value = ( ( DateTime )Value ).AddSeconds( value );
+              result = ( ( DateTime )Value ).AddSeconds( value );
               break;
             }
           case DateTimePart.Millisecond:
             {
-              Value = ( ( DateTime )Value ).AddMilliseconds( value );
+              result = ( ( DateTime )Value ).AddMilliseconds( value );
               break;
             }
           case DateTimePart.AmPmDesignator:
             {
-              Value = ( ( DateTime )Value ).AddHours( value * 12 );
+              result = ( ( DateTime )Value ).AddHours( value * 12 );
               break;
             }
           default:
@@ -826,19 +861,48 @@ namespace Xceed.Wpf.Toolkit
         //efficient if I just handle the edge case and allow an exeption to occur and swallow it instead.
       }
 
+      this.Value = this.CoerceValueMinMax( result );
+
       //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event
       TextBox.Select( info.StartPosition, info.Length );
       _fireSelectionChangedEvent = true;
     }
 
+    private DateTime? CoerceValueMinMax( DateTime? value )
+    {
+      if( this.IsLowerThan( value, this.Minimum ) )
+        return this.Minimum;
+      else if( this.IsGreaterThan( value, this.Maximum ) )
+        return this.Maximum;
+      else
+        return value;
+    }
+
+    private bool IsLowerThan( DateTime? value1, DateTime? value2 )
+    {
+      if( value1 == null || value2 == null )
+        return false;
+
+      return ( value1.Value < value2.Value );
+    }
+
+    private bool IsGreaterThan( DateTime? value1, DateTime? value2 )
+    {
+      if( value1 == null || value2 == null )
+        return false;
+
+      return ( value1.Value > value2.Value );
+    }
+
     private bool TryParseDateTime( string text, out DateTime result )
     {
-      bool isValid;
+      bool isValid = false;
+      result = DateTime.Now;
 
       DateTime current = this.Value.HasValue ? this.Value.Value : DateTime.Parse( DateTime.Now.ToString(), this.CultureInfo.DateTimeFormat );
       isValid = DateTimeParser.TryParse( text, this.GetFormatString( Format ), current, this.CultureInfo, out result );
 
-      if( !isValid && ( this.Format == DateTimeFormat.Custom ) )
+      if( !isValid )
       {
         isValid = DateTime.TryParseExact( text, this.GetFormatString( this.Format ), this.CultureInfo, DateTimeStyles.None, out result );
       }
@@ -854,6 +918,27 @@ namespace Xceed.Wpf.Toolkit
         return true;
 
       return this.TryParseDateTime( this.TextBox.Text, out result );
+    }
+
+    private void ValidateDefaultMinMax( DateTime? value )
+    {
+      // DefaultValue is always accepted.
+      if( object.Equals( value, DefaultValue ) )
+        return;
+
+      if( IsLowerThan( value, Minimum ) )
+        throw new ArgumentOutOfRangeException( "Minimum", String.Format( "Value must be greater than MinValue of {0}", Minimum ) );
+      else if( IsGreaterThan( value, Maximum ) )
+        throw new ArgumentOutOfRangeException( "Maximum", String.Format( "Value must be less than MaxValue of {0}", Maximum ) );
+    }
+
+    private DateTime? GetClippedMinMaxValue( DateTime? value )
+    {
+      if( this.IsGreaterThan( value, this.Maximum ) )
+        return this.Maximum;
+      else if( this.IsLowerThan( value, this.Minimum ) )
+        return this.Minimum;
+      return value;
     }
 
     #endregion //Methods
