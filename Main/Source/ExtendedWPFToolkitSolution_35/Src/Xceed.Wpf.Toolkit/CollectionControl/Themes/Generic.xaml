@@ -38,6 +38,17 @@
    </Style>
 
    <Style TargetType="{x:Type local:CollectionControl}">
+      <Style.Resources>
+         <Style TargetType="ListBox">
+            <Setter Property="ItemTemplate">
+               <Setter.Value>
+                   <DataTemplate>
+                     <TextBlock Text="{Binding Converter={StaticResource ObjectTypeToNameConverter}}"/>
+                  </DataTemplate>
+               </Setter.Value>
+            </Setter>
+         </Style>
+      </Style.Resources>
       <Setter Property="Template">
          <Setter.Value>
             <ControlTemplate TargetType="{x:Type local:CollectionControl}">
@@ -84,11 +95,6 @@
                                  ItemsSource="{Binding Items, RelativeSource={RelativeSource TemplatedParent}}"
                                  SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}"
                                  SelectedIndex="0">
-                           <ListBox.ItemTemplate>
-                              <DataTemplate>
-                                 <TextBlock Text="{Binding Converter={StaticResource ObjectTypeToNameConverter}}" />
-                              </DataTemplate>
-                           </ListBox.ItemTemplate>
                         </ListBox>
                         <StackPanel Margin="7,2,0,0" VerticalAlignment="Top" Grid.Column="2" Grid.Row="2">
                            <Button Style="{StaticResource CollectionControlButtonStyle}"

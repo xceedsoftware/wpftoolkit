@@ -22,6 +22,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Windows.Controls.Primitives;
+using System.Linq;
+using System.Collections.Generic;
+using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -29,6 +32,12 @@ namespace Xceed.Wpf.Toolkit
   {
     ColorPalette,
     ColorCanvas
+  }
+
+  public enum ColorSortingMode
+  {
+    Alphabetical,
+    HueSaturationBrightness
   }
 
   [TemplatePart( Name = PART_AvailableColors, Type = typeof( ListBox ) )]
@@ -54,6 +63,7 @@ namespace Xceed.Wpf.Toolkit
     private ToggleButton _toggleButton;
     private Popup _popup;
     private Button _colorModeButton;
+    private bool _selectionChanged;
 
     #endregion //Members
 
@@ -75,6 +85,41 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //AvailableColors
+
+    #region AvailableColorsSortingMode
+
+    public static readonly DependencyProperty AvailableColorsSortingModeProperty = DependencyProperty.Register( "AvailableColorsSortingMode", typeof( ColorSortingMode ), typeof( ColorPicker ), new UIPropertyMetadata( ColorSortingMode.Alphabetical, OnAvailableColorsSortingModeChanged ) );
+    public ColorSortingMode AvailableColorsSortingMode
+    {
+      get
+      {
+        return ( ColorSortingMode )GetValue( AvailableColorsSortingModeProperty );
+      }
+      set
+      {
+        SetValue( AvailableColorsSortingModeProperty, value );
+      }
+    }
+
+    private static void OnAvailableColorsSortingModeChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      ColorPicker colorPicker = ( ColorPicker )d;
+      if( colorPicker != null )
+        colorPicker.OnAvailableColorsSortingModeChanged( ( ColorSortingMode )e.OldValue, ( ColorSortingMode )e.NewValue );
+    }
+
+    private void OnAvailableColorsSortingModeChanged( ColorSortingMode oldValue, ColorSortingMode newValue )
+    {
+      ListCollectionView lcv = ( ListCollectionView )( CollectionViewSource.GetDefaultView( this.AvailableColors ) );
+      if( lcv != null )
+      {
+        lcv.CustomSort = ( AvailableColorsSortingMode == ColorSortingMode.HueSaturationBrightness )
+                          ? new ColorSorter()
+                          : null;
+      }
+    }
+
+    #endregion //AvailableColorsSortingMode
 
     #region AvailableColorsHeader
 
@@ -454,7 +499,19 @@ namespace Xceed.Wpf.Toolkit
 
       if( _colorModeButton != null )
         _colorModeButton.Click += new RoutedEventHandler( this.ColorModeButton_Clicked );
-    }   
+    }
+
+    protected override void OnMouseUp( MouseButtonEventArgs e )
+    {
+      base.OnMouseUp( e );
+
+      // Close ColorPicker on MouseUp to prevent action of mouseUp on controls behind the ColorPicker.
+      if( _selectionChanged )
+      {
+        CloseColorPicker( true );
+        _selectionChanged = false;
+      }
+    }
 
     #endregion //Base Class Overrides
 
@@ -500,7 +557,7 @@ namespace Xceed.Wpf.Toolkit
         var colorItem = ( ColorItem )e.AddedItems[ 0 ];
         SelectedColor = colorItem.Color;
         UpdateRecentColors( colorItem );
-        CloseColorPicker( true );
+        _selectionChanged = true;
         lb.SelectedIndex = -1; //for now I don't care about keeping track of the selected color
       }
     }

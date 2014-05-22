@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -39,6 +39,8 @@
          <LineBreak/>
            CategoryAttribute
          <LineBreak/>
+           CategoryOrderAttribute
+         <LineBreak/>
            EditorAttribute
          <LineBreak/>
            NewItemTypesAttribute
@@ -55,10 +57,10 @@
          Plus edition Only:
          <LineBreak/>
          (Not demoed here. See corresponding samples)
+         <LineBreak />
+         ExpandedCategoryAttribute
          <LineBreak/>
          DefinitionKeyAttribute
-         <LineBreak/>
-         CategoryOrderAttribute
          <LineBreak/>
          LocalizedCategoryAttribute
          <LineBreak/>

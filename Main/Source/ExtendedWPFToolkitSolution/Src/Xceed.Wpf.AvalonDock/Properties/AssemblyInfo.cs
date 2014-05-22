@@ -30,7 +30,7 @@ using System;
 
 [assembly: AssemblyCompany( "Xceed Software Inc." )]
 [assembly: AssemblyProduct( "Xceed Extended WPF Toolkit - AvalonDock" )]
-[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2013" )]
+[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2014" )]
 [assembly: AssemblyCulture( "" )]
 
 

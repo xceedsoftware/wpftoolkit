@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -27,7 +27,7 @@
             The Magnifier control allows the user to magnify parts of an application.
         </Paragraph>
     </local:DemoView.Description>
-    
+
     <local:DemoView.Resources>
         <conv:ColorConverter x:Key="colorConverter" />
         <conv:VisibilityConverter x:Key="visibilityConverter" />
@@ -39,7 +39,7 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </local:DemoView.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -30,7 +30,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.DateTime.Converters
       if( value is System.DateTime )
       {
         System.DateTime time = (System.DateTime)value;
-        return new TimeSpan( time.Hour, time.Minute, 0 );
+        return new System.TimeSpan( time.Hour, time.Minute, 0 );
       }
       return value;
     }

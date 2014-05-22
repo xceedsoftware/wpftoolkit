@@ -27,7 +27,6 @@ namespace Xceed.Wpf.Toolkit.Core.Converters
       {
         string valueString = value.ToString();
         if( string.IsNullOrEmpty( valueString )
-         || string.IsNullOrWhiteSpace( valueString )
          || ( valueString == value.GetType().UnderlyingSystemType.ToString() ) )
         {
           return value.GetType().Name;

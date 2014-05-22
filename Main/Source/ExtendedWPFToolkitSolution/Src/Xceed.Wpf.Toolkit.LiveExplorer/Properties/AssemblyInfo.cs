@@ -11,7 +11,7 @@ using System.Windows;
 [assembly: AssemblyDescription( "" )]
 [assembly: AssemblyCompany( "Xceed Software Inc." )]
 [assembly: AssemblyProduct( "Xceed Extended WPF Toolkit" )]
-[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2013" )]
+[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2014" )]
 [assembly: AssemblyCulture( "" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -49,8 +49,8 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion( "2.1.*" )]
-[assembly: AssemblyFileVersion( "2.1.0.0" )]
+[assembly: AssemblyVersion( "2.2.*" )]
+[assembly: AssemblyFileVersion( "2.2.0.0" )]
 
 #pragma warning disable 1699
 [assembly: AssemblyDelaySign( false )]

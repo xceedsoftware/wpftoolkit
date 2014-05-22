@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -527,7 +527,10 @@
             <core:LiveExplorerTreeViewItem Header="Numbers"
                                            SampleType="{x:Type samples:Numeric.Views.NumericView}" />
             <core:LiveExplorerTreeViewItem Header="DateTime"
-                                           SampleType="{x:Type samples:DateTime.Views.DateTimeView}" />
+                                           SampleType="{x:Type samples:DateTime.Views.DateTimeView}" />             
+            <core:LiveExplorerTreeViewItem Header="TimeSpan"
+                                           SampleType="{x:Type samples:TimeSpan.Views.TimeSpanView}"
+                                           IsNewFeature="True"/>
             <core:LiveExplorerTreeViewItem Header="Color"
                                            SampleType="{x:Type samples:Color.Views.ColorView}" />
             <core:LiveExplorerTreeViewItem Header="Text"
@@ -544,6 +547,13 @@
                <core:LiveExplorerTreeViewItem Header="WatermarkTextBox"
                                               SampleType="{x:Type samples:Text.Views.WatermarkTextboxView}" />
             </core:LiveExplorerTreeViewItem>
+            <core:LiveExplorerTreeViewItem Header="RangeSlider"
+                                           SampleType="{x:Type samples:RangeSlider.Views.RangeSliderView}"
+                                           IsNewFeature="True"/>
+            <core:LiveExplorerTreeViewItem Header="Rating"
+                                           SampleType="{x:Type samples:Rating.Views.RatingView}"
+                                           IsNewFeature="True"
+                                           IsPlusOnlyFeature="True"/>
             <core:LiveExplorerTreeViewItem Header="Enumeration"
                                            SampleType="{x:Type samples:Button.Views.ButtonSpinnerView}" />
          </core:LiveExplorerTreeViewItem>
@@ -603,6 +613,12 @@
                                            SampleType="{x:Type samples:Calculator.Views.CalculatorView}" />
             <core:LiveExplorerTreeViewItem Header="Wizard"
                                            SampleType="{x:Type samples:Wizard.Views.WizardView}" />
+             <core:LiveExplorerTreeViewItem Header="Gauge"
+                                           ItemContainerStyle="{StaticResource TreeViewItemStyle}"
+                                           SampleType="{x:Type samples:Gauge.Views.RadialGaugeView}"
+                                           IsPlusOnlyFeature="True"
+                                           IsNewFeature="True">
+            </core:LiveExplorerTreeViewItem>
          </core:LiveExplorerTreeViewItem>
          <core:LiveExplorerTreeViewItem Header="Other"
                                         Style="{StaticResource TreeViewHeaderStyle}"
@@ -629,8 +645,7 @@
          </core:LiveExplorerTreeViewItem>
          <core:LiveExplorerTreeViewItem Header="Theming"
                                         Style="{StaticResource TreeViewHeaderStyle}"
-                                        ItemContainerStyle="{StaticResource TreeViewItemStyle}"
-                                        IsNewFeature="True">
+                                        ItemContainerStyle="{StaticResource TreeViewItemStyle}">
             <core:LiveExplorerTreeViewItem Header="Extended Toolkit controls"
                                            SampleType="{x:Type samples:Theming.Views.ThemingExtendedToolkitView}"
                                            IsPlusOnlyFeature="True" />

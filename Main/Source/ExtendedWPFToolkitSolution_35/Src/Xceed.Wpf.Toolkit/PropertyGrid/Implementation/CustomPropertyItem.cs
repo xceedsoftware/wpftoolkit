@@ -47,6 +47,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //Category
 
+
+
+
+
     #region Value
 
     public static readonly DependencyProperty ValueProperty = DependencyProperty.Register( "Value", typeof( object ), typeof( CustomPropertyItem ), new UIPropertyMetadata( null, OnValueChanged, OnCoerceValueChanged ) );

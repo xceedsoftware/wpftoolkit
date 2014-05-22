@@ -279,8 +279,8 @@ namespace Xceed.Wpf.Toolkit.Primitives
       {
         windowControl.Left = 0;
         windowControl.Top = 0;
-        windowControl.Width = this.ActualWidth;
-        windowControl.Height = this.ActualHeight;
+        windowControl.Width = Math.Min( this.ActualWidth, windowControl.MaxWidth );
+        windowControl.Height = Math.Min( this.ActualHeight, windowControl.MaxHeight );
       }
     }
 

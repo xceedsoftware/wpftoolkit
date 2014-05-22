@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -39,6 +39,8 @@
          <LineBreak/>
            CategoryAttribute
          <LineBreak/>
+           CategoryOrderAttribute
+         <LineBreak/>
            EditorAttribute
          <LineBreak/>
            NewItemTypesAttribute
@@ -55,10 +57,10 @@
          Plus edition Only:
          <LineBreak/>
          (Not demoed here. See corresponding samples)
+         <LineBreak />
+         ExpandedCategoryAttribute
          <LineBreak/>
          DefinitionKeyAttribute
-         <LineBreak/>
-         CategoryOrderAttribute
          <LineBreak/>
          LocalizedCategoryAttribute
          <LineBreak/>
@@ -67,7 +69,7 @@
          LocalizedDescriptionAttribute
       </Paragraph>
     </local:DemoView.Description>
-    
+
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
@@ -85,10 +87,10 @@
                     FontStyle="Italic"
                     Margin="0,10,0,0"/>
       </StackPanel>
-      
+
       <xctk:PropertyGrid Grid.Row="1" x:Name="_propertyGrid" Width="450" MaxHeight="650" Margin="10" 
                          SelectedObject="{Binding}">
       </xctk:PropertyGrid>      
-      
+
    </Grid>
 </local:DemoView>

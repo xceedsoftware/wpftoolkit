@@ -253,7 +253,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     /// <summary>
     /// Identifies the MouseWheelActiveTrigger dependency property
     /// </summary>
-    public static readonly DependencyProperty MouseWheelActiveTriggerProperty = DependencyProperty.Register( "MouseWheelActiveTrigger", typeof( MouseWheelActiveTrigger ), typeof( UpDownBase<T> ), new UIPropertyMetadata( MouseWheelActiveTrigger.Focused ) );
+    public static readonly DependencyProperty MouseWheelActiveTriggerProperty = DependencyProperty.Register( "MouseWheelActiveTrigger", typeof( MouseWheelActiveTrigger ), typeof( UpDownBase<T> ), new UIPropertyMetadata( MouseWheelActiveTrigger.FocusedMouseOver ) );
 
     /// <summary>
     /// Get or set when the mouse wheel event should affect the value.
@@ -299,7 +299,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       UpDownBase<T> upDownBase = o as UpDownBase<T>;
       if( upDownBase != null )
         upDownBase.MouseWheelActiveTrigger = (( bool )e.NewValue) 
-          ? MouseWheelActiveTrigger.Focused
+          ? MouseWheelActiveTrigger.FocusedMouseOver
           : MouseWheelActiveTrigger.MouseOver;
     }
 
@@ -458,7 +458,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
         var activeTrigger = this.MouseWheelActiveTrigger;
         bool spin = !e.UsingMouseWheel;
         spin |= (activeTrigger == MouseWheelActiveTrigger.MouseOver);
-        spin |= ( TextBox.IsFocused && ( activeTrigger == MouseWheelActiveTrigger.Focused ) );
+        spin |= ( TextBox.IsFocused && ( activeTrigger == MouseWheelActiveTrigger.FocusedMouseOver ) );
 
         if( spin )
         {

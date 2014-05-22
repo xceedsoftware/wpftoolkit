@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -33,11 +33,23 @@
                          MaxHeight="245"
                          Margin="10"
                          AutoGenerateProperties="False">
+
          <xctk:PropertyGrid.PropertyDefinitions>
-            <!-- The following properties will be displayed in the PropertyGrid -->
-            <xctk:PropertyDefinition TargetProperties="FirstName,FavoriteColor,PetNames" />
-            <!-- And all properties of type Boolean -->
-            <xctk:PropertyDefinition TargetProperties="{x:Type s:Boolean}" />
+            <!-- //# TODODOC 
+               The following properties will be displayed in the PropertyGrid 
+               Some data of properties will be overriden-->
+            <xctk:PropertyDefinition TargetProperties="FirstName,PetNames" DisplayOrder="0"/>
+            <xctk:PropertyDefinition TargetProperties="FavoriteColor" 
+                                     DisplayName="Shirt Color" 
+                                     Category="Clothes"
+                                     Description="The color of the Person's shirt can be changed with the ColorPicker."
+                                     IsExpandable="True"/>
+            <!-- And all properties of type Boolean will be displayed in the PropertyGrid-->
+            <xctk:PropertyDefinition TargetProperties="{x:Type s:Boolean}" DisplayOrder="1"/>
+
+            <!-- //# TODODOC
+               This Property won't be displayed -->
+             <xctk:PropertyDefinition TargetProperties="WritingHand" IsBrowsable="False"/>
          </xctk:PropertyGrid.PropertyDefinitions>
       </xctk:PropertyGrid>
    </Grid>

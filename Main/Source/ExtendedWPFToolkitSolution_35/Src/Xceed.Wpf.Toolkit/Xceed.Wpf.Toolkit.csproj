@@ -39,6 +39,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -232,6 +233,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="RangeSlider\Themes\Aero2.NormalColor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RangeSlider\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="RichTextBoxFormatBar\Themes\Aero2.NormalColor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -328,6 +337,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="TimeSpanUpDown\Themes\Aero2.NormalColor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TimeSpanUpDown\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WatermarkTextBox\Themes\Aero2.NormalColor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -383,9 +400,11 @@
     <Compile Include="CollectionControl\Implementation\ItemDeletingEventArgs.cs" />
     <Compile Include="CollectionControl\Implementation\ItemEventArgs.cs" />
     <Compile Include="CollectionControl\Implementation\PrimitiveTypeCollectionControl.cs" />
+    <Compile Include="ColorPicker\Implementation\ColorSorter.cs" />
     <Compile Include="Core\CancelRoutedEventArgs.cs" />
     <Compile Include="Core\Converters\CenterTitleConverter.cs" />
     <Compile Include="Core\Converters\ColorBlendConverter.cs" />
+    <Compile Include="Core\Converters\IntToThicknessConverter.cs" />
     <Compile Include="Core\Converters\WindowContentBorderMarginConverter.cs" />
     <Compile Include="Core\Converters\WindowControlBackgroundConverter.cs" />
     <Compile Include="Core\Input\IValidateInput.cs" />
@@ -414,12 +433,14 @@
     <Compile Include="Core\Input\KeyModifierCollectionConverter.cs" />
     <Compile Include="Core\InvalidContentException.cs" />
     <Compile Include="Core\InvalidTemplateException.cs" />
+    <Compile Include="Core\Primitives\DateTimeUpDownBase.cs" />
     <Compile Include="Core\Primitives\HsvColor.cs" />
     <Compile Include="ColorPicker\Implementation\ColorItem.cs" />
     <Compile Include="ColorPicker\Implementation\ColorPicker.cs" />
     <Compile Include="Core\Primitives\MouseWheelActiveTriggerEnum.cs" />
     <Compile Include="Core\Primitives\WindowContainer.cs" />
     <Compile Include="Core\Primitives\WindowControl.cs" />
+    <Compile Include="Core\Utilities\ChangeTypeHelper.cs" />
     <Compile Include="Core\Utilities\FontUtilities.cs" />
     <Compile Include="Core\Utilities\GeneralUtilities.cs" />
     <Compile Include="Core\Utilities\KeyboardUtilities.cs" />
@@ -522,11 +543,13 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="BusyIndicator\Implementation\VisualStates.BusyIndicator.cs" />
+    <Compile Include="PropertyGrid\Implementation\Attributes\CategoryOrderAttribute.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\ExpandableObjectAttribute.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\IItemsSource.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\ItemsSourceAttribute.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\NewItemTypesAttribute.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\PropertyOrderAttribute.cs" />
+    <Compile Include="PropertyGrid\Implementation\Converters\ObjectToUIElementConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Commands\PropertyGridCommands.cs" />
     <Compile Include="PropertyGrid\Implementation\CommonPropertyExceptionValidationRule.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\ListConverter.cs" />
@@ -536,6 +559,7 @@
     <Compile Include="PropertyGrid\Implementation\Definitions\EditorTemplateDefinition.cs" />
     <Compile Include="PropertyGrid\Implementation\Definitions\PropertyDefinitionBase.cs" />
     <Compile Include="PropertyGrid\Implementation\Definitions\EditorDefinitionBase.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\MaskedTextBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyDefinitionBaseCollection.cs" />
     <Compile Include="PropertyGrid\Implementation\FilterInfo.cs" />
     <Compile Include="PropertyGrid\Implementation\ObjectContainerHelperBase.cs" />
@@ -551,7 +575,6 @@
     <Compile Include="PropertyGrid\Implementation\Editors\FontComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\ItemsSourceAttributeEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\UpDownEditors.cs" />
-    <Compile Include="PropertyGrid\Implementation\Editors\TimeSpanEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\ITypeEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\PrimitiveTypeCollectionEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\TextBlockEditor.cs" />
@@ -572,6 +595,8 @@
     <Compile Include="PropertyGrid\Implementation\ObjectContainerHelper.cs" />
     <Compile Include="PropertyGrid\Implementation\StringConstants.cs" />
     <Compile Include="PropertyGrid\Implementation\TargetPropertyType.cs" />
+    <Compile Include="RangeSlider\Implementation\Converters\SliderThumbWidthConverter.cs" />
+    <Compile Include="RangeSlider\Implementation\RangeSlider.cs" />
     <Compile Include="RichTextBoxFormatBar\IRichTextBoxFormatBar.cs" />
     <Compile Include="RichTextBoxFormatBar\RichTextBoxFormatBar.cs" />
     <Compile Include="RichTextBoxFormatBar\RichTextBoxFormatBarManager.cs" />
@@ -591,6 +616,7 @@
     <Compile Include="TimePicker\Implementation\TimeFormat.cs" />
     <Compile Include="TimePicker\Implementation\TimeItem.cs" />
     <Compile Include="TimePicker\Implementation\TimePicker.cs" />
+    <Compile Include="TimeSpanUpDown\Implementation\TimeSpanUpDown.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\Implementation\VisualStates.MessageBox.cs" />
     <Compile Include="WatermarkTextBox\Implementation\WatermarkTextBox.cs" />

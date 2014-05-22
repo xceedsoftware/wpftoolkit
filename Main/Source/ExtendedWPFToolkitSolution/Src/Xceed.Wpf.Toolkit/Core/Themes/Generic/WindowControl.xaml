@@ -162,7 +162,7 @@
                                     <Binding Path="WindowThickness.Bottom" RelativeSource="{RelativeSource TemplatedParent}" />
                                 </MultiBinding>
                             </Border.Margin>
-                            <Border x:Name="ContentBorder" Background="{TemplateBinding Background}" BorderBrush="#5D6C7A" BorderThickness="1" >
+                            <Border x:Name="ContentBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" >
                                 <Border x:Name="ContentInnerBorder" BorderBrush="#FFF2F2F2" BorderThickness="0"> <!-- only visible for ToolWindow -->
                                     <ContentPresenter x:Name="Content" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
                                 </Border>
@@ -255,6 +255,8 @@
       <Setter Property="CloseButtonStyle" Value="{StaticResource {ComponentResourceKey 
                   TypeInTargetAssembly={x:Type local:WindowControl}, 
                   ResourceId=DefaultCloseButtonStyle}}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Window_BorderBrush}" />
+        <Setter Property="BorderThickness" Value="{StaticResource Window_BorderThickness}" />       
         <Setter Property="Background" Value="{StaticResource Window_Background}" />
         <Setter Property="CaptionForeground" Value="{StaticResource Window_CaptionForeground}" />
         <Setter Property="WindowBorderBrush" Value="{StaticResource Window_WindowBorderBrush}" />
