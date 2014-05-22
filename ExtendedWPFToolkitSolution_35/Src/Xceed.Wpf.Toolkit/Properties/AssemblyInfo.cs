@@ -36,7 +36,7 @@ using System.Windows.Markup;
 
 [assembly: AssemblyCompany("Xceed Software Inc.")]
 [assembly: AssemblyProduct( "Xceed Extended WPF Toolkit" )]
-[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2013" )]
+[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2014" )]
 [assembly: AssemblyCulture( "" )]
 
 

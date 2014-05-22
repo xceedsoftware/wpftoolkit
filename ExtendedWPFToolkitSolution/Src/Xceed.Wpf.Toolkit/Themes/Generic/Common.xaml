@@ -190,6 +190,10 @@
 
    <SolidColorBrush x:Key="Window_Background"  Color="White"/>
 
+   <SolidColorBrush x:Key="Window_BorderBrush" Color="#5D6C7A" />
+
+   <Thickness x:Key="Window_BorderThickness" Left="1" Right="1" Bottom="1" Top="1" />
+
    <conv:ColorBlendConverter x:Key="Window_WindowInactiveBackground_converter" BlendedColor="#FFF0F0F0" BlendedColorRatio="0.67" />
    <SolidColorBrush x:Key="Window_WindowInactiveBackground" 
                     Color="{Binding 

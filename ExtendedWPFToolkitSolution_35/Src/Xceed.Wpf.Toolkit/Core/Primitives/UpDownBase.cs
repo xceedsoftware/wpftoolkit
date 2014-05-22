@@ -79,6 +79,53 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #endregion //AllowSpin
 
+#region ClipValueToMinMax
+
+    public static readonly DependencyProperty ClipValueToMinMaxProperty = DependencyProperty.Register( "ClipValueToMinMax", typeof( bool ), typeof( UpDownBase<T> ), new UIPropertyMetadata( false ) );
+    public bool ClipValueToMinMax
+    {
+      get
+      {
+        return ( bool )GetValue( ClipValueToMinMaxProperty );
+      }
+      set
+      {
+        SetValue( ClipValueToMinMaxProperty, value );
+      }
+    }
+
+#endregion //ClipValueToMinMax
+
+#region DisplayDefaultValueOnEmptyText
+
+    public static readonly DependencyProperty DisplayDefaultValueOnEmptyTextProperty = DependencyProperty.Register( "DisplayDefaultValueOnEmptyText", typeof( bool ), typeof( UpDownBase<T> ), new UIPropertyMetadata( false, OnDisplayDefaultValueOnEmptyTextChanged ) );
+    public bool DisplayDefaultValueOnEmptyText
+    {
+      get
+      {
+        return ( bool )GetValue( DisplayDefaultValueOnEmptyTextProperty );
+      }
+      set
+      {
+        SetValue( DisplayDefaultValueOnEmptyTextProperty, value );
+      }
+    }
+
+     private static void OnDisplayDefaultValueOnEmptyTextChanged( DependencyObject source, DependencyPropertyChangedEventArgs args )
+    {
+      ( ( UpDownBase<T> )source ).OnDisplayDefaultValueOnEmptyTextChanged( ( bool )args.OldValue, ( bool )args.NewValue );
+    }
+
+    private void OnDisplayDefaultValueOnEmptyTextChanged( bool oldValue, bool newValue )
+    {
+      if( this.IsInitialized && string.IsNullOrEmpty( Text ))
+      {
+        this.SyncTextAndValueProperties( true, Text );
+      }
+    }
+
+    #endregion //DisplayDefaultValueOnEmptyText
+
     #region DefaultValue
 
     public static readonly DependencyProperty DefaultValueProperty = DependencyProperty.Register( "DefaultValue", typeof( T ), typeof( UpDownBase<T> ), new UIPropertyMetadata( default( T ), OnDefaultValueChanged ) );
@@ -109,12 +156,104 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #endregion //DefaultValue
 
+    #region Maximum
+
+    public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register( "Maximum", typeof( T ), typeof( UpDownBase<T> ), new UIPropertyMetadata( default( T ), OnMaximumChanged, OnCoerceMaximum ) );
+    public T Maximum
+    {
+      get
+      {
+        return ( T )GetValue( MaximumProperty );
+      }
+      set
+      {
+        SetValue( MaximumProperty, value );
+      }
+    }
+
+    private static void OnMaximumChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      UpDownBase<T> upDown = o as UpDownBase<T>;
+      if( upDown != null )
+        upDown.OnMaximumChanged( ( T )e.OldValue, ( T )e.NewValue );
+    }
+
+    protected virtual void OnMaximumChanged( T oldValue, T newValue )
+    {
+      if( this.IsInitialized )
+      {
+        SetValidSpinDirection();
+      }
+    }
+
+    private static object OnCoerceMaximum( DependencyObject d, object baseValue )
+    {
+      UpDownBase<T> upDown = d as UpDownBase<T>;
+      if( upDown != null )
+        return upDown.OnCoerceMaximum( ( T )baseValue );
+
+      return baseValue;
+    }
+
+    protected virtual T OnCoerceMaximum( T baseValue )
+    {
+      return baseValue;
+    }
+
+    #endregion //Maximum
+
+    #region Minimum
+
+    public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register( "Minimum", typeof( T ), typeof( UpDownBase<T> ), new UIPropertyMetadata( default( T ), OnMinimumChanged, OnCoerceMinimum ) );
+    public T Minimum
+    {
+      get
+      {
+        return ( T )GetValue( MinimumProperty );
+      }
+      set
+      {
+        SetValue( MinimumProperty, value );
+      }
+    }
+
+    private static void OnMinimumChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      UpDownBase<T> upDown = o as UpDownBase<T>;
+      if( upDown != null )
+        upDown.OnMinimumChanged( ( T )e.OldValue, ( T )e.NewValue );
+    }
+
+    protected virtual void OnMinimumChanged( T oldValue, T newValue )
+    {
+      if( this.IsInitialized )
+      {
+        SetValidSpinDirection();
+      }
+    }
+
+    private static object OnCoerceMinimum( DependencyObject d, object baseValue )
+    {
+      UpDownBase<T> upDown = d as UpDownBase<T>;
+      if( upDown != null )
+        return upDown.OnCoerceMinimum( ( T )baseValue );
+
+      return baseValue;
+    }
+
+    protected virtual T OnCoerceMinimum( T baseValue )
+    {
+      return baseValue;
+    }
+
+    #endregion //Minimum
+
     #region MouseWheelActiveTrigger
 
     /// <summary>
     /// Identifies the MouseWheelActiveTrigger dependency property
     /// </summary>
-    public static readonly DependencyProperty MouseWheelActiveTriggerProperty = DependencyProperty.Register( "MouseWheelActiveTrigger", typeof( MouseWheelActiveTrigger ), typeof( UpDownBase<T> ), new UIPropertyMetadata( MouseWheelActiveTrigger.Focused ) );
+    public static readonly DependencyProperty MouseWheelActiveTriggerProperty = DependencyProperty.Register( "MouseWheelActiveTrigger", typeof( MouseWheelActiveTrigger ), typeof( UpDownBase<T> ), new UIPropertyMetadata( MouseWheelActiveTrigger.FocusedMouseOver ) );
 
     /// <summary>
     /// Get or set when the mouse wheel event should affect the value.
@@ -132,7 +271,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
     }
 
     #endregion //MouseWheelActiveTrigger
-
 
     #region MouseWheelActiveOnFocus
 
@@ -161,7 +299,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       UpDownBase<T> upDownBase = o as UpDownBase<T>;
       if( upDownBase != null )
         upDownBase.MouseWheelActiveTrigger = (( bool )e.NewValue) 
-          ? MouseWheelActiveTrigger.Focused
+          ? MouseWheelActiveTrigger.FocusedMouseOver
           : MouseWheelActiveTrigger.MouseOver;
     }
 
@@ -225,9 +363,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
       SetValidSpinDirection();
 
-      RoutedPropertyChangedEventArgs<object> args = new RoutedPropertyChangedEventArgs<object>( oldValue, newValue );
-      args.RoutedEvent = ValueChangedEvent;
-      RaiseEvent( args );
+      this.RaiseValueChangedEvent( oldValue, newValue );
     }
 
     #endregion //Value
@@ -322,7 +458,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
         var activeTrigger = this.MouseWheelActiveTrigger;
         bool spin = !e.UsingMouseWheel;
         spin |= (activeTrigger == MouseWheelActiveTrigger.MouseOver);
-        spin |= ( TextBox.IsFocused && ( activeTrigger == MouseWheelActiveTrigger.Focused ) );
+        spin |= ( TextBox.IsFocused && ( activeTrigger == MouseWheelActiveTrigger.FocusedMouseOver ) );
 
         if( spin )
         {
@@ -368,6 +504,13 @@ namespace Xceed.Wpf.Toolkit.Primitives
         DoIncrement();
       else
         DoDecrement();
+    }
+
+    protected virtual void RaiseValueChangedEvent( T oldValue, T newValue )
+    {
+      RoutedPropertyChangedEventArgs<object> args = new RoutedPropertyChangedEventArgs<object>( oldValue, newValue );
+      args.RoutedEvent = ValueChangedEvent;
+      RaiseEvent( args );
     }
 
     protected override void OnInitialized( EventArgs e )
@@ -491,7 +634,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
         if(!_isTextChangedFromUI)
         {
           // Don't replace the empty Text with the non-empty representation of DefaultValue.
-          bool shouldKeepEmpty = !forceTextUpdate && string.IsNullOrEmpty( Text ) && object.Equals( Value, DefaultValue );
+          bool shouldKeepEmpty = !forceTextUpdate && string.IsNullOrEmpty( Text ) && object.Equals( Value, DefaultValue ) && !this.DisplayDefaultValueOnEmptyText;
           if(  !shouldKeepEmpty )
           {
             Text = ConvertValueToText();

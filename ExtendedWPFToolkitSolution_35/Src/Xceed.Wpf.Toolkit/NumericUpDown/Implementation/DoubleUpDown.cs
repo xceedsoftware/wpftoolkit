@@ -76,7 +76,7 @@ namespace Xceed.Wpf.Toolkit
     protected override double? OnCoerceMinimum( double? baseValue )
     {
       if( baseValue.HasValue && double.IsNaN( baseValue.Value ) )
-        throw new ArgumentException( "NaN is for Minimum." );
+        throw new ArgumentException( "NaN is invalid for Minimum." );
 
       return base.OnCoerceMinimum( baseValue );
     }

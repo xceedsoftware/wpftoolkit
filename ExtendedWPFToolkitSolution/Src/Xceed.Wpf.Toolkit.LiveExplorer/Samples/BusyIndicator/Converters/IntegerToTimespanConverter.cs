@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -25,7 +25,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.BusyIndicator.Converters
   {
     public object Convert( object value, Type targetType, object parameter, System.Globalization.CultureInfo culture )
     {
-      return TimeSpan.FromMilliseconds( ( int )value );
+      return System.TimeSpan.FromMilliseconds( ( int )value );
     }
 
     public object ConvertBack( object value, Type targetType, object parameter, System.Globalization.CultureInfo culture )

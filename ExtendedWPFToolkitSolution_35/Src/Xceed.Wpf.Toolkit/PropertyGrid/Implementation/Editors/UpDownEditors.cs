@@ -107,6 +107,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     }
   }
 
+  public class TimeSpanUpDownEditor : UpDownEditor<TimeSpanUpDown, TimeSpan?>
+  {
+    protected override TimeSpanUpDown CreateEditor()
+    {
+      return new PropertyGridEditorTimeSpanUpDown();
+    }
+  }
+
   internal class SByteUpDownEditor : UpDownEditor<SByteUpDown, sbyte?>
   {
     protected override SByteUpDown CreateEditor()
@@ -202,6 +210,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     static PropertyGridEditorDateTimeUpDown()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( PropertyGridEditorDateTimeUpDown ), new FrameworkPropertyMetadata( typeof( PropertyGridEditorDateTimeUpDown ) ) );
+    }
+  }
+
+  public class PropertyGridEditorTimeSpanUpDown : TimeSpanUpDown
+  {
+    static PropertyGridEditorTimeSpanUpDown()
+    {
+      DefaultStyleKeyProperty.OverrideMetadata( typeof( PropertyGridEditorTimeSpanUpDown ), new FrameworkPropertyMetadata( typeof( PropertyGridEditorTimeSpanUpDown ) ) );
     }
   }
 

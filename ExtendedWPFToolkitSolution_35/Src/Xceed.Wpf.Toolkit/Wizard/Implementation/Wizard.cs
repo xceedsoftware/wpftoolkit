@@ -331,6 +331,17 @@ namespace Xceed.Wpf.Toolkit
         CurrentPage = Items[ 0 ] as WizardPage;
     }
 
+    protected override void OnPropertyChanged( DependencyPropertyChangedEventArgs e )
+    {
+      base.OnPropertyChanged( e );
+
+      if( ( e.Property.Name == "CanSelectNextPage" ) || ( e.Property.Name == "CanHelp" ) || ( e.Property.Name == "CanFinish" )
+        || ( e.Property.Name == "CanCancel" ) || ( e.Property.Name == "CanSelectPreviousPage" ) )
+      {
+        CommandManager.InvalidateRequerySuggested();
+      }
+    }
+
     #endregion //Base Class Overrides
 
     #region Commands

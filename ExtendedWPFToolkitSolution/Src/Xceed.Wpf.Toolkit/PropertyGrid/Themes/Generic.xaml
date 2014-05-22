@@ -28,6 +28,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../../NumericUpDown/Themes/Generic.xaml" />
        <ResourceDictionary Source="../../DateTimeUpDown/Themes/Generic.xaml" />
+       <ResourceDictionary Source="../../TimeSpanUpDown/Themes/Generic.xaml" />
        <ResourceDictionary Source="../../WatermarkTextBox/Themes/Generic.xaml" />
         <ResourceDictionary Source="../../ColorPicker/Themes/Generic.xaml" />
     </ResourceDictionary.MergedDictionaries>
@@ -148,7 +149,25 @@
       </Style.Triggers>
    </Style>
 
-   <!-- PropertyGrid ComboBox Editors --> 
+    <!-- PropertyGrid TimeSpan Editors -->
+    <Style TargetType="{x:Type editor:PropertyGridEditorTimeSpanUpDown}" BasedOn="{StaticResource TimeSpanUpDown}">
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsKeyboardFocusWithin"
+                               Value="False" />
+                    <Condition Property="IsMouseOver"
+                               Value="False" />
+                </MultiTrigger.Conditions>
+                <Setter Property="BorderBrush"
+                        Value="Transparent" />
+                <Setter Property="ShowButtonSpinner"
+                        Value="False" />
+            </MultiTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- PropertyGrid ComboBox Editors --> 
    <Style TargetType="{x:Type editor:PropertyGridEditorComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" >
       <Style.Triggers>
          <MultiTrigger>
@@ -180,8 +199,12 @@
       </Style.Triggers>
    </Style>
 
-    <!-- PropertyGrid TextBlock Editors --> 
-   <Style TargetType="{x:Type editor:PropertyGridEditorTextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}" />
+    <!-- PropertyGrid TextBlock Editors -->
+   <Style TargetType="{x:Type editor:PropertyGridEditorTextBlock}"
+          BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="Foreground"
+                    Value="Gray" />
+   </Style>
 
    <!-- PropertyGrid ColorPicker Editors --> 
    <Style TargetType="{x:Type editor:PropertyGridEditorColorPicker}" BasedOn="{StaticResource {x:Type local:ColorPicker}}" >
@@ -571,10 +594,13 @@
                                             IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
                                             Visibility="{Binding IsExpandable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-                              <TextBlock Grid.Column="1" Text="{Binding DisplayName, RelativeSource={RelativeSource TemplatedParent}}" 
+                              <TextBlock x:Name="_text"
+                                         Grid.Column="1" 
+                                         Text="{Binding DisplayName, RelativeSource={RelativeSource TemplatedParent}}" 
                                          HorizontalAlignment="Stretch" 
                                          VerticalAlignment="Center"
-                                         TextTrimming="CharacterEllipsis" />
+                                         TextTrimming="CharacterEllipsis"
+                                         IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}, Converter={StaticResource InverseBoolConverter}}"/>
                            </Grid>
 
                            <Grid Grid.Column="1"
@@ -627,7 +653,12 @@
                      <Setter TargetName="PART_Name" Property="TextElement.Foreground" Value="White" />
                   </Trigger>
                   <Trigger Property="IsEnabled" Value="False">
-                     <Setter Property="Foreground" TargetName="PART_ValueContainer"  Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"  />
+                     <Setter Property="Foreground" 
+                             TargetName="PART_ValueContainer"  
+                             Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"  />
+                     <Setter Property="Foreground"
+                             TargetName="_text"
+                             Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                   </Trigger>
                   <Trigger Property="Validation.HasError" Value="true">
                         <Setter Property="ToolTip"
@@ -664,7 +695,7 @@
    <Style TargetType="{x:Type pg:PropertyGrid}">
       <Style.Resources>
          <pgconv:SelectedObjectConverter x:Key="objectConverter" />
-      </Style.Resources>
+       </Style.Resources>
       <Setter Property="Background" Value="#BCC7D8" />
       <Setter Property="BorderBrush" Value="#43577B" />
       <Setter Property="BorderThickness" Value="1" />
@@ -766,10 +797,14 @@
                                              <Setter.Value>
                                                 <ControlTemplate>
                                                    <Border >
-                                                      <Expander Header="{Binding Name}" Style="{StaticResource ExpanderStyle}" IsExpanded="True" >
-                                                         <ItemsPresenter />
-                                                      </Expander>
-                                                   </Border>
+                                                        <Expander Header="{Binding Name}"
+                                                                    Style="{StaticResource ExpanderStyle}">
+                                                            <Expander.IsExpanded>
+                                                                <sys:Boolean>True</sys:Boolean>
+                                                            </Expander.IsExpanded>
+                                                            <ItemsPresenter />
+                                                        </Expander>
+                                                    </Border>
                                                 </ControlTemplate>
                                              </Setter.Value>
                                           </Setter>

@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -27,7 +27,7 @@
             The DateTimePicker and TimePicker controls let you select the date and the time in several ways. The TimePicker is used in the DateTimePicker.
         </Paragraph>
     </local:DemoView.Description>
-    
+
     <local:DemoView.Resources>
       <conv:DateTimeToTimeSpanConverter x:Key="dateTimeToTimeSpanConverter" />
       <conv:CustomFormatToBoolConverter x:Key="CustomFormatToBoolConverter" />
@@ -42,7 +42,12 @@
             <x:Type TypeName="xctk:DateTimeFormat"/>
          </ObjectDataProvider.MethodParameters>
       </ObjectDataProvider>
-   </local:DemoView.Resources>
+        <ObjectDataProvider x:Key="enumVisibility" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="Visibility" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </local:DemoView.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -56,6 +61,7 @@
       <GroupBox Header="Features" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" >
          <Grid>
             <Grid.RowDefinitions>
+               <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
@@ -78,8 +84,10 @@
             <TextBlock Text="AutoCloseCalendar:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"/>
             <CheckBox x:Name="_autoCloseCalendar" Grid.Row="3" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5,5,25,5"/>    
             <TextBlock Text="ClipValueToMinMax:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center"/>
-            <CheckBox x:Name="_clipValueToMinMax" Grid.Row="4" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5,5,25,5"/>    
-            
+            <CheckBox x:Name="_clipValueToMinMax" Grid.Row="4" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5,5,25,5"/>
+            <TextBlock Text="TimePickerVisibility:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"/>
+            <ComboBox x:Name="_timePickerVisibility" Grid.Row="5" Grid.Column="1" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumVisibility}}" Width="190" Margin="5,5,25,5"/>
+
             <TextBlock Text="TimeFormat:" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" />
             <ComboBox x:Name="_timeFormat" Grid.Row="0" Grid.Column="3" SelectedIndex="1" ItemsSource="{Binding Source={StaticResource enumTimeFormatData}}" Width="190" Margin="5"/>
             <TextBlock Text="Time FormatString:" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_timeFormatString}" Style="{StaticResource DisableGrayText}"/>
@@ -107,6 +115,7 @@
                                  TimeWatermark="{Binding  Source={x:Reference _timeWatermark}, Path=Text}"
                                  AutoCloseCalendar="{Binding IsChecked, ElementName=_autoCloseCalendar}"
                                  ClipValueToMinMax="{Binding IsChecked, ElementName=_clipValueToMinMax}"
+                                 TimePickerVisibility="{Binding Source={x:Reference _timePickerVisibility}, Path=SelectedItem}"
                                  Minimum="{Binding Value, ElementName=_minimum}"
                                  Maximum="{Binding Value, ElementName=_maximum}"/>
         </StackPanel>

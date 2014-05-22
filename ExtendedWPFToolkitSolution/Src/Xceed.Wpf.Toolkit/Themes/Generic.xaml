@@ -46,10 +46,12 @@
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="MultiLineTextEditor/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="NumericUpDown/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Pie/Themes/Generic.xaml" />
+      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="RangeSlider/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="SplitButton/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="PropertyGrid/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="RichTextBoxFormatBar/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="TimePicker/Themes/Generic.xaml" />
+      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="TimeSpanUpDown/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="WatermarkTextBox/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Wizard/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Zoombox/Themes/Generic.xaml" />

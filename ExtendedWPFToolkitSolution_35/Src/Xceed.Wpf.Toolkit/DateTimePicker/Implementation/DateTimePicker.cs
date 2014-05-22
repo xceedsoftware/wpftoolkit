@@ -133,6 +133,23 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //TimeFormatString
 
+    #region TimePickerVisibility
+
+    public static readonly DependencyProperty TimePickerVisibilityProperty = DependencyProperty.Register( "TimePickerVisibility", typeof( Visibility ), typeof( DateTimePicker ), new UIPropertyMetadata( Visibility.Visible ) );
+    public Visibility TimePickerVisibility
+    {
+      get
+      {
+        return ( Visibility )GetValue( TimePickerVisibilityProperty );
+      }
+      set
+      {
+        SetValue( TimePickerVisibilityProperty, value );
+      }
+    }
+
+    #endregion //TimePickerVisibility
+
     #region TimeWatermark
 
     public static readonly DependencyProperty TimeWatermarkProperty = DependencyProperty.Register( "TimeWatermark", typeof( object ), typeof( DateTimePicker ), new UIPropertyMetadata( null ) );
@@ -224,14 +241,14 @@ namespace Xceed.Wpf.Toolkit
           CloseDateTimePicker( true );
         }
       }
+      base.OnPreviewMouseUp( e );
     }
 
     protected override void OnValueChanged( DateTime? oldValue, DateTime? newValue )
     {
-      if( _calendar != null && _calendar.SelectedDate != newValue )
+      if( (_calendar != null) && (_calendar.SelectedDate != newValue) )
       {
         _calendar.SelectedDate = newValue;
-        _calendar.DisplayDate = newValue ?? DateTime.Now;
       }
 
       base.OnValueChanged( oldValue, newValue );

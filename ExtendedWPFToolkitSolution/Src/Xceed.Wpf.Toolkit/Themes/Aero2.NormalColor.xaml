@@ -46,12 +46,14 @@
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/MultiLineTextEditor/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/NumericUpDown/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Pie/Themes/Aero2.NormalColor.xaml" />
+        <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/RangeSlider/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/RichTextBoxFormatBar/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/SplitButton/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/PropertyGrid/Themes/Aero2.NormalColor.xaml" />
 
 
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/TimePicker/Themes/Aero2.NormalColor.xaml" />
+        <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/TimeSpanUpDown/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/WatermarkTextBox/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Wizard/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Zoombox/Themes/Aero2.NormalColor.xaml" />

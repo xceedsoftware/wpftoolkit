@@ -31,6 +31,7 @@ using System.Diagnostics;
 using System.Windows.Automation;
 using Xceed.Wpf.Toolkit;
 using Xceed.Wpf.Toolkit.Core;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit.Primitives
 {
@@ -813,7 +814,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
       try
       {
-        value = System.Convert.ChangeType( text, validatingType, this.GetActiveFormatProvider() );
+        value = ChangeTypeHelper.ChangeType( text, validatingType, this.GetActiveFormatProvider() );
       }
       catch
       {
@@ -871,6 +872,11 @@ namespace Xceed.Wpf.Toolkit.Primitives
         return;
 
       Type validatingType = this.ValueDataType;
+      if( validatingType.IsGenericType && validatingType.GetGenericTypeDefinition().Equals( typeof( Nullable<> ) ) )
+      {
+        NullableConverter nullableConverter = new NullableConverter( validatingType );
+        validatingType = nullableConverter.UnderlyingType;
+      }
 
       if( validatingType == null )
         throw new InvalidOperationException( "An attempt was made to set a value when the ValueDataType property is null." );
@@ -986,6 +992,11 @@ namespace Xceed.Wpf.Toolkit.Primitives
         return true;
 
       Type type = this.ValueDataType;
+      if( type.IsGenericType && type.GetGenericTypeDefinition().Equals( typeof( Nullable<> ) ) )
+      {
+        NullableConverter nullableConverter = new NullableConverter( type );
+        type = nullableConverter.UnderlyingType;
+      }
 
       if( value.GetType() != type )
         value = System.Convert.ChangeType( value, type );
@@ -1113,6 +1124,11 @@ namespace Xceed.Wpf.Toolkit.Primitives
         return;
 
       Type type = this.ValueDataType;
+      if( type.IsGenericType && type.GetGenericTypeDefinition().Equals( typeof( Nullable<> ) ) )
+      {
+        NullableConverter nullableConverter = new NullableConverter( type );
+        type = nullableConverter.UnderlyingType;
+      }
 
       if( value.GetType() != type )
         value = System.Convert.ChangeType( value, type );

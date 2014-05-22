@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -27,7 +27,7 @@
             <Run>The SplitButton control is a button that can be clicked and also provides a drop down in which you can place any custom content within.</Run>
         </Paragraph>
     </local:DemoView.Description>
-    
+
    <Grid>
         <Grid.RowDefinitions>
            <RowDefinition Height="Auto" />
@@ -53,7 +53,7 @@
                </StackPanel>
             </xctk:DropDownButton.DropDownContent>
          </xctk:DropDownButton>
-       
+
          <TextBlock Text="SplitButton Usage:" Grid.Column="1" Style="{StaticResource Header}" />
          <xctk:SplitButton x:Name="_splitButton"
                            Grid.Row="1"

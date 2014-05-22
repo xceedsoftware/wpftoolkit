@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -46,7 +46,15 @@
             <x:Type TypeName="xctk:ColorMode" />
          </ObjectDataProvider.MethodParameters>
       </ObjectDataProvider>
-   </local:DemoView.Resources>
+
+      <ObjectDataProvider x:Key="AvailableColorsSortingModeOptions"
+                        MethodName="GetValues"
+                        ObjectType="{x:Type sys:Enum}">
+        <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="xctk:ColorSortingMode" />
+        </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+    </local:DemoView.Resources>
    <Grid>
       <Grid.ColumnDefinitions>
          <ColumnDefinition Width="*" />
@@ -208,6 +216,7 @@
                   <RowDefinition Height="Auto" />
                   <RowDefinition Height="Auto" />
                   <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
                </Grid.RowDefinitions>
                <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="Auto" />
@@ -240,47 +249,55 @@
                <TextBox Grid.Column="1"
                         Grid.Row="3"
                         Text="{Binding ElementName=_colorPicker, Path=StandardColorsHeader, Mode=TwoWay}" />
+               <TextBlock Grid.Column="0"
+                          Grid.Row="4"
+                          Text="AvailableColorsSortingMode:" />
+               <ComboBox Grid.Column="1"
+                         Grid.Row="4"
+                         ItemsSource="{Binding Source={StaticResource AvailableColorsSortingModeOptions}}"
+                         SelectedItem="{Binding ElementName=_colorPicker, Path=AvailableColorsSortingMode, Mode=TwoWay}"
+                         Height="22" />
 
                <CheckBox Grid.Column="0"
-                         Grid.Row="4"
+                         Grid.Row="5"
                          Grid.ColumnSpan="2"
                          Content="DisplayColorAndName"
                          IsChecked="{Binding ElementName=_colorPicker, Path=DisplayColorAndName, Mode=TwoWay}" />
                <CheckBox Grid.Column="0"
-                         Grid.Row="5"
+                         Grid.Row="6"
                          Grid.ColumnSpan="2"
                          Content="ShowAdvancedButton"
                          IsChecked="{Binding ElementName=_colorPicker, Path=ShowAdvancedButton, Mode=TwoWay}" />
                <CheckBox Grid.Column="0"
-                         Grid.Row="6"
+                         Grid.Row="7"
                          Grid.ColumnSpan="2"
                          Content="ShowAvailableColors"
                          IsChecked="{Binding ElementName=_colorPicker, Path=ShowAvailableColors, Mode=TwoWay}" />
                <CheckBox Grid.Column="0"
-                         Grid.Row="7"
+                         Grid.Row="8"
                          Grid.ColumnSpan="2"
                          Content="ShowDropDownButton"
                          IsChecked="{Binding ElementName=_colorPicker, Path=ShowDropDownButton, Mode=TwoWay}" />
                <CheckBox Grid.Column="0"
-                         Grid.Row="8"
+                         Grid.Row="9"
                          Grid.ColumnSpan="2"
                          Content="ShowRecentColors"
                          IsChecked="{Binding ElementName=_colorPicker, Path=ShowRecentColors, Mode=TwoWay}" />
                <CheckBox Grid.Column="0"
-                         Grid.Row="9"
+                         Grid.Row="10"
                          Grid.ColumnSpan="2"
                          Content="ShowStandardColors"
                          IsChecked="{Binding ElementName=_colorPicker, Path=ShowStandardColors, Mode=TwoWay}" />
                <CheckBox Grid.Column="0"
-                         Grid.Row="10"
+                         Grid.Row="11"
                          Grid.ColumnSpan="2"
                          Content="UsingAlphaChannel"
                          IsChecked="{Binding ElementName=_colorPicker, Path=UsingAlphaChannel, Mode=TwoWay}" />
                <TextBlock Grid.Column="0"
-                          Grid.Row="11"
+                          Grid.Row="12"
                           Text="SelectedColorText:" />
                <TextBox Grid.Column="1"
-                        Grid.Row="11"
+                        Grid.Row="12"
                         IsEnabled="False"
                         Text="{Binding ElementName=_colorPicker, Path=SelectedColorText}" />
             </Grid>

@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -35,7 +35,7 @@
             <Run>All these numeric types support the following properties.</Run>
         </Paragraph>
     </local:DemoView.Description>
-    
+
     <local:DemoView.Resources>
         <x:Array x:Key="FormatStringComboBox" Type="numeric:FormatObject">
             <numeric:FormatObject Value="C2" DisplayValue="Currency" />
@@ -69,12 +69,12 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        
+
         <sys:String x:Key="allowInputSpecialValuesTooltip">Infinity and -Infinity input will not be accepted if Maximum and/or Minimum values does not allow them.</sys:String>
         <sys:String x:Key="parsingNumberStyleTooltip">HexNumber is not a valid choice when used with a DoubleUpDown (current control used in this sample). It will work with the following controls: IntegerUpDown, ByteUpDown, LongUpDown, and ShortUpDown.</sys:String>
 
     </local:DemoView.Resources>
-    
+
    <StackPanel>
       <Grid>
            <Grid.RowDefinitions>
@@ -105,11 +105,11 @@
                        <ColumnDefinition Width="Auto" />
                        <ColumnDefinition Width="125" />
                    </Grid.ColumnDefinitions>
-                   
+
                    <!-- 1st column -->
                    <TextBlock Text="Mouse Wheel:" Grid.Row="0" VerticalAlignment="Center" />
                    <ComboBox Grid.Row="0" Grid.Column="1" SelectedItem="{Binding MouseWheelActiveTrigger, ElementName=_doubleUpDown}" Margin="5" VerticalAlignment="Center" >
-                      <x:StaticExtension Member="xctk:MouseWheelActiveTrigger.Focused" />
+                      <x:StaticExtension Member="xctk:MouseWheelActiveTrigger.FocusedMouseOver" />
                       <x:StaticExtension Member="xctk:MouseWheelActiveTrigger.MouseOver" />
                       <x:StaticExtension Member="xctk:MouseWheelActiveTrigger.Disabled" />
                    </ComboBox>
@@ -125,7 +125,7 @@
 
                    <TextBlock Text="Is Read Only:" Grid.Row="4" VerticalAlignment="Center" />
                    <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding IsReadOnly, ElementName=_doubleUpDown}"  ClickMode="Press" Margin="5" VerticalAlignment="Center" />
-                  
+
                    <TextBlock Text="DisplayDefaultValueOnEmptyText:" Grid.Row="5" VerticalAlignment="Center" />
                    <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding DisplayDefaultValueOnEmptyText, ElementName=_doubleUpDown}" ClickMode="Press" Margin="5" VerticalAlignment="Center" />
 
@@ -160,7 +160,7 @@
 
                    <TextBlock Text="Text:" Grid.Column="4" Grid.Row="4" VerticalAlignment="Center" Margin="10,0,0,0"/>
                    <TextBox Grid.Column="5" Grid.Row="4" Text="{Binding Text, ElementName=_doubleUpDown}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5" />
-                   
+
                    <!-- last rows -->
                    <TextBlock Text="(DoubleUpDown and SingleUpDown support the AllowInputSpecialValues property)" Grid.Row="6" Grid.ColumnSpan="6" VerticalAlignment="Center" Margin="0,5,0,0"/>
                    <TextBlock Text="Allow Input Special Values:" VerticalAlignment="Center" Grid.Row="7" Grid.ColumnSpan="2"/>
@@ -189,11 +189,11 @@
                                   DefaultValue="10"
                                   Value="25" />
          </StackPanel>
-          
+
            <TextBlock Grid.Row="2" Margin="10,15,0,0"
                       Text="CalculatorUpDown is a DecimalUpDown with all the properties from a NumericUpDown. It provides a Calculator dropdown which allows you to perform mathematical calculations."
                       TextWrapping="Wrap" />
-          
+
            <GroupBox Header="CalculatorUpDown Features" Grid.Row="3" Margin="5,15,0,0">
                 <StackPanel Orientation="Horizontal" Margin="5" HorizontalAlignment="Left">
                     <TextBlock Text="Enter closes calculator:" VerticalAlignment="Center" />
@@ -202,7 +202,7 @@
                     <xctk:IntegerUpDown Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" Minimum="0" Value="{Binding Precision, ElementName=_calculatorUpDown}" ToolTip="Gets/Sets the maximum number of digits displayed to the right of the decimal point." />
                 </StackPanel>
             </GroupBox>
-          
+
            <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="10" HorizontalAlignment="Left">
              <TextBlock Text="CalculatorUpDown Usage:" Style="{StaticResource Header}" />
              <xctk:CalculatorUpDown x:Name="_calculatorUpDown"

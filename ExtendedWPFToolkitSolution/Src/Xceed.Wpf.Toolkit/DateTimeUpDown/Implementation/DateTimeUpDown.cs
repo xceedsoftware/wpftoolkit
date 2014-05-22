@@ -23,20 +23,12 @@ using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Primitives;
 using System.Windows.Controls;
 using System.Linq;
+using Xceed.Wpf.Toolkit.Core.Primitives;
 
 namespace Xceed.Wpf.Toolkit
 {
-  public class DateTimeUpDown : UpDownBase<DateTime?>
+  public class DateTimeUpDown : DateTimeUpDownBase<DateTime?>
   {
-    #region Members
-
-    private List<DateTimeInfo> _dateTimeInfoList = new List<DateTimeInfo>();
-    private DateTimeInfo _selectedDateTimeInfo;
-    private bool _fireSelectionChangedEvent = true;
-    private bool _processTextChanged = true;
-
-    #endregion //Members
-
     #region Properties
 
     #region Format
@@ -125,29 +117,11 @@ namespace Xceed.Wpf.Toolkit
 
     public DateTimeUpDown()
     {
-      InitializeDateTimeInfoList();
     }
 
     #endregion //Constructors
 
     #region Base Class Overrides
-
-    public override void OnApplyTemplate()
-    {
-      if( this.TextBox != null )
-      {
-        this.TextBox.SelectionChanged -= this.TextBox_SelectionChanged;
-        this.TextBox.GotFocus -= new RoutedEventHandler( this.TextBox_GotFocus );
-      }
-
-      base.OnApplyTemplate();
-
-      if( TextBox != null )
-      {
-        this.TextBox.SelectionChanged += this.TextBox_SelectionChanged;
-        this.TextBox.GotFocus += new RoutedEventHandler(this.TextBox_GotFocus);
-      }
-    }
 
     protected override void OnCultureInfoChanged( CultureInfo oldValue, CultureInfo newValue )
     {
@@ -174,80 +148,6 @@ namespace Xceed.Wpf.Toolkit
         else
           Value = DefaultValue ?? DateTime.Now;
       }
-    }
-
-    protected override void OnPreviewKeyDown( KeyEventArgs e )
-    {      
-      int selectionStart = (_selectedDateTimeInfo != null) ? _selectedDateTimeInfo.StartPosition : 0;
-      int selectionLength = ( _selectedDateTimeInfo != null ) ? _selectedDateTimeInfo.Length : 0;
-
-      switch( e.Key )
-      {
-        case Key.Enter:
-          {
-            if( !IsReadOnly )
-            {
-              _fireSelectionChangedEvent = false;
-              BindingExpression binding = BindingOperations.GetBindingExpression( TextBox, System.Windows.Controls.TextBox.TextProperty );
-              binding.UpdateSource();
-              _fireSelectionChangedEvent = true;
-            }
-            return;
-          }
-        case Key.Add:
-          if( this.AllowSpin && !this.IsReadOnly )
-          {
-            this.DoIncrement();
-            e.Handled = true;
-          }
-          _fireSelectionChangedEvent = false;
-          break;
-        case Key.Subtract:
-          if( this.AllowSpin && !this.IsReadOnly )
-          {
-            this.DoDecrement();
-            e.Handled = true;
-          }
-          _fireSelectionChangedEvent = false;
-          break;
-        case Key.OemSemicolon:
-          if( this.IsCurrentValueValid() && ( Keyboard.Modifiers == ModifierKeys.Shift ) )
-          {
-            this.PerformKeyboardSelection( selectionStart + selectionLength );
-            e.Handled = true;
-          }
-          _fireSelectionChangedEvent = false;
-          break;
-        case Key.OemPeriod:
-        case Key.OemComma:
-        case Key.OemQuotes:
-        case Key.OemMinus:
-        case Key.Divide:
-        case Key.Decimal: 
-        case Key.Right:
-          if( this.IsCurrentValueValid() )
-          {
-            this.PerformKeyboardSelection( selectionStart + selectionLength );
-            e.Handled = true;
-          }
-          _fireSelectionChangedEvent = false;
-          break;
-        case Key.Left:
-          if( this.IsCurrentValueValid() )
-          {
-            this.PerformKeyboardSelection( selectionStart > 0 ? selectionStart - 1 : 0 );
-            e.Handled = true;
-          }
-          _fireSelectionChangedEvent = false;
-          break;
-         default:
-          {
-            _fireSelectionChangedEvent = false;
-            break;
-          }
-      }
-
-      base.OnPreviewKeyDown( e );
     }
 
     protected override void OnTextChanged( string previousValue, string currentValue )
@@ -320,27 +220,17 @@ namespace Xceed.Wpf.Toolkit
       base.RaiseValueChangedEvent( oldValue, newValue );
     }
 
+    protected override bool IsCurrentValueValid()
+    {
+      DateTime result;
+
+      if( string.IsNullOrEmpty( this.TextBox.Text ) )
+        return true;
+
+      return this.TryParseDateTime( this.TextBox.Text, out result );
+    }
+
     #endregion //Base Class Overrides
-
-    #region Event Hanlders
-
-    private void TextBox_SelectionChanged( object sender, RoutedEventArgs e )
-    {
-      if( _fireSelectionChangedEvent )
-        PerformMouseSelection();
-      else
-        _fireSelectionChangedEvent = true;
-    }
-
-    private void TextBox_GotFocus( object sender, RoutedEventArgs e )
-    {
-      if( _selectedDateTimeInfo == null )
-      {
-        this.Select( this.GetDateTimeInfo( 0 ) );
-      }
-    }
-
-    #endregion //Event Hanlders
 
     #region Methods
 
@@ -366,7 +256,7 @@ namespace Xceed.Wpf.Toolkit
 
     }
 
-    private void InitializeDateTimeInfoList()
+    protected override void InitializeDateTimeInfoList()
     {
       _dateTimeInfoList.Clear();
       _selectedDateTimeInfo = null;
@@ -606,6 +496,22 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    protected override bool IsLowerThan( DateTime? value1, DateTime? value2 )
+    {
+      if( value1 == null || value2 == null )
+        return false;
+
+      return ( value1.Value < value2.Value );
+    }
+
+    protected override bool IsGreaterThan( DateTime? value1, DateTime? value2 )
+    {
+      if( value1 == null || value2 == null )
+        return false;
+
+      return ( value1.Value > value2.Value );
+    }
+
     private static int GetElementLengthByFormat( string format )
     {
       for( int i = 1; i < format.Length; i++ )
@@ -639,92 +545,6 @@ namespace Xceed.Wpf.Toolkit
           text += info.Content;
         }
       } );
-    }
-
-    private void PerformMouseSelection()
-    {
-      this.Select( this.GetDateTimeInfo( TextBox.SelectionStart ) );
-    }
-
-    private void PerformKeyboardSelection( int nextSelectionStart )
-    {
-      this.TextBox.Focus();
-
-      this.CommitInput();
-
-      int selectedDateStartPosition = ( _selectedDateTimeInfo != null ) ? _selectedDateTimeInfo.StartPosition : 0;
-      int direction = nextSelectionStart - selectedDateStartPosition;
-      if( direction > 0 )
-      {
-        this.Select( this.GetNextDateTimeInfo( nextSelectionStart ) );
-      }
-      else
-      {
-        this.Select( this.GetPreviousDateTimeInfo( nextSelectionStart - 1) );
-      }
-    }
-
-    private DateTimeInfo GetDateTimeInfo( int selectionStart )
-    {
-      return _dateTimeInfoList.FirstOrDefault( (info) =>
-                              ( info.StartPosition <= selectionStart ) && ( selectionStart < ( info.StartPosition + info.Length ) ) );
-    }
-
-    private DateTimeInfo GetNextDateTimeInfo( int nextSelectionStart )
-    {
-      DateTimeInfo nextDateTimeInfo = this.GetDateTimeInfo( nextSelectionStart );
-      if( nextDateTimeInfo == null )
-      {
-        nextDateTimeInfo = _dateTimeInfoList.First();
-      }
-
-      DateTimeInfo initialDateTimeInfo = nextDateTimeInfo;
-
-      while( nextDateTimeInfo.Type == DateTimePart.Other )
-      {
-        nextDateTimeInfo = this.GetDateTimeInfo( nextDateTimeInfo.StartPosition + nextDateTimeInfo.Length );
-        if( nextDateTimeInfo == null )
-        {
-          nextDateTimeInfo = _dateTimeInfoList.First();
-        }
-        if( object.Equals( nextDateTimeInfo, initialDateTimeInfo ) )
-          throw new InvalidOperationException( "Couldn't find a valid DateTimeInfo." );
-      }
-      return nextDateTimeInfo;
-    }
-
-    private DateTimeInfo GetPreviousDateTimeInfo( int previousSelectionStart )
-    {
-      DateTimeInfo previousDateTimeInfo = this.GetDateTimeInfo( previousSelectionStart );
-      if( previousDateTimeInfo == null )
-      {
-        previousDateTimeInfo = _dateTimeInfoList.Last();
-      }
-
-      DateTimeInfo initialDateTimeInfo = previousDateTimeInfo;
-
-      while( previousDateTimeInfo.Type == DateTimePart.Other )
-      {
-        previousDateTimeInfo = this.GetDateTimeInfo( previousDateTimeInfo.StartPosition - 1 );
-        if( previousDateTimeInfo == null )
-        {
-          previousDateTimeInfo = _dateTimeInfoList.Last();
-        }
-        if( object.Equals( previousDateTimeInfo, initialDateTimeInfo ) )
-          throw new InvalidOperationException( "Couldn't find a valid DateTimeInfo." );
-      }
-      return previousDateTimeInfo;
-    }
-
-    private void Select( DateTimeInfo info )
-    {
-      if( info != null )
-      {
-        _fireSelectionChangedEvent = false;
-        TextBox.Select( info.StartPosition, info.Length );
-        _fireSelectionChangedEvent = true;
-        _selectedDateTimeInfo = info;
-      }
     }
 
     private string GetFormatString( DateTimeFormat dateTimeFormat )
@@ -868,32 +688,6 @@ namespace Xceed.Wpf.Toolkit
       _fireSelectionChangedEvent = true;
     }
 
-    private DateTime? CoerceValueMinMax( DateTime? value )
-    {
-      if( this.IsLowerThan( value, this.Minimum ) )
-        return this.Minimum;
-      else if( this.IsGreaterThan( value, this.Maximum ) )
-        return this.Maximum;
-      else
-        return value;
-    }
-
-    private bool IsLowerThan( DateTime? value1, DateTime? value2 )
-    {
-      if( value1 == null || value2 == null )
-        return false;
-
-      return ( value1.Value < value2.Value );
-    }
-
-    private bool IsGreaterThan( DateTime? value1, DateTime? value2 )
-    {
-      if( value1 == null || value2 == null )
-        return false;
-
-      return ( value1.Value > value2.Value );
-    }
-
     private bool TryParseDateTime( string text, out DateTime result )
     {
       bool isValid = false;
@@ -908,37 +702,6 @@ namespace Xceed.Wpf.Toolkit
       }
 
       return isValid;
-    }
-
-    private bool IsCurrentValueValid()
-    {
-      DateTime result;
-
-      if( string.IsNullOrEmpty( this.TextBox.Text ) )
-        return true;
-
-      return this.TryParseDateTime( this.TextBox.Text, out result );
-    }
-
-    private void ValidateDefaultMinMax( DateTime? value )
-    {
-      // DefaultValue is always accepted.
-      if( object.Equals( value, DefaultValue ) )
-        return;
-
-      if( IsLowerThan( value, Minimum ) )
-        throw new ArgumentOutOfRangeException( "Minimum", String.Format( "Value must be greater than MinValue of {0}", Minimum ) );
-      else if( IsGreaterThan( value, Maximum ) )
-        throw new ArgumentOutOfRangeException( "Maximum", String.Format( "Value must be less than MaxValue of {0}", Maximum ) );
-    }
-
-    private DateTime? GetClippedMinMaxValue( DateTime? value )
-    {
-      if( this.IsGreaterThan( value, this.Maximum ) )
-        return this.Maximum;
-      else if( this.IsLowerThan( value, this.Minimum ) )
-        return this.Minimum;
-      return value;
     }
 
     #endregion //Methods

@@ -143,7 +143,8 @@
                                                 Maximum="{Binding Maximum, RelativeSource={RelativeSource TemplatedParent}}"
                                                 ClipValueToMinMax="{Binding ClipValueToMinMax, RelativeSource={RelativeSource TemplatedParent}}"
                                                 Watermark="{TemplateBinding TimeWatermark}"
-                                                WatermarkTemplate="{TemplateBinding TimeWatermarkTemplate}" />
+                                                WatermarkTemplate="{TemplateBinding TimeWatermarkTemplate}"
+                                                Visibility="{TemplateBinding TimePickerVisibility}"/>
                                     </StackPanel>
                                 </Border>
                             </Popup>

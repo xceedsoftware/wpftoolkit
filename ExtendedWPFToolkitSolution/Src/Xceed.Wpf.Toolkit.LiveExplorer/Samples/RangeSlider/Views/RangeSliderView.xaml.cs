@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -14,24 +14,20 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Globalization;
-using System.Windows.Data;
-using Xceed.Wpf.Toolkit.PropertyGrid.Converters;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 
-namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
+namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.RangeSlider.Views
 {
-  public class TimeSpanEditor : DateTimeUpDownEditor
+  /// <summary>
+  /// Interaction logic for RangeSliderView.xaml
+  /// </summary>
+  public partial class RangeSliderView : DemoView
   {
-    protected override void SetControlProperties()
+    public RangeSliderView()
     {
-      base.SetControlProperties();
-      Editor.Format = DateTimeFormat.LongTime;
-    }
-
-    protected override IValueConverter CreateValueConverter()
-    {
-      return new EditorTimeSpanConverter();
+      InitializeComponent();
     }
   }
 }

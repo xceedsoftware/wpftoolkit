@@ -234,7 +234,14 @@ namespace Xceed.Wpf.Toolkit
           object value = null;
           try
           {
-            value = Convert.ChangeType( valueString, ItemType );
+            if( ItemType.IsEnum )
+            {
+              value = Enum.Parse( ItemType, valueString );
+            }
+            else
+            {
+              value = Convert.ChangeType( valueString, ItemType );
+            }
           }
           catch
           {

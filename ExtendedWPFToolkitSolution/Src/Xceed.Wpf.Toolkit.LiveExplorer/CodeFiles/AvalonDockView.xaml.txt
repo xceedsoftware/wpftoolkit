@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -26,7 +26,7 @@
          The AvalonDock layout system allows developers to create customizable layouts using a window docking system similar to what is found in many popular integrated development environements.
       </Paragraph>
    </local:DemoView.Description>
-      
+
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />

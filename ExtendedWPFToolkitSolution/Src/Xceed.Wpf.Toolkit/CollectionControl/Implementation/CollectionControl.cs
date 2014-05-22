@@ -100,7 +100,7 @@ namespace Xceed.Wpf.Toolkit
       if( newValue != null )
       {
         foreach( var item in newValue )
-          Items.Add( CreateClone( item ) );
+          Items.Add( item );
       }
     }
 
@@ -360,33 +360,6 @@ namespace Xceed.Wpf.Toolkit
     #endregion //Commands
 
     #region Methods
-
-    private static void CopyValues( object source, object destination )
-    {
-      Type currentType = source.GetType();
-
-      while( currentType != null )
-      {
-        FieldInfo[] myObjectFields = currentType.GetFields( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance );
-        foreach( FieldInfo fi in myObjectFields )
-        {
-          fi.SetValue( destination, fi.GetValue( source ) );
-        }
-
-        currentType = currentType.BaseType;
-      }
-    }
-
-    private object CreateClone( object source )
-    {
-      object clone = null;
-
-      Type type = source.GetType();
-      clone = Activator.CreateInstance( type );
-      CopyValues( source, clone );
-
-      return clone;
-    }
 
     private IList CreateItemsSource()
     {

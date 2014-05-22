@@ -1913,6 +1913,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
         _content.Measure( new Size( double.PositiveInfinity, double.PositiveInfinity ) );
       }
 
+
       // avoid returning infinity
       if( double.IsInfinity( constraint.Height ) )
       {

@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -43,6 +43,7 @@
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="Auto" />
@@ -68,7 +69,11 @@
             <TextBlock Text="Show Advanced Options:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="2"  Margin="10,0,0,0"/>
             <CheckBox x:Name="_showAdvancedOptions" Grid.Row="1" Grid.Column="3" IsChecked="True" VerticalAlignment="Center" Margin="5" ToolTip="Shows/Hides the advanced options menu next to a property." />
             <TextBlock Text="IsReadOnly:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
-            <CheckBox x:Name="_isReadOnly" Grid.Row="2" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5" ToolTip="Set the IsReadOnly property to true or false." />            
+            <CheckBox x:Name="_isReadOnly" Grid.Row="2" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5" ToolTip="Set the IsReadOnly property to true or false." />
+            <TextBlock Text="UpdateTextBoxSourceOnEnterKey:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="2"  Margin="10,0,0,0"/>
+            <CheckBox x:Name="_updateTextBoxSourceOnEnterKey" Grid.Row="2" Grid.Column="3" IsChecked="True" VerticalAlignment="Center" Margin="5" ToolTip="Update the source of a TextBox when True and Enter key is pressed." />
+            <TextBlock Text="ShowPreview:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"/>
+            <CheckBox x:Name="_showPreview" Grid.Row="3" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5" ToolTip="Shows/Hides the selected object preview." />
          </Grid>
       </GroupBox>
 
@@ -92,6 +97,8 @@
                                IsCategorized="{Binding IsChecked, ElementName=_isCategorized, Mode=TwoWay}"
                                ShowAdvancedOptions="{Binding IsChecked, ElementName=_showAdvancedOptions}" 
                                IsReadOnly="{Binding IsChecked, ElementName=_isReadOnly}"
+                               UpdateTextBoxSourceOnEnterKey="{Binding IsChecked, ElementName=_updateTextBoxSourceOnEnterKey}"
+                               ShowPreview="{Binding IsChecked, ElementName=_showPreview}"
                                SelectedObject="{Binding ElementName=_button}">
             </xctk:PropertyGrid>
          </Grid>

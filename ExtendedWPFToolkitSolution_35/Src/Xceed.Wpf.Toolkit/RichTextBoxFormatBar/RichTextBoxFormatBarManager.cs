@@ -132,12 +132,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    private void OnMouseLeaveParentWindow( object sender, MouseEventArgs e )
-    {
-      // Mouse is outside parent Window: Close it.
-      HideAdorner();
-    }
-
     void RichTextBox_TextChanged( object sender, TextChangedEventArgs e )
     {
       //This fixes the bug when applying text transformations the text would lose it's highlight. That was because the RichTextBox was losing focus,
@@ -196,7 +190,6 @@ namespace Xceed.Wpf.Toolkit
       if( _parentWindow != null )
       {
         Mouse.AddMouseMoveHandler( _parentWindow, OnPreviewMouseMoveParentWindow );
-        Mouse.AddMouseLeaveHandler( _parentWindow, OnMouseLeaveParentWindow );
       }
     }
 
@@ -255,7 +248,6 @@ namespace Xceed.Wpf.Toolkit
         if( _parentWindow != null )
         {
           Mouse.RemoveMouseMoveHandler( _parentWindow, OnPreviewMouseMoveParentWindow );
-          Mouse.RemoveMouseLeaveHandler( _parentWindow, OnMouseLeaveParentWindow );
         }
       }
     }

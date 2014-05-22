@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2014 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -44,6 +44,8 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       selectedObject.FontStretch = FontStretches.Normal;
       selectedObject.FontStyle = FontStyles.Italic;
       selectedObject.FontWeight = FontWeights.Bold;
+      selectedObject.Guid = new Guid( "F9168C5E-CEB2-4faa-B6BF-329BF39FA1E4" );
+      selectedObject.Char = 'T';
       selectedObject.Int16 = ( short )4;
       selectedObject.Int32 = (int)5;
       selectedObject.Int64 = (long)6;
@@ -54,7 +56,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       selectedObject.SByte = (sbyte) 7;
       selectedObject.Single = (float)8;
       selectedObject.String = "this is a string";
-      selectedObject.TimeSpan = TimeSpan.FromHours( 2 );      
+      selectedObject.TimeSpan = System.TimeSpan.FromHours( 2 );      
       selectedObject.UInt16 = (ushort)9;
       selectedObject.UInt32 = (uint)10;
       selectedObject.UInt64 = (ulong)11;
@@ -111,8 +113,8 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       [Description( "This property uses a DateTimeUpDown as the default editor." )]
       public System.DateTime DateTime { get; set; }
       [Category( "Non-Numeric Editors" )]
-      [Description( "This property uses a DateTimeUpDown as the default editor." )]
-      public TimeSpan TimeSpan { get; set; }
+      [Description( "This property uses a TimeSpanUpDown as the default editor." )]
+      public System.TimeSpan TimeSpan { get; set; }
       [Category( "Non-Numeric Editors" )]
       [Description( "This property uses a ColorPicker as the default editor." )]
       public System.Windows.Media.Color Color { get; set; }
@@ -131,6 +133,12 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       [Category( "Non-Numeric Editors" )]
       [Description( "This property uses a ComboBox as the default editor." )]
       public FontStretch FontStretch { get; set; }
+      [Category( "Non-Numeric Editors" )]
+      [Description( "This property uses a Guid as the default editor." )]
+      public Guid Guid { get; set; }
+      [Category( "Non-Numeric Editors" )]
+      [Description( "This property uses a Char as the default editor." )]
+      public Char Char { get; set; }
       [Category( "Non-Numeric Editors" )]
       [Description( "This property uses a PrimitiveTypeCollectionEditor as the default editor." )]
       public List<string> ListOfStrings { get; set; }

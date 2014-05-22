@@ -145,6 +145,16 @@ namespace Xceed.Wpf.Toolkit
         // No longer visible
         _displayAfterTimer.Stop();
         IsContentVisible = false;
+
+        if( this.FocusAferBusy != null )
+        {
+          this.FocusAferBusy.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
+          {
+            this.FocusAferBusy.Focus();
+            this.FocusAferBusy = null;
+          }
+          ) );
+        }
       }
 
       ChangeVisualState( true );
@@ -235,6 +245,34 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //Display After
+
+    #region FocusAferBusy
+
+    /// <summary>
+    /// Identifies the FocusAferBusy dependency property.
+    /// </summary>
+    public static readonly DependencyProperty FocusAferBusyProperty = DependencyProperty.Register(
+        "FocusAferBusy",
+        typeof( Control ),
+        typeof( BusyIndicator ),
+        new PropertyMetadata( null ) );
+
+    /// <summary>
+    /// Gets or sets a Control that should get focus when the busy indicator disapears.
+    /// </summary>
+    public Control FocusAferBusy
+    {
+      get
+      {
+        return ( Control )GetValue( FocusAferBusyProperty );
+      }
+      set
+      {
+        SetValue( FocusAferBusyProperty, value );
+      }
+    }
+
+    #endregion //IsBusy
 
     #region Overlay Style
 

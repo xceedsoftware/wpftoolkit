@@ -59,6 +59,7 @@
                                           Foreground="{TemplateBinding Foreground}" 
                                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
+                                          IsTabStop="{TemplateBinding IsTabStop}"
                                           MinWidth="20"
                                           AcceptsReturn="False"
                                           Padding="{TemplateBinding Padding}"

@@ -81,10 +81,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         editor = new ColorEditor();
       else if( propertyType.IsEnum )
         editor = new EnumComboBoxEditor();
-      else if( propertyType == typeof( TimeSpan ) )
-        editor = new TimeSpanEditor();
+      else if( propertyType == typeof( TimeSpan ) || propertyType == typeof( TimeSpan? ) )
+        editor = new TimeSpanUpDownEditor();
       else if( propertyType == typeof( FontFamily ) || propertyType == typeof( FontWeight ) || propertyType == typeof( FontStyle ) || propertyType == typeof( FontStretch ) )
         editor = new FontComboBoxEditor();
+      else if (propertyType == typeof(Guid) || propertyType == typeof(Guid?))
+        editor = new MaskedTextBoxEditor() { ValueDataType = propertyType, Mask = "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA" };
+      else if (propertyType == typeof(char) || propertyType == typeof(char?))
+        editor = new MaskedTextBoxEditor() { ValueDataType = propertyType, Mask = "&" };
       else if( propertyType == typeof( object ) )
         // If any type of object is possible in the property, default to the TextBoxEditor.
         // Useful in some case (e.g., Button.Content).

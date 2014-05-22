@@ -46,6 +46,7 @@ namespace Xceed.Wpf.Toolkit
     private ToggleButton _btnAlignRight;
 
     private Thumb _dragWidget;
+    private bool _waitingForMouseOver;
     #endregion
 
     #region Properties
@@ -84,6 +85,7 @@ namespace Xceed.Wpf.Toolkit
 
       FontFamily editValue = ( FontFamily )e.AddedItems[ 0 ];
       ApplyPropertyValueToSelectedText( TextElement.FontFamilyProperty, editValue );
+      _waitingForMouseOver = true;
     }
 
     private void FontSize_SelectionChanged( object sender, SelectionChangedEventArgs e )
@@ -92,18 +94,21 @@ namespace Xceed.Wpf.Toolkit
         return;
 
       ApplyPropertyValueToSelectedText( TextElement.FontSizeProperty, e.AddedItems[ 0 ] );
+      _waitingForMouseOver = true;
     }
 
     void FontColor_SelectedColorChanged( object sender, RoutedPropertyChangedEventArgs<Color> e )
     {
       Color selectedColor = ( Color )e.NewValue;
       ApplyPropertyValueToSelectedText( TextElement.ForegroundProperty, new SolidColorBrush( selectedColor ) );
+      _waitingForMouseOver = true;
     }
 
     private void FontBackgroundColor_SelectedColorChanged( object sender, RoutedPropertyChangedEventArgs<Color> e )
     {
       Color selectedColor = ( Color )e.NewValue;
       ApplyPropertyValueToSelectedText( TextElement.BackgroundProperty, new SolidColorBrush( selectedColor ) );
+      _waitingForMouseOver = true;
     }
 
     private void Bullets_Clicked( object sender, RoutedEventArgs e )
@@ -125,6 +130,12 @@ namespace Xceed.Wpf.Toolkit
     private void DragWidget_DragDelta( object sender, DragDeltaEventArgs e )
     {
       ProcessMove( e );
+    }
+
+    protected override void OnMouseEnter( System.Windows.Input.MouseEventArgs e )
+    {
+      base.OnMouseEnter( e );
+      _waitingForMouseOver = false;
     }
 
     #endregion //Event Hanlders
@@ -391,7 +402,7 @@ namespace Xceed.Wpf.Toolkit
       get
       {
         return ( _cmbFontFamilies.IsDropDownOpen || _cmbFontSizes.IsDropDownOpen ||
-               _cmbFontBackgroundColor.IsOpen || _cmbFontColor.IsOpen );
+               _cmbFontBackgroundColor.IsOpen || _cmbFontColor.IsOpen || _waitingForMouseOver );
       }
     }
 

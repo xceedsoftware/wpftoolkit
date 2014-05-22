@@ -186,6 +186,9 @@
     <Compile Include="Samples\DateTime\Views\DateTimeView.xaml.cs">
       <DependentUpon>DateTimeView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Samples\Gauge\Views\RadialGaugeView.xaml.cs">
+      <DependentUpon>RadialGaugeView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Samples\ListBox\Converters\BoxArtImageSourceConverter.cs" />
     <Compile Include="Samples\ListBox\Views\ListBoxView.xaml.cs">
       <DependentUpon>ListBoxView.xaml</DependentUpon>
@@ -273,6 +276,13 @@
     <Compile Include="Samples\PropertyGrid\Views\PropertyGridView.xaml.cs">
       <DependentUpon>PropertyGridView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Samples\RangeSlider\Converters\IntegerToBoolConverter.cs" />
+    <Compile Include="Samples\RangeSlider\Views\RangeSliderView.xaml.cs">
+      <DependentUpon>RangeSliderView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Rating\Views\RatingView.xaml.cs">
+      <DependentUpon>RatingView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Samples\Text\Views\AutoSelectTextboxView.xaml.cs">
       <DependentUpon>AutoSelectTextboxView.xaml</DependentUpon>
     </Compile>
@@ -306,6 +316,9 @@
     </Compile>
     <Compile Include="Samples\TimelinePanel\Views\TimelinePanelView.xaml.cs">
       <DependentUpon>TimelinePanelView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\TimeSpan\Views\TimeSpanView.xaml.cs">
+      <DependentUpon>TimeSpanView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Samples\Window\Converters\IntToBoolConverter.cs" />
     <Compile Include="Samples\Window\Converters\WindowStateToBoolConverter.cs" />
@@ -450,6 +463,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Samples\Gauge\Views\RadialGaugeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Samples\ListBox\Views\ListBoxView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -550,6 +567,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Samples\RangeSlider\Views\RangeSliderView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\Rating\Views\RatingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Samples\Text\Views\AutoSelectTextboxView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -593,6 +618,10 @@
     <Page Include="Samples\TimelinePanel\Views\TimelinePanelView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\TimeSpan\Views\TimeSpanView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Samples\Window\Resources\FancyStyles.xaml">
       <SubType>Designer</SubType>
@@ -976,6 +1005,37 @@
     <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockOffice2007Black.png" />
     <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockOffice2007Blue.png" />
     <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockOffice2007Silver.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\RadialGaugeView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\RadialGaugeView.xaml.txt" />
+    <Resource Include="CodeFiles\RangeSliderView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\RangeSliderView.xaml.txt" />
+    <Resource Include="CodeFiles\RatingView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\RatingView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Gauge\Resources\fuel.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Gauge\Resources\pointing.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Gauge\Resources\arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Gauge\Resources\smiley.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\TimeSpanView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\TimeSpanView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Samples\Gauge\OpenSourceImages\Gauge.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Rating\OpenSourceImages\Rating.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

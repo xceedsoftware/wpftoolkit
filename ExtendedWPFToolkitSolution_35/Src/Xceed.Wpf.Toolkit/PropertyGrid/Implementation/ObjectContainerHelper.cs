@@ -92,10 +92,34 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       PropertyItem propertyItem = new PropertyItem( definition );
       Debug.Assert( SelectedObject != null );
       propertyItem.Instance = SelectedObject;
+      propertyItem.CategoryOrder = this.GetCategoryOrder( definition.CategoryValue );
+
       return propertyItem;
     }
 
+    private int GetCategoryOrder( object categoryValue )
+    {
+      Debug.Assert( SelectedObject != null );
 
+      if( categoryValue == null )
+        return int.MaxValue;
+
+      int order = int.MaxValue;
+        object selectedObject = SelectedObject;
+        CategoryOrderAttribute[] orderAttributes = ( selectedObject != null )
+          ? ( CategoryOrderAttribute[] )selectedObject.GetType().GetCustomAttributes( typeof( CategoryOrderAttribute ), true )
+          : new CategoryOrderAttribute[ 0 ];
+
+        var orderAttribute = orderAttributes
+          .FirstOrDefault( ( a ) => object.Equals( a.CategoryValue, categoryValue ) );
+
+        if( orderAttribute != null )
+        {
+          order = orderAttribute.Order;
+        }
+
+      return order;
+    }
 
 
 
