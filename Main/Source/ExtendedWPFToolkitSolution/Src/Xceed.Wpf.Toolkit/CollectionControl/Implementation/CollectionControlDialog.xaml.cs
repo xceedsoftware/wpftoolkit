@@ -108,11 +108,13 @@ namespace Xceed.Wpf.Toolkit
     private void OkButton_Click( object sender, RoutedEventArgs e )
     {
       _propertyGrid.PersistChanges();
+      this.DialogResult = true;
       Close();
     }
 
     private void CancelButton_Click( object sender, RoutedEventArgs e )
     {
+      this.DialogResult = false;
       Close();
     }
 

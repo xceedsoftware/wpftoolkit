@@ -24,7 +24,7 @@
            The Wizard will explain how to do something in a series of steps.
         </Paragraph>
     </local:DemoView.Description>
-
+    
     <local:DemoView.Resources>
         <xctk:Wizard x:Key="_wizard" FinishButtonClosesWindow="True" Help="OnWizardHelp">
             <xctk:WizardPage Title="Welcome to my Wizard"

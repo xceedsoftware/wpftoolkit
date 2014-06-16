@@ -29,6 +29,12 @@ namespace Xceed.Wpf.Toolkit
 {
   public class DateTimeUpDown : DateTimeUpDownBase<DateTime?>
   {
+    #region Members
+
+    private DateTime? _lastValidDate;
+
+    #endregion
+
     #region Properties
 
     #region Format
@@ -123,6 +129,13 @@ namespace Xceed.Wpf.Toolkit
 
     #region Base Class Overrides
 
+    public override bool CommitInput()
+    {
+      bool isSyncValid = this.SyncTextAndValueProperties( true, Text );
+      _lastValidDate = this.Value;
+      return isSyncValid;
+    }
+
     protected override void OnCultureInfoChanged( CultureInfo oldValue, CultureInfo newValue )
     {
       FormatUpdated();
@@ -209,6 +222,11 @@ namespace Xceed.Wpf.Toolkit
         ParseValueIntoDateTimeInfo();
 
       base.OnValueChanged( oldValue, newValue );
+
+      if( !_isTextChangedFromUI )
+      {
+        _lastValidDate = newValue;
+      }
     }
 
     protected override void RaiseValueChangedEvent( DateTime? oldValue, DateTime? newValue )
@@ -700,6 +718,9 @@ namespace Xceed.Wpf.Toolkit
       {
         isValid = DateTime.TryParseExact( text, this.GetFormatString( this.Format ), this.CultureInfo, DateTimeStyles.None, out result );
       }
+
+      if( !isValid )
+        result = ( _lastValidDate != null ) ? _lastValidDate.Value : current;
 
       return isValid;
     }

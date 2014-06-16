@@ -26,14 +26,26 @@
            By default the propertyGrid will autogenerate all the properties for a given object.  You can override this behavior by setting the AutoGenerateProperties property to False, and then provide a collection of PropertyDefinitions of the properties you would like to show.
         </Paragraph>
     </local:DemoView.Description>
-
+    
    <Grid>      
       <xctk:PropertyGrid x:Name="_propertyGrid"
                          Width="450" 
                          MaxHeight="245"
                          Margin="10"
                          AutoGenerateProperties="False">
-
+         <!--##EXCLUDE_OPEN_SOURCE-->
+         <!-- //# TODODOC
+         The following categories DisplayOrder will be overriden -->
+         <xctk:PropertyGrid.CategoryDefinitions>
+            <xctk:CategoryDefinition Name="Information"
+                                     DisplayOrder="0" />
+            <xctk:CategoryDefinition Name="Connections"
+                                     DisplayOrder="2" />
+            <xctk:CategoryDefinition Name="Clothes"
+                                     DisplayOrder="1" />
+         </xctk:PropertyGrid.CategoryDefinitions>
+         <!--##END-->
+         
          <xctk:PropertyGrid.PropertyDefinitions>
             <!-- //# TODODOC 
                The following properties will be displayed in the PropertyGrid 
@@ -46,7 +58,7 @@
                                      IsExpandable="True"/>
             <!-- And all properties of type Boolean will be displayed in the PropertyGrid-->
             <xctk:PropertyDefinition TargetProperties="{x:Type s:Boolean}" DisplayOrder="1"/>
-
+            
             <!-- //# TODODOC
                This Property won't be displayed -->
              <xctk:PropertyDefinition TargetProperties="WritingHand" IsBrowsable="False"/>

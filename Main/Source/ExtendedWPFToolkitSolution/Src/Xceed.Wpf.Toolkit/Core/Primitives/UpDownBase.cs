@@ -41,11 +41,12 @@ namespace Xceed.Wpf.Toolkit.Primitives
     /// </summary>
     internal const string PART_Spinner = "PART_Spinner";
 
+    internal bool _isTextChangedFromUI;
+
     /// <summary>
     /// Flags if the Text and Value properties are in the process of being sync'd
     /// </summary>
-    private bool _isSyncingTextAndValueProperties;
-    private bool _isTextChangedFromUI;
+    private bool _isSyncingTextAndValueProperties;    
 
     #endregion //Members
 
@@ -79,7 +80,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #endregion //AllowSpin
 
-#region ClipValueToMinMax
+    #region ClipValueToMinMax
 
     public static readonly DependencyProperty ClipValueToMinMaxProperty = DependencyProperty.Register( "ClipValueToMinMax", typeof( bool ), typeof( UpDownBase<T> ), new UIPropertyMetadata( false ) );
     public bool ClipValueToMinMax
@@ -94,9 +95,9 @@ namespace Xceed.Wpf.Toolkit.Primitives
       }
     }
 
-#endregion //ClipValueToMinMax
+    #endregion //ClipValueToMinMax
 
-#region DisplayDefaultValueOnEmptyText
+    #region DisplayDefaultValueOnEmptyText
 
     public static readonly DependencyProperty DisplayDefaultValueOnEmptyTextProperty = DependencyProperty.Register( "DisplayDefaultValueOnEmptyText", typeof( bool ), typeof( UpDownBase<T> ), new UIPropertyMetadata( false, OnDisplayDefaultValueOnEmptyTextChanged ) );
     public bool DisplayDefaultValueOnEmptyText
@@ -583,7 +584,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       }
     }
 
-    public bool CommitInput()
+    public virtual bool CommitInput()
     {
       return this.SyncTextAndValueProperties( true, Text );
     }

@@ -33,7 +33,7 @@
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
       <Setter Property="HorizontalContentAlignment" Value="Right" />
-      <Setter Property="IsTabStop" Value="False" />
+      <Setter Property="Focusable"  Value="False" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="TextAlignment" Value="Right" />
       <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />

@@ -30,7 +30,7 @@
            The PropertyGrid also supports complex properties, which allows you to drill down into a nested property hierarchy.
         </Paragraph>
     </local:DemoView.Description>
-
+    
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
@@ -78,7 +78,7 @@
       </GroupBox>
 
       <DockPanel Grid.Row="1" Margin="10">
-
+         
          <TextBlock DockPanel.Dock="Top" Text="Usage:" Style="{StaticResource Header}" />
          <TextBlock DockPanel.Dock="Top" 
                     Text="Edit the values in the PropertyGrid to see the effect on the button."
@@ -89,7 +89,7 @@
                <ColumnDefinition MaxWidth="530" />
             </Grid.ColumnDefinitions>
             <Button x:Name="_button" Height="100" Width="100" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">Button</Button>
-
+            
             <xctk:PropertyGrid Grid.Column="1"
                                x:Name="_propertyGrid"
                                ShowSummary="{Binding IsChecked, ElementName=_showSummary}"

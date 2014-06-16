@@ -25,6 +25,7 @@
      <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
             <Run>The ChildWindow control can be used to create a window that is displayed within the bounds of a specific parent container.</Run>
+       <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <LineBreak />
             <Run>In addition to the following features, the "Plus" version allows ChildWindow to be resizable and to use a Maximize/Restore button.</Run>
@@ -32,13 +33,14 @@
             <Hyperlink NavigateUri="http://www.xceed.com/Extended_WPF_Toolkit_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Extended WPF Toolkit Plus.
             </Hyperlink>
+        ##END-->
         </Paragraph>
     </local:DemoView.Description>
 
    <local:DemoView.Resources>
       <conv:IntToBoolConverter x:Key="IntToBoolConverter" />
       <xctkconv:VisibilityToBoolConverter x:Key="VisibilityToBoolConverter" Inverted="True"/>
-
+       
       <ObjectDataProvider x:Key="WindowStates" MethodName="GetValues"
                           ObjectType="{x:Type sys:Enum}">
          <ObjectDataProvider.MethodParameters>
@@ -52,7 +54,7 @@
          </ObjectDataProvider.MethodParameters>
       </ObjectDataProvider>
    </local:DemoView.Resources>
-
+    
 
    <Grid>
       <Grid.RowDefinitions>
@@ -82,7 +84,7 @@
 
             <TextBlock Grid.Row="2" Name="textBlock3" Text="Top:" Margin="2" VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_txtTop}" Style="{StaticResource DisableGrayText}"/>
             <xctk:DoubleUpDown x:Name="_txtTop" Grid.Column="1" Grid.Row="2" Value="0" Minimum="0" VerticalAlignment="Center" Margin="5" IsEnabled="{Binding SelectedIndex, ElementName=_cboWindowStartupLocations}"/>
-
+             
             <TextBlock Text="IsModal:" VerticalAlignment="Center" Margin="10,2,2,2" Grid.Column="2" />
             <CheckBox x:Name="_chkIsModal" Grid.Column="3" VerticalAlignment="Center" Margin="5" IsChecked="True" />
 
