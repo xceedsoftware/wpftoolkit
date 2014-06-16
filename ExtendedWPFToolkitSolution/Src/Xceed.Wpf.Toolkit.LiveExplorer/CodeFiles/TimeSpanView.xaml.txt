@@ -27,7 +27,7 @@
             The TimeSpanUpDown controls let you increment or decrement a time over 24 hours. The Format is Days.Hours:Minutes:Seconds.
         </Paragraph>
     </local:DemoView.Description>
-
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

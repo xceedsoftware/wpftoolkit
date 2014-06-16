@@ -25,8 +25,8 @@
             Obviously, the Pie control can be used to create a pie chart.
         </Paragraph>
     </local:DemoView.Description>
-
-
+    
+   
    <local:DemoView.Resources>
       <XmlDataProvider x:Key="XMLData">
          <x:XData>

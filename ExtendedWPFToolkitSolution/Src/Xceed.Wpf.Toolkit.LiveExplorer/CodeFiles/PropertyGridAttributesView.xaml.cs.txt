@@ -33,7 +33,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     public PropertyGridAttributesView()
     {
       InitializeComponent();
-
+      
       var person = new Man();
       person.FirstName = "John";
       person.LastName = "Doe";
@@ -53,6 +53,9 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
   [CategoryOrder("Information", 0)]
   [CategoryOrder( "Conections", 1 )]
   [CategoryOrder( "Other", 2 )]
+#if !OPEN_SOURCE
+  [ExpandedCategory( "Conections", false )]
+#endif
   public abstract class Person
   {
     // All properties have their own "[Category(...)]" attribute to specify which category they
@@ -105,6 +108,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     public string NameInParentheses { get; set; }
 
     [Category( "Other" )]
+    //# TODODOC
     [Description( "This property uses the [Browsable(false)] attribute to not display the property" )]
     [BrowsableAttribute( false )]
     public string InvisibleProperty

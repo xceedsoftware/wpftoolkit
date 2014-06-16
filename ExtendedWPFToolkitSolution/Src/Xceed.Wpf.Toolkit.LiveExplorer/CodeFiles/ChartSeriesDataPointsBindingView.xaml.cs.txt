@@ -14,6 +14,9 @@
 
   ************************************************************************************/
 
+#if !OPEN_SOURCE
+using Xceed.Wpf.Toolkit.Chart;
+#endif
 using System.Windows.Media;
 using System;
 using System.Collections.ObjectModel;

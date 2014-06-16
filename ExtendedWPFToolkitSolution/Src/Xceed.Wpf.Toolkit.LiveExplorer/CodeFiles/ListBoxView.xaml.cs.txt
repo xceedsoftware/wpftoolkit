@@ -32,9 +32,17 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.ListBox.Views
 
     public ListBoxView()
     {
+#if !OPEN_SOURCE
+      this.DataContext = SampleDataProvider.GetOrders();
+#endif
 
       InitializeComponent();
 
+#if !OPEN_SOURCE
+      //Add the default GroupDescriptions to the ListBox's GroupDescriptions collection.
+      _listBox.GroupDescriptions.Add( this.Resources[ "shipCountryGroupDescription" ] as GroupDescription );
+      _listBox.GroupDescriptions.Add( this.Resources[ "shipCityGroupDescription" ] as GroupDescription );
+#endif
     }
 
     #endregion
