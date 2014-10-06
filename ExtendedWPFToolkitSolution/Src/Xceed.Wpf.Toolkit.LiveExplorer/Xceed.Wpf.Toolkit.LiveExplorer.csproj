@@ -320,6 +320,9 @@
     <Compile Include="Samples\TimeSpan\Views\TimeSpanView.xaml.cs">
       <DependentUpon>TimeSpanView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Samples\ToggleSwitch\Views\ToggleSwitchView.xaml.cs">
+      <DependentUpon>ToggleSwitchView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Samples\Window\Converters\IntToBoolConverter.cs" />
     <Compile Include="Samples\Window\Converters\WindowStateToBoolConverter.cs" />
     <Compile Include="Samples\Window\Resources\WindowModelEditor.xaml.cs">
@@ -620,6 +623,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Samples\TimeSpan\Views\TimeSpanView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\ToggleSwitch\Views\ToggleSwitchView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -1030,12 +1037,19 @@
     <Resource Include="CodeFiles\TimeSpanView.xaml.cs.txt" />
     <Resource Include="CodeFiles\TimeSpanView.xaml.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="CodeFiles\ToggleSwitchView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ToggleSwitchView.xaml.txt" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\Gauge\OpenSourceImages\Gauge.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\Rating\OpenSourceImages\Rating.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Samples\ToggleSwitch\OpenSourceImages\ToggleSwitch.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

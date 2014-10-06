@@ -94,7 +94,15 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     private static void OnDelimiterChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
-      ( ( Selector )o ).UpdateSelectedValue();
+      ( (Selector)o ).OnSelectedItemChanged( (string)e.OldValue, (string)e.NewValue );
+    }
+
+    protected virtual void OnSelectedItemChanged( string oldValue, string newValue )
+    {
+      if( !this.IsInitialized )
+        return;
+
+      this.UpdateSelectedValue();
     }
 
     #endregion

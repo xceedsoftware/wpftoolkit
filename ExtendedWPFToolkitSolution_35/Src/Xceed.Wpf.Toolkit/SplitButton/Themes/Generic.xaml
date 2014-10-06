@@ -49,6 +49,7 @@
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="Background" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalBackgroundKey}}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalOuterBorderKey}}" />
       <Setter Property="Padding" Value="3" />
       <Setter Property="Template">
          <Setter.Value>
@@ -68,7 +69,10 @@
                            </Button.Template>
                            <Grid>
                               <chrome:ButtonChrome x:Name="ActionButtonChrome"
+                                                   Background="{TemplateBinding Background}" 
+                                                   Foreground="{TemplateBinding Foreground}"
                                                    BorderThickness="1,1,0,1"
+                                                   BorderBrush="{TemplateBinding BorderBrush}"
                                                    CornerRadius="2.75, 0, 0, 2.75"
                                                    RenderEnabled="{TemplateBinding IsEnabled}"
 											                  RenderMouseOver="{Binding IsMouseOver, ElementName=PART_ActionButton}"
@@ -89,6 +93,8 @@
                            </ToggleButton.Template>
                            <Grid>
                               <chrome:ButtonChrome x:Name="ToggleButtonChrome"
+                                                   Background="{TemplateBinding Background}" 
+                                                   BorderBrush="{TemplateBinding BorderBrush}"
                                                    Padding="1,0,1,0"
                                                    CornerRadius="0, 2.75, 2.75, 0"
                                                    RenderChecked="{TemplateBinding IsOpen}"

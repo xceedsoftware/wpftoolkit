@@ -26,6 +26,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
   /// </summary>
   public enum MouseWheelActiveTrigger
   {
+    Focused,
     FocusedMouseOver,
     MouseOver,
     Disabled

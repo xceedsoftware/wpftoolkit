@@ -28,6 +28,7 @@ using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -255,6 +256,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         ? descriptors.Cast<PropertyDescriptor>().ToList()
         : null;
     }
+
+
+
 
     internal void InitializeDescriptorDefinition(
       DescriptorPropertyDefinitionBase descriptorDef,

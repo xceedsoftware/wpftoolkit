@@ -181,7 +181,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="400" />
+            <RowDefinition Height="450" />
         </Grid.RowDefinitions>
 
         <GroupBox Header="Features" Grid.Row="0" Margin="5">
@@ -473,6 +473,9 @@
 
                   <TextBlock Text="MaskedTextBox:" Grid.Row="7" Style="{StaticResource TextBlockStyle}"/>
                   <xctk:MaskedTextBox Grid.Row="7" Grid.Column="1"  Mask="(000) 000-0000" Text="5256963" Margin="5" />
+
+                  <TextBlock Text="ToggleSwitch:" Grid.Row="8" Style="{StaticResource TextBlockStyle}"/>
+                  <xctk:ToggleSwitch Grid.Row="8" Grid.Column="1" Margin="5" />
                </Grid>
 
                <Grid Grid.Column="1">

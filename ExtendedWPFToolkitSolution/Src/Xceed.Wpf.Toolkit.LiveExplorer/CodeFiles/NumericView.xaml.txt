@@ -109,6 +109,7 @@
                    <!-- 1st column -->
                    <TextBlock Text="Mouse Wheel:" Grid.Row="0" VerticalAlignment="Center" />
                    <ComboBox Grid.Row="0" Grid.Column="1" SelectedItem="{Binding MouseWheelActiveTrigger, ElementName=_doubleUpDown}" Margin="5" VerticalAlignment="Center" >
+                      <x:StaticExtension Member="xctk:MouseWheelActiveTrigger.Focused" />
                       <x:StaticExtension Member="xctk:MouseWheelActiveTrigger.FocusedMouseOver" />
                       <x:StaticExtension Member="xctk:MouseWheelActiveTrigger.MouseOver" />
                       <x:StaticExtension Member="xctk:MouseWheelActiveTrigger.Disabled" />

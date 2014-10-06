@@ -529,8 +529,7 @@
             <core:LiveExplorerTreeViewItem Header="DateTime"
                                            SampleType="{x:Type samples:DateTime.Views.DateTimeView}" />             
             <core:LiveExplorerTreeViewItem Header="TimeSpan"
-                                           SampleType="{x:Type samples:TimeSpan.Views.TimeSpanView}"
-                                           IsNewFeature="True"/>
+                                           SampleType="{x:Type samples:TimeSpan.Views.TimeSpanView}"/>
             <core:LiveExplorerTreeViewItem Header="Color"
                                            SampleType="{x:Type samples:Color.Views.ColorView}" />
             <core:LiveExplorerTreeViewItem Header="Text"
@@ -548,12 +547,14 @@
                                               SampleType="{x:Type samples:Text.Views.WatermarkTextboxView}" />
             </core:LiveExplorerTreeViewItem>
             <core:LiveExplorerTreeViewItem Header="RangeSlider"
-                                           SampleType="{x:Type samples:RangeSlider.Views.RangeSliderView}"
-                                           IsNewFeature="True"/>
+                                           SampleType="{x:Type samples:RangeSlider.Views.RangeSliderView}"/>
             <core:LiveExplorerTreeViewItem Header="Rating"
                                            SampleType="{x:Type samples:Rating.Views.RatingView}"
-                                           IsNewFeature="True"
                                            IsPlusOnlyFeature="True"/>
+            <core:LiveExplorerTreeViewItem Header="ToggleSwitch"
+                                           SampleType="{x:Type samples:ToggleSwitch.Views.ToggleSwitchView}"
+                                           IsNewFeature="True"
+                                           IsPlusOnlyFeature="True" />
             <core:LiveExplorerTreeViewItem Header="Enumeration"
                                            SampleType="{x:Type samples:Button.Views.ButtonSpinnerView}" />
          </core:LiveExplorerTreeViewItem>
@@ -616,8 +617,7 @@
              <core:LiveExplorerTreeViewItem Header="Gauge"
                                            ItemContainerStyle="{StaticResource TreeViewItemStyle}"
                                            SampleType="{x:Type samples:Gauge.Views.RadialGaugeView}"
-                                           IsPlusOnlyFeature="True"
-                                           IsNewFeature="True">
+                                           IsPlusOnlyFeature="True">
             </core:LiveExplorerTreeViewItem>
          </core:LiveExplorerTreeViewItem>
          <core:LiveExplorerTreeViewItem Header="Other"

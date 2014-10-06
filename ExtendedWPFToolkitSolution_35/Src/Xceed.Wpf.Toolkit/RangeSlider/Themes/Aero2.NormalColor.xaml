@@ -94,6 +94,19 @@
                     TargetName="MainBorder"
                     Value="#FFDCECFC" />
          </MultiDataTrigger>
+
+         <Trigger Property="IsEnabled"
+                  Value="False">
+            <Setter Property="Opacity"
+                    TargetName="MainBorder"
+                    Value="1" />
+            <Setter Property="Stroke"
+                    TargetName="MainBorder"
+                    Value="#FFD9D9D9" />
+            <Setter Property="Fill"
+                    TargetName="MainBorder"
+                    Value="#FFF0F0F0" />
+         </Trigger>
       </ControlTemplate.Triggers>
    </ControlTemplate>
 
@@ -149,6 +162,19 @@
                     TargetName="MainBorder"
                     Value="#FFDCECFC" />
          </MultiDataTrigger>
+
+         <Trigger Property="IsEnabled"
+                  Value="False">
+            <Setter Property="Opacity"
+                    TargetName="MainBorder"
+                    Value="1" />
+            <Setter Property="Stroke"
+                    TargetName="MainBorder"
+                    Value="#FFD9D9D9" />
+            <Setter Property="Fill"
+                    TargetName="MainBorder"
+                    Value="#FFF0F0F0" />
+         </Trigger>
       </ControlTemplate.Triggers>
    </ControlTemplate>
 
@@ -331,6 +357,19 @@
                                                      TargetName="MainBorder"
                                                      Value="#FFDCECFC" />
                                           </MultiDataTrigger>
+
+                                          <Trigger Property="IsEnabled"
+                                                   Value="False">
+                                             <Setter Property="Opacity"
+                                                     TargetName="MainBorder"
+                                                     Value="1" />
+                                             <Setter Property="Stroke"
+                                                     TargetName="MainBorder"
+                                                     Value="#FFD9D9D9" />
+                                             <Setter Property="Fill"
+                                                     TargetName="MainBorder"
+                                                     Value="#FFF0F0F0" />
+                                          </Trigger>
                                        </ControlTemplate.Triggers>
                                     </ControlTemplate>
                                  </Thumb.Template>
@@ -408,6 +447,19 @@
                                                      TargetName="MainBorder"
                                                      Value="#FFDCECFC" />
                                           </MultiDataTrigger>
+
+                                          <Trigger Property="IsEnabled"
+                                                   Value="False">
+                                             <Setter Property="Opacity"
+                                                     TargetName="MainBorder"
+                                                     Value="1" />
+                                             <Setter Property="Stroke"
+                                                     TargetName="MainBorder"
+                                                     Value="#FFD9D9D9" />
+                                             <Setter Property="Fill"
+                                                     TargetName="MainBorder"
+                                                     Value="#FFF0F0F0" />
+                                          </Trigger>
                                        </ControlTemplate.Triggers>
                                     </ControlTemplate>
                                  </Thumb.Template>

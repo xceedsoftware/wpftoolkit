@@ -33,7 +33,8 @@
        <ResourceDictionary Source="../../TimeSpanUpDown/Themes/Aero2.NormalColor.xaml" />
        <ResourceDictionary Source="../../WatermarkTextBox/Themes/Aero2.NormalColor.xaml" />
        <ResourceDictionary Source="../../ColorPicker/Themes/Aero2.NormalColor.xaml" />
-    </ResourceDictionary.MergedDictionaries>
+       <ResourceDictionary Source="../../CollectionControl/Themes/Aero2.NormalColor.xaml" />
+   </ResourceDictionary.MergedDictionaries>
 
     <!-- =============================================================================== -->
     <!-- PropertyGrid                                                                    -->
@@ -221,6 +222,20 @@
             <Setter Property="ShowDropDownButton" Value="False" />
          </MultiTrigger>
       </Style.Triggers>
+   </Style>
+
+   <!-- PropertyGrid PrimitiveTypeCollectionControl Editors -->
+   <Style TargetType="{x:Type editor:PropertyGridEditorPrimitiveTypeCollectionControl}" 
+          BasedOn="{StaticResource PrimitiveTypeCollectionControl}" >
+      <Setter Property="BorderThickness"
+              Value="0" />
+      <Setter Property="Content"
+              Value="(Collection)" />
+   </Style>
+
+   <!-- PropertyGrid CollectionControl Editors -->
+   <Style TargetType="{x:Type editor:PropertyGridEditorCollectionControl}"
+          BasedOn="{StaticResource CollectionControlButton}">
    </Style>
 
    <!-- ===============================================================================   -->
@@ -501,6 +516,8 @@
               Value="Center" />
       <Setter Property="SnapsToDevicePixels"
               Value="True" />
+      <Setter Property="IsTabStop"
+              Value="False" />
       <Setter Property="Template">
          <Setter.Value>
             <ControlTemplate TargetType="{x:Type pg:PropertyItemBase}">

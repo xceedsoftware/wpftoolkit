@@ -67,6 +67,7 @@
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="Auto"/>
@@ -87,6 +88,8 @@
             <CheckBox x:Name="_clipValueToMinMax" Grid.Row="4" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5,5,25,5"/>
             <TextBlock Text="TimePickerVisibility:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"/>
             <ComboBox x:Name="_timePickerVisibility" Grid.Row="5" Grid.Column="1" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumVisibility}}" Width="190" Margin="5,5,25,5"/>
+            <TextBlock Text="TimePickerShowButtonSpinner:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="_timePickerShowButtonSpinner" Grid.Row="6" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
 
             <TextBlock Text="TimeFormat:" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" />
             <ComboBox x:Name="_timeFormat" Grid.Row="0" Grid.Column="3" SelectedIndex="1" ItemsSource="{Binding Source={StaticResource enumTimeFormatData}}" Width="190" Margin="5"/>
@@ -116,6 +119,7 @@
                                  AutoCloseCalendar="{Binding IsChecked, ElementName=_autoCloseCalendar}"
                                  ClipValueToMinMax="{Binding IsChecked, ElementName=_clipValueToMinMax}"
                                  TimePickerVisibility="{Binding Source={x:Reference _timePickerVisibility}, Path=SelectedItem}"
+                                 TimePickerShowButtonSpinner="{Binding IsChecked, ElementName=_timePickerShowButtonSpinner}"
                                  Minimum="{Binding Value, ElementName=_minimum}"
                                  Maximum="{Binding Value, ElementName=_maximum}"/>
         </StackPanel>

@@ -1021,40 +1021,6 @@ namespace Xceed.Wpf.AvalonDock
 
         #endregion
 
-        protected override void OnGotKeyboardFocus(System.Windows.Input.KeyboardFocusChangedEventArgs e)
-        {
-            //if (e.NewFocus is Grid)
-          //    Trace.WriteLine(string.Format("DockingManager.OnGotKeyboardFocus({0})", e.NewFocus));
-            base.OnGotKeyboardFocus(e);
-        }
-
-        protected override void OnPreviewGotKeyboardFocus(System.Windows.Input.KeyboardFocusChangedEventArgs e)
-        {
-          Trace.WriteLine( string.Format( "DockingManager.OnPreviewGotKeyboardFocus({0})", e.NewFocus ) );
-
-            base.OnPreviewGotKeyboardFocus(e);
-        }
-
-        protected override void OnPreviewLostKeyboardFocus(KeyboardFocusChangedEventArgs e)
-        {
-          Trace.WriteLine( string.Format( "DockingManager.OnPreviewLostKeyboardFocus({0})", e.OldFocus ) );
-            base.OnPreviewLostKeyboardFocus(e);
-        }
-
-        protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
-        {
-          Trace.WriteLine( string.Format( "DockingManager.OnMouseLeftButtonDown([{0}])", e.GetPosition( this ) ) );
-            base.OnMouseLeftButtonDown(e);
-        }
-
-        protected override void OnMouseMove(System.Windows.Input.MouseEventArgs e)
-        {
-          //Trace.WriteLine(string.Format("DockingManager.OnMouseMove([{0}])", e.GetPosition(this)));
-            base.OnMouseMove(e);
-        }
-
-
-
         #region LayoutRootPanel
 
         /// <summary>
@@ -1260,7 +1226,6 @@ namespace Xceed.Wpf.AvalonDock
 
         #endregion
 
-
         #region LogicalChildren
 
         List<WeakReference> _logicalChildren = new List<WeakReference>();
@@ -1276,7 +1241,6 @@ namespace Xceed.Wpf.AvalonDock
 
         internal void InternalAddLogicalChild(object element)
         {
-          //System.Diagnostics.Trace.WriteLine("[{0}]InternalAddLogicalChild({1})", this, element);
 #if DEBUG
             if (_logicalChildren.Select(ch => ch.GetValueOrDefault<object>()).Contains(element))
                 new InvalidOperationException();
@@ -1290,8 +1254,6 @@ namespace Xceed.Wpf.AvalonDock
 
         internal void InternalRemoveLogicalChild(object element)
         {
-          //System.Diagnostics.Trace.WriteLine("[{0}]InternalRemoveLogicalChild({1})", this, element);
-
             var wrToRemove = _logicalChildren.FirstOrDefault(ch => ch.GetValueOrDefault<object>() == element);
             if (wrToRemove != null)
                 _logicalChildren.Remove(wrToRemove);
@@ -1785,7 +1747,6 @@ namespace Xceed.Wpf.AvalonDock
 
         IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
         {
-          //Trace.WriteLine("ShowOverlayWindow");
             CreateOverlayWindow();
             _overlayWindow.Owner = draggingWindow;
             _overlayWindow.EnableDropTargets();
@@ -1795,7 +1756,6 @@ namespace Xceed.Wpf.AvalonDock
 
         void IOverlayWindowHost.HideOverlayWindow()
         {
-          //Trace.WriteLine("HideOverlayWindow");
             _areas = null;
             _overlayWindow.Owner = null;
             _overlayWindow.HideDropTargets();
@@ -2194,15 +2154,13 @@ namespace Xceed.Wpf.AvalonDock
                     return;
             }
 
-            if (!document.TestCanClose())
-                return;
-
-            document.CloseInternal();
-
-            if (DocumentClosed != null)
-            { 
-                var evargs = new DocumentClosedEventArgs(document);
-                DocumentClosed(this, evargs);
+            if( document.CloseDocument() )
+            {
+              if( DocumentClosed != null )
+              {
+                var evargs = new DocumentClosedEventArgs( document );
+                DocumentClosed( this, evargs );
+              }
             }
         }
 
@@ -2535,13 +2493,9 @@ namespace Xceed.Wpf.AvalonDock
         internal void _ExecuteCloseCommand(LayoutAnchorable anchorable)
         {
             var model = anchorable as LayoutAnchorable;
-            if (model != null && model.TestCanClose())
+            if (model != null )
             {
-                if (model.IsAutoHidden)
-                    model.ToggleAutoHide();
-
-                model.Close();
-                return;
+              model.CloseAnchorable();
             }
         }
 
@@ -3165,8 +3119,6 @@ namespace Xceed.Wpf.AvalonDock
 
             _navigatorWindow.ShowDialog();
             _navigatorWindow = null;
-
-            Trace.WriteLine( "ShowNavigatorWindow()" );
         }
 
         bool IsNavigatorWindowActive
@@ -3177,7 +3129,6 @@ namespace Xceed.Wpf.AvalonDock
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
-          Trace.WriteLine( string.Format( "OnPreviewKeyDown({0})", e.Key ) );
             if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
             {
                 if (e.IsDown && e.Key == Key.Tab)

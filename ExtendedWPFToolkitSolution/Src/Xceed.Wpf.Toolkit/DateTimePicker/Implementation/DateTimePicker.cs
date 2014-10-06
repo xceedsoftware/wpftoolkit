@@ -133,6 +133,40 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //TimeFormatString
 
+    #region TimePickerAllowSpin
+
+    public static readonly DependencyProperty TimePickerAllowSpinProperty = DependencyProperty.Register( "TimePickerAllowSpin", typeof( bool ), typeof( DateTimePicker ), new UIPropertyMetadata( true ) );
+    public bool TimePickerAllowSpin
+    {
+      get
+      {
+        return (bool)GetValue( TimePickerAllowSpinProperty );
+      }
+      set
+      {
+        SetValue( TimePickerAllowSpinProperty, value );
+      }
+    }
+
+    #endregion //TimePickerAllowSpin
+
+    #region TimePickerShowButtonSpinner
+
+    public static readonly DependencyProperty TimePickerShowButtonSpinnerProperty = DependencyProperty.Register( "TimePickerShowButtonSpinner", typeof( bool ), typeof( DateTimePicker ), new UIPropertyMetadata( true ) );
+    public bool TimePickerShowButtonSpinner
+    {
+      get
+      {
+        return (bool)GetValue( TimePickerShowButtonSpinnerProperty );
+      }
+      set
+      {
+        SetValue( TimePickerShowButtonSpinnerProperty, value );
+      }
+    }
+
+    #endregion //TimePickerShowButtonSpinner
+
     #region TimePickerVisibility
 
     public static readonly DependencyProperty TimePickerVisibilityProperty = DependencyProperty.Register( "TimePickerVisibility", typeof( Visibility ), typeof( DateTimePicker ), new UIPropertyMetadata( Visibility.Visible ) );
@@ -225,6 +259,7 @@ namespace Xceed.Wpf.Toolkit
         _calendar.SelectedDatesChanged += Calendar_SelectedDatesChanged;
         _calendar.SelectedDate = Value ?? null;
         _calendar.DisplayDate = Value ?? DateTime.Now;
+        this.SetBlackOutDates();
       }
 
       _timePicker = GetTemplateChild( PART_TimeUpDown ) as TimePicker;
@@ -259,6 +294,20 @@ namespace Xceed.Wpf.Toolkit
       //if the calendar is open then we don't want to modify the behavior of navigating the calendar control with the Up/Down keys.
       if( !IsOpen )
         base.OnPreviewKeyDown( e );
+    }
+
+    protected override void OnMaximumChanged( DateTime? oldValue, DateTime? newValue )
+    {
+      base.OnMaximumChanged( oldValue, newValue );
+
+      this.SetBlackOutDates();
+    }
+
+    protected override void OnMinimumChanged( DateTime? oldValue, DateTime? newValue )
+    {
+      base.OnMinimumChanged( oldValue, newValue );
+
+      this.SetBlackOutDates();
     }
 
     #endregion //Base Class Overrides
@@ -358,6 +407,25 @@ namespace Xceed.Wpf.Toolkit
         }
         this.CloseDateTimePicker( true );
         e.Handled = true;
+      }
+    }
+
+    private void SetBlackOutDates()
+    {
+      if( _calendar != null )
+      {
+        _calendar.BlackoutDates.Clear();
+
+        if( ( this.Minimum != null ) && this.Minimum.HasValue && ( this.Minimum.Value != DateTime.MinValue ) )
+        {
+          DateTime minDate = this.Minimum.Value;
+          _calendar.BlackoutDates.Add( new CalendarDateRange( DateTime.MinValue, minDate.AddDays( -1 ) ) );
+        }
+        if( ( this.Maximum != null ) && this.Maximum.HasValue && ( this.Maximum.Value != DateTime.MaxValue ) )
+        {
+          DateTime maxDate = this.Maximum.Value;
+          _calendar.BlackoutDates.Add( new CalendarDateRange( maxDate.AddDays( 1 ), DateTime.MaxValue ) );
+        }
       }
     }
 

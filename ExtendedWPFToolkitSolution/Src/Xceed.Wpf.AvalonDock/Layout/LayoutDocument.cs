@@ -67,11 +67,27 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         public override void Close()
         {
-          var dockingManager = this.Root.Manager;
           if( ( this.Root != null ) && ( this.Root.Manager != null ) )
+          {
+            var dockingManager = this.Root.Manager;
             dockingManager._ExecuteCloseCommand( this );
+          }
+          else
+          {
+            this.CloseDocument();
+          }
         }
 
+        internal bool CloseDocument()
+        {
+          if( this.TestCanClose() )
+          {
+            this.CloseInternal();
+            return true;
+          }
+
+          return false;
+        }
 
 #if TRACE
         public override void ConsoleDump(int tab)

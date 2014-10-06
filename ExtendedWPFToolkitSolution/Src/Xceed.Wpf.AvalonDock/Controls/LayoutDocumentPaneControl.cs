@@ -53,17 +53,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
             modelWithAtcualSize.ActualHeight = ActualHeight;
         }
 
-        protected override void OnGotKeyboardFocus(System.Windows.Input.KeyboardFocusChangedEventArgs e)
-        {
-            base.OnGotKeyboardFocus(e);
-            System.Diagnostics.Trace.WriteLine( string.Format( "OnGotKeyboardFocus({0}, {1})", e.Source, e.NewFocus ) );
-
-
-            //if (_model.SelectedContent != null)
-            //    _model.SelectedContent.IsActive = true;
-
-        }
-
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
             base.OnSelectionChanged(e);

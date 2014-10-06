@@ -174,14 +174,12 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         internal void EnableDropTargets()
         {
-          //Trace.WriteLine("EnableDropTargets()");
             if (_mainCanvasPanel != null)
                 _mainCanvasPanel.Visibility = System.Windows.Visibility.Visible;
         }
 
         internal void HideDropTargets()
         {
-          //Trace.WriteLine("HideDropTargets()");
             if (_mainCanvasPanel != null)
                 _mainCanvasPanel.Visibility = System.Windows.Visibility.Hidden;
 

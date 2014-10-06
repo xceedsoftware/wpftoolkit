@@ -52,6 +52,10 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     void WindowContainer_Loaded( object sender, RoutedEventArgs e )
     {
+      foreach( WindowControl window in this.Children )
+      {
+        window.SetIsActiveInternal( false );
+      }
       this.SetNextActiveWindow( null );
     }
 
@@ -309,7 +313,9 @@ namespace Xceed.Wpf.Toolkit.Primitives
       if( ( windowControl.ActualWidth != 0 ) && ( windowControl.ActualHeight != 0 ) )
       {
         windowControl.Left = ( this.ActualWidth - windowControl.ActualWidth ) / 2.0;
+        windowControl.Left += (windowControl.Margin.Left - windowControl.Margin.Right);
         windowControl.Top = ( this.ActualHeight - windowControl.ActualHeight ) / 2.0;
+        windowControl.Top += ( windowControl.Margin.Top - windowControl.Margin.Bottom );
       }
     }
 
@@ -356,6 +362,9 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     private void SetActiveWindow( WindowControl windowControl )
     {
+      if( windowControl.IsActive )
+        return;
+
       foreach( WindowControl window in this.Children )
       {
         window.SetIsActiveInternal( false );

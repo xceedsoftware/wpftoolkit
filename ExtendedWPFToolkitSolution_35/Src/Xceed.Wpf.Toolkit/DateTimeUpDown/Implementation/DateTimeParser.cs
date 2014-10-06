@@ -134,7 +134,10 @@ namespace Xceed.Wpf.Toolkit
           key = "Year";
           value = currentDate.Year.ToString("D4");
         }
-        dateParts.Add( key, value );
+        if( !dateParts.ContainsKey( key ) )
+        {
+          dateParts.Add( key, value );
+        }
       } );
       return dateParts;
     }

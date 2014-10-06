@@ -22,12 +22,14 @@ using System.Windows;
 using System.Windows.Markup;
 using Xceed.Wpf.DataGrid.Views;
 using System.Windows.Media;
+using System.ComponentModel;
 
 namespace Xceed.Wpf.DataGrid.Markup
 {
   [MarkupExtensionReturnType( typeof( ThemeKey ) )]
   public class ThemeKey : ResourceKey
   {
+
     public ThemeKey()
     {
     }
@@ -97,8 +99,8 @@ namespace Xceed.Wpf.DataGrid.Markup
         if( value == null )
           throw new ArgumentNullException( "TargetViewType" );
 
-        if( !typeof( ViewBase ).IsAssignableFrom( value ) )
-          throw new ArgumentException( "The specified view type must derive from ViewBase.", "TargetViewType" );
+          if( !typeof( ViewBase ).IsAssignableFrom( value ) )
+            throw new ArgumentException( "The specified view type must derive from ViewBase.", "TargetViewType" );
 
         if( m_targetViewTypeInitialized )
           throw new InvalidOperationException( "An attempt was made to set the TargetViewType property when it has already been initialized." );

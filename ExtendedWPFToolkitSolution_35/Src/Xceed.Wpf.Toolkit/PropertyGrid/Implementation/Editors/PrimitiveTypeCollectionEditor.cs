@@ -14,6 +14,7 @@
 
   ***********************************************************************************/
 
+using System.Windows;
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class PrimitiveTypeCollectionEditor : TypeEditor<PrimitiveTypeCollectionControl>
@@ -38,12 +39,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       {
         Editor.ItemType = type.GetElementType();
       }
-      else
+      else if( type.ContainsGenericParameters )
       {
         Editor.ItemType = type.GetGenericArguments()[ 0 ];
       }
 
       base.ResolveValueBinding( propertyItem );
+    }
+  }
+
+  public class PropertyGridEditorPrimitiveTypeCollectionControl : PrimitiveTypeCollectionControl
+  {
+    static PropertyGridEditorPrimitiveTypeCollectionControl()
+    {
+      DefaultStyleKeyProperty.OverrideMetadata( typeof( PropertyGridEditorPrimitiveTypeCollectionControl ), new FrameworkPropertyMetadata( typeof( PropertyGridEditorPrimitiveTypeCollectionControl ) ) );
     }
   }
 }

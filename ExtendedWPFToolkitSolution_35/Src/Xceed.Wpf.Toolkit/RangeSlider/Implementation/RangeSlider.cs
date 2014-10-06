@@ -211,6 +211,10 @@ namespace Xceed.Wpf.Toolkit
       protected virtual void OnHigherValueChanged( double oldValue, double newValue )
       {
         this.AdjustWidths( this.Minimum, this.Maximum, this.LowerValue, newValue );
+
+        RoutedEventArgs args = new RoutedEventArgs();
+        args.RoutedEvent = RangeSlider.HigherValueChangedEvent;
+        this.RaiseEvent(args);
       }
 
       #endregion HigherValue
@@ -355,7 +359,11 @@ namespace Xceed.Wpf.Toolkit
       {
         this.HigherValue = Math.Max( this.HigherValue, newValue );
 
-        this.AdjustWidths( this.Minimum, this.Maximum, newValue, this.HigherValue );
+          this.AdjustWidths( this.Minimum, this.Maximum, newValue, this.HigherValue );
+
+          RoutedEventArgs args = new RoutedEventArgs();
+          args.RoutedEvent = RangeSlider.LowerValueChangedEvent;
+          this.RaiseEvent(args);
       }
 
       #endregion LowerValue
