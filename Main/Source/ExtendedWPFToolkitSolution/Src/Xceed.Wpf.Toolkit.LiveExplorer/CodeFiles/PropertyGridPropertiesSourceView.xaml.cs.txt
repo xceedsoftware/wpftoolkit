@@ -55,7 +55,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       list.Add( new MyData( "FontFamily", Fonts.SystemFontFamilies.First() ) );
       list.Add( new MyData( "FontStyle", FontStyles.Italic ) );
       list.Add( new MyData( "FontStretch", FontStretches.ExtraExpanded ) );
-      list.Add( new MyData( "TimeSpan", System.TimeSpan.FromHours( 2 ) ) );
       
       // PropertyGrid PropertiesSource property is bound to the DataContext
       this.DataContext = list;

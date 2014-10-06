@@ -181,8 +181,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 _draggingItem != this &&
                 e.LeftButton == MouseButtonState.Pressed)
             {
-              //Trace.WriteLine("Dragging item from {0} to {1}", _draggingItem, this);
-
                 var model = Model;
                 var container = model.Parent as ILayoutContainer;
                 var containerPane = model.Parent as ILayoutPane;

@@ -94,7 +94,7 @@ namespace Xceed.Wpf.Toolkit
       if( ItemsSourceType == null )
         ItemsSourceType = newValue.GetType();
 
-      if( ItemType == null )
+      if( ItemType == null && newValue.GetType().ContainsGenericParameters )
         ItemType = newValue.GetType().GetGenericArguments()[ 0 ];
 
       SetText( newValue );
@@ -234,7 +234,14 @@ namespace Xceed.Wpf.Toolkit
           object value = null;
           try
           {
-            value = Convert.ChangeType( valueString, ItemType );
+            if( ItemType.IsEnum )
+            {
+              value = Enum.Parse( ItemType, valueString );
+            }
+            else
+            {
+              value = Convert.ChangeType( valueString, ItemType );
+            }
           }
           catch
           {

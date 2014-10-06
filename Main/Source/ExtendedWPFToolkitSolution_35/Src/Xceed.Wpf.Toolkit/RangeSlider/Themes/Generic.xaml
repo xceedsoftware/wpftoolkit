@@ -25,6 +25,57 @@
    <conv:SliderThumbWidthConverter x:Key="SliderThumbWidthConverter" />
    <coreConv:SolidColorBrushToColorConverter x:Key="SolidColorBrushToColorConverter" />
 
+   <LinearGradientBrush x:Key="NormalThumbFillBackground"
+                        StartPoint="0.5,0"
+                        EndPoint="0.5,1">
+      <GradientStop Color="White"
+                    Offset="0" />
+      <GradientStop Color="#FFEBEBEB"
+                    Offset="0.5" />
+      <GradientStop Color="#FFD6D6D6"
+                    Offset="1" />
+   </LinearGradientBrush>
+
+   <LinearGradientBrush x:Key="MouseOverThumbFillBackground"
+                        StartPoint="0.5,0"
+                        EndPoint="0.5,1">
+      <GradientStop Color="White"
+                    Offset="0" />
+      <GradientStop Color="#FFBBE3F9"
+                    Offset="0.5" />
+      <GradientStop Color="#FFB1E0F8"
+                    Offset="1" />
+   </LinearGradientBrush>
+
+   <LinearGradientBrush x:Key="PressedThumbFillBackground"
+                        StartPoint="0.5,0"
+                        EndPoint="0.5,1">
+      <GradientStop Color="White"
+                    Offset="0" />
+      <GradientStop Color="#FF5DB2E0"
+                    Offset="0.5" />
+      <GradientStop Color="#FF4F93BD"
+                    Offset="1" />
+   </LinearGradientBrush>
+
+   <LinearGradientBrush x:Key="SliderBorderBrush"
+                        StartPoint="0.5,0"
+                        EndPoint="0.5,1">
+      <GradientStop Color="#FFB2B5B3"
+                    Offset="0" />
+      <GradientStop Color="#FFFAFAFA"
+                    Offset="1" />
+   </LinearGradientBrush>
+
+   <LinearGradientBrush x:Key="SliderVerticalBorderBrush"
+                        StartPoint="0,0.5"
+                        EndPoint="1,0.5">
+      <GradientStop Color="#FFB2B5B3"
+                    Offset="0" />
+      <GradientStop Color="#FFFAFAFA"
+                    Offset="1" />
+   </LinearGradientBrush>
+
    <!-- //#TODODOC
          Repeat Button - This is used by RangeSlider for the LowerRange, Range, and HigherRange buttons -->
    <Style x:Key="DefaultRangeStyle"
@@ -48,35 +99,36 @@
    <ControlTemplate x:Key="LowerThumbTemplate"
                     TargetType="{x:Type Thumb}">
       <Grid>
-         <Rectangle x:Name="BackgroundFadingRect"
-                    Fill="Black"
-                    Width="11"
-                    Height="20" />
-         <Rectangle x:Name="MainBorder"
-                    Fill="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerThumbBackground, TargetNullValue=#FFF0F0F0}"
-                    StrokeThickness="1"
-                    Stroke="#FFACACAC"
-                    Opacity="1"
-                    Width="11"
-                    Height="20"
-                    ToolTip="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerValue, StringFormat=\{0:00.00\}}"
-                    SnapsToDevicePixels="True" />
+         <Border x:Name="BackgroundFadingBorder"
+                 Background="Black" />
+         <Border x:Name="BackgroundBorder"
+                 BorderBrush="#FF929292"
+                 BorderThickness="1"
+                 CornerRadius="1">
+            <Rectangle x:Name="MainBorder"
+                       Fill="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerThumbBackground, TargetNullValue={StaticResource NormalThumbFillBackground}}"
+                       StrokeThickness="1"
+                       Stroke="White"
+                       Width="9"
+                       Height="20"
+                       Opacity="1"
+                       ToolTip="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerValue, StringFormat=\{0:00.00\}}"
+                       SnapsToDevicePixels="True" />
+         </Border>
       </Grid>
       <ControlTemplate.Triggers>
-         <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerThumbBackground, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                      Value="Transparent">
-            <Setter Property="Visibility"
-                    TargetName="BackgroundFadingRect"
-                    Value="Collapsed" />
-         </DataTrigger>
          <Trigger Property="IsMouseOver"
                   Value="True">
             <Setter Property="Opacity"
                     TargetName="MainBorder"
-                    Value="0.75" />
+                    Value="0.9" />
          </Trigger>
-         <!-- //# TODODOC
-               Do something else when MouseOver and LowerThumbBackground is null -->
+         <Trigger Property="IsMouseCaptureWithin"
+                  Value="True">
+            <Setter Property="Opacity"
+                    TargetName="MainBorder"
+                    Value="0.8" />
+         </Trigger>
          <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
                <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerThumbBackground}"
@@ -87,13 +139,40 @@
             <Setter Property="Opacity"
                     TargetName="MainBorder"
                     Value="1" />
-            <Setter Property="Stroke"
-                    TargetName="MainBorder"
-                    Value="#FF7EB4EA" />
+            <Setter Property="BorderBrush"
+                    TargetName="BackgroundBorder"
+                    Value="#FF3C7FB1" />
             <Setter Property="Fill"
                     TargetName="MainBorder"
-                    Value="#FFDCECFC" />
+                    Value="{StaticResource MouseOverThumbFillBackground}" />
          </MultiDataTrigger>
+         <MultiDataTrigger>
+            <MultiDataTrigger.Conditions>
+               <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerThumbBackground}"
+                          Value="{x:Null}" />
+               <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseCaptureWithin}"
+                          Value="True" />
+            </MultiDataTrigger.Conditions>
+            <Setter Property="BorderBrush"
+                    TargetName="BackgroundBorder"
+                    Value="#FF2C628B" />
+            <Setter Property="Fill"
+                    TargetName="MainBorder"
+                    Value="{StaticResource PressedThumbFillBackground}" />
+         </MultiDataTrigger>
+
+         <Trigger Property="IsEnabled"
+                  Value="False">
+            <Setter Property="BorderBrush"
+                    TargetName="BackgroundBorder"
+                    Value="#FFD7D7D7" />
+            <Setter Property="Fill"
+                    TargetName="MainBorder"
+                    Value="#FFF4F4F4" />
+            <Setter Property="Stroke"
+                    TargetName="MainBorder"
+                    Value="#FFD7D7D7" />
+         </Trigger>
       </ControlTemplate.Triggers>
    </ControlTemplate>
 
@@ -103,35 +182,35 @@
    <ControlTemplate x:Key="HigherThumbTemplate"
                     TargetType="{x:Type Thumb}">
       <Grid>
-         <Rectangle x:Name="BackgroundFadingRect"
-                    Fill="Black"
-                    Width="11"
-                    Height="20" />
-         <Rectangle Name="MainBorder"
-                    Fill="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherThumbBackground, TargetNullValue=#FFF0F0F0}"
-                    StrokeThickness="1"
-                    Stroke="#FFACACAC"
-                    Opacity="1"
-                    Width="11"
-                    Height="20"
-                    ToolTip="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherValue, StringFormat=\{0:00.00\}}"
-                    SnapsToDevicePixels="True" />
+         <Border x:Name="BackgroundFadingBorder"
+                 Background="Black" />
+         <Border x:Name="BackgroundBorder"
+                 BorderBrush="#FF929292"
+                 BorderThickness="1"
+                 CornerRadius="1">
+            <Rectangle x:Name="MainBorder"
+                       Fill="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherThumbBackground, TargetNullValue={StaticResource NormalThumbFillBackground}}"
+                       StrokeThickness="1"
+                       Stroke="White"
+                       Width="9"
+                       Height="20"
+                       ToolTip="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherValue, StringFormat=\{0:00.00\}}"
+                       SnapsToDevicePixels="True" />
+         </Border>
       </Grid>
       <ControlTemplate.Triggers>
-         <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherThumbBackground, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                      Value="Transparent">
-            <Setter Property="Visibility"
-                    TargetName="BackgroundFadingRect"
-                    Value="Collapsed" />
-         </DataTrigger>
          <Trigger Property="IsMouseOver"
                   Value="True">
             <Setter Property="Opacity"
                     TargetName="MainBorder"
-                    Value="0.75" />
+                    Value="0.9" />
          </Trigger>
-         <!-- //# TODODOC
-               Do something else when MouseOver and HigherThumbBackground is null -->
+         <Trigger Property="IsMouseCaptureWithin"
+                  Value="True">
+            <Setter Property="Opacity"
+                    TargetName="MainBorder"
+                    Value="0.8" />
+         </Trigger>
          <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
                <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherThumbBackground}"
@@ -142,13 +221,40 @@
             <Setter Property="Opacity"
                     TargetName="MainBorder"
                     Value="1" />
-            <Setter Property="Stroke"
-                    TargetName="MainBorder"
-                    Value="#FF7EB4EA" />
+            <Setter Property="BorderBrush"
+                    TargetName="BackgroundBorder"
+                    Value="#FF3C7FB1" />
             <Setter Property="Fill"
                     TargetName="MainBorder"
-                    Value="#FFDCECFC" />
+                    Value="{StaticResource MouseOverThumbFillBackground}" />
          </MultiDataTrigger>
+         <MultiDataTrigger>
+            <MultiDataTrigger.Conditions>
+               <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherThumbBackground}"
+                          Value="{x:Null}" />
+               <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseCaptureWithin}"
+                          Value="True" />
+            </MultiDataTrigger.Conditions>
+            <Setter Property="BorderBrush"
+                    TargetName="BackgroundBorder"
+                    Value="#FF2C628B" />
+            <Setter Property="Fill"
+                    TargetName="MainBorder"
+                    Value="{StaticResource PressedThumbFillBackground}" />
+         </MultiDataTrigger>
+
+         <Trigger Property="IsEnabled"
+                  Value="False">
+            <Setter Property="BorderBrush"
+                    TargetName="BackgroundBorder"
+                    Value="#FFD7D7D7" />
+            <Setter Property="Fill"
+                    TargetName="MainBorder"
+                    Value="#FFF4F4F4" />
+            <Setter Property="Stroke"
+                    TargetName="MainBorder"
+                    Value="#FFD7D7D7" />
+         </Trigger>
       </ControlTemplate.Triggers>
    </ControlTemplate>
 
@@ -233,7 +339,7 @@
                  Grid.Row="1"
                  Grid.RowSpan="3"
                  BorderThickness="1"
-                 BorderBrush="#FFD6D6D6"
+                 BorderBrush="{StaticResource SliderVerticalBorderBrush}"
                  Background="#FFE7EAEA"
                  VerticalAlignment="Stretch"
                  HorizontalAlignment="Center"
@@ -285,35 +391,37 @@
                                  <Thumb.Template>
                                     <ControlTemplate TargetType="{x:Type Thumb}">
                                        <Grid>
-                                          <Rectangle x:Name="BackgroundFadingRect"
-                                                     Fill="Black"
-                                                     Width="20"
-                                                     Height="11" />
-                                          <Rectangle x:Name="MainBorder"
-                                                     Fill="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerThumbBackground, TargetNullValue=#FFF0F0F0}"
-                                                     StrokeThickness="1"
-                                                     Stroke="#FFACACAC"
-                                                     Width="20"
-                                                     Height="11"
-                                                     Opacity="1"
-                                                     ToolTip="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerValue, StringFormat=\{0:00.00\}}"
-                                                     SnapsToDevicePixels="True" />
+                                          <Border x:Name="BackgroundFadingBorder"
+                                                  Background="Black"
+                                                  Width="22" />
+                                          <Border x:Name="BackgroundBorder"
+                                                  BorderBrush="#FF929292"
+                                                  BorderThickness="1"
+                                                  Width="22"
+                                                  CornerRadius="1">
+                                             <Rectangle x:Name="MainBorder"
+                                                        Fill="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerThumbBackground, TargetNullValue={StaticResource NormalThumbFillBackground}}"
+                                                        StrokeThickness="1"
+                                                        Stroke="White"
+                                                        Width="20"
+                                                        Height="9"
+                                                        ToolTip="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerValue, StringFormat=\{0:00.00\}}"
+                                                        SnapsToDevicePixels="True" />
+                                          </Border>
                                        </Grid>
                                        <ControlTemplate.Triggers>
-                                          <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerThumbBackground, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                                       Value="Transparent">
-                                             <Setter Property="Visibility"
-                                                     TargetName="BackgroundFadingRect"
-                                                     Value="Collapsed" />
-                                          </DataTrigger>
                                           <Trigger Property="IsMouseOver"
                                                    Value="True">
                                              <Setter Property="Opacity"
                                                      TargetName="MainBorder"
-                                                     Value="0.75" />
+                                                     Value="0.9" />
                                           </Trigger>
-                                          <!-- //# TODODOC
-                                             Do something else when MouseOver and LowerThumbBackground is null -->
+                                          <Trigger Property="IsMouseCaptureWithin"
+                                                   Value="True">
+                                             <Setter Property="Opacity"
+                                                     TargetName="MainBorder"
+                                                     Value="0.8" />
+                                          </Trigger>
                                           <MultiDataTrigger>
                                              <MultiDataTrigger.Conditions>
                                                 <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerThumbBackground}"
@@ -324,13 +432,40 @@
                                              <Setter Property="Opacity"
                                                      TargetName="MainBorder"
                                                      Value="1" />
-                                             <Setter Property="Stroke"
-                                                     TargetName="MainBorder"
-                                                     Value="#FF7EB4EA" />
+                                             <Setter Property="BorderBrush"
+                                                     TargetName="BackgroundBorder"
+                                                     Value="#FF3C7FB1" />
                                              <Setter Property="Fill"
                                                      TargetName="MainBorder"
-                                                     Value="#FFDCECFC" />
+                                                     Value="{StaticResource MouseOverThumbFillBackground}" />
                                           </MultiDataTrigger>
+                                          <MultiDataTrigger>
+                                             <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=LowerThumbBackground}"
+                                                           Value="{x:Null}" />
+                                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseCaptureWithin}"
+                                                           Value="True" />
+                                             </MultiDataTrigger.Conditions>
+                                             <Setter Property="BorderBrush"
+                                                     TargetName="BackgroundBorder"
+                                                     Value="#FF2C628B" />
+                                             <Setter Property="Fill"
+                                                     TargetName="MainBorder"
+                                                     Value="{StaticResource PressedThumbFillBackground}" />
+                                          </MultiDataTrigger>
+
+                                          <Trigger Property="IsEnabled"
+                                                   Value="False">
+                                             <Setter Property="BorderBrush"
+                                                     TargetName="BackgroundBorder"
+                                                     Value="#FFD7D7D7" />
+                                             <Setter Property="Fill"
+                                                     TargetName="MainBorder"
+                                                     Value="#FFF4F4F4" />
+                                             <Setter Property="Stroke"
+                                                     TargetName="MainBorder"
+                                                     Value="#FFD7D7D7" />
+                                          </Trigger>
                                        </ControlTemplate.Triggers>
                                     </ControlTemplate>
                                  </Thumb.Template>
@@ -363,34 +498,37 @@
                                  <Thumb.Template>
                                     <ControlTemplate TargetType="{x:Type Thumb}">
                                        <Grid>
-                                          <Rectangle x:Name="BackgroundFadingRect"
-                                                     Fill="Black"
-                                                     Width="20"
-                                                     Height="11" />
-                                          <Rectangle Name="MainBorder"
-                                                     Fill="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherThumbBackground, TargetNullValue=#FFF0F0F0}"
-                                                     StrokeThickness="1"
-                                                     Stroke="#FFACACAC"
-                                                     Width="20"
-                                                     Height="11"
-                                                     ToolTip="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherValue, StringFormat=\{0:00.00\}}"
-                                                     SnapsToDevicePixels="True" />
+                                          <Border x:Name="BackgroundFadingBorder"
+                                                  Width="22"
+                                                  Background="Black" />
+                                          <Border x:Name="BackgroundBorder"
+                                                  BorderBrush="#FF929292"
+                                                  BorderThickness="1"
+                                                  Width="22"
+                                                  CornerRadius="1">
+                                             <Rectangle x:Name="MainBorder"
+                                                        Fill="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherThumbBackground, TargetNullValue={StaticResource NormalThumbFillBackground}}"
+                                                        StrokeThickness="1"
+                                                        Stroke="White"
+                                                        Width="20"
+                                                        Height="9"
+                                                        ToolTip="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherValue, StringFormat=\{0:00.00\}}"
+                                                        SnapsToDevicePixels="True" />
+                                          </Border>
                                        </Grid>
                                        <ControlTemplate.Triggers>
-                                          <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherThumbBackground, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                                       Value="Transparent">
-                                             <Setter Property="Visibility"
-                                                     TargetName="BackgroundFadingRect"
-                                                     Value="Collapsed" />
-                                          </DataTrigger>
                                           <Trigger Property="IsMouseOver"
                                                    Value="True">
-                                             <Setter TargetName="MainBorder"
-                                                     Property="Opacity"
-                                                     Value="0.75" />
+                                             <Setter Property="Opacity"
+                                                     TargetName="MainBorder"
+                                                     Value="0.9" />
                                           </Trigger>
-                                          <!-- //# TODODOC
-                                                Do something else when MouseOver and HigherThumbBackground is null -->
+                                          <Trigger Property="IsMouseCaptureWithin"
+                                                   Value="True">
+                                             <Setter Property="Opacity"
+                                                     TargetName="MainBorder"
+                                                     Value="0.8" />
+                                          </Trigger>
                                           <MultiDataTrigger>
                                              <MultiDataTrigger.Conditions>
                                                 <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherThumbBackground}"
@@ -401,13 +539,40 @@
                                              <Setter Property="Opacity"
                                                      TargetName="MainBorder"
                                                      Value="1" />
-                                             <Setter Property="Stroke"
-                                                     TargetName="MainBorder"
-                                                     Value="#FF7EB4EA" />
+                                             <Setter Property="BorderBrush"
+                                                     TargetName="BackgroundBorder"
+                                                     Value="#FF3C7FB1" />
                                              <Setter Property="Fill"
                                                      TargetName="MainBorder"
-                                                     Value="#FFDCECFC" />
+                                                     Value="{StaticResource MouseOverThumbFillBackground}" />
                                           </MultiDataTrigger>
+                                          <MultiDataTrigger>
+                                             <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}, Path=HigherThumbBackground}"
+                                                           Value="{x:Null}" />
+                                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseCaptureWithin}"
+                                                           Value="True" />
+                                             </MultiDataTrigger.Conditions>
+                                             <Setter Property="BorderBrush"
+                                                     TargetName="BackgroundBorder"
+                                                     Value="#FF2C628B" />
+                                             <Setter Property="Fill"
+                                                     TargetName="MainBorder"
+                                                     Value="{StaticResource PressedThumbFillBackground}" />
+                                          </MultiDataTrigger>
+
+                                          <Trigger Property="IsEnabled"
+                                                   Value="False">
+                                             <Setter Property="BorderBrush"
+                                                     TargetName="BackgroundBorder"
+                                                     Value="#FFD7D7D7" />
+                                             <Setter Property="Fill"
+                                                     TargetName="MainBorder"
+                                                     Value="#FFF4F4F4" />
+                                             <Setter Property="Stroke"
+                                                     TargetName="MainBorder"
+                                                     Value="#FFD7D7D7" />
+                                          </Trigger>
                                        </ControlTemplate.Triggers>
                                     </ControlTemplate>
                                  </Thumb.Template>
@@ -452,7 +617,7 @@
                           Grid.Column="1"
                           Grid.ColumnSpan="3"
                           BorderThickness="1"
-                          BorderBrush="#FFD6D6D6"
+                          BorderBrush="{StaticResource SliderBorderBrush}"
                           Background="#FFE7EAEA"
                           VerticalAlignment="Center"
                           Height="4" />

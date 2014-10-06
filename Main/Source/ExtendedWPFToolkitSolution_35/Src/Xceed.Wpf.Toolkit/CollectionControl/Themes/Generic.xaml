@@ -19,6 +19,7 @@
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
                     xmlns:colconv="clr-namespace:Xceed.Wpf.Toolkit.Converters"
+                    xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes"
                     xmlns:pg="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid">
 
    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
@@ -137,7 +138,7 @@
       </Setter>
    </Style>
 
-   <Style TargetType="{x:Type local:PrimitiveTypeCollectionControl}">
+   <Style x:Key="PrimitiveTypeCollectionControl" TargetType="{x:Type local:PrimitiveTypeCollectionControl}">
       <Setter Property="BorderBrush">
          <Setter.Value>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -170,5 +171,86 @@
          </Setter.Value>
       </Setter>
    </Style>
+
+   <Style TargetType="{x:Type local:PrimitiveTypeCollectionControl}" BasedOn="{StaticResource PrimitiveTypeCollectionControl}" />
+
+   <Style x:Key="CollectionControlButton"
+          TargetType="{x:Type local:CollectionControlButton}">
+      <Setter Property="Background"
+              Value="White" />
+      <Setter Property="BorderThickness"
+              Value="0" />
+      <Setter Property="Padding"
+              Value="2,0,0,0" />
+      <Setter Property="HorizontalContentAlignment"
+              Value="Left" />
+      <Setter Property="VerticalContentAlignment"
+              Value="Center" />
+      <Setter Property="Content"
+              Value="(Collection)" />
+      <Setter Property="SnapsToDevicePixels"
+              Value="True" />
+      <Setter Property="MinHeight"
+              Value="22" />
+      <Setter Property="IsTabStop"
+              Value="True" />
+      <Setter Property="Template">
+         <Setter.Value>
+            <ControlTemplate TargetType="Button">
+               <Grid SnapsToDevicePixels="True">
+                  <Grid>
+                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                     </Grid.ColumnDefinitions>
+
+                     <Border Background="{TemplateBinding Background}"
+                             BorderBrush="{TemplateBinding BorderBrush}"
+                             BorderThickness="{TemplateBinding BorderThickness}"
+                             Padding="{TemplateBinding Padding}"
+                             SnapsToDevicePixels="True">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                     </Border>
+
+                     <chrome:ButtonChrome x:Name="ToggleButtonChrome"
+                                          Grid.Column="1"
+                                          CornerRadius="0,2.75,2.75,0"
+                                          RenderEnabled="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:CollectionControlButton}}"
+                                          RenderMouseOver="{TemplateBinding IsMouseOver}">
+                        <Grid x:Name="arrowGlyph"
+                              IsHitTestVisible="False"
+                              Grid.Column="1"
+                              Margin="5">
+                           <Path x:Name="Arrow"
+                                 Width="7"
+                                 Height="4"
+                                 Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z"
+                                 Fill="#FF000000" />
+                        </Grid>
+                     </chrome:ButtonChrome>
+                  </Grid>
+
+               </Grid>
+               <ControlTemplate.Triggers>
+                  <Trigger Property="IsEnabled"
+                           Value="False">
+                     <Setter Property="Fill"
+                             TargetName="Arrow"
+                             Value="#AFAFAF" />
+                     <Setter Property="Foreground"
+                             Value="Gray" />
+                  </Trigger>
+               </ControlTemplate.Triggers>
+            </ControlTemplate>
+         </Setter.Value>
+      </Setter>
+   </Style>
+
+   <Style TargetType="{x:Type local:CollectionControlButton}"
+          BasedOn="{StaticResource CollectionControlButton}" />
 
 </ResourceDictionary>

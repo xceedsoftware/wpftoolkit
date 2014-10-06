@@ -30,8 +30,9 @@
        <ResourceDictionary Source="../../DateTimeUpDown/Themes/Generic.xaml" />
        <ResourceDictionary Source="../../TimeSpanUpDown/Themes/Generic.xaml" />
        <ResourceDictionary Source="../../WatermarkTextBox/Themes/Generic.xaml" />
-        <ResourceDictionary Source="../../ColorPicker/Themes/Generic.xaml" />
-    </ResourceDictionary.MergedDictionaries>
+       <ResourceDictionary Source="../../ColorPicker/Themes/Generic.xaml" />
+      <ResourceDictionary Source="../../CollectionControl/Themes/Generic.xaml" />
+   </ResourceDictionary.MergedDictionaries>
 
    <!-- =============================================================================== -->
    <!-- PropertyGrid                                                                    -->
@@ -218,6 +219,20 @@
             <Setter Property="ShowDropDownButton" Value="False" />
          </MultiTrigger>
       </Style.Triggers>
+   </Style>
+
+   <!-- PropertyGrid PrimitiveTypeCollectionControl Editors -->
+   <Style TargetType="{x:Type editor:PropertyGridEditorPrimitiveTypeCollectionControl}" 
+          BasedOn="{StaticResource PrimitiveTypeCollectionControl}" >
+      <Setter Property="BorderThickness"
+              Value="0" />
+      <Setter Property="Content"
+              Value="(Collection)" />
+   </Style>
+
+   <!-- PropertyGrid CollectionControl Editors -->
+   <Style TargetType="{x:Type editor:PropertyGridEditorCollectionControl}"
+          BasedOn="{StaticResource CollectionControlButton}">
    </Style>
 
    <!-- ===============================================================================   -->
@@ -554,6 +569,7 @@
       <Setter Property="Margin" Value="0,0,0,1" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="SnapsToDevicePixels" Value="True"/>
+      <Setter Property="IsTabStop" Value="False" />
       <Setter Property="Template">
          <Setter.Value>
             <ControlTemplate TargetType="{x:Type pg:PropertyItemBase}">

@@ -536,7 +536,8 @@
                                                   Width="225"
                                                   DataSourceFilterExpression="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=FilterExpression, Mode=TwoWay}"
                                                   xclb:SearchTextBox.FilteredFieldNames="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(xclb:SearchTextBox.FilteredFieldNames)}"
-                                                  xclb:SearchTextBox.TooComplexText="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(xclb:SearchTextBox.TooComplexText)}" />
+                                                  xclb:SearchTextBox.TooComplexText="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(xclb:SearchTextBox.TooComplexText)}"
+                                                  xclb:SearchTextBox.IsCaseSensitive="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(xclb:SearchTextBox.IsCaseSensitive)}"/>
                               
                               <Rectangle Height="1"
                                          VerticalAlignment="Bottom"
@@ -1037,7 +1038,8 @@
       <xclb:ListBox x:Name="_listBox"
                     ItemsSource="{Binding}" 
                     ItemTemplate="{StaticResource orderListBoxItemTemplate}"
-                    xclb:SearchTextBox.FilteredFieldNames="{StaticResource filteredFieldNameList}">
+                    xclb:SearchTextBox.FilteredFieldNames="{StaticResource filteredFieldNameList}"
+                    xclb:SearchTextBox.IsCaseSensitive="False">
       </xclb:ListBox>
    </Grid >
    <!--##END-->

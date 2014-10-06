@@ -382,7 +382,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
             if (Orientation == System.Windows.Controls.Orientation.Horizontal)
             {
-              //Trace.WriteLine(string.Format("PrevChild From {0}", prevChildModel.DockWidth));
                 if (prevChildModel.DockWidth.IsStar)
                 {
                     prevChildModel.DockWidth = new GridLength(prevChildModel.DockWidth.Value * (prevChildActualSize.Width + delta) / prevChildActualSize.Width, GridUnitType.Star);
@@ -391,9 +390,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 {
                     prevChildModel.DockWidth = new GridLength(prevChildModel.DockWidth.Value + delta, GridUnitType.Pixel);
                 }
-                //Trace.WriteLine(string.Format("PrevChild To {0}", prevChildModel.DockWidth));
 
-                //Trace.WriteLine(string.Format("NextChild From {0}", nextChildModel.DockWidth));
                 if (nextChildModel.DockWidth.IsStar)
                 {
                     nextChildModel.DockWidth = new GridLength(nextChildModel.DockWidth.Value * (nextChildActualSize.Width - delta) / nextChildActualSize.Width, GridUnitType.Star);
@@ -402,11 +399,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 {
                     nextChildModel.DockWidth = new GridLength(nextChildModel.DockWidth.Value - delta, GridUnitType.Pixel);
                 }
-              //Trace.WriteLine(string.Format("NextChild To {0}", nextChildModel.DockWidth));
             }
             else
             {
-              //Trace.WriteLine(string.Format("PrevChild From {0}", prevChildModel.DockHeight));
                 if (prevChildModel.DockHeight.IsStar)
                 {
                     prevChildModel.DockHeight = new GridLength(prevChildModel.DockHeight.Value * (prevChildActualSize.Height + delta) / prevChildActualSize.Height, GridUnitType.Star);
@@ -415,9 +410,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 {
                     prevChildModel.DockHeight = new GridLength(prevChildModel.DockHeight.Value + delta, GridUnitType.Pixel);
                 }
-                //Trace.WriteLine(string.Format("PrevChild To {0}", prevChildModel.DockHeight));
 
-                //Trace.WriteLine(string.Format("NextChild From {0}", nextChildModel.DockHeight));
                 if (nextChildModel.DockHeight.IsStar)
                 {
                     nextChildModel.DockHeight = new GridLength(nextChildModel.DockHeight.Value * (nextChildActualSize.Height - delta) / nextChildActualSize.Height, GridUnitType.Star);
@@ -426,7 +419,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 {
                     nextChildModel.DockHeight = new GridLength(nextChildModel.DockHeight.Value - delta, GridUnitType.Pixel);
                 }
-              //Trace.WriteLine(string.Format("NextChild To {0}", nextChildModel.DockHeight));
             }
 
             HideResizerOverlayWindow();

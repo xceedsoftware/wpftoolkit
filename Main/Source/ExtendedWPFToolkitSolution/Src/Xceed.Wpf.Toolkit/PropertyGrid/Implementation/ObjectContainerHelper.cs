@@ -93,7 +93,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       Debug.Assert( SelectedObject != null );
       propertyItem.Instance = SelectedObject;
       propertyItem.CategoryOrder = this.GetCategoryOrder( definition.CategoryValue );
-
       return propertyItem;
     }
 

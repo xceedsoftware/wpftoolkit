@@ -201,7 +201,7 @@
         <Setter Property="ItemContainerStyle">
             <Setter.Value>
                 <Style TargetType="{x:Type TabItem}">
-                    <Setter Property="Foreground" Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor10}"/>                   
+                    <Setter Property="Foreground" Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor10}"/>                
                     <Setter Property="Background" Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor4}"/>
                     <Setter Property="BorderBrush" Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor4}"/>
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
@@ -241,20 +241,17 @@
                                         <Setter Property="Margin" Value="-1,0,-1,-4"/>
                                         <Setter Property="Margin" TargetName="Content" Value="0,0,0,3"/>
                                     </Trigger>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding IsActive}" Value="True"/>
-                                            <Condition Binding="{Binding IsLastFocusedDocument}" Value="True"/>
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter Property="BorderBrush"
-									        Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor31}" />
-                                        <Setter Property="Background"
-									        Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor25}" />
-                                        <Setter Property="Foreground"
-									        Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor3}"/>
-                                        <Setter Property="Panel.ZIndex" 
-                                            Value="1" />
-                                    </MultiDataTrigger>
+                                    <DataTrigger Binding="{Binding IsActive}"
+                                                 Value="True">
+                                       <Setter Property="BorderBrush"
+                                               Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor31}" />
+                                       <Setter Property="Background"
+                                               Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor25}" />
+                                       <Setter Property="Foreground"
+                                               Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor3}" />
+                                       <Setter Property="Panel.ZIndex"
+                                               Value="1" />
+                                    </DataTrigger>
 
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>
@@ -886,11 +883,10 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                        <ContentPresenter Content="{Binding LayoutItem.View, RelativeSource={RelativeSource TemplatedParent}}"/>
-                        <!--<ContentPresenter Content="{Binding Model.Content, RelativeSource={RelativeSource TemplatedParent}}" 
-                                          ContentTemplate="{Binding LayoutItemTemplate, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
-                                          ContentTemplateSelector="{Binding LayoutItemTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"/>-->
-                    </Border>
+                  <ContentPresenter Content="{Binding LayoutItem.View.Content, RelativeSource={RelativeSource TemplatedParent}}"
+                                    ContentTemplate="{Binding LayoutItem.View.ContentTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                    ContentTemplateSelector="{Binding LayoutItem.View.ContentTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}" />
+               </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

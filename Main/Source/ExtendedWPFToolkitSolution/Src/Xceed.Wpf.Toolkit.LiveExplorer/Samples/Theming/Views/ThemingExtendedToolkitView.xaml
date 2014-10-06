@@ -61,6 +61,7 @@
 
 
 
+
     <Image Source="..\OpenSourceImages\ExtendedWPFToolkitControls.png" Width="700" Height="500"/>
 
 </local:DemoView>

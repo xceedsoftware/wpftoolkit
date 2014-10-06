@@ -301,11 +301,7 @@ namespace Xceed.Wpf.AvalonDock
         } 
 
         internal static int MakeLParam(int LoWord, int HiWord)
-        {
-
-          //System.Diagnostics.Trace.WriteLine("LoWord: " + LoWord2(((HiWord << 16) |
-         //(LoWord & 0xffff))));
-
+        { 
             return (int) ((HiWord << 16) | (LoWord & 0xffff));
         }
 

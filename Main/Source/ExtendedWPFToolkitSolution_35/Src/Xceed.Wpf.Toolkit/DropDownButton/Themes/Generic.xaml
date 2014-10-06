@@ -18,6 +18,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes"
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
+                    xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit">
 
    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
@@ -43,6 +44,8 @@
       <Setter Property="IsTabStop" Value="False" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Background" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalBackgroundKey}}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalOuterBorderKey}}" />
       <Setter Property="Padding" Value="3" />
       <Setter Property="Template">
          <Setter.Value>
@@ -59,6 +62,10 @@
                      </ToggleButton.Template>
                      <Grid>
                         <chrome:ButtonChrome x:Name="ToggleButtonChrome"
+                                             Background="{TemplateBinding Background}"
+                                             Foreground="{TemplateBinding Foreground}"
+                                             BorderThickness="{TemplateBinding BorderThickness}"
+                                             BorderBrush="{TemplateBinding BorderBrush}"
                                              CornerRadius="2.75"
                                              RenderChecked="{TemplateBinding IsOpen}"
                                              RenderEnabled="{TemplateBinding IsEnabled}"

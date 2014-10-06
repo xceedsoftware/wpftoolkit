@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{2C3149D9-832B-4754-A27B-898A392344B5}</ProjectGuid>
     <OutputType>library</OutputType>
@@ -221,10 +221,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PropertyGrid\Implementation\Editors\CollectionEditor.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="PropertyGrid\Themes\Aero2.NormalColor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -392,6 +388,7 @@
     <Compile Include="Chromes\Implementation\ButtonChrome.cs" />
     <Compile Include="CheckComboBox\Implementation\CheckComboBox.cs" />
     <Compile Include="CollectionControl\Implementation\CollectionControl.cs" />
+    <Compile Include="CollectionControl\Implementation\CollectionControlButton.cs" />
     <Compile Include="CollectionControl\Implementation\CollectionControlDialog.xaml.cs">
       <DependentUpon>CollectionControlDialog.xaml</DependentUpon>
     </Compile>
@@ -404,7 +401,10 @@
     <Compile Include="Core\CancelRoutedEventArgs.cs" />
     <Compile Include="Core\Converters\CenterTitleConverter.cs" />
     <Compile Include="Core\Converters\ColorBlendConverter.cs" />
+    <Compile Include="Core\Converters\CornerRadiusToDoubleConverter.cs" />
     <Compile Include="Core\Converters\IntToThicknessConverter.cs" />
+    <Compile Include="Core\Converters\ThicknessToDoubleConverter.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\CollectionEditor.cs" />
     <Compile Include="Core\Converters\WindowContentBorderMarginConverter.cs" />
     <Compile Include="Core\Converters\WindowControlBackgroundConverter.cs" />
     <Compile Include="Core\Input\IValidateInput.cs" />
@@ -565,9 +565,6 @@
     <Compile Include="PropertyGrid\Implementation\ObjectContainerHelperBase.cs" />
     <Compile Include="PropertyGrid\Implementation\DescriptorPropertyDefinitionBase.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\CheckBoxEditor.cs" />
-    <Compile Include="PropertyGrid\Implementation\Editors\CollectionEditor.xaml.cs">
-      <DependentUpon>CollectionEditor.xaml</DependentUpon>
-    </Compile>
     <Compile Include="PropertyGrid\Implementation\Editors\ColorEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\ComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\EditorDefinition.cs" />
@@ -749,6 +746,7 @@
   <ItemGroup>
     <Compile Include="PropertyGrid\Implementation\Definitions\DefinitionBase.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
   </PropertyGroup>

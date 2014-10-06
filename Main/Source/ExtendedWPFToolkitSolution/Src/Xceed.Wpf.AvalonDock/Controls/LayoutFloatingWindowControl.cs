@@ -83,11 +83,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
             }
 
 
-            protected override void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
-            {
-                Trace.WriteLine("FloatingWindowContentHost.GotKeyboardFocus");
-                base.OnGotKeyboardFocus(e);
-            }
             protected override void DestroyWindowCore(HandleRef hwnd)
             {
                 _manager.InternalRemoveLogicalChild(_rootPresenter);
@@ -96,19 +91,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
                     _wpfContentHost.Dispose();
                     _wpfContentHost = null;
                 }
-            }
-            protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-            {
-                switch (msg)
-                {
-                    case Win32Helper.WM_SETFOCUS:
-                        Trace.WriteLine("FloatingWindowContentHost.WM_SETFOCUS");
-                        break;
-                    case Win32Helper.WM_KILLFOCUS:
-                        Trace.WriteLine("FloatingWindowContentHost.WM_KILLFOCUS");
-                        break;
-                }                
-                return base.WndProc(hwnd, msg, wParam, lParam, ref handled);
             }
 
             public Visual RootVisual
@@ -356,7 +338,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
         /// </summary>
         protected virtual void OnIsDraggingChanged(DependencyPropertyChangedEventArgs e)
         {
-          //Trace.WriteLine("IsDragging={0}", e.NewValue);
         }
 
         #endregion

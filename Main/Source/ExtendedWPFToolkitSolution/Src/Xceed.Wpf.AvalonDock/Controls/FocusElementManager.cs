@@ -156,7 +156,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
             if (_modelFocusedWindowHandle.GetValue(model, out handleToFocus))
                 focused = IntPtr.Zero != Win32Helper.SetFocus(handleToFocus);
 
-            Trace.WriteLine( string.Format( "SetFocusOnLastElement(focused={0}, model={1}, element={2})", focused, model, handleToFocus == IntPtr.Zero ? ( objectToFocus == null ? "" : objectToFocus.ToString() ) : handleToFocus.ToString() ) );
 
             if (focused)
             {
@@ -193,8 +192,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
                         }
                     }
                 }
-
-
             }
         }
 
@@ -202,8 +199,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         static void WindowActivating(object sender, WindowActivateEventArgs e)
         {
-            Trace.WriteLine("WindowActivating");
-
             if (Keyboard.FocusedElement == null && 
                 _lastFocusedElement != null && 
                 _lastFocusedElement.IsAlive)

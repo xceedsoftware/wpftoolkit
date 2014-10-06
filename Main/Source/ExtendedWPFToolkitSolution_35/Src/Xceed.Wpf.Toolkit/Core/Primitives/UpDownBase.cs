@@ -47,6 +47,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     /// Flags if the Text and Value properties are in the process of being sync'd
     /// </summary>
     private bool _isSyncingTextAndValueProperties;    
+    private bool _isSpinnerCaptured;
 
     #endregion //Members
 
@@ -375,6 +376,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     internal UpDownBase()
     {
+      this.AddHandler( Mouse.PreviewMouseDownOutsideCapturedElementEvent, new RoutedEventHandler( this.HandleClickOutsideOfControl ), true );
     }
 
     #endregion //Constructors
@@ -397,6 +399,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       if( TextBox != null )
       {
         TextBox.Text = Text;
+        TextBox.GotFocus += new RoutedEventHandler( TextBox_GotFocus );
         TextBox.LostFocus += new RoutedEventHandler( TextBox_LostFocus );
         TextBox.TextChanged += new TextChangedEventHandler( TextBox_TextChanged );
       }
@@ -452,14 +455,24 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #region Event Handlers
 
+    private void HandleClickOutsideOfControl( object sender, RoutedEventArgs e )
+    {
+      if( _isSpinnerCaptured )
+      {
+        this.Spinner.ReleaseMouseCapture();
+        _isSpinnerCaptured = false;
+      }
+    }
+
     private void OnSpinnerSpin( object sender, SpinEventArgs e )
     {
       if( AllowSpin && !IsReadOnly )
       {
         var activeTrigger = this.MouseWheelActiveTrigger;
         bool spin = !e.UsingMouseWheel;
-        spin |= (activeTrigger == MouseWheelActiveTrigger.MouseOver);
+        spin |= ( activeTrigger == MouseWheelActiveTrigger.MouseOver );
         spin |= ( TextBox.IsFocused && ( activeTrigger == MouseWheelActiveTrigger.FocusedMouseOver ) );
+        spin |= ( TextBox.IsFocused && ( activeTrigger == MouseWheelActiveTrigger.Focused ) && (Mouse.Captured != null) );
 
         if( spin )
         {
@@ -563,6 +576,15 @@ namespace Xceed.Wpf.Toolkit.Primitives
       finally
       {
         _isTextChangedFromUI = false;
+      }
+    }
+
+    private void TextBox_GotFocus( object sender, RoutedEventArgs e )
+    {
+      if( ( this.MouseWheelActiveTrigger == Primitives.MouseWheelActiveTrigger.Focused ) && !_isSpinnerCaptured )
+      {
+        _isSpinnerCaptured = true;
+        Mouse.Capture( this.Spinner );
       }
     }
 

@@ -439,7 +439,7 @@
       <!-- //#TODODOC -->
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
-         The RangeSlider control let you sets a range with 2 slider thumbs. The lower limit is marked with the right side of the left thumb while the higher limit is marked with the left side of the right thumb.
+         The RangeSlider control lets you set a range with 2 slider thumbs. The lower limit is marked with the right side of the left thumb while the higher limit is marked with the left side of the right thumb.
       </Paragraph>
    </local:DemoView.Description>
 

@@ -38,6 +38,7 @@
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Background" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalBackgroundKey}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalOuterBorderKey}}" />
         <Setter Property="Padding" Value="3" />
         <Setter Property="Template">
             <Setter.Value>
@@ -58,19 +59,21 @@
                                     <Grid>
                                         <chrome:ButtonChrome x:Name="ActionButtonChrome"
                                                              Background="{TemplateBinding Background}" 
+                                                             Foreground="{TemplateBinding Foreground}"
                                                              BorderThickness="1,1,0,1"
+                                                             BorderBrush="{TemplateBinding BorderBrush}"
                                                              RenderEnabled="{TemplateBinding IsEnabled}"
-											                 RenderMouseOver="{Binding IsMouseOver, ElementName=PART_ActionButton}"
-											                 RenderPressed="{Binding IsPressed, ElementName=PART_ActionButton}">
+											                            RenderMouseOver="{Binding IsMouseOver, ElementName=PART_ActionButton}"
+											                            RenderPressed="{Binding IsPressed, ElementName=PART_ActionButton}">
                                             <ContentPresenter Name="ActionButtonContent" Margin="{TemplateBinding Padding}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" RecognizesAccessKey="true" />
                                         </chrome:ButtonChrome>
                                     </Grid>
                                 </Button>
                                 <ToggleButton x:Name="PART_ToggleButton"
-                                      Grid.Column="1"
-                                      IsTabStop="False"
-                                      IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                                      IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}">
+                                               Grid.Column="1"
+                                               IsTabStop="False"
+                                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                               IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}">
                                     <ToggleButton.Template>
                                         <ControlTemplate TargetType="ToggleButton">
                                             <ContentPresenter />
@@ -79,11 +82,12 @@
                                     <Grid>
                                         <chrome:ButtonChrome x:Name="ToggleButtonChrome"
                                                              Background="{TemplateBinding Background}" 
+                                                             BorderBrush="{TemplateBinding BorderBrush}"
                                                              Padding="1,0,1,0"
                                                              RenderChecked="{TemplateBinding IsOpen}"
                                                              RenderEnabled="{TemplateBinding IsEnabled}"
-											                 RenderMouseOver="{Binding IsMouseOver, ElementName=PART_ToggleButton}"
-											                 RenderPressed="{Binding IsPressed, ElementName=PART_ToggleButton}">
+											                             RenderMouseOver="{Binding IsMouseOver, ElementName=PART_ToggleButton}"
+											                             RenderPressed="{Binding IsPressed, ElementName=PART_ToggleButton}">
                                             <Grid x:Name="arrowGlyph" IsHitTestVisible="False" Margin="4,3,4,3">
                                                 <Path x:Name="Arrow" Width="7" Height="4" Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z" Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
                                             </Grid>

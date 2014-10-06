@@ -61,7 +61,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
             Visibility = System.Windows.Visibility.Visible;
             InvalidateMeasure();
             UpdateWindowPos();
-            Trace.WriteLine("LayoutAutoHideWindowControl.Show()");
         }
 
         internal void Hide()
@@ -76,8 +75,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
             _model = null;
             _manager = null;
             Visibility = System.Windows.Visibility.Hidden;
-
-            Trace.WriteLine("LayoutAutoHideWindowControl.Hide()");
         }
 
         LayoutAnchorControl _anchor;

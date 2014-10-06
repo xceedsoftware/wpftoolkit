@@ -359,6 +359,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private void OnPropertyDefinitionsCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
       _containerHelper.NotifyPropertyDefinitionsCollectionChanged();
+      if( this.IsLoaded )
+      {
+        this.UpdateContainerHelper();
+      }
     }
 
     #endregion //PropertyDefinitions

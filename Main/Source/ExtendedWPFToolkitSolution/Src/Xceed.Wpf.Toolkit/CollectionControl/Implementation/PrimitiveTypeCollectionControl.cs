@@ -94,7 +94,7 @@ namespace Xceed.Wpf.Toolkit
       if( ItemsSourceType == null )
         ItemsSourceType = newValue.GetType();
 
-      if( ItemType == null )
+      if( ItemType == null && newValue.GetType().ContainsGenericParameters )
         ItemType = newValue.GetType().GetGenericArguments()[ 0 ];
 
       SetText( newValue );

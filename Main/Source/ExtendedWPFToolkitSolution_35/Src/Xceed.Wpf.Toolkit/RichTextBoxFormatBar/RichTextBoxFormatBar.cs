@@ -361,7 +361,15 @@ namespace Xceed.Wpf.Toolkit
       if( ( value == null ) || ( Target == null ) || ( Target.Selection == null ) )
         return;
 
-      Target.Selection.ApplyPropertyValue( formattingProperty, value );
+      SolidColorBrush solidColorBrush = value as SolidColorBrush;
+      if( ( solidColorBrush != null ) && solidColorBrush.Color.Equals( Colors.Transparent ) )
+      {
+        Target.Selection.ApplyPropertyValue( formattingProperty, null );
+      }
+      else
+      {
+        Target.Selection.ApplyPropertyValue( formattingProperty, value );
+      }
     }
 
     private void ProcessMove( DragDeltaEventArgs e )

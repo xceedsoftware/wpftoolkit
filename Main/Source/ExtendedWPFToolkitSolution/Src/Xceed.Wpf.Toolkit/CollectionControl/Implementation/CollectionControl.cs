@@ -100,7 +100,12 @@ namespace Xceed.Wpf.Toolkit
       if( newValue != null )
       {
         foreach( var item in newValue )
-          Items.Add( item );
+        {
+          if( item != null )
+          {
+            Items.Add( item );
+          }
+        }
       }
     }
 
@@ -368,7 +373,10 @@ namespace Xceed.Wpf.Toolkit
       if( ItemsSourceType != null )
       {
         ConstructorInfo constructor = ItemsSourceType.GetConstructor( Type.EmptyTypes );
-        list = ( IList )constructor.Invoke( null );
+        if( constructor != null )
+        {
+          list = ( IList )constructor.Invoke( null );
+        }
       }
 
       return list;

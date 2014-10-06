@@ -947,7 +947,7 @@
                                     MarkerOffset="0"
                                     NumericIndicatorOffsetX="0"
                                     NumericIndicatorOffsetY="60"
-                                    Value="60"
+                                    Value="88"
                                     IsFullCircleBackground="False"
                                     IsTickMarkVisible="True"
                                     IsTickLabelVisible="True"

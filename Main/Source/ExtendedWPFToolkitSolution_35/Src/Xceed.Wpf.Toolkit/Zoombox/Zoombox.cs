@@ -3315,6 +3315,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       if( _content == null )
         return;
 
+      if( double.IsNaN( scale ) )
+        return;
+
       // if necessary, verify that the relativeTo point falls within the content
       if( restrictRelativePointToContent && !( new Rect( _content.RenderSize ) ).Contains( relativeTo ) )
         return;
