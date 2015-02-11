@@ -33,5 +33,25 @@ namespace Xceed.Wpf.DataGrid
 
       return collectionViewGroup.GetItems();
     }
+
+    public static IEnumerable<object> GetLeafItems( this Group group )
+    {
+      CollectionViewGroup collectionViewGroup = group.CollectionViewGroup;
+
+      if( collectionViewGroup == null )
+        return new object[0];
+
+      return collectionViewGroup.GetLeafItems();
+    }
+
+    public static SelectionRange GetRange( this Group group )
+    {
+      CollectionViewGroup collectionViewGroup = group.CollectionViewGroup;
+
+      if( collectionViewGroup == null )
+        return SelectionRange.Empty;
+
+      return collectionViewGroup.GetRange( group.DataGridContext );
+    }
   }
 }

@@ -24,7 +24,7 @@ using System.Globalization;
 
 namespace Xceed.Wpf.DataGrid.FilterCriteria
 {
-  [CriterionDescriptor( "*@", FilterOperatorPrecedence.RelationalOperator, FilterTokenPriority.RelationalOperator)]
+  [CriterionDescriptor( "*@", FilterOperatorPrecedence.RelationalOperator, FilterTokenPriority.RelationalOperator )]
   [DebuggerDisplay( "EndsWith( {Value} )" )]
   public class EndsWithFilterCriterion : RelationalFilterCriterion
   {
@@ -45,7 +45,6 @@ namespace Xceed.Wpf.DataGrid.FilterCriteria
       return ( strValue == null ) ? "" : "*" + strValue;
     }
 
-    // TODO: to be tested
     public override Expression ToLinqExpression( IQueryable queryable, ParameterExpression parameterExpression, string propertyName )
     {
       if( queryable == null )

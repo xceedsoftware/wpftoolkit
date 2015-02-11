@@ -55,6 +55,8 @@
          <LineBreak/>
          <LineBreak/>
          Plus edition Only:
+         <LineBreak />
+         DependsOnAttribute
          <LineBreak/>
          (Not demoed here. See corresponding samples)
          <LineBreak />
@@ -89,7 +91,8 @@
       </StackPanel>
       
       <xctk:PropertyGrid Grid.Row="1" x:Name="_propertyGrid" Width="450" MaxHeight="650" Margin="10" 
-                         SelectedObject="{Binding}">
+                         SelectedObject="{Binding}"
+                         ShowDescriptionByTooltip="True">
       </xctk:PropertyGrid>      
       
    </Grid>

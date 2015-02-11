@@ -311,10 +311,6 @@ namespace Xceed.Wpf.DataGrid
           }
 
           scrollTip.m_mainColumn = null;
-          scrollTip.m_horizontalScrollBar = null;
-          scrollTip.m_horizontalScrollThumb = null;
-          scrollTip.m_verticalScrollBar = null;
-          scrollTip.m_verticalScrollThumb = null;
 
           scrollTip.UnregisterListeners( oldParentGridControl );
         }
@@ -341,64 +337,25 @@ namespace Xceed.Wpf.DataGrid
     private void RegisterListeners( DataGridControl parentGridControl )
     {
       if( parentGridControl.ScrollViewer != null )
+      {
         parentGridControl.ScrollViewer.ScrollChanged += new ScrollChangedEventHandler( this.OnScrollViewerScrollChanged );
-
-      m_verticalScrollBar = parentGridControl.ScrollViewer.Template.FindName( "PART_VerticalScrollBar", parentGridControl.ScrollViewer ) as ScrollBar;
-      m_horizontalScrollBar = parentGridControl.ScrollViewer.Template.FindName( "PART_HorizontalScrollBar", parentGridControl.ScrollViewer ) as ScrollBar;
-
-      if( m_verticalScrollBar != null )
-      {
-        if( parentGridControl.ScrollViewer != null )
-        {
-          // Assert the Template as been applied on the ScrollBar to get access to the ScrollThumb
-          if( m_verticalScrollBar.Track == null )
-            m_verticalScrollBar.ApplyTemplate();
-
-          Debug.Assert( m_verticalScrollBar.Track != null );
-
-          if( m_verticalScrollBar.Track != null )
-            m_verticalScrollThumb = m_verticalScrollBar.Track.Thumb;
-
-          if( m_verticalScrollThumb != null )
-          {
-            // Register to IsMouseCaptureChanged to know when this ScrollThumb is clicked to display the ScrollTip if required
-            m_verticalScrollThumb.IsMouseCapturedChanged += new DependencyPropertyChangedEventHandler( this.ScrollThumb_IsMouseCapturedChanged );
-          }
-        }
-      }
-
-      if( m_horizontalScrollBar != null )
-      {
-        if( parentGridControl.ScrollViewer != null )
-        {
-          // Assert the Template as been applied on the ScrollBar to get access to the ScrollThumb
-          if( m_horizontalScrollBar.Track == null )
-            m_horizontalScrollBar.ApplyTemplate();
-
-          Debug.Assert( m_horizontalScrollBar.Track != null );
-
-          if( m_horizontalScrollBar.Track != null )
-            m_horizontalScrollThumb = m_horizontalScrollBar.Track.Thumb;
-
-          if( m_horizontalScrollThumb != null )
-          {
-            // Register to IsMouseCaptureChanged to know when this ScrollThumb is clicked to display the ScrollTip if required
-            m_horizontalScrollThumb.IsMouseCapturedChanged += new DependencyPropertyChangedEventHandler( this.ScrollThumb_IsMouseCapturedChanged );
-          }
-        }
+        m_scrollViewerTemplateHelper = new ScrollViewerTemplateHelper( parentGridControl.ScrollViewer, this.DragScrollBegin, this.DragScrollEnd );
+        m_scrollViewerTemplateHelper.RefreshTemplate();
       }
     }
 
     private void UnregisterListeners( DataGridControl parentGridControl )
     {
-      if( ( parentGridControl != null ) && ( parentGridControl.ScrollViewer != null ) )
+      if( parentGridControl.ScrollViewer != null )
+      {
         parentGridControl.ScrollViewer.ScrollChanged -= new ScrollChangedEventHandler( this.OnScrollViewerScrollChanged );
+      }
 
-      if( m_verticalScrollThumb != null )
-        m_verticalScrollThumb.IsMouseCapturedChanged -= new DependencyPropertyChangedEventHandler( this.ScrollThumb_IsMouseCapturedChanged );
-
-      if( m_horizontalScrollThumb != null )
-        m_horizontalScrollThumb.IsMouseCapturedChanged -= new DependencyPropertyChangedEventHandler( this.ScrollThumb_IsMouseCapturedChanged );
+      if( m_scrollViewerTemplateHelper != null )
+      {
+        m_scrollViewerTemplateHelper.Dispose();
+        m_scrollViewerTemplateHelper = null;
+      }
     }
 
     private void RefreshDefaultScrollTipContentTemplate()
@@ -492,38 +449,10 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private void ScrollThumb_IsMouseCapturedChanged( object sender, DependencyPropertyChangedEventArgs e )
+    private void DragScrollBegin( Orientation orientation )
     {
-      Thumb scrollThumb = sender as Thumb;
-
-      if( scrollThumb == null )
-        return;
-
-      if( !scrollThumb.IsMouseCaptured )
-        return;
-
       if( !this.ShouldDisplayScrollTip )
         return;
-
-      ScrollBar scrollBar = scrollThumb.TemplatedParent as ScrollBar;
-
-      if( scrollBar == null )
-        return;
-
-      // Register to LostMouseCapture to be sure to hide the ScrollTip when the ScrollThumb lost the focus
-      if( scrollThumb == m_horizontalScrollThumb )
-      {
-        m_horizontalScrollThumb.LostMouseCapture += new MouseEventHandler( this.ScrollThumb_LostMouseCapture );
-      }
-      else if( scrollThumb == m_verticalScrollThumb )
-      {
-        m_verticalScrollThumb.LostMouseCapture += new MouseEventHandler( this.ScrollThumb_LostMouseCapture );
-      }
-      else
-      {
-        Debug.Fail( "Unknown thumb used for scrolling." );
-        return;
-      }
 
       DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
 
@@ -536,34 +465,19 @@ namespace Xceed.Wpf.DataGrid
       // Update items scrolling orientation and pixel scrolling
       m_itemsScrollingOrientation = ScrollViewerHelper.GetItemScrollingOrientation( dataGridContext.DataGridControl );
 
-      if( m_itemsScrollingOrientation == Orientation.Vertical )
-      {
-        if( scrollBar != m_verticalScrollBar )
-          return;
-      }
-      else
-      {
-        if( scrollBar != m_horizontalScrollBar )
-          return;
-      }
+      if( m_itemsScrollingOrientation != orientation )
+        return;
 
       this.Visibility = Visibility.Visible;
 
       this.IsPixelScrolling = ScrollViewerHelper.IsPixelScrolling( dataGridContext.DataGridControl, dataGridContext.DataGridControl.ItemsHost, dataGridContext.DataGridControl.ScrollViewer );
 
-      this.RefreshScrollTipContent( scrollBar );
+      this.RefreshScrollTipContent( m_scrollViewerTemplateHelper.GetScrollBar( orientation ) );
     }
 
-    private void ScrollThumb_LostMouseCapture( object sender, MouseEventArgs e )
+    private void DragScrollEnd( Orientation orientation )
     {
       this.Visibility = Visibility.Collapsed;
-
-      Thumb scrollBarThumb = sender as Thumb;
-
-      Debug.Assert( scrollBarThumb != null );
-
-      if( scrollBarThumb != null )
-        scrollBarThumb.LostMouseCapture -= new MouseEventHandler( this.ScrollThumb_LostMouseCapture );
     }
 
     private void OnScrollViewerScrollChanged( object sender, ScrollChangedEventArgs e )
@@ -579,11 +493,11 @@ namespace Xceed.Wpf.DataGrid
 
       if( e.VerticalChange == 0 )
       {
-        scrollBar = m_horizontalScrollBar;
+        scrollBar = m_scrollViewerTemplateHelper.HorizontalScrollBar;
       }
       else
       {
-        scrollBar = m_verticalScrollBar;
+        scrollBar = m_scrollViewerTemplateHelper.VerticalScrollBar;
       }
 
       if( scrollBar == null )
@@ -775,10 +689,7 @@ namespace Xceed.Wpf.DataGrid
 
     private ColumnBase m_mainColumn; // = null;
     private Orientation m_itemsScrollingOrientation = Orientation.Vertical;
-    private ScrollBar m_horizontalScrollBar; // = null;
-    private Thumb m_horizontalScrollThumb; // = null;
-    private ScrollBar m_verticalScrollBar; // = null;
-    private Thumb m_verticalScrollThumb; // = null;
+    private ScrollViewerTemplateHelper m_scrollViewerTemplateHelper;
 
     private BitVector32 m_flags = new BitVector32();
 

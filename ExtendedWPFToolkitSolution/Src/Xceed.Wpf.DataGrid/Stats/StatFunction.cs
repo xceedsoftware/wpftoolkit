@@ -31,6 +31,9 @@ namespace Xceed.Wpf.DataGrid.Stats
   {
     static StatFunction()
     {
+#if DEBUG
+      //StatFunction.TestStatFunctions();
+#endif
     }
 
     protected StatFunction()
@@ -211,24 +214,17 @@ namespace Xceed.Wpf.DataGrid.Stats
       m_initialized = true;
     }
 
-    protected internal virtual void Reset()
-    {
-    }
+    protected internal abstract void Reset();
 
     protected internal virtual void InitializePrerequisites( StatResult[] prerequisitesValues )
     {
       throw new NotImplementedException( "InitializePrerequisites must also be overridden when PrerequisiteFunctions has been overridden." ); 
     }
 
-    protected internal virtual void Accumulate( object[] values )
-    {
-    }
+    protected internal abstract void Accumulate( object[] values );
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate" )]
-    protected internal virtual StatResult GetResult()
-    {
-      return new StatResult( new InvalidOperationException( Log.NotToolkitStr( "Statistical functions" ) ) );
-    }
+    protected internal abstract StatResult GetResult();
 
     protected void CheckSealed()
     {
@@ -238,8 +234,11 @@ namespace Xceed.Wpf.DataGrid.Stats
 
     protected internal virtual bool IsEquivalent( StatFunction statFunction )
     {
-      if( statFunction == null )
+      if( object.ReferenceEquals( statFunction, null ) )
         return false;
+
+      if( object.ReferenceEquals( statFunction, this ) )
+        return true;
 
       return ( this.GetType() == statFunction.GetType() ) &&
              ( this.SourcePropertyName == statFunction.SourcePropertyName );
@@ -248,7 +247,7 @@ namespace Xceed.Wpf.DataGrid.Stats
     [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate" )]
     protected internal virtual int GetEquivalenceKey()
     {
-      return this.GetType().GetHashCode() ^ this.SourcePropertyName.GetHashCode();
+      return this.SourcePropertyName.GetHashCode();
     }
 
     internal static bool AreEquivalents( StatFunction statFunctionA, StatFunction statFunctionB )
@@ -319,6 +318,64 @@ namespace Xceed.Wpf.DataGrid.Stats
 
       return accType;
     }
+
+#if DEBUG
+    private static StatResult RunStatFunction( StatFunction statFunction, Type[] dataTypes, params object[] values )
+    {
+      return StatFunction.RunStatFunction( statFunction, dataTypes, values, null );
+    }
+
+    private static StatResult RunStatFunction( 
+      StatFunction statFunction, 
+      Type[] dataTypes, 
+      object[] valuesX, 
+      object[] valuesY )
+    {
+      statFunction.InitializeAccumulationTypes( dataTypes );
+      statFunction.StartCalculation();
+      statFunction.Reset();
+
+      try
+      {
+        if( statFunction.PrerequisiteFunctions != null && statFunction.PrerequisiteFunctions.Length > 0 )
+        {
+          StatResult[] preValues = new StatResult[ statFunction.PrerequisiteFunctions.Length ];
+
+          for( int i = 0; i < statFunction.PrerequisiteFunctions.Length; i++ )
+          {
+            preValues[ i ] = StatFunction.RunStatFunction( statFunction.PrerequisiteFunctions[ i ], dataTypes, valuesX, valuesY );
+
+            if( preValues[ i ].Value is Exception )
+              throw ( Exception )preValues[ i ].Value;
+          }
+
+          statFunction.InitializePrerequisites( preValues );
+        }
+
+        if( statFunction.RequiresAccumulation )
+        {
+          for( int i = 0; i < valuesX.Length; i++ )
+          {
+            if( valuesY == null )
+            {
+              statFunction.Accumulate( new object[] { valuesX[ i ] } );
+            }
+            else
+            {
+              statFunction.Accumulate( new object[] { valuesX[ i ], valuesY[ i ] } );
+            }
+          }
+        }
+
+        statFunction.EndCalculation();
+        return statFunction.GetResult();
+      }
+      catch( Exception ex )
+      {
+        return new StatResult( ex );
+      }
+    }
+#endif
 
     private bool m_initialized; // = false
   }

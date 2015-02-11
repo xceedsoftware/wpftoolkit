@@ -32,6 +32,7 @@ namespace Xceed.Wpf.DataGrid
         throw new ArgumentNullException( "parentRow" );
 
       m_parentRow = parentRow;
+      m_cells = new CellSet( parentRow );
       m_readOnlyCellsCollection = new ReadOnlyCollection<Cell>( m_cells );
 
       // We must assign the VirtualizingCellCollection of the VirtualizingItemsList manually
@@ -68,7 +69,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region DataGridContext Property (Private)
+    #region DataGridContext Private Property
 
     private DataGridContext DataGridContext
     {
@@ -80,29 +81,37 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region ColumnManager Property (Private)
+    #region Columns Private Property
 
-    private ColumnVirtualizationManager ColumnManager
+    private ColumnCollection Columns
     {
       get
       {
-        DataGridContext context = this.DataGridContext;
-        if( context == null )
-          throw new DataGridInternalException();
+        if( this.DataGridContext == null )
+          return null;
 
-        return context.ColumnVirtualizationManager;
+        return this.DataGridContext.Columns;
       }
     }
 
     #endregion
 
-    #region NeedsNotification Property
+    #region IsUpdating Property
 
-    internal bool AlreadyUpdating
+    internal bool IsUpdating
     {
-      get;
-      set;
+      get
+      {
+        return m_isUpdating.IsSet;
+      }
     }
+
+    internal IDisposable SetIsUpdating()
+    {
+      return m_isUpdating.Set();
+    }
+
+    private readonly AutoResetFlag m_isUpdating = AutoResetFlagFactory.Create();
 
     #endregion
 
@@ -112,10 +121,11 @@ namespace Xceed.Wpf.DataGrid
 
     private void NotifyCollectionChanged()
     {
-      if( this.CollectionChanged != null )
-      {
-        this.CollectionChanged( this, EventArgs.Empty );
-      }
+      var handler = this.CollectionChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, EventArgs.Empty );
     }
 
     #endregion
@@ -124,7 +134,7 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return this.GetCell( column );
+        return this.GetCell( column, true );
       }
     }
 
@@ -132,7 +142,7 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return this.GetCell( fieldName );
+        return this.GetCell( this.GetColumn( fieldName ), true );
       }
     }
 
@@ -163,16 +173,11 @@ namespace Xceed.Wpf.DataGrid
 
     internal override void InternalClear()
     {
-      this.Unregister( m_bindedCells.Values );
+      m_recyclingBins = null;
+      m_freeCells = null;
 
       m_bindedCells.Clear();
-      m_recyclingBins.Clear();
-
-      m_freeCells.Clear();
-      m_freeCells.TrimExcess();
-
       m_cells.Clear();
-      m_cells.TrimExcess();
     }
 
     internal override void InternalInsert( int index, Cell cell )
@@ -187,7 +192,7 @@ namespace Xceed.Wpf.DataGrid
 
     internal override void InternalRemoveAt( int index )
     {
-      ColumnBase column = this.DataGridContext.Columns[ index ];
+      ColumnBase column = this.Columns[ index ];
       if( column == null )
         return;
 
@@ -206,7 +211,7 @@ namespace Xceed.Wpf.DataGrid
     internal void Release( Cell cell )
     {
       // Make sure the cell is allowed to be recycled.
-      if( ( cell == null ) || ( !this.IsRecyclableCell( cell ) ) )
+      if( ( cell == null ) || ( !VirtualizingCellCollection.IsRecyclableCell( cell ) ) )
         return;
 
       // Remove the target cell from the binded cells.
@@ -215,7 +220,46 @@ namespace Xceed.Wpf.DataGrid
       cell.Visibility = Visibility.Collapsed;
     }
 
+    internal Cell GetCell( string fieldName, bool prepareCell )
+    {
+      if( string.IsNullOrEmpty( fieldName ) )
+        return null;
+
+      Cell cell;
+      if( this.TryGetCell( fieldName, prepareCell, out cell ) )
+        return cell;
+
+      return this.CreateOrRecycleCell( fieldName );
+    }
+
+    internal Cell GetCell( ColumnBase column, bool prepareCell )
+    {
+      if( column == null )
+        return null;
+
+      Cell cell;
+      if( this.TryGetCell( column, prepareCell, out cell ) )
+        return cell;
+
+      return this.CreateOrRecycleCell( column, this.DataGridContext );
+    }
+
+    internal bool TryGetCell( string fieldName, out Cell cell )
+    {
+      return this.TryGetCell( fieldName, true, out cell );
+    }
+
     internal bool TryGetCell( ColumnBase column, out Cell cell )
+    {
+      return this.TryGetCell( column, true, out cell );
+    }
+
+    internal bool TryGetCell( string fieldName, bool prepareCell, out Cell cell )
+    {
+      return this.TryGetCell( this.GetColumn( fieldName ), prepareCell, out cell );
+    }
+
+    internal bool TryGetCell( ColumnBase column, bool prepareCell, out Cell cell )
     {
       cell = null;
       if( column == null )
@@ -226,24 +270,37 @@ namespace Xceed.Wpf.DataGrid
       if( !m_bindedCells.TryGetValue( column.FieldName, out cell ) )
         return false;
 
-      this.PrepareCell( cell, column, this.DataGridContext );
+      if( prepareCell )
+      {
+        this.PrepareCell( cell, column, this.DataGridContext );
+      }
 
       return true;
     }
 
-    internal void ClearUnusedRecycleBins( IEnumerable<ColumnBase> columns )
+    internal bool TryGetBindedCell( string fieldName, out Cell cell )
     {
-      if( m_recyclingBins.Count == 0 )
+      this.MergeFreeCells();
+
+      if( m_bindedCells.TryGetValue( fieldName, out cell ) )
+        return true;
+
+      return false;
+    }
+
+    internal void ClearUnusedRecycleBins( ColumnCollection columns )
+    {
+      if( m_recyclingBins == null )
         return;
 
-      HashSet<object> unusedRecyclingGroups = new HashSet<object>( m_recyclingBins.Keys );
+      var unusedRecyclingGroups = new HashSet<object>( m_recyclingBins.Keys );
 
       if( columns != null )
       {
         foreach( ColumnBase column in columns )
         {
           if( unusedRecyclingGroups.Count == 0 )
-            return;
+            break;
 
           unusedRecyclingGroups.Remove( this.GetRecyclingGroup( column ) );
         }
@@ -259,30 +316,10 @@ namespace Xceed.Wpf.DataGrid
           m_cells.Remove( cell );
         }
       }
-    }
 
-    private void OnCellRequestBringIntoView( object sender, RequestBringIntoViewEventArgs e )
-    {
-      Cell cell = e.Source as Cell;
-      if( cell == null )
-        return;
-
-      // Make sure the the current row if the cell's parent row.
-      Row parentRow = cell.ParentRow;
-      if( parentRow != m_parentRow )
+      if( m_recyclingBins.Count == 0 )
       {
-        this.Unregister( cell );
-        return;
-      }
-
-      // Do not process the bring into view for a templated cell.
-      if( this.IsTemplatedCell( cell ) )
-        return;
-
-      IVirtualizingCellsHost cellsHost = parentRow.CellsHostPanel as IVirtualizingCellsHost;
-      if( cellsHost != null )
-      {
-        e.Handled = cellsHost.BringIntoView( cell );
+        m_recyclingBins = null;
       }
     }
 
@@ -291,7 +328,7 @@ namespace Xceed.Wpf.DataGrid
       if( cell == null )
         throw new ArgumentNullException( "cell" );
 
-      if( !this.IsFreeCell( cell ) )
+      if( !VirtualizingCellCollection.IsFreeCell( cell ) )
       {
         string fieldName = cell.FieldName;
 
@@ -311,10 +348,13 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
+        if( m_freeCells == null )
+        {
+          m_freeCells = new List<Cell>( 1 );
+        }
+
         m_freeCells.Add( cell );
       }
-
-      this.Register( cell );
 
       m_cells.Add( cell );
     }
@@ -324,7 +364,7 @@ namespace Xceed.Wpf.DataGrid
       if( cell == null )
         throw new ArgumentNullException( "cell" );
 
-      if( !this.IsFreeCell( cell ) )
+      if( !VirtualizingCellCollection.IsFreeCell( cell ) )
       {
         m_bindedCells.Remove( cell.FieldName );
       }
@@ -333,13 +373,11 @@ namespace Xceed.Wpf.DataGrid
         Debug.Fail( "Should always have a field name" );
       }
 
-      this.Unregister( cell );
-
       if( recycle )
       {
         // Put the cell into the appropriate recycle bin.
-        object recyclingGroup = this.GetRecyclingGroup( this.GetColumn( cell ) );
-        ICollection<Cell> recycleBin = this.GetRecycleBinOrNew( recyclingGroup );
+        var recyclingGroup = this.GetRecyclingGroup( this.GetColumn( cell ) );
+        var recycleBin = this.GetRecycleBinOrNew( recyclingGroup );
 
         // A released cell shouldn't be in the recycle bin already.
         Debug.Assert( !recycleBin.Contains( cell ) );
@@ -351,95 +389,33 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private void Register( Cell cell )
+    private Cell CreateOrRecycleCell( string fieldName )
     {
-      if( cell == null )
-        return;
-
-      cell.RequestBringIntoView += new RequestBringIntoViewEventHandler( this.OnCellRequestBringIntoView );
+      return this.CreateOrRecycleCell( this.GetColumn( fieldName ), this.DataGridContext );
     }
 
-    private void Unregister( Cell cell )
+    private Cell CreateOrRecycleCell( ColumnBase column, DataGridContext context )
     {
-      if( cell == null )
-        return;
-
-      cell.RequestBringIntoView -= new RequestBringIntoViewEventHandler( this.OnCellRequestBringIntoView );
-    }
-
-    private void Unregister( IEnumerable<Cell> cells )
-    {
-      if( cells == null )
-        return;
-
-      foreach( Cell cell in cells )
-      {
-        this.Unregister( cell );
-      }
-    }
-
-    private Cell GetCell( string fieldName )
-    {
-      if( string.IsNullOrEmpty( fieldName ) )
-        return null;
-
-      DataGridContext context = this.DataGridContext;
-      if( context == null )
-      {
-        Debug.Fail( "An unprepared Row was asked a Cell" );
-        return null;
-      }
-
-      ColumnBase column = this.GetColumn( context, fieldName );
-      if( column == null )
-        return null;
-
-      return this.GetCell( fieldName, column, context );
-    }
-
-    private Cell GetCell( ColumnBase column )
-    {
-      if( column == null )
-        return null;
-
-      return this.GetCell( column.FieldName, column, this.DataGridContext );
-    }
-
-    private Cell GetCell( string fieldName, ColumnBase column, DataGridContext context )
-    {
-      this.CheckFieldName( fieldName );
-      this.MergeFreeCells();
-
-      // Try to recycle a cell if it wasn't already binded.
+      // Create a new cell if recycling wasn't possible.
       Cell cell;
-      if( !( m_bindedCells.TryGetValue( fieldName, out cell ) ) && ( column != null ) )
+      if( !this.TryGetRecycledCell( column, out cell ) )
       {
-        // Create a new cell if recycling wasn't possible.
-        if( !this.TryGetRecycledCell( column, out cell ) )
-        {
-          cell = m_parentRow.ProvideCell( column );
-
-          Debug.Assert( cell != null );
-        }
-        else
-        {
-          cell.Visibility = Visibility.Visible;
-        }
-
-        // Make sure the cell is initialized and prepared to be used.
-        this.PrepareCell( cell, column, context );
-        this.InternalAdd( cell );
-
-        //Need to notify only when cells are not already binded, since the binded cells will get properly measured and arranged by the Virtualizing/FixedCellSubPanel(s).
-        if( !this.AlreadyUpdating )
-        {
-          this.NotifyCollectionChanged();
-        }
+        cell = m_parentRow.ProvideCell( column );
+        Debug.Assert( cell != null );
       }
-      else if( cell != null )
+      else
       {
-        // Make sure the cell is initialized and prepared to be used.
-        this.PrepareCell( cell, column, context );
+        cell.ClearValue( Cell.VisibilityProperty );
+      }
+
+      // Make sure the cell is initialized and prepared to be used.
+      this.PrepareCell( cell, column, context );
+      this.InternalAdd( cell );
+
+      //Need to notify only when cells are not already binded, since the binded cells will get properly measured and arranged by the Virtualizing/FixedCellSubPanel(s).
+      if( !this.IsUpdating )
+      {
+        this.NotifyCollectionChanged();
       }
 
       return cell;
@@ -448,22 +424,25 @@ namespace Xceed.Wpf.DataGrid
     private void PrepareCell( Cell cell, ColumnBase column, DataGridContext context )
     {
       //context can be null when the DataGridCollectionView directly has a list of Xceed.Wpf.DataGrid.DataRow
-      //Certain non recycling cells like StatCell must not be (re)intialized at this point if their binding is not set, for performance reasons.
-      if( ( cell == null ) || ( context == null ) || ( !cell.HasAliveContentBinding ) )
+      if( ( cell == null ) || ( context == null ) )
         return;
 
       // Initialize the cell in case it hasn't been initialized or in case of a column change.
       cell.Initialize( context, m_parentRow, column );
 
-      // Make sure the cell is prepared before leaving this method.
-      cell.PrepareContainer( context, m_parentRow.DataContext );
+      // Certain non recycling cells like StatCell must not be (re)prepared if their binding is not set, for performance reasons.
+      if( cell.HasAliveContentBinding )
+      {
+        // Make sure the cell is prepared before leaving this method.
+        cell.PrepareContainer( context, m_parentRow.DataContext );
+      }
     }
 
     private bool TryGetRecycledCell( ColumnBase column, out Cell cell )
     {
       cell = null;
 
-      if( column == null )
+      if( ( column == null ) || ( m_recyclingBins == null ) )
         return false;
 
       object recyclingGroup = this.GetRecyclingGroup( column );
@@ -473,7 +452,7 @@ namespace Xceed.Wpf.DataGrid
       {
         // Try to recycle a cell that has already the appropriate column in order to minimize the cell's initialization time.
         LinkedListNode<Cell> targetNode = null;
-        for( LinkedListNode<Cell> node = recycleBin.Last; node != null; node = node.Previous )
+        for( var node = recycleBin.Last; node != null; node = node.Previous )
         {
           targetNode = node;
 
@@ -508,7 +487,7 @@ namespace Xceed.Wpf.DataGrid
 
     private void MergeFreeCells()
     {
-      if( m_freeCells.Count == 0 )
+      if( m_freeCells == null )
         return;
 
       foreach( Cell cell in m_freeCells )
@@ -516,8 +495,7 @@ namespace Xceed.Wpf.DataGrid
         this.MergeFreeCell( cell );
       }
 
-      m_freeCells.Clear();
-      m_freeCells.TrimExcess();
+      m_freeCells = null;
     }
 
     private ColumnBase GetColumn( Cell cell )
@@ -536,28 +514,26 @@ namespace Xceed.Wpf.DataGrid
 
     private ColumnBase GetColumn( string fieldName )
     {
-      return this.GetColumn( this.DataGridContext, fieldName );
-    }
-
-    private ColumnBase GetColumn( DataGridContext context, string fieldName )
-    {
-      if( ( context == null ) || ( string.IsNullOrEmpty( fieldName ) ) )
+      if( ( this.Columns == null ) || ( string.IsNullOrEmpty( fieldName ) ) )
         return null;
 
-      return context.Columns[ fieldName ];
+      return this.Columns[ fieldName ];
     }
 
     private object GetRecyclingGroup( ColumnBase column )
     {
-      if( column == null )
-        throw new ArgumentNullException( "column" );
-
       return column.GetCellRecyclingGroupOrDefault();
     }
 
     private ICollection<Cell> GetRecycleBinOrNew( object recyclingGroup )
     {
+      if( m_recyclingBins == null )
+      {
+        m_recyclingBins = new Dictionary<object, LinkedList<Cell>>();
+      }
+
       LinkedList<Cell> recycleBin;
+
       if( !m_recyclingBins.TryGetValue( recyclingGroup, out recycleBin ) )
       {
         recycleBin = new LinkedList<Cell>();
@@ -567,37 +543,16 @@ namespace Xceed.Wpf.DataGrid
       return recycleBin;
     }
 
-    private bool IsRecyclableCell( Cell cell )
-    {
-      return ( cell != null ) && ( !this.IsTemplatedCell( cell ) );
-    }
-
-    private bool IsTemplatedCell( Cell cell )
-    {
-      if( cell == null )
-        return false;
-
-      return Row.GetIsTemplateCell( cell );
-    }
-
-    private bool IsFreeCell( Cell cell )
-    {
-      if( cell == null )
-        throw new ArgumentNullException( "cell" );
-
-      return string.IsNullOrEmpty( cell.FieldName );
-    }
-
     private void CheckFieldName( string fieldName )
     {
       if( string.IsNullOrEmpty( fieldName ) )
-        throw new DataGridInternalException( "A field name is required." );
+        throw new DataGridInternalException( "A field name is required.", this.DataGridContext.DataGridControl );
     }
 
     private void CheckCellFieldName( string fieldName )
     {
       if( string.IsNullOrEmpty( fieldName ) )
-        throw new DataGridInternalException( "A Cell should always have a FieldName." );
+        throw new DataGridInternalException( "A Cell should always have a FieldName.", this.DataGridContext.DataGridControl );
     }
 
     private void CheckCellBinded( string fieldName )
@@ -610,8 +565,49 @@ namespace Xceed.Wpf.DataGrid
 
     private void ThrowCellBinded( string fieldName )
     {
-      throw new DataGridInternalException( string.Format( "A cell with FieldName {0} already exists.", fieldName ) );
+      throw new DataGridInternalException( string.Format( "A cell with FieldName {0} already exists.", fieldName ), this.DataGridContext.DataGridControl );
     }
+
+    private static bool IsRecyclableCell( Cell cell )
+    {
+      return ( cell != null )
+          && !VirtualizingCellCollection.IsTemplatedCell( cell );
+    }
+
+    private static bool IsTemplatedCell( Cell cell )
+    {
+      return ( cell != null )
+          && Row.GetIsTemplateCell( cell );
+    }
+
+    private static bool IsFreeCell( Cell cell )
+    {
+      if( cell == null )
+        throw new ArgumentNullException( "cell" );
+
+      return string.IsNullOrEmpty( cell.FieldName );
+    }
+
+    #region Private Fields
+
+    private readonly Row m_parentRow;
+    private readonly ICollection<Cell> m_cells;
+
+    // This Dictionary is used as a caching system to optimize lookup when virtualizing instead of
+    // parsing every columns looking for the fieldname. e.g.: looking for the last one when 1000
+    // Cells in the parent row. When virtualizing, only the cell visible in the viewport will be contained
+    // within this collection speeding the lookup.
+    private readonly Dictionary<string, Cell> m_bindedCells = new Dictionary<string, Cell>();
+
+    // This Dictionary contains the recycling queues for the cells ready to be recycled.
+    private Dictionary<object, LinkedList<Cell>> m_recyclingBins; //null
+
+    // This collection is used to store cells that are added to the Collection
+    // before the FieldName and/or ParentColumn being set. This occurs when
+    // defining a Row with Cell in XAML during a BeginInit / EndInit.
+    private List<Cell> m_freeCells; //null
+
+    #endregion
 
     #region VirtualizingCellCollectionEnumerator Nested Type
 
@@ -680,7 +676,7 @@ namespace Xceed.Wpf.DataGrid
       private Cell m_current; // = null;
     }
 
-    #endregion VirtualizingCellCollectionEnumerator Nested Type
+    #endregion
 
     #region VirtualizingItemsList Nested Type
 
@@ -708,9 +704,9 @@ namespace Xceed.Wpf.DataGrid
       {
         get
         {
-          DataGridContext dataGridContext = this.DataGridContext;
-          if( dataGridContext != null )
-            return dataGridContext.Columns.Count;
+          ColumnCollection columns = this.Columns;
+          if( columns != null )
+            return columns.Count;
 
           return 0;
         }
@@ -729,11 +725,11 @@ namespace Xceed.Wpf.DataGrid
         get
         {
           Cell cell = null;
-          DataGridContext dataGridContext = this.DataGridContext;
+          ColumnCollection columns = this.Columns;
 
-          if( dataGridContext != null )
+          if( columns != null )
           {
-            ColumnBase column = dataGridContext.Columns[ index ];
+            ColumnBase column = columns[ index ];
 
             if( column != null )
             {
@@ -753,14 +749,14 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      private DataGridContext DataGridContext
+      private ColumnCollection Columns
       {
         get
         {
           if( m_collection == null )
             return null;
 
-          return m_collection.DataGridContext;
+          return m_collection.Columns;
         }
       }
 
@@ -795,10 +791,10 @@ namespace Xceed.Wpf.DataGrid
           return false;
 
         string fieldName = item.FieldName;
-        DataGridContext dataGridContext = this.DataGridContext;
+        ColumnCollection columns = this.Columns;
 
-        if( dataGridContext != null )
-          return ( dataGridContext.Columns[ fieldName ] != null );
+        if( columns != null )
+          return ( columns[ fieldName ] != null );
 
         Debug.Fail( "An unprepared Row was asked for Cell" );
 
@@ -828,7 +824,7 @@ namespace Xceed.Wpf.DataGrid
       private VirtualizingCellCollection m_collection;
     }
 
-    #endregion VirtualizingItemsList Nested Type
+    #endregion
 
     #region ReadOnlyCollection Nested Type
 
@@ -896,23 +892,137 @@ namespace Xceed.Wpf.DataGrid
       private readonly ICollection<T> m_collection;
     }
 
-    #endregion ReadOnlyCollection Nested Type
+    #endregion
 
-    private readonly Row m_parentRow;
-    private readonly HashSet<Cell> m_cells = new HashSet<Cell>();
+    #region CellSet Nested Type
 
-    // This Dictionary is used as a caching system to optimize research when virtualizing instead of
-    // parsing every columns looking for the fieldname. e.g.: looking for the last one when 1000
-    // Cells in the parent row. When virtualizing, only the cell visible in the viewport will be contained
-    // within this collection speeding the research.
-    private readonly Dictionary<string, Cell> m_bindedCells = new Dictionary<string, Cell>();
+    private sealed class CellSet : ICollection<Cell>, IWeakEventListener
+    {
+      internal CellSet( Row parentRow )
+      {
+        Debug.Assert( parentRow != null );
 
-    // This Dictionary contains the recycling queues for the cells ready to be recycled.
-    private readonly Dictionary<object, LinkedList<Cell>> m_recyclingBins = new Dictionary<object, LinkedList<Cell>>();
+        m_parentRow = parentRow;
+      }
 
-    // This collection is used to store cells that are added to the Collection
-    // before the FieldName and/or ParentColumn being set. This occurs when
-    // defining a Row with Cell in XAML during a BeginInit / EndInit.
-    private readonly List<Cell> m_freeCells = new List<Cell>( 0 );
+      public int Count
+      {
+        get
+        {
+          return m_collection.Count;
+        }
+      }
+
+      bool ICollection<Cell>.IsReadOnly
+      {
+        get
+        {
+          return false;
+        }
+      }
+
+      public bool Contains( Cell item )
+      {
+        return m_collection.Contains( item );
+      }
+
+      public void Add( Cell item )
+      {
+        Debug.Assert( item != null );
+
+        m_collection.Add( item );
+
+        this.RegisterBringIntoView( item );
+      }
+
+      public bool Remove( Cell item )
+      {
+        Debug.Assert( item != null );
+
+        if( !m_collection.Remove( item ) )
+          return false;
+
+        this.UnregisterBringIntoView( item );
+
+        return true;
+      }
+
+      public void Clear()
+      {
+        foreach( var item in m_collection )
+        {
+          this.UnregisterBringIntoView( item );
+        }
+
+        m_collection.Clear();
+        m_collection.TrimExcess();
+      }
+
+      private void RegisterBringIntoView( Cell item )
+      {
+        RequestBringIntoViewWeakEventManager.AddListener( item, this );
+      }
+
+      private void UnregisterBringIntoView( Cell item )
+      {
+        RequestBringIntoViewWeakEventManager.RemoveListener( item, this );
+      }
+
+      private void OnRequestBringIntoView( object sender, RequestBringIntoViewEventArgs e )
+      {
+        if( e.Handled )
+          return;
+
+        var targetCell = ( Cell )sender;
+        Debug.Assert( targetCell != null );
+        Debug.Assert( m_collection.Contains( targetCell ) );
+
+        if( ( targetCell != e.TargetObject ) && !targetCell.IsAncestorOf( e.TargetObject ) )
+          return;
+
+        // Do not process the bring into view for a templated cell.
+        if( VirtualizingCellCollection.IsTemplatedCell( targetCell ) )
+          return;
+
+        var targetRow = targetCell.ParentRow;
+        Debug.Assert( ( targetRow == null ) || ( targetRow == m_parentRow ) );
+
+        var targetHost = ( targetRow != null ) ? targetRow.CellsHostPanel as IVirtualizingCellsHost : null;
+
+        e.Handled = ( targetHost != null )
+                 && ( targetHost.BringIntoView( targetCell, e ) );
+      }
+
+      void ICollection<Cell>.CopyTo( Cell[] array, int arrayIndex )
+      {
+        m_collection.CopyTo( array, arrayIndex );
+      }
+
+      IEnumerator<Cell> IEnumerable<Cell>.GetEnumerator()
+      {
+        return m_collection.GetEnumerator();
+      }
+
+      IEnumerator IEnumerable.GetEnumerator()
+      {
+        return m_collection.GetEnumerator();
+      }
+
+      bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+      {
+        if( managerType == typeof( RequestBringIntoViewWeakEventManager ) )
+        {
+          this.OnRequestBringIntoView( sender, ( RequestBringIntoViewEventArgs )e );
+          return true;
+        }
+
+        return false;
+      }
+
+      private readonly HashSet<Cell> m_collection = new HashSet<Cell>();
+      private readonly Row m_parentRow;
+    }
+
+    #endregion
   }
 }

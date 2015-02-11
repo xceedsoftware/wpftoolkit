@@ -108,7 +108,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region AutoCreateItemProperty Public Property
+    #region AutoCreateItemProperties Public Property
 
     public bool AutoCreateItemProperties
     {
@@ -258,7 +258,7 @@ namespace Xceed.Wpf.DataGrid
 
     #region StatFunctions Public Property
 
-    public StatFunctionCollection StatFunctions
+    internal StatFunctionCollection StatFunctions
     {
       get
       {

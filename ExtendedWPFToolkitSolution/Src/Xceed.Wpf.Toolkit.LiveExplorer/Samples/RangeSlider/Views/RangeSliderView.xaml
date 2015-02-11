@@ -18,14 +18,12 @@
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
-                xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.RangeSlider.Converters"
                 xmlns:xctkconv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters;assembly=Xceed.Wpf.Toolkit"
                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                 Title="RangeSlider">
 
    <local:DemoView.Resources>
 
-      <conv:IntegerToBoolConverter x:Key="IntegerToBoolConverter" />
       <xctkconv:SolidColorBrushToColorConverter x:Key="SolidColorBrushToColorConverter" />
 
       <Style x:Key="LowerRangeStyle1"
@@ -36,7 +34,6 @@
                <ControlTemplate  TargetType="{x:Type RepeatButton}">
                   <Grid x:Name="MainGrid"
                         Height="10">
-                     <Rectangle Fill="Black" />
                      <Rectangle x:Name="MainBorder"
                                 Fill="{TemplateBinding Background}"
                                 Opacity="1" />
@@ -71,7 +68,6 @@
                <ControlTemplate TargetType="{x:Type RepeatButton}">
                   <Grid x:Name="MainGrid"
                         Height="10">
-                     <Ellipse Fill="Black"/>
                      <Ellipse x:Name="MainBorder"
                               Fill="{TemplateBinding Background}"
                               Opacity="1" />
@@ -106,7 +102,6 @@
                <ControlTemplate TargetType="{x:Type RepeatButton}">
                   <Grid x:Name="MainGrid"
                         Height="19">
-                     <Rectangle Fill="Black" />
                      <Rectangle x:Name="MainBorder"
                                 Fill="{TemplateBinding Background}"
                                 Opacity="1" />
@@ -173,7 +168,6 @@
                <ControlTemplate  TargetType="{x:Type RepeatButton}">
                   <Grid x:Name="MainGrid"
                         Height="10">
-                     <Rectangle Fill="Black" />
                      <Rectangle x:Name="MainBorder"
                                 Fill="{TemplateBinding Background}"
                                 Opacity="1" />
@@ -202,7 +196,6 @@
                <ControlTemplate TargetType="{x:Type RepeatButton}">
                   <Grid x:Name="MainGrid"
                         Height="10">
-                     <Ellipse Fill="Black" />
                      <Ellipse x:Name="MainBorder"
                               Fill="{TemplateBinding Background}" />
                   </Grid>
@@ -230,7 +223,6 @@
                <ControlTemplate TargetType="{x:Type RepeatButton}">
                   <Grid x:Name="MainGrid"
                         Height="19">
-                     <Rectangle Fill="Black" />
                      <Rectangle x:Name="MainBorder"
                                 Fill="{TemplateBinding Background}"
                                 Opacity="1" />
@@ -301,7 +293,6 @@
                <ControlTemplate  TargetType="{x:Type RepeatButton}">
                   <Grid x:Name="MainGrid"
                         Height="10">
-                     <Rectangle Fill="Black" />
                      <Rectangle x:Name="MainBorder"
                                 Fill="{TemplateBinding Background}"
                                 Opacity="1" />
@@ -336,7 +327,6 @@
                <ControlTemplate TargetType="{x:Type RepeatButton}">
                   <Grid x:Name="MainGrid"
                         Height="10">
-                     <Ellipse Fill="Black" />
                      <Ellipse x:Name="MainBorder"
                               Fill="{TemplateBinding Background}"
                               Opacity="1" />
@@ -372,7 +362,6 @@
                <ControlTemplate TargetType="{x:Type RepeatButton}">
                   <Grid x:Name="MainGrid"
                         Height="19">
-                     <Rectangle Fill="Black" />
                      <Rectangle x:Name="MainBorder"
                                 Fill="{TemplateBinding Background}"
                                 Opacity="1" />
@@ -566,7 +555,6 @@
                        Margin="10,5,5,5" />
             <xctk:ColorPicker Grid.Row="2"
                               Grid.Column="3"
-                              IsEnabled="{Binding SelectedIndex, ElementName=lowerRangeStyleComboBox, Converter={StaticResource IntegerToBoolConverter}}"
                               SelectedColor="{Binding LowerRangeBackground, ElementName=_rangeSlider, Converter={StaticResource SolidColorBrushToColorConverter}}"
                               VerticalAlignment="Center"
                               Margin="5" />
@@ -578,7 +566,6 @@
                        Margin="10,5,5,5" />
             <xctk:ColorPicker Grid.Row="3"
                               Grid.Column="3"
-                              IsEnabled="{Binding SelectedIndex, ElementName=rangeStyleComboBox, Converter={StaticResource IntegerToBoolConverter}}"
                               SelectedColor="{Binding RangeBackground, ElementName=_rangeSlider, Converter={StaticResource SolidColorBrushToColorConverter}}"
                               VerticalAlignment="Center"
                               Margin="5" />
@@ -590,7 +577,6 @@
                        Margin="10,5,5,5" />
             <xctk:ColorPicker Grid.Row="4"
                               Grid.Column="3"
-                              IsEnabled="{Binding SelectedIndex, ElementName=higherRangeStyleComboBox, Converter={StaticResource IntegerToBoolConverter}}"
                               SelectedColor="{Binding HigherRangeBackground, ElementName=_rangeSlider, Converter={StaticResource SolidColorBrushToColorConverter}}"
                               VerticalAlignment="Center"
                               Margin="5" />
@@ -605,6 +591,7 @@
                       SelectedIndex="0"
                       SelectedValue="{Binding LowerRangeStyle, ElementName=_rangeSlider}"
                       SelectedValuePath="Tag"
+                      SelectionChanged="RangeStyleComboBox_SelectionChanged"
                       VerticalAlignment="Center"
                       Margin="5">
                <ComboBoxItem Content="Default"
@@ -628,6 +615,7 @@
                       SelectedIndex="0"
                       SelectedValue="{Binding RangeStyle, ElementName=_rangeSlider}"
                       SelectedValuePath="Tag"
+                      SelectionChanged="RangeStyleComboBox_SelectionChanged"
                       VerticalAlignment="Center"
                       Margin="5">
                <ComboBoxItem Content="Default"
@@ -651,6 +639,7 @@
                       SelectedIndex="0"
                       SelectedValue="{Binding HigherRangeStyle, ElementName=_rangeSlider}"
                       SelectedValuePath="Tag"
+                      SelectionChanged="RangeStyleComboBox_SelectionChanged"
                       VerticalAlignment="Center"
                       Margin="5">
                <ComboBoxItem Content="Default"
@@ -669,7 +658,6 @@
                   Margin="10">
          <TextBlock Text="Usage:"
                     Style="{StaticResource Header}" />
-
          <xctk:RangeSlider x:Name="_rangeSlider"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
@@ -678,17 +666,32 @@
                            LowerValue="30"
                            HigherValue="70"
                            Step="1"
-                           Width="600"
-                           Height="225"
                            Orientation="Horizontal"
                            LowerThumbBackground="#FFF0F0F0"
                            HigherThumbBackground="#FFF0F0F0"
-                           RangeBackground="Black"
-                           HigherRangeBackground="Blue"
-                           LowerRangeBackground="Blue"
+                           RangeBackground="Transparent"
+                           HigherRangeBackground="Transparent"
+                           LowerRangeBackground="Transparent"
                            HigherRangeStyle="{x:Null}"
                            RangeStyle="{x:Null}"
-                           LowerRangeStyle="{x:Null}" />
+                           LowerRangeStyle="{x:Null}">
+            <xctk:RangeSlider.Resources>
+               <Style TargetType="xctk:RangeSlider">
+                  <Style.Triggers>
+                     <Trigger Property="Orientation"
+                              Value="Horizontal">
+                        <Setter Property="Width"
+                                Value="600" />
+                     </Trigger>
+                     <Trigger Property="Orientation"
+                              Value="Vertical">
+                        <Setter Property="Height"
+                                Value="225" />
+                     </Trigger>
+                  </Style.Triggers>
+               </Style>
+            </xctk:RangeSlider.Resources>
+         </xctk:RangeSlider>
       </StackPanel>
    </Grid>
 </local:DemoView>

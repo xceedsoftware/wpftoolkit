@@ -19,7 +19,7 @@ using System.ComponentModel;
 
 namespace Xceed.Wpf.DataGrid
 {
-  public partial class GeneratorNode
+  internal partial class GeneratorNode
   {
     internal GeneratorNode( GeneratorNode parent )
     {

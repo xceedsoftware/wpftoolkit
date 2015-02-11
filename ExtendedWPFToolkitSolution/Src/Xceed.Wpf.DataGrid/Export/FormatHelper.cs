@@ -147,41 +147,6 @@ namespace Xceed.Wpf.DataGrid.Export
       return outputString;
     }
 
-    public static void FormatHtmlData( StringBuilder htmlDataStringBuilder )
-    {
-      string htmlDataString = htmlDataStringBuilder.ToString();
-
-      StringBuilder headerStringBuilder = new StringBuilder();
-      headerStringBuilder.Append( "Version:1.0" );
-      headerStringBuilder.Append( Environment.NewLine );
-      headerStringBuilder.Append( "StartHTML:-1" ); // This is optional according to MSDN documentation
-      headerStringBuilder.Append( Environment.NewLine );
-      headerStringBuilder.Append( "EndHTML:-1" ); // This is optional according to MSDN documentation
-      headerStringBuilder.Append( Environment.NewLine );
-      headerStringBuilder.Append( "StartFragment:0000000109" ); // Always 109 bytes from start of Version to the end of <!--StartFragment--> tag
-      headerStringBuilder.Append( Environment.NewLine );
-      headerStringBuilder.Append( "EndFragment:{0}" ); // need + 7 to "emulate" the 10 digits ( "{x}" is already 3 of the 10 chars )
-      headerStringBuilder.Append( Environment.NewLine );
-      headerStringBuilder.Append( "<!--StartFragment-->" );
-
-      // We assure the StartFramgment offset is correct
-      string headerString = headerStringBuilder.ToString();
-      int startFragmentByteCounts = headerString.Length + 7; //  +7 chars as mentionned above
-      Debug.Assert( startFragmentByteCounts == 109 );
-
-      // Compute the EndFragment offset => header size + html data size + final end line (after data) length (\r\n)
-      int endFragmentByteCounts = startFragmentByteCounts + htmlDataString.Length + Environment.NewLine.Length;
-      string endFragmentOffset = endFragmentByteCounts.ToString( "0000000000", CultureInfo.InvariantCulture );
-      headerString = string.Format( CultureInfo.InvariantCulture, headerString, endFragmentOffset );
-
-      // Insert header at the beginning of the htmlDataStringBuilder
-      htmlDataStringBuilder.Insert( 0, headerString );
-
-      // Append the final end line and EndFragment tag
-      htmlDataStringBuilder.Append( Environment.NewLine );
-      htmlDataStringBuilder.Append( "<!--EndFragment-->" );
-    }
-
     public static string FormatPlainTextAsHtml( string plainText )
     {
       StringBuilder htmlStringBuilder = new StringBuilder();

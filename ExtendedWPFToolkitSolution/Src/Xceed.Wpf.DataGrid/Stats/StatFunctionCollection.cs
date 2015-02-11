@@ -15,38 +15,49 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 
 namespace Xceed.Wpf.DataGrid.Stats
 {
-  internal class StatFunctionCollection : ObservableCollection<StatFunction>
+  internal sealed class StatFunctionCollection : ObservableCollection<StatFunction>
   {
+    #region Constructor
+
     internal StatFunctionCollection()
-      :base()
+      : base()
     {
     }
+
+    #endregion
+
+    #region [] Property
 
     public StatFunction this[ string resultPropertyName ]
     {
       get
       {
-        StatFunction statFunction;
+        if( resultPropertyName == null )
+          return null;
 
-        for( int i = 0; i < this.Count; i++ )
-        {
-          statFunction = this[ i ];
-
-          if( string.Equals( statFunction.ResultPropertyName, resultPropertyName ) )
-            return statFunction;
-        }
+        StatFunction value;
+        if( m_lookup.TryGetValue( resultPropertyName, out value ) )
+          return value;
 
         return null;
       }
     }
 
+    #endregion
+
     public bool Contains( string resultPropertyName )
     {
-      return this[ resultPropertyName ] != null;
+      if( resultPropertyName == null )
+        return false;
+
+      return m_lookup.ContainsKey( resultPropertyName );
     }
 
     protected override void InsertItem( int index, StatFunction item )
@@ -61,26 +72,74 @@ namespace Xceed.Wpf.DataGrid.Stats
       base.SetItem( index, item );
     }
 
-    internal StatFunction GetEquivalentOf( StatFunction statFunction )
+    protected override void OnCollectionChanged( NotifyCollectionChangedEventArgs e )
     {
-      int count = this.Count;
-
-      for( int i = 0; i < count; i++ )
+      switch( e.Action )
       {
-        if( StatFunction.AreEquivalents( statFunction, this[ i ] ) )
-          return this[ i ];
+        case NotifyCollectionChangedAction.Add:
+          this.AddStatFunctions( e.NewItems.Cast<StatFunction>() );
+          break;
+
+        case NotifyCollectionChangedAction.Remove:
+          this.RemoveStatFunctions( e.OldItems.Cast<StatFunction>() );
+          break;
+
+        case NotifyCollectionChangedAction.Replace:
+          this.RemoveStatFunctions( e.OldItems.Cast<StatFunction>() );
+          this.AddStatFunctions( e.NewItems.Cast<StatFunction>() );
+          break;
+
+        case NotifyCollectionChangedAction.Reset:
+          this.ResetStatFunctions();
+          break;
       }
 
-      return null;
+      base.OnCollectionChanged( e );
     }
 
     private void PrepareStatFunction( StatFunction item )
     {
-      if( this.Contains( item.ResultPropertyName ) )
-        throw new ArgumentException( "A StatFunction with the same ResultPropertyName already exists in the StatFunctionCollection." ); 
+      if( item == null )
+        throw new ArgumentNullException( "item" );
+
+      var key = item.ResultPropertyName;
+      if( key == null )
+        throw new ArgumentException( "TODODOC: The StatFunction must have a ResultPropertyName", "item" );
+
+      if( this.Contains( key ) )
+        throw new ArgumentException( "A StatFunction with the same ResultPropertyName already exists in the StatFunctionCollection." );
 
       item.Validate();
       item.Seal();
     }
+
+    private void AddStatFunctions( IEnumerable<StatFunction> items )
+    {
+      foreach( StatFunction item in items )
+      {
+        m_lookup.Add( item.ResultPropertyName, item );
+      }
+    }
+
+    private void RemoveStatFunctions( IEnumerable<StatFunction> items )
+    {
+      foreach( StatFunction item in items )
+      {
+        m_lookup.Remove( item.ResultPropertyName );
+      }
+    }
+
+    private void ResetStatFunctions()
+    {
+      m_lookup.Clear();
+
+      this.AddStatFunctions( this );
+    }
+
+    #region Private Fields
+
+    private readonly Dictionary<string, StatFunction> m_lookup = new Dictionary<string, StatFunction>();
+
+    #endregion
   }
 }

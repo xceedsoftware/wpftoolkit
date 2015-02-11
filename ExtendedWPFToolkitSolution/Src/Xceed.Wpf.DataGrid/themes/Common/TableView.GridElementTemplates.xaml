@@ -22,7 +22,7 @@
                     xmlns:views="clr-namespace:Xceed.Wpf.DataGrid.Views">
 
    <ResourceDictionary.MergedDictionaries>
-      <ResourceDictionary Source="Common.Resources.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="Common.Resources.xaml" />
    </ResourceDictionary.MergedDictionaries>
 
    <Style x:Key="tableViewRowFocusVisualStyle"
@@ -44,6 +44,7 @@
       </Setter>
    </Style>
 
+   <conv:NullToBooleanConverter x:Key="nullToBooleanConverter" />
    <conv:ThicknessConverter x:Key="inverseThicknessConverter"
                             InverseValue="True" />
 
@@ -579,6 +580,9 @@
    <!--**************************
     * TEMPLATE: ColumnManagerCell 
     ************************** -->
+
+    <conv:SortingDirectionToBooleanConverter x:Key="SortingDirectionToBooleanConverter" />
+
    <ControlTemplate x:Key="tableViewColumnManagerCellTemplate"
                     TargetType="local:ColumnManagerCell">
 
@@ -634,7 +638,6 @@
                                    Visibility="Collapsed"
                                    Margin="2,0,0,0"
                                    Opacity="0.5" />
-
                   </Grid>
 
                </Border>
@@ -660,7 +663,6 @@
                            <ContentPresenter x:Name="sortGlyphPresenter"
                                              Content="{x:Null}"
                                              ContentTemplate="{x:Null}" />
-
                         </StackPanel>
                      </Border>
 
@@ -681,7 +683,6 @@
                    Style="{StaticResource invisibleThumbStyle}"
                    Width="6"
                    HorizontalAlignment="Right" />
-
 
          </Grid>
 
@@ -982,8 +983,8 @@
                     Property="Focusable"
                     Value="False" />
          </Trigger>
-      </ControlTemplate.Triggers>
 
+      </ControlTemplate.Triggers>
    </ControlTemplate>
 
    <!--**************************

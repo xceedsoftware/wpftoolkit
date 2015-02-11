@@ -33,6 +33,7 @@ namespace Xceed.Wpf.DataGrid
       FocusableProperty.OverrideMetadata( typeof( HierarchicalGroupLevelIndicatorPane ), new FrameworkPropertyMetadata( false ) );
 
       DataGridControl.ParentDataGridControlPropertyKey.OverrideMetadata( typeof( HierarchicalGroupLevelIndicatorPane ), new FrameworkPropertyMetadata( new PropertyChangedCallback( OnParentDataGridControlChanged ) ) );
+      DataGridControl.DataGridContextPropertyKey.OverrideMetadata( typeof( HierarchicalGroupLevelIndicatorPane ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.Inherits, new PropertyChangedCallback( OnDataGridContextChanged ) ) );
     }
 
     #region GroupLevelIndicatorPaneHost Read-Only Property
@@ -136,14 +137,17 @@ namespace Xceed.Wpf.DataGrid
               //insert the Spacer GroupLevelIndicator in the panel
               panel.Children.Insert( 0, newGroupMargin );
 
-              //then create the GLIP for the running DataGridContext
-              GroupLevelIndicatorPane newSubGLIP = new GroupLevelIndicatorPane();
-              DataGridControl.SetDataGridContext( newSubGLIP, runningDataGridContext );
-              newSubGLIP.SetIsLeaf( false );
-              GroupLevelIndicatorPane.SetGroupLevel( newSubGLIP, -1 );
+              if( !runningDataGridContext.AreDetailsFlatten )
+              {
+                //then create the GLIP for the running DataGridContext
+                GroupLevelIndicatorPane newSubGLIP = new GroupLevelIndicatorPane();
+                DataGridControl.SetDataGridContext( newSubGLIP, runningDataGridContext );
+                newSubGLIP.SetIsLeaf( false );
+                GroupLevelIndicatorPane.SetGroupLevel( newSubGLIP, -1 );
 
-              //and insert it in the panel.
-              panel.Children.Insert( 0, newSubGLIP );
+                //and insert it in the panel.
+                panel.Children.Insert( 0, newSubGLIP );
+              }
 
               previousContext = runningDataGridContext;
               runningDataGridContext = runningDataGridContext.ParentDataGridContext;
@@ -157,27 +161,35 @@ namespace Xceed.Wpf.DataGrid
 
     private static void OnParentDataGridControlChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      HierarchicalGroupLevelIndicatorPane self = sender as HierarchicalGroupLevelIndicatorPane;
-      if( self != null )
+      HierarchicalGroupLevelIndicatorPane self = ( HierarchicalGroupLevelIndicatorPane )sender;
+      DataGridControl grid = e.OldValue as DataGridControl;
+
+      //unsubsribe from the old DataGridControl (the GLIP was disconnected)
+      if( grid != null )
       {
-        DataGridControl grid = e.OldValue as DataGridControl;
+        DetailsChangedEventManager.RemoveListener( grid, self );
+      }
 
-        //unsubsribe from the old DataGridControl (the GLIP was disconnected)
-        if( grid != null )
-        {
-          DetailsChangedEventManager.RemoveListener( grid, self );
-        }
+      grid = e.NewValue as DataGridControl;
 
-        grid = e.NewValue as DataGridControl;
+      //register to the parent grid control's Items Collection GroupDescriptions Changed event
+      if( grid != null )
+      {
+        self.PrepareDefaultStyleKey( grid.GetView() );
 
-        //register to the parent grid control's Items Collection GroupDescriptions Changed event
-        if( grid != null )
-        {
-          self.PrepareDefaultStyleKey( grid.GetView() );
+        DetailsChangedEventManager.AddListener( grid, self );
+        self.InvalidateMeasure();
+      }
+    }
 
-          DetailsChangedEventManager.AddListener( grid, self );
-          self.InvalidateMeasure();
-        }
+    private static void OnDataGridContextChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    {
+      HierarchicalGroupLevelIndicatorPane self = ( HierarchicalGroupLevelIndicatorPane )sender;
+      Panel panel = self.GroupLevelIndicatorPaneHost;
+
+      if( panel != null )
+      {
+        panel.Children.Clear();
       }
     }
 

@@ -86,7 +86,7 @@
          </xctk:PropertyGrid.Resources>
          
          <xctk:PropertyGrid.EditorDefinitions>
-            <!-- The property with the name "SecondText" will have this special editor. -->
+            <!-- The property with the name "Second string" will have this special editor. -->
             <xctk:EditorTextDefinition TargetProperties="Second string"
                                        FontStyle="Italic"
                                        FontWeight="Bold" >

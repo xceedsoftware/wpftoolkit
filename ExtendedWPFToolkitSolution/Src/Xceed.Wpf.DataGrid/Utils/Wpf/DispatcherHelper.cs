@@ -22,7 +22,7 @@ namespace Xceed.Utils.Wpf
 {
   internal static class DispatcherHelper
   {
-    private static object ExitFrame( Object state )
+    private static object ExitFrame( object state )
     {
       DispatcherFrame frame = state as DispatcherFrame;
       frame.Continue = false;

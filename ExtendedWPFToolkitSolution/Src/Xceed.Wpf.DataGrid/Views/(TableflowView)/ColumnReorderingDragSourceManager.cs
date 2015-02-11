@@ -16,44 +16,34 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xceed.Utils.Wpf.DragDrop;
-using System.Windows;
-using System.Windows.Documents;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Input;
-using System.Windows.Controls;
-using Xceed.Utils.Math;
-using System.Collections.ObjectModel;
+using Xceed.Utils.Wpf.DragDrop;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
   internal class ColumnReorderingDragSourceManager : DragSourceManager
   {
-    public ColumnReorderingDragSourceManager( UIElement draggedElement,
-                              AdornerLayer adornerLayerInsideDragContainer,
-                              UIElement dragContainer )
+    public ColumnReorderingDragSourceManager( UIElement draggedElement, AdornerLayer adornerLayerInsideDragContainer, UIElement dragContainer, int level )
       : this( draggedElement, adornerLayerInsideDragContainer, dragContainer, true )
     {
+      m_level = level;
     }
 
-    public ColumnReorderingDragSourceManager( UIElement draggedElement,
-                              AdornerLayer adornerLayerInsideDragContainer,
-                              UIElement dragContainer,
-                              bool enableAutoScroll )
+    public ColumnReorderingDragSourceManager( UIElement draggedElement, AdornerLayer adornerLayerInsideDragContainer, UIElement dragContainer, bool enableAutoScroll )
       : this( draggedElement, adornerLayerInsideDragContainer, dragContainer, enableAutoScroll, true )
     {
-
     }
 
-    public ColumnReorderingDragSourceManager( UIElement draggedElement,
-                                                      AdornerLayer adornerLayerInsideDragContainer,
-                                                      UIElement dragContainer,
-                                                      bool enableAutoScroll,
-                                                      bool showDraggedElementGhost )
+    public ColumnReorderingDragSourceManager( UIElement draggedElement, AdornerLayer adornerLayerInsideDragContainer, UIElement dragContainer, bool enableAutoScroll,
+                                              bool showDraggedElementGhost )
       : base( draggedElement, adornerLayerInsideDragContainer, dragContainer, enableAutoScroll, showDraggedElementGhost )
     {
     }
@@ -70,23 +60,53 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region AnimatedColumnReorderingTranslation Attached Property
 
-    // This translation will be used by the AnimatedColumnReorderingManager to apply
-    // a TranslateTransform to Columns that require it in order to give a preview
-    // of the reordering in an animated or live way
+    // This translation will be used by the AnimatedColumnReorderingManager to apply a TranslateTransform
+    // to Columns that require it in order to give a preview of the reordering in an animated or live way
     internal static readonly DependencyProperty AnimatedColumnReorderingTranslationProperty = DependencyProperty.RegisterAttached(
       "AnimatedColumnReorderingTranslation",
-      typeof( TranslateTransform ),
+      typeof( TransformGroup ),
       typeof( ColumnReorderingDragSourceManager ),
       new FrameworkPropertyMetadata( null ) );
 
-    internal static TranslateTransform GetAnimatedColumnReorderingTranslation( DependencyObject obj )
+    internal static TransformGroup GetAnimatedColumnReorderingTranslation( DependencyObject obj )
     {
-      return ( TranslateTransform )obj.GetValue( ColumnReorderingDragSourceManager.AnimatedColumnReorderingTranslationProperty );
+      return ( TransformGroup )obj.GetValue( ColumnReorderingDragSourceManager.AnimatedColumnReorderingTranslationProperty );
     }
 
-    internal static void SetAnimatedColumnReorderingTranslation( DependencyObject obj, TranslateTransform value )
+    internal static void SetAnimatedColumnReorderingTranslation( DependencyObject obj, TransformGroup value )
     {
       obj.SetValue( ColumnReorderingDragSourceManager.AnimatedColumnReorderingTranslationProperty, value );
+    }
+
+    private static TranslateTransform GetAnimatedColumnReorderingPositionTransform( DependencyObject obj )
+    {
+      TransformGroup transformGroup = ColumnReorderingDragSourceManager.GetAnimatedColumnReorderingTranslation( obj );
+      if( transformGroup == null )
+      {
+        transformGroup = ColumnReorderingDragSourceManager.CreateTransformGroup( obj );
+      }
+      return transformGroup.Children[ 0 ] as TranslateTransform;
+    }
+
+    private static TransformGroup GetAnimatedColumnReorderingTransformGroup( DependencyObject obj )
+    {
+      TransformGroup transformGroup = ColumnReorderingDragSourceManager.GetAnimatedColumnReorderingTranslation( obj );
+      if( transformGroup == null )
+      {
+        transformGroup = ColumnReorderingDragSourceManager.CreateTransformGroup( obj );
+      }
+
+      return transformGroup;
+    }
+
+    private static TransformGroup CreateTransformGroup( DependencyObject obj )
+    {
+      TransformGroup transformGroup = new TransformGroup();
+      transformGroup.Children.Add( new TranslateTransform() );
+      transformGroup.Children.Add( new ScaleTransform() );
+      ColumnReorderingDragSourceManager.SetAnimatedColumnReorderingTranslation( obj, transformGroup );
+
+      return transformGroup;
     }
 
     #endregion
@@ -105,8 +125,7 @@ namespace Xceed.Wpf.DataGrid.Views
         {
           m_columnAnimationDurationCache = value;
           // Keep a cache of the duration as a Duration struct for performance
-          m_columnAnimationDuration
-            = new Duration( TimeSpan.FromMilliseconds( m_columnAnimationDurationCache ) );
+          m_columnAnimationDuration = new Duration( TimeSpan.FromMilliseconds( m_columnAnimationDurationCache ) );
         }
       }
     }
@@ -143,6 +162,18 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion
 
+    #region VisibleColumns Property
+
+    private ReadOnlyObservableCollection<ColumnBase> VisibleColumns
+    {
+      get
+      {
+        return this.DraggedDataGridContext.VisibleColumns;
+      }
+    }
+
+    #endregion
+
     #region FixedColumnSplitterTranslation Private Property
 
     private TranslateTransform FixedColumnSplitterTranslation
@@ -155,7 +186,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region ColumnVirtualizationManager Private Property
 
-    private TableViewColumnVirtualizationManager ColumnVirtualizationManager
+    private TableViewColumnVirtualizationManagerBase ColumnVirtualizationManager
     {
       get;
       set;
@@ -171,7 +202,7 @@ namespace Xceed.Wpf.DataGrid.Views
       {
         if( m_reorderingInfoManager == null )
         {
-          m_reorderingInfoManager = new ReorderingInfoManager();
+          m_reorderingInfoManager = new ReorderingInfoManager( m_level );
         }
 
         return m_reorderingInfoManager;
@@ -182,34 +213,24 @@ namespace Xceed.Wpf.DataGrid.Views
 
     public void AddDraggedColumnGhost( UIElement element )
     {
-      if( element == null )
+      if( ( element == null ) || m_elementToDraggedElementAdorner.ContainsKey( element ) )
         return;
 
       // Get the Rect for the DataGridControl
       DataGridControl dataGridControl = this.DraggedDataGridContext.DataGridControl;
 
-      Rect dataGridControlRect = new Rect( 0,
-        0,
-        dataGridControl.ActualWidth,
-        dataGridControl.ActualHeight );
+      Rect dataGridControlRect = new Rect( 0, 0, dataGridControl.ActualWidth, dataGridControl.ActualHeight );
 
-      Point elementToDataGridControl
-        = element.TranslatePoint( ColumnReorderingDragSourceManager.EmptyPoint, dataGridControl );
+      Point elementToDataGridControl = element.TranslatePoint( ColumnReorderingDragSourceManager.EmptyPoint, dataGridControl );
 
       // Get the Rect for the element that request a ghost
       Rect elementRect = new Rect( elementToDataGridControl, element.RenderSize );
 
-      // This is a special case with the current Element that is 
-      // always be layouted, but can be out of view
+      // This is a special case with the current Element that is always layouted, but can be out of view
       if( !elementRect.IntersectsWith( dataGridControlRect ) )
         return;
 
-      // We already have a DraggedElementAdorner for this Cell
-      if( m_elementToDraggedElementAdorner.ContainsKey( element ) )
-        return;
-
-      AnimatedDraggedElementAdorner adorner
-        = new AnimatedDraggedElementAdorner( element, this.AdornerLayerInsideDragContainer, true );
+      AnimatedDraggedElementAdorner adorner = new AnimatedDraggedElementAdorner( element, this.AdornerLayerInsideDragContainer, true );
 
       this.ApplyContainerClip( adorner );
 
@@ -223,15 +244,21 @@ namespace Xceed.Wpf.DataGrid.Views
       if( m_elementToDraggedElementAdorner.Count == 0 )
         return;
 
-      DraggedElementAdorner adorner = null;
-
+      DraggedElementAdorner adorner;
       if( !m_elementToDraggedElementAdorner.TryGetValue( element, out adorner ) )
         return;
 
-      adorner = m_elementToDraggedElementAdorner[ element ];
       Debug.Assert( adorner != null );
       this.AdornerLayerInsideDragContainer.Remove( adorner );
       m_elementToDraggedElementAdorner.Remove( element );
+    }
+
+    public bool ContainsDraggedColumnGhost( UIElement element )
+    {
+      if( ( element == null ) || ( m_elementToDraggedElementAdorner.Count == 0 ) )
+        return false;
+
+      return m_elementToDraggedElementAdorner.ContainsKey( element );
     }
 
     public override void SetDraggedElement( UIElement newDraggedElement )
@@ -262,8 +289,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     public override void ProcessMouseLeftButtonDown( MouseButtonEventArgs e )
     {
-      // Must re-initialize the manager before processing the MouseLeftButtonDown
-      // to ensure the internal state is up to date
+      // Must re-initialize the manager before processing the MouseLeftButtonDown to ensure the internal state is up to date
       this.InitializeManager();
 
       this.UpdateIsAnimatedColumnReorderingEnabled();
@@ -292,25 +318,23 @@ namespace Xceed.Wpf.DataGrid.Views
       DataGridContext dataGridContext = this.DraggedDataGridContext;
 
       Cell draggedCell = draggedElement as Cell;
-
       if( draggedCell != null )
       {
-        reorderingInfoManager.BeginReordering( dataGridContext, draggedCell.ParentColumn.VisiblePosition );
+        int initialFixedColumnCount = this.ColumnVirtualizationManager.GetFixedColumnCount( m_level );
+        reorderingInfoManager.BeginReordering( dataGridContext, draggedCell.ParentColumn.VisiblePosition, initialFixedColumnCount );
       }
 
       // Get initial mouse positions
       Point draggedElementToMouse = e.GetPosition( draggedElement );
 
-      m_lastDraggedElementOffset = draggedElement.TranslatePoint(
-        draggedElementToMouse,
-        this.DragContainer ).X;
+      m_lastDraggedElementOffset = draggedElement.TranslatePoint( draggedElementToMouse, this.DragContainer ).X;
 
       // Affect the manager on the DataGridContext and DraggedColumn
       TableflowView.SetAreColumnsBeingReordered( dataGridContext, true );
 
       if( draggedCell != null )
       {
-        TableflowView.SetColumnReorderingDragSourceManager( draggedCell.ParentColumn, this );
+        draggedCell.ParentColumn.SetColumnReorderingDragSourceManager( this );
       }
 
       TableflowView.SetColumnReorderingDragSourceManager( dataGridContext, this );
@@ -385,7 +409,6 @@ namespace Xceed.Wpf.DataGrid.Views
 
       Cell draggedCell = this.DraggedElement as Cell;
       Debug.Assert( draggedCell != null );
-      Debug.Assert( draggedCell == this.DraggedElement );
 
       Point parentRowToDragContainer = parentRow.TranslatePoint( ColumnReorderingDragSourceManager.EmptyPoint, dragContainer );
 
@@ -396,7 +419,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
       Point draggedElementToDragContainer = draggedCell.TranslatePoint( draggedElementToMouse, dragContainer );
 
-      double draggedelementWidth = draggedCell.RenderSize.Width;
+      double draggedElementWidth = draggedCell.RenderSize.Width;
 
       // Get the Rect for the DragContainer
       Rect dragContainerRect = new Rect( ColumnReorderingDragSourceManager.EmptyPoint, dragContainer.RenderSize );
@@ -417,7 +440,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
         if( m_horizontalMouseDragDirection == HorizontalMouseDragDirection.Left )
         {
-          double rightEdge = draggedElementToDragContainer.X + draggedelementWidth;
+          double rightEdge = draggedElementToDragContainer.X + draggedElementWidth;
 
           // When scrolling left, try to find the first IDropTarget from the left edge of the dragged element to the mouse cursor to the mouse cursor over the dragged element
           while( ( returnedDropTarget == null ) && ( correctedPoint.X < rightEdge ) )
@@ -514,7 +537,7 @@ namespace Xceed.Wpf.DataGrid.Views
         draggedElementToMouse.Y -= this.InitialMousePositionToDraggedElement.GetValueOrDefault().Y;
 
         this.ApplyContainerClip( m_popupDraggedElementAdorner );
-        m_popupDraggedElementAdorner.AdornedElementImage.Opacity = 1;
+        m_popupDraggedElementAdorner.AdornedElementImage.Opacity = 1d;
         m_popupDraggedElementAdorner.SetOffset( draggedElementToMouse );
       }
       //If no animation, or if the dragged object is beyond the edge of the grid, no need to do anything in this override, simply call base.
@@ -524,9 +547,7 @@ namespace Xceed.Wpf.DataGrid.Views
         // We are reverting every animation before detaching from the manager
         // so do not update the ghost position
         if( m_ghostToTargetAndDetachAnimationClock != null )
-        {
           return;
-        }
 
         bool dragOverRowOrCell = ( this.CurrentDropTarget as ColumnManagerRow ) != null || ( this.CurrentDropTarget as ColumnManagerCell ) != null;
 
@@ -560,7 +581,7 @@ namespace Xceed.Wpf.DataGrid.Views
           draggedElementToMouse.Y -= this.InitialMousePositionToDraggedElement.GetValueOrDefault().Y;
 
           this.ApplyContainerClip( m_popupDraggedElementAdorner );
-          m_popupDraggedElementAdorner.AdornedElementImage.Opacity = 1;
+          m_popupDraggedElementAdorner.AdornedElementImage.Opacity = 1d;
           m_popupDraggedElementAdorner.SetOffset( draggedElementToMouse );
         }
         //If animations are required.
@@ -569,7 +590,7 @@ namespace Xceed.Wpf.DataGrid.Views
           //If in a popup, hide the dragged element adorner.
           if( this.ParentWindowIsPopup )
           {
-            m_popupDraggedElementAdorner.AdornedElementImage.Opacity = 0;
+            m_popupDraggedElementAdorner.AdornedElementImage.Opacity = 0d;
             m_popupDraggedElementAdorner.SetOffset( ColumnReorderingDragSourceManager.EmptyPoint );
           }
 
@@ -586,17 +607,12 @@ namespace Xceed.Wpf.DataGrid.Views
           draggedElementToMouse.X -= this.InitialMousePositionToDraggedElement.GetValueOrDefault().X;
           draggedElementToMouse.Y -= this.InitialMousePositionToDraggedElement.GetValueOrDefault().Y;
 
-          // Wait for the animation to complete before explicitly setting the 
-          // X and Y offsets on the ghost adorners
-          // OR if reordering was canceled
-          if( ( m_ghostToMousePositionAnimationClock == null )
-            && ( m_ghostToTargetColumnAnimationClock == null )
-            && !m_reorderCancelled )
+          // Wait for the animation to complete before explicitly setting the X and Y offsets on the ghost adorners OR if reordering was canceled
+          if( ( m_ghostToMousePositionAnimationClock == null ) && ( m_ghostToTargetColumnAnimationClock == null ) && !m_reorderCancelled )
           {
             // Update the position of ghosts for each rows
-            foreach( UIElement element in m_elementToDraggedElementAdorner.Keys )
+            foreach( var adorner in this.GetElementAdorners() )
             {
-              DraggedElementAdorner adorner = m_elementToDraggedElementAdorner[ element ];
               adorner.ApplyAnimationClock( DraggedElementAdorner.OffsetProperty, null );
               adorner.SetOffset( draggedElementToMouse );
             }
@@ -634,8 +650,8 @@ namespace Xceed.Wpf.DataGrid.Views
 
       if( draggedCell != null )
       {
-        // Affect the IsBeingDraggedAnimated in the ParentColumn to ensure every prepared container calls AddDraggedColumnGhost to this manager
-        TableflowView.SetIsBeingDraggedAnimated( draggedCell.ParentColumn, true );
+        // Affect the IsBeingDraggedAnimated of the ParentColumn to ensure every prepared container calls AddDraggedColumnGhost to this manager
+        draggedCell.ParentColumn.SetIsBeingDraggedAnimated( true );
       }
 
       this.HideDraggedElements();
@@ -646,15 +662,11 @@ namespace Xceed.Wpf.DataGrid.Views
       ReorderingInfoManager reorderingInfoManager = this.ReorderingInfoManagerInstance;
       RequiredAnimationsInfo animationState = reorderingInfoManager.RequiredAnimations;
 
-      // Commiting the reordering will set the new VisiblePosition
-      // of the dragged Column. We need to preserve the old values
-      // before commiting to correctly commit the new fixed column 
-      // count
-      this.CommitColumnReordering();
+      // Commiting the reordering will set the new VisiblePosition of the dragged Column.
+      // We need to preserve the old values before commiting to correctly commit the new fixed column count
+      this.CommitColumnReordering( animationState );
 
-      this.CommitSplitterReordering( reorderingInfoManager.InitialColumnVisiblePosition,
-        animationState.DraggedColumnNewVisiblePosition,
-        reorderingInfoManager.InitialFixedColumnCount );
+      this.CommitSplitterReordering( animationState );
     }
 
     private void SetPopupDragAdorner( ColumnManagerCell columnManagerCell )
@@ -671,7 +683,7 @@ namespace Xceed.Wpf.DataGrid.Views
       // Get the Rect for the DataGridControl
       DataGridControl dataGridControl = this.DraggedDataGridContext.DataGridControl;
 
-      Rect dataGridControlRect = new Rect( 0, 0, dataGridControl.ActualWidth, dataGridControl.ActualHeight );
+      Rect dataGridControlRect = new Rect( 0d, 0d, dataGridControl.ActualWidth, dataGridControl.ActualHeight );
 
       Point elementToDataGridControl = columnManagerCell.TranslatePoint( ColumnReorderingDragSourceManager.EmptyPoint, dataGridControl );
 
@@ -684,7 +696,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
       AnimatedDraggedElementAdorner adorner = new AnimatedDraggedElementAdorner( columnManagerCell, this.AdornerLayerInsideDragContainer, true );
 
-      adorner.AdornedElementImage.Opacity = 0;
+      adorner.AdornedElementImage.Opacity = 0d;
 
       this.ApplyContainerClip( adorner );
 
@@ -711,14 +723,11 @@ namespace Xceed.Wpf.DataGrid.Views
 
         if( cell != null )
         {
-          // The Cell could be partially or completely under the fixed region
-          // of the FixedCellPanel, so not "really" HitTestible
+          // The Cell could be partially or completely under the fixed region of the FixedCellPanel, so not "really" HitTestible
           isCellHitTestible = ColumnReorderingDragSourceManager.TryHitTestCell( cell, point, dragContainer );
         }
 
-        if( ( isCellHitTestible )
-            && ( dropTarget != null )
-            && ( dropTarget.CanDropElement( draggedElement ) ) )
+        if( ( isCellHitTestible ) && ( dropTarget != null ) && ( dropTarget.CanDropElement( draggedElement ) ) )
         {
           return dropTarget;
         }
@@ -749,19 +758,11 @@ namespace Xceed.Wpf.DataGrid.Views
 
       Point cellPoint = cell.TranslatePoint( ColumnReorderingDragSourceManager.EmptyPoint, dragContainer );
 
-      Rect cellRect = new Rect( cellPoint.X,
-                                cellPoint.Y,
-                                cell.ActualWidth,
-                                cell.ActualHeight );
+      Rect cellRect = new Rect( cellPoint.X, cellPoint.Y, cell.ActualWidth, cell.ActualHeight );
 
-      Point scrollingCellsDecoratorPoint = scrollingCellsDecorator.TranslatePoint(
-        ColumnReorderingDragSourceManager.EmptyPoint,
-        dragContainer );
+      Point scrollingCellsDecoratorPoint = scrollingCellsDecorator.TranslatePoint( ColumnReorderingDragSourceManager.EmptyPoint, dragContainer );
 
-      Rect scrollingCellsDecoratorRect = new Rect( scrollingCellsDecoratorPoint.X,
-                                                   scrollingCellsDecoratorPoint.Y,
-                                                   scrollingCellsDecorator.ActualWidth,
-                                                   scrollingCellsDecorator.ActualHeight );
+      Rect scrollingCellsDecoratorRect = new Rect( scrollingCellsDecoratorPoint.X, scrollingCellsDecoratorPoint.Y, scrollingCellsDecorator.ActualWidth, scrollingCellsDecorator.ActualHeight );
 
       if( !cellRect.IntersectsWith( scrollingCellsDecoratorRect ) )
       {
@@ -780,16 +781,23 @@ namespace Xceed.Wpf.DataGrid.Views
       if( transform == null )
         return;
 
-      // Force a local value before removing the potential animation clock
-      // of this transform to avoid leaving the current animated value after
-      // animation is removed
-      transform.X = 0;
+      // Force a local value before removing the potential animation clock of this transform to avoid leaving the current animated value after animation is removed
+      transform.X = 0d;
       transform.ApplyAnimationClock( TranslateTransform.XProperty, null );
     }
 
-    // Gets the index of a Column present in the 
-    // DataGridContext.ColumnsByVisiblePosition from its 
-    // index in the DataGridContext.VisibleColumns
+    private static void ClearScaleTransformAnimation( ScaleTransform transform )
+    {
+      if( transform == null )
+        return;
+
+      // Force a local value before removing the potential animation clock of this transform to avoid leaving the current animated value after animation is removed
+      transform.CenterX = 0d;
+      transform.ScaleX = 1d;
+      transform.ApplyAnimationClock( ScaleTransform.ScaleXProperty, null );
+    }
+
+    // Gets the index of a Column present in the DataGridContext.ColumnsByVisiblePosition from its index in the DataGridContext.VisibleColumns
     private static int GetColumnByVisiblePositionIndexFromVisibleColumnIndex( int visibleColumnIndex, List<ColumnBase> columnsByVisiblePosition )
     {
       if( columnsByVisiblePosition == null )
@@ -829,12 +837,11 @@ namespace Xceed.Wpf.DataGrid.Views
       if( draggedElement == null )
         return;
 
-      DataGridContext dataGridContext
-        = DataGridControl.GetDataGridContext( draggedElement );
+      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( draggedElement );
 
       this.DraggedDataGridContext = dataGridContext;
 
-      this.ColumnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
+      this.ColumnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManagerBase;
 
       this.ColumnAnimationDuration = 500;
       this.DraggedElementFadeInDuration = 250;
@@ -856,7 +863,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
       this.ReorderingInfoManagerInstance.RollbackReorderedColumnsAndFixedColumnCount();
 
-      this.RemoveColumnsPreviousAnimations( dataGridContext.VisibleColumns );
+      this.RemoveColumnsPreviousAnimations();
       this.RemoveFixedColumnSplitterPreviousAnimation( dataGridContext );
     }
 
@@ -869,11 +876,7 @@ namespace Xceed.Wpf.DataGrid.Views
       double currentDraggedElementOffset = draggedElement.TranslatePoint( draggedElementToMouse, this.DragContainer ).X;
 
       // Verify if there is an horizontal change according to the lastchange      
-      Rect dragRect = new Rect(
-        m_lastDraggedElementOffset - SystemParameters.MinimumHorizontalDragDistance,
-        0,
-        SystemParameters.MinimumVerticalDragDistance * 2,
-        0 );
+      Rect dragRect = new Rect( m_lastDraggedElementOffset - SystemParameters.MinimumHorizontalDragDistance, 0d, SystemParameters.MinimumVerticalDragDistance * 2, 0d );
 
       if( dragRect.Contains( new Point( currentDraggedElementOffset, 0 ) ) )
         return;
@@ -892,31 +895,46 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private void UpdateIsAnimatedColumnReorderingEnabled()
     {
-      bool isAnimatedColumnReorderingEnabled = false;
+      bool isAnimatedColumnReorderingEnabled;
 
-      if( this.DraggedDataGridContext != null )
+      var dataGridContext = this.DraggedDataGridContext;
+      if( dataGridContext != null )
       {
-        TableflowView tableflowView = this.DraggedDataGridContext.DataGridControl.GetView() as TableflowView;
+        var tableflowView = dataGridContext.DataGridControl.GetView() as TableflowView;
 
-        if( ( tableflowView != null ) && ( tableflowView.IsAnimatedColumnReorderingEnabled ) )
-        {
-          isAnimatedColumnReorderingEnabled = true;
-        }
+        // Column reordering is not allowed in a detail when details are flatten.
+        isAnimatedColumnReorderingEnabled = ( tableflowView != null )
+                                         && ( tableflowView.IsAnimatedColumnReorderingEnabled )
+                                         && ( !dataGridContext.IsAFlattenDetail );
+      }
+      else
+      {
+        isAnimatedColumnReorderingEnabled = false;
       }
 
-      Cell draggedCell = this.DraggedElement as Cell;
-
-      // We must ensure the draggedCell's ParentRow allows the Column Reordering
-      if( draggedCell != null )
+      // Make sure the dragged cell's parent row allows column reordering.
+      if( isAnimatedColumnReorderingEnabled )
       {
-        // We don't want any ghost to be displayed when Column Reordering
-        // is not allowed by the ParentRow. Setting the IsAnimatedColumnReorderingEnabled
-        // property will prevent this and will display the Cursor.No when dragging.
-        ColumnManagerRow parentRow = draggedCell.ParentRow as ColumnManagerRow;
-
-        if( parentRow != null )
+        var draggedCell = this.DraggedElement as Cell;
+        if( draggedCell != null )
         {
-          isAnimatedColumnReorderingEnabled &= parentRow.AllowColumnReorder;
+          // We don't want any ghost to be displayed when column reordering is not allowed by the parent row.
+          // Setting the IsAnimatedColumnReorderingEnabled property will prevent this and will display the Cursor.No when dragging.
+          var parentRow = draggedCell.ParentRow as ColumnManagerRow;
+          if( parentRow != null )
+          {
+            isAnimatedColumnReorderingEnabled = parentRow.AllowColumnReorder;
+          }
+
+          // The main column is not allowed to be reorder when details are flatten.
+          if( isAnimatedColumnReorderingEnabled && dataGridContext.AreDetailsFlatten )
+          {
+            ColumnBase parentColumn = draggedCell.ParentColumn;
+            if( parentColumn != null )
+            {
+              isAnimatedColumnReorderingEnabled = parentColumn != null && !parentColumn.IsMainColumn;
+            }
+          }
         }
       }
 
@@ -969,10 +987,8 @@ namespace Xceed.Wpf.DataGrid.Views
       m_ghostToMousePositionAnimationClock = animation.CreateClock( true ) as AnimationClock;
       m_ghostToMousePositionAnimationClock.Completed += this.GhostToMousePosition_Completed;
 
-      foreach( UIElement element in m_elementToDraggedElementAdorner.Keys )
+      foreach( var adorner in this.GetElementAdorners() )
       {
-        DraggedElementAdorner adorner = m_elementToDraggedElementAdorner[ element ];
-
         adorner.ApplyAnimationClock( DraggedElementAdorner.OffsetProperty, m_ghostToMousePositionAnimationClock, HandoffBehavior.SnapshotAndReplace );
       }
 
@@ -986,8 +1002,7 @@ namespace Xceed.Wpf.DataGrid.Views
         this.PauseGhostToMousePositionAnimation();
       }
 
-      // Ghosts are returned to their original position
-      // reordering was successfully cancelled
+      // Ghosts are returned to their original position reordering was successfully cancelled
       m_reorderCancelled = false;
     }
 
@@ -1038,10 +1053,8 @@ namespace Xceed.Wpf.DataGrid.Views
       m_ghostToTargetColumnAnimationClock = animation.CreateClock( true ) as AnimationClock;
       m_ghostToTargetColumnAnimationClock.Completed += this.GhostToTargetAnimation_Completed;
 
-      foreach( UIElement element in m_elementToDraggedElementAdorner.Keys )
+      foreach( var adorner in this.GetElementAdorners() )
       {
-        DraggedElementAdorner adorner = m_elementToDraggedElementAdorner[ element ];
-
         adorner.ApplyAnimationClock( DraggedElementAdorner.OffsetProperty, m_ghostToTargetColumnAnimationClock, HandoffBehavior.SnapshotAndReplace );
       }
     }
@@ -1059,10 +1072,8 @@ namespace Xceed.Wpf.DataGrid.Views
 
       if( ( m_ghostToTargetColumnAnimationClock == null ) && ( m_draggedElementFadeInAnimationClock == null ) )
       {
-        // The ghosts were successfully moved to the target position
-        // so we hide the ghosts and display the Cells in order
-        // for the DraggedElementGhost, which is a VisulalBrush of
-        // the DraggedElement that is transparent during the drag
+        // The ghosts were successfully moved to the target position so we hide the ghosts and display the Cells in order
+        // for the DraggedElementGhost, which is a VisulalBrush of the DraggedElement that is transparent during the drag
         this.HideDraggedColumnGhosts();
         this.ShowDraggedElements();
         m_reorderCancelled = false;
@@ -1090,90 +1101,57 @@ namespace Xceed.Wpf.DataGrid.Views
 
       this.PauseMoveGhostToTargetAndDetachAnimation();
 
-      Cell draggedCell = this.DraggedElement as Cell;
-
+      var draggedCell = this.DraggedElement as Cell;
       if( draggedCell == null )
         return;
 
-      bool animationInitialized = false;
+      var parentRow = draggedCell.ParentRow;
+      if( ( parentRow == null ) || ( parentRow.CellsHostPanel == null ) )
+        return;
 
-      DraggedElementAdorner draggedAdorner = m_elementToDraggedElementAdorner[ draggedCell ];
-
-      Nullable<Point> currentDraggedAdornerPosition = null;
+      var draggedAdorner = m_elementToDraggedElementAdorner[ draggedCell ];
+      var currentDraggedAdornerPosition = ( draggedAdorner != null ) ? draggedAdorner.Offset : default( Point );
+      var fromPoint = currentDraggedAdornerPosition;
 
       if( draggedAdorner != null )
       {
-        currentDraggedAdornerPosition = draggedAdorner.Offset;
+        // Calculate the animation from the current ColumnManagerCell, since it could be a MergedColumnMangerCell dragging any number of columns.
+        // If calculating the animation from a different cell, the animation could be starting from a wrong position and give a bad visual effect.
+        var animations = this.ReorderingInfoManagerInstance.RequiredAnimations;
+        if( animations.AnimateToLeft.Count > 0 )
+        {
+          var siblingCell = parentRow.Cells[ draggedCell.ParentColumn.PreviousVisibleColumn ];
+          var targetPosition = siblingCell.PointToScreen( new Point( siblingCell.ActualWidth, 0d ) );
+          var relativePosition = draggedAdorner.PointFromScreen( targetPosition );
+
+          fromPoint = new Point( -relativePosition.X, -relativePosition.Y );
+        }
+        else if( animations.AnimateToRight.Count > 0 )
+        {
+          var siblingCell = parentRow.Cells[ draggedCell.ParentColumn.NextVisibleColumn ];
+          var targetPosition = siblingCell.PointToScreen( new Point( -draggedCell.ActualWidth, 0d ) );
+          var relativePosition = draggedAdorner.PointFromScreen( targetPosition );
+
+          fromPoint = new Point( -relativePosition.X, -relativePosition.Y );
+        }
       }
 
-      foreach( UIElement element in m_elementToDraggedElementAdorner.Keys )
-      {
-        Cell cell = element as Cell;
+      PointAnimation animation = new PointAnimation( fromPoint, ColumnReorderingDragSourceManager.EmptyPoint, m_columnAnimationDuration );
 
+      m_ghostToTargetAndDetachAnimationClock = animation.CreateClock( true ) as AnimationClock;
+      m_ghostToTargetAndDetachAnimationClock.Completed += this.MoveGhostToTargetAndDetach_Completed;
+
+      //Animate all cells of all columns.
+      foreach( var entry in this.GetElementAdornerEntries() )
+      {
+        var cell = entry.Key as Cell;
         if( cell == null )
         {
           Debug.Assert( false, "Only Cells should be dragged by this manager" );
           continue;
         }
 
-        DraggedElementAdorner adorner = m_elementToDraggedElementAdorner[ element ];
-
-        if( !animationInitialized )
-        {
-          TableViewColumnVirtualizationManager columnVirtualizationManager = this.DraggedDataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
-
-          if( columnVirtualizationManager == null )
-            return;
-
-          double offset = columnVirtualizationManager.FieldNameToOffset[ draggedCell.FieldName ];
-
-          if( ( draggedCell.ParentRow == null ) || ( draggedCell.ParentRow.CellsHostPanel == null ) )
-            return;
-
-          // Get the position of the Mouse according to the DragContainer
-          Point mouseToDragContainer = Mouse.GetPosition( this.DragContainer );
-
-          // Get the position of the Mouse according to the DraggedElementAdorner
-          Point adornerToMouse = Mouse.GetPosition( adorner );
-
-          // Get the position of the Cell according to the ParentRow.CellsHostPanel for the dragged Cell
-          Panel cellsHost = cell.ParentRow.CellsHostPanel;
-          Point newCellInCellsHostToDragContainer = cellsHost.TranslatePoint( new Point( offset, 0 ), this.DragContainer );
-
-          // Get the position of the Cell according to its CellsHost in order to know
-          // if it was dragged from the Fixed to the Scrolling Cells.
-          Point cellToCellsHost = cell.TranslatePoint( ColumnReorderingDragSourceManager.EmptyPoint, cell.ParentRow.CellsHostPanel );
-
-          double initialX = mouseToDragContainer.X - newCellInCellsHostToDragContainer.X - adornerToMouse.X;
-
-          // The DraggedCell is a FixedCell and it offset is greater than  the FixedColumnWidth
-          if( columnVirtualizationManager.FixedFieldNames.Contains( cell.FieldName ) && ( cellToCellsHost.X > columnVirtualizationManager.FixedColumnsWidth ) )
-          {
-            // In this case, we must take the HorizontalOffset into consideration
-            initialX -= this.DraggedDataGridContext.DataGridControl.ScrollViewer.HorizontalOffset;
-          }
-          else
-          {
-            // The offset of the Cell according the CellsHost is less than 0 and
-            // there is a Compensation offset to ensure all the ScrollingCells are
-            // in view even if the HorizontalOffset would have scrolled them
-            // outside the ViewPort
-            if( ( ( newCellInCellsHostToDragContainer.X - columnVirtualizationManager.FixedColumnsWidth ) < 0 ) && ( columnVirtualizationManager.FirstColumnCompensationOffset > 0 ) )
-            {
-              initialX -= columnVirtualizationManager.FirstColumnCompensationOffset;
-            }
-          }
-
-          Point fromPoint = new Point( initialX, currentDraggedAdornerPosition.GetValueOrDefault().Y );
-
-          PointAnimation animation = new PointAnimation( fromPoint, ColumnReorderingDragSourceManager.EmptyPoint, m_columnAnimationDuration );
-
-          m_ghostToTargetAndDetachAnimationClock = animation.CreateClock( true ) as AnimationClock;
-          m_ghostToTargetAndDetachAnimationClock.Completed += this.MoveGhostToTargetAndDetach_Completed;
-
-          animationInitialized = true;
-        }
-
+        var adorner = entry.Value;
         adorner.ApplyAnimationClock( DraggedElementAdorner.OffsetProperty, m_ghostToTargetAndDetachAnimationClock, HandoffBehavior.SnapshotAndReplace );
       }
 
@@ -1202,48 +1180,36 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       this.ShowDraggedElements();
 
-      Cell draggedCell = this.DraggedElement as Cell;
-
-      if( draggedCell != null )
+      var draggedCell = this.DraggedElement as Cell;
+      if( ( draggedCell != null ) && this.OwnElement( draggedCell ) )
       {
-        TableflowView.SetIsBeingDraggedAnimated( draggedCell.ParentColumn, false );
+        draggedCell.ParentColumn.SetIsBeingDraggedAnimated( false );
       }
 
-      // Get the manager currently in use on the DataGridContext
-      ColumnReorderingDragSourceManager currentManager = TableflowView.GetColumnReorderingDragSourceManager( this.DraggedDataGridContext );
-
-      // Clear properties on the manager if it is the one currently in
-      // use on for this Detail level. This avoids problem with the FixedColumnSplitter
+      // Clear properties on the manager if it is the one currently in use on for this Detail level. This avoids problem with the FixedColumnSplitter
       // when multiple Cells are moved rapidly:
-      // The FixedColumnSplitter listens to TableflowView.AreColumnsBeingReordered internal 
-      // ViewProperty to bind to the TableflowView.FixedColumnSplitterTranslation internal 
-      // ViewProperty. The internal ViewProeprty ColumnReorderingDragSourceManager is
-      // affected when a new Drag begins. The old DragSourceManager is not stopped to allow 
-      // any pending animations to complete smoothly. If the first manager clears the
-      // TableflowView.AreColumnBeingReordered property, the FixedColumnSplitters
+      // The FixedColumnSplitter listens to TableflowView.AreColumnsBeingReordered internal ViewProperty to bind to the TableflowView.FixedColumnSplitterTranslation internal 
+      // ViewProperty. The internal ViewProeprty ColumnReorderingDragSourceManager is affected when a new Drag begins. The old DragSourceManager is not stopped to allow 
+      // any pending animations to complete smoothly. If the first manager clears the TableflowView.AreColumnBeingReordered property, the FixedColumnSplitters
       // just clears its binding to the FixedColumnSplitterTranslation and is no more animated.
       //
-      // Ensuring that the current manager for this Detail level ensure that no other
-      // drag was initialized since this manager started animations.
+      // Ensuring that the current manager for this Detail level ensure that no other drag was initialized since this manager started animations.
 
-      if( currentManager == this )
+      if( this.OwnElement( this.DraggedDataGridContext ) )
       {
         TableflowView.SetAreColumnsBeingReordered( this.DraggedDataGridContext, false );
 
-        if( draggedCell != null )
+        if( ( draggedCell != null ) && this.OwnElement( draggedCell ) )
         {
-          TableflowView.ClearColumnReorderingDragSourceManager( draggedCell.ParentColumn );
+          draggedCell.ParentColumn.ClearColumnReorderingDragSourceManager();
         }
 
         TableflowView.ClearColumnReorderingDragSourceManager( this.DraggedDataGridContext );
       }
     }
 
-    private void CommitColumnReordering()
+    private void CommitColumnReordering( RequiredAnimationsInfo animationState )
     {
-      ReorderingInfoManager reorderingInfoManager = this.ReorderingInfoManagerInstance;
-      RequiredAnimationsInfo animationState = reorderingInfoManager.RequiredAnimations;
-
       int newVisiblePosition = ( animationState != null ) ? animationState.DraggedColumnNewVisiblePosition : -1;
 
       // Affect the new VisiblePosition to the DraggedColumn to allow the Grid to reflect the change
@@ -1256,51 +1222,22 @@ namespace Xceed.Wpf.DataGrid.Views
         {
           ColumnBase draggedColumn = draggedCell.ParentColumn;
 
-          // Affect the new VisiblePosition of the DraggedColumn
+          // Affect the new VisiblePosition of the DraggedColumn - this will automatically update all child columns when dealing with merged columns
           draggedColumn.VisiblePosition = newVisiblePosition;
         }
       }
 
-      DataGridContext dataGridContext = this.DraggedDataGridContext;
-      ReadOnlyObservableCollection<ColumnBase> visibleColumns = dataGridContext.VisibleColumns;
-
-      for( int i = 0; i < visibleColumns.Count; i++ )
-      {
-        ColumnBase column = visibleColumns[ i ];
-
-        TranslateTransform transform = ColumnReorderingDragSourceManager.GetAnimatedColumnReorderingTranslation( column );
-
-        AnimationClock animationClock = null;
-
-        // Get the AnimationClock for this Column
-        if( m_fieldNameToClock.TryGetValue( column.FieldName, out animationClock ) )
-        {
-          m_fieldNameToClock.Remove( column.FieldName );
-          m_clockToFieldName.Remove( animationClock );
-        }
-
-        if( animationClock != null )
-        {
-          animationClock.Controller.Remove();
-        }
-
-        if( transform != null )
-        {
-          transform.X = 0;
-        }
-      }
+      this.CleanUpColumnAnimations();
     }
 
-    private void CommitSplitterReordering( int oldVisiblePosition, int newVisiblePosition, int oldFixedColumnCount )
+    private void CommitSplitterReordering( RequiredAnimationsInfo animationState )
     {
       if( m_splitterAnimationClock == null )
         return;
 
       double fixedColumnTranslation = this.FixedColumnSplitterTranslation.X;
 
-      // Try to get the TargetOffset of the FixedColumnSplitter
-      // AnimationClock if available to ensure to commit the
-      // correct fixed column count
+      // Try to get the TargetOffset of the FixedColumnSplitter AnimationClock if available to ensure to commit the correct fixed column count
       if( m_splitterAnimationClock != null )
       {
         OffsetAnimation animation = m_splitterAnimationClock.Timeline as OffsetAnimation;
@@ -1316,23 +1253,22 @@ namespace Xceed.Wpf.DataGrid.Views
 
       if( fixedColumnTranslation != 0 )
       {
-        ReorderingInfoManager reorderingInfoManager = this.ReorderingInfoManagerInstance;
-        int fixedColumnCount = reorderingInfoManager.RequiredAnimations.NewFixedColumnCount;
+        int fixedColumnCount = animationState.NewFixedColumnCount;
+        int correctionValue = animationState.CorrectionValue;
 
-        // Update the FixedColumnCount on the DataGridContext in order to 
-        // correctly represent the value modified during animated reordering
+        // Update the FixedColumnCount on the DataGridContext in order to correctly represent the value modified during animated reordering
         DataGridContext dataGridContext = this.DraggedDataGridContext;
 
-        if( ( dataGridContext != null ) && ( dataGridContext.ParentDataGridContext != null ) )
+        if( dataGridContext.ParentDataGridContext != null )
         {
           foreach( DataGridContext childDataGridContext in dataGridContext.ParentDataGridContext.GetChildContexts() )
           {
-            TableView.SetFixedColumnCount( childDataGridContext, fixedColumnCount );
+            this.ColumnVirtualizationManager.SetFixedColumnCount( m_level, fixedColumnCount, correctionValue );
           }
         }
         else
         {
-          TableView.SetFixedColumnCount( dataGridContext, fixedColumnCount );
+          this.ColumnVirtualizationManager.SetFixedColumnCount( m_level, fixedColumnCount, correctionValue );
         }
       }
 
@@ -1349,83 +1285,66 @@ namespace Xceed.Wpf.DataGrid.Views
       ColumnManagerCell draggedCell = this.DraggedElement as ColumnManagerCell;
       Debug.Assert( draggedCell != null );
 
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( draggedOverCell );
-      Debug.Assert( dataGridContext != null );
+      int initialVisiblePosition = draggedCell.ParentColumn.VisiblePosition;
+      int draggedOverCellVisiblePosition = draggedOverCell.ParentColumn.VisiblePosition;
+      int newTargetVisiblePosition = -1;
+      int newFixedColumnCount;
+      int correctionValue;
 
       Point draggedOverCellToDragContainer = draggedOverCell.TranslatePoint( ColumnReorderingDragSourceManager.EmptyPoint, this.DragContainer );
-
-      Rect hitTestRect = new Rect( draggedOverCellToDragContainer.X,
-        draggedOverCellToDragContainer.Y,
-        draggedOverCell.RenderSize.Width / 2,
-        draggedOverCell.RenderSize.Height );
-
-      int initialVisiblePosition = draggedCell.ParentColumn.VisiblePosition;
-      int initialFixedColumnCount = this.ColumnVirtualizationManager.FixedColumnCount;
-      int newFixedColumnCount = initialFixedColumnCount;
-      int newTargetVisiblePosition = -1;
-
-      DraggedOverCellRegion draggedOverCellRegion = DraggedOverCellRegion.Unknown;
-
-      int draggedOverCellVisiblePosition = draggedOverCell.ParentColumn.VisiblePosition;
-
-      Dictionary<string, double> fieldNameToOffset = this.ColumnVirtualizationManager.FieldNameToOffset;
+      Rect hitTestRect = new Rect( draggedOverCellToDragContainer.X, draggedOverCellToDragContainer.Y, draggedOverCell.RenderSize.Width / 2, draggedOverCell.RenderSize.Height );
 
       if( mousePosition.HasValue && ( mousePosition.Value.X < ( hitTestRect.X + hitTestRect.Width ) ) )
       {
-        draggedOverCellRegion = DraggedOverCellRegion.Left;
-
         newTargetVisiblePosition = ( initialVisiblePosition >= draggedOverCellVisiblePosition ) ? draggedOverCellVisiblePosition : draggedOverCellVisiblePosition - 1;
       }
       else
       {
-        draggedOverCellRegion = DraggedOverCellRegion.Right;
-
         newTargetVisiblePosition = ( initialVisiblePosition <= draggedOverCellVisiblePosition ) ? draggedOverCellVisiblePosition : draggedOverCellVisiblePosition + 1;
       }
 
-      ReadOnlyObservableCollection<ColumnBase> visibleColumn = this.DraggedDataGridContext.VisibleColumns;
-
-      int lastFixedColumnVisiblePosition = visibleColumn[ Math.Max( 0, Math.Min( initialFixedColumnCount, visibleColumn.Count ) - 1 ) ].VisiblePosition;
-
-      int firstScrollingColumnVisiblePosition = visibleColumn[ Math.Min( initialFixedColumnCount, visibleColumn.Count - 1 ) ].VisiblePosition;
-
-      // Ensure we have fixed and/or scrolling columns
-      if( lastFixedColumnVisiblePosition != firstScrollingColumnVisiblePosition )
-      {
-        // Initially at the left of the splitter
-        if( initialVisiblePosition <= lastFixedColumnVisiblePosition )
-        {
-          // Moving at the right of the splitter or over the left edged of the first visible scrolling Column
-          bool movingAtRightOfSplitter = ( newTargetVisiblePosition >= lastFixedColumnVisiblePosition ) && ( newTargetVisiblePosition >= firstScrollingColumnVisiblePosition );
-
-          bool movingOverFirstVisibleColumnLeftEdge = ( newTargetVisiblePosition == lastFixedColumnVisiblePosition ) && ( draggedOverCellRegion == DraggedOverCellRegion.Left );
-
-          if( movingAtRightOfSplitter || movingOverFirstVisibleColumnLeftEdge )
-          {
-            newFixedColumnCount--;
-          }
-        }
-        // Initially at the right of the splitter
-        else if( initialVisiblePosition >= firstScrollingColumnVisiblePosition )
-        {
-          // Moving at the left of the splitter or over right edge of the last fixed Column
-          bool movingAtLeftOfSpliter = ( newTargetVisiblePosition < firstScrollingColumnVisiblePosition );
-
-          bool movingOverLastFixedColumnRightEdged = ( newTargetVisiblePosition == lastFixedColumnVisiblePosition ) && ( draggedOverCellRegion == DraggedOverCellRegion.Right );
-
-          if( movingAtLeftOfSpliter || movingOverLastFixedColumnRightEdged )
-          {
-            newFixedColumnCount++;
-          }
-        }
-      }
+      this.CalculateAnimatedFixedColumnCount( initialVisiblePosition, newTargetVisiblePosition, out newFixedColumnCount, out correctionValue );
 
       // Update the VisiblePositions, DraggedOverCellRegion and FixedColumnCount of the ReorderingInfoManager
       ReorderingInfoManager reorderingInfoManager = this.ReorderingInfoManagerInstance;
 
-      reorderingInfoManager.InitalizeInfoManager( newFixedColumnCount );
+      reorderingInfoManager.InitializeInfoManager( newFixedColumnCount, correctionValue );
       reorderingInfoManager.UpdateDraggedColumnVisiblePosition( newTargetVisiblePosition );
       reorderingInfoManager.UpdateReorderingInfo( this.ColumnVirtualizationManager );
+    }
+
+    private void CalculateAnimatedFixedColumnCount( int initialVisiblePosition, int newTargetVisiblePosition, out int newFixedColumnCount, out int correctionValue )
+    {
+      ReadOnlyObservableCollection<ColumnBase> visibleColumns = this.VisibleColumns;
+
+      int initialFixedColumnCount = this.ColumnVirtualizationManager.GetFixedColumnCount( m_level );
+      int lastFixedColumnVisiblePosition = visibleColumns[ Math.Max( 0, Math.Min( initialFixedColumnCount, visibleColumns.Count ) - 1 ) ].VisiblePosition;
+      int firstScrollingColumnVisiblePosition = visibleColumns[ Math.Min( initialFixedColumnCount, visibleColumns.Count - 1 ) ].VisiblePosition;
+      newFixedColumnCount = initialFixedColumnCount;
+      correctionValue = initialFixedColumnCount == visibleColumns.Count ? 1 : 0;
+
+      // Ensure we have fixed and/or scrolling columns
+      if( lastFixedColumnVisiblePosition != firstScrollingColumnVisiblePosition )
+      {
+        // Initially at the left of the splitter and moving after the first column after the splitter
+        if( ( initialVisiblePosition <= lastFixedColumnVisiblePosition ) && ( newTargetVisiblePosition > lastFixedColumnVisiblePosition ) )
+        {
+          newFixedColumnCount--;
+          if( newFixedColumnCount > 0 )
+          {
+            correctionValue = 1;
+          }
+        }
+        // Initially at the right of the splitter and moving before the first column before the splitter
+        else if( ( initialVisiblePosition >= firstScrollingColumnVisiblePosition ) && ( newTargetVisiblePosition < firstScrollingColumnVisiblePosition ) )
+        {
+          newFixedColumnCount++;
+          if( newFixedColumnCount == visibleColumns.Count )
+          {
+            correctionValue = 1;
+          }
+        }
+      }
     }
 
     private void ProcessDragOverColumnManagerCell()
@@ -1465,14 +1384,20 @@ namespace Xceed.Wpf.DataGrid.Views
 
       double draggedColumnWidth = draggedCell.ParentColumn.ActualWidth;
 
-      foreach( ColumnBase column in animationState.AnimateToLeft )
+      if( animationState.AnimateToLeft.Count > 0 )
       {
-        this.DoColumnAnimation( column, -draggedColumnWidth, m_columnAnimationDuration, false );
+        foreach( ColumnBase column in animationState.AnimateToLeft )
+        {
+          this.DoColumnAnimation( column, -draggedColumnWidth, m_columnAnimationDuration, false );
+        }
       }
 
-      foreach( ColumnBase column in animationState.AnimateToRight )
+      if( animationState.AnimateToRight.Count > 0 )
       {
-        this.DoColumnAnimation( column, draggedColumnWidth, m_columnAnimationDuration, false );
+        foreach( ColumnBase column in animationState.AnimateToRight )
+        {
+          this.DoColumnAnimation( column, draggedColumnWidth, m_columnAnimationDuration, false );
+        }
       }
 
       foreach( ColumnBase column in animationState.RollbackAnimation )
@@ -1483,19 +1408,21 @@ namespace Xceed.Wpf.DataGrid.Views
       this.SetSplitterAnimation( reorderingInfoManager.InitialFixedColumnCount, animationState.NewFixedColumnCount, draggedColumnWidth );
     }
 
-    private AnimationClock AnimateColumn( ColumnBase column, double offset, Duration animationDuration )
-    {
-      return this.DoColumnAnimation( column, offset, animationDuration, false );
-    }
-
     private void RollbackReordering()
     {
-      this.ReorderingInfoManagerInstance.RollbackReorderedColumnsAndFixedColumnCount();
+      RequiredAnimationsInfo animationState = this.ReorderingInfoManagerInstance.RequiredAnimations;
 
-      foreach( ColumnBase column in this.DraggedDataGridContext.VisibleColumns )
+      foreach( ColumnBase column in animationState.AnimateToLeft )
       {
         this.RollbackColumnAnimation( column );
       }
+
+      foreach( ColumnBase column in animationState.AnimateToRight )
+      {
+        this.RollbackColumnAnimation( column );
+      }
+
+      this.ReorderingInfoManagerInstance.RollbackReorderedColumnsAndFixedColumnCount();
 
       this.DoSplitterAnimation( 0, true );
 
@@ -1507,64 +1434,50 @@ namespace Xceed.Wpf.DataGrid.Views
       this.DoColumnAnimation( column, 0, m_columnAnimationDuration, true );
     }
 
-    private AnimationClock DoColumnAnimation( ColumnBase column, double toValue, Duration duration, bool isReverting )
+    private void DoColumnAnimation( ColumnBase column, double toValue, Duration duration, bool isReverting )
     {
       if( column == null )
-        return null;
+        return;
 
+      // Never animate the dragged Column to avoid flickering effects on the ghosts because we compute its position on each MouseMove event
       Cell draggedCell = this.DraggedElement as Cell;
-
-      // Never animate the dragged Column to avoid flickering
-      // effects on the ghosts because we compute its position
-      // on each MouseMove event
       if( ( draggedCell != null ) && ( column == draggedCell.ParentColumn ) )
-        return null;
+        return;
 
-      TranslateTransform transform = ColumnReorderingDragSourceManager.GetAnimatedColumnReorderingTranslation( column );
-
-      if( transform == null )
-      {
-        transform = new TranslateTransform();
-        ColumnReorderingDragSourceManager.SetAnimatedColumnReorderingTranslation( column, transform );
-      }
-
-      string fieldName = column.FieldName;
-
-      AnimationClock animationClock = null;
+      TranslateTransform positionTransform = ColumnReorderingDragSourceManager.GetAnimatedColumnReorderingPositionTransform( column );
+      List<AnimationClock> animationClocks;
+      AnimationClock positionAnimationClock = null;
 
       // Pause previously applied AnimationClock
-      if( m_fieldNameToClock.TryGetValue( fieldName, out animationClock ) )
+      if( m_fieldNameToClock.TryGetValue( column, out animationClocks ) )
       {
-        OffsetAnimation clockOffsetAnimation = animationClock.Timeline as OffsetAnimation;
-
         // If the target value is already the correct one, no need to stop animation and create another one
-        if( ( clockOffsetAnimation != null ) && ( clockOffsetAnimation.To == toValue ) )
-          return animationClock;
+        positionAnimationClock = animationClocks[ 0 ];
+        OffsetAnimation positionTimeLine = positionAnimationClock.Timeline as OffsetAnimation;
+        if( ( positionTimeLine != null ) && ( positionTimeLine.To == toValue ) )
+          return;
 
         // Stop the animation, do not simply pause it, so it resets correctly.
-        animationClock.Controller.Stop();
-        animationClock.Completed -= this.ColumnAnimationCompleted;
+        positionAnimationClock.Controller.Stop();
+        positionAnimationClock.Completed -= this.ColumnAnimationCompleted;
 
-        m_fieldNameToClock.Remove( fieldName );
-        m_clockToFieldName.Remove( animationClock );
+        m_fieldNameToClock.Remove( column );
       }
 
-      OffsetAnimation animation = new OffsetAnimation( toValue, duration );
-      animationClock = animation.CreateClock( true ) as AnimationClock;
+      OffsetAnimation positionAnimation = new OffsetAnimation( toValue, duration );
+      positionAnimationClock = positionAnimation.CreateClock( true ) as AnimationClock;
+      positionTransform.ApplyAnimationClock( TranslateTransform.XProperty, positionAnimationClock, HandoffBehavior.SnapshotAndReplace );
 
-      transform.ApplyAnimationClock( TranslateTransform.XProperty, animationClock, HandoffBehavior.SnapshotAndReplace );
-
-      m_fieldNameToClock.Add( fieldName, animationClock );
-      m_clockToFieldName.Add( animationClock, fieldName );
+      //Since we are dealing with regular Columns (i.e. not MergedColumns), no need for resize animation, so we can simply store a null value for the resize AnimationClock.
+      m_fieldNameToClock.Add( column, new List<AnimationClock>() { positionAnimationClock, null } );
 
       if( isReverting )
       {
-        animationClock.Completed += this.ColumnAnimationCompleted;
+        positionAnimationClock.Completed += this.ColumnAnimationCompleted;
       }
 
-      animationClock.Controller.Begin();
-
-      return animationClock;
+      //Start the animation
+      positionAnimationClock.Controller.Begin();
     }
 
     private void ColumnAnimationCompleted( object sender, EventArgs e )
@@ -1580,32 +1493,41 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private void CleanUpColumnAnimations()
     {
-      foreach( KeyValuePair<string, AnimationClock> fieldNameToClock in m_fieldNameToClock )
+      foreach( KeyValuePair<ColumnBase, List<AnimationClock>> animationClocks in m_fieldNameToClock )
       {
-        // Using Columns instead of Visible Columns for performance reasons
-        ColumnBase column = this.DraggedDataGridContext.Columns[ fieldNameToClock.Key ];
+        foreach( AnimationClock animationClock in animationClocks.Value )
+        {
+          if( animationClock != null )
+          {
+            animationClock.Controller.Remove();
+          }
+        }
 
-        Debug.Assert( column != null );
+        ColumnBase column = animationClocks.Key;
+        TransformGroup transformGroup = ColumnReorderingDragSourceManager.GetAnimatedColumnReorderingTransformGroup( column );
 
-        //Remove the animation translate form the column.
-        TranslateTransform transform = ColumnReorderingDragSourceManager.GetAnimatedColumnReorderingTranslation( column );
-        Debug.Assert( transform != null );
-        transform.X = 0;
+        TranslateTransform positionTransform = transformGroup.Children[ 0 ] as TranslateTransform;
+        if( positionTransform != null )
+        {
+          positionTransform.X = 0;
+        }
 
-        //Clear the animation
-        fieldNameToClock.Value.Controller.Remove();
+        ScaleTransform sizeTransform = transformGroup.Children[ 1 ] as ScaleTransform;
+        if( sizeTransform != null )
+        {
+          sizeTransform.CenterX = 0;
+          sizeTransform.ScaleX = 1;
+        }
       }
 
       m_fieldNameToClock.Clear();
-      m_clockToFieldName.Clear();
     }
 
-    private void RemoveColumnsPreviousAnimations( ReadOnlyObservableCollection<ColumnBase> readOnlyObservableCollection )
+    private void RemoveColumnsPreviousAnimations()
     {
-      foreach( ColumnBase column in readOnlyObservableCollection )
+      foreach( ColumnBase column in this.VisibleColumns )
       {
-        TranslateTransform transform = ColumnReorderingDragSourceManager.GetAnimatedColumnReorderingTranslation( column );
-
+        TranslateTransform transform = ColumnReorderingDragSourceManager.GetAnimatedColumnReorderingPositionTransform( column );
         ColumnReorderingDragSourceManager.ClearTranslateTransformAnimation( transform );
       }
     }
@@ -1677,11 +1599,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private void RemoveFixedColumnSplitterPreviousAnimation( DataGridContext dataGridContext )
     {
-      if( dataGridContext == null )
-        return;
-
       TranslateTransform transform = TableflowView.GetFixedColumnSplitterTranslation( dataGridContext ) as TranslateTransform;
-
       ColumnReorderingDragSourceManager.ClearTranslateTransformAnimation( transform );
     }
 
@@ -1690,8 +1608,7 @@ namespace Xceed.Wpf.DataGrid.Views
       if( adorner == null )
         return;
 
-      UIElement adornedElement = adorner.AdornedElement;
-
+      var adornedElement = adorner.AdornedElement;
       if( adornedElement == null )
         return;
 
@@ -1699,18 +1616,19 @@ namespace Xceed.Wpf.DataGrid.Views
       if( adornedElement == this.DraggedElement )
         return;
 
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( adornedElement );
-
+      var dataGridContext = DataGridControl.GetDataGridContext( adornedElement );
       if( dataGridContext == null )
         return;
 
-      object dataItem = adornedElement.GetValue( CustomItemContainerGenerator.DataItemPropertyProperty );
+      var dataItemStore = CustomItemContainerGenerator.GetDataItemProperty( adornedElement );
+      if( ( dataItemStore == null ) || dataItemStore.IsEmpty )
+        return;
 
+      var dataItem = dataItemStore.Data;
       if( dataItem == null )
         return;
 
-      UIElement container = dataGridContext.GetContainerFromItem( dataItem ) as UIElement;
-
+      var container = dataGridContext.GetContainerFromItem( dataItem ) as UIElement;
       if( container != null )
       {
         RectangleGeometry containerClip = container.Clip as RectangleGeometry;
@@ -1727,19 +1645,15 @@ namespace Xceed.Wpf.DataGrid.Views
       }
       else
       {
-        // Clip adorner completely
-        adorner.AdornedElementImage.Clip = new RectangleGeometry( Rect.Empty );
+        //This is an item that is in the FixedHeaders/Footers of the gird, do not clip it.
+        adorner.AdornedElementImage.Clip = null;
       }
     }
 
     private TableflowViewItemsHost GetTableFlowViewItemsHost()
     {
-      if( ( this.DraggedDataGridContext != null )
-        && ( this.DraggedDataGridContext.DataGridControl != null )
-        && ( this.DraggedDataGridContext.DataGridControl.ItemsHost != null ) )
-      {
+      if( ( this.DraggedDataGridContext != null ) && ( this.DraggedDataGridContext.DataGridControl != null ) && ( this.DraggedDataGridContext.DataGridControl.ItemsHost != null ) )
         return this.DraggedDataGridContext.DataGridControl.ItemsHost as TableflowViewItemsHost;
-      }
 
       return null;
     }
@@ -1753,14 +1667,10 @@ namespace Xceed.Wpf.DataGrid.Views
         double stickyHeadersHeight = itemsHost.GetStickyHeadersRegionHeight();
         double stickyFootersHeight = itemsHost.GetStickyHeadersRegionHeight();
 
-        Point itemsHostToDragContainer =
-          itemsHost.TranslatePoint( ColumnReorderingDragSourceManager.EmptyPoint, this.DragContainer );
+        Point itemsHostToDragContainer = itemsHost.TranslatePoint( ColumnReorderingDragSourceManager.EmptyPoint, this.DragContainer );
 
-        tableflowItemsHostToDragContainerRect = new Rect(
-          itemsHostToDragContainer.X,
-          itemsHostToDragContainer.Y + stickyHeadersHeight,
-          itemsHost.RenderSize.Width,
-          Math.Max( 0, itemsHost.RenderSize.Height - stickyHeadersHeight - stickyFootersHeight ) );
+        tableflowItemsHostToDragContainerRect = new Rect( itemsHostToDragContainer.X, itemsHostToDragContainer.Y + stickyHeadersHeight, itemsHost.RenderSize.Width,
+                                                          Math.Max( 0d, itemsHost.RenderSize.Height - stickyHeadersHeight - stickyFootersHeight ) );
       }
 
       return tableflowItemsHostToDragContainerRect;
@@ -1768,31 +1678,25 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private Dictionary<DataGridContext, Rect> GetColumnManagerCellGhostRects()
     {
-      Dictionary<DataGridContext, Rect> dataGridContextToColumnManagerCellRects =
-        new Dictionary<DataGridContext, Rect>();
+      Dictionary<DataGridContext, Rect> dataGridContextToColumnManagerCellRects = new Dictionary<DataGridContext, Rect>();
 
-      foreach( Cell cell in m_elementToDraggedElementAdorner.Keys )
+      foreach( var element in this.GetElements() )
       {
-        ColumnManagerCell columnManagerCell = cell as ColumnManagerCell;
+        var columnManagerCell = element as ColumnManagerCell;
+        if( columnManagerCell == null )
+          continue;
 
-        if( columnManagerCell != null )
+        Point columnManagerCellToDragContainer = columnManagerCell.TranslatePoint( ColumnReorderingDragSourceManager.EmptyPoint, this.DragContainer );
+
+        Rect columnManagerCellRect = new Rect( columnManagerCellToDragContainer.X, columnManagerCellToDragContainer.Y, columnManagerCell.RenderSize.Width,
+                                               columnManagerCell.RenderSize.Height );
+
+        DataGridContext columnManagerCellDataGridContext = DataGridControl.GetDataGridContext( columnManagerCell );
+
+        // We will only consider the first ColumnManagerRow added to this DataGridContext
+        if( !dataGridContextToColumnManagerCellRects.ContainsKey( columnManagerCellDataGridContext ) )
         {
-          Point columnManagerCellToDragContainer =
-            columnManagerCell.TranslatePoint( ColumnReorderingDragSourceManager.EmptyPoint, this.DragContainer );
-
-          Rect columnManagerCellRect = new Rect(
-            columnManagerCellToDragContainer.X,
-            columnManagerCellToDragContainer.Y,
-            columnManagerCell.RenderSize.Width,
-            columnManagerCell.RenderSize.Height );
-
-          DataGridContext columnManagerCellDataGridContext = DataGridControl.GetDataGridContext( columnManagerCell );
-
-          // We will only consider the first ColumnManagerRow added to this DataGridContext
-          if( !dataGridContextToColumnManagerCellRects.ContainsKey( columnManagerCellDataGridContext ) )
-          {
-            dataGridContextToColumnManagerCellRects.Add( columnManagerCellDataGridContext, columnManagerCellRect );
-          }
+          dataGridContextToColumnManagerCellRects.Add( columnManagerCellDataGridContext, columnManagerCellRect );
         }
       }
 
@@ -1801,16 +1705,14 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private void RemoveAllGhosts()
     {
-      DraggedElementAdorner adorner = null;
-
       this.PauseDraggedElementFadeInAnimation();
 
-      foreach( UIElement element in m_elementToDraggedElementAdorner.Keys )
+      foreach( var entry in this.GetElementAdornerEntries() )
       {
-        adorner = m_elementToDraggedElementAdorner[ element ];
-        Debug.Assert( adorner != null );
-        this.AdornerLayerInsideDragContainer.Remove( adorner );
-        element.Opacity = 1;
+        Debug.Assert( entry.Value != null );
+        this.AdornerLayerInsideDragContainer.Remove( entry.Value );
+
+        entry.Key.Opacity = 1d;
       }
 
       m_elementToDraggedElementAdorner.Clear();
@@ -1824,18 +1726,18 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private void ShowDraggedColumnGhosts()
     {
-      foreach( DraggedElementAdorner adorner in m_elementToDraggedElementAdorner.Values )
+      foreach( var adorner in this.GetElementAdorners() )
       {
         this.ApplyContainerClip( adorner );
-        adorner.AdornedElementImage.Opacity = 1;
+        adorner.AdornedElementImage.Opacity = 1d;
       }
     }
 
     private void HideDraggedColumnGhosts()
     {
-      foreach( DraggedElementAdorner adorner in m_elementToDraggedElementAdorner.Values )
+      foreach( var adorner in this.GetElementAdorners() )
       {
-        adorner.AdornedElementImage.Opacity = 0;
+        adorner.AdornedElementImage.Opacity = 0d;
       }
     }
 
@@ -1843,9 +1745,9 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       this.PauseDraggedElementFadeInAnimation();
 
-      foreach( UIElement element in m_elementToDraggedElementAdorner.Keys )
+      foreach( var element in this.GetElements() )
       {
-        element.Opacity = 1;
+        element.Opacity = 1d;
       }
     }
 
@@ -1853,9 +1755,9 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       this.PauseDraggedElementFadeInAnimation();
 
-      foreach( UIElement element in m_elementToDraggedElementAdorner.Keys )
+      foreach( var element in this.GetElements() )
       {
-        element.Opacity = 0;
+        element.Opacity = 0d;
       }
     }
 
@@ -1863,12 +1765,11 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       int remainingOpacityDuration = this.DraggedElementFadeInDuration;
 
-
       if( m_draggedElementFadeInAnimationClock != null )
       {
         OffsetAnimation fadeInAnimation = m_draggedElementFadeInAnimationClock.Timeline as OffsetAnimation;
 
-        if( ( fadeInAnimation != null ) && ( fadeInAnimation.To == 1 ) )
+        if( ( fadeInAnimation != null ) && ( fadeInAnimation.To == 1d ) )
         {
           return;
         }
@@ -1886,17 +1787,15 @@ namespace Xceed.Wpf.DataGrid.Views
 
       UIElement draggedElement = this.DraggedElement;
 
-      // Apply an animation on the opacity of the Cell to ensure a nice transition between
-      // the ColumnReordering and another IDropTarget that is not handled by this manager
+      // Apply an animation on the opacity of the Cell to ensure a nice transition between the ColumnReordering and another IDropTarget that is not handled by this manager
       if( draggedElement != null )
       {
         OffsetAnimation opacityAnimation = new OffsetAnimation( 1, new Duration( TimeSpan.FromMilliseconds( remainingOpacityDuration ) ) );
 
         m_draggedElementFadeInAnimationClock = opacityAnimation.CreateClock( true ) as AnimationClock;
 
-        // We ust the same completed callback as MoveGhostToTarget animation to 
-        // be sure that the DraggedElement FadeIn is completed and the ghosts are
-        // correctly positioned before displaying the original UIElements
+        // We ust the same completed callback as MoveGhostToTarget animation to  be sure that the DraggedElement
+        // FadeIn is completed and the ghosts are correctly positioned before displaying the original UIElements
         m_draggedElementFadeInAnimationClock.Completed += this.GhostToTargetAnimation_Completed;
 
         draggedElement.ApplyAnimationClock( UIElement.OpacityProperty, m_draggedElementFadeInAnimationClock );
@@ -1907,8 +1806,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private void PauseDraggedElementFadeInAnimation()
     {
-      // Ensure to stop dragged element FadeIn in order
-      // to correctly display the DraggedElementGhost
+      // Ensure to stop dragged element FadeIn in order to correctly display the DraggedElementGhost
       UIElement draggedElement = this.DraggedElement;
 
       if( draggedElement != null )
@@ -1925,6 +1823,56 @@ namespace Xceed.Wpf.DataGrid.Views
       m_draggedElementFadeInAnimationClock = null;
     }
 
+    private IEnumerable<UIElement> GetElements()
+    {
+      return this.GetElementAdornerEntries().Select( item => item.Key );
+    }
+
+    private IEnumerable<DraggedElementAdorner> GetElementAdorners()
+    {
+      return this.GetElementAdornerEntries().Select( item => item.Value );
+    }
+
+    private IEnumerable<KeyValuePair<UIElement, DraggedElementAdorner>> GetElementAdornerEntries()
+    {
+      var entries = m_elementToDraggedElementAdorner.ToList();
+
+      foreach( var entry in entries )
+      {
+        var container = entry.Key;
+
+        if( this.OwnElement( container ) )
+        {
+          Debug.Assert( m_elementToDraggedElementAdorner.ContainsKey( container ) );
+
+          yield return entry;
+        }
+        else
+        {
+          this.RemoveDraggedColumnGhost( container );
+        }
+      }
+    }
+
+    private bool OwnElement( DependencyObject target )
+    {
+      if( target == null )
+        return false;
+
+      ColumnReorderingDragSourceManager manager;
+      Cell cell = target as Cell;
+
+      if( cell != null )
+      {
+        manager = cell.ParentColumnReorderingDragSourceManager;
+      }
+      else
+      {
+        manager = TableflowView.GetColumnReorderingDragSourceManager( target );
+      }
+
+      return ( this == manager );
+    }
 
     private bool m_reorderCancelled; // = false;
     private bool m_noColumnsReorderingNeeded = false;
@@ -1936,9 +1884,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private AnimationClock m_splitterAnimationClock; // = null;
 
-    private Dictionary<string, AnimationClock> m_fieldNameToClock = new Dictionary<string, AnimationClock>();
-
-    private Dictionary<AnimationClock, string> m_clockToFieldName = new Dictionary<AnimationClock, string>();
+    private Dictionary<ColumnBase, List<AnimationClock>> m_fieldNameToClock = new Dictionary<ColumnBase, List<AnimationClock>>();
 
     private Dictionary<UIElement, DraggedElementAdorner> m_elementToDraggedElementAdorner = new Dictionary<UIElement, DraggedElementAdorner>();
     private DraggedElementAdorner m_popupDraggedElementAdorner;
@@ -1950,16 +1896,10 @@ namespace Xceed.Wpf.DataGrid.Views
     private int m_columnAnimationDurationCache;
     private Duration m_columnAnimationDuration;
 
+    private ReorderingInfoManager m_reorderingInfoManager; // = null;
+    private int m_level;
+
     private static Point EmptyPoint = new Point();
-
-    ReorderingInfoManager m_reorderingInfoManager; // = null;
-
-    internal enum DraggedOverCellRegion
-    {
-      Unknown,
-      Left,
-      Right
-    }
 
     private enum HorizontalMouseDragDirection
     {
@@ -1970,48 +1910,50 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private class ReorderingInfoManager
     {
-      public ReorderingInfoManager()
+      internal ReorderingInfoManager( int level )
       {
+        m_level = level;
       }
 
-      public int InitialColumnVisiblePosition
+      internal int InitialColumnVisiblePosition
       {
         get;
-        private set;
+        set;
       }
 
-      public int InitialFixedColumnCount
+      internal int InitialFixedColumnCount
       {
         get;
-        private set;
+        set;
       }
 
-      public List<ColumnBase> InitialColumnsByVisiblePosition
+      internal List<ColumnBase> InitialColumnsByVisiblePosition
       {
         get;
-        private set;
+        set;
       }
 
       // Contains the ColumnsByVisiblePosition of the DataGridContext in the current reordered order
-      public List<ColumnBase> ReorderedColumnsByVisiblePosition
+      internal List<ColumnBase> ReorderedColumnsByVisiblePosition
       {
         get;
-        private set;
+        set;
       }
 
-      public RequiredAnimationsInfo RequiredAnimations
+      internal RequiredAnimationsInfo RequiredAnimations
       {
         get;
-        private set;
+        set;
       }
 
-      internal void InitalizeInfoManager( int newFixedColumnCount )
+      internal void InitializeInfoManager( int newFixedColumnCount, int correctionValue )
       {
         this.RequiredAnimations = new RequiredAnimationsInfo();
         this.RequiredAnimations.NewFixedColumnCount = newFixedColumnCount;
+        this.RequiredAnimations.CorrectionValue = correctionValue;
       }
 
-      public void BeginReordering( DataGridContext dataGridContext, int initialColumnVisiblePosition )
+      internal void BeginReordering( DataGridContext dataGridContext, int initialColumnVisiblePosition, int initialFixedColumnCount )
       {
         if( dataGridContext == null )
           throw new ArgumentNullException( "dataGridContext" );
@@ -2022,25 +1964,30 @@ namespace Xceed.Wpf.DataGrid.Views
         }
 
         this.InitialColumnVisiblePosition = initialColumnVisiblePosition;
-        this.InitialFixedColumnCount = TableflowView.GetFixedColumnCount( dataGridContext );
+        this.InitialFixedColumnCount = initialFixedColumnCount;
 
-        int columnsByVisiblePositionCount = dataGridContext.ColumnsByVisiblePosition.Count;
-        ColumnBase[] columnsByVisiblePosition = new ColumnBase[ columnsByVisiblePositionCount ];
-        dataGridContext.ColumnsByVisiblePosition.CopyTo( columnsByVisiblePosition, 0 );
+        ColumnBase[] columnsByVisiblePosition;
+        HashedLinkedList<ColumnBase> sourceColumnList;
+        sourceColumnList = dataGridContext.ColumnsByVisiblePosition;
+
+        columnsByVisiblePosition = new ColumnBase[ sourceColumnList.Count ];
+        sourceColumnList.CopyTo( columnsByVisiblePosition, 0 );
 
         this.InitialColumnsByVisiblePosition = new List<ColumnBase>( columnsByVisiblePosition );
 
         this.ReorderedColumnsByVisiblePosition = new List<ColumnBase>();
 
+        this.RollbackReorderedColumnsAndFixedColumnCount();
+
         m_isProcessingReordering = true;
       }
 
-      public void EndReordering()
+      internal void EndReordering()
       {
         m_isProcessingReordering = false;
       }
 
-      public void UpdateDraggedColumnVisiblePosition( int newPosition )
+      internal void UpdateDraggedColumnVisiblePosition( int newPosition )
       {
         // Reinitialize the ReorderedColumns List
         this.ReorderedColumnsByVisiblePosition = new List<ColumnBase>( this.InitialColumnsByVisiblePosition );
@@ -2149,14 +2096,12 @@ namespace Xceed.Wpf.DataGrid.Views
         }
       }
 
-      public void RollbackReorderedColumnsAndFixedColumnCount()
+      internal void RollbackReorderedColumnsAndFixedColumnCount()
       {
-        this.RequiredAnimations = new RequiredAnimationsInfo( this.InitialColumnVisiblePosition,
-          this.InitialFixedColumnCount,
-          this.InitialColumnsByVisiblePosition );
+        this.RequiredAnimations = new RequiredAnimationsInfo( this.InitialColumnVisiblePosition, this.InitialFixedColumnCount, 0, this.InitialColumnsByVisiblePosition );
       }
 
-      internal void UpdateReorderingInfo( TableViewColumnVirtualizationManager columnVirtualizationManager )
+      internal void UpdateReorderingInfo( TableViewColumnVirtualizationManagerBase columnVirtualizationManager )
       {
         // Do not create another instance since we want to keep the NewFixedColumnCount
         RequiredAnimationsInfo animationState = this.RequiredAnimations;
@@ -2173,7 +2118,7 @@ namespace Xceed.Wpf.DataGrid.Views
         bool draggedColumnReached = false;
         int visibleColumnCount = columnsByVisiblePosition.Count;
 
-        Dictionary<string, object> columnsInView = columnVirtualizationManager.FixedAndScrollingFieldNamesLookupDictionary;
+        var columnsInView = columnVirtualizationManager.GetVisibleFieldNames( m_level );
 
         for( int i = 0; i < visibleColumnCount; i++ )
         {
@@ -2192,19 +2137,19 @@ namespace Xceed.Wpf.DataGrid.Views
 
           if( originalColumn == reorderedColumn )
           {
-            animationState.RollbackAnimation.Add( reorderedColumn );
+            this.ProcessAnimatedCollectionAddition( reorderedColumn, animationState.RollbackAnimation );
             continue;
           }
 
-          if( columnsInView.ContainsKey( reorderedColumn.FieldName ) )
+          if( columnsInView.Contains( reorderedColumn.FieldName ) )
           {
             if( !draggedColumnReached )
             {
-              animationState.AnimateToLeft.Add( reorderedColumn );
+              this.ProcessAnimatedCollectionAddition( reorderedColumn, animationState.AnimateToLeft );
             }
             else
             {
-              animationState.AnimateToRight.Add( reorderedColumn );
+              this.ProcessAnimatedCollectionAddition( reorderedColumn, animationState.AnimateToRight );
             }
           }
         }
@@ -2212,17 +2157,22 @@ namespace Xceed.Wpf.DataGrid.Views
         animationState.DraggedColumnNewVisiblePosition = reorderedColumnsByVisiblePosition.IndexOf( draggedColumn );
       }
 
+      private void ProcessAnimatedCollectionAddition( ColumnBase animatedColumn, List<ColumnBase> animatedCollection )
+      {
+        animatedCollection.Add( animatedColumn );
+      }
       private bool m_isProcessingReordering; // = false;
+      private int m_level;
     }
 
     private class RequiredAnimationsInfo
     {
-      public RequiredAnimationsInfo()
-        : this( -1, -1, null )
+      internal RequiredAnimationsInfo()
+        : this( -1, -1, 0, null )
       {
       }
 
-      public RequiredAnimationsInfo( int draggedColumnNewVisiblePosition, int newFixedColumnCount, IList<ColumnBase> initialColumns )
+      internal RequiredAnimationsInfo( int draggedColumnNewVisiblePosition, int newFixedColumnCount, int correctionValue, IList<ColumnBase> initialColumns )
       {
         this.AnimateToLeft = new List<ColumnBase>();
         this.AnimateToRight = new List<ColumnBase>();
@@ -2230,6 +2180,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
         this.DraggedColumnNewVisiblePosition = draggedColumnNewVisiblePosition;
         this.NewFixedColumnCount = newFixedColumnCount;
+        this.CorrectionValue = correctionValue;
 
         if( initialColumns != null )
         {
@@ -2237,34 +2188,40 @@ namespace Xceed.Wpf.DataGrid.Views
         }
       }
 
-      public int DraggedColumnNewVisiblePosition
+      internal int DraggedColumnNewVisiblePosition
       {
         get;
         set;
       }
 
-      public int NewFixedColumnCount
+      internal int NewFixedColumnCount
       {
         get;
         set;
       }
 
-      public List<ColumnBase> AnimateToLeft
+      internal int CorrectionValue
       {
         get;
-        private set;
+        set;
       }
 
-      public List<ColumnBase> AnimateToRight
+      internal List<ColumnBase> AnimateToLeft
       {
         get;
-        private set;
+        set;
       }
 
-      public List<ColumnBase> RollbackAnimation
+      internal List<ColumnBase> AnimateToRight
       {
         get;
-        private set;
+        set;
+      }
+
+      internal List<ColumnBase> RollbackAnimation
+      {
+        get;
+        set;
       }
     }
   }

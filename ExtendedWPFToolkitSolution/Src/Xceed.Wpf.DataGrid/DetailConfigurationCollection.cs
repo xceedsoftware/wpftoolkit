@@ -15,11 +15,9 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
-using System.Collections.Specialized;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -36,7 +34,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion CONSTRUCTORS
 
-    public DetailConfiguration this[ string relationName]
+    public DetailConfiguration this[ string relationName ]
     {
       get
       {
@@ -139,24 +137,13 @@ namespace Xceed.Wpf.DataGrid
 
         m_dataGridControl = value;
 
-        foreach( DetailConfiguration detail in this.Items )
-        {
-          if( detail.Columns != null )
-          {
-            detail.Columns.DataGridControl = value;
-          }
-
-          if( detail.DetailConfigurations != null )
-          {
-            detail.DetailConfigurations.DataGridControl = value;
-          }
-        }
+        this.OnPropertyChanged( new PropertyChangedEventArgs( "DataGridControl" ) );
       }
     }
 
     private DataGridControl m_dataGridControl;
 
-    #endregion DataGridControl Property
+    #endregion
 
     #region ParentDetailConfiguration Property
 
@@ -166,6 +153,6 @@ namespace Xceed.Wpf.DataGrid
       set;
     }
 
-    #endregion ParentDetailConfiguration Property
+    #endregion
   }
 }

@@ -26,6 +26,34 @@ namespace Xceed.Wpf.Toolkit.Primitives
   {
     #region Properties
 
+    #region AllowTextInput
+
+    public static readonly DependencyProperty AllowTextInputProperty = DependencyProperty.Register( "AllowTextInput", typeof( bool ), typeof( InputBase ), new UIPropertyMetadata( true, OnAllowTextInputChanged ) );
+    public bool AllowTextInput
+    {
+      get
+      {
+        return ( bool )GetValue( AllowTextInputProperty );
+      }
+      set
+      {
+        SetValue( AllowTextInputProperty, value );
+      }
+    }
+
+    private static void OnAllowTextInputChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      InputBase inputBase = o as InputBase;
+      if( inputBase != null )
+        inputBase.OnAllowTextInputChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+    }
+
+    protected virtual void OnAllowTextInputChanged( bool oldValue, bool newValue )
+    {
+    }
+
+    #endregion //AllowTextInput
+
     #region CultureInfo
 
     public static readonly DependencyProperty CultureInfoProperty = DependencyProperty.Register( "CultureInfo", typeof( CultureInfo ), typeof( InputBase ), new UIPropertyMetadata( CultureInfo.CurrentCulture, OnCultureInfoChanged ) );

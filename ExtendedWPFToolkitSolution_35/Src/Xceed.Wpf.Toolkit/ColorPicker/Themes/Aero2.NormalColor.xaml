@@ -117,6 +117,7 @@
     </Style>
 
      <Style x:Key="ColorDisplayStyle" TargetType="ContentControl">
+      <Setter Property="Focusable" Value="False" />
       <Setter Property="ContentTemplate">
          <Setter.Value>
             <DataTemplate>

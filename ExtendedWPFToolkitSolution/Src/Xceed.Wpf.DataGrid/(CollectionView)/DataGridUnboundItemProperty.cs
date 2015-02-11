@@ -23,8 +23,6 @@ namespace Xceed.Wpf.DataGrid
 {
   public class DataGridUnboundItemProperty : DataGridItemPropertyBase
   {
-    #region CONSTRUTORS
-
     public DataGridUnboundItemProperty()
     {
     }
@@ -69,10 +67,6 @@ namespace Xceed.Wpf.DataGrid
       this.CommittingValue += template.CommittingValue;
     }
 
-    #endregion CONSTRUTORS
-
-    #region PUBLIC METHODS
-
     public override object Clone()
     {
       Type type = this.GetType();
@@ -83,16 +77,8 @@ namespace Xceed.Wpf.DataGrid
       return base.Clone();
     }
 
-    #endregion PUBLIC METHODS
-
-    #region PUBLIC EVENTS
-
     public event EventHandler<DataGridItemPropertyQueryValueEventArgs> QueryValue;
     public event EventHandler<DataGridItemPropertyCommittingValueEventArgs> CommittingValue;
-
-    #endregion PUBLIC EVENTS
-
-    #region PROTECTED METHODS
 
     protected override object GetValueCore( object component )
     {
@@ -115,10 +101,6 @@ namespace Xceed.Wpf.DataGrid
 
       base.SetValueCore( component, value );
     }
-
-    #endregion PROTECTED METHODS
-
-    #region INTERNAL METHODS
 
     internal void Refresh( object component )
     {
@@ -147,7 +129,5 @@ namespace Xceed.Wpf.DataGrid
         this.OverrideReadOnlyForInsertion = false;
       }
     }
-
-    #endregion INTERNAL METHODS
   }
 }

@@ -384,7 +384,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion PropertyDescriptor Property
 
-    #region IsAutoCreated
+    #region IsAutoCreated Property
 
     public bool IsAutoCreated
     {
@@ -392,7 +392,7 @@ namespace Xceed.Wpf.DataGrid
       private set;
     }
 
-    #endregion IsAutoCreated
+    #endregion IsAutoCreated Property
 
     #region PUBLIC METHODS
 

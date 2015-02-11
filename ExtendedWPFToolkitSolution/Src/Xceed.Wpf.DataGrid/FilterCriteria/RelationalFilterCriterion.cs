@@ -64,7 +64,7 @@ namespace Xceed.Wpf.DataGrid.FilterCriteria
     private object m_value;
     private IComparable m_comparableValue;
 
-    #endregion Value Property
+    #endregion
 
     public override bool Equals( object obj )
     {
@@ -169,10 +169,10 @@ namespace Xceed.Wpf.DataGrid.FilterCriteria
       if( parameters.Length != 1 )
         throw new DataGridException( string.Format( FilterParser.MissingRightOperandErrorText, this.GetType().Name ) );
 
-      Debug.Assert( !( parameters[ 0 ] is FilterCriterion), "Should have been caught earlier during BuildCriterion." );
+      Debug.Assert( !( parameters[ 0 ] is FilterCriterion ), "Should have been caught earlier during BuildCriterion." );
 
       if( parameters[ 0 ] is FilterCriterion )
-        throw new DataGridInternalException( "Comparison with the result of a filter criterion is not allowed." ); 
+        throw new DataGridInternalException( "Comparison with the result of a filter criterion is not allowed." );
 
       this.Value = parameters[ 0 ];
     }
@@ -185,7 +185,7 @@ namespace Xceed.Wpf.DataGrid.FilterCriteria
     {
       object value2 = this.Value;
 
-      if( ( value == null ) || ( value == DBNull.Value ) || (value as string == string.Empty) )
+      if( ( value == null ) || ( value == DBNull.Value ) || ( value as string == string.Empty ) )
       {
         if( ( value2 == null ) || ( value2 == DBNull.Value ) || ( ( value2 as string ) == string.Empty ) )
         {

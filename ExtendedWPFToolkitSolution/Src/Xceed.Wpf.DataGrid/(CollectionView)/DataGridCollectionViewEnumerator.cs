@@ -58,7 +58,7 @@ namespace Xceed.Wpf.DataGrid
       {
         m_beforeStart = false;
 
-        if( ( m_currentGroup != null ) && ( m_currentGroup.RawItems == null ) )
+        if( ( m_currentGroup != null ) && ( m_currentGroup.RawItems.Count == 0 ) )
         {
           // This should only occur if the first leaf group encountered after the Reset call was empty.
           this.MoveToNextNonEmptyLeafGroup();
@@ -71,14 +71,14 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        if( ( m_currentGroup == null ) || ( m_currentGroup.RawItems == null ) )
+        if( ( m_currentGroup == null ) || ( m_currentGroup.RawItems.Count == 0 ) )
         {
           m_afterEnd = true;
         }
         else
         {
           //check indexes
-          if( m_currentItemIndex < m_currentGroup.RawItems.Count ) 
+          if( m_currentItemIndex < m_currentGroup.RawItems.Count )
           {
             m_current = m_currentGroup.RawItems[ m_currentItemIndex ];
             m_currentItemIndex++;
@@ -114,7 +114,7 @@ namespace Xceed.Wpf.DataGrid
         {
           m_currentGroup = this.MoveToFirstLeafGroup( m_currentGroup, index );
 
-          foundNonEmptyLeafGroup = ( ( m_currentGroup.RawItems != null ) && ( m_currentGroup.RawItems.Count > 0 ) );
+          foundNonEmptyLeafGroup = ( m_currentGroup.RawItems.Count > 0 );
         }
       }
 
@@ -144,8 +144,7 @@ namespace Xceed.Wpf.DataGrid
       m_currentItemIndex = 0;
       m_currentGroupIndex.Clear();
 
-      m_currentGroup = ( m_collectionView.Count == 0 ) ?
-        null : this.MoveToFirstLeafGroup( m_collectionView.RootGroup, 0 );
+      m_currentGroup = ( m_collectionView.Count == 0 ) ? null : this.MoveToFirstLeafGroup( m_collectionView.RootGroup, 0 );
     }
 
     #endregion

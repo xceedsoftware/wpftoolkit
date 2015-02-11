@@ -23,17 +23,21 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Xceed.Wpf.Toolkit
 {
   [TemplatePart( Name = PART_NewItemTypesComboBox, Type = typeof( ComboBox ) )]
+  [TemplatePart( Name = PART_PropertyGrid, Type = typeof( PropertyGrid.PropertyGrid ) )]
   public class CollectionControl : Control
   {
     private const string PART_NewItemTypesComboBox = "PART_NewItemTypesComboBox";
+    private const string PART_PropertyGrid = "PART_PropertyGrid";
 
     #region Private Members
 
     private ComboBox _newItemTypesComboBox;
+    private PropertyGrid.PropertyGrid _propertyGrid;
 
     #endregion
 
@@ -177,6 +181,20 @@ namespace Xceed.Wpf.Toolkit
 
       if( _newItemTypesComboBox != null )
         _newItemTypesComboBox.Loaded += new RoutedEventHandler( this.NewItemTypesComboBox_Loaded );
+
+      _propertyGrid = GetTemplateChild( PART_PropertyGrid ) as PropertyGrid.PropertyGrid;
+    }
+
+    public PropertyGrid.PropertyGrid PropertyGrid
+    {
+      get
+      {
+        if( _propertyGrid == null )
+        {
+          this.ApplyTemplate();
+        }
+        return _propertyGrid;
+      }
     }
 
     #endregion

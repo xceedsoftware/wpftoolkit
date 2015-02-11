@@ -385,6 +385,8 @@ namespace Xceed.Wpf.Toolkit
       Point p = e.GetPosition( _colorShadingCanvas );
       UpdateColorShadeSelectorPositionAndCalculateColor( p, true );
       _colorShadingCanvas.CaptureMouse();
+      //Prevent from closing ColorCanvas after mouseDown in ListView
+      e.Handled = true; 
     }
 
     void ColorShadingCanvas_MouseLeftButtonUp( object sender, MouseButtonEventArgs e )

@@ -15,17 +15,16 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Xceed.Wpf.DataGrid.Print;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
   // Panel used as children of the FixedCellPanel that only layout horizontally.
-  internal class FixedCellSubPanel : Panel, IPrintInfo
+  internal class FixedCellSubPanel : Panel
   {
     public FixedCellSubPanel( FixedCellPanel parentPanel )
     {
@@ -35,7 +34,7 @@ namespace Xceed.Wpf.DataGrid.Views
       m_parentPanel = parentPanel;
     }
 
-    #region DataGridContext Property
+    #region DataGridContext Internal Property
 
     internal DataGridContext DataGridContext
     {
@@ -47,7 +46,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion
 
-    #region ParentFixedCellPanel Property
+    #region ParentFixedCellPanel Internal Property
 
     internal FixedCellPanel ParentPanel
     {
@@ -61,32 +60,45 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion
 
+    #region ColumnVirtualizationManager Internal Property
+
+    internal TableViewColumnVirtualizationManagerBase ColumnVirtualizationManager
+    {
+      get
+      {
+        var dataGridContext = this.DataGridContext;
+        if( dataGridContext == null )
+          return null;
+
+        return ( TableViewColumnVirtualizationManagerBase )dataGridContext.ColumnVirtualizationManager;
+      }
+    }
+
+    #endregion
+
     protected override UIElementCollection CreateUIElementCollection( FrameworkElement logicalParent )
     {
-      // We make sure that the element added to this panel won't have this panel as 
-      // logical parent. We want the logical parent of these element to be the 
-      // FixedCellPanel itself. This is handled in the UICellCollection class.
+      // We make sure that the element added to this panel won't have this panel as logical parent.
+      // We want the logical parent of these element to be the FixedCellPanel itself. This is handled in the UICellCollection class.
       return new UIElementCollection( this, null );
     }
 
     // Measure horizontally.
     protected override Size MeasureOverride( Size constraint )
     {
-      Size desiredSize = new Size();
-
-      DataGridContext dataGridContext = this.DataGridContext;
-
-      // DataGridContext can be null when a the parent Row was not prepared
-      if( dataGridContext == null )
+      // This can be null when the parent Row is not prepared yet.
+      var columnVirtualizationManager = this.ColumnVirtualizationManager;
+      if( columnVirtualizationManager == null )
         return this.DesiredSize;
 
-      TableViewColumnVirtualizationManager columnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
+      var desiredSize = new Size();
+      var fieldNameToWidth = columnVirtualizationManager.GetFieldNameToWidth( m_parentPanel.ParentRow.LevelCache );
 
-      foreach( Cell cell in this.GetVisibleCells() )
+      foreach( var cell in this.GetVisibleCells() )
       {
         Debug.Assert( !Row.GetIsTemplateCell( cell ), "No template Cells should be added to FixedCellPanel" );
 
-        cell.Measure( new Size( columnVirtualizationManager.FieldNameToWidth[ cell.FieldName ], constraint.Height ) );
+        cell.Measure( new Size( fieldNameToWidth[ cell.FieldName ], constraint.Height ) );
 
         if( cell.DesiredSize.Height > desiredSize.Height )
         {
@@ -102,17 +114,15 @@ namespace Xceed.Wpf.DataGrid.Views
     // Arrange horizontally.
     protected override Size ArrangeOverride( Size arrangeSize )
     {
-      DataGridContext dataGridContext = this.DataGridContext;
-
-      // DataGridContext can be null when the parent Row was not prepared
-      if( dataGridContext == null )
+      // This can be null when the parent Row is not prepared yet.
+      var columnVirtualizationManager = this.ColumnVirtualizationManager;
+      if( columnVirtualizationManager == null )
         return this.DesiredSize;
 
-      TableViewColumnVirtualizationManager columnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
-      Dictionary<string, double> columnToVisibleOffset = columnVirtualizationManager.FieldNameToOffset;
-      Rect finalRect = new Rect( arrangeSize );
+      var columnToVisibleOffset = columnVirtualizationManager.GetFieldNameToOffset( m_parentPanel.ParentRow.LevelCache );
+      var finalRect = new Rect( arrangeSize );
 
-      foreach( Cell cell in this.GetVisibleCells() )
+      foreach( var cell in this.GetVisibleCells() )
       {
         // Never add Template Cells to FixedCellPanel
         if( Row.GetIsTemplateCell( cell ) )
@@ -138,149 +148,24 @@ namespace Xceed.Wpf.DataGrid.Views
 
     protected virtual IEnumerable<string> GetVisibleFieldsName()
     {
-      DataGridContext dataGridContext = this.DataGridContext;
-      if( dataGridContext == null )
+      var columnVirtualizationManager = this.ColumnVirtualizationManager;
+      if( columnVirtualizationManager == null )
         return new string[ 0 ];
 
-      TableViewColumnVirtualizationManager columnVirtualizationManager =
-        dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
-
-      return columnVirtualizationManager.FixedFieldNames;
+      return columnVirtualizationManager.GetFixedFieldNames( m_parentPanel.ParentRow.LevelCache );
     }
 
     protected IEnumerable<Cell> GetVisibleCells()
     {
-      CellCollection collection = this.ParentPanel.ParentRowCells;
+      VirtualizingCellCollection collection = this.ParentPanel.ParentRowCells;
 
-      if( collection != null )
+      if( collection == null )
+        yield break;
+
+      foreach( string fieldName in this.GetVisibleFieldsName() )
       {
-        foreach( string fieldName in this.GetVisibleFieldsName() )
-        {
-          yield return collection[ fieldName ];
-        }
+        yield return collection.GetCell( fieldName, false );
       }
     }
-
-    #region IPrintInfo Members
-
-    double IPrintInfo.GetPageRightOffset( double horizontalOffset, double viewportWidth )
-    {
-      Cell firstCellInView = null;
-      double offset = 0.0d;
-      double accumulatedWidth = 0.0d;
-
-      foreach( Cell cell in this.GetVisibleCells() )
-      {
-        double cellWidth = cell.ActualWidth;
-
-        offset += cellWidth;
-
-        // The cell is in view.
-        if( offset > horizontalOffset )
-        {
-          if( firstCellInView == null )
-          {
-            firstCellInView = cell;
-          }
-
-          accumulatedWidth += cellWidth;
-
-          if( accumulatedWidth > viewportWidth )
-          {
-            // If the first cell is larger than the viewPort, break.
-            if( cell != firstCellInView )
-            {
-              accumulatedWidth -= cellWidth;
-            }
-
-            break;
-          }
-        }
-      }
-
-      return accumulatedWidth + horizontalOffset;
-    }
-
-    void IPrintInfo.UpdateElementVisibility( double horizontalOffset, double viewportWidth, object state )
-    {
-      IDictionary<string, object> visibilityState = ( IDictionary<string, object> )state;
-      Debug.Assert( visibilityState != null );
-
-      double accumulatedWidth = 0.0d;
-      bool firstCellInViewportFound = false;
-      double viewportLimitsHorizontalOffset = horizontalOffset + viewportWidth;
-
-      foreach( Cell cell in this.GetVisibleCells() )
-      {
-        Visibility cellVisibility = cell.Visibility;
-        if( cellVisibility == Visibility.Collapsed )
-          continue;
-
-        accumulatedWidth += cell.ActualWidth;
-
-        bool isPastViewportStart = accumulatedWidth > horizontalOffset;
-        bool isBeforeViewportEnd = isPastViewportStart && ( accumulatedWidth <= ( viewportLimitsHorizontalOffset ) );
-
-        bool isFirstInViewport = ( isPastViewportStart ) && ( !firstCellInViewportFound );
-
-        if( isFirstInViewport )
-          firstCellInViewportFound = true;
-
-        if( isPastViewportStart )
-        {
-          // The cell is past the Viewport's start.
-          if( ( isBeforeViewportEnd ) || ( isFirstInViewport ) )
-          {
-            // Either the cell is completely visible in the Viewport
-            // or we face a cell which is the first in the Viewport but does not completely fit in the Viewport.
-            FixedCellSubPanel.RestoreCellVisibility( cell, visibilityState );
-          }
-          else if( cellVisibility == Visibility.Visible )
-          {
-            // The cell is past the Viewport's end.
-            FixedCellSubPanel.HideCell( cell, visibilityState );
-          }
-        }
-        else if( cellVisibility == Visibility.Visible )
-        {
-          // The cell is before the Viewport's start.
-          FixedCellSubPanel.HideCell( cell, visibilityState );
-        }
-      }
-    }
-
-    object IPrintInfo.CreateElementVisibilityState()
-    {
-      return new Dictionary<string, object>();
-    }
-
-    private static void HideCell( Cell cell, IDictionary<string, object> visibilityState )
-    {
-      visibilityState[ cell.FieldName ] = cell.ReadLocalValue( Cell.VisibilityProperty );
-      cell.Visibility = Visibility.Hidden;
-    }
-
-    private static void RestoreCellVisibility( Cell cell, IDictionary<string, object> visibilityState )
-    {
-      string fieldName = cell.FieldName;
-      object storedVisibility;
-
-      if( !visibilityState.TryGetValue( fieldName, out storedVisibility ) )
-        return;
-
-      // Restore Visibility
-      if( storedVisibility is Visibility )
-      {
-        cell.Visibility = ( Visibility )storedVisibility;
-      }
-      else
-      {
-        cell.ClearValue( Cell.VisibilityProperty );
-      }
-
-      visibilityState.Remove( fieldName );
-    }
-
-    #endregion
   }
 }

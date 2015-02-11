@@ -19,17 +19,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using Xceed.Wpf.DataGrid.Views;
-using System.ComponentModel;
-using Xceed.Wpf.DataGrid.Automation;
-using System.Windows.Media;
+using Xceed.Utils.Collections;
 using Xceed.Utils.Wpf;
-using System.Text;
+using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -40,70 +41,92 @@ namespace Xceed.Wpf.DataGrid
     INotifyPropertyChanged,
     IDataGridContextVisitable
   {
-    internal static CustomItemContainerGenerator CreateGenerator( DataGridControl parentGridControl, CollectionView collectionView, DataGridContext dataGridContext )
-    {
-      CustomItemContainerGenerator newGenerator = new CustomItemContainerGenerator( collectionView, dataGridContext, parentGridControl );
-      dataGridContext.SetGenerator( newGenerator );
+    #region Static Fields
 
-      return newGenerator;
-    }
+    private const int GlobalItemsResetThreshold = 10000;
 
-    private CustomItemContainerGenerator( CollectionView collectionView, DataGridContext dataGridContext, DataGridControl gridControl )
+    #endregion
+
+    internal static CustomItemContainerGenerator CreateGenerator( DataGridControl dataGridControl, CollectionView collectionView, DataGridContext dataGridContext )
     {
+      if( dataGridControl == null )
+        throw new ArgumentNullException( "dataGridControl" );
+
       if( collectionView == null )
-      {
-        throw new ArgumentNullException( "collectionView" );
-      }
+        DataGridException.ThrowSystemException( "collectionView", typeof( ArgumentNullException ), dataGridControl.Name );
 
       if( dataGridContext == null )
-      {
-        throw new ArgumentNullException( "dataGridContext" );
-      }
+        DataGridException.ThrowSystemException( "dataGridContext", typeof( ArgumentNullException ), dataGridControl.Name );
 
-      if( gridControl == null )
-      {
-        throw new ArgumentNullException( "gridControl" );
-      }
+      var log = new Log();
+      log.StartUp();
 
-      m_dataGridControl = gridControl;
+      var handleGlobalItemsResetFlag = new InheritAutoResetFlag();
+      var deferDetailsRemapFlag = new LeveledAutoResetFlag();
+      var generator = new CustomItemContainerGenerator( dataGridControl, collectionView, dataGridContext, log, handleGlobalItemsResetFlag, deferDetailsRemapFlag );
+
+      dataGridContext.SetGenerator( generator );
+
+      return generator;
+    }
+
+    private static CustomItemContainerGenerator CreateGenerator( DataGridControl dataGridControl, CollectionView collectionView, DataGridContext dataGridContext, CustomItemContainerGenerator masterGenerator )
+    {
+      if( dataGridControl == null )
+        throw new ArgumentNullException( "dataGridControl" );
+
+      if( collectionView == null )
+        DataGridException.ThrowSystemException( "collectionView", typeof( ArgumentNullException ), dataGridControl.Name );
+
+      if( dataGridContext == null )
+        DataGridException.ThrowSystemException( "dataGridContext", typeof( ArgumentNullException ), dataGridControl.Name );
+
+      if( masterGenerator == null )
+        DataGridException.ThrowSystemException( "masterGenerator", typeof( ArgumentNullException ), dataGridControl.Name );
+
+      var log = masterGenerator.m_log;
+      var handleGlobalItemsResetFlag = new InheritAutoResetFlag( masterGenerator.m_handleGlobalItemsReset );
+      var deferDetailsRemapFlag = masterGenerator.m_deferDetailsRemap.GetChild();
+      var generator = new CustomItemContainerGenerator( dataGridControl, collectionView, dataGridContext, log, handleGlobalItemsResetFlag, deferDetailsRemapFlag );
+
+      dataGridContext.SetGenerator( generator );
+
+      return generator;
+    }
+
+    private CustomItemContainerGenerator(
+      DataGridControl dataGridControl,
+      CollectionView collectionView,
+      DataGridContext dataGridContext,
+      Log log,
+      InheritAutoResetFlag handleGlobalItemResetFlag,
+      LeveledAutoResetFlag deferDetailsRemapFlag )
+    {
+      Debug.Assert( dataGridControl != null );
+      Debug.Assert( collectionView != null );
+      Debug.Assert( dataGridContext != null );
+      Debug.Assert( log != null );
+      Debug.Assert( handleGlobalItemResetFlag != null );
+      Debug.Assert( deferDetailsRemapFlag != null );
+
+      m_dataGridControl = dataGridControl;
       m_dataGridContext = dataGridContext;
       m_collectionView = collectionView;
-
-      IList listInterface = m_collectionView as IList;
-      if( listInterface == null )
-      {
-        listInterface = m_collectionView.SourceCollection as IList;
-      }
-      m_listInterface = listInterface;
+      m_log = log;
+      m_handleGlobalItemsReset = handleGlobalItemResetFlag;
+      m_deferDetailsRemap = deferDetailsRemapFlag;
 
       //initialize explicitly (set a local value) to the DataItem attached property (for nested DataGridControls)
-      CustomItemContainerGenerator.SetDataItemProperty( m_dataGridControl, CustomItemContainerGenerator.NotSet );
+      CustomItemContainerGenerator.SetDataItemProperty( m_dataGridControl, EmptyDataItemDataProvider.Instance );
 
-      //Notify to the ItemCollection CollectionChanged event.
-      CollectionChangedEventManager.AddListener( m_collectionView, this );
-
-      //Notify to the DataGridControl's or DetailConfiguration GroupConfigurationSelector Changed event.
-      GroupConfigurationSelectorChangedEventManager.AddListener( m_dataGridContext, this );
-
-      CollectionChangedEventManager.AddListener( m_dataGridContext.DetailConfigurations, this );
-
-      // It would have been neat to create a DependencyPropertyChangedEventManager but the 
-      // WeakEventManager was not made to work with DependencyPropertyDescriptor.AddValueChanged.
-
-      //identifies a Master generator
-      if( m_dataGridContext.SourceDetailConfiguration == null )
-      {
-        ItemsSourceChangeCompletedEventManager.AddListener( m_dataGridControl, this );
-        ViewChangedEventManager.AddListener( m_dataGridControl, this );
-        ThemeChangedEventManager.AddListener( m_dataGridControl, this );
-
-      }
+      this.RegisterEvents();
 
       m_nodeFactory = new GeneratorNodeFactory( this.OnGeneratorNodeItemsCollectionChanged,
                                                 this.OnGeneratorNodeGroupsCollectionChanged,
                                                 this.OnGeneratorNodeExpansionStateChanged,
                                                 this.OnGroupGeneratorNodeIsExpandedChanging,
-                                                this.OnGroupGeneratorNodeIsExpandedChanged );
+                                                this.OnGroupGeneratorNodeIsExpandedChanged,
+                                                dataGridControl );
 
       m_headerFooterDataContextBinding = new Binding();
       m_headerFooterDataContextBinding.Source = m_dataGridControl;
@@ -114,14 +137,7 @@ namespace Xceed.Wpf.DataGrid
       this.IncrementCurrentGenerationCount();
     }
 
-    internal event CustomGeneratorChangedEventHandler ItemsChanged;
-    internal event ContainersRemovedEventHandler ContainersRemoved;
-
-    public event EventHandler DetailsChanged;
-
-    internal static readonly object NotSet = new object();
-
-    #region CurrentGeneratorContentGeneration Property
+    #region CurrentGeneratorContentGeneration Internal Property
 
     internal int CurrentGeneratorContentGeneration
     {
@@ -131,27 +147,31 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion CurrentGeneratorContentGeneration Property
+    private int m_currentGeneratorContentGeneration; //0
 
-    #region DataItemProperty Attached Property
+    #endregion
+
+    #region DataItemProperty Attached Internal Property
 
     internal static readonly DependencyProperty DataItemPropertyProperty = DependencyProperty.RegisterAttached(
-      "DataItemProperty", typeof( object ), typeof( CustomItemContainerGenerator ),
-      new FrameworkPropertyMetadata( CustomItemContainerGenerator.NotSet, FrameworkPropertyMetadataOptions.Inherits ) );
+      "DataItemProperty",
+      typeof( DataItemDataProviderBase ),
+      typeof( CustomItemContainerGenerator ),
+      new FrameworkPropertyMetadata( EmptyDataItemDataProvider.Instance, FrameworkPropertyMetadataOptions.Inherits ) );
 
-    private static object GetDataItemProperty( DependencyObject obj )
+    internal static DataItemDataProviderBase GetDataItemProperty( DependencyObject obj )
     {
-      return obj.GetValue( CustomItemContainerGenerator.DataItemPropertyProperty );
+      return ( DataItemDataProviderBase )obj.GetValue( CustomItemContainerGenerator.DataItemPropertyProperty );
     }
 
-    private static void SetDataItemProperty( DependencyObject obj, object value )
+    private static void SetDataItemProperty( DependencyObject obj, DataItemDataProviderBase value )
     {
       obj.SetValue( CustomItemContainerGenerator.DataItemPropertyProperty, value );
     }
 
-    #endregion DataItemProperty Attached Property
+    #endregion
 
-    #region IsInUse Property
+    #region IsInUse Internal Property
 
     internal bool IsInUse
     {
@@ -175,7 +195,7 @@ namespace Xceed.Wpf.DataGrid
       this.IsInUse = true;
     }
 
-    #endregion IsInUse Property
+    #endregion
 
     #region Header Property
 
@@ -187,7 +207,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion Header Property
+    private HeadersFootersGeneratorNode m_firstHeader;
+
+    #endregion
 
     #region Footer Property
 
@@ -199,7 +221,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion Footer Property
+    private HeadersFootersGeneratorNode m_firstFooter;
+
+    #endregion
 
     #region RealizedContainers Property
 
@@ -211,7 +235,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion RealizedContainers
+    #endregion
 
     #region RealizedItems Property
 
@@ -223,47 +247,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion RealizedItems
-
-    #region IsHandlingItemsRecreation Private Property
-
-    private bool IsHandlingItemsRecreation
-    {
-      get
-      {
-        return m_flags[ ( int )CustomItemContainerGeneratorFlags.IsHandlingItemsRecreation ];
-      }
-      set
-      {
-        m_flags[ ( int )CustomItemContainerGeneratorFlags.IsHandlingItemsRecreation ] = value;
-      }
-    }
-
     #endregion
 
-    #region IsEnsuringNodeTreeCreated Private Property
-
-    private bool IsEnsuringNodeTreeCreated
-    {
-      get
-      {
-        return m_flags[ ( int )CustomItemContainerGeneratorFlags.IsEnsuringNodeTreeCreated ];
-      }
-      set
-      {
-        m_flags[ ( int )CustomItemContainerGeneratorFlags.IsEnsuringNodeTreeCreated ] = value;
-      }
-    }
-
-    #endregion
-
-    private GeneratorNodeFactory NodeFactory
-    {
-      get
-      {
-        return m_nodeFactory;
-      }
-    }
+    #region Status Property
 
     public GeneratorStatus Status
     {
@@ -273,55 +259,464 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private GeneratorStatus m_generatorStatus = GeneratorStatus.NotStarted;
+
+    #endregion
+
+    #region NodeFactory Private Property
+
+    private GeneratorNodeFactory NodeFactory
+    {
+      get
+      {
+        return m_nodeFactory;
+      }
+    }
+
+    private readonly GeneratorNodeFactory m_nodeFactory;
+
+    #endregion
+
+    #region IsDetailsRemapDeferred Private Property
+
+    private bool IsDetailsRemapDeferred
+    {
+      get
+      {
+        return m_deferDetailsRemap.IsSet;
+      }
+    }
+
+    private IDisposable DeferDetailsRemap()
+    {
+      return m_deferDetailsRemap.Set();
+    }
+
+    private readonly LeveledAutoResetFlag m_deferDetailsRemap;
+
+    #endregion
+
+    #region IsEnsuringNodeTreeCreated Private Property
+
+    private bool IsEnsuringNodeTreeCreated
+    {
+      get
+      {
+        return m_ensureNodeTreeCreated.IsSet;
+      }
+    }
+
+    private IDisposable SetIsEnsuringNodeTreeCreated()
+    {
+      return m_ensureNodeTreeCreated.Set();
+    }
+
+    private readonly AutoResetFlag m_ensureNodeTreeCreated = AutoResetFlagFactory.Create();
+
+    #endregion
+
+    #region IsHandlingGlobalItemsReset Private Property
+
+    private bool IsHandlingGlobalItemsReset
+    {
+      get
+      {
+        return m_handleGlobalItemsReset.IsSet;
+      }
+    }
+
+    private bool IsHandlingGlobalItemsResetLocally
+    {
+      get
+      {
+        return m_handleGlobalItemsReset.IsSetLocal;
+      }
+    }
+
+    private IDisposable SetIsHandlingGlobalItemsResetLocally()
+    {
+      m_log.Assert( this, ( m_containersRemovedDeferCount != 0 ) || ( m_deferredContainersRemoved.Count == 0 ), "( m_containersRemovedDeferCount != 0 ) || ( m_deferredContainersRemoved.Count == 0 )" );
+
+      return m_handleGlobalItemsReset.SetLocal();
+    }
+
+    private readonly InheritAutoResetFlag m_handleGlobalItemsReset;
+
+    #endregion
+
+    #region DetailsChanged Event
+
+    public event EventHandler DetailsChanged;
+
+    #endregion
+
+    #region ItemsChanged Internal Event
+
+    internal event CustomGeneratorChangedEventHandler ItemsChanged;
+
+    private void SendRemoveEvent( GeneratorPosition remPos, int oldIndex, int remCount, int generatedRemCount, IList<DependencyObject> removedContainers )
+    {
+      var handler = this.ItemsChanged;
+      if( handler == null )
+        return;
+
+      using( this.DeferDetailsRemap() )
+      {
+        handler.Invoke( this, new CustomGeneratorChangedEventArgs( NotifyCollectionChangedAction.Remove, remPos, oldIndex, remPos, oldIndex, remCount, generatedRemCount, removedContainers ) );
+      }
+    }
+
+    private void SendAddEvent( GeneratorPosition genPos, int index, int addCount )
+    {
+      var handler = this.ItemsChanged;
+      if( handler == null )
+        return;
+
+      using( this.DeferDetailsRemap() )
+      {
+        handler.Invoke( this, new CustomGeneratorChangedEventArgs( NotifyCollectionChangedAction.Add, genPos, index, addCount, 0 ) );
+      }
+    }
+
+    private void SendResetEvent()
+    {
+      var handler = this.ItemsChanged;
+      if( handler == null )
+        return;
+
+      using( this.DeferDetailsRemap() )
+      {
+        handler.Invoke( this, new CustomGeneratorChangedEventArgs( NotifyCollectionChangedAction.Reset, new GeneratorPosition(), 0, 0, 0 ) );
+      }
+    }
+
+    #endregion
+
+    #region ContainersRemoved Internal Event
+
+    internal event ContainersRemovedEventHandler ContainersRemoved;
+
+    private void NotifyContainersRemoved( IList<DependencyObject> removedContainers )
+    {
+      if( m_containersRemovedDeferCount > 0 )
+      {
+        m_deferredContainersRemoved.AddRange( removedContainers );
+      }
+      else if( removedContainers.Count > 0 )
+      {
+        this.NotifyContainersRemoved( new ContainersRemovedEventArgs( removedContainers ) );
+      }
+    }
+
+    private void NotifyContainersRemoved( ContainersRemovedEventArgs e )
+    {
+      if( !this.IsRecyclingEnabled )
+        return;
+
+      var handler = this.ContainersRemoved;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, e );
+    }
+
+    #endregion
+
+    #region Logging Methods
+
+    [Conditional( "CUSTOMLOG" )]
+    internal void ResetLog( string gridUniqueName )
+    {
+      m_log.StartUp( gridUniqueName );
+    }
+
+    [Conditional( "LOG" )]
+    private void LogState()
+    {
+      StringBuilder sb = new StringBuilder( 1024 );
+      this.LogState( sb );
+
+      m_log.WriteLine( this, sb.ToString() );
+    }
+
+    [Conditional( "LOG" )]
+    private void LogState( StringBuilder sb )
+    {
+      var parent = m_dataGridContext.ParentDataGridContext;
+      if( parent != null )
+      {
+        parent.CustomItemContainerGenerator.LogState( sb );
+      }
+
+      sb.Append( "Generator state : " );
+      if( parent == null )
+      {
+        sb.AppendLine( "MASTER" );
+      }
+      else
+      {
+        sb.AppendLine( CustomItemContainerGenerator.FormatObjectId( "DETAIL - D", m_dataGridContext.ParentItem ) );
+      }
+
+      sb.AppendLine( string.Empty );
+      sb.AppendLine( " m_genPosToContainer :" );
+      for( int i = 0; i < m_genPosToContainer.Count; i++ )
+      {
+        object value = m_genPosToContainer[ i ];
+
+        if( value == null )
+        {
+          sb.AppendLine( "  [ " + i.ToString() + " ] - null" );
+        }
+        else
+        {
+          sb.AppendLine( "  [ " + i.ToString() + " ] - " + value.GetHashCode() );
+        }
+      }
+
+      sb.AppendLine( " m_genPosToIndex :" );
+      for( int i = 0; i < m_genPosToIndex.Count; i++ )
+      {
+        object value = m_genPosToIndex[ i ];
+
+        if( value == null )
+        {
+          sb.AppendLine( "  [ " + i.ToString() + " ] - null" );
+        }
+        else
+        {
+          sb.AppendLine( "  [ " + i.ToString() + " ] - " + value.ToString() );
+        }
+      }
+
+      sb.AppendLine( " m_genPosToItem :" );
+      for( int i = 0; i < m_genPosToItem.Count; i++ )
+      {
+        object value = m_genPosToItem[ i ];
+
+        if( value == null )
+        {
+          sb.AppendLine( "  [ " + i.ToString() + " ] - null" );
+        }
+        else
+        {
+          sb.AppendLine( "  [ " + i.ToString() + " ] - D" + value.GetHashCode() );
+        }
+      }
+
+      sb.AppendLine( " m_genPosToNode :" );
+      for( int i = 0; i < m_genPosToNode.Count; i++ )
+      {
+        object value = m_genPosToNode[ i ];
+
+        if( value == null )
+        {
+          sb.AppendLine( "  [ " + i.ToString() + " ] - null" );
+        }
+        else
+        {
+          string prefix;
+
+          if( value is DetailGeneratorNode )
+          {
+            prefix = "DN";
+          }
+          else if( value is ItemsGeneratorNode )
+          {
+            prefix = "IN";
+          }
+          else if( value is CollectionGeneratorNode )
+          {
+            prefix = "CN";
+          }
+          else
+          {
+            prefix = "?N";
+          }
+
+          int itemCount = ( value is GeneratorNode ) ? ( ( GeneratorNode )value ).ItemCount : 0;
+
+          sb.AppendLine( "  [ " + i.ToString() + " ] - " + prefix + value.GetHashCode() + " - ItemCount : " + itemCount );
+        }
+      }
+
+      sb.AppendLine( " m_generatorDirection :" + m_generatorDirection.ToString() );
+      sb.AppendLine( CustomItemContainerGenerator.FormatObjectId( " m_generatorCurrentDetail : DN", m_generatorCurrentDetail ) );
+      sb.AppendLine( " m_generatorCurrentDetailIndex : " + m_generatorCurrentDetailIndex.ToString() );
+      sb.AppendLine( " m_generatorCurrentDetailNodeIndex : " + m_generatorCurrentDetailNodeIndex.ToString() );
+      sb.AppendLine( " m_generatorCurrentGlobalIndex : " + m_generatorCurrentGlobalIndex.ToString() );
+      sb.AppendLine( " m_generatorCurrentOffset : " + m_generatorCurrentOffset.ToString() );
+      sb.AppendLine( " m_generatorStatus : " + m_generatorStatus.ToString() );
+      sb.AppendLine( " m_genPosToIndexUpdateInhibitCount : " + m_genPosToIndexUpdateInhibitCount.ToString() );
+      sb.AppendLine( " IsEnsuringNodeTreeCreated : " + this.IsEnsuringNodeTreeCreated.ToString() );
+      sb.AppendLine( " IsHandlingGlobalItemsReset : " + this.IsHandlingGlobalItemsReset.ToString() );
+      sb.AppendLine( " IsDetailsRemapDeferred : " + this.IsDetailsRemapDeferred.ToString() );
+
+      int newItemCount = m_cachedItemCount;
+      if( m_lastValidItemCountGeneration != m_currentGeneratorContentGeneration )
+      {
+        if( m_startNode != null )
+        {
+          int chainLength;
+          GeneratorNodeHelper.EvaluateChain( m_startNode, out newItemCount, out chainLength );
+        }
+        else
+        {
+          newItemCount = 0;
+        }
+      }
+
+      sb.Append( " m_cachedItemCount : " + m_cachedItemCount.ToString() );
+      if( newItemCount != m_cachedItemCount )
+      {
+        sb.Append( " (needs refresh) - ItemCount : " + newItemCount.ToString() );
+      }
+      sb.AppendLine( string.Empty );
+
+      sb.AppendLine( string.Empty );
+    }
+
+    [Conditional( "LOG" )]
+    private void ValidateIndexOrder( string message )
+    {
+      int count = m_genPosToIndex.Count;
+      int previousIndex = -1;
+
+      for( int i = 0; i < count; i++ )
+      {
+        int tempIndex = m_genPosToIndex[ i ];
+
+        if( tempIndex <= previousIndex )
+        {
+          this.LogState();
+
+          if( string.IsNullOrEmpty( message ) )
+          {
+            m_log.Fail( this, "### none sequential index detected." );
+          }
+          else
+          {
+            m_log.Fail( this, "### none sequential index detected. " + message );
+          }
+
+          break;
+        }
+
+        previousIndex = tempIndex;
+      }
+    }
+
+    [Conditional( "DEBUG" ), Conditional( "LOG" )]
+    private void CheckMasterItem( object dataItem )
+    {
+      if( m_masterToDetails.ContainsKey( dataItem ) )
+        return;
+
+      m_log.Fail( this, "m_masterToDetails do not contains the item from m_floatingDetails." );
+    }
+
+    private static string FormatObjectId( string message, object item )
+    {
+      string id = ( item == null ) ? "null" : item.GetHashCode().ToString();
+
+      if( string.IsNullOrEmpty( message ) )
+        return id;
+
+      return message + id;
+    }
+
+    private readonly Log m_log;
+
+    #endregion
+
+    public static T FindContainerFromChild<T>( DataGridControl dataGridControl, DependencyObject element ) where T : DependencyObject, IDataGridItemContainer
+    {
+      if( ( dataGridControl == null ) || ( element == null ) )
+        return null;
+
+      T container = null;
+
+      while( element != null )
+      {
+        var currentDataGridContext = DataGridControl.GetDataGridContext( element );
+        var currentDataGridControl = ( currentDataGridContext == null ) ? null : currentDataGridContext.DataGridControl;
+
+        // We are only interested in containers that are part of the same grid.
+        if( currentDataGridControl == dataGridControl )
+        {
+          container = element as T;
+
+          // We have found the container;
+          if( container != null )
+            break;
+        }
+
+        // Since the element is the grid itself, we already know we will not find a suitable container beyond this point.
+        if( element == dataGridControl )
+          break;
+
+        element = TreeHelper.GetParent( element );
+      }
+
+      return container;
+    }
+
     public static FrameworkElement FindContainerFromChildOrRowSelectorOrSelf( DataGridControl dataGridControl, DependencyObject originalChildOrSelf )
     {
       if( ( dataGridControl == null ) || ( originalChildOrSelf == null ) )
         return null;
 
       DependencyObject childOrSelf = originalChildOrSelf;
+      IDataGridItemContainer container = null;
 
-      var containerDataGridContext = DataGridControl.GetDataGridContext( childOrSelf );
-      var containerDataGridControl = ( containerDataGridContext == null ) ? null : containerDataGridContext.DataGridControl;
-      var container = childOrSelf as IDataGridItemContainer;
-
-      while( ( childOrSelf != null ) &&
-        ( ( container == null ) || ( dataGridControl != containerDataGridControl ) ) )
+      while( childOrSelf != null )
       {
-        childOrSelf = TreeHelper.GetParent( childOrSelf );
+        var currentDataGridContext = DataGridControl.GetDataGridContext( childOrSelf );
+        var currentDataGridControl = ( currentDataGridContext == null ) ? null : currentDataGridContext.DataGridControl;
 
-        container = childOrSelf as IDataGridItemContainer;
-
-        if( container != null )
+        // We are only interested in containers that are part of the same grid.
+        if( currentDataGridControl == dataGridControl )
         {
-          // Let's check if the container's parent DataGridControl is itself inside a container.
-          containerDataGridContext = DataGridControl.GetDataGridContext( childOrSelf );
-          containerDataGridControl = ( containerDataGridContext == null ) ? null : containerDataGridContext.DataGridControl;
+          container = childOrSelf as IDataGridItemContainer;
+
+          // We have found the container;
+          if( container != null )
+            break;
+        }
+
+        // Since the element is the grid itself, we already know we will not find a suitable container beyond this point.
+        if( childOrSelf == dataGridControl )
+          break;
+
+        childOrSelf = TreeHelper.GetParent( childOrSelf );
+      }
+
+      // RowSelector are handled differently.
+      if( container == null )
+      {
+        var target = DataGridControl.GetContainer( originalChildOrSelf );
+
+        if( TreeHelper.IsDescendantOf( target, dataGridControl ) )
+        {
+          container = target as IDataGridItemContainer;
         }
       }
 
-      //This will happen in the case of a RowSelector, this is the way to retreive the row from the selector.
-      if( container == null )
-      {
-        container = DataGridControl.GetContainer( originalChildOrSelf ) as IDataGridItemContainer;
-      }
-
-      Debug.Assert( ( container == null ) || ( container is FrameworkElement ), "( container == null ) || ( container is FrameworkElement )" );
-#if LOG
-      Log.Assert( null, ( container == null ) || ( container is FrameworkElement ), "( container == null ) || ( container is FrameworkElement )" );
-#endif
+      dataGridControl.CustomItemContainerGenerator.m_log.Assert( ( container == null ) || ( container is FrameworkElement ),
+                                                                "( container == null ) || ( container is FrameworkElement )" );
 
       return container as FrameworkElement;
     }
 
     public void ResetGeneratorContent()
     {
-      this.CleanupGenerator( false );
+      this.CleanupGenerator();
       this.EnsureNodeTreeCreated();
     }
 
     public DependencyObject ContainerFromIndex( int itemIndex )
     {
-      if( m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount > 0 )
+      if( this.IsHandlingGlobalItemsReset )
         return null;
 
       DependencyObject retval = null;
@@ -348,7 +743,7 @@ namespace Xceed.Wpf.DataGrid
 
     internal DependencyObject ContainerFromItem( object item )
     {
-      if( m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount > 0 )
+      if( this.IsHandlingGlobalItemsReset )
         return null;
 
       DependencyObject retval = null;
@@ -404,17 +799,16 @@ namespace Xceed.Wpf.DataGrid
     [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1822:MarkMembersAsStatic" )]
     internal object ItemFromContainer( DependencyObject container )
     {
-      if( m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount > 0 )
+      if( this.IsHandlingGlobalItemsReset )
         return null;
 
-      object retval = null;
-
-      retval = CustomItemContainerGenerator.GetDataItemProperty( container );
-
-      if( retval == CustomItemContainerGenerator.NotSet )
+      var dataItemStore = CustomItemContainerGenerator.GetDataItemProperty( container );
+      if( ( dataItemStore == null ) || dataItemStore.IsEmpty )
         return null;
 
-      int genPosIndex = m_genPosToContainer.IndexOf( container );
+      var dataItem = dataItemStore.Data;
+      var genPosIndex = m_genPosToContainer.IndexOf( container );
+
       if( genPosIndex != -1 )
       {
         DetailGeneratorNode detailNode = m_genPosToNode[ genPosIndex ] as DetailGeneratorNode;
@@ -422,7 +816,7 @@ namespace Xceed.Wpf.DataGrid
           return null;
       }
 
-      return retval;
+      return dataItem;
     }
 
     public int IndexFromItem( object item )
@@ -471,7 +865,7 @@ namespace Xceed.Wpf.DataGrid
     public int GetGroupIndex( Group group )
     {
       if( group == null )
-        throw new ArgumentNullException( "group" );
+        DataGridException.ThrowSystemException( "group", typeof( ArgumentNullException ), m_dataGridControl.Name );
 
       this.EnsureNodeTreeCreated();
 
@@ -481,15 +875,12 @@ namespace Xceed.Wpf.DataGrid
         return nodeHelper.Index;
 
       //the item was not found in this generator's content... check all the detail generators
-      foreach( KeyValuePair<object, List<DetailGeneratorNode>> itemToDetails in m_masterToDetails )
+      foreach( var detailNode in this.GetDetailGeneratorNodes() )
       {
-        foreach( DetailGeneratorNode detailNode in itemToDetails.Value )
-        {
-          int groupIndex = detailNode.DetailGenerator.GetGroupIndex( group );
+        int groupIndex = detailNode.DetailGenerator.GetGroupIndex( group );
 
-          if( groupIndex > -1 )
-            return groupIndex + this.FindGlobalIndexForDetailNode( detailNode );
-        }
+        if( groupIndex > -1 )
+          return groupIndex + this.FindGlobalIndexForDetailNode( detailNode );
       }
 
       return -1;
@@ -523,7 +914,8 @@ namespace Xceed.Wpf.DataGrid
           }
           else
           {
-            throw new InvalidOperationException( "An attempt was made to retrieve the group of an item that does not belong to the generator." );
+            DataGridException.ThrowSystemException( "An attempt was made to retrieve the group of an item that does not belong to the generator.",
+                                                    typeof( InvalidOperationException ), m_dataGridControl.Name );
           }
         }
       }
@@ -559,14 +951,13 @@ namespace Xceed.Wpf.DataGrid
     public CollectionViewGroup GetParentGroupFromItem( object item, bool recurseDetails )
     {
       if( item == null )
-        throw new ArgumentNullException( "item" );
+        DataGridException.ThrowSystemException( "item", typeof( ArgumentNullException ), m_dataGridControl.Name );
 
       CollectionViewGroup collectionViewGroup = null;
 
       if( !this.TryGetParentGroupFromItem( item, recurseDetails, out collectionViewGroup ) )
-      {
-        throw new InvalidOperationException( "An attempt was made to retrieve the parent group of an item that does not belong to the generator." );
-      }
+        DataGridException.ThrowSystemException( "An attempt was made to retrieve the parent group of an item that does not belong to the generator.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       return collectionViewGroup;
     }
@@ -581,7 +972,7 @@ namespace Xceed.Wpf.DataGrid
       this.EnsureNodeTreeCreated();
 
       if( m_startNode == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "Start node is null for the CollectionViewGroup.", m_dataGridControl );
 
       //Invoke the helper that will check for the parent group within the local generator.
       if( this.TryGetParentGroupFromItemHelper( item, out collectionViewGroup ) )
@@ -594,15 +985,10 @@ namespace Xceed.Wpf.DataGrid
       if( recurseDetails )
       {
         //the item was not found in this generator's content... check all the detail generators
-        foreach( KeyValuePair<object, List<DetailGeneratorNode>> itemToDetails in m_masterToDetails )
+        foreach( var generator in this.GetDetailGenerators() )
         {
-          foreach( DetailGeneratorNode detail in itemToDetails.Value )
-          {
-            if( detail.DetailGenerator.TryGetParentGroupFromItem( item, recurseDetails, out collectionViewGroup ) )
-            {
-              return true;
-            }
-          }
+          if( generator.TryGetParentGroupFromItem( item, recurseDetails, out collectionViewGroup ) )
+            return true;
         }
       }
 
@@ -699,9 +1085,6 @@ namespace Xceed.Wpf.DataGrid
       {
         return false;
       }
-
-      //Default function behavior, if nobody else returned, then the function did not work as intended... as each "block" is supposed to return a value...
-      throw new DataGridInternalException();
     }
 
     public bool ExpandGroup( CollectionViewGroup group )
@@ -709,7 +1092,7 @@ namespace Xceed.Wpf.DataGrid
       bool groupExpanded = this.ExpandGroupCore( group, false );
 
       if( !groupExpanded )
-        throw new InvalidOperationException( "An attempt was made to expand a group that does not exist." );
+        DataGridException.ThrowSystemException( "An attempt was made to expand a group that does not exist.", typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       return groupExpanded;
     }
@@ -717,17 +1100,16 @@ namespace Xceed.Wpf.DataGrid
     internal bool ExpandGroupCore( CollectionViewGroup group, bool recurseDetails )
     {
       if( this.Status == GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "An attempt was made to expand a group while the generator is busy generating items." );
-      }
+        DataGridException.ThrowSystemException( "An attempt was made to expand a group while the generator is busy generating items.",
+                                                 typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       if( group == null )
-        throw new ArgumentNullException( "group" );
+        DataGridException.ThrowSystemException( "group", typeof( ArgumentNullException ), m_dataGridControl.Name );
 
       this.EnsureNodeTreeCreated();
 
       if( m_firstItem == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "No GeneratorNode found for the group.", m_dataGridControl );
 
       Group uiGroup = this.GetGroupFromCollectionViewGroup( group );
       if( uiGroup != null )
@@ -739,15 +1121,12 @@ namespace Xceed.Wpf.DataGrid
       if( recurseDetails )
       {
         //the item was not found in this generator's content... check all the detail generators
-        foreach( KeyValuePair<object, List<DetailGeneratorNode>> itemToDetails in m_masterToDetails )
+        foreach( var generator in this.GetDetailGenerators() )
         {
-          foreach( DetailGeneratorNode detail in itemToDetails.Value )
-          {
-            // If the item is not found in the detail generator, it will return false;
-            // The "public" function call will throw if item is never found in itself or its details.
-            if( detail.DetailGenerator.ExpandGroupCore( group, recurseDetails ) )
-              return true;
-          }
+          // If the item is not found in the detail generator, it will return false;
+          // The "public" function call will throw if item is never found in itself or its details.
+          if( generator.ExpandGroupCore( group, recurseDetails ) )
+            return true;
         }
       }
 
@@ -759,7 +1138,7 @@ namespace Xceed.Wpf.DataGrid
       bool groupCollapsed = this.CollapseGroupCore( group, false );
 
       if( !groupCollapsed )
-        throw new InvalidOperationException( "An attempt was made to collapse a group that does not exist." );
+        DataGridException.ThrowSystemException( "An attempt was made to collapse a group that does not exist.", typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       return groupCollapsed;
     }
@@ -767,17 +1146,16 @@ namespace Xceed.Wpf.DataGrid
     internal bool CollapseGroupCore( CollectionViewGroup group, bool recurseDetails )
     {
       if( this.Status == GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "An attempt was made to collapse a group while the generator is busy generating items." );
-      }
+        DataGridException.ThrowSystemException( "An attempt was made to collapse a group while the generator is busy generating items.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       if( group == null )
-        throw new ArgumentNullException( "group" );
+        DataGridException.ThrowSystemException( "group", typeof( ArgumentNullException ), m_dataGridControl.Name );
 
       this.EnsureNodeTreeCreated();
 
       if( m_firstItem == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "No GeneratorNode found for the group.", m_dataGridControl );
 
       Group uiGroup = this.GetGroupFromCollectionViewGroup( group );
       if( uiGroup != null )
@@ -789,15 +1167,12 @@ namespace Xceed.Wpf.DataGrid
       if( recurseDetails )
       {
         //the item was not found in this generator's content... check all the detail generators
-        foreach( KeyValuePair<object, List<DetailGeneratorNode>> itemToDetails in m_masterToDetails )
+        foreach( var generator in this.GetDetailGenerators() )
         {
-          foreach( DetailGeneratorNode detail in itemToDetails.Value )
-          {
-            // If the item is not found in the detail generator, it will return false;
-            // The "public" function call will throw if item is never found in itself or its details.
-            if( detail.DetailGenerator.CollapseGroupCore( group, recurseDetails ) )
-              return true;
-          }
+          // If the item is not found in the detail generator, it will return false;
+          // The "public" function call will throw if item is never found in itself or its details.
+          if( generator.CollapseGroupCore( group, recurseDetails ) )
+            return true;
         }
       }
 
@@ -809,7 +1184,7 @@ namespace Xceed.Wpf.DataGrid
       bool groupToggled = this.ToggleGroupExpansionCore( group, false );
 
       if( !groupToggled )
-        throw new InvalidOperationException( "An attempt was made to toggle a group that does not exist." );
+        DataGridException.ThrowSystemException( "An attempt was made to toggle a group that does not exist.", typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       return groupToggled;
     }
@@ -817,17 +1192,16 @@ namespace Xceed.Wpf.DataGrid
     internal bool ToggleGroupExpansionCore( CollectionViewGroup group, bool recurseDetails )
     {
       if( this.Status == GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "An attempt was made to a toggle a group's expansion while the generator is busy generating items." );
-      }
+        DataGridException.ThrowSystemException( "An attempt was made to a toggle a group's expansion while the generator is busy generating items.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       if( group == null )
-        throw new ArgumentNullException( "group" );
+        DataGridException.ThrowSystemException( "group", typeof( ArgumentNullException ), m_dataGridControl.Name );
 
       this.EnsureNodeTreeCreated();
 
       if( m_firstItem == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "No GeneratorNode found for the group.", m_dataGridControl );
 
       Group uiGroup = this.GetGroupFromCollectionViewGroup( group );
       if( uiGroup != null )
@@ -840,23 +1214,20 @@ namespace Xceed.Wpf.DataGrid
       if( recurseDetails )
       {
         //the item was not found in this generator's content... check all the detail generators
-        foreach( KeyValuePair<object, List<DetailGeneratorNode>> itemToDetails in m_masterToDetails )
+        foreach( var generator in this.GetDetailGenerators() )
         {
-          foreach( DetailGeneratorNode detail in itemToDetails.Value )
+          try
           {
-            try
-            {
-              return detail.DetailGenerator.ToggleGroupExpansionCore( group, recurseDetails );
-            }
-            catch( InvalidOperationException )
-            {
-              //if the item is not found in the detail generator, it will throw 
-              //an invalid operation exception. If it doesn't throw, then it is 
-              //safe to return the return value of the function.
+            return generator.ToggleGroupExpansionCore( group, recurseDetails );
+          }
+          catch( InvalidOperationException )
+          {
+            //if the item is not found in the detail generator, it will throw 
+            //an invalid operation exception. If it doesn't throw, then it is 
+            //safe to return the return value of the function.
 
-              //otherwise, suppress this exception as ultimately, the "root" function call will 
-              //throw if item is never found in itself or its details.
-            }
+            //otherwise, suppress this exception as ultimately, the "root" function call will 
+            //throw if item is never found in itself or its details.
           }
         }
       }
@@ -872,12 +1243,16 @@ namespace Xceed.Wpf.DataGrid
     internal bool IsGroupExpandedCore( CollectionViewGroup group, bool recurseDetails )
     {
       if( group == null )
-        throw new ArgumentNullException( "group" );
+      {
+        DataGridException.ThrowSystemException( "group", typeof( ArgumentNullException ), m_dataGridControl.Name );
+        //Simply there to remove compile error.
+        return false;
+      }
 
       this.EnsureNodeTreeCreated();
 
       if( m_firstItem == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "No GeneratorNode found for the group.", m_dataGridControl );
 
       Group uiGroup = this.GetGroupFromCollectionViewGroup( group );
       if( uiGroup != null )
@@ -888,28 +1263,29 @@ namespace Xceed.Wpf.DataGrid
       if( recurseDetails )
       {
         //the group was not found in this generator, check in all the child generators for the group.
-        foreach( KeyValuePair<object, List<DetailGeneratorNode>> itemToDetails in m_masterToDetails )
+        foreach( var generator in this.GetDetailGenerators() )
         {
-          foreach( DetailGeneratorNode detail in itemToDetails.Value )
+          try
           {
-            try
-            {
-              return detail.DetailGenerator.IsGroupExpandedCore( group, recurseDetails );
-            }
-            catch( InvalidOperationException )
-            {
-              //if the item is not found in the detail generator, it will throw 
-              //an invalid operation exception. If it doesn't throw, then it is 
-              //safe to return the return value of the function.
+            return generator.IsGroupExpandedCore( group, recurseDetails );
+          }
+          catch( InvalidOperationException )
+          {
+            //if the item is not found in the detail generator, it will throw 
+            //an invalid operation exception. If it doesn't throw, then it is 
+            //safe to return the return value of the function.
 
-              //otherwise, suppress this exception as ultimately, the "root" function call will 
-              //throw if item is never found in itself or its details.
-            }
+            //otherwise, suppress this exception as ultimately, the "root" function call will 
+            //throw if item is never found in itself or its details.
           }
         }
       }
 
-      throw new InvalidOperationException( "An attempt was made to consult the expansion state of a group that does not exist." );
+      DataGridException.ThrowSystemException( "An attempt was made to consult the expansion state of a group that does not exist.",
+                                              typeof( InvalidOperationException ), m_dataGridControl.Name );
+
+      //Simply there to remove compile error.
+      return false;
     }
 
     internal void ExpandDetails( object dataItem )
@@ -927,7 +1303,7 @@ namespace Xceed.Wpf.DataGrid
     internal bool AreDetailsExpanded( object dataItem )
     {
       if( dataItem == null )
-        throw new ArgumentNullException( "dataItem" );
+        DataGridException.ThrowSystemException( "dataItem", typeof( ArgumentNullException ), m_dataGridControl.Name );
 
       return m_masterToDetails.ContainsKey( dataItem );
     }
@@ -989,14 +1365,12 @@ namespace Xceed.Wpf.DataGrid
             {
               int masterIndex = this.IndexFromItem( masterToDetails.Key );
 
-              Debug.Assert( masterIndex != -1, "masterIndex != -1" );
-#if LOG
-              Log.Assert( this, masterIndex != -1, "masterIndex != -1" );
-#endif
+              m_log.Assert( this, masterIndex != -1, "masterIndex != -1" );
 
               retval = masterIndex + 1 + detailsTotalCount + itemIndex;
               break;
             }
+
             detailsTotalCount += detailNode.ItemCount;
           }
         }
@@ -1014,10 +1388,10 @@ namespace Xceed.Wpf.DataGrid
       GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
 
       if( !nodeHelper.FindNodeForIndex( index ) )
-        throw new ArgumentException( "The specified index does not correspond to an item in the generator.", "index" );
+        DataGridException.ThrowSystemException( "The specified index does not correspond to an item in the generator.",
+                                                typeof( ArgumentException ), m_dataGridControl.Name, "index" );
 
       int indexIndex = m_genPosToIndex.IndexOf( index );
-
       if( indexIndex == -1 )
         return null;
 
@@ -1027,7 +1401,6 @@ namespace Xceed.Wpf.DataGrid
     public int GetRealizedIndexForContainer( DependencyObject container )
     {
       int containerIndex = m_genPosToContainer.IndexOf( container );
-
       if( containerIndex == -1 )
         return -1;
 
@@ -1042,14 +1415,13 @@ namespace Xceed.Wpf.DataGrid
       {
         int itemIndex = m_collectionView.IndexOf( dataItem );
 
-        Debug.Assert( itemIndex != -1, "itemIndex != -1" );
-#if LOG
-        Log.Assert( this, itemIndex != -1, "itemIndex != -1" );
-#endif
+        m_log.Assert( this, itemIndex != -1, "itemIndex != -1" );
 
         masterIndexes.Add( itemIndex );
       }
+
       masterIndexes.Sort();
+
       return masterIndexes;
     }
 
@@ -1072,7 +1444,7 @@ namespace Xceed.Wpf.DataGrid
     public DataGridContext GetChildContext( object parentItem, string relationName )
     {
       if( parentItem == null )
-        throw new ArgumentNullException( "parentItem" );
+        DataGridException.ThrowSystemException( "parentItem", typeof( ArgumentNullException ), m_dataGridControl.Name );
 
       this.EnsureNodeTreeCreated();
 
@@ -1100,13 +1472,12 @@ namespace Xceed.Wpf.DataGrid
     {
       this.EnsureNodeTreeCreated();
 
-      foreach( List<DetailGeneratorNode> details in m_masterToDetails.Values )
-      {
-        foreach( DetailGeneratorNode detailNode in details )
-        {
-          yield return detailNode.DetailContext;
-        }
-      }
+      return this.GetChildContextsCore();
+    }
+
+    internal IEnumerable<DataGridContext> GetChildContextsCore()
+    {
+      return this.GetDetailContexts();
     }
 
     public bool Contains( object item )
@@ -1200,7 +1571,7 @@ namespace Xceed.Wpf.DataGrid
           }
 
           if( containerRealizedIndex == -1 )
-            throw new DataGridInternalException();
+            throw new DataGridInternalException( "The index of a sticky header container is out of bound.", m_dataGridControl );
 
           generatedStickyContainers.AddRange(
             this.GenerateStickyHeadersForDetail( container,
@@ -1312,7 +1683,7 @@ namespace Xceed.Wpf.DataGrid
           int insertionIndex = this.FindInsertionPoint( detailItemIndex );
 
           m_genPosToIndex.Insert( insertionIndex, detailItemIndex );
-          m_genPosToItem.Insert( insertionIndex, CustomItemContainerGenerator.GetDataItemProperty( stickyContainer.StickyContainer ) );
+          m_genPosToItem.Insert( insertionIndex, CustomItemContainerGenerator.GetDataItemProperty( stickyContainer.StickyContainer ).Data );
           m_genPosToContainer.Insert( insertionIndex, stickyContainer.StickyContainer );
           m_genPosToNode.Insert( insertionIndex, detailNode );
         }
@@ -1599,7 +1970,7 @@ namespace Xceed.Wpf.DataGrid
           }
 
           if( containerRealizedIndex == -1 )
-            throw new DataGridInternalException();
+            throw new DataGridInternalException( "The index of a sticky footer container is out of bound.", m_dataGridControl );
 
           generatedStickyContainers.AddRange(
             this.GenerateStickyFootersForDetail( container, detailNode, areFootersSticky, areGroupFootersSticky ) );
@@ -1686,7 +2057,7 @@ namespace Xceed.Wpf.DataGrid
           int insertionIndex = this.FindInsertionPoint( detailItemIndex );
 
           m_genPosToIndex.Insert( insertionIndex, detailItemIndex );
-          m_genPosToItem.Insert( insertionIndex, CustomItemContainerGenerator.GetDataItemProperty( stickyContainer.StickyContainer ) );
+          m_genPosToItem.Insert( insertionIndex, CustomItemContainerGenerator.GetDataItemProperty( stickyContainer.StickyContainer ).Data );
           m_genPosToContainer.Insert( insertionIndex, stickyContainer.StickyContainer );
           m_genPosToNode.Insert( insertionIndex, detailNode );
         }
@@ -1821,10 +2192,7 @@ namespace Xceed.Wpf.DataGrid
           int detailFirstRealizedIndex = this.FindGlobalIndexForDetailNode( detailNode );
           int correctedIndex = index - detailFirstRealizedIndex;
 
-          Debug.Assert( correctedIndex >= 0, "correctedIndex >= 0 .. 1" );
-#if LOG
-          Log.Assert( this, correctedIndex >= 0, "correctedIndex >= 0 .. 1" );
-#endif
+          m_log.Assert( this, correctedIndex >= 0, "correctedIndex >= 0 .. 1" );
 
           stickyHeadersCount +=
             detailNode.DetailGenerator.GetStickyHeaderCountForIndex( correctedIndex,
@@ -1945,10 +2313,7 @@ namespace Xceed.Wpf.DataGrid
           int detailFirstRealizedIndex = this.FindGlobalIndexForDetailNode( detailNode );
           int correctedIndex = index - detailFirstRealizedIndex;
 
-          Debug.Assert( correctedIndex >= 0, "correctedIndex >= 0 .. 2" );
-#if LOG
-          Log.Assert( this, correctedIndex >= 0, "correctedIndex >= 0 .. 2" );
-#endif
+          m_log.Assert( this, correctedIndex >= 0, "correctedIndex >= 0 .. 2" );
 
           stickyFooterCount +=
             detailNode.DetailGenerator.GetStickyFooterCountForIndex( correctedIndex,
@@ -2042,32 +2407,28 @@ namespace Xceed.Wpf.DataGrid
     DependencyObject IItemContainerGenerator.GenerateNext( out bool isNewlyRealized )
     {
       if( this.Status != GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "The Generator is not active: StartAt() was not called prior calling GenerateNext() or the returned IDisposable was already disposed of." );
-      }
+        DataGridException.ThrowSystemException( "The Generator is not active: StartAt() was not called prior calling GenerateNext() or the returned IDisposable was already disposed of.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       DependencyObject container = null;
       isNewlyRealized = false;
 
-      //case 117460: the GeneratorNodeHelper will not be created if there are no items in the generator when started.
       if( m_generatorNodeHelper == null ) //the m_generatorNodeHelper will be turned to null when we reach the end of the list ot items.
         return null;
 
-      Debug.Assert( !( m_generatorNodeHelper.CurrentNode is GroupGeneratorNode ), "Algorithm should not allow the Generator's m_generatorNodeHelper to be on a GroupGeneratorNode" );
-#if LOG
-      Log.Assert( this, !( m_generatorNodeHelper.CurrentNode is GroupGeneratorNode ), "Algorithm should not allow the Generator's m_generatorNodeHelper to be on a GroupGeneratorNode" );
-#endif
+      m_log.Assert( this, !( m_generatorNodeHelper.CurrentNode is GroupGeneratorNode ), "Algorithm should not allow the Generator's m_generatorNodeHelper to be on a GroupGeneratorNode" );
 
       GeneratorNode node = m_generatorNodeHelper.CurrentNode;
 
-      if( ( node == null ) || ( !( node is CollectionGeneratorNode ) ) )
-        throw new DataGridInternalException();
+      if( node == null )
+        throw new DataGridInternalException( "CurrentNode is null.", m_dataGridControl );
 
+      if( !( node is CollectionGeneratorNode ) )
+        throw new DataGridInternalException( "CurrentNode is not a CollectionGeneratorNode.", m_dataGridControl );
 
       //if a detail generator is currently "started", then rely on it for the generation of items
       if( m_generatorCurrentDetail != null )
       {
-
         //if the detail generator was not yet started
         if( m_generatorCurrentDetailDisposable == null )
         {
@@ -2097,31 +2458,11 @@ namespace Xceed.Wpf.DataGrid
         Debug.Unindent();
 
         m_genPosToIndex.Insert( insertionIndex, m_generatorCurrentGlobalIndex );
-        m_genPosToItem.Insert( insertionIndex, CustomItemContainerGenerator.GetDataItemProperty( container ) );
+        m_genPosToItem.Insert( insertionIndex, CustomItemContainerGenerator.GetDataItemProperty( container ).Data );
         m_genPosToContainer.Insert( insertionIndex, container );
         m_genPosToNode.Insert( insertionIndex, node );
 
-#if LOG
-        int count = m_genPosToIndex.Count;
-        int previousIndex = -1;
-
-        for( int i = 0; i < count; i++ )
-        {
-          int tempIndex = m_genPosToIndex[ i ];
-
-          if( tempIndex >= previousIndex )
-          {
-            previousIndex = tempIndex;
-          }
-          else
-          {
-            Debug.Assert( false, "### none sequential index detected (GenerateNext - genpos" + insertionIndex.ToString() + ", globalIndex" + m_generatorCurrentGlobalIndex.ToString() + ")" );
-            Log.Assert( this, false, "### none sequential index detected (GenerateNext - genpos" + insertionIndex.ToString() + ", globalIndex" + m_generatorCurrentGlobalIndex.ToString() + ")" );
-            this.WriteStateInLog();
-            break;
-          }
-        }
-#endif
+        this.ValidateIndexOrder( "genpos" + insertionIndex.ToString() + ", globalIndex" + m_generatorCurrentGlobalIndex.ToString() + ")" );
       }
 
       if( m_generatorDirection == GeneratorDirection.Forward )
@@ -2180,6 +2521,14 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private GeneratorPosition GetSafeGeneratorPositionFromIndex( int itemIndex )
+    {
+      using( this.DeferDetailsRemap() )
+      {
+        return this.GeneratorPositionFromIndex( itemIndex );
+      }
+    }
+
     ItemContainerGenerator IItemContainerGenerator.GetItemContainerGeneratorForPanel( Panel panel )
     {
       return ( ( IItemContainerGenerator )( ( ItemsControl )m_dataGridControl ).ItemContainerGenerator ).GetItemContainerGeneratorForPanel( panel );
@@ -2219,33 +2568,31 @@ namespace Xceed.Wpf.DataGrid
     void IItemContainerGenerator.PrepareItemContainer( DependencyObject container )
     {
       if( this.Status != GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "The Generator is not active: StartAt() was not called prior calling PrepareItemContainer() or the returned IDisposable was already disposed of." );
-      }
+        DataGridException.ThrowSystemException( "The Generator is not active: StartAt() was not called prior calling PrepareItemContainer() or the returned IDisposable was already disposed of.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
-      object dataItem = CustomItemContainerGenerator.GetDataItemProperty( container );
-      if( dataItem != null )
-      {
-        m_dataGridControl.PrepareItemContainer( container, dataItem );
-      }
+      var dataItemStore = CustomItemContainerGenerator.GetDataItemProperty( container );
+      if( ( dataItemStore == null ) || dataItemStore.IsEmpty )
+        return;
 
+      var dataItem = dataItemStore.Data;
+      if( dataItem == null )
+        return;
+
+      m_dataGridControl.PrepareItemContainer( container, dataItem );
     }
 
     void IItemContainerGenerator.Remove( GeneratorPosition position, int count )
     {
       if( this.Status == GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "Cannot perform this operation while the generator is busy generating items" );
-      }
-      if( position.Offset != 0 )
-      {
+        DataGridException.ThrowSystemException( "Cannot perform this operation while the generator is busy generating items",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
-        throw new InvalidOperationException( "The GeneratorPosition to remove cannot map to a non-realized item." );
-      }
+      if( position.Offset != 0 )
+        DataGridException.ThrowSystemException( "The GeneratorPosition to remove cannot map to a non-realized item.", typeof( InvalidOperationException ), m_dataGridControl.Name );
+
       if( position.Index == -1 )
-      {
-        throw new InvalidOperationException( "The GeneratorPosition to remove cannot map to a non-realized item." );
-      }
+        DataGridException.ThrowSystemException( "he GeneratorPosition to remove cannot map to a non-realized item.", typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       //if the index passed is within the array!
       if( position.Index < m_genPosToIndex.Count )
@@ -2254,10 +2601,8 @@ namespace Xceed.Wpf.DataGrid
         for( int i = 0; i < count; i++ )
         {
           if( this.RemoveGeneratedItem( position.Index, null ) == 0 )
-          {
             //This case deserves a more solid approach... We do not want to allow removal from the user panel of an item that somehow is not present.
-            throw new DataGridInternalException();
-          }
+            throw new DataGridInternalException( "Trying to remove an item at an out-of-bound GenratorPosition index.", m_dataGridControl );
         }
 
         //No need to update the Generator current generation, since the content of the generator items did not change (only the list of realized items).
@@ -2265,7 +2610,7 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "Trying to remove an item at an out-of-bound GenratorPosition index", m_dataGridControl );
       }
 
     }
@@ -2273,17 +2618,16 @@ namespace Xceed.Wpf.DataGrid
     void IItemContainerGenerator.RemoveAll()
     {
       if( this.Status == GeneratorStatus.GeneratingContainers )
+        DataGridException.ThrowSystemException( "Cannot perform this operation while the generator is busy generating items",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
+
+      using( this.SetIsHandlingGlobalItemsResetLocally() )
       {
-        throw new InvalidOperationException( "Cannot perform this operation while the generator is busy generating items" );
+        //Call to remove all shall not request container recycling panels to remove their containers. Therefore, I am not collecting the remove containers.
+        this.RemoveAllGeneratedItems();
       }
 
-      //Call to remove all shall not request container recycling panels to remove their containers. Tehrefore, I am not collecting the remove 
-      //containers.
-      this.RemoveAllGeneratedItems();
-
       //No need to update the Generator current generation, since the content of the generator items did not change (only the list of realized items).
-      //m_currentGeneratorContentGeneration++;
-
     }
 
     IDisposable IItemContainerGenerator.StartAt( GeneratorPosition position, GeneratorDirection direction, bool allowStartAtRealizedItem )
@@ -2291,9 +2635,8 @@ namespace Xceed.Wpf.DataGrid
       this.SetIsInUse();
 
       if( this.Status == GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "Cannot perform this operation while the generator is busy generating items" );
-      }
+        DataGridException.ThrowSystemException( "Cannot perform this operation while the generator is busy generating items",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       this.EnsureNodeTreeCreated();
 
@@ -2369,7 +2712,11 @@ namespace Xceed.Wpf.DataGrid
         }
 
         m_flags[ ( int )CustomItemContainerGeneratorFlags.RecyclingEnabled ] = value;
-        this.SetIsRecyclingEnabledOnDetails( value );
+
+        foreach( var generator in this.GetDetailGenerators() )
+        {
+          generator.IsRecyclingEnabled = value;
+        }
       }
     }
 
@@ -2397,7 +2744,8 @@ namespace Xceed.Wpf.DataGrid
       object newCurrentItem = nodeHelper.FindIndex( newCurrentIndex );
 
       if( newCurrentItem == null )
-        throw new InvalidOperationException( "An attempt was made to access an item at an index that does not correspond to an item." );
+        DataGridException.ThrowSystemException( "An attempt was made to access an item at an index that does not correspond to an item.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       //Then, if the item is within an ItemsNode, check if it belongs to a detail
       ItemsGeneratorNode itemsNode = nodeHelper.CurrentNode as ItemsGeneratorNode;
@@ -2421,7 +2769,7 @@ namespace Xceed.Wpf.DataGrid
 
       //If the item is not within an ItemsNode or not within a detail
       //then set it current within its context.
-      m_dataGridContext.SetCurrentItemCore( newCurrentItem, false, false );
+      m_dataGridContext.SetCurrentItemCore( newCurrentItem, false, false, AutoScrollCurrentItemSourceTriggers.Navigation );
     }
 
     int ICustomItemContainerGenerator.GetCurrentIndex()
@@ -2438,22 +2786,12 @@ namespace Xceed.Wpf.DataGrid
     void ICustomItemContainerGenerator.RestoreFocus( DependencyObject container )
     {
       if( !m_genPosToContainer.Contains( container ) )
-        throw new ArgumentException( "The specified container is not part of the generator's content." );
+        DataGridException.ThrowSystemException( "The specified container is not part of the generator's content.",
+                                                typeof( ArgumentException ), m_dataGridControl.Name, "container" );
 
       DataGridContext dataGridContext = DataGridControl.GetDataGridContext( container );
       ColumnBase column = ( dataGridContext == null ) ? null : dataGridContext.CurrentColumn;
       m_dataGridControl.SetFocusHelper( container as UIElement, column, false, true );
-    }
-
-    private void SetIsRecyclingEnabledOnDetails( bool value )
-    {
-      foreach( List<DetailGeneratorNode> details in m_masterToDetails.Values )
-      {
-        foreach( DetailGeneratorNode detail in details )
-        {
-          detail.DetailGenerator.IsRecyclingEnabled = value;
-        }
-      }
     }
 
     #endregion
@@ -2464,10 +2802,7 @@ namespace Xceed.Wpf.DataGrid
       object dataItem;
       CollectionGeneratorNode node = m_generatorNodeHelper.CurrentNode as CollectionGeneratorNode;
 
-      Debug.Assert( node != null, "CustomItemContainerGenerator.GenerateNextLocalContainer: node is null." );
-#if LOG
-      Log.Assert( this, node != null, "CustomItemContainerGenerator.GenerateNextLocalContainer: node is null." );
-#endif
+      m_log.Assert( this, node != null, "CustomItemContainerGenerator.GenerateNextLocalContainer: node is null." );
 
       ItemsGeneratorNode itemsNode = node as ItemsGeneratorNode;
 
@@ -2484,44 +2819,17 @@ namespace Xceed.Wpf.DataGrid
 
         if( tempNode == null )
         {
-#if LOG
-          Debug.Assert( false, "CustomItemContainerGenerator.GenerateNextLocalContainer: ### cached Node is null ( at " + genPosIndex.ToString() + " )" );
-          Log.Assert( this, false, "CustomItemContainerGenerator.GenerateNextLocalContainer: ### cached Node is null ( at " + genPosIndex.ToString() + " )" );
-          Log.WriteLine( this, "### Possible crash - ResetGeneratorContent dispatched" );
-          this.WriteStateInLog();
+          this.LogState();
+          m_log.Fail( this, "CustomItemContainerGenerator.GenerateNextLocalContainer: ### cached Node is null ( at " + genPosIndex.ToString() + " )" );
 
-          m_dataGridControl.Dispatcher.BeginInvoke( ( Action )( () =>
-          {
-            this.ResetGeneratorContent();
-
-            if( m_dataGridControl.ItemsHost != null )
-              m_dataGridControl.ItemsHost.InvalidateMeasure();
-          } ), System.Windows.Threading.DispatcherPriority.Background );
-#else
-          throw new DataGridInternalException( "CustomItemContainerGenerator.GenerateNextLocalContainer: cached Node is null" );
-#endif
+          throw new DataGridInternalException( "CustomItemContainerGenerator.GenerateNextLocalContainer: cached Node is null", m_dataGridControl );
         }
-        else
+        else if( node != m_generatorNodeHelper.CurrentNode )
         {
-          if( node != m_generatorNodeHelper.CurrentNode )
-          {
-#if LOG
-            Debug.Assert( false, "CustomItemContainerGenerator.GenerateNextLocalContainer: # testNode is not the current one. ( " + m_genPosToNode[ genPosIndex ].GetType().ToString() + " ) ( at " + genPosIndex.ToString() + " )" );
-            Log.Assert( this, false, "CustomItemContainerGenerator.GenerateNextLocalContainer: # testNode is not the current one. ( " + m_genPosToNode[ genPosIndex ].GetType().ToString() + " ) ( at " + genPosIndex.ToString() + " )" );
-            Log.WriteLine( this, "### Possible crash - ResetGeneratorContent dispatched" );
-            this.WriteStateInLog();
+          this.LogState();
+          m_log.Fail( this, "CustomItemContainerGenerator.GenerateNextLocalContainer: # testNode is not the current one. ( " + m_genPosToNode[ genPosIndex ].GetType().ToString() + " ) ( at " + genPosIndex.ToString() + " )" );
 
-            m_dataGridControl.Dispatcher.BeginInvoke( ( Action )( () =>
-            {
-              this.ResetGeneratorContent();
-
-              if( m_dataGridControl.ItemsHost != null )
-                m_dataGridControl.ItemsHost.InvalidateMeasure();
-            } ), System.Windows.Threading.DispatcherPriority.Background );
-#else
-            throw new DataGridInternalException( "CustomItemContainerGenerator.GenerateNextLocalContainer: Node is not the current one." );
-#endif
-          }
+          throw new DataGridInternalException( "CustomItemContainerGenerator.GenerateNextLocalContainer: Node is not the current one.", m_dataGridControl );
         }
 
         isNewlyRealized = false;
@@ -2596,21 +2904,8 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        Debug.Assert( false, "CustomItemContainerGenerator.GenerateNextLocalContainer: node is null ( at " + genPosIndex.ToString() + " )" );
-#if LOG
-        Log.Assert( this, false, "CustomItemContainerGenerator.GenerateNextLocalContainer: node is null ( at " + genPosIndex.ToString() + " )" );
-        this.WriteStateInLog();
-
-        Log.WriteLine( this, "### Possible crash - ResetGeneratorContent dispatched" );
-
-        m_dataGridControl.Dispatcher.BeginInvoke( ( Action )( () =>
-          {
-            this.ResetGeneratorContent();
-
-            if( m_dataGridControl.ItemsHost != null )
-              m_dataGridControl.ItemsHost.InvalidateMeasure();
-          } ), System.Windows.Threading.DispatcherPriority.Background );
-#endif
+        this.LogState();
+        m_log.Fail( this, "CustomItemContainerGenerator.GenerateNextLocalContainer: node is null ( at " + genPosIndex.ToString() + " )" );
       }
 
       return container;
@@ -2668,12 +2963,8 @@ namespace Xceed.Wpf.DataGrid
       //if I was generating from a detail generator
       if( m_generatorCurrentDetail != null )
       {
-        Debug.Assert( currentMasterNode != null, "CustomItemContainerGenerator.MoveGeneratorForward: currentMasterNode is not null." );
-        Debug.Assert( currentMasterNode.Details != null, "CustomItemContainerGenerator.MoveGeneratorForward: currentMasterNode.Details is not null." );
-#if LOG
-        Log.Assert( this, currentMasterNode != null, "CustomItemContainerGenerator.MoveGeneratorForward: currentMasterNode is not null." );
-        Log.Assert( this, currentMasterNode.Details != null, "CustomItemContainerGenerator.MoveGeneratorForward: currentMasterNode.Details is not null." );
-#endif
+        m_log.Assert( this, currentMasterNode != null, "CustomItemContainerGenerator.MoveGeneratorForward: currentMasterNode is not null." );
+        m_log.Assert( this, currentMasterNode.Details != null, "CustomItemContainerGenerator.MoveGeneratorForward: currentMasterNode.Details is not null." );
 
         //incremment the running counter for the item index generated in the detail generator
         m_generatorCurrentDetailIndex++;
@@ -2692,10 +2983,7 @@ namespace Xceed.Wpf.DataGrid
           List<DetailGeneratorNode> detailsforMasterNode;
           currentMasterNode.Details.TryGetValue( m_generatorCurrentOffset, out detailsforMasterNode );
 
-          Debug.Assert( detailsforMasterNode != null, "CustomItemContainerGenerator.MoveGeneratorForward: detailsforMasterNode is not null." );
-#if LOG
-          Log.Assert( this, detailsforMasterNode != null, "CustomItemContainerGenerator.MoveGeneratorForward: detailsforMasterNode is not null." );
-#endif
+          m_log.Assert( this, detailsforMasterNode != null, "CustomItemContainerGenerator.MoveGeneratorForward: detailsforMasterNode is not null." );
 
           while( ( m_generatorCurrentDetailNodeIndex < detailsforMasterNode.Count ) && ( m_generatorCurrentDetailIndex == -1 ) )
           {
@@ -2786,12 +3074,8 @@ namespace Xceed.Wpf.DataGrid
       //if I was generating from a detail generator
       if( m_generatorCurrentDetail != null )
       {
-        Debug.Assert( currentMasterNode != null, "CustomItemContainerGenerator.MoveGeneratorBackward: currentMasterNode is not null." );
-        Debug.Assert( currentMasterNode.Details != null, "CustomItemContainerGenerator.MoveGeneratorBackward: currentMasterNode.Details is not null." );
-#if LOG
-        Log.Assert( this, currentMasterNode != null, "CustomItemContainerGenerator.MoveGeneratorBackward: currentMasterNode is not null." );
-        Log.Assert( this, currentMasterNode.Details != null, "CustomItemContainerGenerator.MoveGeneratorBackward: currentMasterNode.Details is not null." );
-#endif
+        m_log.Assert( this, currentMasterNode != null, "CustomItemContainerGenerator.MoveGeneratorBackward: currentMasterNode is not null." );
+        m_log.Assert( this, currentMasterNode.Details != null, "CustomItemContainerGenerator.MoveGeneratorBackward: currentMasterNode.Details is not null." );
 
         //decrement the running counter for the item index generated in the detail generator
         m_generatorCurrentDetailIndex--;
@@ -2812,10 +3096,7 @@ namespace Xceed.Wpf.DataGrid
             List<DetailGeneratorNode> detailsforMasterNode;
             currentMasterNode.Details.TryGetValue( m_generatorCurrentOffset, out detailsforMasterNode );
 
-            Debug.Assert( detailsforMasterNode != null, "CustomItemContainerGenerator.MoveGeneratorBackward: detailsforMasterNode is not null." );
-#if LOG
-            Log.Assert( this, detailsforMasterNode != null, "CustomItemContainerGenerator.MoveGeneratorBackward: detailsforMasterNode is not null." );
-#endif
+            m_log.Assert( this, detailsforMasterNode != null, "CustomItemContainerGenerator.MoveGeneratorBackward: detailsforMasterNode is not null." );
 
             while( ( m_generatorCurrentDetailNodeIndex >= 0 ) && ( m_generatorCurrentDetailIndex == -1 ) )
             {
@@ -2909,7 +3190,8 @@ namespace Xceed.Wpf.DataGrid
     private bool ShouldDrawBottomLine()
     {
       if( m_generatorStatus != GeneratorStatus.GeneratingContainers )
-        throw new InvalidOperationException( "An attempt was made to call the CustomItemContainerGenerator.ShouldDrawBottomLine method while containers are not being generated." );
+        DataGridException.ThrowSystemException( "An attempt was made to call the CustomItemContainerGenerator.ShouldDrawBottomLine method while containers are not being generated.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       return ( m_generatorCurrentGlobalIndex == ( this.ItemCount - 1 ) );
     }
@@ -2917,47 +3199,36 @@ namespace Xceed.Wpf.DataGrid
     private bool ItemHasExpandedDetails()
     {
       if( m_generatorStatus != GeneratorStatus.GeneratingContainers )
-        throw new InvalidOperationException( "An attempt was made to call the CustomItemContainerGenerator.ItemHasExpandedDetails method while containers are not being generated." );
+        DataGridException.ThrowSystemException( "An attempt was made to call the CustomItemContainerGenerator.ItemHasExpandedDetails method while containers are not being generated.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       ItemsGeneratorNode itemsNode = m_generatorNodeHelper.CurrentNode as ItemsGeneratorNode;
-
-      if( itemsNode == null )
+      if( ( itemsNode == null ) || ( itemsNode.Details == null ) )
         return false;
 
-      if( itemsNode.Details == null )
-      {
-        return false;
-      }
-      else if( itemsNode.Details.ContainsKey( m_generatorCurrentOffset ) )
-        return true;
+      return itemsNode.Details.ContainsKey( m_generatorCurrentOffset );
+    }
 
-      return false;
+    internal void CleanupGenerator()
+    {
+      this.CleanupGenerator( false );
     }
 
     internal void CleanupGenerator( bool isNestedCall )
     {
-      Debug.Assert( m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount == 0, "Generator is already processing a HandleGlobalItemReset or CleanupGenerator" );
-#if LOG
-      Log.Start( this, "CleanupGenerator" );
+      m_log.Assert( this, !this.IsHandlingGlobalItemsResetLocally, "Generator is already processing a HandleGlobalItemReset or CleanupGenerator" );
 
-      Log.Assert( this, m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount == 0, "Generator is already processing a HandleGlobalItemReset or CleanupGenerator" );
-#endif
-
-      if( m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount > 0 )
-      {
-#if LOG
-        Log.End( this, "CleanupGenerator - Ignored" );
-#endif
+      if( this.IsHandlingGlobalItemsResetLocally )
         return;
-      }
 
-      using( new ProcessingGlobalItemsResetOrRemovingAllGeneratedItemsDisposable( this ) )
+      using( m_log.BeginBlock( this, null ) )
+      using( this.SetIsHandlingGlobalItemsResetLocally() )
       {
         this.RemoveAllGeneratedItems();
 
         IList<DependencyObject> removedContainers = null;
 
-        RecyclingManager recyclingManager = m_dataGridContext.RecyclingManager;
+        var recyclingManager = m_dataGridContext.RecyclingManager;
         recyclingManager.RemoveRef( this );
         if( recyclingManager.RefCount == 0 )
         {
@@ -2975,6 +3246,8 @@ namespace Xceed.Wpf.DataGrid
           this.NotifyContainersRemoved( removedContainers );
         }
 
+        this.ClearLateGroupLevelDescriptions();
+
         if( m_startNode != null )
         {
           //Note: this does not disconnects the "general" master/detail relationship established between an Item and its details,
@@ -2991,39 +3264,23 @@ namespace Xceed.Wpf.DataGrid
         //This absolutelly needs to be done after the node list is Cleaned!
         this.CleanupDetailRelations();
       }
-
-#if LOG
-      Log.End( this, "CleanupGenerator" );
-#endif
     }
 
     private void CleanupDetailRelations()
     {
-#if LOG
-      Log.Start( this, "CleanupDetailRelations" );
-#endif
-
-      //clean the remnants of the master/detail stuff
-      foreach( KeyValuePair<object, List<DetailGeneratorNode>> masterToDetails in m_masterToDetails )
+      using( m_log.BeginBlock( this, null ) )
       {
-        foreach( DetailGeneratorNode detailNode in masterToDetails.Value )
+        var detailNodes = this.GetDetailGeneratorNodes().ToList();
+
+        m_masterToDetails.Clear();
+
+        foreach( var detailNode in detailNodes )
         {
-          this.CleanDetailNode( detailNode );
+          this.ClearDetailGeneratorNode( detailNode );
         }
 
-        masterToDetails.Value.Clear();
+        m_floatingDetails.Clear();
       }
-
-#if LOG
-      Log.WriteLine( this, "masterToDetails.Clear" );
-#endif
-
-      m_masterToDetails.Clear();
-      m_floatingDetails.Clear();
-
-#if LOG
-      Log.End( this, "CleanupDetailRelations" );
-#endif
     }
 
     private void IncrementCurrentGenerationCount( bool updateGenPosList )
@@ -3055,13 +3312,10 @@ namespace Xceed.Wpf.DataGrid
     private void OnItemsSourceChanged( object sender, EventArgs e )
     {
       // Avoid re-entrance when processing a global reset
-      if( m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount > 0 )
+      if( this.IsHandlingGlobalItemsReset )
         return;
 
-      //do a global reset when the items source changes on the DataGridControl.
-      this.HandleGlobalItemsReset( true );
-
-
+      this.CleanupGenerator();
     }
 
     private void OnDetailConfigurationsChanged( object sender, NotifyCollectionChangedEventArgs e )
@@ -3079,38 +3333,38 @@ namespace Xceed.Wpf.DataGrid
         case NotifyCollectionChangedAction.Reset:
         default:
           {
-#if LOG
-            Log.Start( this, "DetailConfiguration Changed" );
-#endif
+            using( m_log.BeginBlock( this, "DetailConfiguration Changed" ) )
+            {
+              // That ensure the RemapFloatingDetails() got called and the loop on m_masterToDetails.Keys will not contain invalid item.
+              this.EnsureNodeTreeCreated();
+            }
 
-            // That ensure the RemapFloatingDetails() got called and the loop on m_masterToDetails.Keys will not contain invalid item.
-            this.EnsureNodeTreeCreated();
-
-#if LOG
-            Log.End( this, "DetailConfiguration Changed" );
-#endif
             break;
           }
       }
     }
 
+    private void OnCollectionViewGroupsPropertyChanged()
+    {
+      this.HandleGlobalItemsReset();
+    }
+
     private void OnItemsChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
       // Avoid re-entrance when processing a global reset
-      if( m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount > 0 )
+      if( this.IsHandlingGlobalItemsResetLocally )
         return;
 
       if( this.Status == GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "Cannot perform this operation while the generator is busy generating items" );
-      }
+        DataGridException.ThrowSystemException( "Cannot perform this operation while the generator is busy generating items.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       switch( e.Action )
       {
         case NotifyCollectionChangedAction.Add:
           //do not handle the Items.CollectionChanged if groups are present or if there is already a items node.
           // (because the OnGeneratorNodeItemsCollectionChanged will handle things)
-          if( m_collectionView.Groups == null )
+          if( m_collectionView.GroupDescriptions.Count == 0 )
           {
             if( m_firstItem == null )
             {
@@ -3124,31 +3378,33 @@ namespace Xceed.Wpf.DataGrid
             }
           }
           break;
+
         case NotifyCollectionChangedAction.Move:
         case NotifyCollectionChangedAction.Remove:
         case NotifyCollectionChangedAction.Replace:
           //I voluntarilly do not handle these particular cases because the ItemsNode
           //handler will cover it. (OnGeneratorNodeItemsCollectionChanged)
           break;
-        case NotifyCollectionChangedAction.Reset:
-          this.HandleGlobalItemsReset();
-          break;
-        default:
-          throw new DataGridInternalException();
-      }
 
+        case NotifyCollectionChangedAction.Reset:
+          // If there are group descriptions, the PropertyChanged on Groups will handle it.
+          if( m_collectionView.GroupDescriptions.Count == 0 )
+          {
+            this.HandleGlobalItemsReset();
+          }
+          break;
+      }
     }
 
     private void OnGroupsChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
       // Avoid re-entrance when processing a global reset
-      if( m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount > 0 )
+      if( this.IsHandlingGlobalItemsResetLocally )
         return;
 
       if( this.Status == GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "Cannot perform this operation while the generator is busy generating items" );
-      }
+        DataGridException.ThrowSystemException( "Cannot perform this operation while the generator is busy generating items.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       //this fonction is only used to process the content of the DataGridControl.Items.Groups collection...
       // for the CollectionChanged event of branch groups ( IsBottomLevel = false ), refer to the 
@@ -3183,29 +3439,24 @@ namespace Xceed.Wpf.DataGrid
           this.SendAddEvent( genPos, addIndex, addCount );
 
           break;
+
         case NotifyCollectionChangedAction.Move:
           if( m_firstItem != null )
           {
             if( !( m_firstItem is GroupGeneratorNode ) )
-            {
-              throw new DataGridInternalException();
-            }
+              throw new DataGridInternalException( "Trying to move a GeneratorNode that is not a GroupGeneratorNode.", m_dataGridControl );
 
-            Debug.Assert( e.OldStartingIndex != e.NewStartingIndex, "An attempt was made to move a group to the same location." );
-#if LOG
-            Log.Assert( this, e.OldStartingIndex != e.NewStartingIndex, "An attempt was made to move a group to the same location." );
-#endif
+            m_log.Assert( this, e.OldStartingIndex != e.NewStartingIndex, "An attempt was made to move a group to the same location." );
 
             this.HandleSameLevelGroupMove( m_firstItem, e );
           }
           break;
+
         case NotifyCollectionChangedAction.Remove:
           if( m_firstItem != null )
           {
             if( !( m_firstItem is GroupGeneratorNode ) )
-            {
-              throw new DataGridInternalException();
-            }
+              throw new DataGridInternalException( "Trying to remove a GeneratorNode that is not a GroupGeneratorNode.", m_dataGridControl );
 
             int remCount;
             int generatedRemCount;
@@ -3221,15 +3472,24 @@ namespace Xceed.Wpf.DataGrid
           }
 
           break;
+
         case NotifyCollectionChangedAction.Replace:
-          throw new NotSupportedException( "Replace not supported at the moment on groups!!!" );
-        //break;
-        case NotifyCollectionChangedAction.Reset:
-          //I'm forced to handle it specifically since the Panel will AUTOMATICALLY clear its children
-          this.HandleGlobalItemsReset();
+          DataGridException.ThrowSystemException( "Replace not supported at the moment on groups.", typeof( NotSupportedException ), m_dataGridControl.Name );
           break;
-        default:
-          throw new DataGridInternalException();
+
+        case NotifyCollectionChangedAction.Reset:
+          if( m_firstItem != null )
+          {
+            if( !( m_firstItem is GroupGeneratorNode ) )
+              throw new DataGridInternalException( "Trying to reset a GeneratorNode that is not a GroupGeneratorNode.", m_dataGridControl );
+
+            this.HandleSameLevelGroupReset( m_firstItem );
+          }
+          else
+          {
+            this.HandleGlobalItemsReset();
+          }
+          break;
       }
 
     }
@@ -3237,106 +3497,98 @@ namespace Xceed.Wpf.DataGrid
     private void OnGeneratorNodeItemsCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
       // Avoid re-entrance when processing a global reset
-      if( m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount > 0 )
+      if( this.IsHandlingGlobalItemsResetLocally )
         return;
 
       if( this.Status == GeneratorStatus.GeneratingContainers )
+        DataGridException.ThrowSystemException( "Cannot perform this operation while the generator is busy generating items.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
+
+      var node = sender as GeneratorNode;
+      if( node == null )
+        return;
+
+      var itemsNode = sender as ItemsGeneratorNode;
+      var headersNode = sender as HeadersFootersGeneratorNode;
+
+      e = e.GetRangeActionOrSelf();
+
+      switch( e.Action )
       {
-        throw new InvalidOperationException( "Cannot perform this operation while the generator is busy generating items" );
-      }
+        case NotifyCollectionChangedAction.Add:
+          this.HandleItemAddition( node, e );
+          break;
 
-      GeneratorNode node = sender as GeneratorNode;
-      ItemsGeneratorNode itemsNode = sender as ItemsGeneratorNode;
-      HeadersFootersGeneratorNode headersNode = sender as HeadersFootersGeneratorNode;
+        case NotifyCollectionChangedAction.Remove:
+          if( itemsNode != null )
+          {
+            this.HandleItemRemoveMoveReplace( itemsNode, e );
+          }
+          else if( headersNode != null )
+          {
+            this.HandleHeaderFooterRemove( headersNode, e );
+          }
+          else
+          {
+            throw new DataGridInternalException( "Cannot remove the GeneratorNode as it is not of a valid type.", m_dataGridControl );
+          }
+          break;
 
-      if( node != null )
-      {
-        switch( e.Action )
-        {
-          case NotifyCollectionChangedAction.Add:
-            this.HandleItemAddition( node, e );
-            break;
-          case NotifyCollectionChangedAction.Remove:
-
-            if( itemsNode != null )
+        case NotifyCollectionChangedAction.Move:
+        case NotifyCollectionChangedAction.Replace:
+          if( itemsNode != null )
+          {
+            //detect the case where the replace is targeted at a single item, replaced with himself.
+            //This particular case is there to handle the particularities of the DGCV with regards to
+            //IBindingList.ListChanged.ChangeType == ItemChanged.
+            if( ( e.Action == NotifyCollectionChangedAction.Replace ) &&
+                ( e.OldItems.Count == 1 ) && ( e.NewItems.Count == 1 ) &&
+                ( e.NewItems[ 0 ] == e.OldItems[ 0 ] ) )
             {
+              // Getting a replace with the same instance should just do nothing.
+              //
+              // Note : We know that will prevent a row from refreshing correctly if the item 
+              // are not implementing a mechanic of notification ( like INotifyPropertyChanged ).
+            }
+            else
+            {
+              //any other case, normal handling
               this.HandleItemRemoveMoveReplace( itemsNode, e );
             }
-            else if( headersNode != null )
-            {
-              this.HandleHeaderFooterRemove( headersNode, e );
-            }
-            else
-            {
-              throw new DataGridInternalException();
-            }
+          }
+          else if( headersNode != null )
+          {
+            this.HandleHeaderFooterReplace( headersNode, e );
+          }
+          else
+          {
+            throw new DataGridInternalException( "Cannot move or replace the GeneratorNode as it is not of a valid type.", m_dataGridControl );
+          }
+          break;
 
-            break;
-          case NotifyCollectionChangedAction.Move:
-          case NotifyCollectionChangedAction.Replace:
-            if( itemsNode != null )
-            {
-              //detect the case where the replace is targeted at a single item, replaced with himself.
-              //This particular case is there to handle the particularities of the DGCV with regards to
-              //IBindingList.ListChanged.ChangeType == ItemChanged.
-              if( ( e.Action == NotifyCollectionChangedAction.Replace ) &&
-                  ( e.OldItems.Count == 1 ) && ( e.NewItems.Count == 1 ) &&
-                  ( e.NewItems[ 0 ] == e.OldItems[ 0 ] ) )
-              {
-                // Getting a replace with the same instance should just do nothing.
-                //
-                // Note : We know that will prevent a row from refreshing correctly if the item 
-                // are not implementing a mechanic of notification ( like INotifyPropertyChanged ).
-              }
-              else
-              {
-                //any other case, normal handling
-                this.HandleItemRemoveMoveReplace( itemsNode, e );
-              }
-            }
-            else if( headersNode != null )
-            {
-              this.HandleHeaderFooterReplace( headersNode, e );
-            }
-            else
-            {
-              throw new DataGridInternalException();
-            }
-            break;
-          case NotifyCollectionChangedAction.Reset:
-            this.HandleItemReset( node );
-            break;
-          default:
-            throw new DataGridInternalException();
-        }
+        case NotifyCollectionChangedAction.Reset:
+          this.HandleItemReset( node );
+          break;
       }
-
     }
 
     private void OnGeneratorNodeExpansionStateChanged( object sender, ExpansionStateChangedEventArgs e )
     {
       //throw an error is the Generator is actually busy generating!
       if( this.Status == GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "Cannot perform this operation while the generator is busy generating items" );
-      }
+        DataGridException.ThrowSystemException( "Cannot perform this operation while the generator is busy generating items.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       GeneratorNode node = sender as GeneratorNode;
 
-      Debug.Assert( node != null, "node != null" );
-#if LOG
-      Log.Assert( this, node != null, "node != null" );
-#endif
+      m_log.Assert( this, node != null, "node != null" );
 
       if( node == null )
         return;
 
       GroupGeneratorNode changedNode = node.Parent as GroupGeneratorNode;
 
-      Debug.Assert( changedNode != null, "changedNode != null" ); //should never be null, as the "node" is supposed to be the child node of this one.
-#if LOG
-      Log.Assert( this, changedNode != null, "changedNode != null" ); //should never be null, as the "node" is supposed to be the child node of this one.
-#endif
+      m_log.Assert( this, changedNode != null, "changedNode != null" ); //should never be null, as the "node" is supposed to be the child node of this one.
 
       //Determine if the changedNode is "below" a collapsed group (because if so, I don't need any sort of notification or removal ).
       GroupGeneratorNode parentGroupNode = changedNode.Parent as GroupGeneratorNode;
@@ -3383,14 +3635,10 @@ namespace Xceed.Wpf.DataGrid
     {
       //throw an error is the Generator is actually busy generating!
       if( this.Status == GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "Cannot perform this operation while the generator is busy generating items" );
-      }
+        DataGridException.ThrowSystemException( "Cannot perform this operation while the generator is busy generating items.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
-      Debug.Assert( m_currentGenPosToIndexInhibiterDisposable == null, "m_currentGenPosToIndexInhibiterDisposable == null" );
-#if LOG
-      Log.Assert( this, m_currentGenPosToIndexInhibiterDisposable == null, "m_currentGenPosToIndexInhibiterDisposable == null" );
-#endif
+      m_log.Assert( this, m_currentGenPosToIndexInhibiterDisposable == null, "m_currentGenPosToIndexInhibiterDisposable == null" );
 
       m_currentGenPosToIndexInhibiterDisposable = this.InhibitParentGenPosToIndexUpdate();
 
@@ -3414,9 +3662,8 @@ namespace Xceed.Wpf.DataGrid
     {
       //throw an error is the Generator is actually busy generating!
       if( this.Status == GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "Cannot perform this operation while the generator is busy generating items" );
-      }
+        DataGridException.ThrowSystemException( "Cannot perform this operation while the generator is busy generating items.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       GroupGeneratorNode node = sender as GroupGeneratorNode;
       if( node != null )
@@ -3434,9 +3681,8 @@ namespace Xceed.Wpf.DataGrid
     private void OnGeneratorNodeGroupsCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
       if( this.Status == GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "Cannot perform this operation while the generator is busy generating items" );
-      }
+        DataGridException.ThrowSystemException( "Cannot perform this operation while the generator is busy generating items.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       GroupGeneratorNode node = sender as GroupGeneratorNode;
 
@@ -3445,43 +3691,40 @@ namespace Xceed.Wpf.DataGrid
         switch( e.Action )
         {
           case NotifyCollectionChangedAction.Add:
-            int addCount;
-            GeneratorNode addNode = this.HandleParentGroupAddition( node, out addCount, e );
-
-            if( node.IsComputedExpanded )
             {
-              GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( addNode, 0, 0 );//index not important, will reserve find it.
-              nodeHelper.ReverseCalculateIndex();
+              int addCount;
+              GeneratorNode addNode = this.HandleParentGroupAddition( node, out addCount, e );
 
-              this.IncrementCurrentGenerationCount();
+              if( node.IsComputedExpanded )
+              {
+                GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( addNode, 0, 0 );//index not important, will reserve find it.
+                nodeHelper.ReverseCalculateIndex();
 
-              GeneratorPosition genPos = this.GeneratorPositionFromIndex( nodeHelper.Index );
+                this.IncrementCurrentGenerationCount();
 
-              this.SendAddEvent( genPos, nodeHelper.Index, addCount );
+                GeneratorPosition genPos = this.GeneratorPositionFromIndex( nodeHelper.Index );
+
+                this.SendAddEvent( genPos, nodeHelper.Index, addCount );
+              }
             }
             break;
+
           case NotifyCollectionChangedAction.Move:
-            if( node.Child == null )
             {
-              throw new DataGridInternalException();
-            }
-            else
-            {
-              Debug.Assert( e.OldStartingIndex != e.NewStartingIndex, "An attempt was made to move a group to the same location." );
-#if LOG
-              Log.Assert( this, e.OldStartingIndex != e.NewStartingIndex, "An attempt was made to move a group to the same location." );
-#endif
+              if( node.Child == null )
+                throw new DataGridInternalException( "An attempt was made to move a group with a null child GeneratorNode.", m_dataGridControl );
+
+              m_log.Assert( this, e.OldStartingIndex != e.NewStartingIndex, "An attempt was made to move a group to the same location." );
 
               this.HandleSameLevelGroupMove( node.Child, e );
             }
             break;
+
           case NotifyCollectionChangedAction.Remove:
-            if( node.Child == null )
             {
-              throw new DataGridInternalException();
-            }
-            else
-            {
+              if( node.Child == null )
+                throw new DataGridInternalException( "An attempt was made to remove a group with a null child GeneratorNode.", m_dataGridControl );
+
               int remCount;
               int generatedRemCount;
               int removeIndex;
@@ -3494,41 +3737,34 @@ namespace Xceed.Wpf.DataGrid
 
                 this.SendRemoveEvent( remPos, removeIndex, remCount, generatedRemCount, removedContainers );
               }
-
             }
             break;
+
           case NotifyCollectionChangedAction.Replace:
-            //if( node.Child == null )
-            //{
-            //  throw new DataGridInternalException();
-            //}
-            //else
-            //{
-            //  this.HandleGroupReplace( node.Child, e );
-            //}
+            DataGridException.ThrowSystemException( "Replace not supported at the moment on groups.", typeof( NotSupportedException ), m_dataGridControl.Name );
+            break;
 
-            //m_currentGeneratorContentGeneration++;
-            throw new DataGridInternalException();
-          //break;
           case NotifyCollectionChangedAction.Reset:
-            //m_currentGeneratorContentGeneration++;
-            throw new DataGridInternalException();
-          default:
-            throw new DataGridInternalException();
+            {
+              if( node.Child == null )
+                throw new DataGridInternalException( "An attempt was made to reset a group with a null child GeneratorNode.", m_dataGridControl );
 
+              this.HandleSameLevelGroupReset( node.Child );
+            }
+            break;
         }
       }
-
     }
 
     private void OnViewThemeChanged( object sender, EventArgs e )
     {
       if( this.Status == GeneratorStatus.GeneratingContainers )
-        throw new InvalidOperationException( "Cannot perform this operation while the generator is busy generating items" );
+        DataGridException.ThrowSystemException( "Cannot perform this operation while the generator is busy generating items.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       if( m_startNode != null )
       {
-        this.CleanupGenerator( false );
+        this.CleanupGenerator();
       }
 
       this.IncrementCurrentGenerationCount();
@@ -3536,7 +3772,7 @@ namespace Xceed.Wpf.DataGrid
 
     private void OnGroupConfigurationSelectorChanged()
     {
-      this.CleanupGenerator( false );
+      this.CleanupGenerator();
     }
 
     private void ResetNodeList()
@@ -3601,6 +3837,7 @@ namespace Xceed.Wpf.DataGrid
         int chainLength;
         GeneratorNodeHelper.EvaluateChain( m_firstItem, out removeCount, out chainLength );
 
+        this.ClearLateGroupLevelDescriptions();
         m_groupNodeMappingCache.Clear();
         this.NodeFactory.CleanGeneratorNodeTree( m_firstItem );
         m_firstItem = null;
@@ -3621,16 +3858,10 @@ namespace Xceed.Wpf.DataGrid
       DependencyObject container = m_genPosToContainer[ index ];
       GeneratorNode node = m_genPosToNode[ index ];
 
-      Debug.Assert( ( m_genPosToContainer.Count != 0 )
-                       && ( m_genPosToIndex.Count != 0 )
-                       && ( m_genPosToItem.Count != 0 )
-                       && ( m_genPosToNode.Count != 0 ), "Internal Generator's lists are empty, cannot continue to process RemoveGeneratedItems" );
-#if LOG
-      Log.Assert( this, ( m_genPosToContainer.Count != 0 )
-                       && ( m_genPosToIndex.Count != 0 )
-                       && ( m_genPosToItem.Count != 0 )
-                       && ( m_genPosToNode.Count != 0 ), "Internal Generator's lists are empty, cannot continue to process RemoveGeneratedItems" );
-#endif
+      m_log.Assert( this, ( m_genPosToContainer.Count != 0 )
+                     && ( m_genPosToIndex.Count != 0 )
+                     && ( m_genPosToItem.Count != 0 )
+                     && ( m_genPosToNode.Count != 0 ), "Internal Generator's lists are empty, cannot continue to process RemoveGeneratedItems" );
 
       //remove the item from the 4 lists... (same as doing a "remove")
       this.GenPosArraysRemoveAt( index );
@@ -3669,38 +3900,38 @@ namespace Xceed.Wpf.DataGrid
 
     private int RemoveGeneratedItems( int startIndex, int endIndex, IList<DependencyObject> removedContainers )
     {
-      int genCountRemoved = 0;
+      if( startIndex > endIndex )
+        return 0;
+
+      var count = m_genPosToIndex.Count;
+      if( ( count <= 0 ) || ( m_genPosToIndex[ 0 ] > endIndex ) || ( m_genPosToIndex[ count - 1 ] < startIndex ) )
+        return 0;
+
+      var removed = 0;
 
       //cycle through the list of generated items, and see if any items are generated between the indexes in the removed range.
-      //start from the end so that removing an item will not cause the indexes to shift
-      for( int i = m_genPosToIndex.Count - 1; i >= 0; i-- )
+      //start from the end so that removing an item will not cause the indexes to shift.
+      for( var i = count - 1; i >= 0; i-- )
       {
-        Debug.Assert( ( m_genPosToContainer.Count != 0 )
-                      && ( m_genPosToIndex.Count != 0 )
-                      && ( m_genPosToItem.Count != 0 )
-                      && ( m_genPosToNode.Count != 0 ), "Internal Generator's lists are empty, cannot continue to process RemoveGeneratedItems" );
-#if LOG
-        Log.Assert( this, ( m_genPosToContainer.Count != 0 )
-                      && ( m_genPosToIndex.Count != 0 )
-                      && ( m_genPosToItem.Count != 0 )
-                      && ( m_genPosToNode.Count != 0 ), "Internal Generator's lists are empty, cannot continue to process RemoveGeneratedItems" );
-#endif
+        m_log.Assert( this, ( m_genPosToContainer.Count != 0 )
+                         && ( m_genPosToIndex.Count != 0 )
+                         && ( m_genPosToItem.Count != 0 )
+                         && ( m_genPosToNode.Count != 0 ), "Internal Generator's lists are empty, cannot continue to process RemoveGeneratedItems" );
 
-        int itemIndex = m_genPosToIndex[ i ];
+        var index = m_genPosToIndex[ i ];
 
         //if the item is within the range removed
-        if( ( itemIndex >= startIndex ) && ( itemIndex <= endIndex ) )
+        if( ( index >= startIndex ) && ( index <= endIndex ) )
         {
           //this will ensure to recurse the call to the appropriate Detail Generator for clearing of the container.
           //otherwise, it will only remove it from the list of container generated in the current generator instance.
           this.RemoveGeneratedItem( i, removedContainers );
 
-          //increment realized item count removed
-          genCountRemoved++;
+          removed++;
         }
       }
 
-      return genCountRemoved;
+      return removed;
     }
 
     private int RemoveGeneratedItems( GeneratorNode referenceNode, IList<DependencyObject> removedContainers )
@@ -3749,24 +3980,14 @@ namespace Xceed.Wpf.DataGrid
 
     private void RemoveAllGeneratedItems()
     {
-      this.RemoveAllGeneratedItems( false );
-    }
+      m_log.Assert( this.IsHandlingGlobalItemsReset, "IsHandlingGlobalItemsReset is not set." );
 
-    private void RemoveAllGeneratedItems( bool itemsSourceChanged )
-    {
-#if LOG
-      Log.Start( this, "RemoveAllGeneratedItems" );
-#endif
-
-      using( new ProcessingGlobalItemsResetOrRemovingAllGeneratedItemsDisposable( this ) )
+      using( m_log.BeginBlock( this, null ) )
       {
         //Call RemoveAllGeneratedItems() on all the detail generators
-        foreach( KeyValuePair<object, List<DetailGeneratorNode>> masterToDetails in m_masterToDetails )
+        foreach( var generator in this.GetDetailGenerators() )
         {
-          foreach( DetailGeneratorNode detailNode in masterToDetails.Value )
-          {
-            detailNode.DetailGenerator.RemoveAllGeneratedItems( itemsSourceChanged );
-          }
+          generator.RemoveAllGeneratedItems();
         }
 
         //then we can clean the list of items of items generated held by this generator
@@ -3791,10 +4012,6 @@ namespace Xceed.Wpf.DataGrid
           this.GenPosArraysRemoveAt( i );
         }
       }
-
-#if LOG
-      Log.End( this, "RemoveAllGeneratedItems" );
-#endif
     }
 
     private bool RemoveGeneratedItems( HeadersFootersGeneratorNode referenceNode, object referenceItem, IList<DependencyObject> removedContainers )
@@ -3869,9 +4086,7 @@ namespace Xceed.Wpf.DataGrid
         }
         else
         {
-#if LOG
-          Log.WriteLine( this, "UpdateHeaders - new tree" );
-#endif
+          m_log.WriteLine( this, "UpdateHeaders - new tree" );
         }
 
         //set the start node as the first header node.
@@ -3910,9 +4125,8 @@ namespace Xceed.Wpf.DataGrid
           else
           {
             m_startNode = m_firstFooter;
-#if LOG
-            Log.WriteLine( this, "UpdateFooters - new tree" );
-#endif
+
+            m_log.WriteLine( this, "UpdateFooters - new tree" );
           }
         }
       }
@@ -3933,7 +4147,6 @@ namespace Xceed.Wpf.DataGrid
 
     private GeneratorNode SetupInitialItemsNodes( out int addCount )
     {
-      //TODO ( case 117275 ): Check the amount of time this is executed for a single grid being populated!
       GeneratorNode newItemNode = null;
 
       addCount = 0;
@@ -3983,15 +4196,15 @@ namespace Xceed.Wpf.DataGrid
           }
           else
           {
-            throw new DataGridInternalException(); //this case should not be possible: no header, no footers but there is a startNode
+            //this case should not be possible: no header, no footers but there is a startNode
+            throw new DataGridInternalException( "No start node found for the current GeneratorNode.", m_dataGridControl );
           }
         }
         else
         {
           m_startNode = m_firstItem;
-#if LOG
-          Log.WriteLine( this, "SetupInitialItemsNodes - new tree" );
-#endif
+
+          m_log.WriteLine( this, "SetupInitialItemsNodes - new tree" );
         }
       }
 
@@ -4014,18 +4227,21 @@ namespace Xceed.Wpf.DataGrid
           //Registers to the groups collection change notification.
           CollectionChangedEventManager.AddListener( m_groupsCollection, this );
         }
-
       }
-
     }
 
     private GeneratorNode CreateStandaloneItemsNode()
     {
-      return this.NodeFactory.CreateItemsGeneratorNode( m_listInterface, null, null, null, this );
+      var list = CustomItemContainerGenerator.GetList( m_collectionView );
+
+      return this.NodeFactory.CreateItemsGeneratorNode( list, null, null, null, this );
     }
 
     private GeneratorNode CreateGroupListFromCollection( IList collection, GeneratorNode parentNode )
     {
+      if( collection.Count == 0 )
+        return null;
+
       GeneratorNode rootNode = null;
       GeneratorNode previousNode = null;
       GroupGeneratorNode actualNode = null;
@@ -4037,23 +4253,24 @@ namespace Xceed.Wpf.DataGrid
 
       ObservableCollection<GroupDescription> groupDescriptions = DataGridContext.GetGroupDescriptionsHelper( m_collectionView );
       GroupConfigurationSelector groupConfigurationSelector = m_dataGridContext.GroupConfigurationSelector;
-
+      LateGroupLevelDescription lateGroupLevelDescription = this.CreateOrGetLateGroupLevelDescription( level, groupDescriptions );
 
       foreach( CollectionViewGroup group in collection )
       {
         groupConfig = GroupConfiguration.GetGroupConfiguration( m_dataGridContext, groupDescriptions, groupConfigurationSelector, level, group );
 
-        Debug.Assert( groupConfig != null, "groupConfig != null" );
-#if LOG
-        Log.Assert( this, groupConfig != null, "groupConfig != null" );
-#endif
+        m_log.Assert( this, groupConfig != null, "groupConfig != null" );
 
         if( groupConfig.UseDefaultHeadersFooters )
+        {
           groupConfig.AddDefaultHeadersFooters();
+        }
 
         initiallyExpanded = groupConfig.InitiallyExpanded;
 
         actualNode = ( GroupGeneratorNode )this.NodeFactory.CreateGroupGeneratorNode( group, parentNode, previousNode, null, groupConfig );
+        actualNode.UIGroup = new Group( actualNode, group, lateGroupLevelDescription, m_dataGridContext );
+
         m_groupNodeMappingCache.Add( group, actualNode );
 
         if( rootNode == null )
@@ -4063,15 +4280,12 @@ namespace Xceed.Wpf.DataGrid
 
         previousNode = actualNode;
 
-        actualNode.UIGroup = new Group( actualNode, group, m_dataGridContext.GroupLevelDescriptions, m_dataGridContext );
-
         //Independently if the Group is the bottom level or not, we need to setup GroupHeaders
         childNode = this.SetupGroupHeaders( groupConfig, actualNode );
         actualNode.Child = childNode;
 
         GeneratorNodeHelper childNodeHelper = new GeneratorNodeHelper( childNode, 0, 0 ); //do not care about index.
         childNodeHelper.MoveToEnd(); //extensibility, just in case SetupGroupHeaders() ever return a node list.
-
 
         IList<object> subItems = group.GetItems();
 
@@ -4103,12 +4317,50 @@ namespace Xceed.Wpf.DataGrid
       return rootNode;
     }
 
+    private LateGroupLevelDescription CreateOrGetLateGroupLevelDescription( int level, IList<GroupDescription> groupDescriptions )
+    {
+      Debug.Assert( groupDescriptions != null );
+
+      if( ( m_groupLevelDescriptionCache == null ) || ( level >= m_groupLevelDescriptionCache.Length ) )
+      {
+        var newSize = Math.Max( level + 1, groupDescriptions.Count );
+        Array.Resize<LateGroupLevelDescription>( ref m_groupLevelDescriptionCache, newSize );
+      }
+
+      var item = m_groupLevelDescriptionCache[ level ];
+      if( item == null )
+      {
+        var groupDescription = groupDescriptions[ level ];
+        Debug.Assert( groupDescription != null );
+
+        item = new LateGroupLevelDescription( groupDescription, m_dataGridContext.GroupLevelDescriptions );
+        m_groupLevelDescriptionCache[ level ] = item;
+      }
+
+      return item;
+    }
+
+    private void ClearLateGroupLevelDescriptions()
+    {
+      if( m_groupLevelDescriptionCache == null )
+        return;
+
+      for( int i = 0; i < m_groupLevelDescriptionCache.Length; i++ )
+      {
+        var item = m_groupLevelDescriptionCache[ i ];
+        if( item == null )
+          continue;
+
+        item.Clear();
+      }
+
+      m_groupLevelDescriptionCache = null;
+    }
+
     private GeneratorNode SetupGroupFooters( GroupConfiguration groupConfig, GeneratorNode actualNode )
     {
       if( groupConfig == null )
-      {
         return new GeneratorNode( actualNode );
-      }
 
       return this.NodeFactory.CreateHeadersFootersGeneratorNode( groupConfig.Footers, actualNode, null, null );
     }
@@ -4116,9 +4368,7 @@ namespace Xceed.Wpf.DataGrid
     private GeneratorNode SetupGroupHeaders( GroupConfiguration groupConfig, GeneratorNode actualNode )
     {
       if( groupConfig == null )
-      {
         return new GeneratorNode( actualNode );
-      }
 
       return this.NodeFactory.CreateHeadersFootersGeneratorNode( groupConfig.Headers, actualNode, null, null );
     }
@@ -4130,10 +4380,8 @@ namespace Xceed.Wpf.DataGrid
       // start by moving to the first child... of the node (GroupHeaders node, most probably).
       // false parameter is to prevent skipping over a collapsed node (item count 0 )
       if( !nodeHelper.MoveToChild( false ) )
-      {
         //could not advance to the child item so there is no items to be removed...
-        throw new DataGridInternalException();
-      }
+        throw new DataGridInternalException( "No child item in the group to remove.", m_dataGridControl );
 
       return this.HandleSameLevelGroupRemove( nodeHelper.CurrentNode, out countRemoved, out genCountRemoved, out removeIndex, e, removedContainers );
     }
@@ -4148,18 +4396,16 @@ namespace Xceed.Wpf.DataGrid
       GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( firstChild, 0, 0 );
       nodeHelper.ReverseCalculateIndex();
 
-      //Advance to the first "Group" node (skip the GroupHEaders)
+      //Advance to the first "Group" node (skip the GroupHeaders)
       while( !( nodeHelper.CurrentNode is GroupGeneratorNode ) )
       {
         if( !nodeHelper.MoveToNext() )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "Unable to move to next GeneratorNode.", m_dataGridControl );
       }
 
       //then move up to the removal start point.
       if( !nodeHelper.MoveToNextBy( e.OldStartingIndex ) )
-      {
-        throw new DataGridInternalException();
-      }
+        throw new DataGridInternalException( "Unable to move to the requested generator index.", m_dataGridControl );
 
       GroupGeneratorNode startNode = nodeHelper.CurrentNode as GroupGeneratorNode;
       removeIndex = -1;
@@ -4191,17 +4437,9 @@ namespace Xceed.Wpf.DataGrid
       return retval;
     }
 
-    private GroupGeneratorNode ProcessGroupRemoval(
-      GeneratorNode startNode,
-      int removeCount,
-      bool updateGroupNodeMappingCache,
-      out int countRemoved )
+    private GroupGeneratorNode ProcessGroupRemoval( GeneratorNode startNode, int removeCount, bool updateGroupNodeMappingCache, out int countRemoved )
     {
-
-      Debug.Assert( removeCount != 0, "remove count cannot be 0" );
-#if LOG
-      Log.Assert( this, removeCount != 0, "remove count cannot be 0" );
-#endif
+      m_log.Assert( this, removeCount != 0, "remove count cannot be 0" );
 
       GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( startNode, 0, 0 );//index not important.
       GroupGeneratorNode parentGroup = startNode.Parent as GroupGeneratorNode;
@@ -4218,10 +4456,7 @@ namespace Xceed.Wpf.DataGrid
           m_groupNodeMappingCache.Remove( group.CollectionViewGroup );
         }
 
-        Debug.Assert( group != null, "node to be removed must be a GroupGeneratorNode" );
-#if LOG
-        Log.Assert( this, group != null, "node to be removed must be a GroupGeneratorNode" );
-#endif
+        m_log.Assert( this, group != null, "node to be removed must be a GroupGeneratorNode" );
 
         //add the total number of child to the count of items removed.
         countRemoved += group.ItemCount;
@@ -4231,11 +4466,7 @@ namespace Xceed.Wpf.DataGrid
         if( i < removeCount )
         {
           if( !nodeHelper.MoveToNext() )
-          {
-            //could not advance to the last item to be removed...
-
-            throw new DataGridInternalException();
-          }
+            throw new DataGridInternalException( "Could not move to the last node to be removed.", m_dataGridControl );
         }
       }
       while( i < removeCount );
@@ -4283,12 +4514,307 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      Debug.Assert( nodeHelper.CurrentNode is GroupGeneratorNode, "last node is not a GroupGeneratorNode" );
-#if LOG
-      Log.Assert( this, nodeHelper.CurrentNode is GroupGeneratorNode, "last node is not a GroupGeneratorNode" );
-#endif
+      m_log.Assert( this, nodeHelper.CurrentNode is GroupGeneratorNode, "last node is not a GroupGeneratorNode" );
 
       return ( GroupGeneratorNode )nodeHelper.CurrentNode;
+    }
+
+    private void HandleSameLevelGroupReset( GeneratorNode node )
+    {
+      Debug.Assert( node != null );
+
+      var parentNode = node.Parent as GroupGeneratorNode;
+      var oldGroups = new List<CollectionViewGroup>();
+      var nodeHelper = new GeneratorNodeHelper( node, 0, 0 );
+
+      do
+      {
+        var groupNode = nodeHelper.CurrentNode as GroupGeneratorNode;
+        if( groupNode != null )
+        {
+          Debug.Assert( groupNode.CollectionViewGroup != null );
+          oldGroups.Add( groupNode.CollectionViewGroup );
+        }
+      }
+      while( nodeHelper.MoveToNext() );
+
+      var newGroups = ( parentNode != null )
+                        ? parentNode.CollectionViewGroup.GetItems().Cast<CollectionViewGroup>().ToList()
+                        : m_groupsCollection.Cast<CollectionViewGroup>().ToList();
+
+      Debug.Assert( ( oldGroups.Count > 0 ), "The group being reset should have had at least a child group." );
+      Debug.Assert( ( newGroups.Count > 0 ), "The group being reset should have at least a child group." );
+
+      // If nothing has changed, avoid the heavy process of finding out which groups have been added,
+      // removed and moved.
+      if( newGroups.Count == oldGroups.Count )
+      {
+        if( newGroups.SequenceEqual( oldGroups ) )
+          return;
+      }
+
+      var groupsAdded = default( ICollection<CollectionViewGroup> );
+      var groupsRemoved = default( ICollection<CollectionViewGroup> );
+      var groupsMoved = default( ICollection<CollectionViewGroup> );
+
+      this.GetGroupChanges( oldGroups, newGroups, out groupsAdded, out groupsRemoved, out groupsMoved );
+
+      if( groupsAdded.Count + groupsRemoved.Count + groupsMoved.Count > CustomItemContainerGenerator.GlobalItemsResetThreshold )
+      {
+        this.HandleGlobalItemsReset();
+      }
+      else
+      {
+        this.ApplyGroupChanges( node, oldGroups, newGroups, groupsAdded, groupsRemoved, groupsMoved );
+      }
+    }
+
+    private void GetGroupChanges(
+      IList<CollectionViewGroup> oldGroups,
+      IList<CollectionViewGroup> newGroups,
+      out ICollection<CollectionViewGroup> groupsAdded,
+      out ICollection<CollectionViewGroup> groupsRemoved,
+      out ICollection<CollectionViewGroup> groupsMoved )
+    {
+      Debug.Assert( oldGroups != null );
+      Debug.Assert( newGroups != null );
+
+      groupsAdded = new HashSet<CollectionViewGroup>();
+      groupsRemoved = new HashSet<CollectionViewGroup>();
+      groupsMoved = new HashSet<CollectionViewGroup>();
+
+      var oldGroupsPositions = new Dictionary<CollectionViewGroup, int>();
+
+      for( var i = 0; i < oldGroups.Count; i++ )
+      {
+        oldGroupsPositions.Add( oldGroups[ i ], i );
+      }
+
+      var sequence = new List<int>( newGroups.Count );
+      var isAlive = new BitArray( oldGroups.Count, false );
+
+      foreach( var group in newGroups )
+      {
+        int index;
+
+        if( oldGroupsPositions.TryGetValue( group, out index ) )
+        {
+          isAlive[ index ] = true;
+          sequence.Add( index );
+        }
+        else
+        {
+          Debug.Assert( !m_groupNodeMappingCache.ContainsKey( group ), "How come there is a node for the group." );
+
+          groupsAdded.Add( group );
+        }
+      }
+
+      var hasNotMoved = new BitArray( oldGroups.Count, false );
+
+      // The subsequence contains the position of the old groups that are in the new groups and that have not moved.
+      foreach( var index in LongestIncreasingSubsequence.Find( sequence ) )
+      {
+        hasNotMoved[ index ] = true;
+      }
+
+      for( var i = 0; i < oldGroups.Count; i++ )
+      {
+        if( isAlive[ i ] )
+        {
+          if( !hasNotMoved[ i ] )
+          {
+            groupsMoved.Add( oldGroups[ i ] );
+          }
+        }
+        else
+        {
+          groupsRemoved.Add( oldGroups[ i ] );
+        }
+      }
+    }
+
+    private void ApplyGroupChanges(
+      GeneratorNode node,
+      IList<CollectionViewGroup> oldGroups,
+      IList<CollectionViewGroup> newGroups,
+      ICollection<CollectionViewGroup> groupsAdded,
+      ICollection<CollectionViewGroup> groupsRemoved,
+      ICollection<CollectionViewGroup> groupsMoved )
+    {
+      Debug.Assert( node != null );
+
+      var parentNode = node.Parent as GroupGeneratorNode;
+      var insertAfter = !( node is GroupGeneratorNode );
+
+      if( ( groupsRemoved.Count > 0 ) || ( groupsMoved.Count > 0 ) )
+      {
+        var removeNodeHelper = new GeneratorNodeHelper( m_groupNodeMappingCache[ oldGroups.Last() ], 0, 0 );
+        removeNodeHelper.ReverseCalculateIndex();
+
+        for( int i = oldGroups.Count - 1; i >= 0; i-- )
+        {
+          var group = oldGroups[ i ];
+          var removed = groupsRemoved.Contains( group );
+          var moved = ( !removed && groupsMoved.Contains( group ) );
+
+          if( removed || moved )
+          {
+            var groupNode = removeNodeHelper.CurrentNode;
+            Debug.Assert( ( groupNode != null ) && ( groupNode == m_groupNodeMappingCache[ group ] ) );
+
+            if( groupNode == node )
+            {
+              Debug.Assert( !( groupNode.Previous is GroupGeneratorNode ), "How come the node was not the first GroupGeneratorNode." );
+
+              node = groupNode.Next;
+              insertAfter = false;
+            }
+
+            var startIndex = removeNodeHelper.Index;
+            int count;
+
+            removeNodeHelper.MoveToPrevious();
+
+            if( removed )
+            {
+              this.ProcessGroupRemoval( groupNode, 1, true, out count );
+              this.NodeFactory.CleanGeneratorNodeTree( groupNode );
+            }
+            else
+            {
+              this.ProcessGroupRemoval( groupNode, 1, false, out count );
+            }
+
+            if( count > 0 )
+            {
+              this.RemoveGeneratedItems( startIndex, startIndex + count - 1, null );
+            }
+          }
+          else
+          {
+            removeNodeHelper.MoveToPrevious();
+          }
+        }
+      }
+
+      if( ( groupsAdded.Count > 0 ) || ( groupsMoved.Count > 0 ) )
+      {
+        var firstGroup = newGroups[ 0 ];
+        var added = groupsAdded.Contains( firstGroup );
+        var moved = ( !added && groupsMoved.Contains( firstGroup ) );
+
+        if( added || moved )
+        {
+          var groupNode = default( GeneratorNode );
+
+          if( added )
+          {
+            groupNode = this.CreateGroupListFromCollection( new object[] { firstGroup }, parentNode );
+          }
+          else
+          {
+            groupNode = m_groupNodeMappingCache[ firstGroup ];
+          }
+
+          Debug.Assert( groupNode != null );
+
+          if( node != null )
+          {
+            var addNodeHelper = new GeneratorNodeHelper( node, 0, 0 );
+
+            if( insertAfter )
+            {
+              addNodeHelper.InsertAfter( groupNode );
+            }
+            else
+            {
+              addNodeHelper.InsertBefore( groupNode );
+              insertAfter = true;
+            }
+
+            if( parentNode == null )
+            {
+              if( m_startNode == m_firstItem )
+              {
+                m_startNode = groupNode;
+              }
+
+              m_firstItem = groupNode;
+            }
+          }
+          else
+          {
+            if( parentNode == null )
+            {
+              m_firstItem = groupNode;
+
+              if( m_startNode != null )
+              {
+                if( m_firstFooter != null )
+                {
+                  var addNodeHelper = new GeneratorNodeHelper( m_firstFooter, 0, 0 );
+                  addNodeHelper.InsertBefore( groupNode );
+                }
+                else if( m_firstHeader != null )
+                {
+                  var addNodeHelper = new GeneratorNodeHelper( m_firstHeader, 0, 0 );
+                  addNodeHelper.MoveToEnd();
+                  addNodeHelper.InsertAfter( groupNode );
+                }
+                else
+                {
+                  throw new DataGridInternalException( "No start node found for the current GeneratorNode.", m_dataGridControl );
+                }
+              }
+              else
+              {
+                m_startNode = groupNode;
+              }
+            }
+            else
+            {
+              Debug.Assert( parentNode.Child != null );
+
+              var addNodeHelper = new GeneratorNodeHelper( parentNode.Child, 0, 0 );
+              addNodeHelper.MoveToEnd();
+              addNodeHelper.InsertAfter( groupNode );
+            }
+          }
+
+          node = groupNode;
+        }
+
+        for( var i = 1; i < newGroups.Count; i++ )
+        {
+          var group = newGroups[ i ];
+
+          added = groupsAdded.Contains( group );
+          moved = ( !added && groupsMoved.Contains( group ) );
+
+          if( !added && !moved )
+            continue;
+
+          var groupNode = default( GeneratorNode );
+
+          if( added )
+          {
+            groupNode = this.CreateGroupListFromCollection( new object[] { group }, parentNode );
+          }
+          else
+          {
+            groupNode = m_groupNodeMappingCache[ group ];
+          }
+
+          Debug.Assert( groupNode != null );
+
+          var addNodeHelper = new GeneratorNodeHelper( m_groupNodeMappingCache[ newGroups[ i - 1 ] ], 0, 0 );
+          addNodeHelper.InsertAfter( groupNode );
+        }
+      }
+
+      this.IncrementCurrentGenerationCount();
+      this.SendResetEvent();
     }
 
     private void HandleSameLevelGroupMove( GeneratorNode node, NotifyCollectionChangedEventArgs e )
@@ -4303,14 +4829,12 @@ namespace Xceed.Wpf.DataGrid
       while( !( nodeHelper.CurrentNode is GroupGeneratorNode ) )
       {
         if( !nodeHelper.MoveToNext() )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "Unable to move to next GeneratorNode.", m_dataGridControl );
       }
 
       //then move up to the removal start point.
       if( !nodeHelper.MoveToNextBy( e.OldStartingIndex ) )
-      {
-        throw new DataGridInternalException();
-      }
+        throw new DataGridInternalException( "Unable to move to the requested generator index.", m_dataGridControl );
 
       //remember the current node as the start point of the move (will be used when "extracting the chain")
       GeneratorNode startNode = nodeHelper.CurrentNode;
@@ -4334,7 +4858,7 @@ namespace Xceed.Wpf.DataGrid
       node = ( parentGroup != null ) ? parentGroup.Child : m_firstItem;
 
       if( node == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "No node found to move.", m_dataGridControl );
 
       //Once the chain was pulled out, re-insert it at the appropriate location.
       nodeHelper = new GeneratorNodeHelper( node, 0, 0 ); //do not care about the index for what I need
@@ -4343,7 +4867,7 @@ namespace Xceed.Wpf.DataGrid
       while( !( nodeHelper.CurrentNode is GroupGeneratorNode ) )
       {
         if( !nodeHelper.MoveToNext() )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "Unable to move to next GeneratorNode.", m_dataGridControl );
       }
 
       bool insertBefore = nodeHelper.MoveToNextBy( e.NewStartingIndex );
@@ -4374,11 +4898,7 @@ namespace Xceed.Wpf.DataGrid
 
     private GeneratorNode HandleSameLevelGroupAddition( GeneratorNode firstChild, out int countAdded, NotifyCollectionChangedEventArgs e )
     {
-
-      Debug.Assert( ( ( firstChild.Parent == null ) || ( firstChild.Parent is GroupGeneratorNode ) ), "parent of the node should be a GroupGeneratorNode" );
-#if LOG
-      Log.Assert( this, ( ( firstChild.Parent == null ) || ( firstChild.Parent is GroupGeneratorNode ) ), "parent of the node should be a GroupGeneratorNode" );
-#endif
+      m_log.Assert( this, ( ( firstChild.Parent == null ) || ( firstChild.Parent is GroupGeneratorNode ) ), "parent of the node should be a GroupGeneratorNode" );
 
       GeneratorNode newNodeChain = this.CreateGroupListFromCollection( e.NewItems, firstChild.Parent );
 
@@ -4444,12 +4964,8 @@ namespace Xceed.Wpf.DataGrid
       GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( parent, 0, 0 ); //do not care about index (for now).
 
       //start by moving to the first child... of the node (GroupHeaders node, most probably).
-      if( !nodeHelper.MoveToChild( false ) ) //case 120137: false parameter is to prevent skipping over a collapsed node (item count 0 )
-      {
-        //could not advance to the child item so there is no items to be removed...
-
-        throw new DataGridInternalException();
-      }
+      if( !nodeHelper.MoveToChild( false ) ) 
+        throw new DataGridInternalException( "Could not move to the child node to be removed.", m_dataGridControl );
 
       return this.HandleSameLevelGroupAddition( nodeHelper.CurrentNode, out countAdded, e );
     }
@@ -4481,44 +4997,10 @@ namespace Xceed.Wpf.DataGrid
         //and send notification message
         this.SendAddEvent( addGenPos, startIndex, e.NewItems.Count );
       }
-    }
-
-    private void OffsetDetails( ItemsGeneratorNode node, int startIndex, int addOffset )
-    {
-      if( ( node.Details == null ) || ( node.Details.Count == 0 ) )
-        return;
-
-      int detailsCount = node.Details.Count;
-      //first, create an array that will contain the keys for all the expanded details from the ItemsGeneratorNode
-      int[] keys = new int[ detailsCount ];
-      node.Details.Keys.CopyTo( keys, 0 );
-
-      //sort the array, this will prevent any operation that will duplicate keys in the dictionary.
-      Array.Sort<int>( keys );
-
-      //loop from the end of the sorted array to the beginning. to ensuyre
-      for( int i = detailsCount - 1; i >= 0; i-- )
+      else
       {
-        int key = keys[ i ];
-
-        //only process the key if it is in the processed range
-        if( key >= startIndex )
-        {
-          List<DetailGeneratorNode> details;
-          if( node.Details.TryGetValue( key, out details ) )
-          {
-#if LOG
-            Log.WriteLine( this, "details.Offset for Add - IN" + node.GetHashCode().ToString() + "- Di" + key.ToString() + " - new Di" + ( key + addOffset ).ToString() );
-#endif
-            node.Details.Remove( key );
-            node.Details.Add( key + addOffset, details );
-          }
-          else
-          {
-            //Key not found in the dictionary, something wrong is going on.
-            throw new DataGridInternalException();
-          }
-        }
+        //An item can be added in the source without the need to regenerate the containers, but still provoke a change to the realized containers' corresponding source index.
+        this.UpdateContainersIndex();
       }
     }
 
@@ -4545,13 +5027,10 @@ namespace Xceed.Wpf.DataGrid
       int removeCount = e.OldItems.Count + detailCountToRemove;
       int replaceCount = ( e.Action == NotifyCollectionChangedAction.Replace ) ? e.NewItems.Count : 0;
 
-      // *** RemoveDetails must be done before GeneratorPositionFromIndex, since GeneratorPositionFromIndex will indirectly do a RemapFloatingDetails
-      // *** that will cause the index to already be rectified and make a double rectification to occurs.
-
       //Remove the details from the ItemsGeneratorNode and re-index the other details appropriatly.
       this.RemoveDetails( node, nodeStartIndex, nodeEndIndex, replaceCount );
 
-      GeneratorPosition removeGenPos = this.GeneratorPositionFromIndex( startIndex );
+      GeneratorPosition removeGenPos = this.GetSafeGeneratorPositionFromIndex( startIndex );
 
       //Try to remap the old item for detail remapping (will do nothing if item has no details )
       foreach( object oldItem in e.OldItems )
@@ -4559,9 +5038,11 @@ namespace Xceed.Wpf.DataGrid
         this.QueueDetailItemForRemapping( oldItem );
       }
 
+      bool needsUpdateToIndexes = true;
       //if the node is totally expanded
       if( node.IsComputedExpanded )
       {
+        needsUpdateToIndexes = false;
         List<DependencyObject> removedContainers = new List<DependencyObject>();
         int genRemCount = this.RemoveGeneratedItems( startIndex, endIndex, removedContainers );
 
@@ -4583,13 +5064,18 @@ namespace Xceed.Wpf.DataGrid
           break;
 
         case NotifyCollectionChangedAction.Remove:
-          // Do nothing!
+          if( needsUpdateToIndexes )
+          {
+            //An item can be removed from the source without the need to regenerate the containers,
+            //but still provoke a change to the realized containers' corresponding source index.
+            this.UpdateContainersIndex();
+          }
           break;
 
         case NotifyCollectionChangedAction.Add:
         case NotifyCollectionChangedAction.Reset:
-        default:
-          throw new DataGridInternalException();
+          DataGridException.ThrowSystemException( "Add or Reset not supported at the moment on groups.", typeof( NotSupportedException ), m_dataGridControl.Name );
+          break;
       }
 
     }
@@ -4603,6 +5089,87 @@ namespace Xceed.Wpf.DataGrid
 
       //this is used to notify any Master Generator that it must update its content's status (UpdateGenPosToIndexList)
       this.SendAddEvent( new GeneratorPosition( -1, 1 ), nodeIndex + e.NewStartingIndex, e.NewItems.Count );
+    }
+
+    private void UpdateContainersIndex()
+    {
+      DataGridCollectionView collectionView = m_collectionView.SourceCollection as DataGridCollectionView;
+      GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
+      int currentIndex = -1;
+      int offset = 0;
+      int sourceItemIndex;
+
+      foreach( object item in m_genPosToItem )
+      {
+        currentIndex++;
+
+        //If the item is not found, it means it belongs to a detail grid, no need to process it.
+        if( nodeHelper.FindItem( item ) == -1 )
+          continue;
+
+        //If we're not on a ItemsGeneratorNode, it means we are not on a DataRow, so no need to process it (all ItemIndex == -1 in this case).
+        ItemsGeneratorNode itemsNode = nodeHelper.CurrentNode as ItemsGeneratorNode;
+        if( itemsNode == null )
+        {
+          offset = 0;
+          continue;
+        }
+
+        //If we have a DataGridCollectionView, let's get the sorted index from it in case there are details expanded.
+        if( collectionView != null )
+        {
+          sourceItemIndex = collectionView.GetGlobalSortedIndexFromDataItem( item );
+        }
+        //If not a DGCV, it means there are no details, so this will work fine.
+        else
+        {
+          if( offset == 0 )
+          {
+            //This will make sure we get the right index in case the group is patially scrolled.
+            offset = itemsNode.IndexOf( item );
+          }
+          sourceItemIndex = nodeHelper.SourceDataIndex + offset++;
+        }
+        DataGridVirtualizingPanel.SetItemIndex( m_genPosToContainer[ currentIndex ], sourceItemIndex );
+      }
+    }
+
+    private void OffsetDetails( ItemsGeneratorNode node, int startIndex, int addOffset )
+    {
+      if( ( node.Details == null ) || ( node.Details.Count == 0 ) )
+        return;
+
+      int detailsCount = node.Details.Count;
+      //first, create an array that will contain the keys for all the expanded details from the ItemsGeneratorNode
+      int[] keys = new int[ detailsCount ];
+      node.Details.Keys.CopyTo( keys, 0 );
+
+      //sort the array, this will prevent any operation that will duplicate keys in the dictionary.
+      Array.Sort<int>( keys );
+
+      //loop from the end of the sorted array to the beginning. to ensuyre
+      for( int i = detailsCount - 1; i >= 0; i-- )
+      {
+        int key = keys[ i ];
+
+        //only process the key if it is in the processed range
+        if( key >= startIndex )
+        {
+          List<DetailGeneratorNode> details;
+          if( node.Details.TryGetValue( key, out details ) )
+          {
+            m_log.WriteLine( this, "details.Offset for Add - IN" + node.GetHashCode().ToString() + "- Di" + key.ToString() + " - new Di" + ( key + addOffset ).ToString() );
+
+            node.Details.Remove( key );
+            node.Details.Add( key + addOffset, details );
+          }
+          else
+          {
+            //Key not found in the dictionary, something wrong is going on.
+            throw new DataGridInternalException( "Key not found in Details dictionary.", m_dataGridControl );
+          }
+        }
+      }
     }
 
     private void RemoveDetails( ItemsGeneratorNode node, int nodeStartIndex, int nodeEndIndex, int replaceCount )
@@ -4642,9 +5209,7 @@ namespace Xceed.Wpf.DataGrid
             }
             details.Clear(); //note: detail generators will be "closed" by another section of code (Remap floating details).
 
-#if LOG
-            Log.WriteLine( this, "details.Remove - IN" + node.GetHashCode().ToString() + " - Di" + key.ToString() );
-#endif
+            m_log.WriteLine( this, "details.Remove - IN" + node.GetHashCode().ToString() + " - Di" + key.ToString() );
 
             node.Details.Remove( key );
 
@@ -4656,7 +5221,7 @@ namespace Xceed.Wpf.DataGrid
           else
           {
             //Key not found in the dictionary, something wrong is going on.
-            throw new DataGridInternalException();
+            throw new DataGridInternalException( "Key not found in Details dictionary within the remove range.", m_dataGridControl );
           }
         }
         //If the key is above the remove range, re-key it appropriatly.
@@ -4665,16 +5230,15 @@ namespace Xceed.Wpf.DataGrid
           List<DetailGeneratorNode> details;
           if( node.Details.TryGetValue( key, out details ) )
           {
-#if LOG
-            Log.WriteLine( this, "details.offset for remove - IN" + node.GetHashCode().ToString() + "- Di" + key.ToString() + " - new Di" + ( key - removeCount ).ToString() );
-#endif
+            m_log.WriteLine( this, "details.offset for remove - IN" + node.GetHashCode().ToString() + "- Di" + key.ToString() + " - new Di" + ( key - removeCount ).ToString() );
+
             node.Details.Remove( key );
             node.Details.Add( key - removeCount, details );
           }
           else
           {
             //Key not found in the dictionary, something wrong is going on.
-            throw new DataGridInternalException();
+            throw new DataGridInternalException( "Key not found in Details dictionary above the remove range.", m_dataGridControl );
           }
         }
       }
@@ -4735,9 +5299,7 @@ namespace Xceed.Wpf.DataGrid
           }
         }
 
-#if LOG
-        Log.WriteLine( this, "details.Clear - IN" + itemsNode.GetHashCode().ToString() );
-#endif
+        m_log.WriteLine( this, "details.Clear - IN" + itemsNode.GetHashCode().ToString() );
 
         itemsNode.Details.Clear();
         itemsNode.Details = null;
@@ -4856,35 +5418,21 @@ namespace Xceed.Wpf.DataGrid
 
     private void HandleGlobalItemsReset()
     {
-      this.HandleGlobalItemsReset( false );
-    }
+      m_log.Assert( this, !this.IsHandlingGlobalItemsResetLocally, "Generator is already processing a HandleGlobalItemReset or CleanupGenerator" );
 
-    private void HandleGlobalItemsReset( bool itemsSourceChanged )
-    {
-      Debug.Assert( m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount == 0, "Generator is already processing a HandleGlobalItemReset or CleanupGenerator" );
-#if LOG
-      Log.Start( this, "HandleGlobalItemsReset" );
-#endif
-
-      if( m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount > 0 )
-      {
-#if LOG
-        Log.End( this, "HandleGlobalItemsReset - Ignored 1" );
-#endif
+      if( this.IsHandlingGlobalItemsResetLocally )
         return;
-      }
 
       if( m_startNode == null )
       {
-#if LOG
-        Log.End( this, "HandleGlobalItemsReset - Ignored 2" );
-#endif
+        m_log.WriteLine( this, "No starting node in HandleGlobalItemsReset." );
         return;
       }
 
-      using( new ProcessingGlobalItemsResetOrRemovingAllGeneratedItemsDisposable( this ) )
+      using( m_log.BeginBlock( this, null ) )
+      using( this.SetIsHandlingGlobalItemsResetLocally() )
       {
-        this.RemoveAllGeneratedItems( itemsSourceChanged );
+        this.RemoveAllGeneratedItems();
 
         //No need to clean any more Master/Detail stuff, effectivelly, the call to ClearItems() below will clean the nodes themselves...
         //generator will then be able to remap.
@@ -4892,6 +5440,8 @@ namespace Xceed.Wpf.DataGrid
         //if there are items to start with!!!
         if( m_firstItem != null )
         {
+          m_dataGridControl.SaveDataGridContextState( m_dataGridContext, true, int.MaxValue );
+
           //requeue all opened details for remapping!
           foreach( object item in m_masterToDetails.Keys )
           {
@@ -4907,34 +5457,10 @@ namespace Xceed.Wpf.DataGrid
           //Note: There is no need to Clear the recyclingManager since this only represents a reset of the Items (not the headers and footers nodes)
           //and that the list of containers to be recycled is not "invalidated"
 
-          try
-          {
-            this.IsHandlingItemsRecreation = true;
-            this.HandleItemsRecreation();
-            m_dataGridControl.RestoreDataGridContextState( m_dataGridContext );
-          }
-          finally
-          {
-            this.IsHandlingItemsRecreation = false;
-          }
         }
 
         this.SendResetEvent();
-
-        if( itemsSourceChanged )
-        {
-          IList<DependencyObject> removedContainers = m_dataGridContext.RecyclingManager.Clear();
-          //Do not remove the Generator's reference to the RecyclingManager as all we want is to empty it!
-          //Effectivelly, for an items source change (only time where this method is called with notify == true ) we need
-          //to get rid of the containers.
-
-          this.NotifyContainersRemoved( removedContainers );
-        }
       }
-
-#if LOG
-      Log.End( this, "HandleGlobalItemsReset" );
-#endif
     }
 
     internal void EnsureNodeTreeCreated()
@@ -4946,15 +5472,12 @@ namespace Xceed.Wpf.DataGrid
       if( this.IsEnsuringNodeTreeCreated )
         return;
 
-      this.IsEnsuringNodeTreeCreated = true;
-
-      try
+      using( this.SetIsEnsuringNodeTreeCreated() )
       {
         if( m_startNode == null )
         {
-#if LOG
-          Log.WriteLine( this, "EnsureNodeTreeCreated - new tree" );
-#endif
+          m_log.WriteLine( this, "EnsureNodeTreeCreated - new tree" );
+
           int addCount;
 
           this.UpdateHeaders( m_dataGridContext.Headers );
@@ -4974,10 +5497,6 @@ namespace Xceed.Wpf.DataGrid
 
         m_dataGridControl.RestoreDataGridContextState( m_dataGridContext );
       }
-      finally
-      {
-        this.IsEnsuringNodeTreeCreated = false;
-      }
     }
 
     private void HandleItemsRecreation()
@@ -4987,43 +5506,20 @@ namespace Xceed.Wpf.DataGrid
       GeneratorNode addNode = this.SetupInitialItemsNodes( out resetAddCount );
 
       if( addNode != null )
+      {
         this.IncrementCurrentGenerationCount();
+      }
     }
 
     private void UpdateGenPosToIndexList()
     {
-#if LOG
-      int count = m_genPosToIndex.Count;
-      int previousIndex = -1;
+      this.ValidateIndexOrder( "Before" );
 
-      for( int i = 0; i < count; i++ )
-      {
-        int tempIndex = m_genPosToIndex[ i ];
-
-        if( tempIndex >= previousIndex )
-        {
-          previousIndex = tempIndex;
-        }
-        else
-        {
-          Debug.Assert( false, "### none sequential index detected (before)" );
-          Log.Assert( this, false, "### none sequential index detected (before)" );
-          this.WriteStateInLog();
-          break;
-        }
-      }
-#endif
       //after the modification to have the item count stored "locally" in the DetailGeneratorNodes,
       //it becomes important to have the nodes updated when the layout of the items changes.
-      if( m_masterToDetails.Count > 0 )
+      foreach( var detailNode in this.GetDetailGeneratorNodes() )
       {
-        foreach( KeyValuePair<object, List<DetailGeneratorNode>> masterToDetails in m_masterToDetails )
-        {
-          foreach( DetailGeneratorNode detailNode in masterToDetails.Value )
-          {
-            detailNode.UpdateItemCount();
-          }
-        }
+        detailNode.UpdateItemCount();
       }
 
       if( m_startNode != null )
@@ -5058,16 +5554,8 @@ namespace Xceed.Wpf.DataGrid
             }
             else
             {
-#if LOG
-              if( item == null )
-              {
-                Log.WriteLine( this, "# UpdateGenPosToIndexList - item not found Dnull" );
-              }
-              else
-              {
-                Log.WriteLine( this, "# UpdateGenPosToIndexList - Item not found D" + item.GetHashCode() );
-              }
-#endif
+              m_log.WriteLine( this, CustomItemContainerGenerator.FormatObjectId( "# UpdateGenPosToIndexList - item not found D", item ) );
+
               //a possible fix for this is to set the index of the "not found" element to the same index as previous item in the generated list...
               m_genPosToIndex[ i ] = ( i > 0 ) ? m_genPosToIndex[ i - 1 ] : 0;
 
@@ -5090,27 +5578,7 @@ namespace Xceed.Wpf.DataGrid
         } //end for()
       }
 
-#if LOG
-      count = m_genPosToIndex.Count;
-      previousIndex = -1;
-
-      for( int i = 0; i < count; i++ )
-      {
-        int tempIndex = m_genPosToIndex[ i ];
-
-        if( tempIndex >= previousIndex )
-        {
-          previousIndex = tempIndex;
-        }
-        else
-        {
-          Debug.Assert( false, "### none sequential index detected (after)" );
-          Log.Assert( this, false, "### none sequential index detected (after)" );
-          this.WriteStateInLog();
-          break;
-        }
-      }
-#endif
+      this.ValidateIndexOrder( "After" );
     }
 
     private int IndexFromRealizedItem( object referenceItem, int startIndex, out int foundIndex )
@@ -5135,97 +5603,42 @@ namespace Xceed.Wpf.DataGrid
 
     private int FindGlobalIndexForDetailNode( DetailGeneratorNode detailNode )
     {
-      int retval = -1;
-
-      //first thing, loop through the details for the 
-      foreach( KeyValuePair<object, List<DetailGeneratorNode>> masterItemToDetails in m_masterToDetails )
+      foreach( var masterItemToDetails in m_masterToDetails )
       {
-        //in each master to details entry, try to find the detail node passed
-        int detailIndex = masterItemToDetails.Value.IndexOf( detailNode );
-        if( detailIndex != -1 )
+        var detailsNodes = masterItemToDetails.Value;
+        var detailIndex = detailsNodes.IndexOf( detailNode );
+        if( detailIndex < 0 )
+          continue;
+
+        var parentItem = masterItemToDetails.Key;
+        var offset = detailsNodes.Take( detailIndex ).Sum( item => item.ItemCount - 1 );
+
+        var index = m_genPosToItem.IndexOf( parentItem );
+
+        if( index >= 0 )
         {
-          //if the desired detailNode is present for this master item... then evaluate it...
-          int detailNodeOffset = 0;
-          for( int i = 0; i < detailIndex; i++ )
-          {
-            detailNodeOffset += masterItemToDetails.Value[ i ].ItemCount - 1;
-          }
-
-          int index = m_genPosToItem.IndexOf( masterItemToDetails.Key );
-          int masterItemIndex;
-
-          if( index > -1 )
-          {
-            masterItemIndex = m_genPosToIndex[ index ];
-          }
-          else
-          {
-            GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
-            masterItemIndex = nodeHelper.FindItem( masterItemToDetails.Key );
-          }
-
-          if( masterItemIndex == -1 )
-            throw new DataGridInternalException();
-
-          retval = detailNodeOffset + masterItemIndex + detailIndex + 1;
-
-          //leave the top level loop
-          break;
+          if( m_genPosToNode[ index ] is ItemsGeneratorNode )
+            return offset + detailIndex + m_genPosToIndex[ index ] + 1;
         }
+
+        // Look for parent item index the old way.
+        var nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
+
+        var parentItemIndex = nodeHelper.FindItem( parentItem );
+        if( parentItemIndex < 0 )
+          throw new DataGridInternalException( "Master item index is out of bound.", m_dataGridControl );
+
+        return offset + detailIndex + parentItemIndex + 1;
       }
 
-      return retval;
-    }
-
-    private void SendRemoveEvent( GeneratorPosition remPos, int oldIndex, int remCount, int generatedRemCount, IList<DependencyObject> removedContainers )
-    {
-      // Never send Remove events while processing ItemsRecreation
-      // to avoid bad ItemCount on master node
-      if( this.IsHandlingItemsRecreation )
-        return;
-
-      if( this.ItemsChanged != null )
-      {
-        using( new DeferDetailsRemapDisposable( this ) )
-        {
-          this.ItemsChanged( this, new CustomGeneratorChangedEventArgs( NotifyCollectionChangedAction.Remove, remPos, oldIndex, remPos, oldIndex, remCount, generatedRemCount, removedContainers ) );
-        }
-      }
-    }
-
-    private void SendAddEvent( GeneratorPosition genPos, int index, int addCount )
-    {
-      // Never send Add events while processing ItemsRecreation
-      // to avoid bad ItemCount on master node
-      if( this.IsHandlingItemsRecreation )
-        return;
-
-      if( this.ItemsChanged != null )
-      {
-        using( new DeferDetailsRemapDisposable( this ) )
-        {
-          this.ItemsChanged( this, new CustomGeneratorChangedEventArgs( NotifyCollectionChangedAction.Add, genPos, index, addCount, 0 ) );
-        }
-      }
-    }
-
-    private void SendResetEvent()
-    {
-      if( this.ItemsChanged != null )
-      {
-        using( new DeferDetailsRemapDisposable( this ) )
-        {
-          this.ItemsChanged( this, new CustomGeneratorChangedEventArgs( NotifyCollectionChangedAction.Reset, new GeneratorPosition(), 0, 0, 0 ) );
-        }
-      }
+      return -1;
     }
 
     private void StartGenerator( GeneratorPosition startPos, GeneratorDirection direction )
     {
       if( this.Status == GeneratorStatus.GeneratingContainers )
-      {
-        throw new InvalidOperationException( "Cannot perform this operation while the generator is busy generating items" );
-      }
+        DataGridException.ThrowSystemException( "Cannot perform this operation while the generator is busy generating items.",
+                                                typeof( InvalidOperationException ), m_dataGridControl.Name );
 
       //set the GeneratorStatus to "Generating"
       m_generatorStatus = GeneratorStatus.GeneratingContainers;
@@ -5236,14 +5649,11 @@ namespace Xceed.Wpf.DataGrid
       //retrieve the Index for the GeneratorPosition retrieved
       m_generatorCurrentGlobalIndex = this.IndexFromGeneratorPosition( startPos );
 
-      // case 117460: throw an exception if the GeneratorPosition is bad, but not if the itemcount is 0 
-      //(and generator position maps to index 0 ).
       int itemCount = this.ItemCount;
       if( ( m_generatorCurrentGlobalIndex < 0 ) || ( ( itemCount > 0 ) && ( m_generatorCurrentGlobalIndex >= itemCount ) ) )
-        throw new ArgumentOutOfRangeException( "startPos", "The specified start position is outside the range of the Generator content." );
+        DataGridException.ThrowSystemException( "The specified start position is outside the range of the Generator content.",
+                                                typeof( ArgumentOutOfRangeException ), m_dataGridControl.Name, "startPos" );
 
-      //case 117460: if the item count is 0, return without doing any check, GenerateNext will never process any content in that case.
-      //Since the GeneratorNodeHelper is never created.
       if( itemCount == 0 )
         return;
 
@@ -5252,10 +5662,8 @@ namespace Xceed.Wpf.DataGrid
 
       //position the GeneratorNodeHelper to the appropriate node
       if( !m_generatorNodeHelper.FindNodeForIndex( m_generatorCurrentGlobalIndex ) ) //find index?!?!
-      {
         //there was a problem moving the Node helper... 
-        throw new DataGridInternalException();
-      }
+        throw new DataGridInternalException( "Unable to move to the required generator node by using the current index.", m_dataGridControl );
 
       //Calculate the offset
       m_generatorCurrentOffset = m_generatorCurrentGlobalIndex - m_generatorNodeHelper.Index;
@@ -5268,6 +5676,10 @@ namespace Xceed.Wpf.DataGrid
 
       if( m_generatorCurrentDetail != null )
       {
+        // No detail generator should be started already.
+        if( m_generatorCurrentDetailDisposable != null )
+          throw new DataGridInternalException( "The detail generator is already started.", m_dataGridControl );
+
         m_generatorCurrentDetailDisposable = ( ( IItemContainerGenerator )m_generatorCurrentDetail.DetailGenerator ).StartAt( m_generatorCurrentDetail.DetailGenerator.GeneratorPositionFromIndex( m_generatorCurrentDetailIndex ), direction, true );
       }
     }
@@ -5275,9 +5687,7 @@ namespace Xceed.Wpf.DataGrid
     private void StopGenerator()
     {
       if( this.Status != GeneratorStatus.GeneratingContainers )
-      {
-        throw new DataGridInternalException();
-      }
+        throw new DataGridInternalException( "Cannot perform this operation while the generator is busy generating items.", m_dataGridControl );
 
       m_generatorNodeHelper = null;
       m_generatorCurrentOffset = -1;
@@ -5290,8 +5700,17 @@ namespace Xceed.Wpf.DataGrid
 
       if( m_generatorCurrentDetailDisposable != null )
       {
-        m_generatorCurrentDetailDisposable.Dispose();
-        m_generatorCurrentDetailDisposable = null;
+        try
+        {
+          m_generatorCurrentDetailDisposable.Dispose();
+          m_generatorCurrentDetailDisposable = null;
+        }
+        catch( Exception e )
+        {
+          m_generatorStatus = GeneratorStatus.Error;
+
+          throw new DataGridInternalException( "The generator failed to stop.", e, m_dataGridControl );
+        }
       }
 
       m_generatorStatus = GeneratorStatus.ContainersGenerated;
@@ -5348,7 +5767,12 @@ namespace Xceed.Wpf.DataGrid
       {
         this.EnqueueContainer( container, dataItem );
 
-        CustomItemContainerGenerator.SetDataItemProperty( container, CustomItemContainerGenerator.NotSet );
+        var dataItemStore = container.ReadLocalValue( CustomItemContainerGenerator.DataItemPropertyProperty ) as DataItemDataProviderBase;
+        if( dataItemStore != null )
+        {
+          dataItemStore.ClearDataItem();
+        }
+
         if( GroupLevelIndicatorPane.GetGroupLevel( container ) == -1 )
         {
           container.ClearValue( GroupLevelIndicatorPane.GroupLevelProperty );
@@ -5363,78 +5787,85 @@ namespace Xceed.Wpf.DataGrid
 
     private DependencyObject CreateContainerForItem( object dataItem, GeneratorNode node )
     {
-      DependencyObject retval = null;
+      DependencyObject container = null;
 
       if( node is HeadersFootersGeneratorNode )
       {
-        retval = this.CreateHeaderFooterContainer( dataItem );
+        container = this.CreateHeaderFooterContainer( dataItem );
+
         if( node.Parent == null )
         {
-          GroupLevelIndicatorPane.SetGroupLevel( retval, -1 );
+          GroupLevelIndicatorPane.SetGroupLevel( container, -1 );
         }
         else
         {
-          GroupLevelIndicatorPane.SetGroupLevel( retval, node.Level );
+          GroupLevelIndicatorPane.SetGroupLevel( container, node.Level );
         }
 
-        this.SetStatContext( retval, node );
+        this.SetStatContext( container, node );
       }
       else if( node is ItemsGeneratorNode )
       {
         //ensure that item is not its own container...
         if( !this.IsItemItsOwnContainer( dataItem ) )
         {
-          retval = this.CreateNextItemContainer();
+          container = this.CreateNextItemContainer( dataItem );
         }
         else
         {
-          retval = dataItem as DependencyObject;
+          container = dataItem as DependencyObject;
         }
 
-        GroupLevelIndicatorPane.SetGroupLevel( retval, node.Level );
+        GroupLevelIndicatorPane.SetGroupLevel( container, node.Level );
       }
       else
       {
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "Cannot create container for the GeneratorNode, as it is not of a valid type.", m_dataGridControl );
       }
 
-      if( retval == null )
+      if( container == null )
+        throw new DataGridInternalException( "A container could not be created or recycled for the GeneratorNode.", m_dataGridControl );
+
+      var dataItemStore = container.ReadLocalValue( CustomItemContainerGenerator.DataItemPropertyProperty ) as DataItemDataProviderBase;
+      if( dataItemStore != null )
       {
-        throw new DataGridInternalException();
+        dataItemStore.SetDataItem( dataItem );
+      }
+      else
+      {
+        dataItemStore = new DataItemDataProvider();
+        dataItemStore.SetDataItem( dataItem );
+
+        CustomItemContainerGenerator.SetDataItemProperty( container, dataItemStore );
       }
 
-      CustomItemContainerGenerator.SetDataItemProperty( retval, dataItem );
-      DataGridControl.SetDataGridContext( retval, m_dataGridContext );
+      DataGridControl.SetDataGridContext( container, m_dataGridContext );
 
-      return retval;
+      return container;
     }
 
     private void SetStatContext( DependencyObject container, GeneratorNode node )
     {
       GroupGeneratorNode parentGroup = node.Parent as GroupGeneratorNode;
-      DataGridCollectionViewGroup cvg = null;
+      DataGridCollectionViewGroup collectionViewGroup = null;
 
-      if( parentGroup == null )
+      if( parentGroup != null )
       {
-        DataGridCollectionViewBase dataGridCollectionViewBase = null;
-
-        if( m_dataGridContext != null )
+        collectionViewGroup = parentGroup.CollectionViewGroup as DataGridCollectionViewGroup;
+      }
+      else if( m_dataGridContext != null )
+      {
+        var collectionView = m_dataGridContext.ItemsSourceCollection as DataGridCollectionViewBase;
+        if( collectionView != null )
         {
-          dataGridCollectionViewBase = m_dataGridContext.ItemsSourceCollection as DataGridCollectionViewBase;
+          collectionViewGroup = collectionView.RootGroup as DataGridCollectionViewGroup;
         }
-
-        Debug.Assert( dataGridCollectionViewBase != null, "dataGridCollectionViewBase != null" );
-
-        if( dataGridCollectionViewBase != null )
-          cvg = dataGridCollectionViewBase.RootGroup as DataGridCollectionViewGroup;
       }
-      else
+
+      if( collectionViewGroup != null )
       {
-        cvg = parentGroup.CollectionViewGroup as DataGridCollectionViewGroup;
+        container.SetValue( DataGridControl.StatContextPropertyKey, collectionViewGroup );
       }
-
-      if( cvg != null )
-        container.SetValue( DataGridControl.StatContextPropertyKey, cvg );
     }
 
     private bool IsItemItsOwnContainer( object dataItem )
@@ -5470,7 +5901,7 @@ namespace Xceed.Wpf.DataGrid
         }
 
         if( template == null )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "No template found for the creation of a header or footer container.", m_dataGridControl );
       }
 
       HeaderFooterItem newItem = new HeaderFooterItem();
@@ -5510,293 +5941,334 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private void CleanDetailNode( DetailGeneratorNode detailNode )
+    private DetailGeneratorNode CreateDetailGeneratorNode( object dataItem, DataGridCollectionViewBase collectionView, DetailConfiguration detailConfiguration )
     {
-#if LOG
-      Log.Start( this, "CleanDetailNode - DN" + detailNode.GetHashCode().ToString() );
-#endif
+      var detailDataGridContext = new DataGridContext( m_dataGridContext, m_dataGridControl, dataItem, collectionView, detailConfiguration );
+      detailDataGridContext.SetAssociatedAutomationPeer();
 
-      m_dataGridControl.SelectionChangerManager.Begin();
+      var detailGenerator = CustomItemContainerGenerator.CreateGenerator( m_dataGridControl, collectionView, detailDataGridContext, this );
+      detailGenerator.SetGenPosToIndexUpdateInhibiter( this );
+      detailGenerator.IsRecyclingEnabled = this.IsRecyclingEnabled;
 
-      try
+      if( m_dataGridControl.AreDetailsFlatten )
       {
-        m_dataGridControl.SelectionChangerManager.UnselectAllItems( detailNode.DetailContext );
-        m_dataGridControl.SelectionChangerManager.UnselectAllCells( detailNode.DetailContext );
+        var updateColumnSortCommand = detailDataGridContext.UpdateColumnSortCommand;
+        if( updateColumnSortCommand.CanExecute() )
+        {
+          updateColumnSortCommand.Execute();
+        }
       }
-      finally
+
+      DetailsChangedEventManager.AddListener( detailGenerator, this );
+
+      var detailNode = new DetailGeneratorNode( detailDataGridContext, detailGenerator );
+
+      //register to the ItemsChanged only after the columns were updated (to avoid a reset being received without having completed the initialization ).
+      //Also wait after the creation of the DetailGeneratorNode, since messages could be issued before initialization completes.
+      detailGenerator.ItemsChanged += new CustomGeneratorChangedEventHandler( this.HandleDetailGeneratorContentChanged );
+      detailGenerator.ContainersRemoved += new ContainersRemovedEventHandler( this.OnDetailContainersRemoved );
+
+      return detailNode;
+    }
+
+    private void ClearDetailGeneratorNode( DetailGeneratorNode detailNode )
+    {
+      using( m_log.BeginBlock( this, CustomItemContainerGenerator.FormatObjectId( "ClearDetailGeneratorNode - DN", detailNode ) ) )
       {
-        m_dataGridControl.SelectionChangerManager.End( false, false, false );
+        m_dataGridControl.SelectionChangerManager.Begin();
+
+        try
+        {
+          m_dataGridControl.SelectionChangerManager.UnselectAllItems( detailNode.DetailContext );
+          m_dataGridControl.SelectionChangerManager.UnselectAllCells( detailNode.DetailContext );
+        }
+        finally
+        {
+          m_dataGridControl.SelectionChangerManager.End( false, false, false );
+        }
+
+        m_dataGridControl.SaveDataGridContextState( detailNode.DetailContext, true, int.MaxValue );
+
+        CustomItemContainerGenerator detailGenerator = detailNode.DetailGenerator;
+
+        detailNode.CleanGeneratorNode();
+
+        DetailsChangedEventManager.RemoveListener( detailGenerator, this );
+        detailGenerator.ItemsChanged -= new CustomGeneratorChangedEventHandler( this.HandleDetailGeneratorContentChanged );
+        detailGenerator.ContainersRemoved -= new ContainersRemovedEventHandler( this.OnDetailContainersRemoved );
+        detailGenerator.SetGenPosToIndexUpdateInhibiter( null );
+        detailGenerator.UnregisterEvents();
+        detailGenerator.ClearEvents();
       }
+    }
 
-      m_dataGridControl.SaveDataGridContextState( detailNode.DetailContext, true, int.MaxValue );
+    private void RegisterEvents()
+    {
+      Debug.Assert( m_dataGridControl != null );
+      Debug.Assert( m_collectionView != null );
+      Debug.Assert( ( m_dataGridContext != null ) && ( m_dataGridContext.DetailConfigurations != null ) );
 
-      CustomItemContainerGenerator generator = detailNode.DetailGenerator;
+      CollectionChangedEventManager.AddListener( m_collectionView, this );
+      GroupConfigurationSelectorChangedEventManager.AddListener( m_dataGridContext, this );
+      CollectionChangedEventManager.AddListener( m_dataGridContext.DetailConfigurations, this );
+      PropertyChangedEventManager.AddListener( m_collectionView, this, "Groups" );
 
-      detailNode.CleanGeneratorNode();
+      // The top most generator must register to additional events.
+      if( m_dataGridContext.SourceDetailConfiguration == null )
+      {
+        ItemsSourceChangeCompletedEventManager.AddListener( m_dataGridControl, this );
+        ViewChangedEventManager.AddListener( m_dataGridControl, this );
+        ThemeChangedEventManager.AddListener( m_dataGridControl, this );
+      }
+    }
 
-      DetailsChangedEventManager.RemoveListener( generator, this );
-      generator.ItemsChanged -= HandleDetailGeneratorContentChanged;
-      generator.ContainersRemoved -= OnDetailContainersRemoved;
-      generator.SetGenPosToIndexUpdateInhibiter( null );
+    private void UnregisterEvents()
+    {
+      Debug.Assert( m_dataGridControl != null );
+      Debug.Assert( m_collectionView != null );
+      Debug.Assert( ( m_dataGridContext != null ) && ( m_dataGridContext.DetailConfigurations != null ) );
 
-#if LOG
-      Log.End( this, "CleanDetailNode - DN" + detailNode.GetHashCode().ToString() );
-#endif
+      CollectionChangedEventManager.RemoveListener( m_collectionView, this );
+      GroupConfigurationSelectorChangedEventManager.RemoveListener( m_dataGridContext, this );
+      CollectionChangedEventManager.RemoveListener( m_dataGridContext.DetailConfigurations, this );
+      PropertyChangedEventManager.RemoveListener( m_collectionView, this, "Groups" );
+
+      // The top most generator must unregister from additional events.
+      if( m_dataGridContext.SourceDetailConfiguration == null )
+      {
+        ItemsSourceChangeCompletedEventManager.RemoveListener( m_dataGridControl, this );
+        ViewChangedEventManager.RemoveListener( m_dataGridControl, this );
+        ThemeChangedEventManager.RemoveListener( m_dataGridControl, this );
+      }
+    }
+
+    private void ClearEvents()
+    {
+      this.ContainersRemoved = null;
+      this.DetailsChanged = null;
+      this.ItemsChanged = null;
+      this.PropertyChanged = null;
     }
 
     private void HandleDetailGeneratorContentChanged( object sender, CustomGeneratorChangedEventArgs e )
     {
-      Debug.Assert( m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount == 0, "Generator is already processing a HandleGlobalItemReset or CleanupGenerator" );
-#if LOG
-      Log.Assert( this, m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount == 0, "Generator is already processing a HandleGlobalItemReset or CleanupGenerator" );
-#endif
+      m_log.Assert( this, !this.IsHandlingGlobalItemsResetLocally, "Generator is already processing a HandleGlobalItemReset or CleanupGenerator" );
 
-      if( m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount > 0 )
+      if( this.IsHandlingGlobalItemsResetLocally )
         return;
 
-      using( new ProcessingGlobalItemsResetOrRemovingAllGeneratedItemsDisposable( this ) )
+      m_log.Assert( this, m_startNode != null, "m_startNode != null" );
+
+      CustomItemContainerGenerator detailGenerator = sender as CustomItemContainerGenerator;
+
+      m_log.Assert( this, detailGenerator != null, "detailGenerator != null" );
+
+      object masterItem;
+      DetailGeneratorNode detailNode = this.FindDetailGeneratorNodeForGenerator( detailGenerator, out masterItem );
+
+      m_log.Assert( this, masterItem != null, "masterItem != null" );
+      m_log.Assert( this, detailNode != null, "detailNode != null" );
+
+      if( ( detailNode != null ) && ( masterItem != null ) )
       {
-        Debug.Assert( m_startNode != null, "m_startNode != null" );
-#if LOG
-        Log.Assert( this, m_startNode != null, "m_startNode != null" );
-#endif
-
-        CustomItemContainerGenerator detailGenerator = sender as CustomItemContainerGenerator;
-
-        Debug.Assert( detailGenerator != null, "detailGenerator != null" );
-#if LOG
-        Log.Assert( this, detailGenerator != null, "detailGenerator != null" );
-#endif
-
-        object masterItem;
-        DetailGeneratorNode detailNode = this.FindDetailGeneratorNodeForGenerator( detailGenerator, out masterItem );
-
-        Debug.Assert( masterItem != null, "masterItem != null" );
-        Debug.Assert( detailNode != null, "detailNode != null" );
-#if LOG
-        Log.Assert( this, masterItem != null, "masterItem != null" );
-        Log.Assert( this, detailNode != null, "detailNode != null" );
-#endif
-
-        if( ( detailNode != null ) && ( masterItem != null ) )
+        switch( e.Action )
         {
-          switch( e.Action )
-          {
-            case NotifyCollectionChangedAction.Add:
-              this.HandleDetailAddition( masterItem, detailNode, e );
-              break;
+          case NotifyCollectionChangedAction.Add:
+            this.HandleDetailAddition( masterItem, detailNode, e );
+            break;
 
-            case NotifyCollectionChangedAction.Move:
-            case NotifyCollectionChangedAction.Remove:
-              this.HandleDetailMoveRemove( masterItem, detailNode, e );
-              break;
+          case NotifyCollectionChangedAction.Move:
+          case NotifyCollectionChangedAction.Remove:
+            this.HandleDetailMoveRemove( masterItem, detailNode, e );
+            break;
 
-            case NotifyCollectionChangedAction.Replace: //CustomItemContainerGenreator never issues a Replace!
-              throw new DataGridInternalException();
+          case NotifyCollectionChangedAction.Replace: //CustomItemContainerGenreator never issues a Replace!
+            throw new DataGridInternalException( "CustomItemContainerGenerator never notifies a Replace action.", m_dataGridControl );
 
-            case NotifyCollectionChangedAction.Reset:
-              this.HandleDetailReset( masterItem, detailNode );
-              break;
+          case NotifyCollectionChangedAction.Reset:
+            this.HandleDetailReset( masterItem, detailNode );
+            break;
 
-            default:
-              break;
-          }
+          default:
+            break;
         }
       }
     }
 
     private void HandleDetailAddition( object masterItem, DetailGeneratorNode detailNode, CustomGeneratorChangedEventArgs e )
     {
-      GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
-      int masterIndex = nodeHelper.FindItem( masterItem );
+      if( m_floatingDetails.Contains( masterItem ) )
+        return;
 
-      //If the masterItem is part of an ItemsGeneratorNode which is below a collapsed group, masterIndex will be -1
-      if( masterIndex == -1 )
+      var nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
+      var masterIndex = nodeHelper.FindItem( masterItem );
+
+      // The master item has been found.
+      if( masterIndex != -1 )
+      {
+        int globalIndex = -1;
+        var convertedGeneratorPosition = this.ConvertDetailGeneratorPosition( e.Position, masterItem, detailNode, out globalIndex );
+        var masterNode = ( ItemsGeneratorNode )nodeHelper.CurrentNode;
+
+        masterNode.AdjustItemCount( e.ItemCount );
+        detailNode.UpdateItemCount();
+
+        this.IncrementCurrentGenerationCount();
+        this.SendAddEvent( convertedGeneratorPosition, masterIndex + 1 + e.Index, e.ItemCount );
+      }
+      // The master item could be located inside a collapsed group.
+      else
       {
         //in that case, I need to determine the appropriate masterNode another way
         nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
         if( !nodeHelper.Contains( masterItem ) )
-          throw new DataGridInternalException();
-      }
+          DataGridException.ThrowSystemException( "An attempt was made to add a detail for an item that does not belong to the generator.",
+                                                  typeof( InvalidOperationException ), m_dataGridControl.Name );
 
-      ItemsGeneratorNode masterNode = nodeHelper.CurrentNode as ItemsGeneratorNode;
+        var masterNode = ( ItemsGeneratorNode )nodeHelper.CurrentNode;
 
-      Debug.Assert( masterNode != null, "masterNode != null" );
-#if LOG
-      Log.Assert( this, masterNode != null, "masterNode != null" );
-#endif
+        masterNode.AdjustItemCount( e.ItemCount );
+        detailNode.UpdateItemCount();
 
-      int globalIndex;
-      GeneratorPosition convertedGeneratorPosition = ( masterIndex != -1 ) ? this.ConvertDetailGeneratorPosition( e.Position, masterItem, detailNode, out globalIndex ) : new GeneratorPosition( -1, 1 );
-
-      masterNode.AdjustItemCount( e.ItemCount );
-
-      detailNode.UpdateItemCount();
-
-      this.IncrementCurrentGenerationCount();
-
-      if( masterIndex != -1 )
-      {
-        this.SendAddEvent( convertedGeneratorPosition, masterIndex + 1 + e.Index, e.ItemCount );
+        this.IncrementCurrentGenerationCount();
       }
     }
 
     private void HandleDetailMoveRemove( object masterItem, DetailGeneratorNode detailNode, CustomGeneratorChangedEventArgs e )
     {
-      GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
-      int masterIndex = nodeHelper.FindItem( masterItem );
+      if( m_floatingDetails.Contains( masterItem ) )
+        return;
 
-      //If the masterItem is part of an ItemsGeneratorNode which is below a collapsed group, masterIndex will be -1
-      if( masterIndex == -1 )
+      var nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
+      var masterIndex = nodeHelper.FindItem( masterItem );
+
+      // The master item has been found.
+      if( masterIndex != -1 )
+      {
+        int globalIndex = -1;
+        var convertedGeneratorPosition = this.ConvertDetailGeneratorPosition( e.OldPosition, masterItem, detailNode, out globalIndex );
+
+        this.RemoveDetailContainers( convertedGeneratorPosition, e.ItemUICount );
+
+        if( e.Action == NotifyCollectionChangedAction.Remove )
+        {
+          var masterNode = ( ItemsGeneratorNode )nodeHelper.CurrentNode;
+
+          masterNode.AdjustItemCount( -e.ItemCount );
+          detailNode.UpdateItemCount();
+        }
+
+        this.IncrementCurrentGenerationCount();
+        this.SendRemoveEvent( convertedGeneratorPosition, globalIndex, e.ItemCount, e.ItemUICount, e.RemovedContainers );
+      }
+      // The master item could be located inside a collapsed group.
+      else
       {
         //in that case, I need to determine the appropriate masterNode another way
         nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
         if( !nodeHelper.Contains( masterItem ) )
-          throw new DataGridInternalException();
-      }
+          DataGridException.ThrowSystemException( "An attempt was made to move or remove a detail for an item that does not belong to the generator.",
+                                                  typeof( InvalidOperationException ), m_dataGridControl.Name );
 
-      ItemsGeneratorNode masterNode = nodeHelper.CurrentNode as ItemsGeneratorNode;
+        if( e.Action == NotifyCollectionChangedAction.Remove )
+        {
+          var masterNode = ( ItemsGeneratorNode )nodeHelper.CurrentNode;
 
-      Debug.Assert( masterNode != null, "masterNode != null" );
-#if LOG
-      Log.Assert( this, masterNode != null, "masterNode != null" );
-#endif
+          masterNode.AdjustItemCount( -e.ItemCount );
+          detailNode.UpdateItemCount();
+        }
 
-      int globalIndex = -1;
-      GeneratorPosition convertedGeneratorPosition = ( masterIndex != -1 ) ? this.ConvertDetailGeneratorPosition( e.OldPosition, masterItem, detailNode, out globalIndex ) : new GeneratorPosition( -1, 1 );
-
-      if( masterIndex != -1 )
-      {
-        this.RemoveDetailContainers( convertedGeneratorPosition, e.ItemUICount );
-      }
-
-      if( e.Action == NotifyCollectionChangedAction.Remove )
-      {
-        masterNode.AdjustItemCount( -e.ItemCount );
-
-        detailNode.UpdateItemCount();
-      }
-
-      this.IncrementCurrentGenerationCount();
-
-      if( masterIndex != -1 )
-      {
-        this.SendRemoveEvent( convertedGeneratorPosition, globalIndex, e.ItemCount, e.ItemUICount, e.RemovedContainers );
+        this.IncrementCurrentGenerationCount();
       }
     }
 
     private void HandleDetailReset( object masterItem, DetailGeneratorNode detailNode )
     {
-      GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
-      int masterIndex = nodeHelper.FindItem( masterItem );
+      if( m_floatingDetails.Contains( masterItem ) )
+        return;
 
-      // -1 means either taht the master item is below a collapsed group node, or that the item does not exists, validate.
-      if( masterIndex == -1 )
+      var nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
+      var masterIndex = nodeHelper.FindItem( masterItem );
+      var masterItemFound = ( masterIndex != -1 );
+
+      // The master item could be located inside a collapsed group.
+      if( !masterItemFound )
       {
         nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
         if( !nodeHelper.Contains( masterItem ) )
-          throw new DataGridInternalException();
+          DataGridException.ThrowSystemException( "An attempt was made to reset a detail for an item that does not belong to the generator.",
+                                                  typeof( InvalidOperationException ), m_dataGridControl.Name );
       }
 
-      ItemsGeneratorNode masterNode = nodeHelper.CurrentNode as ItemsGeneratorNode;
+      var masterNode = ( ItemsGeneratorNode )nodeHelper.CurrentNode;
 
-      Debug.Assert( masterNode != null, "masterNode != null" );
-#if LOG
-      Log.Assert( this, masterNode != null, "masterNode != null" );
-#endif
+      List<DetailGeneratorNode> detailsForMaster;
+      if( ( masterNode.Details == null ) || !masterNode.Details.TryGetValue( masterNode.Items.IndexOf( masterItem ), out detailsForMaster ) )
+        throw new DataGridInternalException( "An attempt was made to reset a detail that does not belong to the generator.", m_dataGridControl );
 
       //start index will be ignored later on if the masterIndex is -1!!
       int startIndex = nodeHelper.Index + masterNode.IndexOf( masterItem ) + 1; //details start a master index + 1
 
-      List<DetailGeneratorNode> detailsForMaster = null;
-
-      //edge case, it is possible to receive a Reset from Floating details!
-      if( masterNode.Details == null )
+      //this is required to ensure that if the details that resets is not the first one, the index is calculated appropriatly.
+      foreach( DetailGeneratorNode node in detailsForMaster )
       {
-        //check for floating details, if not present, throw, this is an abnormal case.
-        if( !m_floatingDetails.Contains( masterItem ) )
-        {
-          throw new DataGridInternalException();
-        }
-      }
-      else
-      {
-        masterNode.Details.TryGetValue( masterNode.Items.IndexOf( masterItem ), out detailsForMaster );
+        if( node == detailNode )
+          break;
 
-        Debug.Assert( detailsForMaster != null, "detailsForMaster != null" );
-#if LOG
-        Log.Assert( this, detailsForMaster != null, "detailsForMaster != null" );
-#endif
+        startIndex += node.ItemCount;
       }
 
-      if( detailsForMaster != null )
+      var removePosition = new GeneratorPosition( -1, 1 );
+      int removedCount = 0;
+      var removedContainers = new List<DependencyObject>();
+      var oldDetailCount = detailNode.ItemCount;
+      var hasOldDetailItems = ( oldDetailCount > 0 );
+
+      if( hasOldDetailItems )
       {
-        //this is required to ensure that if the details that resets is not the first one, the index is calculated appropriatly.
-        foreach( DetailGeneratorNode node in detailsForMaster )
+        // The information about the removal is only required when the master item is not collapsed.
+        if( masterItemFound )
         {
-          if( node == detailNode )
-          {
-            break;
-          }
-          else
-          {
-            startIndex += node.ItemCount;
-          }
+          removePosition = this.GetSafeGeneratorPositionFromIndex( startIndex );
+          removedCount = this.RemoveGeneratedItems( startIndex, startIndex + oldDetailCount - 1, removedContainers );
         }
 
-        //if there were 'items' in the detail node, process the remove of them
-        int oldDetailCount = detailNode.ItemCount;
-        if( oldDetailCount > 0 )
+        masterNode.AdjustItemCount( -oldDetailCount );
+      }
+
+      detailNode.UpdateItemCount();
+
+      GeneratorPosition addPosition = new GeneratorPosition( -1, 1 );
+      int newDetailCount = detailNode.ItemCount;
+      bool hasNewDetailItems = ( newDetailCount > 0 );
+
+      if( hasNewDetailItems )
+      {
+        // The information about the addition is only required when the master item is not collapsed.
+        if( masterItemFound )
         {
-          int endIndex = startIndex + oldDetailCount - 1; //last detail index
-
-          GeneratorPosition removeGenPos = ( masterIndex != -1 )
-            ? this.GeneratorPositionFromIndex( startIndex )
-            : new GeneratorPosition( -1, 1 );
-
-          int genRemCount = 0;
-
-          List<DependencyObject> removedContainers = new List<DependencyObject>();
-
-          //this has no uses if the masterIndex is -1 ( collapsed master item )
-          if( masterIndex != -1 )
-          {
-            genRemCount = this.RemoveGeneratedItems( startIndex, endIndex, removedContainers );
-          }
-
-          masterNode.AdjustItemCount( -oldDetailCount );
-
-          this.IncrementCurrentGenerationCount();
-
-          //this has no uses if the masterIndex is -1 ( collapsed master item )
-          if( masterIndex != -1 )
-          {
-            this.SendRemoveEvent( removeGenPos, masterIndex + 1, oldDetailCount, genRemCount, removedContainers );
-          }
+          addPosition = this.GetSafeGeneratorPositionFromIndex( startIndex );
         }
 
-        detailNode.UpdateItemCount();
+        masterNode.AdjustItemCount( newDetailCount );
+      }
 
-        int newDetailCount = detailNode.ItemCount;
-        if( newDetailCount > 0 )
+      this.IncrementCurrentGenerationCount();
+
+      // The events must be raised only when the master item is not collapsed.
+      if( masterItemFound )
+      {
+        if( hasOldDetailItems && hasNewDetailItems )
         {
-          GeneratorPosition addGenPos = new GeneratorPosition( -1, 1 );
-
-          //this has no uses if the masterIndex is -1 ( collapsed master item )
-          if( masterIndex != -1 )
-          {
-            addGenPos = this.GeneratorPositionFromIndex( startIndex );
-          }
-
-          masterNode.AdjustItemCount( newDetailCount );
-
-          this.IncrementCurrentGenerationCount();
-
-          //this has no uses if the masterIndex is -1 ( collapsed master item )
-          if( masterIndex != -1 )
-          {
-            this.SendAddEvent( addGenPos, masterIndex + 1, newDetailCount );
-          }
+          this.SendResetEvent();
+        }
+        else if( hasOldDetailItems )
+        {
+          this.SendRemoveEvent( removePosition, masterIndex + 1, oldDetailCount, removedCount, removedContainers );
+        }
+        else if( hasNewDetailItems )
+        {
+          this.SendAddEvent( addPosition, masterIndex + 1, newDetailCount );
         }
       }
     }
@@ -5806,6 +6278,7 @@ namespace Xceed.Wpf.DataGrid
       int removeGenPosIndex = convertedGeneratorPosition.Index;
       if( convertedGeneratorPosition.Offset > 0 )
       {
+        Debug.Assert( convertedGeneratorPosition.Offset == 1 );
         removeGenPosIndex++;
       }
 
@@ -5826,9 +6299,7 @@ namespace Xceed.Wpf.DataGrid
         // if the generator index is not found for
         // a DetailNode. This can occur if a Detail
         // is filtered out via AutoFiltering.
-        globalIndex = ( generatorIndex > -1 )
-          ? m_genPosToIndex[ generatorIndex ]
-          : globalIndex = -1;
+        globalIndex = ( generatorIndex > -1 ) ? m_genPosToIndex[ generatorIndex ] : -1;
 
         return new GeneratorPosition( generatorIndex, referencePosition.Offset );
       }
@@ -5861,9 +6332,7 @@ namespace Xceed.Wpf.DataGrid
         {
           offsetCounter++;
           if( offsetCounter == offset )
-          {
             return i;
-          }
         }
       }
 
@@ -5935,10 +6404,7 @@ namespace Xceed.Wpf.DataGrid
     {
       RecyclingManager manager = m_dataGridContext.RecyclingManager;
 
-      Debug.Assert( manager != null, "manager != null" );
-#if LOG
-      Log.Assert( this, manager != null, "manager != null" );
-#endif
+      m_log.Assert( this, manager != null, "manager != null" );
 
       if( container is HeaderFooterItem )
       {
@@ -5950,14 +6416,17 @@ namespace Xceed.Wpf.DataGrid
             return;
 
           //The tree is already correctly created since we are recycling containers!
-          this.IsEnsuringNodeTreeCreated = true;
-          Group UIgroup = this.GetGroupFromCollectionViewGroup( viewGroup );
-          this.IsEnsuringNodeTreeCreated = false;
+          Group group;
 
-          if( UIgroup == null )
+          using( this.SetIsEnsuringNodeTreeCreated() )
+          {
+            group = this.GetGroupFromCollectionViewGroup( viewGroup );
+          }
+
+          if( group == null )
             return;
 
-          string groupBy = UIgroup.GroupBy;
+          string groupBy = group.GroupBy;
           if( string.IsNullOrEmpty( groupBy ) )
             return;
 
@@ -5970,30 +6439,24 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        manager.EnqueueItemContainer( container );
+        manager.EnqueueItemContainer( item, container );
       }
     }
 
-    private DependencyObject DequeueItemContainer()
+    private DependencyObject DequeueItemContainer( object item )
     {
       RecyclingManager manager = m_dataGridContext.RecyclingManager;
 
-      Debug.Assert( manager != null, "manager != null" );
-#if LOG
-      Log.Assert( this, manager != null, "manager != null" );
-#endif
+      m_log.Assert( this, manager != null, "manager != null" );
 
-      return manager.DequeueItemContainer();
+      return manager.DequeueItemContainer( item );
     }
 
     private DependencyObject DequeueHeaderFooterContainer( object item )
     {
       RecyclingManager manager = m_dataGridContext.RecyclingManager;
 
-      Debug.Assert( manager != null, "manager != null" );
-#if LOG
-      Log.Assert( this, manager != null, "manager != null" );
-#endif
+      m_log.Assert( this, manager != null, "manager != null" );
 
       if( item is GroupHeaderFooterItem )
       {
@@ -6002,14 +6465,17 @@ namespace Xceed.Wpf.DataGrid
           return null;
 
         //The tree is already correctly created since we are recycling containers!
-        this.IsEnsuringNodeTreeCreated = true;
-        Group UIgroup = this.GetGroupFromCollectionViewGroup( viewGroup );
-        this.IsEnsuringNodeTreeCreated = false;
+        Group group;
 
-        if( UIgroup == null )
+        using( this.SetIsEnsuringNodeTreeCreated() )
+        {
+          group = this.GetGroupFromCollectionViewGroup( viewGroup );
+        }
+
+        if( group == null )
           return null;
 
-        string groupBy = UIgroup.GroupBy;
+        string groupBy = group.GroupBy;
         if( string.IsNullOrEmpty( groupBy ) )
           return null;
 
@@ -6018,26 +6484,6 @@ namespace Xceed.Wpf.DataGrid
       else
       {
         return manager.DequeueHeaderFooterContainer( item );
-      }
-    }
-
-    private void NotifyContainersRemoved( IList<DependencyObject> removedContainers )
-    {
-      if( m_containersRemovedDeferCount > 0 )
-      {
-        m_deferredContainersRemoved.AddRange( removedContainers );
-      }
-      else if( removedContainers.Count > 0 )
-      {
-        this.NotifyContainersRemoved( new ContainersRemovedEventArgs( removedContainers ) );
-      }
-    }
-
-    private void NotifyContainersRemoved( ContainersRemovedEventArgs e )
-    {
-      if( ( this.IsRecyclingEnabled ) && ( this.ContainersRemoved != null ) )
-      {
-        this.ContainersRemoved( this, e );
       }
     }
 
@@ -6058,131 +6504,57 @@ namespace Xceed.Wpf.DataGrid
       return new DeferContainersRemovedDisposable( this );
     }
 
-    private DependencyObject CreateNextItemContainer()
+    private DependencyObject CreateNextItemContainer( object item )
     {
       DependencyObject container = null;
 
       if( this.IsRecyclingEnabled )
       {
-        container = this.DequeueItemContainer();
+        container = this.DequeueItemContainer( item );
       }
 
       if( container == null )
+      {
         container = m_dataGridControl.CreateContainerForItem();
+      }
 
       return container;
     }
 
-#if LOG
-    private void WriteStateInLog()
+    private IEnumerable<DataGridContext> GetDetailContexts()
     {
-      StringBuilder state = new StringBuilder( 1024 );
-
-      state.AppendLine( "Generator state" );
-
-      state.AppendLine( " m_genPosToContainer :" );
-      for( int i = 0; i < m_genPosToContainer.Count; i++ )
-      {
-        object value = m_genPosToContainer[ i ];
-
-        if( value == null )
-        {
-          state.AppendLine( "  [ " + i.ToString() + " ] - null" );
-        }
-        else
-        {
-          state.AppendLine( "  [ " + i.ToString() + " ] - " + value.GetHashCode() );
-        }
-      }
-
-      state.AppendLine( " m_genPosToIndex :" );
-      for( int i = 0; i < m_genPosToIndex.Count; i++ )
-      {
-        object value = m_genPosToIndex[ i ];
-
-        if( value == null )
-        {
-          state.AppendLine( "  [ " + i.ToString() + " ] - null" );
-        }
-        else
-        {
-          state.AppendLine( "  [ " + i.ToString() + " ] - " + value.ToString() );
-        }
-      }
-
-      state.AppendLine( " m_genPosToItem :" );
-      for( int i = 0; i < m_genPosToItem.Count; i++ )
-      {
-        object value = m_genPosToItem[ i ];
-
-        if( value == null )
-        {
-          state.AppendLine( "  [ " + i.ToString() + " ] - null" );
-        }
-        else
-        {
-          state.AppendLine( "  [ " + i.ToString() + " ] - D" + value.GetHashCode() );
-        }
-      }
-
-      state.AppendLine( " m_genPosToNode :" );
-      for( int i = 0; i < m_genPosToNode.Count; i++ )
-      {
-        object value = m_genPosToNode[ i ];
-
-        if( value == null )
-        {
-          state.AppendLine( "  [ " + i.ToString() + " ] - null" );
-        }
-        else
-        {
-          string prefix;
-
-          if( value is DetailGeneratorNode )
-          {
-            prefix = "DN";
-          }
-          else if( value is ItemsGeneratorNode )
-          {
-            prefix = "IN";
-          }
-          else if( value is CollectionGeneratorNode )
-          {
-            prefix = "CN";
-          }
-          else
-          {
-            prefix = "?N";
-          }
-
-          state.AppendLine( "  [ " + i.ToString() + " ] - " + prefix + value.GetHashCode() );
-        }
-      }
-
-      state.AppendLine( " m_generatorDirection :" + m_generatorDirection.ToString() );
-
-      if( m_generatorCurrentDetail == null )
-      {
-        state.AppendLine( " m_generatorCurrentDetail : null" );
-      }
-      else
-      {
-        state.AppendLine( " m_generatorCurrentDetail : DN" + m_generatorCurrentDetail.GetHashCode() );
-      }
-
-      state.AppendLine( " m_generatorCurrentDetailIndex : " + m_generatorCurrentDetailIndex.ToString() );
-      state.AppendLine( " m_generatorCurrentDetailNodeIndex : " + m_generatorCurrentDetailNodeIndex.ToString() );
-      state.AppendLine( " m_generatorCurrentGlobalIndex : " + m_generatorCurrentGlobalIndex.ToString() );
-      state.AppendLine( " m_generatorCurrentOffset : " + m_generatorCurrentOffset.ToString() );
-      state.AppendLine( " m_generatorStatus : " + m_generatorStatus.ToString() );
-      state.AppendLine( " m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount : " + m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount.ToString() );
-      state.AppendLine( " m_remapDeferCount : " + m_remapDeferCount.ToString() );
-      state.AppendLine( " m_genPosToIndexUpdateInhibitCount : " + m_genPosToIndexUpdateInhibitCount.ToString() );
-      state.AppendLine( "" );
-
-      Log.WriteLine( this, state.ToString() );
+      return ( from node in this.GetDetailGeneratorNodes()
+               select node.DetailContext );
     }
-#endif
+
+    private IEnumerable<CustomItemContainerGenerator> GetDetailGenerators()
+    {
+      return ( from node in this.GetDetailGeneratorNodes()
+               select node.DetailGenerator );
+    }
+
+    private IEnumerable<DetailGeneratorNode> GetDetailGeneratorNodes()
+    {
+      foreach( List<DetailGeneratorNode> details in m_masterToDetails.Values )
+      {
+        foreach( DetailGeneratorNode detailNode in details )
+        {
+          yield return detailNode;
+        }
+      }
+    }
+
+    private static IList GetList( CollectionView collectionView )
+    {
+      if( collectionView == null )
+        return null;
+
+      var list = collectionView as IList;
+      if( list != null )
+        return list;
+
+      return collectionView.SourceCollection as IList;
+    }
 
     public void Skip()
     {
@@ -6202,8 +6574,6 @@ namespace Xceed.Wpf.DataGrid
 
     private BitVector32 m_flags = new BitVector32();
 
-    private int m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount; // = false;
-
     //This list is used to map from a Realized Item generator position to an actual index. Index in list is the GenPos Index.
     private readonly List<int> m_genPosToIndex = new List<int>();
     private readonly List<object> m_genPosToItem = new List<object>();
@@ -6214,31 +6584,25 @@ namespace Xceed.Wpf.DataGrid
     private readonly List<object> m_floatingDetails = new List<object>();
 
     private GeneratorNode m_startNode;
-    private HeadersFootersGeneratorNode m_firstHeader;
     private GeneratorNode m_firstItem;
-    private HeadersFootersGeneratorNode m_firstFooter;
 
-    private ReadOnlyObservableCollection<Object> m_groupsCollection;
+    private ReadOnlyObservableCollection<object> m_groupsCollection;
 
     private readonly DataGridControl m_dataGridControl;
     private readonly DataGridContext m_dataGridContext;
     private readonly CollectionView m_collectionView;
-    private readonly IList m_listInterface;
-    private readonly GeneratorNodeFactory m_nodeFactory;
-
-    private int m_currentGeneratorContentGeneration = 0;
 
     private int m_lastValidItemCountGeneration = 0;
 
     private int m_cachedItemCount = 0;
 
-    private GeneratorStatus m_generatorStatus = GeneratorStatus.NotStarted;
     private GeneratorDirection m_generatorDirection;
     private int m_generatorCurrentOffset;
     private int m_generatorCurrentGlobalIndex = -1;
     private GeneratorNodeHelper m_generatorNodeHelper; // = null
 
     private readonly Dictionary<CollectionViewGroup, GroupGeneratorNode> m_groupNodeMappingCache = new Dictionary<CollectionViewGroup, GroupGeneratorNode>();
+    private LateGroupLevelDescription[] m_groupLevelDescriptionCache; // = null
 
     private IDisposable m_generatorCurrentDetailDisposable; // = null
     private DetailGeneratorNode m_generatorCurrentDetail; // = null
@@ -6253,199 +6617,7 @@ namespace Xceed.Wpf.DataGrid
     private List<DependencyObject> m_deferredContainersRemoved = new List<DependencyObject>();
     private int m_containersRemovedDeferCount = 0;
 
-    private int m_remapDeferCount = 0;
-
     private Binding m_headerFooterDataContextBinding;
-
-    #endregion
-
-    #region CustomItemContainerGeneratorDisposableDisposer Private Class
-
-    private sealed class CustomItemContainerGeneratorDisposableDisposer : IDisposable
-    {
-      public CustomItemContainerGeneratorDisposableDisposer( CustomItemContainerGenerator generator, GeneratorPosition startGenPos, GeneratorDirection direction )
-      {
-        if( generator == null )
-        {
-          throw new ArgumentNullException( "generator" );
-        }
-
-        m_generator = generator;
-
-        m_generator.StartGenerator( startGenPos, direction );
-      }
-
-      #region IDisposable Members
-
-      public void Dispose()
-      {
-        m_generator.StopGenerator();
-        m_generator = null;
-      }
-
-      #endregion
-
-      CustomItemContainerGenerator m_generator = null;
-    }
-
-    #endregion
-
-    #region GenPostoIndexInhibitionDisposable Private Class
-
-    private sealed class GenPostoIndexInhibitionDisposable : IDisposable
-    {
-      public GenPostoIndexInhibitionDisposable( CustomItemContainerGenerator generator )
-      {
-        if( generator == null )
-          throw new ArgumentNullException( "generator" );
-
-        m_generator = generator;
-
-        m_generator.m_genPosToIndexUpdateInhibitCount++;
-
-        if( m_generator.m_genPosToIndexInhibiter != null )
-        {
-          m_nestedDisposable = m_generator.m_genPosToIndexInhibiter.InhibitGenPosToIndexUpdates();
-        }
-      }
-
-      #region IDisposable Members
-
-      public void Dispose()
-      {
-        m_generator.m_genPosToIndexUpdateInhibitCount--;
-
-        if( ( m_generator.m_genPosToIndexUpdateInhibitCount == 0 ) && ( m_generator.GenPosToIndexNeedsUpdate ) )
-        {
-          m_generator.IncrementCurrentGenerationCount();
-        }
-
-        if( m_nestedDisposable != null )
-        {
-          m_nestedDisposable.Dispose();
-          m_nestedDisposable = null;
-        }
-      }
-
-      #endregion
-
-      private CustomItemContainerGenerator m_generator; // = null
-      private IDisposable m_nestedDisposable; // = null
-    }
-
-    #endregion
-
-    #region DeferDetailsRemapDisposable Private Class
-
-    private sealed class DeferDetailsRemapDisposable : IDisposable
-    {
-      public DeferDetailsRemapDisposable( CustomItemContainerGenerator generator )
-      {
-        if( generator == null )
-          throw new ArgumentNullException( "generator" );
-
-        m_generator = generator;
-
-        m_generator.m_remapDeferCount++;
-      }
-
-      #region IDisposable Members
-
-      public void Dispose()
-      {
-        m_generator.m_remapDeferCount--;
-      }
-
-      #endregion
-
-      private CustomItemContainerGenerator m_generator; // = null
-    }
-
-    #endregion
-
-    #region DeferContainersRemovedDisposable Private Class
-
-    private sealed class DeferContainersRemovedDisposable : IDisposable
-    {
-      public DeferContainersRemovedDisposable( CustomItemContainerGenerator generator )
-      {
-        if( generator == null )
-          throw new ArgumentNullException( "generator" );
-
-        m_generator = generator;
-
-        Debug.Assert( ( m_generator.m_containersRemovedDeferCount != 0 ) || ( m_generator.m_deferredContainersRemoved.Count == 0 ), "( m_generator.m_containersRemovedDeferCount != 0 ) || ( m_generator.m_deferredContainersRemoved.Count == 0 )" );
-#if LOG
-        Log.Assert( this, ( m_generator.m_containersRemovedDeferCount != 0 ) || ( m_generator.m_deferredContainersRemoved.Count == 0 ), "( m_generator.m_containersRemovedDeferCount != 0 ) || ( m_generator.m_deferredContainersRemoved.Count == 0 )" );
-#endif
-
-        m_generator.m_containersRemovedDeferCount++;
-      }
-
-      #region IDisposable Members
-
-      public void Dispose()
-      {
-        m_generator.m_containersRemovedDeferCount--;
-
-        if( ( m_generator.m_containersRemovedDeferCount == 0 ) && ( m_generator.m_deferredContainersRemoved.Count > 0 ) )
-        {
-          m_generator.NotifyContainersRemoved( new ContainersRemovedEventArgs( m_generator.m_deferredContainersRemoved ) );
-          m_generator.m_deferredContainersRemoved.Clear();
-        }
-      }
-
-      #endregion
-
-      private CustomItemContainerGenerator m_generator; // = null
-    }
-
-    #endregion
-
-    #region ProcessingGlobalItemsResetOrRemovingAllGeneratedItemsDisposable Private Class
-
-    private sealed class ProcessingGlobalItemsResetOrRemovingAllGeneratedItemsDisposable : IDisposable
-    {
-      public ProcessingGlobalItemsResetOrRemovingAllGeneratedItemsDisposable( CustomItemContainerGenerator generator )
-      {
-        if( generator == null )
-          throw new ArgumentNullException( "generator" );
-
-        m_generator = generator;
-
-        Debug.Assert( ( m_generator.m_containersRemovedDeferCount != 0 ) || ( m_generator.m_deferredContainersRemoved.Count == 0 ), "( m_generator.m_containersRemovedDeferCount != 0 ) || ( m_generator.m_deferredContainersRemoved.Count == 0 )" );
-#if LOG
-        Log.Assert( this, ( m_generator.m_containersRemovedDeferCount != 0 ) || ( m_generator.m_deferredContainersRemoved.Count == 0 ), "( m_generator.m_containersRemovedDeferCount != 0 ) || ( m_generator.m_deferredContainersRemoved.Count == 0 )" );
-#endif
-
-        m_generator.m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount++;
-      }
-
-      #region IDisposable Members
-
-      public void Dispose()
-      {
-        m_generator.m_isProcessingGlobalResetOrRemovingAllGeneratedItemsDisposableCount--;
-      }
-
-      #endregion
-
-      private CustomItemContainerGenerator m_generator; // = null
-    }
-
-    #endregion
-
-    #region CustomItemContainerGeneratorFlags Private Enum
-
-    [Flags]
-    private enum CustomItemContainerGeneratorFlags : int
-    {
-      RecyclingEnabled = 1,
-      InUse = 2,
-      GenPosToIndexNeedsUpdate = 4,
-      IsHandlingItemsRecreation = 8,
-      IsEnsuringNodeTreeCreated = 16,
-    }
 
     #endregion
 
@@ -6459,7 +6631,7 @@ namespace Xceed.Wpf.DataGrid
 
         if( sender == m_collectionView )
         {
-          this.OnItemsChanged( sender, nccArgs );
+          this.OnItemsChanged( sender, nccArgs.GetRangeActionOrSelf() );
           return true;
         }
         else if( sender == m_groupsCollection )
@@ -6475,6 +6647,12 @@ namespace Xceed.Wpf.DataGrid
       }
       else if( managerType == typeof( PropertyChangedEventManager ) )
       {
+        if( sender == m_collectionView )
+        {
+          this.OnCollectionViewGroupsPropertyChanged();
+          return true;
+        }
+
         //this is only registered on the DataGridContext, this has the effect of forwarding property changes for all properties of the DataGridContext
         PropertyChangedEventArgs pcArgs = ( PropertyChangedEventArgs )e;
         this.OnNotifyPropertyChanged( pcArgs );
@@ -6528,7 +6706,7 @@ namespace Xceed.Wpf.DataGrid
 
     IDisposable IInhibitGenPosToIndexUpdating.InhibitGenPosToIndexUpdates()
     {
-      return new GenPostoIndexInhibitionDisposable( this );
+      return new GenPosToIndexInhibitionDisposable( this );
     }
 
     #endregion
@@ -6565,6 +6743,267 @@ namespace Xceed.Wpf.DataGrid
 
       GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( m_startNode, 0, 0 );
       nodeHelper.ProcessVisit( m_dataGridContext, minIndex, maxIndex, visitor, visitorType, visitDetails, out visitWasStopped );
+    }
+
+    #endregion
+
+    #region InheritAutoResetFlag Private Class
+
+    private sealed class InheritAutoResetFlag : AutoResetFlag
+    {
+      internal InheritAutoResetFlag()
+        : this( null )
+      {
+      }
+
+      internal InheritAutoResetFlag( AutoResetFlag parent )
+      {
+        m_parent = parent;
+        m_current = AutoResetFlagFactory.Create();
+      }
+
+      public override bool IsSet
+      {
+        get
+        {
+          return ( this.IsSetLocal )
+              || ( ( m_parent != null ) && m_parent.IsSet );
+        }
+      }
+
+      public bool IsSetLocal
+      {
+        get
+        {
+          return m_current.IsSet;
+        }
+      }
+
+      public override IDisposable Set()
+      {
+        return m_current.Set();
+      }
+
+      public IDisposable SetLocal()
+      {
+        return this.Set();
+      }
+
+      private readonly AutoResetFlag m_parent;
+      private readonly AutoResetFlag m_current;
+    }
+
+    #endregion
+
+    #region LeveledAutoResetFlag Private Class
+
+    private sealed class LeveledAutoResetFlag : AutoResetFlag
+    {
+      internal LeveledAutoResetFlag()
+        : this( new List<WeakReference>( 3 ), 0 )
+      {
+      }
+
+      private LeveledAutoResetFlag( IList<WeakReference> levels, int index )
+      {
+        Debug.Assert( levels != null );
+        Debug.Assert( ( index >= 0 ) && ( index <= levels.Count ) );
+
+        m_levels = levels;
+        m_flag = AutoResetFlagFactory.Create();
+        m_index = index;
+
+        var self = new WeakReference( this );
+        if( m_index == m_levels.Count )
+        {
+          m_levels.Add( self );
+        }
+        else
+        {
+          m_levels[ m_index ] = self;
+        }
+      }
+
+      public override bool IsSet
+      {
+        get
+        {
+          return m_flag.IsSet;
+        }
+      }
+
+      public override IDisposable Set()
+      {
+        return m_flag.Set();
+      }
+
+      internal LeveledAutoResetFlag GetChild()
+      {
+        int index = m_index + 1;
+        if( index < m_levels.Count )
+        {
+          var flag = ( LeveledAutoResetFlag )m_levels[ index ].Target;
+          if( flag != null )
+            return flag;
+        }
+
+        return new LeveledAutoResetFlag( m_levels, index );
+      }
+
+      private readonly IList<WeakReference> m_levels;
+      private readonly AutoResetFlag m_flag;
+      private readonly int m_index;
+    }
+
+    #endregion
+
+    #region CustomItemContainerGeneratorDisposableDisposer Private Class
+
+    private sealed class CustomItemContainerGeneratorDisposableDisposer : IDisposable
+    {
+      public CustomItemContainerGeneratorDisposableDisposer( CustomItemContainerGenerator generator, GeneratorPosition startGenPos, GeneratorDirection direction )
+      {
+        if( generator == null )
+          throw new ArgumentNullException( "generator" );
+
+        try
+        {
+          generator.StartGenerator( startGenPos, direction );
+        }
+        catch( Exception e )
+        {
+          try
+          {
+            generator.StopGenerator();
+          }
+          catch
+          {
+            // We swallow all exceptions thrown here because the actual exception we want to raise to the user
+            // is the one that has been thrown in the call to StartGenerator.
+          }
+
+          throw new DataGridInternalException( "The generator failed to start.", e, generator.m_dataGridControl );
+        }
+
+        m_generator = generator;
+      }
+
+      void IDisposable.Dispose()
+      {
+        this.Dispose( true );
+        GC.SuppressFinalize( this );
+      }
+
+      private void Dispose( bool disposing )
+      {
+        var generator = m_generator;
+
+        // Prevent this method from being called more than once.
+        if( Interlocked.CompareExchange<CustomItemContainerGenerator>( ref m_generator, null, generator ) == null )
+          return;
+
+        generator.StopGenerator();
+      }
+
+      ~CustomItemContainerGeneratorDisposableDisposer()
+      {
+        this.Dispose( false );
+      }
+
+      private CustomItemContainerGenerator m_generator; //null
+    }
+
+    #endregion
+
+    #region GenPosToIndexInhibitionDisposable Private Class
+
+    private sealed class GenPosToIndexInhibitionDisposable : IDisposable
+    {
+      public GenPosToIndexInhibitionDisposable( CustomItemContainerGenerator generator )
+      {
+        if( generator == null )
+          throw new ArgumentNullException( "generator" );
+
+        m_generator = generator;
+
+        m_generator.m_genPosToIndexUpdateInhibitCount++;
+
+        if( m_generator.m_genPosToIndexInhibiter != null )
+        {
+          m_nestedDisposable = m_generator.m_genPosToIndexInhibiter.InhibitGenPosToIndexUpdates();
+        }
+      }
+
+      #region IDisposable Members
+
+      public void Dispose()
+      {
+        m_generator.m_genPosToIndexUpdateInhibitCount--;
+
+        if( ( m_generator.m_genPosToIndexUpdateInhibitCount == 0 ) && ( m_generator.GenPosToIndexNeedsUpdate ) )
+        {
+          m_generator.IncrementCurrentGenerationCount();
+        }
+
+        if( m_nestedDisposable != null )
+        {
+          m_nestedDisposable.Dispose();
+          m_nestedDisposable = null;
+        }
+      }
+
+      #endregion
+
+      private CustomItemContainerGenerator m_generator; // = null
+      private IDisposable m_nestedDisposable; // = null
+    }
+
+    #endregion
+
+    #region DeferContainersRemovedDisposable Private Class
+
+    private sealed class DeferContainersRemovedDisposable : IDisposable
+    {
+      public DeferContainersRemovedDisposable( CustomItemContainerGenerator generator )
+      {
+        if( generator == null )
+          throw new ArgumentNullException( "generator" );
+
+        m_generator = generator;
+
+        m_generator.m_log.Assert( this, ( m_generator.m_containersRemovedDeferCount != 0 ) || ( m_generator.m_deferredContainersRemoved.Count == 0 ), "( m_generator.m_containersRemovedDeferCount != 0 ) || ( m_generator.m_deferredContainersRemoved.Count == 0 )" );
+
+        m_generator.m_containersRemovedDeferCount++;
+      }
+
+      #region IDisposable Members
+
+      public void Dispose()
+      {
+        m_generator.m_containersRemovedDeferCount--;
+
+        if( ( m_generator.m_containersRemovedDeferCount == 0 ) && ( m_generator.m_deferredContainersRemoved.Count > 0 ) )
+        {
+          m_generator.NotifyContainersRemoved( new ContainersRemovedEventArgs( m_generator.m_deferredContainersRemoved ) );
+          m_generator.m_deferredContainersRemoved.Clear();
+        }
+      }
+
+      #endregion
+
+      private CustomItemContainerGenerator m_generator; // = null
+    }
+
+    #endregion
+
+    #region CustomItemContainerGeneratorFlags Private Enum
+
+    [Flags]
+    private enum CustomItemContainerGeneratorFlags
+    {
+      RecyclingEnabled = 1,
+      InUse = 2,
+      GenPosToIndexNeedsUpdate = 4,
     }
 
     #endregion

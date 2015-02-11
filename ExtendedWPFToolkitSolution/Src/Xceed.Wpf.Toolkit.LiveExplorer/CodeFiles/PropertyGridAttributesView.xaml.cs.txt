@@ -46,7 +46,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       };
 
       this.DataContext = person;
-
     }
   }
 
@@ -64,11 +63,14 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     [Category( "Information" )]
     [Description( "This property uses the [DisplayName(\"Is a Men\")] attribute to customize the name of this property." )]
     [DisplayName( "Is male" )]
-    public bool IsMale { get; protected set; }
+    public bool IsMale { get; set; }
 
     [Category( "Information" )]
-    [Description( "This property uses the [Editor(..)] attribute to provide a custom editor using the 'FirstNameEditor' class" )]
+    [Description( "This property uses the [Editor(..)] attribute to provide a custom editor using the 'FirstNameEditor' class. In the Plus version, it also depends on the IsMale property to change its foreground and source." )]
     [Editor( typeof( FirstNameEditor ), typeof( FirstNameEditor ) )]
+#if !OPEN_SOURCE
+    [DependsOn( "IsMale" )]
+#endif
     public string FirstName { get; set; }
 
     [Category( "Information" )]
@@ -153,17 +155,36 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
   {
     public FrameworkElement ResolveEditor( Xceed.Wpf.Toolkit.PropertyGrid.PropertyItem propertyItem )
     {
+#if !OPEN_SOURCE
+      ComboBox comboBox = new ComboBox();
+      if( ( ( Person )propertyItem.Instance ).IsMale )
+      {
+        comboBox.Foreground = new SolidColorBrush( Colors.Green );
+        comboBox.ItemsSource = new List<string>() {"Tom", "Mark", "Bryan"};
+      }
+      else
+      {
+        comboBox.Foreground = new SolidColorBrush( Colors.Red );
+        comboBox.ItemsSource = new List<string>() { "Kathy", "Christine", "Tammy" };
+      }
+      comboBox.SelectedIndex = 0;
+#else
       TextBox textBox = new TextBox();
       textBox.Background = new SolidColorBrush( Colors.Red );
-
+#endif
       //create the binding from the bound property item to the editor
       var _binding = new Binding( "Value" ); //bind to the Value property of the PropertyItem
       _binding.Source = propertyItem;
       _binding.ValidatesOnExceptions = true;
       _binding.ValidatesOnDataErrors = true;
       _binding.Mode = propertyItem.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay;
+#if !OPEN_SOURCE
+      BindingOperations.SetBinding( comboBox, ComboBox.SelectedItemProperty, _binding );
+      return comboBox;
+#else
       BindingOperations.SetBinding( textBox, TextBox.TextProperty, _binding );
       return textBox;
+#endif
     }
   }
 

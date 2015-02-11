@@ -97,7 +97,8 @@
         </Grid.Resources>
 
         <xcdg:DataGridControl x:Name="_dataGrid"
-                            ItemsSource="{Binding Source={StaticResource cvsOrders}}" >           
+                            ItemsSource="{Binding Source={StaticResource cvsOrders}}" 
+                              AllowDrag="True">           
             <xcdg:DataGridControl.View>
                 <xcdg:TableflowView FixedColumnCount="2" />
             </xcdg:DataGridControl.View>

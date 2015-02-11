@@ -120,7 +120,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
       _dataGrid.View.Theme = dataGridTheme;
     }
 
-    private void ChangeMetroTheme( MetroThemeResourceDictionaryBase metroDataGridThemeResourceDictionary )
+    private void ChangeMetroTheme( DataGridMetroThemeResourceDictionaryBase metroDataGridThemeResourceDictionary )
     {
       _accentColorPanel.Visibility = Visibility.Visible;
 

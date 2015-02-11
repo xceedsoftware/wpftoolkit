@@ -16,27 +16,31 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Collections;
 using System.Collections.Specialized;
-using System.Windows.Threading;
 using System.Diagnostics;
-using System.Collections.ObjectModel;
+using System.Windows.Threading;
 
 namespace Xceed.Wpf.DataGrid
 {
-
-  internal class DeferredOperationManager
+  internal sealed class DeferredOperationManager
   {
-    public DeferredOperationManager(
-      DataGridCollectionViewBase collectionViewToUpdate,
-      Dispatcher dispatcher,
-      bool postPendingRefreshWithoutDispatching )
+    #region Static Fields
+
+    private static readonly TimeSpan MaxProcessDuration = TimeSpan.FromMilliseconds( 100d );
+    private static readonly TimeSpan MaxQueueDuration = TimeSpan.FromMilliseconds( 20d );
+
+    #endregion
+
+    internal DeferredOperationManager( DataGridCollectionViewBase collectionView, Dispatcher dispatcher, bool postPendingRefreshWithoutDispatching )
     {
-      m_collectionViewToUpdate = collectionViewToUpdate;
+      m_collectionView = collectionView;
+      m_deferredOperations = new List<DeferredOperation>( 1000 );
+      m_invalidatedGroups = new HashSet<DataGridCollectionViewGroup>();
 
       if( postPendingRefreshWithoutDispatching )
+      {
         this.Add( new DeferredOperation( DeferredOperation.DeferredOperationAction.Refresh, -1, null ) );
+      }
 
       m_dispatcher = dispatcher;
     }
@@ -49,7 +53,7 @@ namespace Xceed.Wpf.DataGrid
       {
         lock( this )
         {
-          return ( m_pendingFlags.Data != 0 ) || ( m_deferredOperations != null );
+          return ( m_pendingFlags.Data != 0 ) || ( !m_isProcessingOperations && m_deferredOperations.Count > 0 );
         }
       }
     }
@@ -136,6 +140,32 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
+    #region DeferProcessOfInvalidatedGroupStats Property
+
+    internal bool DeferProcessOfInvalidatedGroupStats
+    {
+      private get
+      {
+        return m_deferProcessOfInvalidatedGroupStats;
+      }
+      set
+      {
+        lock( this )
+        {
+          //Make sure that stats calculation that have been defer are processed before defering again!
+          if( value && m_deferredOperationsToProcess > 0 )
+          {
+            m_forceProcessOfInvalidatedGroupStats = true;
+          }
+          m_deferProcessOfInvalidatedGroupStats = value;
+        }
+      }
+    }
+
+    private bool m_deferProcessOfInvalidatedGroupStats;
+
+    #endregion
+
     public void ClearInvalidatedGroups()
     {
       lock( this )
@@ -144,9 +174,11 @@ namespace Xceed.Wpf.DataGrid
         {
           m_dispatcherOperation.Abort();
           m_dispatcherOperation = null;
+          m_dispatcherOperationStartTime = DateTime.MinValue;
+          m_hasNewOperationsSinceStartTime = false;
         }
 
-        m_invalidatedGroups = null;
+        m_invalidatedGroups.Clear();
       }
     }
 
@@ -154,22 +186,21 @@ namespace Xceed.Wpf.DataGrid
     {
       lock( this )
       {
-        if( ( m_dispatcherOperation != null ) && ( m_invalidatedGroups == null ) )
+        if( ( m_dispatcherOperation != null ) && ( m_invalidatedGroups.Count == 0 ) )
         {
           m_dispatcherOperation.Abort();
           m_dispatcherOperation = null;
+          m_dispatcherOperationStartTime = DateTime.MinValue;
+          m_hasNewOperationsSinceStartTime = false;
         }
 
         m_pendingFlags[ -1 ] = false;
-        m_deferredOperations = null;
+        m_deferredOperations.Clear();
       }
     }
 
     public void PurgeAddWithRemoveOrReplace()
     {
-      if( m_deferredOperations == null )
-        return;
-
       if( m_deferredOperations.Count >= 2 )
       {
         DeferredOperation addOperation = m_deferredOperations[ 0 ];
@@ -205,7 +236,9 @@ namespace Xceed.Wpf.DataGrid
               lastIndexToRemove = i;
 
               if( removed )
+              {
                 firstIndexToRemove = 0;
+              }
             }
             else
             {
@@ -223,9 +256,7 @@ namespace Xceed.Wpf.DataGrid
 
         if( lastIndexToRemove > -1 )
         {
-          m_deferredOperations.RemoveRange(
-            firstIndexToRemove,
-            ( lastIndexToRemove - firstIndexToRemove ) + 1 );
+          m_deferredOperations.RemoveRange( firstIndexToRemove, ( lastIndexToRemove - firstIndexToRemove ) + 1 );
         }
       }
     }
@@ -242,7 +273,7 @@ namespace Xceed.Wpf.DataGrid
           case DeferredOperation.DeferredOperationAction.Refresh:
             {
               this.RefreshPending = true;
-              m_deferredOperations = null;
+              m_deferredOperations.Clear();
               break;
             }
 
@@ -274,22 +305,25 @@ namespace Xceed.Wpf.DataGrid
 
           default:
             {
-              if( m_deferredOperations == null )
-                m_deferredOperations = new List<DeferredOperation>();
-
               m_deferredOperations.Add( operation );
+              m_hasNewOperationsSinceStartTime = true;
+
+              if( this.DeferProcessOfInvalidatedGroupStats )
+              {
+                m_deferredOperationsToProcess++;
+              }
+
               break;
             }
         }
 
         if( ( m_dispatcher != null ) && ( m_dispatcherOperation == null ) )
         {
-          Debug.Assert( m_collectionViewToUpdate.Loaded );
+          Debug.Assert( m_collectionView.Loaded );
 
-          m_dispatcherOperation = m_dispatcher.BeginInvoke(
-            DispatcherPriority.DataBind,
-            new DispatcherOperationCallback( this.Dispatched_Process ),
-            null );
+          m_dispatcherOperation = m_dispatcher.BeginInvoke( DispatcherPriority.DataBind, new DispatcherOperationCallback( this.Dispatched_Process ), null );
+          m_dispatcherOperationStartTime = DateTime.UtcNow;
+          m_hasNewOperationsSinceStartTime = false;
         }
       }
     }
@@ -298,28 +332,22 @@ namespace Xceed.Wpf.DataGrid
     {
       lock( this )
       {
-        this.RefreshPending |= sourceDeferredOperationManager.RefreshPending;
-        this.RegroupPending |= sourceDeferredOperationManager.RegroupPending;
-        this.ResortPending |= sourceDeferredOperationManager.ResortPending;
-
-        this.RefreshDistincValuesPending |= sourceDeferredOperationManager.RefreshDistincValuesPending;
-
-        this.RefreshDistincValuesWithFilteredItemChangedPending |=
-          sourceDeferredOperationManager.RefreshDistincValuesWithFilteredItemChangedPending;
+        this.RefreshPending = this.RefreshPending || sourceDeferredOperationManager.RefreshPending;
+        this.RegroupPending = this.RegroupPending || sourceDeferredOperationManager.RegroupPending;
+        this.ResortPending = this.ResortPending || sourceDeferredOperationManager.ResortPending;
+        this.RefreshDistincValuesPending = this.RefreshDistincValuesPending || sourceDeferredOperationManager.RefreshDistincValuesPending;
+        this.RefreshDistincValuesWithFilteredItemChangedPending = this.RefreshDistincValuesWithFilteredItemChangedPending || sourceDeferredOperationManager.RefreshDistincValuesWithFilteredItemChangedPending;
 
         if( this.RefreshPending )
         {
-          m_deferredOperations = null;
+          m_deferredOperations.Clear();
           return;
         }
 
         List<DeferredOperation> sourceOperations = sourceDeferredOperationManager.m_deferredOperations;
 
-        if( ( sourceOperations == null ) || ( sourceOperations.Count == 0 ) )
+        if( sourceOperations.Count == 0 )
           return;
-
-        if( m_deferredOperations == null )
-          m_deferredOperations = new List<DeferredOperation>();
 
         m_deferredOperations.InsertRange( 0, sourceOperations );
       }
@@ -330,7 +358,7 @@ namespace Xceed.Wpf.DataGrid
       this.Process( true );
     }
 
-    internal void InvalidateGroupStats( DataGridCollectionViewGroup group )
+    public void InvalidateGroupStats( DataGridCollectionViewGroup group, bool calculateAllStats = false )
     {
       if( group == null )
         return;
@@ -340,28 +368,31 @@ namespace Xceed.Wpf.DataGrid
         if( this.RefreshPending )
           return;
 
-        if( m_invalidatedGroups == null )
-          m_invalidatedGroups = new List<DataGridCollectionViewGroup>( 64 );
-
         DataGridCollectionViewGroup parent = group;
 
         while( parent != null )
         {
           if( !m_invalidatedGroups.Contains( parent ) )
           {
-            parent.ClearStatFunctionsResult();
             m_invalidatedGroups.Add( parent );
           }
 
+          parent.ClearStatFunctionsResult();
+          parent.CalculateAllStats = calculateAllStats;
           parent = parent.Parent;
         }
 
-        if( ( m_dispatcherOperation == null ) && ( m_dispatcher != null ) )
+        if( m_dispatcher != null )
         {
-          m_dispatcherOperation = m_dispatcher.BeginInvoke(
-            DispatcherPriority.DataBind,
-            new DispatcherOperationCallback( this.Dispatched_Process ),
-            null );
+          if( m_dispatcherOperation == null )
+          {
+            m_dispatcherOperation = m_dispatcher.BeginInvoke( DispatcherPriority.DataBind, new DispatcherOperationCallback( this.Dispatched_Process ), null );
+            m_dispatcherOperationStartTime = DateTime.UtcNow;
+          }
+          else
+          {
+            m_hasNewOperationsSinceStartTime = true;
+          }
         }
       }
     }
@@ -371,7 +402,7 @@ namespace Xceed.Wpf.DataGrid
       if( item == null )
         throw new ArgumentNullException( "item" );
 
-      if( m_deferredOperations == null )
+      if( m_deferredOperations.Count == 0 )
         return false;
 
       int deferredOperationsCount = m_deferredOperations.Count;
@@ -388,7 +419,7 @@ namespace Xceed.Wpf.DataGrid
           {
             object oldItem = deferredOperation.OldItems[ j ];
 
-            if( Object.Equals( oldItem, item ) )
+            if( object.Equals( oldItem, item ) )
               return true;
           }
         }
@@ -406,14 +437,29 @@ namespace Xceed.Wpf.DataGrid
     private void Process( bool processAll )
     {
       //This method will be called again when Dispose() is called on the DeferRefreshHelper of the CollectionView.
-      if( m_collectionViewToUpdate.InDeferRefresh )
+      if( m_collectionView.InDeferRefresh )
         return;
 
-      bool refreshForced = false;
+      if( !processAll )
+      {
+        lock( this )
+        {
+          if( ( m_hasNewOperationsSinceStartTime )
+            && ( m_dispatcherOperation != null )
+            && ( DateTime.UtcNow.Subtract( m_dispatcherOperationStartTime ) < DeferredOperationManager.MaxQueueDuration ) )
+          {
+            Debug.Assert( m_dispatcher != null );
+            m_dispatcherOperation = m_dispatcher.BeginInvoke( m_dispatcherOperation.Priority, new DispatcherOperationCallback( this.Dispatched_Process ), null );
+            m_hasNewOperationsSinceStartTime = false;
+
+            return;
+          }
+        }
+      }
 
       // We lock here since it is possible that a DataTable Column's value array is being redimensioned 
       // while we are trying to process the DeferredOperation.
-      lock( m_collectionViewToUpdate.SyncRoot )
+      lock( m_collectionView.SyncRoot )
       {
         lock( this )
         {
@@ -422,18 +468,13 @@ namespace Xceed.Wpf.DataGrid
           {
             m_dispatcherOperation.Abort();
             m_dispatcherOperation = null;
+            m_dispatcherOperationStartTime = DateTime.MinValue;
+            m_hasNewOperationsSinceStartTime = false;
           }
 
-          int operationIndex = 0;
-
-          long startTicks = DateTime.Now.Ticks;
-
-          // The fact of processing a deferredOperations can cause other DeferRefresh on the CollectionView
-          // that will finaly call this Process() again even if not yet completed.
-          // So we must cache all the flags and deferredOperations in local variable to prevent
-          // double execution of the operation.
-          List<DeferredOperation> deferredOperations = m_deferredOperations;
-          m_deferredOperations = null;
+          // The fact of processing a deferredOperations can cause other DeferRefresh on the CollectionView that will finaly call this Process() again even if not yet completed.
+          // So we must cache all the flags in local variable to prevent double execution of the operation, except for m_deferredOperation which has its own flag is set.
+          m_isProcessingOperations = true;
           bool refreshDistincValuesWithFilteredItemChangedPending = this.RefreshDistincValuesWithFilteredItemChangedPending;
           this.RefreshDistincValuesWithFilteredItemChangedPending = false;
           bool refreshDistincValuesPending = this.RefreshDistincValuesPending;
@@ -444,85 +485,86 @@ namespace Xceed.Wpf.DataGrid
           this.RegroupPending = false;
           bool resortPending = this.ResortPending;
           this.ResortPending = false;
-          List<DataGridCollectionViewGroup> invalidatedGroups = m_invalidatedGroups;
-          m_invalidatedGroups = null;
-          bool ensureGroupPosition = true;
+          bool refreshForced = false;
+
+          m_collectionView.RaisePreBatchCollectionChanged();
+
+          DateTime startTime = DateTime.UtcNow;
 
           if( refreshPending )
           {
-            Debug.Assert( deferredOperations == null );
-
-            m_collectionViewToUpdate.ExecuteSourceItemOperation( new DeferredOperation(
-              DeferredOperation.DeferredOperationAction.Refresh, -1, null ), out refreshForced );
+            m_collectionView.ExecuteSourceItemOperation( new DeferredOperation( DeferredOperation.DeferredOperationAction.Refresh, -1, null ), out refreshForced );
           }
           else if( regroupPending )
           {
-            ensureGroupPosition = false;
-
-            // Regrouping also do resorting
-            m_collectionViewToUpdate.ExecuteSourceItemOperation( new DeferredOperation(
-              DeferredOperation.DeferredOperationAction.Regroup, -1, null ), out refreshForced );
+            m_collectionView.ExecuteSourceItemOperation( new DeferredOperation( DeferredOperation.DeferredOperationAction.Regroup, -1, null ), out refreshForced );
           }
           else if( resortPending )
           {
-            ensureGroupPosition = false;
-
-            m_collectionViewToUpdate.ExecuteSourceItemOperation( new DeferredOperation(
-              DeferredOperation.DeferredOperationAction.Resort, -1, null ), out refreshForced );
+            m_collectionView.ExecuteSourceItemOperation( new DeferredOperation( DeferredOperation.DeferredOperationAction.Resort, -1, null ), out refreshForced );
           }
 
-          if( ( deferredOperations != null ) && ( !refreshForced ) )
+          if( ( m_deferredOperations.Count > 0 ) && ( !refreshForced ) )
           {
-            int count = deferredOperations.Count;
+            int count = m_deferredOperations.Count;
+            int operationIndex = 0;
 
-            while( ( operationIndex < count ) && ( ( processAll ) || ( DateTime.Now.Ticks - startTicks ) < 1000000 ) && ( !refreshForced ) )
+            while( ( operationIndex < count ) && ( !refreshForced ) && ( processAll || ( DateTime.UtcNow.Subtract( startTime ) < DeferredOperationManager.MaxProcessDuration ) ) )
             {
-              m_collectionViewToUpdate.ExecuteSourceItemOperation( deferredOperations[ operationIndex ], out refreshForced );
+              m_collectionView.ExecuteSourceItemOperation( m_deferredOperations[ operationIndex ], out refreshForced );
               operationIndex++;
             }
 
             if( ( operationIndex < count ) && ( !refreshForced ) )
             {
-              deferredOperations.RemoveRange( 0, operationIndex );
-
-              if( m_deferredOperations == null )
-              {
-                m_deferredOperations = deferredOperations;
-              }
-              else
-              {
-                Debug.Assert( false, "Should never get there." );
-                m_deferredOperations.InsertRange( 0, deferredOperations );
-              }
+              m_deferredOperations.RemoveRange( 0, operationIndex );
+              m_deferredOperationsToProcess -= operationIndex;
+            }
+            else
+            {
+              m_deferredOperations.Clear();
+              m_deferredOperationsToProcess = 0;
             }
           }
 
+          m_isProcessingOperations = false;
+
           // The recalculation of the StatFunctions is performed last.
-          if( invalidatedGroups != null )
-            m_collectionViewToUpdate.ProcessInvalidatedGroupStats( invalidatedGroups, ensureGroupPosition );
+          if( ( m_deferredOperationsToProcess <= 0 || m_forceProcessOfInvalidatedGroupStats ) && ( m_invalidatedGroups.Count != 0 ) )
+          {
+            m_collectionView.ProcessInvalidatedGroupStats( m_invalidatedGroups );
+            m_invalidatedGroups.Clear();
+            m_forceProcessOfInvalidatedGroupStats = false;
+          }
 
           // Since a refresh has been forced, we don't want to process anything else.
           if( !refreshForced )
           {
-            if( ( ( processAll ) || ( DateTime.Now.Ticks - startTicks ) < 1000000 ) )
+            if( processAll || ( DateTime.UtcNow.Subtract( startTime ) < DeferredOperationManager.MaxProcessDuration ) )
             {
               if( refreshDistincValuesWithFilteredItemChangedPending || refreshDistincValuesPending )
               {
-                m_collectionViewToUpdate.ExecuteSourceItemOperation( new DeferredOperation(
-                  DeferredOperation.DeferredOperationAction.RefreshDistincValues, refreshDistincValuesWithFilteredItemChangedPending ), out refreshForced );
+                m_collectionView.ExecuteSourceItemOperation( new DeferredOperation( DeferredOperation.DeferredOperationAction.RefreshDistincValues,
+                                                                                    refreshDistincValuesWithFilteredItemChangedPending ), out refreshForced );
               }
             }
             else
             {
               if( refreshDistincValuesWithFilteredItemChangedPending )
+              {
                 this.RefreshDistincValuesWithFilteredItemChangedPending = true;
+              }
 
               if( refreshDistincValuesPending )
+              {
                 this.RefreshDistincValuesPending = true;
+              }
             }
           }
 
-          if( this.HasPendingOperations )
+          m_collectionView.RaisePostBatchCollectionChanged();
+
+          if( this.HasPendingOperations || m_invalidatedGroups.Count != 0 )
           {
             Debug.Assert( !processAll );
             Debug.Assert( m_dispatcher != null );
@@ -532,29 +574,33 @@ namespace Xceed.Wpf.DataGrid
             {
               if( m_dispatcher != null )
               {
-                m_dispatcherOperation = m_dispatcher.BeginInvoke(
-                  DispatcherPriority.Input,
-                  new DispatcherOperationCallback( this.Dispatched_Process ),
-                  null );
+                m_dispatcherOperation = m_dispatcher.BeginInvoke( DispatcherPriority.Input, new DispatcherOperationCallback( this.Dispatched_Process ), null );
+                m_dispatcherOperationStartTime = DateTime.UtcNow;
+                m_hasNewOperationsSinceStartTime = false;
               }
             }
             else
             {
               m_dispatcherOperation.Priority = DispatcherPriority.Input;
+              m_dispatcherOperationStartTime = DateTime.UtcNow;
             }
           }
         }
       }
     }
 
-    private DataGridCollectionViewBase m_collectionViewToUpdate;
+    private readonly DataGridCollectionViewBase m_collectionView;
     private List<DeferredOperation> m_deferredOperations;
+    private HashSet<DataGridCollectionViewGroup> m_invalidatedGroups;
+    private int m_deferredOperationsToProcess;
     private BitVector32 m_pendingFlags;
+    private bool m_isProcessingOperations;
+    private bool m_forceProcessOfInvalidatedGroupStats;
 
-    private Dispatcher m_dispatcher;
+    private readonly Dispatcher m_dispatcher;
     private DispatcherOperation m_dispatcherOperation;
-
-    private List<DataGridCollectionViewGroup> m_invalidatedGroups;
+    private DateTime m_dispatcherOperationStartTime;
+    private bool m_hasNewOperationsSinceStartTime;
 
     [Flags]
     private enum DeferredOperationManagerPendingFlags

@@ -20,7 +20,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
-
 using Xceed.Wpf.DataGrid.FilterCriteria;
 
 namespace Xceed.Wpf.DataGrid
@@ -77,20 +76,8 @@ namespace Xceed.Wpf.DataGrid
     // If culture is null, CurrentThread.CurrentCulture will be used when necessary.
     public static FilterCriterion Parse( string expression, Type dataType, CultureInfo culture )
     {
-     FilterCriterion filterCriterion = null;
-      List<Token> tokens = new List<Token>();
-
-      FilterParser.LastError = null;
-
-      FilterParser.PrepareExpressionTokens( expression, tokens );
-
-      Type defaultCriterionType = ( dataType == typeof( string ) ) ? typeof( ContainsFilterCriterion ) : typeof( EqualToFilterCriterion );
-
-      FilterParser.Tokenize( tokens, dataType, defaultCriterionType );
-      FilterParser.TrimTokens( tokens );
-      filterCriterion = FilterParser.BuildCriterion( tokens, dataType, defaultCriterionType, culture );
-
-      return filterCriterion;
+      List<Token> tokens = FilterParser.GetTokens( expression, dataType );
+      return FilterParser.BuildCriterion( tokens, dataType, FilterParser.GetDefaultCriterionType( dataType ), culture );
     }
 
     public static FilterCriterion TryParse( string expression, Type dataType, CultureInfo culture )
@@ -108,6 +95,18 @@ namespace Xceed.Wpf.DataGrid
       }
 
       return filterCriterion;
+    }
+
+    private static List<Token> GetTokens( string expression, Type dataType )
+    {
+      List<Token> tokens = new List<Token>();
+      FilterParser.LastError = null;
+
+      FilterParser.PrepareExpressionTokens( expression, tokens );
+      FilterParser.Tokenize( tokens, dataType, FilterParser.GetDefaultCriterionType( dataType ) );
+      FilterParser.TrimTokens( tokens );
+
+      return tokens;
     }
 
     private static void TrimTokens( List<Token> tokens )
@@ -148,7 +147,9 @@ namespace Xceed.Wpf.DataGrid
         CriterionDescriptorAttribute attribute = ( CriterionDescriptorAttribute )type.GetCustomAttributes( typeof( CriterionDescriptorAttribute ), true )[ 0 ];
 
         if( !parserPriorities.Contains( ( int )attribute.ParserPriority ) )
+        {
           parserPriorities.Add( ( int )attribute.ParserPriority );
+        }
       }
 
       parserPriorities.Sort();
@@ -189,7 +190,7 @@ namespace Xceed.Wpf.DataGrid
           quotesEnd++;
         }
 
-        if( ( (( quotesEnd - quoteIndex > 1 ) && ( quoteOpened ) ) ) )
+        if( ( ( ( quotesEnd - quoteIndex > 1 ) && ( quoteOpened ) ) ) )
         {
           // Transform the " couples to a single ".
           StringBuilder temp = new StringBuilder( expression.Substring( 0, quoteIndex ) );
@@ -197,7 +198,7 @@ namespace Xceed.Wpf.DataGrid
           for( int i = 0; i < ( quotesEnd - quoteIndex ) / 2; i++ )
           {
             temp.Append( '"' );
-            quotesCounter++ ;
+            quotesCounter++;
           }
           temp.Append( expression.Substring( quotesEnd ) );
 
@@ -329,7 +330,6 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    //private static bool ExtractFirstCriterion( List<Token> rawTokens, int tokenIndex, int parserPriority, out FilterCriterionToken filterToken, out int startIndex, out int length )
     private static bool ExtractFirstCriterion( Token precedentToken, RawToken rawToken, int parserPriority, out FilterCriterionToken filterToken, out int startIndex, out int length )
     {
       //RawToken rawToken = rawTokens[ tokenIndex ] as RawToken;
@@ -570,6 +570,11 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private static Type GetDefaultCriterionType( Type dataType )
+    {
+      return dataType == typeof( string ) ? typeof( ContainsFilterCriterion ) : typeof( EqualToFilterCriterion );
+    }
+
     private static CriterionTypeCollection RegisteredFilterCriterionTypes = new CriterionTypeCollection();
     private static string LastErrorString = null;
     internal static string MissingClosingQuotesErrorText = "Missing closing quotes.";
@@ -577,10 +582,10 @@ namespace Xceed.Wpf.DataGrid
     internal static string MissingLeftOperandErrorText = "Missing left operand for filter {0}.";
     internal static string InvalidExpressionErrorText = "The expression cannot be resolved. Are you missing a logical operator?";
     internal static string InvalidCharValueErrorText = "{0} is not a valid character value.";
-    internal static string InvalidDateTimeValueErrorText = "Invalid date/time value. It is recommended to use the following format: yyyy-MM-ddTHH:mm:ss.fff."; 
+    internal static string InvalidDateTimeValueErrorText = "Invalid date/time value. It is recommended to use the following format: yyyy-MM-ddTHH:mm:ss.fff.";
     internal static string InvalidNumberFormatErrorText = "Invalid number format.";
-    internal static string InvalidEnumValueErrorText = "Invalid enum value."; 
-    internal static string NumberOverflowErrorText = "Number value is out of range."; 
+    internal static string InvalidEnumValueErrorText = "Invalid enum value.";
+    internal static string NumberOverflowErrorText = "Number value is out of range.";
 
     #region CriterionTypeCollection Nested Type
 
@@ -589,7 +594,7 @@ namespace Xceed.Wpf.DataGrid
       protected override void InsertItem( int index, Type item )
       {
         if( !typeof( FilterCriterion ).IsAssignableFrom( item ) )
-          throw new ArgumentException( "Must be derived from FilterCriterion.", "item" ); 
+          throw new ArgumentException( "Must be derived from FilterCriterion.", "item" );
 
         if( item.GetCustomAttributes( typeof( CriterionDescriptorAttribute ), false ).Length == 0 )
           throw new ArgumentException( "Must have the CriterionDescriptor attribute.", "item" );
@@ -600,7 +605,7 @@ namespace Xceed.Wpf.DataGrid
       protected override void SetItem( int index, Type item )
       {
         if( !typeof( FilterCriterion ).IsAssignableFrom( item ) )
-          throw new ArgumentException( "Must be derived from FilterCriterion.", "item" ); 
+          throw new ArgumentException( "Must be derived from FilterCriterion.", "item" );
 
         if( item.GetCustomAttributes( typeof( CriterionDescriptorAttribute ), false ).Length == 0 )
           throw new ArgumentException( "Must have the CriterionDescriptor attribute.", "item" );
@@ -617,7 +622,7 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
-    #endregion Token Nested Type
+    #endregion
 
     #region ValueToken Nested Type
 
@@ -639,7 +644,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion ValueToken Nested Type
+    #endregion
 
     #region RawToken Nested Type
 
@@ -659,9 +664,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion RawToken Nested Type
+    #endregion
 
-    #region AtomicStringToken Nested Type
+    #region AtomicStringToken
 
     /// <summary>
     /// A token containing a value that will not be processed by the parser because it
@@ -679,7 +684,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion AtomicStringToken Nested Type
+    #endregion
 
     #region FilterCriterionToken Nested Type
 
@@ -701,15 +706,13 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion FilterCriterionToken Nested Type
+    #endregion
 
     #region ReferenceList Nested Type
 
     // This list will prevent the same object of being added twice.
-    // To compare objects (in IndexOf, Add, Remove and Contains), it will use the 
-    // ReferenceEquals() method.
-    // Naturally, this class won't behave properly with ValueType because
-    // of boxing.
+    // To compare objects (in IndexOf, Add, Remove and Contains), it will use the ReferenceEquals() method.
+    // Naturally, this class won't behave properly with ValueType because of boxing.
     private class ReferenceList<T> : ICollection<T>
     {
       public int IndexOf( T item )
@@ -733,7 +736,7 @@ namespace Xceed.Wpf.DataGrid
       public void Add( T item )
       {
         if( this.Contains( item ) )
-          throw new InvalidOperationException( "An attempt was made to add an item that is already contained in the list." ); 
+          throw new InvalidOperationException( "An attempt was made to add an item that is already contained in the list." );
 
         m_internalList.Add( item );
       }
@@ -804,6 +807,6 @@ namespace Xceed.Wpf.DataGrid
       private List<T> m_internalList = new List<T>();
     }
 
-    #endregion ReferenceList Nested Type
+    #endregion
   }
 }

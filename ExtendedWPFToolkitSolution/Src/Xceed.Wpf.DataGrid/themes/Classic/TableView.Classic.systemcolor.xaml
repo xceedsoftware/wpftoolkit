@@ -19,19 +19,18 @@
                     xmlns:local="clr-namespace:Xceed.Wpf.DataGrid"
                     xmlns:conv="clr-namespace:Xceed.Wpf.DataGrid.Converters"
                     xmlns:markup="clr-namespace:Xceed.Wpf.DataGrid.Markup"
-                    xmlns:views="clr-namespace:Xceed.Wpf.DataGrid.Views"
-                    xmlns:utils="clr-namespace:Xceed.Utils.Wpf.Markup">
+                    xmlns:views="clr-namespace:Xceed.Wpf.DataGrid.Views">
 
    <ResourceDictionary.MergedDictionaries>
 
       <!-- Include the view independant and color-scheme independant theme resources -->
-      <ResourceDictionary Source="Resources/Classic.Resources.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="Resources/Classic.Resources.xaml" />
 
       <!-- Include the view independant and color-scheme dependant theme resources -->
-      <ResourceDictionary Source="Resources/Classic.systemcolor.Resources.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="Resources/Classic.systemcolor.Resources.xaml" />
 
       <!-- Include the standard grid element templates -->
-      <ResourceDictionary Source="../Common/TableView.GridElementTemplates.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="../Common/TableView.GridElementTemplates.xaml" />
 
    </ResourceDictionary.MergedDictionaries>
 
@@ -124,6 +123,8 @@
    <!--**************************
     * TEMPLATE: ColumnManagerCell 
     ************************** -->
+   <conv:SortingDirectionToBooleanConverter x:Key="SortingDirectionToBooleanConverter" />
+
    <ControlTemplate x:Key="tableViewColumnManagerCellTemplate"
                     TargetType="local:ColumnManagerCell">
       <!-- This Grid is used to position the resizer Thumb over the ColumnManagerCell -->
@@ -180,7 +181,6 @@
                                       Visibility="Collapsed"
                                       Margin="2,0,0,0"
                                       Opacity="0.5" />
-
                      </Grid>
 
                   </Border>
@@ -197,6 +197,7 @@
                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
                               <Grid.ColumnDefinitions>
                                  <ColumnDefinition Width="*" />
+                                 <ColumnDefinition Width="Auto" />
                                  <ColumnDefinition Width="Auto" />
                               </Grid.ColumnDefinitions>
 
@@ -693,7 +694,7 @@
       <Style.Resources>
          <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-               <ResourceDictionary Source="/PresentationFramework.Classic;V4.0.0.0;31bf3856ad364e35;component\themes/classic.xaml" />
+               <markup:FrameworkThemeResourceDictionary Source="/PresentationFramework.Classic;V4.0.0.0;31bf3856ad364e35;component\themes/classic.xaml" />
             </ResourceDictionary.MergedDictionaries>
          </ResourceDictionary>
       </Style.Resources>
@@ -799,7 +800,7 @@
            assuming that the bottom gridline will be drawn by its following row/element -->
 
       <Setter Property="BorderThickness"
-              Value="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness,Converter={StaticResource thicknessConverter},ConverterParameter='Top'}" />
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness, Converter={StaticResource thicknessConverter}, ConverterParameter='Top'}" />
 
       <Setter Property="BorderBrush"
               Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HorizontalGridLineBrush}" />
@@ -810,11 +811,14 @@
       <Setter Property="Background"
               Value="Transparent" />
 
+      <Setter Property="Foreground"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentForeground}" />
+
       <Style.Triggers>
          <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(views:ViewBase.IsLastItem)}"
                       Value="True">
             <Setter Property="BorderThickness"
-                    Value="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness,Converter={StaticResource thicknessConverter},ConverterParameter='Top, Bottom'}" />
+                    Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness, Converter={StaticResource thicknessConverter}, ConverterParameter='Top, Bottom'}" />
             <Setter Property="Margin"
                     Value="0,0,0,5" />
          </DataTrigger>
@@ -822,7 +826,7 @@
          <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.HasExpandedDetails)}"
                       Value="True">
             <Setter Property="BorderThickness"
-                    Value="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness,Converter={StaticResource thicknessConverter},ConverterParameter='Top, Bottom'}" />
+                    Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness, Converter={StaticResource thicknessConverter}, ConverterParameter='Top, Bottom'}" />
 
          </DataTrigger>
 
@@ -912,18 +916,27 @@
       <Setter Property="Background"
               Value="Transparent" />
 
+      <Setter Property="Foreground"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentForeground}" />
+
       <!-- In TableView, each Cell has the same width as its ParentColum's ActualWidth -->
       <Setter Property="Width"
-              Value="{Binding RelativeSource={RelativeSource Self},Path=ParentColumn.ActualWidth}" />
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.ActualWidth}" />
 
       <Setter Property="Padding"
               Value="{StaticResource cellPadding}" />
+
+      <Setter Property="HorizontalContentAlignment"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.CellHorizontalContentAlignment, FallbackValue=Stretch}" />
+
+      <Setter Property="VerticalContentAlignment"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.CellVerticalContentAlignment, FallbackValue=Stretch}" />
 
       <!-- The Cell is responsible for drawing the vertical gridlines. It draws only its right gridline, 
            assuming that the left gridline will have been drawn by its preceding cell -->
 
       <Setter Property="BorderThickness"
-              Value="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).VerticalGridLineThickness,Converter={StaticResource thicknessConverter},ConverterParameter='Right'}" />
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).VerticalGridLineThickness, Converter={StaticResource thicknessConverter}, ConverterParameter='Right'}" />
 
       <Setter Property="BorderBrush"
               Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).VerticalGridLineBrush}" />
@@ -959,7 +972,10 @@
               Value="{StaticResource cellPadding}" />
 
       <Setter Property="HorizontalContentAlignment"
-              Value="Left" />
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.CellHorizontalContentAlignment, FallbackValue=Stretch}" />
+
+      <Setter Property="VerticalContentAlignment"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.CellVerticalContentAlignment, FallbackValue=Stretch}" />
 
       <Setter Property="Template"
               Value="{StaticResource tableViewColumnManagerCellTemplate}" />
@@ -1047,6 +1063,18 @@
 
       <Setter Property="Foreground"
               Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+
+      <Setter Property="SelectionBackground"
+              Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+
+      <Setter Property="SelectionForeground"
+              Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+
+      <Setter Property="InactiveSelectionBackground"
+              Value="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}" />
+
+      <Setter Property="InactiveSelectionForeground"
+              Value="{DynamicResource {x:Static SystemColors.InactiveCaptionTextBrushKey}}" />
 
       <Setter Property="BorderBrush"
               Value="{StaticResource gridLineBrush}" />
@@ -1178,7 +1206,7 @@
                   Value="-1">
 
             <!-- Stop the propagation of the value set by the default style trigger of
-                 the ColumnManagerRow . -->
+                 the ColumnManagerRow -->
             <Setter Property="local:GroupLevelIndicatorPane.ShowIndicators"
                     Value="True" />
 

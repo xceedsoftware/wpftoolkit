@@ -21,44 +21,58 @@
                     xmlns:prim="clr-namespace:Xceed.Wpf.Toolkit.Primitives"
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
 
-    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+   <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
 
-    <DataTemplate x:Key="DefaultWatermarkTemplate">
-        <ContentControl Content="{Binding}" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Focusable="False" Margin="0,0,3,0" />
-    </DataTemplate>
+   <DataTemplate x:Key="DefaultWatermarkTemplate">
+      <ContentControl Content="{Binding}"
+                      Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+                      Focusable="False"
+                      Margin="0,0,3,0" />
+   </DataTemplate>
 
-    <Style x:Key="NumericUpDown" TargetType="{x:Type prim:InputBase}">
-        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="HorizontalContentAlignment" Value="Right" />
-        <Setter Property="Focusable"  Value="False" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="TextAlignment" Value="Right" />
-        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Control">
-                    <local:ButtonSpinner x:Name="PART_Spinner"
+   <Style x:Key="NumericUpDown"
+          TargetType="{x:Type prim:InputBase}">
+      <Setter Property="Background"
+              Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
+      <Setter Property="Foreground"
+              Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+      <Setter Property="BorderBrush"
+              Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
+      <Setter Property="BorderThickness"
+              Value="1" />
+      <Setter Property="HorizontalContentAlignment"
+              Value="Right" />
+      <Setter Property="Focusable"
+              Value="False" />
+      <Setter Property="VerticalContentAlignment"
+              Value="Center" />
+      <Setter Property="TextAlignment"
+              Value="Right" />
+      <Setter Property="WatermarkTemplate"
+              Value="{StaticResource DefaultWatermarkTemplate}" />
+      <Setter Property="Template">
+         <Setter.Value>
+            <ControlTemplate TargetType="Control">
+               <local:ButtonSpinner x:Name="PART_Spinner"
                                     IsTabStop="False"
                                     Background="{TemplateBinding Background}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     AllowSpin="{Binding AllowSpin, RelativeSource={RelativeSource TemplatedParent}}"
-                                    ShowButtonSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}">
-                        <local:WatermarkTextBox x:Name="PART_TextBox"
+                                    ShowButtonSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}"
+                                    ButtonSpinnerLocation="{Binding ButtonSpinnerLocation, RelativeSource={RelativeSource TemplatedParent}}">
+                  <local:WatermarkTextBox x:Name="PART_TextBox"
                                           BorderThickness="0"
                                           Background="{TemplateBinding Background}"
                                           ContextMenu="{TemplateBinding ContextMenu}"
-                                          FontFamily="{TemplateBinding FontFamily}" 
-                                          FontSize="{TemplateBinding FontSize}" 
+                                          FontFamily="{TemplateBinding FontFamily}"
+                                          FontSize="{TemplateBinding FontSize}"
                                           FontStretch="{TemplateBinding FontStretch}"
-                                          FontStyle="{TemplateBinding FontStyle}" 
-                                          FontWeight="{TemplateBinding FontWeight}" 
-                                          Foreground="{TemplateBinding Foreground}" 
+                                          FontStyle="{TemplateBinding FontStyle}"
+                                          FontWeight="{TemplateBinding FontWeight}"
+                                          Foreground="{TemplateBinding Foreground}"
                                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
+
                                           IsTabStop="{TemplateBinding IsTabStop}"
                                           MinWidth="20"
                                           AcceptsReturn="False"
@@ -67,43 +81,69 @@
                                           AutoSelectBehavior="{Binding AutoSelectBehavior, RelativeSource={RelativeSource TemplatedParent}}"
                                           AutoMoveFocus="{Binding AutoMoveFocus, RelativeSource={RelativeSource TemplatedParent}}"
                                           TextAlignment="{Binding TextAlignment, RelativeSource={RelativeSource TemplatedParent}}"
-                                          TextWrapping="NoWrap" 
+                                          TextWrapping="NoWrap"
                                           TabIndex="{TemplateBinding TabIndex}"
                                           VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                           Watermark="{Binding Watermark, RelativeSource={RelativeSource TemplatedParent}}"
                                           WatermarkTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}}" />
-                    </local:ButtonSpinner>
+               </local:ButtonSpinner>
 
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                        </Trigger>
-                        <Trigger Property="IsFocused" Value="True">
-                            <Setter TargetName="PART_TextBox" Property="FocusManager.FocusedElement" Value="{Binding ElementName=PART_TextBox}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+               <ControlTemplate.Triggers>
+                  <Trigger Property="IsMouseOver"
+                           Value="True">
+                     <Setter Property="BorderBrush"
+                             Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
+                  </Trigger>
+                  <MultiDataTrigger>
+                     <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource Self}}"
+                                   Value="False" />
+                        <Condition Binding="{Binding AllowTextInput, RelativeSource={RelativeSource Self}}"
+                                   Value="False" />
+                     </MultiDataTrigger.Conditions> 
+                     <Setter Property="IsReadOnly"
+                             Value="True"
+                             TargetName="PART_TextBox"/>
+                  </MultiDataTrigger>
+                  <DataTrigger Binding="{Binding IsReadOnly, RelativeSource={RelativeSource Self}}"
+                               Value="True">
+                     <Setter Property="IsReadOnly"
+                             Value="True"
+                             TargetName="PART_TextBox" />
+                  </DataTrigger>
+                  <Trigger Property="IsKeyboardFocusWithin"
+                           Value="True">
+                     <Setter Property="BorderBrush"
+                             Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
+                  </Trigger>
+                  <Trigger Property="IsEnabled"
+                           Value="False">
+                     <Setter Property="Foreground"
+                             Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                  </Trigger>
+                  <Trigger Property="IsFocused"
+                           Value="True">
+                     <Setter TargetName="PART_TextBox"
+                             Property="FocusManager.FocusedElement"
+                             Value="{Binding ElementName=PART_TextBox}" />
+                  </Trigger>
+               </ControlTemplate.Triggers>
+            </ControlTemplate>
+         </Setter.Value>
+      </Setter>
+   </Style>
 
-    <!-- =============================================================================== -->
-    <!-- DecimalUpDown                                                                   -->
-    <!-- =============================================================================== -->
-    <Style TargetType="{x:Type local:DecimalUpDown}" BasedOn="{StaticResource NumericUpDown}" />
+   <!-- =============================================================================== -->
+   <!-- DecimalUpDown                                                                   -->
+   <!-- =============================================================================== -->
+   <Style TargetType="{x:Type local:DecimalUpDown}" BasedOn="{StaticResource NumericUpDown}" />
 
-    <!-- =============================================================================== -->
-    <!-- DoubleUpDown                                                                    -->
-    <!-- =============================================================================== -->
-    <Style TargetType="{x:Type local:DoubleUpDown}" BasedOn="{StaticResource NumericUpDown}" />
+   <!-- =============================================================================== -->
+   <!-- DoubleUpDown                                                                    -->
+   <!-- =============================================================================== -->
+   <Style TargetType="{x:Type local:DoubleUpDown}" BasedOn="{StaticResource NumericUpDown}" />
 
-    <!-- =============================================================================== -->
+   <!-- =============================================================================== -->
     <!-- IntegerUpDown                                                                   -->
     <!-- =============================================================================== -->
     <Style TargetType="{x:Type local:IntegerUpDown}" BasedOn="{StaticResource NumericUpDown}" />

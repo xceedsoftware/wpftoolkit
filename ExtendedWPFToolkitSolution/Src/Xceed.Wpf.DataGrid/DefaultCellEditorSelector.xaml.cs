@@ -24,25 +24,17 @@ namespace Xceed.Wpf.DataGrid
 {
   internal partial class DefaultCellEditorSelector : FrameworkElement
   {
-    #region Constructors
-
     static DefaultCellEditorSelector()
     {
       Instance = new DefaultCellEditorSelector();
-    } 
+    }
 
     private DefaultCellEditorSelector()
     {
       this.InitializeComponent();
     }
 
-    #endregion
-
-    #region Static Fields
-
     private static readonly DefaultCellEditorSelector Instance;
-
-    #endregion
 
     #region TextBoxEditor Public Static Property
 
@@ -57,7 +49,7 @@ namespace Xceed.Wpf.DataGrid
 
         return TextBoxEditorCache;
       }
-    } 
+    }
 
     #endregion
 
@@ -74,7 +66,7 @@ namespace Xceed.Wpf.DataGrid
 
         return CheckBoxEditorCache;
       }
-    } 
+    }
 
     #endregion
 
@@ -111,13 +103,13 @@ namespace Xceed.Wpf.DataGrid
 
         return ForeignKeyEditorCache;
       }
-    } 
+    }
 
     #endregion
 
     #region LinqCellEditor Public Static Editor
 
-    private static CellEditor LinqCellEditorCache; 
+    private static CellEditor LinqCellEditorCache;
 
     public static CellEditor LinqCellEditor
     {
@@ -135,8 +127,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region Public Methods
-
     public static CellEditor SelectCellEditor( Type dataType )
     {
       CellEditor cellEditor = null;
@@ -153,11 +143,7 @@ namespace Xceed.Wpf.DataGrid
       }
 
       return cellEditor;
-    } 
-
-    #endregion
-
-    #region Private Methods
+    }
 
     private static object ThreadSafeTryFindResource( string key )
     {
@@ -199,11 +185,9 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        DefaultCellEditorSelector.Instance.Dispatcher.Invoke( 
+        DefaultCellEditorSelector.Instance.Dispatcher.Invoke(
           new Action<CellEditor>( DefaultCellEditorSelector.ThreadSafeTryFreezeEditor ), cellEditor );
       }
-    } 
-
-    #endregion
+    }
   }
 }

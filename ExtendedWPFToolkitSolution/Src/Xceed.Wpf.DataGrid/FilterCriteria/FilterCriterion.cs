@@ -22,7 +22,7 @@ using System.Linq;
 
 namespace Xceed.Wpf.DataGrid.FilterCriteria
 {
-  [ CriterionDescriptor( "", FilterOperatorPrecedence.Default, FilterTokenPriority.Default ) ]
+  [CriterionDescriptor( "", FilterOperatorPrecedence.Default, FilterTokenPriority.Default )]
   public abstract class FilterCriterion : INotifyPropertyChanged
   {
 #if DEBUG
@@ -67,7 +67,7 @@ namespace Xceed.Wpf.DataGrid.FilterCriteria
 
     public abstract bool IsMatch( object value );
 
-    public abstract string ToExpression( CultureInfo culture);
+    public abstract string ToExpression( CultureInfo culture );
 
     public abstract Expression ToLinqExpression( IQueryable queryable, ParameterExpression parameterExpression, string propertyName );
 

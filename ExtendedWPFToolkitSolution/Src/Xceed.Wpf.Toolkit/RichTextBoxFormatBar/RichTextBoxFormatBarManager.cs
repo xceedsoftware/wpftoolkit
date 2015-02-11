@@ -79,18 +79,21 @@ namespace Xceed.Wpf.Toolkit
     {
       if( e.ChangedButton == MouseButton.Left && e.LeftButton == MouseButtonState.Released )
       {
-        TextRange selectedText = new TextRange( _richTextBox.Selection.Start, _richTextBox.Selection.End );
+        if( !_richTextBox.IsReadOnly )
+        {
+          TextRange selectedText = new TextRange( _richTextBox.Selection.Start, _richTextBox.Selection.End );
 #if !VS2008
-        if( selectedText.Text.Length > 0 && !String.IsNullOrWhiteSpace( selectedText.Text ) )
-          ShowAdorner();
+          if( selectedText.Text.Length > 0 && !String.IsNullOrWhiteSpace( selectedText.Text ) )
+            ShowAdorner();
 #else
-        if( selectedText.Text.Length > 0 && !String.IsNullOrEmpty( selectedText.Text ) )
-          ShowAdorner();
+          if( selectedText.Text.Length > 0 && !String.IsNullOrEmpty( selectedText.Text ) )
+            ShowAdorner();
 #endif
-        else
-          HideAdorner();
+          else
+            HideAdorner();
 
-        e.Handled = true;
+          e.Handled = true;
+        }
       }
       else
         HideAdorner();

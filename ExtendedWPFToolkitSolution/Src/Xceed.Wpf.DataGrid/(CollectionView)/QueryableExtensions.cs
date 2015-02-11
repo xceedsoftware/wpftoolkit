@@ -16,12 +16,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -482,9 +481,9 @@ namespace Xceed.Wpf.DataGrid
         typeof( Queryable ), "Count",
         new Type[] { queryableElementType }, expressionToCount );
 
-      Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization,"Beginning Provider Execute for total count." );
+      Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "Beginning Provider Execute for total count." );
       int count = ( int )queryable.Provider.Execute( countExpression );
-      Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization,"Ended Provider Execute for total count." );
+      Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "Ended Provider Execute for total count." );
       return count;
     }
 
@@ -531,7 +530,7 @@ namespace Xceed.Wpf.DataGrid
       MemberInfo member = QueryableExtensions.GetMemberInfo( typeExpression.Type, name );
 
       if( member == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "MemberInfo is null." );
 
       if( member is PropertyInfo )
       {
@@ -651,9 +650,20 @@ namespace Xceed.Wpf.DataGrid
 
     internal interface IQueryableGroupNameCountPair
     {
-      object GroupName { get; }
-      Type GroupNameType { get; }
-      int Count { get; }
+      object GroupName
+      {
+        get;
+      }
+
+      Type GroupNameType
+      {
+        get;
+      }
+
+      int Count
+      {
+        get;
+      }
     }
 
     #endregion INTERNAL NESTED CLASSES
@@ -668,24 +678,42 @@ namespace Xceed.Wpf.DataGrid
         this.Count = count;
       }
 
-      public T GroupName { get; set; }
-      public int Count { get; set;  }
+      public T GroupName
+      {
+        get;
+        set;
+      }
+
+      public int Count
+      {
+        get;
+        set;
+      }
 
       #region QueryableGroupNameCountPair Members
 
       object IQueryableGroupNameCountPair.GroupName
       {
-        get { return this.GroupName; }
+        get
+        {
+          return this.GroupName;
+        }
       }
 
       public Type GroupNameType
       {
-        get { return typeof( T ); }
+        get
+        {
+          return typeof( T );
+        }
       }
 
       int IQueryableGroupNameCountPair.Count
       {
-        get { return this.Count; }
+        get
+        {
+          return this.Count;
+        }
       }
 
       #endregion
@@ -729,10 +757,29 @@ namespace Xceed.Wpf.DataGrid
 
     private struct QueryableGroupNameCountPairInfo
     {
-      public Type Type { get; set; }
-      public ConstructorInfo ConstructorInfo { get; set; }
-      public PropertyInfo KeyPropertyInfo { get; set; }
-      public PropertyInfo CountPropertyInfo { get; set; }
+      public Type Type
+      {
+        get;
+        set;
+      }
+
+      public ConstructorInfo ConstructorInfo
+      {
+        get;
+        set;
+      }
+
+      public PropertyInfo KeyPropertyInfo
+      {
+        get;
+        set;
+      }
+
+      public PropertyInfo CountPropertyInfo
+      {
+        get;
+        set;
+      }
     }
 
     #endregion PRIVATE NESTED CLASSES

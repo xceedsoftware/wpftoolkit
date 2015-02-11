@@ -44,6 +44,7 @@
     <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
     <pgconv:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
     <pgconv:ObjectToUIElementConverter x:Key="ObjectToUIElementConverter" />
+    <pgconv:IsStringEmptyConverter x:Key="IsStringEmptyConverter" />
 
    <x:Static x:Key="EmptyString" Member="sys:String.Empty" />
 
@@ -500,7 +501,28 @@
         </Setter>
     </Style>
 
-    <ContextMenu x:Key="{ComponentResourceKey 
+   <Style x:Key="PropertyItemGroupContainerStyle"
+          TargetType="{x:Type GroupItem}">
+      <Style.Resources>
+      </Style.Resources>
+      <Setter Property="Template">
+         <Setter.Value>
+            <ControlTemplate>
+               <Border>
+                  <Expander Header="{Binding Name}"
+                            Style="{StaticResource ExpanderStyle}">
+                        <Expander.IsExpanded>
+                           <sys:Boolean>True</sys:Boolean>
+                        </Expander.IsExpanded>
+                     <ItemsPresenter />
+                  </Expander>
+               </Border>
+            </ControlTemplate>
+         </Setter.Value>
+      </Setter>
+   </Style>
+
+   <ContextMenu x:Key="{ComponentResourceKey 
                   TypeInTargetAssembly={x:Type pg:PropertyGrid}, 
                   ResourceId=SelectedObjectAdvancedOptionsMenu}">
         <MenuItem Header="Reset Value" Command="commands:PropertyItemCommands.ResetValue" />
@@ -615,6 +637,11 @@
                                  <VirtualizingStackPanel />
                               </ItemsPanelTemplate>
                            </ItemsControl.ItemsPanel>
+
+                           <ItemsControl.GroupStyle>
+                              <GroupStyle ContainerStyle="{StaticResource PropertyItemGroupContainerStyle}"/>
+                           </ItemsControl.GroupStyle>
+
                         </pg:PropertyItemsControl>
                      </Expander>
                   </Grid>
@@ -641,6 +668,17 @@
                              TargetName="_text"
                              Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                   </Trigger>
+                  <MultiDataTrigger>
+                     <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding ShowDescriptionByTooltip, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}}"
+                                   Value="True" />
+                        <Condition Binding="{Binding Description, RelativeSource={RelativeSource Self}, Converter={StaticResource IsStringEmptyConverter}}"
+                                   Value="False" />
+                     </MultiDataTrigger.Conditions>
+                     <Setter Property="ToolTipService.ToolTip"
+                             Value="{Binding Description, RelativeSource={RelativeSource TemplatedParent}}"
+                             TargetName="PART_Name" />
+                  </MultiDataTrigger>
                   <Trigger Property="Validation.HasError"
                            Value="true">
                      <Setter Property="ToolTip"
@@ -815,28 +853,8 @@
                                         </ItemsControl.ItemsPanel>
 
                                         <ItemsControl.GroupStyle>
-                                            <GroupStyle>
-                                                <GroupStyle.ContainerStyle>
-                                                    <Style TargetType="{x:Type GroupItem}">
-                                                        <Setter Property="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate>
-                                                                    <Border>
-                                                                        <Expander Header="{Binding Name}"
-                                                                                  Style="{StaticResource ExpanderStyle}">
-                                                                            <Expander.IsExpanded>
-                                                                                <sys:Boolean>True</sys:Boolean>
-                                                                            </Expander.IsExpanded>
-                                                                            <ItemsPresenter />
-                                                                        </Expander>
-                                                                    </Border>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </Style>
-                                                </GroupStyle.ContainerStyle>
-                                            </GroupStyle>
-                                        </ItemsControl.GroupStyle>
+                                          <GroupStyle ContainerStyle="{StaticResource PropertyItemGroupContainerStyle}" />
+                                       </ItemsControl.GroupStyle>
 
                                     </pg:PropertyItemsControl>
                                 </ScrollViewer>

@@ -404,6 +404,8 @@
     <Compile Include="Core\Converters\CornerRadiusToDoubleConverter.cs" />
     <Compile Include="Core\Converters\IntToThicknessConverter.cs" />
     <Compile Include="Core\Converters\ThicknessToDoubleConverter.cs" />
+    <Compile Include="Core\Utilities\DateTimeUtilities.cs" />
+    <Compile Include="PropertyGrid\Implementation\Converters\IsStringEmptyConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\CollectionEditor.cs" />
     <Compile Include="Core\Converters\WindowContentBorderMarginConverter.cs" />
     <Compile Include="Core\Converters\WindowControlBackgroundConverter.cs" />
@@ -606,7 +608,7 @@
     <Compile Include="Core\Primitives\UpDownBase.cs" />
     <Compile Include="SplitButton\Implementation\SplitButton.cs" />
     <Compile Include="Core\Themes\ResourceKeys.cs" />
-    <Compile Include="StylableWindow\Implementation\Converters\StylableWindowClippingBorderConverter.cs" />
+    <Compile Include="StyleableWindow\Implementation\Converters\StyleableWindowClippingBorderConverter.cs" />
     <Compile Include="TimelinePanel\Implementation\DateElement.cs" />
     <Compile Include="TimelinePanel\Implementation\OverlapBehavior.cs" />
     <Compile Include="TimelinePanel\Implementation\TimelinePanel.cs" />
@@ -746,7 +748,6 @@
   <ItemGroup>
     <Compile Include="PropertyGrid\Implementation\Definitions\DefinitionBase.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

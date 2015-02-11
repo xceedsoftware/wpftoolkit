@@ -40,7 +40,7 @@
 
     <!-- =============================================================================== -->
     <!-- Common Styles                                                                   -->
-    <!-- Need to find a way to share these for WindowControl and StylableWindow          -->
+   <!-- Need to find a way to share these for WindowControl and StyleableWindow          -->
     <!-- =============================================================================== -->
 
     <!-- ResizeGrip -->

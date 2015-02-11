@@ -14,19 +14,14 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using Xceed.Utils.Wpf.DragDrop;
-using System.Diagnostics;
-using System.Windows.Media;
 using System.Windows.Data;
-using Xceed.Utils.Wpf;
 using System.Windows.Documents;
-using Xceed.Wpf.DataGrid.Views;
-using System.ComponentModel;
+using System.Windows.Media;
+using Xceed.Utils.Wpf.DragDrop;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -302,7 +297,7 @@ namespace Xceed.Wpf.DataGrid
       Debug.Assert( groupLevelDescriptions != null );
 
       if( rootItem == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "rootItem is null." );
 
       foreach( object item in rootItem.Items )
       {
@@ -339,7 +334,7 @@ namespace Xceed.Wpf.DataGrid
       Debug.Assert( groupLevelDescription != null );
 
       if( rootItem == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "rootItem is null." );
 
       foreach( object item in rootItem.Items )
       {

@@ -33,7 +33,7 @@ namespace Xceed.Wpf.DataGrid.Views
     #region Static Fields
 
     // We must add a setter since this value is used as default
-    // value of a DependencyObject which will be instantiated
+    // value of a DependencyObject which will be instanciated
     // before the static constructor is called
     internal static Cursor DefaultGroupDraggedOutsideCursor
     {
@@ -108,8 +108,8 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region DropMarkOrientation Attached Property
 
-    public static readonly DependencyProperty DropMarkOrientationProperty = DependencyProperty.RegisterAttached( 
-      "DropMarkOrientation", typeof( DropMarkOrientation ), typeof( UIViewBase ), 
+    public static readonly DependencyProperty DropMarkOrientationProperty = DependencyProperty.RegisterAttached(
+      "DropMarkOrientation", typeof( DropMarkOrientation ), typeof( UIViewBase ),
       new FrameworkPropertyMetadata( DropMarkOrientation.Default, FrameworkPropertyMetadataOptions.Inherits ) );
 
     public static DropMarkOrientation GetDropMarkOrientation( DependencyObject obj )
@@ -477,5 +477,6 @@ namespace Xceed.Wpf.DataGrid.Views
     }
 
     #endregion
+
   }
 }

@@ -15,24 +15,28 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Automation.Peers;
 using System.Windows.Automation.Provider;
 using System.Windows.Data;
-using System.Windows;
-using System.Windows.Controls;
-using System.Collections;
-using System.Collections.ObjectModel;
-using System.Windows.Automation;
-using System.Globalization;
-using System.Diagnostics;
+using Xceed.Wpf.DataGrid.Utils;
 
 namespace Xceed.Wpf.DataGrid.Automation
 {
-  public class DataGridGroupAutomationPeer : AutomationPeer, IExpandCollapseProvider, IItemContainerProvider
+  public class DataGridGroupAutomationPeer : AutomationPeer, IExpandCollapseProvider, IItemContainerProvider, IWeakEventListener
   {
+    #region Static Fields
+
+    private static readonly string GroupIsExpandedPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.IsExpanded );
+
+    #endregion
+
     public DataGridGroupAutomationPeer( Group uiGroupOwner )
     {
       if( uiGroupOwner == null )
@@ -41,6 +45,8 @@ namespace Xceed.Wpf.DataGrid.Automation
       m_uiGroupOwner = uiGroupOwner;
       m_dataChildren = new Hashtable( 0 );
       m_headerFooterChildren = new Hashtable( 0 );
+
+      PropertyChangedEventManager.AddListener( uiGroupOwner, this, DataGridGroupAutomationPeer.GroupIsExpandedPropertyName );
     }
 
     #region Owner Property
@@ -52,6 +58,8 @@ namespace Xceed.Wpf.DataGrid.Automation
         return m_uiGroupOwner;
       }
     }
+
+    private readonly Group m_uiGroupOwner;
 
     #endregion
 
@@ -174,7 +182,7 @@ namespace Xceed.Wpf.DataGrid.Automation
 
       for( int i = 0; i < itemsCount; i++ )
       {
-        Object item = items[ i ];
+        object item = items[ i ];
         CollectionViewGroup collectionViewGroup = item as CollectionViewGroup;
 
         if( collectionViewGroup == null )
@@ -372,7 +380,27 @@ namespace Xceed.Wpf.DataGrid.Automation
       throw new NotSupportedException();
     }
 
-    static internal void AddHeaderPeer(
+    private void OnOwnerPropertyChanged( object sender, PropertyChangedEventArgs e )
+    {
+      if( !AutomationPeer.ListenerExists( AutomationEvents.PropertyChanged ) )
+        return;
+
+      Debug.Assert( sender == this.Owner );
+
+      if( string.IsNullOrEmpty( e.PropertyName ) || ( e.PropertyName == DataGridGroupAutomationPeer.GroupIsExpandedPropertyName ) )
+      {
+        if( this.Owner.IsExpanded )
+        {
+          this.RaisePropertyChangedEvent( ExpandCollapsePatternIdentifiers.ExpandCollapseStateProperty, ExpandCollapseState.Collapsed, ExpandCollapseState.Expanded );
+        }
+        else
+        {
+          this.RaisePropertyChangedEvent( ExpandCollapsePatternIdentifiers.ExpandCollapseStateProperty, ExpandCollapseState.Expanded, ExpandCollapseState.Collapsed );
+        }
+      }
+    }
+
+    internal static void AddHeaderPeer(
       DataGridContext dataGridContext,
       HeadersFootersGeneratorNode node,
       List<AutomationPeer> list,
@@ -411,7 +439,7 @@ namespace Xceed.Wpf.DataGrid.Automation
       }
     }
 
-    static internal void AddFooterPeer(
+    internal static void AddFooterPeer(
       DataGridContext dataGridContext,
       HeadersFootersGeneratorNode node,
       List<AutomationPeer> list,
@@ -648,8 +676,30 @@ namespace Xceed.Wpf.DataGrid.Automation
 
     #endregion
 
-    private Group m_uiGroupOwner;
+    #region IWeakEventListener Members
+
+    bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      if( typeof( PropertyChangedEventManager ) == managerType )
+      {
+        if( sender == this.Owner )
+        {
+          this.OnOwnerPropertyChanged( sender, ( PropertyChangedEventArgs )e );
+        }
+
+        return true;
+      }
+
+      return false;
+    }
+
+    #endregion
+
+    #region Private Fields
+
     private Hashtable m_dataChildren;
     private Hashtable m_headerFooterChildren;
+
+    #endregion
   }
 }

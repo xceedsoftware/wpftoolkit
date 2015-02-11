@@ -19,18 +19,22 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
   [TemplatePart( Name = PART_ResizeThumb, Type = typeof( Thumb ) )]
+  [TemplatePart( Name = PART_TextBox, Type = typeof( TextBox ) )]
   public class MultiLineTextEditor : ContentControl
   {
     private const string PART_ResizeThumb = "PART_ResizeThumb";
+    private const string PART_TextBox = "PART_TextBox";
 
     #region Members
 
-    Thumb _resizeThumb;
+    private Thumb _resizeThumb;
+    private TextBox _textBox;
 
     #endregion //Members
 
@@ -90,7 +94,8 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnIsOpenChanged( bool oldValue, bool newValue )
     {
-
+      // Focus the content of the popup, after its loaded
+      Dispatcher.BeginInvoke(new Action(()=>_textBox.Focus()), DispatcherPriority.Background);
     }
 
     #endregion //IsOpen
@@ -214,6 +219,8 @@ namespace Xceed.Wpf.Toolkit
 
       if( _resizeThumb != null )
         _resizeThumb.DragDelta += ResizeThumb_DragDelta;
+
+      _textBox = GetTemplateChild( PART_TextBox ) as TextBox;
     }
 
     #endregion //Bass Class Overrides

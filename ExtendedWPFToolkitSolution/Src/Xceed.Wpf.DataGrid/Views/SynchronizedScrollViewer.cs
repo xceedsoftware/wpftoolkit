@@ -157,8 +157,6 @@ namespace Xceed.Wpf.DataGrid.Views
 
     protected override void OnScrollChanged( ScrollChangedEventArgs e )
     {
-      //case 117456: Because the event is routed (bubble) we have to kill the event here so that other classes ( more particularly the
-      // DataGridScrollViewer) does not get confused by the event.
       e.Handled = true;
 
       base.OnScrollChanged( e );

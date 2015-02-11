@@ -49,6 +49,8 @@ namespace Xceed.Wpf.Toolkit.Primitives
     private bool _isSyncingTextAndValueProperties;    
     private bool _isSpinnerCaptured;
 
+    private bool _internalValueSet;
+
     #endregion //Members
 
     #region Properties
@@ -80,6 +82,23 @@ namespace Xceed.Wpf.Toolkit.Primitives
     }
 
     #endregion //AllowSpin
+
+    #region ButtonSpinnerLocation
+
+    public static readonly DependencyProperty ButtonSpinnerLocationProperty = DependencyProperty.Register( "ButtonSpinnerLocation", typeof( Location ), typeof( UpDownBase<T> ), new UIPropertyMetadata( Location.Right ) );
+    public Location ButtonSpinnerLocation
+    {
+      get
+      {
+        return ( Location )GetValue( ButtonSpinnerLocationProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerLocationProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerLocation
 
     #region ClipValueToMinMax
 
@@ -122,7 +141,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       if( this.IsInitialized && string.IsNullOrEmpty( Text ))
       {
-        this.SyncTextAndValueProperties( true, Text );
+        this.SyncTextAndValueProperties( false, Text );
       }
     }
 
@@ -339,6 +358,19 @@ namespace Xceed.Wpf.Toolkit.Primitives
       }
     }
 
+    private void SetValueInternal( T value )
+    {
+      _internalValueSet = true;
+      try
+      {
+        this.Value = value;
+      }
+      finally
+      {
+        _internalValueSet = false;
+      }
+    }
+
     private static object OnCoerceValue( DependencyObject o, object basevalue )
     {
       return ( ( UpDownBase<T> )o ).OnCoerceValue( basevalue );
@@ -358,9 +390,9 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     protected virtual void OnValueChanged( T oldValue, T newValue )
     {
-      if( this.IsInitialized )
+      if( !_internalValueSet && this.IsInitialized )
       {
-        SyncTextAndValueProperties( false, null );
+        SyncTextAndValueProperties( false, null, true );
       }
 
       SetValidSpinDirection();
@@ -630,13 +662,17 @@ namespace Xceed.Wpf.Toolkit.Primitives
           if( string.IsNullOrEmpty( text ) )
           {
             // An empty input sets the value to the default value.
-            Value = this.DefaultValue;
+            this.SetValueInternal( this.DefaultValue );
           }
           else
           {
             try
             {
-              Value = this.ConvertTextToValue( text );
+              T newValue = this.ConvertTextToValue( text );
+              if( !object.Equals( newValue, this.Value ) )
+              {
+                this.SetValueInternal( newValue );
+              }
             }
             catch( Exception e )
             {
@@ -660,7 +696,11 @@ namespace Xceed.Wpf.Toolkit.Primitives
           bool shouldKeepEmpty = !forceTextUpdate && string.IsNullOrEmpty( Text ) && object.Equals( Value, DefaultValue ) && !this.DisplayDefaultValueOnEmptyText;
           if(  !shouldKeepEmpty )
           {
-            Text = ConvertValueToText();
+            string newText = ConvertValueToText();
+            if( !object.Equals( this.Text, newText ) )
+            {
+              Text = newText;
+            }
           }
 
           // Sync Text and textBox

@@ -1,0 +1,45 @@
+﻿<!--***********************************************************************************
+
+   Extended WPF Toolkit
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:s="clr-namespace:System;assembly=mscorlib"
+                    xmlns:local="clr-namespace:Xceed.Wpf.DataGrid"
+                    xmlns:conv="clr-namespace:Xceed.Wpf.DataGrid.Converters"
+                    xmlns:markup="clr-namespace:Xceed.Wpf.DataGrid.Markup"
+                    xmlns:views="clr-namespace:Xceed.Wpf.DataGrid.Views">
+
+   <ResourceDictionary.MergedDictionaries>
+
+      <!-- Include the view independant, color-scheme independant, theme resources -->
+      <markup:DataGridThemeResourceDictionary Source="Resources/Aero2.normalcolor.Resources.xaml" />
+
+      <!-- Include the view dependant, color-scheme independant, theme graphics -->
+      <markup:DataGridThemeResourceDictionary Source="Resources/TableView.Aero2.normalcolor.Graphics.xaml" />
+
+      <!-- Include the standard grid element templates -->
+      <markup:DataGridThemeResourceDictionary Source="../Common/TableView.GridElementTemplates.xaml" />
+
+      <!-- Control Styles used in the Grid Control -->
+      <markup:DataGridThemeResourceDictionary Source="Resources/Aero2.normalcolor.Controls.xaml" />
+
+   </ResourceDictionary.MergedDictionaries>
+
+   <!-- =================================================================== -->
+   <!-- Resources specific to this View/Theme/ColorScheme                   -->
+   <!-- =================================================================== -->
+
+</ResourceDictionary>

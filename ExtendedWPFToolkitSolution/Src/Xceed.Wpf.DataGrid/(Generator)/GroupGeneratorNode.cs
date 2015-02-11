@@ -230,7 +230,7 @@ namespace Xceed.Wpf.DataGrid
 
         if( this.TotalLeafCountChanged != null )
         {
-          this.TotalLeafCountChanged( this, new EventArgs() );
+          this.TotalLeafCountChanged( this, EventArgs.Empty );
         }
       }
 

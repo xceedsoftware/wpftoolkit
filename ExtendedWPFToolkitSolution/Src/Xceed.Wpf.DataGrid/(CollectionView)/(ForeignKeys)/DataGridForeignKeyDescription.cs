@@ -14,27 +14,16 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections;
-using System.Windows.Data;
-using System.Diagnostics;
 using System.Windows;
-using System.ComponentModel;
 
 namespace Xceed.Wpf.DataGrid
 {
   public class DataGridForeignKeyDescription : DependencyObject
   {
-    #region Constructors
-
     public DataGridForeignKeyDescription()
     {
     }
-
-    #endregion
 
     #region ForeignKeyConverter Property
 
@@ -64,31 +53,17 @@ namespace Xceed.Wpf.DataGrid
       "ItemsSource",
       typeof( IEnumerable ),
       typeof( DataGridForeignKeyDescription ),
-      new FrameworkPropertyMetadata(
-        null,
-        new PropertyChangedCallback( DataGridForeignKeyDescription.OnItemsSourceChanged ) ) );
+      new FrameworkPropertyMetadata( null ) );
 
     public IEnumerable ItemsSource
     {
       get
       {
-        return m_itemsSource;
+        return ( IEnumerable )this.GetValue( DataGridForeignKeyDescription.ItemsSourceProperty );
       }
       set
       {
         this.SetValue( DataGridForeignKeyDescription.ItemsSourceProperty, value );
-      }
-    }
-
-    private IEnumerable m_itemsSource; // = null;
-
-    private static void OnItemsSourceChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
-    {
-      DataGridForeignKeyDescription foreignKeyDescription = sender as DataGridForeignKeyDescription;
-
-      if( foreignKeyDescription != null )
-      {
-        foreignKeyDescription.m_itemsSource = e.NewValue as IEnumerable;
       }
     }
 
@@ -121,6 +96,28 @@ namespace Xceed.Wpf.DataGrid
       set
       {
         this.SetValue( DataGridForeignKeyDescription.ValuePathProperty, value );
+      }
+    }
+
+    #endregion
+
+    #region DisplayMemberPath Property
+
+    public static readonly DependencyProperty DisplayMemberPathProperty = DependencyProperty.Register(
+      "DisplayMemberPath",
+      typeof( string ),
+      typeof( DataGridForeignKeyDescription ),
+      new FrameworkPropertyMetadata( null ) );
+
+    public string DisplayMemberPath
+    {
+      get
+      {
+        return ( string )this.GetValue( DataGridForeignKeyDescription.DisplayMemberPathProperty );
+      }
+      set
+      {
+        this.SetValue( DataGridForeignKeyDescription.DisplayMemberPathProperty, value );
       }
     }
 

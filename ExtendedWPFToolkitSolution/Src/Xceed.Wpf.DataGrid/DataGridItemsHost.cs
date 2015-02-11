@@ -15,15 +15,14 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Controls;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Windows.Controls.Primitives;
 using System.Diagnostics;
+using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
 using Xceed.Utils.Wpf;
 
 namespace Xceed.Wpf.DataGrid
@@ -161,7 +160,6 @@ namespace Xceed.Wpf.DataGrid
       if( m_children == null )
         throw new InvalidOperationException( "An attempt was made to retrieve a visual child when none exists for this element." );
 
-      //TODO (case 117289): Insert ZIndex lookup table checkup here.
 
       if( ( index < 0 ) || ( index >= m_children.Count ) )
         throw new ArgumentOutOfRangeException( "index", index, "index must be greater than or equal to zero and less than or equal to the number of contained UI elements." );
@@ -172,7 +170,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region  PreviewKeyDown and KeyDown handling overrides
+    #region PreviewKeyDown and KeyDown handling overrides
 
     protected override void OnPreviewKeyDown( KeyEventArgs e )
     {
@@ -431,7 +429,7 @@ namespace Xceed.Wpf.DataGrid
       if( ( m_generator != null ) && ( newValue != null ) )
       {
         if( newValue.CustomItemContainerGenerator != m_generator )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "The custom generator is different on the parent DataGridControl.", newValue );
       }
 
       // We must ensure that the old ItemsHost clears the Content of the
@@ -445,7 +443,7 @@ namespace Xceed.Wpf.DataGrid
       // DataGridControl and when the System color scheme is changed.
       if( ( oldValue != null ) && ( newValue == null ) )
       {
-        oldValue.CustomItemContainerGenerator.CleanupGenerator( false );
+        oldValue.CustomItemContainerGenerator.CleanupGenerator();
       }
 
       if( newValue != null )
@@ -501,7 +499,7 @@ namespace Xceed.Wpf.DataGrid
           navDirection = FocusNavigationDirection.Up;
           break;
         default:
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "An invalid key was processed to move the focus." );
       }
 
       //2. Call MoveFocus() on the currently focused keyboard element, 
@@ -568,6 +566,71 @@ namespace Xceed.Wpf.DataGrid
       }
 
       return null;
+    }
+
+    internal bool ValidateTabKeyHandleIsWithin( FrameworkElement originalSource, KeyboardDevice keyboardDevice )
+    {
+      DependencyObject predictedNextVisual = null;
+
+      //If the original source is not a control (e.g. the cells panel instead of a cell), columns will be used to move focus.
+      //In the case of a ListBox set with Cycle or Contained navigation mode, we must move in the other direction if on the first or last item,
+      //since PedictFocus will throw is we use FocusNavigationDirection.First/Last.
+      if( originalSource != null )
+      {
+        if( ( keyboardDevice.Modifiers & ModifierKeys.Shift ) == ModifierKeys.Shift )
+        {
+          predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Left );
+          if( predictedNextVisual == null )
+          {
+            predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Up );
+            if( predictedNextVisual == null )
+            {
+              KeyboardNavigationMode navigationMode = ( KeyboardNavigationMode )originalSource.GetValue( KeyboardNavigation.TabNavigationProperty );
+              if( navigationMode == KeyboardNavigationMode.Cycle || navigationMode == KeyboardNavigationMode.Contained )
+              {
+                predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Right );
+                if( predictedNextVisual == null )
+                {
+                  predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Down );
+                }
+              }
+            }
+          }
+        }
+        else
+        {
+          predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Right );
+          if( predictedNextVisual == null )
+          {
+            predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Down );
+            if( predictedNextVisual == null )
+            {
+              KeyboardNavigationMode navigationMode = ( KeyboardNavigationMode )originalSource.GetValue( KeyboardNavigation.TabNavigationProperty );
+              if( navigationMode == KeyboardNavigationMode.Cycle || navigationMode == KeyboardNavigationMode.Contained )
+              {
+                predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Left );
+                if( predictedNextVisual == null )
+                {
+                  predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Up );
+                }
+              }
+            }
+          }
+        }
+      }
+
+      if( predictedNextVisual != null )
+      {
+        Cell ownerCell = Cell.FindFromChild( predictedNextVisual );
+
+        if( ( ownerCell != null ) && ( ownerCell.ParentColumn == this.ParentDataGridControl.CurrentColumn ) )
+        {
+          if( object.Equals( ownerCell.ParentRow.DataContext, this.ParentDataGridControl.CurrentItemInEdition ) )
+            return true;
+        }
+      }
+
+      return false;
     }
 
     #endregion

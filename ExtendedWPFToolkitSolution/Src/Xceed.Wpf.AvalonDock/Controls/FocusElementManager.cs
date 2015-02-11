@@ -227,7 +227,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
                         {
                             _setFocusAsyncOperation = null;
                         }
-                    }), DispatcherPriority.Background);
+                    }), DispatcherPriority.Input);
                 }
             }
         }

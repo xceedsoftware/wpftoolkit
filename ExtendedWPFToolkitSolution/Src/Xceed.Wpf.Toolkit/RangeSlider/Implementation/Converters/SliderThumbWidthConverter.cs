@@ -25,6 +25,7 @@ using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit.Converters
 {
+  [Obsolete("This class is no longer used internaly and may be removed in a future release")]
   public class SliderThumbWidthConverter : IValueConverter
   {
     public object Convert( object value, Type targetType, object parameter, CultureInfo culture )

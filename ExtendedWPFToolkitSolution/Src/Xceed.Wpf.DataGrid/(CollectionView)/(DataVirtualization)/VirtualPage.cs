@@ -308,12 +308,22 @@ namespace Xceed.Wpf.DataGrid
 
     private void AsyncQueryInfo_BuiltInAbort( AsyncQueryInfo queryInfo )
     {
+      if( this.IsDisposed )
+        return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+
       this.ParentVirtualList.PagingManager.OnBuiltInAbort( this, queryInfo );
       this.IsAborting = false;
     }
 
     private void AsyncQueryInfo_BeginQueryItems( AsyncQueryInfo queryInfo )
     {
+      if( this.IsDisposed )
+        return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+
       this.ParentVirtualList.PagingManager.OnQueryItems( this, queryInfo );
     }
 
@@ -321,6 +331,8 @@ namespace Xceed.Wpf.DataGrid
     {
       if( this.IsDisposed )
         return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
 
       this.ParentVirtualList.PagingManager.OnAbortQueryItems( this, queryInfo );
 
@@ -337,6 +349,7 @@ namespace Xceed.Wpf.DataGrid
       if( this.IsDisposed )
         return;
 
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
       Debug.Assert( !this.IsAborting );
       this.ParentVirtualList.PagingManager.OnQueryItemsCompleted( this, queryInfo, fetchedItems );
 
@@ -346,6 +359,11 @@ namespace Xceed.Wpf.DataGrid
 
     private void AsyncQueryInfo_QueryErrorChanged( AsyncQueryInfo queryInfo )
     {
+      if( this.IsDisposed )
+        return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+
       this.ParentVirtualList.PagingManager.OnQueryErrorChanged( this, queryInfo );
 
       if( this.ParentVirtualList.IsRestarting )
@@ -354,11 +372,21 @@ namespace Xceed.Wpf.DataGrid
 
     private void AsyncCommitInfo_BeginCommitItems( AsyncCommitInfo commitInfo )
     {
+      if( this.IsDisposed )
+        return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+
       this.ParentVirtualList.PagingManager.OnCommitItems( this, commitInfo );
     }
 
     private void AsyncCommitInfo_EndCommitItems( AsyncCommitInfo commitInfo )
     {
+      if( this.IsDisposed )
+        return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+
       this.ParentVirtualList.PagingManager.OnCommitItemsCompleted( this, commitInfo );
 
       if( this.ParentVirtualList.IsRestarting )
@@ -367,6 +395,11 @@ namespace Xceed.Wpf.DataGrid
 
     private void AsyncCommitInfo_CommitErrorChanged( AsyncCommitInfo commitInfo )
     {
+      if( this.IsDisposed )
+        return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+
       this.ParentVirtualList.PagingManager.OnCommitErrorChanged( this, commitInfo );
 
       if( this.ParentVirtualList.IsRestarting )

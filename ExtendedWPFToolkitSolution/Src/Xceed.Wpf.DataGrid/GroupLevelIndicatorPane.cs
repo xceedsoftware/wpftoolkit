@@ -15,17 +15,15 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Diagnostics;
-using Xceed.Wpf.DataGrid.Views;
-using System.Windows.Data;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
+using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -94,11 +92,13 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private Panel m_storedGroupLevelIndicatorPaneHost; //null
+
     #endregion GroupLevelIndicatorPaneHost Read-Only Property
 
     #region ShowIndicators Attached Property
 
-    public static readonly DependencyProperty ShowIndicatorsProperty = DependencyProperty.RegisterAttached( 
+    public static readonly DependencyProperty ShowIndicatorsProperty = DependencyProperty.RegisterAttached(
       "ShowIndicators", typeof( bool ), typeof( GroupLevelIndicatorPane ),
       new FrameworkPropertyMetadata( true, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure ) );
 
@@ -154,7 +154,7 @@ namespace Xceed.Wpf.DataGrid
 
     #region GroupLevel Attached Property
 
-    public static readonly DependencyProperty GroupLevelProperty = DependencyProperty.RegisterAttached( 
+    public static readonly DependencyProperty GroupLevelProperty = DependencyProperty.RegisterAttached(
       "GroupLevel", typeof( int ), typeof( GroupLevelIndicatorPane ),
       new FrameworkPropertyMetadata( 0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure ) );
 
@@ -222,101 +222,101 @@ namespace Xceed.Wpf.DataGrid
 
     protected override Size MeasureOverride( Size availableSize )
     {
-      Panel panel = this.GroupLevelIndicatorPaneHost;
+      var panel = this.GroupLevelIndicatorPaneHost;
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
 
-      if( panel == null )
+      if( ( panel == null ) || ( dataGridContext == null ) )
         return base.MeasureOverride( availableSize );
 
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
+      var groupDescriptions = DataGridContext.GetGroupDescriptionsHelper( dataGridContext.Items );
+      var leafGroupLevel = GroupLevelIndicatorPane.GetGroupLevel( this );
 
-      if( dataGridContext != null )
+      // If Indented is true (default), we use the total groupDescriptions.Count for this DataGridContext
+      var correctedGroupLevel = ( this.Indented == true ) ? groupDescriptions.Count : leafGroupLevel;
+
+      // Ensure that the GroupLevel retrieved does not exceeds the number of group descriptions for the DataGridContext
+      correctedGroupLevel = Math.Min( correctedGroupLevel, groupDescriptions.Count );
+
+      // Then finally, if the GroupLevel is -1, then indent at maximum.
+      if( correctedGroupLevel == -1 )
       {
-        ObservableCollection<GroupDescription> groupDescriptions = DataGridContext.GetGroupDescriptionsHelper( dataGridContext.Items );
+        correctedGroupLevel = groupDescriptions.Count;
+      }
 
-        int leafGroupLevel = GroupLevelIndicatorPane.GetGroupLevel( this );
+      if( ( correctedGroupLevel > 0 ) && ( this.AreGroupsFlattened ) )
+      {
+        correctedGroupLevel = ( this.Indented ) ? 1 : 0;
+      }
 
-        // If Indented is true (default), we use the total groupDescriptions.Count for this DataGridContext
-        int correctedGroupLevel = ( this.Indented == true ) ? groupDescriptions.Count : leafGroupLevel;
+      var children = panel.Children;
+      var childrenCount = children.Count;
 
-        // Ensure that the GroupLevel retrieved does not exceeds the number of group descriptions for the DataGridContext
-        correctedGroupLevel = Math.Min( correctedGroupLevel, groupDescriptions.Count );
+      // If we need to add/remove GroupLevelIndicators from the panel
+      if( correctedGroupLevel != childrenCount )
+      {
+        // When grouping change, we take for granted that the group deepness will change, 
+        // so we initialize DataContext of the margin only in there.
 
-        // Then finally, if the GroupLevel is -1, then indent at maximum.
-        if( correctedGroupLevel == -1 )
-          correctedGroupLevel = groupDescriptions.Count;
+        // Clear all the panel's children!
+        children.Clear();
 
-        if( ( correctedGroupLevel > 0 )
-          && ( this.AreGroupsFlattened ) )
+        // Create 1 group margin content presenter for each group level
+        for( int i = correctedGroupLevel - 1; i >= 0; i-- )
         {
-          correctedGroupLevel = ( this.Indented ) ? 1 : 0;
+          GroupLevelIndicator groupMargin = new GroupLevelIndicator();
+          groupMargin.DataContext = dataGridContext.GroupLevelDescriptions[ i ];
+          children.Insert( 0, new GroupLevelIndicator() );
         }
 
-        UIElementCollection children = panel.Children;
-        int childrenCount = children.Count;
+        childrenCount = correctedGroupLevel;
+        this.SetCurrentIndicatorCount( childrenCount );
 
-        // If we need to add/remove GroupLevelIndicators from the panel
-        if( correctedGroupLevel != childrenCount )
+        this.InvalidateGroupLevelIndicatorPaneHostPanelMeasure();
+      }
+
+      var item = dataGridContext.GetItemFromContainer( this );
+
+      for( int i = 0; i < childrenCount; i++ )
+      {
+        GroupLevelIndicator groupMargin = children[ i ] as GroupLevelIndicator;
+
+        CollectionViewGroup groupForIndicator = GroupLevelIndicatorPane.GetCollectionViewGroupHelper(
+          dataGridContext, groupDescriptions, item, i );
+
+        GroupConfiguration groupLevelConfig = GroupConfiguration.GetGroupConfiguration(
+          dataGridContext, groupDescriptions, dataGridContext.GroupConfigurationSelector, i, groupForIndicator );
+
+        if( groupLevelConfig != null )
         {
-          // When grouping change, we take for granted that the group deepness will change, 
-          // so we initialize DataContext of the margin only in there.
+          Binding groupLevelIndicatorStyleBinding = BindingOperations.GetBinding( groupMargin, GroupLevelIndicator.StyleProperty );
 
-          // Clear all the panel's children!
-          children.Clear();
-
-          // Create 1 group margin content presenter for each group level
-          for( int i = correctedGroupLevel - 1; i >= 0; i-- )
+          if( ( groupLevelIndicatorStyleBinding == null ) || ( groupLevelIndicatorStyleBinding.Source != groupLevelConfig ) )
           {
-            GroupLevelIndicator groupMargin = new GroupLevelIndicator();
-            groupMargin.DataContext = dataGridContext.GroupLevelDescriptions[ i ];
-            children.Insert( 0, new GroupLevelIndicator() );
-          }
+            groupLevelIndicatorStyleBinding = new Binding( "GroupLevelIndicatorStyle" );
+            groupLevelIndicatorStyleBinding.Source = groupLevelConfig;
 
-          childrenCount = correctedGroupLevel;
-          this.SetCurrentIndicatorCount( childrenCount );
+            // Use a Converter to manage groupLevelConfig.GroupLevelIndicatorStyle == null
+            // so that an implicit syle won't be overriden by a null style.
+            groupLevelIndicatorStyleBinding.Converter = new GroupLevelIndicatorConverter();
+
+            groupLevelIndicatorStyleBinding.ConverterParameter = groupMargin;
+            groupMargin.SetBinding( GroupLevelIndicator.StyleProperty, groupLevelIndicatorStyleBinding );
+          }
+        }
+        else
+        {
+          groupMargin.ClearValue( GroupLevelIndicator.StyleProperty );
         }
 
-        object item = dataGridContext.GetItemFromContainer( this );
-
-        for( int i = 0; i < childrenCount; i++ )
+        // If the ShowIndicators property is False or there is already leafGroupLevel GroupLevelIndicators in the panel,
+        // the current newGroupMargin must be hidden.
+        if( ( !GroupLevelIndicatorPane.GetShowIndicators( this ) ) || ( ( i >= leafGroupLevel ) && ( leafGroupLevel != -1 ) ) )
         {
-          GroupLevelIndicator groupMargin = children[ i ] as GroupLevelIndicator;
-
-          CollectionViewGroup groupForIndicator = GroupLevelIndicatorPane.GetCollectionViewGroupHelper( 
-            dataGridContext, groupDescriptions, item, i );
-
-          GroupConfiguration groupLevelConfig = GroupConfiguration.GetGroupConfiguration( 
-            dataGridContext, groupDescriptions, dataGridContext.GroupConfigurationSelector, i, groupForIndicator );
-
-          if( groupLevelConfig != null )
-          {
-            Binding groupLevelIndicatorStyleBinding = BindingOperations.GetBinding( groupMargin, GroupLevelIndicator.StyleProperty );
-
-            if( ( groupLevelIndicatorStyleBinding == null ) || ( groupLevelIndicatorStyleBinding.Source != groupLevelConfig ) )
-            {
-              groupLevelIndicatorStyleBinding = new Binding( "GroupLevelIndicatorStyle" );
-              groupLevelIndicatorStyleBinding.Source = groupLevelConfig;
-              // Use a Converter to manage groupLevelConfig.GroupLevelIndicatorStyle == null
-              // so that an implicit syle won't be overriden by a null style.
-              groupLevelIndicatorStyleBinding.Converter = new GroupLevelIndicatorConverter();
-              groupLevelIndicatorStyleBinding.ConverterParameter = groupMargin;
-              groupMargin.SetBinding( GroupLevelIndicator.StyleProperty, groupLevelIndicatorStyleBinding );
-            }
-          }
-          else
-          {
-            groupMargin.ClearValue( GroupLevelIndicator.StyleProperty );
-          }
-
-          // If the ShowIndicators property is False or there is already leafGroupLevel GroupLevelIndicators in the panel,
-          // the current newGroupMargin must be hidden.
-          if( ( !GroupLevelIndicatorPane.GetShowIndicators( this ) ) || ( ( i >= leafGroupLevel ) && ( leafGroupLevel != -1 ) ) )
-          {
-            groupMargin.Visibility = Visibility.Hidden;
-          }
-          else
-          {
-            groupMargin.Visibility = Visibility.Visible;
-          }
+          groupMargin.Visibility = Visibility.Hidden;
+        }
+        else
+        {
+          groupMargin.Visibility = Visibility.Visible;
         }
       }
 
@@ -375,9 +375,23 @@ namespace Xceed.Wpf.DataGrid
 
     private static void OnDataItemChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      GroupLevelIndicatorPane self = sender as GroupLevelIndicatorPane;
+      var self = ( GroupLevelIndicatorPane )sender;
+      Debug.Assert( self != null );
 
-      if( ( self != null ) && ( e.NewValue != CustomItemContainerGenerator.NotSet ) )
+      var oldDataItemStore = ( DataItemDataProviderBase )e.OldValue;
+      var newDataItemStore = ( DataItemDataProviderBase )e.NewValue;
+
+      if( oldDataItemStore != null )
+      {
+        PropertyChangedEventManager.RemoveListener( oldDataItemStore, self, "Data" );
+      }
+
+      if( newDataItemStore != null )
+      {
+        PropertyChangedEventManager.AddListener( newDataItemStore, self, "Data" );
+      }
+
+      if( !newDataItemStore.IsEmpty )
       {
         self.InvalidateMeasure();
       }
@@ -407,7 +421,16 @@ namespace Xceed.Wpf.DataGrid
       return this.GetTemplateChild( "PART_GroupLevelIndicatorHost" ) as Panel;
     }
 
-    private Panel m_storedGroupLevelIndicatorPaneHost = null;
+    private void InvalidateGroupLevelIndicatorPaneHostPanelMeasure()
+    {
+      UIElement container = this.GroupLevelIndicatorPaneHost;
+
+      while( ( container != null ) && ( container != this ) )
+      {
+        container.InvalidateMeasure();
+        container = VisualTreeHelper.GetParent( container ) as UIElement;
+      }
+    }
 
     #region IWeakEventListener Members
 
@@ -421,6 +444,16 @@ namespace Xceed.Wpf.DataGrid
       if( managerType == typeof( CollectionChangedEventManager ) )
       {
         this.InvalidateMeasure();
+        return true;
+      }
+      else if( managerType == typeof( PropertyChangedEventManager ) )
+      {
+        var dataItemStore = sender as DataItemDataProviderBase;
+        if( ( dataItemStore != null ) && !dataItemStore.IsEmpty )
+        {
+          this.InvalidateMeasure();
+        }
+
         return true;
       }
 

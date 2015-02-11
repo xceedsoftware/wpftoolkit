@@ -128,87 +128,54 @@ namespace Xceed.Wpf.DataGrid
       throw new InvalidOperationException( "An attempt was made to initialize a PropertyDetailDescription whose data source does not contain a property that corresponds to the specified relation name." );
     }
 
-    private PropertyDescriptor GetPropertyDescriptorFromITypedList( ITypedList iTypedList )
+    private PropertyDescriptor GetPropertyDescriptorFromITypedList( ITypedList typedList )
     {
-      if( string.IsNullOrEmpty( this.RelationName ) == true )
+      if( string.IsNullOrEmpty( this.RelationName ) || ( typedList == null ) )
         return null;
 
-      Type objectType = null;
-      ICustomTypeDescriptor customTypeDescriptor = null;
-      PropertyDescriptorCollection properties = null;
-      PropertyDescriptor relationDescriptor = null;
-      TypeDescriptionProvider typeDescriptionProvider = null;
+      PropertyDescriptorCollection properties;
 
-      if( iTypedList != null )
-      {
-        properties = iTypedList.GetItemProperties( null );
+      properties = typedList.GetItemProperties( null );
+      if( ( properties != null ) && ( properties.Count > 0 ) )
+        return properties[ this.RelationName ];
 
-        if( ( properties != null ) && ( properties.Count > 0 ) )
-        {
-          relationDescriptor = properties[ this.RelationName ];
-        }
-        else
-        {
-          string listName = iTypedList.GetListName( null );
+      var listName = typedList.GetListName( null );
+      if( string.IsNullOrEmpty( listName ) )
+        return null;
 
-          if( string.IsNullOrEmpty( listName ) == false )
-          {
-            objectType = Type.GetType( listName, false, false );
+      var itemType = Type.GetType( listName, false, false );
+      if( itemType == null )
+        return null;
 
-            if( objectType != null )
-            {
-              typeDescriptionProvider = TypeDescriptor.GetProvider( objectType );
-              if( typeDescriptionProvider != null )
-              {
-                customTypeDescriptor = typeDescriptionProvider.GetTypeDescriptor( objectType );
+      var descriptionProvider = TypeDescriptor.GetProvider( itemType );
+      if( descriptionProvider == null )
+        return null;
 
-                if( customTypeDescriptor != null )
-                {
-                  properties = customTypeDescriptor.GetProperties();
+      var descriptor = descriptionProvider.GetTypeDescriptor( itemType );
+      if( descriptor == null )
+        return null;
 
-                  if( ( properties != null ) && ( properties.Count > 0 ) )
-                    relationDescriptor = properties[ this.RelationName ];
-                }
-              }
-            }
-          }
-        }
-      }
+      properties = descriptor.GetProperties();
+      if( ( properties != null ) && ( properties.Count > 0 ) )
+        return properties[ this.RelationName ];
 
-      return relationDescriptor;
+      return null;
     }
 
     private PropertyDescriptor GetPropertyDescriptorFromFirstItem( object firstItem )
     {
-      if( string.IsNullOrEmpty( this.RelationName ) == true )
+      if( string.IsNullOrEmpty( this.RelationName ) || ( firstItem == null ) )
         return null;
 
-      Type objectType = null;
-      ICustomTypeDescriptor customTypeDescriptor = null;
-      PropertyDescriptorCollection properties = null;
-      PropertyDescriptor relationDescriptor = null;
-      TypeDescriptionProvider typeDescriptionProvider = null;
+      var descriptor = ItemsSourceHelper.GetCustomTypeDescriptor( firstItem, firstItem.GetType() );
+      if( descriptor == null )
+        return null;
 
-      objectType = firstItem.GetType();
+      var properties = descriptor.GetProperties();
+      if( ( properties != null ) && ( properties.Count > 0 ) )
+        return properties[ this.RelationName ];
 
-      if( objectType != null )
-      {
-        typeDescriptionProvider = TypeDescriptor.GetProvider( objectType );
-        if( typeDescriptionProvider != null )
-        {
-          customTypeDescriptor = typeDescriptionProvider.GetTypeDescriptor( objectType, firstItem );
-
-          if( customTypeDescriptor != null )
-          {
-            properties = customTypeDescriptor.GetProperties();
-
-            if( ( properties != null ) && ( properties.Count > 0 ) )
-              relationDescriptor = properties[ this.RelationName ];
-          }
-        }
-      }
-
-      return relationDescriptor;
+      return null;
     }
 
     protected internal override IEnumerable GetDetailsForParentItem( DataGridCollectionViewBase parentCollectionView, object parentItem )

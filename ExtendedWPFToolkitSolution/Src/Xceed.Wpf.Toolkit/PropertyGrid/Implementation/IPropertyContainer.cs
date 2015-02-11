@@ -31,6 +31,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
+
     ContainerHelperBase ContainerHelper { get; }
 
     Style PropertyContainerStyle { get; }

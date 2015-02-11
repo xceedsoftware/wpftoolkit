@@ -23,8 +23,8 @@
    <ResourceDictionary.MergedDictionaries>
       <!-- Style definitions for specific controls (things that are not grid elements) -->
 
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Controls/FixedColumnSplitter.generic.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Controls/TableViewScrollViewer.generic.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Controls/FixedColumnSplitter.generic.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Controls/TableViewScrollViewer.generic.xaml" />
 
       <!-- For each specific systeme theme ResourceDictionary, we only need to include 
            the xaml associated to the theme (to make the "BasedOn" work). However, here 
@@ -33,8 +33,8 @@
            specific ResourceDictionary, WPF looks in the generic.xaml ResourceDictionary. 
            That way, we don't have to maintain this list in all the xaml files. -->
 
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Luna/TableflowView.Luna.homestead.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Luna/TableView.Luna.homestead.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Luna/TableflowView.Luna.homestead.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Luna/TableView.Luna.homestead.xaml" />
 
    </ResourceDictionary.MergedDictionaries>
 

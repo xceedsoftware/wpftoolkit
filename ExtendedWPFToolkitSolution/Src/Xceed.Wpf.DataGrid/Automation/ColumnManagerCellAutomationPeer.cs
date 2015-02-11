@@ -141,7 +141,11 @@ namespace Xceed.Wpf.DataGrid.Automation
 
     void ITransformProvider.Resize( double width, double height )
     {
-      this.Owner.DoResize( width );
+      ColumnBase parentColumn = this.Owner.ParentColumn;
+      if( parentColumn == null )
+        return;
+
+      this.Owner.DoResize( width, parentColumn );
     }
 
     void ITransformProvider.Rotate( double degrees )

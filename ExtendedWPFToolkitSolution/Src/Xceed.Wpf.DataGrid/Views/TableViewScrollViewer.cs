@@ -15,15 +15,15 @@
   ***********************************************************************************/
 
 using System;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Controls.Primitives;
-using System.Windows.Controls;
-using System.Windows.Input;
-using Xceed.Utils.Wpf;
-using System.Windows.Data;
-using Xceed.Wpf.DataGrid.Converters;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
+using Xceed.Utils.Wpf;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
@@ -33,7 +33,9 @@ namespace Xceed.Wpf.DataGrid.Views
     static TableViewScrollViewer()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( TableViewScrollViewer ), new FrameworkPropertyMetadata( typeof( TableViewScrollViewer ) ) );
-      StoredFixedTransformProperty = StoredFixedTransformPropertyKey.DependencyProperty;
+
+      TableViewScrollViewer.HorizontalScrollBarVisibilityHintProperty = TableViewScrollViewer.HorizontalScrollBarVisibilityHintPropertyKey.DependencyProperty;
+      TableViewScrollViewer.StoredFixedTransformProperty = TableViewScrollViewer.StoredFixedTransformPropertyKey.DependencyProperty;
     }
 
     public TableViewScrollViewer()
@@ -54,22 +56,21 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region RowSelectorPaneWidth Property
 
-    public static readonly DependencyProperty RowSelectorPaneWidthProperty =
-        DependencyProperty.Register(
-          "RowSelectorPaneWidth",
-          typeof( double ),
-          typeof( TableViewScrollViewer ),
-          new FrameworkPropertyMetadata( 20d ) );
+    public static readonly DependencyProperty RowSelectorPaneWidthProperty = DependencyProperty.Register(
+      "RowSelectorPaneWidth",
+      typeof( double ),
+      typeof( TableViewScrollViewer ),
+      new FrameworkPropertyMetadata( 20d ) );
 
     public double RowSelectorPaneWidth
     {
       get
       {
-        return ( double )this.GetValue( RowSelectorPaneWidthProperty );
+        return ( double )this.GetValue( TableViewScrollViewer.RowSelectorPaneWidthProperty );
       }
       set
       {
-        this.SetValue( RowSelectorPaneWidthProperty, value );
+        this.SetValue( TableViewScrollViewer.RowSelectorPaneWidthProperty, value );
       }
     }
 
@@ -77,34 +78,66 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region ShowRowSelectorPane Property
 
-    public static readonly DependencyProperty ShowRowSelectorPaneProperty =
-        DependencyProperty.Register(
-          "ShowRowSelectorPane",
-          typeof( bool ),
-          typeof( TableViewScrollViewer ),
-          new FrameworkPropertyMetadata( true ) );
+    public static readonly DependencyProperty ShowRowSelectorPaneProperty = DependencyProperty.Register(
+      "ShowRowSelectorPane",
+      typeof( bool ),
+      typeof( TableViewScrollViewer ),
+      new FrameworkPropertyMetadata( true ) );
 
     public bool ShowRowSelectorPane
     {
       get
       {
-        return ( bool )this.GetValue( ShowRowSelectorPaneProperty );
+        return ( bool )this.GetValue( TableViewScrollViewer.ShowRowSelectorPaneProperty );
       }
       set
       {
-        this.SetValue( ShowRowSelectorPaneProperty, value );
+        this.SetValue( TableViewScrollViewer.ShowRowSelectorPaneProperty, value );
       }
     }
 
     #endregion ShowRowSelectorPane Property
 
+    #region HorizontalScrollBarVisibilityHint Property
+
+    private static readonly DependencyPropertyKey HorizontalScrollBarVisibilityHintPropertyKey = DependencyProperty.RegisterReadOnly(
+      "HorizontalScrollBarVisibilityHint",
+      typeof( ScrollBarVisibility ),
+      typeof( TableViewScrollViewer ),
+      new FrameworkPropertyMetadata( ScrollBarVisibility.Auto ) );
+
+    [Browsable( false )]
+    [EditorBrowsable( EditorBrowsableState.Never )]
+    public static readonly DependencyProperty HorizontalScrollBarVisibilityHintProperty;
+
+    [Browsable( false )]
+    [EditorBrowsable( EditorBrowsableState.Never )]
+    public ScrollBarVisibility HorizontalScrollBarVisibilityHint
+    {
+      get
+      {
+        return ( ScrollBarVisibility )this.GetValue( TableViewScrollViewer.HorizontalScrollBarVisibilityHintProperty );
+      }
+    }
+
+    private void SetHorizontalScrollBarVisibilityHint( ScrollBarVisibility value )
+    {
+      this.SetValue( TableViewScrollViewer.HorizontalScrollBarVisibilityHintPropertyKey, value );
+    }
+
+    private void ResetHorizontalScrollBarVisibilityHint()
+    {
+      this.ClearValue( TableViewScrollViewer.HorizontalScrollBarVisibilityHintPropertyKey );
+    }
+
+    #endregion HorizontalScrollBarVisibilityHint Property
+
     #region StoredFixedTransform Attached Property
 
-    internal static readonly DependencyPropertyKey StoredFixedTransformPropertyKey =
-        DependencyProperty.RegisterAttachedReadOnly( "StoredFixedTransform",
-        typeof( Transform ),
-        typeof( TableViewScrollViewer ),
-        new UIPropertyMetadata( null ) );
+    internal static readonly DependencyPropertyKey StoredFixedTransformPropertyKey = DependencyProperty.RegisterAttachedReadOnly( "StoredFixedTransform",
+      typeof( Transform ),
+      typeof( TableViewScrollViewer ),
+      new UIPropertyMetadata( null ) );
 
     internal static readonly DependencyProperty StoredFixedTransformProperty;
 
@@ -138,6 +171,8 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
+    private RowSelectorPane m_rowSelectorPane;
+
     #endregion
 
     public override void OnApplyTemplate()
@@ -147,29 +182,26 @@ namespace Xceed.Wpf.DataGrid.Views
       m_rowSelectorPane = this.Template.FindName( "PART_RowSelectorPane", this ) as RowSelectorPane;
     }
 
-    internal static void SetFixedTranslateTransform( UIElement element, bool canScrollHorizontally )
+    protected override Size MeasureOverride( Size constraint )
+    {
+      this.UpdateHorizontalScrollBarVisibilityHint( constraint );
+
+      return base.MeasureOverride( constraint );
+    }
+
+    internal static void SetFixedTranslateTransform( FrameworkElement element, bool canScrollHorizontally )
     {
       if( element == null )
         throw new ArgumentNullException( "element" );
 
-      ScrollViewer parentScrollViewer = TableViewScrollViewer.GetParentScrollViewer( element ) as ScrollViewer;
-
-      if( parentScrollViewer != null )
+      if( !TableViewScrollViewer.SetFixedTranslateTransformCore( element, canScrollHorizontally ) )
       {
-        Transform fixedTransform = TableViewScrollViewer.GetStoredFixedTransform( parentScrollViewer );
-
-        Debug.Assert( fixedTransform != null );
-
-        if( canScrollHorizontally )
+        if( !element.IsLoaded )
         {
-          if( element.RenderTransform == fixedTransform )
-          {
-            element.ClearValue( UIElement.RenderTransformProperty );
-          }
-        }
-        else
-        {
-          element.RenderTransform = fixedTransform;
+          // The method failed to apply the translate transform because it could not find a ScrollViewer
+          // among its ancestors.  Try again when the element will be loaded in case it wasn't in the
+          // VisualTree.
+          element.Loaded += new RoutedEventHandler( TableViewScrollViewer.OnFixedElementLoaded );
         }
       }
     }
@@ -215,6 +247,43 @@ namespace Xceed.Wpf.DataGrid.Views
       return newTransform;
     }
 
+    private static bool SetFixedTranslateTransformCore( FrameworkElement element, bool canScrollHorizontally )
+    {
+      Debug.Assert( element != null );
+
+      var parentScrollViewer = TableViewScrollViewer.GetParentScrollViewer( element ) as ScrollViewer;
+      if( parentScrollViewer == null )
+        return false;
+
+      var fixedTransform = TableViewScrollViewer.GetStoredFixedTransform( parentScrollViewer );
+      Debug.Assert( fixedTransform != null );
+
+      if( canScrollHorizontally )
+      {
+        if( element.RenderTransform == fixedTransform )
+        {
+          element.ClearValue( UIElement.RenderTransformProperty );
+        }
+      }
+      else
+      {
+        element.RenderTransform = fixedTransform;
+      }
+
+      return true;
+    }
+
+    private static void OnFixedElementLoaded( object sender, RoutedEventArgs e )
+    {
+      var element = sender as FrameworkElement;
+      if( element == null )
+        return;
+
+      element.Loaded -= new RoutedEventHandler( TableViewScrollViewer.OnFixedElementLoaded );
+
+      TableViewScrollViewer.SetFixedTranslateTransformCore( element, TableView.GetCanScrollHorizontally( element ) );
+    }
+
     private void OnQueryScrollCommand( object sender, CanExecuteRoutedEventArgs e )
     {
       e.CanExecute = true;
@@ -226,7 +295,9 @@ namespace Xceed.Wpf.DataGrid.Views
       FixedCellPanel cellPanel = this.LocateFixedCellPanel( this );
 
       if( cellPanel != null )
+      {
         scrollingViewport -= cellPanel.GetFixedWidth();
+      }
 
       if( e.Command == ScrollBar.PageLeftCommand )
       {
@@ -278,7 +349,32 @@ namespace Xceed.Wpf.DataGrid.Views
       return null;
     }
 
+    private void UpdateHorizontalScrollBarVisibilityHint( Size viewport )
+    {
+      bool isContentLargerThanViewport = false;
 
-    RowSelectorPane m_rowSelectorPane;
+      var viewportWidth = viewport.Width;
+      if( !double.IsInfinity( viewportWidth ) )
+      {
+        var dataGridContext = DataGridControl.GetDataGridContext( this );
+        if( dataGridContext != null )
+        {
+          var columnVirtualizationManager = dataGridContext.GetColumnVirtualizationManagerOrNull() as TableViewColumnVirtualizationManagerBase;
+          if( columnVirtualizationManager != null )
+          {
+            isContentLargerThanViewport = ( columnVirtualizationManager.VisibleColumnsWidth > viewportWidth );
+          }
+        }
+      }
+
+      if( isContentLargerThanViewport )
+      {
+        this.SetHorizontalScrollBarVisibilityHint( ScrollBarVisibility.Visible );
+      }
+      else
+      {
+        this.ResetHorizontalScrollBarVisibilityHint();
+      }
+    }
   }
 }

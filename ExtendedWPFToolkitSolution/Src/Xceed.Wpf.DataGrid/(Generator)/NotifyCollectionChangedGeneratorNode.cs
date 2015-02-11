@@ -19,7 +19,7 @@ using System.ComponentModel;
 
 namespace Xceed.Wpf.DataGrid
 {
-  public class NotifyCollectionChangedGeneratorNode : GeneratorNode, INotifyCollectionChanged
+  internal class NotifyCollectionChangedGeneratorNode : GeneratorNode, INotifyCollectionChanged
   {
     internal NotifyCollectionChangedGeneratorNode( GeneratorNode parent )
       : base( parent )

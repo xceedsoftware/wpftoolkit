@@ -147,8 +147,14 @@ namespace Xceed.Wpf.DataGrid
         // Synchronize the CurrentItem of the DataGridContext
         // with the one of the CollecitonView.
         m_dataGridContext.SetCurrent(
-          m_collectionView.CurrentItem, null, m_collectionView.CurrentPosition,
-          m_dataGridContext.CurrentColumn, false, false, this.ShouldSynchronizeSelectionWithCurrent );
+          m_collectionView.CurrentItem,
+          null,
+          m_collectionView.CurrentPosition,
+          m_dataGridContext.CurrentColumn,
+          false,
+          false,
+          this.ShouldSynchronizeSelectionWithCurrent,
+          AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged );
 
         if( m_collectionView.CurrentItem == null )
           this.ChangeCurrentDataGridContext();
@@ -163,8 +169,14 @@ namespace Xceed.Wpf.DataGrid
           m_dataGridContext.CancelEdit();
 
           m_dataGridContext.SetCurrent(
-            m_collectionView.CurrentItem, null, m_collectionView.CurrentPosition,
-            m_dataGridContext.CurrentColumn, false, false, this.ShouldSynchronizeSelectionWithCurrent );
+            m_collectionView.CurrentItem,
+            null,
+            m_collectionView.CurrentPosition,
+            m_dataGridContext.CurrentColumn,
+            false,
+            false,
+            this.ShouldSynchronizeSelectionWithCurrent,
+            AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged );
 
           if( m_collectionView.CurrentItem == null )
             this.ChangeCurrentDataGridContext();
@@ -180,9 +192,7 @@ namespace Xceed.Wpf.DataGrid
     {
       if( ( m_dataGridContext.ParentDataGridContext == null )
         || ( m_dataGridContext.ParentItem == null ) )
-      {
         return;
-      }
 
       List<DataGridContext> childContexts = this.GetParentItemChildContexts();
       int currentContextIndex = childContexts.IndexOf( m_dataGridContext );
@@ -200,7 +210,7 @@ namespace Xceed.Wpf.DataGrid
             if( childContext.Items.Count == 0 )
               continue;
 
-            childContext.SetCurrentItemCore( childContext.Items.GetItemAt( 0 ), false, this.ShouldSynchronizeSelectionWithCurrent );
+            childContext.SetCurrentItemCore( childContext.Items.GetItemAt( 0 ), false, this.ShouldSynchronizeSelectionWithCurrent, AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged );
             return;
           }
         }
@@ -216,13 +226,13 @@ namespace Xceed.Wpf.DataGrid
           if( count == 0 )
             continue;
 
-          childContext.SetCurrentItemCore( childContext.Items.GetItemAt( count - 1 ), false, this.ShouldSynchronizeSelectionWithCurrent );
+          childContext.SetCurrentItemCore( childContext.Items.GetItemAt( count - 1 ), false, this.ShouldSynchronizeSelectionWithCurrent, AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged );
           return;
         }
       }
 
       // No context after or before us have been found, we will set the CurrentItem to our ParentItem.
-      m_dataGridContext.ParentDataGridContext.SetCurrentItemCore( m_dataGridContext.ParentItem, false, this.ShouldSynchronizeSelectionWithCurrent );
+      m_dataGridContext.ParentDataGridContext.SetCurrentItemCore( m_dataGridContext.ParentItem, false, this.ShouldSynchronizeSelectionWithCurrent, AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged );
     }
 
     private List<DataGridContext> GetParentItemChildContexts()

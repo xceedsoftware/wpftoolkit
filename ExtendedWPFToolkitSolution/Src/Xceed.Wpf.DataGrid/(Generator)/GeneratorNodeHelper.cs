@@ -15,11 +15,9 @@
   ***********************************************************************************/
 
 using System;
-using System.Windows.Data;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Windows;
 using System.Collections;
+using System.Windows;
+using System.Windows.Data;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -221,7 +219,7 @@ namespace Xceed.Wpf.DataGrid
     public bool InsertAfter( GeneratorNode insert )
     {
       if( insert == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "GeneratorNode is null." );
 
       int insertionCount;
       int chainLength;
@@ -238,7 +236,7 @@ namespace Xceed.Wpf.DataGrid
 
       // Move the current node to the last node inserted
       if( !this.MoveToNextBy( chainLength ) )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "Unable to move to the requested generator index." );
 
       return true;
     }
@@ -246,7 +244,7 @@ namespace Xceed.Wpf.DataGrid
     public bool InsertBefore( GeneratorNode insert )
     {
       if( insert == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "GeneratorNode is null" );
 
       int insertionCount;
       int chainLength;
@@ -779,7 +777,10 @@ namespace Xceed.Wpf.DataGrid
       int endSourceDataItemIndex = -1;
 
       if( minIndex < 0 )
-        throw new ArgumentException( "The minimum index must be greater than or equal to zero." );
+      {
+        DataGridException.ThrowSystemException( "The minimum index must be greater than or equal to zero.",
+                                                typeof( ArgumentException ), sourceContext.DataGridControl.Name, "minIndex" );
+      }
 
       if( ( visitorType & DataGridContextVisitorType.DataGridContext ) == DataGridContextVisitorType.DataGridContext )
       {
@@ -893,7 +894,7 @@ namespace Xceed.Wpf.DataGrid
         }
 
         if( !processed )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "Unable to process the visit.", sourceContext.DataGridControl );
 
         if( visitWasStopped )
           break;
@@ -915,7 +916,7 @@ namespace Xceed.Wpf.DataGrid
         {
           bool stopVisit = false;
           visitor.Visit( sourceContext, startSourceDataItemIndex, endSourceDataItemIndex, ref stopVisit );
-          visitWasStopped |= stopVisit;
+          visitWasStopped = visitWasStopped || stopVisit;
         }
       }
     }
@@ -981,7 +982,7 @@ namespace Xceed.Wpf.DataGrid
           ( ( IDataGridContextVisitable )detailNode.DetailGenerator ).AcceptVisitor(
             detailStartIndex, detailEndIndex, visitor, visitorType, visitDetails, out visitWasStopped );
 
-          stopVisit |= visitWasStopped;
+          stopVisit = stopVisit || visitWasStopped;
 
           if( stopVisit )
             break;
@@ -1049,10 +1050,10 @@ namespace Xceed.Wpf.DataGrid
           {
             bool visitWasStopped;
 
-            ( ( IDataGridContextVisitable )detailNode.DetailGenerator ).AcceptVisitor( 
+            ( ( IDataGridContextVisitable )detailNode.DetailGenerator ).AcceptVisitor(
               detailStartIndex, detailEndIndex, visitor, visitorType, visitDetails, out visitWasStopped );
 
-            stopVisit |= visitWasStopped;
+            stopVisit = stopVisit || visitWasStopped;
 
             if( stopVisit )
               break;

@@ -17,19 +17,15 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Xceed.Utils.Wpf.DragDrop;
-using Xceed.Wpf.DataGrid.Views;
-using System.Collections;
-using Xceed.Utils.Collections;
-using System.Collections.Specialized;
-using System;
-using System.Windows.Automation.Peers;
 using Xceed.Wpf.DataGrid.Automation;
+using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -42,11 +38,9 @@ namespace Xceed.Wpf.DataGrid
       FocusableProperty.OverrideMetadata( typeof( ColumnManagerCell ), new FrameworkPropertyMetadata( false ) );
       ReadOnlyProperty.OverrideMetadata( typeof( ColumnManagerCell ), new FrameworkPropertyMetadata( true ) );
 
-      ColumnManagerCell.IsPressedProperty =
-        ColumnManagerCell.IsPressedPropertyKey.DependencyProperty;
+      ColumnManagerCell.IsPressedProperty = ColumnManagerCell.IsPressedPropertyKey.DependencyProperty;
 
-      ColumnManagerCell.IsBeingDraggedProperty =
-        ColumnManagerCell.IsBeingDraggedPropertyKey.DependencyProperty;
+      ColumnManagerCell.IsBeingDraggedProperty = ColumnManagerCell.IsBeingDraggedPropertyKey.DependencyProperty;
     }
 
     public ColumnManagerCell()
@@ -98,14 +92,12 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion IsBeingDragged Read-Only Property
 
-    #region DataGridContext Property
+    #region DataGridContext Internal Read-Only Property
 
-    private DataGridContext DataGridContext
+    internal DataGridContext DataGridContext
     {
       get
       {
-        Debug.Assert( m_dataGridContext != null );
-
         return m_dataGridContext;
       }
     }
@@ -126,11 +118,44 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
+    #region ShowResizeCursor Property
+
+    internal bool ShowResizeCursor
+    {
+      get;
+      set;
+    }
+
+    #endregion
+
+    #region AllowResize Internal Read-Only Property
+
+    internal virtual bool AllowResize
+    {
+      get
+      {
+        if( this.ParentColumn == null )
+          return false;
+
+        var dataGridContext = this.DataGridContext;
+        if( dataGridContext == null )
+          return false;
+
+        // When details are flatten, only the column at the master level may be resized.
+        if( dataGridContext.IsAFlattenDetail )
+          return false;
+
+        return true;
+      }
+    }
+
+    #endregion
+
     #region ColumnReordering Internal Event
 
     internal static readonly RoutedEvent ColumnReorderingEvent =
           EventManager.RegisterRoutedEvent( "ColumnReordering",
-               RoutingStrategy.Bubble,
+             RoutingStrategy.Bubble,
              typeof( ColumnReorderingEventHandler ),
              typeof( ColumnManagerCell ) );
 
@@ -147,9 +172,9 @@ namespace Xceed.Wpf.DataGrid
     {
       base.InitializeCore( dataGridContext, parentRow, parentColumn );
 
-      this.SetContent( parentColumn );
-      this.SetContentTemplate( parentColumn );
-      this.SetContentTemplateSelector( parentColumn );
+      this.SetColumnBinding( ColumnManagerCell.ContentProperty, parentColumn, ColumnBase.TitleProperty );
+      this.SetColumnBinding( ColumnManagerCell.ContentTemplateProperty, parentColumn, ColumnBase.TitleTemplateProperty );
+      this.SetColumnBinding( ColumnManagerCell.ContentTemplateSelectorProperty, parentColumn, ColumnBase.TitleTemplateSelectorProperty );
     }
 
     protected override AutomationPeer OnCreateAutomationPeer()
@@ -159,12 +184,11 @@ namespace Xceed.Wpf.DataGrid
 
     protected internal override void PrepareDefaultStyleKey( ViewBase view )
     {
-      object currentThemeKey = view.GetDefaultStyleKey( typeof( ColumnManagerCell ) );
+      var newThemeKey = view.GetDefaultStyleKey( typeof( ColumnManagerCell ) );
+      if( object.Equals( this.DefaultStyleKey, newThemeKey ) )
+        return;
 
-      if( currentThemeKey.Equals( this.DefaultStyleKey ) == false )
-      {
-        this.DefaultStyleKey = currentThemeKey;
-      }
+      this.DefaultStyleKey = newThemeKey;
     }
 
     protected internal override void PrepareContainer( DataGridContext dataGridContext, object item )
@@ -201,9 +225,7 @@ namespace Xceed.Wpf.DataGrid
             // Update the DropOutsideCursor since it is defined on the View
             UIViewBase uiViewBase = dataGridContext.DataGridControl.GetView() as UIViewBase;
 
-            m_dragSourceManager.DropOutsideCursor = ( uiViewBase != null )
-             ? uiViewBase.CannotDropDraggedElementCursor
-             : UIViewBase.DefaultCannotDropDraggedElementCursor;
+            m_dragSourceManager.DropOutsideCursor = ( uiViewBase != null ) ? uiViewBase.CannotDropDraggedElementCursor : UIViewBase.DefaultCannotDropDraggedElementCursor;
 
             m_dragSourceManager.ProcessMouseLeftButtonDown( e );
           }
@@ -242,8 +264,7 @@ namespace Xceed.Wpf.DataGrid
 
     protected override void OnMouseLeftButtonUp( MouseButtonEventArgs e )
     {
-      // m_dragSourceManager.ProcessMouseLeftButtonUp() will release the capture,
-      // so we need to check the IsMouseCaptured and IsPressed states before calling it.
+      // m_dragSourceManager.ProcessMouseLeftButtonUp() will release the capture, so we need to check the IsMouseCaptured and IsPressed states before calling it.
       bool isMouseCaptured = this.IsMouseCaptured;
       bool isPressed = this.IsPressed;
 
@@ -290,7 +311,9 @@ namespace Xceed.Wpf.DataGrid
     protected override void OnLostMouseCapture( MouseEventArgs e )
     {
       if( m_dragSourceManager != null )
+      {
         m_dragSourceManager.ProcessLostMouseCapture( e );
+      }
 
       if( this.IsPressed )
       {
@@ -303,7 +326,6 @@ namespace Xceed.Wpf.DataGrid
     internal bool CanDoSort()
     {
       ColumnManagerRow parentRow = this.ParentRow as ColumnManagerRow;
-
       if( parentRow != null )
       {
         if( !parentRow.AllowSort )
@@ -311,8 +333,11 @@ namespace Xceed.Wpf.DataGrid
       }
 
       DataGridContext dataGridContext = this.DataGridContext;
-
       if( dataGridContext == null )
+        return false;
+
+      // When details are flatten, only the ColumnManagerCell at the master level may do the sort.
+      if( dataGridContext.IsAFlattenDetail )
         return false;
 
       if( dataGridContext.SourceDetailConfiguration == null )
@@ -325,7 +350,6 @@ namespace Xceed.Wpf.DataGrid
         return false;
 
       ColumnBase parentColumn = this.ParentColumn;
-
       if( ( parentColumn == null ) || ( !parentColumn.AllowSort ) )
         return false;
 
@@ -338,159 +362,83 @@ namespace Xceed.Wpf.DataGrid
         return;
 
       DataGridContext dataGridContext = this.DataGridContext;
+      ColumnBase column = this.ParentColumn;
 
       Debug.Assert( dataGridContext != null );
 
-      SortingHelper.ToggleColumnSort(
-        dataGridContext, dataGridContext.Items.SortDescriptions,
-        dataGridContext.Columns, this.ParentColumn, shiftUnpressed );
-    }
-
-    internal void DoResize( double newWidth )
-    {
-      if( !this.IsEnabled )
+      var toggleColumnSortCommand = dataGridContext.ToggleColumnSortCommand;
+      if( !toggleColumnSortCommand.CanExecute( column, shiftUnpressed ) )
         return;
 
-      ColumnBase parentColumn = this.ParentColumn;
+      toggleColumnSortCommand.Execute( column, shiftUnpressed );
+    }
 
-      if( parentColumn == null )
+    internal void DoResize( double newWidth, ColumnBase parentColumn )
+    {
+      if( !this.IsEnabled )
         return;
 
       if( !parentColumn.HasFixedWidth )
       {
         if( newWidth < MIN_WIDTH )
+        {
           newWidth = MIN_WIDTH;
+        }
 
         if( newWidth < parentColumn.MinWidth )
+        {
           newWidth = parentColumn.MinWidth;
+        }
 
         if( newWidth > parentColumn.MaxWidth )
+        {
           newWidth = parentColumn.MaxWidth;
+        }
 
         parentColumn.Width = newWidth;
       }
     }
 
-    private void SetContent( ColumnBase parentColumn )
+    internal virtual void OnColumnResizerThumbDragStarted( DragStartedEventArgs e )
     {
-      Binding binding = new Binding();
-      binding.Path = new PropertyPath( ColumnBase.TitleProperty );
-      binding.Mode = BindingMode.OneWay;
-      binding.Source = parentColumn;
-      binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-      BindingOperations.SetBinding( this, ColumnManagerCell.ContentProperty, binding );
-    }
+      var parentColumn = this.ParentColumn;
+      Debug.Assert( parentColumn != null );
 
-    private void SetContentTemplate( ColumnBase parentColumn )
-    {
-      Binding binding = new Binding();
-      binding.Path = new PropertyPath( ColumnBase.TitleTemplateProperty );
-      binding.Mode = BindingMode.OneWay;
-      binding.Source = parentColumn;
-      binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-      BindingOperations.SetBinding( this, ColumnManagerCell.ContentTemplateProperty, binding );
-    }
+      var dataGridContext = this.DataGridContext;
+      Debug.Assert( dataGridContext != null );
 
-    private void SetContentTemplateSelector( ColumnBase parentColumn )
-    {
-      Binding binding = new Binding();
-      binding.Path = new PropertyPath( ColumnBase.TitleTemplateSelectorProperty );
-      binding.Mode = BindingMode.OneWay;
-      binding.Source = parentColumn;
-      binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-      BindingOperations.SetBinding( this, ColumnManagerCell.ContentTemplateSelectorProperty, binding );
-    }
+      m_originalWidth = parentColumn.ActualWidth;
 
-    private void SetupDragManager()
-    {
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-
-      // We do not support DragDrop when there are no AdornerLayer because there wouldn't 
-      // be any visual feedback for the operation.
-      AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer( this );
-
-      if( adornerLayer == null )
+      if( TableView.GetRemoveColumnStretchingOnResize( dataGridContext ) )
       {
-        // When virtualizing, the Cell is not yet in the VisualTree because it is
-        // the ParentRow's CellsHost which is reponsible of putting them in the 
-        // VisualTree. We try to get the adorner from the ParentRow instead
-        if( this.ParentRow != null )
-          adornerLayer = AdornerLayer.GetAdornerLayer( this.ParentRow );
-
-        if( adornerLayer == null )
-          return;
-      }
-
-      // Can be null in design-time (edition of a style TargetType ColumnManagerCell).
-      if( dataGridContext == null )
-        return;
-
-      DataGridControl dataGridControl = dataGridContext.DataGridControl;
-
-      if( dataGridControl == null )
-        return;
-
-
-      if( m_dragSourceManager != null )
-      {
-        m_dragSourceManager.PropertyChanged -= this.DragSourceManager_PropertyChanged;
-      }
-
-      // The DataGridControl's AdornerDecoratorForDragAndDrop must be used for dragging in order to include the 
-      // RenderTransform the DataGridControl may performs. This AdornerDecorator is defined in the ControlTemplate
-      // as PART_DragDropAdornerDecorator
-      if( ( dataGridControl.DragDropAdornerDecorator != null )
-          && ( dataGridControl.DragDropAdornerDecorator.AdornerLayer != null ) )
-      {
-        m_dragSourceManager = new ColumnReorderingDragSourceManager( this,
-                                                                     dataGridControl.DragDropAdornerDecorator.AdornerLayer,
-                                                                     dataGridControl );
-      }
-      else
-      {
-        m_dragSourceManager = new ColumnReorderingDragSourceManager( this,
-                                                                     null,
-                                                                     dataGridControl );
-      }
-
-      m_dragSourceManager.PropertyChanged += this.DragSourceManager_PropertyChanged;
-
-      // Create bindings to ViewProperties for AutoScroll Properties
-      Binding binding = new Binding();
-      binding.Path = new PropertyPath( "(0).(1)",
-        DataGridControl.DataGridContextProperty,
-        TableView.AutoScrollIntervalProperty );
-
-      binding.Mode = BindingMode.OneWay;
-      binding.Source = this;
-
-      BindingOperations.SetBinding( m_dragSourceManager, DragSourceManager.AutoScrollIntervalProperty, binding );
-
-      binding = new Binding();
-      binding.Path = new PropertyPath( "(0).(1)", DataGridControl.DataGridContextProperty, TableView.AutoScrollTresholdProperty );
-      binding.Mode = BindingMode.OneWay;
-      binding.Source = this;
-
-      BindingOperations.SetBinding( m_dragSourceManager, DragSourceManager.AutoScrollTresholdProperty, binding );
-    }
-
-    private void DragSourceManager_PropertyChanged( object sender, PropertyChangedEventArgs e )
-    {
-      if( e.PropertyName == "IsDragging" )
-      {
-        this.SetIsBeingDragged( m_dragSourceManager.IsDragging );
+        dataGridContext.ColumnStretchingManager.DisableColumnStretching();
       }
     }
 
-    private void ShowDropMark( Point mousePosition )
+    internal virtual void OnColumnResizerThumbDragDelta( DragDeltaEventArgs e )
+    {
+      var parentColumn = this.ParentColumn;
+      Debug.Assert( parentColumn != null );
+
+      this.DoResize( parentColumn.ActualWidth + e.HorizontalChange, parentColumn );
+    }
+
+    internal virtual void OnColumnResizerThumbDragCompleted( DragCompletedEventArgs e )
+    {
+      if( e.Canceled )
+      {
+        this.ParentColumn.Width = m_originalWidth;
+      }
+
+      m_originalWidth = -1d;
+    }
+
+    internal void ShowDropMark( Point mousePosition )
     {
       if( m_dropMarkAdorner == null )
       {
-        DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-
-        DataGridControl grid = ( dataGridContext != null )
-          ? dataGridContext.DataGridControl
-          : null;
+        var dataGridContext = this.DataGridContext;
+        var grid = ( dataGridContext != null ) ? dataGridContext.DataGridControl : null;
 
         Pen pen = UIViewBase.GetDropMarkPen( this );
 
@@ -513,20 +461,24 @@ namespace Xceed.Wpf.DataGrid
         AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer( this );
 
         if( adornerLayer != null )
+        {
           adornerLayer.Add( m_dropMarkAdorner );
+        }
       }
 
       m_dropMarkAdorner.UpdateAlignment( mousePosition );
     }
 
-    private void HideDropMark()
+    internal void HideDropMark()
     {
       if( m_dropMarkAdorner != null )
       {
         AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer( this );
 
         if( adornerLayer != null )
+        {
           adornerLayer.Remove( m_dropMarkAdorner );
+        }
 
         m_dropMarkAdorner = null;
       }
@@ -536,22 +488,22 @@ namespace Xceed.Wpf.DataGrid
     {
       if( m_columnResizerThumb != null )
       {
-        m_columnResizerThumb.DragStarted -= new DragStartedEventHandler( ColumnResizerThumb_DragStarted );
-        m_columnResizerThumb.DragDelta -= new DragDeltaEventHandler( ColumnResizerThumb_DragDelta );
-        m_columnResizerThumb.DragCompleted -= new DragCompletedEventHandler( ColumnResizerThumb_DragCompleted );
-        m_columnResizerThumb.QueryCursor -= new QueryCursorEventHandler( ColumnResizerThumb_QueryCursor );
-        m_columnResizerThumb.MouseDoubleClick -= new MouseButtonEventHandler( ColumnResizerThumb_MouseDoubleClick );
+        m_columnResizerThumb.DragStarted -= new DragStartedEventHandler( this.ColumnResizerThumb_DragStarted );
+        m_columnResizerThumb.DragDelta -= new DragDeltaEventHandler( this.ColumnResizerThumb_DragDelta );
+        m_columnResizerThumb.DragCompleted -= new DragCompletedEventHandler( this.ColumnResizerThumb_DragCompleted );
+        m_columnResizerThumb.QueryCursor -= new QueryCursorEventHandler( this.ColumnResizerThumb_QueryCursor );
+        m_columnResizerThumb.MouseDoubleClick -= new MouseButtonEventHandler( this.ColumnResizerThumb_MouseDoubleClick );
 
         m_columnResizerThumb = null;
       }
 
       if( m_columnResizerThumbLeft != null )
       {
-        m_columnResizerThumbLeft.DragStarted -= new DragStartedEventHandler( ColumnResizerThumbLeft_DragStarted );
-        m_columnResizerThumbLeft.DragDelta -= new DragDeltaEventHandler( ColumnResizerThumbLeft_DragDelta );
-        m_columnResizerThumbLeft.DragCompleted -= new DragCompletedEventHandler( ColumnResizerThumbLeft_DragCompleted );
-        m_columnResizerThumbLeft.QueryCursor -= new QueryCursorEventHandler( ColumnResizerThumbLeft_QueryCursor );
-        m_columnResizerThumbLeft.MouseDoubleClick -= new MouseButtonEventHandler( ColumnResizerThumbLeft_MouseDoubleClick );
+        m_columnResizerThumbLeft.DragStarted -= new DragStartedEventHandler( this.ColumnResizerThumbLeft_DragStarted );
+        m_columnResizerThumbLeft.DragDelta -= new DragDeltaEventHandler( this.ColumnResizerThumbLeft_DragDelta );
+        m_columnResizerThumbLeft.DragCompleted -= new DragCompletedEventHandler( this.ColumnResizerThumbLeft_DragCompleted );
+        m_columnResizerThumbLeft.QueryCursor -= new QueryCursorEventHandler( this.ColumnResizerThumbLeft_QueryCursor );
+        m_columnResizerThumbLeft.MouseDoubleClick -= new MouseButtonEventHandler( this.ColumnResizerThumbLeft_MouseDoubleClick );
 
         m_columnResizerThumbLeft = null;
       }
@@ -561,34 +513,122 @@ namespace Xceed.Wpf.DataGrid
 
       if( m_columnResizerThumb != null )
       {
-        m_columnResizerThumb.DragStarted += new DragStartedEventHandler( ColumnResizerThumb_DragStarted );
-        m_columnResizerThumb.DragDelta += new DragDeltaEventHandler( ColumnResizerThumb_DragDelta );
-        m_columnResizerThumb.DragCompleted += new DragCompletedEventHandler( ColumnResizerThumb_DragCompleted );
-        m_columnResizerThumb.QueryCursor += new QueryCursorEventHandler( ColumnResizerThumb_QueryCursor );
-        m_columnResizerThumb.MouseDoubleClick += new MouseButtonEventHandler( ColumnResizerThumb_MouseDoubleClick );
+        m_columnResizerThumb.DragStarted += new DragStartedEventHandler( this.ColumnResizerThumb_DragStarted );
+        m_columnResizerThumb.DragDelta += new DragDeltaEventHandler( this.ColumnResizerThumb_DragDelta );
+        m_columnResizerThumb.DragCompleted += new DragCompletedEventHandler( this.ColumnResizerThumb_DragCompleted );
+        m_columnResizerThumb.QueryCursor += new QueryCursorEventHandler( this.ColumnResizerThumb_QueryCursor );
+        m_columnResizerThumb.MouseDoubleClick += new MouseButtonEventHandler( this.ColumnResizerThumb_MouseDoubleClick );
       }
 
       if( m_columnResizerThumbLeft != null )
       {
-        m_columnResizerThumbLeft.DragStarted += new DragStartedEventHandler( ColumnResizerThumbLeft_DragStarted );
-        m_columnResizerThumbLeft.DragDelta += new DragDeltaEventHandler( ColumnResizerThumbLeft_DragDelta );
-        m_columnResizerThumbLeft.DragCompleted += new DragCompletedEventHandler( ColumnResizerThumbLeft_DragCompleted );
-        m_columnResizerThumbLeft.QueryCursor += new QueryCursorEventHandler( ColumnResizerThumbLeft_QueryCursor );
-        m_columnResizerThumbLeft.MouseDoubleClick += new MouseButtonEventHandler( ColumnResizerThumbLeft_MouseDoubleClick );
+        m_columnResizerThumbLeft.DragStarted += new DragStartedEventHandler( this.ColumnResizerThumbLeft_DragStarted );
+        m_columnResizerThumbLeft.DragDelta += new DragDeltaEventHandler( this.ColumnResizerThumbLeft_DragDelta );
+        m_columnResizerThumbLeft.DragCompleted += new DragCompletedEventHandler( this.ColumnResizerThumbLeft_DragCompleted );
+        m_columnResizerThumbLeft.QueryCursor += new QueryCursorEventHandler( this.ColumnResizerThumbLeft_QueryCursor );
+        m_columnResizerThumbLeft.MouseDoubleClick += new MouseButtonEventHandler( this.ColumnResizerThumbLeft_MouseDoubleClick );
       }
+    }
+
+    private void SetupDragManager()
+    {
+      var dataGridContext = this.DataGridContext;
+      // Can be null in design-time (edition of a style TargetType ColumnManagerCell).
+      if( dataGridContext == null )
+        return;
+
+      // We do not support DragDrop when there are no AdornerLayer because there wouldn't be any visual feedback for the operation.
+      AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer( this );
+      if( adornerLayer == null )
+      {
+        // When virtualizing, the Cell is not yet in the VisualTree because it is the ParentRow's CellsHost which
+        // is reponsible of putting them in the VisualTree. We try to get the adorner from the ParentRow instead
+        if( this.ParentRow != null )
+        {
+          adornerLayer = AdornerLayer.GetAdornerLayer( this.ParentRow );
+        }
+
+        if( adornerLayer == null )
+          return;
+      }
+
+      var dataGridControl = dataGridContext.DataGridControl;
+      if( dataGridControl == null )
+        return;
+
+      if( m_dragSourceManager != null )
+      {
+        m_dragSourceManager.PropertyChanged -= this.DragSourceManager_PropertyChanged;
+      }
+
+      // The DataGridControl's AdornerDecoratorForDragAndDrop must be used for dragging in order to include the RenderTransform
+      // the DataGridControl may performs. This AdornerDecorator is defined in the ControlTemplate as PART_DragDropAdornerDecorator
+      if( ( dataGridControl.DragDropAdornerDecorator != null ) && ( dataGridControl.DragDropAdornerDecorator.AdornerLayer != null ) )
+      {
+        m_dragSourceManager = new ColumnReorderingDragSourceManager( this, dataGridControl.DragDropAdornerDecorator.AdornerLayer, dataGridControl, this.ParentRow.LevelCache );
+      }
+      else
+      {
+        m_dragSourceManager = new ColumnReorderingDragSourceManager( this, null, dataGridControl, this.ParentRow.LevelCache );
+      }
+
+      m_dragSourceManager.PropertyChanged += this.DragSourceManager_PropertyChanged;
+
+      // Create bindings to ViewProperties for AutoScroll Properties
+      Binding binding = new Binding();
+      binding.Path = new PropertyPath( "(0).(1)", DataGridControl.DataGridContextProperty, TableView.AutoScrollIntervalProperty );
+      binding.Mode = BindingMode.OneWay;
+      binding.Source = this;
+      BindingOperations.SetBinding( m_dragSourceManager, DragSourceManager.AutoScrollIntervalProperty, binding );
+
+      binding = new Binding();
+      binding.Path = new PropertyPath( "(0).(1)", DataGridControl.DataGridContextProperty, TableView.AutoScrollTresholdProperty );
+      binding.Mode = BindingMode.OneWay;
+      binding.Source = this;
+      BindingOperations.SetBinding( m_dragSourceManager, DragSourceManager.AutoScrollTresholdProperty, binding );
+    }
+
+    private void DragSourceManager_PropertyChanged( object sender, PropertyChangedEventArgs e )
+    {
+      if( e.PropertyName == "IsDragging" )
+      {
+        this.SetIsBeingDragged( m_dragSourceManager.IsDragging );
+      }
+    }
+
+    private void ColumnResizerThumb_DragStarted( object sender, DragStartedEventArgs e )
+    {
+      if( !this.ShowResizeCursor || !this.AllowResize )
+        return;
+
+      this.OnColumnResizerThumbDragStarted( e );
+    }
+
+    private void ColumnResizerThumb_DragDelta( object sender, DragDeltaEventArgs e )
+    {
+      if( !this.ShowResizeCursor || !this.AllowResize )
+        return;
+
+      this.OnColumnResizerThumbDragDelta( e );
+    }
+
+    private void ColumnResizerThumb_DragCompleted( object sender, DragCompletedEventArgs e )
+    {
+      if( !this.ShowResizeCursor || !this.AllowResize )
+        return;
+
+      this.OnColumnResizerThumbDragCompleted( e );
     }
 
     private void ColumnResizerThumb_MouseDoubleClick( object sender, MouseButtonEventArgs e )
     {
-      ColumnBase parentColumn = this.ParentColumn;
-
-      if( parentColumn == null )
+      var parentColumn = this.ParentColumn;
+      if( ( parentColumn == null ) || !this.ShowResizeCursor || !this.AllowResize )
         return;
 
       e.Handled = true;
 
       double fittedWidth = parentColumn.GetFittedWidth();
-
       if( fittedWidth != -1 )
       {
         parentColumn.Width = fittedWidth;
@@ -597,84 +637,33 @@ namespace Xceed.Wpf.DataGrid
 
     private void ColumnResizerThumb_QueryCursor( object sender, QueryCursorEventArgs e )
     {
-      ColumnBase parentColumn = this.ParentColumn;
-
+      var parentColumn = this.ParentColumn;
       if( parentColumn == null )
         return;
 
-      DataGridContext dataGridContext = this.DataGridContext;
+      var dataGridContext = this.DataGridContext;
 
-      bool showResizeCursor = !parentColumn.HasFixedWidth;
-
-      if( !showResizeCursor )
+      bool showResizeCursor = false;
+      if( this.AllowResize )
       {
         // Don't disable resizing if ColumnStretching can be disabled by an end-user resize.
-        showResizeCursor = ( dataGridContext != null ) && ( TableView.GetRemoveColumnStretchingOnResize( dataGridContext ) );
+        showResizeCursor = ( !parentColumn.HasFixedWidth )
+                        || ( ( dataGridContext != null ) && TableView.GetRemoveColumnStretchingOnResize( dataGridContext ) );
       }
 
-      if( showResizeCursor )
+      this.ShowResizeCursor = showResizeCursor;
+      if( this.ShowResizeCursor )
       {
-        if( dataGridContext != null )
-        {
-          UIViewBase uiViewBase = dataGridContext.DataGridControl.GetView() as UIViewBase;
+        UIViewBase viewBase = ( dataGridContext != null ) ? dataGridContext.DataGridControl.GetView() as UIViewBase : null;
 
-          e.Cursor = ( uiViewBase != null )
-            ? uiViewBase.ColumnResizeWestEastCursor
-            : UIViewBase.DefaultColumnResizeWestEastCursor;
-        }
-        else
-        {
-          e.Cursor = UIViewBase.DefaultColumnResizeWestEastCursor;
-        }
-
+        e.Cursor = ( viewBase != null ) ? viewBase.ColumnResizeWestEastCursor : UIViewBase.DefaultColumnResizeWestEastCursor;
         e.Handled = true;
       }
-    }
-
-    private void ColumnResizerThumb_DragStarted( object sender, DragStartedEventArgs e )
-    {
-      ColumnBase parentColumn = this.ParentColumn;
-
-      if( parentColumn == null )
-        return;
-
-      m_originalWidth = parentColumn.ActualWidth;
-
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-
-      if( ( dataGridContext != null ) && ( TableView.GetRemoveColumnStretchingOnResize( dataGridContext ) ) )
-      {
-        dataGridContext.ColumnStretchingManager.DisableColumnStretching();
-      }
-    }
-
-    private void ColumnResizerThumb_DragDelta( object sender, DragDeltaEventArgs e )
-    {
-      ColumnBase parentColumn = this.ParentColumn;
-
-      if( parentColumn != null )
-      {
-        this.DoResize( parentColumn.ActualWidth + e.HorizontalChange );
-      }
-    }
-
-    private void ColumnResizerThumb_DragCompleted( object sender, DragCompletedEventArgs e )
-    {
-      ColumnBase parentColumn = this.ParentColumn;
-
-      if( parentColumn == null )
-        return;
-
-      if( e.Canceled || parentColumn.HasFixedWidth )
-        parentColumn.Width = m_originalWidth;
-
-      m_originalWidth = -1d;
     }
 
     private ColumnManagerCell GetPreviousVisibleColumnManagerCell()
     {
       var previousVisibleColumn = this.ParentColumn.PreviousVisibleColumn;
-
       if( previousVisibleColumn == null )
         return null;
 
@@ -684,69 +673,119 @@ namespace Xceed.Wpf.DataGrid
     private void ColumnResizerThumbLeft_QueryCursor( object sender, QueryCursorEventArgs e )
     {
       var previousColumnManagerCell = this.GetPreviousVisibleColumnManagerCell();
+      if( previousColumnManagerCell == null )
+        return;
 
-      if( previousColumnManagerCell != null )
-        previousColumnManagerCell.ColumnResizerThumb_QueryCursor( previousColumnManagerCell, e );
+      previousColumnManagerCell.ColumnResizerThumb_QueryCursor( previousColumnManagerCell, e );
     }
 
     private void ColumnResizerThumbLeft_DragStarted( object sender, DragStartedEventArgs e )
     {
       var previousColumnManagerCell = this.GetPreviousVisibleColumnManagerCell();
+      if( previousColumnManagerCell == null )
+        return;
 
-      if( previousColumnManagerCell != null )
-        previousColumnManagerCell.ColumnResizerThumb_DragStarted( previousColumnManagerCell, e );
+      previousColumnManagerCell.ColumnResizerThumb_DragStarted( previousColumnManagerCell, e );
     }
 
     private void ColumnResizerThumbLeft_MouseDoubleClick( object sender, MouseButtonEventArgs e )
     {
       var previousColumnManagerCell = this.GetPreviousVisibleColumnManagerCell();
+      if( previousColumnManagerCell == null )
+        return;
 
-      if( previousColumnManagerCell != null )
-        previousColumnManagerCell.ColumnResizerThumb_MouseDoubleClick( previousColumnManagerCell, e );
+      previousColumnManagerCell.ColumnResizerThumb_MouseDoubleClick( previousColumnManagerCell, e );
     }
 
     private void ColumnResizerThumbLeft_DragDelta( object sender, DragDeltaEventArgs e )
     {
       var previousColumnManagerCell = this.GetPreviousVisibleColumnManagerCell();
+      if( previousColumnManagerCell == null )
+        return;
 
-      if( previousColumnManagerCell != null )
-        previousColumnManagerCell.ColumnResizerThumb_DragDelta( previousColumnManagerCell, e );
+      previousColumnManagerCell.ColumnResizerThumb_DragDelta( previousColumnManagerCell, e );
     }
 
     private void ColumnResizerThumbLeft_DragCompleted( object sender, DragCompletedEventArgs e )
     {
       var previousColumnManagerCell = this.GetPreviousVisibleColumnManagerCell();
+      if( previousColumnManagerCell == null )
+        return;
 
-      if( previousColumnManagerCell != null )
-        previousColumnManagerCell.ColumnResizerThumb_DragCompleted( previousColumnManagerCell, e );
+      previousColumnManagerCell.ColumnResizerThumb_DragCompleted( previousColumnManagerCell, e );
+    }
+
+    private void SetColumnBinding( DependencyProperty targetProperty, ColumnBase parentColumn, DependencyProperty sourceProperty )
+    {
+      if( this.HasColumnBinding( targetProperty, parentColumn, sourceProperty ) )
+        return;
+
+      var binding = ColumnManagerCell.CreateColumnBinding( parentColumn, sourceProperty );
+      if( binding != null )
+      {
+        BindingOperations.SetBinding( this, targetProperty, binding );
+      }
+      else
+      {
+        BindingOperations.ClearBinding( this, targetProperty );
+      }
+    }
+
+    private bool HasColumnBinding( DependencyProperty targetProperty, ColumnBase parentColumn, DependencyProperty sourceProperty )
+    {
+      if( parentColumn == null )
+        return false;
+
+      var binding = BindingOperations.GetBinding( this, targetProperty );
+      if( binding == null )
+        return false;
+
+      var path = binding.Path;
+      if( path == null )
+        return false;
+
+      var pathParameters = path.PathParameters;
+
+      return ( binding.Source == parentColumn )
+          && ( pathParameters.Count == 1 )
+          && ( pathParameters[ 0 ] == sourceProperty );
+    }
+
+    private static Binding CreateColumnBinding( ColumnBase parentColumn, DependencyProperty sourceProperty )
+    {
+      if( parentColumn == null )
+        return null;
+
+      var binding = new Binding();
+      binding.Path = new PropertyPath( sourceProperty );
+      binding.Mode = BindingMode.OneWay;
+      binding.Source = parentColumn;
+      binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+
+      return binding;
     }
 
     #region IDropTarget Members
 
     bool IDropTarget.CanDropElement( UIElement draggedElement )
     {
-      bool allowColumnReorder = true;
+      ColumnManagerCell draggedCell = draggedElement as ColumnManagerCell;
+      if( ( draggedCell == null ) || ( this == draggedCell ) )
+        return false;
+
       ColumnManagerRow parentRow = this.ParentRow as ColumnManagerRow;
+      if( ( parentRow == null ) || !parentRow.AllowColumnReorder )
+        return false;
 
-      if( parentRow != null )
-        allowColumnReorder = parentRow.AllowColumnReorder;
+      if( !ColumnManagerCell.CanMove( draggedCell ) || !ColumnManagerCell.CanMove( this ) )
+        return false;
 
+      DataGridContext draggedDetailContext = draggedCell.DataGridContext;
       DataGridContext sourceDetailContext = this.DataGridContext;
-      Debug.Assert( sourceDetailContext != null );
-      DetailConfiguration sourceDetailConfig = ( sourceDetailContext != null ) ? sourceDetailContext.SourceDetailConfiguration : null;
+      Debug.Assert( ( draggedDetailContext != null ) && ( sourceDetailContext != null ) );
 
-      DataGridContext draggedDetailContext = DataGridControl.GetDataGridContext( draggedElement );
-      Debug.Assert( draggedDetailContext != null );
-      DetailConfiguration draggedDetailConfig = ( draggedDetailContext != null ) ? draggedDetailContext.SourceDetailConfiguration : null;
-
-
-      return ( ( sourceDetailConfig == draggedDetailConfig ) &&
-             ( sourceDetailContext != null ) &&
-             ( draggedDetailContext != null ) &&
-             ( sourceDetailContext.GroupLevelDescriptions == draggedDetailContext.GroupLevelDescriptions ) &&
-             ( allowColumnReorder ) &&
-             ( draggedElement is ColumnManagerCell ) &&
-             ( draggedElement != this ) );
+      return ( sourceDetailContext.SourceDetailConfiguration == draggedDetailContext.SourceDetailConfiguration ) &&
+             ( sourceDetailContext.GroupLevelDescriptions == draggedDetailContext.GroupLevelDescriptions );
     }
 
     void IDropTarget.DragEnter( UIElement draggedElement )
@@ -759,8 +798,7 @@ namespace Xceed.Wpf.DataGrid
 
       if( draggedCell != null )
       {
-        ColumnReorderingDragSourceManager manager =
-          draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
+        ColumnReorderingDragSourceManager manager = draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
 
         // No need for drop mark when performing animated Column reordering
         if( ( manager != null ) && ( manager.IsAnimatedColumnReorderingEnabled ) )
@@ -776,8 +814,7 @@ namespace Xceed.Wpf.DataGrid
 
       if( draggedCell != null )
       {
-        ColumnReorderingDragSourceManager manager =
-          draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
+        ColumnReorderingDragSourceManager manager = draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
 
         // No need for drop mark when performing animated Column reordering
         if( ( manager != null ) && ( manager.IsAnimatedColumnReorderingEnabled ) )
@@ -794,6 +831,11 @@ namespace Xceed.Wpf.DataGrid
       if( draggedCell == null )
         return;
 
+      this.ProcessDrop( draggedCell );
+    }
+
+    internal void ProcessDrop( ColumnManagerCell draggedCell )
+    {
       ColumnReorderingDragSourceManager manager = null;
 
       if( draggedCell != null )
@@ -815,15 +857,6 @@ namespace Xceed.Wpf.DataGrid
           DropMarkAlignment alignment = m_dropMarkAdorner.Alignment;
 
           this.HideDropMark();
-
-          // This will force every Rows to update there layout
-
-          ColumnReorderingEventArgs e = new ColumnReorderingEventArgs(
-                    ColumnManagerCell.ColumnReorderingEvent,
-                    oldPosition,
-                    newPosition );
-
-          this.RaiseEvent( e );
 
           if( draggedCell.ParentColumn.VisiblePosition < newPosition )
           {
@@ -847,14 +880,45 @@ namespace Xceed.Wpf.DataGrid
               draggedCell.ParentColumn.VisiblePosition = newPosition + 1;
             }
           }
+
+          // This will force every Rows to update there layout
+          ColumnReorderingEventArgs e = new ColumnReorderingEventArgs( ColumnManagerCell.ColumnReorderingEvent, oldPosition, newPosition );
+          this.RaiseEvent( e );
+
         }
       }
+    }
+
+    private static bool CanMove( ColumnManagerCell cell )
+    {
+      if( cell == null )
+        return false;
+
+      var dataGridContext = cell.DataGridContext;
+      if( dataGridContext == null )
+        return false;
+
+      if( dataGridContext.AreDetailsFlatten )
+      {
+        // Column reordering is not allowed for a ColumnManagerCell that is located at a detail level
+        // when details are flatten.
+        if( dataGridContext.SourceDetailConfiguration != null )
+          return false;
+
+        // The main column is not allowed to be reordered when details are flatten.
+        var parentColumn = cell.ParentColumn;
+        if( ( parentColumn == null ) || ( parentColumn.IsMainColumn ) )
+          return false;
+      }
+
+      return true;
     }
 
     #endregion IDropTarget Members
 
     // Will remain null when no AdornerLayer is found.
     private ColumnReorderingDragSourceManager m_dragSourceManager;
+
     private DropMarkAdorner m_dropMarkAdorner;
 
     private DataGridContext m_dataGridContext; // = null;

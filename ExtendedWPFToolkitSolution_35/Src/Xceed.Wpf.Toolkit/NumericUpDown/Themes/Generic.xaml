@@ -46,7 +46,8 @@
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     AllowSpin="{Binding AllowSpin, RelativeSource={RelativeSource TemplatedParent}}"
-                                    ShowButtonSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}">
+                                    ShowButtonSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}"
+                                    ButtonSpinnerLocation="{Binding ButtonSpinnerLocation, RelativeSource={RelativeSource TemplatedParent}}">
                         <local:WatermarkTextBox x:Name="PART_TextBox"
                                           BorderThickness="0"
                                           Background="{TemplateBinding Background}"
@@ -58,7 +59,6 @@
                                           FontWeight="{TemplateBinding FontWeight}" 
                                           Foreground="{TemplateBinding Foreground}" 
                                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
                                           IsTabStop="{TemplateBinding IsTabStop}"
                                           MinWidth="20"
                                           AcceptsReturn="False"
@@ -74,6 +74,23 @@
                                           WatermarkTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}}" />
                </local:ButtonSpinner>
                <ControlTemplate.Triggers>
+                  <MultiDataTrigger>
+                     <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource Self}}"
+                                   Value="False" />
+                        <Condition Binding="{Binding AllowTextInput, RelativeSource={RelativeSource Self}}"
+                                   Value="False" />
+                     </MultiDataTrigger.Conditions>
+                     <Setter Property="IsReadOnly"
+                             Value="True"
+                             TargetName="PART_TextBox" />
+                  </MultiDataTrigger>
+                  <DataTrigger Binding="{Binding IsReadOnly, RelativeSource={RelativeSource Self}}"
+                               Value="True">
+                     <Setter Property="IsReadOnly"
+                             Value="True"
+                             TargetName="PART_TextBox" />
+                  </DataTrigger>
                   <Trigger Property="IsEnabled" Value="False">
                      <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                   </Trigger>

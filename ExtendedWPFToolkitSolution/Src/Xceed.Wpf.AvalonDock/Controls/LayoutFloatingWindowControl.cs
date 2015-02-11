@@ -237,7 +237,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
             this.SetParentToMainWindowOf(Model.Root.Manager);
 
-
             _hwndSrc = HwndSource.FromDependencyObject(this) as HwndSource;
             _hwndSrcHook = new HwndSourceHook(FilterMessage);
             _hwndSrc.AddHook(_hwndSrcHook);
@@ -338,11 +337,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
         /// </summary>
         protected virtual void OnIsDraggingChanged(DependencyPropertyChangedEventArgs e)
         {
+          if( ( bool )e.NewValue )
+          {
+            CaptureMouse();
+          }
+          else
+          {
+            ReleaseMouseCapture();
+          }
         }
 
         #endregion
-
-
 
         DragService _dragService = null;
 

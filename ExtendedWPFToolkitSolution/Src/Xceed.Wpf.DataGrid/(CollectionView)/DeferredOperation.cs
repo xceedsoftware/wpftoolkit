@@ -23,29 +23,34 @@ namespace Xceed.Wpf.DataGrid
 {
   internal class DeferredOperation
   {
-    #region CONSTRUCTORS
+    internal static DeferredOperation RefreshDistinctValuesOperation = new DeferredOperation( DeferredOperationAction.RefreshDistincValues, false );
 
-    public DeferredOperation(
-      DeferredOperationAction action,
-      bool filteredItemsChanged )
+    internal static DeferredOperation RefreshDistinctValuesOperationWithFilteredItemsChanged = new DeferredOperation( DeferredOperationAction.RefreshDistincValues, true );
+
+    public DeferredOperation( DeferredOperationAction action, bool filteredItemsChanged )
       : this( action, -1, -1, null )
     {
       m_filteredItemsChanged = filteredItemsChanged;
     }
 
-    public DeferredOperation(
-      DeferredOperationAction action,
-      int startingIndex,
-      IList items )
+    public DeferredOperation( DeferredOperationAction action, object dataItem )
+    {
+      m_action = action;
+      m_dataItem = dataItem;
+    }
+
+    public DeferredOperation( DeferredOperationAction action, IList items )
+    {
+      m_action = action;
+      m_newItems = items;
+    }
+
+    public DeferredOperation( DeferredOperationAction action, int startingIndex, IList items )
       : this( action, -1, startingIndex, items )
     {
     }
 
-    public DeferredOperation(
-      DeferredOperationAction action,
-      int newSourceItemCount,
-      int startingIndex,
-      IList items )
+    public DeferredOperation( DeferredOperationAction action, int newSourceItemCount, int startingIndex, IList items )
     {
       // newSourceItemCount is for when we are adding item in a IBindingList
       // It is use to detect we 2 add are in fact only one, bcause the second one is just for confirming the first one.
@@ -82,13 +87,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    public DeferredOperation(
-      DeferredOperationAction action,
-      int newSourceItemCount,
-      int newStartingIndex,
-      IList newItems,
-      int oldStartingIndex,
-      IList oldItems )
+    public DeferredOperation( DeferredOperationAction action, int newSourceItemCount, int newStartingIndex, IList newItems, int oldStartingIndex, IList oldItems )
     {
       // newSourceItemCount is for when we are adding item in a IBindingList
       // It is use to detect that 2 add are in fact only one, because the second one is just for confirming the first one.
@@ -99,8 +98,6 @@ namespace Xceed.Wpf.DataGrid
       m_oldItems = oldItems;
       m_oldStartingIndex = oldStartingIndex;
     }
-
-    #endregion CONSTRUCTORS
 
     #region Action Property
 
@@ -186,6 +183,20 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion OldItems Property
 
+    #region DataItem Property
+
+    public object DataItem
+    {
+      get
+      {
+        return m_dataItem;
+      }
+    }
+
+    private object m_dataItem;
+
+    #endregion
+
     #region FilteredItemsChanged Property
 
     public bool FilteredItemsChanged
@@ -210,7 +221,9 @@ namespace Xceed.Wpf.DataGrid
       Refresh = 5,
       Resort = 6,
       Regroup = 7,
-      RefreshDistincValues = 8
+      RefreshDistincValues = 8,
+      ResetItem = 9,
+      RefreshUnboundItemProperties = 10
     }
   }
 }

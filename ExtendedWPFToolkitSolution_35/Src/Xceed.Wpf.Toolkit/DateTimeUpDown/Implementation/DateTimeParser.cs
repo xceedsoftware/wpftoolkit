@@ -55,6 +55,15 @@ namespace Xceed.Wpf.Toolkit
       var dateTimeParts = dateTime.Split( dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries ).ToList();
       var formats = format.Split( dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries ).ToList();
 
+      //Auto-complete missing date parts
+      if( dateTimeParts.Count < formats.Count )
+      {
+        while( dateTimeParts.Count != formats.Count  )
+        {
+          dateTimeParts.Add( "0" );
+        }
+      }
+
       //something went wrong
       if( dateTimeParts.Count != formats.Count )
         return string.Empty;
@@ -65,12 +74,12 @@ namespace Xceed.Wpf.Toolkit
         if( !f.Contains( "ddd" ) && !f.Contains( "GMT" ) )
         {
           if( f.Contains( "M" ) )
-            dateParts[ "Month" ] = dateTimeParts[ i ];
+            dateParts[ "Month" ] = dateTimeParts[ i ] != "0" ? dateTimeParts[ i ] : "1";
           else if( f.Contains( "d" ) )
-            dateParts[ "Day" ] = dateTimeParts[ i ];
+            dateParts[ "Day" ] = dateTimeParts[ i ] != "0" ? dateTimeParts[ i ] : "1";
           else if( f.Contains( "y" ) )
           {
-            dateParts[ "Year" ] = dateTimeParts[ i ];
+            dateParts[ "Year" ] = dateTimeParts[ i ] != "0" ? dateTimeParts[ i ] : "0001";
 
             if( dateParts[ "Year" ].Length == 2 )
               dateParts[ "Year" ] = string.Format( "{0}{1}", currentDate.Year / 100, dateParts[ "Year" ] );

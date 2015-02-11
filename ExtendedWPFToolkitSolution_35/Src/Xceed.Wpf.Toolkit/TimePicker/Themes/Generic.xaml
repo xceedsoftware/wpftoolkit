@@ -134,6 +134,7 @@
                                               Format="{TemplateBinding Format, Converter={StaticResource TimeFormatToDateTimeFormatConverter}}"
                                               FormatString="{TemplateBinding FormatString}"
                                               ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
+                                              Kind="{Binding Kind, RelativeSource={RelativeSource TemplatedParent}}"
                                               Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
                                               Minimum="{Binding Minimum, RelativeSource={RelativeSource TemplatedParent}}"
                                               Maximum="{Binding Maximum, RelativeSource={RelativeSource TemplatedParent}}"
@@ -156,7 +157,7 @@
                               <ListBox x:Name="PART_TimeListItems"
                                        BorderThickness="0"
                                        Width="150"
-                                       Height="130"
+                                       Height="{TemplateBinding MaxDropDownHeight}"
                                        DisplayMemberPath="Display"
                                        ItemContainerStyle="{StaticResource TimeItemStyle}" />
                            </Grid>

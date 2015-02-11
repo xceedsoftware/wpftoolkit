@@ -14,24 +14,53 @@
 
   ***********************************************************************************/
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
 using System.Windows;
 
 namespace Xceed.Wpf.DataGrid
 {
-  internal class RecyclingManager
+  internal sealed class RecyclingManager
   {
-    public void EnqueueItemContainer( DependencyObject container )
+    #region RefCount Property
+
+    public int RefCount
     {
-      m_itemRecyclingStack.Push( container );
+      get
+      {
+        return m_generators.Count;
+      }
     }
 
-    public DependencyObject DequeueItemContainer()
-    {
-      if( m_itemRecyclingStack.Count > 0 )
-        return m_itemRecyclingStack.Pop();
+    #endregion
 
-      return null;
+    public void EnqueueItemContainer( object item, DependencyObject container )
+    {
+      Debug.Assert( container != null );
+
+      var entry = new ItemRecyclingPoolContainer( item, container );
+
+      m_itemRecyclingPool.Add( entry, entry );
+    }
+
+    public DependencyObject DequeueItemContainer( object item )
+    {
+      if( m_itemRecyclingPool.Count <= 0 )
+        return null;
+
+      var retriever = new ItemRecyclingPoolContainerRetriever( item );
+
+      ItemRecyclingPoolEntry value;
+      if( !m_itemRecyclingPool.TryGetValue( retriever, out value ) )
+      {
+        value = m_itemRecyclingPool.First().Value;
+      }
+
+      m_itemRecyclingPool.Remove( value );
+
+      return value.Container;
     }
 
     public void EnqueueHeaderFooterContainer( object key, DependencyObject container )
@@ -88,7 +117,6 @@ namespace Xceed.Wpf.DataGrid
 
     public DependencyObject DequeueGroupHeaderFooterContainer( object key, object item )
     {
-
       Dictionary<object, Stack<DependencyObject>> headerFooterRecyclingStacks;
 
       if( m_groupLevelRecyclingStacks.TryGetValue( key, out headerFooterRecyclingStacks ) )
@@ -112,14 +140,10 @@ namespace Xceed.Wpf.DataGrid
 
     public IList<DependencyObject> Clear()
     {
-      List<DependencyObject> removedContainers = new List<DependencyObject>();
+      var removedContainers = new List<DependencyObject>( ( from entry in m_itemRecyclingPool.Values
+                                                            select entry.Container ) );
 
-      foreach( DependencyObject container in m_itemRecyclingStack )
-      {
-        removedContainers.Add( container );
-      }
-
-      m_itemRecyclingStack.Clear();
+      m_itemRecyclingPool.Clear();
 
       foreach( Stack<DependencyObject> stack in m_headerRecyclingStacks.Values )
       {
@@ -155,32 +179,164 @@ namespace Xceed.Wpf.DataGrid
 
     public void AddRef( CustomItemContainerGenerator reference )
     {
-      if( m_refList.Contains( reference ) == false )
-      {
-        m_refList.Add( reference );
-      }
+      Debug.Assert( reference != null );
+
+      if( m_generators.Contains( reference ) )
+        return;
+
+      m_generators.Add( reference );
     }
 
     public void RemoveRef( CustomItemContainerGenerator reference )
     {
-      if( m_refList.Contains( reference ) == true )
-      {
-        m_refList.Remove( reference );
-      }
+      Debug.Assert( reference != null );
+
+      m_generators.Remove( reference );
     }
 
-    public int RefCount
-    {
-      get
-      {
-        return m_refList.Count;
-      }
-    }
+    #region Private Fields
 
     private readonly Dictionary<object, Dictionary<object, Stack<DependencyObject>>> m_groupLevelRecyclingStacks = new Dictionary<object, Dictionary<object, Stack<DependencyObject>>>();
     private readonly Dictionary<object, Stack<DependencyObject>> m_headerRecyclingStacks = new Dictionary<object, Stack<DependencyObject>>();
-    private readonly Stack<DependencyObject> m_itemRecyclingStack = new Stack<DependencyObject>();
-    private readonly List<CustomItemContainerGenerator> m_refList = new List<CustomItemContainerGenerator>();
+    private readonly Dictionary<ItemRecyclingPoolEntry, ItemRecyclingPoolEntry> m_itemRecyclingPool = new Dictionary<ItemRecyclingPoolEntry, ItemRecyclingPoolEntry>( new ItemRecyclingPoolEqualityComparer() );
+    private readonly HashSet<CustomItemContainerGenerator> m_generators = new HashSet<CustomItemContainerGenerator>();
 
+    #endregion
+
+    #region ItemRecyclingPoolEntry Private Class
+
+    private abstract class ItemRecyclingPoolEntry
+    {
+      internal ItemRecyclingPoolEntry( object dataItem )
+      {
+        m_key = ( dataItem != null ) ? dataItem.GetHashCode() : 0;
+      }
+
+      internal int Key
+      {
+        get
+        {
+          return m_key;
+        }
+      }
+
+      // This property has been set here to remove the casts every time we want to
+      // retrieve the container from an instance of ItemRecyclingPoolContainer.
+      internal abstract DependencyObject Container
+      {
+        get;
+      }
+
+      public override int GetHashCode()
+      {
+        return m_key;
+      }
+
+      public override bool Equals( object obj )
+      {
+        var item = obj as ItemRecyclingPoolEntry;
+        if( item == null )
+          return false;
+
+        return ( item.m_key == m_key );
+      }
+
+      private readonly int m_key;
+    }
+
+    #endregion
+
+    #region ItemRecyclingPoolContainer Private Class
+
+    private sealed class ItemRecyclingPoolContainer : ItemRecyclingPoolEntry
+    {
+      internal ItemRecyclingPoolContainer( object dataItem, DependencyObject container )
+        : base( dataItem )
+      {
+        Debug.Assert( container != null );
+
+        m_container = container;
+      }
+
+      internal override DependencyObject Container
+      {
+        get
+        {
+          return m_container;
+        }
+      }
+
+      public override int GetHashCode()
+      {
+        return base.GetHashCode();
+      }
+
+      public override bool Equals( object obj )
+      {
+        if( !base.Equals( obj ) )
+          return false;
+
+        if( obj == this )
+          return true;
+
+        var item = obj as ItemRecyclingPoolContainer;
+
+        return ( item != null )
+            && ( item.m_container == m_container );
+      }
+
+      private readonly DependencyObject m_container;
+    }
+
+    #endregion
+
+    #region ItemRecyclingPoolContainerRetriever Private Class
+
+    private sealed class ItemRecyclingPoolContainerRetriever : ItemRecyclingPoolEntry
+    {
+      internal ItemRecyclingPoolContainerRetriever( object dataItem )
+        : base( dataItem )
+      {
+      }
+
+      internal override DependencyObject Container
+      {
+        get
+        {
+          throw new NotSupportedException( "A retriever has no container." );
+        }
+      }
+    }
+
+    #endregion
+
+    #region ItemRecyclingPoolEqualityComparer Private Class
+
+    private sealed class ItemRecyclingPoolEqualityComparer : IEqualityComparer<ItemRecyclingPoolEntry>
+    {
+      public int GetHashCode( ItemRecyclingPoolEntry obj )
+      {
+        Debug.Assert( obj != null );
+
+        return obj.GetHashCode();
+      }
+
+      public bool Equals( ItemRecyclingPoolEntry x, ItemRecyclingPoolEntry y )
+      {
+        if( object.ReferenceEquals( x, y ) )
+          return true;
+
+        if( object.ReferenceEquals( x, null ) || object.ReferenceEquals( y, null ) )
+          return false;
+
+        // If one of the entry is a retriever, invoke its Equals method so the retriever may do its job.
+        if( x is ItemRecyclingPoolContainerRetriever )
+          return x.Equals( y );
+
+        return y.Equals( x );
+      }
+    }
+
+    #endregion
   }
 }

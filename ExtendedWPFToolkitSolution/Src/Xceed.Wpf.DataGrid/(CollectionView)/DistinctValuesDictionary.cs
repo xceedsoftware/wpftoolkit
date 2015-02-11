@@ -14,12 +14,8 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Xceed.Utils.Collections;
 using System.Diagnostics;
-using System.Collections;
+using Xceed.Utils.Collections;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -28,7 +24,7 @@ namespace Xceed.Wpf.DataGrid
     public DistinctValuesDictionary( DataGridCollectionViewBase dataGridCollectionViewBase )
     {
       if( dataGridCollectionViewBase == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "dataGridCollectionView is null." );
 
       m_dataGridCollectionViewBase = dataGridCollectionViewBase;
     }
@@ -66,7 +62,7 @@ namespace Xceed.Wpf.DataGrid
       {
         value = new ReadOnlyObservableHashList();
         this.InternalAdd( key, value );
-        m_dataGridCollectionViewBase.ForceRefreshDistinctValuesForFieldName( key, value.InnerObservableHashList );
+        m_dataGridCollectionViewBase.ForceRefreshDistinctValuesForFieldName( key );
       }
 
       Debug.Assert( value != null );

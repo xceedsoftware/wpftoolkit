@@ -27,31 +27,25 @@ namespace Xceed.Wpf.DataGrid
 {
   internal class DataGridCollectionViewGroupSort : IndexWeakHeapSort
   {
-    public DataGridCollectionViewGroupSort( 
-      int[] dataIndexArray,
-      GroupSortComparer groupSortedComparer,
-      DataGridCollectionViewGroup parentGroup )
+    public DataGridCollectionViewGroupSort( int[] dataIndexArray, GroupSortComparer groupSortedComparer, DataGridCollectionViewGroup[] protectedItems )
       : base( dataIndexArray )
     {
-      if( parentGroup == null )
-        throw new ArgumentNullException( "parentGroup" );
-
       if( groupSortedComparer == null )
         throw new ArgumentNullException( "groupSortedComparer" );
 
       m_groupSortedComparer = groupSortedComparer;
-      m_groups = parentGroup.ProtectedItems;
+      m_groups = protectedItems;
     }
 
     public override int Compare( int xDataIndex, int yDataIndex )
     {
-      DataGridCollectionViewGroup xGroup = m_groups[ xDataIndex ] as DataGridCollectionViewGroup;
-      DataGridCollectionViewGroup yGroup = m_groups[ yDataIndex ] as DataGridCollectionViewGroup;
+      DataGridCollectionViewGroup xGroup = m_groups[ xDataIndex ];
+      DataGridCollectionViewGroup yGroup = m_groups[ yDataIndex ];
 
       return m_groupSortedComparer.Compare( xGroup, yGroup );
     }
 
     private GroupSortComparer m_groupSortedComparer;
-    private ObservableCollection<object> m_groups;
+    private DataGridCollectionViewGroup[] m_groups;
   }
 }

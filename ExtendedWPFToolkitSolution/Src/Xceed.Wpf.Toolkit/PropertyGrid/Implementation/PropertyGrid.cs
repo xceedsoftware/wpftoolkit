@@ -94,6 +94,23 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //AutoGenerateProperties
 
+    #region ShowDescriptionByTooltip
+
+    public static readonly DependencyProperty ShowDescriptionByTooltipProperty = DependencyProperty.Register( "ShowDescriptionByTooltip", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( false ) );
+    public bool ShowDescriptionByTooltip
+    {
+      get
+      {
+        return ( bool )GetValue( ShowDescriptionByTooltipProperty );
+      }
+      set
+      {
+        SetValue( ShowDescriptionByTooltipProperty, value );
+      }
+    }
+
+    #endregion //ShowDescriptionByTooltip
+
     #region ShowSummary
 
     public static readonly DependencyProperty ShowSummaryProperty = DependencyProperty.Register( "ShowSummary", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( true ) );
@@ -721,7 +738,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       CommandBindings.Add( new CommandBinding( PropertyGridCommands.ClearFilter, ClearFilter, CanClearFilter ) );
     }
 
-
     #endregion //Constructors
 
     #region Base Class Overrides
@@ -817,6 +833,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       NameColumnWidth = Math.Max( 0, NameColumnWidth + e.HorizontalChange );
     }
+
 
     #endregion //Event Handlers
 
@@ -914,6 +931,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       _containerHelper.UpdateValuesFromSource();
     }
+
 
 
 
@@ -1128,6 +1146,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         return _containerHelper;
       }
     }
+
 
     #endregion
 

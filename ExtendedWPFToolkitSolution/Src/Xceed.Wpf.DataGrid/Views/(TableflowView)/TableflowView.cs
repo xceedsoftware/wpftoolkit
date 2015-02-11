@@ -14,13 +14,9 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
-using System.ComponentModel;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
@@ -144,7 +140,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region AreColumnsBeingReordered Attached Property
 
-    [ViewProperty( ViewPropertyMode.RoutedNoFallback )]
+    [ViewProperty( ViewPropertyMode.RoutedNoFallback, FlattenDetailBindingMode.MasterOneWay )]
     public static readonly DependencyProperty AreColumnsBeingReorderedProperty = DependencyProperty.RegisterAttached(
       "AreColumnsBeingReordered",
       typeof( bool ),
@@ -225,7 +221,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region FixedColumnSplitterTranslation Attached Property
 
-    [ViewProperty( ViewPropertyMode.RoutedNoFallback )]
+    [ViewProperty( ViewPropertyMode.RoutedNoFallback, FlattenDetailBindingMode.MasterOneWay )]
     internal static readonly DependencyProperty FixedColumnSplitterTranslationProperty = DependencyProperty.RegisterAttached(
       "FixedColumnSplitterTranslation",
       typeof( TranslateTransform ),

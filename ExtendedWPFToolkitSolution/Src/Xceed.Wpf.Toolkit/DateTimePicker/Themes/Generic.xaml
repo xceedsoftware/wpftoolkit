@@ -117,7 +117,6 @@
                                                    FontWeight="{TemplateBinding FontWeight}" 
                                                    Foreground="{TemplateBinding Foreground}" 
                                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                   IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
                                                    MinWidth="20"
                                                    AcceptsReturn="False"
                                                    Padding="0"
@@ -146,6 +145,7 @@
                                                 Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" 
                                                 Format="{TemplateBinding TimeFormat}"
                                                 FormatString="{TemplateBinding TimeFormatString}"
+                                                Kind="{Binding Kind, RelativeSource={RelativeSource TemplatedParent}}"
                                                 Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
                                                 Minimum="{Binding Minimum, RelativeSource={RelativeSource TemplatedParent}}"
                                                 Maximum="{Binding Maximum, RelativeSource={RelativeSource TemplatedParent}}"
@@ -160,6 +160,25 @@
                      </Popup>
                   </Grid>
                </Border>
+               <ControlTemplate.Triggers>
+                  <MultiDataTrigger>
+                     <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource Self}}"
+                                   Value="False" />
+                        <Condition Binding="{Binding AllowTextInput, RelativeSource={RelativeSource Self}}"
+                                   Value="False" />
+                     </MultiDataTrigger.Conditions>
+                     <Setter Property="IsReadOnly"
+                             Value="True"
+                             TargetName="PART_TextBox" />
+                  </MultiDataTrigger>
+                  <DataTrigger Binding="{Binding IsReadOnly, RelativeSource={RelativeSource Self}}"
+                               Value="True">
+                     <Setter Property="IsReadOnly"
+                             Value="True"
+                             TargetName="PART_TextBox" />
+                  </DataTrigger>
+               </ControlTemplate.Triggers>
             </ControlTemplate>
          </Setter.Value>
       </Setter>

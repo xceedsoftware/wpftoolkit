@@ -276,7 +276,6 @@
     <Compile Include="Samples\PropertyGrid\Views\PropertyGridView.xaml.cs">
       <DependentUpon>PropertyGridView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Samples\RangeSlider\Converters\IntegerToBoolConverter.cs" />
     <Compile Include="Samples\RangeSlider\Views\RangeSliderView.xaml.cs">
       <DependentUpon>RangeSliderView.xaml</DependentUpon>
     </Compile>
@@ -323,6 +322,9 @@
     <Compile Include="Samples\ToggleSwitch\Views\ToggleSwitchView.xaml.cs">
       <DependentUpon>ToggleSwitchView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Samples\Text\Views\TokenizedTextBoxView.xaml.cs">
+      <DependentUpon>TokenizedTextBoxView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Samples\Window\Converters\IntToBoolConverter.cs" />
     <Compile Include="Samples\Window\Converters\WindowStateToBoolConverter.cs" />
     <Compile Include="Samples\Window\Resources\WindowModelEditor.xaml.cs">
@@ -331,8 +333,8 @@
     <Compile Include="Samples\Window\Views\ChildWindowView.xaml.cs">
       <DependentUpon>ChildWindowView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Samples\Window\Views\StylableWindowView.xaml.cs">
-      <DependentUpon>StylableWindowView.xaml</DependentUpon>
+    <Compile Include="Samples\Window\Views\StyleableWindowView.xaml.cs">
+      <DependentUpon>StyleableWindowView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Samples\Window\Views\WindowContainerView.xaml.cs">
       <DependentUpon>WindowContainerView.xaml</DependentUpon>
@@ -630,6 +632,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Samples\Text\Views\TokenizedTextBoxView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Samples\Window\Resources\FancyStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -642,7 +648,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Samples\Window\Views\StylableWindowView.xaml">
+    <Page Include="Samples\Window\Views\StyleableWindowView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -964,8 +970,6 @@
     <Resource Include="CodeFiles\PropertyGridView.xaml.txt" />
     <Resource Include="CodeFiles\RichTextboxView.xaml.cs.txt" />
     <Resource Include="CodeFiles\RichTextboxView.xaml.txt" />
-    <Resource Include="CodeFiles\StylableWindowView.xaml.cs.txt" />
-    <Resource Include="CodeFiles\StylableWindowView.xaml.txt" />
     <Resource Include="CodeFiles\SwitchPanelView.xaml.cs.txt" />
     <Resource Include="CodeFiles\SwitchPanelView.xaml.txt" />
     <Resource Include="CodeFiles\ThemingCoreWPFView.xaml.cs.txt" />
@@ -1047,9 +1051,19 @@
   <ItemGroup>
     <Resource Include="Samples\Rating\OpenSourceImages\Rating.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="CodeFiles\TokenizedTextBoxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\TokenizedTextBoxView.xaml.txt" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\ToggleSwitch\OpenSourceImages\ToggleSwitch.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Text\OpenSourceImages\TokenizedTextBox.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\StyleableWindowView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\StyleableWindowView.xaml.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

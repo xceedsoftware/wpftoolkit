@@ -24,6 +24,7 @@ using Xceed.Wpf.Toolkit.Primitives;
 using System.Windows.Controls;
 using System.Linq;
 using Xceed.Wpf.Toolkit.Core.Primitives;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -31,7 +32,8 @@ namespace Xceed.Wpf.Toolkit
   {
     #region Members
 
-    private DateTime? _lastValidDate;
+    private DateTime? _lastValidDate; //null
+    private bool _setKindInternal = false;
 
     #endregion
 
@@ -110,6 +112,75 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //FormatString
 
+    #region Kind
+
+    public static readonly DependencyProperty KindProperty = DependencyProperty.Register( "Kind", typeof( DateTimeKind ), typeof( DateTimeUpDown ), 
+      new FrameworkPropertyMetadata( DateTimeKind.Unspecified, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnKindChanged ) );
+    public DateTimeKind Kind
+    {
+      get
+      {
+        return ( DateTimeKind )GetValue( KindProperty );
+      }
+      set
+      {
+        SetValue( KindProperty, value );
+      }
+    }
+
+    private static void OnKindChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      DateTimeUpDown dateTimeUpDown = o as DateTimeUpDown;
+      if( dateTimeUpDown != null )
+        dateTimeUpDown.OnKindChanged( ( DateTimeKind )e.OldValue, ( DateTimeKind )e.NewValue );
+    }
+
+    protected virtual void OnKindChanged( DateTimeKind oldValue, DateTimeKind newValue )
+    {
+      //Upate the value based on kind. (Postpone to EndInit if not yet initialized)
+      if( !_setKindInternal
+        && this.Value != null 
+        && this.IsInitialized )
+      {
+        this.Value = this.ConvertToKind( this.Value.Value, newValue );
+      }
+    }
+
+    private void SetKindInternal( DateTimeKind kind )
+    {
+      _setKindInternal = true;
+      try
+      {
+#if VS2008
+        // Warning : Binding could be lost
+        this.Kind = kind;
+#else
+        //We use SetCurrentValue to not erase the possible underlying 
+        //OneWay Binding. (This will also update correctly any
+        //possible TwoWay bindings).
+        this.SetCurrentValue( DateTimeUpDown.KindProperty, kind );
+#endif
+      }
+      finally
+      {
+        _setKindInternal = false;
+      }
+    }
+
+    #endregion //Kind
+
+    #region ContextNow (Private)
+
+    internal DateTime ContextNow
+    {
+      get
+      {
+        return DateTimeUtilities.GetContextNow( this.Kind );
+      }
+    }
+
+    #endregion
+
     #endregion //Properties
 
     #region Constructors
@@ -148,7 +219,7 @@ namespace Xceed.Wpf.Toolkit
         if( Value.HasValue )
           UpdateDateTime( 1 );
         else
-          Value = DefaultValue ?? DateTime.Now;
+          Value = DefaultValue ?? this.ContextNow;
       }
     }
 
@@ -159,7 +230,7 @@ namespace Xceed.Wpf.Toolkit
         if( Value.HasValue )
           UpdateDateTime( -1 );
         else
-          Value = DefaultValue ?? DateTime.Now;
+          Value = DefaultValue ?? this.ContextNow;
       }
     }
 
@@ -178,6 +249,21 @@ namespace Xceed.Wpf.Toolkit
 
       DateTime result;
       this.TryParseDateTime( text, out result );
+
+      //Do not force "unspecified" to a time-zone specific
+      //parsed text value. This would result in a lost of precision and
+      //corrupt data. Let the value impose the Kind to the
+      //DateTimePicker. 
+      if( this.Kind != DateTimeKind.Unspecified )
+      {
+
+        //Keep the current kind (Local or Utc) 
+        //by imposing it to the parsed text value.
+        //
+        //Note: A parsed UTC text value may be
+        //      adjusted with a Local kind and time.
+        result = this.ConvertToKind( result, this.Kind );
+      }
 
       if( this.ClipValueToMinMax )
       {
@@ -214,10 +300,28 @@ namespace Xceed.Wpf.Toolkit
         this.Spinner.ValidSpinDirection = validDirections;
     }
 
+    protected override object OnCoerceValue( object newValue )
+    {
+      //Since only changing the "kind" of a date
+      //Ex. "2001-01-01 12:00 AM, Kind=Utc" to "2001-01-01 12:00 AM Kind=Local"
+      //by setting the "Value" property won't trigger a property changed,
+      //but will call this callback (coerce), we update the Kind here.
+      DateTime? value = ( DateTime? )base.OnCoerceValue( newValue );
+
+      //Let the initialized determine the final "kind" value.
+      if(value != null && this.IsInitialized)
+      {
+        //Update kind based on value kind
+        this.SetKindInternal( value.Value.Kind );
+      }
+
+      return value;
+    }
+
     protected override void OnValueChanged( DateTime? oldValue, DateTime? newValue )
     {
-      //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
-      //but only if it is not null
+        //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
+        //but only if it is not null
       if( newValue != null )
         ParseValueIntoDateTimeInfo();
 
@@ -246,6 +350,29 @@ namespace Xceed.Wpf.Toolkit
         return true;
 
       return this.TryParseDateTime( this.TextBox.Text, out result );
+    }
+
+    protected override void OnInitialized( EventArgs e )
+    {
+      base.OnInitialized( e );
+      if( this.Value != null )
+      {
+        DateTimeKind valueKind = this.Value.Value.Kind;
+
+        if( valueKind != this.Kind )
+        {
+          //Conflit between "Kind" property and the "Value.Kind" value.
+          //Priority to the one that is not "Unspecified".
+          if( this.Kind == DateTimeKind.Unspecified )
+          {
+            this.SetKindInternal( valueKind );
+          }
+          else
+          {
+            this.Value = this.ConvertToKind( this.Value.Value, this.Kind );
+          }
+        }
+      }
     }
 
     #endregion //Base Class Overrides
@@ -709,9 +836,8 @@ namespace Xceed.Wpf.Toolkit
     private bool TryParseDateTime( string text, out DateTime result )
     {
       bool isValid = false;
-      result = DateTime.Now;
 
-      DateTime current = this.Value.HasValue ? this.Value.Value : DateTime.Parse( DateTime.Now.ToString(), this.CultureInfo.DateTimeFormat );
+      DateTime current = this.Value.HasValue ? this.Value.Value : DateTime.Parse( this.ContextNow.ToString(), this.CultureInfo.DateTimeFormat );
       isValid = DateTimeParser.TryParse( text, this.GetFormatString( Format ), current, this.CultureInfo, out result );
 
       if( !isValid )
@@ -720,9 +846,29 @@ namespace Xceed.Wpf.Toolkit
       }
 
       if( !isValid )
+      {
         result = ( _lastValidDate != null ) ? _lastValidDate.Value : current;
+      }
 
       return isValid;
+    }
+
+    private DateTime ConvertToKind( DateTime dateTime, DateTimeKind kind )
+    {
+      //Same kind, just return same value.
+      if( kind == dateTime.Kind )
+        return dateTime;
+
+      //"ToLocalTime()" from an unspecified will assume
+      // That the time was originaly Utc and affect the datetime value. 
+      // Just "Force" the "Kind" instead.
+      if( dateTime.Kind == DateTimeKind.Unspecified 
+        || kind == DateTimeKind.Unspecified )
+        return DateTime.SpecifyKind( dateTime, kind );
+
+      return ( kind == DateTimeKind.Local )
+         ? dateTime.ToLocalTime()
+         : dateTime.ToUniversalTime();
     }
 
     #endregion //Methods

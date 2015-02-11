@@ -16,13 +16,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Automation.Peers;
-using System.Windows;
-using System.Globalization;
 using System.Diagnostics;
-using System.Windows.Media;
+using System.Globalization;
+using System.Linq;
+using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Automation.Provider;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
@@ -312,21 +310,17 @@ namespace Xceed.Wpf.DataGrid.Automation
     internal UIElement GetWrapper()
     {
       HeaderFooterItem headerFooterItem = m_owner as HeaderFooterItem;
-
       if( headerFooterItem == null )
       {
-        headerFooterItem =
-          m_dataGridContext.GetContainerFromItem( m_owner ) as HeaderFooterItem;
+        headerFooterItem = m_dataGridContext.GetContainerFromItem( m_owner ) as HeaderFooterItem;
       }
 
       if( headerFooterItem == null )
         return null;
 
-      IDataGridItemContainer dataGridItemContainer = HeaderFooterItem.FindIDataGridItemContainerInChildren(
-        headerFooterItem, headerFooterItem.AsVisual() );
-
-      if( dataGridItemContainer != null )
-        return dataGridItemContainer as UIElement;
+      var container = headerFooterItem.GetTemplatedDescendantDataGridItemContainers().FirstOrDefault();
+      if( container != null )
+        return container as UIElement;
 
       return headerFooterItem;
     }

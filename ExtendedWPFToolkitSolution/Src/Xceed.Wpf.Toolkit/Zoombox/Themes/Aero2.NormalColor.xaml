@@ -333,7 +333,7 @@
 
     <Style x:Key="{x:Type local:Zoombox}" TargetType="{x:Type local:Zoombox}">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Foreground" Value="Black" />
         <Setter Property="PanDistance" Value="5.0" />
         <Setter Property="ZoomOrigin" Value="0.5,0.5" />
         <Setter Property="ZoomPercentage" Value="5.0" />

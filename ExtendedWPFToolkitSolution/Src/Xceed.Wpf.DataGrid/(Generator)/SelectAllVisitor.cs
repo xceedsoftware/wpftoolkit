@@ -67,7 +67,7 @@ namespace Xceed.Wpf.DataGrid
       else
       {
         HashedLinkedList<ColumnBase> columnsByVisiblePosition = sourceContext.ColumnsByVisiblePosition;
-        SelectedItemsStorage selectedColumnStore = new SelectedItemsStorage( null, 8 );
+        SelectedItemsStorage selectedColumnStore = new SelectedItemsStorage( null );
         SelectionRange fullColumnRange = new SelectionRange( 0, columnsByVisiblePosition.Count - 1 );
         selectedColumnStore.Add( new SelectionRangeWithItems( fullColumnRange, null ) );
         int index = 0;

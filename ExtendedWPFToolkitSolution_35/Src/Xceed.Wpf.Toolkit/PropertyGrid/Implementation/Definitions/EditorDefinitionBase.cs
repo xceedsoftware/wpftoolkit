@@ -42,16 +42,28 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       object currentValue = this.GetValue( definitionProperty );
       object localValue = this.ReadLocalValue( definitionProperty );
+      object elementValue = element.GetValue( elementProp );
+      bool areEquals = false;
+
       // Avoid setting values if it does not affect anything 
       // because setting a local value may prevent a style setter from being active.
-      if( ( localValue != DependencyProperty.UnsetValue )
-        || currentValue != element.GetValue( elementProp ) )
+      if( localValue != DependencyProperty.UnsetValue )
       {
-        element.SetValue( elementProp, currentValue );
-      }
-      else
-      {
-        element.ClearValue( elementProp );
+        if( ( elementValue != null ) && ( currentValue != null ) )
+        {
+          areEquals = ( elementValue.GetType().IsValueType && currentValue.GetType().IsValueType )
+                      ? elementValue.Equals( currentValue )  // Value Types
+                      : currentValue == element.GetValue( elementProp ); // Reference Types
+        }
+
+        if( !areEquals )
+        {
+          element.SetValue( elementProp, currentValue );
+        }
+        else
+        {
+          element.ClearValue( elementProp );
+        }
       }
     }
   }

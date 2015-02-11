@@ -96,6 +96,7 @@ namespace Xceed.Wpf.DataGrid
 
         oldItem.FilterCriterionChanged -= new EventHandler( DataGridItemProperty_FilterCriterionChanged );
         oldItem.ValueChanged -= new EventHandler<DataGridItemPropertyBase.ValueChangedEventArgs>( DataGridItemProperty_ValueChanged );
+        oldItem.PropertyChanged -= new PropertyChangedEventHandler( OnDataGridItemProperty_PropertyChanged );
       }
     }
 
@@ -118,6 +119,7 @@ namespace Xceed.Wpf.DataGrid
       }
 
       item.ValueChanged += new EventHandler<DataGridItemPropertyBase.ValueChangedEventArgs>( DataGridItemProperty_ValueChanged );
+      item.PropertyChanged += new PropertyChangedEventHandler( OnDataGridItemProperty_PropertyChanged );
       item.SetUnspecifiedPropertiesValues( this );
 
       try
@@ -127,6 +129,7 @@ namespace Xceed.Wpf.DataGrid
       catch
       {
         item.ValueChanged -= new EventHandler<DataGridItemPropertyBase.ValueChangedEventArgs>( DataGridItemProperty_ValueChanged );
+        item.PropertyChanged -= new PropertyChangedEventHandler( OnDataGridItemProperty_PropertyChanged );
         throw;
       }
 
@@ -144,6 +147,7 @@ namespace Xceed.Wpf.DataGrid
 
         oldItem.FilterCriterionChanged -= new EventHandler( DataGridItemProperty_FilterCriterionChanged );
         oldItem.ValueChanged -= new EventHandler<DataGridItemPropertyBase.ValueChangedEventArgs>( DataGridItemProperty_ValueChanged );
+        oldItem.PropertyChanged -= new PropertyChangedEventHandler( OnDataGridItemProperty_PropertyChanged );
       }
 
       item.FilterCriterionChanged += new EventHandler( DataGridItemProperty_FilterCriterionChanged );
@@ -165,6 +169,7 @@ namespace Xceed.Wpf.DataGrid
       }
 
       item.ValueChanged += new EventHandler<DataGridItemPropertyBase.ValueChangedEventArgs>( DataGridItemProperty_ValueChanged );
+      item.PropertyChanged += new PropertyChangedEventHandler( OnDataGridItemProperty_PropertyChanged );
       item.SetUnspecifiedPropertiesValues( this );
       item.Initialized = true;
 
@@ -180,6 +185,7 @@ namespace Xceed.Wpf.DataGrid
       catch
       {
         item.ValueChanged -= new EventHandler<DataGridItemPropertyBase.ValueChangedEventArgs>( DataGridItemProperty_ValueChanged );
+        item.PropertyChanged -= new PropertyChangedEventHandler( OnDataGridItemProperty_PropertyChanged );
         item.Initialized = false;
 
         if( item is DataGridUnboundItemProperty )
@@ -255,6 +261,7 @@ namespace Xceed.Wpf.DataGrid
 
         item.FilterCriterionChanged -= this.DataGridItemProperty_FilterCriterionChanged;
         item.ValueChanged -= this.DataGridItemProperty_ValueChanged;
+        item.PropertyChanged -= new PropertyChangedEventHandler( OnDataGridItemProperty_PropertyChanged );
       }
     }
 
@@ -308,7 +315,9 @@ namespace Xceed.Wpf.DataGrid
     internal void SuspendUnboundItemPropertyChanged( object component )
     {
       if( m_unboundItemPropertyChangedSuspended == null )
+      {
         m_unboundItemPropertyChangedSuspended = new Hashtable( 1 );
+      }
 
       m_unboundItemPropertyChangedSuspended[ component ] = DBNull.Value;
     }
@@ -324,7 +333,9 @@ namespace Xceed.Wpf.DataGrid
       m_unboundItemPropertyChangedSuspended.Remove( component );
 
       if( m_unboundItemPropertyChangedSuspended.Count == 0 )
+      {
         m_unboundItemPropertyChangedSuspended = null;
+      }
 
       this.RefreshUnboundItemProperty( component );
     }
@@ -404,6 +415,25 @@ namespace Xceed.Wpf.DataGrid
         }
       }
     }
+
+    #region ItemPropertyGroupSortStatNameChanged Event
+
+    internal event EventHandler ItemPropertyGroupSortStatNameChanged;
+
+    private void OnDataGridItemProperty_PropertyChanged( object sender, PropertyChangedEventArgs e )
+    {
+      if( e.PropertyName != "GroupSortStatResultPropertyName" )
+        return;
+
+      var handler = this.ItemPropertyGroupSortStatNameChanged;
+
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, e );
+    }
+
+    #endregion
 
     private List<DataGridItemPropertyBase> m_defaultItemProperties;
     private Type m_itemType;
