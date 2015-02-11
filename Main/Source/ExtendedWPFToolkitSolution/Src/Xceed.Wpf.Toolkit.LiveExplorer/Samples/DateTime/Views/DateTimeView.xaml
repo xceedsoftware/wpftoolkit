@@ -47,6 +47,11 @@
                 <x:Type TypeName="Visibility" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
+       <ObjectDataProvider x:Key="enumKind" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="sys:DateTimeKind" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </local:DemoView.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -61,6 +66,7 @@
       <GroupBox Header="Features" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" >
          <Grid>
             <Grid.RowDefinitions>
+               <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
@@ -86,10 +92,12 @@
             <CheckBox x:Name="_autoCloseCalendar" Grid.Row="3" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5,5,25,5"/>    
             <TextBlock Text="ClipValueToMinMax:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center"/>
             <CheckBox x:Name="_clipValueToMinMax" Grid.Row="4" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5,5,25,5"/>
-            <TextBlock Text="TimePickerVisibility:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"/>
-            <ComboBox x:Name="_timePickerVisibility" Grid.Row="5" Grid.Column="1" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumVisibility}}" Width="190" Margin="5,5,25,5"/>
-            <TextBlock Text="TimePickerShowButtonSpinner:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center"/>
-            <CheckBox x:Name="_timePickerShowButtonSpinner" Grid.Row="6" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
+            <TextBlock Text="Kind:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"/>
+            <ComboBox x:Name="_kind" Grid.Row="5" Grid.Column="1" SelectedIndex="2" ItemsSource="{Binding Source={StaticResource enumKind}}" Width="190" Margin="5,5,25,5"/>
+             <TextBlock Text="TimePickerVisibility:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center"/>
+            <ComboBox x:Name="_timePickerVisibility" Grid.Row="6" Grid.Column="1" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumVisibility}}" Width="190" Margin="5,5,25,5"/>
+            <TextBlock Text="TimePickerShowButtonSpinner:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="_timePickerShowButtonSpinner" Grid.Row="7" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
 
             <TextBlock Text="TimeFormat:" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" />
             <ComboBox x:Name="_timeFormat" Grid.Row="0" Grid.Column="3" SelectedIndex="1" ItemsSource="{Binding Source={StaticResource enumTimeFormatData}}" Width="190" Margin="5"/>
@@ -121,13 +129,15 @@
                                  TimePickerVisibility="{Binding Source={x:Reference _timePickerVisibility}, Path=SelectedItem}"
                                  TimePickerShowButtonSpinner="{Binding IsChecked, ElementName=_timePickerShowButtonSpinner}"
                                  Minimum="{Binding Value, ElementName=_minimum}"
-                                 Maximum="{Binding Value, ElementName=_maximum}"/>
+                                 Maximum="{Binding Value, ElementName=_maximum}"
+                                 Kind="{Binding SelectedItem, ElementName=_kind}"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch">
             <GroupBox Header="TimePicker Features" Margin="0,15,0,0">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -143,10 +153,12 @@
                     <xctk:DateTimeUpDown x:Name="_endTime" Grid.Row="1" Grid.Column="1" Format="ShortTime" Value="17:00" Width="100" Margin="5"/>
                     <TextBlock Text="TimeInterval:" Grid.Row="2" VerticalAlignment="Center" />
                     <xctk:DateTimeUpDown x:Name="_timeInterval" Grid.Row="2" Grid.Column="1" Format="Custom" FormatString="H:mm" Value="0:30" Width="100" Margin="5"/>
-                </Grid>
-            </GroupBox>
+                    <TextBlock Grid.Row="3" Text="MaxDropDownHeight:" VerticalAlignment="Center" />
+                    <xctk:DoubleUpDown x:Name="_maxDropDownHeight" Grid.Row="3" Grid.Column="1" Width="100" Value="130" DefaultValue="130" AllowInputSpecialValues="PositiveInfinity" Minimum="0" />
+                 </Grid>
+              </GroupBox>
 
-            <StackPanel>
+              <StackPanel>
                 <TextBlock Text="TimePicker Usage: " Style="{StaticResource Header}" />
                 <xctk:TimePicker x:Name="_timePicker"
                                  VerticalAlignment="Top"
@@ -158,8 +170,9 @@
                                  TimeInterval="{Binding Source={x:Reference _timeInterval}, Path=Value, Converter={StaticResource dateTimeToTimeSpanConverter}}"
                                  ClipValueToMinMax="{Binding IsChecked, ElementName=_clipValueToMinMax}"
                                  Minimum="{Binding Value, ElementName=_minimum}"
-                                 Maximum="{Binding Value, ElementName=_maximum}"/>
-         </StackPanel>
+                                 Maximum="{Binding Value, ElementName=_maximum}"
+                                 MaxDropDownHeight="{Binding Value, ElementName=_maxDropDownHeight}"/>
+           </StackPanel>
         </StackPanel>
     </Grid>
 </local:DemoView>

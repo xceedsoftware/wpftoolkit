@@ -15,55 +15,34 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-using System.Windows.Input;
-using System.Diagnostics;
 using System.ComponentModel;
-using System.Windows.Documents;
-using System.Windows.Media;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Xceed.Wpf.DataGrid;
-using System.Windows.Navigation;
-using System.Windows.Controls.Primitives;
 
 namespace Xceed.Utils.Wpf.DragDrop
 {
   internal class DragSourceManager : DependencyObject, INotifyPropertyChanged
   {
-    public DragSourceManager(
-      UIElement draggedElement,
-      AdornerLayer adornerLayerInsideDragContainer,
-      UIElement dragContainer )
-      : this( draggedElement,
-              adornerLayerInsideDragContainer,
-              dragContainer,
-              true )
+    public DragSourceManager( UIElement draggedElement, AdornerLayer adornerLayerInsideDragContainer, UIElement dragContainer )
+      : this( draggedElement, adornerLayerInsideDragContainer, dragContainer, true )
     {
     }
 
-    public DragSourceManager(
-      UIElement draggedElement,
-      AdornerLayer adornerLayerInsideDragContainer,
-      UIElement dragContainer,
-      bool enableAutoScroll )
-      : this( draggedElement,
-              adornerLayerInsideDragContainer,
-              dragContainer,
-              enableAutoScroll,
-              true )
+    public DragSourceManager( UIElement draggedElement, AdornerLayer adornerLayerInsideDragContainer, UIElement dragContainer, bool enableAutoScroll )
+      : this( draggedElement, adornerLayerInsideDragContainer, dragContainer, enableAutoScroll, true )
     {
     }
 
-    public DragSourceManager(
-      UIElement draggedElement,
-      AdornerLayer adornerLayerInsideDragContainer,
-      UIElement dragContainer,
-      bool enableAutoScroll,
-      bool showDraggedElementGhost )
+    public DragSourceManager( UIElement draggedElement, AdornerLayer adornerLayerInsideDragContainer, UIElement dragContainer, bool enableAutoScroll, bool showDraggedElementGhost )
     {
       if( draggedElement == null )
         throw new ArgumentNullException( "draggedElement" );
@@ -100,10 +79,10 @@ namespace Xceed.Utils.Wpf.DragDrop
             break;
         }
 
-        m_parentScrollViewer = scrollViewer;
-        m_timer = new System.Windows.Threading.DispatcherTimer();
-        m_timer.Interval = new TimeSpan( 0, 0, 0, 0, this.TimerInterval );
-        m_timer.Tick += new EventHandler( this.OnAutoScrollTimer_Tick );
+        if( scrollViewer != null )
+        {
+          m_autoScrollManager = new AutoScrollManager( scrollViewer );
+        }
       }
     }
 
@@ -190,6 +169,24 @@ namespace Xceed.Utils.Wpf.DragDrop
 
     #endregion
 
+    #region MouseToScreenPositionFactor Read-Only Public Property
+
+    internal Vector MouseToScreenPositionFactor
+    {
+      get
+      {
+        return m_mouseToScreenPositionFactor;
+      }
+      private set
+      {
+        m_mouseToScreenPositionFactor = value;
+      }
+    }
+
+    private Vector m_mouseToScreenPositionFactor = new Vector( 1d, 1d );
+
+    #endregion
+
     #region ShowDraggedElementGhost Public Property
 
     public bool ShowDraggedElementGhost
@@ -226,7 +223,7 @@ namespace Xceed.Utils.Wpf.DragDrop
     {
       get
       {
-        return m_parentScrollViewer;
+        return ( m_autoScrollManager != null ) ? m_autoScrollManager.ScrollViewer : null;
       }
     }
 
@@ -238,7 +235,7 @@ namespace Xceed.Utils.Wpf.DragDrop
       "AutoScrollInterval",
       typeof( int ),
       typeof( DragSourceManager ),
-      new FrameworkPropertyMetadata( 50 ) );
+      new FrameworkPropertyMetadata( AutoScrollManager.AutoScrollInterval_DefaultValue, OnAutoScrollIntervalChanged ) );
 
     public int AutoScrollInterval
     {
@@ -249,6 +246,15 @@ namespace Xceed.Utils.Wpf.DragDrop
       set
       {
         this.SetValue( DragSourceManager.AutoScrollIntervalProperty, value );
+      }
+    }
+
+    private static void OnAutoScrollIntervalChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
+    {
+      var autoScrollManager = ( ( DragSourceManager )sender ).m_autoScrollManager;
+      if( autoScrollManager != null )
+      {
+        autoScrollManager.AutoScrollInterval = ( int )args.NewValue;
       }
     }
 
@@ -270,7 +276,7 @@ namespace Xceed.Utils.Wpf.DragDrop
       "AutoScrollTreshold",
       typeof( int ),
       typeof( DragSourceManager ),
-      new FrameworkPropertyMetadata( 5 ) );
+      new FrameworkPropertyMetadata( AutoScrollManager.AutoScrollTreshold_DefaultValue, OnAutoScrollTresholdChanged ) );
 
     public int AutoScrollTreshold
     {
@@ -281,6 +287,15 @@ namespace Xceed.Utils.Wpf.DragDrop
       set
       {
         this.SetValue( DragSourceManager.AutoScrollTresholdProperty, value );
+      }
+    }
+
+    private static void OnAutoScrollTresholdChanged( DependencyObject sender, DependencyPropertyChangedEventArgs args )
+    {
+      var autoScrollManager = ( ( DragSourceManager )sender ).m_autoScrollManager;
+      if( autoScrollManager != null )
+      {
+        autoScrollManager.AutoScrollTreshold = ( int )args.NewValue;
       }
     }
 
@@ -336,39 +351,22 @@ namespace Xceed.Utils.Wpf.DragDrop
       this.CheckMouseEventArgs( e );
 #endif
 
-      bool captured = this.DraggedElement.CaptureMouse();
-
-      if( captured )
-      {
-        this.InitialMousePositionToDragContainerAdorner = e.GetPosition( this.AdornerLayerInsideDragContainer );
-
-        this.InitialMousePositionToDraggedElement = e.GetPosition( this.DraggedElement );
-
-        //Get the current window (which can be a popup) on which the drag is happening
-        Visual parent = this.GetDraggedElementWindow();
-
-        //Set the flag because the dragged ghost in the case of a popup is different, and return because DraggedElementGhost will not be used.
-        if( parent is Popup )
-        {
-          this.ParentWindowIsPopup = true;
-          return;
-        }
-
-        //Get the starting position of the gost window, so it can be used to correct the mouse position while dragging it.  
-        Point ghostPostion = new Point( -this.InitialMousePositionToDraggedElement.Value.X, -this.InitialMousePositionToDraggedElement.Value.Y );
-        if( parent != null )
-        {
-          m_ghostInitialScreenPositon = parent.PointToScreen( ghostPostion );
-        }
-        else
-        {
-          m_ghostInitialScreenPositon = ghostPostion;
-        }
-      }
-      else
+      if( !this.DraggedElement.CaptureMouse() )
       {
         Debug.Fail( "The DragSourceManager was unable to capture the mouse on the dragged element." );
+        return;
       }
+
+      //Get the current window (which can be a popup) on which the drag is happening
+      var parent = this.GetDraggedElementWindow();
+
+      this.InitialMousePositionToDragContainerAdorner = e.GetPosition( this.AdornerLayerInsideDragContainer );
+      this.InitialMousePositionToDraggedElement = e.GetPosition( this.DraggedElement );
+      this.MouseToScreenPositionFactor = DragSourceManager.CalculateMouseToScreenPositionFactor( parent );
+      this.ParentWindowIsPopup = ( parent is Popup );
+
+      var draggedElementMousePosition = e.GetPosition( this.DraggedElement );
+      m_draggedElementMouseOffset = new Vector( draggedElementMousePosition.X, draggedElementMousePosition.Y );
     }
 
     public virtual void ProcessPreviewMouseRightButtonDown( MouseButtonEventArgs e )
@@ -384,8 +382,7 @@ namespace Xceed.Utils.Wpf.DragDrop
       this.CheckMouseEventArgs( e );
 #endif
 
-      if( ( this.InitialMousePositionToDragContainerAdorner.HasValue )
-          && ( e.LeftButton == MouseButtonState.Pressed ) )
+      if( ( this.InitialMousePositionToDragContainerAdorner.HasValue ) && ( e.LeftButton == MouseButtonState.Pressed ) )
       {
         if( !this.IsDragging )
         {
@@ -432,8 +429,7 @@ namespace Xceed.Utils.Wpf.DragDrop
       if( this.ParentWindowIsPopup )
         return;
 
-      Window ghost = this.DraggedElementGhost;
-
+      var ghost = this.DraggedElementGhost;
       if( ghost == null )
         return;
 
@@ -446,12 +442,22 @@ namespace Xceed.Utils.Wpf.DragDrop
         ghost.Hide();
       }
 
-      //Get the current position of the mouse
-      Point currentMousePosition = e.GetPosition( null );
+      //Find the new ghost position based on the current mouse position.
+      var mousePosition = e.GetPosition( this.DragContainer );
+      var draggedElementPosition = Point.Subtract( mousePosition, m_draggedElementMouseOffset );
 
-      //And set the ghost position by correcting the mouse position.
-      ghost.Left = currentMousePosition.X + m_ghostInitialScreenPositon.X;
-      ghost.Top = currentMousePosition.Y + m_ghostInitialScreenPositon.Y;
+      if( FrameworkElement.GetFlowDirection( this.DragContainer ) != FlowDirection.LeftToRight )
+      {
+        draggedElementPosition.X += this.DraggedElement.RenderSize.Width;
+      }
+
+      var draggedElementPositionOnScreen = this.DragContainer.PointToScreen( draggedElementPosition );
+
+      var ghostPosition = new Point( draggedElementPositionOnScreen.X * m_mouseToScreenPositionFactor.X,
+                                     draggedElementPositionOnScreen.Y * m_mouseToScreenPositionFactor.Y );
+
+      ghost.Left = ghostPosition.X;
+      ghost.Top = ghostPosition.Y;
     }
 
     protected virtual IDropTarget GetDropTargetOnDrag( MouseEventArgs e, out Nullable<Point> dropTargetPosition, out IDropTarget lastFoundDropTarget )
@@ -518,75 +524,15 @@ namespace Xceed.Utils.Wpf.DragDrop
 
     protected virtual void StopAutoScroll()
     {
-      if( m_timer != null )
+      if( m_autoScrollManager != null )
       {
-        m_timer.Stop();
-      }
-    }
-
-    protected virtual void PerformAutoScroll()
-    {
-      if( ( m_timer != null ) && ( m_timer.IsEnabled ) )
-      {
-        TimeSpan timeSpanSinceLastScroll = ( TimeSpan )( DateTime.Now - m_lastAutoScrollTime );
-
-        // This method may be called before its time (on the MouseMove event). We make
-        // sure that the AutoScroll is not performed before the desired time span has elapsed.
-        if( timeSpanSinceLastScroll.Milliseconds >= AutoScrollInterval )
-        {
-          double scrollOffset = m_parentScrollViewer.HorizontalOffset + m_scrollAmount;
-
-          if( ( m_autoScrollDirection & AutoScrollDirection.Left ) == AutoScrollDirection.Left )
-          {
-            if( m_scrollPage )
-            {
-              m_parentScrollViewer.PageLeft();
-            }
-            else
-            {
-              //Make sure the grid stops scrolling.
-              if( scrollOffset < 0 )
-              {
-                scrollOffset = 0;
-              }
-              m_parentScrollViewer.ScrollToHorizontalOffset( scrollOffset );
-            }
-          }
-          else if( ( m_autoScrollDirection & AutoScrollDirection.Right ) == AutoScrollDirection.Right )
-          {
-            if( m_scrollPage )
-            {
-              m_parentScrollViewer.PageRight();
-            }
-            else
-            {
-              //Make sure the grid does not scroll pass the last right column.
-              if( scrollOffset > m_maxHorizontalScrollOffset )
-              {
-                scrollOffset = m_maxHorizontalScrollOffset;
-              }
-              m_parentScrollViewer.ScrollToHorizontalOffset( scrollOffset );
-            }
-          }
-          else if( ( m_autoScrollDirection & AutoScrollDirection.Up ) == AutoScrollDirection.Up )
-          {
-            m_parentScrollViewer.LineUp();
-          }
-          else if( ( m_autoScrollDirection & AutoScrollDirection.Down ) == AutoScrollDirection.Down )
-          {
-            m_parentScrollViewer.LineDown();
-          }
-
-          m_lastAutoScrollTime = DateTime.Now;
-        }
+        m_autoScrollManager.StopAutoScroll();
       }
     }
 
     protected virtual void NotifyDragOutsideQueryCursor( object sender, QueryCursorEventArgs e )
     {
-      e.Cursor = ( this.DropOutsideCursor != null )
-        ? this.DropOutsideCursor
-        : Cursors.No;
+      e.Cursor = ( this.DropOutsideCursor != null ) ? this.DropOutsideCursor : Cursors.No;
 
       if( this.DragOutsideQueryCursor != null )
       {
@@ -660,13 +606,12 @@ namespace Xceed.Utils.Wpf.DragDrop
 
       this.ProcessDragOnCurrentDropTarget( dropTarget );
 
-      // Call this method after the drag is processed in case
-      // the ShowDraggedElementGhost property was modified by the GetDropTargetOnDrag
+      // Call this method after the drag is processed in case the ShowDraggedElementGhost property was modified by the GetDropTargetOnDrag
       this.UpdateDraggedElementGhostOnDrag( e );
 
-      if( m_parentScrollViewer != null )
+      if( m_autoScrollManager != null )
       {
-        this.CheckForAutoScroll( e.GetPosition( m_parentScrollViewer ) );
+        m_autoScrollManager.ProcessMouseMove( e );
       }
     }
 
@@ -691,19 +636,79 @@ namespace Xceed.Utils.Wpf.DragDrop
       }
     }
 
-    private Visual GetDraggedElementWindow()
+    private static Vector CalculateMouseToScreenPositionFactor( FrameworkElement element )
+    {
+      if( element == null )
+        return new Vector( 1d, 1d );
+
+      var source = PresentationSource.FromVisual( element );
+      if( source == null )
+      {
+        var parent = DragSourceManager.GetPopupParent( element );
+        while( parent != null )
+        {
+          source = PresentationSource.FromDependencyObject( parent );
+          if( source != null )
+            break;
+
+          parent = DragSourceManager.GetPopupParent( parent );
+        }
+      }
+
+      double x, y;
+
+      if( source != null )
+      {
+        var deviceUnits = source.CompositionTarget.TransformToDevice;
+        x = deviceUnits.M11;
+        y = deviceUnits.M22;
+      }
+      else
+      {
+        using( var hwnd = new HwndSource( new HwndSourceParameters() ) )
+        {
+          var deviceUnits = hwnd.CompositionTarget.TransformToDevice;
+          x = deviceUnits.M11;
+          y = deviceUnits.M22;
+        }
+      }
+
+      return new Vector( ( x == 0d ) ? 1d : 1d / x, ( y == 0d ) ? 1d : 1d / y );
+    }
+
+    private static DependencyObject GetPopupParent( DependencyObject element )
+    {
+      while( element != null )
+      {
+        var popup = element as Popup;
+        if( popup != null )
+        {
+          var parent = popup.Parent;
+          if( parent != null )
+            return parent;
+
+          var target = popup.PlacementTarget;
+          if( target != null )
+            return target;
+        }
+
+        element = VisualTreeHelper.GetParent( element );
+      }
+
+      return null;
+    }
+
+    private FrameworkElement GetDraggedElementWindow()
     {
       DependencyObject current = this.DraggedElement;
       while( current != null )
       {
-        Popup popup = current as Popup;
-
         //If the grid is in a popup, this becomes the owning window, so return it.
+        var popup = current as Popup;
         if( popup != null )
           return popup;
 
-        Window window = current as Window;
-
+        var window = current as Window;
         if( window != null )
           return window;
 
@@ -714,103 +719,6 @@ namespace Xceed.Utils.Wpf.DragDrop
       return null;
     }
 
-    private void CheckForAutoScroll( Point clientMousePosition )
-    {
-      if( m_timer == null )
-        return; // AutoScroll is not active
-
-      Size scrollViewerRenderSize = m_parentScrollViewer.RenderSize;
-
-      m_autoScrollDirection = AutoScrollDirection.None;
-      if( m_parentScrollViewer.ScrollableWidth > 0 )
-      {
-        //Calculate the right edge maximum scroll offset
-        m_maxHorizontalScrollOffset = m_parentScrollViewer.ExtentWidth - scrollViewerRenderSize.Width;
-
-        //Scrolling left
-        if( ( clientMousePosition.X < AutoScrollTreshold ) &&
-            ( m_parentScrollViewer.HorizontalOffset > 0 ) )
-        {
-          m_autoScrollDirection |= AutoScrollDirection.Left;
-          m_scrollAmount = -1;
-
-          if( clientMousePosition.X < -1 )
-          {
-            m_scrollAmount = clientMousePosition.X;
-          }
-
-          //Scroll to a maximum of one page at a time.
-          if( m_scrollAmount < -scrollViewerRenderSize.Width )
-          {
-            m_scrollPage = true;
-          }
-          else
-          {
-            m_scrollPage = false;
-          }
-        }
-        //Scrolling right
-        else if( ( clientMousePosition.X > scrollViewerRenderSize.Width - AutoScrollTreshold )
-                 && ( m_parentScrollViewer.HorizontalOffset < m_maxHorizontalScrollOffset ) )
-        {
-          m_autoScrollDirection |= AutoScrollDirection.Right;
-          double rightEdgeMouseDelta = clientMousePosition.X - scrollViewerRenderSize.Width;
-          m_scrollAmount = 1;
-
-          if( rightEdgeMouseDelta > 1 )
-          {
-            m_scrollAmount = rightEdgeMouseDelta;
-          }
-
-          //Scroll to a maximum of one page at a time.
-          if( m_scrollAmount > scrollViewerRenderSize.Width )
-          {
-            m_scrollPage = true;
-          }
-          else
-          {
-            m_scrollPage = false;
-          }
-        }
-      }
-
-      if( m_parentScrollViewer.ScrollableHeight > 0 )
-      {
-        if( ( clientMousePosition.Y < AutoScrollTreshold )
-            && ( m_parentScrollViewer.VerticalOffset > 0 ) )
-        {
-          m_autoScrollDirection |= AutoScrollDirection.Up;
-        }
-        else if( ( clientMousePosition.Y > scrollViewerRenderSize.Height - AutoScrollTreshold )
-            && ( m_parentScrollViewer.VerticalOffset < m_parentScrollViewer.ExtentHeight - scrollViewerRenderSize.Height ) )
-        {
-          m_autoScrollDirection |= AutoScrollDirection.Down;
-        }
-      }
-
-      if( m_autoScrollDirection == AutoScrollDirection.None )
-      {
-        this.StopAutoScroll();
-      }
-      else
-      {
-        // The DispatcherTimer is not a priority event. The Tick event won't fire while 
-        // the user moves the mouse pointer. That's why we manually call the 
-        // PerformAutoScroll method (on each MouseMove, i.e. Drag). When the user doesn't 
-        // move the mouse pointer, the timer will take over to do the AutoScroll.
-        if( !m_timer.IsEnabled )
-        {
-          m_timer.Start();
-        }
-
-        this.PerformAutoScroll();
-      }
-    }
-
-    private void OnAutoScrollTimer_Tick( object sender, EventArgs e )
-    {
-      this.PerformAutoScroll();
-    }
 
     private void OnDraggedElement_QueryCursor( object sender, QueryCursorEventArgs e )
     {
@@ -855,26 +763,9 @@ namespace Xceed.Utils.Wpf.DragDrop
 
     #endregion
 
-    private AutoScrollDirection m_autoScrollDirection = AutoScrollDirection.None;
-    private DispatcherTimer m_timer = null;
-    private DateTime m_lastAutoScrollTime;
-    private double m_scrollAmount;
-    private double m_maxHorizontalScrollOffset;
-    private bool m_scrollPage;
-
     //This is used to position the DraggedElementGhost as such.
-    private Point m_ghostInitialScreenPositon;
+    private Vector m_draggedElementMouseOffset;
 
-    private ScrollViewer m_parentScrollViewer;
-
-    [Flags()]
-    private enum AutoScrollDirection
-    {
-      None = 0,
-      Left = 1,
-      Right = 2,
-      Up = 4,
-      Down = 8
-    }
+    private AutoScrollManager m_autoScrollManager;
   }
 }

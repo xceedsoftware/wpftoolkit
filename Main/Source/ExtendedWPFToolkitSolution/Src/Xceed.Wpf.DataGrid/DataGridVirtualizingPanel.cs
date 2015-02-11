@@ -47,9 +47,7 @@ namespace Xceed.Wpf.DataGrid
         if( ( control1 != null ) && ( m_customGenerator != null ) )
         {
           if( control1.IsGrouping == true )
-          {
             throw new NotSupportedException( "GroupStyles are not supported by the DataGridVirtualizingPanel." );
-          }
 
           retval = m_customGenerator;
         }

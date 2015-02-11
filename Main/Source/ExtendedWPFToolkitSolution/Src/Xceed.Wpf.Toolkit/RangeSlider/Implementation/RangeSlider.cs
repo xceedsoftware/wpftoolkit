@@ -49,16 +49,6 @@ namespace Xceed.Wpf.Toolkit
 
       #endregion Members
 
-      #region Enums
-
-      public enum OrientationEnum
-      {
-          Horizontal,
-          Vertical
-      };
-
-      #endregion Enums
-
       #region Constructors
 
       static RangeSlider()
@@ -177,7 +167,7 @@ namespace Xceed.Wpf.Toolkit
       /// HigherValue property represents the higher value within the selected range.
       /// </summary>
       public static readonly DependencyProperty HigherValueProperty = DependencyProperty.Register( "HigherValue", typeof( double ), typeof( RangeSlider )
-        , new FrameworkPropertyMetadata( RangeSlider.OnHigherValueChanged, RangeSlider.CoerceHigherValue ) );
+        , new FrameworkPropertyMetadata( 0d, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, RangeSlider.OnHigherValueChanged ) );
 
       public double HigherValue
       {
@@ -191,14 +181,6 @@ namespace Xceed.Wpf.Toolkit
         }
       }
 
-      private static object CoerceHigherValue( DependencyObject sender, object value )
-      {
-        RangeSlider rangeSlider = sender as RangeSlider;
-        double newValue = ( double )value;
-
-        return Math.Max( rangeSlider.LowerValue, Math.Max( rangeSlider.Minimum, Math.Min( rangeSlider.Maximum, newValue ) ) );
-      }
-
       private static void OnHigherValueChanged( DependencyObject sender, DependencyPropertyChangedEventArgs args )
       {
         RangeSlider rangeSlider = sender as RangeSlider;
@@ -210,7 +192,7 @@ namespace Xceed.Wpf.Toolkit
 
       protected virtual void OnHigherValueChanged( double oldValue, double newValue )
       {
-        this.AdjustWidths( this.Minimum, this.Maximum, this.LowerValue, newValue );
+        this.AdjustView();
 
         RoutedEventArgs args = new RoutedEventArgs();
         args.RoutedEvent = RangeSlider.HigherValueChangedEvent;
@@ -273,7 +255,7 @@ namespace Xceed.Wpf.Toolkit
       /// 
 
       private static DependencyPropertyKey LowerRangeWidthPropertyKey = DependencyProperty.RegisterAttachedReadOnly( "LowerRangeWidth", typeof( double )
-        , typeof( RangeSlider ), new PropertyMetadata( 0d ) );
+        , typeof( RangeSlider ), new PropertyMetadata( 0d  ) );
 
       public static readonly DependencyProperty LowerRangeWidthProperty = LowerRangeWidthPropertyKey.DependencyProperty;
 
@@ -319,7 +301,7 @@ namespace Xceed.Wpf.Toolkit
       /// LowerValue property represents the lower value within the selected range.
       /// </summary>
       public static readonly DependencyProperty LowerValueProperty = DependencyProperty.Register( "LowerValue", typeof( double ), typeof( RangeSlider )
-        , new FrameworkPropertyMetadata( RangeSlider.OnLowerValueChanged, RangeSlider.CoerceLowerValue ) );
+        , new FrameworkPropertyMetadata( 0d, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, RangeSlider.OnLowerValueChanged ) );
 
       public double LowerValue
       {
@@ -333,19 +315,6 @@ namespace Xceed.Wpf.Toolkit
         }
       }
 
-      private static object CoerceLowerValue( DependencyObject sender, object value )
-      {
-        RangeSlider rangeSlider = sender as RangeSlider;
-        double newValue = ( double )value;
-
-        if( ( rangeSlider.HigherValue == 0 ) && ( rangeSlider.LowerValue == 0 ) )
-          newValue = Math.Max( rangeSlider.Minimum, Math.Min( rangeSlider.Maximum, newValue ) );
-        else
-          newValue = Math.Min( Math.Max( rangeSlider.Minimum, Math.Min( rangeSlider.Maximum, newValue ) ), rangeSlider.HigherValue );
-
-        return newValue;
-      }
-
       private static void OnLowerValueChanged( DependencyObject sender, DependencyPropertyChangedEventArgs args )
       {
         RangeSlider rangeSlider = sender as RangeSlider;
@@ -357,9 +326,7 @@ namespace Xceed.Wpf.Toolkit
 
       protected virtual void OnLowerValueChanged( double oldValue, double newValue )
       {
-        this.HigherValue = Math.Max( this.HigherValue, newValue );
-
-          this.AdjustWidths( this.Minimum, this.Maximum, newValue, this.HigherValue );
+          this.AdjustView();
 
           RoutedEventArgs args = new RoutedEventArgs();
           args.RoutedEvent = RangeSlider.LowerValueChangedEvent;
@@ -374,7 +341,7 @@ namespace Xceed.Wpf.Toolkit
       /// Maximum property represents the maximum value, which can be selected, in a range.
       /// </summary>
       public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register( "Maximum", typeof( double ), typeof( RangeSlider )
-        , new FrameworkPropertyMetadata( RangeSlider.OnMaximumChanged, RangeSlider.CoerceMaximum ) );
+        , new FrameworkPropertyMetadata( RangeSlider.OnMaximumChanged ) );
 
       public double Maximum
       {
@@ -388,14 +355,6 @@ namespace Xceed.Wpf.Toolkit
         }
       }
 
-      private static object CoerceMaximum( DependencyObject sender, object value )
-      {
-        RangeSlider rangeSlider = sender as RangeSlider;
-        double newValue = ( double )value;
-
-        return Math.Max( newValue, rangeSlider.HigherValue );
-      }
-
       private static void OnMaximumChanged( DependencyObject sender, DependencyPropertyChangedEventArgs args )
       {
         RangeSlider rangeSlider = sender as RangeSlider;
@@ -407,7 +366,7 @@ namespace Xceed.Wpf.Toolkit
 
       protected virtual void OnMaximumChanged( double oldValue, double newValue )
       {
-        this.AdjustWidths( this.Minimum, newValue, this.LowerValue, this.HigherValue );
+        this.AdjustView();
       }
 
       #endregion Maximum
@@ -418,7 +377,7 @@ namespace Xceed.Wpf.Toolkit
       /// Minimum property represents the minimum value, which can be selected, in a range.
       /// </summary>
       public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register( "Minimum", typeof( double ), typeof( RangeSlider )
-        , new FrameworkPropertyMetadata( RangeSlider.OnMinimumChanged, RangeSlider.CoerceMinimum ) );
+        , new FrameworkPropertyMetadata( RangeSlider.OnMinimumChanged ) );
 
       public double Minimum
       {
@@ -430,23 +389,6 @@ namespace Xceed.Wpf.Toolkit
         {
           SetValue( RangeSlider.MinimumProperty, value );
         }
-      }
-
-      private static object CoerceMinimum( DependencyObject sender, object value )
-      {
-        RangeSlider rangeSlider = sender as RangeSlider;
-        double newValue = ( double )value;
-
-        if( ( rangeSlider.Minimum == 0.0 ) && ( rangeSlider.LowerValue == 0 ) && ( rangeSlider.HigherValue == 0 ) && ( rangeSlider.Maximum == 0 ) )
-        {
-          newValue = Math.Max( newValue, rangeSlider.LowerValue );
-        }
-        else
-        {
-          newValue = Math.Min( newValue, rangeSlider.LowerValue );
-        }
-
-        return newValue;
       }
 
       private static void OnMinimumChanged( DependencyObject sender, DependencyPropertyChangedEventArgs args )
@@ -461,7 +403,7 @@ namespace Xceed.Wpf.Toolkit
       protected virtual void OnMinimumChanged( double oldValue, double newValue )
       {
         // adjust the range width
-        this.AdjustWidths( newValue, this.Maximum, this.LowerValue, this.HigherValue );
+        this.AdjustView();
       }
 
       #endregion Minimum
@@ -472,14 +414,14 @@ namespace Xceed.Wpf.Toolkit
       /// # TODODOC
       /// Get/Set the RangeSlider orientation.
       /// </summary>
-      public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register( "Orientation", typeof( OrientationEnum ), typeof( RangeSlider ),
-          new FrameworkPropertyMetadata( OrientationEnum.Horizontal, RangeSlider.OnOrientationChanged ) );
+      public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register( "Orientation", typeof( Orientation ), typeof( RangeSlider ),
+          new FrameworkPropertyMetadata( Orientation.Horizontal, RangeSlider.OnOrientationChanged ) );
 
-      public OrientationEnum Orientation
+      public Orientation Orientation
       {
         get
         {
-          return ( OrientationEnum )GetValue( RangeSlider.OrientationProperty );
+          return ( Orientation )GetValue( RangeSlider.OrientationProperty );
         }
         set
         {
@@ -492,11 +434,11 @@ namespace Xceed.Wpf.Toolkit
         RangeSlider rangeSlider = sender as RangeSlider;
         if( rangeSlider != null )
         {
-          rangeSlider.OnOrientationChanged( ( OrientationEnum )e.OldValue, ( OrientationEnum )e.NewValue );
+          rangeSlider.OnOrientationChanged( ( Orientation )e.OldValue, ( Orientation )e.NewValue );
         }
       }
 
-      protected virtual void OnOrientationChanged( OrientationEnum oldValue, OrientationEnum newValue )
+      protected virtual void OnOrientationChanged( Orientation oldValue, Orientation newValue )
       {
       }
 
@@ -635,21 +577,25 @@ namespace Xceed.Wpf.Toolkit
         if( _lowerSlider != null )
         {
           _lowerSlider.Loaded -= this.Slider_Loaded;
+          _lowerSlider.ValueChanged -= LowerSlider_ValueChanged;
         }
         _lowerSlider = this.Template.FindName( PART_LowerSlider, this ) as Slider;
         if( _lowerSlider != null )
         {
           _lowerSlider.Loaded += this.Slider_Loaded;
+          _lowerSlider.ValueChanged += LowerSlider_ValueChanged;
         }
 
         if( _higherSlider != null )
         {
-            _higherSlider.Loaded -= this.Slider_Loaded;    
+            _higherSlider.Loaded -= this.Slider_Loaded;
+            _higherSlider.ValueChanged -= HigherSlider_ValueChanged;
         }
         _higherSlider = this.Template.FindName( PART_HigherSlider, this ) as Slider;
         if( _higherSlider != null )
         {
-          _higherSlider.Loaded += this.Slider_Loaded; 
+          _higherSlider.Loaded += this.Slider_Loaded;
+          _higherSlider.ValueChanged += HigherSlider_ValueChanged;
         }
       }
 
@@ -690,19 +636,22 @@ namespace Xceed.Wpf.Toolkit
         return 0d;
       }
 
-      private void AdjustWidths( double minimum, double maximum, double lowerValue, double higherValue )
+      private void AdjustView()
       {
+        //Coerce values to make them consistent.
+        CoercedValues cv = this.GetCoercedValues();
+
         double actualWidth = 0;
         double lowerSliderThumbWidth = 0d;
         double higherSliderThumbWidth = 0d;
 
-        if( this.Orientation == OrientationEnum.Horizontal )
+        if( this.Orientation == Orientation.Horizontal )
         {
           actualWidth = this.ActualWidth;
           lowerSliderThumbWidth = RangeSlider.GetThumbWidth( _lowerSlider );
           higherSliderThumbWidth = RangeSlider.GetThumbWidth( _higherSlider );
         }
-        else if( this.Orientation == OrientationEnum.Vertical )
+        else if( this.Orientation == Orientation.Vertical )
         {
           actualWidth = this.ActualHeight;
           lowerSliderThumbWidth = RangeSlider.GetThumbHeight( _lowerSlider );
@@ -711,20 +660,34 @@ namespace Xceed.Wpf.Toolkit
 
         actualWidth -= ( lowerSliderThumbWidth + higherSliderThumbWidth );
 
-        double entireRange = maximum - minimum;
+        this.SetLowerSliderValues( cv.LowerValue, cv.Minimum, cv.Maximum );
+        this.SetHigherSliderValues( cv.HigherValue, cv.Minimum, cv.Maximum );
 
-        this.HigherRangeWidth = ( actualWidth * ( maximum - higherValue ) ) / entireRange;
+        double entireRange = cv.Maximum - cv.Minimum;
 
-        this.RangeWidth = ( actualWidth * ( higherValue - lowerValue ) ) / entireRange;
+        if( entireRange > 0 )
+        {
+          this.HigherRangeWidth = ( actualWidth * ( cv.Maximum - cv.HigherValue ) ) / entireRange;
 
-        this.LowerRangeWidth = ( actualWidth * ( lowerValue - minimum ) ) / entireRange;
+          this.RangeWidth = ( actualWidth * ( cv.HigherValue - cv.LowerValue ) ) / entireRange;
+
+          this.LowerRangeWidth = ( actualWidth * ( cv.LowerValue - cv.Minimum ) ) / entireRange;
+        }
+        else
+        {
+          this.HigherRangeWidth = 0d;
+          this.RangeWidth = 0d;
+          this.LowerRangeWidth = actualWidth;
+        }
+
+
       }
 
       private void SetSlidersMargins()
       {
         if( ( _lowerSlider != null ) && ( _higherSlider != null ) )
         {
-          if( this.Orientation == OrientationEnum.Horizontal )
+          if( this.Orientation == Orientation.Horizontal )
           {
             double lowerSliderThumbWidth = RangeSlider.GetThumbWidth( _lowerSlider );
             double higherSliderThumbWidth = RangeSlider.GetThumbWidth( _higherSlider );
@@ -740,6 +703,53 @@ namespace Xceed.Wpf.Toolkit
             _higherSlider.Margin = new Thickness( 0d, 0d, 0d, lowerSliderThumbHeight );
             _lowerSlider.Margin = new Thickness( 0d, higherSliderThumbHeight, 0d, 0d );
           }
+        }
+      }
+
+      private CoercedValues GetCoercedValues()
+      {
+        CoercedValues cv = new CoercedValues();
+        cv.Minimum = Math.Min( this.Minimum, this.Maximum );
+        cv.Maximum = Math.Max( cv.Minimum, this.Maximum );
+        cv.LowerValue = Math.Max( cv.Minimum, Math.Min( cv.Maximum, this.LowerValue ) );
+        cv.HigherValue = Math.Max( cv.Minimum, Math.Min( cv.Maximum, this.HigherValue ) );
+        cv.HigherValue = Math.Max( cv.LowerValue, cv.HigherValue );
+
+        return cv;
+      }
+
+      private void SetLowerSliderValues( double value, double? minimum, double? maximum )
+      {
+        this.SetSliderValues( _lowerSlider, this.LowerSlider_ValueChanged, value, minimum, maximum );
+      }
+
+      private void SetHigherSliderValues( double value, double? minimum, double? maximum )
+      {
+        this.SetSliderValues( _higherSlider, this.HigherSlider_ValueChanged, value, minimum, maximum );
+      }
+
+      private void SetSliderValues(
+        Slider slider,
+        RoutedPropertyChangedEventHandler<double> handler,
+        double value,
+        double? minimum,
+        double? maximum )
+      {
+        if( slider != null )
+        {
+          slider.ValueChanged -= handler;
+
+          slider.Value = value;
+          if( minimum != null )
+          {
+            slider.Minimum = minimum.Value;
+          }
+          if( maximum != null )
+          {
+            slider.Maximum = maximum.Value;
+          }
+
+          slider.ValueChanged += handler;
         }
       }
 
@@ -779,25 +789,73 @@ namespace Xceed.Wpf.Toolkit
 
       private void LowerRange_Click(object sender, RoutedEventArgs e)
       {
-        this.LowerValue -= this.Step;
+        CoercedValues cv = this.GetCoercedValues();
+        //When Maximum is not greater than Minimum, the
+        //slider display is in an inconsistant state. Don't 
+        //consider any operation from the user
+        if( cv.Minimum < cv.Maximum )
+        {
+          double newValue = cv.LowerValue - this.Step;
+          this.LowerValue = Math.Min( cv.Maximum, Math.Max( cv.Minimum, newValue ) );
+        }
       }
 
       private void HigherRange_Click(object sender, RoutedEventArgs e)
       {
-        this.HigherValue += this.Step;
+        CoercedValues cv = this.GetCoercedValues();
+        //When Maximum is not greater than Minimum, the
+        //slider display is in an inconsistant state. Don't 
+        //consider any operation from the user
+        if( cv.Minimum < cv.Maximum )
+        {
+          double newValue = cv.HigherValue + this.Step;
+          this.HigherValue = Math.Min( cv.Maximum, Math.Max( cv.Minimum, newValue ) );
+        }
       }
 
       private void RangeSlider_SizeChanged( object sender, SizeChangedEventArgs e )
       {
-        this.AdjustWidths( this.Minimum, this.Maximum, this.LowerValue, this.HigherValue );
+        this.AdjustView();
       }
 
       private void Slider_Loaded( object sender, RoutedEventArgs e )
       {
         this.SetSlidersMargins();
-        this.AdjustWidths( this.Minimum, this.Maximum, this.LowerValue, this.HigherValue );
+        this.AdjustView();
+      }
+
+      private void LowerSlider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
+      {
+        if( _lowerSlider.IsLoaded )
+        {
+          CoercedValues cv = this.GetCoercedValues();
+          double newValue = Math.Max( cv.Minimum, Math.Min( cv.Maximum, e.NewValue ) );
+          newValue = Math.Min( newValue, cv.HigherValue );
+          this.SetLowerSliderValues( newValue, null, null );
+          this.LowerValue = newValue;
+        }
+      }
+
+      private void HigherSlider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
+      {
+        if( _higherSlider.IsLoaded )
+        {
+          CoercedValues cv = this.GetCoercedValues();
+          double newValue = Math.Max( cv.Minimum, Math.Min( cv.Maximum, e.NewValue ) );
+          newValue = Math.Max( newValue, cv.LowerValue );
+          this.SetHigherSliderValues( newValue, null, null );
+          this.HigherValue = newValue;
+        }
       }
 
       #endregion Events Handlers
+
+      private struct CoercedValues
+      {
+        public double Minimum;
+        public double Maximum;
+        public double LowerValue;
+        public double HigherValue;
+      }
     }
 }

@@ -188,7 +188,7 @@ namespace Xceed.Wpf.AvalonDock
                                 if (Layout.ActiveContent != null)
                                     FocusElementManager.SetFocusOnLastElement(Layout.ActiveContent);
                                 _setFocusAsyncOperation = null;
-                            }), DispatcherPriority.Background);
+                            } ), DispatcherPriority.Input );
                     }
                 }
 

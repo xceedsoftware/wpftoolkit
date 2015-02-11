@@ -1907,10 +1907,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       if( _content != null )
       {
         // measure visuals according to supplied constraint
-        base.MeasureOverride( constraint );
+        Size size = base.MeasureOverride( constraint );
 
         // now re-measure content to let the child be whatever size it desires
         _content.Measure( new Size( double.PositiveInfinity, double.PositiveInfinity ) );
+        return size;
       }
 
 
@@ -3342,7 +3343,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
         // adjust translateFrom based on relativeTo
         translateFrom = this.TranslatePoint( relativeTo, _contentPresenter );
       }
-      else
+      else if( _contentPresenter != null )
       {
         // prior to the first render, just use the ContentPresenter's transform and do not adjust translateFrom
         if( _contentPresenter.RenderTransform == Transform.Identity )

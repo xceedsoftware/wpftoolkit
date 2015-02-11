@@ -44,12 +44,12 @@
                <Border x:Name="Border" SnapsToDevicePixels="True" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" >
                   <Grid>
                      <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition x:Name="firstContentColumn" Width="*" />
+                        <ColumnDefinition x:Name="secondContentColumn" Width="Auto" />
                      </Grid.ColumnDefinitions>
-                     <ContentPresenter Focusable="False" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                     <ContentPresenter x:Name="contentPresenter" Focusable="False" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
 
-                     <Grid Grid.Column="1" Visibility="{TemplateBinding ShowButtonSpinner, Converter={StaticResource BooleanToVisibilityConverter}}" Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}">
+                     <Grid x:Name="gridContent" Grid.Column="1" Visibility="{TemplateBinding ShowButtonSpinner, Converter={StaticResource BooleanToVisibilityConverter}}" Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}">
                         <Grid.RowDefinitions>
                            <RowDefinition Height="*" />
                            <RowDefinition Height="*" />
@@ -76,6 +76,21 @@
                   </Trigger>
                   <Trigger SourceName="PART_DecreaseButton" Property="IsEnabled" Value="False">
                      <Setter TargetName="PART_DecreaseButton" Property="ContentTemplate" Value="{StaticResource DecreaseGlyphDisabledKey}" />
+                  </Trigger>
+                  <Trigger Property="ButtonSpinnerLocation"
+                           Value="Left">
+                     <Setter TargetName="firstContentColumn"
+                             Property="Width"
+                             Value="Auto" />
+                     <Setter TargetName="secondContentColumn"
+                             Property="Width"
+                             Value="*" />
+                     <Setter TargetName="contentPresenter"
+                             Property="Grid.Column"
+                             Value="1" />
+                     <Setter TargetName="gridContent"
+                             Property="Grid.Column"
+                             Value="0" />
                   </Trigger>
                </ControlTemplate.Triggers>
             </ControlTemplate>

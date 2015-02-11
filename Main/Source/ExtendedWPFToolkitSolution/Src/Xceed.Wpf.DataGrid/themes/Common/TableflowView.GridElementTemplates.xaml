@@ -22,7 +22,7 @@
                     xmlns:views="clr-namespace:Xceed.Wpf.DataGrid.Views">
 
    <ResourceDictionary.MergedDictionaries>
-      <ResourceDictionary Source="Common.Resources.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="Common.Resources.xaml" />
    </ResourceDictionary.MergedDictionaries>
 
    <Style x:Key="tableflowViewRowFocusVisualStyle"
@@ -44,6 +44,7 @@
       </Setter>
    </Style>
 
+   <conv:NullToBooleanConverter x:Key="nullToBooleanConverter" />
    <conv:ThicknessConverter x:Key="inverseThicknessConverter"
                             InverseValue="True" />
 
@@ -258,7 +259,7 @@
             <MultiDataTrigger.Conditions>
 
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=IsSelected}"
-                          Value="True" />               
+                          Value="True" />
 
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).DataGridControl.IsKeyboardFocusWithin}"
                           Value="True" />
@@ -413,6 +414,7 @@
       </Grid>
 
       <ControlTemplate.Triggers>
+
          <!-- When there are details, display the Toggle button for the expansion, collapsing of the details -->
          <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
@@ -604,6 +606,8 @@
    <!--**************************
     * TEMPLATE: ColumnManagerCell 
     ************************** -->
+    <conv:SortingDirectionToBooleanConverter x:Key="SortingDirectionToBooleanConverter" />
+
    <ControlTemplate x:Key="tableflowViewColumnManagerCellTemplate"
                     TargetType="local:ColumnManagerCell">
 
@@ -662,7 +666,6 @@
                                       Visibility="Collapsed"
                                       Margin="2,0,0,0"
                                       Opacity="0.5" />
-
                      </Grid>
 
                   </Border>
@@ -688,7 +691,6 @@
                               <ContentPresenter x:Name="sortGlyphPresenter"
                                                 Content="{x:Null}"
                                                 ContentTemplate="{x:Null}" />
-
                            </StackPanel>
                         </Border>
 

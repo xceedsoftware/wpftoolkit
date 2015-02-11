@@ -24,8 +24,6 @@ namespace Xceed.Wpf.DataGrid
 {
   internal class DataGridLINQPageManager : DataGridPageManagerBase
   {
-    #region CONSTRUCTORS
-
     public DataGridLINQPageManager( DataGridVirtualizingQueryableCollectionView collectionView, object syncRoot, bool supportsPrimaryKeyOptimizations )
       : base( collectionView )
     {
@@ -33,9 +31,11 @@ namespace Xceed.Wpf.DataGrid
       m_syncRoot = syncRoot;
     }
 
-    #endregion CONSTRUCTORS
-
-    #region DATA VIRTUALIZATION
+    protected override void DisposeCore()
+    {
+      m_syncRoot = null;
+      base.DisposeCore();
+    }
 
     protected override int OnQueryItemCountCore( VirtualList virtualList )
     {
@@ -80,65 +80,6 @@ namespace Xceed.Wpf.DataGrid
       System.Threading.ThreadPool.QueueUserWorkItem( new System.Threading.WaitCallback( this.AsyncGatherItems ), new object[] { queryInfo, queryableToUse, queryableIsReversed } );
     }
 
-
-    private void AsyncGatherItems( object workItem )
-    {
-      object[] parameters = ( object[] )workItem;
-
-      AsyncQueryInfo queryInfo = parameters[ 0 ] as AsyncQueryInfo;
-
-      if( queryInfo.ShouldAbort )
-        return;
-
-      IQueryable queryable = ( IQueryable )parameters[ 1 ];
-
-      object[] items = new object[ queryInfo.RequestedItemCount ];
-
-      System.Collections.IEnumerator enumerator;
-
-      lock( m_syncRoot )
-      {
-        // We reverify here since a reset could have been issued while we were waiting on the lock statement.
-        if( ( queryInfo.ShouldAbort ) || ( !this.IsConnected ) || ( this.IsDisposed ) )
-          return;
-
-        try
-        {
-          Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization,"Beginning Provider Execute for page at start index: " + queryInfo.StartIndex.ToString() );
-
-          enumerator = queryable.GetEnumerator();
-
-          Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization,"Ended Provider Execute for page at start index: " + queryInfo.StartIndex.ToString() );
-
-          int i = 0;
-
-          while( enumerator.MoveNext() )
-          {
-            object current = enumerator.Current;
-
-            if( current != null )
-              items[ i ] = enumerator.Current;
-
-            i++;
-          }
-        }
-        catch( Exception exception )
-        {
-          // TimeOut exeception or other.
-          queryInfo.AbortQuery();
-          queryInfo.Error = exception.Message;
-          return;
-        }
-      }
-
-      bool queryableWasReversed = ( bool )parameters[ 2 ];
-
-      if( queryableWasReversed )
-        Array.Reverse( items );
-
-      queryInfo.EndQuery( items );
-    }
-
     protected internal override void OnQueryItemsCompleted( VirtualPage page, AsyncQueryInfo queryInfo, object[] fetchedItems )
     {
       DataGridVirtualizingQueryableCollectionView collectionView = this.CollectionView as DataGridVirtualizingQueryableCollectionView;
@@ -153,19 +94,78 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    protected override void DisposeCore()
+    private void AsyncGatherItems( object workItem )
     {
-      m_syncRoot = null;
-      base.DisposeCore();
+      object[] parameters = ( object[] )workItem;
+
+      AsyncQueryInfo queryInfo = parameters[ 0 ] as AsyncQueryInfo;
+
+      if( queryInfo.ShouldAbort )
+        return;
+
+      IQueryable queryable = ( IQueryable )parameters[ 1 ];
+      int requestedItemCount = queryInfo.RequestedItemCount;
+      object[] items = new object[ requestedItemCount ];
+
+      System.Collections.IEnumerator enumerator;
+
+      lock( m_syncRoot )
+      {
+        // We reverify here since a reset could have been issued while we were waiting on the lock statement.
+        if( ( queryInfo.ShouldAbort ) || ( !this.IsConnected ) || ( this.IsDisposed ) )
+          return;
+
+        try
+        {
+          Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "Beginning Provider Execute for page at start index: " + queryInfo.StartIndex.ToString() );
+
+          enumerator = queryable.GetEnumerator();
+
+          Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "Ended Provider Execute for page at start index: " + queryInfo.StartIndex.ToString() );
+
+          int i = 0;
+
+          while( enumerator.MoveNext() && ( i < requestedItemCount ) )
+          {
+            object current = enumerator.Current;
+
+            if( current != null )
+            {
+              items[ i ] = enumerator.Current;
+              i++;
+            }
+          }
+        }
+        catch( Exception exception )
+        {
+          // TimeOut exeception or other.
+          queryInfo.AbortQuery();
+          queryInfo.Error = exception.Message;
+          return;
+        }
+      }
+
+      items = items.Where( item => item != null ).ToArray();
+
+      try
+      {
+        if( items.Count() != requestedItemCount )
+          throw new InvalidOperationException( "TODODOC : The number of non-null items return by the source must be equal to the provided item count" );
+      }
+      catch
+      {
+        //go silently here, in case the next sequance give a valid result.  At the same time, if it does not, the dev has information when debugging.
+      }
+
+      bool queryableWasReversed = ( bool )parameters[ 2 ];
+
+      if( queryableWasReversed )
+        Array.Reverse( items );
+
+      queryInfo.EndQuery( items );
     }
-
-    #endregion DATA VIRTUALIZATION
-
-    #region PRIVATE FIELDS
 
     private object m_syncRoot;
     private bool m_supportsPrimaryKeyOptimizations;
-
-    #endregion PRIVATE FIELDS
   }
 }

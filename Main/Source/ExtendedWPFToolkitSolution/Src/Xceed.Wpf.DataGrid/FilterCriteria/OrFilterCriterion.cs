@@ -136,7 +136,7 @@ namespace Xceed.Wpf.DataGrid.FilterCriteria
         throw new ArgumentException( "PropertyName must not be empty.", "propertyName" );
       }
 
-      System.Linq.Expressions.Expression firstFilterLINQExpression = 
+      System.Linq.Expressions.Expression firstFilterLINQExpression =
         ( m_firstFilterCriterion == null ) ? null : m_firstFilterCriterion.ToLinqExpression( queryable, parameterExpression, propertyName );
 
       System.Linq.Expressions.Expression secondFilterLINQExpression =

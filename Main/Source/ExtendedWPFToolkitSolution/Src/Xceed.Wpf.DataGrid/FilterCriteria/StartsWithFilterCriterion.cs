@@ -45,7 +45,6 @@ namespace Xceed.Wpf.DataGrid.FilterCriteria
       return ( strValue == null ) ? "" : strValue + "*";
     }
 
-    // TODO: to be tested
     public override Expression ToLinqExpression( IQueryable queryable, ParameterExpression parameterExpression, string propertyName )
     {
       if( queryable == null )

@@ -23,6 +23,7 @@ namespace Xceed.Wpf.DataGrid
   public enum DistinctValuesConstraint
   {
     All,
-    Filtered
+    Filtered,
+    FilteredWithAllFilters
   }
 }

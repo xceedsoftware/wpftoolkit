@@ -15,33 +15,27 @@
   ***********************************************************************************/
 
 using System;
-using System.Xml;
-using System.Xml.XPath;
-using System.Globalization;
-using System.ComponentModel;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Data;
+using System.Data.Objects.DataClasses;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-
-using Xceed.Utils;
+using System.Xml;
 using Xceed.Wpf.DataGrid.Converters;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Data;
-using System.Collections.Specialized;
-using System.Reflection;
 using Xceed.Wpf.DataGrid.ValidationRules;
-using System.Data.Objects.DataClasses;
 
 namespace Xceed.Wpf.DataGrid
 {
-  internal class ItemsSourceHelper
+  internal static class ItemsSourceHelper
   {
-    #region PUBLIC STATIC METHODS
-
     public static bool IsSourceSupportingChangeNotification( object obj )
     {
       if( obj == null )
@@ -176,9 +170,7 @@ namespace Xceed.Wpf.DataGrid
       IList list = enumerable as IList;
 
       if( list != null )
-      {
         return ( ( list.Count > 0 ) ? list[ 0 ] : null );
-      }
 
       try
       {
@@ -186,7 +178,9 @@ namespace Xceed.Wpf.DataGrid
 
 
         if( enumerator.MoveNext() )
+        {
           current = enumerator.Current;
+        }
 
       }
       catch( NotSupportedException )
@@ -197,10 +191,7 @@ namespace Xceed.Wpf.DataGrid
       return current;
     }
 
-    public static object AddNewDataItem(
-      IEnumerable itemsSourceCollection,
-      DataGridControl dataGridControl,
-      out int itemIndex )
+    public static object AddNewDataItem( IEnumerable itemsSourceCollection, DataGridControl dataGridControl, out int itemIndex )
     {
       DataGridCollectionViewBase dataGridCollectionViewBase = itemsSourceCollection as DataGridCollectionViewBase;
 
@@ -281,11 +272,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    public static void CancelNewDataItem(
-      IEnumerable itemsSourceCollection,
-      DataGridControl dataGridControl,
-      object newItem,
-      int newItemIndex )
+    public static void CancelNewDataItem( IEnumerable itemsSourceCollection, DataGridControl dataGridControl, object newItem, int newItemIndex )
     {
       DataGridCollectionViewBase dataGridCollectionViewBase = itemsSourceCollection as DataGridCollectionViewBase;
 
@@ -351,11 +338,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    public static void EndNewDataItem(
-      IEnumerable itemsSourceCollection,
-      DataGridControl dataGridControl,
-      object newItem,
-      ref int newItemIndex )
+    public static void EndNewDataItem( IEnumerable itemsSourceCollection, DataGridControl dataGridControl, object newItem, ref int newItemIndex )
     {
       DataGridCollectionViewBase dataGridCollectionViewBase = itemsSourceCollection as DataGridCollectionViewBase;
 
@@ -435,9 +418,7 @@ namespace Xceed.Wpf.DataGrid
       list.Add( newItem );
     }
 
-    public static Dictionary<string, FieldDescriptor> GetFieldDescriptors(
-      PropertyDescriptorCollection properties,
-      bool supportDBNull )
+    public static Dictionary<string, FieldDescriptor> GetFieldDescriptors( PropertyDescriptorCollection properties, bool supportDBNull )
     {
       int fieldCount = properties.Count;
 
@@ -449,11 +430,7 @@ namespace Xceed.Wpf.DataGrid
       return fieldDescriptors;
     }
 
-    public static void ExtractFieldDescriptors(
-      string namePrefix,
-      PropertyDescriptorCollection properties,
-      bool supportDBNull,
-      Dictionary<string, FieldDescriptor> fieldDescriptors )
+    public static void ExtractFieldDescriptors( string namePrefix, PropertyDescriptorCollection properties, bool supportDBNull, Dictionary<string, FieldDescriptor> fieldDescriptors )
     {
       int propertyCount = properties.Count;
 
@@ -491,14 +468,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    public static void GenerateColumnsFromItemsSourceFields(
-      ColumnCollection columns,
-      IDictionary<Type, CellEditor> defaultCellEditors,
-      Dictionary<string, FieldDescriptor> fields,
-      bool autoCreateForeignKeyConfigurations )
+    public static void GenerateColumnsFromItemsSourceFields( ColumnCollection columns, IDictionary<Type, CellEditor> defaultCellEditors, Dictionary<string, FieldDescriptor> fields,
+                                                             bool autoCreateForeignKeyConfigurations )
     {
-      DataGridControl dataGridControl = columns.DataGridControl;
-
       using( columns.DeferColumnAdditionMessages() )
       {
         foreach( FieldDescriptor field in fields.Values )
@@ -510,13 +482,11 @@ namespace Xceed.Wpf.DataGrid
 
           if( column == null )
           {
-            dataColumn = ItemsSourceHelper.CreateColumnFromItemsSourceField(
-              dataGridControl, defaultCellEditors, field, autoCreateForeignKeyConfigurations );
+            dataColumn = ItemsSourceHelper.CreateColumnFromItemsSourceField( defaultCellEditors, field, autoCreateForeignKeyConfigurations );
 
             if( dataColumn != null )
             {
               columns.Add( dataColumn );
-              ItemsSourceHelper.ApplySettingsRepositoryToColumn( dataColumn );
             }
           }
           else if( dataColumn != null )
@@ -604,31 +574,20 @@ namespace Xceed.Wpf.DataGrid
                 autoCreateForeignKeyConfigurations );
             }
 
-            // Disable warning for DisplayMemberBinding when internaly used
-#pragma warning disable 618
-
-            if( dataColumn.DisplayMemberBinding == null )
+            if( dataColumn.GetDisplayMemberBinding() == null )
             {
-              dataColumn.DisplayMemberBinding = ItemsSourceHelper.CreateDefaultBinding(
-                false, field.Name, field,
-                false, ( dataColumn.ReadOnly && !dataColumn.OverrideReadOnlyForInsertion ), dataType );
-
-              //mark the Column's Binding as AutoCreated.
+              dataColumn.SetDisplayMemberBinding( ItemsSourceHelper.CreateDefaultBinding( false, field.Name, field, dataColumn, false, dataType ) );
               dataColumn.IsBindingAutoCreated = true;
               dataColumn.IsBoundToDataGridUnboundItemProperty = field.IsDataGridUnboundItemProperty;
             }
 
-#pragma warning restore 618
+            column.DefaultCellRecyclingGroupDataType = dataType;
           }
         }
       } //end using
     }
 
-    public static Column CreateColumnFromItemsSourceField(
-      DataGridControl dataGridControl,
-      IDictionary<Type, CellEditor> defaultCellEditors,
-      FieldDescriptor field,
-      bool autoCreateForeignKeyConfigurations )
+    public static Column CreateColumnFromItemsSourceField( IDictionary<Type, CellEditor> defaultCellEditors, FieldDescriptor field, bool autoCreateForeignKeyConfigurations )
     {
       if( ( field.IsASubRelationship ) || ( !field.Browsable ) )
         return null;
@@ -646,21 +605,14 @@ namespace Xceed.Wpf.DataGrid
       // We only set ReadOnly when the value is true in order for the inheritence chain to work.  
       // Otherwise, the column value is always used instead of the row or grid value.
       if( readOnly )
+      {
         dataColumn.ReadOnly = readOnly;
+      }
 
       dataColumn.OverrideReadOnlyForInsertion = overrideReadOnlyForInsertion;
       dataColumn.Title = field.DisplayName;
 
-      // Disable warning for DisplayMemberBinding when internaly used
-#pragma warning disable 618
-
-      dataColumn.DisplayMemberBinding = ItemsSourceHelper.CreateDefaultBinding(
-        false, field.Name, field,
-        false, ( readOnly && !overrideReadOnlyForInsertion ), dataType );
-
-#pragma warning restore 618
-
-      //mark the Column's Binding as AutoCreated.
+      dataColumn.SetDisplayMemberBinding( ItemsSourceHelper.CreateDefaultBinding( false, field.Name, field, dataColumn, false, dataType ) );
       dataColumn.IsBindingAutoCreated = true;
       dataColumn.IsBoundToDataGridUnboundItemProperty = field.IsDataGridUnboundItemProperty;
 
@@ -699,35 +651,63 @@ namespace Xceed.Wpf.DataGrid
       }
 
       dataColumn.CellEditor = cellEditor;
+      dataColumn.DefaultCellRecyclingGroupDataType = dataType;
+
       return dataColumn;
     }
 
-    private static void ApplySettingsRepositoryToColumn( ColumnBase column )
+    public static ICustomTypeDescriptor GetCustomTypeDescriptor( IEnumerable itemsSource, Type itemType )
     {
+      var firstItem = ItemsSourceHelper.GetFirstItemByEnumerable( itemsSource );
+
+      var descriptor = firstItem as ICustomTypeDescriptor;
+      if( descriptor != null )
+      {
+        if( !( descriptor is DataItemTypeDescriptor ) )
+        {
+          descriptor = DataItemTypeDescriptionProvider.GetTypeDescriptor( itemType, descriptor );
+        }
+      }
+      else
+      {
+        descriptor = ItemsSourceHelper.GetCustomTypeDescriptor( firstItem, itemType );
+      }
+
+      return descriptor;
     }
 
-    public static System.Windows.Data.Binding CreateDefaultBinding(
-      bool dataItemIsDataRow,
-      string fieldName,
-      FieldDescriptor sourceField,
-      bool supportDBNull,
-      bool readOnly,
-      Type dataType )
+    public static ICustomTypeDescriptor GetCustomTypeDescriptor( object firstItem, Type itemType )
+    {
+      var descriptionProvider = TypeDescriptor.GetProvider( itemType );
+      if( !( descriptionProvider is DataItemTypeDescriptionProvider ) )
+      {
+        descriptionProvider = new DataItemTypeDescriptionProvider( descriptionProvider );
+      }
+
+      return descriptionProvider.GetTypeDescriptor( itemType, firstItem );
+    }
+
+    public static System.Windows.Data.Binding CreateDefaultBinding( bool dataItemIsDataRow, string fieldName, FieldDescriptor sourceField, ColumnBase column, bool supportDBNull,
+                                                                    Type dataType )
     {
       DataGridBindingInfo bindingInfo = new DataGridBindingInfo();
-
       PropertyDescriptor propertyDescriptor = null;
       string bindingPath = null;
       string bindingXPath = null;
+      bool readOnly;
 
       if( sourceField != null )
       {
         dataType = sourceField.DataType;
         supportDBNull = sourceField.SupportDBNull;
-        readOnly |= ( sourceField.ReadOnly && !sourceField.OverrideReadOnlyForInsertion );
+        readOnly = ( sourceField.ReadOnly && !sourceField.OverrideReadOnlyForInsertion );
         propertyDescriptor = sourceField.PropertyDescriptor;
         bindingXPath = sourceField.BindingXPath;
         bindingPath = sourceField.BindingPath;
+      }
+      else
+      {
+        readOnly = ( column.ReadOnly && !column.OverrideReadOnlyForInsertion );
       }
 
       if( dataItemIsDataRow )
@@ -752,7 +732,7 @@ namespace Xceed.Wpf.DataGrid
       }
 
       bindingInfo.ReadOnly = readOnly;
-      bindingInfo.Converter = new SourceDataConverter( supportDBNull );
+      bindingInfo.Converter = new ReadOnlyConverter( column, supportDBNull );
 
       bindingInfo.ValidationRules.Add( new SourceDataConverterValidationRule( supportDBNull, dataType ) );
 
@@ -816,6 +796,91 @@ namespace Xceed.Wpf.DataGrid
       return ItemsSourceHelper.GetFieldsForItemType( itemsSource, itemType, supportsDBNull );
     }
 
+    public static Dictionary<string, FieldDescriptor> GetFields( Dictionary<string, FieldDescriptor> masterFields, FieldNameMap fieldMap, IEnumerable itemsSource, Type itemType )
+    {
+      Dictionary<string, FieldDescriptor> fieldDescriptors;
+      DataGridCollectionViewBase dataGridCollectionViewBase = itemsSource as DataGridCollectionViewBase;
+
+      if( dataGridCollectionViewBase != null )
+      {
+        var itemProperties = dataGridCollectionViewBase.ItemProperties;
+
+        fieldDescriptors = new Dictionary<string, FieldDescriptor>( itemProperties.Count );
+
+        foreach( var itemProperty in itemProperties )
+        {
+          string detailFieldName = itemProperty.Name;
+          string masterFieldName;
+
+          if( !fieldMap.TryGetColumnFieldName( detailFieldName, out masterFieldName ) )
+          {
+            Debug.WriteLine( string.Format( "No mapping was found for the item property." ) );
+            continue;
+          }
+
+          FieldDescriptor masterField;
+          if( !masterFields.TryGetValue( masterFieldName, out masterField ) )
+          {
+            Debug.WriteLine( string.Format( "An item property is mapped to a non-existent master field." ) );
+            continue;
+          }
+
+          FieldDescriptor detailField = ItemsSourceHelper.CreateFieldFromDataGridItemProperty( itemProperty );
+          if( detailField.DataType != masterField.DataType )
+          {
+            Debug.WriteLine( string.Format( "The data type of an item property doesn't match the data type of its master field." ) );
+            continue;
+          }
+
+          FieldDescriptor oldDetailField;
+          if( fieldDescriptors.TryGetValue( masterFieldName, out oldDetailField ) )
+          {
+            Debug.WriteLine( string.Format( "Another detail field is already linked to the master field." ) );
+            continue;
+          }
+
+          fieldDescriptors.Add( masterFieldName, detailField );
+        }
+      }
+      else
+      {
+        fieldDescriptors = ItemsSourceHelper.GetFields( itemsSource, itemType );
+        var fieldNames = fieldDescriptors.Keys.ToArray();
+
+        foreach( var fieldName in fieldNames )
+        {
+          string detailFieldName = fieldName;
+          string masterFieldName;
+
+          if( !fieldMap.TryGetColumnFieldName( detailFieldName, out masterFieldName ) )
+          {
+            fieldDescriptors.Remove( detailFieldName );
+            continue;
+          }
+
+          FieldDescriptor masterField;
+          if( !masterFields.TryGetValue( masterFieldName, out masterField ) )
+          {
+            fieldDescriptors.Remove( masterFieldName );
+
+            Debug.WriteLine( string.Format( "An item property is mapped to a non-existent master field." ) );
+            continue;
+          }
+
+          FieldDescriptor detailField = fieldDescriptors[ fieldName ];
+          if( detailField.DataType != masterField.DataType )
+          {
+            fieldDescriptors.Remove( fieldName );
+
+            Debug.WriteLine( string.Format( "The data type of an item property doesn't match the data type of its master field." ) );
+            continue;
+          }
+        }
+      }
+
+      return fieldDescriptors;
+    }
+
     private static Dictionary<string, FieldDescriptor> GetFieldsForItemType( IEnumerable itemsSource, Type itemType, bool supportsDBNull )
     {
       if( itemType == null )
@@ -833,72 +898,12 @@ namespace Xceed.Wpf.DataGrid
       if( ItemsSourceHelper.IsEntityFramework( itemType ) )
         return ItemsSourceHelper.GetFieldsForEntityFramework( itemType );
 
-      TypeDescriptionProvider typeDescriptionProvider = TypeDescriptor.GetProvider( itemType );
-      object firstItem = ItemsSourceHelper.GetFirstItemByEnumerable( itemsSource );
-
-      ICustomTypeDescriptor customTypeDescriptor = firstItem as ICustomTypeDescriptor;
-
-      if( customTypeDescriptor == null )
-        customTypeDescriptor = typeDescriptionProvider.GetTypeDescriptor( itemType, firstItem );
-
       if( ItemsSourceHelper.IsValueType( itemType ) )
-      {
-        Dictionary<string, FieldDescriptor> fieldDescriptors = new Dictionary<string, FieldDescriptor>();
+        return ItemsSourceHelper.GetFieldsForValueType( itemType, supportsDBNull );
 
-        fieldDescriptors.Add( ".", new FieldDescriptor( ".",
-                                                        string.Empty,
-                                                        itemType,
-                                                        null,
-                                                        null,
-                                                        ".",
-                                                        true,
-                                                        false,
-                                                        supportsDBNull,
-                                                        true,
-                                                        ItemsSourceHelper.IsASubRelationship( itemType ),
-                                                        false,
-                                                        null ) );
-
-        return fieldDescriptors;
-      }
-      else if( customTypeDescriptor != null )
-      {
-        string className = customTypeDescriptor.GetClassName();
-
-        Type customType = ( className == null ) ? null : Type.GetType( className );
-
-        if( ( customType != null ) && ( ItemsSourceHelper.IsValueType( customType ) ) )
-        {
-          Dictionary<string, FieldDescriptor> fieldDescriptors = new Dictionary<string, FieldDescriptor>();
-
-          DataGridForeignKeyDescription foreignKeyDescription = null;
-
-          // Try to retreive the ForeignKeyDescription if the field is an Enum
-          if( ( itemType != null ) && ( itemType.IsEnum ) )
-          {
-            foreignKeyDescription = ItemsSourceHelper.GetDataGridForeignKeyDescriptionForEnum( itemType );
-          }
-
-          fieldDescriptors.Add( ".", new FieldDescriptor( ".",
-                                                          string.Empty,
-                                                          itemType,
-                                                          null,
-                                                          null,
-                                                          ".",
-                                                          true,
-                                                          false,
-                                                          supportsDBNull,
-                                                          true,
-                                                          ItemsSourceHelper.IsASubRelationship( itemType ),
-                                                          false,
-                                                          foreignKeyDescription ) );
-
-          return fieldDescriptors;
-        }
-      }
-
+      var customTypeDescriptor = ItemsSourceHelper.GetCustomTypeDescriptor( itemsSource, itemType );
       if( customTypeDescriptor != null )
-        return ItemsSourceHelper.GetFieldDescriptors( customTypeDescriptor.GetProperties(), supportsDBNull );
+        return ItemsSourceHelper.GetFieldsForCustomTypeDescriptor( customTypeDescriptor, itemType, supportsDBNull );
 
       return ItemsSourceHelper.GetFieldDescriptors( TypeDescriptor.GetProperties( itemType ), supportsDBNull );
     }
@@ -1058,24 +1063,16 @@ namespace Xceed.Wpf.DataGrid
         }
         else if( dataColumn.IsBindingAutoCreated )
         {
-          // Disable warning for DisplayMemberBinding when internaly used
-#pragma warning disable 618
-
-          //clear the display member binding.
-          dataColumn.DisplayMemberBinding = null;
-
-#pragma warning restore 618
-
           dataColumn.IsBindingAutoCreated = false;
           dataColumn.IsBoundToDataGridUnboundItemProperty = false;
+          dataColumn.SetDisplayMemberBinding( null );
         }
       }
     }
 
     public static FieldDescriptor CreateFieldFromDataGridItemProperty( DataGridItemPropertyBase itemProperty )
     {
-      DataGridItemPropertyBase.PropertyDescriptorFromItemPropertyBase propertyDescriptor =
-        itemProperty.GetPropertyDescriptorForBinding();
+      var propertyDescriptor = itemProperty.GetPropertyDescriptorForBinding();
 
       string name = propertyDescriptor.Name;
       Type type = propertyDescriptor.PropertyType;
@@ -1097,12 +1094,8 @@ namespace Xceed.Wpf.DataGrid
                                   itemProperty.ForeignKeyDescription );
     }
 
-    public static void UpdateColumnsOnItemsPropertiesChanged( 
-      DataGridControl dataGridControl, 
-      ColumnCollection columns,
-      bool autoCreateForeignKeyConfigurations,
-      NotifyCollectionChangedEventArgs e,
-      DataGridItemPropertyCollection itemProperties )
+    public static void UpdateColumnsOnItemsPropertiesChanged( DataGridControl dataGridControl, ColumnCollection columns, bool autoCreateForeignKeyConfigurations,
+                                                              NotifyCollectionChangedEventArgs e, DataGridItemPropertyCollection itemProperties )
     {
       if( dataGridControl == null )
         return;
@@ -1118,14 +1111,13 @@ namespace Xceed.Wpf.DataGrid
               if( columns[ name ] == null )
               {
                 Column column = ItemsSourceHelper.CreateColumnFromItemsSourceField(
-                  dataGridControl, dataGridControl.DefaultCellEditors,
+                  dataGridControl.DefaultCellEditors,
                   ItemsSourceHelper.CreateFieldFromDataGridItemProperty( itemProperty ),
                   autoCreateForeignKeyConfigurations );
 
                 if( column != null )
                 {
                   columns.Add( column );
-                  ItemsSourceHelper.ApplySettingsRepositoryToColumn( column );
                 }
               }
             }
@@ -1169,14 +1161,13 @@ namespace Xceed.Wpf.DataGrid
               if( columns[ name ] == null )
               {
                 Column column = ItemsSourceHelper.CreateColumnFromItemsSourceField(
-                  dataGridControl, dataGridControl.DefaultCellEditors,
+                  dataGridControl.DefaultCellEditors,
                   ItemsSourceHelper.CreateFieldFromDataGridItemProperty( itemProperty ),
                   autoCreateForeignKeyConfigurations );
 
                 if( column != null )
                 {
                   columns.Add( column );
-                  ItemsSourceHelper.ApplySettingsRepositoryToColumn( column );
                 }
               }
             }
@@ -1203,14 +1194,13 @@ namespace Xceed.Wpf.DataGrid
               if( columns[ name ] == null )
               {
                 Column column = ItemsSourceHelper.CreateColumnFromItemsSourceField(
-                  dataGridControl, dataGridControl.DefaultCellEditors,
+                  dataGridControl.DefaultCellEditors,
                   ItemsSourceHelper.CreateFieldFromDataGridItemProperty( itemProperty ),
                   autoCreateForeignKeyConfigurations );
 
                 if( column != null )
                 {
                   columns.Add( column );
-                  ItemsSourceHelper.ApplySettingsRepositoryToColumn( column );
                 }
               }
             }
@@ -1221,13 +1211,36 @@ namespace Xceed.Wpf.DataGrid
         //case NotifyCollectionChangedAction.Move:
         default:
           break;
-
       }
     }
 
-    #endregion PUBLIC STATIC METHODS
+    internal static System.Windows.Data.Binding AutoCreateDisplayMemberBinding( Column column, DataGridContext dataGridContext, object dataItem, out bool isDataGridUnboundItemProperty )
+    {
+      System.Windows.Data.Binding displayMemberBinding = null;
 
-    #region PRIVATE STATIC METHODS
+      if( column == null )
+        throw new ArgumentNullException( "column" );
+
+      string name = column.FieldName;
+
+      // Don't create the default binding if FieldName is null and we're in design-time.
+      if( !string.IsNullOrEmpty( name ) )
+      {
+        ItemsSourceHelper.FieldDescriptor fieldDescriptor;
+        dataGridContext.ItemsSourceFieldDescriptors.TryGetValue( name, out fieldDescriptor );
+
+        isDataGridUnboundItemProperty = ( fieldDescriptor == null ) ? false :
+          fieldDescriptor.IsDataGridUnboundItemProperty;
+
+        displayMemberBinding = ItemsSourceHelper.CreateDefaultBinding( dataItem is DataRow, name, fieldDescriptor, column, false, typeof( object ) );
+      }
+      else
+      {
+        isDataGridUnboundItemProperty = false;
+      }
+
+      return displayMemberBinding;
+    }
 
     private static Type GetTypedListIndexerType( Type listType )
     {
@@ -1357,9 +1370,8 @@ namespace Xceed.Wpf.DataGrid
       return fieldDescriptors;
     }
 
-    private static Dictionary<string, FieldDescriptor> GetFieldsForDataGridCollectionViewBase(
-      DataGridCollectionViewBase dataGridCollectionViewBase,
-      DataGridItemPropertyCollection itemProperties )
+    private static Dictionary<string, FieldDescriptor> GetFieldsForDataGridCollectionViewBase( DataGridCollectionViewBase dataGridCollectionViewBase,
+                                                                                               DataGridItemPropertyCollection itemProperties )
     {
       int fieldCount = itemProperties.Count;
 
@@ -1388,9 +1400,7 @@ namespace Xceed.Wpf.DataGrid
       return fieldDescriptors;
     }
 
-    private static Dictionary<string, FieldDescriptor> GetFieldsForJaggedArray(
-      Type itemType,
-      IEnumerable jaggedArray )
+    private static Dictionary<string, FieldDescriptor> GetFieldsForJaggedArray( Type itemType, IEnumerable jaggedArray )
     {
       int fieldCount = 0;
       IEnumerator enumerator = jaggedArray.GetEnumerator();
@@ -1479,8 +1489,55 @@ namespace Xceed.Wpf.DataGrid
       return fieldDescriptors;
     }
 
-    private static Dictionary<string, ForeignKeyConstraint> GetForeignKeyConstraints(
-      ConstraintCollection constraints )
+    private static Dictionary<string, FieldDescriptor> GetFieldsForValueType( Type itemType, bool supportsDBNull )
+    {
+      return ItemsSourceHelper.GetFieldsForValueType( itemType, supportsDBNull, null );
+    }
+
+    private static Dictionary<string, FieldDescriptor> GetFieldsForValueType( Type itemType, bool supportsDBNull, DataGridForeignKeyDescription foreignKeyDescription )
+    {
+      Dictionary<string, FieldDescriptor> fieldDescriptors = new Dictionary<string, FieldDescriptor>();
+      FieldDescriptor fieldDescriptor = new FieldDescriptor( ".",
+                                                             string.Empty,
+                                                             itemType,
+                                                             null,
+                                                             null,
+                                                             ".",
+                                                             true,
+                                                             false,
+                                                             supportsDBNull,
+                                                             true,
+                                                             ItemsSourceHelper.IsASubRelationship( itemType ),
+                                                             false,
+                                                             foreignKeyDescription );
+
+      fieldDescriptors.Add( ".", fieldDescriptor );
+
+      return fieldDescriptors;
+    }
+
+    private static Dictionary<string, FieldDescriptor> GetFieldsForCustomTypeDescriptor( ICustomTypeDescriptor customTypeDescriptor, Type itemType, bool supportsDBNull )
+    {
+      var className = customTypeDescriptor.GetClassName();
+      var customType = ( className == null ) ? null : Type.GetType( className );
+
+      if( ( customType != null ) && ( ItemsSourceHelper.IsValueType( customType ) ) )
+      {
+        DataGridForeignKeyDescription foreignKeyDescription = null;
+
+        // Try to retreive the ForeignKeyDescription if the field is an Enum
+        if( ( itemType != null ) && ( itemType.IsEnum ) )
+        {
+          foreignKeyDescription = ItemsSourceHelper.GetDataGridForeignKeyDescriptionForEnum( itemType );
+        }
+
+        return ItemsSourceHelper.GetFieldsForValueType( itemType, supportsDBNull, foreignKeyDescription );
+      }
+
+      return ItemsSourceHelper.GetFieldDescriptors( customTypeDescriptor.GetProperties(), supportsDBNull );
+    }
+
+    private static Dictionary<string, ForeignKeyConstraint> GetForeignKeyConstraints( ConstraintCollection constraints )
     {
       Dictionary<string, ForeignKeyConstraint> foreignKeyConstraints =
         new Dictionary<string, ForeignKeyConstraint>();
@@ -1525,8 +1582,7 @@ namespace Xceed.Wpf.DataGrid
       return foreignKeyDescription;
     }
 
-    private static DataTableForeignKeyDescription GetDataGridForeignKeyDescriptionForForeignKeyConstraint(
-      ForeignKeyConstraint foreignKeyConstraint )
+    private static DataTableForeignKeyDescription GetDataGridForeignKeyDescriptionForForeignKeyConstraint( ForeignKeyConstraint foreignKeyConstraint )
     {
       DataTableForeignKeyDescription foreignKeyDescription = null;
 
@@ -1544,9 +1600,7 @@ namespace Xceed.Wpf.DataGrid
       return foreignKeyDescription;
     }
 
-    #endregion PRIVATE STATIC METHODS
-
-    #region PRIVATE FIELDS
+    #region Static Fields
 
     private static readonly object[] EmptyObjectArray = new object[ 0 ];
 
@@ -1554,14 +1608,12 @@ namespace Xceed.Wpf.DataGrid
       "System.Data.Objects.DataClasses.EntityObject, System.Data.Entity, Version=" + _XceedVersionInfo.FrameworkVersion + ", Culture=neutral, PublicKeyToken=b77a5c561934e089",
       false, false );
 
-    #endregion PRIVATE FIELDS
+    #endregion
 
-    #region FieldDescriptor NESTED CLASSES
+    #region FieldDescriptor Nested Type
 
     internal class FieldDescriptor
     {
-      #region CONSTRUCTORS
-
       public FieldDescriptor(
         string name,
         string displayName,
@@ -1600,8 +1652,6 @@ namespace Xceed.Wpf.DataGrid
         this.IsDataGridUnboundItemProperty = isDataGridUnboundItemProperty;
         this.ForeignKeyDescription = foreignKeyDescription;
       }
-
-      #endregion CONSTRUCTORS
 
       #region Name PROPERTY
 
@@ -1783,7 +1833,7 @@ namespace Xceed.Wpf.DataGrid
 
       #endregion IsDataGridUnboundItemProperty Property
 
-      #region ForeignKeyDescription
+      #region ForeignKeyDescription Property
 
       public DataGridForeignKeyDescription ForeignKeyDescription
       {
@@ -1793,13 +1843,7 @@ namespace Xceed.Wpf.DataGrid
 
       #endregion
 
-      #region Private Fields
-
       private BitVector32 m_flags = new BitVector32();
-
-      #endregion
-
-      #region FieldDescriptor Flags
 
       [Flags]
       private enum FieldDescriptorFlags
@@ -1812,40 +1856,37 @@ namespace Xceed.Wpf.DataGrid
         OverrideReadOnlyForInsertion = 32,
         IsDataGridUnboundItemProperty = 64
       }
-
-      #endregion
     }
 
-    #endregion NESTED CLASSES
+    #endregion
 
-    internal static System.Windows.Data.Binding AutoCreateDisplayMemberBinding( Column column, DataGridContext dataGridContext, object dataItem, out bool isDataGridUnboundItemProperty )
+    #region ReadOnlyConverter Private Class
+
+    private sealed class ReadOnlyConverter : IValueConverter
     {
-      System.Windows.Data.Binding displayMemberBinding = null;
-
-      if( column == null )
-        throw new ArgumentNullException( "column" );
-
-      string name = column.FieldName;
-
-      // Don't create the default binding if FieldName is null and we're in design-time.
-      if( !string.IsNullOrEmpty( name ) )
+      internal ReadOnlyConverter( ColumnBase column, bool supportDBNull )
       {
-        ItemsSourceHelper.FieldDescriptor fieldDescriptor;
-        dataGridContext.ItemsSourceFieldDescriptors.TryGetValue( name, out fieldDescriptor );
-
-        isDataGridUnboundItemProperty = ( fieldDescriptor == null ) ? false :
-          fieldDescriptor.IsDataGridUnboundItemProperty;
-
-        displayMemberBinding = ItemsSourceHelper.CreateDefaultBinding(
-          dataItem is DataRow, name, fieldDescriptor,
-          false, ( column.ReadOnly && !column.OverrideReadOnlyForInsertion ), typeof( object ) );
-      }
-      else
-      {
-        isDataGridUnboundItemProperty = false;
+        m_converter = new SourceDataConverter( supportDBNull );
+        m_column = column;
       }
 
-      return displayMemberBinding;
+      public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
+      {
+        return m_converter.Convert( value, targetType, parameter, culture );
+      }
+
+      public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
+      {
+        if( ( m_column != null ) && ( m_column.ReadOnly ) && ( !m_column.OverrideReadOnlyForInsertion ) )
+          return Binding.DoNothing;
+
+        return m_converter.ConvertBack( value, targetType, parameter, culture );
+      }
+
+      private readonly IValueConverter m_converter;
+      private readonly ColumnBase m_column;
     }
+
+    #endregion
   }
 }

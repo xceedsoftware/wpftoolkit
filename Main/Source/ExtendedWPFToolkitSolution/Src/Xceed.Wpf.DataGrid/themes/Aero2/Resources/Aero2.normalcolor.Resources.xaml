@@ -21,29 +21,29 @@
    <SolidColorBrush x:Key="gridLineBrush"
                     Color="Gray" />
 
-    <LinearGradientBrush x:Key="errorBackgroundBrush"
+   <LinearGradientBrush x:Key="errorBackgroundBrush"
                         EndPoint="0.5,1"
                         StartPoint="0.5,0">
-        <GradientStop Color="#FFF69898"
+      <GradientStop Color="#FFF69898"
                     Offset="1" />
-        <GradientStop Color="Red" />
-    </LinearGradientBrush>
+      <GradientStop Color="Red" />
+   </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="errorForegroundBrush"
+   <SolidColorBrush x:Key="errorForegroundBrush"
                     Color="White" />
 
-    <SolidColorBrush x:Key="dropMarkBrush"
+   <SolidColorBrush x:Key="dropMarkBrush"
                     Color="#FFC4E5F6" />
 
-    <!-- Pen that is used to draw the drop mark when a ColumnHeader is dragged over another one. -->
-    <Pen x:Key="dropMarkPen"
+   <!-- Pen that is used to draw the drop mark when a ColumnHeader is dragged over another one. -->
+   <Pen x:Key="dropMarkPen"
         Brush="{StaticResource dropMarkBrush}"
         Thickness="7" />
 
-    <!--**************************
+   <!--**************************
     * TEMPLATE: ScrollTip
     ************************** -->
-    <ControlTemplate x:Key="scrollTipTemplate"
+   <ControlTemplate x:Key="scrollTipTemplate"
                     TargetType="{x:Type local:ScrollTip}">
 
         <Grid VerticalAlignment="{TemplateBinding VerticalAlignment}"

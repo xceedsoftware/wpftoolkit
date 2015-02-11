@@ -15,15 +15,11 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
-using System.Collections;
-using System.Globalization;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Xceed.Wpf.DataGrid.Stats;
 
 namespace Xceed.Wpf.DataGrid
@@ -64,7 +60,7 @@ namespace Xceed.Wpf.DataGrid
 
     #region StatFunctions Property
 
-    internal ObservableCollection<Stats.StatFunction> StatFunctions
+    internal ObservableCollection<StatFunction> StatFunctions
     {
       get
       {
@@ -72,7 +68,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private ObservableCollection<Stats.StatFunction> m_statFunctions;
+    private StatFunctionCollection m_statFunctions;
 
     #endregion StatFunctions Property
 
@@ -115,11 +111,10 @@ namespace Xceed.Wpf.DataGrid
       DataGridCollectionView dataGridCollectionView = currentView as DataGridCollectionView;
 
       dataGridCollectionView.StatFunctions.Clear();
-      int count = m_statFunctions.Count;
 
-      for( int i = 0; i < count; i++ )
+      foreach( var statFunction in m_statFunctions )
       {
-        dataGridCollectionView.StatFunctions.Add( m_statFunctions[ i ] );
+        dataGridCollectionView.StatFunctions.Add( statFunction );
       }
 
       dataGridCollectionView.UpdateChangedPropertyStatsOnly = this.UpdateChangedPropertyStatsOnly;

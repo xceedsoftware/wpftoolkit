@@ -22,10 +22,10 @@
                   xmlns:local="clr-namespace:Xceed.Wpf.DataGrid"
                   xmlns:conv="clr-namespace:Xceed.Wpf.DataGrid.Converters"
                   xmlns:markup="clr-namespace:Xceed.Wpf.DataGrid.Markup"
-                  xmlns:s="clr-namespace:System;assembly=mscorlib"
-                  xmlns:sxml="clr-namespace:System.Xml;assembly=System.Xml">
-
+                  xmlns:s="clr-namespace:System;assembly=mscorlib">
    <FrameworkElement.Resources>
+
+      <conv:NullToBooleanConverter x:Key="nullToBooleanConverter" />
 
       <ControlTemplate x:Key="scrollViewerTemplate"
                        TargetType="{x:Type ScrollViewer}">
@@ -203,10 +203,10 @@
          <local:CellEditor.EditTemplate>
             <DataTemplate DataType="{x:Type s:Boolean}">
                <local:DataGridCheckBox IsChecked="{markup:CellEditorBinding}"
-                                       local:DataCell.IsCellFocusScope="True"
-                                       VerticalAlignment="Stretch"
-                                       Foreground="{Binding RelativeSource={RelativeSource TemplatedParent},  Path=(TextElement.Foreground)}"
-                                       AutomationProperties.AutomationId="CheckBoxEditor" />
+                               local:DataCell.IsCellFocusScope="True"
+                               VerticalAlignment="Stretch"
+                               Foreground="{Binding RelativeSource={RelativeSource TemplatedParent},  Path=(TextElement.Foreground)}"
+                               AutomationProperties.AutomationId="CheckBoxEditor" />
             </DataTemplate>
          </local:CellEditor.EditTemplate>
          <local:CellEditor.ActivationGestures>
@@ -227,13 +227,13 @@
          <local:CellEditor.EditTemplate>
             <DataTemplate DataType="{x:Type s:DateTime}">
                <local:ValidateInputWrapper>
-                    <local:DataGridDatePicker SelectedDate="{markup:CellEditorBinding}"
-                                        x:Name="PART_CellEditorBoundControl"
-                                        VerticalAlignment="Top"
-                                        Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(TextElement.Foreground)}"
-                                        AutomationProperties.AutomationId="DatePickerEditor" />
-                </local:ValidateInputWrapper>
-                </DataTemplate>
+                  <local:DataGridDatePicker SelectedDate="{markup:CellEditorBinding}"
+                                            x:Name="PART_CellEditorBoundControl"
+                                            VerticalAlignment="Top"
+                                            Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(TextElement.Foreground)}"
+                                            AutomationProperties.AutomationId="DatePickerEditor" />
+               </local:ValidateInputWrapper>
+            </DataTemplate>
          </local:CellEditor.EditTemplate>
          <local:CellEditor.ActivationGestures>
             <local:KeyActivationGesture SystemKey="Down"
@@ -243,8 +243,6 @@
             <local:TextInputActivationGesture />
          </local:CellEditor.ActivationGestures>
       </local:CellEditor>
-
-      <conv:NullToBooleanConverter x:Key="nullToBooleanConverter" />
 
       <!-- ForeignKey CellEditor -->
       <local:CellEditor x:Key="foreignKeyCellEditor">
@@ -257,18 +255,38 @@
                          ItemContainerStyle="{Binding RelativeSource={RelativeSource Self}, Path=(local:Cell.CellEditorContext).ForeignKeyConfiguration.ItemContainerStyle, Mode=OneWay}"
                          ItemsSource="{Binding RelativeSource={RelativeSource Self}, Path=(local:Cell.CellEditorContext).ForeignKeyConfiguration.ItemsSource, Mode=OneWay}"
                          SelectedValuePath="{Binding RelativeSource={RelativeSource Self}, Path=(local:Cell.CellEditorContext).ForeignKeyConfiguration.ValuePath, Mode=OneWay}"
-                         DisplayMemberPath="{Binding RelativeSource={RelativeSource Self}, Path=(local:Cell.CellEditorContext).ForeignKeyConfiguration.DisplayMemberPath, Mode=OneWay}"
                          SelectedValue="{markup:CellEditorBinding}"
                          AutomationProperties.AutomationId="ForeignKeyCellEditor" />
 
-               <!-- Only affect Selector if Template or Style is null -->
+               <!-- Only affect Selector if Template is null and DisplayMemberPath is null or empty -->
                <DataTemplate.Triggers>
-                  <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:Cell.CellEditorContext).ParentColumn.CellContentTemplate, Converter={StaticResource nullToBooleanConverter}, Mode=OneWay}"
-                               Value="True">
-                     <Setter TargetName="fkComboBox"
-                             Property="ItemTemplateSelector"
-                             Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:Cell.CellEditorContext).ParentColumn.CellContentTemplateSelector, Mode=OneWay}" />
-                  </DataTrigger>
+                  <MultiDataTrigger>
+                     <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:Cell.CellEditorContext).ParentColumn.CellContentTemplate, Converter={StaticResource nullToBooleanConverter}, Mode=OneWay}"
+                                   Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:Cell.CellEditorContext).ParentColumn.CellContentTemplateSelector, Converter={StaticResource nullToBooleanConverter}, Mode=OneWay}"
+                                   Value="False" />
+                     </MultiDataTrigger.Conditions>
+                     <MultiDataTrigger.Setters>
+                        <Setter TargetName="fkComboBox"
+                                Property="ItemTemplateSelector"
+                                Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:Cell.CellEditorContext).ParentColumn.CellContentTemplateSelector, Mode=OneWay}" />
+                     </MultiDataTrigger.Setters>
+                  </MultiDataTrigger>
+
+                  <MultiDataTrigger>
+                     <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:Cell.CellEditorContext).ParentColumn.CellContentTemplate, Converter={StaticResource nullToBooleanConverter}, Mode=OneWay}"
+                                   Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:Cell.CellEditorContext).ParentColumn.CellContentTemplateSelector, Converter={StaticResource nullToBooleanConverter}, Mode=OneWay}"
+                                   Value="True" />
+                     </MultiDataTrigger.Conditions>
+                     <MultiDataTrigger.Setters>
+                        <Setter TargetName="fkComboBox"
+                                Property="DisplayMemberPath"
+                                Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:Cell.CellEditorContext).ForeignKeyConfiguration.DisplayMemberPath, Mode=OneWay}" />
+                     </MultiDataTrigger.Setters>
+                  </MultiDataTrigger>
 
                   <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:Cell.CellEditorContext).ForeignKeyConfiguration.ItemContainerStyle, Converter={StaticResource nullToBooleanConverter}, Mode=OneWay}"
                                Value="True">

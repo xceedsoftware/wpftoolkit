@@ -227,6 +227,53 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //IsOpen
 
+    #region Kind
+
+    public static readonly DependencyProperty KindProperty = DependencyProperty.Register( "Kind", typeof( DateTimeKind ), typeof( TimePicker ),
+      new FrameworkPropertyMetadata( DateTimeKind.Unspecified, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault ) );
+    public DateTimeKind Kind
+    {
+      get
+      {
+        return ( DateTimeKind )GetValue( KindProperty );
+      }
+      set
+      {
+        SetValue( KindProperty, value );
+      }
+    }
+
+    #endregion //Kind
+
+    #region MaxDropDownHeight
+
+    public static readonly DependencyProperty MaxDropDownHeightProperty = DependencyProperty.Register( "MaxDropDownHeight", typeof( double ), typeof( TimePicker ), new UIPropertyMetadata( 130d, OnMaxDropDownHeightChanged ) );
+    public double MaxDropDownHeight
+    {
+      get
+      {
+        return ( double )GetValue( MaxDropDownHeightProperty );
+      }
+      set
+      {
+        SetValue( MaxDropDownHeightProperty, value );
+      }
+    }
+
+    private static void OnMaxDropDownHeightChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      TimePicker timePicker = o as TimePicker;
+      if( timePicker != null )
+        timePicker.OnMaxDropDownHeightChanged( ( double )e.OldValue, ( double )e.NewValue );
+    }
+
+    protected virtual void OnMaxDropDownHeightChanged( double oldValue, double newValue )
+    {
+      // TODO: Add your property changed side-effects. Descendants can override as well.
+    }
+
+    #endregion
+
     #region Maximum
 
     public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register( "Maximum", typeof( DateTime? ), typeof( TimePicker ), new UIPropertyMetadata( DateTime.MaxValue ) );
@@ -554,9 +601,9 @@ namespace Xceed.Wpf.Toolkit
       {
         TimeItem selectedTimeListItem = ( TimeItem )e.AddedItems[ 0 ];
         var time = selectedTimeListItem.Time;
-        var date = Value ?? DateTime.MinValue;
+        var date = Value ?? DateTimeUtilities.GetContextNow( this.Kind );
 
-        Value = new DateTime( date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds );
+        Value = new DateTime( date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds, date.Kind );
       }
     }
 

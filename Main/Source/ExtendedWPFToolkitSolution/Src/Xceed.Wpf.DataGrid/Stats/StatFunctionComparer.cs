@@ -14,13 +14,14 @@
 
   ***********************************************************************************/
 
-using System;
 using System.Collections.Generic;
 
 namespace Xceed.Wpf.DataGrid.Stats
 {
   internal class StatFunctionComparer : IEqualityComparer<StatFunction>
   {
+    internal static readonly StatFunctionComparer Default = new StatFunctionComparer();
+
     public bool Equals( StatFunction x, StatFunction y )
     {
       return StatFunction.AreEquivalents( x, y );
@@ -29,7 +30,7 @@ namespace Xceed.Wpf.DataGrid.Stats
     public int GetHashCode( StatFunction statFunction )
     {
       if( statFunction == null )
-        throw new ArgumentNullException( "statFunction" );
+        return 0;
 
       return statFunction.GetEquivalenceKey();
     }

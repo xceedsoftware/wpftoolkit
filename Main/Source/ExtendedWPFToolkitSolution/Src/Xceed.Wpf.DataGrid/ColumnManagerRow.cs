@@ -14,12 +14,13 @@
 
   ***********************************************************************************/
 
+using System.Collections;
+using System.Diagnostics;
 using System.Windows;
-using Xceed.Wpf.DataGrid.Views;
 using System.Windows.Automation.Peers;
 using Xceed.Wpf.DataGrid.Automation;
+using Xceed.Wpf.DataGrid.Views;
 using Xceed.Utils.Wpf.DragDrop;
-using System.Diagnostics;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -36,7 +37,7 @@ namespace Xceed.Wpf.DataGrid
       this.ReadOnly = true; //This is safe to perform since there is nowhere a callback installed on the DP... 
 
       //ensure that all ColumnManagerRows are not navigable
-      this.NavigationBehavior = NavigationBehavior.None; //This is safe to perform since there is nowhere a callback installed on the DP... 
+      this.NavigationBehavior = NavigationBehavior.None; //This is safe to perform since there is nowhere a callback installed on the DP...
     }
 
     #region AllowColumnReorder Property
@@ -138,20 +139,17 @@ namespace Xceed.Wpf.DataGrid
       if( draggedCell == null )
         return false;
 
-      ColumnReorderingDragSourceManager manager =
-        draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
+      ColumnReorderingDragSourceManager manager = draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
 
       if( ( manager != null ) && ( manager.IsAnimatedColumnReorderingEnabled ) )
       {
         ColumnManagerCell cell = draggedElement as ColumnManagerCell;
 
-        if( ( cell != null )
-            && ( cell.IsBeingDragged ) )
+        if( ( cell != null ) && ( cell.IsBeingDragged ) )
         {
           DataGridContext rowDataGridContext = DataGridControl.GetDataGridContext( this );
 
-          if( ( rowDataGridContext != null )
-              && ( rowDataGridContext.Columns.Contains( cell.ParentColumn ) ) )
+          if( ( rowDataGridContext != null ) && ( rowDataGridContext.Columns.Contains( cell.ParentColumn ) ) )
           {
             canDrop = true;
           }
@@ -180,8 +178,7 @@ namespace Xceed.Wpf.DataGrid
       if( draggedCell == null )
         return;
 
-      ColumnReorderingDragSourceManager manager =
-        draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
+      ColumnReorderingDragSourceManager manager = draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
 
       if( ( manager != null ) && ( manager.IsAnimatedColumnReorderingEnabled ) )
       {

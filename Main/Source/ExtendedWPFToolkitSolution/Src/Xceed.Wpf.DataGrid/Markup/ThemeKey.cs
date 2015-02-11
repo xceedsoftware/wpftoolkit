@@ -15,14 +15,12 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
-using System.Text;
 using System.Windows;
 using System.Windows.Markup;
-using Xceed.Wpf.DataGrid.Views;
 using System.Windows.Media;
-using System.ComponentModel;
+using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid.Markup
 {
@@ -34,7 +32,7 @@ namespace Xceed.Wpf.DataGrid.Markup
     {
     }
 
-    public ThemeKey( Type targetViewType, Type themeType, Type targetElementType, Brush targetAccentBrush )
+    public ThemeKey( Type targetViewType, Type themeType, Type targetElementType )
     {
       if( targetViewType == null )
         throw new ArgumentNullException( "targetViewType" );
@@ -48,42 +46,12 @@ namespace Xceed.Wpf.DataGrid.Markup
       m_themeTypeInitialized = true;
       m_targetElementType = targetElementType;
       m_targetElementTypeInitialized = true;
-      m_targetAccentBrush = targetAccentBrush;
-      m_targetAccentBrushInitialized = true;
     }
 
     public ThemeKey( Type targetViewType, Type targetElementType )
-      : this( targetViewType, null, targetElementType, null )
+      : this( targetViewType, null, targetElementType )
     {
     }
-
-    public ThemeKey( Type targetViewType, Type themeType, Type targetElementType )
-      : this( targetViewType, themeType, targetElementType, null )
-    {
-    }
-
-    #region TargetAccentBrush Property
-
-    public Brush TargetAccentBrush
-    {
-      get
-      {
-        return m_targetAccentBrush;
-      }
-      set
-      {
-        if( m_targetAccentBrushInitialized )
-          throw new InvalidOperationException( "An attempt was made to set the TargetAccentBrush property when it has already been initialized." );
-
-        m_targetAccentBrush = value;
-        m_targetAccentBrushInitialized = true;
-      }
-    }
-
-    private Brush m_targetAccentBrush; // = null;
-    private bool m_targetAccentBrushInitialized; // = false;
-
-    #endregion TargetAccentBrush Property
 
     #region TargetViewType Property
 
@@ -177,32 +145,33 @@ namespace Xceed.Wpf.DataGrid.Markup
 
     public override bool Equals( object obj )
     {
-      ThemeKey key = obj as ThemeKey;
+      if( object.ReferenceEquals( obj, this ) )
+        return true;
 
-      if( key == null )
+      var key = obj as ThemeKey;
+      if( object.ReferenceEquals( key, null ) )
         return false;
 
-      if( !( ( key.TargetViewType != null ) ? key.TargetViewType.Equals( this.TargetViewType ) : ( this.TargetViewType == null ) ) )
-        return false;
-
-      if( !( ( key.ThemeType != null ) ? key.ThemeType.Equals( this.ThemeType ) : ( this.ThemeType == null ) ) )
-        return false;
-
-      if( !( ( key.TargetElementType != null ) ? key.TargetElementType.Equals( this.TargetElementType ) : ( this.TargetElementType == null ) ) )
-        return false;
-
-      if( !( ( key.TargetAccentBrush != null ) ? key.TargetAccentBrush.Equals( this.TargetAccentBrush ) : ( this.TargetAccentBrush == null ) ) )
-        return false;
-
-      return true;
+      return ( object.Equals( key.TargetViewType, this.TargetViewType ) )
+          && ( object.Equals( key.ThemeType, this.ThemeType ) )
+          && ( object.Equals( key.TargetElementType, this.TargetElementType ) );
     }
 
     public override int GetHashCode()
     {
-      return ( ( ( this.TargetViewType != null ) ? this.TargetViewType.GetHashCode() : 0 )
-        ^ ( ( this.ThemeType != null ) ? this.ThemeType.GetHashCode() : 0 )
-        ^ ( ( this.TargetElementType != null ) ? this.TargetElementType.GetHashCode() : 0 ) 
-        ^ ( ( this.TargetAccentBrush != null ) ? this.TargetAccentBrush.GetHashCode() : 0 ) );
+      var elementType = this.TargetElementType;
+      if( elementType != null )
+        return elementType.GetHashCode();
+
+      var viewType = this.TargetViewType;
+      if( viewType != null )
+        return viewType.GetHashCode();
+
+      var themeType = this.ThemeType;
+      if( themeType != null )
+        return themeType.GetHashCode();
+
+      return 0;
     }
   }
 }

@@ -14,14 +14,16 @@
 
   ***********************************************************************************/
 
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Automation.Peers;
-using System.Collections.Specialized;
-using System;
-using System.Diagnostics;
+using Xceed.Utils.Wpf;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -53,6 +55,8 @@ namespace Xceed.Wpf.DataGrid
       this.CommandBindings.Add( new CommandBinding( DataGridCommands.ToggleGroupExpansion,
                                                     this.OnToggleExecuted,
                                                     this.OnToggleCanExecute ) );
+
+      m_itemContainerManager = new DataGridItemContainerManager( this );
     }
 
     #endregion
@@ -77,8 +81,6 @@ namespace Xceed.Wpf.DataGrid
 
     #region Group Property
 
-    private Group m_group;
-
     public Group Group
     {
       get
@@ -93,13 +95,95 @@ namespace Xceed.Wpf.DataGrid
       this.Content = m_group;
       GroupHeaderControl.SetGroup( this, group );
 
-      if( this.PropertyChanged != null )
+      this.RaisePropertyChanged( "Group" );
+    }
+
+    private Group m_group;
+
+    #endregion
+
+    #region SelectionBackground Property
+
+    public static readonly DependencyProperty SelectionBackgroundProperty = Cell.SelectionBackgroundProperty.AddOwner( typeof( GroupHeaderControl ) );
+
+    public Brush SelectionBackground
+    {
+      get
       {
-        this.PropertyChanged( this, new PropertyChangedEventArgs( "Group" ) );
+        return ( Brush )this.GetValue( GroupHeaderControl.SelectionBackgroundProperty );
+      }
+      set
+      {
+        this.SetValue( GroupHeaderControl.SelectionBackgroundProperty, value );
       }
     }
 
-    #endregion Group Property
+    #endregion SelectionBackground Property
+
+    #region SelectionForeground Property
+
+    public static readonly DependencyProperty SelectionForegroundProperty = Cell.SelectionForegroundProperty.AddOwner( typeof( GroupHeaderControl ) );
+
+    public Brush SelectionForeground
+    {
+      get
+      {
+        return ( Brush )this.GetValue( GroupHeaderControl.SelectionForegroundProperty );
+      }
+      set
+      {
+        this.SetValue( GroupHeaderControl.SelectionForegroundProperty, value );
+      }
+    }
+
+    #endregion SelectionForeground Property
+
+    #region InactiveSelectionBackground Property
+
+    public static readonly DependencyProperty InactiveSelectionBackgroundProperty = Cell.InactiveSelectionBackgroundProperty.AddOwner( typeof( GroupHeaderControl ) );
+
+    public Brush InactiveSelectionBackground
+    {
+      get
+      {
+        return ( Brush )this.GetValue( GroupHeaderControl.InactiveSelectionBackgroundProperty );
+      }
+      set
+      {
+        this.SetValue( GroupHeaderControl.InactiveSelectionBackgroundProperty, value );
+      }
+    }
+
+    #endregion InactiveSelectionBackground Property
+
+    #region InactiveSelectionForeground Property
+
+    public static readonly DependencyProperty InactiveSelectionForegroundProperty = Cell.InactiveSelectionForegroundProperty.AddOwner( typeof( GroupHeaderControl ) );
+
+    public Brush InactiveSelectionForeground
+    {
+      get
+      {
+        return ( Brush )this.GetValue( GroupHeaderControl.InactiveSelectionForegroundProperty );
+      }
+      set
+      {
+        this.SetValue( GroupHeaderControl.InactiveSelectionForegroundProperty, value );
+      }
+    }
+
+    #endregion InactiveSelectionForeground Property
+
+    #region Public Overrides Methods
+
+    public override void OnApplyTemplate()
+    {
+      base.OnApplyTemplate();
+
+      m_itemContainerManager.Update();
+    }
+
+    #endregion
 
     #region Protected Overrides Methods
 
@@ -126,7 +210,7 @@ namespace Xceed.Wpf.DataGrid
           {
             try
             {
-              dataGridContext.SetCurrent( item, null, -1, dataGridContext.CurrentColumn, true, true, false );
+              dataGridContext.SetCurrent( item, null, -1, dataGridContext.CurrentColumn, true, true, false, AutoScrollCurrentItemSourceTriggers.FocusChanged );
             }
             catch( DataGridException )
             {
@@ -140,21 +224,16 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region Protected Internal Methods
+    #region Protected Methods
 
-    protected internal virtual void PrepareDefaultStyleKey( Xceed.Wpf.DataGrid.Views.ViewBase view )
-    {
-      this.DefaultStyleKey = view.GetDefaultStyleKey( typeof( GroupHeaderControl ) );
-    }
-
-    protected internal virtual void PrepareContainer( DataGridContext dataGridContext, object item )
+    protected virtual void PrepareContainer( DataGridContext dataGridContext, object item )
     {
       if( m_isContainerPrepared )
         Debug.Fail( "A GroupHeaderControl can't be prepared twice, it must be cleaned before PrepareContainer is called again" );
 
       Group group = null;
-
       DataGridContext gridContext = DataGridControl.GetDataGridContext( this );
+
       if( gridContext != null )
       {
         object dataItem = gridContext.GetItemFromContainer( this );
@@ -166,14 +245,31 @@ namespace Xceed.Wpf.DataGrid
 
       this.SetGroup( group );
 
+      m_itemContainerManager.Prepare( gridContext, item );
+
       m_isContainerPrepared = true;
     }
 
-    protected internal virtual void ClearContainer()
+    protected virtual void ClearContainer()
     {
-      //Do nothing!
+      m_itemContainerManager.Clear();
       m_isContainerPrepared = false;
     }
+
+    protected internal virtual void PrepareDefaultStyleKey( Xceed.Wpf.DataGrid.Views.ViewBase view )
+    {
+      this.DefaultStyleKey = view.GetDefaultStyleKey( typeof( GroupHeaderControl ) );
+    }
+
+    protected internal virtual bool ShouldHandleSelectionEvent( InputEventArgs eventArgs )
+    {
+      var targetChild = eventArgs.OriginalSource as DependencyObject;
+      // If the event is comming from a control inside the header, ignore the event
+      // since it is not for selection purposes that the user targeted this control. 
+      // This handle the expand collapse butto, and the GroupNavigationControl
+      return TreeHelper.FindParent<Control>( targetChild, true, null, this ) == null;
+    }
+
 
     #endregion
 
@@ -278,13 +374,23 @@ namespace Xceed.Wpf.DataGrid
 
     #region Private Fields
 
+    private readonly DataGridItemContainerManager m_itemContainerManager;
     private bool m_isContainerPrepared;
 
-    #endregion Private Fields
+    #endregion
 
     #region INotifyPropertyChanged Members
 
     public event PropertyChangedEventHandler PropertyChanged;
+
+    private void RaisePropertyChanged( string propertyName )
+    {
+      var handler = this.PropertyChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, new PropertyChangedEventArgs( propertyName ) );
+    }
 
     #endregion
 

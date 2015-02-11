@@ -420,16 +420,27 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #region Methods
 
+    protected object GetPathValue( object item, string propertyPath )
+    {
+      if( item == null )
+        throw new ArgumentNullException( "item" );
+
+      if( String.IsNullOrEmpty( propertyPath )
+        || propertyPath == "." )
+        return item;
+
+
+      PropertyInfo prop = item.GetType().GetProperty( propertyPath );
+      return ( prop != null )
+        ? prop.GetValue( item, null )
+        : null;
+    }
+
     protected object GetItemValue( object item )
     {
-      if( !String.IsNullOrEmpty( ValueMemberPath ) && ( item != null ) )
-      {
-        var property = item.GetType().GetProperty( ValueMemberPath );
-        if( property != null )
-          return property.GetValue( item, null );
-      }
-
-      return item;
+      return ( item != null )
+        ? this.GetPathValue( item, this.ValueMemberPath )
+        : null;
     }
 
     protected object ResolveItemByValue( string value )
@@ -490,7 +501,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void OnSelectedItemsCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
+    protected virtual void OnSelectedItemsCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
       if( _ignoreSelectedItemsCollectionChanged > 0 )
         return;
@@ -641,6 +652,26 @@ namespace Xceed.Wpf.Toolkit.Primitives
             }
           }
         }
+      }
+      _ignoreSelectedItemsCollectionChanged--;
+      this.UpdateFromSelectedItems();
+    }
+
+    internal void UpdateSelectedItems( IList selectedItems )
+    {
+      if( selectedItems == null )
+        throw new ArgumentNullException( "selectedItems" );
+
+      // Just check if the collection is the same..
+      if( selectedItems.Count == this.SelectedItems.Count
+        && selectedItems.Cast<object>().SequenceEqual( this.SelectedItems.Cast<object>() ) )
+        return;
+
+      _ignoreSelectedItemsCollectionChanged++;
+      this.SelectedItems.Clear();
+      foreach( object newItem in selectedItems )
+      {
+        this.SelectedItems.Add( newItem );
       }
       _ignoreSelectedItemsCollectionChanged--;
       this.UpdateFromSelectedItems();

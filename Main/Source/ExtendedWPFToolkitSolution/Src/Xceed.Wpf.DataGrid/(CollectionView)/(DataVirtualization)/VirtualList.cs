@@ -15,16 +15,12 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Diagnostics;
-using System.Collections.Specialized;
-using System.Windows.Threading;
-using System.Windows;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Text;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -492,7 +488,7 @@ namespace Xceed.Wpf.DataGrid
     internal void NotifyCommitComplete( AsyncCommitInfo asyncCommitInfo )
     {
       if( asyncCommitInfo.VirtualizedItemInfos.Length < 1 )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "VirualizedItemInfos is empty." );
 
       int indexForItemInPage = asyncCommitInfo.VirtualizedItemInfos[ 0 ].Index;
 

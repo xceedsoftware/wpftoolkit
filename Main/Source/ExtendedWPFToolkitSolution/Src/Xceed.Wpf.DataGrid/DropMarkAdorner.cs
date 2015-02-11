@@ -44,8 +44,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    // This Property does not use the Alignment paradigm. It allows to manually set the
-    // position of the drop mark.
+    // This Property does not use the Alignment paradigm. It allows to manually set the position of the drop mark.
     #region HorizontalPosition Property
 
     public static readonly DependencyProperty HorizontalPositionProperty = DependencyProperty.Register(
@@ -79,7 +78,6 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion
-
 
     public void ForceAlignment( DropMarkAlignment alignment )
     {
@@ -143,8 +141,6 @@ namespace Xceed.Wpf.DataGrid
           case DropMarkOrientation.Horizontal:
             size = new Size( this.AdornedElement.RenderSize.Width, m_pen.Thickness );
             break;
-          default:
-            throw new DataGridInternalException();
         }
       }
 
@@ -197,8 +193,8 @@ namespace Xceed.Wpf.DataGrid
       if( m_pen != null )
       {
         Size renderSize = this.RenderSize;
-        Point startPoint;
-        Point endPoint;
+        Point startPoint = new Point();
+        Point endPoint = new Point();
 
         switch( m_orientation )
         {
@@ -211,8 +207,6 @@ namespace Xceed.Wpf.DataGrid
             startPoint = new Point( 0d, renderSize.Height / 2 );
             endPoint = new Point( renderSize.Width, startPoint.Y );
             break;
-          default:
-            throw new DataGridInternalException();
         }
 
         drawingContext.DrawLine( m_pen, startPoint, endPoint );

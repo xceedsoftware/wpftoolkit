@@ -320,23 +320,23 @@ namespace Xceed.Wpf.DataGrid
 
           if( allowSort )
           {
-            DataGridContext gridContext = DataGridControl.GetDataGridContext( this );
+            DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
             GroupLevelDescription groupInfo = this.Content as GroupLevelDescription;
-            Debug.Assert( ( gridContext != null ) && ( groupInfo != null ) );
+            Debug.Assert( ( dataGridContext != null ) && ( groupInfo != null ) );
 
-            if( ( gridContext != null ) && ( groupInfo != null ) )
+            if( ( dataGridContext != null ) && ( groupInfo != null ) )
             {
-              ColumnBase column = gridContext.Columns[ groupInfo.FieldName ];
+              ColumnBase column = dataGridContext.Columns[ groupInfo.FieldName ];
 
               if( ( column != null ) && ( column.AllowSort ) )
               {
-                DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-                SortDescriptionCollection sortDescriptions = dataGridContext.Items.SortDescriptions;
-                ColumnCollection columns = dataGridContext.Columns;
+                bool shiftUnpressed = ( ( Keyboard.Modifiers & ModifierKeys.Shift ) != ModifierKeys.Shift );
 
-                SortingHelper.ToggleColumnSort(
-                  dataGridContext, sortDescriptions,
-                  columns, column, ( ( Keyboard.Modifiers & ModifierKeys.Shift ) != ModifierKeys.Shift ) );
+                var toggleColumnSort = dataGridContext.ToggleColumnSortCommand;
+                if( toggleColumnSort.CanExecute( column, shiftUnpressed ) )
+                {
+                  toggleColumnSort.Execute( column, shiftUnpressed );
+                }
 
                 e.Handled = true;
               }

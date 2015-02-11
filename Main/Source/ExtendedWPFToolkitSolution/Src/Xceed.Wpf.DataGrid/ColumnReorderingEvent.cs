@@ -17,7 +17,6 @@
 using System;
 using System.Windows;
 
-// TODO (case 117282) : Renommer ce fichier.
 namespace Xceed.Wpf.DataGrid
 {
   internal delegate void ColumnReorderingEventHandler( object sender, ColumnReorderingEventArgs e );
@@ -26,12 +25,12 @@ namespace Xceed.Wpf.DataGrid
   {
     #region Constructors
 
-    public ColumnReorderingEventArgs(RoutedEvent routedEvent, int oldVisiblePosition, int newVisiblePosition )
+    public ColumnReorderingEventArgs( RoutedEvent routedEvent, int oldVisiblePosition, int newVisiblePosition )
       : base( routedEvent )
     {
       m_oldVisiblePosition = oldVisiblePosition;
       m_newVisiblePosition = newVisiblePosition;
-    } 
+    }
 
     #endregion
 

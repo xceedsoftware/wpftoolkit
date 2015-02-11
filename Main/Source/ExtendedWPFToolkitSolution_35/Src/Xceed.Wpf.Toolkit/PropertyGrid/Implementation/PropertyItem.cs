@@ -196,7 +196,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     #region Constructors
 
     internal PropertyItem( DescriptorPropertyDefinitionBase definition )
-      : base()
+      : base( definition.IsPropertyGridCategorized )
     {
       if( definition == null )
         throw new ArgumentNullException( "definition" );

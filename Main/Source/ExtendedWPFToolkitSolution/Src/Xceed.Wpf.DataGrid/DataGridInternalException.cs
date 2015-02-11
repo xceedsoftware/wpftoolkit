@@ -33,6 +33,11 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
+    public DataGridInternalException( string message, DataGridControl dataGridControl )
+      : base( message, dataGridControl )
+    {
+    }
+
     public DataGridInternalException( Exception innerException )
       : this( DefaultMessage, innerException )
     {
@@ -40,6 +45,11 @@ namespace Xceed.Wpf.DataGrid
 
     public DataGridInternalException( string message, Exception innerException )
       : base( message, innerException )
+    {
+    }
+
+    public DataGridInternalException( string message, Exception innerException, DataGridControl dataGridControl )
+      : base( message, innerException, dataGridControl )
     {
     }
 

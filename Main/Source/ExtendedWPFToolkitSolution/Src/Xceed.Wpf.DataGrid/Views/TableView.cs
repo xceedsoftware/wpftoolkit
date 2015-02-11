@@ -15,30 +15,20 @@
   ***********************************************************************************/
 
 using System;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Controls;
 using System.ComponentModel;
-using System.Windows.Data;
-using System.Collections.Generic;
-using System.Security;
-using System.Security.Permissions;
 using System.Diagnostics;
-using System.Windows.Resources;
+using System.Security;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Resources;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
   public class TableView : UIViewBase
   {
-    #region Static Fields
-
     internal static Cursor DefaultRowSelectorResizeNorthSouthCursor = Cursors.SizeNS;
     internal static Cursor DefaultRowSelectorResizeWestEastCursor = Cursors.SizeWE;
-
-    #endregion
-
-    #region Contructors
 
     static TableView()
     {
@@ -62,8 +52,6 @@ namespace Xceed.Wpf.DataGrid.Views
     public TableView()
     {
     }
-
-    #endregion
 
     #region AutoFillLastPage Property
 
@@ -120,20 +108,19 @@ namespace Xceed.Wpf.DataGrid.Views
     private static void OnCanScrollHorizontallyChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
       // This property makes sense (only works) for potentially visible element; UIElement.
-      UIElement element = sender as UIElement;
+      var element = sender as FrameworkElement;
+      if( element == null )
+        return;
 
-      if( element != null )
-      {
-        TableViewScrollViewer.SetFixedTranslateTransform( element, ( bool )e.NewValue );
-      }
+      TableViewScrollViewer.SetFixedTranslateTransform( element, ( bool )e.NewValue );
     }
 
     #endregion CanScrollHorizontally Attached Property
 
     #region CompensationOffset Attached Property
 
-    internal static readonly DependencyPropertyKey CompensationOffsetPropertyKey = DependencyProperty.RegisterAttachedReadOnly( 
-      "CompensationOffset", typeof( double ), typeof( TableView ), 
+    internal static readonly DependencyPropertyKey CompensationOffsetPropertyKey = DependencyProperty.RegisterAttachedReadOnly(
+      "CompensationOffset", typeof( double ), typeof( TableView ),
       new FrameworkPropertyMetadata( 0d, FrameworkPropertyMetadataOptions.Inherits ) );
 
     internal static readonly DependencyProperty CompensationOffsetProperty;
@@ -349,7 +336,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region FixedColumnCount Property
 
-    [ViewProperty( ViewPropertyMode.RoutedNoFallback )]
+    [ViewProperty( ViewPropertyMode.RoutedNoFallback, FlattenDetailBindingMode.MasterOneWay )]
     public static readonly DependencyProperty FixedColumnCountProperty =
       DependencyProperty.RegisterAttached( "FixedColumnCount", typeof( int ), typeof( TableView ),
       new UIPropertyMetadata( 0 ),
@@ -674,7 +661,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region IsColumnVirtualizationEnabled Property
 
-    [ViewProperty( ViewPropertyMode.Routed )]
+    [ViewProperty( ViewPropertyMode.Routed, FlattenDetailBindingMode.MasterOneWay )]
     public static readonly DependencyProperty IsColumnVirtualizationEnabledProperty =
         DependencyProperty.RegisterAttached( "IsColumnVirtualizationEnabled",
           typeof( bool ),
@@ -707,7 +694,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region IsAlternatingRowStyleEnabled Property
 
-    [ViewProperty( ViewPropertyMode.Routed )]
+    [ViewProperty( ViewPropertyMode.Routed, FlattenDetailBindingMode.MasterOneWay )]
     public static readonly DependencyProperty IsAlternatingRowStyleEnabledProperty =
       DependencyProperty.RegisterAttached( "IsAlternatingRowStyleEnabled", typeof( bool ), typeof( TableView ), new UIPropertyMetadata( false ) );
 
@@ -823,7 +810,11 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion
 
-    #region Internal Methods
+    protected override void AddDefaultHeadersFooters()
+    {
+      this.FixedHeaders.Insert( 0, TableView.DefaultColumnManagerRowTemplate );
+      this.FixedHeaders.Insert( 0, TableView.DefaultGroupByControlTemplate );
+    }
 
     internal override ColumnVirtualizationManager CreateColumnVirtualizationManager( DataGridContext dataGridContext )
     {
@@ -832,23 +823,7 @@ namespace Xceed.Wpf.DataGrid.Views
       return new TableViewColumnVirtualizationManager( dataGridContext );
     }
 
-    #endregion
-
-    #region Protected Methods
-
-    protected override void AddDefaultHeadersFooters()
-    {
-      this.FixedHeaders.Insert( 0, TableView.DefaultColumnManagerRowTemplate );
-      this.FixedHeaders.Insert( 0, TableView.DefaultGroupByControlTemplate );
-    }
-
-    #endregion
-
-    #region Private Fields
-
     private static readonly DataTemplate DefaultColumnManagerRowTemplate;
     private static readonly DataTemplate DefaultGroupByControlTemplate;
-
-    #endregion
   }
 }

@@ -95,7 +95,6 @@ namespace Xceed.Wpf.DataGrid
         m_parentCollection.m_deferResortCount++;
       }
 
-
       #region IDisposable Members
 
       public void Dispose()

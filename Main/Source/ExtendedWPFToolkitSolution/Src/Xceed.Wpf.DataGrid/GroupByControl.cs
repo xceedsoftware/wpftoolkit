@@ -14,20 +14,14 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 using System.Windows;
-using System.Collections.ObjectModel;
 using System.Windows.Controls;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Media;
 using Xceed.Utils.Wpf.DragDrop;
-using System.Diagnostics;
 using Xceed.Wpf.DataGrid.Views;
-using System.Windows.Documents;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -437,7 +431,7 @@ namespace Xceed.Wpf.DataGrid
 
         Debug.Assert( groupByItem != null );
         if( groupByItem == null )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "groupByItem is null." );
 
         groupByItem.ShowDropMark( mousePosition );
       }
@@ -459,7 +453,7 @@ namespace Xceed.Wpf.DataGrid
 
         Debug.Assert( groupByItem != null );
         if( groupByItem == null )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "groupByItem is null." );
 
         groupByItem.HideDropMark();
       }
@@ -485,7 +479,7 @@ namespace Xceed.Wpf.DataGrid
 
         Debug.Assert( groupByItem != null );
         if( groupByItem == null )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "groupByItem is null." );
 
         groupByItem.HideDropMark();
       }

@@ -15,6 +15,7 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -329,6 +330,17 @@ namespace Xceed.Wpf.Toolkit
 
       if( Items.Count > 0 && CurrentPage == null )
         CurrentPage = Items[ 0 ] as WizardPage;
+    }
+
+    protected override void OnItemsChanged( NotifyCollectionChangedEventArgs e )
+    {
+      base.OnItemsChanged( e );
+
+      foreach( object o in this.Items )
+      {
+        if( !( o is WizardPage ) )
+          throw new NotSupportedException( "Wizard should only contains WizardPages." );
+      }
     }
 
     protected override void OnPropertyChanged( DependencyPropertyChangedEventArgs e )

@@ -73,6 +73,24 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion AllowGroup Property
 
+    #region GroupValueStringFormat Property
+
+    [EditorBrowsable( EditorBrowsableState.Never )]
+    [Browsable( false )]
+    public new string GroupValueStringFormat
+    {
+      get
+      {
+        return base.GroupValueStringFormat;
+      }
+      set
+      {
+        base.GroupValueStringFormat = value;
+      }
+    }
+
+    #endregion GroupValueStringFormat Property
+
     #region GroupValueTemplate Property
 
     [EditorBrowsable( EditorBrowsableState.Never )]
@@ -257,8 +275,8 @@ namespace Xceed.Wpf.DataGrid
 
     #region ReadOnly Property
 
-    public static new readonly DependencyProperty ReadOnlyProperty =
-        DataGridControl.ReadOnlyProperty.AddOwner( typeof( UnboundColumn ), new FrameworkPropertyMetadata( true ) );
+    public static new readonly DependencyProperty ReadOnlyProperty = DependencyProperty.Register(
+      "ReadOnly", typeof( bool ), typeof( UnboundColumn ), new FrameworkPropertyMetadata( true ) );
 
     public override bool ReadOnly
     {
@@ -275,6 +293,6 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion ReadOnly Property
+    #endregion
   }
 }

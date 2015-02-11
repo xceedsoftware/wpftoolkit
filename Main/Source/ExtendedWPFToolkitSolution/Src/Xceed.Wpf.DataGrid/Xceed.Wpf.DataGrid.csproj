@@ -47,10 +47,10 @@
     <NoWarn>1699</NoWarn>
     <BaseAddress>125829120</BaseAddress>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugSymbols>false</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
     <Optimize>true</Optimize>
     <OutputPath>.\bin\Release\</OutputPath>
     <DefineConstants>TRACE;CODE_ANALYSIS;XBAP_FRIENDLY</DefineConstants>
@@ -62,11 +62,47 @@
     </CodeAnalysisRules>
     <BaseAddress>125829120</BaseAddress>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <ErrorReport>prompt</ErrorReport>
+    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release+Log|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;CODE_ANALYSIS;XBAP_FRIENDLY;LOG</DefineConstants>
+    <BaseAddress>125829120</BaseAddress>
+    <Optimize>true</Optimize>
+    <NoWarn>1699</NoWarn>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisLogFile>bin\Release\Xceed.Wpf.DataGrid.v4.2.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug+Log|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;XBAP_FRIENDLY;LOG</DefineConstants>
+    <BaseAddress>125829120</BaseAddress>
+    <NoWarn>1699</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\Xceed.Wpf.DataGrid.v4.2.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationFramework.Aero">
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="PresentationFramework.Aero" />
     <Reference Include="PresentationFramework.Classic" />
     <Reference Include="PresentationFramework.Luna" />
     <Reference Include="PresentationFramework.Royale" />
@@ -113,6 +149,8 @@
     <Compile Include="%28CollectionView%29\BindingPathValueExtractor.cs" />
     <Compile Include="%28CollectionView%29\CollectionViewGroupExtensions.cs" />
     <Compile Include="%28CollectionView%29\CommitItemsEvent.cs" />
+    <Compile Include="%28CollectionView%29\ConnectionErrorChangedEventManager.cs" />
+    <Compile Include="%28CollectionView%29\ConnectionStateChangedEventManager.cs" />
     <Compile Include="%28CollectionView%29\CustomDistinctValueItemConfiguration.cs" />
     <Compile Include="%28CollectionView%29\CustomDistinctValueItemConfigurationCollection.cs" />
     <Compile Include="%28CollectionView%29\CustomDistinctValueItemFilterEventArgs.cs" />
@@ -162,9 +200,17 @@
     <Compile Include="%28CollectionView%29\DataGridItemEvent.cs" />
     <Compile Include="%28CollectionView%29\DataGridItemHandledEvent.cs" />
     <Compile Include="%28CollectionView%29\DataGridItemRemovedEvent.cs" />
+    <Compile Include="%28CollectionView%29\DistinctValuesRefreshNeededEventManager.cs" />
     <Compile Include="%28CollectionView%29\EmptyDataItemSafePropertyDescriptor.cs" />
     <Compile Include="%28CollectionView%29\EntityDetailDescription.cs" />
-    <Compile Include="%28CollectionView%29\OptimizedReadOnlyObservableCollection.cs" />
+    <Compile Include="%28CollectionView%29\ItemPropertyGroupSortStatNameChangedEventManager.cs" />
+    <Compile Include="%28CollectionView%29\PostBatchCollectionChangedEventManager.cs" />
+    <Compile Include="%28CollectionView%29\PreBatchCollectionChangedEventManager.cs" />
+    <Compile Include="%28CollectionView%29\ProxyApplyingFilterCriteriasEventManager.cs" />
+    <Compile Include="%28CollectionView%29\ProxyAutoFilterValuesChangedEventManager.cs" />
+    <Compile Include="%28CollectionView%29\ProxyCollectionRefreshEventManager.cs" />
+    <Compile Include="%28CollectionView%29\ProxyGroupDescriptionsChangedEventManager.cs" />
+    <Compile Include="%28CollectionView%29\ProxySortDescriptionsChangedEventManager.cs" />
     <Compile Include="%28CollectionView%29\QueryEntityDetailsEventArgs.cs" />
     <Compile Include="%28CollectionView%29\QueryDistinctValueEventArgs.cs" />
     <Compile Include="%28CollectionView%29\%28DataVirtualization%29\EmptyDataItem.cs" />
@@ -186,11 +232,15 @@
     <Compile Include="%28CollectionView%29\QueryGroupsEventArgs.cs" />
     <Compile Include="%28CollectionView%29\QueryItemCountEvent.cs" />
     <Compile Include="%28CollectionView%29\QueryItemsEvent.cs" />
+    <Compile Include="%28CollectionView%29\RawItemMap.cs" />
+    <Compile Include="%28CollectionView%29\RootGroupChangedEventManager.cs" />
     <Compile Include="%28CollectionView%29\SortDescriptionsSyncContext.cs" />
     <Compile Include="%28CollectionView%29\%28DataVirtualization%29\VirtualizedItemInfo.cs" />
     <Compile Include="%28CollectionView%29\%28DataVirtualization%29\VirtualizedItemValueCollection.cs" />
     <Compile Include="%28CollectionView%29\StatResultComparer.cs" />
     <Compile Include="%28CollectionView%29\UnboundDataItem.cs" />
+    <Compile Include="%28enums%29\AutoScrollCurrentItemTriggersEnum.cs" />
+    <Compile Include="%28enums%29\AutoScrollCurrentItemSourceTriggersEnum.cs" />
     <Compile Include="%28enums%29\CommitModeEnum.cs" />
     <Compile Include="%28enums%29\DataGridConnectionStateEnum.cs" />
     <Compile Include="%28enums%29\DataGridUpdateSourceTriggerEnum.cs" />
@@ -205,29 +255,55 @@
     <Compile Include="%28ForeignKeys%29\DataTableForeignKeyConverter.cs" />
     <Compile Include="%28ForeignKeys%29\ForeignKeyConverter.cs" />
     <Compile Include="%28ForeignKeys%29\ForeignKeyScrollTipContentControl.cs" />
+    <Compile Include="%28Generator%29\DataItemDataProvider.cs" />
+    <Compile Include="%28Generator%29\DataItemDataProviderBase.cs" />
+    <Compile Include="%28Generator%29\EmptyDataItemDataProvider.cs" />
     <Compile Include="%28Generator%29\IInhibitGenPosToIndexUpdating.cs" />
     <Compile Include="%28Generator%29\StickyContainerGeneratedComparer.cs" />
     <Compile Include="%28Generator%29\StickyContainerGeneratedReverseComparer.cs" />
     <Compile Include="%28Generator%29\StickyContainerGeneratedStruct.cs" />
+    <Compile Include="%28Generator%29\VisibilityChangingEventManager.cs" />
     <Compile Include="Automation\AutomationPeerExtensions.cs" />
+    <Compile Include="AutoResetFlag.cs" />
+    <Compile Include="AutoResetFlagFactory.cs" />
+    <Compile Include="AutoScrollCurrentItemSourceTriggersRestrictions.cs" />
     <Compile Include="CanBeCurrentWhenReadOnlyChangedEventManager.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CellContentStringFormatChangedEventManager.cs" />
     <Compile Include="CellContentTemplateChangedEventManager.cs" />
-    <Compile Include="ValidateInputWrapper.cs" />
     <Compile Include="CellEditorDisplayConditionsChangedEventManager.cs" />
-    <Compile Include="DataGridCheckBox.cs" />
+    <Compile Include="ValidateInputWrapper.cs" />
+    <Compile Include="CheckBox.cs" />
+    <Compile Include="ChildColumnVisibilityChangedEventManager.cs" />
+    <Compile Include="ColumnAddGroupCommand.cs" />
+    <Compile Include="ColumnCommand.cs" />
+    <Compile Include="ColumnGroupCommand.cs" />
+    <Compile Include="ColumnSortCommand.cs" />
     <Compile Include="Converters\SortingDirectionToBooleanConverter.cs" />
+    <Compile Include="Converters\StringFormatMultiConverter.cs" />
+    <Compile Include="DataItemEventDescriptor.cs" />
+    <Compile Include="DataItemEventDescriptorBase.cs" />
+    <Compile Include="DataItemEventDescriptorFactory.cs" />
+    <Compile Include="DataItemPropertyDescriptor.cs" />
+    <Compile Include="DataItemPropertyDescriptorBase.cs" />
+    <Compile Include="DataItemPropertyDescriptorFactory.cs" />
+    <Compile Include="DataItemTypeDescriptionProvider.cs" />
+    <Compile Include="DataItemTypeDescriptor.cs" />
+    <Compile Include="FilterCriteria\FilterExpressionHelper.cs" />
+    <Compile Include="ForeignKeyConfigNotifyCollectionChangedEventManager.cs" />
     <Compile Include="DataGridControlSelectionChangedWeakEventManager.cs" />
     <Compile Include="DataGridCurrentChangedEvent.cs" />
     <Compile Include="DataGridCurrentChangingEvent.cs" />
     <Compile Include="DataGridDatePicker.cs" />
     <Compile Include="DataGridFocusException.cs" />
+    <Compile Include="DataGridItemContainerManager.cs" />
     <Compile Include="DataGridSelectionChangingEvent.cs" />
+    <Compile Include="FittedWidthRequestedEventArgs.cs" />
     <Compile Include="ForeignKeyConfigurationChangedEventManager.cs" />
+    <Compile Include="GenericContentTemplateSelector.cs" />
     <Compile Include="GroupNavigationButton.cs" />
     <Compile Include="CellEditorContext.cs" />
-    <Compile Include="Converters\FilterCriterionToForeignKeyConverter.cs" />
     <Compile Include="Converters\EmptyStringToBooleanConverter.cs" />
     <Compile Include="ColumnBase.cs" />
     <Compile Include="FilterCriteria\EndsWithFilterCriterion.cs">
@@ -239,12 +315,34 @@
     <Compile Include="GroupNavigationControl.cs" />
     <Compile Include="GroupNavigationControlItem.cs" />
     <Compile Include="HashedLinkedList.cs" />
+    <Compile Include="IDataGridItemContainerExtensions.cs" />
+    <Compile Include="IGroupLevelDescription.cs" />
     <Compile Include="InnerCellContentPresenter.cs" />
     <Compile Include="ItemPropertiesChangedEventManager.cs" />
+    <Compile Include="ItemPropertyNameMap.cs" />
+    <Compile Include="LateGroupLevelDescription.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="Markup\DataGridThemeResourceDictionary.cs" />
+    <Compile Include="Markup\FrameworkThemeResourceDictionary.cs" />
+    <Compile Include="Markup\SharedResourceDictionary.cs" />
+    <Compile Include="Markup\SharedThemeResourceDictionary.cs" />
+    <Compile Include="FieldNameMap.cs" />
+    <Compile Include="NotifyCollectionChangedEventArgsExtensions.cs" />
+    <Compile Include="SelectionChangedInternalEventArgs.cs" />
+    <Compile Include="SelectionRangePoint.cs" />
+    <Compile Include="StringFormatDataTemplate.cs" />
+    <Compile Include="Utils\Collections\DoubleFenwickTree.cs" />
+    <Compile Include="Utils\Collections\FenwickTree.Generic.cs" />
+    <Compile Include="Utils\Collections\LongestIncreasingSubsequence.cs" />
+    <Compile Include="Utils\PropertyHelper.cs" />
+    <Compile Include="Utils\Wpf\DragDrop\AutoScrollManager.cs" />
+    <Compile Include="ValueChangeDataItemPropertyDescriptor.cs" />
+    <Compile Include="NotifyRangeCollectionChangedEventArgs.cs" />
     <Compile Include="ObjectComparer.cs" />
+    <Compile Include="ObservableColumnCollection.cs" />
     <Compile Include="FrameworkElementUnloadedEventManager.cs" />
-    <Compile Include="Print\IPrintInfo.cs" />
+    <Compile Include="RequestBringIntoViewWeakEventManager.cs" />
+    <Compile Include="RequestingDelayBringIntoViewAndFocusCurrentEventArgs.cs" />
     <Compile Include="ScrollChangedWeakEventManager.cs" />
     <Compile Include="SelectedCellsStorage.cs" />
     <Compile Include="SelectionCellRange.cs" />
@@ -254,6 +352,8 @@
     <Compile Include="SelectionRange.cs" />
     <Compile Include="SelectionItemRangeCollection.cs" />
     <Compile Include="SelectionRangeWithItems.cs" />
+    <Compile Include="ColumnSynchronizationManager.cs" />
+    <Compile Include="ToggleColumnSortCommand.cs" />
     <Compile Include="UnboundColumn.cs" />
     <Compile Include="SelectionInfo.cs" />
     <Compile Include="DataGridSelectionChangedEvent.cs" />
@@ -266,7 +366,6 @@
     <Compile Include="FilterCriteria\EqualToFilterCriterion.cs" />
     <Compile Include="FilterCriteria\FilterCriterion.cs" />
     <Compile Include="%28enums%29\FilterOperatorPrecedenceEnum.cs" />
-    <Compile Include="Converters\FilterCriterionToNullableBoolConverter.cs" />
     <Compile Include="FilterParser.cs" />
     <Compile Include="FilterParserTestWindow.cs" />
     <Compile Include="FilterParser_UnitTests.cs" />
@@ -278,9 +377,15 @@
     <Compile Include="FilterCriteria\OrFilterCriterion.cs" />
     <Compile Include="MaxGroupLevelsChangedEventManager.cs" />
     <Compile Include="MaxSortLevelsChangedEventManager.cs" />
+    <Compile Include="UpdateColumnSortCommand.cs" />
     <Compile Include="Utils\WeakEventHandler.cs" />
+    <Compile Include="Utils\Wpf\BreadthFirstSearchTreeTraversal.cs" />
+    <Compile Include="Utils\Wpf\BreadthFirstSearchTreeTraversalStrategy.cs" />
+    <Compile Include="Utils\Wpf\DepthFirstSearchTreeTraversal.cs" />
+    <Compile Include="Utils\Wpf\DepthFirstSearchTreeTraversalStrategy.cs" />
     <Compile Include="Utils\Wpf\DragDrop\DragDropHelper.cs" />
-    <Compile Include="ValidationRules\FilterExpressionValidationRule.cs" />
+    <Compile Include="Utils\Wpf\ITreeTraversal.cs" />
+    <Compile Include="Utils\Wpf\ITreeTraversalStrategy.cs" />
     <Compile Include="Automation\ColumnManagerCellAutomationPeer.cs" />
     <Compile Include="Automation\ColumnManagerRowAutomationPeer.cs" />
     <Compile Include="Automation\DataGridItemCellAutomationPeer.cs" />
@@ -298,6 +403,14 @@
     <Compile Include="Export\FormatSettingsBase.cs" />
     <Compile Include="%28ForeignKeys%29\ForeignKeyConfiguration.cs" />
     <Compile Include="GroupExtensions.cs" />
+    <Compile Include="SharedListStruct.cs" />
+    <Compile Include="Views\%28ColumnVirtualization%29\FixedColumnCountChangedEventArgs.cs" />
+    <Compile Include="Views\%28ColumnVirtualization%29\FixedColumnCountEventManager.cs" />
+    <Compile Include="Views\%28ColumnVirtualization%29\IColumnInfoCollection.Generic.cs" />
+    <Compile Include="Views\%28ColumnVirtualization%29\IColumnNameCollection.cs" />
+    <Compile Include="Views\%28ColumnVirtualization%29\TableViewColumnVirtualizationManagerBase.cs" />
+    <Compile Include="Views\%28Enums%29\FlattenDetailBindingModeEnum.cs" />
+    <Compile Include="Views\%28Enums%29\MasterDetailLayoutModeEnum.cs" />
     <Compile Include="Views\%28TableflowView%29\AnimatedDraggedElementAdorner.cs" />
     <Compile Include="Views\%28TableflowView%29\PointAnimation.cs" />
     <Compile Include="Views\%28TableflowView%29\TableflowView.cs" />
@@ -333,8 +446,6 @@
     <Compile Include="SelectedItemsStorage.cs" />
     <Compile Include="SelectionChanger.cs" />
     <Compile Include="SelectionManager.cs" />
-    <Compile Include="Settings\UserSettingsEnum.cs" />
-    <Compile Include="Settings\XmlColumnWidthStruct.cs" />
     <Compile Include="Automation\CellAutomationPeer.cs" />
     <Compile Include="Automation\DataGridContextAutomationPeer.cs" />
     <Compile Include="Automation\DataGridControlAutomationPeer.cs" />
@@ -347,6 +458,7 @@
     <Compile Include="ValidationRules\CellEditorValidationRule.cs" />
     <Compile Include="ValidationRules\CellEditorErrorValidationRule.cs" />
     <Compile Include="Views\DictionaryTheme.cs" />
+    <Compile Include="Views\MasterDetailLayoutAttribute.cs" />
     <Compile Include="Views\FixedCellPanel.cs" />
     <Compile Include="Views\%28ColumnVirtualization%29\UpdateMeasureRequiredEventArgs.cs" />
     <Compile Include="Views\%28ColumnVirtualization%29\UpdateMeasureRequiredEventManager.cs" />
@@ -354,6 +466,8 @@
     <Compile Include="Views\DataGridControlBackgroundBrushesResources.xaml.cs">
       <DependentUpon>DataGridControlBackgroundBrushesResources.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\NavigationHelper.cs" />
+    <Compile Include="Views\ScrollViewerTemplateHelper.cs" />
     <Compile Include="Views\ColumnStretchingManager.cs" />
     <Compile Include="Views\%28Enums%29\ColumnStretchModeEnum.cs" />
     <Compile Include="%28enums%29\ColumnWidthUnitTypeEnum.cs" />
@@ -384,6 +498,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ThemeChangedEventManager.cs" />
+    <Compile Include="Views\TableViewEndPageInfo.cs" />
+    <Compile Include="Views\TableViewFullPageInfo.cs" />
     <Compile Include="Views\TableViewHeaderFooterPanel.cs" />
     <Compile Include="Views\%28Enums%29\ViewPropertyModeEnum.cs" />
     <Compile Include="%28Generator%29\WeakDataGridContextKey.cs" />
@@ -443,9 +559,6 @@
     <Compile Include="LevelGroupConfigurationSelector.cs" />
     <Compile Include="HierarchicalGroupLevelIndicatorPane.cs" />
     <Compile Include="Markup\ClearGroupLevelConfigurations.cs" />
-    <Compile Include="SortingHelper.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Utils\Collections\ReadOnlyObservableHashList.cs" />
     <Compile Include="Views\%28Enums%29\PassiveLayoutAxisEnum.cs" />
     <Compile Include="%28enums%29\DistinctValuesConstraintEnum.cs" />
@@ -475,7 +588,6 @@
     <Compile Include="Converters\DefaultDataConverter.cs" />
     <Compile Include="Converters\MultimodalResultConverter.cs" />
     <Compile Include="Converters\SourceDataConverter.cs" />
-    <Compile Include="Converters\StatResultConverter.cs" />
     <Compile Include="Converters\StringFormatConverter.cs" />
     <Compile Include="%28CollectionView%29\DataGridDetailDescription.cs" />
     <Compile Include="%28CollectionView%29\DataGridDetailDescriptionCollection.cs" />
@@ -493,8 +605,6 @@
     <Compile Include="%28Generator%29\GeneratorNodeFactory.cs" />
     <Compile Include="%28Generator%29\GeneratorNodeHelper.cs" />
     <Compile Include="ValidationRules\SourceDataConverterValidationRule.cs" />
-    <Compile Include="Stats\InvalidSourcePropertyNameException.cs" />
-    <Compile Include="Stats\InvalidValueException.cs" />
     <Compile Include="Stats\StatFunctionCollection.cs" />
     <Compile Include="Stats\StatFunctionComparer.cs" />
     <Compile Include="Stats\StatResult.cs" />
@@ -518,8 +628,7 @@
     <Compile Include="IDeferableScrollInfoRefresh.cs" />
     <Compile Include="Views\PassiveLayoutDecorator.cs" />
     <Compile Include="Views\ScrollingCellsDecorator.cs" />
-    <Compile Include="Views\FixedCellSubPanel.cs">
-    </Compile>
+    <Compile Include="Views\FixedCellSubPanel.cs" />
     <Compile Include="Views\FixedColumnSplitter.cs" />
     <Compile Include="Views\%28Enums%29\SynchronizedScrollViewerPositionEnum.cs" />
     <Compile Include="%28enums%29\ValidationModeEnum.cs" />
@@ -583,7 +692,11 @@
     <Compile Include="StaircasePanel.cs" />
     <Compile Include="Views\SynchronizedScrollViewer.cs" />
     <Compile Include="Views\TableView.cs" />
+    <Compile Include="Views\TableViewPage.cs" />
+    <Compile Include="Views\TableViewPageInfo.cs" />
+    <Compile Include="Views\TableViewPartialPageInfo.cs" />
     <Compile Include="Views\TableViewScrollViewer.cs" />
+    <Compile Include="Views\TableViewStartPageInfo.cs" />
     <Compile Include="Views\TargetViewAttribute.cs" />
     <Compile Include="TextInputActivationGesture.cs" />
     <Compile Include="Views\Theme.cs" />
@@ -601,6 +714,7 @@
     <Compile Include="VirtualizingCellCollection.cs" />
     <Compile Include="VirtualizingCellCollectionChangedEventManager.cs" />
     <Compile Include="VirtualizingStackPanel.cs" />
+    <Compile Include="VisibleColumnsUpdatedEventArgs.cs" />
     <Compile Include="VisibleColumnsUpdatingEventManager.cs" />
     <Compile Include="WatermarkAdorner.cs" />
     <AppDesigner Include="Properties\" />
@@ -775,16 +889,24 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="themes\Aero2\Resources\TableView.Aero2.normalcolor.Graphics.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Aero2\Resources\Aero2.normalcolor.Controls.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="themes\Aero2\Resources\Aero2.normalcolor.Resources.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="themes\Aero2\TableflowView.Aero2.normalcolor.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="themes\Aero2\TableView.Aero2.normalcolor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="themes\zune.normalcolor.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -969,10 +1091,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Xceed.Wpf.Toolkit\Xceed.Wpf.Toolkit.csproj">
-      <Project>{72E591D6-8F83-4D8C-8F67-9C325E623234}</Project>
+      <Project>{72e591d6-8f83-4d8c-8f67-9c325e623234}</Project>
       <Name>Xceed.Wpf.Toolkit</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="GenSerializationAssembly" DependsOnTargets="AssignTargetPaths;Compile;ResolveKeySource" Inputs="$(MSBuildAllProjects);@(IntermediateAssembly)" Outputs="$(OutputPath)$(_SGenDllName)">
     <SGen BuildAssemblyName="$(TargetFileName)" BuildAssemblyPath="$(OutputPath)" References="@(ReferencePath)" ShouldGenerateSerializer="true" UseProxyTypes="false" KeyContainer="$(KeyContainerName)" KeyFile="..\..\SolutionItems\Xceed.snk" DelaySign="$(DelaySign)" ToolPath="$(SGenToolPath)">

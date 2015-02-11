@@ -14,14 +14,13 @@
 
   ***********************************************************************************/
 
-using System.Windows.Controls;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Controls.Primitives;
 using System;
 using System.ComponentModel;
-using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Input;
 using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
@@ -39,6 +38,11 @@ namespace Xceed.Wpf.DataGrid
 
       DataGridControl.ParentDataGridControlPropertyKey.OverrideMetadata( typeof( RowSelector ),
         new FrameworkPropertyMetadata( new PropertyChangedCallback( RowSelector.OnParentGridControlChanged ) ) );
+
+      m_sDataContextBinding = new Binding();
+      m_sDataContextBinding.RelativeSource = new RelativeSource( RelativeSourceMode.Self );
+      m_sDataContextBinding.Path = new PropertyPath( DataGridControl.ContainerProperty );
+      m_sDataContextBinding.Mode = BindingMode.OneWay;
 
       m_sItemIndexBinding = new Binding();
       m_sItemIndexBinding.Path = new PropertyPath( DataGridVirtualizingPanel.ItemIndexProperty );
@@ -77,8 +81,7 @@ namespace Xceed.Wpf.DataGrid
 
     internal RowSelector()
     {
-      this.DataContext = null;
-
+      BindingOperations.SetBinding( this, RowSelector.DataContextProperty, m_sDataContextBinding );
       BindingOperations.SetBinding( this, RowSelector.IsCurrentProperty, m_sIsCurrentBinding );
       BindingOperations.SetBinding( this, RowSelector.IsBeingEditedProperty, m_sIsBeingEditedBinding );
       BindingOperations.SetBinding( this, RowSelector.ItemIndexProperty, m_sItemIndexBinding );
@@ -647,7 +650,7 @@ namespace Xceed.Wpf.DataGrid
               {
                 try
                 {
-                  dataGridContext.SetCurrentColumnCore( null, false, false );
+                  dataGridContext.SetCurrentColumnCore( null, false, false, AutoScrollCurrentItemSourceTriggers.Navigation );
                 }
                 catch( DataGridException )
                 {
@@ -728,6 +731,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion Button Behavior Code
 
+    private static readonly Binding m_sDataContextBinding;
     private static readonly Binding m_sItemIndexBinding;
     private static readonly Binding m_sIsCurrentBinding;
     private static readonly Binding m_sIsBeingEditedBinding;

@@ -15,14 +15,11 @@
   ***********************************************************************************/
 
 using System;
-using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows;
-using System.ComponentModel;
-using System.Windows.Media;
-using System.Windows.Threading;
+using System.Windows.Controls;
 using System.Windows.Data;
-using System.Diagnostics;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
@@ -147,7 +144,9 @@ namespace Xceed.Wpf.DataGrid.Views
       // We need to take ScrollingCellsDecoratorClipOffset into consideration
       // in case an animated column reordering is in progress
       double clipOffset = this.SplitterOffset;
-      double widthOffset = arrangeSize.Width - clipOffset;
+
+      //Width of Rect cannot be less then 0.
+      double widthOffset = Math.Max( 0, arrangeSize.Width - clipOffset );
 
       // Try to get the RectangleGeometry from the Clip
       // to avoid recreating one per call

@@ -123,7 +123,8 @@
                            <RowDefinition />
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Column="1" Text="Properties:" />
-                        <pg:PropertyGrid Grid.Row="1"
+                        <pg:PropertyGrid x:Name="PART_PropertyGrid"
+                                         Grid.Row="1"
                                          Grid.Column="1"
                                          Margin="0,5,0,0"
                                          HorizontalAlignment="Stretch"

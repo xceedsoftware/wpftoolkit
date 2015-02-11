@@ -258,7 +258,7 @@ namespace Xceed.Wpf.Toolkit
       {
         _calendar.SelectedDatesChanged += Calendar_SelectedDatesChanged;
         _calendar.SelectedDate = Value ?? null;
-        _calendar.DisplayDate = Value ?? DateTime.Now;
+        _calendar.DisplayDate = Value ?? this.ContextNow;
         this.SetBlackOutDates();
       }
 
@@ -281,9 +281,15 @@ namespace Xceed.Wpf.Toolkit
 
     protected override void OnValueChanged( DateTime? oldValue, DateTime? newValue )
     {
-      if( (_calendar != null) && (_calendar.SelectedDate != newValue) )
+      //The calendar only select the Date part, not the time part.
+      DateTime? newValueDate = (newValue != null) 
+        ? newValue.Value.Date 
+        : (DateTime?)null;
+
+      if( _calendar != null && _calendar.SelectedDate != newValueDate)
       {
-        _calendar.SelectedDate = newValue;
+        _calendar.SelectedDate = newValueDate;
+        _calendar.DisplayDate = newValue.GetValueOrDefault( this.ContextNow );
       }
 
       base.OnValueChanged( oldValue, newValue );
@@ -357,8 +363,16 @@ namespace Xceed.Wpf.Toolkit
       {
         var newDate = ( DateTime? )e.AddedItems[ 0 ];
 
-        if( ( Value != null ) && ( newDate != null ) && newDate.HasValue )
+        //The Calendar will always return a date with an "Unspecified" Kind.
+        //Force the expected kind to the value.
+        if( newDate != null )
         {
+          newDate = DateTime.SpecifyKind( newDate.Value, this.Kind );
+        }
+
+        if( ( Value != null ) && ( newDate != null ) )
+        {
+
           // Only change the year, month, and day part of the value. Keep everything to the last "tick."
           // "Milliseconds" aren't precise enough. Use a mathematical scheme instead.
           newDate = newDate.Value.Date + Value.Value.TimeOfDay;

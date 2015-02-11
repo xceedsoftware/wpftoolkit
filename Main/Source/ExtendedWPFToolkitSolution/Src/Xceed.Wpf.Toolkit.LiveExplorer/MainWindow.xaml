@@ -23,8 +23,8 @@
         AllowsTransparency="False"
         Icon="App.ico"
         Title="Extended WPF Toolkit - LiveExplorer"
-        Height="768"
-        Width="1290">
+        Height="778"
+        Width="1300">
    <Window.Resources>
       <ResourceDictionary>
          <ResourceDictionary.MergedDictionaries>
@@ -545,6 +545,10 @@
                                               SampleType="{x:Type samples:Text.Views.RichTextboxView}" />
                <core:LiveExplorerTreeViewItem Header="WatermarkTextBox"
                                               SampleType="{x:Type samples:Text.Views.WatermarkTextboxView}" />
+               <core:LiveExplorerTreeViewItem Header="TokenizedTextBox"
+                                              SampleType="{x:Type samples:TokenizedTextBox.Views.TokenizedTextBoxView}"
+                                              IsNewFeature="True"
+                                              IsPlusOnlyFeature="True" />
             </core:LiveExplorerTreeViewItem>
             <core:LiveExplorerTreeViewItem Header="RangeSlider"
                                            SampleType="{x:Type samples:RangeSlider.Views.RangeSliderView}"/>
@@ -553,7 +557,6 @@
                                            IsPlusOnlyFeature="True"/>
             <core:LiveExplorerTreeViewItem Header="ToggleSwitch"
                                            SampleType="{x:Type samples:ToggleSwitch.Views.ToggleSwitchView}"
-                                           IsNewFeature="True"
                                            IsPlusOnlyFeature="True" />
             <core:LiveExplorerTreeViewItem Header="Enumeration"
                                            SampleType="{x:Type samples:Button.Views.ButtonSpinnerView}" />
@@ -592,8 +595,8 @@
          <core:LiveExplorerTreeViewItem Header="Windows"
                                         Style="{StaticResource TreeViewHeaderStyle}"
                                         ItemContainerStyle="{StaticResource TreeViewItemStyle}">
-            <core:LiveExplorerTreeViewItem Header="StylableWindows"
-                                           SampleType="{x:Type samples:Window.Views.StylableWindowView}" />
+            <core:LiveExplorerTreeViewItem Header="StyleableWindows"
+                                           SampleType="{x:Type samples:Window.Views.StyleableWindowView}" />
             <core:LiveExplorerTreeViewItem Header="ChildWindow"
                                            SampleType="{x:Type samples:Window.Views.ChildWindowView}" />
             <core:LiveExplorerTreeViewItem Header="WindowContainer"
@@ -642,8 +645,10 @@
                                            IsPlusOnlyFeature="True" />
             <core:LiveExplorerTreeViewItem Header="SwitchPanel"
                                            SampleType="{x:Type samples:Panels.Views.SwitchPanelView}" />
-         </core:LiveExplorerTreeViewItem>
-         <core:LiveExplorerTreeViewItem Header="Theming"
+            </core:LiveExplorerTreeViewItem>
+
+
+           <core:LiveExplorerTreeViewItem Header="Theming"
                                         Style="{StaticResource TreeViewHeaderStyle}"
                                         ItemContainerStyle="{StaticResource TreeViewItemStyle}">
             <core:LiveExplorerTreeViewItem Header="Extended Toolkit controls"

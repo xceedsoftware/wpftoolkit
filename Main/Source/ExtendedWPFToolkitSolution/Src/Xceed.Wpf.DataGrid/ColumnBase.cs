@@ -15,25 +15,23 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Collections;
-using System.ComponentModel;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Windows.Media;
-using Xceed.Wpf.DataGrid.ValidationRules;
-using System.Collections.Generic;
-using System.Windows.Controls.Primitives;
 using Xceed.Utils.Collections;
-using System.Collections.Specialized;
-using Xceed.Wpf.DataGrid.Converters;
+using Xceed.Wpf.DataGrid.ValidationRules;
+using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
 {
   [DebuggerDisplay( "FieldName = {FieldName}" )]
-  public abstract class ColumnBase : Freezable, INotifyPropertyChanged
+  public abstract class ColumnBase : Freezable, INotifyPropertyChanged, IWeakEventListener
   {
     static ColumnBase()
     {
@@ -68,15 +66,13 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return m_cellContentTemplate;
+        return ( DataTemplate )this.GetValue( ColumnBase.CellContentTemplateProperty );
       }
       set
       {
         this.SetValue( ColumnBase.CellContentTemplateProperty, value );
       }
     }
-
-    private DataTemplate m_cellContentTemplate;
 
     #endregion CellContentTemplate Property
 
@@ -87,22 +83,21 @@ namespace Xceed.Wpf.DataGrid
         "CellContentTemplateSelector",
         typeof( DataTemplateSelector ),
         typeof( ColumnBase ),
-        new FrameworkPropertyMetadata( GenericContentTemplateSelector.Instance,
+        new FrameworkPropertyMetadata(
+          GenericContentTemplateSelector.Instance,
           new PropertyChangedCallback( ColumnBase.OnCellContentTemplateSelectorChanged ) ) );
 
     public DataTemplateSelector CellContentTemplateSelector
     {
       get
       {
-        return m_cellContentTemplateSelector;
+        return ( DataTemplateSelector )this.GetValue( ColumnBase.CellContentTemplateSelectorProperty );
       }
       set
       {
         this.SetValue( ColumnBase.CellContentTemplateSelectorProperty, value );
       }
     }
-
-    private DataTemplateSelector m_cellContentTemplateSelector = GenericContentTemplateSelector.Instance;
 
     #endregion CellContentTemplateSelector Property
 
@@ -150,29 +145,46 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion CellVerticalContentAlignment
 
+    #region CellContentStringFormat Property
+
+    //StringFormat to use when in ViewMode (not editing)
+    public static readonly DependencyProperty CellContentStringFormatProperty =
+        DependencyProperty.Register( "CellContentStringFormat",
+        typeof( string ),
+        typeof( ColumnBase ),
+        new FrameworkPropertyMetadata( null, new PropertyChangedCallback( ColumnBase.OnCellContentStringFormatChanged ) ) );
+
+    public string CellContentStringFormat
+    {
+      get
+      {
+        return ( string )this.GetValue( ColumnBase.CellContentStringFormatProperty );
+      }
+      set
+      {
+        this.SetValue( ColumnBase.CellContentStringFormatProperty, value );
+      }
+    }
+
+    internal event EventHandler CellContentStringFormatChanged;
+
+    #endregion CellContentStringFormat Property
+
     #region Title Property
 
     public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
       "Title",
       typeof( object ),
       typeof( ColumnBase ),
-      new UIPropertyMetadata( null, new PropertyChangedCallback( ColumnBase.OnTitleChanged ) ) );
-
-    private static void OnTitleChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = ( ColumnBase )sender;
-
-      column.m_title = e.NewValue;
-
-      if( column.TitleChanged != null )
-        column.TitleChanged( column, EventArgs.Empty );
-    }
+      new UIPropertyMetadata(
+        null,
+        new PropertyChangedCallback( ColumnBase.OnTitleChanged ) ) );
 
     public object Title
     {
       get
       {
-        return m_title;
+        return this.GetValue( ColumnBase.TitleProperty );
       }
       set
       {
@@ -180,33 +192,34 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private static void OnTitleChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    {
+      var column = ( ColumnBase )sender;
+      var handler = column.TitleChanged;
+
+      if( handler != null )
+      {
+        handler.Invoke( column, EventArgs.Empty );
+      }
+    }
+
     internal event EventHandler TitleChanged;
-    private object m_title;
 
     #endregion Title Property
 
     #region TitleTemplate Property
 
-    public static readonly DependencyProperty TitleTemplateProperty =
-        DependencyProperty.Register( "TitleTemplate", typeof( DataTemplate ), typeof( ColumnBase ), new UIPropertyMetadata( null, new PropertyChangedCallback( ColumnBase.OnTitleTemplateChanged ) ) );
-
-    private DataTemplate m_titleTemplate;
-
-    private static void OnTitleTemplateChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      column.m_titleTemplate = e.NewValue as DataTemplate;
-    }
+    public static readonly DependencyProperty TitleTemplateProperty = DependencyProperty.Register(
+      "TitleTemplate",
+      typeof( DataTemplate ),
+      typeof( ColumnBase ),
+      new UIPropertyMetadata( null ) );
 
     public DataTemplate TitleTemplate
     {
       get
       {
-        return m_titleTemplate;
+        return ( DataTemplate )this.GetValue( ColumnBase.TitleTemplateProperty );
       }
       set
       {
@@ -218,26 +231,17 @@ namespace Xceed.Wpf.DataGrid
 
     #region TitleTemplateSelector Property
 
-    public static readonly DependencyProperty TitleTemplateSelectorProperty =
-        DependencyProperty.Register( "TitleTemplateSelector", typeof( DataTemplateSelector ), typeof( ColumnBase ), new UIPropertyMetadata( null, new PropertyChangedCallback( ColumnBase.OnTitleTemplateSelectorChanged ) ) );
-
-    private DataTemplateSelector m_titleTemplateSelector;
-
-    private static void OnTitleTemplateSelectorChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      column.m_titleTemplateSelector = e.NewValue as DataTemplateSelector;
-    }
+    public static readonly DependencyProperty TitleTemplateSelectorProperty = DependencyProperty.Register(
+      "TitleTemplateSelector",
+      typeof( DataTemplateSelector ),
+      typeof( ColumnBase ),
+      new UIPropertyMetadata( null ) );
 
     public DataTemplateSelector TitleTemplateSelector
     {
       get
       {
-        return m_titleTemplateSelector;
+        return ( DataTemplateSelector )this.GetValue( ColumnBase.TitleTemplateSelectorProperty );
       }
       set
       {
@@ -249,33 +253,42 @@ namespace Xceed.Wpf.DataGrid
 
     #region ActualWidth Property
 
-    private static readonly DependencyPropertyKey ActualWidthPropertyKey =
-      DependencyProperty.RegisterReadOnly( "ActualWidth", typeof( double ), typeof( ColumnBase ), new PropertyMetadata( ColumnBase.OnActualWidthChanged ) );
+    private static readonly DependencyPropertyKey ActualWidthPropertyKey = DependencyProperty.RegisterReadOnly(
+      "ActualWidth",
+      typeof( double ),
+      typeof( ColumnBase ),
+      new PropertyMetadata( ColumnBase.OnActualWidthChanged ) );
 
     public static readonly DependencyProperty ActualWidthProperty = ColumnBase.ActualWidthPropertyKey.DependencyProperty;
 
+    public double ActualWidth
+    {
+      get
+      {
+        return ( double )this.GetValue( ColumnBase.ActualWidthProperty );
+      }
+    }
+
     private static void OnActualWidthChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
-      ColumnBase column = o as ColumnBase;
-
+      var column = o as ColumnBase;
       if( column == null )
         return;
 
-      if( column.ActualWidthChanged != null )
+      var handler = column.ActualWidthChanged;
+      if( handler != null )
       {
-        Debug.Assert( e.NewValue != null );
-        Debug.Assert( e.OldValue != null );
-        column.m_actualWidth = ( double )e.NewValue;
-        column.ActualWidthChanged( column, new ColumnActualWidthChangedEventArgs( column, ( double )e.OldValue, ( double )e.NewValue ) );
+        handler.Invoke( column, new ColumnActualWidthChangedEventArgs( column, ( double )e.OldValue, ( double )e.NewValue ) );
       }
     }
 
     private void UpdateActualWidth()
     {
-      double actualWidth = ( ( this.Width.UnitType == ColumnWidthUnitType.Pixel ) ? this.Width.Value : ( ( ColumnWidth )WidthProperty.DefaultMetadata.DefaultValue ).Value );
-      double maxWidth = this.MaxWidth;
-      double minWidth = this.MinWidth;
-      bool useDesiredWidth = false;
+      var width = this.Width;
+      var actualWidth = ( ( width.UnitType == ColumnWidthUnitType.Pixel ) ? width.Value : ( ( ColumnWidth )ColumnBase.WidthProperty.DefaultMetadata.DefaultValue ).Value );
+      var maxWidth = this.MaxWidth;
+      var minWidth = this.MinWidth;
+      var useDesiredWidth = false;
 
       if( this.DesiredWidth >= 0d )
       {
@@ -284,35 +297,28 @@ namespace Xceed.Wpf.DataGrid
       }
 
       if( actualWidth > maxWidth )
+      {
         actualWidth = maxWidth;
+      }
 
       // If Width is set to a value lesser than MinWidth or, if MaxWidth is inferior to
       // MinWidth, ActualWidth will become equal to MinWidth.
       if( actualWidth < minWidth )
+      {
         actualWidth = minWidth;
+      }
 
       this.SetValue( ColumnBase.ActualWidthPropertyKey, actualWidth );
-      m_actualWidth = actualWidth;
 
       if( ( minWidth >= maxWidth ) || ( useDesiredWidth ) )
       {
-        this.SetHasFixedWidth( true );
+        this.HasFixedWidth = true;
       }
       else
       {
         this.ClearValue( ColumnBase.HasFixedWidthPropertyKey );
       }
     }
-
-    public double ActualWidth
-    {
-      get
-      {
-        return m_actualWidth;
-      }
-    }
-
-    private double m_actualWidth;
 
     #endregion ActualWidth Property
 
@@ -338,12 +344,12 @@ namespace Xceed.Wpf.DataGrid
 
     private static void WidthChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      ColumnBase column = ( ColumnBase )sender;
+      var column = ( ColumnBase )sender;
 
       if( e.Property == ColumnBase.WidthProperty )
       {
-        ColumnWidth oldValue = ( ColumnWidth )e.OldValue;
-        ColumnWidth newValue = ( ColumnWidth )e.NewValue;
+        var oldValue = ( ColumnWidth )e.OldValue;
+        var newValue = ( ColumnWidth )e.NewValue;
 
         if( ( oldValue.UnitType == ColumnWidthUnitType.Star ) &&
             ( newValue.UnitType == ColumnWidthUnitType.Pixel ) )
@@ -358,7 +364,7 @@ namespace Xceed.Wpf.DataGrid
           // to force a new Measure pass. Mandatory, for instance, when the old star
           // value was limited by a MaxValue and the new star value would give a 
           // smaller value to DesiredWidth.
-          double oldActualWidth = column.ActualWidth;
+          var oldActualWidth = column.ActualWidth;
 
           if( column.ActualWidth > column.MinWidth )
           {
@@ -439,26 +445,13 @@ namespace Xceed.Wpf.DataGrid
       "TextTrimming",
       typeof( TextTrimming ),
       typeof( ColumnBase ),
-      new UIPropertyMetadata( TextTrimming.CharacterEllipsis, new PropertyChangedCallback( ColumnBase.OnTextTrimmingPropertyChanged ) ) );
-
-    private TextTrimming m_textTrimming = TextTrimming.CharacterEllipsis;
-
-    private static void OnTextTrimmingPropertyChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      if( e.NewValue != null )
-        column.m_textTrimming = ( TextTrimming )e.NewValue;
-    }
+      new UIPropertyMetadata( TextTrimming.CharacterEllipsis ) );
 
     public TextTrimming TextTrimming
     {
       get
       {
-        return m_textTrimming;
+        return ( TextTrimming )this.GetValue( ColumnBase.TextTrimmingProperty );
       }
       set
       {
@@ -474,26 +467,13 @@ namespace Xceed.Wpf.DataGrid
       "TextWrapping",
       typeof( TextWrapping ),
       typeof( ColumnBase ),
-      new UIPropertyMetadata( TextWrapping.NoWrap, new PropertyChangedCallback( ColumnBase.OnTextWrappingChanged ) ) );
-
-    private TextWrapping m_textWrapping = TextWrapping.NoWrap;
-
-    private static void OnTextWrappingChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      if( e.NewValue != null )
-        column.m_textWrapping = ( TextWrapping )e.NewValue;
-    }
+      new UIPropertyMetadata( TextWrapping.NoWrap ) );
 
     public TextWrapping TextWrapping
     {
       get
       {
-        return m_textWrapping;
+        return ( TextWrapping )this.GetValue( ColumnBase.TextWrappingProperty );
       }
       set
       {
@@ -505,35 +485,24 @@ namespace Xceed.Wpf.DataGrid
 
     #region HasFixedWidth Read-Only Property
 
-    private static readonly DependencyPropertyKey HasFixedWidthPropertyKey =
-      DependencyProperty.RegisterReadOnly( "HasFixedWidth", typeof( bool ), typeof( ColumnBase ), new PropertyMetadata( false, new PropertyChangedCallback( ColumnBase.OnHasFixedWidthChanged ) ) );
+    private static readonly DependencyPropertyKey HasFixedWidthPropertyKey = DependencyProperty.RegisterReadOnly(
+      "HasFixedWidth",
+      typeof( bool ),
+      typeof( ColumnBase ),
+      new PropertyMetadata( false ) );
 
-    public static readonly DependencyProperty HasFixedWidthProperty =
-      ColumnBase.HasFixedWidthPropertyKey.DependencyProperty;
-
-    private bool m_hasFixedWidth = false;
-
-    private static void OnHasFixedWidthChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      column.m_hasFixedWidth = ( bool )e.NewValue;
-    }
+    public static readonly DependencyProperty HasFixedWidthProperty = ColumnBase.HasFixedWidthPropertyKey.DependencyProperty;
 
     public bool HasFixedWidth
     {
       get
       {
-        return m_hasFixedWidth;
+        return ( bool )this.GetValue( ColumnBase.HasFixedWidthProperty );
       }
-    }
-
-    private void SetHasFixedWidth( bool value )
-    {
-      this.SetValue( ColumnBase.HasFixedWidthPropertyKey, value );
+      private set
+      {
+        this.SetValue( ColumnBase.HasFixedWidthPropertyKey, value );
+      }
     }
 
     #endregion HasFixedWidth Read-Only Property
@@ -545,16 +514,13 @@ namespace Xceed.Wpf.DataGrid
       "VisiblePosition",
       typeof( int ),
       typeof( ColumnBase ),
-      new UIPropertyMetadata(
-        int.MaxValue,
-        new PropertyChangedCallback( ColumnBase.OnVisibilePositionChanged ),
-        new CoerceValueCallback( ColumnBase.OnCoerceVisiblePosition ) ) );
+      new UIPropertyMetadata( int.MaxValue, new PropertyChangedCallback( ColumnBase.OnVisiblePositionChanged ), new CoerceValueCallback( ColumnBase.OnCoerceVisiblePosition ) ) );
 
     public int VisiblePosition
     {
       get
       {
-        return m_visiblePosition;
+        return ( int )this.GetValue( ColumnBase.VisiblePositionProperty );
       }
       set
       {
@@ -565,20 +531,41 @@ namespace Xceed.Wpf.DataGrid
     [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly" )]
     private static object OnCoerceVisiblePosition( DependencyObject sender, object value )
     {
-      if( ( int )value < 0 )
+      var newValue = ( int )value;
+      if( newValue < 0 )
         throw new ArgumentOutOfRangeException( "VisiblePosition", "VisiblePosition must be greater than or equal to zero." );
+
+      var column = ( ColumnBase )sender;
+
+      if( !column.m_inhibitVisiblePositionChanging.IsSet )
+      {
+        var oldValue = column.VisiblePosition;
+
+        if( newValue != oldValue )
+        {
+          var handler = column.VisiblePositionChanging;
+          if( handler != null )
+          {
+            handler.Invoke( sender, EventArgs.Empty );
+          }
+        }
+      }
 
       return value;
     }
 
-    private static void OnVisibilePositionChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    private static void OnVisiblePositionChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
       ColumnBase column = ( ColumnBase )sender;
 
-      column.m_visiblePosition = ( int )e.NewValue;
+      int oldValue = ( int )e.OldValue;
+      int newValue = ( int )e.NewValue;
 
-      if( column.VisiblePositionChanged != null )
-        column.VisiblePositionChanged( column, new ColumnVisiblePositionChangedEventArgs( column, ( int )e.OldValue, ( int )e.NewValue ) );
+      var handler = column.VisiblePositionChanged;
+      if( handler != null )
+      {
+        handler.Invoke( column, new ColumnVisiblePositionChangedEventArgs( column, oldValue, newValue ) );
+      }
 
       // Invalidate own PreviousVisibleColumnProperty
       column.InvalidatePreviousVisibleColumnProperty();
@@ -592,35 +579,33 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    internal IDisposable InhibitVisiblePositionChanging()
+    {
+      return m_inhibitVisiblePositionChanging.Set();
+    }
+
+    internal event EventHandler VisiblePositionChanging;
     internal event EventHandler VisiblePositionChanged;
-    private int m_visiblePosition = Int32.MaxValue;
+
+    private readonly AutoResetFlag m_inhibitVisiblePositionChanging = AutoResetFlagFactory.Create( false );
 
     #endregion VisiblePosition Property
 
     #region IsFirstVisible Read-Only Property
 
-    private static readonly DependencyPropertyKey IsFirstVisiblePropertyKey =
-        DependencyProperty.RegisterReadOnly( "IsFirstVisible", typeof( bool ), typeof( ColumnBase ), new PropertyMetadata( false, new PropertyChangedCallback( ColumnBase.OnIsFirstVisibleChanged ) ) );
+    private static readonly DependencyPropertyKey IsFirstVisiblePropertyKey = DependencyProperty.RegisterReadOnly(
+      "IsFirstVisible",
+      typeof( bool ),
+      typeof( ColumnBase ),
+      new PropertyMetadata( false ) );
 
     public static readonly DependencyProperty IsFirstVisibleProperty;
-
-    private bool m_isFirstVisible; // = false;
-
-    private static void OnIsFirstVisibleChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      column.m_isFirstVisible = ( bool )e.NewValue;
-    }
 
     public bool IsFirstVisible
     {
       get
       {
-        return m_isFirstVisible;
+        return ( bool )this.GetValue( ColumnBase.IsFirstVisibleProperty );
       }
     }
 
@@ -632,35 +617,25 @@ namespace Xceed.Wpf.DataGrid
     internal void ClearIsFirstVisible()
     {
       this.ClearValue( ColumnBase.IsFirstVisiblePropertyKey );
-      m_isFirstVisible = false;
     }
 
     #endregion IsFirstVisible Read-Only Property
 
     #region IsLastVisible Read-Only Property
 
-    private static readonly DependencyPropertyKey IsLastVisiblePropertyKey =
-        DependencyProperty.RegisterReadOnly( "IsLastVisible", typeof( bool ), typeof( ColumnBase ), new PropertyMetadata( false, new PropertyChangedCallback( ColumnBase.OnIsLastVisibleChanged ) ) );
+    private static readonly DependencyPropertyKey IsLastVisiblePropertyKey = DependencyProperty.RegisterReadOnly(
+      "IsLastVisible",
+      typeof( bool ),
+      typeof( ColumnBase ),
+      new PropertyMetadata( false ) );
 
     public static readonly DependencyProperty IsLastVisibleProperty;
-
-    private bool m_isLastVisible; // = false;
-
-    private static void OnIsLastVisibleChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      column.m_isLastVisible = ( bool )e.NewValue;
-    }
 
     public bool IsLastVisible
     {
       get
       {
-        return m_isLastVisible;
+        return ( bool )this.GetValue( ColumnBase.IsLastVisibleProperty );
       }
     }
 
@@ -678,41 +653,34 @@ namespace Xceed.Wpf.DataGrid
 
     #region FieldName Property
 
-    public static readonly DependencyProperty FieldNameProperty =
-        DependencyProperty.Register( "FieldName", typeof( string ), typeof( ColumnBase ), new UIPropertyMetadata( null, new PropertyChangedCallback( ColumnBase.OnFieldNameChanged ), new CoerceValueCallback( ColumnBase.OnCoerceFieldName ) ) );
-
-    private string m_fieldName; // = null;
-
-    private static void OnFieldNameChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      column.m_fieldName = ( string )e.NewValue;
-    }
-
-    private static object OnCoerceFieldName( DependencyObject sender, object requestedValue )
-    {
-      ColumnBase column = sender as ColumnBase;
-
-      if( ( column.m_containingCollection != null ) && ( !DesignerProperties.GetIsInDesignMode( column ) ) )
-        throw new InvalidOperationException( "An attempt was made to change the FieldName of a column that is contained in a grid." );
-
-      return requestedValue;
-    }
+    public static readonly DependencyProperty FieldNameProperty = DependencyProperty.Register(
+      "FieldName",
+      typeof( string ),
+      typeof( ColumnBase ),
+      new UIPropertyMetadata(
+        null,
+        null,
+        new CoerceValueCallback( ColumnBase.OnCoerceFieldName ) ) );
 
     public string FieldName
     {
       get
       {
-        return m_fieldName;
+        return ( string )this.GetValue( ColumnBase.FieldNameProperty );
       }
       set
       {
         this.SetValue( ColumnBase.FieldNameProperty, value );
       }
+    }
+
+    private static object OnCoerceFieldName( DependencyObject sender, object requestedValue )
+    {
+      var column = sender as ColumnBase;
+      if( ( column.m_containingCollection != null ) && ( !DesignerProperties.GetIsInDesignMode( column ) ) )
+        throw new InvalidOperationException( "An attempt was made to change the FieldName of a column that is contained in a grid." );
+
+      return requestedValue;
     }
 
     #endregion FieldName Property
@@ -723,13 +691,13 @@ namespace Xceed.Wpf.DataGrid
       "Visible",
       typeof( bool ),
       typeof( ColumnBase ),
-      new UIPropertyMetadata( true, new PropertyChangedCallback( ColumnBase.OnVisiblePropertyChanged ) ) );
+      new UIPropertyMetadata( true, new PropertyChangedCallback( ColumnBase.OnVisibilityChanged ) ) );
 
     public bool Visible
     {
       get
       {
-        return m_visible;
+        return ( bool )this.GetValue( ColumnBase.VisibleProperty );
       }
       set
       {
@@ -737,18 +705,18 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private static void OnVisiblePropertyChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    private static void OnVisibilityChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      ColumnBase column = ( ColumnBase )sender;
+      var column = ( ColumnBase )sender;
 
-      column.m_visible = ( bool )e.NewValue;
-
-      if( column.VisibleChanged != null )
-        column.VisibleChanged( column, EventArgs.Empty );
+      var handler = column.VisibleChanged;
+      if( handler != null )
+      {
+        handler.Invoke( column, EventArgs.Empty );
+      }
     }
 
     internal event EventHandler VisibleChanged;
-    private bool m_visible = true;
 
     #endregion Visible Property
 
@@ -848,26 +816,17 @@ namespace Xceed.Wpf.DataGrid
 
     #region GroupValueTemplate Property
 
-    public static readonly DependencyProperty GroupValueTemplateProperty =
-        DependencyProperty.Register( "GroupValueTemplate", typeof( DataTemplate ), typeof( ColumnBase ), new FrameworkPropertyMetadata( null, new PropertyChangedCallback( ColumnBase.OnGroupValueTemplateChanged ) ) );
-
-    private DataTemplate m_groupValueTemplate;
-
-    private static void OnGroupValueTemplateChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      column.m_groupValueTemplate = e.NewValue as DataTemplate;
-    }
+    public static readonly DependencyProperty GroupValueTemplateProperty = DependencyProperty.Register(
+      "GroupValueTemplate",
+      typeof( DataTemplate ),
+      typeof( ColumnBase ),
+      new FrameworkPropertyMetadata( null ) );
 
     public DataTemplate GroupValueTemplate
     {
       get
       {
-        return m_groupValueTemplate;
+        return ( DataTemplate )this.GetValue( ColumnBase.GroupValueTemplateProperty );
       }
       set
       {
@@ -879,30 +838,17 @@ namespace Xceed.Wpf.DataGrid
 
     #region GroupValueTemplateSelector Property
 
-    public static readonly DependencyProperty GroupValueTemplateSelectorProperty =
-        DependencyProperty.Register( "GroupValueTemplateSelector",
-        typeof( DataTemplateSelector ),
-        typeof( ColumnBase ),
-        new FrameworkPropertyMetadata( null,
-          new PropertyChangedCallback( ColumnBase.OnGroupValueTemplateSelectorChanged ) ) );
-
-    private DataTemplateSelector m_groupValueTemplateSelector; // = null;
-
-    private static void OnGroupValueTemplateSelectorChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      column.m_groupValueTemplateSelector = e.NewValue as DataTemplateSelector;
-    }
+    public static readonly DependencyProperty GroupValueTemplateSelectorProperty = DependencyProperty.Register(
+      "GroupValueTemplateSelector",
+      typeof( DataTemplateSelector ),
+      typeof( ColumnBase ),
+      new FrameworkPropertyMetadata( null ) );
 
     public DataTemplateSelector GroupValueTemplateSelector
     {
       get
       {
-        return m_groupValueTemplateSelector;
+        return ( DataTemplateSelector )this.GetValue( ColumnBase.GroupValueTemplateSelectorProperty );
       }
       set
       {
@@ -912,31 +858,41 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion GroupValueTemplateSelector Property
 
+    #region GroupValueStringFormat Property
+
+    public static readonly DependencyProperty GroupValueStringFormatProperty = DependencyProperty.Register(
+      "GroupValueStringFormat",
+      typeof( string ),
+      typeof( ColumnBase ),
+      new FrameworkPropertyMetadata( null ) );
+
+    public string GroupValueStringFormat
+    {
+      get
+      {
+        return ( string )this.GetValue( ColumnBase.GroupValueStringFormatProperty );
+      }
+      set
+      {
+        this.SetValue( ColumnBase.GroupValueStringFormatProperty, value );
+      }
+    }
+
+    #endregion GroupValueStringFormat Property
+
     #region CellEditor Property
 
     public static readonly DependencyProperty CellEditorProperty = DependencyProperty.Register(
       "CellEditor",
       typeof( CellEditor ),
       typeof( ColumnBase ),
-      new UIPropertyMetadata( null, new PropertyChangedCallback( ColumnBase.OnCellEditorChanged ) ) );
-
-    private CellEditor m_cellEditor = null;
-
-    private static void OnCellEditorChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      column.m_cellEditor = e.NewValue as CellEditor;
-    }
+      new UIPropertyMetadata( null ) );
 
     public CellEditor CellEditor
     {
       get
       {
-        return m_cellEditor;
+        return ( CellEditor )this.GetValue( ColumnBase.CellEditorProperty );
       }
       set
       {
@@ -979,7 +935,7 @@ namespace Xceed.Wpf.DataGrid
 
       if( column.CellEditorDisplayConditionsChanged != null )
       {
-        column.CellEditorDisplayConditionsChanged( column, new EventArgs() );
+        column.CellEditorDisplayConditionsChanged( column, EventArgs.Empty );
       }
     }
 
@@ -1037,14 +993,13 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return m_canBeCurrentWhenReadOnly;
+        return ( bool )this.GetValue( ColumnBase.CanBeCurrentWhenReadOnlyProperty );
       }
       set
       {
         this.SetValue( ColumnBase.CanBeCurrentWhenReadOnlyProperty, value );
       }
     }
-    private bool m_canBeCurrentWhenReadOnly = true;
 
     private static void OnCanBeCurrentWhenReadOnlyChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
@@ -1053,11 +1008,9 @@ namespace Xceed.Wpf.DataGrid
       if( column == null )
         return;
 
-      column.m_canBeCurrentWhenReadOnly = ( bool )e.NewValue;
-
       if( column.CanBeCurrentWhenReadOnlyChanged != null )
       {
-        column.CanBeCurrentWhenReadOnlyChanged( sender, new EventArgs() );
+        column.CanBeCurrentWhenReadOnlyChanged( sender, EventArgs.Empty );
       }
     }
 
@@ -1065,30 +1018,19 @@ namespace Xceed.Wpf.DataGrid
 
     #region HasValidationError Property
 
-    private static readonly DependencyPropertyKey HasValidationErrorPropertyKey =
-        DependencyProperty.RegisterReadOnly( "HasValidationError", typeof( bool ), typeof( ColumnBase ), new UIPropertyMetadata( false, new PropertyChangedCallback( ColumnBase.OnHasValidationErrorChanged ) ) );
+    private static readonly DependencyPropertyKey HasValidationErrorPropertyKey = DependencyProperty.RegisterReadOnly(
+      "HasValidationError",
+      typeof( bool ),
+      typeof( ColumnBase ),
+      new UIPropertyMetadata( false ) );
 
-    public static readonly DependencyProperty HasValidationErrorProperty =
-      HasValidationErrorPropertyKey.DependencyProperty;
-
-    private bool m_hasValidationError;
-
-    private static void OnHasValidationErrorChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      if( e.NewValue != null )
-        column.m_hasValidationError = ( bool )e.NewValue;
-    }
+    public static readonly DependencyProperty HasValidationErrorProperty = ColumnBase.HasValidationErrorPropertyKey.DependencyProperty;
 
     public bool HasValidationError
     {
       get
       {
-        return m_hasValidationError;
+        return ( bool )this.GetValue( ColumnBase.HasValidationErrorProperty );
       }
     }
 
@@ -1111,29 +1053,19 @@ namespace Xceed.Wpf.DataGrid
 
     #region SortDirection Property
 
-    private static readonly DependencyPropertyKey SortDirectionPropertyKey =
-        DependencyProperty.RegisterReadOnly( "SortDirection", typeof( SortDirection ), typeof( ColumnBase ), new PropertyMetadata( SortDirection.None, new PropertyChangedCallback( ColumnBase.OnSortDirectionChanged ) ) );
+    private static readonly DependencyPropertyKey SortDirectionPropertyKey = DependencyProperty.RegisterReadOnly(
+      "SortDirection",
+      typeof( SortDirection ),
+      typeof( ColumnBase ),
+      new PropertyMetadata( SortDirection.None ) );
 
-    public static readonly DependencyProperty SortDirectionProperty =
-      ColumnBase.SortDirectionPropertyKey.DependencyProperty;
-
-    private SortDirection m_sortDirection = SortDirection.None;
-
-    private static void OnSortDirectionChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      column.m_sortDirection = ( SortDirection )e.NewValue;
-    }
+    public static readonly DependencyProperty SortDirectionProperty = ColumnBase.SortDirectionPropertyKey.DependencyProperty;
 
     public SortDirection SortDirection
     {
       get
       {
-        return m_sortDirection;
+        return ( SortDirection )this.GetValue( ColumnBase.SortDirectionProperty );
       }
     }
 
@@ -1153,29 +1085,19 @@ namespace Xceed.Wpf.DataGrid
 
     #region SortIndex Read-Only Property
 
-    private static readonly DependencyPropertyKey SortIndexPropertyKey =
-        DependencyProperty.RegisterReadOnly( "SortIndex", typeof( int ), typeof( ColumnBase ), new PropertyMetadata( -1, new PropertyChangedCallback( ColumnBase.OnSortIndexChanged ) ) );
+    private static readonly DependencyPropertyKey SortIndexPropertyKey = DependencyProperty.RegisterReadOnly(
+      "SortIndex",
+      typeof( int ),
+      typeof( ColumnBase ),
+      new PropertyMetadata( -1 ) );
 
-    public static readonly DependencyProperty SortIndexProperty =
-      ColumnBase.SortIndexPropertyKey.DependencyProperty;
-
-    private int m_sortIndex = -1;
-
-    private static void OnSortIndexChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = o as ColumnBase;
-
-      if( column == null )
-        return;
-
-      column.m_sortIndex = ( int )e.NewValue;
-    }
+    public static readonly DependencyProperty SortIndexProperty = ColumnBase.SortIndexPropertyKey.DependencyProperty;
 
     public int SortIndex
     {
       get
       {
-        return m_sortIndex;
+        return ( int )this.GetValue( ColumnBase.SortIndexProperty );
       }
     }
 
@@ -1235,7 +1157,7 @@ namespace Xceed.Wpf.DataGrid
 
     private Nullable<bool> m_isMainColumn = null;
 
-    public bool IsMainColumn
+    public virtual bool IsMainColumn
     {
       get
       {
@@ -1248,31 +1170,36 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
-        ColumnCollection containingCollection = this.ContainingCollection;
+        this.SetIsMainColumnInternal( value );
+      }
+    }
 
-        if( containingCollection == null )
+    internal virtual void SetIsMainColumnInternal( bool value )
+    {
+      ColumnCollection containingCollection = this.ContainingCollection;
+
+      if( containingCollection == null )
+      {
+        if( ( !m_isMainColumn.HasValue ) || ( m_isMainColumn.Value != value ) )
         {
-          if( ( !m_isMainColumn.HasValue ) || ( m_isMainColumn.Value != value ) )
-          {
-            m_isMainColumn = value;
-            this.OnPropertyChanged( new PropertyChangedEventArgs( "IsMainColumn" ) );
-          }
+          m_isMainColumn = value;
+          this.OnPropertyChanged( new PropertyChangedEventArgs( "IsMainColumn" ) );
         }
-        else
+      }
+      else
+      {
+        ColumnBase oldMainColumn = containingCollection.MainColumn;
+
+        if( oldMainColumn != this )
         {
-          ColumnBase oldMainColumn = containingCollection.MainColumn;
+          containingCollection.MainColumn = this;
+          // These two PropertyChanged are done in this order to be consistent with
+          // the events' order when adding a Column already "IsMainColumn".
+          this.OnPropertyChanged( new PropertyChangedEventArgs( "IsMainColumn" ) );
 
-          if( oldMainColumn != this )
+          if( oldMainColumn != null )
           {
-            containingCollection.MainColumn = this;
-            // These two PropertyChanged are done in this order to be consistent with
-            // the events' order when adding a Column already "IsMainColumn".
-            this.OnPropertyChanged( new PropertyChangedEventArgs( "IsMainColumn" ) );
-
-            if( oldMainColumn != null )
-            {
-              oldMainColumn.OnPropertyChanged( new PropertyChangedEventArgs( "IsMainColumn" ) );
-            }
+            oldMainColumn.OnPropertyChanged( new PropertyChangedEventArgs( "IsMainColumn" ) );
           }
         }
       }
@@ -1282,8 +1209,11 @@ namespace Xceed.Wpf.DataGrid
 
     #region ReadOnly Property
 
-    public static readonly DependencyProperty ReadOnlyProperty =
-        DataGridControl.ReadOnlyProperty.AddOwner( typeof( ColumnBase ) );
+    public static readonly DependencyProperty ReadOnlyProperty = DependencyProperty.Register(
+      "ReadOnly",
+      typeof( bool ),
+      typeof( ColumnBase ),
+      new FrameworkPropertyMetadata( false ) );
 
     public virtual bool ReadOnly
     {
@@ -1297,7 +1227,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion ReadOnly Property
+    #endregion
 
     #region OverrideReadOnlyForInsertion Property
 
@@ -1324,7 +1254,7 @@ namespace Xceed.Wpf.DataGrid
     #region PreviousVisibleColumn Property
 
     [EditorBrowsable( EditorBrowsableState.Never )]
-    public ColumnBase PreviousVisibleColumn
+    public virtual ColumnBase PreviousVisibleColumn
     {
       get
       {
@@ -1360,7 +1290,7 @@ namespace Xceed.Wpf.DataGrid
 
     #region NextVisibleColumn Property
 
-    private ColumnBase NextVisibleColumn
+    internal virtual ColumnBase NextVisibleColumn
     {
       get
       {
@@ -1371,7 +1301,12 @@ namespace Xceed.Wpf.DataGrid
         var columnsByVisiblePosition =
           ( this.ParentDetailConfiguration != null ) ? this.ParentDetailConfiguration.ColumnsByVisiblePosition : this.DataGridControl.ColumnsByVisiblePosition;
 
-        var nextColumnNode = columnsByVisiblePosition.Find( this ).Next;
+        var nextColumnNode = columnsByVisiblePosition.Find( this );
+
+        if( nextColumnNode != null )
+        {
+          nextColumnNode = nextColumnNode.Next;
+        }
 
         while( nextColumnNode != null )
         {
@@ -1395,23 +1330,13 @@ namespace Xceed.Wpf.DataGrid
       "CellRecyclingGroup",
       typeof( object ),
       typeof( ColumnBase ),
-      new FrameworkPropertyMetadata( null, new PropertyChangedCallback( ColumnBase.OnCellRecyclingGroupChanged ) ) );
-
-    private static void OnCellRecyclingGroupChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
-    {
-      ColumnBase column = sender as ColumnBase;
-
-      if( column == null )
-        return;
-
-      column.m_cellRecyclingGroup = e.NewValue;
-    }
+      new FrameworkPropertyMetadata( null ) );
 
     public object CellRecyclingGroup
     {
       get
       {
-        return m_cellRecyclingGroup;
+        return this.GetValue( ColumnBase.CellRecyclingGroupProperty );
       }
       set
       {
@@ -1422,22 +1347,73 @@ namespace Xceed.Wpf.DataGrid
     internal object GetCellRecyclingGroupOrDefault()
     {
       //Always return the one assigned by the client application
-      if( m_cellRecyclingGroup != null )
-        return m_cellRecyclingGroup;
+      var recyclingGroup = this.CellRecyclingGroup;
+      if( recyclingGroup != null )
+        return recyclingGroup;
 
-      //If not assigned, then generate and return the default.
-      if( m_defaultCellRecyclingGroup == null )
-      {
-        m_defaultCellRecyclingGroup = new CellRecyclingGroupKey( this );
-      }
+      var defaultCellRecyclingGroup = this.DefaultCellRecyclingGroup;
+      Debug.Assert( defaultCellRecyclingGroup != null );
 
-      return m_defaultCellRecyclingGroup;
+      return defaultCellRecyclingGroup;
     }
 
-    private object m_cellRecyclingGroup;
+    #endregion CellRecyclingGroup Property
+
+    #region DefaultCellRecyclingGroupDataType Internal Property
+
+    internal Type DefaultCellRecyclingGroupDataType
+    {
+      get
+      {
+        return m_defaultCellRecyclingGroupDataType;
+      }
+      set
+      {
+        if( value == m_defaultCellRecyclingGroupDataType )
+          return;
+
+        Debug.Assert( value != null );
+
+        m_defaultCellRecyclingGroupDataType = value;
+
+        this.ResetDefaultCellRecyclingGroup();
+      }
+    }
+
+    private Type m_defaultCellRecyclingGroupDataType = typeof( object );
+
+    #endregion DefaultCellRecyclingGroupDataType Internal Property
+
+    #region DefaultCellRecyclingGroup Private Property
+
+    private object DefaultCellRecyclingGroup
+    {
+      get
+      {
+        if( m_defaultCellRecyclingGroup == null )
+        {
+          m_defaultCellRecyclingGroup = this.CreateDefaultCellRecyclingGroup();
+          if( m_defaultCellRecyclingGroup == null )
+            throw new InvalidOperationException( "CreateDefaultCellRecyclingGroup must return a non-null value." );
+        }
+
+        return m_defaultCellRecyclingGroup;
+      }
+    }
+
+    internal virtual object CreateDefaultCellRecyclingGroup()
+    {
+      return new CellRecyclingGroupKey( this.CellContentTemplate, this.DefaultCellRecyclingGroupDataType );
+    }
+
+    internal void ResetDefaultCellRecyclingGroup()
+    {
+      m_defaultCellRecyclingGroup = null;
+    }
+
     private object m_defaultCellRecyclingGroup;
 
-    #endregion CellRecyclingGroup Property
+    #endregion DefaultCellRecyclingGroup Private Property
 
     #region CurrentRowInEditionCellState Property
 
@@ -1450,6 +1426,58 @@ namespace Xceed.Wpf.DataGrid
       set
       {
         m_currentRowInEditionCellState = value;
+      }
+    }
+
+    #endregion
+
+    #region DisplayedValueConverter Property
+
+    public IValueConverter DisplayedValueConverter
+    {
+      get;
+      set;
+    }
+
+    #endregion
+
+    #region DisplayedValueConverterParameter Property
+
+    public object DisplayedValueConverterParameter
+    {
+      get;
+      set;
+    }
+
+    #endregion
+
+    #region DisplayedValueConverterCulture Property
+
+    public CultureInfo DisplayedValueConverterCulture
+    {
+      get;
+      set;
+    }
+
+    #endregion
+
+    #region DefaultCulture Property
+
+    public static readonly DependencyProperty DefaultCultureProperty = DependencyProperty.Register(
+     "DefaultCulture",
+     typeof( CultureInfo ),
+     typeof( ColumnBase ),
+     new UIPropertyMetadata( CultureInfo.CurrentCulture ) );
+
+    public CultureInfo DefaultCulture
+    {
+      get
+      {
+        return ( CultureInfo )this.GetValue( ColumnBase.DefaultCultureProperty );
+      }
+      set
+      {
+        this.SetValue( ColumnBase.DefaultCultureProperty, value );
       }
     }
 
@@ -1473,33 +1501,53 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
+    #region FittedWidthRequested Event
+
+    internal event FittedWidthRequestedEventHandler FittedWidthRequested;
+
+    private Nullable<double> RequestFittedWidth()
+    {
+      var handler = this.FittedWidthRequested;
+      if( handler == null )
+        return null;
+
+      var e = new FittedWidthRequestedEventArgs();
+      handler.Invoke( this, e );
+
+      return e.Value;
+    }
+
+    #endregion
+
 #if DEBUG
     public override string ToString()
     {
       string toString = base.ToString();
 
-      if( string.IsNullOrEmpty( this.FieldName ) == false )
+      if( !string.IsNullOrEmpty( this.FieldName ) )
+      {
         toString += " " + this.FieldName;
+      }
 
       return toString;
     }
 #endif
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate" )]
-    public double GetFittedWidth()
+    public virtual double GetFittedWidth()
     {
-      double fittedWidth = -1;
+      var fittedWidth = this.RequestFittedWidth().GetValueOrDefault( -1d );
 
-      RealizedContainersRequestedEventArgs realizedContainers = new RealizedContainersRequestedEventArgs();
-
+      var eventArgs = new RealizedContainersRequestedEventArgs();
       if( this.RealizedContainersRequested != null )
       {
-        this.RealizedContainersRequested( this, realizedContainers );
+        this.RealizedContainersRequested( this, eventArgs );
       }
 
-      if( realizedContainers.RealizedContainers.Count > 0 )
+      var realizedContainers = eventArgs.RealizedContainers;
+      if( realizedContainers.Count > 0 )
       {
-        fittedWidth = Math.Max( fittedWidth, this.GetElementCollectionFittedWidth( realizedContainers.RealizedContainers ) );
+        fittedWidth = Math.Max( fittedWidth, this.GetElementCollectionFittedWidth( realizedContainers ) );
       }
 
       return fittedWidth;
@@ -1524,6 +1572,21 @@ namespace Xceed.Wpf.DataGrid
       // Only derived from Freezable to have DataContext and ElementName binding.
       // So we don't want to be freezable.
       return false;
+    }
+
+    internal virtual void SetIsBeingDraggedAnimated( bool value )
+    {
+      TableflowView.SetIsBeingDraggedAnimated( this, value );
+    }
+
+    internal virtual void SetColumnReorderingDragSourceManager( ColumnReorderingDragSourceManager value )
+    {
+      TableflowView.SetColumnReorderingDragSourceManager( this, value );
+    }
+
+    internal virtual void ClearColumnReorderingDragSourceManager()
+    {
+      TableflowView.ClearColumnReorderingDragSourceManager( this );
     }
 
     internal void AttachToContainingCollection( ColumnCollection columnCollection )
@@ -1560,8 +1623,7 @@ namespace Xceed.Wpf.DataGrid
           {
             oldMainColumn.OnPropertyChanged( new PropertyChangedEventArgs( "IsMainColumn" ) );
           }
-          // The PropertyChanged of this instance has already been fired before it 
-          // was added to the collection.
+          // The PropertyChanged of this instance has already been fired before it was added to the collection.
         }
 
         m_isMainColumn = null;
@@ -1570,7 +1632,7 @@ namespace Xceed.Wpf.DataGrid
       {
         if( columnCollection.Count == 0 )
         {
-          this.IsMainColumn = true;
+          this.SetIsMainColumnInternal( true );
         }
       }
     }
@@ -1602,18 +1664,69 @@ namespace Xceed.Wpf.DataGrid
         this.DistinctValuesRequested( this, e );
     }
 
+    internal bool GetIsSettingFixedColumnCount()
+    {
+      var detailConfiguration = this.ParentDetailConfiguration;
+      if( detailConfiguration != null )
+      {
+        return detailConfiguration.IsSettingFixedColumnCount;
+      }
+
+      return this.DataGridControl.DataGridContext.IsSettingFixedColumnCount;
+    }
+
+    internal int GetFixedColumnCount()
+    {
+      var detailConfiguration = this.ParentDetailConfiguration;
+      if( detailConfiguration != null )
+      {
+        return ( int )TableView.GetFixedColumnCount( detailConfiguration );
+      }
+
+      return ( int )TableView.GetFixedColumnCount( this.DataGridControl.DataGridContext );
+    }
+
+    internal void SetFixedColumnCountInfo( FixedColumnUpdateType updateType )
+    {
+      FixedColumnCountInfoEventArgs infoEventArgs = new FixedColumnCountInfoEventArgs( this, updateType );
+
+      var detailConfiguration = this.ParentDetailConfiguration;
+      if( detailConfiguration != null )
+      {
+        detailConfiguration.RaiseFixedColumnCountChanged( infoEventArgs );
+        return;
+      }
+
+      TableViewColumnVirtualizationManagerBase columnVirtualizationManager =
+                                         this.DataGridControl.DataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManagerBase;
+      columnVirtualizationManager.UpdateFixedColumnCountInfo( infoEventArgs );
+    }
+
+    internal CultureInfo GetCulture( CultureInfo value )
+    {
+      if( value != null )
+        return value;
+
+      return this.GetCulture();
+    }
+
+    internal CultureInfo GetCulture()
+    {
+      var culture = this.DefaultCulture;
+      if( culture != null )
+        return culture;
+
+      return CultureInfo.CurrentCulture;
+    }
+
     private double GetElementCollectionFittedWidth( IEnumerable collection )
     {
       if( collection == null )
         throw new ArgumentNullException( "collection" );
 
-      // Ensure to use the FieldName of the
-      // Cell instead of the visible position
-      // since a lookup dictionary is used underneath
-      // and if the Indexer is used, the Cells are returned
-      // in the order they were added, not visible position.
+      // Ensure to use the FieldName of the Cell instead of the visible position since a lookup dictionary is used underneath
+      // and if the Indexer is used, the Cells are returned in the order they were added, not visible position.
       double fittedWidth = -1;
-      string fieldName = this.FieldName;
 
       foreach( object item in collection )
       {
@@ -1629,53 +1742,125 @@ namespace Xceed.Wpf.DataGrid
           }
         }
 
-        if( row == null )
+        double cellFittedWidth;
+        if( !this.TryGetCellFittedWidth( row, out cellFittedWidth ) )
           continue;
 
-        Cell cell = row.Cells[ fieldName ];
-
-        if( cell == null )
-          continue;
-
-        fittedWidth = Math.Max( fittedWidth, cell.GetFittedWidth() );
+        fittedWidth = Math.Max( fittedWidth, cellFittedWidth );
       }
 
       return fittedWidth;
     }
 
+    private bool TryGetCellFittedWidth( Row row, out double fittedWidth )
+    {
+      fittedWidth = -1;
+
+      if( row == null )
+        return false;
+
+      Cell cell;
+      CellCollection cells = row.Cells;
+      VirtualizingCellCollection virtualCells = cells as VirtualizingCellCollection;
+      bool releaseCell = false;
+
+      if( virtualCells != null )
+      {
+        if( !virtualCells.TryGetCell( this, out cell ) )
+        {
+          releaseCell = true;
+          cell = virtualCells[ this ];
+
+          Debug.Assert( cell != null );
+
+          if( !cell.IsMeasureValid )
+          {
+            cell.Measure( Size.Empty );
+          }
+        }
+      }
+      else
+      {
+        cell = cells[ this ];
+      }
+
+      Debug.Assert( cell != null );
+      fittedWidth = cell.GetFittedWidth();
+
+      // A cell that was created or recycled to calculate the fitted width must be released
+      // in order to minimize the number of cells created overall.
+      if( releaseCell )
+      {
+        Debug.Assert( virtualCells != null );
+        virtualCells.Release( cell );
+      }
+
+      return true;
+    }
+
+    private void SetIsSettingFixedColumnCount()
+    {
+      var detailConfiguration = this.ParentDetailConfiguration;
+      if( detailConfiguration != null )
+      {
+        detailConfiguration.IsSettingFixedColumnCount = true;
+        return;
+      }
+
+      this.DataGridControl.DataGridContext.IsSettingFixedColumnCount = true;
+    }
+
+    private void SetFixedColumnCountInfo()
+    {
+      FixedColumnUpdateType updateType;
+      if( this.Visible )
+      {
+        updateType = FixedColumnUpdateType.Show;
+      }
+      else
+      {
+        updateType = FixedColumnUpdateType.Hide;
+      }
+
+      this.SetFixedColumnCountInfo( updateType );
+    }
+
+    private static void OnCellContentStringFormatChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    {
+      ColumnBase column = ( ColumnBase )sender;
+
+      if( string.IsNullOrEmpty( ( string )e.OldValue ) && string.IsNullOrEmpty( ( string )e.NewValue ) )
+        return;
+
+      if( column.CellContentStringFormatChanged != null )
+      {
+        column.CellContentStringFormatChanged( sender, EventArgs.Empty );
+      }
+    }
+
     private static void OnCellContentTemplateChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      ColumnBase column = sender as ColumnBase;
-      Debug.Assert( column != null );
+      var column = ( ColumnBase )sender;
 
-      if( column != null )
+      //Make sure cells pertaining to this group are assigned to the correct recycle bin.
+      //The recycle bin based on the previous key value will be clean up later by the FixedCellPanel, if no other column uses it.
+      column.ResetDefaultCellRecyclingGroup();
+
+      var handler = column.CellContentTemplateChanged;
+      if( handler != null )
       {
-        column.m_cellContentTemplate = e.NewValue as DataTemplate;
-
-        //Make sure cells pertaining to this group are assigned to the correct recycle bin.
-        //The recycle bin based on the previous key value will be clean up later by the FixedCellPanel, if no other column uses it.
-        column.m_defaultCellRecyclingGroup = new CellRecyclingGroupKey( column );
-
-        if( column.CellContentTemplateChanged != null )
-        {
-          column.CellContentTemplateChanged( sender, new EventArgs() );
-        }
+        handler.Invoke( column, EventArgs.Empty );
       }
     }
 
     private static void OnCellContentTemplateSelectorChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      ColumnBase column = sender as ColumnBase;
-      Debug.Assert( column != null );
+      var column = ( ColumnBase )sender;
+      var handler = column.CellContentTemplateChanged;
 
-      if( column != null )
+      if( handler != null )
       {
-        column.m_cellContentTemplateSelector = e.NewValue as DataTemplateSelector;
-
-        if( column.CellContentTemplateChanged != null )
-        {
-          column.CellContentTemplateChanged( sender, new EventArgs() );
-        }
+        handler.Invoke( column, EventArgs.Empty );
       }
     }
 
@@ -1685,134 +1870,34 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion INotifyPropertyChanged Members
 
+    #region IWeakEventListener Members
+
+    bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      return false;
+    }
+
+    #endregion
+
     private ColumnCollection m_containingCollection; // = null
     private CellState m_currentRowInEditionCellState;
 
-    internal partial class GenericContentTemplateSelector : DataTemplateSelector
-    {
-      static GenericContentTemplateSelector()
-      {
-        // We need to initalize the ResourceDictionary before accessing since we access
-        // it in a static constructor and will be called before the Layout was performed
-        GenericContentTemplateSelector.GenericContentTemplateResources.InitializeComponent();
-
-        GenericContentTemplateSelector.BoolTemplate = GenericContentTemplateSelector.GenericContentTemplateResources[ "booleanDefaultContentTemplate" ] as DataTemplate;
-        Debug.Assert( GenericContentTemplateSelector.BoolTemplate != null );
-        GenericContentTemplateSelector.BoolTemplate.Seal();
-
-        GenericContentTemplateSelector.ImageTemplate = GenericContentTemplateSelector.GenericContentTemplateResources[ "imageDefaultContentTemplate" ] as DataTemplate;
-        Debug.Assert( GenericContentTemplateSelector.ImageTemplate != null );
-        GenericContentTemplateSelector.ImageTemplate.Seal();
-
-        GenericContentTemplateSelector.ForeignKeyDistinctValueItemContentTemplate = GenericContentTemplateSelector.GenericContentTemplateResources[ "foreignKeyDistinctValueItemDefaultContentTemplate" ] as DataTemplate;
-        Debug.Assert( GenericContentTemplateSelector.ForeignKeyDistinctValueItemContentTemplate != null );
-        GenericContentTemplateSelector.ForeignKeyDistinctValueItemContentTemplate.Seal();
-
-        GenericContentTemplateSelector.ForeignKeyCellContentTemplate = GenericContentTemplateSelector.GenericContentTemplateResources[ "foreignKeyDefaultContentTemplate" ] as DataTemplate;
-        Debug.Assert( GenericContentTemplateSelector.ForeignKeyCellContentTemplate != null );
-        GenericContentTemplateSelector.ForeignKeyCellContentTemplate.Seal();
-
-        GenericContentTemplateSelector.ForeignKeyGroupValueTemplate = GenericContentTemplateSelector.GenericContentTemplateResources[ "foreignKeyGroupValueDefaultContentTemplate" ] as DataTemplate;
-        Debug.Assert( GenericContentTemplateSelector.ForeignKeyGroupValueTemplate != null );
-        GenericContentTemplateSelector.ForeignKeyGroupValueTemplate.Seal();
-
-        GenericContentTemplateSelector.ForeignKeyScrollTipContentTemplate = GenericContentTemplateSelector.GenericContentTemplateResources[ "foreignKeyScrollTipDefaultContentTemplate" ] as DataTemplate;
-        Debug.Assert( GenericContentTemplateSelector.ForeignKeyScrollTipContentTemplate != null );
-        GenericContentTemplateSelector.ForeignKeyScrollTipContentTemplate.Seal();
-
-      }
-
-      #region Singleton Pattern
-
-      private GenericContentTemplateSelector()
-      {
-      }
-
-      public static GenericContentTemplateSelector Instance
-      {
-        get
-        {
-          return m_instance;
-        }
-      }
-
-      private static GenericContentTemplateSelector m_instance = new GenericContentTemplateSelector();
-
-      #endregion
-
-      public override DataTemplate SelectTemplate( object item, DependencyObject container )
-      {
-        DataTemplate template = null;
-        bool useImageTemplate = false;
-
-        if( ( item is byte[] ) || ( item is System.Drawing.Image ) )
-        {
-          ImageConverter converter = new ImageConverter();
-          object convertedValue = null;
-
-          try
-          {
-            convertedValue = converter.Convert( item, typeof( ImageSource ), null, System.Globalization.CultureInfo.CurrentCulture );
-          }
-          catch( NotSupportedException )
-          {
-            //suppress the exception, the byte[] is not an image. convertedValue will remain null
-          }
-
-          if( convertedValue != null )
-            useImageTemplate = true;
-        }
-        else if( item is ImageSource )
-        {
-          useImageTemplate = true;
-        }
-        else if( item is bool )
-        {
-          template = GenericContentTemplateSelector.BoolTemplate;
-        }
-
-        if( useImageTemplate )
-        {
-          template = GenericContentTemplateSelector.ImageTemplate;
-
-          DataGridContext dataGridContext = DataGridControl.GetDataGridContext( container );
-
-          DataGridControl parentGrid = ( dataGridContext != null )
-            ? dataGridContext.DataGridControl
-            : null;
-        }
-
-        if( template == null )
-          template = base.SelectTemplate( item, container );
-
-        return template;
-      }
-
-      private static GenericContentTemplateSelectorResources GenericContentTemplateResources = new GenericContentTemplateSelectorResources();
-
-      private static readonly DataTemplate BoolTemplate;
-      private static readonly DataTemplate ImageTemplate;
-
-      internal static readonly DataTemplate ForeignKeyDistinctValueItemContentTemplate;
-      internal static readonly DataTemplate ForeignKeyCellContentTemplate;
-      internal static readonly DataTemplate ForeignKeyGroupValueTemplate;
-      internal static readonly DataTemplate ForeignKeyScrollTipContentTemplate;
-    }
-
     private sealed class CellRecyclingGroupKey
     {
-      internal CellRecyclingGroupKey( ColumnBase column )
+      internal CellRecyclingGroupKey( DataTemplate contentTemplate, Type dataType )
       {
         //This is a value that is cached at the cell level and that is costly to update, thus basing the recycling on it optimizes performance.
-        m_cellContentTemplate = column.CellContentTemplate;
+        m_contentTemplate = contentTemplate;
+        m_dataType = dataType;
       }
 
       public override int GetHashCode()
       {
-        if( m_cellContentTemplate != null )
-        {
-          return m_cellContentTemplate.GetHashCode();
-        }
+        if( m_contentTemplate != null )
+          return m_contentTemplate.GetHashCode();
+
+        if( m_dataType != null )
+          return m_dataType.GetHashCode();
 
         return 0;
       }
@@ -1826,10 +1911,14 @@ namespace Xceed.Wpf.DataGrid
         if( key == this )
           return true;
 
-        return object.Equals( key.m_cellContentTemplate, m_cellContentTemplate );
+        if( ( key.m_contentTemplate == null ) && ( m_contentTemplate == null ) )
+          return ( key.m_dataType == m_dataType );
+
+        return ( key.m_contentTemplate == m_contentTemplate );
       }
 
-      private readonly DataTemplate m_cellContentTemplate;
+      private readonly DataTemplate m_contentTemplate;
+      private readonly Type m_dataType;
     }
   }
 }

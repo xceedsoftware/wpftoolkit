@@ -38,7 +38,7 @@ namespace Xceed.Utils.Collections
         throw new InvalidOperationException( "A dataIndexArray must be passed at construction in order to sort." );
 
       if( length < 0 )
-        throw new ArgumentOutOfRangeException( "length", length, "length must be greater than or equal to zero." );        
+        throw new ArgumentOutOfRangeException( "length", length, "length must be greater than or equal to zero." );
 
       if( length >= m_dataIndexArray.Length )
         throw new ArgumentOutOfRangeException( "length", length, "length must be less than dataIndexArray.Length - 1." );
@@ -52,7 +52,9 @@ namespace Xceed.Utils.Collections
 
         // Gparent //
         while( ( parent & 1 ) == 0 )
+        {
           parent >>= 1;
+        }
 
         parent >>= 1;
         // End GParent //
@@ -100,7 +102,7 @@ namespace Xceed.Utils.Collections
       }
 
       do
-      { 
+      {
         // Merge //
         if( this.Compare( m_dataIndexArray[ m ], m_dataIndexArray[ x ] ) < 0 )
         {

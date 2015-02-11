@@ -60,7 +60,7 @@ namespace Xceed.Wpf.DataGrid.Converters
       {
         if( m_formatProvider == null )
         {
-          return string.Format( format, value );
+          return string.Format( culture, format, value );
         }
         else
         {

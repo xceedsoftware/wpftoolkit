@@ -46,7 +46,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       };
 
       this.DataContext = person;
-
     }
   }
 
@@ -61,10 +60,10 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     [Category( "Information" )]
     [Description( "This property uses the [DisplayName(\"Is a Men\")] attribute to customize the name of this property." )]
     [DisplayName( "Is male" )]
-    public bool IsMale { get; protected set; }
+    public bool IsMale { get; set; }
 
     [Category( "Information" )]
-    [Description( "This property uses the [Editor(..)] attribute to provide a custom editor using the 'FirstNameEditor' class" )]
+    [Description( "This property uses the [Editor(..)] attribute to provide a custom editor using the 'FirstNameEditor' class. In the Plus version, it also depends on the IsMale property to change its foreground and source." )]
     [Editor( typeof( FirstNameEditor ), typeof( FirstNameEditor ) )]
     public string FirstName { get; set; }
 
@@ -151,7 +150,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     {
       TextBox textBox = new TextBox();
       textBox.Background = new SolidColorBrush( Colors.Red );
-
       //create the binding from the bound property item to the editor
       var _binding = new Binding( "Value" ); //bind to the Value property of the PropertyItem
       _binding.Source = propertyItem;

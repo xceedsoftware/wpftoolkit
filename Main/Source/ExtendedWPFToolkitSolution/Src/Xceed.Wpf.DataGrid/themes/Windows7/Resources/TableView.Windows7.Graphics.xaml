@@ -17,15 +17,15 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Xceed.Wpf.DataGrid"
-                    xmlns:utils="clr-namespace:Xceed.Utils.Wpf.Markup">
+                    xmlns:markup="clr-namespace:Xceed.Wpf.DataGrid.Markup">
 
    <ResourceDictionary.MergedDictionaries>
 
       <!-- Include the standard graphics -->
-      <utils:XceedResourceDictionary XceedSource="/Xceed.Wpf.DataGrid;component\themes/Common/Graphics.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="../../Common/Graphics.xaml" />
 
       <!-- Needs Windows7 Resources -->
-      <ResourceDictionary Source="Windows7.Resources.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="Windows7.Resources.xaml" />
 
    </ResourceDictionary.MergedDictionaries>
 

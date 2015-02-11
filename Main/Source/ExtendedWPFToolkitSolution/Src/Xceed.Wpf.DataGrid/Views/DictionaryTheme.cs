@@ -15,9 +15,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace Xceed.Wpf.DataGrid.Views
@@ -30,13 +27,30 @@ namespace Xceed.Wpf.DataGrid.Views
 
     public DictionaryTheme( ResourceDictionary themeResourceDictionary )
     {
-      this.ThemeResourceDictionary = themeResourceDictionary;
+      m_themeResourceDictionary = themeResourceDictionary;
+      m_themeResourceDictionaryInitialized = true;
     }
+
+    #region ThemeResourceDictionary Property
 
     public ResourceDictionary ThemeResourceDictionary
     {
-      get;
-      set;
+      get
+      {
+        return m_themeResourceDictionary;
+      }
+      set
+      {
+        if( m_themeResourceDictionaryInitialized )
+          throw new InvalidOperationException( "An attempt was made to set the ThemeResourceDictionary property when it has already been initialized." );
+
+        m_themeResourceDictionary = value;
+      }
     }
+
+    private ResourceDictionary m_themeResourceDictionary;
+    private bool m_themeResourceDictionaryInitialized; //false
+
+    #endregion
   }
 }

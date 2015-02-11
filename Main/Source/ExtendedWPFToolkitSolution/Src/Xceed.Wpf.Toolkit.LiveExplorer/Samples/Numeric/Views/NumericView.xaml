@@ -45,13 +45,21 @@
             <numeric:FormatObject Value="P2" DisplayValue="Percent" />
         </x:Array>
 
-        <DataTemplate x:Key="FormatStringItemTemplate">
+        <xctk:InverseBoolConverter x:Key="InverseBoolConverter" />
+
+         <DataTemplate x:Key="FormatStringItemTemplate">
             <TextBlock Text="{Binding DisplayValue}" />
         </DataTemplate>
 
         <ObjectDataProvider x:Key="AllowInputSpecialValuesComboBox" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="xctk:AllowedSpecialValues" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
+        <ObjectDataProvider x:Key="ButtonSpinnerLocationComboBox" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="xctk:Location" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
 
@@ -96,6 +104,7 @@
                        <RowDefinition Height="Auto" />
                        <RowDefinition Height="Auto" />
                        <RowDefinition Height="Auto" />
+                       <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                    <Grid.ColumnDefinitions>
                        <ColumnDefinition Width="Auto" />
@@ -118,17 +127,22 @@
                    <TextBlock Text="Show Button Spinner:" Grid.Row="1" VerticalAlignment="Center" />
                    <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding ShowButtonSpinner, ElementName=_doubleUpDown}"  ClickMode="Press" Margin="5" VerticalAlignment="Center" />
 
-                   <TextBlock Text="Allow Spin:" Grid.Row="2" VerticalAlignment="Center" />
-                   <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding AllowSpin, ElementName=_doubleUpDown}" ClickMode="Press" Margin="5" VerticalAlignment="Center" />
+                   <TextBlock Text="Is Read Only:" Grid.Row="2" VerticalAlignment="Center" ToolTip="Prevent from using button spinners or editing text." />
+                   <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding IsReadOnly, ElementName=_doubleUpDown}"  ClickMode="Press" Margin="5" VerticalAlignment="Center" />
 
-                   <TextBlock Text="Clip Value to Min Max:" Grid.Row="3"  VerticalAlignment="Center" />
-                   <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding ClipValueToMinMax, ElementName=_doubleUpDown, Mode=TwoWay}" ClickMode="Press" Margin="5" VerticalAlignment="Center"/>
+                   <TextBlock Text="Allow Spin:" Grid.Row="3" VerticalAlignment="Center" />
+                   <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding AllowSpin, ElementName=_doubleUpDown}" ClickMode="Press" Margin="5" VerticalAlignment="Center"
+                             IsEnabled="{Binding IsReadOnly, ElementName=_doubleUpDown, Converter={StaticResource InverseBoolConverter}}" />
 
-                   <TextBlock Text="Is Read Only:" Grid.Row="4" VerticalAlignment="Center" />
-                   <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding IsReadOnly, ElementName=_doubleUpDown}"  ClickMode="Press" Margin="5" VerticalAlignment="Center" />
+                   <TextBlock Text="Allow TextInput:" Grid.Row="4" VerticalAlignment="Center" />
+                   <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding AllowTextInput, ElementName=_doubleUpDown}"  ClickMode="Press" Margin="5" VerticalAlignment="Center"
+                             IsEnabled="{Binding IsReadOnly, ElementName=_doubleUpDown, Converter={StaticResource InverseBoolConverter}}"/>
 
-                   <TextBlock Text="DisplayDefaultValueOnEmptyText:" Grid.Row="5" VerticalAlignment="Center" />
-                   <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding DisplayDefaultValueOnEmptyText, ElementName=_doubleUpDown}" ClickMode="Press" Margin="5" VerticalAlignment="Center" />
+                   <TextBlock Text="Clip Value to Min Max:" Grid.Row="5"  VerticalAlignment="Center" />
+                   <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding ClipValueToMinMax, ElementName=_doubleUpDown, Mode=TwoWay}" ClickMode="Press" Margin="5" VerticalAlignment="Center"/>
+
+                   <TextBlock Text="DisplayDefaultValueOnEmptyText:" Grid.Row="6" VerticalAlignment="Center" />
+                   <CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding DisplayDefaultValueOnEmptyText, ElementName=_doubleUpDown}" ClickMode="Press" Margin="5" VerticalAlignment="Center" />
 
                     <!-- 2nd column -->
                    <TextBlock Grid.Column="2" Text="CultureInfo:" VerticalAlignment="Center" Margin="10,0,0,0" />
@@ -147,25 +161,28 @@
                    <xctk:DoubleUpDown Grid.Column="3" Grid.Row="4" Value="{Binding Maximum, ElementName=_doubleUpDown}" AllowInputSpecialValues="PositiveInfinity" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5" />
 
                    <!-- 3rd column -->
-                   <TextBlock Grid.Column="4" Text="ParsingNumberStyle:" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                   <ComboBox Grid.Column="5" ItemsSource="{Binding Source={StaticResource ParsingNumberStyleComboBox}}" SelectedValue="{Binding ParsingNumberStyle, ElementName=_doubleUpDown}" ToolTip="{StaticResource parsingNumberStyleTooltip}" HorizontalAlignment="Stretch" Margin="5" />
+                   <TextBlock Grid.Column="4" Text="ButtonSpinnerLocation:" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <ComboBox Grid.Column="5" ItemsSource="{Binding Source={StaticResource ButtonSpinnerLocationComboBox}}" SelectedValue="{Binding ButtonSpinnerLocation, ElementName=_doubleUpDown}" HorizontalAlignment="Stretch" Margin="5" />
 
-                   <TextBlock Text="Watermark:" Grid.Column="4" Grid.Row="1" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                   <TextBox Grid.Column="5" Grid.Row="1" HorizontalAlignment="Stretch" Margin="5" Text="{Binding Watermark, ElementName=_doubleUpDown}" />
+                   <TextBlock Grid.Column="4" Grid.Row="1" Text="ParsingNumberStyle:" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <ComboBox Grid.Column="5" Grid.Row="1" ItemsSource="{Binding Source={StaticResource ParsingNumberStyleComboBox}}" SelectedValue="{Binding ParsingNumberStyle, ElementName=_doubleUpDown}" ToolTip="{StaticResource parsingNumberStyleTooltip}" HorizontalAlignment="Stretch" Margin="5" />
 
-                   <TextBlock Text="Default Value:" Grid.Column="4" Grid.Row="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                   <xctk:DoubleUpDown Grid.Column="5" Grid.Row="2" Value="{Binding DefaultValue, ElementName=_doubleUpDown}" AllowInputSpecialValues="Any" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5" />
+                   <TextBlock Text="Watermark:" Grid.Column="4" Grid.Row="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <TextBox Grid.Column="5" Grid.Row="2" HorizontalAlignment="Stretch" Margin="5" Text="{Binding Watermark, ElementName=_doubleUpDown}" />
 
-                   <TextBlock Text="Value:" Grid.Column="4" Grid.Row="3" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                   <xctk:DoubleUpDown Grid.Column="5" Grid.Row="3" Value="{Binding Value, ElementName=_doubleUpDown, ValidatesOnExceptions=True}" AllowInputSpecialValues="Any" Style="{StaticResource ControlInError}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5" />
+                   <TextBlock Text="Default Value:" Grid.Column="4" Grid.Row="3" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <xctk:DoubleUpDown Grid.Column="5" Grid.Row="3" Value="{Binding DefaultValue, ElementName=_doubleUpDown}" AllowInputSpecialValues="Any" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5" />
 
-                   <TextBlock Text="Text:" Grid.Column="4" Grid.Row="4" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                   <TextBox Grid.Column="5" Grid.Row="4" Text="{Binding Text, ElementName=_doubleUpDown}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5" />
+                   <TextBlock Text="Value:" Grid.Column="4" Grid.Row="4" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <xctk:DoubleUpDown Grid.Column="5" Grid.Row="4" Value="{Binding Value, ElementName=_doubleUpDown, ValidatesOnExceptions=True}" AllowInputSpecialValues="Any" Style="{StaticResource ControlInError}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5" />
+
+                   <TextBlock Text="Text:" Grid.Column="4" Grid.Row="5" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                   <TextBox Grid.Column="5" Grid.Row="5" Text="{Binding Text, ElementName=_doubleUpDown}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5" />
 
                    <!-- last rows -->
-                   <TextBlock Text="(DoubleUpDown and SingleUpDown support the AllowInputSpecialValues property)" Grid.Row="6" Grid.ColumnSpan="6" VerticalAlignment="Center" Margin="0,5,0,0"/>
-                   <TextBlock Text="Allow Input Special Values:" VerticalAlignment="Center" Grid.Row="7" Grid.ColumnSpan="2"/>
-                   <ComboBox Grid.Column="2" Grid.Row="7" Grid.ColumnSpan="2" ItemsSource="{Binding Source={StaticResource AllowInputSpecialValuesComboBox}}" SelectedValue="{Binding AllowInputSpecialValues, ElementName=_doubleUpDown}" ToolTip="{StaticResource allowInputSpecialValuesTooltip}" Margin="5" Width="108"/>
+                   <TextBlock Text="(DoubleUpDown and SingleUpDown support the AllowInputSpecialValues property)" Grid.Row="7" Grid.ColumnSpan="6" VerticalAlignment="Center" Margin="0,5,0,0"/>
+                   <TextBlock Text="Allow Input Special Values:" VerticalAlignment="Center" Grid.Row="8" Grid.ColumnSpan="2"/>
+                   <ComboBox Grid.Column="2" Grid.Row="8" Grid.ColumnSpan="2" ItemsSource="{Binding Source={StaticResource AllowInputSpecialValuesComboBox}}" SelectedValue="{Binding AllowInputSpecialValues, ElementName=_doubleUpDown}" ToolTip="{StaticResource allowInputSpecialValuesTooltip}" Margin="5" Width="108"/>
                 </Grid>
            </GroupBox>
 
@@ -177,6 +194,7 @@
                                   ClipValueToMinMax="False"
                                   ShowButtonSpinner="True" 
                                   AllowSpin="True"
+                                  AllowTextInput="True"
                                   IsReadOnly="False" 
                                   MouseWheelActiveOnFocus="True"
                                   CultureInfo="en-US"
@@ -185,6 +203,7 @@
                                   Maximum="100"
                                   Minimum="0"
                                   DisplayDefaultValueOnEmptyText="False"
+                                  ButtonSpinnerLocation="Right"
                                   ParsingNumberStyle="Any"
                                   Watermark="Enter Text"
                                   DefaultValue="10"

@@ -58,13 +58,6 @@ using System.Diagnostics.CodeAnalysis;
   Target = "Xceed.Utils.Wpf.Markup" )]
 
 [assembly: SuppressMessage( 
-  "Microsoft.Security", 
-  "CA2116:AptcaMethodsShouldOnlyCallAptcaMethods", 
-  Scope = "member", 
-  Target = "Xceed.Wpf.DataGrid.Print.DataGridPaginator.InitializeSettings(System.Printing.PrintQueue,System.Printing.PrintTicket):System.Void",
-  Justification = "A permission demand for FullTrust has been added to InitializeSettings()." )]
-
-[assembly: SuppressMessage( 
   "Microsoft.Design", 
   "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", 
   Scope = "member", 
@@ -209,12 +202,6 @@ using System.Diagnostics.CodeAnalysis;
   "CA2214:DoNotCallOverridableMethodsInConstructors", 
   Scope = "member", 
   Target = "Xceed.Wpf.DataGrid.Views.ScrollingCellsDecorator..ctor(Xceed.Wpf.DataGrid.Views.FixedCellPanel)" )]
-
-[assembly: SuppressMessage( 
-  "Microsoft.Usage", 
-  "CA2214:DoNotCallOverridableMethodsInConstructors", 
-  Scope = "member", 
-  Target = "Xceed.Wpf.DataGrid.Print.DataGridPageControl..ctor(Xceed.Wpf.DataGrid.DataGridControl)" )]
 
 [assembly: SuppressMessage( 
   "Microsoft.Usage", 

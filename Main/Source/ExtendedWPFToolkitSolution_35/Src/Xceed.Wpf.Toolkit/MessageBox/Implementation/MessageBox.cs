@@ -768,27 +768,6 @@ namespace Xceed.Wpf.Toolkit
     }
 
     /// <summary>
-    /// Resolves the owner Window of the MessageBox.
-    /// </summary>
-    /// <returns>the owner Window</returns>
-    private static Window ComputeOwnerWindow()
-    {
-      Window owner = null;
-      if( Application.Current != null )
-      {
-        foreach( Window w in Application.Current.Windows )
-        {
-          if( w.IsActive )
-          {
-            owner = w;
-            break;
-          }
-        }
-      }
-      return owner;
-    }
-
-    /// <summary>
     /// Sets the message image source.
     /// </summary>
     /// <param name="image">The image to show.</param>
@@ -839,7 +818,6 @@ namespace Xceed.Wpf.Toolkit
       newWindow.AllowsTransparency = true;
       newWindow.Background = Brushes.Transparent;
       newWindow.Content = this;
-      newWindow.Owner = _owner ?? ComputeOwnerWindow();
 
       if( newWindow.Owner != null )
         newWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;

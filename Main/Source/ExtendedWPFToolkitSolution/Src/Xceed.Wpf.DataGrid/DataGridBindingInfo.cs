@@ -152,6 +152,23 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion FallbackValue Property
 
+    #region IsAsync Property
+
+    public bool IsAsync
+    {
+      get
+      {
+        return m_binding.IsAsync;
+      }
+
+      set
+      {
+        m_binding.IsAsync = value;
+      }
+    }
+
+    #endregion IsAsync Property
+
     #region NotifyOnSourceUpdated Property
 
     public bool NotifyOnSourceUpdated
@@ -210,7 +227,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion ReadOnly Property
 
-
     #region UpdateSourceExceptionFilter Property
 
     public UpdateSourceExceptionFilterCallback UpdateSourceExceptionFilter
@@ -256,7 +272,6 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion Path Property
-
 
     #region INTERNAL METHODS
 

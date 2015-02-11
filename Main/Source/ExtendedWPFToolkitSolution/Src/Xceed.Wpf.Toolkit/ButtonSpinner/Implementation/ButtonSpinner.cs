@@ -21,6 +21,12 @@ using System.Windows.Markup;
 
 namespace Xceed.Wpf.Toolkit
 {
+  public enum Location
+  {
+    Left,
+    Right
+  }
+
   /// <summary>
   /// Represents a spinner control that includes two Buttons.
   /// </summary>
@@ -56,6 +62,23 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //AllowSpin
+
+    #region ButtonSpinnerLocation
+
+    public static readonly DependencyProperty ButtonSpinnerLocationProperty = DependencyProperty.Register( "ButtonSpinnerLocation", typeof( Location ), typeof( ButtonSpinner ), new UIPropertyMetadata( Location.Right ) );
+    public Location ButtonSpinnerLocation
+    {
+      get
+      {
+        return ( Location )GetValue( ButtonSpinnerLocationProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerLocationProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerLocation
 
     #region Content
 

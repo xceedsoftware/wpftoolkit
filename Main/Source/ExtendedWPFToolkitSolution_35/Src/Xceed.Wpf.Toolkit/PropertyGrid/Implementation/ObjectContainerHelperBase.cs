@@ -47,7 +47,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       _propertyItemCollection = new PropertyItemCollection( new ObservableCollection<PropertyItem>() );
       UpdateFilter();
-      UpdateCategorization();
+      UpdateCategorization( false );
 
     }
 
@@ -137,7 +137,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected override void OnCategorizationChanged()
     {
-      UpdateCategorization();
+      UpdateCategorization( true );
     }
 
     protected override void OnAutoGeneratePropertiesChanged()
@@ -165,9 +165,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         ?? PropertyItemCollection.CreateFilter( filterInfo.InputString );
     }
 
-    private void UpdateCategorization()
+    private void UpdateCategorization( bool updateSubPropertiesCategorization )
     {
       _propertyItemCollection.UpdateCategorization( this.ComputeCategoryGroupDescription(), this.PropertyContainer.IsCategorized );
+      if( updateSubPropertiesCategorization && (_propertyItemCollection.Count > 0) )
+      {
+        foreach( PropertyItem propertyItem in _propertyItemCollection )
+        {
+          PropertyItemCollection subPropertyItemsCollection = propertyItem.Properties as PropertyItemCollection;
+          if( subPropertyItemsCollection != null )
+          {
+            subPropertyItemsCollection.UpdateCategorization( this.ComputeCategoryGroupDescription(), this.PropertyContainer.IsCategorized );
+          }
+        }
+      }
     }
 
     private GroupDescription ComputeCategoryGroupDescription()
@@ -217,7 +228,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         propertyItem.PropertyChanged -= OnChildrenPropertyChanged;
       }
-
 
       PropertyItems.UpdateItems( subProperties );
 
@@ -309,6 +319,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       propertyItem.IsReadOnly = pd.IsReadOnly;
       propertyItem.DisplayName = pd.DisplayName;
       propertyItem.Description = pd.Description;
+
       propertyItem.Category = pd.Category;
       propertyItem.PropertyOrder = pd.DisplayOrder;
 
@@ -344,7 +355,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       propertyItem.SetBinding( itemProperty, binding );
     }
 
-    private FrameworkElement GenerateChildrenEditorElement( PropertyItem propertyItem )
+    internal FrameworkElement GenerateChildrenEditorElement( PropertyItem propertyItem )
     {
       FrameworkElement editorElement = null;
       DescriptorPropertyDefinitionBase pd = propertyItem.DescriptorDefinition;

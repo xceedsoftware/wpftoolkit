@@ -15,20 +15,10 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
-using System.Globalization;
-using System.ComponentModel;
-using System.Collections.ObjectModel;
 using System.Collections;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Data;
-using Xceed.Utils.Collections;
-using Xceed.Utils.Data;
-using System.Windows.Threading;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -47,7 +37,6 @@ namespace Xceed.Wpf.DataGrid
     internal DataGridVirtualizingCollectionViewBase( object sourceModel, Type itemType, bool autoCreateItemProperties, int pageSize, int maxRealizedItemCount )
       : base( sourceModel, null, itemType, autoCreateItemProperties, false, false )
     {
-
       if( itemType == null )
         itemType = typeof( object );
 
@@ -68,7 +57,7 @@ namespace Xceed.Wpf.DataGrid
     internal override DataGridCollectionViewBase CreateDetailDataGridCollectionViewBase(
       IEnumerable detailDataSource,
       DataGridDetailDescription parentDetailDescription,
-      DataGridCollectionViewBase rootDataGridCollectionViewBase )
+      DataGridCollectionViewBase parentDataGridCollectionViewBase )
     {
       throw new NotImplementedException();
     }
@@ -82,7 +71,6 @@ namespace Xceed.Wpf.DataGrid
       get
       {
         bool canGroup = true;
-
         return canGroup;
       }
     }
@@ -368,7 +356,9 @@ namespace Xceed.Wpf.DataGrid
           m_maxRealizedItemCount = value;
 
           if( value < this.PageSize )
+          {
             value = this.PageSize;
+          }
 
           // Cannot modify this PageManager property.  Must Refresh which will recreate the CollectionViewGroupRoot
           // and the DataGridVirtualPageManagerBase taking the new pageSize into account.
@@ -925,7 +915,11 @@ namespace Xceed.Wpf.DataGrid
         }
 
         if( sendResetNotification )
+        {
           this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
+        }
+
+        this.OnPropertyChanged( new PropertyChangedEventArgs( "Groups" ) );
       }
     }
 

@@ -80,6 +80,14 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    public CollectionControl CollectionControl
+    {
+      get
+      {
+        return _collectionControl;
+      }
+    }
+
     #endregion //Properties
 
     #region Constructors
@@ -107,7 +115,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void OkButton_Click( object sender, RoutedEventArgs e )
     {
-      _propertyGrid.PersistChanges();
+      _collectionControl.PersistChanges();
       this.DialogResult = true;
       Close();
     }

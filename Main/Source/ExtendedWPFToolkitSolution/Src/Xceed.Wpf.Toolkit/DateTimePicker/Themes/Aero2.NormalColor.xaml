@@ -109,7 +109,6 @@
                                                    FontWeight="{TemplateBinding FontWeight}" 
                                                    Foreground="{TemplateBinding Foreground}" 
                                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                   IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
                                                    MinWidth="20"
                                                    AcceptsReturn="False"
                                                    Padding="0"
@@ -138,6 +137,7 @@
                                                           Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" 
                                                           Format="{TemplateBinding TimeFormat}"
                                                           FormatString="{TemplateBinding TimeFormatString}"
+                                                          Kind="{Binding Kind, RelativeSource={RelativeSource TemplatedParent}}"
                                                           Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
                                                           Minimum="{Binding Minimum, RelativeSource={RelativeSource TemplatedParent}}"
                                                           Maximum="{Binding Maximum, RelativeSource={RelativeSource TemplatedParent}}"
@@ -156,7 +156,24 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
                         </Trigger>
-                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                     <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                           <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource Self}}"
+                                      Value="False" />
+                           <Condition Binding="{Binding AllowTextInput, RelativeSource={RelativeSource Self}}"
+                                      Value="False" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter Property="IsReadOnly"
+                                Value="True"
+                                TargetName="PART_TextBox" />
+                     </MultiDataTrigger>
+                     <DataTrigger Binding="{Binding IsReadOnly, RelativeSource={RelativeSource Self}}"
+                                  Value="True">
+                        <Setter Property="IsReadOnly"
+                                Value="True"
+                                TargetName="PART_TextBox" />
+                     </DataTrigger>
+                     <Trigger Property="IsKeyboardFocusWithin" Value="True">
                             <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">

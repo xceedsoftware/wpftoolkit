@@ -452,7 +452,7 @@
                                  <ToolTip.Template>
                                     <ControlTemplate TargetType="{x:Type ToolTip}">
                                        <ContentPresenter Content="{Binding ActualValue, RelativeSource={RelativeSource AncestorType={x:Type xctk:RadialGauge}}}"
-                                                         ContentTemplate="{Binding PointerTooltipTemplate, RelativeSource={RelativeSource AncestorType={x:Type xctk:RadialGauge}}, TargetNullValue={StaticResource DefaultPointerTooltipTemplate}}" />
+                                                         ContentTemplate="{Binding PointerTooltipTemplate, RelativeSource={RelativeSource AncestorType={x:Type xctk:RadialGauge}}}" />
                                     </ControlTemplate>
                                  </ToolTip.Template>
                               </ToolTip>

@@ -482,7 +482,9 @@ namespace Xceed.Wpf.DataGrid
     internal void OnEditCanceled( DataGridItemEventArgs e )
     {
       if( this.EditCanceled != null )
+      {
         this.EditCanceled( this, e );
+      }
     }
 
     public event EventHandler<DataGridItemCancelEventArgs> CommittingEdit;

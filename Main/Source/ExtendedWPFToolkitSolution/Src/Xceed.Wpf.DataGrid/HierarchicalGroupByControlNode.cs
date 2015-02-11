@@ -14,18 +14,15 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using Xceed.Utils.Wpf.DragDrop;
-using System.Diagnostics;
-using System.ComponentModel;
-using System.Collections.ObjectModel;
-using Xceed.Utils.Wpf;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Media;
+using Xceed.Utils.Wpf.DragDrop;
 using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
@@ -788,7 +785,7 @@ namespace Xceed.Wpf.DataGrid
         HierarchicalGroupByControlNode draggedHierarchicalGroupByControlNode = HierarchicalGroupByItem.GetParentHierarchicalGroupByControlNode( hierarchicalGroupByItem );
 
         if( draggedHierarchicalGroupByControlNode == null )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "draggedHierarchicalGroupByControlNode is null." );
 
         if( draggedHierarchicalGroupByControlNode.GroupLevelDescriptions == this.GroupLevelDescriptions )
         {
@@ -840,7 +837,7 @@ namespace Xceed.Wpf.DataGrid
         HierarchicalGroupByControlNode draggedHierarchicalGroupByControlNode = HierarchicalGroupByItem.GetParentHierarchicalGroupByControlNode( hierarchicalGroupByItem );
 
         if( draggedHierarchicalGroupByControlNode == null )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "draggedHierarchicalGroupByControlNode is null." );
 
         if( draggedHierarchicalGroupByControlNode.GroupLevelDescriptions == this.GroupLevelDescriptions )
         {

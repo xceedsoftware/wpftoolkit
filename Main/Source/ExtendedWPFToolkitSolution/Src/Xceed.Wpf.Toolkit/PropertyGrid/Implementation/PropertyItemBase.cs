@@ -40,6 +40,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private ContentControl _valueContainer;
     private ContainerHelperBase _containerHelper;
     private IPropertyContainer _parentNode;
+    internal bool _isPropertyGridCategorized;
 
     #region Properties
 
@@ -416,6 +417,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
+
     Style IPropertyContainer.PropertyContainerStyle
     {
       get { return this.PropertyContainerStyle; }
@@ -441,7 +443,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     bool IPropertyContainer.IsCategorized 
     {
-      get { return false; }
+      get
+      {
+        return _isPropertyGridCategorized;
+      }
     }
 
     bool IPropertyContainer.AutoGenerateProperties

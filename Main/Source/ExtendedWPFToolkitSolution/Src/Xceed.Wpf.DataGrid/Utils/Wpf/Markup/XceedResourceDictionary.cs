@@ -20,32 +20,21 @@ using System.Windows;
 
 namespace Xceed.Utils.Wpf.Markup
 {
-  [ EditorBrowsable( EditorBrowsableState.Never ) ]
+  [Browsable( false )]
+  [EditorBrowsable( EditorBrowsableState.Never )]
   public sealed class XceedResourceDictionary : ResourceDictionary
   {
-    #region CONSTRUCTORS
-
-    public XceedResourceDictionary()
-      : base()
-    {
-      m_xceedSource = string.Empty;
-    }
-
-    #endregion CONSTRUCTORS
-
-    #region XceedSource PROPERTY
-
-    private string m_xceedSource;
+    #region XceedSource Property
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly" )]
     public string XceedSource
     {
 
-      get 
-      { 
+      get
+      {
         return m_xceedSource;
       }
-      set 
+      set
       {
         if( value == null )
           throw new ArgumentNullException( "XceedSource" );
@@ -60,12 +49,12 @@ namespace Xceed.Utils.Wpf.Markup
         string uriString =  parsedArguments[ 0 ] + 
           ";;;" + parsedArguments[ 1 ];
 
-        Uri uri = new Uri( uriString, UriKind.RelativeOrAbsolute );
-
-        this.Source = uri;
+        this.Source = new Uri( uriString, UriKind.RelativeOrAbsolute );
       }
     }
 
-    #endregion XceedSource PROPERTY
+    private string m_xceedSource = string.Empty;
+
+    #endregion
   }
 }

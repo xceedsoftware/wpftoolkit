@@ -19,22 +19,21 @@
                     xmlns:local="clr-namespace:Xceed.Wpf.DataGrid"
                     xmlns:markup="clr-namespace:Xceed.Wpf.DataGrid.Markup"
                     xmlns:views="clr-namespace:Xceed.Wpf.DataGrid.Views"
-                    xmlns:conv="clr-namespace:Xceed.Wpf.DataGrid.Converters"
-                    xmlns:utils="clr-namespace:Xceed.Utils.Wpf.Markup">
+                    xmlns:conv="clr-namespace:Xceed.Wpf.DataGrid.Converters">
 
    <ResourceDictionary.MergedDictionaries>
 
       <!-- Include the view independant and color-scheme independant theme resources -->
-      <ResourceDictionary Source="Resources/Aero.Resources.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="Resources/Aero.Resources.xaml" />
 
       <!-- Include the view dependant and color-scheme independant theme graphics -->
-      <ResourceDictionary Source="Resources/TableView.Aero.Graphics.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="Resources/TableView.Aero.Graphics.xaml" />
 
       <!-- Include the view independant and color-scheme dependant theme resources -->
-      <ResourceDictionary Source="Resources/Aero.normalcolor.Resources.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="Resources/Aero.normalcolor.Resources.xaml" />
 
       <!-- Include the standard grid element templates -->
-      <ResourceDictionary Source="../Common/TableflowView.GridElementTemplates.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="../Common/TableflowView.GridElementTemplates.xaml" />
 
    </ResourceDictionary.MergedDictionaries>
 
@@ -339,7 +338,6 @@
         Thickness="2"
         Pen.Brush="White" />
 
-
    <!-- =================================================================== -->
    <!-- Templates specific to this View/Theme/ColorScheme                   -->
    <!-- =================================================================== -->
@@ -635,7 +633,6 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
 
-
             <!-- CellsHost panel -->
             <ColumnDefinition Width="*" />
          </Grid.ColumnDefinitions>
@@ -694,7 +691,6 @@
                                ColumnStretchMode="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).ColumnStretchMode}"
                                FixedCellCount="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).FixedColumnCount, Mode=TwoWay}"
                                FixedColumnDropMarkPen="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).FixedColumnDropMarkPen}"
-                               TextElement.Foreground="{TemplateBinding Foreground}"
                                Margin="{TemplateBinding BorderThickness}" />
 
       </Grid>
@@ -725,6 +721,10 @@
                     Property="Background"
                     Value="{StaticResource selectionInnerRowBackgroundBrush}" />
 
+            <Setter TargetName="rootGrid"
+                    Property="TextElement.Foreground"
+                    Value="{Binding RelativeSource={RelativeSource TemplatedParent},Path=SelectionForeground}" />
+
          </MultiDataTrigger>
 
          <!-- This trigger is used to display the Inactive Selection look -->
@@ -754,6 +754,10 @@
                     Property="Background"
                     Value="{StaticResource inactiveSelectionInnerRowBackgroundBrush}" />
 
+            <Setter TargetName="rootGrid"
+                    Property="TextElement.Foreground"
+                    Value="{Binding RelativeSource={RelativeSource TemplatedParent},Path=InactiveSelectionForeground}" />
+
          </MultiDataTrigger>
 
          <!-- This trigger is used to display Mouse Over look -->
@@ -779,7 +783,6 @@
             <Setter TargetName="innerBackground"
                     Property="Background"
                     Value="{StaticResource hotInnerRowBackgroundBrush}" />
-
 
          </MultiDataTrigger>
 
@@ -920,7 +923,6 @@
 
       </Grid>
       <ControlTemplate.Triggers>
-
          <!-- When there are details, display the Toggle button for the expansion, collapsing of the details -->
          <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
@@ -1227,6 +1229,8 @@
    <!--**************************
     * TEMPLATE: ColumnManagerCell 
     ************************** -->
+    <conv:SortingDirectionToBooleanConverter x:Key="SortingDirectionToBooleanConverter" />
+
    <ControlTemplate x:Key="tableflowViewColumnManagerCellTemplate"
                     TargetType="local:ColumnManagerCell">
 
@@ -1244,18 +1248,22 @@
 
                   <DockPanel Margin="{TemplateBinding Padding}">
 
-                     <ContentPresenter x:Name="sortGlyphPresenter"
-                                       DockPanel.Dock="Top"
-                                       Content="{x:Null}"
-                                       ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).AscendingSortGlyph}"
-                                       Visibility="Hidden"
-                                       HorizontalAlignment="Center" />
+                     <StackPanel Orientation="Horizontal"
+                                 DockPanel.Dock="Top"
+                                 HorizontalAlignment="Center">
+                        <ContentPresenter x:Name="sortGlyphPresenter"
+                                          Content="{x:Null}"
+                                          ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).AscendingSortGlyph}"
+                                          VerticalAlignment="Top"
+                                          Visibility="Hidden" />
+                     </StackPanel>
                      <Grid>
                         <Grid.ColumnDefinitions>
                            <ColumnDefinition Width="*" />
                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <local:CellContentPresenter x:Name="PART_CellContentPresenter" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        <local:CellContentPresenter x:Name="PART_CellContentPresenter"
+                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
 
                         <Border x:Name="thumbToggleBackgroundBorder"
@@ -1279,7 +1287,6 @@
                   <Border x:Name="delimiterBorder"
                           BorderThickness="1,0,1,0"
                           BorderBrush="{StaticResource rowSelectorDelimiterBorderBrush}" />
-
                </Grid>
 
             </DockPanel>
@@ -1306,12 +1313,13 @@
                <Condition Value="Visible"
                           Binding="{Binding ElementName=toggleButton, Path=Visibility}" />
                <Condition Value="Center"
-                           Binding="{Binding RelativeSource={RelativeSource Self},
+                          Binding="{Binding RelativeSource={RelativeSource Self},
                         Path=HorizontalContentAlignment}" />
             </MultiDataTrigger.Conditions>
 
             <Setter TargetName="PART_CellContentPresenter"
-                    Property="Margin" Value="19,0,0,0"/>
+                    Property="Margin"
+                    Value="19,0,0,0" />
          </MultiDataTrigger>
 
          <!-- Trigger related to the filteringToggleButton-->
@@ -1745,7 +1753,6 @@
                           Grid.Column="1"
                           Grid.RowSpan="3">
 
-
                      <!--Will contain DetailGroupByConrol-->
 
                      <ContentPresenter Content="{TemplateBinding HeaderedContentControl.Header}"
@@ -1811,7 +1818,6 @@
                  Grid.ColumnSpan="2"
                  BorderBrush="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).VerticalGridLineBrush}"
                  BorderThickness="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).VerticalGridLineThickness,Converter={StaticResource thicknessConverter},ConverterParameter='Right'}" />
-
 
          <local:HierarchicalGroupLevelIndicatorPane Grid.Column="0" />
 
@@ -1944,11 +1950,9 @@
                     Value="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).VerticalGridLineThickness,Converter={StaticResource thicknessConverter},ConverterParameter='Right, Left'}" />
          </DataTrigger>
 
-
       </ControlTemplate.Triggers>
 
    </ControlTemplate>
-
 
    <!--**************************
     * TEMPLATE: HierarchicalGroupByControlNode
@@ -2322,7 +2326,7 @@
       <Style.Resources>
          <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-               <ResourceDictionary Source="/PresentationFramework.Aero;V4.0.0.0;31bf3856ad364e35;component\themes/aero.normalcolor.xaml" />
+               <markup:FrameworkThemeResourceDictionary Source="/PresentationFramework.Aero;V4.0.0.0;31bf3856ad364e35;component\themes/aero.normalcolor.xaml" />
             </ResourceDictionary.MergedDictionaries>
          </ResourceDictionary>
       </Style.Resources>
@@ -2374,7 +2378,6 @@
               Value="{StaticResource tableflowViewRowSelectorTemplate}" />
 
       <Style.Triggers>
-
 
          <!-- The DataContext of a RowSelector is always set to its corresponding
               Row/item. This is why we use DataTriggers with no explicit Binding Source
@@ -2433,13 +2436,16 @@
            assuming that the bottom gridline will be drawn by its following row/element -->
 
       <Setter Property="BorderThickness"
-              Value="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness,Converter={StaticResource thicknessConverter},ConverterParameter='Top'}" />
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness, Converter={StaticResource thicknessConverter}, ConverterParameter='Top'}" />
 
       <Setter Property="BorderBrush"
               Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HorizontalGridLineBrush}" />
 
       <Setter Property="Background"
               Value="Transparent" />
+
+      <Setter Property="Foreground"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentForeground}" />
 
       <Setter Property="Template"
               Value="{StaticResource tableflowViewRowTemplate}" />
@@ -2448,13 +2454,13 @@
          <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(views:ViewBase.IsLastItem)}"
                       Value="True">
             <Setter Property="BorderThickness"
-                    Value="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness,Converter={StaticResource thicknessConverter},ConverterParameter='Top, Bottom'}" />
+                    Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness, Converter={StaticResource thicknessConverter}, ConverterParameter='Top, Bottom'}" />
          </DataTrigger>
 
          <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.HasExpandedDetails)}"
                       Value="True">
             <Setter Property="BorderThickness"
-                    Value="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness,Converter={StaticResource thicknessConverter},ConverterParameter='Top, Bottom'}" />
+                    Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness, Converter={StaticResource thicknessConverter}, ConverterParameter='Top, Bottom'}" />
 
          </DataTrigger>
 
@@ -2544,18 +2550,27 @@
       <Setter Property="Background"
               Value="Transparent" />
 
+      <Setter Property="Foreground"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentForeground}" />
+
       <!-- In TableflowView, each Cell has the same width as its ParentColum's ActualWidth -->
       <Setter Property="Width"
-              Value="{Binding RelativeSource={RelativeSource Self},Path=ParentColumn.ActualWidth}" />
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.ActualWidth}" />
 
       <Setter Property="Padding"
               Value="{StaticResource cellPadding}" />
+
+      <Setter Property="HorizontalContentAlignment"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.CellHorizontalContentAlignment, FallbackValue=Stretch}" />
+
+      <Setter Property="VerticalContentAlignment"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.CellVerticalContentAlignment, FallbackValue=Stretch}" />
 
       <!-- The Cell is responsible for drawing the vertical gridlines. It draws only its right gridline, 
            assuming that the left gridline will have been drawn by its preceding cell -->
 
       <Setter Property="BorderThickness"
-              Value="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).VerticalGridLineThickness,Converter={StaticResource thicknessConverter},ConverterParameter='Right'}" />
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).VerticalGridLineThickness, Converter={StaticResource thicknessConverter}, ConverterParameter='Right'}" />
 
       <Setter Property="BorderBrush"
               Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).VerticalGridLineBrush}" />
@@ -2584,12 +2599,21 @@
       <Setter Property="BorderThickness"
               Value="1" />
 
+      <Setter Property="Background"
+              Value="Transparent" />
+
       <!-- In TableflowView, each Cell has the same width as its ParentColum's ActualWidth -->
       <Setter Property="Width"
               Value="{Binding RelativeSource={RelativeSource Self},Path=ParentColumn.ActualWidth}" />
 
       <Setter Property="Padding"
               Value="{StaticResource columnManagerCellPadding}" />
+
+      <Setter Property="HorizontalContentAlignment"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.CellHorizontalContentAlignment, FallbackValue=Stretch}" />
+
+      <Setter Property="VerticalContentAlignment"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.CellVerticalContentAlignment, FallbackValue=Stretch}" />
 
       <Setter Property="Template"
               Value="{StaticResource tableflowViewColumnManagerCellTemplate}" />
@@ -2649,6 +2673,9 @@
       <Setter Property="Background"
               Value="Transparent" />
 
+      <Setter Property="BorderThickness"
+              Value="1" />      
+
       <Setter Property="Padding"
               Value="{StaticResource cellPadding}" />
 
@@ -2658,12 +2685,23 @@
       <Setter Property="views:TableView.CanScrollHorizontally"
               Value="False" />
 
+      <Setter Property="SelectionBackground"
+              Value="{StaticResource selectionInnerRowBackgroundBrush}" />
+
+      <Setter Property="SelectionForeground"
+              Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+
+      <Setter Property="InactiveSelectionBackground"
+              Value="{StaticResource inactiveSelectionInnerRowBackgroundBrush}" />
+
+      <Setter Property="InactiveSelectionForeground"
+              Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+
       <!-- The GroupHeaderControl itself must not be focusable. The main Border inside its Template will
            be made Focusable because it holds the various InputBindings that make the
            GroupHeaderControl work. -->
       <Setter Property="Focusable"
               Value="False" />
-
 
       <Setter Property="Template"
               Value="{StaticResource tableflowViewGroupHeaderControlTemplate}" />
@@ -2690,7 +2728,6 @@
       </Style.Triggers>
 
    </Style>
-
 
    <!--**************************
     * STYLE: GroupLevelIndicator
@@ -2768,7 +2805,7 @@
                   Value="-1">
 
             <!-- Stop the propagation of the value set by the default style trigger of
-                 the ColumnManagerRow . -->
+                 the ColumnManagerRow -->
             <Setter Property="local:GroupLevelIndicatorPane.ShowIndicators"
                     Value="True" />
 
@@ -2936,7 +2973,6 @@
               Value="{StaticResource tableflowViewGroupNavigationButtonTemplate}" />
    </Style>
 
-
    <!--**************************
     * STYLE: ScrollTip
     ************************** -->
@@ -3037,7 +3073,6 @@
       <Setter Property="ConnectionStateErrorGlyph"
               Value="{StaticResource connectionStateErrorGlyph}" />
    </Style>
-
 
    <!-- =================================================================== -->
    <!-- DefaultStyleKey declarations                                        -->

@@ -34,9 +34,21 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
+    public DataGridException( string message, DataGridControl dataGridControl )
+      : base( message )
+    {
+      this.DataGridControl = dataGridControl;
+    }
+
     public DataGridException( string message, Exception innerException )
       : base( message, innerException )
     {
+    }
+
+    public DataGridException( string message, Exception innerException, DataGridControl dataGridControl )
+      : base( message, innerException )
+    {
+      this.DataGridControl = dataGridControl;
     }
 
     protected DataGridException( SerializationInfo info, StreamingContext context )
@@ -44,5 +56,51 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
+    #region DataGridControl Property
+
+    public DataGridControl DataGridControl
+    {
+      get;
+      private set;
+    }
+
+    #endregion
+
+    internal static void ThrowSystemException( string message, Type exceptionType, string source, string argument = "" )
+    {
+      Exception exception;
+
+      if( exceptionType == typeof( ArgumentException ) )
+      {
+        exception = new ArgumentException( message, argument );
+      }
+      else if( exceptionType == typeof( ArgumentNullException ) )
+      {
+        exception = new ArgumentNullException( message );
+      }
+      else if( exceptionType == typeof( ArgumentOutOfRangeException ) )
+      {
+        exception = new ArgumentOutOfRangeException( argument, message );
+      }
+      else if( exceptionType == typeof( IndexOutOfRangeException ) )
+      {
+        exception = new IndexOutOfRangeException( message );
+      }
+      else if( exceptionType == typeof( InvalidOperationException ) )
+      {
+        exception = new InvalidOperationException( message );
+      }
+      else if( exceptionType == typeof( NotSupportedException ) )
+      {
+        exception = new NotSupportedException( message );
+      }
+      else
+      {
+        exception = new Exception( message );
+      }
+
+      exception.Source = source;
+      throw exception;
+    }
   }
 }

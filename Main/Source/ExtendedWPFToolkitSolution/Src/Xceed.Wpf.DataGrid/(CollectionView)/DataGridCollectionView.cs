@@ -17,26 +17,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
-using System.Windows.Data;
-using System.Windows.Threading;
-using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Collections.ObjectModel;
-using System.Data;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
-using System.Security;
-using System.Security.Permissions;
 using System.Threading;
-using System.Windows;
-using System.Xml;
-
-using Xceed.Utils;
+using System.Windows.Data;
 using Xceed.Utils.Collections;
 using Xceed.Utils.Data;
 using Xceed.Wpf.DataGrid.Stats;
-using System.Data.Objects.DataClasses;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -75,18 +65,43 @@ namespace Xceed.Wpf.DataGrid
       throw new NotSupportedException( "This constructor is obsolete and should no longer be used." );
     }
 
-    private DataGridCollectionView( IEnumerable collection, DataGridDetailDescription parentDetailDescription, DataGridCollectionView rootDataGridCollectionView )
-      : base( collection, parentDetailDescription, rootDataGridCollectionView )
+    private DataGridCollectionView( IEnumerable collection, DataGridDetailDescription parentDetailDescription, DataGridCollectionView parentDataGridCollectionView )
+      : base( collection, parentDetailDescription, parentDataGridCollectionView.RootDataGridCollectionViewBase )
     {
       if( collection == null )
         throw new ArgumentNullException( "collection" );
 
-      this.UpdateChangedPropertyStatsOnly = rootDataGridCollectionView.UpdateChangedPropertyStatsOnly;
+      this.UpdateChangedPropertyStatsOnly = parentDataGridCollectionView.UpdateChangedPropertyStatsOnly;
+
+      //If already deferring refreshes while a detail grid is expanded.
+      if( parentDataGridCollectionView.InDeferRefresh )
+      {
+        //If count is 0, it means this child collection view represents the first detail of its parent item, so create the parent's list of disposable.
+        if( parentDataGridCollectionView.DetailDeferRefreshes.Count == 0 )
+        {
+          parentDataGridCollectionView.DetailDeferRefreshes.Add( new List<IDisposable>() );
+        }
+
+        //Need to defer refresh on the detail CollectionView as well, and for as many "defers" there are presently at the master level.
+        foreach( List<IDisposable> detailDisposables in parentDataGridCollectionView.DetailDeferRefreshes )
+        {
+          detailDisposables.Add( this.DeferRefresh() );
+        }
+
+        //If Refresh() has been called on the root CollectionView, do it also for the detail one.
+        if( parentDataGridCollectionView.NeedsRefresh )
+        {
+          this.Refresh();
+        }
+      }
     }
 
     internal override void PreConstruct()
     {
       base.PreConstruct();
+
+      m_sourceItemList = new List<RawItem>( 128 );
+      m_filteredItemList = new List<RawItem>( 128 );
 
       m_sourceItems = new SourceItemCollection( this );
       this.RootGroup = new DataGridCollectionViewGroupRoot( this );
@@ -102,13 +117,13 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    StatFunctionCollection m_statFunctions; // = null
+    private StatFunctionCollection m_statFunctions; // = null
 
     #endregion StatFunctions Property
 
     #region InvalidatedStatFunctions Property
 
-    internal List<StatFunction> InvalidatedStatFunctions
+    internal ICollection<StatFunction> InvalidatedStatFunctions
     {
       get
       {
@@ -116,13 +131,13 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    List<StatFunction> m_invalidatedStatFunctions = new List<StatFunction>();
+    private HashSet<StatFunction> m_invalidatedStatFunctions = new HashSet<StatFunction>();
 
     #endregion
 
     #region UpdateChangedPropertyStatsOnly Property
 
-    public bool UpdateChangedPropertyStatsOnly
+    internal bool UpdateChangedPropertyStatsOnly
     {
       get;
       set;
@@ -294,9 +309,6 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        if( m_sourceItemList == null )
-          return 0;
-
         return m_sourceItemList.Count;
       }
     }
@@ -332,7 +344,9 @@ namespace Xceed.Wpf.DataGrid
     private void OnRootGroupChanged( EventArgs e )
     {
       if( this.RootGroupChanged != null )
+      {
         this.RootGroupChanged( this, e );
+      }
     }
 
     #endregion RootGroupChanged Internal Event
@@ -352,9 +366,21 @@ namespace Xceed.Wpf.DataGrid
         throw new InvalidOperationException( "An attempt was made to remove an item from a source that does not support removal." );
 
       RawItem rawItem = this.GetRawItemAt( index );
-      int sourceIndex = ( rawItem == null ) ? -1 : rawItem.Index;
+      int sourceIndex;
+      object dataItem;
 
-      DataGridRemovingItemEventArgs removingItemEventArgs = new DataGridRemovingItemEventArgs( this, null, index, false );
+      if( rawItem != null )
+      {
+        sourceIndex = rawItem.Index;
+        dataItem = rawItem.DataItem;
+      }
+      else
+      {
+        sourceIndex = -1;
+        dataItem = null;
+      }
+
+      DataGridRemovingItemEventArgs removingItemEventArgs = new DataGridRemovingItemEventArgs( this, dataItem, index, false );
       this.RootDataGridCollectionViewBase.OnRemovingItem( removingItemEventArgs );
 
       if( removingItemEventArgs.Cancel )
@@ -368,12 +394,12 @@ namespace Xceed.Wpf.DataGrid
         DeferredOperation deferredOperation = new DeferredOperation(
           DeferredOperation.DeferredOperationAction.Remove,
           sourceIndex,
-          new object[] { rawItem.DataItem } );
+          new object[] { dataItem } );
 
         this.ExecuteOrQueueSourceItemOperation( deferredOperation );
       }
 
-      DataGridItemRemovedEventArgs itemRemovedEventArgs = new DataGridItemRemovedEventArgs( this, null, index );
+      DataGridItemRemovedEventArgs itemRemovedEventArgs = new DataGridItemRemovedEventArgs( this, dataItem, index );
       this.RootDataGridCollectionViewBase.OnItemRemoved( itemRemovedEventArgs );
     }
 
@@ -384,20 +410,44 @@ namespace Xceed.Wpf.DataGrid
       return this.RootGroup.GetRawItemAtGlobalSortedIndex( index ).DataItem;
     }
 
+    public void ResetItem( object item )
+    {
+      DeferredOperation deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.ResetItem, item );
+      this.ExecuteOrQueueSourceItemOperation( deferredOperation );
+    }
+
+    public void ResetItems( IList items )
+    {
+      DeferredOperation deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.ResetItem, items );
+      this.ExecuteOrQueueSourceItemOperation( deferredOperation );
+    }
+
     public void RefreshDistinctValuesForFieldName( string fieldName )
     {
-      this.ForceRefreshDistinctValuesForFieldName( fieldName, this.DistinctValues[ fieldName ].InnerObservableHashList );
+      this.ForceRefreshDistinctValuesForFieldName( fieldName );
+    }
+
+    public void RefreshUnboundItemProperties( object item = null )
+    {
+      DeferredOperation deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.RefreshUnboundItemProperties, item );
+      this.ExecuteOrQueueSourceItemOperation( deferredOperation );
+    }
+
+    public void RefreshUnboundItemProperties( IList items )
+    {
+      DeferredOperation deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.RefreshUnboundItemProperties, items );
+      this.ExecuteOrQueueSourceItemOperation( deferredOperation );
     }
 
     internal override DataGridCollectionViewBase CreateDetailDataGridCollectionViewBase(
       IEnumerable detailDataSource,
       DataGridDetailDescription parentDetailDescription,
-      DataGridCollectionViewBase rootDataGridCollectionViewBase )
+      DataGridCollectionViewBase parentDataGridCollectionViewBase )
     {
-      Debug.Assert( rootDataGridCollectionViewBase is DataGridCollectionView );
+      Debug.Assert( parentDataGridCollectionViewBase is DataGridCollectionView );
 
       if( parentDetailDescription != null )
-        return new DataGridCollectionView( detailDataSource, parentDetailDescription, rootDataGridCollectionViewBase as DataGridCollectionView );
+        return new DataGridCollectionView( detailDataSource, parentDetailDescription, parentDataGridCollectionViewBase as DataGridCollectionView );
 
       return new DataGridCollectionView( detailDataSource );
     }
@@ -406,8 +456,7 @@ namespace Xceed.Wpf.DataGrid
     {
       base.CreateDefaultCollections( parentDetailDescription );
 
-      m_statFunctions = ( parentDetailDescription == null ) ? new StatFunctionCollection() :
-        parentDetailDescription.StatFunctions;
+      m_statFunctions = ( parentDetailDescription != null ) ? parentDetailDescription.StatFunctions : new StatFunctionCollection();
     }
 
     internal override void RefreshDistinctValuesForField( DataGridItemPropertyBase dataGridItemProperty )
@@ -440,14 +489,16 @@ namespace Xceed.Wpf.DataGrid
           distinctValuesSortComparer = dataGridItemProperty.SortComparer;
         }
 
-        int rowsCount = m_sourceItemList.Count; // Parse every rows to get distinct values
+        List<RawItem> currentItemsList = this.GetItemsList();
+        int rowsCount = currentItemsList.Count; // Parse every rows to get distinct values
         int maximumDistinctValuesCount = dataGridItemProperty.MaxDistinctValues;
 
         for( int rowIndex = 0; rowIndex < rowsCount; rowIndex++ )
         {
-          object rowItem = m_sourceItemList[ rowIndex ].DataItem;
+          object rowItem = currentItemsList[ rowIndex ].DataItem;
 
-          // If we have more than one filtered item, we need to verify if the row passes every filter except the filtered one to get
+          // If we have more than one filtered item :
+          // we need to verify if the row passes every AUTO filter except the filtered one to get
           if( this.DistinctValuesConstraint == DistinctValuesConstraint.Filtered )
           {
             if( !this.PassesAutoFilter( rowItem, dataGridItemProperty ) )
@@ -513,21 +564,13 @@ namespace Xceed.Wpf.DataGrid
       {
         case DeferredOperation.DeferredOperationAction.Add:
           {
-            refreshForced = !this.AddSourceItem(
-              deferredOperation.NewStartingIndex,
-              deferredOperation.NewItems,
-              deferredOperation.NewSourceItemCount );
-
+            refreshForced = !this.AddSourceItem( deferredOperation.NewStartingIndex, deferredOperation.NewItems, deferredOperation.NewSourceItemCount );
             break;
           }
 
         case DeferredOperation.DeferredOperationAction.Move:
           {
-            refreshForced = !this.MoveSourceItem(
-              deferredOperation.OldStartingIndex,
-              deferredOperation.OldItems,
-              deferredOperation.NewStartingIndex );
-
+            refreshForced = !this.MoveSourceItem( deferredOperation.OldStartingIndex, deferredOperation.OldItems, deferredOperation.NewStartingIndex );
             break;
           }
 
@@ -558,10 +601,7 @@ namespace Xceed.Wpf.DataGrid
           {
             refreshForced = false;
 
-            // Ensure to defer the CurrentItem change
-            // when regrouping is completed to be sure
-            // the SaveCurrent has the right values
-            // when restoring
+            // Ensure to defer the CurrentItem change when regrouping is completed to be sure the SaveCurrent has the right values when restoring
             using( this.DeferCurrencyEvent() )
             {
               int oldCurrentPosition = -1;
@@ -577,27 +617,19 @@ namespace Xceed.Wpf.DataGrid
               this.AdjustCurrentAndSendResetNotification( oldCurrentRawItem, oldCurrentPosition );
               this.TriggerRootGroupChanged();
             }
-
             break;
           }
 
         case DeferredOperation.DeferredOperationAction.Remove:
           {
-            refreshForced = !this.RemoveSourceItem(
-              deferredOperation.OldStartingIndex,
-              deferredOperation.OldItems.Count );
-
+            refreshForced = !this.RemoveSourceItem( deferredOperation.OldStartingIndex, deferredOperation.OldItems.Count );
             break;
           }
 
         case DeferredOperation.DeferredOperationAction.Replace:
           {
-            refreshForced = !this.ReplaceSourceItem(
-              deferredOperation.OldStartingIndex,
-              deferredOperation.OldItems,
-              deferredOperation.NewStartingIndex,
-              deferredOperation.NewItems );
-
+            refreshForced = !this.ReplaceSourceItem( deferredOperation.OldStartingIndex, deferredOperation.OldItems,
+                                                     deferredOperation.NewStartingIndex, deferredOperation.NewItems );
             break;
           }
 
@@ -605,10 +637,7 @@ namespace Xceed.Wpf.DataGrid
           {
             refreshForced = false;
 
-            // Ensure to defer the CurrentItem change
-            // when resort is completed to be sure
-            // the SaveCurrent has the right values
-            // when restoring
+            // Ensure to defer the CurrentItem change when resort is completed to be sure the SaveCurrent has the right values when restoring
             using( this.DeferCurrencyEvent() )
             {
               int oldCurrentPosition = -1;
@@ -621,9 +650,43 @@ namespace Xceed.Wpf.DataGrid
 
               // Ensure to send reset notifications
               this.AdjustCurrentAndSendResetNotification( oldCurrentRawItem, oldCurrentPosition );
-              this.TriggerRootGroupChanged();
-            }
 
+              //If there is no grouping, there is no group changes, so no GroupChanged to raise.
+              if( !this.RootGroup.IsBottomLevel )
+              {
+                this.TriggerRootGroupChanged();
+              }
+            }
+            break;
+          }
+
+        case DeferredOperation.DeferredOperationAction.ResetItem:
+          {
+            refreshForced = false;
+            if( deferredOperation.DataItem != null )
+            {
+              this.ResetSourceItem( deferredOperation.DataItem );
+            }
+            else
+            {
+              this.ResetSourceItems( deferredOperation.NewItems );
+            }
+            m_currentChildCollectionView = null;
+            break;
+          }
+
+        case DeferredOperation.DeferredOperationAction.RefreshUnboundItemProperties:
+          {
+            refreshForced = false;
+            if( deferredOperation.NewItems != null )
+            {
+              this.RefreshUnboundItemPropertiesCore( deferredOperation.NewItems );
+            }
+            else
+            {
+              this.RefreshUnboundItemPropertiesCore( deferredOperation.DataItem );
+            }
+            m_currentChildCollectionView = null;
             break;
           }
 
@@ -635,17 +698,43 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    internal override void ProcessInvalidatedGroupStats( List<DataGridCollectionViewGroup> invalidatedGroups, bool ensurePosition )
+    internal override void ProcessInvalidatedGroupStats( HashSet<DataGridCollectionViewGroup> invalidatedGroups )
     {
-      GroupSortComparer[] groupSortComparers = this.GetGroupSortComparers();
-
       foreach( DataGridCollectionViewGroup group in invalidatedGroups )
       {
         group.InvokeStatFunctionsPropertyChanged( this );
+      }
 
-        if( ensurePosition )
+      if( m_hasGroupSortBasedOnStats )
+      {
+        using( this.DeferCurrencyEvent() )
         {
-          this.EnsurePosition( group, groupSortComparers );
+          object oldCurrentDataItem = this.CurrentItem;
+          int oldCurrentPosition = this.CurrentPosition;
+
+          this.SortGroups();
+
+          RawItem currentRawItem = null;
+
+          if( oldCurrentDataItem != null )
+          {
+            currentRawItem = this.GetFirstRawItemFromDataItem( oldCurrentDataItem );
+          }
+
+          if( currentRawItem == null )
+          {
+            if( ( oldCurrentPosition > 0 ) && ( oldCurrentPosition < this.RootGroup.GlobalRawItemCount ) )
+            {
+              currentRawItem = this.RootGroup.GetRawItemAtGlobalSortedIndex( oldCurrentPosition );
+            }
+          }
+
+          if( currentRawItem != null )
+          {
+            this.SetCurrentItem( currentRawItem.GetGlobalSortedIndex(), oldCurrentDataItem, false, false );
+          }
+
+          this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
         }
       }
 
@@ -665,12 +754,13 @@ namespace Xceed.Wpf.DataGrid
       int oldCurrentPosition = -1;
       RawItem oldCurrentRawItem = null;
 
-      // The cache of PropertyDescriptors for the StatFunctions will be recreated if 
-      // needed in GetStatFunctionProperties().
+      // The cache of PropertyDescriptors for the StatFunctions will be recreated if needed in GetStatFunctionProperties().
       m_statisticalProperties = null;
 
       if( !initialLoad )
+      {
         this.SaveCurrentBeforeReset( out oldCurrentRawItem, out oldCurrentPosition );
+      }
 
       SortDescriptionInfo[] sortDescriptionInfos = null;
 
@@ -700,9 +790,10 @@ namespace Xceed.Wpf.DataGrid
                 if( list != null )
                 {
                   int count = list.Count;
-                  m_sourceItemList = new List<RawItem>( count );
-                  m_dataItemToRawItemList = new Dictionary<object, object>();
-                  m_filteredItemList = new List<RawItem>( count );
+
+                  m_sourceItemList.Clear();
+                  m_filteredItemList.Clear();
+                  m_dataItemToRawItemMap.Clear();
 
                   for( int i = 0; i < count; i++ )
                   {
@@ -738,12 +829,14 @@ namespace Xceed.Wpf.DataGrid
                     ICollection collection = enumeration as ICollection;
 
                     if( collection != null )
+                    {
                       count = collection.Count;
+                    }
                   }
 
-                  m_sourceItemList = new List<RawItem>( count );
-                  m_dataItemToRawItemList = new Dictionary<object, object>();
-                  m_filteredItemList = new List<RawItem>( count );
+                  m_sourceItemList.Clear();
+                  m_filteredItemList.Clear();
+                  m_dataItemToRawItemMap.Clear();
 
                   int index = 0;
                   IEnumerator enumerator = enumeration.GetEnumerator();
@@ -763,17 +856,6 @@ namespace Xceed.Wpf.DataGrid
                       m_filteredItemList.Add( rawItem );
                     }
                   }
-                }
-                else
-                {
-                  if( m_sourceItemList == null )
-                    m_sourceItemList = new List<RawItem>( 128 );
-
-                  if( m_dataItemToRawItemList == null )
-                    m_dataItemToRawItemList = new Dictionary<object, object>();
-
-                  if( m_filteredItemList == null )
-                    m_filteredItemList = new List<RawItem>( 128 );
                 }
               }
 
@@ -823,12 +905,16 @@ namespace Xceed.Wpf.DataGrid
 
         if( sendResetNotification )
         {
-          this.OnCollectionChanged( new NotifyCollectionChangedEventArgs(
-            NotifyCollectionChangedAction.Reset ) );
+          this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
         }
 
         this.TriggerRootGroupChanged();
       }
+    }
+
+    internal override void ClearGroupSortComparers()
+    {
+      m_groupSortComparers.Clear();
     }
 
     internal RawItem GetRawItemAt( int index )
@@ -839,7 +925,7 @@ namespace Xceed.Wpf.DataGrid
 
     internal object GetSourceItemAt( int index )
     {
-      if( m_sourceItemList == null )
+      if( index > m_sourceItemList.Count - 1 )
         throw new ArgumentOutOfRangeException( "index", index, "index must be greater than zero and less than SourceItems.Count." );
 
       return m_sourceItemList[ index ].DataItem;
@@ -847,9 +933,6 @@ namespace Xceed.Wpf.DataGrid
 
     internal IEnumerator<RawItem> GetSourceListEnumerator()
     {
-      if( m_sourceItemList == null )
-        return new List<RawItem>().GetEnumerator();
-
       return m_sourceItemList.GetEnumerator();
     }
 
@@ -859,7 +942,7 @@ namespace Xceed.Wpf.DataGrid
       {
         m_statisticalProperties = new PropertyDescriptorCollection( null );
 
-        foreach( Stats.StatFunction statFunction in m_statFunctions )
+        foreach( StatFunction statFunction in m_statFunctions )
         {
           m_statisticalProperties.Add( new StatFunctionPropertyDescriptor( statFunction.ResultPropertyName ) );
         }
@@ -915,10 +998,14 @@ namespace Xceed.Wpf.DataGrid
         this.AddRawItemInFilteredList( filteredItems, isLast );
         this.AddRawItemInGroup( filteredItems );
 
-        DeferredOperationManager deferredOperationManager = this.DeferredOperationManager;
-        foreach( RawItem rawItem in filteredItems )
+        if( m_statFunctions.Count > 0 )
         {
-          deferredOperationManager.InvalidateGroupStats( rawItem.ParentGroup );
+          DeferredOperationManager deferredOperationManager = this.DeferredOperationManager;
+          foreach( RawItem rawItem in filteredItems )
+          {
+            //When adding a new item, make sure all stats for the specified group are recalculated even if UpdateChangedPropertyStatsOnly is set to true
+            deferredOperationManager.InvalidateGroupStats( rawItem.ParentGroup, true );
+          }
         }
       }
 
@@ -944,10 +1031,17 @@ namespace Xceed.Wpf.DataGrid
         rawItem = m_sourceItemList[ i + startIndex ];
 
         if( this.CurrentEditItem == rawItem.DataItem )
+        {
           this.SetCurrentEditItem( null );
+        }
 
         removedItems[ i ] = rawItem;
-        this.DeferredOperationManager.InvalidateGroupStats( rawItem.ParentGroup );
+
+        //When removing an item, make sure all stats for the specified group are recalculated even if UpdateChangedPropertyStatsOnly is set to true
+        if( m_statFunctions.Count > 0 )
+        {
+          this.DeferredOperationManager.InvalidateGroupStats( rawItem.ParentGroup, true );
+        }
       }
 
       int filteredItemRemovedCount = this.RemoveRawItemInFilteredList( removedItems );
@@ -956,7 +1050,9 @@ namespace Xceed.Wpf.DataGrid
       this.RemoveRawItemInSourceList( startIndex, count );
 
       if( filteredItemRemovedCount > 0 )
+      {
         this.RemoveRawItemInGroup( removedItems );
+      }
 
       this.RefreshDistinctValues( filteredItemRemovedCount > 0 );
       return true;
@@ -976,8 +1072,7 @@ namespace Xceed.Wpf.DataGrid
       int newItemCount = newItems.Count;
       int sourceItemListCount = m_sourceItemList.Count;
 
-      if( ( oldStartIndex + oldItemCount ) > sourceItemListCount
-        || ( newStartIndex + newItemCount ) > sourceItemListCount )
+      if( ( oldStartIndex + oldItemCount ) > sourceItemListCount || ( newStartIndex + newItemCount ) > sourceItemListCount )
       {
         this.ForceRefresh( true, !this.Loaded, true );
         return false;
@@ -1000,7 +1095,9 @@ namespace Xceed.Wpf.DataGrid
             // globalSortedIndex == -1 means item does not pass filter
             if( globalSortedIndex != -1 )
             {
-              bool itemChanged = !object.Equals( oldItem, newItems[ i ] );
+              object newItem = newItems[ i ];
+
+              bool itemChanged = !object.Equals( oldItem, newItem );
 
               if( ( this.CurrentEditItem == oldItem ) && ( itemChanged ) )
               {
@@ -1015,10 +1112,7 @@ namespace Xceed.Wpf.DataGrid
 
               if( this.CurrentEditItem != oldItem )
               {
-                object newItem = newItems[ i ];
-                DeferredOperationManager deferredOperationManager = this.DeferredOperationManager;
-
-                if( newItem != rawItem.DataItem )
+                if( newItem != oldItem )
                 {
                   this.RemoveRawItemDataItemMapping( rawItem );
                   rawItem.SetDataItem( newItem );
@@ -1035,21 +1129,45 @@ namespace Xceed.Wpf.DataGrid
                   oldGroup.ProtectedItems[ rawItem.SortedIndex ] = newItem;
                 }
 
-                this.OnCollectionChanged( new NotifyCollectionChangedEventArgs(
-                  NotifyCollectionChangedAction.Replace, newItem, oldItem, rawItem.GetGlobalSortedIndex() ) );
+                this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Replace, newItem, oldItem, rawItem.GetGlobalSortedIndex() ) );
 
-                deferredOperationManager.InvalidateGroupStats( oldGroup );
                 this.EnsurePosition( rawItem, globalSortedIndex );
-                deferredOperationManager.InvalidateGroupStats( rawItem.ParentGroup );
+
+                DataGridCollectionViewGroup newGroup = rawItem.ParentGroup;
+                bool movedToDifferentParentGroup = oldGroup != newGroup;
+
+                if( m_statFunctions.Count > 0 )
+                {
+                  DeferredOperationManager deferredOperationManager = this.DeferredOperationManager;
+                  deferredOperationManager.InvalidateGroupStats( oldGroup, movedToDifferentParentGroup );
+                  if( movedToDifferentParentGroup )
+                  {
+                    deferredOperationManager.InvalidateGroupStats( rawItem.ParentGroup, true );
+                  }
+                }
               }
             }
             else
             {
-              // Since it is a replace, we must re-ensure position even if current item did not passed filter
-              // in case a properperty change would let it pass the filter
-              this.DeferredOperationManager.InvalidateGroupStats( rawItem.ParentGroup );
+              Debug.Assert( rawItem.ParentGroup == null, "ParentGroup should be null, since according to the comment at the top of the if, the item is filtered out" );
+
+              DataGridCollectionViewGroup oldGroup = rawItem.ParentGroup;
+
+              // Since it is a replace, we must re-ensure position even if current item did not passed filter in case a property change would let it pass the filter
               this.EnsurePosition( rawItem, globalSortedIndex );
-              this.DeferredOperationManager.InvalidateGroupStats( rawItem.ParentGroup );
+
+              DataGridCollectionViewGroup newGroup = rawItem.ParentGroup;
+              bool movedToDifferentParentGroup = oldGroup != newGroup;
+
+              if( m_statFunctions.Count > 0 )
+              {
+                DeferredOperationManager deferredOperationManager = this.DeferredOperationManager;
+                deferredOperationManager.InvalidateGroupStats( oldGroup, movedToDifferentParentGroup );
+                if( movedToDifferentParentGroup )
+                {
+                  deferredOperationManager.InvalidateGroupStats( rawItem.ParentGroup, true );
+                }
+              }
             }
           }
           else
@@ -1061,7 +1179,9 @@ namespace Xceed.Wpf.DataGrid
         }
 
         if( extraOldItemCount > 0 )
+        {
           this.RemoveSourceItem( oldStartIndex + newItemCount, extraOldItemCount );
+        }
 
         int extraNewItemCount = newItemCount - oldItemCount;
 
@@ -1085,20 +1205,27 @@ namespace Xceed.Wpf.DataGrid
     {
       this.EnsureThreadAndCollectionLoaded();
 
-      object cached;
+      return m_dataItemToRawItemMap[ dataItem ];
+    }
 
-      if( ( m_dataItemToRawItemList != null )
-        && ( m_dataItemToRawItemList.TryGetValue( dataItem, out cached ) ) )
+    internal int GetGlobalSortedIndexFromDataItem( object dataItem )
+    {
+      RawItem rawItem = this.GetFirstRawItemFromDataItem( dataItem );
+      int globalSortedIndex = rawItem.GetGlobalSortedIndex();
+      if( globalSortedIndex == -1 )
       {
-        RawItem temp = cached as RawItem;
-
-        if( cached != null )
-          return temp;
-
-        return ( ( RawItem[] )cached )[ 0 ];
+        return rawItem.SortedIndex;
       }
 
-      return null;
+      return globalSortedIndex;
+    }
+
+    internal IEnumerable<object> GetSortedFilteredDataItems()
+    {
+      foreach( RawItem item in this.RootGroup.RawItems )
+      {
+        yield return item.DataItem;
+      }
     }
 
     private static DataStore CreateStore( Type dataType, int initialCapacity )
@@ -1177,13 +1304,20 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private List<RawItem> GetItemsList()
+    {
+      return ( this.DistinctValuesConstraint == DistinctValuesConstraint.FilteredWithAllFilters ) ? m_filteredItemList : m_sourceItemList;
+    }
+
     private void EnsurePosition( RawItem rawItem, int globalSortedIndex )
     {
       Debug.Assert( rawItem.GetGlobalSortedIndex() == globalSortedIndex );
 
-      if( this.PassesFilter( rawItem.DataItem )
-        && this.PassesAutoFilter( rawItem.DataItem, null )
-        && this.PassesFilterCriterion( rawItem.DataItem ) )
+      object dataItem = rawItem.DataItem;
+
+      if( this.PassesFilter( dataItem )
+        && this.PassesAutoFilter( dataItem, null )
+        && this.PassesFilterCriterion( dataItem ) )
       {
         if( globalSortedIndex == -1 )
         {
@@ -1214,14 +1348,20 @@ namespace Xceed.Wpf.DataGrid
 
       // Verify the row is in the correct group.
       DataGridCollectionViewGroup newGroup = this.GetRawItemNewGroup( rawItem );
+      DataGridCollectionViewGroup currentGroup = rawItem.ParentGroup;
 
-      if( rawItem.ParentGroup != newGroup )
+      if( currentGroup != newGroup )
       {
         using( this.DeferCurrencyEvent() )
         {
-          DeferredOperationManager deferredOperationManager = this.DeferredOperationManager;
-          deferredOperationManager.InvalidateGroupStats( rawItem.ParentGroup );
-          deferredOperationManager.InvalidateGroupStats( newGroup );
+          if( m_statFunctions.Count > 0 )
+          {
+            DeferredOperationManager deferredOperationManager = this.DeferredOperationManager;
+
+            //If an item is moved from one group to another, make sure all stats for the specified groups are recalculated even if UpdateChangedPropertyStatsOnly is set to true
+            deferredOperationManager.InvalidateGroupStats( currentGroup, true );
+            deferredOperationManager.InvalidateGroupStats( newGroup, true );
+          }
 
           int newSortIndex = newGroup.BinarySearchRawItem( rawItem, this.RawItemSortComparer );
 
@@ -1230,7 +1370,7 @@ namespace Xceed.Wpf.DataGrid
             newSortIndex = ~newSortIndex;
           }
 
-          rawItem.ParentGroup.RemoveRawItemAt( rawItem.SortedIndex );
+          currentGroup.RemoveRawItemAt( rawItem.SortedIndex );
           newGroup.InsertRawItem( newSortIndex, rawItem );
           int newGlobalSortedIndex = rawItem.GetGlobalSortedIndex();
           this.AdjustCurrencyAfterMove( globalSortedIndex, newGlobalSortedIndex, 1 );
@@ -1239,15 +1379,24 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
+        if( m_statFunctions.Count > 0 )
+        {
+          this.DeferredOperationManager.InvalidateGroupStats( currentGroup );
+        }
+
         // Verify sorting only if we have not changed group, since adding an item in a group will automatically sort it.
         // Even if we are not sorted, we must ensure the order matches the natural order of the source.
         int newSortIndex = newGroup.BinarySearchRawItem( rawItem, this.RawItemSortComparer );
 
         if( newSortIndex < 0 )
+        {
           newSortIndex = ~newSortIndex;
+        }
 
         if( newSortIndex > rawItem.SortedIndex )
+        {
           newSortIndex--;
+        }
 
         if( rawItem.SortedIndex != newSortIndex )
         {
@@ -1262,56 +1411,6 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private void EnsurePosition( DataGridCollectionViewGroup group, GroupSortComparer[] groupSortComparers )
-    {
-      DataGridCollectionViewGroup parentGroup = group.Parent;
-
-      if( parentGroup == null )
-        return;
-
-      int oldSortIndex = parentGroup.ProtectedItems.IndexOf( group );
-
-      // If the group have been removed, we have nothing to do here.
-      if( oldSortIndex == -1 )
-        return;
-
-      DataGridCollectionViewGroup currentGroup = parentGroup.Parent;
-      int groupLevel = 0;
-
-      while( currentGroup != null )
-      {
-        groupLevel++;
-        currentGroup = currentGroup.Parent;
-      }
-
-      int newSortIndex = parentGroup.BinarySearchGroup( group, groupSortComparers[ groupLevel ] );
-
-      if( newSortIndex < 0 )
-        newSortIndex = ~newSortIndex;
-
-      if( newSortIndex > oldSortIndex )
-        newSortIndex--;
-
-      if( oldSortIndex != newSortIndex )
-      {
-        using( this.DeferCurrencyEvent() )
-        {
-          int oldGlobalSortedIndex = group.GetFirstRawItemGlobalSortedIndex();
-          parentGroup.ProtectedItems.Move( oldSortIndex, newSortIndex );
-          int newGlobalSortedIndex = group.GetFirstRawItemGlobalSortedIndex();
-
-          int itemCount = group.GlobalRawItemCount;
-          this.AdjustCurrencyAfterMove( oldGlobalSortedIndex, newGlobalSortedIndex, itemCount );
-
-          List<object> items = new List<object>( 256 );
-          group.GetGlobalItems( items );
-
-          this.OnCollectionChanged( new NotifyCollectionChangedEventArgs(
-            NotifyCollectionChangedAction.Move, items, newGlobalSortedIndex, oldGlobalSortedIndex ) );
-        }
-      }
-    }
-
     // excludedFilteredDataGridItemProperty is used to avoid filtering the column on which we are calculating Distinct Values if null, this parameter is ignored
     private bool PassesAutoFilter( object item, DataGridItemPropertyBase excludedFilteredDataGridItemProperty )
     {
@@ -1320,7 +1419,6 @@ namespace Xceed.Wpf.DataGrid
       if( autoFilterMode == AutoFilterMode.None )
         return true;
 
-      DistinctValuesConstraint distinctValuesConstraint = this.DistinctValuesConstraint;
       bool isRowAccepted = false;
       bool isColumnFiltered = false;
 
@@ -1548,22 +1646,29 @@ namespace Xceed.Wpf.DataGrid
             Debug.Assert( ( newCurrentPosition == -1 ) || ( newCurrentPosition >= ( globalRawItemCount - 1 ) ) );
 #endif
 
-          this.SetCurrentItemAndPositionCore(
-            newCurrentItem, newCurrentPosition, isCurrentBeforeFirst, isCurrentAfterLast );
+          this.SetCurrentItemAndPositionCore( newCurrentItem, newCurrentPosition, isCurrentBeforeFirst, isCurrentAfterLast );
 
           if( !this.IsCurrencyDeferred )
           {
             if( !object.Equals( oldCurrentItem, newCurrentItem ) )
+            {
               this.OnPropertyChanged( new PropertyChangedEventArgs( "CurrentItem" ) );
+            }
 
             if( oldCurrentPosition != this.CurrentPosition )
+            {
               this.OnPropertyChanged( new PropertyChangedEventArgs( "CurrentPosition" ) );
+            }
 
             if( oldIsCurrentBeforeFirst != this.IsCurrentBeforeFirst )
+            {
               this.OnPropertyChanged( new PropertyChangedEventArgs( "IsCurrentBeforeFirst" ) );
+            }
 
             if( oldIsCurrentAfterLast != this.IsCurrentAfterLast )
+            {
               this.OnPropertyChanged( new PropertyChangedEventArgs( "IsCurrentAfterLast" ) );
+            }
 
             this.OnCurrentChanged();
           }
@@ -1577,8 +1682,7 @@ namespace Xceed.Wpf.DataGrid
     {
       int count = items.Count;
 
-      if( ( oldStartIndex < 0 ) || ( oldStartIndex + count > m_sourceItemList.Count )
-        || ( newStartIndex < 0 ) || ( newStartIndex > ( m_sourceItemList.Count - count ) ) )
+      if( ( oldStartIndex < 0 ) || ( oldStartIndex + count > m_sourceItemList.Count ) || ( newStartIndex < 0 ) || ( newStartIndex > ( m_sourceItemList.Count - count ) ) )
       {
         this.ForceRefresh( true, !this.Loaded, true );
         return false;
@@ -1595,7 +1699,9 @@ namespace Xceed.Wpf.DataGrid
 
         // If our parent group is null, we are filtered out.
         if( rawItem.ParentGroup != null )
+        {
           filteredRawItems.Add( rawItem );
+        }
       }
 
       int filteredItemCount = this.RemoveRawItemInFilteredList( rawItems );
@@ -1629,6 +1735,62 @@ namespace Xceed.Wpf.DataGrid
       return true;
     }
 
+    private bool ResetSourceItem( object dataItem )
+    {
+      RawItem rawItem = null;
+
+      //Verify if the item is in the same detail CollectionView as the previous item was found in.
+      if( m_currentChildCollectionView != null )
+      {
+        rawItem = m_currentChildCollectionView.GetFirstRawItemFromDataItem( dataItem );
+
+        //If the item was found, refresh it.
+        if( rawItem != null )
+        {
+          int globalSortedIndex = rawItem.GetGlobalSortedIndex();
+          m_currentChildCollectionView.EnsurePosition( rawItem, globalSortedIndex );
+          return true;
+        }
+      }
+
+      //If the item has not been found, try to find it in the current CollectionView.
+      rawItem = this.GetFirstRawItemFromDataItem( dataItem );
+      m_currentChildCollectionView = null;
+
+      //If the item was found, refresh it.
+      if( rawItem != null )
+      {
+        int globalSortedIndex = rawItem.GetGlobalSortedIndex();
+        this.EnsurePosition( rawItem, globalSortedIndex );
+        return true;
+      }
+
+      //If the item was not found, look for it in an expended detail.
+      foreach( DataGridContext detailContext in this.DataGridContext.GetChildContextsCore() )
+      {
+        DataGridCollectionView detailCollectionView = detailContext.Items as DataGridCollectionView;
+        if( detailCollectionView != null )
+        {
+          if( detailCollectionView.ResetSourceItem( dataItem ) )
+          {
+            //keep a reference to the detail CollectionView the item was found in, in case following items belong to the same detail.
+            m_currentChildCollectionView = detailCollectionView;
+            return true;
+          }
+        }
+      }
+
+      return false;
+    }
+
+    private void ResetSourceItems( IList items )
+    {
+      foreach( object dataItem in items )
+      {
+        this.ResetSourceItem( dataItem );
+      }
+    }
+
     private void AddRawItemInSourceList( int startIndex, IList<RawItem> rawItems )
     {
       m_sourceItemList.InsertRange( startIndex, rawItems );
@@ -1659,13 +1821,14 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        index = m_filteredItemList.BinarySearch(
-          rawItems[ 0 ], DataGridCollectionView.RawItemIndexComparer );
+        index = m_filteredItemList.BinarySearch( rawItems[ 0 ], DataGridCollectionView.RawItemIndexComparer );
 
         Debug.Assert( index < 0 );
 
         if( index < 0 )
+        {
           index = ~index;
+        }
 
         Debug.Assert( index <= m_filteredItemList.Count );
       }
@@ -1691,7 +1854,9 @@ namespace Xceed.Wpf.DataGrid
         int index = newGroup.BinarySearchRawItem( rawItem, this.RawItemSortComparer );
 
         if( index < 0 )
+        {
           index = ~index;
+        }
 
         int globalIndex = newGroup.GetFirstRawItemGlobalSortedIndex() + index;
         this.AdjustCurrencyBeforeAdd( globalIndex );
@@ -1702,8 +1867,7 @@ namespace Xceed.Wpf.DataGrid
           m_sortedItemVersion++;
         }
 
-        this.OnCollectionChanged( new NotifyCollectionChangedEventArgs(
-          NotifyCollectionChangedAction.Add, rawItem.DataItem, globalIndex ) );
+        this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Add, rawItem.DataItem, globalIndex ) );
       }
     }
 
@@ -1729,11 +1893,12 @@ namespace Xceed.Wpf.DataGrid
       // The function take for granted that all RawItem's index are sequential,
       // There should not be any gap in the index sequence.
 
-      int index = m_filteredItemList.BinarySearch(
-        rawItems[ 0 ], DataGridCollectionView.RawItemIndexComparer );
+      int index = m_filteredItemList.BinarySearch( rawItems[ 0 ], DataGridCollectionView.RawItemIndexComparer );
 
       if( index < 0 )
+      {
         index = ~index;
+      }
 
       if( index > m_filteredItemList.Count )
         return 0;
@@ -1746,11 +1911,15 @@ namespace Xceed.Wpf.DataGrid
       for( int i = index; i < count; i++ )
       {
         if( m_filteredItemList[ i ].Index <= lastRawItemIndex )
+        {
           countToRemove++;
+        }
       }
 
       if( countToRemove > 0 )
+      {
         m_filteredItemList.RemoveRange( index, countToRemove );
+      }
 
       return countToRemove;
     }
@@ -1779,13 +1948,75 @@ namespace Xceed.Wpf.DataGrid
             }
           }
 
-          // In the case of a remove, the CollectionChanged must be after the CurrentChanged
-          // since when the DataGridCollectionView is used with a Selector having the 
-          // IsSynchronizedWithCurrent set, the Selector will sett the current position to 
-          // -1 if the selected item is removed. 
-          this.OnCollectionChanged( new NotifyCollectionChangedEventArgs(
-            NotifyCollectionChangedAction.Remove, oldRawItem.DataItem, globalSortedIndex ) );
+          // In the case of a remove, the CollectionChanged must be after the CurrentChanged since when the DataGridCollectionView is used with a Selector having the 
+          // IsSynchronizedWithCurrent set, the Selector will set the current position to -1 if the selected item is removed. 
+          this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Remove, oldRawItem.DataItem, globalSortedIndex ) );
         }
+      }
+    }
+
+    private bool RefreshUnboundItemPropertiesCore( object dataItem = null )
+    {
+      if( dataItem != null )
+      {
+        //Verify if the item is in the same detail CollectionView as the previous item was found in.
+        if( m_currentChildCollectionView != null && m_currentChildCollectionView.m_sourceItems.Contains( dataItem ) )
+        {
+          m_currentChildCollectionView.ItemProperties.RefreshUnboundItemProperty( dataItem );
+          return true;
+        }
+
+        //Since the item was not found in the previous detail, it means items are not sequential, thus no need to keep looking into this detail.
+        m_currentChildCollectionView = null;
+
+        //Try to find it in the current CollectionView.
+        if( m_sourceItems.Contains( dataItem ) )
+        {
+          this.ItemProperties.RefreshUnboundItemProperty( dataItem );
+          return true;
+        }
+
+        //If not, try to find it in an expended detail
+        foreach( DataGridContext detailContext in this.DataGridContext.GetChildContextsCore() )
+        {
+          DataGridCollectionView detailCollectionView = detailContext.Items as DataGridCollectionView;
+          if( detailCollectionView != null )
+          {
+            if( detailCollectionView.RefreshUnboundItemPropertiesCore( dataItem ) )
+            {
+              m_currentChildCollectionView = detailCollectionView;
+              return true;
+            }
+          }
+        }
+
+        return false;
+      }
+
+      //If dataItem is null, it means every item must be Refreshed.  Let's start with the level we're on.
+      foreach( RawItem rawItem in m_sourceItemList )
+      {
+        this.ItemProperties.RefreshUnboundItemProperty( rawItem.DataItem );
+      }
+
+      //Refresh every expended detail of the parent
+      foreach( DataGridContext detailContext in this.DataGridContext.GetChildContextsCore() )
+      {
+        DataGridCollectionView detailCollectionView = detailContext.Items as DataGridCollectionView;
+        if( detailCollectionView != null )
+        {
+          detailCollectionView.RefreshUnboundItemPropertiesCore();
+        }
+      }
+
+      return true;
+    }
+
+    private void RefreshUnboundItemPropertiesCore( IList items )
+    {
+      foreach( object dataItem in items )
+      {
+        this.RefreshUnboundItemPropertiesCore( dataItem );
       }
     }
 
@@ -1815,7 +2046,9 @@ namespace Xceed.Wpf.DataGrid
           DataGridGroupDescription groupDescription = groupDescriptions[ i ] as DataGridGroupDescription;
 
           if( groupDescription != null )
+          {
             groupDescription.SetContext( this );
+          }
         }
 
         try
@@ -1831,8 +2064,7 @@ namespace Xceed.Wpf.DataGrid
             for( int j = 1; j <= groupDescriptionCount; j++ )
             {
               // We set SortComparers to null to avoid Sorting since we are in the middle of a "batch operation"
-              // The sorting will be done after the batch operation which is faster than sorting for each
-              // group modification
+              // The sorting will be done after the batch operation which is faster than sorting for each group modification
               currentGroup = currentGroup.GetGroup( rawItem, j - 1, culture, groupDescriptions, null );
             }
 
@@ -1846,7 +2078,9 @@ namespace Xceed.Wpf.DataGrid
             DataGridGroupDescription groupDescription = groupDescriptions[ i ] as DataGridGroupDescription;
 
             if( groupDescription != null )
+            {
               groupDescription.SetContext( null );
+            }
           }
         }
       }
@@ -1866,8 +2100,7 @@ namespace Xceed.Wpf.DataGrid
 
     private void SortItems( SortDescriptionInfo[] sortDescriptionInfos )
     {
-      // We set the current item to -1 to prevent the developper to get an invalid position.
-      // We will replace the current item to the correct one later.
+      // We set the current item to -1 to prevent the developper to get an invalid position. We will replace the current item to the correct one later.
       this.SetCurrentItem( -1, null, false, false );
 
       DataGridCollectionViewGroupRoot rootGroup = this.RootGroup;
@@ -1878,16 +2111,28 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        // We use a new DataGridCollectionViewGroupRoot to prevent
-        // some event to be raised.
+        // We use a new DataGridCollectionViewGroupRoot to prevent some event to be raised.
         DataGridCollectionViewGroupRoot newRootGroup = new DataGridCollectionViewGroupRoot( rootGroup );
 
-        rootGroup.SortItems(
-          sortDescriptionInfos, this.GetGroupSortComparers(),
-          0, m_sourceItemList, newRootGroup );
+        rootGroup.SortItems( sortDescriptionInfos, this.GetGroupSortComparers(), 0, m_sourceItemList, newRootGroup );
 
         this.RootGroup = newRootGroup;
       }
+
+      unchecked
+      {
+        m_sortedItemVersion++;
+      }
+    }
+
+    private void SortGroups()
+    {
+      DataGridCollectionViewGroupRoot rootGroup = this.RootGroup;
+
+      if( rootGroup.IsBottomLevel )
+        return;
+
+      rootGroup.SortGroups( this.GetGroupSortComparers(), 0 );
 
       unchecked
       {
@@ -1917,8 +2162,7 @@ namespace Xceed.Wpf.DataGrid
               SortDescription sortDescription = sortDescriptions[ i ];
               DataGridItemPropertyBase dataProperty = itemProperties[ sortDescription.PropertyName ];
 
-              SortDescriptionInfo sortDescriptionInfo =
-                new SortDescriptionInfo( dataProperty, sortDescription.Direction );
+              SortDescriptionInfo sortDescriptionInfo = new SortDescriptionInfo( dataProperty, sortDescription.Direction );
 
               sortDescriptionInfos[ i ] = sortDescriptionInfo;
 
@@ -1943,7 +2187,9 @@ namespace Xceed.Wpf.DataGrid
               ISupportInitialize supportInitialize = dataProperty as ISupportInitialize;
 
               if( supportInitialize != null )
+              {
                 supportInitialize.BeginInit();
+              }
 
               try
               {
@@ -1955,7 +2201,9 @@ namespace Xceed.Wpf.DataGrid
               finally
               {
                 if( supportInitialize != null )
+                {
                   supportInitialize.EndInit();
+                }
               }
             }
           }
@@ -1963,36 +2211,27 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private GroupSortComparer[] GetGroupSortComparers()
+    private List<GroupSortComparer> GetGroupSortComparers()
     {
+      if( m_groupSortComparers.Count > 0 )
+        return m_groupSortComparers;
+
+      m_hasGroupSortBasedOnStats = false;
+
       SortDescriptionCollection sortDescriptions = this.SortDescriptions;
-      ObservableCollection<GroupDescription> groupDescriptions = this.GroupDescriptions;
-
-      int groupDescriptionCount = groupDescriptions.Count;
-      int sortDescriptionCount = sortDescriptions.Count;
-      GroupSortComparer[] sortComparers = new GroupSortComparer[ groupDescriptionCount ];
-
       DataGridItemPropertyCollection itemProperties = this.ItemProperties;
 
-      for( int j = 0; j < groupDescriptionCount; j++ )
+      foreach( GroupDescription groupDescription in this.GroupDescriptions )
       {
-        GroupDescription groupDescription = groupDescriptions[ j ];
-
         // Find the sortDescriptionInfo for the current sub group.
-        ListSortDirection sortDirection = ListSortDirection.Ascending;
-        string groupName = DataGridCollectionView.GetPropertyNameFromGroupDescription( groupDescription );
-        DataGridGroupDescription dataGridGroupDescription = groupDescription as DataGridGroupDescription;
-        bool defaultGroupSortAdded = false;
+        string groupDescriptionName = DataGridCollectionView.GetPropertyNameFromGroupDescription( groupDescription );
+        List<GroupSortComparer.SortInfo> sortInfos = new List<GroupSortComparer.SortInfo>( sortDescriptions.Count );
 
-        List<GroupSortComparer.SortInfo> sortInfos =
-          new List<GroupSortComparer.SortInfo>( sortDescriptionCount );
-
-        for( int i = 0; i < sortDescriptionCount; i++ )
+        foreach( SortDescription sortDescription in sortDescriptions )
         {
-          SortDescription sortDescription = sortDescriptions[ i ];
-          sortDirection = sortDescription.Direction;
-          string sortDescriptionPropertyName = sortDescription.PropertyName;
-          DataGridItemPropertyBase itemProperty = itemProperties[ sortDescriptionPropertyName ];
+          ListSortDirection sortDirection = sortDescription.Direction;
+          string sortDescriptionName = sortDescription.PropertyName;
+          DataGridItemPropertyBase itemProperty = itemProperties[ sortDescriptionName ];
 
           if( itemProperty != null )
           {
@@ -2000,66 +2239,50 @@ namespace Xceed.Wpf.DataGrid
 
             if( !string.IsNullOrEmpty( sortStatResultPropertyName ) )
             {
+              m_hasGroupSortBasedOnStats = true;
+
               IComparer sortComparer = itemProperty.GroupSortStatResultComparer;
 
               if( sortComparer == null )
+              {
                 sortComparer = StatResultComparer.Singleton;
+              }
 
-              sortInfos.Add( new GroupSortComparer.SortInfo(
-                sortStatResultPropertyName, sortDirection, sortComparer ) );
+              sortInfos.Add( new GroupSortComparer.SortInfo( sortStatResultPropertyName, sortDirection, sortComparer ) );
             }
           }
 
-          if( string.Equals( groupName, sortDescriptionPropertyName ) )
+          if( string.Equals( groupDescriptionName, sortDescriptionName ) )
           {
-            sortInfos.Add( this.CreateDefaultGroupSortInfo(
-              groupDescription, itemProperty, sortDirection, true ) );
-
-            defaultGroupSortAdded = true;
+            sortInfos.Add( this.CreateDefaultGroupSortInfo( groupDescription, itemProperty, sortDirection ) );
           }
         }
 
-        if( !defaultGroupSortAdded )
-        {
-          GroupSortComparer.SortInfo sortInfo = this.CreateDefaultGroupSortInfo(
-            groupDescription, itemProperties[ groupName ], sortDirection, false );
-
-          if( sortInfo != null )
-          {
-            sortInfos.Add( sortInfo );
-          }
-        }
-
-        sortComparers[ j ] = new GroupSortComparer( sortInfos );
+        m_groupSortComparers.Add( new GroupSortComparer( sortInfos ) );
       }
 
-      return sortComparers;
+      return m_groupSortComparers;
     }
 
-    private GroupSortComparer.SortInfo CreateDefaultGroupSortInfo(
-      GroupDescription groupDescription,
-      DataGridItemPropertyBase itemProperty,
-      ListSortDirection sortDirection,
-      bool useDefaultComparer )
+    private GroupSortComparer.SortInfo CreateDefaultGroupSortInfo( GroupDescription groupDescription, DataGridItemPropertyBase itemProperty, ListSortDirection sortDirection )
     {
       DataGridGroupDescription dataGridGroupDescription = groupDescription as DataGridGroupDescription;
       IComparer sortComparer = null;
 
       if( dataGridGroupDescription != null )
+      {
         sortComparer = dataGridGroupDescription.SortComparer;
+      }
 
       if( ( sortComparer == null ) && ( itemProperty != null ) )
       {
         sortComparer = itemProperty.SortComparer;
       }
 
-      if( ( sortComparer == null ) && ( useDefaultComparer ) )
+      if( sortComparer == null )
       {
         sortComparer = ObjectComparer.Singleton;
       }
-
-      if( sortComparer == null )
-        return null;
 
       return new GroupSortComparer.SortInfo( null, sortDirection, sortComparer );
     }
@@ -2068,8 +2291,7 @@ namespace Xceed.Wpf.DataGrid
     {
       this.AdjustCurrencyAfterReset( oldCurrentRawItem, oldCurrentPosition, false );
 
-      this.OnCollectionChanged( new NotifyCollectionChangedEventArgs(
-        NotifyCollectionChangedAction.Reset ) );
+      this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
     }
 
     private void TriggerRootGroupChanged()
@@ -2077,9 +2299,11 @@ namespace Xceed.Wpf.DataGrid
       // All the groups will be recreated. No need to trigger the StatFunctions PropertyChanged.
       this.DeferredOperationManager.ClearInvalidatedGroups();
 
-      // The previous GroupItems or SortItems have changed RootGroup but have not
-      // send the RootGroupChanged event. Do it here.
+      // The previous GroupItems or SortItems have changed RootGroup but have not send the RootGroupChanged event. Do it here.
       this.OnRootGroupChanged( EventArgs.Empty );
+
+      //Flag that the Collection of groups itself has changed.
+      this.OnPropertyChanged( new PropertyChangedEventArgs( "Groups" ) );
     }
 
     private DataGridCollectionViewGroup GetRawItemNewGroup( RawItem rawItem )
@@ -2091,14 +2315,16 @@ namespace Xceed.Wpf.DataGrid
         return this.RootGroup;
 
       CultureInfo culture = this.Culture;
-      GroupSortComparer[] sortComparers = this.GetGroupSortComparers();
+      List<GroupSortComparer> sortComparers = this.GetGroupSortComparers();
 
       for( int i = 0; i < groupDescriptionCount; i++ )
       {
         DataGridGroupDescription groupDescription = groupDescriptions[ i ] as DataGridGroupDescription;
 
         if( groupDescription != null )
+        {
           groupDescription.SetContext( this );
+        }
       }
 
       try
@@ -2119,87 +2345,21 @@ namespace Xceed.Wpf.DataGrid
           DataGridGroupDescription groupDescription = groupDescriptions[ i ] as DataGridGroupDescription;
 
           if( groupDescription != null )
+          {
             groupDescription.SetContext( null );
+          }
         }
       }
     }
 
     private void AddRawItemDataItemMapping( RawItem rawItem )
     {
-      object dataItem = rawItem.DataItem;
-
-      object cached;
-      if( m_dataItemToRawItemList.TryGetValue( dataItem, out cached ) )
-      {
-        // rawItems will either be a RawItem or an array of RawItem.
-        // For sure, after this, we will have an array of RawItem.
-        RawItem temp = cached as RawItem;
-        RawItem[] rawItems;
-
-        if( temp != null )
-        {
-          System.Diagnostics.Debug.Assert( rawItem != temp, "It's not normal to be called twice for the same RawItem." );
-
-          // We need to convert the entry to an array.
-          rawItems = new RawItem[ 2 ] { temp, rawItem };
-        }
-        else
-        {
-          rawItems = ( RawItem[] )cached;
-
-          int count = rawItems.Length;
-          for( int i = 0; i < count; i++ )
-          {
-            if( rawItems[ i ] == rawItem )
-            {
-              System.Diagnostics.Debug.Fail( "It's not normal to be called twice for the same RawItem." );
-              return;
-            }
-          }
-
-          // Resize the array and add the new RawItem into it.
-          Array.Resize<RawItem>( ref rawItems, rawItems.Length + 1 );
-          rawItems[ rawItems.Length - 1 ] = rawItem;
-        }
-
-        m_dataItemToRawItemList[ dataItem ] = rawItems;
-      }
-      else
-      {
-        // This is the first time that we are adding a map for this
-        // data item. No need for an array here.
-        m_dataItemToRawItemList.Add( dataItem, rawItem );
-      }
+      m_dataItemToRawItemMap.Add( rawItem.DataItem, rawItem );
     }
 
     private void RemoveRawItemDataItemMapping( RawItem rawItem )
     {
-      object dataItem = rawItem.DataItem;
-
-      object cached;
-      if( m_dataItemToRawItemList.TryGetValue( dataItem, out cached ) )
-      {
-        RawItem temp = cached as RawItem;
-        if( temp != null )
-        {
-          // We only had one RawItem for the data item.
-          // Simply remove the cached entry.
-          m_dataItemToRawItemList.Remove( dataItem );
-        }
-        else
-        {
-          // Remove the RawItem from the mapping.
-          List<RawItem> rawItemList = new List<RawItem>( ( RawItem[] )cached );
-          if( rawItemList.Remove( rawItem ) )
-          {
-            // If there is only one RawItem left in the list,
-            // we convert the list to store only the RawItem.
-            m_dataItemToRawItemList[ dataItem ] = ( rawItemList.Count == 1 )
-              ? ( object )rawItemList[ 0 ]
-              : rawItemList.ToArray();
-          }
-        }
-      }
+      m_dataItemToRawItemMap.Remove( rawItem.DataItem, rawItem );
     }
 
     private void SaveCurrentBeforeReset( out RawItem oldCurrentRawItem, out int oldCurrentPosition )
@@ -2215,8 +2375,7 @@ namespace Xceed.Wpf.DataGrid
         oldCurrentPosition = this.CurrentPosition;
       }
 
-      oldCurrentRawItem = ( oldCurrentPosition < 0 ) || ( oldCurrentPosition == int.MaxValue ) ?
-        null : this.RootGroup.GetRawItemAtGlobalSortedIndex( oldCurrentPosition );
+      oldCurrentRawItem = ( oldCurrentPosition < 0 ) || ( oldCurrentPosition == int.MaxValue ) ? null : this.RootGroup.GetRawItemAtGlobalSortedIndex( oldCurrentPosition );
     }
 
     private void AdjustCurrencyAfterReset( RawItem oldCurrentRawItem, int oldCurrentPosition, bool itemsChanged )
@@ -2251,10 +2410,7 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        this.SetCurrentItem(
-          oldCurrentRawItem.GetGlobalSortedIndex(),
-          oldCurrentRawItem.DataItem,
-          false, false );
+        this.SetCurrentItem( oldCurrentRawItem.GetGlobalSortedIndex(), oldCurrentRawItem.DataItem, false, false );
       }
     }
 
@@ -2337,10 +2493,7 @@ namespace Xceed.Wpf.DataGrid
         }
         else
         {
-          this.SetCurrentItem(
-            index,
-            rootGroup.GetRawItemAtGlobalSortedIndex( index + 1 ).DataItem,
-            false, true );
+          this.SetCurrentItem( index, rootGroup.GetRawItemAtGlobalSortedIndex( index + 1 ).DataItem, false, true );
         }
       }
     }
@@ -2348,7 +2501,9 @@ namespace Xceed.Wpf.DataGrid
     private void AdjustCurrencyBeforeReplace( int index, object newItem )
     {
       if( index == this.CurrentPosition )
+      {
         this.SetCurrentItem( index, newItem, false, false );
+      }
     }
 
     #region ICancelAddNew Members
@@ -2384,7 +2539,9 @@ namespace Xceed.Wpf.DataGrid
     private void OnInitialized( EventArgs e )
     {
       if( this.Initialized != null )
+      {
         this.Initialized( this, e );
+      }
     }
 
     bool ISupportInitializeNotification.IsInitialized
@@ -2413,7 +2570,9 @@ namespace Xceed.Wpf.DataGrid
     void ISupportInitialize.EndInit()
     {
       if( m_batchInitializationCount > 0 )
+      {
         m_batchInitializationCount--;
+      }
 
       if( m_batchInitializationCount == 0 )
       {
@@ -2699,8 +2858,8 @@ namespace Xceed.Wpf.DataGrid
     #endregion IEnumerable Members
 
     private static RawItemIndexComparer m_rawItemIndexComparer;
-
     private RawItemSortComparer m_rawItemSortComparer;
+    private List<GroupSortComparer> m_groupSortComparers = new List<GroupSortComparer>();
 
     private int m_lastAddCount;
     private int m_lastAddIndex;
@@ -2710,12 +2869,14 @@ namespace Xceed.Wpf.DataGrid
 
     private List<RawItem> m_sourceItemList;
     private List<RawItem> m_filteredItemList;
-    private Dictionary<object, object> m_dataItemToRawItemList;
+    private readonly RawItemMap m_dataItemToRawItemMap = new RawItemMap();
 
     private PropertyDescriptorCollection m_statisticalProperties;
     private List<WeakReference> m_tempStatFunctions = new List<WeakReference>();
+    private bool m_hasGroupSortBasedOnStats;
 
     private int m_sortedItemVersion;
+    private DataGridCollectionView m_currentChildCollectionView;
 
     #region Private Class StatFunctionPropertyDescriptor
 
@@ -2813,5 +2974,6 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion
+
   }
 }

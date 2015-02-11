@@ -15,18 +15,28 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
-  [AttributeUsage( AttributeTargets.Field )] // Applies only to the fields that store the DependencyProperties
+  [AttributeUsage( AttributeTargets.Field, AllowMultiple = false )] // Applies only to the fields that store the DependencyProperties
   public sealed class ViewPropertyAttribute : Attribute
   {
+    #region Constructors
+
     public ViewPropertyAttribute( ViewPropertyMode viewPropertyMode )
+      : this( viewPropertyMode, FlattenDetailBindingMode.Default )
+    {
+    }
+
+    internal ViewPropertyAttribute( ViewPropertyMode viewPropertyMode, FlattenDetailBindingMode flattenDetailBindingMode )
     {
       m_viewPropertyMode = viewPropertyMode;
+      m_flattenDetailBindingMode = flattenDetailBindingMode;
     }
+
+    #endregion
+
+    #region ViewPropertyMode Property
 
     public ViewPropertyMode ViewPropertyMode
     {
@@ -35,6 +45,23 @@ namespace Xceed.Wpf.DataGrid.Views
         return m_viewPropertyMode;
       }
     }
-    private ViewPropertyMode m_viewPropertyMode = ViewPropertyMode.None;
+
+    private readonly ViewPropertyMode m_viewPropertyMode = ViewPropertyMode.None;
+
+    #endregion
+
+    #region FlattenDetailBindingMode Internal Property
+
+    internal FlattenDetailBindingMode FlattenDetailBindingMode
+    {
+      get
+      {
+        return m_flattenDetailBindingMode;
+      }
+    }
+
+    private readonly FlattenDetailBindingMode m_flattenDetailBindingMode = FlattenDetailBindingMode.Default;
+
+    #endregion
   }
 }

@@ -28,13 +28,7 @@ namespace Xceed.Wpf.DataGrid
 {
   internal class ForeignKeyContentControl : ContentControl
   {
-    #region Static Members
-
     private static readonly Binding BindingToValue;
-
-    #endregion
-
-    #region Constructors
 
     static ForeignKeyContentControl()
     {
@@ -55,8 +49,6 @@ namespace Xceed.Wpf.DataGrid
       // ID and ForeignKey
       this.Focusable = false;
     }
-
-    #endregion
 
     #region ForeignKeyConfiguration Property
 
@@ -154,13 +146,11 @@ namespace Xceed.Wpf.DataGrid
 
       if( contentControl != null )
       {
-        contentControl.NotifyKeyChanged();
+        contentControl.NotifyValueChanged();
       }
     }
 
     #endregion
-
-    #region Protected Methods
 
     protected void NotifyKeyChanged()
     {
@@ -196,10 +186,6 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion
-
-    #region Private Methods
-
     private void OnKeyChanged()
     {
       ForeignKeyConfiguration configuration = this.ForeignKeyConfiguration;
@@ -220,7 +206,7 @@ namespace Xceed.Wpf.DataGrid
 
       if( ( configuration != null ) && ( configuration.ForeignKeyConverter != null ) )
       {
-        this.Key = configuration.ForeignKeyConverter.GetValueFromKey( this.Value, configuration );
+        this.Key = configuration.ForeignKeyConverter.GetKeyFromValue( this.Value, configuration );
       }
       else
       {
@@ -228,12 +214,6 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion
-
-    #region Private Fields
-
     private bool m_isBeingModified; // = false;
-
-    #endregion
   }
 }

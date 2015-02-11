@@ -79,6 +79,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       return null;
     }
+
+
+
     protected virtual int ComputeDisplayOrder( bool isPropertyGridCategorized )
     {
       return int.MaxValue;
@@ -241,6 +244,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
               ? attribute.Types 
               : null;
     }
+
+
+
+
 
     internal object ComputeDisplayOrderForItem( object item )
     {
@@ -407,6 +414,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       get { return _displayName; }
       internal set { _displayName = value; }
     }
+
+
+
     public string Description
     {
       get { return _description; }

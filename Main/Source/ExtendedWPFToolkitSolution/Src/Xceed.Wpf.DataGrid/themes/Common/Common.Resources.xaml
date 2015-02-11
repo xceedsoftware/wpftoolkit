@@ -21,6 +21,8 @@
                     xmlns:views="clr-namespace:Xceed.Wpf.DataGrid.Views"
                     xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase">
 
+    <cnv:StringFormatMultiConverter x:Key="stringFormatMultiConverter" />
+
    <!-- Style applied to the Thumbs that are used to resize the columns and rows.
         The Thumb's template is an empty Grid with a Transparent background to
         make it hit-testable. -->
@@ -92,12 +94,19 @@
 
          <TextBlock Text=": "
                     VerticalAlignment="Center" />
-         <ContentPresenter Content="{Binding Value}"
-                           ContentTemplate="{Binding RelativeSource={RelativeSource TemplatedParent},Path=DataContext.ValueTemplate}"
-                           ContentTemplateSelector="{Binding RelativeSource={RelativeSource TemplatedParent},Path=DataContext.ValueTemplateSelector}"
-                           VerticalAlignment="Center" />
+            <ContentPresenter ContentTemplate="{Binding RelativeSource={RelativeSource TemplatedParent},Path=DataContext.ValueTemplate}"
+                              ContentTemplateSelector="{Binding RelativeSource={RelativeSource TemplatedParent},Path=DataContext.ValueTemplateSelector}"
+                              VerticalAlignment="Center">
+                <ContentPresenter.Content>
+                   <MultiBinding Converter="{StaticResource stringFormatMultiConverter}">
+                        <Binding Path="Value" />
+                        <Binding Path="DataContext.ValueStringFormat" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="DataContext.ValueStringFormatCulture" RelativeSource="{RelativeSource TemplatedParent}" />
+                   </MultiBinding>
+                </ContentPresenter.Content>
+            </ContentPresenter>
 
-         <TextBlock Text=" ("
+            <TextBlock Text=" ("
                     VerticalAlignment="Center" />
          <TextBlock Text="{Binding ItemCount}"
                     VerticalAlignment="Center" />
@@ -126,14 +135,23 @@
          <DataTemplate x:Key="detailedGroupItemContentTemplate">
             <StackPanel Orientation="Horizontal"
                         VerticalAlignment="Center">
+                    <ContentControl ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplate}"
+                                    ContentTemplateSelector="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplateSelector}"
+                                    TextBlock.FontWeight="Bold"
+                                    VerticalAlignment="Center">
+                        <ContentControl.Content>
+                     <MultiBinding Converter="{StaticResource stringFormatMultiConverter}">
+                                <Binding Path="(local:GroupNavigationControl.Group).Value"
+                                         RelativeSource="{RelativeSource Self}"/>
+                                <Binding Path="(local:GroupNavigationControl.Group).ValueStringFormat"
+                                         RelativeSource="{RelativeSource Self}" />
+                                <Binding Path="(local:GroupNavigationControl.Group).ValueStringFormatCulture"
+                                         RelativeSource="{RelativeSource Self}" />
+                           </MultiBinding>
+                        </ContentControl.Content>
+                    </ContentControl>
 
-               <ContentControl Content="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).Value}"
-                               ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplate}"
-                               ContentTemplateSelector="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplateSelector}"
-                               TextBlock.FontWeight="Bold"
-                               VerticalAlignment="Center" />
-
-               <TextBlock Text=" ("
+                    <TextBlock Text=" ("
                           VerticalAlignment="Center" />
                <TextBlock Text="{Binding ItemCount}"
                           VerticalAlignment="Center" />
@@ -158,10 +176,20 @@
          </DataTemplate>
 
          <DataTemplate x:Key="groupItemContentTemplate">
-            <ContentControl Content="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).Value}"
-                            ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplate}"
-                            ContentTemplateSelector="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplateSelector}" />
-         </DataTemplate>
+                <ContentControl ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplate}"
+                                ContentTemplateSelector="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplateSelector}">
+                    <ContentControl.Content>
+                  <MultiBinding Converter="{StaticResource stringFormatMultiConverter}">
+                            <Binding Path="(local:GroupNavigationControl.Group).Value" 
+                                     RelativeSource="{RelativeSource Self}" />
+                            <Binding Path="(local:GroupNavigationControl.Group).ValueStringFormat"
+                                     RelativeSource="{RelativeSource Self}" />
+                            <Binding Path="(local:GroupNavigationControl.Group).ValueStringFormatCulture"
+                                     RelativeSource="{RelativeSource Self}" />
+                        </MultiBinding>
+                    </ContentControl.Content>
+                </ContentControl>
+            </DataTemplate>
 
          <DataTemplate x:Key="parentGroupTemplate">
             <local:GroupNavigationControl Group="{Binding}"
@@ -225,7 +253,7 @@
 
    <cnv:EmptyStringToBooleanConverter x:Key="emptyStringToBooleanConverter" />
 
-   <cnv:DefaultDataConverter x:Key="defaultDataConverter" />
+   <cnv:SourceDataConverter x:Key="sourceDataConverter" />
 
    <Thickness x:Key="cellPadding"
               Left="2"
@@ -236,6 +264,30 @@
    <!--**************************
    * Style: ListBoxItem Style (AutoFilter Options)
    **************************-->
+   <Style x:Key="defaultAutoFilteringCheckBoxItemStyle"
+          TargetType="ListBoxItem">
+      <Setter Property="Template">
+         <Setter.Value>
+            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+
+               <Border Background="{TemplateBinding Background}"
+                       BorderBrush="{TemplateBinding BorderBrush}"
+                       BorderThickness="{TemplateBinding BorderThickness}">
+
+                  <CheckBox Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                            Focusable="False"
+                            TextElement.Foreground="{TemplateBinding Foreground}"
+                            IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent},Path=IsSelected, Mode=TwoWay}"
+                            Margin="2,2,2,2"
+                            AutomationProperties.AutomationId="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource sourceDataConverter}}" />
+               </Border>
+
+            </ControlTemplate>
+         </Setter.Value>
+      </Setter>
+   </Style>
 
    <DataTemplate x:Key="connectionStateLoadingGlyph">
       <DataTemplate.Resources>

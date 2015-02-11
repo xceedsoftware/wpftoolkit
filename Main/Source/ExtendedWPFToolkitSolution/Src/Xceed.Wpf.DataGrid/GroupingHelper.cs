@@ -14,15 +14,12 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
-using Xceed.Utils.Wpf;
 using System.Windows.Data;
+using Xceed.Utils.Wpf;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -178,46 +175,38 @@ namespace Xceed.Wpf.DataGrid
       if( cell == null )
         return;
 
-      DataGridContext cellDataGridContext = DataGridControl.GetDataGridContext( cell );
-      DataGridControl cellParentGrid = cellDataGridContext.DataGridControl;
-
-      if( ( cellDataGridContext == null ) ||
-          ( parentDataGridControl == null ) ||
-          ( parentDataGridControl != cellParentGrid ) )
-        return;
-
-      // By default, add it at the end
-      int newPos = cellDataGridContext.GroupLevelDescriptions.Count;
-
-      if( draggedOverDescription != null )
-        newPos = GroupingHelper.GetGroupDescriptionIndexFromFieldName( cellDataGridContext, draggedOverDescription.FieldName, alignment );
-
+      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( cell );
       ColumnBase column = cell.ParentColumn;
 
-      if( column != null )
+      if( ( dataGridContext == null ) ||
+          ( parentDataGridControl == null ) ||
+          ( column == null ) ||
+          ( parentDataGridControl != dataGridContext.DataGridControl ) )
+        return;
+
+      var addGroupCommand = dataGridContext.AddGroupCommand;
+
+      if( draggedOverDescription != null )
       {
-        GroupingHelper.AddNewGroupFromColumn( column, cellDataGridContext.Items.GroupDescriptions, newPos );
+        var position = GroupingHelper.GetGroupDescriptionIndexFromFieldName( dataGridContext, draggedOverDescription.FieldName, alignment );
+
+        if( addGroupCommand.CanExecute( column, position ) )
+        {
+          addGroupCommand.Execute( column, position );
+        }
+      }
+      else
+      {
+        if( addGroupCommand.CanExecute( column ) )
+        {
+          addGroupCommand.Execute( column );
+        }
       }
     }
 
     public static void AppendNewGroupFromColumnManagerCell( ColumnManagerCell cell, DataGridControl parentDataGridControl )
     {
       GroupingHelper.AddNewGroupFromColumnManagerCell( cell, null, DropMarkAlignment.Far, parentDataGridControl );
-    }
-
-    public static void AddNewGroupFromColumn( ColumnBase column, ObservableCollection<GroupDescription> targetGroupDescriptions, int position )
-    {
-      GroupDescription groupDescription = column.GroupDescription;
-
-      if( groupDescription == null )
-        groupDescription = new DataGridGroupDescription( column.FieldName );
-
-      DataGridGroupDescription dataGridGroupDescription = groupDescription as DataGridGroupDescription;
-
-      if( ( dataGridGroupDescription != null ) && ( dataGridGroupDescription.GroupConfiguration == null ) )
-        dataGridGroupDescription.GroupConfiguration = column.GroupConfiguration;
-
-      targetGroupDescriptions.Insert( position, groupDescription );
     }
 
     public static void MoveGroupDescription( ColumnCollection targetColumns, ObservableCollection<GroupDescription> targetGroupDescriptions, GroupLevelDescription targetGroupLevelDescription, DropMarkAlignment targetAlignment, GroupLevelDescription movedGroupLevelDescription, DataGridControl parentDataGridControl )
@@ -238,13 +227,18 @@ namespace Xceed.Wpf.DataGrid
       int newPos = GroupingHelper.GetGroupDescriptionIndex( targetGroupDescriptions, targetGroupLevelDescription, targetAlignment );
 
       if( newPos > oldPos )
+      {
         newPos--;
+      }
 
       if( newPos != oldPos )
       {
         Debug.Assert( oldPos < targetGroupDescriptions.Count );
 
-        targetGroupDescriptions.Move( oldPos, newPos );
+        using( parentDataGridControl.SetQueueBringIntoViewRestrictions( AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged ) )
+        {
+          targetGroupDescriptions.Move( oldPos, newPos );
+        }
       }
     }
 
@@ -254,7 +248,10 @@ namespace Xceed.Wpf.DataGrid
           ( parentDataGridControl == null ) )
         return;
 
-      groupDescriptions.Remove( groupLevelDescription.GroupDescription );
+      using( parentDataGridControl.SetQueueBringIntoViewRestrictions( AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged ) )
+      {
+        groupDescriptions.Remove( groupLevelDescription.GroupDescription );
+      }
     }
 
     public static bool ValidateMaxGroupDescriptions( DataGridContext draggedContext )

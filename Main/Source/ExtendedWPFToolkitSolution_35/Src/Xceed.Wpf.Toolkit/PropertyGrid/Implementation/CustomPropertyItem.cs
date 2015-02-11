@@ -34,6 +34,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
   {
     internal CustomPropertyItem() { }
 
+    internal CustomPropertyItem( bool isPropertyGridCategorized )
+    {
+      _isPropertyGridCategorized = isPropertyGridCategorized;
+    }
+
     #region Category
 
     public static readonly DependencyProperty CategoryProperty =

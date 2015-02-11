@@ -34,10 +34,10 @@ namespace Xceed.Wpf.DataGrid
     public SelectionChanger( DataGridContext owner )
     {
       m_owner = owner;
-      m_itemsToSelect = new SelectedItemsStorage( owner, 2 );
-      m_itemsToUnselect = new SelectedItemsStorage( owner, 2 );
-      m_cellsToSelect = new SelectedCellsStorage( owner, 2 );
-      m_cellsToUnselect = new SelectedCellsStorage( owner, 2 );
+      m_itemsToSelect = new SelectedItemsStorage( owner );
+      m_itemsToUnselect = new SelectedItemsStorage( owner );
+      m_cellsToSelect = new SelectedCellsStorage( owner );
+      m_cellsToUnselect = new SelectedCellsStorage( owner );
       m_toDeferSelect = new List<object>( 1 );
       m_sourceChanges = new List<SourceChangeInfo>( 2 );
     }
@@ -102,7 +102,7 @@ namespace Xceed.Wpf.DataGrid
       {
         bool selectionChanged = m_itemsToUnselect.Remove( rangeWithItems );
 
-        SelectedItemsStorage tempStorage = new SelectedItemsStorage( m_owner, 8 );
+        SelectedItemsStorage tempStorage = new SelectedItemsStorage( m_owner );
         tempStorage.Add( rangeWithItems );
 
         // Remove the currently selected item from the new range to select
@@ -157,7 +157,7 @@ namespace Xceed.Wpf.DataGrid
       {
         bool selectionChanged = m_cellsToUnselect.Remove( cellRangeWithItems );
 
-        SelectedCellsStorage tempStorage = new SelectedCellsStorage( m_owner, 8 );
+        SelectedCellsStorage tempStorage = new SelectedCellsStorage( m_owner );
         tempStorage.Add( cellRangeWithItems );
 
         // Remove the currently selected item from the new range to select
@@ -285,7 +285,7 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        SelectedItemsStorage tempStorage = new SelectedItemsStorage( m_owner, 8 );
+        SelectedItemsStorage tempStorage = new SelectedItemsStorage( m_owner );
         tempStorage.Add( rangeWithItems );
 
         // Remove the currently selected item from the new range to select
@@ -413,7 +413,7 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        SelectedCellsStorage tempStorage = new SelectedCellsStorage( m_owner, 8 );
+        SelectedCellsStorage tempStorage = new SelectedCellsStorage( m_owner );
         tempStorage.Add( cellRangeWithItems );
 
         // Remove the currently selected item from the new range to select
@@ -550,7 +550,7 @@ namespace Xceed.Wpf.DataGrid
 
       // Remove all currently selected Cells from the new selectionRange
       // to avoid duplicate SelectionCellRange
-      SelectedCellsStorage tempStorage = new SelectedCellsStorage( null, 1 );
+      SelectedCellsStorage tempStorage = new SelectedCellsStorage( null );
       tempStorage.Add( rangeWithItemsToSelect );
 
       for( int i = 0; i < selectedCellsInChange.Count; i++ )
@@ -598,7 +598,7 @@ namespace Xceed.Wpf.DataGrid
         {
           foreach( SelectionCellRangeWithItems selectedCellRangeWithItems in selectedCellsInChange )
           {
-            tempStorage = new SelectedCellsStorage( null, 1 );
+            tempStorage = new SelectedCellsStorage( null );
             tempStorage.Add( selectedCellRangeWithItems );
             tempStorage.Remove( rangeWithItemsToSelect );
             tempStorageCount = tempStorage.Count;
@@ -1012,8 +1012,8 @@ namespace Xceed.Wpf.DataGrid
       List<SelectionCellRangeWithItems> removedCellsRangeWithItems;
       List<SelectionCellRangeWithItems> unselectedCellsFromRemove = this.GetUnselectedCellsFromRemove( out removedCellsRangeWithItems );
 
-      SelectedItemsStorage itemsToUnselect = new SelectedItemsStorage( m_itemsToUnselect );
-      SelectedCellsStorage cellsToUnselect = new SelectedCellsStorage( m_cellsToUnselect );
+      SelectedItemsStorage itemsToUnselect = ( SelectedItemsStorage )m_itemsToUnselect.Clone();
+      SelectedCellsStorage cellsToUnselect = ( SelectedCellsStorage )m_cellsToUnselect.Clone();
 
       foreach( SelectionRangeWithItems rangeWithItems in unselectedItemsFromRemove )
       {
@@ -1026,8 +1026,8 @@ namespace Xceed.Wpf.DataGrid
       }
 
       return new SelectionInfo(
-        m_owner, itemsToUnselect, new SelectedItemsStorage( m_itemsToSelect ),
-        cellsToUnselect, new SelectedCellsStorage( m_cellsToSelect ) );
+        m_owner, itemsToUnselect, ( SelectedItemsStorage )m_itemsToSelect.Clone(),
+        cellsToUnselect, ( SelectedCellsStorage )m_cellsToSelect.Clone() );
     }
 
     #endregion PUBLIC METHODS
@@ -1093,7 +1093,7 @@ namespace Xceed.Wpf.DataGrid
 
         removedCellsRangeWithItems.Add( cellRangeWithItemsToRemove );
 
-        List<SelectionCellRangeWithItems> intersectedCellRangesWithItems =
+        IEnumerable<SelectionCellRangeWithItems> intersectedCellRangesWithItems =
           m_owner.SelectedCellsStore.GetIntersectedCellRangesWithItems( cellRangeWithItemsToRemove.CellRange );
 
         foreach( SelectionCellRangeWithItems cellRangeWithItems in intersectedCellRangesWithItems )

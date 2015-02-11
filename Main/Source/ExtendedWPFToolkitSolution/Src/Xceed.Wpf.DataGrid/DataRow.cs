@@ -15,17 +15,15 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Data;
-using Xceed.Wpf.DataGrid.Views;
 using System.Windows.Input;
-using System.Windows.Controls;
-using System.Collections.Specialized;
-using System.Windows.Threading;
 using System.Windows.Media.Animation;
-using System.Collections.Generic;
+using System.Windows.Threading;
+using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -152,6 +150,36 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion TitleBarContent Private Property
 
+    protected override void OnMouseEnter( MouseEventArgs e )
+    {
+      base.OnMouseEnter( e );
+
+      //If the current CellEditorDisplayConditions requires display when mouse is over the Row 
+      if( Row.IsCellEditorDisplayConditionsSet( this, CellEditorDisplayConditions.MouseOverRow ) )
+      {
+        //Display the editors for the Row
+        this.SetDisplayEditorMatchingCondition( CellEditorDisplayConditions.MouseOverRow );
+      }
+
+      // In case a value was explicitly specified on the Cell's ParentColumn
+      this.RefreshCellsDisplayedTemplate();
+    }
+
+    protected override void OnMouseLeave( MouseEventArgs e )
+    {
+      base.OnMouseLeave( e );
+
+      //If the current CellEditorDisplayConditions requires display when mouse is over the Row 
+      if( Row.IsCellEditorDisplayConditionsSet( this, CellEditorDisplayConditions.MouseOverRow ) )
+      {
+        //Display the editors for the Row
+        this.RemoveDisplayEditorMatchingCondition( CellEditorDisplayConditions.MouseOverRow );
+      }
+
+      // In case a value was explicitly specified on the Cell's ParentColumn
+      this.RefreshCellsDisplayedTemplate();
+    }
+
     protected override void SetDataContext( object item )
     {
       DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
@@ -174,10 +202,10 @@ namespace Xceed.Wpf.DataGrid
 
         Debug.Assert( m_affectDataContextOperation == null );
 
-        // Dispatch a call to SetRealDataItem that will update
-        // the DataContext of the Row and every CreatedCells
-        // to the DataItem the Row must display. We use a Background priority
-        // to limit the impact on scrolling.
+        // Dispatch a call to SetDataContextDispatched that will update
+        // the DataContext of the Row and every CreatedCells to the
+        // DataItem the Row must display. We use a low priority to limit
+        // the impact on scrolling.
         m_affectDataContextOperation = this.Dispatcher.BeginInvoke(
           new Action<object>( this.SetDataContextDispatched ), DispatcherPriority.Background, item );
       }
@@ -327,7 +355,7 @@ namespace Xceed.Wpf.DataGrid
       base.PreEditCanceled();
     }
 
-    protected internal override void PrepareContainer( DataGridContext dataGridContext, object item )
+    protected override void PrepareContainer( DataGridContext dataGridContext, object item )
     {
       base.PrepareContainer( dataGridContext, item );
 
@@ -339,7 +367,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    protected internal override void ClearContainer()
+    protected override void ClearContainer()
     {
       if( m_affectDataContextOperation != null )
       {
@@ -368,7 +396,7 @@ namespace Xceed.Wpf.DataGrid
     protected override Cell CreateCell( ColumnBase column )
     {
       if( column == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "Column is null.", DataGridControl.GetDataGridContext( this ).DataGridControl );
 
       return new DataCell();
     }
@@ -503,22 +531,14 @@ namespace Xceed.Wpf.DataGrid
       {
         Xceed.Wpf.DataGrid.Views.ViewBase view = dataGridContext.DataGridControl.GetView();
 
-        if( ( view is TableView )
-          || ( view is TableflowView ) )
-        {
+        if( ( view is TableView ) || ( view is TableflowView ) )
           return;
-        }
 
         Column headerColumn = dataGridContext.Columns.MainColumn as Column;
 
         if( headerColumn != null )
         {
-          // Disable warning for DisplayMemberBinding when internaly used
-#pragma warning disable 618
-
-          BindingBase displayMemberBinding = headerColumn.DisplayMemberBinding;
-
-#pragma warning restore 618
+          BindingBase displayMemberBinding = headerColumn.GetDisplayMemberBinding();
 
           if( displayMemberBinding == null )
           {
@@ -529,9 +549,7 @@ namespace Xceed.Wpf.DataGrid
             ItemsSourceHelper.FieldDescriptor fieldDescriptor;
             dataGridContext.ItemsSourceFieldDescriptors.TryGetValue( name, out fieldDescriptor );
 
-            displayMemberBinding = ItemsSourceHelper.CreateDefaultBinding(
-              this.DataContext is DataRow, name, fieldDescriptor,
-              false, true, typeof( object ) );
+            displayMemberBinding = ItemsSourceHelper.CreateDefaultBinding( this.DataContext is DataRow, name, fieldDescriptor, headerColumn, true, typeof( object ) );
 
           }
 
@@ -607,7 +625,7 @@ namespace Xceed.Wpf.DataGrid
         this.ApplyAnimationClock( Row.CellContentOpacityProperty, null );
         this.SetValue( Row.CellContentOpacityProperty, 0d );
       }
-      else 
+      else
       {
         m_fadeInAnimation.From = 0d;
         m_fadeInAnimation.To = 1d;

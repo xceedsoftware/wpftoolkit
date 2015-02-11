@@ -56,11 +56,10 @@ namespace Xceed.Wpf.DataGrid
 
       ListSortDirection sortDirection = ListSortDirection.Ascending;
       int result;
-      int sortInfoCount = m_sortInfos.Count;
 
-      for( int i = 0; i < sortInfoCount; i++ )
+      foreach( SortInfo sortInfo in m_sortInfos )
+      //for( int i = 0; i < sortInfoCount; i++ )
       {
-        SortInfo sortInfo = m_sortInfos[ i ];
         string statResultPropertyName = sortInfo.StatResultPropertyName;
         IComparer sortComparer = sortInfo.SortComparer;
         sortDirection = sortInfo.SortDirection;
@@ -97,12 +96,12 @@ namespace Xceed.Wpf.DataGrid
 
     public class SortInfo
     {
-      public SortInfo( string name, ListSortDirection sortDirection, IComparer sortComparer )
+      public SortInfo( string statResultPropertyName, ListSortDirection sortDirection, IComparer sortComparer )
       {
         if( sortComparer == null )
           throw new ArgumentNullException( "sortComparer" );
 
-        this.StatResultPropertyName = name;
+        this.StatResultPropertyName = statResultPropertyName;
         this.SortDirection = sortDirection;
         this.SortComparer = sortComparer;
       }

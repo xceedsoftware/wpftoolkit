@@ -16,21 +16,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls.Primitives;
-using System.Windows.Media;
-using System.Windows.Controls;
-using Xceed.Utils.Math;
-using System.Windows.Threading;
-using System.Diagnostics;
-using System.Windows.Media.Animation;
-using Xceed.Utils.Wpf;
-using System.Windows.Input;
-using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
@@ -334,7 +329,14 @@ namespace Xceed.Wpf.DataGrid.Views
       TableflowViewItemsHost host = ( TableflowViewItemsHost )sender;
 
       host.SetVerticalOffsetCore( ( double )e.NewValue );
-      host.GeneratePage( false, host.AnimatedScrollInfo.ViewportHeight );
+
+      // Do not generate a page while the changed is due to the unloading 
+      // of the grid. See TableflowViewItemsHost.OnParentDataGridControlChanged
+      if( DataGridControl.GetDataGridContext( host ) != null )
+      {
+        host.GeneratePage( false, host.AnimatedScrollInfo.ViewportHeight );
+      }
+
       host.InvalidateArrange();
       host.InvalidateScrollInfo();
     }
@@ -550,8 +552,6 @@ namespace Xceed.Wpf.DataGrid.Views
 
     protected override Size MeasureOverride( Size availableSize )
     {
-      this.InvalidateAutomationPeerChildren();
-
       m_cachedContainerDesiredWidth.Clear();
       m_cachedContainerRealDesiredWidth.Clear();
       m_autoWidthCalculatedDataGridContextList.Clear();
@@ -637,8 +637,8 @@ namespace Xceed.Wpf.DataGrid.Views
         // We invalidate the CellsHostPanel of the row and all is parent to ensure the
         // size is correctly evaluated when we have some auto stretching column.
         container.InvalidateMeasure();
-        Row row = this.ExtractRowFromContainer( container );
 
+        Row row = Row.FromContainer( container );
         if( row != null )
         {
           UIElement itemToInvalidate = row.CellsHostPanel;
@@ -672,40 +672,23 @@ namespace Xceed.Wpf.DataGrid.Views
         m_cachedContainerDesiredWidth.Add( dataGridContextName, desiredSize );
       }
 
-      HeaderFooterItem headerFooterItem = container as HeaderFooterItem;
-
-      if( headerFooterItem != null )
+      PassiveLayoutDecorator decorator = this.GetPassiveLayoutDecorator( container as HeaderFooterItem );
+      if( decorator != null )
       {
-        PassiveLayoutDecorator passiveLayoutDecorator = null;
+        desiredSize = decorator.RealDesiredSize.Width;
 
-        if( VisualTreeHelper.GetChildrenCount( headerFooterItem ) > 0 )
+        if( m_cachedContainerRealDesiredWidth.TryGetValue( dataGridContextName, out cachedSize ) )
         {
-          DependencyObject child = VisualTreeHelper.GetChild( headerFooterItem, 0 );
-          passiveLayoutDecorator = child as PassiveLayoutDecorator;
-
-          if( ( passiveLayoutDecorator == null ) && ( VisualTreeHelper.GetChildrenCount( child ) > 0 ) )
+          // Keep the largest size!
+          if( cachedSize < desiredSize )
           {
-            passiveLayoutDecorator = VisualTreeHelper.GetChild( child, 0 ) as PassiveLayoutDecorator;
+            m_cachedContainerRealDesiredWidth[ dataGridContextName ] = desiredSize;
           }
-
-          if( passiveLayoutDecorator != null )
-          {
-            desiredSize = passiveLayoutDecorator.RealDesiredSize.Width;
-
-            if( m_cachedContainerRealDesiredWidth.TryGetValue( dataGridContextName, out cachedSize ) )
-            {
-              // Keep the largest size!
-              if( cachedSize < desiredSize )
-              {
-                m_cachedContainerRealDesiredWidth[ dataGridContextName ] = desiredSize;
-              }
-            }
-            else
-            {
-              // Cache the size for the context.
-              m_cachedContainerRealDesiredWidth.Add( dataGridContextName, desiredSize );
-            }
-          }
+        }
+        else
+        {
+          // Cache the size for the context.
+          m_cachedContainerRealDesiredWidth.Add( dataGridContextName, desiredSize );
         }
       }
     }
@@ -723,6 +706,22 @@ namespace Xceed.Wpf.DataGrid.Views
       return finalSize;
     }
 
+    private PassiveLayoutDecorator GetPassiveLayoutDecorator( HeaderFooterItem item )
+    {
+      if( ( item == null ) || ( VisualTreeHelper.GetChildrenCount( item ) == 0 ) )
+        return null;
+
+      DependencyObject firstChild = VisualTreeHelper.GetChild( item, 0 );
+      PassiveLayoutDecorator decorator = firstChild as PassiveLayoutDecorator;
+
+      if( ( decorator == null ) && ( VisualTreeHelper.GetChildrenCount( firstChild ) > 0 ) )
+      {
+        decorator = VisualTreeHelper.GetChild( firstChild, 0 ) as PassiveLayoutDecorator;
+      }
+
+      return decorator;
+    }
+
     private void ArrangeContainer( UIElement container, Point translationPoint, bool rowSelectorPaneVisible )
     {
       DataGridContext dataGridContext = DataGridControl.GetDataGridContext( container );
@@ -736,7 +735,9 @@ namespace Xceed.Wpf.DataGrid.Views
       this.SetCompensationOffset( dataGridContext, container, containerSize.Width );
 
       if( rowSelectorPaneVisible )
+      {
         this.SetRowSelector( container, translationPoint, containerSize );
+      }
     }
 
     private double GetContainerWidth( string dataGridContextName )
@@ -825,7 +826,9 @@ namespace Xceed.Wpf.DataGrid.Views
         }
 
         if( desiredWidth > maxDesiredWidth )
+        {
           maxDesiredWidth = desiredWidth;
+        }
       }
 
       return maxDesiredWidth;
@@ -834,24 +837,6 @@ namespace Xceed.Wpf.DataGrid.Views
     #endregion Measure/Arrange Methods
 
     #region Containers Methods
-
-    private Row ExtractRowFromContainer( UIElement container )
-    {
-      Row row = container as Row;
-
-      if( row != null )
-        return row;
-
-      HeaderFooterItem headerFooterItem = container as HeaderFooterItem;
-
-      if( headerFooterItem != null )
-      {
-        // Until the first measure is called, this will always return null.
-        row = HeaderFooterItem.FindIDataGridItemContainerInChildren( headerFooterItem, headerFooterItem.AsVisual() ) as Row;
-      }
-
-      return row;
-    }
 
     private bool ContainerIsRow( UIElement container )
     {
@@ -990,57 +975,52 @@ namespace Xceed.Wpf.DataGrid.Views
       ICustomItemContainerGenerator generator = this.CustomItemContainerGenerator;
 
       // The generator can be null if we're in design mode.
-      if( generator == null )
-        return;
-
-      if( Double.IsInfinity( viewportHeight ) )
-        viewportHeight = this.AnimatedScrollInfo.ExtentHeight;
-
-      // Make sure that container recycling is currently enabled on the generator.
-      generator.IsRecyclingEnabled = true;
-
-      // Calculate the start and end index of the current page.
-      PageIndexes visiblePageIndexes;
-      this.CalculateLayoutedIndexes( m_verticalOffset, viewportHeight, out visiblePageIndexes );
-
-      bool pageChanged = ( m_lastVisiblePageIndexes != visiblePageIndexes );
-      m_lastVisiblePageIndexes = visiblePageIndexes;
-
-      if( measureInvalidated || pageChanged )
+      if( generator != null )
       {
-        // Recycle and layout the containers for the current page.
-        UIElement focusedElement = this.RecycleContainers( generator, visiblePageIndexes.StartIndex, visiblePageIndexes.EndIndex );
-
-        if( m_containerHeight > 0 )
+        if( Double.IsInfinity( viewportHeight ) )
         {
-          this.GenerateContainers( generator, visiblePageIndexes.StartIndex, visiblePageIndexes.EndIndex, measureInvalidated, ref focusedElement );
-          this.GenerateStickyHeaders( generator, measureInvalidated, ref focusedElement );
-          this.GenerateStickyFooters( generator, measureInvalidated, ref focusedElement );
+          viewportHeight = this.AnimatedScrollInfo.ExtentHeight;
         }
 
-        if( focusedElement != null )
+        // Make sure that container recycling is currently enabled on the generator.
+        generator.IsRecyclingEnabled = true;
+
+        // Calculate the start and end index of the current page.
+        PageIndexes visiblePageIndexes;
+        this.CalculateLayoutedIndexes( m_verticalOffset, viewportHeight, out visiblePageIndexes );
+
+        bool pageChanged = ( m_lastVisiblePageIndexes != visiblePageIndexes );
+
+        if( measureInvalidated || pageChanged )
         {
-          int index = generator.GetRealizedIndexForContainer( focusedElement );
+          UIElement focusedElement;
 
-          if( index > -1 )
+          if( m_containerHeight > 0d )
           {
-            if( measureInvalidated )
-            {
-              this.MeasureContainer( focusedElement );
-            }
+            // Recycle the containers we know will not be in the current page.  GenerateContainers will recycle
+            // the remaining containers that were uncertain.
+            focusedElement = this.RecycleSafeContainers( generator, visiblePageIndexes.StartIndex, visiblePageIndexes.EndIndex );
 
-            m_layoutedContainers.Add( new LayoutedContainerInfo( index, focusedElement ) );
-            focusedElement = null;
+            this.GenerateContainers( generator, visiblePageIndexes.StartIndex, visiblePageIndexes.EndIndex, measureInvalidated, ref focusedElement );
+            this.GenerateStickyHeaders( generator, measureInvalidated, ref focusedElement );
+            this.GenerateStickyFooters( generator, measureInvalidated, ref focusedElement );
           }
           else
           {
-            this.RecycleContainer( focusedElement );
-            m_layoutedContainersToRecycle.Add( focusedElement );
+            focusedElement = this.RecycleAllContainers( generator );
+            Debug.Assert( m_layoutedContainers.Count == 0 );
           }
+
+          // Reuse or recycle the focused element's container.
+          this.GenerateFocusedContainer( generator, measureInvalidated, focusedElement );
         }
+
+        m_lastVisiblePageIndexes = visiblePageIndexes;
+
+        this.PreventOpacityAnimation = false;
       }
 
-      this.PreventOpacityAnimation = false;
+      this.InvalidateAutomationPeerChildren();
     }
 
     private UIElement RecycleContainers(
@@ -1050,30 +1030,67 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       UIElement focusedElement = null;
 
-      for( int i = 0; i < m_layoutedContainers.Count; i++ )
+      for( int i = m_layoutedContainers.Count - 1; i >= 0; i-- )
       {
-        LayoutedContainerInfo layoutedContainerInfo = m_layoutedContainers[ i ];
-        UIElement container = layoutedContainerInfo.Container;
-
-        // We do not recycle the focused element!
-        if( container.IsKeyboardFocusWithin )
-        {
-          focusedElement = container;
-          continue;
-        }
+        var container = m_layoutedContainers[ i ].Container;
 
         int index = generator.GetRealizedIndexForContainer( container );
 
         // If the container's index is now out of view, recycle that container.
         if( ( index < pageStartIndex ) || ( index > pageEndIndex ) )
         {
-          this.RecycleContainer( generator, index, container );
-          m_layoutedContainersToRecycle.Add( container );
+          // We do not recycle the focused element!
+          if( container.IsKeyboardFocusWithin )
+          {
+            focusedElement = container;
+          }
+          else
+          {
+            this.RecycleContainer( generator, index, container );
+          }
+
+          m_layoutedContainers.RemoveAt( i );
         }
       }
 
-      m_layoutedContainers.Clear();
       return focusedElement;
+    }
+
+    private UIElement RecycleAllContainers( ICustomItemContainerGenerator generator )
+    {
+      return this.RecycleContainers( generator, -1, -1 );
+    }
+
+    private UIElement RecycleSafeContainers(
+      ICustomItemContainerGenerator generator,
+      int pageStartIndex,
+      int pageEndIndex )
+    {
+      if( m_lastVisiblePageIndexes == PageIndexes.Empty )
+        return this.RecycleContainers( generator, pageStartIndex, pageEndIndex );
+
+      if( m_lastVisiblePageIndexes.StartIndex == pageStartIndex )
+        return this.RecycleContainers( generator,
+                                       pageStartIndex,
+                                       Math.Max( pageEndIndex, m_lastVisiblePageIndexes.EndIndex ) );
+
+      if( m_lastVisiblePageIndexes.EndIndex == pageEndIndex )
+        return this.RecycleContainers( generator,
+                                       Math.Min( pageStartIndex, m_lastVisiblePageIndexes.StartIndex ),
+                                       pageEndIndex );
+
+      int itemCount = generator.ItemCount;
+      int threshold = Math.Max( 0,
+                                ( m_lastVisiblePageIndexes.EndIndex - m_lastVisiblePageIndexes.StartIndex ) -
+                                ( pageEndIndex - pageStartIndex ) );
+
+      int endIndex = Math.Min( pageEndIndex + threshold, itemCount - 1 );
+      if( endIndex < 0 )
+        return this.RecycleAllContainers( generator );
+
+      int startIndex = Math.Max( endIndex - threshold - ( pageEndIndex - pageStartIndex ), 0 );
+
+      return this.RecycleContainers( generator, startIndex, endIndex );
     }
 
     private void RecycleUnusedStickyContainers(
@@ -1090,15 +1107,12 @@ namespace Xceed.Wpf.DataGrid.Views
         if( m_layoutedContainers.ContainsContainer( container ) )
           continue;
 
-        if( ( stickyContainersToExclude != null )
-          && ( stickyContainersToExclude.ContainsContainer( container ) ) )
-        {
+        if( ( stickyContainersToExclude != null ) && ( stickyContainersToExclude.ContainsContainer( container ) ) )
           continue;
-        }
 
         if( container.IsKeyboardFocusWithin )
         {
-          System.Diagnostics.Debug.Assert( ( focusedElement == null ) || ( focusedElement == container ) );
+          Debug.Assert( ( focusedElement == null ) || ( focusedElement == container ) );
           focusedElement = container;
           continue;
         }
@@ -1106,7 +1120,6 @@ namespace Xceed.Wpf.DataGrid.Views
         int index = generator.GetRealizedIndexForContainer( container );
 
         this.RecycleContainer( generator, index, container );
-        m_layoutedContainersToRecycle.Add( container );
         stickyContainers.RemoveAt( i );
       }
     }
@@ -1139,6 +1152,8 @@ namespace Xceed.Wpf.DataGrid.Views
 
       this.DisableElementNavigation( container );
       this.FreeRowSelector( container );
+
+      m_layoutedContainersToRecycle.Add( container );
     }
 
     private void GenerateContainers(
@@ -1148,39 +1163,41 @@ namespace Xceed.Wpf.DataGrid.Views
       bool measureInvalidated,
       ref UIElement focusedElement )
     {
+      HashSet<UIElement> unusedLayoutedContainers = new HashSet<UIElement>( m_layoutedContainers.Select( item => item.Container ) );
+      m_layoutedContainers.Clear();
+
       ScrollDirection scrollDirection = this.AnimatedScrollInfo.VerticalScrollingDirection;
 
       GeneratorPosition position;
       GeneratorDirection direction;
+      int currentIndex;
+      int step;
 
       if( ( scrollDirection == ScrollDirection.Forward )
         || ( scrollDirection == ScrollDirection.None ) )
       {
         position = generator.GeneratorPositionFromIndex( pageStartIndex );
         direction = GeneratorDirection.Forward;
+        currentIndex = pageStartIndex;
+        step = 1;
       }
       else
       {
         position = generator.GeneratorPositionFromIndex( pageEndIndex );
         direction = GeneratorDirection.Backward;
+        currentIndex = pageEndIndex;
+        step = -1;
       }
 
       using( generator.StartAt( position, direction, true ) )
       {
-        int currentIndex = ( direction == GeneratorDirection.Forward )
-          ? pageStartIndex
-          : pageEndIndex;
-
-        while( ( direction == GeneratorDirection.Forward )
-          ? ( currentIndex <= pageEndIndex )
-          : ( currentIndex >= pageStartIndex ) )
+        while( ( currentIndex >= pageStartIndex ) && ( currentIndex <= pageEndIndex ) )
         {
           UIElement container = this.GenerateContainer( generator, currentIndex, measureInvalidated, true );
-
           if( container == null )
-            return;
+            break;
 
-          if( ( focusedElement != null ) && ( focusedElement == container ) )
+          if( focusedElement == container )
           {
             focusedElement = null;
           }
@@ -1188,12 +1205,98 @@ namespace Xceed.Wpf.DataGrid.Views
           // The container is now part of the page layout. Add it to the list.
           m_layoutedContainers.Add( new LayoutedContainerInfo( currentIndex, container ) );
           m_layoutedContainersToRecycle.Remove( container );
+          unusedLayoutedContainers.Remove( container );
 
-          currentIndex += ( direction == GeneratorDirection.Forward ) ? 1 : -1;
+          currentIndex += step;
+        }
+      }
+
+      // A ScrollViewer may measure forever if the containers that are "underneath" the horizontal
+      // scrollbar are the ones that required the scrollbar in the first place.
+      if( m_lastVisiblePageIndexes != PageIndexes.Empty )
+      {
+        int remainingItemCount = ( m_lastVisiblePageIndexes.EndIndex - m_lastVisiblePageIndexes.StartIndex )
+                               - ( pageEndIndex - pageStartIndex );
+
+        if( ( remainingItemCount > 0 ) && ( this.GetMaxDesiredWidth() < this.AnimatedScrollInfo.ExtentWidth ) )
+        {
+          int itemCount = generator.ItemCount;
+
+          if( ( currentIndex >= 0 ) && ( currentIndex < itemCount ) )
+          {
+            position = generator.GeneratorPositionFromIndex( currentIndex );
+
+            using( generator.StartAt( position, direction, true ) )
+            {
+              while( ( remainingItemCount > 0 ) && ( currentIndex >= 0 ) && ( currentIndex < itemCount ) )
+              {
+                UIElement container = this.GenerateContainer( generator, currentIndex, measureInvalidated, true );
+                if( container == null )
+                  break;
+
+                if( focusedElement == container )
+                {
+                  focusedElement = null;
+                }
+
+                // The container is now part of the page layout. Add it to the list.
+                m_layoutedContainers.Add( new LayoutedContainerInfo( currentIndex, container ) );
+                m_layoutedContainersToRecycle.Remove( container );
+                unusedLayoutedContainers.Remove( container );
+
+                currentIndex += step;
+                remainingItemCount--;
+              }
+            }
+          }
         }
       }
 
       m_layoutedContainers.Sort();
+
+      // Recycle the containers that have not been reused in the current page.
+      foreach( var container in unusedLayoutedContainers )
+      {
+        // We do not recycle the focused element!
+        if( container.IsKeyboardFocusWithin )
+        {
+          Debug.Assert( focusedElement == null );
+          focusedElement = container;
+        }
+        else
+        {
+          int index = generator.GetRealizedIndexForContainer( container );
+
+          this.RecycleContainer( generator, index, container );
+
+          m_layoutedContainersToRecycle.Add( container );
+        }
+      }
+    }
+
+    private void GenerateFocusedContainer(
+      ICustomItemContainerGenerator generator,
+      bool measureInvalidated,
+      UIElement focusedElement )
+    {
+      if( focusedElement == null )
+        return;
+
+      int index = generator.GetRealizedIndexForContainer( focusedElement );
+
+      if( index >= 0 )
+      {
+        if( measureInvalidated )
+        {
+          this.MeasureContainer( focusedElement );
+        }
+
+        m_layoutedContainers.Add( new LayoutedContainerInfo( index, focusedElement ) );
+      }
+      else
+      {
+        this.RecycleContainer( focusedElement );
+      }
     }
 
     private int GetStickyHeaderCountForIndex( int desiredIndex )
@@ -1526,7 +1629,8 @@ namespace Xceed.Wpf.DataGrid.Views
         this.ArrangeContainer( container, TableflowViewItemsHost.OutOfViewPoint, false );
       }
 
-      m_layoutedContainersToRecycle = new HashSet<UIElement>();
+      m_layoutedContainersToRecycle.Clear();
+      m_layoutedContainersToRecycle.TrimExcess();
 
       this.LayoutStickyHeaders( rowSelectorPaneVisible );
       this.LayoutStickyFooters( rowSelectorPaneVisible );
@@ -1787,13 +1891,16 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private void PrepareContainer( UIElement container )
     {
-      object dataItem = container.GetValue( Xceed.Wpf.DataGrid.CustomItemContainerGenerator.DataItemPropertyProperty );
+      var dataItemStore = Xceed.Wpf.DataGrid.CustomItemContainerGenerator.GetDataItemProperty( container );
+      if( ( dataItemStore == null ) || dataItemStore.IsEmpty )
+        return;
 
-      if( dataItem != null )
-      {
-        // Prepare the container.
-        this.ParentDataGridControl.PrepareItemContainer( container, dataItem );
-      }
+      var dataItem = dataItemStore.Data;
+      if( dataItem == null )
+        return;
+
+      // Prepare the container.
+      this.ParentDataGridControl.PrepareItemContainer( container, dataItem );
     }
 
     #endregion Containers Methods
@@ -1901,19 +2008,24 @@ namespace Xceed.Wpf.DataGrid.Views
         && ( m_verticalOffsetAnimationClock.Controller != null ) )
       {
         if( resetScrollDirection )
+        {
           this.AnimatedScrollInfo.VerticalScrollingDirection = ScrollDirection.None;
+        }
 
         // We must call Pause instead on Stop to avoid having our
         // offset momentary set to 0. Weird...
         m_verticalOffsetAnimationClock.Controller.Pause();
         m_verticalOffsetAnimationClock.Completed -= this.OnVerticalOffsetAnimationCompleted;
         m_verticalOffsetAnimationClock = null;
+
+        this.InvalidateAutomationPeerChildren();
       }
     }
 
     private void OnVerticalOffsetAnimationCompleted( object sender, EventArgs e )
     {
       this.AnimatedScrollInfo.VerticalScrollingDirection = ScrollDirection.None;
+      this.InvalidateAutomationPeerChildren();
     }
 
     #endregion Animations Management
@@ -2181,10 +2293,12 @@ namespace Xceed.Wpf.DataGrid.Views
         if( ( isDataRow )
           && ( ( changeColumn ) && ( ( column == null ) || ( !column.CanBeCurrentWhenReadOnly && column.ReadOnly ) ) ) )
         {
-          int focusableIndex = DataGridScrollViewer.GetFirstVisibleFocusableColumnIndex( dataGridContext );
+          int focusableIndex = NavigationHelper.GetFirstVisibleFocusableColumnIndex( dataGridContext );
 
           if( focusableIndex >= 0 )
+          {
             column = dataGridContext.VisibleColumns[ focusableIndex ];
+          }
         }
 
         try
@@ -2239,7 +2353,6 @@ namespace Xceed.Wpf.DataGrid.Views
       if( desiredIndex != focusedIndex )
       {
         DataGridControl dataGridControl = this.ParentDataGridControl;
-
         int cannotFocusCount = 0;
 
         // We want to find the first element that can receive focus upward.
@@ -2262,11 +2375,15 @@ namespace Xceed.Wpf.DataGrid.Views
             }
           }
 
-          // We succeded in changing the current or we're already 
-          // at the first index? Then nothing we can do.
-          if( ( currentChanged )
-            || ( desiredIndex == firstIndex ) )
+          // We succeded in changing the current.
+          if( currentChanged )
+            break;
+
+          // We already are at the first index and still not focused on a new container.
+          if( desiredIndex == firstIndex )
           {
+            //Let's keep the focus on the last focused container.
+            currentChanged = this.SetCurrent( focusedIndex, changeColumn, out isDataRow );
             break;
           }
 
@@ -2274,9 +2391,7 @@ namespace Xceed.Wpf.DataGrid.Views
         }
 
         // We will use MoveFocus if the focused index is currently in view.
-        if( ( !currentChanged )
-          && ( focusedIndex >= layoutedIndexes.StartIndex )
-          && ( focusedIndex <= layoutedIndexes.EndIndex ) )
+        if( ( !currentChanged ) && ( focusedIndex >= layoutedIndexes.StartIndex ) && ( focusedIndex <= layoutedIndexes.EndIndex ) )
         {
           currentChanged = this.MoveFocus( new TraversalRequest( FocusNavigationDirection.Up ) );
         }
@@ -2288,9 +2403,7 @@ namespace Xceed.Wpf.DataGrid.Views
     private bool FocusIndexOrPreviousFocusable( int desiredIndex, int minimumIndex, bool changeColumn )
     {
       bool currentChanged = false;
-
       DataGridControl dataGridControl = this.ParentDataGridControl;
-
       int cannotFocusCount = 0;
 
       // We want to find the first element that can receive focus upward.
@@ -2313,13 +2426,9 @@ namespace Xceed.Wpf.DataGrid.Views
           }
         }
 
-        // We succeded in changing the current or we're already 
-        // at the first index? Then nothing we can do.
-        if( ( currentChanged )
-          || ( desiredIndex == minimumIndex ) )
-        {
+        // We succeded in changing the current or we're already at the first index? Then nothing we can do.
+        if( ( currentChanged ) || ( desiredIndex == minimumIndex ) )
           break;
-        }
 
         desiredIndex--;
       }
@@ -2343,7 +2452,6 @@ namespace Xceed.Wpf.DataGrid.Views
       if( desiredIndex != focusedIndex )
       {
         DataGridControl dataGridControl = this.ParentDataGridControl;
-
         int cannotFocusCount = 0;
 
         // We want to find the first element that can receive focus downward.
@@ -2366,21 +2474,22 @@ namespace Xceed.Wpf.DataGrid.Views
             }
           }
 
-          // We succeded in changing the current or we're already 
-          // at the first index? Then nothing we can do.
-          if( ( currentChanged )
-            || ( desiredIndex == lastIndex ) )
-          {
+          // We succeded in changing the current.
+          if( currentChanged )
             break;
+
+          // We already are at the last index and still not focused on a new container.
+          if( desiredIndex == lastIndex )
+          {
+            //Let's keep the focus on the last focused container.
+            currentChanged = this.SetCurrent( focusedIndex, changeColumn, out isDataRow );
           }
 
           desiredIndex++;
         }
 
         // We will use MoveFocus if the focused index is currently in view.
-        if( ( !currentChanged )
-          && ( focusedIndex >= layoutedIndexes.StartIndex )
-          && ( focusedIndex <= layoutedIndexes.EndIndex ) )
+        if( ( !currentChanged ) && ( focusedIndex >= layoutedIndexes.StartIndex ) && ( focusedIndex <= layoutedIndexes.EndIndex ) )
         {
           currentChanged = this.MoveFocus( new TraversalRequest( FocusNavigationDirection.Down ) );
         }
@@ -2392,9 +2501,7 @@ namespace Xceed.Wpf.DataGrid.Views
     private bool FocusIndexOrNextFocusable( int desiredIndex, int maximumIndex, bool changeColumn )
     {
       bool currentChanged = false;
-
       DataGridControl dataGridControl = this.ParentDataGridControl;
-
       int cannotFocusCount = 0;
 
       // We want to find the first element that can receive focus downward.
@@ -2417,13 +2524,9 @@ namespace Xceed.Wpf.DataGrid.Views
           }
         }
 
-        // We succeded in changing the current or we're already 
-        // at the first index? Then nothing we can do.
-        if( ( currentChanged )
-          || ( desiredIndex == maximumIndex ) )
-        {
+        // We succeded in changing the current or we're already at the first index? Then nothing we can do.
+        if( ( currentChanged ) || ( desiredIndex == maximumIndex ) )
           break;
-        }
 
         desiredIndex++;
       }
@@ -2562,155 +2665,15 @@ namespace Xceed.Wpf.DataGrid.Views
       if( e.Handled )
         return;
 
-      DataGridControl dataGridControl = this.ParentDataGridControl;
-
+      var dataGridControl = this.ParentDataGridControl;
       if( dataGridControl == null )
         return;
 
-      DataGridContext currentDataGridContext = dataGridControl.CurrentContext;
-
-      if( currentDataGridContext == null )
+      var dataGridContext = dataGridControl.CurrentContext;
+      if( dataGridContext == null )
         return;
 
-      // Only process tab in a special way when the grid has focus and is
-      // being edited
-      if( !dataGridControl.IsKeyboardFocusWithin || !dataGridControl.IsBeingEdited )
-        return;
-
-      DependencyObject predictedNextVisual = null;
-
-      //If the original source is not a control (e.g. the cells panel instead of a cell), columns will be used to move focus.
-      Control originalSource = e.OriginalSource as Control;
-      if( originalSource != null )
-      {
-        if( ( e.KeyboardDevice.Modifiers & ModifierKeys.Shift ) == ModifierKeys.Shift )
-        {
-          predictedNextVisual = ( e.OriginalSource as Control ).PredictFocus( FocusNavigationDirection.Left );
-        }
-        else
-        {
-          predictedNextVisual = ( e.OriginalSource as Control ).PredictFocus( FocusNavigationDirection.Right );
-        }
-      }
-
-      if( predictedNextVisual != null )
-      {
-        Cell ownerCell = Cell.FindFromChild( predictedNextVisual );
-
-        if( ( ownerCell != null ) && ( ownerCell.ParentColumn == dataGridControl.CurrentColumn ) )
-        {
-          if( object.Equals( ownerCell.ParentRow.DataContext, dataGridControl.CurrentItemInEdition ) )
-            return;
-        }
-      }
-
-      int visibleColumnCount = currentDataGridContext.VisibleColumns.Count;
-      ReadOnlyObservableCollection<ColumnBase> visibleColumns = currentDataGridContext.VisibleColumns;
-
-      ColumnBase currentColumn = currentDataGridContext.CurrentColumn;
-
-      if( currentColumn == null )
-      {
-        int firstFocusableColumn = DataGridScrollViewer.GetFirstVisibleFocusableColumnIndex( currentDataGridContext );
-
-        if( firstFocusableColumn < 0 )
-          throw new DataGridException( "Trying to edit while no cell is focusable. " );
-
-        try
-        {
-          currentDataGridContext.SetCurrentColumnAndChangeSelection( currentDataGridContext.VisibleColumns[ firstFocusableColumn ] );
-        }
-        catch( DataGridException )
-        {
-          // We swallow the exception if it occurs because of a validation error or Cell was read-only or
-          // any other GridException.
-        }
-
-        e.Handled = true;
-      }
-      else
-      {
-        if( ( e.KeyboardDevice.Modifiers & ModifierKeys.Shift ) == ModifierKeys.Shift )
-        {
-          int previousColumnVisiblePosition = DataGridScrollViewer.GetPreviousVisibleFocusableColumnIndex( currentDataGridContext );
-
-          if( previousColumnVisiblePosition < visibleColumnCount )
-          {
-            if( previousColumnVisiblePosition >= 0 )
-            {
-              try
-              {
-                currentDataGridContext.SetCurrentColumnAndChangeSelection( visibleColumns[ previousColumnVisiblePosition ] );
-              }
-              catch( DataGridException )
-              {
-                // We swallow the exception if it occurs because of a validation error or Cell was read-only or
-                // any other GridException.
-              }
-            }
-            else
-            {
-              previousColumnVisiblePosition = DataGridScrollViewer.GetFirstVisibleFocusableColumnIndex( currentDataGridContext );
-
-              if( previousColumnVisiblePosition < 0 )
-                throw new DataGridException( "Trying to edit while no cell is focusable. " );
-
-              try
-              {
-                // Wrap around to the last column
-                currentDataGridContext.SetCurrentColumnAndChangeSelection( visibleColumns[ previousColumnVisiblePosition ] );
-              }
-              catch( DataGridException )
-              {
-                // We swallow the exception if it occurs because of a validation error or Cell was read-only or
-                // any other GridException.
-              }
-            }
-            e.Handled = true;
-          }
-        }
-        else
-        {
-          int nextColumnVisiblePosition = DataGridScrollViewer.GetNextVisibleFocusableColumnIndex( currentDataGridContext );
-
-          // If previous Column VisiblePosition is greater than 0 and
-          // less than the total VisibleColumn count, affect it
-          if( nextColumnVisiblePosition >= 0 )
-          {
-            if( nextColumnVisiblePosition < visibleColumnCount )
-            {
-              try
-              {
-                currentDataGridContext.SetCurrentColumnAndChangeSelection( visibleColumns[ nextColumnVisiblePosition ] );
-              }
-              catch( DataGridException )
-              {
-                // We swallow the exception if it occurs because of a validation error or Cell was read-only or
-                // any other GridException.
-              }
-            }
-            else
-            {
-              nextColumnVisiblePosition = DataGridScrollViewer.GetFirstVisibleFocusableColumnIndex( currentDataGridContext );
-
-              if( nextColumnVisiblePosition < 0 )
-                throw new DataGridException( "Trying to edit while no cell is focusable. " );
-
-              try
-              {
-                currentDataGridContext.SetCurrentColumnAndChangeSelection( visibleColumns[ nextColumnVisiblePosition ] );
-              }
-              catch( DataGridException )
-              {
-                // We swallow the exception if it occurs because of a validation error or Cell was read-only or
-                // any other GridException.
-              }
-            }
-
-            e.Handled = true;
-          }
-        }
-      }
+      e.Handled = NavigationHelper.HandleTabKey( dataGridControl, dataGridContext, e.OriginalSource as FrameworkElement, e.KeyboardDevice );
     }
 
     protected override void HandleLeftKey( KeyEventArgs e )
@@ -2718,7 +2681,11 @@ namespace Xceed.Wpf.DataGrid.Views
       if( e.Handled )
         return;
 
-      e.Handled = this.MoveFocusLeft();
+      var dataGridControl = this.ParentDataGridControl;
+      if( dataGridControl == null )
+        return;
+
+      e.Handled = NavigationHelper.MoveFocusLeft( dataGridControl.CurrentContext );
     }
 
     protected override void HandleRightKey( KeyEventArgs e )
@@ -2726,7 +2693,11 @@ namespace Xceed.Wpf.DataGrid.Views
       if( e.Handled )
         return;
 
-      e.Handled = this.MoveFocusRight();
+      var dataGridControl = this.ParentDataGridControl;
+      if( dataGridControl == null )
+        return;
+
+      e.Handled = NavigationHelper.MoveFocusRight( dataGridControl.CurrentContext );
     }
 
     protected override void HandleUpKey( KeyEventArgs e )
@@ -2758,23 +2729,19 @@ namespace Xceed.Wpf.DataGrid.Views
 
       if( ( e.KeyboardDevice.Modifiers & ModifierKeys.Control ) == ModifierKeys.Control )
       {
-        // Simply scroll to top and set first index as current
-        this.AnimatedScrollInfo.ScrollOwner.ScrollToTop();
-        this.SetCurrent( 0, changeCurrentColumn );
+        this.MoveToFirstOverallUIElement( changeCurrentColumn );
         return;
       }
 
       UIElement focusedContainer = DataGridItemsHost.GetItemsHostContainerFromElement( this, Keyboard.FocusedElement as DependencyObject );
 
-      if( ( focusedContainer == null ) ||
-        ( navigationBehavior == NavigationBehavior.None ) )
+      if( ( focusedContainer == null ) || ( navigationBehavior == NavigationBehavior.None ) )
       {
         // We just need to scroll one page up.
         this.AnimatedScrollInfo.ScrollOwner.PageUp();
         return;
       }
 
-      int generatorItemCount = this.CustomItemContainerGenerator.ItemCount;
       int focusedContainerRealizedIndex = this.CustomItemContainerGenerator.GetRealizedIndexForContainer( focusedContainer );
       int desiredPageUpIndex = Math.Max( 0, focusedContainerRealizedIndex - m_pageVisibleContainerCount + 1 );
       int initialDesiredIndex = desiredPageUpIndex;
@@ -2786,17 +2753,12 @@ namespace Xceed.Wpf.DataGrid.Views
       else if( focusedContainerRealizedIndex != initialDesiredIndex )
       {
         PageIndexes pageIndexes = this.CalculateVisibleIndexesForDesiredLastVisibleIndex( focusedContainerRealizedIndex );
-
         desiredPageUpIndex = Math.Max( 0, pageIndexes.StartIndex );
-
         initialDesiredIndex = desiredPageUpIndex;
-
         bool isDataRow = false;
 
-        // SetCurrent on the index or down to a focusable index
-        while( ( !dataGridControl.HasValidationError )
-            && ( !isDataRow )
-            && ( desiredPageUpIndex < generatorItemCount ) )
+        // SetCurrent on the desired index or down until BEFORE the focused container.
+        while( ( !dataGridControl.HasValidationError ) && ( !isDataRow ) && ( desiredPageUpIndex < focusedContainerRealizedIndex ) )
         {
           if( this.SetCurrent( desiredPageUpIndex, changeCurrentColumn, out isDataRow ) )
             return;
@@ -2807,21 +2769,20 @@ namespace Xceed.Wpf.DataGrid.Views
         if( ( dataGridControl.HasValidationError ) || ( isDataRow ) )
           return;
 
-        // No container were focused while processing indexes from focused to 
-        // initialDesiredIndex, try SetCurrent on indexes lower than
-        // the initial up to 0
+        // No container were focused while processing indexes from focused to initialDesiredIndex, try SetCurrent on indexes lower than the initial up to 0
         desiredPageUpIndex = initialDesiredIndex - 1;
         isDataRow = false;
 
-        while( ( !dataGridControl.HasValidationError )
-            && ( !isDataRow )
-            && ( desiredPageUpIndex > 0 ) )
+        while( ( !dataGridControl.HasValidationError ) && ( !isDataRow ) && ( desiredPageUpIndex > 0 ) )
         {
           if( this.SetCurrent( desiredPageUpIndex, changeCurrentColumn, out isDataRow ) )
             return;
 
           desiredPageUpIndex--;
         }
+
+        // If not container was successfuly focused, set focus back to the current UIElement.
+        this.SetCurrent( focusedContainerRealizedIndex, changeCurrentColumn, out isDataRow );
       }
     }
 
@@ -2831,24 +2792,21 @@ namespace Xceed.Wpf.DataGrid.Views
         return;
 
       e.Handled = true;
+
       DataGridControl dataGridControl = this.ParentDataGridControl;
       NavigationBehavior navigationBehavior = dataGridControl.NavigationBehavior;
       bool changeCurrentColumn = ( navigationBehavior == NavigationBehavior.CellOnly );
 
-      // CTRL + PageDown
       if( ( e.KeyboardDevice.Modifiers & ModifierKeys.Control ) == ModifierKeys.Control )
       {
-        // Simply scroll to bottom and set last index as current
-        this.AnimatedScrollInfo.ScrollOwner.ScrollToBottom();
-        this.SetCurrent( this.CustomItemContainerGenerator.ItemCount - 1, changeCurrentColumn );
+        this.MoveToLastOverallUIElement( changeCurrentColumn );
         return;
       }
 
       UIElement focusedContainer = DataGridItemsHost.GetItemsHostContainerFromElement( this, Keyboard.FocusedElement as DependencyObject );
 
       // No focused container or no navigation allowed
-      if( ( focusedContainer == null ) ||
-        ( navigationBehavior == NavigationBehavior.None ) )
+      if( ( focusedContainer == null ) || ( navigationBehavior == NavigationBehavior.None ) )
       {
         // We just need to scroll one page down.
         this.AnimatedScrollInfo.ScrollOwner.PageDown();
@@ -2857,13 +2815,9 @@ namespace Xceed.Wpf.DataGrid.Views
 
       int generatorItemCount = this.CustomItemContainerGenerator.ItemCount;
       int focusedContainerRealizedIndex = this.CustomItemContainerGenerator.GetRealizedIndexForContainer( focusedContainer );
-
-      int desiredPageDownIndex = Math.Min( generatorItemCount - 1,
-                                       focusedContainerRealizedIndex + m_pageVisibleContainerCount - 1 );
-
-      int initialDesiredIndex = desiredPageDownIndex;
-
       int maxIndex = generatorItemCount - 1;
+      int desiredPageDownIndex = Math.Min( generatorItemCount - 1, focusedContainerRealizedIndex + m_pageVisibleContainerCount - 1 );
+      int initialDesiredIndex = desiredPageDownIndex;
 
       if( focusedContainerRealizedIndex == maxIndex )
       {
@@ -2878,11 +2832,8 @@ namespace Xceed.Wpf.DataGrid.Views
 
         bool isDataRow = false;
 
-        // SetCurrent on the index or up to focusedContainerRealizedIndex to a focusable index 
-
-        while( ( !dataGridControl.HasValidationError )
-            && ( !isDataRow )
-            && ( desiredPageDownIndex > focusedContainerRealizedIndex ) )
+        // SetCurrent on the desired index or up until BEFORE the focused container.
+        while( ( !dataGridControl.HasValidationError ) && ( !isDataRow ) && ( desiredPageDownIndex > focusedContainerRealizedIndex ) )
         {
           if( this.SetCurrent( desiredPageDownIndex, changeCurrentColumn, out isDataRow ) )
             return;
@@ -2893,22 +2844,20 @@ namespace Xceed.Wpf.DataGrid.Views
         if( ( dataGridControl.HasValidationError ) || ( isDataRow ) )
           return;
 
-        //Debug.Assert( false, "When this will occur???" );
         desiredPageDownIndex = initialDesiredIndex + 1;
         isDataRow = false;
 
-        // No container were focused while processing indexes from focused to 
-        // initialDesiredIndex, try SetCurrent on indexes higher than
-        // the initial down to maxIndex
-        while( ( !dataGridControl.HasValidationError )
-            && ( !isDataRow )
-            && ( desiredPageDownIndex < maxIndex ) )
+        // No container were focused while processing indexes from focused to initialDesiredIndex, try SetCurrent on indexes higher than the initial down to maxIndex
+        while( ( !dataGridControl.HasValidationError ) && ( !isDataRow ) && ( desiredPageDownIndex <= maxIndex ) )
         {
-          if( this.SetCurrent( Math.Min( maxIndex, desiredPageDownIndex ), changeCurrentColumn, out isDataRow ) )
+          if( this.SetCurrent( desiredPageDownIndex, changeCurrentColumn, out isDataRow ) )
             return;
 
           desiredPageDownIndex++;
         }
+
+        // If not container was successfuly focused, set focus back to the current UIElement.
+        this.SetCurrent( focusedContainerRealizedIndex, changeCurrentColumn, out isDataRow );
       }
     }
 
@@ -2917,28 +2866,16 @@ namespace Xceed.Wpf.DataGrid.Views
       if( e.Handled )
         return;
 
-      DataGridControl dataGridControl = this.ParentDataGridControl;
-      IAnimatedScrollInfo scrollInfo = this.AnimatedScrollInfo;
-      ICustomItemContainerGenerator generator = this.CustomItemContainerGenerator;
-
-      NavigationBehavior navigationBehavior = dataGridControl.NavigationBehavior;
-      bool changeCurrentColumn = ( navigationBehavior == NavigationBehavior.CellOnly );
-
       if( ( e.KeyboardDevice.Modifiers & ModifierKeys.Control ) == ModifierKeys.Control )
       {
+        DataGridControl dataGridControl = this.ParentDataGridControl;
+        IAnimatedScrollInfo scrollInfo = this.AnimatedScrollInfo;
+        NavigationBehavior navigationBehavior = dataGridControl.NavigationBehavior;
+        bool changeCurrentColumn = ( navigationBehavior == NavigationBehavior.CellOnly );
+
         if( navigationBehavior != NavigationBehavior.None )
         {
-          int currentIndex = generator.GetCurrentIndex();
-          int itemCount = generator.ItemCount;
-
-          // If the current index is different than the CurrentIndex
-          // force the first focusable from index 0 to become Current
-          if( ( currentIndex != 0 ) && ( itemCount > 0 ) )
-          {
-            // We have to find the first index that can get keyboard focus
-            // from 0 to currentIndex
-            this.FocusIndexOrNextFocusable( 0, currentIndex, changeCurrentColumn );
-          }
+          this.MoveToFirstOverallUIElement( changeCurrentColumn );
 
           if( navigationBehavior == NavigationBehavior.CellOnly )
           {
@@ -2962,14 +2899,6 @@ namespace Xceed.Wpf.DataGrid.Views
       e.Handled = true;
     }
 
-    private void ResetHorizontalOffset()
-    {
-      ScrollViewer parentScrollViewer = this.m_scrollOwner;
-
-      if( parentScrollViewer != null )
-        parentScrollViewer.ScrollToHorizontalOffset( 0d );
-    }
-
     protected override void HandleEndKey( KeyEventArgs e )
     {
       if( e.Handled )
@@ -2979,26 +2908,12 @@ namespace Xceed.Wpf.DataGrid.Views
       {
         DataGridControl dataGridControl = this.ParentDataGridControl;
         IAnimatedScrollInfo scrollInfo = this.AnimatedScrollInfo;
-        ICustomItemContainerGenerator generator = this.CustomItemContainerGenerator;
-
-        FlowDirection flowDirection = dataGridControl.FlowDirection;
         NavigationBehavior navigationBehavior = dataGridControl.NavigationBehavior;
         bool changeCurrentColumn = ( navigationBehavior == NavigationBehavior.CellOnly );
 
         if( navigationBehavior != NavigationBehavior.None )
         {
-          int currentIndex = generator.GetCurrentIndex();
-          int itemCount = generator.ItemCount;
-          int lastItemIndex = itemCount - 1;
-
-          // If the current index is different than the CurrentIndex
-          // force the last focusable from index itemCount to become Current
-          if( ( currentIndex != lastItemIndex ) && ( itemCount > 0 ) )
-          {
-            // We have to find the last index that can get keyboard focus
-            // from lastItemIndex to currentIndex
-            this.FocusIndexOrPreviousFocusable( lastItemIndex, currentIndex, changeCurrentColumn );
-          }
+          this.MoveToLastOverallUIElement( changeCurrentColumn );
 
           if( navigationBehavior == NavigationBehavior.CellOnly )
           {
@@ -3022,143 +2937,35 @@ namespace Xceed.Wpf.DataGrid.Views
       e.Handled = true;
     }
 
-    private bool MoveToNextColumn()
+    private void MoveToFirstOverallUIElement( bool changeCurrentColumn )
     {
-      DataGridControl dataGridControl = this.ParentDataGridControl;
+      // Simply scroll to top.
+      this.AnimatedScrollInfo.ScrollOwner.ScrollToTop();
 
-      if( dataGridControl == null )
-        return false;
-
-      DataGridContext currentDataGridContext = dataGridControl.CurrentContext;
-
-      if( currentDataGridContext == null )
-        return false;
-
-      ReadOnlyColumnCollection visibleColumnsCollection = ( ReadOnlyColumnCollection )currentDataGridContext.VisibleColumns;
-      int visibleColumnsCollectionCount = visibleColumnsCollection.Count;
-      ColumnBase currentColumn = currentDataGridContext.CurrentColumn;
-
-      if( currentColumn == null )
+      //Try to focus on first UIElement.
+      if( !this.SetCurrent( 0, changeCurrentColumn ) )
       {
-        if( visibleColumnsCollectionCount > 0 )
-        {
-          this.MoveToFirstVisibleColumn();
-          return true;
-        }
+        //If not focusable, find the next one downward.
+        CustomItemContainerGenerator generator = this.CustomItemContainerGenerator as CustomItemContainerGenerator;
+        this.FocusIndexOrNextFocusable( 1, generator.RealizedContainers.Count - 1, changeCurrentColumn );
       }
-      Row currentRow = currentDataGridContext.CurrentRow;
-
-      int currentColumnIndex = visibleColumnsCollection.IndexOf( currentColumn );
-
-      int nextFocusableVisibleColumn = 0;
-
-      bool focusableColumnFound = false;
-
-      if( currentRow != null )
-      {
-        for( nextFocusableVisibleColumn = currentColumnIndex + 1; nextFocusableVisibleColumn < visibleColumnsCollectionCount; nextFocusableVisibleColumn++ )
-        {
-          if( currentRow.Cells[ visibleColumnsCollection[ nextFocusableVisibleColumn ] ].GetCalculatedCanBeCurrent() )
-          {
-            focusableColumnFound = true;
-            break;
-          }
-        }
-
-        if( focusableColumnFound )
-        {
-          try
-          {
-            currentDataGridContext.SetCurrentColumnAndChangeSelection(
-              currentDataGridContext.VisibleColumns[ nextFocusableVisibleColumn ] );
-          }
-          catch( DataGridException )
-          {
-            // We swallow the exception if it occurs because of a validation error or Cell was read-only or
-            // any other GridException.
-          }
-
-          return true;
-        }
-        // If the column is other than last Column or than the last current column
-        else
-        {
-          this.MoveToLastVisibleColumn();
-        }
-      }
-      return false;
     }
 
-    private bool MoveToPreviousColumn()
+    private void MoveToLastOverallUIElement( bool changeCurrentColumn )
     {
-      DataGridControl dataGridControl = this.ParentDataGridControl;
+      // Simply scroll to end
+      this.AnimatedScrollInfo.ScrollOwner.ScrollToBottom();
 
-      if( dataGridControl == null )
-        return false;
+      CustomItemContainerGenerator generator = this.CustomItemContainerGenerator as CustomItemContainerGenerator;
+      int lastItemIndex = generator.ItemCount - 1;
 
-      DataGridContext currentDataGridContext = dataGridControl.CurrentContext;
-
-      if( currentDataGridContext == null )
-        return false;
-
-      ReadOnlyColumnCollection visibleColumnsCollection = ( ReadOnlyColumnCollection )currentDataGridContext.VisibleColumns;
-      int visibleColumnsCollectionCount = visibleColumnsCollection.Count;
-
-      ColumnBase currentColumn = currentDataGridContext.CurrentColumn;
-
-      if( currentColumn == null )
+      //Try to focus on last UIElement.
+      if( !this.SetCurrent( lastItemIndex, changeCurrentColumn ) )
       {
-        if( visibleColumnsCollectionCount > 0 )
-        {
-          this.MoveToFirstVisibleColumn();
-          return true;
-        }
+        //If not focusable, find the next one upward.
+        int minimumIndex = lastItemIndex - generator.RealizedContainers.Count;
+        this.FocusIndexOrPreviousFocusable( lastItemIndex, minimumIndex, changeCurrentColumn );
       }
-      else
-      {
-        Row currentRow = currentDataGridContext.CurrentRow;
-
-        int currentColumnIndex = visibleColumnsCollection.IndexOf( currentColumn );
-        bool focusableColumnFound = false;
-
-        // If the column is other than first Column
-        if( currentColumnIndex > 0 )
-        {
-          int previousFocusableVisibleColumn = 0;
-          if( currentRow != null )
-          {
-            for( previousFocusableVisibleColumn = currentColumnIndex - 1; previousFocusableVisibleColumn >= 0; previousFocusableVisibleColumn-- )
-            {
-              if( currentRow.Cells[ visibleColumnsCollection[ previousFocusableVisibleColumn ] ].GetCalculatedCanBeCurrent() )
-              {
-                focusableColumnFound = true;
-                break;
-              }
-            }
-          }
-
-          if( focusableColumnFound )
-          {
-            try
-            {
-              currentDataGridContext.SetCurrentColumnAndChangeSelection(
-                 currentDataGridContext.VisibleColumns[ previousFocusableVisibleColumn ] );
-            }
-            catch( DataGridException )
-            {
-              // We swallow the exception if it occurs because of a validation error or Cell was read-only or
-              // any other GridException.
-            }
-
-            return true;
-          }
-          else
-          {
-            this.MoveToFirstVisibleColumn();
-          }
-        }
-      }
-      return false;
     }
 
     private void MoveToFirstVisibleColumn()
@@ -3259,6 +3066,14 @@ namespace Xceed.Wpf.DataGrid.Views
           }
         }
       }
+    }
+
+    private void ResetHorizontalOffset()
+    {
+      ScrollViewer parentScrollViewer = this.m_scrollOwner;
+
+      if( parentScrollViewer != null )
+        parentScrollViewer.ScrollToHorizontalOffset( 0d );
     }
 
     #endregion
@@ -3649,7 +3464,12 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private static void MoveFocusForwardExecuted( object sender, ExecutedRoutedEventArgs e )
     {
-      e.Handled = ( ( TableflowViewItemsHost )sender ).MoveFocusRight();
+      var itemsHost = ( TableflowViewItemsHost )sender;
+      var dataGridControl = itemsHost.ParentDataGridControl;
+      if( dataGridControl == null )
+        return;
+
+      e.Handled = NavigationHelper.MoveFocusRight( dataGridControl.CurrentContext );
     }
 
     private static void MoveFocusForwardCanExecute( object sender, CanExecuteRoutedEventArgs e )
@@ -3660,7 +3480,12 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private static void MoveFocusBackExecuted( object sender, ExecutedRoutedEventArgs e )
     {
-      e.Handled = ( ( TableflowViewItemsHost )sender ).MoveFocusLeft();
+      var itemsHost = ( TableflowViewItemsHost )sender;
+      var dataGridControl = itemsHost.ParentDataGridControl;
+      if( dataGridControl == null )
+        return;
+
+      e.Handled = NavigationHelper.MoveFocusLeft( dataGridControl.CurrentContext );
     }
 
     private static void MoveFocusBackCanExecute( object sender, CanExecuteRoutedEventArgs e )
@@ -3689,78 +3514,6 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       e.CanExecute = true;
       e.Handled = true;
-    }
-
-    private bool MoveFocusLeft()
-    {
-      DataGridControl dataGridControl = this.ParentDataGridControl;
-
-      if( dataGridControl == null )
-        return false;
-
-      bool dataGridControlFocusWithin = dataGridControl.IsKeyboardFocusWithin;
-
-      // Process Left key even if NavigationBehavior is RowOnly
-      // when the grid is being edited 
-      bool dataGridControlIsBeingEdited =
-        dataGridControlFocusWithin && dataGridControl.IsBeingEdited;
-
-      FlowDirection flowDirection = dataGridControl.FlowDirection;
-      NavigationBehavior navigationBehavior = dataGridControl.NavigationBehavior;
-
-      if( ( navigationBehavior == NavigationBehavior.CellOnly )
-        || ( ( navigationBehavior == NavigationBehavior.RowOnly ) && dataGridControlIsBeingEdited )
-        || ( ( navigationBehavior == NavigationBehavior.RowOrCell )
-              && dataGridControlFocusWithin
-              && dataGridControl.CurrentContext.CurrentColumn != null ) )
-      {
-        if( flowDirection == FlowDirection.LeftToRight )
-        {
-          return this.MoveToPreviousColumn();
-        }
-        else
-        {
-          return this.MoveToNextColumn();
-        }
-      }
-
-      return false;
-    }
-
-    private bool MoveFocusRight()
-    {
-      DataGridControl dataGridControl = this.ParentDataGridControl;
-
-      if( dataGridControl == null )
-        return false;
-
-      bool dataGridControlFocusWithin = dataGridControl.IsKeyboardFocusWithin;
-
-      // Process Right key even if NavigationBehavior is RowOnly
-      // when the grid is being edited 
-      bool dataGridControlIsBeingEdited =
-        dataGridControlFocusWithin && dataGridControl.IsBeingEdited;
-
-      FlowDirection flowDirection = dataGridControl.FlowDirection;
-      NavigationBehavior navigationBehavior = dataGridControl.NavigationBehavior;
-
-      if( ( navigationBehavior == NavigationBehavior.CellOnly )
-        || ( ( navigationBehavior == NavigationBehavior.RowOnly ) && dataGridControlIsBeingEdited )
-        || ( ( navigationBehavior == NavigationBehavior.RowOrCell )
-              && dataGridControlFocusWithin
-              && dataGridControl.CurrentContext.CurrentColumn != null ) )
-      {
-        if( flowDirection == FlowDirection.LeftToRight )
-        {
-          return this.MoveToNextColumn();
-        }
-        else
-        {
-          return this.MoveToPreviousColumn();
-        }
-      }
-
-      return false;
     }
 
     private bool MoveFocusUp()
@@ -3820,11 +3573,11 @@ namespace Xceed.Wpf.DataGrid.Views
 
 
 
-    private LayoutedContainerInfoList m_layoutedContainers = new LayoutedContainerInfoList();
-    private HashSet<UIElement> m_layoutedContainersToRecycle = new HashSet<UIElement>();
+    private readonly LayoutedContainerInfoList m_layoutedContainers = new LayoutedContainerInfoList();
+    private readonly HashSet<UIElement> m_layoutedContainersToRecycle = new HashSet<UIElement>();
 
-    private StickyContainerInfoList m_stickyHeaders = new StickyContainerInfoList();
-    private StickyContainerInfoList m_stickyFooters = new StickyContainerInfoList();
+    private readonly StickyContainerInfoList m_stickyHeaders = new StickyContainerInfoList();
+    private readonly StickyContainerInfoList m_stickyFooters = new StickyContainerInfoList();
 
     private int m_pageVisibleContainerCount;
 
@@ -3836,10 +3589,10 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private PageIndexes m_lastVisiblePageIndexes = PageIndexes.Empty;
 
-    private Dictionary<string, double> m_cachedContainerDesiredWidth = new Dictionary<string, double>();
-    private Dictionary<string, double> m_cachedContainerRealDesiredWidth = new Dictionary<string, double>();
+    private readonly Dictionary<string, double> m_cachedContainerDesiredWidth = new Dictionary<string, double>();
+    private readonly Dictionary<string, double> m_cachedContainerRealDesiredWidth = new Dictionary<string, double>();
 
-    private List<string> m_autoWidthCalculatedDataGridContextList = new List<string>();
+    private readonly List<string> m_autoWidthCalculatedDataGridContextList = new List<string>();
 
     private int m_delayedBringIntoViewIndex = -1;
 

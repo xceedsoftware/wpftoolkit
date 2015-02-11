@@ -199,11 +199,10 @@ namespace Xceed.Wpf.DataGrid.FilterCriteria
       Debug.Assert( parameters.Length == 2, "Should have been caught earlier during BuildCriterion." );
 
       if( parameters.Length != 2 )
-        throw new DataGridInternalException( "Missing operand for the AND operator." ); 
+        throw new DataGridInternalException( "Missing operand for the AND operator." );
 
       this.FirstFilterCriterion = FilterParser.ProduceCriterion( parameters[ 0 ], defaultComparisonFilterCriterionType );
       this.SecondFilterCriterion = FilterParser.ProduceCriterion( parameters[ 1 ], defaultComparisonFilterCriterionType );
     }
-
   }
 }
