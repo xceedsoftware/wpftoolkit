@@ -59,18 +59,26 @@
             <ControlTemplate TargetType="{x:Type local:WatermarkTextBox}">
                <Grid>
 
-                  <Border x:Name="Border" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="1" Background="{TemplateBinding Background}" />
+                  <Border x:Name="Border"
+                          BorderThickness="{TemplateBinding BorderThickness}"
+                          BorderBrush="{TemplateBinding BorderBrush}"
+                          CornerRadius="1"
+                          Background="{TemplateBinding Background}">
+                     <Grid>
+                        <ScrollViewer x:Name="PART_ContentHost"
+                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        <ContentPresenter x:Name="PART_WatermarkHost"
+                                          Content="{TemplateBinding Watermark}"
+                                          ContentTemplate="{TemplateBinding WatermarkTemplate}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          IsHitTestVisible="False"
+                                          Margin="{TemplateBinding Padding}"
+                                          Visibility="Collapsed" />
+                     </Grid>
+                  </Border>
                   <Border x:Name="MouseOverVisual" Opacity="0" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{StaticResource TextBox_MouseOver}" CornerRadius="1" />
                   <Border x:Name="FocusVisual" Opacity="0" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{StaticResource TextBox_Focused}" CornerRadius="1" />
-                  <ScrollViewer x:Name="PART_ContentHost" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                  <ContentPresenter x:Name="PART_WatermarkHost"
-                                    Content="{TemplateBinding Watermark}"
-                                    ContentTemplate="{TemplateBinding WatermarkTemplate}"
-                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                    IsHitTestVisible="False"
-                                    Margin="{TemplateBinding Padding}"
-                                    Visibility="Collapsed" />
 
                </Grid>
                <ControlTemplate.Triggers>

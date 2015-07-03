@@ -43,7 +43,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
       ObservableCollection<ColorItem> alphaAvailableColors = new ObservableCollection<ColorItem>();
       foreach( ColorItem item in _modalBackgroundColorPicker.AvailableColors )
       {
-        System.Windows.Media.Color color = System.Windows.Media.Color.FromArgb( ( byte )100, item.Color.R, item.Color.G, item.Color.B );
+        System.Windows.Media.Color color = System.Windows.Media.Color.FromArgb( ( byte )100, item.Color.Value.R, item.Color.Value.G, item.Color.Value.B );
         alphaAvailableColors.Add( new ColorItem( color, item.Name ) );
       }
       _modalBackgroundColorPicker.AvailableColors = alphaAvailableColors;

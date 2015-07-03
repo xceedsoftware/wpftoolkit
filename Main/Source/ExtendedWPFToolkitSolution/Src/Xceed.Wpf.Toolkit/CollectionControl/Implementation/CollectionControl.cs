@@ -295,6 +295,44 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //ItemAdded Event
 
+    #region ItemMovedDown Event
+
+    public delegate void ItemMovedDownRoutedEventHandler( object sender, ItemEventArgs e );
+
+    public static readonly RoutedEvent ItemMovedDownEvent = EventManager.RegisterRoutedEvent( "ItemMovedDown", RoutingStrategy.Bubble, typeof( ItemMovedDownRoutedEventHandler ), typeof( CollectionControl ) );
+    public event ItemMovedDownRoutedEventHandler ItemMovedDown
+    {
+      add
+      {
+        AddHandler( ItemMovedDownEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( ItemMovedDownEvent, value );
+      }
+    }
+
+    #endregion //ItemMovedDown Event
+
+    #region ItemMovedUp Event
+
+    public delegate void ItemMovedUpRoutedEventHandler( object sender, ItemEventArgs e );
+
+    public static readonly RoutedEvent ItemMovedUpEvent = EventManager.RegisterRoutedEvent( "ItemMovedUp", RoutingStrategy.Bubble, typeof( ItemMovedUpRoutedEventHandler ), typeof( CollectionControl ) );
+    public event ItemMovedUpRoutedEventHandler ItemMovedUp
+    {
+      add
+      {
+        AddHandler( ItemMovedUpEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( ItemMovedUpEvent, value );
+      }
+    }
+
+    #endregion //ItemMovedUp Event
+
     #endregion
 
     #region EventHandlers
@@ -356,6 +394,9 @@ namespace Xceed.Wpf.Toolkit
       var index = Items.IndexOf( selectedItem );
       Items.RemoveAt( index );
       Items.Insert( ++index, selectedItem );
+
+      this.RaiseEvent( new ItemEventArgs( ItemMovedDownEvent, selectedItem ) );
+
       SelectedItem = selectedItem;
     }
 
@@ -371,6 +412,9 @@ namespace Xceed.Wpf.Toolkit
       var index = Items.IndexOf( selectedItem );
       Items.RemoveAt( index );
       Items.Insert( --index, selectedItem );
+
+      this.RaiseEvent( new ItemEventArgs( ItemMovedUpEvent, selectedItem ) );
+
       SelectedItem = selectedItem;
     }
 

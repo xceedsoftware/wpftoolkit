@@ -363,9 +363,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       Type definitionKeyAsType = definitionKey as Type;
       ITypeEditor editor = null;
 
-      if( pd.IsReadOnly )
-        editor = new TextBlockEditor();
-
       if( editor == null )
         editor = pd.CreateAttributeEditor();
 
@@ -381,6 +378,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       if( editorElement == null )
       {
+        if( pd.IsReadOnly )
+          editor = new TextBlockEditor();
+
         // Fallback: Use a default type editor.
         if( editor == null )
         {

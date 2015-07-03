@@ -123,7 +123,9 @@ namespace Xceed.Wpf.Toolkit
       {
         // If the focus was not in one of our child ( or popup ), we select all the text.
         if( !TreeHelper.IsDescendantOf( e.OldFocus as DependencyObject, this ) )
+        {
           this.SelectAll();
+        }
       }
     }
 
@@ -137,7 +139,7 @@ namespace Xceed.Wpf.Toolkit
       if( this.IsKeyboardFocusWithin == false )
       {
         this.Focus();
-        e.Handled = true;
+        e.Handled = true;  //prevent from removing the selection
       }
     }
 

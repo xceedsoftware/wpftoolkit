@@ -206,9 +206,9 @@
    <!-- ********************** -->
    <ControlTemplate x:Key="SliderTemplate"
                     TargetType="{x:Type Slider}">
-      <Border SnapsToDevicePixels="true"
+      <!--<Border SnapsToDevicePixels="true"
               BorderBrush="{TemplateBinding BorderBrush}"
-              BorderThickness="{TemplateBinding BorderThickness}">
+              BorderThickness="{TemplateBinding BorderThickness}">-->
          <Track x:Name="PART_Track"
                 Orientation="{TemplateBinding Orientation}">
             <Track.Thumb>
@@ -220,7 +220,7 @@
                </Thumb>
             </Track.Thumb>
          </Track>
-      </Border>
+      <!--</Border>-->
    </ControlTemplate>
 
    <!-- ********************** -->

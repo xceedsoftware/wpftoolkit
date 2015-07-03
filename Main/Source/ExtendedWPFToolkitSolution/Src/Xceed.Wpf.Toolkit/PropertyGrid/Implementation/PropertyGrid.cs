@@ -242,6 +242,23 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //IsCategorized
 
+    #region IsMiscCategoryLabelHidden
+
+    public static readonly DependencyProperty IsMiscCategoryLabelHiddenProperty = DependencyProperty.Register( "IsMiscCategoryLabelHidden", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( false ) );
+    public bool IsMiscCategoryLabelHidden
+    {
+      get
+      {
+        return ( bool )GetValue( IsMiscCategoryLabelHiddenProperty );
+      }
+      set
+      {
+        SetValue( IsMiscCategoryLabelHiddenProperty, value );
+      }
+    }
+
+    #endregion //IsMiscCategoryLabelHidden
+
 
 
 

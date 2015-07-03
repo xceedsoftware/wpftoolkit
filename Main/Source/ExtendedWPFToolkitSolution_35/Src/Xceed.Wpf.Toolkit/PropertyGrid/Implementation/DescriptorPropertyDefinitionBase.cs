@@ -153,7 +153,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       bool isDynamicResource = false;
 
       var markupProperty = markupObject.Properties.Where( p => p.Name == PropertyName ).FirstOrDefault();
-      if( ( markupProperty != null ) && ( markupProperty.PropertyType != typeof( object ) ) && !markupProperty.PropertyType.IsEnum )
+      if( ( markupProperty != null ) 
+        && ( markupProperty.PropertyType != typeof( object ) ) 
+        && !markupProperty.PropertyType.IsEnum 
+        && !markupProperty.PropertyType.IsArray )
       { 
         //TODO: need to find a better way to determine if a StaticResource has been applied to any property not just a style
         isResource = ( markupProperty.Value is Style );

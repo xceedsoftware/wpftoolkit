@@ -31,10 +31,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.DateTime.Converters
       {
         return ( DateTimeFormat )value == DateTimeFormat.Custom;
       }
-      else if( value is TimeFormat )
-      {
-        return ( TimeFormat )value == TimeFormat.Custom;
-      }
+
       return false;
     }
 

@@ -25,7 +25,7 @@
     </ResourceDictionary.MergedDictionaries>
 
     <conv:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
-    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+   <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
 
     <!-- =============================================================================== -->
@@ -106,9 +106,13 @@
 
     <ControlTemplate x:Key="ColorSpectrumSliderTemplate" TargetType="{x:Type local:ColorSpectrumSlider}">
         <Grid>
-            <Border x:Name="PART_TrackBackground" BorderBrush="DarkGray" BorderThickness="1" Width="15" Margin="0,8,0,0">
-                <Rectangle x:Name="PART_SpectrumDisplay" Stretch="Fill" VerticalAlignment="Stretch" />
-            </Border>
+         <Border BorderBrush="{TemplateBinding BorderBrush}"
+                 BorderThickness="{TemplateBinding BorderThickness}"
+                 Margin="0,8,0,0">
+               <Border x:Name="PART_TrackBackground" Width="15">
+                   <Rectangle x:Name="PART_SpectrumDisplay" Stretch="Fill" VerticalAlignment="Stretch" />
+               </Border>
+         </Border>
 
             <Track Name="PART_Track">
                 <Track.DecreaseRepeatButton>
@@ -125,10 +129,12 @@
     </ControlTemplate>
 
     <Style TargetType="{x:Type local:ColorSpectrumSlider}">
+        <Setter Property="BorderBrush" Value="DarkGray" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Orientation" Value="Vertical" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
-        <Setter Property="Minimum" Value="1" />
+        <Setter Property="Minimum" Value="0" />
         <Setter Property="Maximum" Value="360" />
         <Setter Property="TickFrequency" Value="0.001" />
         <Setter Property="IsSnapToTickEnabled" Value="True" />
@@ -195,7 +201,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Border Background="{StaticResource CheckerBrush}" Height="22" Margin="2,0,2,0" BorderThickness="1" BorderBrush="#FFC9CACA">
+                            <Border x:Name="SelectedColorBorder" Background="{StaticResource CheckerBrush}" Height="22" Margin="2,0,2,0" BorderThickness="1" BorderBrush="#FFC9CACA">
                                 <Rectangle x:Name="SelectedColor" Fill="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ColorToSolidColorBrushConverter}}" />
                             </Border>
                             <TextBox x:Name="PART_HexadecimalTextBox" Grid.Column="1" Margin="2,0,2,0" VerticalAlignment="Center" Style="{StaticResource ColorCanvasTextBoxStyle}" />
@@ -207,7 +213,7 @@
                     </Border>
                 </Grid>
 
-                <Border MinWidth="180" Grid.Row="1" BorderThickness="1" ClipToBounds="True" Margin="0,10,0,0">
+                <Border x:Name="RGBBorder" MinWidth="180" Grid.Row="1" BorderThickness="1" ClipToBounds="True" Margin="0,10,0,0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -222,9 +228,9 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Grid.Row="0"
-                                      Grid.Column="0"
-                                      Text="R"
-                                      VerticalAlignment="Center" />
+                                   Grid.Column="0"
+                                   Text="R"
+                                   VerticalAlignment="Center"/>
                         <Slider x:Name="PART_RSlider"
                                    Maximum="255"
                                    SmallChange="1"
@@ -306,7 +312,29 @@
                 </Border>
             </Grid>
         </Border>
-    </ControlTemplate>
+      <ControlTemplate.Triggers>
+         <Trigger Property="IsEnabled"
+                  Value="False">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+         </Trigger>
+         <Trigger Property="SelectedColor"
+                      Value="{x:Null}">
+            <Setter Property="Visibility"
+                    Value="Collapsed"
+                    TargetName="PART_ColorShadeSelector" />
+            <Setter Property="Background"
+                    Value="Transparent"
+                    TargetName="SelectedColorBorder" />
+            <Setter Property="IsEnabled"
+                    Value="False"
+                    TargetName="RGBBorder" />
+            <Setter Property="TextElement.Foreground"
+                    Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+                    TargetName="RGBBorder" />
+         </Trigger>
+      </ControlTemplate.Triggers>
+   </ControlTemplate>
 
     <Style TargetType="{x:Type local:ColorCanvas}">
         <Setter Property="Background" Value="{StaticResource PanelBackgroundBrush}" />

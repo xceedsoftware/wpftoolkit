@@ -52,9 +52,51 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //Category
 
+    #region CategoryOrder
+
+    public int CategoryOrder
+    {
+      get
+      {
+        return _categoryOrder;
+      }
+      set
+      {
+        if( _categoryOrder != value )
+        {
+          _categoryOrder = value;
+          // Notify the parent helper since this property may affect ordering.
+          this.RaisePropertyChanged( () => this.CategoryOrder );
+        }
+      }
+    }
+
+    private int _categoryOrder;
+
+    #endregion //CategoryOrder
 
 
 
+
+
+    #region PropertyOrder
+
+    public static readonly DependencyProperty PropertyOrderProperty =
+        DependencyProperty.Register( "PropertyOrder", typeof( int ), typeof( CustomPropertyItem ), new UIPropertyMetadata( 0 ) );
+
+    public int PropertyOrder
+    {
+      get
+      {
+        return ( int )GetValue( PropertyOrderProperty );
+      }
+      set
+      {
+        SetValue( PropertyOrderProperty, value );
+      }
+    }
+
+    #endregion //PropertyOrder
 
     #region Value
 

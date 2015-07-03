@@ -108,7 +108,7 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Fill" TargetName="Arrow" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                            <Setter Property="Fill" TargetName="Arrow" Value="#AFAFAF" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -127,6 +127,13 @@
             </DataTemplate>
          </Setter.Value>
       </Setter>
+      <Style.Triggers>
+         <DataTrigger Binding="{Binding SelectedColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:ColorPicker}}"
+                      Value="{x:Null}">
+            <Setter Property="Visibility"
+                    Value="Collapsed" />
+         </DataTrigger>
+      </Style.Triggers>
    </Style>
 
     <Style x:Key="ColorListStyle" TargetType="ListBox">
@@ -276,13 +283,17 @@
                         <Trigger Property="ColorMode" Value="ColorPalette">
                            <Setter TargetName="_colorPaletteHost" Property="Visibility" Value="Visible" />
                            <Setter TargetName="_colorCanvasHost" Property="Visibility" Value="Collapsed" />
-                           <Setter TargetName="PART_ColorModeButton" Property="Content" Value="Advanced" />
+                           <Setter TargetName="PART_ColorModeButton" 
+                                   Property="Content" 
+                                   Value="{Binding AdvancedButtonHeader, RelativeSource={RelativeSource TemplatedParent}}" />
                         </Trigger>
 
                         <Trigger Property="ColorMode" Value="ColorCanvas">
                            <Setter TargetName="_colorPaletteHost" Property="Visibility" Value="Collapsed" />
                            <Setter TargetName="_colorCanvasHost" Property="Visibility" Value="Visible" />
-                           <Setter TargetName="PART_ColorModeButton" Property="Content" Value="Standard" />
+                     <Setter TargetName="PART_ColorModeButton"
+                             Property="Content"
+                             Value="{Binding StandardButtonHeader, RelativeSource={RelativeSource TemplatedParent}}" />
                         </Trigger>
 
                        <Trigger Property="ShowDropDownButton" Value="False">

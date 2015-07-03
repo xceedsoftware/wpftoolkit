@@ -146,12 +146,12 @@ namespace Xceed.Wpf.Toolkit
         _displayAfterTimer.Stop();
         IsContentVisible = false;
 
-        if( this.FocusAferBusy != null )
+        if( this.FocusAfterBusy != null )
         {
-          this.FocusAferBusy.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
+          this.FocusAfterBusy.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
           {
-            this.FocusAferBusy.Focus();
-            this.FocusAferBusy = null;
+            this.FocusAfterBusy.Focus();
+            this.FocusAfterBusy = null;
           }
           ) );
         }
@@ -246,13 +246,13 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Display After
 
-    #region FocusAferBusy
+    #region FocusAfterBusy
 
     /// <summary>
-    /// Identifies the FocusAferBusy dependency property.
+    /// Identifies the FocusAfterBusy dependency property.
     /// </summary>
-    public static readonly DependencyProperty FocusAferBusyProperty = DependencyProperty.Register(
-        "FocusAferBusy",
+    public static readonly DependencyProperty FocusAfterBusyProperty = DependencyProperty.Register(
+        "FocusAfterBusy",
         typeof( Control ),
         typeof( BusyIndicator ),
         new PropertyMetadata( null ) );
@@ -260,19 +260,19 @@ namespace Xceed.Wpf.Toolkit
     /// <summary>
     /// Gets or sets a Control that should get focus when the busy indicator disapears.
     /// </summary>
-    public Control FocusAferBusy
+    public Control FocusAfterBusy
     {
       get
       {
-        return ( Control )GetValue( FocusAferBusyProperty );
+        return ( Control )GetValue( FocusAfterBusyProperty );
       }
       set
       {
-        SetValue( FocusAferBusyProperty, value );
+        SetValue( FocusAfterBusyProperty, value );
       }
     }
 
-    #endregion //IsBusy
+    #endregion //FocusAfterBusy
 
     #region Overlay Style
 

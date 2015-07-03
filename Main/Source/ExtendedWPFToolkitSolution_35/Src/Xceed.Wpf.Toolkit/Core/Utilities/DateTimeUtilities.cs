@@ -32,5 +32,13 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
         ? DateTime.UtcNow
         : DateTime.Now;
     }
+
+    public static bool IsSameDate( DateTime? date1, DateTime? date2 )
+    {
+      if( date1 == null || date2 == null )
+        return false;
+
+      return ( date1.Value.Date == date2.Value.Date );
+    }
   }
 }

@@ -109,7 +109,7 @@ namespace Xceed.Wpf.Toolkit
         Focus();
       }
 
-      base.OnPreviewMouseLeftButtonDown( e );
+      base.OnPreviewMouseLeftButtonDown( e ); //Focus AutoSelectTextBox and eat the event
     }
 
     #endregion //Base Class Overrides

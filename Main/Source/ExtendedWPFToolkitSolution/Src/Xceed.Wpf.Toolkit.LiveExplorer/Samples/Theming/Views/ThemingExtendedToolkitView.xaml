@@ -24,8 +24,7 @@
                  x:Name="_demo">
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-           <!--//# TODODOC -->
-            <Run>Changes the themes of the Extended WPF Toolkit controls. Available themes are System, Office2007 and Metro with accent color. The Xceed.Wpf.Toolkit.Themes.Office2007.dll or Xceed.Wpf.Toolkit.Themes.Metro.dll assembly is necessary to use the themes.</Run>
+         <Run>Changes the themes of the Extended WPF Toolkit controls. Available themes are System, Office2007, and Metro with accent color. The Xceed.Wpf.Toolkit.Themes.Office2007.dll or Xceed.Wpf.Toolkit.Themes.Metro.dll assemblies are necessary to use the themes.</Run>
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />

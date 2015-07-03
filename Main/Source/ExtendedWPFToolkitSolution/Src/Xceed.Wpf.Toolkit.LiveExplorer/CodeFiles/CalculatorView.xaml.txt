@@ -24,7 +24,7 @@
             The Calculator is a control used for performing mathematical calculations.
         </Paragraph>
     </local:DemoView.Description>
-    
+
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />

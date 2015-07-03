@@ -32,6 +32,7 @@ using System.Reflection;
 using System.Windows.Controls.Primitives;
 using Xceed.Wpf.Toolkit.PropertyGrid.Converters;
 using Xceed.Wpf.Toolkit.Primitives;
+using System.IO;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -77,7 +78,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         editor = new UShortUpDownEditor();
       else if( propertyType == typeof( DateTime ) || propertyType == typeof( DateTime? ) )
         editor = new DateTimeUpDownEditor();
-      else if( ( propertyType == typeof( Color ) ) )
+      else if( ( propertyType == typeof( Color ) ) || ( propertyType == typeof( Color? ) ) )
         editor = new ColorEditor();
       else if( propertyType.IsEnum )
         editor = new EnumComboBoxEditor();

@@ -53,11 +53,13 @@ namespace Xceed.Wpf.AvalonDock
 
         public DockingManager()
         {
-            Layout = new LayoutRoot() { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) };
-
-
-            this.Loaded += new RoutedEventHandler(DockingManager_Loaded);
-            this.Unloaded += new RoutedEventHandler(DockingManager_Unloaded);
+#if !VS2008
+          Layout = new LayoutRoot() { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) };
+#else
+          this.SetCurrentValue( DockingManager.LayoutProperty, new LayoutRoot() { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) } );
+#endif
+          this.Loaded += new RoutedEventHandler(DockingManager_Loaded);
+          this.Unloaded += new RoutedEventHandler(DockingManager_Unloaded);
         }
 
         #region Layout
@@ -2183,23 +2185,36 @@ namespace Xceed.Wpf.AvalonDock
         {
             foreach (var contentToClose in Layout.Descendents().OfType<LayoutContent>().Where(d => d != contentSelected && (d.Parent is LayoutDocumentPane || d.Parent is LayoutDocumentFloatingWindow)).ToArray())
             {
-                if (!contentToClose.CanClose)
-                    continue;
-
-                var layoutItem = GetLayoutItemFromModel(contentToClose);
-                if (layoutItem.CloseCommand != null)
-                {
-                    if (layoutItem.CloseCommand.CanExecute(null))
-                        layoutItem.CloseCommand.Execute(null);
-                }
-                else
-                {
-                    if (contentToClose is LayoutDocument)
-                        _ExecuteCloseCommand(contentToClose as LayoutDocument);
-                    else if (contentToClose is LayoutAnchorable)
-                        _ExecuteCloseCommand(contentToClose as LayoutAnchorable);
-                }
+              this.Close( contentToClose );              
             }
+        }
+
+        internal void _ExecuteCloseAllCommand( LayoutContent contentSelected )
+        {
+          foreach( var contentToClose in Layout.Descendents().OfType<LayoutContent>().Where( d => ( d.Parent is LayoutDocumentPane || d.Parent is LayoutDocumentFloatingWindow ) ).ToArray() )
+          {
+            this.Close( contentToClose );
+          }
+        }
+
+        private void Close( LayoutContent contentToClose )
+        {
+          if( !contentToClose.CanClose )
+            return;
+
+          var layoutItem = GetLayoutItemFromModel( contentToClose );
+          if( layoutItem.CloseCommand != null )
+          {
+            if( layoutItem.CloseCommand.CanExecute( null ) )
+              layoutItem.CloseCommand.Execute( null );
+          }
+          else
+          {
+            if( contentToClose is LayoutDocument )
+              _ExecuteCloseCommand( contentToClose as LayoutDocument );
+            else if( contentToClose is LayoutAnchorable )
+              _ExecuteCloseCommand( contentToClose as LayoutAnchorable );
+          }
         }
 
         #region DocumentContextMenu

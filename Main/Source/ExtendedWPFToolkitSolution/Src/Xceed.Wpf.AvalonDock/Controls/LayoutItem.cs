@@ -106,6 +106,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         ICommand _defaultFloatCommand;
         ICommand _defaultDockAsDocumentCommand;
         ICommand _defaultCloseAllButThisCommand;
+        ICommand _defaultCloseAllCommand;
         ICommand _defaultActivateCommand;
         ICommand _defaultNewVerticalTabGroupCommand;
         ICommand _defaultNewHorizontalTabGroupCommand;
@@ -118,7 +119,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
             _defaultFloatCommand = new RelayCommand((p) => ExecuteFloatCommand(p), (p) => CanExecuteFloatCommand(p));
             _defaultDockAsDocumentCommand = new RelayCommand((p) => ExecuteDockAsDocumentCommand(p), (p) => CanExecuteDockAsDocumentCommand(p));
             _defaultCloseAllButThisCommand = new RelayCommand((p) => ExecuteCloseAllButThisCommand(p), (p) => CanExecuteCloseAllButThisCommand(p));
-            _defaultActivateCommand = new RelayCommand((p) => ExecuteActivateCommand(p), (p) => CanExecuteActivateCommand(p));
+            _defaultCloseAllCommand = new RelayCommand( ( p ) => ExecuteCloseAllCommand( p ), ( p ) => CanExecuteCloseAllCommand( p ) );
+            _defaultActivateCommand = new RelayCommand( ( p ) => ExecuteActivateCommand( p ), ( p ) => CanExecuteActivateCommand( p ) );
             _defaultNewVerticalTabGroupCommand = new RelayCommand((p) => ExecuteNewVerticalTabGroupCommand(p), (p) => CanExecuteNewVerticalTabGroupCommand(p));
             _defaultNewHorizontalTabGroupCommand = new RelayCommand((p) => ExecuteNewHorizontalTabGroupCommand(p), (p) => CanExecuteNewHorizontalTabGroupCommand(p));
             _defaultMoveToNextTabGroupCommand = new RelayCommand((p) => ExecuteMoveToNextTabGroupCommand(p), (p) => CanExecuteMoveToNextTabGroupCommand(p));
@@ -135,6 +137,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 BindingOperations.ClearBinding(this, DockAsDocumentCommandProperty);
             if (CloseAllButThisCommand == _defaultCloseAllButThisCommand)
                 BindingOperations.ClearBinding(this, CloseAllButThisCommandProperty);
+            if( CloseAllCommand == _defaultCloseAllCommand )
+              BindingOperations.ClearBinding( this, CloseAllCommandProperty );
             if (ActivateCommand == _defaultActivateCommand)
                 BindingOperations.ClearBinding(this, ActivateCommandProperty);
             if (NewVerticalTabGroupCommand == _defaultNewVerticalTabGroupCommand)
@@ -157,6 +161,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 DockAsDocumentCommand = _defaultDockAsDocumentCommand;
             if (CloseAllButThisCommand == null)
                 CloseAllButThisCommand = _defaultCloseAllButThisCommand;
+            if( CloseAllCommand == null )
+                CloseAllCommand = _defaultCloseAllCommand;
             if (ActivateCommand == null)
                 ActivateCommand = _defaultActivateCommand;
             if (NewVerticalTabGroupCommand == null)
@@ -757,6 +763,75 @@ namespace Xceed.Wpf.AvalonDock.Controls
         private void ExecuteCloseAllButThisCommand(object parameter)
         {
             LayoutElement.Root.Manager._ExecuteCloseAllButThisCommand(LayoutElement);
+        }
+
+        #endregion
+
+        #region CloseAllCommand
+
+        /// <summary>
+        /// CloseAllCommand Dependency Property
+        /// </summary>
+        public static readonly DependencyProperty CloseAllCommandProperty =
+            DependencyProperty.Register( "CloseAllCommand", typeof( ICommand ), typeof( LayoutItem ),
+                new FrameworkPropertyMetadata( null,
+                    new PropertyChangedCallback( OnCloseAllCommandChanged ),
+                    new CoerceValueCallback( CoerceCloseAllCommandValue ) ) );
+
+        /// <summary>
+        /// Gets or sets the CloseAllCommand property.  This dependency property 
+        /// indicates the 'Close All' command.
+        /// </summary>
+        public ICommand CloseAllCommand
+        {
+          get
+          {
+            return ( ICommand )GetValue( CloseAllCommandProperty );
+          }
+          set
+          {
+            SetValue( CloseAllCommandProperty, value );
+          }
+        }
+
+        /// <summary>
+        /// Handles changes to the CloseAllCommand property.
+        /// </summary>
+        private static void OnCloseAllCommandChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+        {
+          ( ( LayoutItem )d ).OnCloseAllCommandChanged( e );
+        }
+
+        /// <summary>
+        /// Provides derived classes an opportunity to handle changes to the CloseAllCommand property.
+        /// </summary>
+        protected virtual void OnCloseAllCommandChanged( DependencyPropertyChangedEventArgs e )
+        {
+        }
+
+        /// <summary>
+        /// Coerces the CloseAllCommand value.
+        /// </summary>
+        private static object CoerceCloseAllCommandValue( DependencyObject d, object value )
+        {
+          return value;
+        }
+
+        private bool CanExecuteCloseAllCommand( object parameter )
+        {
+          if( LayoutElement == null )
+            return false;
+          var root = LayoutElement.Root;
+          if( root == null )
+            return false;
+
+          return LayoutElement.Root.Manager.Layout.
+              Descendents().OfType<LayoutContent>().Where( d => ( d.Parent is LayoutDocumentPane || d.Parent is LayoutDocumentFloatingWindow ) ).Any();
+        }
+
+        private void ExecuteCloseAllCommand( object parameter )
+        {
+          LayoutElement.Root.Manager._ExecuteCloseAllCommand( LayoutElement );
         }
 
         #endregion

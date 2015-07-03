@@ -84,7 +84,7 @@
                            Value="False">
                      <Setter Property="Fill"
                              TargetName="Arrow"
-                             Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                             Value="#AFAFAF" />
                      <Setter Property="Foreground"
                              Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                   </Trigger>

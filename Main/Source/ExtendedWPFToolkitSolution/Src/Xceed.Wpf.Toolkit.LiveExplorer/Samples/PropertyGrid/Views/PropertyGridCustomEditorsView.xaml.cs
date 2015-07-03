@@ -102,7 +102,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
 
       [Category( "Information" )]
       [Description( "This property uses the default editor because no EditorDefinition targets this property name or type." )]
-      public System.Windows.Media.Color FavoriteColor
+      public System.Windows.Media.Color? FavoriteColor
       {
         get;
         set;

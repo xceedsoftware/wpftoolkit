@@ -32,8 +32,13 @@ namespace Xceed.Wpf.Toolkit
 
       ColorItem colorItem1 = ( ColorItem )firstItem;
       ColorItem colorItem2 = ( ColorItem )secondItem;
-      System.Drawing.Color drawingColor1 = System.Drawing.Color.FromArgb( colorItem1.Color.A, colorItem1.Color.R, colorItem1.Color.G, colorItem1.Color.B );
-      System.Drawing.Color drawingColor2 = System.Drawing.Color.FromArgb( colorItem2.Color.A, colorItem2.Color.R, colorItem2.Color.G, colorItem2.Color.B );
+
+      if( (colorItem1.Color == null) || !colorItem1.Color.HasValue || 
+          (colorItem2.Color == null) || !colorItem2.Color.HasValue )
+        return -1;
+
+      System.Drawing.Color drawingColor1 = System.Drawing.Color.FromArgb( colorItem1.Color.Value.A, colorItem1.Color.Value.R, colorItem1.Color.Value.G, colorItem1.Color.Value.B );
+      System.Drawing.Color drawingColor2 = System.Drawing.Color.FromArgb( colorItem2.Color.Value.A, colorItem2.Color.Value.R, colorItem2.Color.Value.G, colorItem2.Color.Value.B );
 
       // Compare Hue
       double hueColor1 = Math.Round( ( double )drawingColor1.GetHue(), 3 );

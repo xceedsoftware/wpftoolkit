@@ -525,11 +525,13 @@
                   Command="{Binding Path=CloseCommand}"
                   Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
         <MenuItem Header="{x:Static avalonDockProperties:Resources.Document_CloseAllButThis}" 
-                Command="{Binding Path=CloseAllButThisCommand}"/>
+                  Command="{Binding Path=CloseAllButThisCommand}"/>
+        <MenuItem Header="{x:Static avalonDockProperties:Resources.Document_CloseAll}"
+                  Command="{Binding Path=CloseAllCommand}" />
         <MenuItem Header="{x:Static avalonDockProperties:Resources.Document_Float}" 
-                Command="{Binding Path=FloatCommand}"/>
+                  Command="{Binding Path=FloatCommand}"/>
         <MenuItem Header="{x:Static avalonDockProperties:Resources.Document_DockAsDocument}" 
-                Command="{Binding Path=DockAsDocumentCommand}"/>
+                  Command="{Binding Path=DockAsDocumentCommand}"/>
         <MenuItem Header="{x:Static avalonDockProperties:Resources.Document_NewHorizontalTabGroup}" 
                 Command="{Binding Path=NewHorizontalTabGroupCommand}"
                 Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
@@ -613,7 +615,7 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                            <ContentPresenter Content="{Binding LayoutItem.View.Content, RelativeSource={RelativeSource TemplatedParent}}"
+                            <ContentPresenter Content="{Binding LayoutItem.View, RelativeSource={RelativeSource TemplatedParent}}"
                                               ContentTemplate="{Binding LayoutItem.View.ContentTemplate, RelativeSource={RelativeSource TemplatedParent}}"
                                               ContentTemplateSelector="{Binding LayoutItem.View.ContentTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"/>
                     </Border>

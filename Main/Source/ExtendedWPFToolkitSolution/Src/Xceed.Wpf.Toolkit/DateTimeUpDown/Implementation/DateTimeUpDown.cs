@@ -23,7 +23,6 @@ using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Primitives;
 using System.Windows.Controls;
 using System.Linq;
-using Xceed.Wpf.Toolkit.Core.Primitives;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
@@ -64,7 +63,7 @@ namespace Xceed.Wpf.Toolkit
     protected virtual void OnFormatChanged( DateTimeFormat oldValue, DateTimeFormat newValue )
     {
         FormatUpdated();
-     }
+    }
 
     #endregion //Format
 
@@ -289,10 +288,10 @@ namespace Xceed.Wpf.Toolkit
 
       if( !IsReadOnly )
       {
-        if( this.IsLowerThan( this.Value, this.Maximum ) || !this.Value.HasValue )
+        if( this.IsLowerThan( this.Value, this.Maximum ) || !this.Value.HasValue || !this.Maximum.HasValue )
           validDirections = validDirections | ValidSpinDirections.Increase;
 
-        if( this.IsGreaterThan( this.Value, this.Minimum ) || !this.Value.HasValue )
+        if( this.IsGreaterThan( this.Value, this.Minimum ) || !this.Value.HasValue || !this.Minimum.HasValue )
           validDirections = validDirections | ValidSpinDirections.Decrease;
       }
 
@@ -692,7 +691,7 @@ namespace Xceed.Wpf.Toolkit
       } );
     }
 
-    private string GetFormatString( DateTimeFormat dateTimeFormat )
+    internal string GetFormatString( DateTimeFormat dateTimeFormat )
     {
       switch( dateTimeFormat )
       {

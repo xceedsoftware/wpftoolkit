@@ -35,8 +35,12 @@ using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit.Zoombox
 {
+  [TemplatePart( Name = PART_VerticalScrollBar, Type = typeof( ScrollBar ) )]
+  [TemplatePart( Name = PART_HorizontalScrollBar, Type = typeof( ScrollBar ) )]
   public sealed class Zoombox : ContentControl
   {
+    private const string PART_VerticalScrollBar = "PART_VerticalScrollBar";
+    private const string PART_HorizontalScrollBar = "PART_HorizontalScrollBar";
 
     #region Constructors
 
@@ -69,6 +73,8 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.AddHandler( FrameworkElement.SizeChangedEvent, new SizeChangedEventHandler( this.OnSizeChanged ), true );
 
       this.CoerceValue( Zoombox.ViewStackModeProperty );
+
+      this.Loaded += this.Zoombox_Loaded;
     }
 
     #endregion
@@ -594,6 +600,26 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     private void SetIsSelectingRegion( bool value )
     {
       this.SetValue( Zoombox.IsSelectingRegionPropertyKey, value );
+    }
+
+    #endregion
+
+    #region IsUsingScrollBars Property
+
+    public static readonly DependencyProperty IsUsingScrollBarsProperty =
+      DependencyProperty.Register( "IsUsingScrollBars", typeof( bool ), typeof( Zoombox ),
+        new FrameworkPropertyMetadata( false, ( PropertyChangedCallback )null ) );
+
+    public bool IsUsingScrollBars
+    {
+      get
+      {
+        return ( bool )this.GetValue( Zoombox.IsUsingScrollBarsProperty );
+      }
+      set
+      {
+        this.SetValue( Zoombox.IsUsingScrollBarsProperty, value );
+      }
     }
 
     #endregion
@@ -1344,11 +1370,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
         {
           case HorizontalAlignment.Center:
           case HorizontalAlignment.Stretch:
-            x = ( this.RenderSize.Width - contentSize.Width ) / 2;
+            x = ( _content.DesiredSize.Width - contentSize.Width ) / 2;
             break;
 
           case HorizontalAlignment.Right:
-            x = this.RenderSize.Width - contentSize.Width;
+            x = _content.DesiredSize.Width - contentSize.Width;
             break;
         }
 
@@ -1356,11 +1382,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
         {
           case VerticalAlignment.Center:
           case VerticalAlignment.Stretch:
-            y = ( this.RenderSize.Height - contentSize.Height ) / 2;
+            y = ( _content.DesiredSize.Height - contentSize.Height ) / 2;
             break;
 
           case VerticalAlignment.Bottom:
-            y = this.RenderSize.Height - contentSize.Height;
+            y = _content.DesiredSize.Height - contentSize.Height;
             break;
         }
 
@@ -1765,6 +1791,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     {
       if( _content != null )
       {
+        this.SetScrollBars();
         this.ZoomTo( ZoomboxView.Center );
       }
     }
@@ -1773,6 +1800,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     {
       if( _content != null )
       {
+        this.SetScrollBars();
         this.ZoomTo( ZoomboxView.Fill );
       }
     }
@@ -1781,6 +1809,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     {
       if( _content != null )
       {
+        this.SetScrollBars();
         this.ZoomTo( ZoomboxView.Fit );
       }
     }
@@ -2036,6 +2065,30 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       if( _contentPresenter == null )
         throw new InvalidTemplateException( ErrorMessages.GetMessage( "ZoomboxTemplateNeedsContent" ) );
 
+      //locate the vertical scrollBar
+      if( _verticalScrollBar != null )
+      {
+        _verticalScrollBar.Scroll -= this.VerticalScrollBar_Scroll;
+      }
+
+      _verticalScrollBar = this.GetTemplateChild( PART_VerticalScrollBar ) as ScrollBar;
+      if( _verticalScrollBar == null )
+        throw new InvalidTemplateException( ErrorMessages.GetMessage( "Zoombox vertical scrollBar not found." ) );
+
+      _verticalScrollBar.Scroll += this.VerticalScrollBar_Scroll;
+
+      //locate the horizontal scrollBar
+      if( _horizontalScrollBar != null )
+      {
+        _horizontalScrollBar.Scroll -= this.HorizontalScrollBar_Scroll;
+      }
+
+      _horizontalScrollBar = this.GetTemplateChild( PART_HorizontalScrollBar ) as ScrollBar;
+      if( _horizontalScrollBar == null )
+        throw new InvalidTemplateException( ErrorMessages.GetMessage( "Zoombox horizontal scrollBar not found." ) );
+
+      _horizontalScrollBar.Scroll += this.HorizontalScrollBar_Scroll;
+
       // check the template for an AdornerDecorator
       AdornerLayer al = null;
       AdornerDecorator ad = VisualTreeHelperEx.FindDescendantByType( this, typeof( AdornerDecorator ) ) as AdornerDecorator;
@@ -2213,6 +2266,23 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       _contentPresenter = null;
     }
 
+    private void Zoombox_Loaded( object sender, RoutedEventArgs e )
+    {
+      this.SetScrollBars();
+    }
+
+    private void VerticalScrollBar_Scroll( object sender, ScrollEventArgs e )
+    {
+      double diff = e.NewValue + _relativePosition.Y;
+      this.OnDrag( new DragDeltaEventArgs( 0d, -diff / this.Scale ), false );
+    }
+
+    private void HorizontalScrollBar_Scroll( object sender, ScrollEventArgs e )
+    {
+      double diff = e.NewValue + _relativePosition.X;
+      this.OnDrag( new DragDeltaEventArgs( -diff / this.Scale, 0d ), false );
+    }
+
     private void DragDisplayViewport( DragDeltaEventArgs e, bool end )
     {
       // get the scale of the view finder display panel, the selection rect, and the VisualBrush rect
@@ -2334,6 +2404,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       {
         if( this.HasRenderedFirstView )
         {
+          this.SetScrollBars();
           this.UpdateView( this.CurrentView, true, false, this.CurrentViewIndex );
         }
         else
@@ -2390,7 +2461,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
               new Vector( e.HorizontalChange, e.VerticalChange ) ),
             new Rect(
               new Point( 0, 0 ),
-              new Point( this.RenderSize.Width, this.RenderSize.Height ) ) );
+              new Point( _content.DesiredSize.Width, _content.DesiredSize.Height ) ) );
       }
     }
 
@@ -2398,6 +2469,8 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     {
       if( !this.HasArrangedContentPresenter )
         return;
+
+      this.SetScrollBars();
 
       // when the size is changing, the viewbox factor must be updated before updating the view
       this.UpdateViewboxFactor();
@@ -2412,6 +2485,23 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       {
         this.IsAnimated = oldIsAnimated;
       }
+    }
+
+    private void SetScrollBars()
+    {
+      var contentSize = ( _content is Viewbox ) ? ( ( Viewbox )_content ).Child.DesiredSize : _content.DesiredSize;
+
+      _verticalScrollBar.SmallChange = 10d;
+      _verticalScrollBar.LargeChange = 10d;
+      _verticalScrollBar.Minimum = 0d;
+      _verticalScrollBar.ViewportSize = _content.DesiredSize.Height;
+      _verticalScrollBar.Maximum = contentSize.Height - _verticalScrollBar.ViewportSize;
+
+      _horizontalScrollBar.SmallChange = 10d;
+      _horizontalScrollBar.LargeChange = 10d;
+      _horizontalScrollBar.Minimum = 0d;
+      _horizontalScrollBar.ViewportSize = _content.DesiredSize.Width;
+      _horizontalScrollBar.Maximum = contentSize.Width - _horizontalScrollBar.ViewportSize;
     }
 
     private void PreProcessInput()
@@ -2627,8 +2717,8 @@ namespace Xceed.Wpf.Toolkit.Zoombox
           _content.TranslatePoint( region.BottomRight, _contentPresenter ) );
 
       // calculate actual scale value
-      double aspectX = this.RenderSize.Width / region.Width;
-      double aspectY = this.RenderSize.Height / region.Height;
+      double aspectX = _content.DesiredSize.Width / region.Width;
+      double aspectY = _content.DesiredSize.Height / region.Height;
       scale = aspectX < aspectY ? aspectX : aspectY;
 
       // scale relative to the anchor point
@@ -2696,8 +2786,8 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
                 // inflate (or deflate) the rect by the appropriate amounts in the x & y directions
                 region = Rect.Inflate( currentContentRect,
-                    ( this.RenderSize.Width / _viewboxFactor - currentContentRect.Width ) / 2,
-                    ( this.RenderSize.Height / _viewboxFactor - currentContentRect.Height ) / 2 );
+                    ( _content.DesiredSize.Width / _viewboxFactor - currentContentRect.Width ) / 2,
+                    ( _content.DesiredSize.Height / _viewboxFactor - currentContentRect.Height ) / 2 );
 
                 // now translate the centered rect back to the coordinate space of the content
                 region = new Rect( this.TranslatePoint( region.TopLeft, _content ), this.TranslatePoint( region.BottomRight, _content ) );
@@ -2841,6 +2931,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
             _contentPresenter.RenderTransform = tg;
 
+            var initialContentSize = ( _content is Viewbox ) ? ( ( Viewbox )_content ).Child.DesiredSize : _content.DesiredSize;
+            var scaledContentSize = new Size( initialContentSize.Width * newRelativeScale, initialContentSize.Height * newRelativeScale );
+
             if( allowAnimation && IsAnimated )
             {
               DoubleAnimation daScale = new DoubleAnimation( currentScale, newRelativeScale / _viewboxFactor, AnimationDuration );
@@ -2864,6 +2957,46 @@ namespace Xceed.Wpf.Toolkit.Zoombox
               st.BeginAnimation( ScaleTransform.ScaleYProperty, daScale );
               tt.BeginAnimation( TranslateTransform.XProperty, daTranslateX );
               tt.BeginAnimation( TranslateTransform.YProperty, daTranslateY );
+
+              if( this.IsUsingScrollBars )
+              {
+                //Vertical scrollBar animations
+                DoubleAnimation verticalMaxAnimation = new DoubleAnimation();
+                verticalMaxAnimation.From = _verticalScrollBar.Maximum;
+                verticalMaxAnimation.To = scaledContentSize.Height - _verticalScrollBar.ViewportSize;
+                verticalMaxAnimation.Duration = AnimationDuration;
+                _verticalScrollBar.BeginAnimation( ScrollBar.MaximumProperty, verticalMaxAnimation );
+
+                DoubleAnimation verticalValueAnimation = new DoubleAnimation();
+                verticalValueAnimation.From = _verticalScrollBar.Value;
+                verticalValueAnimation.To = -newRelativePosition.Y;
+                verticalValueAnimation.Duration = AnimationDuration;
+                verticalValueAnimation.Completed += this.VerticalValueAnimation_Completed;
+                _verticalScrollBar.BeginAnimation( ScrollBar.ValueProperty, verticalValueAnimation );
+
+                //Horizontal scrollBar animations
+                DoubleAnimation horizontalMaxAnimation = new DoubleAnimation();
+                horizontalMaxAnimation.From = _horizontalScrollBar.Maximum;
+                horizontalMaxAnimation.To = scaledContentSize.Width - _horizontalScrollBar.ViewportSize;
+                horizontalMaxAnimation.Duration = AnimationDuration;
+                _horizontalScrollBar.BeginAnimation( ScrollBar.MaximumProperty, horizontalMaxAnimation );
+
+                DoubleAnimation horizontalValueAnimation = new DoubleAnimation();
+                horizontalValueAnimation.From = _horizontalScrollBar.Value;
+                horizontalValueAnimation.To = -newRelativePosition.X;
+                horizontalValueAnimation.Duration = AnimationDuration;
+                horizontalValueAnimation.Completed += this.HorizontalValueAnimation_Completed;
+                _horizontalScrollBar.BeginAnimation( ScrollBar.ValueProperty, horizontalValueAnimation );
+              }
+            }
+            else if( this.IsUsingScrollBars )
+            {
+              //Vertical scrollBar
+              _verticalScrollBar.Maximum = scaledContentSize.Height - _verticalScrollBar.ViewportSize;
+              _verticalScrollBar.Value = -newRelativePosition.Y;
+              //Horizontal scrollBar
+              _horizontalScrollBar.Maximum = scaledContentSize.Width - _horizontalScrollBar.ViewportSize;
+              _horizontalScrollBar.Value = -newRelativePosition.X;
             }
 
             // maintain the relative scale and position for dragging and animating purposes
@@ -2928,7 +3061,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     private Rect CalculateFillRect()
     {
       // determine the x-y ratio of the current Viewport
-      double xyRatio = this.RenderSize.Width / this.RenderSize.Height;
+      double xyRatio = _content.DesiredSize.Width / _content.DesiredSize.Height;
 
       // now find the maximal rect within the ContentRect that has the same ratio
       double x = 0;
@@ -2970,8 +3103,8 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
       // calculate actual zoom, which must fit the entire selection 
       // while maintaining a 1:1 ratio
-      double aspectX = this.RenderSize.Width / region.Width;
-      double aspectY = this.RenderSize.Height / region.Height;
+      double aspectX = _content.DesiredSize.Width / region.Width;
+      double aspectY = _content.DesiredSize.Height / region.Height;
       newRelativeScale = aspectX < aspectY ? aspectX : aspectY;
 
       // ensure that the scale value falls within the valid range
@@ -2992,22 +3125,22 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       {
         case HorizontalAlignment.Center:
         case HorizontalAlignment.Stretch:
-          horizontalOffset = ( this.RenderSize.Width - region.Width * newRelativeScale ) / 2;
+          horizontalOffset = ( _content.DesiredSize.Width - region.Width * newRelativeScale ) / 2;
           break;
 
         case HorizontalAlignment.Right:
-          horizontalOffset = ( this.RenderSize.Width - region.Width * newRelativeScale );
+          horizontalOffset = ( _content.DesiredSize.Width - region.Width * newRelativeScale );
           break;
       }
       switch( VerticalContentAlignment )
       {
         case VerticalAlignment.Center:
         case VerticalAlignment.Stretch:
-          verticalOffset = ( this.RenderSize.Height - region.Height * newRelativeScale ) / 2;
+          verticalOffset = ( _content.DesiredSize.Height - region.Height * newRelativeScale ) / 2;
           break;
 
         case VerticalAlignment.Bottom:
-          verticalOffset = ( this.RenderSize.Height - region.Height * newRelativeScale );
+          verticalOffset = ( _content.DesiredSize.Height - region.Height * newRelativeScale );
           break;
       }
       newRelativePosition =
@@ -3300,6 +3433,46 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
+    private void VerticalValueAnimation_Completed( object sender, EventArgs e )
+    {
+      //When the animaton is completed, with the FillBehavior to HoldEnd, 
+      //the ScrollBarValue will be overriden with the final animation value, preventing future scroll.
+      //To remove it use BeginAnimation with null.
+      //http://msdn.microsoft.com/en-us/library/aa970493(v=vs.110).aspx      
+
+      // only do this when all the overlapped animations are done or limits values reached.
+      if( ( _verticalScrollBar.Value == -_relativePosition.Y )
+        || ( _verticalScrollBar.Value == _verticalScrollBar.Maximum )
+        || ( _verticalScrollBar.Value == _verticalScrollBar.Minimum ) )
+      {
+        var finalValue = _verticalScrollBar.Value;
+        //this will reset Value to original value of animation
+        _verticalScrollBar.BeginAnimation( ScrollBar.ValueProperty, null );
+        //this will set to last value of the animation.
+        _verticalScrollBar.Value = finalValue;
+      }
+    }
+
+    private void HorizontalValueAnimation_Completed( object sender, EventArgs e )
+    {
+      //When the animaton is completed, with the FillBehavior to HoldEnd, 
+      //the ScrollBarValue will be overriden with the final animation value, preventing future scroll.
+      //To remove it use BeginAnimation with null.
+      //http://msdn.microsoft.com/en-us/library/aa970493(v=vs.110).aspx      
+
+      // only do this when all the overlapped animations are done or limits values reached.
+      if( ( _horizontalScrollBar.Value == -_relativePosition.X )
+        || ( _horizontalScrollBar.Value == _horizontalScrollBar.Maximum )
+        || ( _horizontalScrollBar.Value == _horizontalScrollBar.Minimum ) )
+      {
+        var finalValue = _horizontalScrollBar.Value;
+        //this will reset Value to original value of animation
+        _horizontalScrollBar.BeginAnimation( ScrollBar.ValueProperty, null );
+        //this will set to last value of the animation.
+        _horizontalScrollBar.Value = finalValue;
+      }
+    }
+
     private void ZoomTo( double scale, bool allowStackAddition )
     {
       // if there is nothing to scale, just return
@@ -3575,6 +3748,10 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     // the content control's one and only content presenter
     private ContentPresenter _contentPresenter = null;
+
+    //The Scrollbars
+    private ScrollBar _verticalScrollBar = null;
+    private ScrollBar _horizontalScrollBar = null;
 
     // the content of the Zoombox (cast as a UIElement)
     private UIElement _content = null;

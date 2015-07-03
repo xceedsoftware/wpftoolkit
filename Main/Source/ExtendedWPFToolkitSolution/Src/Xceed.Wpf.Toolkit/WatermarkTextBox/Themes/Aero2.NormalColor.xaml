@@ -24,6 +24,18 @@
         <ContentControl Content="{Binding}" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Focusable="False" />
     </DataTemplate>
 
+   <LinearGradientBrush x:Key="TextBox_MouseOver" EndPoint="0,1" StartPoint="0,0">
+      <GradientStop Color="#5794BF" Offset="0.05" />
+      <GradientStop Color="#B7D5EA" Offset="0.07" />
+      <GradientStop Color="#C7E2F1" Offset="1" />
+   </LinearGradientBrush>
+
+   <LinearGradientBrush x:Key="TextBox_Focused" EndPoint="0,1" StartPoint="0,0">
+      <GradientStop Color="#3D7BAD" Offset="0.05" />
+      <GradientStop Color="#A4C9E3" Offset="0.07" />
+      <GradientStop Color="#B7D9ED" Offset="1" />
+   </LinearGradientBrush>
+
 
     <!-- =============================================================================== -->
     <!-- WatermarkTextBox                                                                -->
@@ -45,19 +57,24 @@
                 <ControlTemplate TargetType="{x:Type local:WatermarkTextBox}">
                     <Grid>
 
-                        <Border x:Name="Border" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="0" Background="{TemplateBinding Background}" />
-                        <ScrollViewer x:Name="PART_ContentHost" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                        <ContentPresenter x:Name="PART_WatermarkHost"
-                                    Content="{TemplateBinding Watermark}"
-                                    ContentTemplate="{TemplateBinding WatermarkTemplate}"
-                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                    IsHitTestVisible="False"
-                                    Margin="{TemplateBinding Padding}"
-                                    Visibility="Collapsed" />
+                        <Border x:Name="Border" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="0" Background="{TemplateBinding Background}" >
+                           <Grid>
+                              <ScrollViewer x:Name="PART_ContentHost" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                 <ContentPresenter x:Name="PART_WatermarkHost"
+                                             Content="{TemplateBinding Watermark}"
+                                             ContentTemplate="{TemplateBinding WatermarkTemplate}"
+                                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                             IsHitTestVisible="False"
+                                             Margin="{TemplateBinding Padding}"
+                                             Visibility="Collapsed" />
+                             </Grid>
+                        </Border>
+                       <Border x:Name="MouseOverVisual" Opacity="0" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{StaticResource TextBox_MouseOver}" CornerRadius="1" />
+                       <Border x:Name="FocusVisual" Opacity="0" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{StaticResource TextBox_Focused}" CornerRadius="1" />
 
-                    </Grid>
-                    <ControlTemplate.Triggers>
+                  </Grid>
+                  <ControlTemplate.Triggers>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsFocused" Value="False" />

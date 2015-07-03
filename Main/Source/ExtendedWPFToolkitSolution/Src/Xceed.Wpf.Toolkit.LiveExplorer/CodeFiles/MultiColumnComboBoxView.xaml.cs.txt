@@ -30,32 +30,9 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.DataGrid.Views
   {
     public MultiColumnComboBoxView()
     {
-#if !OPEN_SOURCE
-      this.DataContext = SampleDataProvider.GetOrders();
-#endif
       InitializeComponent();
     }
 
-#if !OPEN_SOURCE
-    private void OnGroupCheck( object sender, System.Windows.RoutedEventArgs e )
-    {
-      DataGridCollectionView collectionView = ( DataGridCollectionView )_combo.ItemsSource;
-      bool isChecked = ( ( CheckBox )sender ).IsChecked.GetValueOrDefault( false );
-      bool isGrouped = ( collectionView.GroupDescriptions.Count > 0 );
 
-      if( isGrouped != isChecked )
-      {
-        if( isChecked )
-        {
-          collectionView.GroupDescriptions.Add( new PropertyGroupDescription( "ShipCountry" ) );
-          collectionView.GroupDescriptions.Add( new PropertyGroupDescription( "ShipCity" ) );
-        }
-        else
-        {
-          collectionView.GroupDescriptions.Clear();
-        }
-      }
-    }
-#endif
   }
 }

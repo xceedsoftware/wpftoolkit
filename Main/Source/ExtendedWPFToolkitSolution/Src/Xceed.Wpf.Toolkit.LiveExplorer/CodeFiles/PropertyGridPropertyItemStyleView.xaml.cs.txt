@@ -37,7 +37,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
 
       var selObject = new Person();
       selObject.Friend = new Person();
-      
+
       this.DataContext = selObject;
     }
 

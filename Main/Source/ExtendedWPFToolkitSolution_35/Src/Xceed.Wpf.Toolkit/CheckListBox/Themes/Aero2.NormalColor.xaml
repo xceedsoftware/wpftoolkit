@@ -20,6 +20,7 @@
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit">
 
     <Style TargetType="{x:Type local:CheckListBox}">
+       <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
         <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="KeyboardNavigation.TabNavigation" Value="Once" />

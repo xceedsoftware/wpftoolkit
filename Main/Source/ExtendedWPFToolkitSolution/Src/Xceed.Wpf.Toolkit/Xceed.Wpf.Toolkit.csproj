@@ -145,19 +145,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Core\Themes\Aero2\SelectorItem.xaml">
+    <Page Include="Primitives\Themes\Aero2\SelectorItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Core\Themes\Aero2\WindowControl.xaml">
+    <Page Include="Primitives\Themes\Aero2\WindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Core\Themes\Generic\SelectorItem.xaml">
+    <Page Include="Primitives\Themes\Generic\SelectorItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Core\Themes\Generic\WindowControl.xaml">
+    <Page Include="Primitives\Themes\Generic\WindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -341,6 +341,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="WatermarkComboBox\Themes\Aero2.NormalColor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WatermarkComboBox\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WatermarkTextBox\Themes\Aero2.NormalColor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -402,11 +410,14 @@
     <Compile Include="Core\Converters\CenterTitleConverter.cs" />
     <Compile Include="Core\Converters\ColorBlendConverter.cs" />
     <Compile Include="Core\Converters\CornerRadiusToDoubleConverter.cs" />
+    <Compile Include="Core\Converters\HalfConverter.cs" />
     <Compile Include="Core\Converters\IntToThicknessConverter.cs" />
     <Compile Include="Core\Converters\ThicknessToDoubleConverter.cs" />
+    <Compile Include="Primitives\DateTimePickerBase.cs" />
     <Compile Include="Core\Utilities\DateTimeUtilities.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\IsStringEmptyConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\CollectionEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\TrimmedTextBlock.cs" />
     <Compile Include="Core\Converters\WindowContentBorderMarginConverter.cs" />
     <Compile Include="Core\Converters\WindowControlBackgroundConverter.cs" />
     <Compile Include="Core\Input\IValidateInput.cs" />
@@ -419,12 +430,11 @@
     <Compile Include="Core\Media\Animation\PennerEquation.cs" />
     <Compile Include="Core\Media\Animation\PennerEquations.cs" />
     <Compile Include="Core\Media\WindowColors.cs" />
-    <Compile Include="Core\Primitives\CachedTextInfo.cs" />
+    <Compile Include="Primitives\CachedTextInfo.cs" />
     <Compile Include="Core\Converters\ObjectTypeToNameConverter.cs" />
     <Compile Include="ColorCanvas\Implementation\ColorCanvas.cs" />
     <Compile Include="Core\Converters\CalculatorMemoryToVisibilityConverter.cs" />
     <Compile Include="Core\Converters\RoundedValueConverter.cs" />
-    <Compile Include="Core\Converters\TimeFormatToDateTimeFormatConverter.cs" />
     <Compile Include="Core\Converters\VisibilityToBoolConverter.cs" />
     <Compile Include="Core\Converters\WizardPageButtonVisibilityConverter.cs" />
     <Compile Include="Core\ErrorMessages.cs" />
@@ -435,13 +445,13 @@
     <Compile Include="Core\Input\KeyModifierCollectionConverter.cs" />
     <Compile Include="Core\InvalidContentException.cs" />
     <Compile Include="Core\InvalidTemplateException.cs" />
-    <Compile Include="Core\Primitives\DateTimeUpDownBase.cs" />
-    <Compile Include="Core\Primitives\HsvColor.cs" />
+    <Compile Include="Primitives\DateTimeUpDownBase.cs" />
+    <Compile Include="Primitives\HsvColor.cs" />
     <Compile Include="ColorPicker\Implementation\ColorItem.cs" />
     <Compile Include="ColorPicker\Implementation\ColorPicker.cs" />
-    <Compile Include="Core\Primitives\MouseWheelActiveTriggerEnum.cs" />
-    <Compile Include="Core\Primitives\WindowContainer.cs" />
-    <Compile Include="Core\Primitives\WindowControl.cs" />
+    <Compile Include="Primitives\MouseWheelActiveTriggerEnum.cs" />
+    <Compile Include="Primitives\WindowContainer.cs" />
+    <Compile Include="Primitives\WindowControl.cs" />
     <Compile Include="Core\Utilities\ChangeTypeHelper.cs" />
     <Compile Include="Core\Utilities\FontUtilities.cs" />
     <Compile Include="Core\Utilities\GeneralUtilities.cs" />
@@ -467,10 +477,10 @@
     <Compile Include="Panels\DoubleAnimator.cs" />
     <Compile Include="Panels\IterativeAnimator.cs" />
     <Compile Include="Panels\PanelBase.cs" />
-    <Compile Include="Core\Primitives\Selector.cs" />
-    <Compile Include="Core\Primitives\SelectorItem.cs" />
-    <Compile Include="Core\Primitives\ShapeBase.cs" />
-    <Compile Include="Core\Primitives\ValueRangeTextBox.cs" />
+    <Compile Include="Primitives\Selector.cs" />
+    <Compile Include="Primitives\SelectorItem.cs" />
+    <Compile Include="Primitives\ShapeBase.cs" />
+    <Compile Include="Primitives\ValueRangeTextBox.cs" />
     <Compile Include="Core\PropertyChangedEventArgs.cs" />
     <Compile Include="Core\PropertyChangedEventHandler.cs" />
     <Compile Include="Core\QueryTextFromValueEventArgs.cs" />
@@ -519,7 +529,7 @@
     <Compile Include="Magnifier\Implementation\Magnifier.cs" />
     <Compile Include="Magnifier\Implementation\MagnifierAdorner.cs" />
     <Compile Include="Magnifier\Implementation\MagnifierManager.cs" />
-    <Compile Include="Core\Primitives\InputBase.cs" />
+    <Compile Include="Primitives\InputBase.cs" />
     <Compile Include="Obselete\MaskedTextBox\Implementation\MaskedTextBox.cs" />
     <Compile Include="MessageBox\Implementation\MessageBox.cs" />
     <Compile Include="NumericUpDown\Implementation\LongUpDown.cs">
@@ -605,19 +615,19 @@
     <Compile Include="RichTextBox\Formatters\RtfFormatter.cs" />
     <Compile Include="RichTextBox\Formatters\XamlFormatter.cs" />
     <Compile Include="RichTextBox\RichTextBox.cs" />
-    <Compile Include="Core\Primitives\UpDownBase.cs" />
+    <Compile Include="Primitives\UpDownBase.cs" />
     <Compile Include="SplitButton\Implementation\SplitButton.cs" />
-    <Compile Include="Core\Themes\ResourceKeys.cs" />
+    <Compile Include="Primitives\Themes\ResourceKeys.cs" />
     <Compile Include="StyleableWindow\Implementation\Converters\StyleableWindowClippingBorderConverter.cs" />
     <Compile Include="TimelinePanel\Implementation\DateElement.cs" />
     <Compile Include="TimelinePanel\Implementation\OverlapBehavior.cs" />
     <Compile Include="TimelinePanel\Implementation\TimelinePanel.cs" />
-    <Compile Include="TimePicker\Implementation\TimeFormat.cs" />
     <Compile Include="TimePicker\Implementation\TimeItem.cs" />
     <Compile Include="TimePicker\Implementation\TimePicker.cs" />
     <Compile Include="TimeSpanUpDown\Implementation\TimeSpanUpDown.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\Implementation\VisualStates.MessageBox.cs" />
+    <Compile Include="WatermarkComboBox\Implementation\WatermarkComboBox.cs" />
     <Compile Include="WatermarkTextBox\Implementation\WatermarkTextBox.cs" />
     <Compile Include="Wizard\Implementation\WizardCommands.cs" />
     <Compile Include="Wizard\Implementation\WizardPage.cs" />

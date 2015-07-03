@@ -23,7 +23,6 @@
                 Title="ToggleSwitch">
 
    <local:DemoView.Description>
-      <!-- //#TODODOC-->
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
          <Run>The ToggleSwitch control is a fully customizable on/off switch that can be used to enhance the UI experience.</Run>

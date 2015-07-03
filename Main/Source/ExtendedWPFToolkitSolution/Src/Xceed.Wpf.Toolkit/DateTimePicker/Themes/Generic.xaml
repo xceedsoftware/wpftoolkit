@@ -17,6 +17,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
+                    xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
                     xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes"
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
 
@@ -84,12 +85,14 @@
 
    <Style TargetType="{x:Type local:DateTimePicker}">
       <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
-      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
+      <Setter Property="BorderThickness" Value="1,1,0,1" />
       <Setter Property="Focusable" Value="False" />
       <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
       <Setter Property="HorizontalContentAlignment" Value="Right" />
       <Setter Property="TextAlignment" Value="Right" />
       <Setter Property="TimeWatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
       <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
       <Setter Property="Template">
          <Setter.Value>
@@ -104,7 +107,11 @@
                         <local:ButtonSpinner x:Name="PART_Spinner"
                                              IsTabStop="False"
                                              Background="{TemplateBinding Background}"
+                                             BorderBrush="{TemplateBinding BorderBrush}"
                                              BorderThickness="{TemplateBinding BorderThickness}"
+                                             ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
+                                             HorizontalContentAlignment="Stretch"
+                                             VerticalContentAlignment="Stretch"
                                              AllowSpin="{TemplateBinding AllowSpin}"
                                              ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
                            <local:WatermarkTextBox x:Name="PART_TextBox"
@@ -117,9 +124,11 @@
                                                    FontWeight="{TemplateBinding FontWeight}" 
                                                    Foreground="{TemplateBinding Foreground}" 
                                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                   VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                   IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
                                                    MinWidth="20"
                                                    AcceptsReturn="False"
-                                                   Padding="0"
+                                                   Padding="{TemplateBinding Padding}"
                                                    TextAlignment="{TemplateBinding TextAlignment}"
                                                    TextWrapping="NoWrap" 
                                                    Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
@@ -150,6 +159,7 @@
                                                 Minimum="{Binding Minimum, RelativeSource={RelativeSource TemplatedParent}}"
                                                 Maximum="{Binding Maximum, RelativeSource={RelativeSource TemplatedParent}}"
                                                 ClipValueToMinMax="{Binding ClipValueToMinMax, RelativeSource={RelativeSource TemplatedParent}}"
+                                                IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
                                                 AllowSpin="{TemplateBinding TimePickerAllowSpin}"
                                                 ShowButtonSpinner="{TemplateBinding TimePickerShowButtonSpinner}"
                                                 Watermark="{TemplateBinding TimeWatermark}"
@@ -178,6 +188,11 @@
                              Value="True"
                              TargetName="PART_TextBox" />
                   </DataTrigger>
+                  <Trigger Property="IsEnabled"
+                           Value="False">
+                     <Setter Property="Foreground"
+                             Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                  </Trigger>
                </ControlTemplate.Triggers>
             </ControlTemplate>
          </Setter.Value>

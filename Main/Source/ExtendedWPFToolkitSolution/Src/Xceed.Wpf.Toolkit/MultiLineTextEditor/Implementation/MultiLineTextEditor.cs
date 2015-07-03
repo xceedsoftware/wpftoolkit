@@ -26,15 +26,18 @@ namespace Xceed.Wpf.Toolkit
 {
   [TemplatePart( Name = PART_ResizeThumb, Type = typeof( Thumb ) )]
   [TemplatePart( Name = PART_TextBox, Type = typeof( TextBox ) )]
+  [TemplatePart( Name = PART_DropDownButton, Type = typeof( ToggleButton ) )]
   public class MultiLineTextEditor : ContentControl
   {
     private const string PART_ResizeThumb = "PART_ResizeThumb";
     private const string PART_TextBox = "PART_TextBox";
+    private const string PART_DropDownButton = "PART_DropDownButton";
 
     #region Members
 
     private Thumb _resizeThumb;
     private TextBox _textBox;
+    private ToggleButton _toggleButton;
 
     #endregion //Members
 
@@ -221,6 +224,7 @@ namespace Xceed.Wpf.Toolkit
         _resizeThumb.DragDelta += ResizeThumb_DragDelta;
 
       _textBox = GetTemplateChild( PART_TextBox ) as TextBox;
+      _toggleButton = GetTemplateChild( PART_DropDownButton ) as ToggleButton;
     }
 
     #endregion //Bass Class Overrides
@@ -275,6 +279,8 @@ namespace Xceed.Wpf.Toolkit
       if( IsOpen )
         IsOpen = false;
       ReleaseMouseCapture();
+
+      _toggleButton.Focus();
     }
 
     #endregion //Methods

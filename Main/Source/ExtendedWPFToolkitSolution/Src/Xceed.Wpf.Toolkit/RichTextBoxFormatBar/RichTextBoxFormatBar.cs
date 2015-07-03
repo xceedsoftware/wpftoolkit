@@ -97,17 +97,17 @@ namespace Xceed.Wpf.Toolkit
       _waitingForMouseOver = true;
     }
 
-    void FontColor_SelectedColorChanged( object sender, RoutedPropertyChangedEventArgs<Color> e )
+    void FontColor_SelectedColorChanged( object sender, RoutedPropertyChangedEventArgs<Color?> e )
     {
-      Color selectedColor = ( Color )e.NewValue;
-      ApplyPropertyValueToSelectedText( TextElement.ForegroundProperty, new SolidColorBrush( selectedColor ) );
+      Color? selectedColor = ( Color? )e.NewValue;
+      ApplyPropertyValueToSelectedText( TextElement.ForegroundProperty, selectedColor.HasValue ? new SolidColorBrush( selectedColor.Value ) : null );
       _waitingForMouseOver = true;
     }
 
-    private void FontBackgroundColor_SelectedColorChanged( object sender, RoutedPropertyChangedEventArgs<Color> e )
+    private void FontBackgroundColor_SelectedColorChanged( object sender, RoutedPropertyChangedEventArgs<Color?> e )
     {
-      Color selectedColor = ( Color )e.NewValue;
-      ApplyPropertyValueToSelectedText( TextElement.BackgroundProperty, new SolidColorBrush( selectedColor ) );
+      Color? selectedColor = ( Color? )e.NewValue;
+      ApplyPropertyValueToSelectedText( TextElement.BackgroundProperty, selectedColor.HasValue ? new SolidColorBrush( selectedColor.Value ) : null );
       _waitingForMouseOver = true;
     }
 
@@ -173,12 +173,12 @@ namespace Xceed.Wpf.Toolkit
 
       if( _cmbFontBackgroundColor != null )
       {
-        _cmbFontBackgroundColor.SelectedColorChanged -= new RoutedPropertyChangedEventHandler<Color>( FontBackgroundColor_SelectedColorChanged );
+        _cmbFontBackgroundColor.SelectedColorChanged -= new RoutedPropertyChangedEventHandler<Color?>( FontBackgroundColor_SelectedColorChanged );
       }
 
       if( _cmbFontColor != null )
       {
-        _cmbFontColor.SelectedColorChanged -= new RoutedPropertyChangedEventHandler<Color>( FontColor_SelectedColorChanged );
+        _cmbFontColor.SelectedColorChanged -= new RoutedPropertyChangedEventHandler<Color?>( FontColor_SelectedColorChanged );
       }
 
       this.GetTemplateComponent( ref _cmbFontFamilies, "_cmbFontFamilies" );
@@ -224,12 +224,12 @@ namespace Xceed.Wpf.Toolkit
 
       if( _cmbFontBackgroundColor != null )
       {
-        _cmbFontBackgroundColor.SelectedColorChanged += new RoutedPropertyChangedEventHandler<Color>( FontBackgroundColor_SelectedColorChanged );
+        _cmbFontBackgroundColor.SelectedColorChanged += new RoutedPropertyChangedEventHandler<Color?>( FontBackgroundColor_SelectedColorChanged );
       }
 
       if( _cmbFontColor != null )
       {
-        _cmbFontColor.SelectedColorChanged += new RoutedPropertyChangedEventHandler<Color>( FontColor_SelectedColorChanged );
+        _cmbFontColor.SelectedColorChanged += new RoutedPropertyChangedEventHandler<Color?>( FontColor_SelectedColorChanged );
       }
 
       // Update the ComboBoxes when changing themes.
@@ -299,9 +299,9 @@ namespace Xceed.Wpf.Toolkit
         value = Target.Selection.GetPropertyValue( TextElement.ForegroundProperty );
       }
 
-      Color currentColor = ( Color )( ( ( value == null ) || ( value == DependencyProperty.UnsetValue ) )
-                                    ? Colors.Black
-                                    : ( ( SolidColorBrush )value ).Color );
+      Color? currentColor =  ( ( value == null ) || ( value == DependencyProperty.UnsetValue )
+                              ? null
+                              : ( Color? )( ( SolidColorBrush )value ).Color );
       _cmbFontColor.SelectedColor = currentColor;
     }
 
@@ -312,9 +312,9 @@ namespace Xceed.Wpf.Toolkit
       {
         value = Target.Selection.GetPropertyValue( TextElement.BackgroundProperty );
       }
-      Color currentColor = ( Color )( ( ( value == null ) || ( value == DependencyProperty.UnsetValue ) )
-                                      ? Colors.Transparent
-                                      : ( ( SolidColorBrush )value ).Color );
+      Color? currentColor = ( ( value == null ) || ( value == DependencyProperty.UnsetValue )
+                              ? null
+                              : ( Color? )( ( SolidColorBrush )value ).Color );
       _cmbFontBackgroundColor.SelectedColor = currentColor;
     }
 
@@ -358,7 +358,7 @@ namespace Xceed.Wpf.Toolkit
 
     void ApplyPropertyValueToSelectedText( DependencyProperty formattingProperty, object value )
     {
-      if( ( value == null ) || ( Target == null ) || ( Target.Selection == null ) )
+      if( ( Target == null ) || ( Target.Selection == null ) )
         return;
 
       SolidColorBrush solidColorBrush = value as SolidColorBrush;

@@ -55,7 +55,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:CollectionControl}">
                     <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                        <Grid>
+                      <Grid  Margin="{TemplateBinding Padding}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="1.5*" />
@@ -135,7 +135,15 @@
                             </Grid>
                         </Grid>
                     </Border>
-                </ControlTemplate>
+               <ControlTemplate.Triggers>
+                  <Trigger Property="IsEnabled"
+                           Value="False">
+                     <Setter Property="Foreground"
+                             Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+                             TargetName="PART_NewItemTypesComboBox"/>
+                  </Trigger>
+               </ControlTemplate.Triggers>
+            </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
@@ -153,13 +161,15 @@
                     <local:MultiLineTextEditor Background="{TemplateBinding Background}"
                                           BorderBrush="{TemplateBinding BorderBrush}"
                                           BorderThickness="{TemplateBinding BorderThickness}"
-                                          Content="{TemplateBinding Content}"  
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
                                           Padding="{TemplateBinding Padding}"
                                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           IsOpen="{TemplateBinding IsOpen}"
                                           IsReadOnly="{TemplateBinding IsReadOnly}"
                                           Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
-                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          DropDownWidth="{TemplateBinding ActualWidth}"/>
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
