@@ -185,7 +185,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      CloseDropDown( false );
+      CloseDropDown( true );
     }
 
     private void OnKeyDown( object sender, KeyEventArgs e )

@@ -35,8 +35,9 @@
       <Setter Property="Template">
          <Setter.Value>
             <ControlTemplate TargetType="{x:Type local:Wizard}">
-               <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                  <Grid Background="{TemplateBinding Background}">
+               <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                       Padding="{TemplateBinding Padding}">
+                  <Grid >
                      <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
@@ -44,9 +45,9 @@
 
                      <ContentPresenter Content="{Binding CurrentPage, RelativeSource={RelativeSource TemplatedParent}}" />
 
-                     <Border Grid.Row="1" Background="#F0F0F0" BorderBrush="#A0A0A0" BorderThickness="0,1,0,0" Padding="7">
-                        <StackPanel Background="{TemplateBinding Background}">
-                           <Grid Margin="{TemplateBinding Padding}">
+                     <Border Grid.Row="1" BorderBrush="#A0A0A0" BorderThickness="0,1,0,0" Padding="7">
+                        <StackPanel >
+                           <Grid>
                               <Grid.ColumnDefinitions>
                                  <ColumnDefinition Width="Auto" />
                                  <ColumnDefinition Width="*" />

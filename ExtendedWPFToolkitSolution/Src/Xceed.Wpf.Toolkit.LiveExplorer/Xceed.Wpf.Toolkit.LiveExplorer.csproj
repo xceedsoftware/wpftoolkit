@@ -186,6 +186,9 @@
     <Compile Include="Samples\DateTime\Views\DateTimeView.xaml.cs">
       <DependentUpon>DateTimeView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Samples\FilePicker\Views\FilePickerView.xaml.cs">
+      <DependentUpon>FilePickerView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Samples\Gauge\Views\RadialGaugeView.xaml.cs">
       <DependentUpon>RadialGaugeView.xaml</DependentUpon>
     </Compile>
@@ -282,6 +285,9 @@
     <Compile Include="Samples\Rating\Views\RatingView.xaml.cs">
       <DependentUpon>RatingView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Samples\SlideShow\Views\SlideShowView.xaml.cs">
+      <DependentUpon>SlideShowView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Samples\Text\Views\AutoSelectTextboxView.xaml.cs">
       <DependentUpon>AutoSelectTextboxView.xaml</DependentUpon>
     </Compile>
@@ -324,6 +330,9 @@
     </Compile>
     <Compile Include="Samples\Text\Views\TokenizedTextBoxView.xaml.cs">
       <DependentUpon>TokenizedTextBoxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\WatermarkComboBox\Views\WatermarkComboBoxView.xaml.cs">
+      <DependentUpon>WatermarkComboBoxView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Samples\Window\Converters\IntToBoolConverter.cs" />
     <Compile Include="Samples\Window\Converters\WindowStateToBoolConverter.cs" />
@@ -468,6 +477,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Samples\FilePicker\Views\FilePickerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Samples\Gauge\Views\RadialGaugeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -580,6 +593,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Samples\SlideShow\Views\SlideShowView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Samples\Text\Views\AutoSelectTextboxView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -635,6 +652,10 @@
     <Page Include="Samples\Text\Views\TokenizedTextBoxView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\WatermarkComboBox\Views\WatermarkComboBoxView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Samples\Window\Resources\FancyStyles.xaml">
       <SubType>Designer</SubType>
@@ -1064,6 +1085,38 @@
   <ItemGroup>
     <Resource Include="CodeFiles\StyleableWindowView.xaml.cs.txt" />
     <Resource Include="CodeFiles\StyleableWindowView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\FilePickerView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\FilePickerView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\SlideShowView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\SlideShowView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\FilePicker\OpenSourceImages\FilePicker.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\WatermarkComboBoxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\WatermarkComboBoxView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\WatermarkComboBox\Resources\PencilTool16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\SlideShow\Resources\photo_1.jpg" />
+    <Resource Include="Samples\SlideShow\Resources\photo_2.jpg" />
+    <Resource Include="Samples\SlideShow\Resources\photo_3.jpg" />
+    <Resource Include="Samples\SlideShow\Resources\photo_4.jpg" />
+    <Resource Include="Samples\SlideShow\Resources\photo_5.jpg" />
+    <Resource Include="Samples\SlideShow\Resources\photo_6.jpg" />
+    <Resource Include="Samples\SlideShow\Resources\photo_7.jpg" />
+    <Resource Include="Samples\SlideShow\Resources\photo_8.jpg" />
+    <Resource Include="Samples\SlideShow\Resources\photo_9.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\SlideShow\OpenSourceImages\SlideShow.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

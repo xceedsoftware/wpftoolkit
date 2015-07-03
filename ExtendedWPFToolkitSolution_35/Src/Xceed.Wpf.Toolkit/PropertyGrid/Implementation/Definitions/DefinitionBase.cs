@@ -39,6 +39,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     internal void ThrowIfLocked<TMember>( Expression<Func<TMember>> propertyExpression )
     {
+      //In XAML, when using any properties of PropertyDefinition, the error of ThrowIfLocked is always thrown => prevent it !
+      if( DesignerProperties.GetIsInDesignMode( this ) )
+        return;
+
       if( this.IsLocked )
       {
         string propertyName = ReflectionHelper.GetPropertyOrFieldName( propertyExpression );

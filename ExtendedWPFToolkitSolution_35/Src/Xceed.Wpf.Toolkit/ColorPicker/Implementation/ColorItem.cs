@@ -20,7 +20,7 @@ namespace Xceed.Wpf.Toolkit
 {
   public class ColorItem
   {
-    public Color Color
+    public Color? Color
     {
       get;
       set;
@@ -31,7 +31,7 @@ namespace Xceed.Wpf.Toolkit
       set;
     }
 
-    public ColorItem( Color color, string name )
+    public ColorItem( Color? color, string name )
     {
       Color = color;
       Name = name;

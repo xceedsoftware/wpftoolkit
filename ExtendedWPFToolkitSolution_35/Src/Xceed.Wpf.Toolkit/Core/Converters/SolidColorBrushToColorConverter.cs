@@ -30,7 +30,7 @@ namespace Xceed.Wpf.Toolkit.Core.Converters
       if( brush != null )
         return brush.Color;
 
-      return default( Color );
+      return default( Color? );
     }
 
     public object ConvertBack( object value, Type targetType, object parameter, System.Globalization.CultureInfo culture )

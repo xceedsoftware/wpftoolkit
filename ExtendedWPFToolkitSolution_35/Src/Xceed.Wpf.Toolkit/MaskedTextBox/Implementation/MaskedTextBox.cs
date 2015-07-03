@@ -1439,7 +1439,7 @@ namespace Xceed.Wpf.Toolkit
     internal override string GetCurrentText()
     {
       if( m_maskIsNull )
-        return base.GetCurrentText();
+        return string.Empty;
 
       string displayText = this.GetFormattedString( m_maskedTextProvider );
 

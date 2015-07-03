@@ -27,16 +27,11 @@
             The DateTimePicker and TimePicker controls let you select the date and the time in several ways. The TimePicker is used in the DateTimePicker.
         </Paragraph>
     </local:DemoView.Description>
-    
+
     <local:DemoView.Resources>
       <conv:DateTimeToTimeSpanConverter x:Key="dateTimeToTimeSpanConverter" />
       <conv:CustomFormatToBoolConverter x:Key="CustomFormatToBoolConverter" />
 
-      <ObjectDataProvider x:Key="enumTimeFormatData" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="xctk:TimeFormat"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
       <ObjectDataProvider x:Key="enumDateFormatData" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
          <ObjectDataProvider.MethodParameters>
             <x:Type TypeName="xctk:DateTimeFormat"/>
@@ -100,7 +95,7 @@
             <CheckBox x:Name="_timePickerShowButtonSpinner" Grid.Row="7" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
 
             <TextBlock Text="TimeFormat:" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" />
-            <ComboBox x:Name="_timeFormat" Grid.Row="0" Grid.Column="3" SelectedIndex="1" ItemsSource="{Binding Source={StaticResource enumTimeFormatData}}" Width="190" Margin="5"/>
+            <ComboBox x:Name="_timeFormat" Grid.Row="0" Grid.Column="3" SelectedIndex="7" ItemsSource="{Binding Source={StaticResource enumDateFormatData}}" Width="190" Margin="5"/>
             <TextBlock Text="Time FormatString:" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_timeFormatString}" Style="{StaticResource DisableGrayText}"/>
             <TextBox x:Name="_timeFormatString" Grid.Row="1" Grid.Column="3" Text="H:mm" Width="190"  IsEnabled="{Binding Source={x:Reference _timeFormat}, Path=SelectedItem, Converter={StaticResource CustomFormatToBoolConverter}}" Margin="5"/>            
             <TextBlock Text="TimeWatermark:" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center"/>
@@ -160,7 +155,7 @@
 
               <StackPanel>
                 <TextBlock Text="TimePicker Usage: " Style="{StaticResource Header}" />
-                <xctk:TimePicker x:Name="_timePicker"
+            <xctk:TimePicker x:Name="_timePicker"
                                  VerticalAlignment="Top"
                                  Format="{Binding Source={x:Reference _timeFormat}, Path=SelectedItem}"
                                  FormatString="{Binding Text, ElementName=_timeFormatString}"

@@ -22,10 +22,10 @@
                 xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters;assembly=Xceed.Wpf.Toolkit"
                 Title="TokenizedTextBox">
 
-   <local:DemoView.Description>
-      <Paragraph FontSize="14"
+    <local:DemoView.Description>
+        <Paragraph FontSize="14"
                  FontFamily="Segoe">
-         <Run>The TokenizedTextBox lets you display a series of values as tokens. If an ItemsSource is specified, an AutoComplete popup will appear with a filtered list of valid values during edition.</Run>
+         <Run>The TokenizedTextBox lets you display a series of values as tokens. If an ItemsSource is specified, an AutoComplete popup will appear with a filtered list of valid values during edit.</Run>
             <LineBreak />
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
@@ -34,7 +34,7 @@
                Click here for more details about Xceed Extended WPF Toolkit Plus.
             </Hyperlink>
       </Paragraph>
-   </local:DemoView.Description>
+    </local:DemoView.Description>
 
 
 

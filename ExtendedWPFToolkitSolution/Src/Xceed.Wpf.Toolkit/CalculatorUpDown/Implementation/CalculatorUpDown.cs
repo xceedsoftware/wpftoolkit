@@ -240,7 +240,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      CloseCalculatorUpDown( false );
+      CloseCalculatorUpDown( true );
     }
 
     #endregion //Event Handlers

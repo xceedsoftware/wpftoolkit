@@ -24,7 +24,7 @@
            The WatermarkTextBox is simply a TextBox that allows you to sepcify an object, usually a String, to represent null or missing text.
         </Paragraph>
     </local:DemoView.Description>
-    
+
    <Grid>
       <StackPanel Margin="10">
          <TextBlock Text="Default:" Style="{StaticResource Header}" />

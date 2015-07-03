@@ -25,196 +25,29 @@
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
             <Run>The chart's Axis class represents the x- and y-axis of an area (Area class) in a chart. They can be individually configured with many properties.</Run>
-       <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="http://www.xceed.com/Extended_WPF_Toolkit_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Extended WPF Toolkit Plus.
             </Hyperlink>
-        ##END-->
         </Paragraph>
     </local:DemoView.Description>
-    
-<!--##EXCLUDE_OPEN_SOURCE-->
-    <local:DemoView.Resources>
-        <ObjectDataProvider x:Key="AxisLabelsType" MethodName="GetValues"
-                          ObjectType="{x:Type sys:Enum}">
-         <ObjectDataProvider.MethodParameters>
-            <x:Type TypeName="xctk:LabelsType" />
-         </ObjectDataProvider.MethodParameters>
-      </ObjectDataProvider>
-        
-        <ObjectDataProvider x:Key="AxisGraduationMode" MethodName="GetValues"
-                          ObjectType="{x:Type sys:Enum}">
-         <ObjectDataProvider.MethodParameters>
-            <x:Type TypeName="xctk:AxisGraduationMode" />
-         </ObjectDataProvider.MethodParameters>
-      </ObjectDataProvider>
-        
-        <ObjectDataProvider x:Key="AxisScaleMode" MethodName="GetValues"
-                          ObjectType="{x:Type sys:Enum}">
-         <ObjectDataProvider.MethodParameters>
-            <x:Type TypeName="xctk:AxisScaleMode" />
-         </ObjectDataProvider.MethodParameters>
-      </ObjectDataProvider>
-        
-        <ObjectDataProvider x:Key="AxisLabelLayout" MethodName="GetValues"
-                          ObjectType="{x:Type sys:Enum}">
-         <ObjectDataProvider.MethodParameters>
-            <x:Type TypeName="xctk:AxisLabelLayout" />
-         </ObjectDataProvider.MethodParameters>
-      </ObjectDataProvider>
-        
-        <x:Array x:Key="AxisArray" Type="sys:String">
-            <sys:String>X Axis</sys:String>
-            <sys:String>Y Axis</sys:String>
-        </x:Array>
-        
-        <conv:GraduationModeToComboBoxConverter x:Key="GraduationModeToComboBoxConverter" />
-        <conv:LabelsTypeToPropertyEnabledConverter x:Key="LabelsTypeToPropertyEnabledConverter" />
-        <conv:ScaleModeToPropertyEnabledConverter x:Key="ScaleModeToPropertyEnabledConverter" />
-        <conv:AxesLabelsTypePropertyEnabledConverter x:Key="AxesLabelsTypePropertyEnabledConverter" />
-        
-        <sys:String x:Key="AxisLabelsLayoutTooltip">
-            Resize the window along the orientation of the selected axis to see all labels (staggered) or only the ones that fit (every second, third label, etc., is omitted).
-        </sys:String>
-    </local:DemoView.Resources>
-    
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
 
 
-      <GroupBox Header="Features" Grid.Row="0" Margin="5">
-         <Grid Margin="5" HorizontalAlignment="Left">
-            <Grid.RowDefinitions>
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="*" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="*" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
 
-            <!-- 1st column -->
-            <TextBlock Text="Axis: " VerticalAlignment="Center" FontWeight="Bold" FontSize="13"/>
-            <ComboBox x:Name="_axisComboBox" FontWeight="Bold" FontSize="13" Grid.Column="1" ItemsSource="{StaticResource AxisArray}" SelectionChanged="OnAxisComboBoxSelectionChanged" Width="100" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5"/>
-            <TextBlock Text="Labels Type: " Grid.Row="1" VerticalAlignment="Center" />
-            <ComboBox x:Name="_labelsType" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Source={StaticResource AxisLabelsType}}" SelectedItem="{Binding SelectedAxis.LabelsType, ElementName=_demo}" SelectionChanged="OnAxisLabelsTypeChanged" IsEnabled="{Binding SelectedIndex, ElementName=_axisComboBox, Converter={StaticResource AxesLabelsTypePropertyEnabledConverter}}"  Width="100" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Graduation Mode: " Grid.Row="2" VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_graduationMode}" />
-            <ComboBox x:Name="_graduationMode" Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Source={StaticResource AxisGraduationMode}}" Width="100" IsEnabled="{Binding SelectedItem, ElementName=_labelsType, Converter={StaticResource LabelsTypeToPropertyEnabledConverter}}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5">
-                <ComboBox.SelectedItem>
-                    <MultiBinding Converter="{StaticResource GraduationModeToComboBoxConverter}" >
-                       <Binding Path="SelectedAxis.GraduationMode" ElementName="_demo" />
-                       <Binding Path="SelectedAxis.LabelsType" ElementName="_demo" />
-                    </MultiBinding>
-                </ComboBox.SelectedItem>
-            </ComboBox>
-            <TextBlock Text="Scale Mode: " Grid.Row="3" VerticalAlignment="Center" />
-            <ComboBox x:Name="_scaleMode" Grid.Row="3" Grid.Column="1" ItemsSource="{Binding Source={StaticResource AxisScaleMode}}" SelectedItem="{Binding SelectedAxis.ScaleMode, ElementName=_demo}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Custom Range Start: " Grid.Row="4" VerticalAlignment="Center" IsEnabled="{Binding SelectedItem, ElementName=_scaleMode, Converter={StaticResource ScaleModeToPropertyEnabledConverter}}" Style="{StaticResource DisableGrayText}"/>
-            <xctk:DoubleUpDown x:Name="_customRangeStart" Grid.Row="4" Grid.Column="1" Minimum="0" Maximum="{Binding Value, ElementName=_customRangeEnd}" Value="{Binding SelectedAxis.CustomRangeStart, ElementName=_demo}" Width="100" IsEnabled="{Binding SelectedItem, ElementName=_scaleMode, Converter={StaticResource ScaleModeToPropertyEnabledConverter}}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Custom Range End: " Grid.Row="5" VerticalAlignment="Center" IsEnabled="{Binding SelectedItem, ElementName=_scaleMode, Converter={StaticResource ScaleModeToPropertyEnabledConverter}}" Style="{StaticResource DisableGrayText}"/>
-            <xctk:DoubleUpDown x:Name="_customRangeEnd" Grid.Row="5" Grid.Column="1" Minimum="{Binding Value, ElementName=_customRangeStart}" Maximum="100" Value="{Binding SelectedAxis.CustomRangeEnd, ElementName=_demo}" Width="100" IsEnabled="{Binding SelectedItem, ElementName=_scaleMode, Converter={StaticResource ScaleModeToPropertyEnabledConverter}}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            
-            <!-- 2nd column -->
-            <TextBlock Text="Title: " Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <TextBox Grid.Column="3" Text="{Binding SelectedAxis.Title, ElementName=_demo, UpdateSourceTrigger=PropertyChanged}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Title Margin: " Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <xctk:IntegerUpDown Grid.Row="1" Grid.Column="3" Minimum="0" Maximum="100" Value="{Binding SelectedAxis.TitleMargin, ElementName=_demo}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Axis Labels Layout: " Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <ComboBox Grid.Row="2" Grid.Column="3" ItemsSource="{Binding Source={StaticResource AxisLabelLayout}}" SelectedItem="{Binding SelectedAxis.AxisLabelsLayout, ElementName=_demo}" ToolTip="{StaticResource AxisLabelsLayoutTooltip}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Ticks Count: " Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <xctk:IntegerUpDown Grid.Row="3" Grid.Column="3" Minimum="0" Maximum="100" Value="{Binding SelectedAxis.TicksCount, ElementName=_demo}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Reversed: " Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <CheckBox Grid.Row="4" Grid.Column="3" IsChecked="{Binding SelectedAxis.Reversed, ElementName=_demo}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            
-            <!-- 3rd column -->
-            <TextBlock Text="Show Arrow: " Grid.Column="4" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <CheckBox Grid.Column="5" IsChecked="{Binding SelectedAxis.ShowArrow, ElementName=_demo}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Show Axis: " Grid.Row="1" Grid.Column="4" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <CheckBox Grid.Row="1" Grid.Column="5" IsChecked="{Binding SelectedAxis.ShowAxis, ElementName=_demo}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Show Grid Lines: " Grid.Row="2" Grid.Column="4" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <CheckBox Grid.Row="2" Grid.Column="5" IsChecked="{Binding SelectedAxis.ShowGridLines, ElementName=_demo}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Show Ticks: " Grid.Row="3" Grid.Column="4" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <CheckBox Grid.Row="3" Grid.Column="5" IsChecked="{Binding SelectedAxis.ShowTicks, ElementName=_demo}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Show Tick Labels: " Grid.Row="4" Grid.Column="4" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <CheckBox Grid.Row="4" Grid.Column="5" IsChecked="{Binding SelectedAxis.ShowTickLabels, ElementName=_demo}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Show Axis Label: " Grid.Row="5" Grid.Column="4" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <CheckBox Grid.Row="5" Grid.Column="5" IsChecked="{Binding SelectedAxis.ShowAxisLabel, ElementName=_demo}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-        </Grid>
-      </GroupBox>
-      
-      <TextBlock Grid.Row="1" Text="Usage:" Style="{StaticResource Header}" Margin="10"/>
 
-      <xctk:Chart Grid.Row="2" MinHeight="200" ShowLegend="False">
-         <xctk:Chart.Areas>
-            <xctk:Area Title="Area #1">
-               <xctk:Area.XAxis>
-					<xctk:Axis x:Name="_xAxis" 
-                                 LabelsType="Numeric"
-                                 GraduationMode="Automatic" 
-                                 TicksCount="10"
-                                 ScaleMode="Automatic"
-                                 CustomRangeStart="0"
-                                 CustomRangeEnd="10"
-                                 Title="X Axis"
-                                 TitleMargin="10"
-                                 AxisLabelsLayout="ShowAll"
-                                 ShowArrow="False"
-                                 ShowAxis="True"
-                                 ShowGridLines="True"
-                                 ShowTicks="True"
-                                 ShowTickLabels="True"
-                                 ShowAxisLabel="True"
-                                 Reversed="False"/>
-				</xctk:Area.XAxis>
-               <xctk:Area.YAxis>
-					<xctk:Axis x:Name="_yAxis" 
-                                 LabelsType="Numeric"
-                                 GraduationMode="Automatic" 
-                                 TicksCount="10"
-                                 ScaleMode="Automatic"
-                                 CustomRangeStart="0"
-                                 CustomRangeEnd="10"
-                                 Title="Y Axis"
-                                 TitleMargin="10"
-                                 AxisLabelsLayout="ShowAll"
-                                 ShowArrow="False"
-                                 ShowAxis="True"
-                                 ShowGridLines="True"
-                                 ShowTicks="True"
-                                 ShowTickLabels="True"
-                                 ShowAxisLabel="True"
-                                 Reversed="False"/>
-				</xctk:Area.YAxis>
-               <xctk:Area.Series>
-                     <xctk:Series x:Name="_series"
-                                 DefaultInterior="Red">
-                        <xctk:Series.Layout>
-							<xctk:ColumnLayout/>
-						</xctk:Series.Layout>
-                     </xctk:Series>
-               </xctk:Area.Series>
-            </xctk:Area>
-         </xctk:Chart.Areas>
-      </xctk:Chart>
-    </Grid>
- <!--##END-->
-    
-<!--##INCLUDE_OPEN_SOURCE
+
+
+
+
+
+
+
+
+
+
+
+
     <Image Source="..\OpenSourceImages\ChartAxis.png" Width="600" Height="400"/>
-##END-->
 </local:DemoView>

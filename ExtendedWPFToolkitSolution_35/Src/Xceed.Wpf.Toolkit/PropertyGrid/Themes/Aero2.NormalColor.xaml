@@ -42,6 +42,7 @@
 
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+    <conv:HalfConverter x:Key="HalfConverter" />
     <pgconv:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
     <pgconv:ObjectToUIElementConverter x:Key="ObjectToUIElementConverter" />
     <pgconv:IsStringEmptyConverter x:Key="IsStringEmptyConverter" />
@@ -183,6 +184,11 @@
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="Background" Value="Transparent" />
          </MultiTrigger>
+         <Trigger Property="IsEnabled"
+                  Value="False">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+         </Trigger>
       </Style.Triggers>
    </Style>
 
@@ -224,6 +230,7 @@
          </MultiTrigger>
       </Style.Triggers>
    </Style>
+
 
    <!-- PropertyGrid PrimitiveTypeCollectionControl Editors -->
    <Style TargetType="{x:Type editor:PropertyGridEditorPrimitiveTypeCollectionControl}" 
@@ -409,6 +416,11 @@
 
     <ControlTemplate x:Key="ExpanderToggleButton" TargetType="{x:Type ToggleButton}">
         <Grid>
+         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="*" />
+         </Grid.ColumnDefinitions>
+
             <Rectangle Margin="0,0,0,0" x:Name="Rectangle" Fill="Transparent" />
             <Path HorizontalAlignment="Center" x:Name="Up_Arrow" VerticalAlignment="Center" Fill="{StaticResource GlyphBrush}" Data="M 0 0 L 4 4 L 8 0 Z" RenderTransformOrigin="0.5,0.5">
                 <Path.RenderTransform>
@@ -430,7 +442,9 @@
                     </TransformGroup>
                 </Path.RenderTransform>
             </Path>
-        </Grid>
+
+         <ContentPresenter Grid.Column="1" />
+      </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="true">
                 <Setter Property="Visibility" Value="Visible" TargetName="Down_Arrow" />
@@ -452,14 +466,14 @@
                             <RowDefinition Height="*" x:Name="ContentRow" />
                         </Grid.RowDefinitions>
                         <Border x:Name="Border" Background="{TemplateBinding Background}" BorderBrush="#FFF0F0F0">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="20" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <ToggleButton Template="{StaticResource ExpanderToggleButton}" IsChecked="{Binding Path=IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" OverridesDefaultStyle="True" />
-                                <ContentPresenter Grid.Column="1" Margin="1" RecognizesAccessKey="True" ContentSource="Header" TextElement.FontWeight="Bold" />
-                            </Grid>
+                           <ToggleButton Template="{StaticResource ExpanderToggleButton}"
+                                         IsChecked="{Binding Path=IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                         OverridesDefaultStyle="True">
+                              <ContentPresenter Margin="1"
+                                                RecognizesAccessKey="True"
+                                                ContentSource="Header"
+                                                TextElement.FontWeight="Bold" />
+                           </ToggleButton>
                         </Border>
                         <Border Visibility="Collapsed" Grid.Row="1" x:Name="ExpandSite" Background="{x:Static SystemColors.ControlBrush}" Padding="10 0 0 0">
                             <Border BorderThickness="0" Margin="0" Padding="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
@@ -517,6 +531,25 @@
             </ControlTemplate>
          </Setter.Value>
       </Setter>
+
+      <Style.Triggers>
+         <MultiDataTrigger>
+            <MultiDataTrigger.Conditions>
+               <Condition Binding="{Binding Name}"
+                          Value="Misc" />
+               <Condition Binding="{Binding IsMiscCategoryLabelHidden, RelativeSource={RelativeSource AncestorType={x:Type pg:PropertyGrid}}}"
+                          Value="True" />
+            </MultiDataTrigger.Conditions>
+            <Setter Property="Template">
+               <Setter.Value>
+                  <ControlTemplate TargetType="{x:Type GroupItem}">
+                     <!-- No Expander for the Misc Category -->
+                     <ItemsPresenter />
+                  </ControlTemplate>
+               </Setter.Value>
+            </Setter>
+         </MultiDataTrigger>
+      </Style.Triggers>
    </Style>
 
    <ContextMenu x:Key="{ComponentResourceKey 
@@ -556,6 +589,8 @@
                      <!-- Set the BorderThickness at 1 pixel to the right to let the "vertical line" appear -->
                      <Border x:Name="PART_Name"
                              Background="{TemplateBinding Background}"
+                             BorderBrush="{TemplateBinding BorderBrush}"
+                             BorderThickness="{TemplateBinding BorderThickness}"
                              Margin="0,0,1,0"
                              VerticalAlignment="Stretch"
                              HorizontalAlignment="Stretch">
@@ -579,13 +614,13 @@
                                             IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
                                             Visibility="{Binding IsExpandable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-                              <TextBlock x:Name="_text"
-                                         Grid.Column="1"
-                                         Text="{Binding DisplayName, RelativeSource={RelativeSource TemplatedParent}}"
-                                         HorizontalAlignment="Stretch"
-                                         VerticalAlignment="Center"
-                                         TextTrimming="CharacterEllipsis"
-                                         IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}, Converter={StaticResource InverseBoolConverter}}"/>
+                              <pg:TrimmedTextBlock x:Name="_text"
+                                                   Grid.Column="1"
+                                                   Text="{Binding DisplayName, RelativeSource={RelativeSource TemplatedParent}}"
+                                                   HorizontalAlignment="Stretch"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}, Converter={StaticResource InverseBoolConverter}}"/>
                            </Grid>
 
                            <Grid Grid.Column="1"
@@ -606,9 +641,14 @@
                      <Border x:Name="PART_Editor"
                              Grid.Column="1"
                              Background="{TemplateBinding Background}"
+                             BorderBrush="{TemplateBinding BorderBrush}"
+                             BorderThickness="{TemplateBinding BorderThickness}"
                              KeyboardNavigation.DirectionalNavigation="None"
                              VerticalAlignment="Stretch"
                              HorizontalAlignment="Stretch">
+                        <Border.ToolTip>
+                           <ToolTip Visibility="Collapsed"/>
+                        </Border.ToolTip>
                         <ContentControl x:Name="PART_ValueContainer"
                                         Content="{TemplateBinding Editor}"
                                         Focusable="False"
@@ -770,15 +810,21 @@
                                         </Rectangle.Fill>
                                     </Rectangle>
                                 </Border>
-                                <StackPanel Orientation="Horizontal"
-                                            VerticalAlignment="Center"
-                                            Margin="6,2,0,4"
-                                            Visibility="{Binding ShowTitle, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                    <TextBlock Text="{TemplateBinding SelectedObjectTypeName}"
-                                               FontWeight="Bold" />
-                                    <TextBlock Text="{TemplateBinding SelectedObjectName}"
-                                               Margin="5,0,0,0" />
-                                </StackPanel>
+                                 <StackPanel Orientation="Horizontal"
+                                             VerticalAlignment="Center"
+                                             Margin="6,2,6,4"
+                                             Visibility="{Binding ShowTitle, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Grid MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource HalfConverter}, ConverterParameter=17}">
+                                       <pg:TrimmedTextBlock Text="{TemplateBinding SelectedObjectTypeName}"
+                                                            TextTrimming="CharacterEllipsis"
+                                                            FontWeight="Bold" />
+                                    </Grid>
+                                    <Grid MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource HalfConverter}, ConverterParameter=17}"
+                                          Margin="5,0,0,0">
+                                       <pg:TrimmedTextBlock Text="{TemplateBinding SelectedObjectName}"
+                                                            TextTrimming="CharacterEllipsis" />
+                                    </Grid>
+                                 </StackPanel>
                             </StackPanel>
 
                             <Grid x:Name="toolsContainer" Grid.Row="1" Margin="4,0,4,4">

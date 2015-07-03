@@ -184,7 +184,7 @@ namespace Xceed.Wpf.Toolkit
         return this.Value;
 
       //Don't know why someone would format a T as %, but just in case they do.
-      result = FormatString.Contains( "P" )
+      result = this.ContainsLetterForPercent( this.FormatString )
         ? _fromDecimal( ParsePercent( text, CultureInfo ) )
         : _fromText( text, this.ParsingNumberStyle, CultureInfo );
 
@@ -213,10 +213,10 @@ namespace Xceed.Wpf.Toolkit
       // Null increment always prevents spin.
       if( (this.Increment != null) && !IsReadOnly )
       {
-        if( IsLowerThan( Value, Maximum ) || !Value.HasValue )
+        if( IsLowerThan( Value, Maximum ) || !Value.HasValue || !Maximum.HasValue)
           validDirections = validDirections | ValidSpinDirections.Increase;
 
-        if( IsGreaterThan( Value, Minimum ) || !Value.HasValue )
+        if( IsGreaterThan( Value, Minimum ) || !Value.HasValue || !Minimum.HasValue )
           validDirections = validDirections | ValidSpinDirections.Decrease;
       }
 
@@ -224,9 +224,21 @@ namespace Xceed.Wpf.Toolkit
         Spinner.ValidSpinDirection = validDirections;
     }
 
+    private bool ContainsLetterForPercent( string stringToTest )
+    {
+      int PIndex = stringToTest.IndexOf( "P" );
+      if( PIndex > 0 )
+      {
+        //stringToTest contains a "P" between 2 "'", it's not considered as percent
+        return !( stringToTest.Substring( 0, PIndex ).Contains( "'" )
+                && stringToTest.Substring( PIndex, FormatString.Length - PIndex ).Contains( "'" ) );
+      }
+      return false;
+    }
+
     private T? GetClippedMinMaxValue()
     {
-      T? result = FormatString.Contains( "P" )
+      T? result = this.ContainsLetterForPercent( this.FormatString )
                 ? _fromDecimal( ParsePercent( this.Text, CultureInfo ) )
                 : _fromText( this.Text, this.ParsingNumberStyle, CultureInfo );
 

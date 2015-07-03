@@ -31,8 +31,8 @@
 
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Calculator/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/CalculatorUpDown/Themes/Aero2.NormalColor.xaml" />
-        <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Core/Themes/Aero2/WindowControl.xaml" />
-        <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Core/Themes/Aero2/SelectorItem.xaml" />
+        <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Primitives/Themes/Aero2/WindowControl.xaml" />
+        <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Primitives/Themes/Aero2/SelectorItem.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/CheckComboBox/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/CheckListBox/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/ChildWindow/Themes/Aero2.NormalColor.xaml" />
@@ -49,11 +49,12 @@
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/RangeSlider/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/RichTextBoxFormatBar/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/SplitButton/Themes/Aero2.NormalColor.xaml" />
-        <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/PropertyGrid/Themes/Aero2.NormalColor.xaml" />
+        <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/PropertyGrid/Themes/Aero2.NormalColor.xaml" />        
 
 
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/TimePicker/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/TimeSpanUpDown/Themes/Aero2.NormalColor.xaml" />
+        <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/WatermarkComboBox/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/WatermarkTextBox/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Wizard/Themes/Aero2.NormalColor.xaml" />
         <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Zoombox/Themes/Aero2.NormalColor.xaml" />

@@ -29,8 +29,7 @@
             <Run>Dress Up Your App in Style in Minutes</Run>
             <LineBreak />
             <LineBreak />
-           <!--//# TODODOC -->
-            <Run>Supports implicit styles, so the entire listbox can be styled in minutes with a couple of lines of code. Also supports explicit styles and Expression Blend. Available themes are System, Office2007, LiveExplorer, MediaPlayer and Metro with accent color. The Xceed.Wpf.ListBox.Themes.xxx.dll assembly is necessary to use the themes.</Run>
+         <Run>Supports implicit styles, so the entire listbox can be styled in minutes with a couple of lines of code. Also supports explicit styles and Expression Blend. Available themes are System, Office2007, LiveExplorer, MediaPlayer and Metro with accent color. The Xceed.Wpf.ListBox.Themes.xxx.dll assembly is necessary to use the themes.</Run>
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />

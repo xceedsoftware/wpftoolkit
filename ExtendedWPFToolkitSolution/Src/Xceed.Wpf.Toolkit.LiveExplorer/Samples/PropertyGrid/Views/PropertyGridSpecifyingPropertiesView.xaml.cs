@@ -90,7 +90,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       [Category( "Information" )]
       [DisplayName( "Favorite Color" )]
       [Description( "This property uses the ColorPicker as the default editor." )]
-      public System.Windows.Media.Color FavoriteColor
+      public System.Windows.Media.Color? FavoriteColor
       {
         get;
         set;

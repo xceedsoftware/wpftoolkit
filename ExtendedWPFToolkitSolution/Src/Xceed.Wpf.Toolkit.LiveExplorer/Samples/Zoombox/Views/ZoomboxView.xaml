@@ -289,6 +289,11 @@
                           FontWeight="Bold"
                           FontSize="12"
                           Text="Input States" />
+               <ItemsControl Tag="{Binding Source={StaticResource Props}, XPath=IsUsingScrollBars}">
+                  <TextBlock Text="IsUsingScrollBars"
+                             Grid.ColumnSpan="2" />
+                  <CheckBox IsChecked="{Binding IsUsingScrollBars}" />
+               </ItemsControl>
                <ItemsControl Tag="{Binding Source={StaticResource Props}, XPath=AreDragModifiersActive}">
                   <TextBlock Text="AreDragModifiersActive"
                              Grid.ColumnSpan="2" />
@@ -325,7 +330,6 @@
                   <CheckBox IsEnabled="False"
                             IsChecked="{Binding IsSelectingRegion, Mode=OneWay}" />
                </ItemsControl>
-
             </ItemsControl>
          </TabItem>
 

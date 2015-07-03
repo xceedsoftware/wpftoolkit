@@ -29,7 +29,6 @@
    <Style x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
       <Setter Property="OverridesDefaultStyle" Value="true" />
       <Setter Property="IsTabStop" Value="false" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="Focusable" Value="false" />
       <Setter Property="Padding" Value="2" />
       <Setter Property="Template">
@@ -80,6 +79,8 @@
       <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
       <Setter Property="ScrollViewer.PanningMode" Value="Both" />
       <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
       <Setter Property="Template">
          <Setter.Value>
             <ControlTemplate TargetType="{x:Type local:CheckComboBox}">
@@ -101,6 +102,9 @@
 
                   <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
                   <ToggleButton x:Name="PART_DropDownButton"  Content="{TemplateBinding Text}" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" Focusable="False" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxToggleButton}"
+                                Padding="{TemplateBinding Padding}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" 
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                 IsHitTestVisible="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}" />
                </Grid>
             </ControlTemplate>

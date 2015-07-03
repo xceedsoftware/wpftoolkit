@@ -34,30 +34,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
   [TemplatePart( Name = "content", Type = typeof( ContentControl ) )]
   public class PropertyItem : CustomPropertyItem
   {
-    private int _categoryOrder;
-
     #region Properties
-
-    #region CategoryOrder
-
-    public int CategoryOrder
-    {
-      get
-      {
-        return _categoryOrder;
-      }
-      internal set
-      {
-        if( _categoryOrder != value )
-        {
-          _categoryOrder = value;
-          // Notify the parent helper since this property may affect ordering.
-          this.RaisePropertyChanged( () => this.CategoryOrder );
-        }
-      }
-    }
-
-    #endregion //CategoryOrder
 
     #region IsReadOnly
 
@@ -74,19 +51,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
     #endregion //IsReadOnly
-
-    #region PropertyOrder
-
-    public static readonly DependencyProperty PropertyOrderProperty =
-        DependencyProperty.Register( "PropertyOrder", typeof( int ), typeof( PropertyItem ), new UIPropertyMetadata( 0 ) );
-
-    public int PropertyOrder
-    {
-      get { return ( int )GetValue( PropertyOrderProperty ); }
-      set { SetValue( PropertyOrderProperty, value ); }
-    }
-
-    #endregion //PropertyOrder
 
     #region PropertyDescriptor
 

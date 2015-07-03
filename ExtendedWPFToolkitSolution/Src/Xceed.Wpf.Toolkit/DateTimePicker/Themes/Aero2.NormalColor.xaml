@@ -59,8 +59,8 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Fill" TargetName="Arrow" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                        </Trigger>
+                        <Setter Property="Fill" TargetName="Arrow" Value="#AFAFAF" />
+                    </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -81,6 +81,7 @@
         <Setter Property="HorizontalContentAlignment" Value="Right" />
         <Setter Property="TextAlignment" Value="Right" />
         <Setter Property="TimeWatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -97,6 +98,9 @@
                                              Background="{TemplateBinding Background}"
                                              BorderThickness="{TemplateBinding BorderThickness}"
                                              BorderBrush="{TemplateBinding BorderBrush}"
+                                             ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
+                                             HorizontalContentAlignment="Stretch"
+                                             VerticalContentAlignment="Stretch"
                                              AllowSpin="{TemplateBinding AllowSpin}"
                                              ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
                                     <local:WatermarkTextBox x:Name="PART_TextBox"
@@ -109,9 +113,11 @@
                                                    FontWeight="{TemplateBinding FontWeight}" 
                                                    Foreground="{TemplateBinding Foreground}" 
                                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                   VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                   IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
                                                    MinWidth="20"
                                                    AcceptsReturn="False"
-                                                   Padding="0"
+                                                   Padding="{TemplateBinding Padding}"
                                                    TextAlignment="{TemplateBinding TextAlignment}"
                                                    TextWrapping="NoWrap" 
                                                    Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
@@ -142,6 +148,7 @@
                                                           Minimum="{Binding Minimum, RelativeSource={RelativeSource TemplatedParent}}"
                                                           Maximum="{Binding Maximum, RelativeSource={RelativeSource TemplatedParent}}"
                                                           ClipValueToMinMax="{Binding ClipValueToMinMax, RelativeSource={RelativeSource TemplatedParent}}"
+                                                          IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
                                                           AllowSpin="{TemplateBinding TimePickerAllowSpin}"
                                                           ShowButtonSpinner="{TemplateBinding TimePickerShowButtonSpinner}"
                                                           Watermark="{TemplateBinding TimeWatermark}"

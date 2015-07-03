@@ -66,7 +66,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
             }
             if( isBrowsable )
             {
-              propertyItems.Add( this.CreatePropertyItem( descriptor, propertyDef ) );
+              var prop = this.CreatePropertyItem( descriptor, propertyDef );
+              if( prop != null )
+              {
+                propertyItems.Add( prop );
+              }
             }
           }
         }
@@ -88,7 +92,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       definition.InitProperties();
 
       this.InitializeDescriptorDefinition( definition, propertyDef );
-
       PropertyItem propertyItem = new PropertyItem( definition );
       Debug.Assert( SelectedObject != null );
       propertyItem.Instance = SelectedObject;
@@ -119,6 +122,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       return order;
     }
+
+
+
 
 
 

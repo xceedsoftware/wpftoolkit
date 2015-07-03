@@ -24,10 +24,9 @@
                 xmlns:toolConv="clr-namespace:Xceed.Wpf.Toolkit.Converters;assembly=Xceed.Wpf.Toolkit"
                 Title="Radial Gauge">
    <local:DemoView.Description>
-      <!-- //# TODODOC-->
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
-         <Run>The Radial Gauge is a fully customizable gauge that can be used to display a current value on a radial or partly-radial scaled circle. Markers can be added to highlight specific values, background portions or border portions of the Radial gauge can be customized and the pointer can be animated when moving from one value to a new one.</Run>
+         <Run>The RadialGauge is a fully customizable gauge that can be used to display a current value on a radial or partially radial scaled circle. Markers can be added to highlight specific values. Background portions or border portions of the Radial gauge can also be customized and the pointer can be animated when moving from one value to a new one.</Run>
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>

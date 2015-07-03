@@ -203,10 +203,11 @@ namespace Xceed.Wpf.Toolkit
       if( list == null )
         return;
 
+      IList items = ComputeItems();
+
       //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
       list.Clear();
 
-      IList items = ComputeItems();
       foreach( var item in items )
       {
         list.Add( item );
@@ -260,7 +261,12 @@ namespace Xceed.Wpf.Toolkit
     private IList ComputeItemsSource()
     {
       if( ItemsSource == null )
+      {
+        // Save current text since creating the ItemsSource will reset it
+        string currentText = this.Text;
         ItemsSource = CreateItemsSource();
+        this.Text = currentText;
+      }
 
       return ItemsSource;
     }

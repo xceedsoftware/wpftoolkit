@@ -23,10 +23,9 @@
                 Title="Rating">
 
    <local:DemoView.Description>
-      <!-- //#TODODOC-->
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
-         <Run>The Rating control fills icons to represent a value on a scale. It can be interactive and fully customizable.</Run>
+         <Run>The Rating control fills icons to represent a value on a scale. It can be interactive and is also fully customizable.</Run>
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>

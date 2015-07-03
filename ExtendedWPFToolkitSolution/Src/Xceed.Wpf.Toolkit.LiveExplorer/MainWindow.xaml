@@ -518,6 +518,9 @@
 
             <core:LiveExplorerTreeViewItem Header="Check lists"
                                            SampleType="{x:Type samples:CheckLists.Views.CheckListsView}" />
+            <core:LiveExplorerTreeViewItem Header="Watermark ComboBox"
+                                           SampleType="{x:Type samples:WatermarkComboBox.Views.WatermarkComboBoxView}"
+                                           IsNewFeature="True" />
             <core:LiveExplorerTreeViewItem Header="TimelinePanel"
                                            SampleType="{x:Type samples:TimelinePanel.Views.TimelinePanelView}" />
          </core:LiveExplorerTreeViewItem>
@@ -547,9 +550,12 @@
                                               SampleType="{x:Type samples:Text.Views.WatermarkTextboxView}" />
                <core:LiveExplorerTreeViewItem Header="TokenizedTextBox"
                                               SampleType="{x:Type samples:TokenizedTextBox.Views.TokenizedTextBoxView}"
-                                              IsNewFeature="True"
                                               IsPlusOnlyFeature="True" />
             </core:LiveExplorerTreeViewItem>
+            <core:LiveExplorerTreeViewItem Header="Files"
+                                           SampleType="{x:Type samples:FilePicker.Views.FilePickerView}"
+                                           IsNewFeature="True"
+                                           IsPlusOnlyFeature="True"/>
             <core:LiveExplorerTreeViewItem Header="RangeSlider"
                                            SampleType="{x:Type samples:RangeSlider.Views.RangeSliderView}"/>
             <core:LiveExplorerTreeViewItem Header="Rating"
@@ -645,10 +651,13 @@
                                            IsPlusOnlyFeature="True" />
             <core:LiveExplorerTreeViewItem Header="SwitchPanel"
                                            SampleType="{x:Type samples:Panels.Views.SwitchPanelView}" />
-            </core:LiveExplorerTreeViewItem>
+            <core:LiveExplorerTreeViewItem Header="SlideShow"
+                                           SampleType="{x:Type samples:SlideShow.Views.SlideShowView}"
+                                           IsNewFeature="True"
+                                           IsPlusOnlyFeature="True"/>
+         </core:LiveExplorerTreeViewItem>
 
-
-           <core:LiveExplorerTreeViewItem Header="Theming"
+         <core:LiveExplorerTreeViewItem Header="Theming"
                                         Style="{StaticResource TreeViewHeaderStyle}"
                                         ItemContainerStyle="{StaticResource TreeViewItemStyle}">
             <core:LiveExplorerTreeViewItem Header="Extended Toolkit controls"
@@ -685,7 +694,8 @@
                   <!-- The sample itself -->
                   <ScrollViewer x:Name="_contentScrollViewer"
                                 Style="{StaticResource LiveExplorerScrollViewerStyle}"
-                                VerticalScrollBarVisibility="{Binding View.VerticalScrollBarVisibility, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
+                                VerticalScrollBarVisibility="{Binding View.VerticalScrollBarVisibility, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                Focusable="False">
                      <ContentPresenter Content="{Binding View, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                        Margin="10,0,10,0"
                                        ScrollViewer.CanContentScroll="True">

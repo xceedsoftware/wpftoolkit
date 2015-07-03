@@ -273,7 +273,7 @@ namespace Xceed.Wpf.Toolkit
     {
       base.OnMouseWheel( e );
 
-      if( !e.Handled && this.AllowSpin )
+      if( this.IsKeyboardFocusWithin && !e.Handled && this.AllowSpin )
       {
         if( e.Delta < 0 )
         {

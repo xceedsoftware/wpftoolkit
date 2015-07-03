@@ -53,12 +53,12 @@ namespace Xceed.Wpf.Toolkit
 
     #region SelectedColor
 
-    public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register( "SelectedColor", typeof( Color ), typeof( ColorCanvas ), new FrameworkPropertyMetadata( Colors.Black, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedColorChanged ) );
-    public Color SelectedColor
+    public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register( "SelectedColor", typeof( Color? ), typeof( ColorCanvas ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedColorChanged ) );
+    public Color? SelectedColor
     {
       get
       {
-        return ( Color )GetValue( SelectedColorProperty );
+        return ( Color? )GetValue( SelectedColorProperty );
       }
       set
       {
@@ -70,16 +70,16 @@ namespace Xceed.Wpf.Toolkit
     {
       ColorCanvas colorCanvas = o as ColorCanvas;
       if( colorCanvas != null )
-        colorCanvas.OnSelectedColorChanged( ( Color )e.OldValue, ( Color )e.NewValue );
+        colorCanvas.OnSelectedColorChanged( ( Color? )e.OldValue, ( Color? )e.NewValue );
     }
 
-    protected virtual void OnSelectedColorChanged( Color oldValue, Color newValue )
+    protected virtual void OnSelectedColorChanged( Color? oldValue, Color? newValue )
     {
       SetHexadecimalStringProperty( GetFormatedColorString( newValue ), false );
       UpdateRGBValues( newValue );
       UpdateColorShadeSelectorPosition( newValue );
 
-      RoutedPropertyChangedEventArgs<Color> args = new RoutedPropertyChangedEventArgs<Color>( oldValue, newValue );
+      RoutedPropertyChangedEventArgs<Color?> args = new RoutedPropertyChangedEventArgs<Color?>( oldValue, newValue );
       args.RoutedEvent = SelectedColorChangedEvent;
       RaiseEvent( args );
     }
@@ -212,7 +212,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region HexadecimalString
 
-    public static readonly DependencyProperty HexadecimalStringProperty = DependencyProperty.Register( "HexadecimalString", typeof( string ), typeof( ColorCanvas ), new UIPropertyMetadata( "#FFFFFFFF", OnHexadecimalStringChanged, OnCoerceHexadecimalString ) );
+    public static readonly DependencyProperty HexadecimalStringProperty = DependencyProperty.Register( "HexadecimalString", typeof( string ), typeof( ColorCanvas ), new UIPropertyMetadata( "", OnHexadecimalStringChanged, OnCoerceHexadecimalString ) );
     public string HexadecimalString
     {
       get
@@ -237,7 +237,14 @@ namespace Xceed.Wpf.Toolkit
       string newColorString = GetFormatedColorString( newValue );
       string currentColorString = GetFormatedColorString( SelectedColor );
       if( !currentColorString.Equals( newColorString ) )
-        UpdateSelectedColor( ( Color )ColorConverter.ConvertFromString( newColorString ) );
+      {
+        Color? col = null;
+        if( !string.IsNullOrEmpty( newColorString ) )
+        {
+          col = ( Color )ColorConverter.ConvertFromString( newColorString );      
+        }
+        UpdateSelectedColor( col );
+      }
 
       SetHexadecimalTextBoxTextProperty( newValue );
     }
@@ -258,7 +265,10 @@ namespace Xceed.Wpf.Toolkit
 
       try
       {
-        ColorConverter.ConvertFromString( value );
+        if( !string.IsNullOrEmpty( retValue ) )
+        {
+          ColorConverter.ConvertFromString( value );
+        }
       }
       catch
       {
@@ -420,7 +430,7 @@ namespace Xceed.Wpf.Toolkit
 
     void SpectrumSlider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
     {
-      if( _currentColorPosition != null )
+      if( (_currentColorPosition != null) && (this.SelectedColor != null) )
       {
         CalculateColor( ( Point )_currentColorPosition );
       }
@@ -436,8 +446,8 @@ namespace Xceed.Wpf.Toolkit
 
     #region Events
 
-    public static readonly RoutedEvent SelectedColorChangedEvent = EventManager.RegisterRoutedEvent( "SelectedColorChanged", RoutingStrategy.Bubble, typeof( RoutedPropertyChangedEventHandler<Color> ), typeof( ColorCanvas ) );
-    public event RoutedPropertyChangedEventHandler<Color> SelectedColorChanged
+    public static readonly RoutedEvent SelectedColorChangedEvent = EventManager.RegisterRoutedEvent( "SelectedColorChanged", RoutingStrategy.Bubble, typeof( RoutedPropertyChangedEventHandler<Color?> ), typeof( ColorCanvas ) );
+    public event RoutedPropertyChangedEventHandler<Color?> SelectedColorChanged
     {
       add
       {
@@ -458,19 +468,24 @@ namespace Xceed.Wpf.Toolkit
       SelectedColor = Color.FromArgb( A, R, G, B );
     }
 
-    private void UpdateSelectedColor( Color color )
+    private void UpdateSelectedColor( Color? color )
     {
-      SelectedColor = Color.FromArgb( color.A, color.R, color.G, color.B );
+      SelectedColor = ( ( color != null ) && color.HasValue ) 
+                      ? (Color?)Color.FromArgb( color.Value.A, color.Value.R, color.Value.G, color.Value.B )
+                      : null;
     }
 
-    private void UpdateRGBValues( Color color )
+    private void UpdateRGBValues( Color? color )
     {
+      if( ( color == null ) || !color.HasValue )
+        return;
+
       _surpressPropertyChanged = true;
 
-      A = color.A;
-      R = color.R;
-      G = color.G;
-      B = color.B;
+      A = color.Value.A;
+      R = color.Value.R;
+      G = color.Value.G;
+      B = color.Value.B;
 
       _surpressPropertyChanged = false;
     }
@@ -501,16 +516,16 @@ namespace Xceed.Wpf.Toolkit
         CalculateColor( p );
     }
 
-    private void UpdateColorShadeSelectorPosition( Color color )
+    private void UpdateColorShadeSelectorPosition( Color? color )
     {
-      if( _spectrumSlider == null || _colorShadingCanvas == null )
+      if( (_spectrumSlider == null) || (_colorShadingCanvas == null) || (color == null) || !color.HasValue)
         return;
 
       _currentColorPosition = null;
 
-      HsvColor hsv = ColorUtilities.ConvertRgbToHsv( color.R, color.G, color.B );
+      HsvColor hsv = ColorUtilities.ConvertRgbToHsv( color.Value.R, color.Value.G, color.Value.B );
 
-      if( !( color.R == color.G && color.R == color.B ) )
+      if( !( color.Value.R == color.Value.G && color.Value.R == color.Value.B ) )
         _spectrumSlider.Value = hsv.H;
 
       Point p = new Point( hsv.S, 1 - hsv.V );
@@ -534,8 +549,10 @@ namespace Xceed.Wpf.Toolkit
       SetHexadecimalStringProperty( GetFormatedColorString( SelectedColor ), false );
     }
 
-    private string GetFormatedColorString( Color colorToFormat )
+    private string GetFormatedColorString( Color? colorToFormat )
     {
+      if( ( colorToFormat == null ) || !colorToFormat.HasValue )
+        return string.Empty;
       return ColorUtilities.FormatColorString( colorToFormat.ToString(), UsingAlphaChannel );
     }
 
@@ -550,7 +567,10 @@ namespace Xceed.Wpf.Toolkit
       {
         try
         {
-          ColorConverter.ConvertFromString( newValue );
+          if( !string.IsNullOrEmpty( newValue ) )
+          {
+            ColorConverter.ConvertFromString( newValue );
+          }
           HexadecimalString = newValue;
         }
         catch

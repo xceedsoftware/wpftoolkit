@@ -27,7 +27,7 @@
             The Magnifier control allows the user to magnify parts of an application.
         </Paragraph>
     </local:DemoView.Description>
-    
+
     <local:DemoView.Resources>
         <conv:ColorConverter x:Key="colorConverter" />
         <conv:VisibilityConverter x:Key="visibilityConverter" />
@@ -39,7 +39,7 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </local:DemoView.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

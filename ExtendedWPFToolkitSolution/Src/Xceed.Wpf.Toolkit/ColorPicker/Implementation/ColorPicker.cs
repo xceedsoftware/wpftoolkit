@@ -69,6 +69,23 @@ namespace Xceed.Wpf.Toolkit
 
     #region Properties
 
+    #region AdvancedButtonHeader
+
+    public static readonly DependencyProperty AdvancedButtonHeaderProperty = DependencyProperty.Register( "AdvancedButtonHeader", typeof( string ), typeof( ColorPicker ), new UIPropertyMetadata( "Advanced" ) );
+    public string AdvancedButtonHeader
+    {
+      get
+      {
+        return ( string )GetValue( AdvancedButtonHeaderProperty );
+      }
+      set
+      {
+        SetValue( AdvancedButtonHeaderProperty, value );
+      }
+    }
+
+    #endregion //AdvancedButtonHeader
+
     #region AvailableColors
 
     public static readonly DependencyProperty AvailableColorsProperty = DependencyProperty.Register( "AvailableColors", typeof( ObservableCollection<ColorItem> ), typeof( ColorPicker ), new UIPropertyMetadata( CreateAvailableColors() ) );
@@ -242,12 +259,12 @@ namespace Xceed.Wpf.Toolkit
 
     #region SelectedColor
 
-    public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register( "SelectedColor", typeof( Color ), typeof( ColorPicker ), new FrameworkPropertyMetadata( Colors.Black, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback( OnSelectedColorPropertyChanged ) ) );
-    public Color SelectedColor
+    public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register( "SelectedColor", typeof( Color? ), typeof( ColorPicker ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback( OnSelectedColorPropertyChanged ) ) );
+    public Color? SelectedColor
     {
       get
       {
-        return ( Color )GetValue( SelectedColorProperty );
+        return ( Color? )GetValue( SelectedColorProperty );
       }
       set
       {
@@ -259,14 +276,14 @@ namespace Xceed.Wpf.Toolkit
     {
       ColorPicker colorPicker = ( ColorPicker )d;
       if( colorPicker != null )
-        colorPicker.OnSelectedColorChanged( ( Color )e.OldValue, ( Color )e.NewValue );
+        colorPicker.OnSelectedColorChanged( ( Color? )e.OldValue, ( Color? )e.NewValue );
     }
 
-    private void OnSelectedColorChanged( Color oldValue, Color newValue )
+    private void OnSelectedColorChanged( Color? oldValue, Color? newValue )
     {
       SelectedColorText = GetFormatedColorString( newValue );
 
-      RoutedPropertyChangedEventArgs<Color> args = new RoutedPropertyChangedEventArgs<Color>( oldValue, newValue );
+      RoutedPropertyChangedEventArgs<Color?> args = new RoutedPropertyChangedEventArgs<Color?>( oldValue, newValue );
       args.RoutedEvent = ColorPicker.SelectedColorChangedEvent;
       RaiseEvent( args );
     }
@@ -275,7 +292,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region SelectedColorText
 
-    public static readonly DependencyProperty SelectedColorTextProperty = DependencyProperty.Register( "SelectedColorText", typeof( string ), typeof( ColorPicker ), new UIPropertyMetadata( "Black" ) );
+    public static readonly DependencyProperty SelectedColorTextProperty = DependencyProperty.Register( "SelectedColorText", typeof( string ), typeof( ColorPicker ), new UIPropertyMetadata( "" ) );
     public string SelectedColorText
     {
       get
@@ -374,6 +391,23 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //ShowDropDownButton
+
+    #region StandardButtonHeader
+
+    public static readonly DependencyProperty StandardButtonHeaderProperty = DependencyProperty.Register( "StandardButtonHeader", typeof( string ), typeof( ColorPicker ), new UIPropertyMetadata( "Standard" ) );
+    public string StandardButtonHeader
+    {
+      get
+      {
+        return ( string )GetValue( StandardButtonHeaderProperty );
+      }
+      set
+      {
+        SetValue( StandardButtonHeaderProperty, value );
+      }
+    }
+
+    #endregion //StandardButtonHeader
 
     #region StandardColors
 
@@ -545,7 +579,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      CloseColorPicker( false );
+      CloseColorPicker( true );
     }
 
     private void Color_SelectionChanged( object sender, SelectionChangedEventArgs e )
@@ -590,8 +624,8 @@ namespace Xceed.Wpf.Toolkit
 
     #region Events
 
-    public static readonly RoutedEvent SelectedColorChangedEvent = EventManager.RegisterRoutedEvent( "SelectedColorChanged", RoutingStrategy.Bubble, typeof( RoutedPropertyChangedEventHandler<Color> ), typeof( ColorPicker ) );
-    public event RoutedPropertyChangedEventHandler<Color> SelectedColorChanged
+    public static readonly RoutedEvent SelectedColorChangedEvent = EventManager.RegisterRoutedEvent( "SelectedColorChanged", RoutingStrategy.Bubble, typeof( RoutedPropertyChangedEventHandler<Color?> ), typeof( ColorPicker ) );
+    public event RoutedPropertyChangedEventHandler<Color?> SelectedColorChanged
     {
       add
       {
@@ -627,9 +661,12 @@ namespace Xceed.Wpf.Toolkit
         RecentColors.RemoveAt( 0 );
     }
 
-    private string GetFormatedColorString( Color colorToFormat )
+    private string GetFormatedColorString( Color? colorToFormat )
     {
-      return ColorUtilities.FormatColorString( colorToFormat.GetColorName(), UsingAlphaChannel );
+      if( ( colorToFormat == null ) || !colorToFormat.HasValue )
+        return string.Empty;
+
+      return ColorUtilities.FormatColorString( colorToFormat.Value.GetColorName(), UsingAlphaChannel );
     }
 
     private static ObservableCollection<ColorItem> CreateStandardColors()
