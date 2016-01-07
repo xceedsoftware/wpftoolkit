@@ -381,6 +381,7 @@
     <Compile Include="AutoSelectTextBox\Implementation\AutoSelectTextBox.cs" />
     <Compile Include="AutoSelectTextBox\Implementation\QueryMoveFocusEventArgs.cs" />
     <Compile Include="BusyIndicator\Implementation\BusyIndicator.cs" />
+    <Compile Include="BusyIndicator\Implementation\Converters\ProgressBarWidthConverter.cs" />
     <Compile Include="ButtonSpinner\Implementation\ButtonSpinner.cs" />
     <Compile Include="CalculatorUpDown\Implementation\CalculatorUpDown.cs" />
     <Compile Include="Calculator\Implementation\Calculator.cs" />

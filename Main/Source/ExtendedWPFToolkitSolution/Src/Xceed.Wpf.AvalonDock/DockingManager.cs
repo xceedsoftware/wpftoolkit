@@ -309,6 +309,9 @@ namespace Xceed.Wpf.AvalonDock
                 _autoHideWindowManager.HideAutoWindow();
               }
 
+              if( AutoHideWindow != null )
+                AutoHideWindow.Dispose();
+
               foreach (var fw in _fwList.ToArray())
               {
                   //fw.Owner = null;

@@ -18,13 +18,16 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Converters"
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <!-- =============================================================================== -->
+   <conv:ProgressBarWidthConverter x:Key="ProgressBarWidthConverter" />
+
+   <!-- =============================================================================== -->
     <!-- BusyIndicator                                                                   -->
     <!-- =============================================================================== -->
 
@@ -101,14 +104,29 @@
                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Border Background="White" BorderThickness="1" BorderBrush="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" CornerRadius="0">
                             <Border Margin="1" Background="{TemplateBinding Background}" CornerRadius="0">
-                                <Grid MinWidth="150">
+                                <Grid x:Name="_grid"
+                                      MinWidth="150">
                                     <Grid.RowDefinitions>
                                         <RowDefinition />
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
-                                    <ContentPresenter Content="{TemplateBinding BusyContent}" ContentTemplate="{TemplateBinding BusyContentTemplate}" Margin="8" />
-                                    <ProgressBar Grid.Row="1" Style="{TemplateBinding ProgressBarStyle}" />
-                                </Grid>
+                                    <ContentPresenter x:Name="busyContent"
+                                                      Content="{TemplateBinding BusyContent}"
+                                                      ContentTemplate="{TemplateBinding BusyContentTemplate}"
+                                                      HorizontalAlignment="Center"
+                                                      Margin="8" />
+                                    <ProgressBar Grid.Row="1"
+                                                 Style="{TemplateBinding ProgressBarStyle}">
+                                       <ProgressBar.Width>
+                                          <MultiBinding Converter="{StaticResource ProgressBarWidthConverter}">
+                                             <Binding Path="ActualWidth"
+                                                      ElementName="busyContent" />
+                                             <Binding Path="MinWidth"
+                                                      ElementName="_grid" />
+                                          </MultiBinding>
+                                       </ProgressBar.Width>
+                                    </ProgressBar>
+                                 </Grid>
                             </Border>
                         </Border>
                     </Grid>

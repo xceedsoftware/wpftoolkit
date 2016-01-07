@@ -265,7 +265,7 @@
                                  <Grid>
                                     <Grid.RowDefinitions>
                                        <RowDefinition Height="Auto" />
-                                       <RowDefinition Height="Auto" />
+                                       <RowDefinition Height="22" />
                                     </Grid.RowDefinitions>
                                     <TextBlock Text="{TemplateBinding RecentColorsHeader}" Background="AliceBlue" Padding="2" Margin="0,1,0,1" />
                                     <ListBox x:Name="PART_RecentColors"

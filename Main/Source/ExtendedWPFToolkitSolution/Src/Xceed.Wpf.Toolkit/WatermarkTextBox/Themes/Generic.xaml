@@ -98,8 +98,6 @@
                      <Setter TargetName="FocusVisual" Property="Opacity" Value="1" />
                   </Trigger>
                   <Trigger Property="IsEnabled" Value="false">
-                     <Setter TargetName="Border"  Property="BorderBrush" Value="{StaticResource TextBox_DisabledBorder}" />
-                     <Setter TargetName="Border"  Property="Background" Value="{StaticResource TextBox_DisabledBackground}" />
                      <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                   </Trigger>
                </ControlTemplate.Triggers>

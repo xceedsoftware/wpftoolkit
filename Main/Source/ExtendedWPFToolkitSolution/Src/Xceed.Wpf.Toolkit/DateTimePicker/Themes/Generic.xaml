@@ -22,6 +22,7 @@
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
 
    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+   <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
    <DataTemplate x:Key="DefaultWatermarkTemplate">
       <ContentControl Content="{Binding}" Foreground="Gray" Focusable="False" Margin="0,0,3,0" />
@@ -143,7 +144,8 @@
                                       IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                       Style="{StaticResource DateTimePickerToggleButtonStyle}"
                                       IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
-                                      IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}" />
+                                      IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                                      Visibility="{TemplateBinding ShowDropDownButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                      </Grid>
                      <Popup x:Name="PART_Popup" IsOpen="{Binding IsChecked, ElementName=_calendarToggleButton}" StaysOpen="False">
                         <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" Padding="3">

@@ -26,6 +26,7 @@
     </ResourceDictionary.MergedDictionaries>
 
     <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
     <DataTemplate x:Key="DefaultWatermarkTemplate">
         <ContentControl Content="{Binding}" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Focusable="False" Margin="0,0,3,0" />
@@ -132,7 +133,8 @@
                                       IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                       Style="{StaticResource DateTimePickerToggleButtonStyle}"
                                       IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
-                                      IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}" />
+                                      IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                                      Visibility="{TemplateBinding ShowDropDownButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             </Grid>
                             <Popup x:Name="PART_Popup" IsOpen="{Binding IsChecked, ElementName=_calendarToggleButton}" StaysOpen="False">
                                 <Border BorderThickness="1" Background="{StaticResource PanelBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" Padding="3">

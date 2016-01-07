@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2014 Xceed Software Inc.
+   Copyright (C) 2007-2015 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -69,6 +69,7 @@
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="Auto"/>
@@ -89,10 +90,12 @@
             <CheckBox x:Name="_clipValueToMinMax" Grid.Row="4" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5,5,25,5"/>
             <TextBlock Text="Kind:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"/>
             <ComboBox x:Name="_kind" Grid.Row="5" Grid.Column="1" SelectedIndex="2" ItemsSource="{Binding Source={StaticResource enumKind}}" Width="190" Margin="5,5,25,5"/>
-             <TextBlock Text="TimePickerVisibility:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center"/>
-            <ComboBox x:Name="_timePickerVisibility" Grid.Row="6" Grid.Column="1" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumVisibility}}" Width="190" Margin="5,5,25,5"/>
-            <TextBlock Text="TimePickerShowButtonSpinner:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center"/>
-            <CheckBox x:Name="_timePickerShowButtonSpinner" Grid.Row="7" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
+            <TextBlock Text="ShowDropDownButton:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="_showDropDownButton" Grid.Row="6" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
+            <TextBlock Text="TimePickerVisibility:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center"/>
+            <ComboBox x:Name="_timePickerVisibility" Grid.Row="7" Grid.Column="1" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumVisibility}}" Width="190" Margin="5,5,25,5"/>
+            <TextBlock Text="TimePickerShowButtonSpinner:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="_timePickerShowButtonSpinner" Grid.Row="8" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
 
             <TextBlock Text="TimeFormat:" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" />
             <ComboBox x:Name="_timeFormat" Grid.Row="0" Grid.Column="3" SelectedIndex="7" ItemsSource="{Binding Source={StaticResource enumDateFormatData}}" Width="190" Margin="5"/>
@@ -125,7 +128,8 @@
                                  TimePickerShowButtonSpinner="{Binding IsChecked, ElementName=_timePickerShowButtonSpinner}"
                                  Minimum="{Binding Value, ElementName=_minimum}"
                                  Maximum="{Binding Value, ElementName=_maximum}"
-                                 Kind="{Binding SelectedItem, ElementName=_kind}"/>
+                                 Kind="{Binding SelectedItem, ElementName=_kind}"
+                                 ShowDropDownButton="{Binding IsChecked, ElementName=_showDropDownButton}" />
         </StackPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch">
@@ -166,7 +170,8 @@
                                  ClipValueToMinMax="{Binding IsChecked, ElementName=_clipValueToMinMax}"
                                  Minimum="{Binding Value, ElementName=_minimum}"
                                  Maximum="{Binding Value, ElementName=_maximum}"
-                                 MaxDropDownHeight="{Binding Value, ElementName=_maxDropDownHeight}"/>
+                                 MaxDropDownHeight="{Binding Value, ElementName=_maxDropDownHeight}"
+                                 ShowDropDownButton="{Binding IsChecked, ElementName=_showDropDownButton}"/>
            </StackPanel>
         </StackPanel>
     </Grid>

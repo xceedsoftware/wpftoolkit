@@ -100,6 +100,7 @@
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
                                  <TextBlock x:Name="TitleText"
+                                            FontSize="{StaticResource Window_CaptionFontSize}"
                                             Text="{TemplateBinding Caption}"
                                             Foreground="{TemplateBinding CaptionForeground}"
                                             TextTrimming="CharacterEllipsis"

@@ -2489,6 +2489,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     private void SetScrollBars()
     {
+      if( _content == null || _verticalScrollBar == null || _horizontalScrollBar == null )
+        return;
+
       var contentSize = ( _content is Viewbox ) ? ( ( Viewbox )_content ).Child.DesiredSize : _content.DesiredSize;
 
       _verticalScrollBar.SmallChange = 10d;

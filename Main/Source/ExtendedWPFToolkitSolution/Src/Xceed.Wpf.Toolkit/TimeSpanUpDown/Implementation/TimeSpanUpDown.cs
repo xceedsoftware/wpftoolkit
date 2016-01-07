@@ -214,8 +214,20 @@ namespace Xceed.Wpf.Toolkit
     {
       DateTimeInfo dayInfo = _dateTimeInfoList.FirstOrDefault( x => x.Type == DateTimePart.Day );
       bool hasDay = dayInfo != null;
+      DateTimeInfo negInfo = _dateTimeInfoList.FirstOrDefault( x => x.Type == DateTimePart.Other );
+      bool hasNegative = (negInfo != null) && (negInfo.Content == "-");
 
       _dateTimeInfoList.Clear();
+
+      if( this.Value.HasValue && this.Value.Value.TotalMilliseconds < 0 )
+      {
+        _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Other, Length = 1, Content = "-", IsReadOnly = true } );
+        // Negative has been added, move TextBox.Selection to keep it on current DateTimeInfo
+        if( !hasNegative && ( this.TextBox != null ) )
+        {
+          this.TextBox.SelectionStart++;
+        }
+      }
 
       if( this.Value.HasValue && this.Value.Value.Days != 0 )
       {
@@ -341,7 +353,8 @@ namespace Xceed.Wpf.Toolkit
       //this only occurs when the user manually type in a value for the Value Property
       if( info == null )
       {
-        info = _dateTimeInfoList[ 0 ];
+        //Skip negative sign
+        info = (_dateTimeInfoList[ 0 ].Content != "-") ? _dateTimeInfoList[ 0 ] : _dateTimeInfoList[ 1 ];
       }
 
       TimeSpan? result = null;
@@ -389,13 +402,17 @@ namespace Xceed.Wpf.Toolkit
       }
 
       result = ( ( result != null ) && result.HasValue )
-                ? result.Value.TotalMilliseconds > 0 ? result.Value : this.DefaultValue
+                ? result.Value
                 : result;
+
+      var oldValue = this.Value;
 
       this.Value = this.CoerceValueMinMax( result );
 
-      //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event
-      this.TextBox.Select( info.StartPosition, info.Length );
+      //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event.
+      //For a negative value, add 1 for the minus sign.
+      int startPos = ( result.HasValue && ( result.Value.TotalMilliseconds < 0 ) && oldValue.HasValue && ( oldValue.Value.TotalMilliseconds >= 0 ) ) ? info.StartPosition + 1 : info.StartPosition;
+      this.TextBox.Select( startPos, info.Length );
       _fireSelectionChangedEvent = true;
     }
 

@@ -134,9 +134,6 @@
                                  <Setter Property="Background"
                                          TargetName="templateRoot"
                                          Value="White" />
-                                 <Setter Property="BorderBrush"
-                                         TargetName="templateRoot"
-                                         Value="#FFABADB3" />
                                  <Setter Property="Background"
                                          TargetName="splitBorder"
                                          Value="Transparent" />

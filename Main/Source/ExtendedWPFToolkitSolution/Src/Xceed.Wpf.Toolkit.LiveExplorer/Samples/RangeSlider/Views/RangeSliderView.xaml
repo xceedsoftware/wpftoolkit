@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2014 Xceed Software Inc.
+   Copyright (C) 2007-2015 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -580,6 +580,18 @@
                               VerticalAlignment="Center"
                               Margin="5" />
 
+            <TextBlock Text="Is Deferred Update Values:"
+                       Grid.Row="5"
+                       Grid.Column="2"
+                       VerticalAlignment="Center"
+                       Margin="10,5,5,5" />
+            <CheckBox Grid.Row="5"
+                      Grid.Column="3"
+                      IsChecked="{Binding IsDeferredUpdateValues, ElementName=_rangeSlider}"
+                      VerticalAlignment="Center"
+                      Margin="5"
+                      ToolTip="Gets/Sets if the LowerValue and HigherValue should be updated only on mouse up."/>
+
             <!-- Column 3 -->
             <TextBlock Text="Lower Range Style:"
                        Grid.Column="4"
@@ -673,7 +685,8 @@
                            LowerRangeBackground="Transparent"
                            HigherRangeStyle="{x:Null}"
                            RangeStyle="{x:Null}"
-                           LowerRangeStyle="{x:Null}">
+                           LowerRangeStyle="{x:Null}"
+                           IsDeferredUpdateValues="False">
             <xctk:RangeSlider.Resources>
                <Style TargetType="xctk:RangeSlider">
                   <Style.Triggers>

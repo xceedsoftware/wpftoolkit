@@ -3346,6 +3346,9 @@ namespace Xceed.Wpf.DataGrid
 
     private void OnCollectionViewGroupsPropertyChanged()
     {
+      if( m_groupsCollection == m_collectionView.Groups )
+        return;
+
       this.HandleGlobalItemsReset();
     }
 
@@ -3387,11 +3390,11 @@ namespace Xceed.Wpf.DataGrid
           break;
 
         case NotifyCollectionChangedAction.Reset:
-          // If there are group descriptions, the PropertyChanged on Groups will handle it.
-          if( m_collectionView.GroupDescriptions.Count == 0 )
+          if( ( m_groupsCollection == null ) || ( m_collectionView.GroupDescriptions.Count == 0 ) )
           {
             this.HandleGlobalItemsReset();
           }
+
           break;
       }
     }
@@ -4213,20 +4216,20 @@ namespace Xceed.Wpf.DataGrid
 
     private void RefreshGroupsCollection()
     {
-      if( ( m_groupsCollection != null ) || ( m_groupsCollection != m_collectionView.Groups ) )
+      var groupsCollection = m_collectionView.Groups;
+      if( m_groupsCollection == groupsCollection )
+        return;
+
+      if( m_groupsCollection != null )
       {
-        if( m_groupsCollection != null )
-        {
-          CollectionChangedEventManager.RemoveListener( m_groupsCollection, this );
-        }
+        CollectionChangedEventManager.RemoveListener( m_groupsCollection, this );
+      }
 
-        m_groupsCollection = m_collectionView.Groups;
+      m_groupsCollection = groupsCollection;
 
-        if( m_groupsCollection != null )
-        {
-          //Registers to the groups collection change notification.
-          CollectionChangedEventManager.AddListener( m_groupsCollection, this );
-        }
+      if( m_groupsCollection != null )
+      {
+        CollectionChangedEventManager.AddListener( m_groupsCollection, this );
       }
     }
 
@@ -4541,9 +4544,6 @@ namespace Xceed.Wpf.DataGrid
       var newGroups = ( parentNode != null )
                         ? parentNode.CollectionViewGroup.GetItems().Cast<CollectionViewGroup>().ToList()
                         : m_groupsCollection.Cast<CollectionViewGroup>().ToList();
-
-      Debug.Assert( ( oldGroups.Count > 0 ), "The group being reset should have had at least a child group." );
-      Debug.Assert( ( newGroups.Count > 0 ), "The group being reset should have at least a child group." );
 
       // If nothing has changed, avoid the heavy process of finding out which groups have been added,
       // removed and moved.
@@ -5450,6 +5450,7 @@ namespace Xceed.Wpf.DataGrid
 
           //then clear the items nodes
           this.ClearItems();
+          this.RefreshGroupsCollection();
 
           //increment the generation count... to ensure that further calls to the index based functions are not messed up.
           this.IncrementCurrentGenerationCount();
@@ -6627,7 +6628,7 @@ namespace Xceed.Wpf.DataGrid
     {
       if( managerType == typeof( CollectionChangedEventManager ) )
       {
-        NotifyCollectionChangedEventArgs nccArgs = ( NotifyCollectionChangedEventArgs )e;
+        var nccArgs = ( NotifyCollectionChangedEventArgs )e;
 
         if( sender == m_collectionView )
         {
@@ -6647,16 +6648,19 @@ namespace Xceed.Wpf.DataGrid
       }
       else if( managerType == typeof( PropertyChangedEventManager ) )
       {
+        var pcArgs = ( PropertyChangedEventArgs )e;
+
         if( sender == m_collectionView )
         {
           this.OnCollectionViewGroupsPropertyChanged();
           return true;
         }
-
-        //this is only registered on the DataGridContext, this has the effect of forwarding property changes for all properties of the DataGridContext
-        PropertyChangedEventArgs pcArgs = ( PropertyChangedEventArgs )e;
-        this.OnNotifyPropertyChanged( pcArgs );
-        return true;
+        else
+        {
+          //this is only registered on the DataGridContext, this has the effect of forwarding property changes for all properties of the DataGridContext
+          this.OnNotifyPropertyChanged( pcArgs );
+          return true;
+        }
       }
       else if( ( managerType == typeof( ViewChangedEventManager ) ) || ( managerType == typeof( ThemeChangedEventManager ) ) )
       {
