@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2014 Xceed Software Inc.
+   Copyright (C) 2007-2015 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -29,17 +29,17 @@ using System.Windows.Media;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.SlideShow.Views
 {
-  /// <summary>
-  /// Interaction logic for SlideShow.xaml
-  /// </summary>
-  public partial class SlideShowView : DemoView
-  {
-    public SlideShowView()
+    /// <summary>
+    /// Interaction logic for SlideShow.xaml
+    /// </summary>
+    public partial class SlideShowView : DemoView
     {
-      InitializeComponent();
+        public SlideShowView()
+        {
+            InitializeComponent();
 
 
+        }
 
     }
-  }
 }

@@ -592,31 +592,29 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
             #endregion
 
-            #region collapse single child layout panels
-            do
-            {
-              exitFlag = true;
-              //for each panel that has only one child
-              foreach( var panelToCollapse in this.Descendents().OfType<LayoutPanel>().Where( p => p.ChildrenCount == 1 && p.Children[ 0 ] is LayoutPanel ).ToArray() )
-              {
-                var singleChild = panelToCollapse.Children[ 0 ] as LayoutPanel;
-                panelToCollapse.Orientation = singleChild.Orientation;
-                panelToCollapse.RemoveChild( singleChild );
-                ILayoutPanelElement[] singleChildChildren = new ILayoutPanelElement[ singleChild.ChildrenCount ];
-                singleChild.Children.CopyTo( singleChildChildren, 0 );
-                while( singleChild.ChildrenCount > 0 )
-                {
-                  panelToCollapse.InsertChildAt(
-                      panelToCollapse.ChildrenCount, singleChildChildren[ panelToCollapse.ChildrenCount ] );
-                }
+            //do
+            //{
+            //  exitFlag = true;
+            //  //for each panel that has only one child
+            //  foreach( var panelToCollapse in this.Descendents().OfType<LayoutPanel>().Where( p => p.ChildrenCount == 1 && p.Children[ 0 ] is LayoutPanel ).ToArray() )
+            //  {
+            //    var singleChild = panelToCollapse.Children[ 0 ] as LayoutPanel;
+            //    panelToCollapse.Orientation = singleChild.Orientation;
+            //    panelToCollapse.RemoveChild( singleChild );
+            //    ILayoutPanelElement[] singleChildChildren = new ILayoutPanelElement[ singleChild.ChildrenCount ];
+            //    singleChild.Children.CopyTo( singleChildChildren, 0 );
+            //    while( singleChild.ChildrenCount > 0 )
+            //    {
+            //      panelToCollapse.InsertChildAt(
+            //          panelToCollapse.ChildrenCount, singleChildChildren[ panelToCollapse.ChildrenCount ] );
+            //    }
 
-                exitFlag = false;
-                break;
-              }
+            //    exitFlag = false;
+            //    break;
+            //  }
 
-            }
-            while( !exitFlag );
-            #endregion
+            //}
+            //while( !exitFlag );
 
             #region Update ActiveContent and LastFocusedDocument properties
             UpdateActiveContentProperty();

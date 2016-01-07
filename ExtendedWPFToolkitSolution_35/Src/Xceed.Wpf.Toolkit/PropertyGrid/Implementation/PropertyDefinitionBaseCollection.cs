@@ -32,11 +32,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
   public abstract class PropertyDefinitionBaseCollection<T> : DefinitionCollectionBase<T> where T : PropertyDefinitionBase
   {
-    internal PropertyDefinitionBaseCollection()
+    protected PropertyDefinitionBaseCollection()
     {
     }
 
-    public T this[ object propertyId ]
+    public virtual T this[ object propertyId ]
     {
       get
       {
@@ -49,15 +49,31 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           // return all the items containing the string (before or after) the "*".
           // ex : Prop* will return properties named Prop1, Prop2, Prop3...
           List<string> stringTargetProperties = item.TargetProperties.OfType<string>().ToList();
-          if( (stringTargetProperties != null) && (stringTargetProperties.Count > 0) && ( propertyId is string ) )
+          if( ( stringTargetProperties != null ) && ( stringTargetProperties.Count > 0 ) )
           {
-            string stringPropertyID = ( string )propertyId;
-            foreach( var targetPropertyString in stringTargetProperties )
+            if( propertyId is string )
             {
-              if( targetPropertyString.Contains( "*" ) )
+              string stringPropertyID = ( string )propertyId;
+              foreach( var targetPropertyString in stringTargetProperties )
               {
-                string searchString = targetPropertyString.Replace( "*", "" );
-                if( stringPropertyID.StartsWith( searchString ) || stringPropertyID.EndsWith( searchString ) )
+                if( targetPropertyString.Contains( "*" ) )
+                {
+                  string searchString = targetPropertyString.Replace( "*", "" );
+                  if( stringPropertyID.StartsWith( searchString ) || stringPropertyID.EndsWith( searchString ) )
+                    return item;
+                }
+              }
+            }
+          }
+          else
+          {
+            //Manage Interfaces
+            var type = propertyId as Type;
+            if( type != null )
+            {
+              foreach( Type targetProperty in item.TargetProperties )
+              {
+                if( targetProperty.IsAssignableFrom( type ) )
                   return item;
               }
             }

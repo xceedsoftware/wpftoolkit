@@ -2,7 +2,7 @@
 
    Extended WPF Toolkit
 
-   Copyright (C) 2007-2014 Xceed Software Inc.
+   Copyright (C) 2007-2015 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -519,8 +519,7 @@
             <core:LiveExplorerTreeViewItem Header="Check lists"
                                            SampleType="{x:Type samples:CheckLists.Views.CheckListsView}" />
             <core:LiveExplorerTreeViewItem Header="Watermark ComboBox"
-                                           SampleType="{x:Type samples:WatermarkComboBox.Views.WatermarkComboBoxView}"
-                                           IsNewFeature="True" />
+                                           SampleType="{x:Type samples:WatermarkComboBox.Views.WatermarkComboBoxView}" />
             <core:LiveExplorerTreeViewItem Header="TimelinePanel"
                                            SampleType="{x:Type samples:TimelinePanel.Views.TimelinePanelView}" />
          </core:LiveExplorerTreeViewItem>
@@ -554,7 +553,6 @@
             </core:LiveExplorerTreeViewItem>
             <core:LiveExplorerTreeViewItem Header="Files"
                                            SampleType="{x:Type samples:FilePicker.Views.FilePickerView}"
-                                           IsNewFeature="True"
                                            IsPlusOnlyFeature="True"/>
             <core:LiveExplorerTreeViewItem Header="RangeSlider"
                                            SampleType="{x:Type samples:RangeSlider.Views.RangeSliderView}"/>
@@ -653,7 +651,6 @@
                                            SampleType="{x:Type samples:Panels.Views.SwitchPanelView}" />
             <core:LiveExplorerTreeViewItem Header="SlideShow"
                                            SampleType="{x:Type samples:SlideShow.Views.SlideShowView}"
-                                           IsNewFeature="True"
                                            IsPlusOnlyFeature="True"/>
          </core:LiveExplorerTreeViewItem>
 

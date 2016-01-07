@@ -31,6 +31,7 @@ namespace Xceed.Wpf.Toolkit
     [TemplatePart(Name = PART_HigherRange, Type = typeof(RepeatButton))]
     [TemplatePart( Name = PART_HigherSlider, Type = typeof( Slider ) )]
     [TemplatePart( Name = PART_LowerSlider, Type = typeof( Slider ) )]
+    [TemplatePart( Name = PART_Track, Type = typeof( Track ) )]
 
     public class RangeSlider : Control
     {
@@ -41,11 +42,15 @@ namespace Xceed.Wpf.Toolkit
       private const String PART_HigherRange = "PART_HigherRange";
       private const String PART_HigherSlider = "PART_HigherSlider";
       private const String PART_LowerSlider = "PART_LowerSlider";
+      private const String PART_Track = "PART_Track";
 
       private RepeatButton _lowerRange;
       private RepeatButton _higherRange;
       private Slider _lowerSlider;
       private Slider _higherSlider;
+      private Track _lowerTrack;
+      private Track _higherTrack;
+      private double _deferredUpdateValue;
 
       #endregion Members
 
@@ -200,6 +205,29 @@ namespace Xceed.Wpf.Toolkit
       }
 
       #endregion HigherValue
+
+      #region IsDeferredUpdateValues
+      /// <summary>
+      /// # TODODOC          
+      /// 
+      /// Gets/Sets if the LowerValue and HigherValue should be updated only on mouse up.
+      /// </summary>
+      public static readonly DependencyProperty IsDeferredUpdateValuesProperty = DependencyProperty.Register( "IsDeferredUpdateValues", typeof( bool ), typeof( RangeSlider )
+        , new FrameworkPropertyMetadata( false ) );
+
+      public bool IsDeferredUpdateValues
+      {
+        get
+        {
+          return ( bool )GetValue( RangeSlider.IsDeferredUpdateValuesProperty );
+        }
+        set
+        {
+          SetValue( RangeSlider.IsDeferredUpdateValuesProperty, value );
+        }
+      }
+
+      #endregion IsDeferredUpdateValues
 
       #region LowerRangeBackground
       /// <summary>
@@ -578,24 +606,44 @@ namespace Xceed.Wpf.Toolkit
         {
           _lowerSlider.Loaded -= this.Slider_Loaded;
           _lowerSlider.ValueChanged -= LowerSlider_ValueChanged;
+          if( _lowerTrack != null )
+          {
+            _lowerTrack.Thumb.DragCompleted -= this.LowerSlider_DragCompleted;
+          }
         }
         _lowerSlider = this.Template.FindName( PART_LowerSlider, this ) as Slider;
         if( _lowerSlider != null )
         {
           _lowerSlider.Loaded += this.Slider_Loaded;
           _lowerSlider.ValueChanged += LowerSlider_ValueChanged;
+          _lowerSlider.ApplyTemplate();
+          _lowerTrack = _lowerSlider.Template.FindName( PART_Track, _lowerSlider ) as Track;
+          if( _lowerTrack != null )
+          {
+            _lowerTrack.Thumb.DragCompleted += this.LowerSlider_DragCompleted;
+          }
         }
 
         if( _higherSlider != null )
         {
             _higherSlider.Loaded -= this.Slider_Loaded;
             _higherSlider.ValueChanged -= HigherSlider_ValueChanged;
+            if( _higherTrack != null )
+            {
+              _higherTrack.Thumb.DragCompleted -= this.HigherSlider_DragCompleted;
+            }
         }
         _higherSlider = this.Template.FindName( PART_HigherSlider, this ) as Slider;
         if( _higherSlider != null )
         {
           _higherSlider.Loaded += this.Slider_Loaded;
           _higherSlider.ValueChanged += HigherSlider_ValueChanged;
+          _higherSlider.ApplyTemplate();
+          _higherTrack = _higherSlider.Template.FindName( PART_Track, _higherSlider ) as Track;
+          if( _higherTrack != null )
+          {
+            _higherTrack.Thumb.DragCompleted += this.HigherSlider_DragCompleted;
+          }
         }
       }
 
@@ -753,6 +801,24 @@ namespace Xceed.Wpf.Toolkit
         }
       }
 
+      private void UpdateHigherValue( double value )
+      {
+        CoercedValues cv = this.GetCoercedValues();
+        double newValue = Math.Max( cv.Minimum, Math.Min( cv.Maximum, value ) );
+        newValue = Math.Max( newValue, cv.LowerValue );
+        this.SetHigherSliderValues( newValue, null, null );
+        this.HigherValue = newValue;
+      }
+
+      private void UpdateLowerValue( double value )
+      {
+        CoercedValues cv = this.GetCoercedValues();
+        double newValue = Math.Max( cv.Minimum, Math.Min( cv.Maximum, value ) );
+        newValue = Math.Min( newValue, cv.HigherValue );
+        this.SetLowerSliderValues( newValue, null, null );
+        this.LowerValue = newValue;
+      }
+
       #endregion
 
       #region Events
@@ -828,11 +894,14 @@ namespace Xceed.Wpf.Toolkit
       {
         if( _lowerSlider.IsLoaded )
         {
-          CoercedValues cv = this.GetCoercedValues();
-          double newValue = Math.Max( cv.Minimum, Math.Min( cv.Maximum, e.NewValue ) );
-          newValue = Math.Min( newValue, cv.HigherValue );
-          this.SetLowerSliderValues( newValue, null, null );
-          this.LowerValue = newValue;
+          if( !this.IsDeferredUpdateValues )
+          {
+            this.UpdateLowerValue( e.NewValue );
+          }
+          else
+          {
+            _deferredUpdateValue = e.NewValue;
+          }
         }
       }
 
@@ -840,12 +909,31 @@ namespace Xceed.Wpf.Toolkit
       {
         if( _higherSlider.IsLoaded )
         {
-          CoercedValues cv = this.GetCoercedValues();
-          double newValue = Math.Max( cv.Minimum, Math.Min( cv.Maximum, e.NewValue ) );
-          newValue = Math.Max( newValue, cv.LowerValue );
-          this.SetHigherSliderValues( newValue, null, null );
-          this.HigherValue = newValue;
+          if( !this.IsDeferredUpdateValues )
+          {
+            this.UpdateHigherValue( e.NewValue );
+          }
+          else
+          {
+            _deferredUpdateValue = e.NewValue;
+          }
         }
+      }
+
+      private void HigherSlider_DragCompleted( object sender, DragCompletedEventArgs e )
+      {
+        if( this.IsDeferredUpdateValues )
+        {
+          this.UpdateHigherValue( _deferredUpdateValue );
+        }
+      }
+
+      private void LowerSlider_DragCompleted( object sender, DragCompletedEventArgs e )
+      {
+        if( this.IsDeferredUpdateValues )
+        {
+          this.UpdateLowerValue( _deferredUpdateValue );
+          }
       }
 
       #endregion Events Handlers

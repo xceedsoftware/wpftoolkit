@@ -62,6 +62,18 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //PropertyDescriptor
 
+    #region PropertyName
+
+    public string PropertyName
+    {
+      get
+      {
+        return (this.DescriptorDefinition != null) ? this.DescriptorDefinition.PropertyName : null;
+      }
+    }
+
+    #endregion
+
     #region PropertyType
 
     public Type PropertyType
@@ -84,7 +96,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       private set;
     }
 
-    #endregion DescriptorDefinition
+    #endregion DescriptorDefinition    
 
     #region Instance
 

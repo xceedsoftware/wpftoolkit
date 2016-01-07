@@ -244,6 +244,7 @@ namespace Xceed.Wpf.Toolkit
       {
         InvalidateListBoxItems();
       }
+      base.OnFormatStringChanged( oldValue, newValue );
     }
 
     protected override void OnMaximumChanged( DateTime? oldValue, DateTime? newValue )

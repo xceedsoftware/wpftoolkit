@@ -71,6 +71,23 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #endregion //IsOpen
 
+    #region ShowDropDownButton
+
+    public static readonly DependencyProperty ShowDropDownButtonProperty = DependencyProperty.Register( "ShowDropDownButton", typeof( bool ), typeof( DateTimePickerBase ), new UIPropertyMetadata( true ) );
+    public bool ShowDropDownButton
+    {
+      get
+      {
+        return ( bool )GetValue( ShowDropDownButtonProperty );
+      }
+      set
+      {
+        SetValue( ShowDropDownButtonProperty, value );
+      }
+    }
+
+    #endregion //ShowDropDownButton
+
     #endregion //Properties
 
     #region Constructors

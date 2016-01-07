@@ -682,7 +682,7 @@ namespace Xceed.Wpf.Toolkit
         }
         else
         {
-          DateTime date = DateTime.Parse( Value.ToString() );
+          DateTime date = Value.Value;
           info.StartPosition = text.Length;
           info.Content = date.ToString( info.Format, CultureInfo.DateTimeFormat );
           info.Length = info.Content.Length;

@@ -483,7 +483,12 @@ namespace Xceed.Wpf.Toolkit
 
     public ColorPicker()
     {
-      RecentColors = new ObservableCollection<ColorItem>();
+#if VS2008
+        this.RecentColors = new ObservableCollection<ColorItem>();
+#else
+      this.SetCurrentValue( ColorPicker.RecentColorsProperty, new ObservableCollection<ColorItem>() );
+#endif
+
       Keyboard.AddKeyDownHandler( this, OnKeyDown );
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );
     }

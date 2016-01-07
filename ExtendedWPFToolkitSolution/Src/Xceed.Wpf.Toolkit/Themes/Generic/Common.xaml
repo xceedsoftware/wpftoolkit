@@ -18,7 +18,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:media="clr-namespace:Xceed.Wpf.Toolkit.Core.Media"
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
-                    xmlns:primitives="clr-namespace:Xceed.Wpf.Toolkit.Primitives">
+                    xmlns:primitives="clr-namespace:Xceed.Wpf.Toolkit.Primitives"
+                    xmlns:s="clr-namespace:System;assembly=mscorlib">
 
 
     <!-- =============================================================================== -->
@@ -191,6 +192,8 @@
    <SolidColorBrush x:Key="Window_Background"  Color="White"/>
 
    <SolidColorBrush x:Key="Window_BorderBrush" Color="#5D6C7A" />
+
+   <s:Double x:Key="Window_CaptionFontSize">15</s:Double>
 
    <Thickness x:Key="Window_BorderThickness" Left="1" Right="1" Bottom="1" Top="1" />
 
