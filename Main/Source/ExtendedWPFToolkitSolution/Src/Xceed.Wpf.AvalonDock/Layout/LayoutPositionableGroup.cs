@@ -26,7 +26,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
     [Serializable]
     public abstract class LayoutPositionableGroup<T> : LayoutGroup<T>, ILayoutPositionableElement, ILayoutPositionableElementWithActualSize where T : class, ILayoutElement
     {
-        public LayoutPositionableGroup()
+        public LayoutPositionableGroup() 
         { }
 
         GridLength _dockWidth = new GridLength(1.0, GridUnitType.Star);
@@ -80,10 +80,32 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         }
 
+        #region CanRepositionItems
+
+        private bool _canRepositionItems = true;
+        public bool CanRepositionItems
+        {
+          get
+          {
+            return _canRepositionItems;
+          }
+          set
+          {
+            if( _canRepositionItems != value )
+            {
+              RaisePropertyChanging( "CanRepositionItems" );
+              _canRepositionItems = value;
+              RaisePropertyChanged( "CanRepositionItems" );
+            }
+          }
+        }
+
+        #endregion
+
 
         #region DockMinWidth
 
-        private double _dockMinWidth = 25.0;
+        private double _dockMinWidth = 100.0;
         public double DockMinWidth
         {
             get { return _dockMinWidth; }
@@ -103,7 +125,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         #region DockMinHeight
 
-        private double _dockMinHeight = 25.0;
+        private double _dockMinHeight = 100.0;
         public double DockMinHeight
         {
             get { return _dockMinHeight; }

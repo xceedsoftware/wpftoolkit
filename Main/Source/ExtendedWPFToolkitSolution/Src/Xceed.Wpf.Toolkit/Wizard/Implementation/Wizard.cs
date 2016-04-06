@@ -341,6 +341,9 @@ namespace Xceed.Wpf.Toolkit
         if( !( o is WizardPage ) )
           throw new NotSupportedException( "Wizard should only contains WizardPages." );
       }
+
+      if( Items.Count > 0 && CurrentPage == null )
+        CurrentPage = Items[ 0 ] as WizardPage;
     }
 
     protected override void OnPropertyChanged( DependencyPropertyChangedEventArgs e )

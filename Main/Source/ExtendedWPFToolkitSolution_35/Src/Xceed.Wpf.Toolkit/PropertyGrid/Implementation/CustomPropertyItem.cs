@@ -32,12 +32,19 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
   /// </summary>
   public class CustomPropertyItem : PropertyItemBase
   {
+    #region Constructors
+
     internal CustomPropertyItem() { }
 
-    internal CustomPropertyItem( bool isPropertyGridCategorized )
+    internal CustomPropertyItem( bool isPropertyGridCategorized, bool isSortedAlphabetically )
     {
       _isPropertyGridCategorized = isPropertyGridCategorized;
+      _isSortedAlphabetically = isSortedAlphabetically;
     }
+
+    #endregion
+
+    #region Properties
 
     #region Category
 
@@ -145,5 +152,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
     #endregion //Value
+
+    #endregion
+
+    #region Overrides
+
+    protected override void OnEditorChanged( FrameworkElement oldValue, FrameworkElement newValue )
+    {
+      if( oldValue != null )
+        oldValue.DataContext = null;
+
+      if( newValue != null )
+        newValue.DataContext = this;
+    }
+
+    #endregion
   }
 }

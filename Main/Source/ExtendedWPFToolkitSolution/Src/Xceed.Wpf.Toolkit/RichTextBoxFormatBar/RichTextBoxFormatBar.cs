@@ -261,7 +261,11 @@ namespace Xceed.Wpf.Toolkit
       {
         currentValue = Target.Selection.GetPropertyValue( formattingProperty );
       }
-      button.IsChecked = ( ( currentValue == null ) || ( currentValue == DependencyProperty.UnsetValue ) )
+
+      if( currentValue == DependencyProperty.UnsetValue )
+        return;
+
+      button.IsChecked = ( currentValue == null )
                           ? false
                           : currentValue != null && currentValue.Equals( expectedValue );
     }
@@ -273,7 +277,11 @@ namespace Xceed.Wpf.Toolkit
       {
         value = Target.Selection.GetPropertyValue( TextElement.FontFamilyProperty );
       }
-      FontFamily currentFontFamily = ( FontFamily )( ( ( value == null ) || ( value == DependencyProperty.UnsetValue ) ) ? null : value );
+
+      if( value == DependencyProperty.UnsetValue )
+        return;
+
+      FontFamily currentFontFamily = ( FontFamily )value;
       if( currentFontFamily != null )
       {
         _cmbFontFamilies.SelectedItem = currentFontFamily;
@@ -288,7 +296,10 @@ namespace Xceed.Wpf.Toolkit
         value = Target.Selection.GetPropertyValue( TextElement.FontSizeProperty );
       }
 
-      _cmbFontSizes.SelectedValue = ( ( value == null ) || ( value == DependencyProperty.UnsetValue ) ) ? null : value;
+      if( value == DependencyProperty.UnsetValue )
+        return;
+
+      _cmbFontSizes.SelectedValue = value;
     }
 
     private void UpdateFontColor()
@@ -299,7 +310,10 @@ namespace Xceed.Wpf.Toolkit
         value = Target.Selection.GetPropertyValue( TextElement.ForegroundProperty );
       }
 
-      Color? currentColor =  ( ( value == null ) || ( value == DependencyProperty.UnsetValue )
+      if( value == DependencyProperty.UnsetValue )
+        return;
+
+      Color? currentColor =  ( ( value == null )
                               ? null
                               : ( Color? )( ( SolidColorBrush )value ).Color );
       _cmbFontColor.SelectedColor = currentColor;
@@ -312,7 +326,11 @@ namespace Xceed.Wpf.Toolkit
       {
         value = Target.Selection.GetPropertyValue( TextElement.BackgroundProperty );
       }
-      Color? currentColor = ( ( value == null ) || ( value == DependencyProperty.UnsetValue )
+
+      if( value == DependencyProperty.UnsetValue )
+        return;
+
+      Color? currentColor = ( ( value == null )
                               ? null
                               : ( Color? )( ( SolidColorBrush )value ).Color );
       _cmbFontBackgroundColor.SelectedColor = currentColor;

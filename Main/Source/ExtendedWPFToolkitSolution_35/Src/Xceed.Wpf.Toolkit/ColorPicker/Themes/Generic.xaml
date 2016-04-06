@@ -60,7 +60,19 @@
       <Setter Property="Template">
          <Setter.Value>
             <ControlTemplate TargetType="{x:Type ListBoxItem}">
-               <Grid ToolTip="{Binding Name}">
+               <Grid x:Name="mainGrid"
+                     ToolTip="{Binding Name}">
+                  <Grid.Resources>
+                     <Style TargetType="ToolTip">
+                        <Style.Triggers>
+                           <Trigger Property="Content"
+                                    Value="{x:Static sys:String.Empty}">
+                              <Setter Property="Visibility"
+                                      Value="Collapsed" />
+                           </Trigger>
+                        </Style.Triggers>
+                     </Style>
+                  </Grid.Resources>
                   <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                   <Border BorderThickness="1" Background="Transparent" BorderBrush="Transparent" x:Name="_outerBorder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                      <Border Background="Transparent" BorderThickness="1" BorderBrush="Transparent" x:Name="_innerBorder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
@@ -75,6 +87,12 @@
                      <Setter TargetName="_outerBorder" Property="BorderBrush" Value="#FFFF0000" />
                      <Setter TargetName="_innerBorder" Property="BorderBrush" Value="#FFFFFF00" />
                   </Trigger>
+                  <DataTrigger Binding="{Binding DisplayColorAndName, RelativeSource={RelativeSource AncestorType={x:Type local:ColorPicker}}}"
+                               Value="False">
+                     <Setter Property="ToolTip"
+                             Value="{x:Static sys:String.Empty}"
+                             TargetName="mainGrid" />
+                  </DataTrigger>
                </ControlTemplate.Triggers>
             </ControlTemplate>
          </Setter.Value>

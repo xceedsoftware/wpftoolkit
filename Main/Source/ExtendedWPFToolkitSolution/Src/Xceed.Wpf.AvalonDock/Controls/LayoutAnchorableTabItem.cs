@@ -30,7 +30,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 {
     public class LayoutAnchorableTabItem : Control
     {
-        static LayoutAnchorableTabItem()
+        static LayoutAnchorableTabItem() 
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutAnchorableTabItem), new FrameworkPropertyMetadata(typeof(LayoutAnchorableTabItem)));
         }
@@ -184,8 +184,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 var model = Model;
                 var container = model.Parent as ILayoutContainer;
                 var containerPane = model.Parent as ILayoutPane;
+
+                if( (containerPane is LayoutAnchorablePane) && !((LayoutAnchorablePane)containerPane).CanRepositionItems )
+                  return;
+                if( (containerPane.Parent != null) && (containerPane.Parent is LayoutAnchorablePaneGroup) && !((LayoutAnchorablePaneGroup)containerPane.Parent).CanRepositionItems )
+                  return;
+
                 var childrenList = container.Children.ToList();
-                containerPane.MoveChild(childrenList.IndexOf(_draggingItem.Model), childrenList.IndexOf(model));
+                containerPane.MoveChild( childrenList.IndexOf( _draggingItem.Model ), childrenList.IndexOf( model ) );
             }
         }
 

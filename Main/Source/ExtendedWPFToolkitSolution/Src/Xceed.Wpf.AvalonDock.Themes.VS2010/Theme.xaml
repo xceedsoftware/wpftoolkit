@@ -1035,6 +1035,7 @@
         <Setter Property="Foreground" Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor10}"/>
         <Setter Property="Background" Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor33}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor33}"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="shell:WindowChrome.WindowChrome">
             <Setter.Value>
                 <shell:WindowChrome
@@ -1050,7 +1051,7 @@
                 <ControlTemplate TargetType="{x:Type avalonDockControls:LayoutDocumentFloatingWindowControl}">
                     <Grid>
                         <Border x:Name="WindowBorder" 
-                                BorderThickness="1" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}">
                             <Grid Margin="3">
@@ -1197,6 +1198,8 @@
 
     <Style x:Key="{x:Type avalonDockControls:LayoutAnchorableFloatingWindowControl}" TargetType="{x:Type avalonDockControls:LayoutAnchorableFloatingWindowControl}">
         <Setter Property="Background" Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor5}"/>
+       <Setter Property="BorderBrush" Value="{DynamicResource AvalonDock_ThemeVS2010_BaseColor16}"/>
+       <Setter Property="BorderThickness" Value="4"/>
         <Setter Property="shell:WindowChrome.WindowChrome">
             <Setter.Value>
                 <shell:WindowChrome
@@ -1211,9 +1214,9 @@
                 <ControlTemplate TargetType="{x:Type avalonDockControls:LayoutAnchorableFloatingWindowControl}">
                     <Grid>
                         <Border x:Name="WindowBorder" 
-                                BorderThickness="4"
+                                BorderThickness="{TemplateBinding BorderThickness}"
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="{DynamicResource AvalonDock_ThemeVS2010_BaseColor16}">
+                                BorderBrush="{TemplateBinding BorderBrush}">
                             <Grid >
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="18"/>

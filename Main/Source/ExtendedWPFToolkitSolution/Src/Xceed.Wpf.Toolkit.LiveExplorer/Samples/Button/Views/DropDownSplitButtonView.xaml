@@ -29,46 +29,85 @@
     </local:DemoView.Description>
 
    <Grid>
-        <Grid.RowDefinitions>
-           <RowDefinition Height="Auto" />
-           <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
+      <StackPanel Margin="10">
 
-         <TextBlock Text="DropDownButton Usage:" Style="{StaticResource Header}" />
-         <xctk:DropDownButton x:Name="_dropDownButton"
-                              Grid.Row="1"
-                              Margin="10"
-                              Width="150"
-                              HorizontalAlignment="Left"
-                              Content="Click Me"
-                              Click="DropDownButton_Click">
-            <xctk:DropDownButton.DropDownContent>
-               <StackPanel>
-                  <xctk:ColorCanvas />
-                  <Button Click="Button_Click" Margin="10">OK</Button>
-               </StackPanel>
-            </xctk:DropDownButton.DropDownContent>
-         </xctk:DropDownButton>
+         <GroupBox Header="Features"
+                   Margin="0,5,0,5">
+            <Grid Margin="5">
+               <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="Auto" />
+               </Grid.ColumnDefinitions>
 
-         <TextBlock Text="SplitButton Usage:" Grid.Column="1" Style="{StaticResource Header}" />
-         <xctk:SplitButton x:Name="_splitButton"
-                           Grid.Row="1"
-                           Grid.Column="1"
-                           Margin="10"
-                           Width="150"
-                           HorizontalAlignment="Left"
-                           Content="Click Me"
-                           Click="SplitButton_Click">
-            <xctk:SplitButton.DropDownContent>
-               <StackPanel>
-                  <xctk:ColorCanvas />
-                  <Button Click="Button_Click" Margin="10">OK</Button>
-               </StackPanel>
-            </xctk:SplitButton.DropDownContent>
-         </xctk:SplitButton>
+               <TextBlock Text="MaxDropDownHeight:"
+                          VerticalAlignment="Center"/>
+               <xctk:DoubleUpDown x:Name="maxDropDownHeight"
+                                  Grid.Column="1"
+                                  Width="60"
+                                  Value="500"
+                                  AllowInputSpecialValues="PositiveInfinity"
+                                  Minimum="0"
+                                  VerticalAlignment="Center"
+                                  Margin="5"/>
+            </Grid>
+         </GroupBox>
+
+         <StackPanel>
+            <TextBlock Text="Usage:"
+                       Style="{StaticResource Header}" />
+
+            <Grid>
+               <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+               </Grid.RowDefinitions>
+               <Grid.ColumnDefinitions>
+                  <ColumnDefinition />
+                  <ColumnDefinition />
+               </Grid.ColumnDefinitions>
+
+               <TextBlock Text="DropDownButton Usage:"
+                          Style="{StaticResource Header}" />
+               <xctk:DropDownButton x:Name="_dropDownButton"
+                                    Grid.Row="1"
+                                    Margin="10"
+                                    Width="150"
+                                    HorizontalAlignment="Left"
+                                    Content="Click Me"
+                                    MaxDropDownHeight="{Binding Value, ElementName=maxDropDownHeight}"
+                                    Click="DropDownButton_Click">
+                  <xctk:DropDownButton.DropDownContent>
+                     <StackPanel>
+                        <xctk:ColorCanvas />
+                        <Button Click="Button_Click"
+                                Margin="10">OK</Button>
+                     </StackPanel>
+                  </xctk:DropDownButton.DropDownContent>
+               </xctk:DropDownButton>
+
+               <TextBlock Text="SplitButton Usage:"
+                          Grid.Column="1"
+                          Style="{StaticResource Header}" />
+               <xctk:SplitButton x:Name="_splitButton"
+                                 Grid.Row="1"
+                                 Grid.Column="1"
+                                 Margin="10"
+                                 Width="150"
+                                 HorizontalAlignment="Left"
+                                 Content="Click Me"
+                                 MaxDropDownHeight="{Binding Value, ElementName=maxDropDownHeight}"
+                                 Click="SplitButton_Click">
+                  <xctk:SplitButton.DropDownContent>
+                     <StackPanel>
+                        <xctk:ColorCanvas />
+                        <Button Click="Button_Click"
+                                Margin="10">OK</Button>
+                     </StackPanel>
+                  </xctk:SplitButton.DropDownContent>
+               </xctk:SplitButton>
+            </Grid>
+         </StackPanel>
+      </StackPanel>
    </Grid>
+
 </local:DemoView>

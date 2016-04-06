@@ -44,6 +44,7 @@
    <pgconv:ObjectToUIElementConverter x:Key="ObjectToUIElementConverter" />
    <pgconv:IsStringEmptyConverter x:Key="IsStringEmptyConverter" />
    <pgconv:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
+   <pgconv:IsDefaultCategoryConverter x:Key="IsDefaultCategoryConverter" />
 
    <x:Static x:Key="EmptyString"
              Member="sys:String.Empty" />
@@ -858,11 +859,10 @@
          <Setter.Value>
             <ControlTemplate>
                <Border>
-                  <Expander Header="{Binding Name}"
-                            Style="{StaticResource ExpanderStyle}">
-                        <Expander.IsExpanded>
-                              <sys:Boolean>True</sys:Boolean>
-                        </Expander.IsExpanded>
+                  <Expander x:Name="expander"
+                            Header="{Binding Name}"
+                            Style="{StaticResource ExpanderStyle}"
+                            IsExpanded="True">
                      <ItemsPresenter />
                   </Expander>
                </Border>
@@ -872,8 +872,8 @@
       <Style.Triggers>
          <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
-               <Condition Binding="{Binding Name}"
-                          Value="Misc" />
+               <Condition Binding="{Binding Name, Converter={StaticResource IsDefaultCategoryConverter}}"
+                          Value="True" />
                <Condition Binding="{Binding IsMiscCategoryLabelHidden, RelativeSource={RelativeSource AncestorType={x:Type pg:PropertyGrid}}}"
                           Value="True" />
             </MultiDataTrigger.Conditions>

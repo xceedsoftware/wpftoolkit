@@ -158,9 +158,13 @@
                      <!-- TODO: Create Popup Styles that can be reused on all popups in the toolkit-->
                      <Border BorderThickness="1"
                              Background="{StaticResource PopupBackgroundBrush}"
-                             BorderBrush="{StaticResource ColorPickerDarkBorderBrush}">
-                        <ContentPresenter x:Name="PART_ContentPresenter"
-                                          Content="{TemplateBinding DropDownContent}" />
+                             BorderBrush="{StaticResource ColorPickerDarkBorderBrush}"
+                             MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                        <ScrollViewer x:Name="DropDownScrollViewer"
+                                      VerticalScrollBarVisibility="Auto">
+                           <ContentPresenter x:Name="PART_ContentPresenter"
+                                             Content="{TemplateBinding DropDownContent}" />
+                        </ScrollViewer>
                      </Border>
                   </Popup>
 

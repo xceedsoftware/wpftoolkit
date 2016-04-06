@@ -29,6 +29,7 @@ using Xceed.Wpf.AvalonDock.Layout;
 using System.Diagnostics;
 using System.Windows.Documents;
 using Xceed.Wpf.AvalonDock.Themes;
+using Microsoft.Windows.Shell;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
@@ -249,8 +250,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
             if (_hwndSrc != null)
             {
                 _hwndSrc.RemoveHook(_hwndSrcHook);
-                _hwndSrc.Dispose();
-                _hwndSrc = null;
+                InternalClose();
             }
         }
 

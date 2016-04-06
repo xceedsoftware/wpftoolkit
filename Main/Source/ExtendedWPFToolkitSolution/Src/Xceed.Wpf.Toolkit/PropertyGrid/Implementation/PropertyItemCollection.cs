@@ -107,7 +107,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
     }
 
-    internal void UpdateCategorization( GroupDescription groupDescription, bool isPropertyGridCategorized )
+    internal void UpdateCategorization( GroupDescription groupDescription, bool isPropertyGridCategorized, bool sortAlphabetically )
     {
       // Compute Display Order relative to PropertyOrderAttributes on PropertyItem
       // which could be different in Alphabetical or Categorized mode.
@@ -133,7 +133,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         }
 
         SortBy( PropertyOrderPropertyName, ListSortDirection.Ascending );
-        SortBy( DisplayNamePropertyName, ListSortDirection.Ascending );
+        if( sortAlphabetically )
+        {
+          SortBy( DisplayNamePropertyName, ListSortDirection.Ascending );
+        }
       }
     }
 
@@ -153,7 +156,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           var property = item as PropertyItem;
           if( property.DisplayName != null )
           {
-            return property.DisplayName.ToLower().StartsWith( text.ToLower() );
+            return property.DisplayName.ToLower().Contains( text.ToLower() );
           }
 
           return false;

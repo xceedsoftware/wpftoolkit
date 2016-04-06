@@ -149,6 +149,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         this.OnAutoGeneratePropertiesChanged();
       }
+      else if( propertyName == ReflectionHelper.GetPropertyOrFieldName( () => ps.HideInheritedProperties ) )
+      {
+        this.OnHideInheritedPropertiesChanged();
+      }
       else if(propertyName == ReflectionHelper.GetPropertyOrFieldName( () => ps.EditorDefinitions ))
       {
         this.OnEditorDefinitionsChanged();
@@ -164,6 +168,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     protected virtual void OnFilterChanged() { }
 
     protected virtual void OnAutoGeneratePropertiesChanged() { }
+
+    protected virtual void OnHideInheritedPropertiesChanged() { }
 
     protected virtual void OnEditorDefinitionsChanged() { }
 

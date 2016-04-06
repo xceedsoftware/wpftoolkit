@@ -66,8 +66,8 @@
       <LinearGradientBrush.GradientStops>
          <GradientStopCollection>
             <GradientStop Offset="0" Color="#FFfcfcfc" />
-            <GradientStop Offset="0.69" Color="#FFf9f9f9" />
-            <GradientStop Offset="0.69" Color="#FFf3f3f3" />
+            <GradientStop Offset="0.5" Color="#FFf9f9f9" />
+            <GradientStop Offset="0.5" Color="#FFf3f3f3" />
             <GradientStop Offset="1" Color="#FFf3f3f3" />
          </GradientStopCollection>
       </LinearGradientBrush.GradientStops>
@@ -78,8 +78,8 @@
       <LinearGradientBrush.GradientStops>
          <GradientStopCollection>
             <GradientStop Offset="0" Color="#FFf2f2f2" />
-            <GradientStop Offset="0.69" Color="#FFe8e8e8" />
-            <GradientStop Offset="0.69" Color="#FFd1d1d1" />
+            <GradientStop Offset="0.5" Color="#FFe8e8e8" />
+            <GradientStop Offset="0.5" Color="#FFd1d1d1" />
             <GradientStop Offset="1" Color="#FFd1d1d1" />
          </GradientStopCollection>
       </LinearGradientBrush.GradientStops>

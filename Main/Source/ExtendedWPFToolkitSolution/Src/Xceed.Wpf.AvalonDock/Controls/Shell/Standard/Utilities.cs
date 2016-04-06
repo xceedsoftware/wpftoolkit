@@ -263,6 +263,15 @@ namespace Standard
             get { return _osVersion >= new Version(6, 1); }
         }
 
+        [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
+        public static bool IsOSWindows8OrNewer
+        {
+          get
+          {
+            return _osVersion >= new Version( 6, 2 );
+          }
+        }
+
         /// <summary>
         /// Is this using WPF4?
         /// </summary>

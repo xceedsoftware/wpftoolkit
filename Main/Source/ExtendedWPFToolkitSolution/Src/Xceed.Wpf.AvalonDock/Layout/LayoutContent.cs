@@ -775,5 +775,26 @@ namespace Xceed.Wpf.AvalonDock.Layout
         }
 
         #endregion
+
+        #region IsEnabled
+
+        private bool _isEnabled = true;
+        public bool IsEnabled
+        {
+          get
+          {
+            return _isEnabled;
+          }
+          set
+          {
+            if( _isEnabled != value )
+            {
+              _isEnabled = value;
+              RaisePropertyChanged( "IsEnabled" );
+            }
+          }
+        }
+
+        #endregion
     }
 }

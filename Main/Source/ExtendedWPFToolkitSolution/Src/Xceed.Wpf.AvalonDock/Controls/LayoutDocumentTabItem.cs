@@ -29,7 +29,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 {
     public class LayoutDocumentTabItem : Control
     {
-        static LayoutDocumentTabItem()
+        static LayoutDocumentTabItem() 
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutDocumentTabItem), new FrameworkPropertyMetadata(typeof(LayoutDocumentTabItem)));
         }
@@ -182,8 +182,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
                         var targetModel = _otherTabs[indexOfTabItemWithMouseOver].Content as LayoutContent;
                         var container = Model.Parent as ILayoutContainer;
                         var containerPane = Model.Parent as ILayoutPane;
+
+                        if( (containerPane is LayoutDocumentPane) && !((LayoutDocumentPane)containerPane).CanRepositionItems )
+                          return;
+                        if( (containerPane.Parent != null) && (containerPane.Parent is LayoutDocumentPaneGroup) && !((LayoutDocumentPaneGroup)containerPane.Parent).CanRepositionItems )
+                          return;
+
                         var childrenList = container.Children.ToList();
-                        containerPane.MoveChild(childrenList.IndexOf(Model), childrenList.IndexOf(targetModel));
+                        containerPane.MoveChild( childrenList.IndexOf( Model ), childrenList.IndexOf( targetModel ) );
                         Model.IsActive = true;
                         _parentDocumentTabPanel.UpdateLayout();
                         UpdateDragDetails();

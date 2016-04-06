@@ -20,6 +20,7 @@
                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                 xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters;assembly=Xceed.Wpf.Toolkit"
+                xmlns:localConv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.ToggleSwitch.Converters"
                 Title="ToggleSwitch">
 
    <local:DemoView.Description>
@@ -35,6 +36,9 @@
          </Hyperlink>
       </Paragraph>
    </local:DemoView.Description>
+
+
+
 
 
 

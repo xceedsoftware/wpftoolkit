@@ -139,6 +139,36 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //IsOpen
 
+    #region MaxDropDownHeight
+
+    public static readonly DependencyProperty MaxDropDownHeightProperty = DependencyProperty.Register( "MaxDropDownHeight", typeof( double )
+      , typeof( DropDownButton ), new UIPropertyMetadata( SystemParameters.PrimaryScreenHeight / 2.0, OnMaxDropDownHeightChanged ) );
+    public double MaxDropDownHeight
+    {
+      get
+      {
+        return (double)GetValue( MaxDropDownHeightProperty );
+      }
+      set
+      {
+        SetValue( MaxDropDownHeightProperty, value );
+      }
+    }
+
+    private static void OnMaxDropDownHeightChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var dropDownButton = o as DropDownButton;
+      if( dropDownButton != null )
+        dropDownButton.OnMaxDropDownHeightChanged( (double)e.OldValue, (double)e.NewValue );
+    }
+
+    protected virtual void OnMaxDropDownHeightChanged( double oldValue, double newValue )
+    {
+      // TODO: Add your property changed side-effects. Descendants can override as well.
+    }
+
+    #endregion
+
     #endregion //Properties
 
     #region Base Class Overrides
@@ -157,6 +187,15 @@ namespace Xceed.Wpf.Toolkit
 
       if( _popup != null )
         _popup.Opened += Popup_Opened;
+    }
+
+    protected override void OnIsKeyboardFocusWithinChanged( DependencyPropertyChangedEventArgs e )
+    {
+      base.OnIsKeyboardFocusWithinChanged( e );
+      if( !( bool )e.NewValue )
+      {
+        this.CloseDropDown( false );
+      }
     }
 
     #endregion //Base Class Overrides

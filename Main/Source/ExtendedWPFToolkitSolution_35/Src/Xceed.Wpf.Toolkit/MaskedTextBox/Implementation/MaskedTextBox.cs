@@ -1344,7 +1344,18 @@ namespace Xceed.Wpf.Toolkit
 
       e.Handled = true;
 
-      this.ProcessTextInput( e.Text );
+      if( this.CharacterCasing == CharacterCasing.Upper )
+      {
+        this.ProcessTextInput( e.Text.ToUpper() );
+      }
+      else if( this.CharacterCasing == CharacterCasing.Lower )
+      {
+        this.ProcessTextInput( e.Text.ToLower() );
+      }
+      else
+      {
+        this.ProcessTextInput( e.Text );
+      }
 
       base.OnTextInput( e );
     }

@@ -84,11 +84,25 @@
                <ControlTemplate.Triggers>
                   <MultiTrigger>
                      <MultiTrigger.Conditions>
+                        <Condition Property="KeepWatermarkOnGotFocus" Value="False" />
                         <Condition Property="IsFocused" Value="False" />
                         <Condition Property="Text" Value="" />
                      </MultiTrigger.Conditions>
                      <MultiTrigger.Setters>
                         <Setter Property="Visibility" TargetName="PART_WatermarkHost" Value="Visible" />
+                     </MultiTrigger.Setters>
+                  </MultiTrigger>
+                  <MultiTrigger>
+                     <MultiTrigger.Conditions>
+                        <Condition Property="KeepWatermarkOnGotFocus"
+                                   Value="True" />
+                        <Condition Property="Text"
+                                   Value="" />
+                     </MultiTrigger.Conditions>
+                     <MultiTrigger.Setters>
+                        <Setter Property="Visibility"
+                                TargetName="PART_WatermarkHost"
+                                Value="Visible" />
                      </MultiTrigger.Setters>
                   </MultiTrigger>
                   <Trigger Property="IsMouseOver" Value="True">

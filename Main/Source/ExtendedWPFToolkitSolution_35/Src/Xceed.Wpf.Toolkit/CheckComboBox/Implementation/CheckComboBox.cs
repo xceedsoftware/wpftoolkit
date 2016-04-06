@@ -35,6 +35,7 @@ namespace Xceed.Wpf.Toolkit
     #region Members
 
     private ValueChangeHelper _displayMemberPathValuesChangeHelper;
+    private bool _ignoreTextValueChanged;
     private Popup _popup;
     private List<object> _initialValue = new List<object>();
 
@@ -58,9 +59,28 @@ namespace Xceed.Wpf.Toolkit
 
     #region Properties
 
+    #region IsEditable
+
+    public static readonly DependencyProperty IsEditableProperty = DependencyProperty.Register( "IsEditable", typeof( bool ), typeof( CheckComboBox )
+      , new UIPropertyMetadata( false ) );
+    public bool IsEditable
+    {
+      get
+      {
+        return (bool)GetValue( IsEditableProperty );
+      }
+      set
+      {
+        SetValue( IsEditableProperty, value );
+      }
+    }
+
+    #endregion
+
     #region Text
 
-    public static readonly DependencyProperty TextProperty = DependencyProperty.Register( "Text", typeof( string ), typeof( CheckComboBox ), new UIPropertyMetadata( null ) );
+    public static readonly DependencyProperty TextProperty = DependencyProperty.Register( "Text", typeof( string ), typeof( CheckComboBox )
+      , new UIPropertyMetadata( null, OnTextChanged ) );
     public string Text
     {
       get
@@ -71,6 +91,21 @@ namespace Xceed.Wpf.Toolkit
       {
         SetValue( TextProperty, value );
       }
+    }
+
+    private static void OnTextChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var checkComboBox = o as CheckComboBox;
+      if( checkComboBox != null )
+        checkComboBox.OnTextChanged( (string)e.OldValue, (string)e.NewValue );
+    }
+
+    protected virtual void OnTextChanged( string oldValue, string newValue )
+    {
+      if( !this.IsInitialized || _ignoreTextValueChanged )
+        return;
+
+      this.UpdateFromText();
     }
 
     #endregion
@@ -254,7 +289,26 @@ namespace Xceed.Wpf.Toolkit
 #endif
 
       if( String.IsNullOrEmpty( Text ) || !Text.Equals( newValue ) )
+      {
+        _ignoreTextValueChanged = true;
         Text = newValue;
+        _ignoreTextValueChanged = false;
+      }
+    }
+
+    /// <summary>
+    /// Updates the SelectedItems collection based on the content of
+    /// the Text property.
+    /// </summary>
+    private void UpdateFromText()
+    {
+      List<string> selectedValues = null;
+      if( !String.IsNullOrEmpty( this.Text ) )
+      {
+        selectedValues = this.Text.Replace( " ", string.Empty ).Split( new string[] { Delimiter }, StringSplitOptions.RemoveEmptyEntries ).ToList();
+      }
+
+      this.UpdateFromList( selectedValues, this.GetItemDisplayValue );
     }
 
     protected object GetItemDisplayValue( object item )

@@ -52,7 +52,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
   [CategoryOrder("Information", 0)]
   [CategoryOrder( "Conections", 1 )]
   [CategoryOrder( "Other", 2 )]
-  public abstract class Person
+  public abstract class Person : INotifyPropertyChanged
   {
     // All properties have their own "[Category(...)]" attribute to specify which category they
     // belong to when the "Categorized" layout is used by the PropertyGrid.
@@ -65,12 +65,22 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     [Category( "Information" )]
     [Description( "This property uses the [Editor(..)] attribute to provide a custom editor using the 'FirstNameEditor' class. In the Plus version, it also depends on the IsMale property to change its foreground and source." )]
     [Editor( typeof( FirstNameEditor ), typeof( FirstNameEditor ) )]
-    public string FirstName { get; set; }
+    public string FirstName
+    {
+      get{ return _firstName; }
+      set{ _firstName = value; OnPropertyChanged( "FirstName" );}
+    }
+    private string _firstName;
 
     [Category( "Information" )]
     [Description( "This property uses the [Editor(..)] attribute to provide a custom editor using the 'LastNameUserControlEditor' user control." )]
     [Editor( typeof( LastNameUserControlEditor ), typeof( LastNameUserControlEditor ) )]
-    public string LastName { get; set; }
+    public string LastName
+    {
+      get{ return _lastName; }
+      set{ _lastName = value; OnPropertyChanged( "LastName" );}
+    }
+    private string _lastName;
 
     [Category( "Conections" )]
     [Description( "This property uses the [NewItemTypes(...)] attribute to provide the underlying CollectionEditor with class types (eg. Man, Woman) that can be inserted in the collection." )]
@@ -81,6 +91,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     [DisplayName( "Writing Font Size" )]
     [Description( "This property defines the [ItemsSource(..)] attribute that allows you to specify a ComboBox editor and control its items." )]
     [ItemsSource( typeof( FontSizeItemsSource ) )]
+    [RefreshProperties( RefreshProperties.All )]    //This will reload the PropertyGrid
     public double WritingFontSize { get; set; }
 
     [Category( "Conections" )]
@@ -115,6 +126,15 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     public override string ToString()
     {
       return FirstName + " " + LastName;
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected void OnPropertyChanged( string propertyName )
+    {
+      if( PropertyChanged != null )
+      {
+        PropertyChanged( this, new PropertyChangedEventArgs( propertyName ) );
+      }
     }
   }
 
