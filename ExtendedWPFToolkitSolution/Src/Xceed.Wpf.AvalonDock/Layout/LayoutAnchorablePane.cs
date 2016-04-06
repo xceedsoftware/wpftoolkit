@@ -125,7 +125,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
                     SelectedContentIndex = Children.Count - 1;
 
                 if (SelectedContentIndex == -1 && ChildrenCount > 0)
-                    SelectedContentIndex = 0;
+                  SetNextSelectedIndex();
             }
         }
 
@@ -150,6 +150,19 @@ namespace Xceed.Wpf.AvalonDock.Layout
                 return false;
                 //return Parent != null && Parent.ChildrenCount == 1 && Parent.Parent is LayoutFloatingWindow;
             }
+        }
+
+        internal void SetNextSelectedIndex()
+        {
+          SelectedContentIndex = -1;
+          for( int i = 0; i < this.Children.Count; ++i )
+          {
+            if( Children[ i ].IsEnabled )
+            {
+              SelectedContentIndex = i;
+              return;
+            }
+          }
         }
 
         internal void UpdateIsDirectlyHostedInFloatingWindow()

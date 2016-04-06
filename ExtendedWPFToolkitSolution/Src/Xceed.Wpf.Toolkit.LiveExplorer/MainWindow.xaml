@@ -56,8 +56,6 @@
 
          <Style x:Key="ExpandCollapseToggleStyle"
                 TargetType="{x:Type ToggleButton}">
-            <Setter Property="Focusable"
-                    Value="False" />
             <Setter Property="Width"
                     Value="20" />
             <Setter Property="Height"
@@ -458,8 +456,7 @@
                                         ItemContainerStyle="{StaticResource TreeViewItemStyle}">
             <core:LiveExplorerTreeViewItem Header="PropertyGrid"
                                            ItemContainerStyle="{StaticResource TreeViewSubHeaderStyle}"
-                                           SampleType="{x:Type samples:PropertyGrid.Views.PropertyGridView}"
-                                           IsSelected="True">
+                                           SampleType="{x:Type samples:PropertyGrid.Views.PropertyGridView}">
 
                <core:LiveExplorerTreeViewItem Header="Editors"
                                               ItemContainerStyle="{StaticResource TreeViewItemStyle}">
@@ -624,7 +621,45 @@
              <core:LiveExplorerTreeViewItem Header="Gauge"
                                            ItemContainerStyle="{StaticResource TreeViewItemStyle}"
                                            SampleType="{x:Type samples:Gauge.Views.RadialGaugeView}"
-                                           IsPlusOnlyFeature="True">
+                                           IsPlusOnlyFeature="True"/>
+            <core:LiveExplorerTreeViewItem Header="Material Controls"
+                                           ItemContainerStyle="{StaticResource TreeViewItemStyle}"
+                                           IsNewFeature="True"
+                                           IsPlusOnlyFeature="True"
+                                           SampleType="{x:Type samples:MaterialControls.Views.MaterialControlsView}"
+                                           IsSelected="True">
+               <core:LiveExplorerTreeViewItem Header="Button"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialButtonView}" />
+               <core:LiveExplorerTreeViewItem Header="CheckBox"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialCheckBoxView}" />
+               <core:LiveExplorerTreeViewItem Header="ComboBox"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialComboBoxView}" />
+               <core:LiveExplorerTreeViewItem Header="DropDown"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialDropDownView}" />
+               <core:LiveExplorerTreeViewItem Header="Frame"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialFrameView}" />
+               <core:LiveExplorerTreeViewItem Header="ListBox"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialListBoxView}" />
+               <core:LiveExplorerTreeViewItem Header="ProgressBar"
+                                              ItemContainerStyle="{StaticResource TreeViewItemStyle}"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialProgressBarView}">
+                  <core:LiveExplorerTreeViewItem Header="Circular"
+                                                 SampleType="{x:Type samples:MaterialControls.Views.MaterialProgressBarCircularView}" />
+               </core:LiveExplorerTreeViewItem>
+               <core:LiveExplorerTreeViewItem Header="RadioButton"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialRadioButtonView}" />
+               <core:LiveExplorerTreeViewItem Header="Slider"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialSliderView}" />
+               <core:LiveExplorerTreeViewItem Header="Switch"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialSwitchView}" />
+               <core:LiveExplorerTreeViewItem Header="Tabs"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialTabsView}" />
+               <core:LiveExplorerTreeViewItem Header="TextField"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialTextFieldView}" />
+               <core:LiveExplorerTreeViewItem Header="Toast"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialToastView}" />
+               <core:LiveExplorerTreeViewItem Header="ToolTip"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialToolTipView}" />
             </core:LiveExplorerTreeViewItem>
          </core:LiveExplorerTreeViewItem>
          <core:LiveExplorerTreeViewItem Header="Other"

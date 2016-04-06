@@ -3417,7 +3417,7 @@ namespace Standard
             }
 
             var dti = new DWM_TIMING_INFO { cbSize = Marshal.SizeOf(typeof(DWM_TIMING_INFO)) };
-            HRESULT hr = _DwmGetCompositionTimingInfo(hwnd, ref dti);
+            HRESULT hr = _DwmGetCompositionTimingInfo( Utility.IsOSWindows8OrNewer ? IntPtr.Zero : hwnd, ref dti );
             if (hr == HRESULT.E_PENDING)
             {
                 // The system isn't yet ready to respond.  Return null rather than throw.

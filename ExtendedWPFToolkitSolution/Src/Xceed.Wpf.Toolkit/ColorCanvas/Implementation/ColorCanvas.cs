@@ -46,6 +46,7 @@ namespace Xceed.Wpf.Toolkit
     private TextBox _hexadecimalTextBox;
     private Point? _currentColorPosition;
     private bool _surpressPropertyChanged;
+    private bool _updateSpectrumSliderValue = true;
 
     #endregion //Private Members
 
@@ -525,8 +526,10 @@ namespace Xceed.Wpf.Toolkit
 
       HsvColor hsv = ColorUtilities.ConvertRgbToHsv( color.Value.R, color.Value.G, color.Value.B );
 
-      if( !( color.Value.R == color.Value.G && color.Value.R == color.Value.B ) )
+      if( _updateSpectrumSliderValue )
+      {
         _spectrumSlider.Value = hsv.H;
+      }
 
       Point p = new Point( hsv.S, 1 - hsv.V );
 
@@ -545,7 +548,9 @@ namespace Xceed.Wpf.Toolkit
       };
       var currentColor = ColorUtilities.ConvertHsvToRgb( hsv.H, hsv.S, hsv.V );
       currentColor.A = A;
+      _updateSpectrumSliderValue = false;
       SelectedColor = currentColor;
+      _updateSpectrumSliderValue = true;
       SetHexadecimalStringProperty( GetFormatedColorString( SelectedColor ), false );
     }
 

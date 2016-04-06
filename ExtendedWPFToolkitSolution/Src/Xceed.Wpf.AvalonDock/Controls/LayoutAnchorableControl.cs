@@ -78,10 +78,36 @@ namespace Xceed.Wpf.AvalonDock.Controls
         /// </summary>
         protected virtual void OnModelChanged(DependencyPropertyChangedEventArgs e)
         {
-            if (Model != null)
-                SetLayoutItem(Model.Root.Manager.GetLayoutItemFromModel(Model));
-            else
-                SetLayoutItem(null);
+          if( e.OldValue != null )
+          {
+            ((LayoutContent)e.OldValue).PropertyChanged -= Model_PropertyChanged;
+          }
+
+          if( Model != null )
+          {
+            Model.PropertyChanged += Model_PropertyChanged;
+            SetLayoutItem( Model.Root.Manager.GetLayoutItemFromModel( Model ) );
+          }
+          else
+            SetLayoutItem( null );
+        }
+
+        private void Model_PropertyChanged( object sender, System.ComponentModel.PropertyChangedEventArgs e )
+        {
+          if( e.PropertyName == "IsEnabled" )
+          {
+            if( Model != null )
+            {
+              IsEnabled = Model.IsEnabled;
+              if( !IsEnabled && Model.IsActive )
+              {
+                if( (Model.Parent != null) && (Model.Parent is LayoutAnchorablePane) )
+                {
+                  ((LayoutAnchorablePane)Model.Parent).SetNextSelectedIndex();
+                }
+              }
+            }
+          }
         }
 
         #endregion

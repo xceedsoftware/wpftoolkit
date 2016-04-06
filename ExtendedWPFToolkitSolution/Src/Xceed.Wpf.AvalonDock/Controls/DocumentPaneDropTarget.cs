@@ -201,7 +201,19 @@ namespace Xceed.Wpf.AvalonDock.Controls
                         var paneModel = targetModel as LayoutDocumentPane;
                         var sourceModel = floatingWindow.RootDocument;
 
-                        int i = _tabIndex == -1 ? 0 : _tabIndex;
+                        int i = 0;
+                        if( _tabIndex != -1 )
+                        {
+                          i = _tabIndex;
+                        }
+                        else
+                        {
+                          var previousContainer = ((ILayoutPreviousContainer)sourceModel).PreviousContainer;
+                          if( object.ReferenceEquals( previousContainer, targetModel ) && (sourceModel.PreviousContainerIndex != -1) )
+                          {
+                            i = sourceModel.PreviousContainerIndex;
+                          }
+                        }
                         sourceModel.IsActive = false;
                         paneModel.Children.Insert(i, sourceModel);
                         sourceModel.IsActive = true;
@@ -384,13 +396,30 @@ namespace Xceed.Wpf.AvalonDock.Controls
                         var paneModel = targetModel as LayoutDocumentPane;
                         var layoutAnchorablePaneGroup = floatingWindow.RootPanel as LayoutAnchorablePaneGroup;
 
-                        int i = _tabIndex == -1 ? 0 : _tabIndex;
+                        bool checkPreviousContainer = true;
+                        int i = 0;
+                        if( _tabIndex != -1 )
+                        {
+                          i = _tabIndex;
+                          checkPreviousContainer = false;
+                        }
                         LayoutAnchorable anchorableToActivate = null;
+
                         foreach (var anchorableToImport in layoutAnchorablePaneGroup.Descendents().OfType<LayoutAnchorable>().ToArray())
                         {
-                            paneModel.Children.Insert(i, anchorableToImport);
-                            i++;
-                            anchorableToActivate = anchorableToImport;
+                          if( checkPreviousContainer )
+                          {
+                            var previousContainer = ((ILayoutPreviousContainer)anchorableToImport).PreviousContainer;
+                            if( object.ReferenceEquals( previousContainer, targetModel ) && (anchorableToImport.PreviousContainerIndex != -1) )
+                            {
+                              i = anchorableToImport.PreviousContainerIndex;
+                            }
+                            checkPreviousContainer = false;
+                          }
+
+                          paneModel.Children.Insert(i, anchorableToImport);
+                          i++;
+                          anchorableToActivate = anchorableToImport;
                         }
 
                         anchorableToActivate.IsActive = true;

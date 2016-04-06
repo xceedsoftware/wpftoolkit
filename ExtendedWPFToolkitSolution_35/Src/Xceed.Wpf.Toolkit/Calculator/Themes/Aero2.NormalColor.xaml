@@ -243,7 +243,9 @@
                                       Text="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}" />
                                 </StackPanel>
                             </Border>
-                            <ContentControl x:Name="PART_CalculatorButtonPanel" Grid.Row="1" Template="{StaticResource CalculatorButtonPanel}" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                            <ContentControl x:Name="PART_CalculatorButtonPanel" Grid.Row="1"
+                                            Template="{Binding CalculatorButtonPanelTemplate, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource CalculatorButtonPanel}}" 
+                                            DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>

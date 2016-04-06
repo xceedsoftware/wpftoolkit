@@ -41,6 +41,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private ContainerHelperBase _containerHelper;
     private IPropertyContainer _parentNode;
     internal bool _isPropertyGridCategorized;
+    internal bool _isSortedAlphabetically = true;
 
     #region Properties
 
@@ -118,7 +119,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private static void OnEditorChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
-      PropertyItem propertyItem = o as PropertyItem;
+      PropertyItemBase propertyItem = o as PropertyItemBase;
       if( propertyItem != null )
         propertyItem.OnEditorChanged( ( FrameworkElement )e.OldValue, ( FrameworkElement )e.NewValue );
     }
@@ -298,6 +299,25 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion
 
+    #region WillRefreshPropertyGrid
+
+    public static readonly DependencyProperty WillRefreshPropertyGridProperty =
+        DependencyProperty.Register( "WillRefreshPropertyGrid", typeof( bool ), typeof( PropertyItemBase ), new UIPropertyMetadata( false ) );
+
+    public bool WillRefreshPropertyGrid
+    {
+      get
+      {
+        return ( bool )GetValue( WillRefreshPropertyGridProperty );
+      }
+      set
+      {
+        SetValue( WillRefreshPropertyGridProperty, value );
+      }
+    }
+
+    #endregion //WillRefreshPropertyGrid
+
     #endregion //Properties
 
     #region Events
@@ -425,7 +445,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     EditorDefinitionCollection IPropertyContainer.EditorDefinitions
     {
-      get { return ParentNode.EditorDefinitions; }
+      get
+      {
+        return (this.ParentNode != null) ? this.ParentNode.EditorDefinitions : null;
+      }
     }
 
     PropertyDefinitionCollection IPropertyContainer.PropertyDefinitions
@@ -449,9 +472,25 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
+    bool IPropertyContainer.IsSortedAlphabetically
+    {
+      get
+      {
+        return _isSortedAlphabetically;
+      }
+    }
+
     bool IPropertyContainer.AutoGenerateProperties
     {
       get { return true; }
+    }
+
+    bool IPropertyContainer.HideInheritedProperties
+    {
+      get
+      {
+        return false;
+      }
     }
 
     FilterInfo IPropertyContainer.FilterInfo

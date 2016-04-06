@@ -462,6 +462,35 @@ namespace Xceed.Wpf.Toolkit.Primitives
       return value;
     }
 
+    internal void UpdateFromList( List<string> selectedValues, Func<object, object> GetItemfunction )
+    {
+      _ignoreSelectedItemsCollectionChanged++;
+      // Just update the SelectedItems collection content 
+      // and let the synchronization be made from UpdateFromSelectedItems();
+      SelectedItems.Clear();
+
+      if( (selectedValues != null) && (selectedValues.Count > 0) )
+      {
+        ValueEqualityComparer comparer = new ValueEqualityComparer();
+
+        foreach( object item in ItemsCollection )
+        {
+          object itemValue = GetItemfunction( item );
+
+          bool isSelected = (itemValue != null)
+            && selectedValues.Contains( itemValue.ToString(), comparer );
+
+          if( isSelected )
+          {
+            SelectedItems.Add( item );
+          }
+        }
+      }
+      _ignoreSelectedItemsCollectionChanged--;
+
+      this.UpdateFromSelectedItems();
+    }
+
     private bool? GetSelectedMemberPathValue( object item )
     {
       PropertyInfo prop = this.GetSelectedMemberPathProperty(item);
@@ -734,32 +763,13 @@ namespace Xceed.Wpf.Toolkit.Primitives
     /// </summary>
     private void UpdateFromSelectedValue()
     {
-      _ignoreSelectedItemsCollectionChanged++;
-      // Just update the SelectedItems collection content 
-      // and let the synchronization be made from UpdateFromSelectedItems();
-      SelectedItems.Clear();
-
+      List<string> selectedValues = null;
       if( !String.IsNullOrEmpty( SelectedValue ) )
       {
-        List<string> selectedValues = SelectedValue.Split( new string[] { Delimiter }, StringSplitOptions.RemoveEmptyEntries ).ToList();
-        ValueEqualityComparer comparer = new ValueEqualityComparer();
-
-        foreach( object item in ItemsCollection )
-        {
-          object itemValue = this.GetItemValue( item );
-
-          bool isSelected = ( itemValue != null )
-            && selectedValues.Contains( itemValue.ToString(), comparer );
-
-          if( isSelected )
-          {
-            SelectedItems.Add( item );
-          }
-        }
+        selectedValues = SelectedValue.Split( new string[] { Delimiter }, StringSplitOptions.RemoveEmptyEntries ).ToList();
       }
-      _ignoreSelectedItemsCollectionChanged--;
 
-      this.UpdateFromSelectedItems();
+      this.UpdateFromList( selectedValues, this.GetItemValue );
     }
 
     #endregion //Methods

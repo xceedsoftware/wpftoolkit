@@ -213,6 +213,23 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //FilterWatermark
 
+    #region HideInheritedProperties
+
+    public static readonly DependencyProperty HideInheritedPropertiesProperty = DependencyProperty.Register( "HideInheritedProperties", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( false ) );
+    public bool HideInheritedProperties
+    {
+      get
+      {
+        return ( bool )GetValue( HideInheritedPropertiesProperty );
+      }
+      set
+      {
+        SetValue( HideInheritedPropertiesProperty, value );
+      }
+    }
+
+    #endregion //HideInheritedProperties
+
     #region IsCategorized
 
     public static readonly DependencyProperty IsCategorizedProperty = DependencyProperty.Register( "IsCategorized", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( true, OnIsCategorizedChanged ) );
@@ -748,6 +765,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       UpdateContainerHelper();
       EditorDefinitions = new EditorDefinitionCollection();
       PropertyDefinitions = new PropertyDefinitionCollection();      
+      this.PropertyValueChanged += this.PropertyGrid_PropertyValueChanged;
 
       AddHandler( PropertyItemBase.ItemSelectionChangedEvent, new RoutedEventHandler( OnItemSelectionChanged ) );
       AddHandler( PropertyItemsControl.PreparePropertyItemEvent, new PropertyItemEventHandler( OnPreparePropertyItemInternal ) );
@@ -852,6 +870,24 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
 
+    private void PropertyGrid_PropertyValueChanged( object sender, PropertyValueChangedEventArgs e )
+    {
+      var modifiedPropertyItem = e.OriginalSource as PropertyItem;
+      if( modifiedPropertyItem != null )
+      {
+        if( modifiedPropertyItem.WillRefreshPropertyGrid )
+          this.UpdateContainerHelper();
+
+        var parentPropertyItem = modifiedPropertyItem.ParentNode as PropertyItem;
+        if( ( parentPropertyItem != null ) && parentPropertyItem.IsExpandable )
+        {
+          //Rebuild Editor for parent propertyItem if one of its sub-propertyItem have changed.
+          this.RebuildEditor( parentPropertyItem );
+        }
+      }
+    }
+
+
     #endregion //Event Handlers
 
     #region Commands
@@ -869,6 +905,30 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     #endregion //Commands
 
     #region Methods
+
+
+
+
+
+
+
+
+
+
+
+
+    private void RebuildEditor( PropertyItem propertyItem )
+    {
+      ObjectContainerHelperBase objectContainerHelperBase = propertyItem.ContainerHelper as ObjectContainerHelperBase;
+      //Re-build the editor to update this propertyItem
+      FrameworkElement editor = objectContainerHelperBase.GenerateChildrenEditorElement( propertyItem );
+      if( editor != null )
+      {
+        // Tag the editor as generated to know if we should clear it.
+        ContainerHelperBase.SetIsGenerated( editor, true );
+        propertyItem.Editor = editor;
+      }
+    }
 
     private void UpdateContainerHelper()
     {
@@ -948,6 +1008,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       _containerHelper.UpdateValuesFromSource();
     }
+
 
 
 
@@ -1161,6 +1222,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       get
       {
         return _containerHelper;
+      }
+    }
+
+    bool IPropertyContainer.IsSortedAlphabetically
+    {
+      get
+      {
+        return true;
       }
     }
 

@@ -88,27 +88,39 @@
                      HorizontalAlignment="Left"
                      Text="{Binding ElementName=_checkListBox, Path=SelectedValue, Mode=TwoWay}"/>
 
-            <TextBlock Grid.Row="0" Grid.Column="2" 
+            <TextBlock Grid.Row="3" Grid.Column="0" 
                        Text="SelectedMemberPath:" 
                        Margin="2,5,5,5"/>
             <TextBox x:Name="_selectedMemberPath" 
-                     Grid.Row="0" Grid.Column="3"
+                     Grid.Row="3" Grid.Column="1"
                      Margin="5"
                      Width="125"
                      HorizontalAlignment="Left"
                      IsEnabled="False"
                      Text="IsSelected" />
 
-            <TextBlock Grid.Row="1" Grid.Column="2" 
+            <TextBlock Grid.Row="0" Grid.Column="2" 
                        Text="DisplayMemberPath:" 
                        Margin="5"/>
             <ComboBox x:Name="_displayMemberPath" 
-                     Grid.Row="1" Grid.Column="3"
+                     Grid.Row="0" Grid.Column="3"
                      Width="125"
                      Margin="5"
                      HorizontalAlignment="Left"
                      ItemsSource="{StaticResource personProperties}"
                      SelectedIndex="1"/>
+            <TextBlock Grid.Row="1"
+                       Grid.Column="2"
+                       Text="IsEditable:"
+                       Margin="5" />
+            <CheckBox x:Name="_isEditable"
+                      Grid.Row="1"
+                      Grid.Column="3"
+                      Margin="5"
+                      HorizontalAlignment="Left"
+                      Content="(CheckComboBox only)"
+                      ClickMode="Press"
+                      IsChecked="{Binding IsEditable, ElementName=_checkComboBox}" />
             <TextBlock Grid.Row="2" Grid.Column="2" 
                        Text="IsDropDownOpen:" 
                        Margin="5"/>
@@ -176,8 +188,9 @@
                              ValueMemberPath="{Binding ElementName=_valueMemberPath, Path=SelectedItem}"
                              SelectedMemberPath="{Binding ElementName=_selectedMemberPath, Path=Text}"
                              DisplayMemberPath="{Binding ElementName=_displayMemberPath, Path=SelectedItem}" 
+                             IsEditable="False"
                              IsDropDownOpen="false"
                              MaxDropDownHeight="100"/>
-        </Grid>
+      </Grid>
    </Grid>
 </local:DemoView>

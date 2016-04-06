@@ -40,14 +40,18 @@
                        Background="{TemplateBinding Background}"
                        BorderBrush="{TemplateBinding BorderBrush}"
                        BorderThickness="{TemplateBinding BorderThickness}">
-                  <CheckBox Foreground="{TemplateBinding Foreground}"
-                            IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}}"
+                  <!-- In Classic Theme, The Foreground shouldn't be applied to Checkmark and Text-->
+                  <CheckBox IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}}"
                             Padding="{TemplateBinding Padding}"
                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                            Content="{TemplateBinding Content}"
-                            ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" 
-                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                     <CheckBox.Content>
+                        <ContentControl Content="{TemplateBinding Content}"
+                                        ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                        Foreground="{TemplateBinding Foreground}" />
+                     </CheckBox.Content>
+                  </CheckBox>
                </Border>
                <ControlTemplate.Triggers>
                   <Trigger Property="IsMouseOver" Value="true">

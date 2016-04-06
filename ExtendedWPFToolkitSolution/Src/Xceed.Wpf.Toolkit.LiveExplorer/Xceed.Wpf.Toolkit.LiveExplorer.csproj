@@ -201,6 +201,57 @@
     <Compile Include="Samples\Magnifier\Views\MagnifierView.xaml.cs">
       <DependentUpon>MagnifierView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Samples\MaterialControls\Converters\EqualsMinusOneConverter.cs" />
+    <Compile Include="Samples\MaterialControls\Data\RequiredRule.cs" />
+    <Compile Include="Samples\MaterialControls\Views\MaterialComboBoxView.xaml.cs">
+      <DependentUpon>MaterialComboBoxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialDemoView.cs" />
+    <Compile Include="Samples\MaterialControls\Views\MaterialListBoxView.xaml.cs">
+      <DependentUpon>MaterialListBoxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialToolTipView.xaml.cs">
+      <DependentUpon>MaterialToolTipView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialDropDownView.xaml.cs">
+      <DependentUpon>MaterialDropDownView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialSwitchView.xaml.cs">
+      <DependentUpon>MaterialSwitchView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialFrameView.xaml.cs">
+      <DependentUpon>MaterialFrameView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialTabsView.xaml.cs">
+      <DependentUpon>MaterialTabsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialProgressBarCircularView.xaml.cs">
+      <DependentUpon>MaterialProgressBarCircularView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialProgressBarView.xaml.cs">
+      <DependentUpon>MaterialProgressBarView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialRadioButtonView.xaml.cs">
+      <DependentUpon>MaterialRadioButtonView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialCheckBoxView.xaml.cs">
+      <DependentUpon>MaterialCheckBoxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialToastView.xaml.cs">
+      <DependentUpon>MaterialToastView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialSliderView.xaml.cs">
+      <DependentUpon>MaterialSliderView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialTextFieldView.xaml.cs">
+      <DependentUpon>MaterialTextFieldView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialButtonView.xaml.cs">
+      <DependentUpon>MaterialButtonView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\MaterialControls\Views\MaterialControlsView.xaml.cs">
+      <DependentUpon>MaterialControlsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Samples\Numeric\Views\NumericView.xaml.cs">
       <DependentUpon>NumericView.xaml</DependentUpon>
     </Compile>
@@ -325,6 +376,7 @@
     <Compile Include="Samples\TimeSpan\Views\TimeSpanView.xaml.cs">
       <DependentUpon>TimeSpanView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Samples\ToggleSwitch\Converters\ZeroToBoolConverter.cs" />
     <Compile Include="Samples\ToggleSwitch\Views\ToggleSwitchView.xaml.cs">
       <DependentUpon>ToggleSwitchView.xaml</DependentUpon>
     </Compile>
@@ -490,6 +542,74 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Samples\Magnifier\Views\MagnifierView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Resources\CommonResources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialComboBoxView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialListBoxView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialToolTipView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialDropDownView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialSwitchView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialFrameView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialTabsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialProgressBarCircularView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialProgressBarView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialRadioButtonView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialCheckBoxView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialToastView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialSliderView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialTextFieldView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialButtonView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialControlsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -1117,6 +1237,97 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\SlideShow\OpenSourceImages\SlideShow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MaterialControlsView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialControlsView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\MaterialControls\Resources\WhitePen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MaterialButtonView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialButtonView.xaml.txt" />
+    <Resource Include="CodeFiles\MaterialSliderView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialSliderView.xaml.txt" />
+    <Resource Include="CodeFiles\MaterialTextFieldView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialTextFieldView.xaml.txt" />
+    <Resource Include="CodeFiles\MaterialToastView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialToastView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MaterialCheckBoxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialCheckBoxView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\MaterialControls\Resources\building16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\MaterialControls\Resources\PencilTool16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MaterialRadioButtonView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialRadioButtonView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MaterialProgressBarCircularView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialProgressBarCircularView.xaml.txt" />
+    <Resource Include="CodeFiles\MaterialProgressBarView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialProgressBarView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MaterialTabsView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialTabsView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MaterialFrameView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialFrameView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MaterialSwitchView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialSwitchView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MaterialDropDownView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialDropDownView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MaterialToolTipView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialToolTipView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MaterialListBoxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialListBoxView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\ToggleSwitch\Resources\PencilTool16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialButton.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialCheckBox.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialControls.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialDropDown.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialFrame.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialListBox.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialProgressBar.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialProgressBarCircular.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialRadioButton.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialSlider.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialSwitch.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialTabs.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialTextField.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialToast.png" />
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialToolTip.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\MaterialControls\Resources\italy.4.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MaterialComboBoxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialComboBoxView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialComboBox.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -47,6 +47,7 @@
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="Auto" />
@@ -138,7 +139,17 @@
                       VerticalAlignment="Center"
                       Margin="5"
                       ToolTip="Update the source of a TextBox when True and Enter key is pressed." />
-
+            <TextBlock Text="HideInheritedProperties:"
+                       VerticalAlignment="Center"
+                       Grid.Row="4"
+                       Grid.Column="2"
+                       Margin="10,0,0,0" />
+            <CheckBox Grid.Row="4"
+                      Grid.Column="3"
+                      IsChecked="{Binding HideInheritedProperties, ElementName=_propertyGrid}"
+                      VerticalAlignment="Center"
+                      Margin="5"
+                      ToolTip="When True, inherited properties are hidden." />
 
 
          </Grid>
@@ -175,6 +186,7 @@
                                UpdateTextBoxSourceOnEnterKey="True"
                                IsMiscCategoryLabelHidden="False"
                                ShowPreview="True"
+                               HideInheritedProperties="False"
                                SelectedObject="{Binding ElementName=_button}">
             </xctk:PropertyGrid>
          </Grid>

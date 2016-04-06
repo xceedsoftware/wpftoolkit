@@ -83,6 +83,7 @@
                <ControlTemplate.Triggers>
                   <MultiTrigger>
                      <MultiTrigger.Conditions>
+                        <Condition Property="KeepWatermarkOnGotFocus" Value="False" />
                         <Condition Property="IsFocused" Value="False" />
                         <Condition Property="Text" Value="" />
                      </MultiTrigger.Conditions>
@@ -90,15 +91,26 @@
                         <Setter Property="Visibility" TargetName="PART_WatermarkHost" Value="Visible" />
                      </MultiTrigger.Setters>
                   </MultiTrigger>
-                  <Trigger Property="IsMouseOver" Value="True">
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="KeepWatermarkOnGotFocus"
+                                   Value="True" />
+                                <Condition Property="Text"
+                                   Value="" />
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.Setters>
+                                <Setter Property="Visibility"
+                                TargetName="PART_WatermarkHost"
+                                Value="Visible" />
+                            </MultiTrigger.Setters>
+                        </MultiTrigger>
+                        <Trigger Property="IsMouseOver" Value="True">
                      <Setter TargetName="MouseOverVisual" Property="Opacity" Value="1" />
                   </Trigger>
                   <Trigger Property="IsFocused" Value="True">
                      <Setter TargetName="FocusVisual" Property="Opacity" Value="1" />
                   </Trigger>
                   <Trigger Property="IsEnabled" Value="false">
-                     <Setter TargetName="Border"  Property="BorderBrush" Value="{StaticResource TextBox_DisabledBorder}" />
-                     <Setter TargetName="Border"  Property="Background" Value="{StaticResource TextBox_DisabledBackground}" />
                      <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                   </Trigger>
                </ControlTemplate.Triggers>

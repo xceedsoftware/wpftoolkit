@@ -93,6 +93,24 @@ namespace Xceed.Wpf.Toolkit
 
     #region Properties
 
+    #region CalculatorButtonPanelTemplate
+
+    public static readonly DependencyProperty CalculatorButtonPanelTemplateProperty = DependencyProperty.Register( "CalculatorButtonPanelTemplate"
+      , typeof( ControlTemplate ), typeof( Calculator ), new UIPropertyMetadata( null ) );
+    public ControlTemplate CalculatorButtonPanelTemplate
+    {
+      get
+      {
+        return (ControlTemplate)GetValue( CalculatorButtonPanelTemplateProperty );
+      }
+      set
+      {
+        SetValue( CalculatorButtonPanelTemplateProperty, value );
+      }
+    }
+
+    #endregion //CalculatorButtonPanelTemplate
+
     #region CalculatorButtonType
 
     public static readonly DependencyProperty CalculatorButtonTypeProperty = DependencyProperty.RegisterAttached( "CalculatorButtonType", typeof( CalculatorButtonType ), typeof( Calculator ), new UIPropertyMetadata( CalculatorButtonType.None, OnCalculatorButtonTypeChanged ) );
@@ -112,7 +130,10 @@ namespace Xceed.Wpf.Toolkit
     {
       Button button = o as Button;
       button.CommandParameter = newValue;
-      button.Content = CalculatorUtilities.GetCalculatorButtonContent( newValue );
+      if( button.Content == null )
+      {
+        button.Content = CalculatorUtilities.GetCalculatorButtonContent( newValue );
+      }
     }
 
     #endregion //CalculatorButtonType

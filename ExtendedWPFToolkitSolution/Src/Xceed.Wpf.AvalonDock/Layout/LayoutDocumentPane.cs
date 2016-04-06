@@ -100,14 +100,16 @@ namespace Xceed.Wpf.AvalonDock.Layout
                 SelectedContentIndex = Children.Count - 1;
             if (SelectedContentIndex == -1 && ChildrenCount > 0)
             {
-                if (Root == null)//if I'm not yet connected just switch to first document
-                    SelectedContentIndex = 0;
-                else
-                {
-                    var childrenToSelect = Children.OrderByDescending(c => c.LastActivationTimeStamp.GetValueOrDefault()).First();
-                    SelectedContentIndex = Children.IndexOf(childrenToSelect);
-                    childrenToSelect.IsActive = true;
-                }
+              if( Root == null )
+              {
+                SetNextSelectedIndex();
+              }
+              else
+              {
+                var childrenToSelect = Children.OrderByDescending( c => c.LastActivationTimeStamp.GetValueOrDefault() ).First();
+                SelectedContentIndex = Children.IndexOf( childrenToSelect );
+                childrenToSelect.IsActive = true;
+              }
             }
 
             base.OnChildrenCollectionChanged();
@@ -124,6 +126,19 @@ namespace Xceed.Wpf.AvalonDock.Layout
         {
             UpdateParentVisibility();
             base.OnIsVisibleChanged();
+        }
+
+        internal void SetNextSelectedIndex()
+        {
+          SelectedContentIndex = -1;
+          for( int i = 0; i < this.Children.Count; ++i )
+          {
+            if( Children[ i ].IsEnabled )
+            {
+              SelectedContentIndex = i;
+              return;
+            }
+          }
         }
 
         void UpdateParentVisibility()

@@ -1100,7 +1100,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       if( ( ( value != null ) && ( value != DBNull.Value ) )
         && ( value.GetType() != type ) )
       {
-        return System.Convert.ChangeType( value, type, CultureInfo.InvariantCulture );
+        return ChangeTypeHelper.ChangeType( value, type, CultureInfo.InvariantCulture );
       }
 
       return value;

@@ -125,9 +125,13 @@
                          IsOpen="{Binding IsChecked, ElementName=PART_DropDownButton}">
                      <Border BorderThickness="1"
                              Background="{StaticResource PopupBackgroundBrush}"
-                             BorderBrush="{StaticResource PopupDarkBorderBrush}">
-                        <ContentPresenter x:Name="PART_ContentPresenter"
-                                          Content="{TemplateBinding DropDownContent}" />
+                             BorderBrush="{StaticResource PopupDarkBorderBrush}"
+                             MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                        <ScrollViewer x:Name="DropDownScrollViewer"
+                                      VerticalScrollBarVisibility="Auto">
+                           <ContentPresenter x:Name="PART_ContentPresenter"
+                                             Content="{TemplateBinding DropDownContent}" />
+                        </ScrollViewer>
                      </Border>
                   </Popup>
 

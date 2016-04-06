@@ -126,21 +126,23 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
-    protected override void OnEditorChanged( FrameworkElement oldValue, FrameworkElement newValue )
-    {
-      if( oldValue != null )
-        oldValue.DataContext = null;
-
-      if( newValue != null )
-        newValue.DataContext = this;
-    }
-
     protected override object OnCoerceValueChanged( object baseValue )
     {
       // Propagate error from DescriptorPropertyDefinitionBase to PropertyItem.Value
       // to see the red error rectangle in the propertyGrid.
-      BindingExpression be = GetBindingExpression( PropertyItem.ValueProperty );
-      if( ( be != null ) && be.DataItem is DescriptorPropertyDefinitionBase )
+      BindingExpression be = this.GetBindingExpression( PropertyItem.ValueProperty );
+      this.SetRedInvalidBorder( be );
+      return baseValue;
+    }
+
+    protected override void OnValueChanged( object oldValue, object newValue )
+    {
+      base.OnValueChanged( oldValue, newValue );
+    }
+
+    internal void SetRedInvalidBorder( BindingExpression be )
+    {
+      if( (be != null) && be.DataItem is DescriptorPropertyDefinitionBase )
       {
         DescriptorPropertyDefinitionBase descriptor = be.DataItem as DescriptorPropertyDefinitionBase;
         if( Validation.GetHasError( descriptor ) )
@@ -149,12 +151,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           Validation.MarkInvalid( be, errors[ 0 ] );
         }
       }
-      return baseValue;
-    }
-
-    protected override void OnValueChanged( object oldValue, object newValue )
-    {
-      base.OnValueChanged( oldValue, newValue );
     }
 
     private void OnDefinitionContainerHelperInvalidated( object sender, EventArgs e )
@@ -172,7 +168,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     #region Constructors
 
     internal PropertyItem( DescriptorPropertyDefinitionBase definition )
-      : base( definition.IsPropertyGridCategorized )
+      : base( definition.IsPropertyGridCategorized, !definition.PropertyType.IsArray )
     {
       if( definition == null )
         throw new ArgumentNullException( "definition" );

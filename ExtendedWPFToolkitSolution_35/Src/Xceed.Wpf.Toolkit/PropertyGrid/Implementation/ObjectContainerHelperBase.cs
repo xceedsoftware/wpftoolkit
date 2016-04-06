@@ -145,6 +145,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       this.RegenerateProperties();
     }
 
+    protected override void OnHideInheritedPropertiesChanged()
+    {
+      this.RegenerateProperties();
+    }
+
     protected override void OnEditorDefinitionsChanged()
     {
       this.RegenerateProperties();
@@ -167,7 +172,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private void UpdateCategorization( bool updateSubPropertiesCategorization )
     {
-      _propertyItemCollection.UpdateCategorization( this.ComputeCategoryGroupDescription(), this.PropertyContainer.IsCategorized );
+      _propertyItemCollection.UpdateCategorization( this.ComputeCategoryGroupDescription(), this.PropertyContainer.IsCategorized, this.PropertyContainer.IsSortedAlphabetically );
       if( updateSubPropertiesCategorization && (_propertyItemCollection.Count > 0) )
       {
         foreach( PropertyItem propertyItem in _propertyItemCollection )
@@ -175,7 +180,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           PropertyItemCollection subPropertyItemsCollection = propertyItem.Properties as PropertyItemCollection;
           if( subPropertyItemsCollection != null )
           {
-            subPropertyItemsCollection.UpdateCategorization( this.ComputeCategoryGroupDescription(), this.PropertyContainer.IsCategorized );
+            subPropertyItemsCollection.UpdateCategorization( this.ComputeCategoryGroupDescription(), this.PropertyContainer.IsCategorized, this.PropertyContainer.IsSortedAlphabetically );
           }
         }
       }
@@ -245,7 +250,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
-    protected static List<PropertyDescriptor> GetPropertyDescriptors( object instance )
+    protected static List<PropertyDescriptor> GetPropertyDescriptors( object instance, bool hideInheritedProperties )
     {
       PropertyDescriptorCollection descriptors;
 
@@ -262,13 +267,39 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         descriptors = tc.GetProperties( instance );
       }
 
-      return ( descriptors != null )
-        ? descriptors.Cast<PropertyDescriptor>().ToList()
-        : null;
+      if( ( descriptors != null ) )
+      {
+        var descriptorsProperties = descriptors.Cast<PropertyDescriptor>();
+        if( hideInheritedProperties )
+        {
+          var properties = from p in descriptorsProperties
+                           where p.ComponentType == instance.GetType()
+                           select p;
+          return properties.ToList();
+        }
+        else
+        {
+          return descriptorsProperties.ToList();
+        }
+      }
+
+      return null;
     }
 
 
 
+
+    protected bool GetWillRefreshPropertyGrid( PropertyDescriptor propertyDescriptor )
+    {
+      if( propertyDescriptor == null )
+        return false;
+
+      var attribute = PropertyGridUtilities.GetAttribute<RefreshPropertiesAttribute>( propertyDescriptor );
+      if( attribute != null )
+        return attribute.RefreshProperties != RefreshProperties.None;
+
+      return false;
+    }
 
     internal void InitializeDescriptorDefinition(
       DescriptorPropertyDefinitionBase descriptorDef,

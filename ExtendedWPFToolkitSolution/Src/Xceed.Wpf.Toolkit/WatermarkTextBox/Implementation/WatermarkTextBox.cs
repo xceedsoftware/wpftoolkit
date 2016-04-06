@@ -46,6 +46,23 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //SelectAllOnGotFocus
 
+    #region KeepWatermarkOnGotFocus
+
+    public static readonly DependencyProperty KeepWatermarkOnGotFocusProperty = DependencyProperty.Register( "KeepWatermarkOnGotFocus", typeof( bool ), typeof( WatermarkTextBox ), new UIPropertyMetadata( false ) );
+    public bool KeepWatermarkOnGotFocus
+    {
+      get
+      {
+        return ( bool )GetValue( KeepWatermarkOnGotFocusProperty );
+      }
+      set
+      {
+        SetValue( KeepWatermarkOnGotFocusProperty, value );
+      }
+    }
+
+    #endregion //KeepWatermarkOnGotFocus
+
     #region Watermark
 
     public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register( "Watermark", typeof( object ), typeof( WatermarkTextBox ), new UIPropertyMetadata( null ) );

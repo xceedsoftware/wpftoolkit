@@ -28,7 +28,7 @@ namespace Xceed.Wpf.Toolkit.Core.Converters
     public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
     {
       double size = ( double )value;
-      double modifier = double.Parse( ( string )parameter);
+      double modifier = (parameter != null) ? double.Parse( ( string )parameter ) : 0d;
       if( modifier != 0 )
         return Math.Max(0, size - modifier) / 2;
 

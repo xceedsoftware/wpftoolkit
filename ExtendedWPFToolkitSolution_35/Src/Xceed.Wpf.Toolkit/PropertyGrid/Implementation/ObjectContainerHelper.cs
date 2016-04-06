@@ -55,7 +55,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         try
         {
-          List<PropertyDescriptor> descriptors = ObjectContainerHelperBase.GetPropertyDescriptors( SelectedObject );
+          List<PropertyDescriptor> descriptors = ObjectContainerHelperBase.GetPropertyDescriptors( SelectedObject, this.PropertyContainer.HideInheritedProperties );
           foreach( var descriptor in descriptors )
           {
             var propertyDef = this.GetPropertyDefinition( descriptor );
@@ -96,6 +96,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       Debug.Assert( SelectedObject != null );
       propertyItem.Instance = SelectedObject;
       propertyItem.CategoryOrder = this.GetCategoryOrder( definition.CategoryValue );
+      propertyItem.WillRefreshPropertyGrid = this.GetWillRefreshPropertyGrid( property );
       return propertyItem;
     }
 

@@ -835,9 +835,25 @@ namespace Xceed.Wpf.Toolkit
     private bool TryParseDateTime( string text, out DateTime result )
     {
       bool isValid = false;
+      result = this.ContextNow;
 
-      DateTime current = this.Value.HasValue ? this.Value.Value : DateTime.Parse( this.ContextNow.ToString(), this.CultureInfo.DateTimeFormat );
-      isValid = DateTimeParser.TryParse( text, this.GetFormatString( Format ), current, this.CultureInfo, out result );
+      DateTime current = this.ContextNow;
+      if( this.Value.HasValue )
+      {
+        current = this.Value.Value;
+      }
+      else
+      {
+        try
+        {
+          current = DateTime.Parse( this.ContextNow.ToString(), this.CultureInfo.DateTimeFormat );
+          isValid = DateTimeParser.TryParse( text, this.GetFormatString( Format ), current, this.CultureInfo, out result );
+        }
+        catch( FormatException )
+        {
+          isValid = false;
+        }
+      }
 
       if( !isValid )
       {
