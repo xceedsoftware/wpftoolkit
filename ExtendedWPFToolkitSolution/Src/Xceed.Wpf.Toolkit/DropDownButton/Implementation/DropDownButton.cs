@@ -176,7 +176,7 @@ namespace Xceed.Wpf.Toolkit
     public override void OnApplyTemplate()
     {
       base.OnApplyTemplate();
-      Button = GetTemplateChild( PART_DropDownButton ) as ToggleButton;
+      this.Button = this.GetTemplateChild( PART_DropDownButton ) as ToggleButton;
 
       _contentPresenter = GetTemplateChild( PART_ContentPresenter ) as ContentPresenter;
 
@@ -195,6 +195,15 @@ namespace Xceed.Wpf.Toolkit
       if( !( bool )e.NewValue )
       {
         this.CloseDropDown( false );
+      }
+    }
+
+    protected override void OnGotFocus( RoutedEventArgs e )
+    {
+      base.OnGotFocus( e );
+      if( this.Button != null )
+      {
+        this.Button.Focus();
       }
     }
 
@@ -320,11 +329,15 @@ namespace Xceed.Wpf.Toolkit
     private void CloseDropDown( bool isFocusOnButton )
     {
       if( IsOpen )
+      {
         IsOpen = false;
+      }
       ReleaseMouseCapture();
 
-      if( isFocusOnButton )
+      if( isFocusOnButton && (this.Button != null) )
+      {
         Button.Focus();
+      }
     }
 
     protected virtual void OnClick()

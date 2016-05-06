@@ -58,6 +58,7 @@
 
                             <TextBox x:Name="TextBox"
                               Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+			      Foreground="{TemplateBinding Foreground}"
                               IsReadOnly="True"
                               Focusable="False"
                               Cursor="Arrow"

@@ -81,6 +81,8 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
       for( int i = 0; i < VisualTreeHelper.GetChildrenCount( parent ); i++ )
       {
         var child = VisualTreeHelper.GetChild( parent, i );
+        if( child == null )
+          continue;
 
         object buttonType = child.GetValue( Button.CommandParameterProperty );
 

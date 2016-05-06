@@ -624,7 +624,6 @@
                                            IsPlusOnlyFeature="True"/>
             <core:LiveExplorerTreeViewItem Header="Material Controls"
                                            ItemContainerStyle="{StaticResource TreeViewItemStyle}"
-                                           IsNewFeature="True"
                                            IsPlusOnlyFeature="True"
                                            SampleType="{x:Type samples:MaterialControls.Views.MaterialControlsView}"
                                            IsSelected="True">

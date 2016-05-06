@@ -51,8 +51,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         protected override void Close()
         {
+          if( (_anchorable.Root != null) && (_anchorable.Root.Manager != null) )
+          {
             var dockingManager = _anchorable.Root.Manager;
-            dockingManager._ExecuteCloseCommand(_anchorable);
+            dockingManager._ExecuteCloseCommand( _anchorable );
+          }
         }
 
         ICommand _defaultHideCommand;

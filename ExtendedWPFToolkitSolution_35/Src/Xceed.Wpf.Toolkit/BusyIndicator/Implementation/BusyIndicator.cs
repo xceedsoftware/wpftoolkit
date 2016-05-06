@@ -151,7 +151,6 @@ namespace Xceed.Wpf.Toolkit
           this.FocusAfterBusy.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
           {
             this.FocusAfterBusy.Focus();
-            this.FocusAfterBusy = null;
           }
           ) );
         }

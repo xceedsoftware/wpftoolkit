@@ -241,6 +241,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
             _hwndSrc = HwndSource.FromDependencyObject(this) as HwndSource;
             _hwndSrcHook = new HwndSourceHook(FilterMessage);
             _hwndSrc.AddHook(_hwndSrcHook);
+
+           // Restore maximize state
+           var maximized = Model.Descendents().OfType<ILayoutElementForFloatingWindow>().Any(l => l.IsMaximized);
+           UpdateMaximizedState(maximized);
         }
 
         void OnUnloaded(object sender, RoutedEventArgs e)
@@ -368,6 +372,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
           {
             posElement.IsMaximized = isMaximized;
           }
+          IsMaximized = isMaximized;
+          WindowState = isMaximized ? WindowState.Maximized : WindowState.Normal;
         }
 
 
@@ -423,11 +429,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
                     }
                     break;
               case Win32Helper.WM_SYSCOMMAND:
-                    IntPtr wMaximize = new IntPtr( Win32Helper.SC_MAXIMIZE );
-                    IntPtr wRestore = new IntPtr( Win32Helper.SC_RESTORE );
-                    if( wParam == wMaximize || wParam == wRestore )
+                    int command = (int)wParam & 0xFFF0;
+                    if (command == Win32Helper.SC_MAXIMIZE || command == Win32Helper.SC_RESTORE)
                     {
-                      UpdateMaximizedState( wParam == wMaximize );
+                      UpdateMaximizedState( command == Win32Helper.SC_MAXIMIZE );
                     }
                     break;
             }
@@ -477,22 +482,24 @@ namespace Xceed.Wpf.AvalonDock.Controls
         #region IsMaximized
 
         /// <summary>
-        /// IsMaximized Read-Only Dependency Property
+        /// IsMaximized Dependency Property
         /// </summary>
-        private static readonly DependencyPropertyKey IsMaximizedPropertyKey
-            = DependencyProperty.RegisterReadOnly("IsMaximized", typeof(bool), typeof(LayoutFloatingWindowControl),
-                new FrameworkPropertyMetadata((bool)false));
-
         public static readonly DependencyProperty IsMaximizedProperty
-            = IsMaximizedPropertyKey.DependencyProperty;
+              = DependencyProperty.Register( "IsMaximized", typeof( bool ), typeof( LayoutFloatingWindowControl ),
+                  new FrameworkPropertyMetadata( (bool)false ) );
 
         /// <summary>
-        /// Gets the IsMaximized property.  This dependency property 
+        /// Gets/sets the IsMaximized property.  This dependency property 
         /// indicates if the window is maximized.
         /// </summary>
         public bool IsMaximized
         {
             get { return (bool)GetValue(IsMaximizedProperty); }
+            private set
+              {
+                  SetValue(IsMaximizedProperty, value);
+                  UpdatePositionAndSizeOfPanes();
+              }
         }
 
         /// <summary>
@@ -500,14 +507,12 @@ namespace Xceed.Wpf.AvalonDock.Controls
         /// This dependency property indicates if the window is maximized.
         /// </summary>
         /// <param name="value">The new value for the property.</param>
-        protected void SetIsMaximized(bool value)
-        {
-            SetValue(IsMaximizedPropertyKey, value);
-        }
 
         protected override void OnStateChanged(EventArgs e)
         {
-            SetIsMaximized(WindowState == System.Windows.WindowState.Maximized);
+            //Windows sometimes send unwanted state changes (when minimizing application for instance)
+            //We force internal state to be used
+            WindowState = IsMaximized ? WindowState.Maximized : WindowState.Normal;
             base.OnStateChanged(e);
         }
 

@@ -74,12 +74,12 @@ namespace Xceed.Wpf.Toolkit
         if( !f.Contains( "ddd" ) && !f.Contains( "GMT" ) )
         {
           if( f.Contains( "M" ) )
-            dateParts[ "Month" ] = dateTimeParts[ i ] != "0" ? dateTimeParts[ i ] : "1";
+            dateParts[ "Month" ] = dateTimeParts[ i ];
           else if( f.Contains( "d" ) )
-            dateParts[ "Day" ] = dateTimeParts[ i ] != "0" ? dateTimeParts[ i ] : "1";
+            dateParts[ "Day" ] = dateTimeParts[ i ];
           else if( f.Contains( "y" ) )
           {
-            dateParts[ "Year" ] = dateTimeParts[ i ] != "0" ? dateTimeParts[ i ] : "0001";
+            dateParts[ "Year" ] = dateTimeParts[ i ] != "0" ? dateTimeParts[ i ] : "0000";
 
             if( dateParts[ "Year" ].Length == 2 )
               dateParts[ "Year" ] = string.Format( "{0}{1}", currentDate.Year / 100, dateParts[ "Year" ] );

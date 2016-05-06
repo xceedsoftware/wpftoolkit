@@ -393,7 +393,7 @@ namespace Xceed.Wpf.Toolkit
     private void ProcessMove( DragDeltaEventArgs e )
     {
       AdornerLayer layer = AdornerLayer.GetAdornerLayer( Target );
-      UIElementAdorner<Control> adorner = layer.GetAdorners( Target )[ 0 ] as UIElementAdorner<Control>;
+      UIElementAdorner<Control> adorner = layer.GetAdorners( Target ).OfType<UIElementAdorner<Control>>().First();
       adorner.SetOffsets( adorner.OffsetLeft + e.HorizontalChange, adorner.OffsetTop + e.VerticalChange );
     }
 

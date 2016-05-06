@@ -41,7 +41,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       }
       else if( type.GetGenericArguments().Count() > 0 )
       {
-        Editor.NewItemTypes = new List<Type>() { type.GetGenericArguments()[ 0 ] };
+        if( (propertyItem.DescriptorDefinition != null)
+        && (propertyItem.DescriptorDefinition.NewItemTypes != null)
+        && (propertyItem.DescriptorDefinition.NewItemTypes.Count > 0) )
+        {
+          Editor.NewItemTypes = propertyItem.DescriptorDefinition.NewItemTypes;
+        }
+        else
+        {
+          Editor.NewItemTypes = new List<Type>() { type.GetGenericArguments()[ 0 ] };
+        }
       }
 
       base.ResolveValueBinding( propertyItem );
