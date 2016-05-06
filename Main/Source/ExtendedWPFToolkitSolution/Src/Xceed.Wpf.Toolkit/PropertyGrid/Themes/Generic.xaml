@@ -1116,6 +1116,8 @@
       <Style.Resources>
          <pgconv:SelectedObjectConverter x:Key="objectConverter" />
       </Style.Resources>
+      <Setter Property="AdvancedOptionsMenu"
+              Value="{StaticResource {ComponentResourceKey TypeInTargetAssembly={x:Type pg:PropertyGrid}, ResourceId=SelectedObjectAdvancedOptionsMenu}}" />
       <Setter Property="Background"
               Value="#BCC7D8" />
       <Setter Property="BorderBrush"

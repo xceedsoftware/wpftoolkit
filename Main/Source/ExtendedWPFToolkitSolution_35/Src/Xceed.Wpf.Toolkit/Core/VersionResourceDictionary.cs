@@ -87,8 +87,8 @@ namespace Xceed.Wpf.Toolkit.Core
           throw new InvalidOperationException( "AssemblyName and SourcePath must be set during initialization" );
 
         //Using an absolute path is necessary in VS2015 for themes different than Windows 8.
-        string uriStr = string.Format(@"pack://application:,,,/{0};v{1};component/{2}", this.AssemblyName, _XceedVersionInfo.Version, this.SourcePath);
-        this.Source = new Uri(uriStr, UriKind.Absolute);
+        string uriStr = string.Format( @"pack://application:,,,/{0};v{1};component/{2}", this.AssemblyName, _XceedVersionInfo.Version, this.SourcePath );
+        this.Source = new Uri( uriStr, UriKind.Absolute );
       }
 
       base.EndInit();

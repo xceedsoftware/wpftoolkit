@@ -426,10 +426,10 @@ namespace Xceed.Wpf.Toolkit
       return timeItemList;
     }
 
-    private TimeItem CreateTimeItem( TimeSpan time )
+    protected virtual TimeItem CreateTimeItem( TimeSpan time )
     {
       var date = Value ?? this.ContextNow;
-      string formatString = this.GetFormatString( ( DateTimeFormat )this.Format );
+      string formatString = this.GetFormatString( (DateTimeFormat)this.Format );
       return new TimeItem( date.Date.Add( time ).ToString( formatString, CultureInfo ), time );
     }
 

@@ -183,8 +183,7 @@ namespace Xceed.Wpf.Toolkit
       if( object.Equals( currentValueText, text ) )
         return this.Value;
 
-      //Don't know why someone would format a T as %, but just in case they do.
-      result = this.ContainsLetterForPercent( this.FormatString )
+      result =  this.IsPercent( this.FormatString )
         ? _fromDecimal( ParsePercent( text, CultureInfo ) )
         : _fromText( text, this.ParsingNumberStyle, CultureInfo );
 
@@ -224,21 +223,23 @@ namespace Xceed.Wpf.Toolkit
         Spinner.ValidSpinDirection = validDirections;
     }
 
-    private bool ContainsLetterForPercent( string stringToTest )
+    private bool IsPercent( string stringToTest )
     {
       int PIndex = stringToTest.IndexOf( "P" );
-      if( PIndex > 0 )
+      if( PIndex >= 0 )
       {
-        //stringToTest contains a "P" between 2 "'", it's not considered as percent
-        return !( stringToTest.Substring( 0, PIndex ).Contains( "'" )
-                && stringToTest.Substring( PIndex, FormatString.Length - PIndex ).Contains( "'" ) );
+        //stringToTest contains a "P" between 2 "'", it's considered as text, not percent
+        bool isText = (stringToTest.Substring( 0, PIndex ).Contains( "'" )
+                      && stringToTest.Substring( PIndex, FormatString.Length - PIndex ).Contains( "'" ));
+
+        return !isText;
       }
       return false;
     }
 
     private T? GetClippedMinMaxValue()
     {
-      T? result = this.ContainsLetterForPercent( this.FormatString )
+      T? result = this.IsPercent( this.FormatString )
                 ? _fromDecimal( ParsePercent( this.Text, CultureInfo ) )
                 : _fromText( this.Text, this.ParsingNumberStyle, CultureInfo );
 

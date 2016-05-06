@@ -838,21 +838,17 @@ namespace Xceed.Wpf.Toolkit
       result = this.ContextNow;
 
       DateTime current = this.ContextNow;
-      if( this.Value.HasValue )
+      try
       {
-        current = this.Value.Value;
+        current = (this.Value.HasValue)
+                    ? this.Value.Value
+                    : DateTime.Parse( this.ContextNow.ToString(), this.CultureInfo.DateTimeFormat );
+
+        isValid = DateTimeParser.TryParse( text, this.GetFormatString( Format ), current, this.CultureInfo, out result );
       }
-      else
+      catch( FormatException )
       {
-        try
-        {
-          current = DateTime.Parse( this.ContextNow.ToString(), this.CultureInfo.DateTimeFormat );
-          isValid = DateTimeParser.TryParse( text, this.GetFormatString( Format ), current, this.CultureInfo, out result );
-        }
-        catch( FormatException )
-        {
-          isValid = false;
-        }
+        isValid = false;
       }
 
       if( !isValid )

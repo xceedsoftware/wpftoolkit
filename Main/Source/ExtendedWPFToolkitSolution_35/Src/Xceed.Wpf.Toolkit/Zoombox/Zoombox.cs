@@ -1370,11 +1370,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
         {
           case HorizontalAlignment.Center:
           case HorizontalAlignment.Stretch:
-            x = ( _content.DesiredSize.Width - contentSize.Width ) / 2;
+            x = ( this.RenderSize.Width - contentSize.Width ) / 2;
             break;
 
           case HorizontalAlignment.Right:
-            x = _content.DesiredSize.Width - contentSize.Width;
+            x = this.RenderSize.Width - contentSize.Width;
             break;
         }
 
@@ -1382,11 +1382,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
         {
           case VerticalAlignment.Center:
           case VerticalAlignment.Stretch:
-            y = ( _content.DesiredSize.Height - contentSize.Height ) / 2;
+            y = ( this.RenderSize.Height - contentSize.Height ) / 2;
             break;
 
           case VerticalAlignment.Bottom:
-            y = _content.DesiredSize.Height - contentSize.Height;
+            y = this.RenderSize.Height - contentSize.Height;
             break;
         }
 
@@ -2461,7 +2461,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
               new Vector( e.HorizontalChange, e.VerticalChange ) ),
             new Rect(
               new Point( 0, 0 ),
-              new Point( _content.DesiredSize.Width, _content.DesiredSize.Height ) ) );
+              new Point( this.RenderSize.Width, this.RenderSize.Height ) ) );
       }
     }
 
@@ -2492,18 +2492,18 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       if( _content == null || _verticalScrollBar == null || _horizontalScrollBar == null )
         return;
 
-      var contentSize = ( _content is Viewbox ) ? ( ( Viewbox )_content ).Child.DesiredSize : _content.DesiredSize;
+      var contentSize = ( _content is Viewbox ) ? ( ( Viewbox )_content ).Child.DesiredSize : this.RenderSize;
 
       _verticalScrollBar.SmallChange = 10d;
       _verticalScrollBar.LargeChange = 10d;
       _verticalScrollBar.Minimum = 0d;
-      _verticalScrollBar.ViewportSize = _content.DesiredSize.Height;
+      _verticalScrollBar.ViewportSize = this.RenderSize.Height;
       _verticalScrollBar.Maximum = contentSize.Height - _verticalScrollBar.ViewportSize;
 
       _horizontalScrollBar.SmallChange = 10d;
       _horizontalScrollBar.LargeChange = 10d;
       _horizontalScrollBar.Minimum = 0d;
-      _horizontalScrollBar.ViewportSize = _content.DesiredSize.Width;
+      _horizontalScrollBar.ViewportSize = this.RenderSize.Width;
       _horizontalScrollBar.Maximum = contentSize.Width - _horizontalScrollBar.ViewportSize;
     }
 
@@ -2720,8 +2720,8 @@ namespace Xceed.Wpf.Toolkit.Zoombox
           _content.TranslatePoint( region.BottomRight, _contentPresenter ) );
 
       // calculate actual scale value
-      double aspectX = _content.DesiredSize.Width / region.Width;
-      double aspectY = _content.DesiredSize.Height / region.Height;
+      double aspectX = this.RenderSize.Width / region.Width;
+      double aspectY = this.RenderSize.Height / region.Height;
       scale = aspectX < aspectY ? aspectX : aspectY;
 
       // scale relative to the anchor point
@@ -2789,8 +2789,8 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
                 // inflate (or deflate) the rect by the appropriate amounts in the x & y directions
                 region = Rect.Inflate( currentContentRect,
-                    ( _content.DesiredSize.Width / _viewboxFactor - currentContentRect.Width ) / 2,
-                    ( _content.DesiredSize.Height / _viewboxFactor - currentContentRect.Height ) / 2 );
+                    ( this.RenderSize.Width / _viewboxFactor - currentContentRect.Width ) / 2,
+                    ( this.RenderSize.Height / _viewboxFactor - currentContentRect.Height ) / 2 );
 
                 // now translate the centered rect back to the coordinate space of the content
                 region = new Rect( this.TranslatePoint( region.TopLeft, _content ), this.TranslatePoint( region.BottomRight, _content ) );
@@ -2934,7 +2934,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
             _contentPresenter.RenderTransform = tg;
 
-            var initialContentSize = ( _content is Viewbox ) ? ( ( Viewbox )_content ).Child.DesiredSize : _content.DesiredSize;
+            var initialContentSize = ( _content is Viewbox ) ? ( ( Viewbox )_content ).Child.DesiredSize : this.RenderSize;
             var scaledContentSize = new Size( initialContentSize.Width * newRelativeScale, initialContentSize.Height * newRelativeScale );
 
             if( allowAnimation && IsAnimated )
@@ -3064,7 +3064,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     private Rect CalculateFillRect()
     {
       // determine the x-y ratio of the current Viewport
-      double xyRatio = _content.DesiredSize.Width / _content.DesiredSize.Height;
+      double xyRatio = this.RenderSize.Width / this.RenderSize.Height;
 
       // now find the maximal rect within the ContentRect that has the same ratio
       double x = 0;
@@ -3106,8 +3106,8 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
       // calculate actual zoom, which must fit the entire selection 
       // while maintaining a 1:1 ratio
-      double aspectX = _content.DesiredSize.Width / region.Width;
-      double aspectY = _content.DesiredSize.Height / region.Height;
+      double aspectX = this.RenderSize.Width / region.Width;
+      double aspectY = this.RenderSize.Height / region.Height;
       newRelativeScale = aspectX < aspectY ? aspectX : aspectY;
 
       // ensure that the scale value falls within the valid range
@@ -3128,22 +3128,22 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       {
         case HorizontalAlignment.Center:
         case HorizontalAlignment.Stretch:
-          horizontalOffset = ( _content.DesiredSize.Width - region.Width * newRelativeScale ) / 2;
+          horizontalOffset = ( this.RenderSize.Width - region.Width * newRelativeScale ) / 2;
           break;
 
         case HorizontalAlignment.Right:
-          horizontalOffset = ( _content.DesiredSize.Width - region.Width * newRelativeScale );
+          horizontalOffset = ( this.RenderSize.Width - region.Width * newRelativeScale );
           break;
       }
       switch( VerticalContentAlignment )
       {
         case VerticalAlignment.Center:
         case VerticalAlignment.Stretch:
-          verticalOffset = ( _content.DesiredSize.Height - region.Height * newRelativeScale ) / 2;
+          verticalOffset = ( this.RenderSize.Height - region.Height * newRelativeScale ) / 2;
           break;
 
         case VerticalAlignment.Bottom:
-          verticalOffset = ( _content.DesiredSize.Height - region.Height * newRelativeScale );
+          verticalOffset = ( this.RenderSize.Height - region.Height * newRelativeScale );
           break;
       }
       newRelativePosition =

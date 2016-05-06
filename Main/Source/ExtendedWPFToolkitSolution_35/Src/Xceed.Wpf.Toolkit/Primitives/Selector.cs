@@ -361,7 +361,12 @@ namespace Xceed.Wpf.Toolkit.Primitives
       if( !this.IsInitialized )
         return;
 
-      this.RemoveUnavailableSelectedItems();
+      if( !VirtualizingStackPanel.GetIsVirtualizing( this )
+        || (VirtualizingStackPanel.GetIsVirtualizing( this ) && (newValue != null)) )
+      {
+        this.RemoveUnavailableSelectedItems();
+      }
+
       this.UpdateSelectedMemberPathValuesBindings();
       this.UpdateValueMemberPathValuesBindings();
     }

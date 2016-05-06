@@ -277,7 +277,11 @@ namespace Xceed.Utils.Wpf
       var childrenCount = VisualTreeHelper.GetChildrenCount( parent );
       for( int i = 0; i < childrenCount; i++ )
       {
-        yield return VisualTreeHelper.GetChild( parent, i );
+        var child = VisualTreeHelper.GetChild( parent, i );
+        if( child != null )
+        {
+          yield return child;
+        }
       }
     }
   }

@@ -426,6 +426,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
                             if (parentGroup.Root.RootPanel.Orientation == Orientation.Horizontal)
                             {
                                 previousContainer = new LayoutAnchorablePane();
+                                previousContainer.DockMinWidth = this.AutoHideMinWidth;
                                 parentGroup.Root.RootPanel.Children.Add(previousContainer);
                             }
                             else
@@ -443,6 +444,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
                             if (parentGroup.Root.RootPanel.Orientation == Orientation.Horizontal)
                             {
                                 previousContainer = new LayoutAnchorablePane();
+                                previousContainer.DockMinWidth = this.AutoHideMinWidth;
                                 parentGroup.Root.RootPanel.Children.Insert(0, previousContainer);
                             }
                             else
@@ -460,6 +462,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
                             if (parentGroup.Root.RootPanel.Orientation == Orientation.Vertical)
                             {
                                 previousContainer = new LayoutAnchorablePane();
+                                previousContainer.DockMinHeight = this.AutoHideMinHeight;
                                 parentGroup.Root.RootPanel.Children.Insert(0, previousContainer);
                             }
                             else
@@ -477,6 +480,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
                             if (parentGroup.Root.RootPanel.Orientation == Orientation.Vertical)
                             {
                                 previousContainer = new LayoutAnchorablePane();
+                                previousContainer.DockMinHeight = this.AutoHideMinHeight;
                                 parentGroup.Root.RootPanel.Children.Add(previousContainer);
                             }
                             else

@@ -105,7 +105,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         #region DockMinWidth
 
-        private double _dockMinWidth = 100.0;
+        private double _dockMinWidth = 25.0;
         public double DockMinWidth
         {
             get { return _dockMinWidth; }
@@ -125,7 +125,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         #region DockMinHeight
 
-        private double _dockMinHeight = 100.0;
+        private double _dockMinHeight = 25.0;
         public double DockMinHeight
         {
             get { return _dockMinHeight; }

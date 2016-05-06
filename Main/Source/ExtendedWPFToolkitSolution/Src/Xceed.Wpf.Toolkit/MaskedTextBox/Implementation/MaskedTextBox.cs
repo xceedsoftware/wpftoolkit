@@ -481,7 +481,7 @@ namespace Xceed.Wpf.Toolkit
       {
         MaskedTextProvider provider = maskedTextBox.CreateMaskedTextProvider( ( string )value );
 
-        string rawText = maskedTextBox.GetRawText();
+        string rawText = MaskedTextBox.GetRawText( maskedTextBox.m_maskedTextProvider );
 
         valid = provider.VerifyString( rawText );
       }
@@ -1450,7 +1450,7 @@ namespace Xceed.Wpf.Toolkit
     internal override string GetCurrentText()
     {
       if( m_maskIsNull )
-        return string.Empty;
+        return base.GetCurrentText();
 
       string displayText = this.GetFormattedString( m_maskedTextProvider );
 

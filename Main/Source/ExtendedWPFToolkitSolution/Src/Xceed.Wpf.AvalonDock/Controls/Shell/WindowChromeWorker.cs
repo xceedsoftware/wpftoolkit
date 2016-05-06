@@ -317,11 +317,14 @@ namespace Microsoft.Windows.Shell
                rcLogicalClient.Right - rcLogicalWindow.Right,
                rcLogicalClient.Bottom - rcLogicalWindow.Bottom);
 
-            rootElement.Margin = new Thickness(
-                0,
-                0,
-                -(nonClientThickness.Left + nonClientThickness.Right),
-                -(nonClientThickness.Top + nonClientThickness.Bottom));
+            if( rootElement != null )
+            {
+              rootElement.Margin = new Thickness(
+                  0,
+                  0,
+                  -(nonClientThickness.Left + nonClientThickness.Right),
+                  -(nonClientThickness.Top + nonClientThickness.Bottom) );
+            }
 
             // The negative thickness on the margin doesn't properly get applied in RTL layouts.
             // The width is right, but there is a black bar on the right.
@@ -329,13 +332,16 @@ namespace Microsoft.Windows.Shell
             // This works fine, but if the window is dynamically changing its FlowDirection then this can have really bizarre side effects.
             // This will mostly work if the FlowDirection is dynamically changed, but there aren't many real scenarios that would call for
             // that so I'm not addressing the rest of the quirkiness.
-            if (_window.FlowDirection == FlowDirection.RightToLeft)
+            if( rootElement != null )
             {
-                rootElement.RenderTransform = new MatrixTransform(1, 0, 0, 1, -(nonClientThickness.Left + nonClientThickness.Right), 0);
-            }
-            else
-            {
-                rootElement.RenderTransform = null;
+              if (_window.FlowDirection == FlowDirection.RightToLeft)
+              {
+                  rootElement.RenderTransform = new MatrixTransform(1, 0, 0, 1, -(nonClientThickness.Left + nonClientThickness.Right), 0);
+              }
+              else
+              {
+                  rootElement.RenderTransform = null;
+              }
             }
 
             if (!_isFixedUp)
@@ -1177,8 +1183,11 @@ namespace Microsoft.Windows.Shell
                 Assert.IsTrue(_isFixedUp);
 
                 var rootElement = (FrameworkElement)VisualTreeHelper.GetChild(_window, 0);
-                // Undo anything that was done before.
-                rootElement.Margin = new Thickness();
+                if( rootElement != null )
+                {
+                  // Undo anything that was done before.
+                  rootElement.Margin = new Thickness();
+                }
 
                 _window.StateChanged -= _FixupRestoreBounds;
                 _isFixedUp = false;

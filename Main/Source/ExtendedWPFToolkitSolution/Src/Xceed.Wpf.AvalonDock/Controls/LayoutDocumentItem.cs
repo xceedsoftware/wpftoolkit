@@ -39,8 +39,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         protected override void Close()
         {
+          if( (_document.Root != null) && (_document.Root.Manager != null) )
+          {
             var dockingManager = _document.Root.Manager;
-            dockingManager._ExecuteCloseCommand(_document);
+            dockingManager._ExecuteCloseCommand( _document );
+          }
         }
 
         #region Description

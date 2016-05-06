@@ -183,15 +183,15 @@ namespace Xceed.Wpf.AvalonDock
 
                     //set focus on active element only after a layout pass is completed
                     //it's possible that it is not yet visible in the visual tree
-                    if (_setFocusAsyncOperation == null)
-                    {
-                        _setFocusAsyncOperation = Dispatcher.BeginInvoke(new Action(() =>
-                            {
+                    //if (_setFocusAsyncOperation == null)
+                    //{
+                    //    _setFocusAsyncOperation = Dispatcher.BeginInvoke(new Action(() =>
+                           // {
                                 if (Layout.ActiveContent != null)
                                     FocusElementManager.SetFocusOnLastElement(Layout.ActiveContent);
-                                _setFocusAsyncOperation = null;
-                            } ), DispatcherPriority.Input );
-                    }
+                                //_setFocusAsyncOperation = null;
+                          //  } ), DispatcherPriority.Input );
+                    //}
                 }
 
                 if (!_insideInternalSetActiveContent)
@@ -2008,7 +2008,7 @@ namespace Xceed.Wpf.AvalonDock
                 CreateDocumentLayoutItem(documentToImport);
 
             }
-            _suspendLayoutItemCreation = true;
+            _suspendLayoutItemCreation = false;
 
 
             var documentsSourceAsNotifier = documentsSource as INotifyCollectionChanged;
@@ -2385,6 +2385,7 @@ namespace Xceed.Wpf.AvalonDock
                     var anchorablesToRemove = Layout.Descendents().OfType<LayoutAnchorable>().Where(d => e.OldItems.Contains(d.Content)).ToArray();
                     foreach (var anchorableToRemove in anchorablesToRemove)
                     {
+                        anchorableToRemove.Content = null;
                         (anchorableToRemove.Parent as ILayoutContainer).RemoveChild(
                             anchorableToRemove);
                     }
