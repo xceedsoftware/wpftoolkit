@@ -19,7 +19,8 @@
                     xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes"
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
-                    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit">
+                    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
 
@@ -122,7 +123,19 @@
                          StaysOpen="False"
                          Placement="Bottom"
                          Focusable="False"
-                         IsOpen="{Binding IsChecked, ElementName=PART_DropDownButton}">
+                         IsOpen="{Binding IsChecked, ElementName=PART_DropDownButton}"
+                         ToolTip="{x:Static sys:String.Empty}">
+                     <Popup.Resources>
+                        <Style TargetType="ToolTip">
+                           <Style.Triggers>
+                              <Trigger Property="Content"
+                                                Value="{x:Static sys:String.Empty}">
+                                 <Setter Property="Visibility"
+                                                  Value="Collapsed" />
+                              </Trigger>
+                           </Style.Triggers>
+                        </Style>
+                     </Popup.Resources>
                      <Border BorderThickness="1"
                              Background="{StaticResource PopupBackgroundBrush}"
                              BorderBrush="{StaticResource PopupDarkBorderBrush}"

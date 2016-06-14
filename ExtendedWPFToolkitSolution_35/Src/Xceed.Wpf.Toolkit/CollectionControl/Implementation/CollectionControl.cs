@@ -367,8 +367,15 @@ namespace Xceed.Wpf.Toolkit
     private void CanAddNew( object sender, CanExecuteRoutedEventArgs e )
     {
       Type t = e.Parameter as Type;
-      if( t != null && t.GetConstructor( Type.EmptyTypes ) != null && !IsReadOnly)
-        e.CanExecute = true;
+      if( (t != null) && !this.IsReadOnly )
+      {
+        bool isComplexStruct = t.IsValueType && !t.IsEnum && !t.IsPrimitive;
+
+        if( isComplexStruct || (t.GetConstructor( Type.EmptyTypes ) != null) )
+        {
+          e.CanExecute = true;
+        }
+      }
     }
 
     private void Delete( object sender, ExecutedRoutedEventArgs e )
@@ -428,6 +435,34 @@ namespace Xceed.Wpf.Toolkit
 
     #region Methods
 
+    public void PersistChanges()
+    {
+      this.PersistChanges( this.Items );
+    }
+
+    internal void PersistChanges( IList sourceList )
+    {
+      IList list = ComputeItemsSource();
+      if( list == null )
+        return;
+
+      //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
+      list.Clear();
+
+      if( list.IsFixedSize )
+      {
+        for( int i = 0; i < sourceList.Count; ++i )
+          list[ i ] = sourceList[ i ];
+      }
+      else
+      {
+        foreach( var item in sourceList )
+        {
+          list.Add( item );
+        }
+      }
+    }
+
     private IList CreateItemsSource()
     {
       IList list = null;
@@ -447,29 +482,6 @@ namespace Xceed.Wpf.Toolkit
     private object CreateNewItem( Type type )
     {
       return Activator.CreateInstance( type );
-    }
-
-    public void PersistChanges()
-    {
-      IList list = ComputeItemsSource();
-      if( list == null )
-        return;
-
-      //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
-      list.Clear();
-
-      if( list.IsFixedSize )
-      {
-        for( int i = 0; i < Items.Count; ++i )
-          list[ i ] = Items[ i ];
-      }
-      else
-      {
-        foreach( var item in Items )
-        {
-          list.Add( item );
-        }
-      }
     }
 
     private IList ComputeItemsSource()

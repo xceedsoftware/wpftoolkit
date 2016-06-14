@@ -216,7 +216,7 @@ namespace Xceed.Wpf.Toolkit
       if( this.IsCurrentValueValid() )
       {
         if( Value.HasValue )
-          UpdateDateTime( 1 );
+          UpdateDateTime( this.Step );
         else
           Value = DefaultValue ?? this.ContextNow;
       }
@@ -227,7 +227,7 @@ namespace Xceed.Wpf.Toolkit
       if( this.IsCurrentValueValid() )
       {
         if( Value.HasValue )
-          UpdateDateTime( -1 );
+          UpdateDateTime( -this.Step );
         else
           Value = DefaultValue ?? this.ContextNow;
       }
@@ -319,6 +319,13 @@ namespace Xceed.Wpf.Toolkit
 
     protected override void OnValueChanged( DateTime? oldValue, DateTime? newValue )
     {
+      _fireSelectionChangedEvent = false;
+      DateTimeInfo info = _selectedDateTimeInfo;
+
+      //this only occurs when the user manually type in a value for the Value Property
+      if( info == null )
+        info = (this.CurrentDateTimePart != DateTimePart.Other) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
+
         //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
         //but only if it is not null
       if( newValue != null )
@@ -330,12 +337,18 @@ namespace Xceed.Wpf.Toolkit
       {
         _lastValidDate = newValue;
       }
+
+      if( TextBox != null )
+      {
+        //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event
+        TextBox.Select( info.StartPosition, info.Length );
+      }
+      _fireSelectionChangedEvent = true;
     }
 
     protected override void RaiseValueChangedEvent( DateTime? oldValue, DateTime? newValue )
     {
-      if( ( this.TemplatedParent is TimePicker )
-        && ( ( TimePicker )this.TemplatedParent ).TemplatedParent is DateTimePicker )
+      if( ( this is TimePicker ) && ( this.TemplatedParent is DateTimePicker ) )
         return;
 
       base.RaiseValueChangedEvent( oldValue, newValue );
@@ -756,12 +769,11 @@ namespace Xceed.Wpf.Toolkit
 
     private void UpdateDateTime( int value )
     {
-      _fireSelectionChangedEvent = false;
       DateTimeInfo info = _selectedDateTimeInfo;
 
       //this only occurs when the user manually type in a value for the Value Property
       if( info == null )
-        info = _dateTimeInfoList[ 0 ];
+        info = (this.CurrentDateTimePart != DateTimePart.Other) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
 
       DateTime? result = null;
 
@@ -826,10 +838,6 @@ namespace Xceed.Wpf.Toolkit
       }
 
       this.Value = this.CoerceValueMinMax( result );
-
-      //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event
-      TextBox.Select( info.StartPosition, info.Length );
-      _fireSelectionChangedEvent = true;
     }
 
     private bool TryParseDateTime( string text, out DateTime result )

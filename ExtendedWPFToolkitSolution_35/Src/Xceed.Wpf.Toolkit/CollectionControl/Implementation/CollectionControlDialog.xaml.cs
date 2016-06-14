@@ -18,15 +18,27 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Media;
 
 namespace Xceed.Wpf.Toolkit
 {
+  public partial class CollectionControlDialogBase :
+    Window
+  {
+  }
+
   /// <summary>
   /// Interaction logic for CollectionControlDialog.xaml
   /// </summary>
-  public partial class CollectionControlDialog : Window
+  public partial class CollectionControlDialog : CollectionControlDialogBase
   {
-    #region Properties
+#region Private Members
+
+    private IList originalData = new List<object>();
+
+#endregion
+
+#region Properties
 
     public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register( "ItemsSource", typeof( IList ), typeof( CollectionControlDialog ), new UIPropertyMetadata( null ) );
     public IList ItemsSource
@@ -88,9 +100,9 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    #endregion //Properties
+#endregion //Properties
 
-    #region Constructors
+#region Constructors
 
     public CollectionControlDialog()
     {
@@ -109,23 +121,76 @@ namespace Xceed.Wpf.Toolkit
       NewItemTypes = newItemTypes;
     }
 
-    #endregion //Constructors
+#endregion //Constructors
 
-    #region Event Handlers
+#region Overrides
+
+    protected override void OnSourceInitialized( EventArgs e )
+    {
+      base.OnSourceInitialized( e );
+
+      //Backup data in case "Cancel" is clicked.
+      if( this.ItemsSource != null )
+      {
+        foreach( var item in this.ItemsSource )
+        {
+          originalData.Add( this.Clone( item ) );
+        }
+      }
+    }
+
+#endregion
+
+#region Event Handlers
 
     private void OkButton_Click( object sender, RoutedEventArgs e )
     {
       _collectionControl.PersistChanges();
       this.DialogResult = true;
-      Close();
+      this.Close();
     }
 
     private void CancelButton_Click( object sender, RoutedEventArgs e )
     {
+      _collectionControl.PersistChanges( originalData );
       this.DialogResult = false;
-      Close();
+      this.Close();
     }
 
-    #endregion //Event Hanlders
+#endregion //Event Hanlders
+
+#region Private Methods
+
+    private object Clone( object source )
+    {
+      var sourceType = source.GetType();
+      //Get default constructor
+      var result = sourceType.GetConstructor( new Type[] { } ).Invoke( null );
+      var properties = sourceType.GetProperties();
+
+      foreach( var propertyInfo in properties )
+      {
+        var propertyInfoValue = propertyInfo.GetValue( source, null );
+
+        if( propertyInfo.CanWrite )
+        {
+          //Look for nested object
+          if( propertyInfo.PropertyType.IsClass && (propertyInfo.PropertyType != typeof(Transform)) && !propertyInfo.PropertyType.Equals( typeof( string ) ) )
+          {
+            var nestedObject = this.Clone( propertyInfoValue );
+            propertyInfo.SetValue( result, nestedObject, null );
+          }
+          else
+          {
+            // copy object
+            propertyInfo.SetValue( result, propertyInfoValue, null );
+          }
+        }
+      }  
+
+      return result;
+    }
+
+#endregion
   }
 }

@@ -19,7 +19,8 @@
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
                     xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes"
-                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
 
@@ -123,6 +124,7 @@
                                              Foreground="{TemplateBinding Foreground}" 
                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                              IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
+                                             IsTabStop="{TemplateBinding IsTabStop}"
                                              MinWidth="20"
                                              AcceptsReturn="False"
                                              Padding="{TemplateBinding Padding}"
@@ -144,7 +146,19 @@
                                  IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}" />
                   <Popup x:Name="PART_CalculatorPopup"
                            IsOpen="{Binding IsChecked, ElementName=_calculatorToggleButton}"
-                           StaysOpen="False">
+                           StaysOpen="False"
+                           ToolTip="{x:Static sys:String.Empty}">
+                        <Popup.Resources>
+                           <Style TargetType="ToolTip">
+                              <Style.Triggers>
+                                 <Trigger Property="Content"
+                                                   Value="{x:Static sys:String.Empty}">
+                                    <Setter Property="Visibility"
+                                                     Value="Collapsed" />
+                                 </Trigger>
+                              </Style.Triggers>
+                           </Style>
+                        </Popup.Resources>
                      <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" Padding="3">
                         <StackPanel>
                            <local:Calculator x:Name="PART_Calculator"

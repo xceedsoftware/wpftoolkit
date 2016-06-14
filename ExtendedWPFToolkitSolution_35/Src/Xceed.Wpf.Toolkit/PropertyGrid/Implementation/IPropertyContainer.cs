@@ -49,5 +49,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     bool HideInheritedProperties { get; }
 
     FilterInfo FilterInfo { get; }
+
+    bool? IsPropertyVisible( PropertyDescriptor pd );
   }
 }

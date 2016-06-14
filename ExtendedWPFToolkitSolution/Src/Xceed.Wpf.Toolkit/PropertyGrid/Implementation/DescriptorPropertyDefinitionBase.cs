@@ -152,15 +152,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       bool isResource = false;
       bool isDynamicResource = false;
 
-      var markupProperty = markupObject.Properties.Where( p => p.Name == PropertyName ).FirstOrDefault();
-      if( ( markupProperty != null ) 
-        && ( markupProperty.PropertyType != typeof( object ) ) 
-        && !markupProperty.PropertyType.IsEnum 
-        && !markupProperty.PropertyType.IsArray )
-      { 
-        //TODO: need to find a better way to determine if a StaticResource has been applied to any property not just a style
-        isResource = ( markupProperty.Value is Style );
-        isDynamicResource = ( markupProperty.Value is DynamicResourceExtension );
+      var markupProperty = markupObject.Properties.FirstOrDefault( p => p.Name == PropertyName );
+      if( markupProperty != null )
+      {
+        //TODO: need to find a better way to determine if a StaticResource has been applied to any property not just a style(maybe with StaticResourceExtension)
+        isResource = typeof( Style ).IsAssignableFrom( markupProperty.PropertyType );
+        isDynamicResource = typeof( DynamicResourceExtension ).IsAssignableFrom( markupProperty.PropertyType );
       }
 
       if( isResource || isDynamicResource )
@@ -291,6 +288,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     internal int ComputeDisplayOrderInternal( bool isPropertyGridCategorized )
     {
       return this.ComputeDisplayOrder( isPropertyGridCategorized );
+    }
+
+    internal object GetValueInstance( object sourceObject )
+    {
+      ICustomTypeDescriptor customTypeDescriptor = sourceObject as ICustomTypeDescriptor;
+      if( customTypeDescriptor != null )
+        sourceObject = customTypeDescriptor.GetPropertyOwner( PropertyDescriptor );
+
+      return sourceObject;
     }
 
     #endregion

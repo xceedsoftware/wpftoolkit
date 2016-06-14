@@ -200,10 +200,15 @@ namespace Xceed.Wpf.AvalonDock.Layout
             reader.Read();
             while (true)
             {
-                if (reader.LocalName == localName &&
-                    reader.NodeType == System.Xml.XmlNodeType.EndElement)
+                if ( (reader.LocalName == localName ) &&
+                    ( reader.NodeType == System.Xml.XmlNodeType.EndElement) )
                 {
                     break;
+                }
+                if( reader.NodeType == System.Xml.XmlNodeType.Whitespace )
+                {
+                  reader.Read();
+                  continue;
                 }
 
                 XmlSerializer serializer = null;
@@ -223,6 +228,13 @@ namespace Xceed.Wpf.AvalonDock.Layout
                     serializer = new XmlSerializer(typeof(LayoutAnchorGroup));
                 else if (reader.LocalName == "LayoutPanel")
                     serializer = new XmlSerializer(typeof(LayoutPanel));
+                else
+                {
+                  Type type = this.FindType( reader.LocalName );
+                  if( type == null )
+                    throw new ArgumentException( "AvalonDock.LayoutGroup doesn't know how to deserialize " + reader.LocalName );
+                  serializer = new XmlSerializer( type );
+                } 
 
                 Children.Add((T)serializer.Deserialize(reader));
             }
@@ -239,6 +251,19 @@ namespace Xceed.Wpf.AvalonDock.Layout
                 serializer.Serialize(writer, child);
             }
 
+        }
+
+        private Type FindType( string name )
+        {
+          foreach( var a in AppDomain.CurrentDomain.GetAssemblies() )
+          {
+            foreach( var t in a.GetTypes() )
+            {
+              if( t.Name.Equals( name ) )
+                return t;
+            }
+          }
+          return null;
         }
     }
 }

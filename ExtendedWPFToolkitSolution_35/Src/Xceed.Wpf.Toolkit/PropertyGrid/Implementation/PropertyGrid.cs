@@ -1071,6 +1071,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion
 
+    #region IsPropertyBrowsable Event
+
+    public event IsPropertyBrowsableHandler IsPropertyBrowsable;
+
+    #endregion
+
     #region PreparePropertyItemEvent Attached Routed Event
 
     /// <summary>
@@ -1234,6 +1240,21 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
 
+    bool? IPropertyContainer.IsPropertyVisible( PropertyDescriptor pd )
+    {
+      var handler = this.IsPropertyBrowsable;
+      //If anyone is registered to PropertyGrid.IsPropertyBrowsable event
+      if( handler != null )
+      {
+        var isBrowsableArgs = new IsPropertyBrowsableArgs( pd );
+        handler( this, isBrowsableArgs );
+
+        return isBrowsableArgs.IsBrowsable;
+      }
+
+      return null;
+    }
+
     #endregion
 
 
@@ -1288,6 +1309,56 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       this.Item = item;
     }
   }
+  #endregion
+
+  #region isPropertyBrowsableEvent Handler/Args
+
+  public delegate void IsPropertyBrowsableHandler( object sender, IsPropertyBrowsableArgs e );
+
+  public class IsPropertyBrowsableArgs : RoutedEventArgs
+  {
+    #region Constructors
+
+    public IsPropertyBrowsableArgs( PropertyDescriptor pd )
+    {
+      this.PropertyDescriptor = pd;
+    }
+
+    #endregion
+
+    #region Properties
+
+    #region IsBrowsable Property
+
+    public bool IsBrowsable
+    {
+      get
+      {
+        return _isBrowsable;
+      }
+      set
+      {
+        _isBrowsable = value;
+      }
+    }
+
+    private bool _isBrowsable = true;
+
+    #endregion
+
+    #region PropertyDescriptor Property
+
+    public PropertyDescriptor PropertyDescriptor
+    {
+      get;
+      private set;
+    }
+
+    #endregion
+
+    #endregion
+  }
+
   #endregion
 
 }

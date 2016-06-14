@@ -436,6 +436,8 @@ namespace Xceed.Wpf.Toolkit
     {
       decimal currentValue = CalculatorUtilities.ParseDecimal( DisplayText );
 
+      _showNewNumber = true;
+
       switch( buttonType )
       {
         case Calculator.CalculatorButtonType.MAdd:
@@ -446,6 +448,7 @@ namespace Xceed.Wpf.Toolkit
           break;
         case Calculator.CalculatorButtonType.MR:
           DisplayText = Memory.ToString();
+          _showNewNumber = false;
           break;
         case Calculator.CalculatorButtonType.MS:
           Memory = currentValue;
@@ -456,8 +459,6 @@ namespace Xceed.Wpf.Toolkit
         default:
           break;
       }
-
-      _showNewNumber = true;
     }
 
     private void ProcessOperationKey( CalculatorButtonType buttonType )

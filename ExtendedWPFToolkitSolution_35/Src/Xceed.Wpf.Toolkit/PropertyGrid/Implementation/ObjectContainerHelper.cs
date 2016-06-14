@@ -59,11 +59,22 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           foreach( var descriptor in descriptors )
           {
             var propertyDef = this.GetPropertyDefinition( descriptor );
-            bool isBrowsable = descriptor.IsBrowsable && this.PropertyContainer.AutoGenerateProperties;
-            if( propertyDef != null )
+            bool isBrowsable = false;
+
+            var isPropertyBrowsable = this.PropertyContainer.IsPropertyVisible( descriptor );
+            if( isPropertyBrowsable.HasValue )
             {
-              isBrowsable = propertyDef.IsBrowsable.GetValueOrDefault( isBrowsable );
+              isBrowsable = isPropertyBrowsable.Value;
             }
+            else
+            {
+              isBrowsable = descriptor.IsBrowsable && this.PropertyContainer.AutoGenerateProperties;
+              if( propertyDef != null )
+              {
+                isBrowsable = propertyDef.IsBrowsable.GetValueOrDefault( isBrowsable );
+              }
+            }
+
             if( isBrowsable )
             {
               var prop = this.CreatePropertyItem( descriptor, propertyDef );

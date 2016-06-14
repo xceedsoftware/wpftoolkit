@@ -63,6 +63,24 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //AutoCloseCalendar
 
+    #region CalendarDisplayMode
+
+    public static readonly DependencyProperty CalendarDisplayModeProperty = DependencyProperty.Register( "CalendarDisplayMode", typeof( CalendarMode )
+      , typeof( DateTimePicker ), new UIPropertyMetadata( CalendarMode.Month ) );
+    public CalendarMode CalendarDisplayMode
+    {
+      get
+      {
+        return (CalendarMode)GetValue( CalendarDisplayModeProperty );
+      }
+      set
+      {
+        SetValue( CalendarDisplayModeProperty, value );
+      }
+    }
+
+    #endregion //CalendarDisplayMode
+
     #region TimeFormat
 
     public static readonly DependencyProperty TimeFormatProperty = DependencyProperty.Register( "TimeFormat", typeof( DateTimeFormat ), typeof( DateTimePicker ), new UIPropertyMetadata( DateTimeFormat.ShortTime ) );

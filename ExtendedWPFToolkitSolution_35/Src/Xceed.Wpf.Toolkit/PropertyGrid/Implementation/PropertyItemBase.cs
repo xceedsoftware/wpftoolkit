@@ -498,6 +498,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       get { return new FilterInfo(); }
     }
 
+    bool? IPropertyContainer.IsPropertyVisible( PropertyDescriptor pd )
+    {
+      if( _parentNode != null )
+      {
+        return _parentNode.IsPropertyVisible( pd );
+      }
+
+      return null;
+    }
+
     #endregion
 
   }

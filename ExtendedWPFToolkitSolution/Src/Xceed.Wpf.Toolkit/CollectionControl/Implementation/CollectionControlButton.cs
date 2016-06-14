@@ -116,7 +116,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void CollectionControlButton_Click( object sender, RoutedEventArgs e )
     {
-      CollectionControlDialog collectionControlDialog = new CollectionControlDialog();
+      var collectionControlDialog = new CollectionControlDialog();
       collectionControlDialog.ItemsSource = this.ItemsSource;
       collectionControlDialog.NewItemTypes = this.NewItemTypes;
       collectionControlDialog.ItemsSourceType = this.ItemsSourceType;

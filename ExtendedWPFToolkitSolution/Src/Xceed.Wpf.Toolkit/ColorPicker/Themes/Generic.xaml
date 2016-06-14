@@ -231,7 +231,27 @@
                      </Grid>
                   </ToggleButton>
 
-                  <Popup x:Name="PART_ColorPickerPalettePopup" VerticalAlignment="Bottom" IsOpen="{Binding ElementName=PART_ColorPickerToggleButton, Path=IsChecked}" StaysOpen="False" AllowsTransparency="True" Focusable="False" HorizontalOffset="1" VerticalOffset="1" PopupAnimation="Slide">
+                  <Popup x:Name="PART_ColorPickerPalettePopup" 
+                         VerticalAlignment="Bottom" 
+                         IsOpen="{Binding ElementName=PART_ColorPickerToggleButton, Path=IsChecked}" 
+                         StaysOpen="False" 
+                         AllowsTransparency="True" 
+                         Focusable="False" 
+                         HorizontalOffset="1"
+                         VerticalOffset="1" 
+                         PopupAnimation="Slide"
+                         ToolTip="{x:Static sys:String.Empty}">
+                     <Popup.Resources>
+                        <Style TargetType="ToolTip">
+                           <Style.Triggers>
+                              <Trigger Property="Content"
+                                                Value="{x:Static sys:String.Empty}">
+                                 <Setter Property="Visibility"
+                                                  Value="Collapsed" />
+                              </Trigger>
+                           </Style.Triggers>
+                        </Style>
+                     </Popup.Resources>
                      <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource ColorPickerDarkBorderBrush}" Padding="3">
                         <Grid>
                            <Grid.RowDefinitions>

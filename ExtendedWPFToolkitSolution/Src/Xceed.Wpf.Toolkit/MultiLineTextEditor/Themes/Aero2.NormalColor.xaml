@@ -19,7 +19,8 @@
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
                     xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes"
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
-                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
    <ResourceDictionary.MergedDictionaries>
       <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
@@ -145,7 +146,19 @@
                          Focusable="False"
                          PopupAnimation="Slide"
                          Width="{TemplateBinding DropDownWidth}"
-                         Height="{TemplateBinding DropDownHeight}">
+                         Height="{TemplateBinding DropDownHeight}"
+                         ToolTip="{x:Static sys:String.Empty}">
+                     <Popup.Resources>
+                        <Style TargetType="ToolTip">
+                           <Style.Triggers>
+                              <Trigger Property="Content"
+                                                Value="{x:Static sys:String.Empty}">
+                                 <Setter Property="Visibility"
+                                                  Value="Collapsed" />
+                              </Trigger>
+                           </Style.Triggers>
+                        </Style>
+                     </Popup.Resources>
                      <Border BorderThickness="1"
                              Background="White"
                              BorderBrush="{StaticResource PopupDarkBorderBrush}">

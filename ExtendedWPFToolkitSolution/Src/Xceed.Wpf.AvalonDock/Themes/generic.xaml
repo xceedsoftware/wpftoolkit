@@ -840,7 +840,7 @@
                     CaptionHeight="16"
                     CornerRadius="3,3,3,3"
                     GlassFrameThickness="0"
-                    ShowSystemMenu="True"/>
+                    ShowSystemMenu="False"/>
             </Setter.Value>
         </Setter>
         <Setter Property="Template">

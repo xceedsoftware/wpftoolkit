@@ -47,7 +47,19 @@
                 <x:Type TypeName="sys:DateTimeKind" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-    </local:DemoView.Resources>
+      <ObjectDataProvider x:Key="enumCalendarDisplayMode"
+                          MethodName="GetValues"
+                          ObjectType="{x:Type sys:Enum}">
+         <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="CalendarMode" />
+         </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+      <ObjectDataProvider x:Key="enumDateTimePart" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+         <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="xctk:DateTimePart"/>
+         </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+   </local:DemoView.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -61,6 +73,7 @@
       <GroupBox Header="Features" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" >
          <Grid>
             <Grid.RowDefinitions>
+               <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
@@ -90,12 +103,14 @@
             <CheckBox x:Name="_clipValueToMinMax" Grid.Row="4" Grid.Column="1" IsChecked="False" VerticalAlignment="Center" Margin="5,5,25,5"/>
             <TextBlock Text="Kind:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"/>
             <ComboBox x:Name="_kind" Grid.Row="5" Grid.Column="1" SelectedIndex="2" ItemsSource="{Binding Source={StaticResource enumKind}}" Width="190" Margin="5,5,25,5"/>
-            <TextBlock Text="ShowDropDownButton:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center"/>
-            <CheckBox x:Name="_showDropDownButton" Grid.Row="6" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
-            <TextBlock Text="TimePickerVisibility:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center"/>
-            <ComboBox x:Name="_timePickerVisibility" Grid.Row="7" Grid.Column="1" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumVisibility}}" Width="190" Margin="5,5,25,5"/>
-            <TextBlock Text="TimePickerShowButtonSpinner:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center"/>
-            <CheckBox x:Name="_timePickerShowButtonSpinner" Grid.Row="8" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
+            <TextBlock Text="CalendarDisplayMode:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center"/>
+            <ComboBox x:Name="_calendarDisplayMode" Grid.Row="6" Grid.Column="1" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumCalendarDisplayMode}}" Width="190" Margin="5,5,25,5"/>
+            <TextBlock Text="ShowDropDownButton:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="_showDropDownButton" Grid.Row="7" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
+            <TextBlock Text="TimePickerVisibility:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center"/>
+            <ComboBox x:Name="_timePickerVisibility" Grid.Row="8" Grid.Column="1" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumVisibility}}" Width="190" Margin="5,5,25,5"/>
+            <TextBlock Text="TimePickerShowButtonSpinner:" Grid.Row="9" Grid.Column="0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="_timePickerShowButtonSpinner" Grid.Row="9" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
 
             <TextBlock Text="TimeFormat:" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" />
             <ComboBox x:Name="_timeFormat" Grid.Row="0" Grid.Column="3" SelectedIndex="7" ItemsSource="{Binding Source={StaticResource enumDateFormatData}}" Width="190" Margin="5"/>
@@ -107,6 +122,8 @@
             <xctk:DateTimeUpDown x:Name="_minimum" Grid.Row="3" Grid.Column="3" Format="Custom" FormatString="yyyy/MM/dd HH:mm" Value="2010/01/01T12:00" Width="190" VerticalAlignment="Center" Margin="5"/>
             <TextBlock Text="Maximum:" Grid.Row="4" Grid.Column="2" VerticalAlignment="Center"/>
             <xctk:DateTimeUpDown x:Name="_maximum" Grid.Row="4" Grid.Column="3" Format="Custom" FormatString="yyyy/MM/dd HH:mm" Value="2015/12/31T12:00" Width="190" VerticalAlignment="Center" Margin="5"/>
+            <TextBlock Text="CurrentDateTimePart:" Grid.Row="5" Grid.Column="2" VerticalAlignment="Center"/>
+            <ComboBox x:Name="_currentDateTimePart" Grid.Row="5" Grid.Column="3" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumDateTimePart}}" Width="190" Margin="5" ToolTip="Must match a DateTimePart of the DateTimePicker Format."/>
          </Grid>
       </GroupBox>
 
@@ -129,7 +146,9 @@
                                  Minimum="{Binding Value, ElementName=_minimum}"
                                  Maximum="{Binding Value, ElementName=_maximum}"
                                  Kind="{Binding SelectedItem, ElementName=_kind}"
-                                 ShowDropDownButton="{Binding IsChecked, ElementName=_showDropDownButton}" />
+                                 CalendarDisplayMode="{Binding SelectedItem, ElementName=_calendarDisplayMode}"
+                                 ShowDropDownButton="{Binding IsChecked, ElementName=_showDropDownButton}"
+                                 CurrentDateTimePart="{Binding SelectedItem, ElementName=_currentDateTimePart, Mode=TwoWay}"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch">

@@ -119,7 +119,7 @@ namespace Xceed.Wpf.Toolkit
     {
       if( this.Value.HasValue )
       {
-        this.UpdateTimeSpan( 1 );
+        this.UpdateTimeSpan( this.Step );
       }
       else
       {
@@ -131,7 +131,7 @@ namespace Xceed.Wpf.Toolkit
     {
       if( this.Value.HasValue )
       {
-        this.UpdateTimeSpan( -1 );
+        this.UpdateTimeSpan( -this.Step );
       }
       else
       {
@@ -353,8 +353,9 @@ namespace Xceed.Wpf.Toolkit
       //this only occurs when the user manually type in a value for the Value Property
       if( info == null )
       {
-        //Skip negative sign
-        info = (_dateTimeInfoList[ 0 ].Content != "-") ? _dateTimeInfoList[ 0 ] : _dateTimeInfoList[ 1 ];
+        info = (this.CurrentDateTimePart != DateTimePart.Other)
+               ? this.GetDateTimeInfo( this.CurrentDateTimePart )
+               : (_dateTimeInfoList[ 0 ].Content != "-") ? _dateTimeInfoList[ 0 ] : _dateTimeInfoList[ 1 ]; //Skip negative sign
       }
 
       TimeSpan? result = null;
@@ -411,7 +412,11 @@ namespace Xceed.Wpf.Toolkit
 
       //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event.
       //For a negative value, add 1 for the minus sign.
-      int startPos = ( result.HasValue && ( result.Value.TotalMilliseconds < 0 ) && oldValue.HasValue && ( oldValue.Value.TotalMilliseconds >= 0 ) ) ? info.StartPosition + 1 : info.StartPosition;
+      int startPos = (this.GetDateTimeInfo( info.Type ) != null) ? this.GetDateTimeInfo( info.Type ).StartPosition : info.StartPosition;
+      if( result.HasValue && (result.Value.TotalMilliseconds < 0) && oldValue.HasValue && (oldValue.Value.TotalMilliseconds >= 0) )
+      {
+        startPos += 1;
+      }
       this.TextBox.Select( startPos, info.Length );
       _fireSelectionChangedEvent = true;
     }
