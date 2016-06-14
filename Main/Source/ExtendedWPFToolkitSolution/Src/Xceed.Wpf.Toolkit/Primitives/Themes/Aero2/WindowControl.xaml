@@ -25,7 +25,7 @@
         <ResourceDictionary Source="../../../Themes/Aero2/Common.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <sys:Double x:Key="TopBorderThumbHeight">8</sys:Double>
+   <sys:Double x:Key="TopBorderThumbHeight">5</sys:Double>
 
     <conv:WindowContentBorderMarginConverter x:Key="WindowContentBorderMarginConverter" />
     <conv:WindowControlBackgroundConverter x:Key="WindowControlBackgroundConverter" />
@@ -65,7 +65,7 @@
                             <ColumnDefinition x:Name="HeaderButtonsColumn" Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition x:Name="HeaderRow" Height="22" />
+                            <RowDefinition x:Name="HeaderRow" Height="28" />
                             <RowDefinition Height="{Binding WindowThickness.Top, RelativeSource={RelativeSource TemplatedParent}}" />
                         </Grid.RowDefinitions>
 

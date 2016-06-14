@@ -47,7 +47,9 @@
                 Value="Center" />
         <Setter Property="TextAlignment"
                 Value="Right" />
-        <Setter Property="WatermarkTemplate"
+      <Setter Property="Focusable"
+              Value="False" />
+      <Setter Property="WatermarkTemplate"
                 Value="{StaticResource DefaultWatermarkTemplate}" />
         <Setter Property="IsTabStop"
                 Value="False" />
@@ -77,6 +79,7 @@
                                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                 VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                                 IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
+                                                IsTabStop="{TemplateBinding IsTabStop}"
                                                 MinWidth="20"
                                                 AcceptsReturn="False"
                                                 Padding="{TemplateBinding Padding}"

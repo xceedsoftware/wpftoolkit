@@ -416,9 +416,11 @@
     <Compile Include="Core\Converters\CornerRadiusToDoubleConverter.cs" />
     <Compile Include="Core\Converters\HalfConverter.cs" />
     <Compile Include="Core\Converters\IntToThicknessConverter.cs" />
+    <Compile Include="Core\Converters\NullToBoolConverter.cs" />
     <Compile Include="Core\Converters\ThicknessToDoubleConverter.cs" />
     <Compile Include="Primitives\DateTimePickerBase.cs" />
     <Compile Include="Core\Utilities\DateTimeUtilities.cs" />
+    <Compile Include="PropertyGrid\Implementation\CategoryGroupStyleSelector.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\IsDefaultCategoryConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\IsStringEmptyConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\CollectionEditor.cs" />

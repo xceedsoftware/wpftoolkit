@@ -266,6 +266,15 @@ namespace Xceed.Wpf.Toolkit
 
             break;
           }
+          case Key.Enter:
+          {
+            //Do not Spin on enter Key when spinners have focus
+            if( this.IncreaseButton.IsFocused || this.DecreaseButton.IsFocused )
+            {
+              e.Handled = true;
+            }
+            break;
+          }
       }
     }
 

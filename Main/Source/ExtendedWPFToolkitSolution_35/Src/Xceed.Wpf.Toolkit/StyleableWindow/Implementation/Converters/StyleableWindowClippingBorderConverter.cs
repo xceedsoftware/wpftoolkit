@@ -28,10 +28,8 @@ namespace Xceed.Wpf.Toolkit.Converters
   {
     public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
     {
-      Type aa = value.GetType();
-      Type b = parameter.GetType();
-      double borderThickness = ( double )value - double.Parse( (string)parameter );
-      return new Thickness( borderThickness, borderThickness, borderThickness, borderThickness );
+      double borderThickness = (double)value;
+      return new Thickness( borderThickness, borderThickness, borderThickness, borderThickness * 2);
     }
 
     public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )

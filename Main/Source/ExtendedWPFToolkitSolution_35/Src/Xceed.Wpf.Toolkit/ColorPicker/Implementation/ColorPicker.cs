@@ -208,7 +208,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region IsOpen
 
-    public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register( "IsOpen", typeof( bool ), typeof( ColorPicker ), new UIPropertyMetadata( false ) );
+    public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register( "IsOpen", typeof( bool ), typeof( ColorPicker ), new UIPropertyMetadata( false, OnIsOpenChanged ) );
     public bool IsOpen
     {
       get
@@ -219,6 +219,19 @@ namespace Xceed.Wpf.Toolkit
       {
         SetValue( IsOpenProperty, value );
       }
+    }
+
+    private static void OnIsOpenChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      ColorPicker colorPicker = (ColorPicker)d;
+      if( colorPicker != null )
+        colorPicker.OnIsOpenChanged( (bool)e.OldValue, (bool)e.NewValue );
+    }
+
+    private void OnIsOpenChanged( bool oldValue, bool newValue )
+    {
+      RoutedEventArgs args = new RoutedEventArgs( newValue ? OpenedEvent : ClosedEvent, this );
+      this.RaiseEvent( args );
     }
 
     #endregion //IsOpen
@@ -629,6 +642,8 @@ namespace Xceed.Wpf.Toolkit
 
     #region Events
 
+    #region SelectedColorChangedEvent
+
     public static readonly RoutedEvent SelectedColorChangedEvent = EventManager.RegisterRoutedEvent( "SelectedColorChanged", RoutingStrategy.Bubble, typeof( RoutedPropertyChangedEventHandler<Color?> ), typeof( ColorPicker ) );
     public event RoutedPropertyChangedEventHandler<Color?> SelectedColorChanged
     {
@@ -641,6 +656,42 @@ namespace Xceed.Wpf.Toolkit
         RemoveHandler( SelectedColorChangedEvent, value );
       }
     }
+
+    #endregion
+
+    #region OpenedEvent
+
+    public static readonly RoutedEvent OpenedEvent = EventManager.RegisterRoutedEvent( "OpenedEvent", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( ColorPicker ) );
+    public event RoutedEventHandler Opened
+    {
+      add
+      {
+        AddHandler( OpenedEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( OpenedEvent, value );
+      }
+    }
+
+    #endregion //OpenedEvent
+
+    #region ClosedEvent
+
+    public static readonly RoutedEvent ClosedEvent = EventManager.RegisterRoutedEvent( "ClosedEvent", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( ColorPicker ) );
+    public event RoutedEventHandler Closed
+    {
+      add
+      {
+        AddHandler( ClosedEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( ClosedEvent, value );
+      }
+    }
+
+    #endregion //ClosedEvent
 
     #endregion //Events
 

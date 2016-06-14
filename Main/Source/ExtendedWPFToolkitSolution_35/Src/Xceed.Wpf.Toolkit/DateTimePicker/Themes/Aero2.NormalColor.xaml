@@ -114,6 +114,7 @@
                                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                                    IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
+						   IsTabStop="{TemplateBinding IsTabStop}"
                                                    MinWidth="20"
                                                    AcceptsReturn="False"
                                                    Padding="{TemplateBinding Padding}"
@@ -137,7 +138,7 @@
                             <Popup x:Name="PART_Popup" IsOpen="{Binding IsChecked, ElementName=_calendarToggleButton}" StaysOpen="False">
                                 <Border BorderThickness="1" Background="{StaticResource PanelBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" Padding="3">
                                     <StackPanel>
-                                        <toolkit:Calendar x:Name="PART_Calendar" BorderThickness="0" />
+                                        <toolkit:Calendar x:Name="PART_Calendar" BorderThickness="0" DisplayMode="{Binding CalendarDisplayMode, RelativeSource={RelativeSource TemplatedParent}}"/>
                                         <local:TimePicker x:Name="PART_TimeUpDown"
                                                           Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
                                                           Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" 

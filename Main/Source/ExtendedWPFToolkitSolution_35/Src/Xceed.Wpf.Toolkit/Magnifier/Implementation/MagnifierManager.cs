@@ -57,25 +57,53 @@ namespace Xceed.Wpf.Toolkit
 
     #region Event Handlers
 
-    void Element_MouseLeave( object sender, MouseEventArgs e )
+    private void Element_MouseLeave( object sender, MouseEventArgs e )
     {
       HideAdorner();
     }
 
-    void Element_MouseEnter( object sender, MouseEventArgs e )
+    private void Element_MouseEnter( object sender, MouseEventArgs e )
     {
       ShowAdorner();
     }
 
-    #endregion //Event Handlers
+    private void Element_MouseWheel( object sender, MouseWheelEventArgs e )
+    {
+      var magnifier = MagnifierManager.GetMagnifier( _element ) as Magnifier;
+      if( (magnifier != null) && magnifier.IsUsingZoomOnMouseWheel )
+      {
+        if( e.Delta < 0 )
+        {
+          var newValue = magnifier.ZoomFactor + magnifier.ZoomFactorOnMouseWheel;
+#if VS2008
+          magnifier.ZoomFactor = newValue;
+#else
+          magnifier.SetCurrentValue( Magnifier.ZoomFactorProperty, newValue );
+#endif
+        }
+        else if ( e.Delta > 0 )
+        {
+          var newValue = (magnifier.ZoomFactor >= magnifier.ZoomFactorOnMouseWheel) ? magnifier.ZoomFactor - magnifier.ZoomFactorOnMouseWheel : 0d;
+#if VS2008
+          magnifier.ZoomFactor = newValue;
+#else
+          magnifier.SetCurrentValue( Magnifier.ZoomFactorProperty, newValue );
+#endif
+        }
+        _adorner.UpdateViewBox();
+      }
+    }
 
-    #region Methods
+#endregion //Event Handlers
+
+#region Methods
 
     private void AttachToMagnifier( UIElement element, Magnifier magnifier )
     {
       _element = element;
       _element.MouseEnter += Element_MouseEnter;
       _element.MouseLeave += Element_MouseLeave;
+      _element.MouseWheel += Element_MouseWheel;
 
       magnifier.Target = _element;
 
@@ -109,6 +137,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    #endregion //Methods
+#endregion //Methods
   }
 }

@@ -41,10 +41,12 @@
    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
    <conv:HalfConverter x:Key="HalfConverter" />
+   <conv:NullToBoolConverter x:Key="NullToBoolConverter" />
    <pgconv:ObjectToUIElementConverter x:Key="ObjectToUIElementConverter" />
    <pgconv:IsStringEmptyConverter x:Key="IsStringEmptyConverter" />
    <pgconv:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
    <pgconv:IsDefaultCategoryConverter x:Key="IsDefaultCategoryConverter" />
+   <pgconv:SelectedObjectConverter x:Key="objectConverter" />
 
    <x:Static x:Key="EmptyString"
              Member="sys:String.Empty" />
@@ -880,7 +882,7 @@
             <Setter Property="Template">
                <Setter.Value>
                   <ControlTemplate TargetType="{x:Type GroupItem}">
-                     <!-- No Expander for the Misc Category -->
+                     <!-- No Expander for the Misc Category if IsMiscCategoryLabelHidden == true-->
                      <ItemsPresenter />
                   </ControlTemplate>
                </Setter.Value>
@@ -889,12 +891,29 @@
       </Style.Triggers>
    </Style>
 
+   <Style x:Key="SingleDefaultCategoryItemGroupContainerStyle"
+          TargetType="{x:Type GroupItem}">
+      <Setter Property="Template">
+         <Setter.Value>
+            <ControlTemplate>
+               <!-- No Expander for the Misc Category if Misc category is the only category-->
+               <ItemsPresenter />
+            </ControlTemplate>
+         </Setter.Value>
+      </Setter>
+   </Style>
+
    <ContextMenu x:Key="{ComponentResourceKey 
                   TypeInTargetAssembly={x:Type pg:PropertyGrid}, 
                   ResourceId=SelectedObjectAdvancedOptionsMenu}">
       <MenuItem Header="Reset Value"
                 Command="commands:PropertyItemCommands.ResetValue" />
    </ContextMenu>
+
+   <pg:CategoryGroupStyleSelector x:Key="categoryGroupStyleSelector"
+                                  SingleDefaultCategoryItemGroupStyle="{StaticResource SingleDefaultCategoryItemGroupContainerStyle}"
+                                  ItemGroupStyle="{StaticResource PropertyItemGroupContainerStyle}" />
+
 
    <Style TargetType="{x:Type pg:PropertyItemBase}">
 
@@ -1015,7 +1034,7 @@
                            </ItemsControl.ItemsPanel>
 
                            <ItemsControl.GroupStyle>
-                              <GroupStyle ContainerStyle="{StaticResource PropertyItemGroupContainerStyle}" />
+                              <GroupStyle ContainerStyleSelector="{StaticResource categoryGroupStyleSelector}" />
                            </ItemsControl.GroupStyle>
 
                         </pg:PropertyItemsControl>
@@ -1113,9 +1132,6 @@
    </Style>
 
    <Style TargetType="{x:Type pg:PropertyGrid}">
-      <Style.Resources>
-         <pgconv:SelectedObjectConverter x:Key="objectConverter" />
-      </Style.Resources>
       <Setter Property="AdvancedOptionsMenu"
               Value="{StaticResource {ComponentResourceKey TypeInTargetAssembly={x:Type pg:PropertyGrid}, ResourceId=SelectedObjectAdvancedOptionsMenu}}" />
       <Setter Property="Background"
@@ -1145,7 +1161,8 @@
                         <RowDefinition Height="Auto" />
                      </Grid.RowDefinitions>
 
-                     <StackPanel Orientation="Horizontal">
+                     <StackPanel x:Name="selectObjectNamePanel"
+                                 Orientation="Horizontal">
                         <Border Background="White"
                                 BorderBrush="Black"
                                 Visibility="{Binding ShowPreview, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}"
@@ -1177,6 +1194,7 @@
                            </Grid>
                         </StackPanel>
                      </StackPanel>
+
 
                      <Grid x:Name="toolsContainer"
                            Grid.Row="1"
@@ -1270,7 +1288,7 @@
                               </ItemsControl.ItemsPanel>
 
                               <ItemsControl.GroupStyle>
-                                 <GroupStyle ContainerStyle="{StaticResource PropertyItemGroupContainerStyle}" />
+                                 <GroupStyle ContainerStyleSelector="{StaticResource categoryGroupStyleSelector}" />
                               </ItemsControl.GroupStyle>
 
                            </pg:PropertyItemsControl>

@@ -19,6 +19,7 @@
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                xmlns:sys="clr-namespace:System;assembly=mscorlib"
                 Title="TimeSpanUpDown">
    <local:DemoView.Description>
       <Paragraph FontSize="14"
@@ -26,6 +27,14 @@
          The TimeSpanUpDown controls let you increment or decrement a time over 24 hours. The Format is Days.Hours:Minutes:Seconds.Milliseconds.
       </Paragraph>
    </local:DemoView.Description>
+
+   <local:DemoView.Resources>
+      <ObjectDataProvider x:Key="enumDateTimePart" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+         <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="xctk:DateTimePart"/>
+         </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+   </local:DemoView.Resources>
 
    <Grid>
       <Grid.RowDefinitions>
@@ -40,6 +49,7 @@
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="Auto" />
@@ -48,6 +58,7 @@
                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
+            <!-- 1st column-->
             <TextBlock Text="Watermark:"
                        VerticalAlignment="Center" />
             <TextBox x:Name="_watermark"
@@ -77,7 +88,18 @@
                                 Minimum="0"
                                 HorizontalAlignment="Left"
                                 Margin="5,5,25,5" />
+            <TextBlock Grid.Row="3" 
+                       Text="CurrentDateTimePart:" 
+                       VerticalAlignment="Center"/>
+            <ComboBox x:Name="_currentDateTimePart"
+                      Grid.Row="3"
+                      Grid.Column="1"
+                      ItemsSource="{Binding Source={StaticResource enumDateTimePart}}"
+                      SelectedItem="{Binding CurrentDateTimePart, ElementName=_timeSpanUpDown}"
+                      Margin="5,5,25,5" 
+                      ToolTip="Must match a DateTimePart of the TimeSpanUpDown"/>
 
+            <!-- 2nd column-->
             <TextBlock Grid.Column="2"
                        Text="DefaultValue:"
                        VerticalAlignment="Center"
@@ -115,6 +137,21 @@
                                  HorizontalAlignment="Left"
                                  VerticalAlignment="Center"
                                  Margin="5,5,25,5" />
+            <TextBlock Grid.Row="3"
+                       Grid.Column="2"
+                       Text="Step:"
+                       VerticalAlignment="Center"
+                       Margin="5" />
+            <xctk:IntegerUpDown x:Name="_step"
+                                Grid.Row="3"
+                                Grid.Column="3"
+                                Value="{Binding Step, ElementName=_timeSpanUpDown}"
+                                Maximum="10"
+                                Minimum="1"
+                                Width="100"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Margin="5,5,25,5" />
          </Grid>
       </GroupBox>
 
@@ -132,7 +169,9 @@
                               Maximum="5.00:00:00"
                               Minimum="-5.00:00:00"
                               ClipValueToMinMax="False"
-                              FractionalSecondsDigitsCount="0"/>
+                              FractionalSecondsDigitsCount="0"
+                              CurrentDateTimePart="Hour24"
+                              Step="1"/>
       </StackPanel>
    </Grid>
 </local:DemoView>

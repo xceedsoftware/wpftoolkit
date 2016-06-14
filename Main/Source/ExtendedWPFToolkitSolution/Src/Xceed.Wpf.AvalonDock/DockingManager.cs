@@ -163,7 +163,7 @@ namespace Xceed.Wpf.AvalonDock
             CommandManager.InvalidateRequerySuggested();
         }
 
-        DispatcherOperation _setFocusAsyncOperation = null;
+      //  DispatcherOperation _setFocusAsyncOperation = null;
 
         void OnLayoutRootPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -194,10 +194,14 @@ namespace Xceed.Wpf.AvalonDock
                     //}
                 }
 
-                if (!_insideInternalSetActiveContent)
-                    ActiveContent = Layout.ActiveContent != null ?
-                        Layout.ActiveContent.Content : null;
+            //if (!_insideInternalSetActiveContent)
+            //    ActiveContent = Layout.ActiveContent != null ?
+            //        Layout.ActiveContent.Content : null;
+            if( !_insideInternalSetActiveContent && (Layout.ActiveContent != null) )
+            {
+              this.ActiveContent = Layout.ActiveContent.Content;
             }
+          }
         }
 
         void OnLayoutRootUpdated(object sender, EventArgs e)
@@ -267,7 +271,7 @@ namespace Xceed.Wpf.AvalonDock
         {
             base.OnApplyTemplate();
 
-            SetupAutoHideWindow();
+          //  SetupAutoHideWindow();
         }
 
         protected override void OnInitialized( EventArgs e )
@@ -287,6 +291,8 @@ namespace Xceed.Wpf.AvalonDock
                   RightSidePanel = CreateUIElementForModel( Layout.RightSide ) as LayoutAnchorSideControl;
                   BottomSidePanel = CreateUIElementForModel( Layout.BottomSide ) as LayoutAnchorSideControl;
                 }
+
+                SetupAutoHideWindow();
 
                 //load windows not already loaded!
                 foreach (var fw in Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)))

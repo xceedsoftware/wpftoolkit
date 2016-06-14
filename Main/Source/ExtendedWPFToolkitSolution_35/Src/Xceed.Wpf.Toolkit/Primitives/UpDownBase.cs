@@ -566,6 +566,8 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     public event InputValidationErrorEventHandler InputValidationError;
 
+    public event EventHandler<SpinEventArgs> Spinned;
+
     #region ValueChanged Event
 
     //Due to a bug in Visual Studio, you cannot create event handlers for generic T args in XAML, so I have to use object instead.
@@ -592,6 +594,13 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       if( e == null )
         throw new ArgumentNullException( "e" );
+
+      // Raise the Spinned event to user
+      EventHandler<SpinEventArgs> handler = this.Spinned;
+      if( handler != null )
+      {
+        handler( this, e );
+      }
 
       if( e.Direction == SpinDirection.Increase )
         DoIncrement();

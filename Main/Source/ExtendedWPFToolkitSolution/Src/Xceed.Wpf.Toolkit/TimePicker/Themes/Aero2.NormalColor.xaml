@@ -19,7 +19,8 @@
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
                     xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes"
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
-                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
@@ -163,6 +164,7 @@
                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                              IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
+                                             IsTabStop="{TemplateBinding IsTabStop}"
                                              MinWidth="20"
                                              AcceptsReturn="False"
                                              Padding="{TemplateBinding Padding}"
@@ -185,7 +187,19 @@
                   <Popup x:Name="PART_Popup"
                          IsOpen="{Binding IsChecked, ElementName=_timePickerToggleButton}"
                          AllowsTransparency="True"
-                         StaysOpen="False">
+                         StaysOpen="False"
+                         ToolTip="{x:Static sys:String.Empty}">
+                     <Popup.Resources>
+                        <Style TargetType="ToolTip">
+                           <Style.Triggers>
+                              <Trigger Property="Content"
+                                                Value="{x:Static sys:String.Empty}">
+                                 <Setter Property="Visibility"
+                                                  Value="Collapsed" />
+                              </Trigger>
+                           </Style.Triggers>
+                        </Style>
+                     </Popup.Resources>
                      <Border BorderThickness="1"
                              MinWidth="{Binding ActualWidth, ElementName=root}"
                              MaxHeight="{TemplateBinding MaxDropDownHeight}"

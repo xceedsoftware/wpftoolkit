@@ -1600,6 +1600,8 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     #endregion
 
+    public event EventHandler<ScrollEventArgs> Scroll;
+
     #region ViewStackIndexChanged Event
 
     public static readonly RoutedEvent ViewStackIndexChangedEvent = EventManager.RegisterRoutedEvent( "ViewStackIndexChanged", RoutingStrategy.Bubble, typeof( IndexChangedEventHandler ), typeof( Zoombox ) );
@@ -2275,12 +2277,26 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     {
       double diff = e.NewValue + _relativePosition.Y;
       this.OnDrag( new DragDeltaEventArgs( 0d, -diff / this.Scale ), false );
+
+      // Raise the Scroll event to user
+      EventHandler<ScrollEventArgs> handler = this.Scroll;
+      if( handler != null )
+      {
+        handler( this, e );
+      }
     }
 
     private void HorizontalScrollBar_Scroll( object sender, ScrollEventArgs e )
     {
       double diff = e.NewValue + _relativePosition.X;
       this.OnDrag( new DragDeltaEventArgs( -diff / this.Scale, 0d ), false );
+
+      // Raise the Scroll event to user
+      EventHandler<ScrollEventArgs> handler = this.Scroll;
+      if( handler != null )
+      {
+        handler( this, e );
+      }
     }
 
     private void DragDisplayViewport( DragDeltaEventArgs e, bool end )
