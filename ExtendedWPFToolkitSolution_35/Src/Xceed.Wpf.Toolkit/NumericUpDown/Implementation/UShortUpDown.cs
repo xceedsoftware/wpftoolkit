@@ -29,7 +29,7 @@ namespace Xceed.Wpf.Toolkit
     }
 
     public UShortUpDown()
-      : base( ushort.Parse, Decimal.ToUInt16, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
+      : base( ushort.TryParse, Decimal.ToUInt16, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
     {
     }
 

@@ -40,6 +40,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     private int _ignoreSelectedItemsCollectionChanged;
     private int _ignoreSelectedMemberPathValuesChanged;
     private IList _selectedItems;
+    private IList _removedItems = new ObservableCollection<object>();
 
     private ValueChangeHelper _selectedMemberPathValuesHelper;
     private ValueChangeHelper _valueMemberPathValuesHelper;
@@ -577,6 +578,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     private void OnItemsSourceCollectionChanged( object sender, NotifyCollectionChangedEventArgs args )
     {
       this.RemoveUnavailableSelectedItems();
+      this.AddAvailableRemovedItems();
       this.UpdateSelectedMemberPathValuesBindings();
       this.UpdateValueMemberPathValuesBindings();
     }
@@ -752,6 +754,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       {
         if( !hash.Contains( SelectedItems[ i ] ) )
         {
+          _removedItems.Add( SelectedItems[ i ] );
           SelectedItems.RemoveAt( i );
           i--;
         }
@@ -760,6 +763,21 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
       UpdateSelectedItem();
       UpdateSelectedValue();
+    }
+
+    private void AddAvailableRemovedItems()
+    {
+      HashSet<object> hash = new HashSet<object>( ItemsCollection.Cast<object>() );
+
+      for( int i = 0; i < _removedItems.Count; i++ )
+      {
+        if( hash.Contains( _removedItems[ i ] ) )
+        {
+          SelectedItems.Add( _removedItems[ i ] );
+          _removedItems.RemoveAt( i );          
+          i--;
+        }
+      }
     }
 
     /// <summary>

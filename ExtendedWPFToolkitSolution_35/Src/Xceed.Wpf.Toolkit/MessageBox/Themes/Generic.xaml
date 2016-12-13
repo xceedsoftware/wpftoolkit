@@ -116,7 +116,8 @@
                 </VisualStateManager.VisualStateGroups>
 
                 <prim:WindowControl x:Name="PART_WindowControl"
-                                    Caption="{TemplateBinding Caption}" 
+                                    Caption="{TemplateBinding Caption}"
+                                    CaptionFontSize="{TemplateBinding CaptionFontSize}"
                                     CaptionForeground="{TemplateBinding CaptionForeground}"
                                     CaptionShadowBrush="{TemplateBinding CaptionShadowBrush}"
                                     CaptionIcon="{TemplateBinding CaptionIcon}"

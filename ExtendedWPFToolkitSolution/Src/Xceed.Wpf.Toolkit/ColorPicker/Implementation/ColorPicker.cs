@@ -63,6 +63,7 @@ namespace Xceed.Wpf.Toolkit
     private ToggleButton _toggleButton;
     private Popup _popup;
     private Button _colorModeButton;
+    private Color? _initialColor;
     private bool _selectionChanged;
 
     #endregion //Members
@@ -230,6 +231,10 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnIsOpenChanged( bool oldValue, bool newValue )
     {
+      if( newValue )
+      {
+        _initialColor = this.SelectedColor;
+      }
       RoutedEventArgs args = new RoutedEventArgs( newValue ? OpenedEvent : ClosedEvent, this );
       this.RaiseEvent( args );
     }
@@ -589,6 +594,7 @@ namespace Xceed.Wpf.Toolkit
         }
         else if( e.Key == Key.Escape )
         {
+          this.SelectedColor = _initialColor;
           CloseColorPicker( true );
           e.Handled = true;
         }

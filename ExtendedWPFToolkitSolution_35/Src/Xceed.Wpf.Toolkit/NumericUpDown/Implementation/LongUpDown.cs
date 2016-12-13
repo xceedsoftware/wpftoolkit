@@ -29,7 +29,7 @@ namespace Xceed.Wpf.Toolkit
     }
 
     public LongUpDown()
-      : base( Int64.Parse, Decimal.ToInt64, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
+      : base( Int64.TryParse, Decimal.ToInt64, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
     {
     }
 

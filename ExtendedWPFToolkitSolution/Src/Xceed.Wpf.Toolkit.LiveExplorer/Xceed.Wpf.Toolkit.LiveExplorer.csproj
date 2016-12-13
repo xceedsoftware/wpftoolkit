@@ -64,6 +64,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Services.Client" />
     <Reference Include="System.Runtime.Serialization" />
@@ -252,6 +253,9 @@
     <Compile Include="Samples\MaterialControls\Views\MaterialControlsView.xaml.cs">
       <DependentUpon>MaterialControlsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Samples\MultiCalendar\Views\MultiCalendarView.xaml.cs">
+      <DependentUpon>MultiCalendarView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Samples\Numeric\Views\NumericView.xaml.cs">
       <DependentUpon>NumericView.xaml</DependentUpon>
     </Compile>
@@ -350,6 +354,9 @@
     </Compile>
     <Compile Include="Samples\Text\Views\RichTextboxView.xaml.cs">
       <DependentUpon>RichTextboxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Text\Views\WatermarkPasswordBoxView.xaml.cs">
+      <DependentUpon>WatermarkPasswordBoxView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Samples\Text\Views\WatermarkTextboxView.xaml.cs">
       <DependentUpon>WatermarkTextboxView.xaml</DependentUpon>
@@ -613,6 +620,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Samples\MultiCalendar\Views\MultiCalendarView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Samples\Numeric\Views\NumericView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -733,6 +744,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Samples\Text\Views\WatermarkPasswordBoxView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Samples\Text\Views\WatermarkTextboxView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -843,9 +858,6 @@
     <AppDesigner Include="Properties\" />
     <None Include="Service References\NorthwindDataService\service.edmx" />
     <Resource Include="Samples\Magnifier\Resources\SampleText.rtf" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\xceed_logo.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\BusyIndicator\Images\CdBurning32.png" />
@@ -1328,6 +1340,30 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialComboBox.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\WatermarkPasswordBoxView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\WatermarkPasswordBoxView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\MultiCalendar\Resources\April.jpg" />
+    <Resource Include="Samples\MultiCalendar\Resources\December.jpg" />
+    <Resource Include="Samples\MultiCalendar\Resources\February.jpg" />
+    <Resource Include="Samples\MultiCalendar\Resources\July.jpg" />
+    <Resource Include="Samples\MultiCalendar\Resources\June.jpg" />
+    <Resource Include="Samples\MultiCalendar\Resources\March.jpg" />
+    <Resource Include="Samples\MultiCalendar\Resources\October.jpg" />
+    <Resource Include="Samples\MultiCalendar\Resources\September.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MultiCalendarView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MultiCalendarView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\MultiCalendar\OpenSourceImages\MultiCalendar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\toolkitIcon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

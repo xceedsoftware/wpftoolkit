@@ -1,26 +1,27 @@
 ﻿/***************************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2015 Xceed Software Inc.
+   Copyright (C) 2007-2016 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
   ************************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
-using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
 {
@@ -53,6 +54,8 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       selectedObject.ListOfInt32 = new List<int>() { 1, 2, 3 };
       selectedObject.ListOfPerson = new List<Person>() { new Person() { Name = "John Smith" }, new Person() { Name = "Robert King" } };
       selectedObject.ListOfStrings = new List<string>() { "string1", "string2", "string3" };
+      selectedObject.Dictionary = new Dictionary<int, System.Windows.Media.Color>() { { 22, System.Windows.Media.Color.FromRgb( 255, 0, 0 ) }, { 33, System.Windows.Media.Color.FromRgb( 0, 255, 0 ) } };
+      selectedObject.CollectionOfPerson = new Collection<Person>() { new Person() { Name = "Tom McNeil" }, new Person() { Name = "Mike Campbell" } };
       selectedObject.Person = new Person() { Name = "John Smith" };
       selectedObject.SByte = (sbyte) 7;
       selectedObject.Single = (float)8;
@@ -149,6 +152,15 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       [Category( "Non-Numeric Editors" )]
       [Description( "(C# IList<T> type) This property uses a CollectionEditor as the default editor." )]
       public List<Person> ListOfPerson { get; set; }
+      [Category( "Non-Numeric Editors" )]
+      [Description( "(C# IDictionary<T> type) This property uses a CollectionEditor as the default editor." )]
+      public Dictionary<int, System.Windows.Media.Color> Dictionary { get; set; }
+      [Category( "Non-Numeric Editors" )]
+      [Description( "(C# ICollection<T> type) This property uses a CollectionEditor as the default editor." )]
+      public Collection<Person> CollectionOfPerson
+      {
+        get; set;
+      }
       [Category( "Non-Numeric Editors" )]
       [Description( "This property is a complex property and has no default editor." )]
       public Person Person { get; set; }

@@ -31,7 +31,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       ValueProperty = TextBlock.TextProperty;
     }
 
-    protected override void SetControlProperties()
+    protected override void SetControlProperties( PropertyItem propertyItem )
     {
       Editor.Margin = new System.Windows.Thickness( 5, 0, 0, 0 );
     }

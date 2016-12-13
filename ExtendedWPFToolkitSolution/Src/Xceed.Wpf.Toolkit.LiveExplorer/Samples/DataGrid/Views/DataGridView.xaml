@@ -1,14 +1,14 @@
 ﻿<!--*************************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2015 Xceed Software Inc.
+   Copyright (C) 2007-2016 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -27,7 +27,7 @@
                  x:Name="_demo">
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-            <Run>Extended WPF Toolkit includes a powerful and fast datagrid control with many improvements over the stock WPF datagrid. In addition to providing a modern experience with the smooth scrolling and fully animated Tableflow view (can be turned off), it also provides zero-lag background data virtualization. Try a basic sample here. There are too many features and options to showcase in this sample. An even more feature-rich edition of this datagrid is available </Run>
+            <Run>Toolkit for WPF includes a powerful and fast datagrid control with many improvements over the stock WPF datagrid. In addition to providing a modern experience with the smooth scrolling and fully animated Tableflow view (can be turned off), it also provides zero-lag background data virtualization. Try a basic sample here. There are too many features and options to showcase in this sample. An even more feature-rich edition of this datagrid is available </Run>
             <Hyperlink NavigateUri="http://xceed.com/Grid_WPF_Intro.html?adtype=154" RequestNavigate="Hyperlink_RequestNavigate">
                 here.
             </Hyperlink>

@@ -61,13 +61,13 @@
                            <Grid>
                               <ScrollViewer x:Name="PART_ContentHost" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                  <ContentPresenter x:Name="PART_WatermarkHost"
-                                             Content="{TemplateBinding Watermark}"
-                                             ContentTemplate="{TemplateBinding WatermarkTemplate}"
-                                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                             IsHitTestVisible="False"
-                                             Margin="{TemplateBinding Padding}"
-                                             Visibility="Collapsed" />
+                                                   Content="{TemplateBinding Watermark}"
+                                                   ContentTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DefaultWatermarkTemplate}}"
+                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                   IsHitTestVisible="False"
+                                                   Margin="{TemplateBinding Padding}"
+                                                   Visibility="Collapsed" />
                              </Grid>
                         </Border>
                        <Border x:Name="MouseOverVisual" Opacity="0" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{StaticResource TextBox_MouseOver}" CornerRadius="1" />

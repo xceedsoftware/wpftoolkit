@@ -17,6 +17,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+#if !VS2008
+using System.ComponentModel.DataAnnotations;
+#endif
 using System.Diagnostics;
 using System.Linq;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
@@ -68,7 +71,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
             }
             else
             {
-              isBrowsable = descriptor.IsBrowsable && this.PropertyContainer.AutoGenerateProperties;
+#if !VS2008
+              var displayAttribute = PropertyGridUtilities.GetAttribute<DisplayAttribute>( descriptor );
+              if( displayAttribute != null )
+              {
+                var autoGenerateField = displayAttribute.GetAutoGenerateField();
+                isBrowsable = this.PropertyContainer.AutoGenerateProperties 
+                              && ((autoGenerateField.HasValue && autoGenerateField.Value) || !autoGenerateField.HasValue);
+              }
+              else
+#endif
+              {
+                isBrowsable = descriptor.IsBrowsable && this.PropertyContainer.AutoGenerateProperties;
+              }
+
               if( propertyDef != null )
               {
                 isBrowsable = propertyDef.IsBrowsable.GetValueOrDefault( isBrowsable );
@@ -88,7 +104,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         catch( Exception e )
         {
           //TODO: handle this some how
-          Debug.WriteLine( "Property creation failed" );
+          Debug.WriteLine( "Property creation failed." );
           Debug.WriteLine( e.StackTrace );
         }
       }

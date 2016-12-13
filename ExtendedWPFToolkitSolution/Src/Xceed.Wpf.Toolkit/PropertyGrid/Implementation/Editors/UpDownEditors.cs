@@ -17,11 +17,16 @@
 using Xceed.Wpf.Toolkit.Primitives;
 using System;
 using System.Windows;
+#if !VS2008
+using System.ComponentModel.DataAnnotations;
+#endif
+using System.ComponentModel;
+
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class UpDownEditor<TEditor, TType> : TypeEditor<TEditor> where TEditor : UpDownBase<TType>, new()
   {
-    protected override void SetControlProperties()
+    protected override void SetControlProperties( PropertyItem propertyItem )
     {
       Editor.TextAlignment = System.Windows.TextAlignment.Left;
     }
@@ -29,6 +34,21 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     {
       ValueProperty = UpDownBase<TType>.ValueProperty;
     }
+
+#if !VS2008
+    internal void SetMinMaxFromRangeAttribute( PropertyDescriptor propertyDescriptor, TypeConverter converter )
+    {
+      if( propertyDescriptor == null )
+        return;
+
+      var rangeAttribute = PropertyGridUtilities.GetAttribute<RangeAttribute>( propertyDescriptor );
+      if( rangeAttribute != null )
+      {
+        Editor.Maximum = ((TType)converter.ConvertFrom( rangeAttribute.Maximum.ToString() ));
+        Editor.Minimum = ((TType)converter.ConvertFrom( rangeAttribute.Minimum.ToString() ));
+      }
+    }
+#endif
   }
 
   public class ByteUpDownEditor : UpDownEditor<ByteUpDown, byte?>
@@ -37,6 +57,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     {
       return new PropertyGridEditorByteUpDown();
     }
+
+    protected override void SetControlProperties( PropertyItem propertyItem )
+    {
+      base.SetControlProperties( propertyItem );
+#if !VS2008
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( byte ) ) );
+#endif
+    }
   }
 
   public class DecimalUpDownEditor : UpDownEditor<DecimalUpDown, decimal?>
@@ -44,6 +72,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     protected override DecimalUpDown CreateEditor()
     {
       return new PropertyGridEditorDecimalUpDown();
+    }
+
+    protected override void SetControlProperties( PropertyItem propertyItem )
+    {
+      base.SetControlProperties( propertyItem );
+#if !VS2008
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( decimal ) ) );
+#endif
     }
   }
 
@@ -54,10 +90,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       return new PropertyGridEditorDoubleUpDown();
     }
 
-    protected override void SetControlProperties()
+    protected override void SetControlProperties( PropertyItem propertyItem )
     {
-      base.SetControlProperties();
+      base.SetControlProperties( propertyItem );
       Editor.AllowInputSpecialValues = AllowedSpecialValues.Any;
+#if !VS2008
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( double ) ) );      
+#endif
     }
   }
 
@@ -67,6 +106,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     {
       return new PropertyGridEditorIntegerUpDown();
     }
+
+    protected override void SetControlProperties( PropertyItem propertyItem )
+    {
+      base.SetControlProperties( propertyItem );
+#if !VS2008
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( int ) ) );
+#endif
+    }
   }
 
   public class LongUpDownEditor : UpDownEditor<LongUpDown, long?>
@@ -75,6 +122,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     {
       return new PropertyGridEditorLongUpDown();
     }
+
+    protected override void SetControlProperties( PropertyItem propertyItem )
+    {
+      base.SetControlProperties( propertyItem );
+#if !VS2008
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( long ) ) );
+#endif
+    }
   }
 
   public class ShortUpDownEditor : UpDownEditor<ShortUpDown, short?>
@@ -82,6 +137,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     protected override ShortUpDown CreateEditor()
     {
       return new PropertyGridEditorShortUpDown();
+    }
+
+    protected override void SetControlProperties( PropertyItem propertyItem )
+    {
+      base.SetControlProperties( propertyItem );
+#if !VS2008
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( short ) ) );
+#endif
     }
   }
 
@@ -92,10 +155,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       return new PropertyGridEditorSingleUpDown();
     }
 
-    protected override void SetControlProperties()
+    protected override void SetControlProperties( PropertyItem propertyItem )
     {
-      base.SetControlProperties();
+      base.SetControlProperties( propertyItem );
       Editor.AllowInputSpecialValues = AllowedSpecialValues.Any;
+#if !VS2008
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( float ) ) );
+#endif
     }
   }
 
@@ -105,6 +171,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     {
       return new PropertyGridEditorDateTimeUpDown();
     }
+    protected override void SetControlProperties( PropertyItem propertyItem )
+    {
+      base.SetControlProperties( propertyItem );
+#if !VS2008
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( DateTime ) ) );
+#endif
+    }
   }
 
   public class TimeSpanUpDownEditor : UpDownEditor<TimeSpanUpDown, TimeSpan?>
@@ -112,6 +185,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     protected override TimeSpanUpDown CreateEditor()
     {
       return new PropertyGridEditorTimeSpanUpDown();
+    }
+
+    protected override void SetControlProperties( PropertyItem propertyItem )
+    {
+      base.SetControlProperties( propertyItem );
+#if !VS2008
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( TimeSpan ) ) );
+#endif
     }
   }
 
@@ -121,6 +202,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     {
       return new PropertyGridEditorSByteUpDown();
     }
+
+    protected override void SetControlProperties( PropertyItem propertyItem )
+    {
+      base.SetControlProperties( propertyItem );
+#if !VS2008
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( sbyte ) ) );
+#endif
+    }
   }
 
   internal class UIntegerUpDownEditor : UpDownEditor<UIntegerUpDown, uint?>
@@ -128,6 +217,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     protected override UIntegerUpDown CreateEditor()
     {
       return new PropertyGridEditorUIntegerUpDown();
+    }
+
+    protected override void SetControlProperties( PropertyItem propertyItem )
+    {
+      base.SetControlProperties( propertyItem );
+#if !VS2008
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( uint ) ) );
+#endif
     }
   }
 
@@ -137,6 +234,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     {
       return new PropertyGridEditorULongUpDown();
     }
+
+    protected override void SetControlProperties( PropertyItem propertyItem )
+    {
+      base.SetControlProperties( propertyItem );
+#if !VS2008
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( ulong ) ) );
+#endif
+    }
   }
 
   internal class UShortUpDownEditor : UpDownEditor<UShortUpDown, ushort?>
@@ -144,6 +249,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     protected override UShortUpDown CreateEditor()
     {
       return new PropertyGridEditorUShortUpDown();
+    }
+
+    protected override void SetControlProperties( PropertyItem propertyItem )
+    {
+      base.SetControlProperties( propertyItem );
+#if !VS2008
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( ushort ) ) );
+#endif
     }
   }
 

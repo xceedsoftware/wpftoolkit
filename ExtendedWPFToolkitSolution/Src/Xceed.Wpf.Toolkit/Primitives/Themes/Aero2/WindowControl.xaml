@@ -65,7 +65,7 @@
                             <ColumnDefinition x:Name="HeaderButtonsColumn" Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition x:Name="HeaderRow" Height="28" />
+                            <RowDefinition x:Name="HeaderRow" MinHeight="28" />
                             <RowDefinition Height="{Binding WindowThickness.Top, RelativeSource={RelativeSource TemplatedParent}}" />
                         </Grid.RowDefinitions>
 
@@ -98,7 +98,7 @@
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
                                  <TextBlock x:Name="TitleText"
-                                            FontSize="{StaticResource Window_CaptionFontSize}"
+                                            FontSize="{TemplateBinding CaptionFontSize}"
                                             Text="{TemplateBinding Caption}"
                                             Foreground="{TemplateBinding CaptionForeground}"
                                             TextTrimming="CharacterEllipsis"
@@ -295,6 +295,7 @@
        <Setter Property="BorderBrush" Value="#5D6C7A" />
         <Setter Property="BorderThickness" Value="1,1,1,1" />       
         <Setter Property="Background" Value="{StaticResource Window_Background}" />
+        <Setter Property="CaptionFontSize" Value="{StaticResource Window_CaptionFontSize}" />
         <Setter Property="CaptionForeground" Value="{StaticResource Window_CaptionForeground}" />
         <Setter Property="CaptionShadowBrush" Value="{StaticResource Window_CaptionShadowBrush}" />
         <Setter Property="WindowBorderBrush" Value="{StaticResource Window_WindowBorderBrush}" />

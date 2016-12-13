@@ -17,8 +17,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
+using Xceed.Wpf.Toolkit.Core.Utilities;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Security;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -40,12 +45,12 @@ namespace Xceed.Wpf.Toolkit
 
 #region Properties
 
-    public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register( "ItemsSource", typeof( IList ), typeof( CollectionControlDialog ), new UIPropertyMetadata( null ) );
-    public IList ItemsSource
+    public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register( "ItemsSource", typeof( IEnumerable ), typeof( CollectionControlDialog ), new UIPropertyMetadata( null ) );
+    public IEnumerable ItemsSource
     {
       get
       {
-        return ( IList )GetValue( ItemsSourceProperty );
+        return (IEnumerable)GetValue( ItemsSourceProperty );
       }
       set
       {
@@ -145,6 +150,15 @@ namespace Xceed.Wpf.Toolkit
 
     private void OkButton_Click( object sender, RoutedEventArgs e )
     {
+      if( this.ItemsSource is IDictionary )
+      {
+        if( !this.AreDictionaryKeysValid() )
+        {
+          MessageBox.Show( "All dictionary items should have distinct non-null Key values.", "Warning" );
+          return;
+        }        
+      }
+
       _collectionControl.PersistChanges();
       this.DialogResult = true;
       this.Close();
@@ -157,38 +171,94 @@ namespace Xceed.Wpf.Toolkit
       this.Close();
     }
 
-#endregion //Event Hanlders
+    #endregion //Event Hanlders
 
-#region Private Methods
+    #region Private Methods
 
+    [SecuritySafeCritical]
     private object Clone( object source )
     {
+      if( source == null )
+        return null;
+
+      object result = null;
       var sourceType = source.GetType();
-      //Get default constructor
-      var result = sourceType.GetConstructor( new Type[] { } ).Invoke( null );
-      var properties = sourceType.GetProperties();
 
-      foreach( var propertyInfo in properties )
+      // For IDictionary, we need to create EditableKeyValuePair to edit the Key-Value.
+      if( (this.ItemsSource is IDictionary)
+        && sourceType.IsGenericType
+        && typeof( KeyValuePair<,> ).IsAssignableFrom( sourceType.GetGenericTypeDefinition() ) )
       {
-        var propertyInfoValue = propertyInfo.GetValue( source, null );
+        result = this.GenerateEditableKeyValuePair( source );
+      }
+      else
+      {
+        // Initialized a new object with default values
+        result = FormatterServices.GetUninitializedObject( sourceType );
+      }
+      Debug.Assert( result != null );
+      if( result != null )
+      {
+        var properties = sourceType.GetProperties();
 
-        if( propertyInfo.CanWrite )
+        foreach( var propertyInfo in properties )
         {
-          //Look for nested object
-          if( propertyInfo.PropertyType.IsClass && (propertyInfo.PropertyType != typeof(Transform)) && !propertyInfo.PropertyType.Equals( typeof( string ) ) )
+          var propertyInfoValue = propertyInfo.GetValue( source, null );
+
+          if( propertyInfo.CanWrite )
           {
-            var nestedObject = this.Clone( propertyInfoValue );
-            propertyInfo.SetValue( result, nestedObject, null );
-          }
-          else
-          {
-            // copy object
-            propertyInfo.SetValue( result, propertyInfoValue, null );
+            //Look for nested object
+            if( propertyInfo.PropertyType.IsClass 
+              && (propertyInfo.PropertyType != typeof( Transform ))
+              && !propertyInfo.PropertyType.Equals( typeof( string ) ) )
+            {
+              var nestedObject = this.Clone( propertyInfoValue );
+              propertyInfo.SetValue( result, nestedObject, null );
+            }
+            else
+            {
+              // copy object
+              propertyInfo.SetValue( result, propertyInfoValue, null );
+            }
           }
         }
-      }  
+      }      
 
       return result;
+    }
+
+    private object GenerateEditableKeyValuePair( object source )
+    {
+      var sourceType = source.GetType();
+      if( (sourceType.GetGenericArguments() == null) || (sourceType.GetGenericArguments().GetLength( 0 ) != 2) )
+        return null;      
+
+      var propInfoKey = sourceType.GetProperty( "Key" );
+      var propInfoValue = sourceType.GetProperty( "Value" );
+      if( (propInfoKey != null) && (propInfoValue != null) )
+      {
+        return ListUtilities.CreateEditableKeyValuePair( propInfoKey.GetValue( source, null )
+                                                          , sourceType.GetGenericArguments()[ 0 ]
+                                                          , propInfoValue.GetValue( source, null )
+                                                          , sourceType.GetGenericArguments()[ 1 ] );
+      }
+      return null;
+    }
+
+    private bool AreDictionaryKeysValid()
+    {
+      var keys = _collectionControl.Items.Select( x =>
+      {
+        var keyType = x.GetType().GetProperty( "Key" );
+        if( keyType != null )
+        {
+          return keyType.GetValue( x, null );
+        }
+        return null;
+      } );
+
+      return (keys.Distinct().Count() == _collectionControl.Items.Count )
+             && keys.All( x => x != null );
     }
 
 #endregion

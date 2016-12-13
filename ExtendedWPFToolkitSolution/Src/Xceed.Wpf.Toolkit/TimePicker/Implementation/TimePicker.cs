@@ -353,9 +353,19 @@ namespace Xceed.Wpf.Toolkit
       {
         TimeItem selectedTimeListItem = ( TimeItem )e.AddedItems[ 0 ];
         var time = selectedTimeListItem.Time;
-        var date = Value ?? this.ContextNow;
 
-        Value = new DateTime( date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds, date.Kind );
+        if( this.UpdateValueOnEnterKey )
+        {
+          var currentValue = this.ConvertTextToValue( this.TextBox.Text );
+          var date = currentValue ?? this.ContextNow;
+          var newValue = new DateTime( date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds, date.Kind );
+          this.TextBox.Text = newValue.ToString( this.GetFormatString( this.Format ), this.CultureInfo );
+        }
+        else
+        {
+          var date = this.Value ?? this.ContextNow;
+          this.Value = new DateTime( date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds, date.Kind );
+        }
       }
     }
 

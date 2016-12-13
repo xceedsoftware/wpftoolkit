@@ -29,7 +29,7 @@ namespace Xceed.Wpf.Toolkit
     }
 
     public IntegerUpDown()
-      : base( Int32.Parse, Decimal.ToInt32, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
+      : base( Int32.TryParse, Decimal.ToInt32, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
     {
     }
 

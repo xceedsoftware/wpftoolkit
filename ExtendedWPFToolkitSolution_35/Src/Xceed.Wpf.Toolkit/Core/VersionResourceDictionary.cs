@@ -64,7 +64,7 @@ namespace Xceed.Wpf.Toolkit.Core
     private void EnsureInitialization()
     {
       if( _initializingCount <= 0 )
-        throw new InvalidOperationException( "VersionResourceDictionary properties can only be set while initializing" );
+        throw new InvalidOperationException( "VersionResourceDictionary properties can only be set while initializing." );
     }
 
     void ISupportInitialize.BeginInit()

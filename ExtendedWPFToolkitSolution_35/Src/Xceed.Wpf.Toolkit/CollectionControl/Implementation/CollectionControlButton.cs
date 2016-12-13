@@ -17,8 +17,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -61,12 +59,12 @@ namespace Xceed.Wpf.Toolkit
 
     #region ItemsSource Property
 
-    public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register( "ItemsSource", typeof( IList ), typeof( CollectionControlButton ), new UIPropertyMetadata( null ) );
-    public IList ItemsSource
+    public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register( "ItemsSource", typeof( IEnumerable ), typeof( CollectionControlButton ), new UIPropertyMetadata( null ) );
+    public IEnumerable ItemsSource
     {
       get
       {
-        return ( IList )GetValue( ItemsSourceProperty );
+        return (IEnumerable)GetValue( ItemsSourceProperty );
       }
       set
       {

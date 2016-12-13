@@ -19,6 +19,10 @@
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters" >
 
+   <ResourceDictionary.MergedDictionaries>
+      <ResourceDictionary Source="..\..\Themes\Generic\Glyphs.xaml" />
+   </ResourceDictionary.MergedDictionaries>
+
    <conv:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
 
    <ControlTemplate x:Key="ThumbControlTemplate"
@@ -323,10 +327,11 @@
                            </Grid>
 
                            <Path Grid.Column="1"
-                                 Width="7"
-                                 Height="4"
-                                 Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z"
-                                 Fill="#FF000000" />
+                                 Width="9"
+                                 Height="5"
+                                 Data="{StaticResource DownArrowGeometry}"
+                                 Fill="#FF000000"
+                                 Margin="0,1,0,0"/>
                         </Grid>
                      </Border>
                   </Border>
@@ -481,10 +486,11 @@
                            </Grid>
 
                            <Path Grid.Column="1"
-                                 Width="7"
-                                 Height="4"
-                                 Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z"
-                                 Fill="#FF000000" />
+                                 Width="9"
+                                 Height="5"
+                                 Data="{StaticResource DownArrowGeometry}"
+                                 Fill="#FF000000"
+                                 Margin="0,1,0,0"/>
                         </Grid>
                      </Border>
                   </Border>
