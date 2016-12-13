@@ -927,6 +927,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         // Tag the editor as generated to know if we should clear it.
         ContainerHelperBase.SetIsGenerated( editor, true );
         propertyItem.Editor = editor;
+
+        //Update Source of binding and Validation of PropertyItem to update
+        var be = propertyItem.GetBindingExpression( PropertyItem.ValueProperty );
+        if( be != null )
+        {
+          be.UpdateSource();
+          propertyItem.SetRedInvalidBorder( be );
+        }
       }
     }
 
@@ -1008,7 +1016,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       _containerHelper.UpdateValuesFromSource();
     }
-
 
 
 
@@ -1330,19 +1337,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region IsBrowsable Property
 
-    public bool IsBrowsable
+    public bool? IsBrowsable
     {
-      get
-      {
-        return _isBrowsable;
-      }
-      set
-      {
-        _isBrowsable = value;
-      }
+      get;
+      set;
     }
-
-    private bool _isBrowsable = true;
 
     #endregion
 

@@ -103,7 +103,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     internal DateTimeUpDownBase()
     {
-      this.InitializeDateTimeInfoList();
+      this.InitializeDateTimeInfoList( this.Value );
       this.Loaded += this.DateTimeUpDownBase_Loaded;
     }
 
@@ -221,7 +221,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #region Methods
 
-    protected virtual void InitializeDateTimeInfoList()
+    protected virtual void InitializeDateTimeInfoList( T value )
     {
     }
 
@@ -303,11 +303,14 @@ namespace Xceed.Wpf.Toolkit.Primitives
       return value;
     }
 
-    private void PerformKeyboardSelection( int nextSelectionStart )
+    protected internal virtual void PerformKeyboardSelection( int nextSelectionStart )
     {
       this.TextBox.Focus();
 
-      this.CommitInput();
+      if( !this.UpdateValueOnEnterKey )
+      {
+        this.CommitInput();
+      }
 
       int selectedDateStartPosition = ( _selectedDateTimeInfo != null ) ? _selectedDateTimeInfo.StartPosition : 0;
       int direction = nextSelectionStart - selectedDateStartPosition;

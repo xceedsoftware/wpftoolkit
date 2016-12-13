@@ -20,7 +20,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class PrimitiveTypeCollectionEditor : TypeEditor<PrimitiveTypeCollectionControl>
   {
-    protected override void SetControlProperties()
+    protected override void SetControlProperties( PropertyItem propertyItem )
     {
       Editor.BorderThickness = new System.Windows.Thickness( 0 );
       Editor.Content = "(Collection)";

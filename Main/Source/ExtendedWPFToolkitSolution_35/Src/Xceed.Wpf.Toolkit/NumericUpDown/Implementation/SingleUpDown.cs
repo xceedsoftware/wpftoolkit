@@ -31,7 +31,7 @@ namespace Xceed.Wpf.Toolkit
     }
 
     public SingleUpDown()
-      : base( Single.Parse, Decimal.ToSingle, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
+      : base( Single.TryParse, Decimal.ToSingle, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
     {
     }
 

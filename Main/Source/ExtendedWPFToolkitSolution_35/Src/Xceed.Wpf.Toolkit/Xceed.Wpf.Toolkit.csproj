@@ -52,7 +52,7 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="WPFToolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\2.6.0\Bin\Release\WPFToolkit.dll</HintPath>
+      <HintPath>..\..\..\..\..\2.5.0\Bin\Release\WPFToolkit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -417,13 +417,16 @@
     <Compile Include="Core\Converters\HalfConverter.cs" />
     <Compile Include="Core\Converters\IntToThicknessConverter.cs" />
     <Compile Include="Core\Converters\NullToBoolConverter.cs" />
+    <Compile Include="Core\Converters\ThicknessSideRemovalConverter.cs" />
     <Compile Include="Core\Converters\ThicknessToDoubleConverter.cs" />
+    <Compile Include="Core\EditableKeyValuePair.cs" />
     <Compile Include="Primitives\DateTimePickerBase.cs" />
     <Compile Include="Core\Utilities\DateTimeUtilities.cs" />
     <Compile Include="PropertyGrid\Implementation\CategoryGroupStyleSelector.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\IsDefaultCategoryConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\IsStringEmptyConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\CollectionEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\SourceComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\TrimmedTextBlock.cs" />
     <Compile Include="Core\Converters\WindowContentBorderMarginConverter.cs" />
     <Compile Include="Core\Converters\WindowControlBackgroundConverter.cs" />
@@ -635,6 +638,7 @@
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\Implementation\VisualStates.MessageBox.cs" />
     <Compile Include="WatermarkComboBox\Implementation\WatermarkComboBox.cs" />
+    <Compile Include="WatermarkPasswordBox\Implementation\WatermarkPasswordBox.cs" />
     <Compile Include="WatermarkTextBox\Implementation\WatermarkTextBox.cs" />
     <Compile Include="Wizard\Implementation\WizardCommands.cs" />
     <Compile Include="Wizard\Implementation\WizardPage.cs" />

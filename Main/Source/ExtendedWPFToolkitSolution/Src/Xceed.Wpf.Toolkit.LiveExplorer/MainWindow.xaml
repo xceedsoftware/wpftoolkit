@@ -1,14 +1,14 @@
 ﻿<!--*************************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2015 Xceed Software Inc.
+   Copyright (C) 2007-2016 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -22,7 +22,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         AllowsTransparency="False"
         Icon="App.ico"
-        Title="Extended WPF Toolkit - LiveExplorer"
+        Title="Toolkit Plus for WPF - LiveExplorer"
         Height="778"
         Width="1300">
    <Window.Resources>
@@ -30,6 +30,8 @@
          <ResourceDictionary.MergedDictionaries>
             <ResourceDictionary Source="Resources/LiveExplorerScrollViewer.xaml" />
          </ResourceDictionary.MergedDictionaries>
+
+         <SolidColorBrush x:Key="SampleDefaultBrush">#FFC72035</SolidColorBrush>
 
          <!--This style is used to override the LiveExplorer scroll bar within the samples-->
          <Style x:Key="ScrollBarBaseStyle"
@@ -68,8 +70,8 @@
                              Background="Transparent"
                              Padding="5,6,3,3">
                         <Path x:Name="ExpandPath"
-                              Fill="#FFEFAC27"
-                              Stroke="#FFEFAC27"
+                              Fill="{StaticResource SampleDefaultBrush}"
+                              Stroke="{StaticResource SampleDefaultBrush}"
                               Data="{StaticResource TreeArrow}">
                         </Path>
                      </Border>
@@ -78,10 +80,10 @@
                                  Value="True">
                            <Setter TargetName="ExpandPath"
                                    Property="Stroke"
-                                   Value="#FFEFAC27" />
+                                   Value="{StaticResource SampleDefaultBrush}" />
                            <Setter TargetName="ExpandPath"
                                    Property="Fill"
-                                   Value="#FFEFAC27" />
+                                   Value="{StaticResource SampleDefaultBrush}" />
                         </Trigger>
 
                         <Trigger Property="IsChecked"
@@ -96,10 +98,10 @@
                            </Setter>
                            <Setter TargetName="ExpandPath"
                                    Property="Fill"
-                                   Value="#FFEFAC27" />
+                                   Value="{StaticResource SampleDefaultBrush}" />
                            <Setter TargetName="ExpandPath"
                                    Property="Stroke"
-                                   Value="#FFEFAC27" />
+                                   Value="{StaticResource SampleDefaultBrush}" />
                         </Trigger>
                      </ControlTemplate.Triggers>
                   </ControlTemplate>
@@ -342,7 +344,7 @@
                   <Setter Property="FontWeight"
                           Value="Bold" />
                   <Setter Property="Foreground"
-                          Value="#efac27" />
+                          Value="{StaticResource SampleDefaultBrush}" />
                </Trigger>
             </Style.Triggers>
          </Style>
@@ -413,7 +415,7 @@
                                  Value="True">
                            <Setter Property="Background"
                                    TargetName="border"
-                                   Value="#efac27" />
+                                   Value="{StaticResource SampleDefaultBrush}" />
                            <Setter Property="Foreground"
                                    TargetName="textBlock"
                                    Value="White" />
@@ -436,12 +438,16 @@
       </Grid.ColumnDefinitions>
 
       <Grid.RowDefinitions>
-         <RowDefinition Height="130" />
+         <RowDefinition Height="90" />
          <RowDefinition />
       </Grid.RowDefinitions>
 
-      <Image Source="Resources/xceed_logo.png"
-             MouseLeftButtonDown="Image_MouseLeftButtonDown" />
+      <Image Source="Resources/toolkitIcon.png"
+             MouseLeftButtonDown="Image_MouseLeftButtonDown"
+             RenderOptions.BitmapScalingMode="Fant"
+             Width="190"
+             HorizontalAlignment="Left"
+             Margin="24,0,0,0"/>
 
       <TreeView x:Name="_treeView"
                 Grid.Row="1"
@@ -544,6 +550,9 @@
                                               SampleType="{x:Type samples:Text.Views.RichTextboxView}" />
                <core:LiveExplorerTreeViewItem Header="WatermarkTextBox"
                                               SampleType="{x:Type samples:Text.Views.WatermarkTextboxView}" />
+               <core:LiveExplorerTreeViewItem Header="WatermarkPasswordBox"
+                                              SampleType="{x:Type samples:Text.Views.WatermarkPasswordBoxView}" 
+                                              IsNewFeature="True"/>
                <core:LiveExplorerTreeViewItem Header="TokenizedTextBox"
                                               SampleType="{x:Type samples:TokenizedTextBox.Views.TokenizedTextBoxView}"
                                               IsPlusOnlyFeature="True" />
@@ -621,7 +630,11 @@
              <core:LiveExplorerTreeViewItem Header="Gauge"
                                            ItemContainerStyle="{StaticResource TreeViewItemStyle}"
                                            SampleType="{x:Type samples:Gauge.Views.RadialGaugeView}"
-                                           IsPlusOnlyFeature="True"/>
+                                           IsPlusOnlyFeature="True" />
+            <core:LiveExplorerTreeViewItem Header="MultiCalendar"
+                                           IsNewFeature="True"
+                                           IsPlusOnlyFeature="True"
+                                           SampleType="{x:Type samples:MultiCalendar.Views.MultiCalendarView}" />
             <core:LiveExplorerTreeViewItem Header="Material Controls"
                                            ItemContainerStyle="{StaticResource TreeViewItemStyle}"
                                            IsPlusOnlyFeature="True"
@@ -691,7 +704,7 @@
          <core:LiveExplorerTreeViewItem Header="Theming"
                                         Style="{StaticResource TreeViewHeaderStyle}"
                                         ItemContainerStyle="{StaticResource TreeViewItemStyle}">
-            <core:LiveExplorerTreeViewItem Header="Extended Toolkit controls"
+            <core:LiveExplorerTreeViewItem Header="Toolkit for WPF controls"
                                            SampleType="{x:Type samples:Theming.Views.ThemingExtendedToolkitView}"
                                            IsPlusOnlyFeature="True" />
             <core:LiveExplorerTreeViewItem Header="AvalonDock Controls"
@@ -787,11 +800,11 @@
                         <!-- Bottom Rectangle -->
                         <Rectangle Grid.Row="2"
                                    Grid.RowSpan="3"
-                                   Fill="#FFEFAC27" />
+                                   Fill="{StaticResource SampleDefaultBrush}" />
 
                         <!-- Bottom Rectangle text -->
                         <TextBlock Grid.Row="2"
-                                   Foreground="Gray"
+                                   Foreground="White"
                                    FontFamily="Verdana"
                                    FontSize="12"
                                    Margin="5,5,5,0"
@@ -806,8 +819,8 @@
                                       FontSize="12"
                                       Focusable="False"
                                       RequestNavigate="Hyperlink_RequestNavigate"
-                                      NavigateUri="http://www.xceed.com/Extended_WPF_Toolkit_Intro.html"> 
-                              Extended WPF Toolkit  
+                                      NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf/"> 
+                              Toolkit Plus 
                            </Hyperlink>
                         </TextBlock>
                      </Grid>

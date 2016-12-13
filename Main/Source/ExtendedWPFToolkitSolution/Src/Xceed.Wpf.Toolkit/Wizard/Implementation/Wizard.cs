@@ -382,7 +382,10 @@ namespace Xceed.Wpf.Toolkit
 
     private void ExecuteFinishWizard( object sender, ExecutedRoutedEventArgs e )
     {
-      RaiseRoutedEvent( Wizard.FinishEvent );
+      var eventArgs = new CancelRoutedEventArgs( Wizard.FinishEvent );
+      this.RaiseEvent( eventArgs );
+      if( eventArgs.Cancel )
+        return;
 
       if( FinishButtonClosesWindow )
         CloseParentWindow( true );
@@ -537,8 +540,8 @@ namespace Xceed.Wpf.Toolkit
 
     #region Finish Event
 
-    public static readonly RoutedEvent FinishEvent = EventManager.RegisterRoutedEvent( "Finish", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( Wizard ) );
-    public event RoutedEventHandler Finish
+    public static readonly RoutedEvent FinishEvent = EventManager.RegisterRoutedEvent( "Finish", RoutingStrategy.Bubble, typeof( CancelRoutedEventHandler ), typeof( Wizard ) );
+    public event CancelRoutedEventHandler Finish
     {
       add
       {

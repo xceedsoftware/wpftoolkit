@@ -85,6 +85,7 @@ namespace Xceed.Wpf.Toolkit
     {
       this.Visibility = Visibility.Collapsed;
       this.InitHandlers();
+      this.IsVisibleChanged += this.MessageBox_IsVisibleChanged;
     }
 
     #endregion //Constructors
@@ -345,6 +346,17 @@ namespace Xceed.Wpf.Toolkit
         okButton.IsCancel = object.Equals( _button, MessageBoxButton.OK );
 
       SetDefaultResult();
+    }
+
+    protected override void OnPreviewKeyDown( KeyEventArgs e )
+    {
+      base.OnPreviewKeyDown( e );
+
+      // Prevent MenuItem shortcuts while MessageBox is active.
+      if( Keyboard.IsKeyDown( Key.LeftAlt ) || Keyboard.IsKeyDown( Key.RightAlt ) )
+      {
+        e.Handled = true;
+      }
     }
 
     protected override object OnCoerceCloseButtonVisibility( Visibility newValue )
@@ -1028,6 +1040,24 @@ namespace Xceed.Wpf.Toolkit
     {
       this.Visibility = Visibility.Collapsed;
       this.OnClosed( EventArgs.Empty );
+    }
+
+    private void MessageBox_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )
+    {
+      if( (bool)e.NewValue )
+      {
+        Action action = () =>
+        {
+          //Focus first Focusable Child element of MessageBox to prevent Tab outside MessageBox.
+          var defaultButton = this.GetDefaultButtonFromDefaultResult();
+          if( defaultButton != null )
+          {
+            defaultButton.Focus();
+          }
+        };
+
+        Dispatcher.BeginInvoke( DispatcherPriority.ApplicationIdle, action );
+      }
     }
 
     #endregion //Event Handlers

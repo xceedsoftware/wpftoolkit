@@ -31,7 +31,7 @@ namespace Xceed.Wpf.Toolkit
     }
 
     public DoubleUpDown()
-      : base( Double.Parse, Decimal.ToDouble, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
+      : base( Double.TryParse, Decimal.ToDouble, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
     {
     }
 

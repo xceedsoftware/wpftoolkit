@@ -1,14 +1,14 @@
 ﻿/***************************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2015 Xceed Software Inc.
+   Copyright (C) 2007-2016 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -39,8 +39,8 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
   public partial class StyleableWindowView : DemoView
   {
     private const string StandardMsgBoxTitle = "Standard MessageBox";
-    private const string StyledMsgBoxTitle = "Extended WPF Toolkit styled MessageBox";
-    private const string StyleableWindowTitle = "Extended WPF Toolkit StyleableWindow";
+    private const string StyledMsgBoxTitle = "Toolkit for WPF styled MessageBox";
+    private const string StyleableWindowTitle = "Toolkit for WPF StyleableWindow";
     private const string StandardMsgBoxMessage = "The standard system MessageBox will always have this look. No styling is possible.";
     private const string StyledMsgBoxMessage = "The Toolkit MessageBox allows you to style it in order to integrate it into your application colors and styles.";
     private const string StyleableWindowContent = "This is a StyleableWindow that has the same functionality as a normal window.";
@@ -153,6 +153,25 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
     }
 
     #endregion //WindowBorderBrush
+
+    #region TitleFontSize
+
+    public static readonly DependencyProperty TitleFontSizeProperty =
+        DependencyProperty.Register( "TitleFontSize", typeof( double ), typeof( WindowModel ) );
+
+    public double TitleFontSize
+    {
+      get
+      {
+        return (double)GetValue( TitleFontSizeProperty );
+      }
+      set
+      {
+        SetValue( TitleFontSizeProperty, value );
+      }
+    }
+
+    #endregion //TitleFontSize
 
     #region TitleForeground
 

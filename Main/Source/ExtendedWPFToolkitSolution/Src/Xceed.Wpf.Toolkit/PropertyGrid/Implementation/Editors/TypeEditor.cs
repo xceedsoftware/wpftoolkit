@@ -43,7 +43,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     {
       Editor = this.CreateEditor();
       SetValueDependencyProperty();
-      SetControlProperties();
+      SetControlProperties( propertyItem );
       ResolveValueBinding( propertyItem );
       return Editor;
     }
@@ -72,7 +72,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       BindingOperations.SetBinding( Editor, ValueProperty, _binding );
     }
 
-    protected virtual void SetControlProperties()
+    protected virtual void SetControlProperties( PropertyItem propertyItem )
     {
       //TODO: implement in derived class
     }

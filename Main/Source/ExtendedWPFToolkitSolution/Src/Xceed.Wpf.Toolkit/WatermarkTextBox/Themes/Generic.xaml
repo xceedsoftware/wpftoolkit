@@ -69,7 +69,7 @@
                                       SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                         <ContentPresenter x:Name="PART_WatermarkHost"
                                           Content="{TemplateBinding Watermark}"
-                                          ContentTemplate="{TemplateBinding WatermarkTemplate}"
+                                          ContentTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DefaultWatermarkTemplate}}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           IsHitTestVisible="False"

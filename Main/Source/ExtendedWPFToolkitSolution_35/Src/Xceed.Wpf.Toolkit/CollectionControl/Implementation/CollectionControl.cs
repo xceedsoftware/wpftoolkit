@@ -19,25 +19,27 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Xceed.Wpf.Toolkit.PropertyGrid;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
   [TemplatePart( Name = PART_NewItemTypesComboBox, Type = typeof( ComboBox ) )]
   [TemplatePart( Name = PART_PropertyGrid, Type = typeof( PropertyGrid.PropertyGrid ) )]
+  [TemplatePart( Name = PART_ListBox, Type = typeof( ListBox ) )]
   public class CollectionControl : Control
   {
     private const string PART_NewItemTypesComboBox = "PART_NewItemTypesComboBox";
     private const string PART_PropertyGrid = "PART_PropertyGrid";
+    private const string PART_ListBox = "PART_ListBox";
 
     #region Private Members
 
     private ComboBox _newItemTypesComboBox;
     private PropertyGrid.PropertyGrid _propertyGrid;
+    private ListBox _listBox;
 
     #endregion
 
@@ -79,12 +81,12 @@ namespace Xceed.Wpf.Toolkit
 
     #region ItemsSource Property
 
-    public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register( "ItemsSource", typeof( IList ), typeof( CollectionControl ), new UIPropertyMetadata( null, OnItemsSourceChanged ) );
-    public IList ItemsSource
+    public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register( "ItemsSource", typeof( IEnumerable ), typeof( CollectionControl ), new UIPropertyMetadata( null, OnItemsSourceChanged ) );
+    public IEnumerable ItemsSource
     {
       get
       {
-        return ( IList )GetValue( ItemsSourceProperty );
+        return (IEnumerable)GetValue( ItemsSourceProperty );
       }
       set
       {
@@ -94,20 +96,43 @@ namespace Xceed.Wpf.Toolkit
 
     private static void OnItemsSourceChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
-      CollectionControl CollectionControl = ( CollectionControl )d;
+      var CollectionControl = ( CollectionControl )d;
       if( CollectionControl != null )
-        CollectionControl.OnItemSourceChanged( ( IList )e.OldValue, ( IList )e.NewValue );
+        CollectionControl.OnItemSourceChanged( (IEnumerable)e.OldValue, (IEnumerable)e.NewValue );
     }
 
-    public void OnItemSourceChanged( IList oldValue, IList newValue )
+    public void OnItemSourceChanged( IEnumerable oldValue, IEnumerable newValue )
     {
       if( newValue != null )
       {
-        foreach( var item in newValue )
+        var dict = newValue as IDictionary;
+        if( dict != null )
         {
-          if( item != null )
+          // A Dictionary contains KeyValuePair that can't be edited.
+          // We need to Add EditableKeyValuePairs from DictionaryEntries.
+          foreach( DictionaryEntry item in dict )
           {
-            Items.Add( item );
+            var keyType = (item.Key != null) 
+                          ? item.Key.GetType()
+                          : (dict.GetType().GetGenericArguments().Count() > 0) ? dict.GetType().GetGenericArguments()[0] : typeof( object );
+            var valueType = (item.Value != null)
+                          ? item.Value.GetType()
+                          : (dict.GetType().GetGenericArguments().Count() > 1) ? dict.GetType().GetGenericArguments()[ 1 ] : typeof( object );
+            var editableKeyValuePair = ListUtilities.CreateEditableKeyValuePair( item.Key
+                                                                                , keyType
+                                                                                , item.Value
+                                                                                , valueType );
+            this.Items.Add( editableKeyValuePair );
+          }
+        }
+        else
+        {
+          foreach( var item in newValue )
+          {
+            if( item != null )
+            {
+              Items.Add( item );
+            }
           }
         }
       }
@@ -175,15 +200,27 @@ namespace Xceed.Wpf.Toolkit
       base.OnApplyTemplate();
 
       if( _newItemTypesComboBox != null )
+      {
         _newItemTypesComboBox.Loaded -= new RoutedEventHandler( this.NewItemTypesComboBox_Loaded );
-
+      }
       _newItemTypesComboBox = GetTemplateChild( PART_NewItemTypesComboBox ) as ComboBox;
-
       if( _newItemTypesComboBox != null )
+      {
         _newItemTypesComboBox.Loaded += new RoutedEventHandler( this.NewItemTypesComboBox_Loaded );
+      }
 
+      _listBox = this.GetTemplateChild( PART_ListBox ) as ListBox;
+
+      if( _propertyGrid != null )
+      {
+        _propertyGrid.PropertyValueChanged -= this.PropertyGrid_PropertyValueChanged;
+      }
       _propertyGrid = GetTemplateChild( PART_PropertyGrid ) as PropertyGrid.PropertyGrid;
-    }
+      if( _propertyGrid != null )
+      {
+        _propertyGrid.PropertyValueChanged += this.PropertyGrid_PropertyValueChanged;
+      }
+    }    
 
     public PropertyGrid.PropertyGrid PropertyGrid
     {
@@ -343,6 +380,14 @@ namespace Xceed.Wpf.Toolkit
         _newItemTypesComboBox.SelectedIndex = 0;
     }
 
+    private void PropertyGrid_PropertyValueChanged( object sender, PropertyGrid.PropertyValueChangedEventArgs e )
+    {
+      if( _listBox != null )
+      {
+        _listBox.Items.Refresh();
+      }
+    }
+
     #endregion
 
     #region Commands
@@ -442,41 +487,87 @@ namespace Xceed.Wpf.Toolkit
 
     internal void PersistChanges( IList sourceList )
     {
-      IList list = ComputeItemsSource();
-      if( list == null )
+      var collection = ComputeItemsSource();
+      if( collection == null )
         return;
 
-      //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
-      list.Clear();
-
-      if( list.IsFixedSize )
+      //IDictionary<T> and IDictionary
+      if( collection is IDictionary )
       {
-        for( int i = 0; i < sourceList.Count; ++i )
-          list[ i ] = sourceList[ i ];
+        //For a Dictionary, we need to parse the list of EditableKeyValuePair and add KeyValuePair to the Dictionary.
+        var dict = (IDictionary)collection;
+        //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
+        dict.Clear();
+
+        foreach( var item in sourceList )
+        {
+          var propInfoKey = item.GetType().GetProperty( "Key" );
+          var propInfoValue = item.GetType().GetProperty( "Value" );
+          if( (propInfoKey != null) && (propInfoValue != null) )
+          {
+            dict.Add( propInfoKey.GetValue( item, null ), propInfoValue.GetValue( item, null ) );
+          }
+        }
+      }
+      //IList
+      else if( collection is IList )
+      {
+        var list = (IList)collection;
+
+        //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
+        list.Clear();
+
+        if( list.IsFixedSize )
+        {
+          for( int i = 0; i < sourceList.Count; ++i )
+            list[ i ] = sourceList[ i ];
+        }
+        else
+        {
+          foreach( var item in sourceList )
+          {
+            list.Add( item );
+          }
+        }
       }
       else
       {
-        foreach( var item in sourceList )
+        //ICollection<T> (or IList<T>)
+        var collectionType = collection.GetType();
+        var iCollectionOfTInterface = collectionType.GetInterfaces().FirstOrDefault( x => x.IsGenericType && (x.GetGenericTypeDefinition() == typeof( ICollection<> )) );
+        if( iCollectionOfTInterface != null )
         {
-          list.Add( item );
+          var argumentType = iCollectionOfTInterface.GetGenericArguments().FirstOrDefault();
+          if( argumentType != null )
+          {
+            var iCollectionOfTType = typeof( ICollection<> ).MakeGenericType( argumentType );
+
+            //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
+            iCollectionOfTType.GetMethod( "Clear" ).Invoke( collection, null );
+
+            foreach( var item in sourceList )
+            {
+              iCollectionOfTType.GetMethod( "Add" ).Invoke( collection, new object[] { item } );
+            }
+          }
         }
       }
     }
 
-    private IList CreateItemsSource()
+    private IEnumerable CreateItemsSource()
     {
-      IList list = null;
+      IEnumerable collection = null;
 
       if( ItemsSourceType != null )
       {
-        ConstructorInfo constructor = ItemsSourceType.GetConstructor( Type.EmptyTypes );
+        var constructor = ItemsSourceType.GetConstructor( Type.EmptyTypes );
         if( constructor != null )
         {
-          list = ( IList )constructor.Invoke( null );
+          collection = (IEnumerable)constructor.Invoke( null );
         }
       }
 
-      return list;
+      return collection;
     }
 
     private object CreateNewItem( Type type )
@@ -484,7 +575,7 @@ namespace Xceed.Wpf.Toolkit
       return Activator.CreateInstance( type );
     }
 
-    private IList ComputeItemsSource()
+    private IEnumerable ComputeItemsSource()
     {
       if( ItemsSource == null )
         ItemsSource = CreateItemsSource();

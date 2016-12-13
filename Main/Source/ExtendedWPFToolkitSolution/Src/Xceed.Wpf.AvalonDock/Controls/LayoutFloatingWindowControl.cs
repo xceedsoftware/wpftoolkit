@@ -42,111 +42,111 @@ namespace Xceed.Wpf.AvalonDock.Controls
             LayoutFloatingWindowControl.ContentProperty.OverrideMetadata(typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(null, null, new CoerceValueCallback(CoerceContentValue)));
             AllowsTransparencyProperty.OverrideMetadata(typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(false));
             ShowInTaskbarProperty.OverrideMetadata(typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(false));
-        } 
+        }
 
-        static object CoerceContentValue(DependencyObject sender, object content)
+        static object CoerceContentValue( DependencyObject sender, object content )
         {
-            return new FloatingWindowContentHost(sender as LayoutFloatingWindowControl) { Content = content as UIElement };
+          return new FloatingWindowContentHost( sender as LayoutFloatingWindowControl ) { Content = content as UIElement };
         }
 
         protected class FloatingWindowContentHost : HwndHost
-        {
-            LayoutFloatingWindowControl _owner;
-            public FloatingWindowContentHost(LayoutFloatingWindowControl owner)
             {
-                _owner = owner;
-                var manager = _owner.Model.Root.Manager;
-            }
-
-
-            HwndSource _wpfContentHost = null;
-            Border _rootPresenter = null;
-            DockingManager _manager = null;
-
-            protected override System.Runtime.InteropServices.HandleRef BuildWindowCore(System.Runtime.InteropServices.HandleRef hwndParent)
-            {
-                _wpfContentHost = new HwndSource(new HwndSourceParameters()
+                LayoutFloatingWindowControl _owner;
+                public FloatingWindowContentHost(LayoutFloatingWindowControl owner)
                 {
-                    ParentWindow = hwndParent.Handle,
-                    WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_VISIBLE | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
-                    Width = 1,
-                    Height = 1
-                });
-
-                _rootPresenter = new Border() { Child = new AdornerDecorator() { Child = Content }, Focusable = true };
-                _rootPresenter.SetBinding(Border.BackgroundProperty, new Binding("Background") { Source = _owner });
-                _wpfContentHost.RootVisual = _rootPresenter;
-                _wpfContentHost.SizeToContent = SizeToContent.Manual;
-                _manager = _owner.Model.Root.Manager;
-                _manager.InternalAddLogicalChild(_rootPresenter);
-
-                return new HandleRef(this, _wpfContentHost.Handle);
-            }
-
-
-            protected override void DestroyWindowCore(HandleRef hwnd)
-            {
-                _manager.InternalRemoveLogicalChild(_rootPresenter);
-                if (_wpfContentHost != null)
-                {
-                    _wpfContentHost.Dispose();
-                    _wpfContentHost = null;
+                    _owner = owner;
+                    var manager = _owner.Model.Root.Manager;
                 }
+
+
+                HwndSource _wpfContentHost = null;
+                Border _rootPresenter = null;
+                DockingManager _manager = null;
+
+                protected override System.Runtime.InteropServices.HandleRef BuildWindowCore(System.Runtime.InteropServices.HandleRef hwndParent)
+                {
+                    _wpfContentHost = new HwndSource(new HwndSourceParameters()
+                    {
+                        ParentWindow = hwndParent.Handle,
+                        WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_VISIBLE | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
+                        Width = 1,
+                        Height = 1
+                    });
+
+                    _rootPresenter = new Border() { Child = new AdornerDecorator() { Child = Content }, Focusable = true };
+                    _rootPresenter.SetBinding(Border.BackgroundProperty, new Binding("Background") { Source = _owner });
+                    _wpfContentHost.RootVisual = _rootPresenter;
+                    _wpfContentHost.SizeToContent = SizeToContent.Manual;
+                    _manager = _owner.Model.Root.Manager;
+                    _manager.InternalAddLogicalChild(_rootPresenter);
+
+                    return new HandleRef(this, _wpfContentHost.Handle);
+                }
+
+
+                protected override void DestroyWindowCore(HandleRef hwnd)
+                {
+                    _manager.InternalRemoveLogicalChild(_rootPresenter);
+                    if (_wpfContentHost != null)
+                    {
+                        _wpfContentHost.Dispose();
+                        _wpfContentHost = null;
+                    }
+                }
+
+                public Visual RootVisual
+                {
+                    get { return _rootPresenter; }
+                }
+
+                protected override Size MeasureOverride(Size constraint)
+                {
+                    if (Content == null)
+                        return base.MeasureOverride(constraint);
+
+                    Content.Measure(constraint);
+                    return Content.DesiredSize;
+                }
+
+                #region Content
+
+                /// <summary>
+                /// Content Dependency Property
+                /// </summary>
+                public static readonly DependencyProperty ContentProperty =
+                    DependencyProperty.Register("Content", typeof(UIElement), typeof(FloatingWindowContentHost),
+                        new FrameworkPropertyMetadata((UIElement)null,
+                            new PropertyChangedCallback(OnContentChanged)));
+
+                /// <summary>
+                /// Gets or sets the Content property.  This dependency property 
+                /// indicates ....
+                /// </summary>
+                public UIElement Content
+                {
+                    get { return (UIElement)GetValue(ContentProperty); }
+                    set { SetValue(ContentProperty, value); }
+                }
+
+                /// <summary>
+                /// Handles changes to the Content property.
+                /// </summary>
+                private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+                {
+                    ((FloatingWindowContentHost)d).OnContentChanged(e);
+                }
+
+                /// <summary>
+                /// Provides derived classes an opportunity to handle changes to the Content property.
+                /// </summary>
+                protected virtual void OnContentChanged(DependencyPropertyChangedEventArgs e)
+                {
+                    if (_rootPresenter != null)
+                        _rootPresenter.Child = Content;
+                }
+
+                #endregion
             }
-
-            public Visual RootVisual
-            {
-                get { return _rootPresenter; }
-            }
-
-            protected override Size MeasureOverride(Size constraint)
-            {
-                if (Content == null)
-                    return base.MeasureOverride(constraint);
-
-                Content.Measure(constraint);
-                return Content.DesiredSize;
-            }
-
-            #region Content
-
-            /// <summary>
-            /// Content Dependency Property
-            /// </summary>
-            public static readonly DependencyProperty ContentProperty =
-                DependencyProperty.Register("Content", typeof(UIElement), typeof(FloatingWindowContentHost),
-                    new FrameworkPropertyMetadata((UIElement)null,
-                        new PropertyChangedCallback(OnContentChanged)));
-
-            /// <summary>
-            /// Gets or sets the Content property.  This dependency property 
-            /// indicates ....
-            /// </summary>
-            public UIElement Content
-            {
-                get { return (UIElement)GetValue(ContentProperty); }
-                set { SetValue(ContentProperty, value); }
-            }
-
-            /// <summary>
-            /// Handles changes to the Content property.
-            /// </summary>
-            private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-            {
-                ((FloatingWindowContentHost)d).OnContentChanged(e);
-            }
-
-            /// <summary>
-            /// Provides derived classes an opportunity to handle changes to the Content property.
-            /// </summary>
-            protected virtual void OnContentChanged(DependencyPropertyChangedEventArgs e)
-            {
-                if (_rootPresenter != null)
-                    _rootPresenter.Child = Content;
-            }
-
-            #endregion
-        }
 
         ILayoutElement _model;
 
@@ -200,7 +200,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
             if (Content != null)
             {
                 var host = Content as FloatingWindowContentHost;
-                host.Dispose();
+                if( host != null )
+                {
+                  host.Dispose();
+                }
 
                 if (_hwndSrc != null)
                 {

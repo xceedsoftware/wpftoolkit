@@ -21,6 +21,10 @@
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes">
 
+   <ResourceDictionary.MergedDictionaries>
+      <ResourceDictionary Source="..\..\Themes\Generic\Glyphs.xaml" />
+   </ResourceDictionary.MergedDictionaries>
+
    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
 
    <LinearGradientBrush x:Key="ColorPickerDarkBorderBrush"
@@ -52,6 +56,7 @@
    <!-- =============================================================================== -->
    <!-- SplitButton                                                                     -->
    <!-- =============================================================================== -->
+   <conv:ThicknessSideRemovalConverter x:Key="ThicknessSideRemovalConverter" />
 
    <Style TargetType="{x:Type local:SplitButton}">
       <Setter Property="BorderThickness"
@@ -96,7 +101,7 @@
                               <chrome:ButtonChrome x:Name="ActionButtonChrome"
                                                    Background="{TemplateBinding Background}"
                                                    Foreground="{TemplateBinding Foreground}"
-                                                   BorderThickness="1,1,0,1"
+                                                   BorderThickness="{Binding BorderThickness, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ThicknessSideRemovalConverter}, ConverterParameter=2}"
                                                    BorderBrush="{TemplateBinding BorderBrush}"
                                                    CornerRadius="2.75, 0, 0, 2.75"
                                                    RenderEnabled="{TemplateBinding IsEnabled}"
@@ -126,6 +131,7 @@
                               <chrome:ButtonChrome x:Name="ToggleButtonChrome"
                                                    Background="{TemplateBinding Background}"
                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                   BorderThickness="{TemplateBinding BorderThickness}"
                                                    Padding="1,0,1,0"
                                                    CornerRadius="0, 2.75, 2.75, 0"
                                                    RenderChecked="{TemplateBinding IsOpen}"
@@ -136,10 +142,11 @@
                                        IsHitTestVisible="False"
                                        Margin="4,3,4,3">
                                     <Path x:Name="Arrow"
-                                          Width="7"
-                                          Height="4"
-                                          Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z"
-                                          Fill="#FF000000" />
+                                          Width="9"
+                                          Height="5"
+                                          Data="{StaticResource DownArrowGeometry}"
+                                          Fill="#FF000000"
+                                          Margin="0,1,0,0"/>
                                  </Grid>
                               </chrome:ButtonChrome>
                            </Grid>
@@ -152,7 +159,7 @@
                          VerticalOffset="1"
                          AllowsTransparency="True"
                          StaysOpen="False"
-                         Placement="Bottom"
+                         Placement="{TemplateBinding DropDownPosition}"
                          Focusable="False"
                          IsOpen="{Binding IsChecked, ElementName=PART_ToggleButton}">
                      <!-- TODO: Create Popup Styles that can be reused on all popups in the toolkit-->

@@ -1249,6 +1249,14 @@ namespace Xceed.Wpf.AvalonDock
             }
         }
 
+    public System.Collections.IEnumerator LogicalChildrenPublic
+    {
+      get
+      {
+        return this.LogicalChildren;
+      }
+    }
+
 
         internal void InternalAddLogicalChild(object element)
         {
@@ -2044,6 +2052,7 @@ namespace Xceed.Wpf.AvalonDock
                     {
                         (documentToRemove.Parent as ILayoutContainer).RemoveChild(
                             documentToRemove);
+                        this.RemoveViewFromLogicalChild( documentToRemove );
                     }
                 }
             }
@@ -2119,6 +2128,7 @@ namespace Xceed.Wpf.AvalonDock
                 {
                     (documentToRemove.Parent as ILayoutContainer).RemoveChild(
                         documentToRemove);
+                    this.RemoveViewFromLogicalChild( documentToRemove );
                 }
             }
 
@@ -2143,6 +2153,7 @@ namespace Xceed.Wpf.AvalonDock
             {
                 (documentToRemove.Parent as ILayoutContainer).RemoveChild(
                     documentToRemove);
+                this.RemoveViewFromLogicalChild( documentToRemove );
             }
 
             var documentsSourceAsNotifier = documentsSource as INotifyCollectionChanged;
@@ -2167,6 +2178,8 @@ namespace Xceed.Wpf.AvalonDock
 
             if( document.CloseDocument() )
             {
+              this.RemoveViewFromLogicalChild( document );
+
               if( DocumentClosed != null )
               {
                 var evargs = new DocumentClosedEventArgs( document );
@@ -2394,6 +2407,7 @@ namespace Xceed.Wpf.AvalonDock
                         anchorableToRemove.Content = null;
                         (anchorableToRemove.Parent as ILayoutContainer).RemoveChild(
                             anchorableToRemove);
+                        this.RemoveViewFromLogicalChild( anchorableToRemove );
                     }
                 }
             }
@@ -2484,6 +2498,7 @@ namespace Xceed.Wpf.AvalonDock
                 {
                     (anchorableToRemove.Parent as ILayoutContainer).RemoveChild(
                         anchorableToRemove);
+                    this.RemoveViewFromLogicalChild( anchorableToRemove );
                 }
             }
 
@@ -2506,6 +2521,7 @@ namespace Xceed.Wpf.AvalonDock
             {
                 (anchorableToRemove.Parent as ILayoutContainer).RemoveChild(
                     anchorableToRemove);
+                this.RemoveViewFromLogicalChild( anchorableToRemove );
             }
 
             var anchorablesSourceAsNotifier = anchorablesSource as INotifyCollectionChanged;
@@ -2521,6 +2537,7 @@ namespace Xceed.Wpf.AvalonDock
             if (model != null )
             {
               model.CloseAnchorable();
+              this.RemoveViewFromLogicalChild( anchorable );
             }
         }
 
@@ -2552,6 +2569,18 @@ namespace Xceed.Wpf.AvalonDock
         internal void _ExecuteDockAsDocumentCommand(LayoutContent content)
         {
             content.DockAsDocument();
+        }
+
+        private void RemoveViewFromLogicalChild( LayoutContent layoutContent )
+        {
+          if( layoutContent == null )
+            return;
+
+          var layoutItem = this.GetLayoutItemFromModel( layoutContent );
+          if( layoutItem != null )
+          {
+            this.InternalRemoveLogicalChild( layoutItem.View );
+          }
         }
 
         #region ActiveContent

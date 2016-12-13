@@ -29,7 +29,7 @@ namespace Xceed.Wpf.Toolkit
     }
 
     public ULongUpDown()
-      : base( ulong.Parse, Decimal.ToUInt64, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
+      : base( ulong.TryParse, Decimal.ToUInt64, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
     {
     }
 

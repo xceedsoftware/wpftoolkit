@@ -46,11 +46,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
-    internal static ITypeEditor CreateDefaultEditor( Type propertyType, TypeConverter typeConverter )
+    internal static ITypeEditor CreateDefaultEditor( Type propertyType, TypeConverter typeConverter, PropertyItem propertyItem )
     {
       ITypeEditor editor = null;
 
-      if( propertyType == typeof( string )  )
+      var context = new EditorTypeDescriptorContext( null, propertyItem.Instance, propertyItem.PropertyDescriptor );
+      if( (typeConverter != null)
+        && typeConverter.GetStandardValuesSupported( context )
+        && typeConverter.GetStandardValuesExclusive( context )
+        && (propertyType != typeof( bool )) && (propertyType != typeof( bool? )) )  //Bool type always have a BooleanConverter with standardValues : True/False.
+      {
+        var items = typeConverter.GetStandardValues( context );
+        editor = new SourceComboBoxEditor( items, typeConverter );
+      }
+      else if( propertyType == typeof( string )  )
         editor = new TextBoxEditor();
       else if( propertyType == typeof( bool ) || propertyType == typeof( bool? ) )
         editor = new CheckBoxEditor();
@@ -97,8 +106,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         editor = new TextBoxEditor();
       else
       {
-        Type listType = ListUtilities.GetListItemType( propertyType );
+        var listType = ListUtilities.GetListItemType( propertyType );
 
+        // A List of T
         if( listType != null )
         {
           if( !listType.IsPrimitive && !listType.Equals( typeof( String ) ) && !listType.IsEnum )
@@ -108,12 +118,22 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         }
         else
         {
-          // If the type is not supported, check if there is a converter that supports
-          // string conversion to the object type. Use TextBox in theses cases.
-          // Otherwise, return a TextBlock editor since no valid editor exists.
-          editor = ( typeConverter != null && typeConverter.CanConvertFrom( typeof( string ) ) )
-            ? ( ITypeEditor )new TextBoxEditor()
-            : ( ITypeEditor )new TextBlockEditor();
+          var dictionaryType = ListUtilities.GetDictionaryItemsType( propertyType );
+          var collectionType = ListUtilities.GetCollectionItemType( propertyType );
+          // A dictionary of T or a Collection of T or an ICollection
+          if( (dictionaryType != null) || (collectionType != null) || typeof( ICollection ).IsAssignableFrom( propertyType ) )
+          {
+            editor = new Xceed.Wpf.Toolkit.PropertyGrid.Editors.CollectionEditor();
+          }
+          else
+          {
+            // If the type is not supported, check if there is a converter that supports
+            // string conversion to the object type. Use TextBox in theses cases.
+            // Otherwise, return a TextBlock editor since no valid editor exists.
+            editor = (typeConverter != null && typeConverter.CanConvertFrom( typeof( string ) ))
+              ? (ITypeEditor)new TextBoxEditor()
+              : (ITypeEditor)new TextBlockEditor();
+          }
         }
       }
 
@@ -132,5 +152,59 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
+
+    #region Private class
+
+    private class EditorTypeDescriptorContext : ITypeDescriptorContext
+    {
+      IContainer _container;
+      object _instance;
+      PropertyDescriptor _propertyDescriptor;
+
+      internal EditorTypeDescriptorContext( IContainer container, object instance, PropertyDescriptor pd )
+      {
+        _container = container;
+        _instance = instance;
+        _propertyDescriptor = pd;
+      }
+
+      IContainer ITypeDescriptorContext.Container
+      {
+        get
+        {
+          return _container;
+        }
+      }
+      object ITypeDescriptorContext.Instance
+      {
+        get
+        {
+          return _instance;
+        }
+      }
+      PropertyDescriptor ITypeDescriptorContext.PropertyDescriptor
+      {
+        get
+        {
+          return _propertyDescriptor;
+        }
+      }
+
+      void ITypeDescriptorContext.OnComponentChanged()
+      {
+      }
+
+      bool ITypeDescriptorContext.OnComponentChanging()
+      {
+        return false;
+      }
+
+      object IServiceProvider.GetService( Type serviceType )
+      {
+        return null;
+      }
+    }
+
+    #endregion
   }
 }

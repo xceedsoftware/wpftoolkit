@@ -38,6 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
@@ -414,13 +415,16 @@
     <Compile Include="Core\Converters\HalfConverter.cs" />
     <Compile Include="Core\Converters\IntToThicknessConverter.cs" />
     <Compile Include="Core\Converters\NullToBoolConverter.cs" />
+    <Compile Include="Core\Converters\ThicknessSideRemovalConverter.cs" />
     <Compile Include="Core\Converters\ThicknessToDoubleConverter.cs" />
+    <Compile Include="Core\EditableKeyValuePair.cs" />
     <Compile Include="Primitives\DateTimePickerBase.cs" />
     <Compile Include="Core\Utilities\DateTimeUtilities.cs" />
     <Compile Include="PropertyGrid\Implementation\CategoryGroupStyleSelector.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\IsDefaultCategoryConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\IsStringEmptyConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\CollectionEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\SourceComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\TrimmedTextBlock.cs" />
     <Compile Include="Core\Converters\WindowContentBorderMarginConverter.cs" />
     <Compile Include="Core\Converters\WindowControlBackgroundConverter.cs" />
@@ -632,6 +636,7 @@
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\Implementation\VisualStates.MessageBox.cs" />
     <Compile Include="WatermarkComboBox\Implementation\WatermarkComboBox.cs" />
+    <Compile Include="WatermarkPasswordBox\Implementation\WatermarkPasswordBox.cs" />
     <Compile Include="WatermarkTextBox\Implementation\WatermarkTextBox.cs" />
     <Compile Include="Wizard\Implementation\WizardCommands.cs" />
     <Compile Include="Wizard\Implementation\WizardPage.cs" />

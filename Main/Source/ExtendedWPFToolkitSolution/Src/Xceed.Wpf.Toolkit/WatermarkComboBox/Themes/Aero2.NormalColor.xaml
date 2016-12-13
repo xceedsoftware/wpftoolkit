@@ -306,6 +306,7 @@
          </ToggleButton>
          <ContentPresenter x:Name="contentPresenter"
                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                           ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
                            Content="{TemplateBinding SelectionBoxItem}"
                            ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"

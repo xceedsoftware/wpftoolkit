@@ -25,6 +25,9 @@ using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using System.Linq;
 using System.Collections;
 using Xceed.Wpf.Toolkit.Core.Utilities;
+#if !VS2008
+using System.ComponentModel.DataAnnotations;
+#endif
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -156,6 +159,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           var property = item as PropertyItem;
           if( property.DisplayName != null )
           {
+#if !VS2008
+            var displayAttribute = PropertyGridUtilities.GetAttribute<DisplayAttribute>( property.PropertyDescriptor );
+            if( displayAttribute != null )
+            {
+              var canBeFiltered = displayAttribute.GetAutoGenerateFilter();
+              if( canBeFiltered.HasValue && !canBeFiltered.Value )
+                return false;
+            }
+#endif
+
             return property.DisplayName.ToLower().Contains( text.ToLower() );
           }
 

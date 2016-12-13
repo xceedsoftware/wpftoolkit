@@ -366,7 +366,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       propertyItem.PropertyOrder = pd.DisplayOrder;
 
       //These properties can vary with the value. They need to be bound.
-      SetupDefinitionBinding( propertyItem, PropertyItemBase.IsExpandableProperty, pd, () => pd.IsExpandable, BindingMode.OneWay );
+      if( pd.PropertyDescriptor.Converter is ExpandableObjectConverter )
+      {
+        propertyItem.IsExpandable = true;
+      }
+      else
+      {
+        SetupDefinitionBinding( propertyItem, PropertyItemBase.IsExpandableProperty, pd, () => pd.IsExpandable, BindingMode.OneWay );
+      }
       SetupDefinitionBinding( propertyItem, PropertyItemBase.AdvancedOptionsIconProperty, pd, () => pd.AdvancedOptionsIcon, BindingMode.OneWay );
       SetupDefinitionBinding( propertyItem, PropertyItemBase.AdvancedOptionsTooltipProperty, pd, () => pd.AdvancedOptionsTooltip, BindingMode.OneWay );
       SetupDefinitionBinding( propertyItem, PropertyItem.ValueProperty, pd, () => pd.Value, BindingMode.TwoWay );
@@ -427,8 +434,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         if( editor == null )
         {
           editor = ( definitionKeyAsType != null )
-          ? PropertyGridUtilities.CreateDefaultEditor( definitionKeyAsType, null )
-          : pd.CreateDefaultEditor();
+          ? PropertyGridUtilities.CreateDefaultEditor( definitionKeyAsType, null, propertyItem )
+          : pd.CreateDefaultEditor( propertyItem );
         }
 
         Debug.Assert( editor != null );

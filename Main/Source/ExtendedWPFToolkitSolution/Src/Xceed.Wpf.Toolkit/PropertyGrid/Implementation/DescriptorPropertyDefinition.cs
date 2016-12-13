@@ -25,6 +25,9 @@ using System.Windows.Input;
 using System.Windows.Markup.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+#if !VS2008
+using System.ComponentModel.DataAnnotations;
+#endif
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using Xceed.Wpf.Toolkit.PropertyGrid.Commands;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
@@ -116,9 +119,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return PropertyDescriptor.IsReadOnly;
     }
 
-    internal override ITypeEditor CreateDefaultEditor()
+    internal override ITypeEditor CreateDefaultEditor( PropertyItem propertyItem )
     {
-      return PropertyGridUtilities.CreateDefaultEditor( PropertyDescriptor.PropertyType, PropertyDescriptor.Converter );
+      return PropertyGridUtilities.CreateDefaultEditor( PropertyDescriptor.PropertyType, PropertyDescriptor.Converter, propertyItem );
     }
 
     protected override bool ComputeCanResetValue()
@@ -137,7 +140,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected override string ComputeCategory()
     {
-      return PropertyDescriptor.Category;
+#if VS2008
+        return PropertyDescriptor.Category;
+#else
+      var displayAttribute = PropertyGridUtilities.GetAttribute<DisplayAttribute>( PropertyDescriptor );
+      return ( (displayAttribute != null) && (displayAttribute.GetGroupName() != null) ) ? displayAttribute.GetGroupName() : PropertyDescriptor.Category;
+#endif
     }
 
     protected override string ComputeCategoryValue()

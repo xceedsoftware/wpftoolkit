@@ -1,14 +1,14 @@
 ﻿<!--*************************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2015 Xceed Software Inc.
+   Copyright (C) 2007-2016 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -119,9 +119,9 @@
             <TextBlock Text="TimeWatermark:" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center"/>
             <TextBox x:Name="_timeWatermark" Grid.Row="2" Grid.Column="3" Text="Enter Text" Width="190" VerticalAlignment="Center" Margin="5"/>
             <TextBlock Text="Minimum:" Grid.Row="3" Grid.Column="2" VerticalAlignment="Center"/>
-            <xctk:DateTimeUpDown x:Name="_minimum" Grid.Row="3" Grid.Column="3" Format="Custom" FormatString="yyyy/MM/dd HH:mm" Value="2010/01/01T12:00" Width="190" VerticalAlignment="Center" Margin="5"/>
+            <xctk:DateTimeUpDown x:Name="_minimum" Grid.Row="3" Grid.Column="3" Format="Custom" FormatString="yyyy/MM/dd HH:mm" Value="2013/01/01T12:00" Width="190" VerticalAlignment="Center" Margin="5"/>
             <TextBlock Text="Maximum:" Grid.Row="4" Grid.Column="2" VerticalAlignment="Center"/>
-            <xctk:DateTimeUpDown x:Name="_maximum" Grid.Row="4" Grid.Column="3" Format="Custom" FormatString="yyyy/MM/dd HH:mm" Value="2015/12/31T12:00" Width="190" VerticalAlignment="Center" Margin="5"/>
+            <xctk:DateTimeUpDown x:Name="_maximum" Grid.Row="4" Grid.Column="3" Format="Custom" FormatString="yyyy/MM/dd HH:mm" Value="2018/12/31T12:00" Width="190" VerticalAlignment="Center" Margin="5"/>
             <TextBlock Text="CurrentDateTimePart:" Grid.Row="5" Grid.Column="2" VerticalAlignment="Center"/>
             <ComboBox x:Name="_currentDateTimePart" Grid.Row="5" Grid.Column="3" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumDateTimePart}}" Width="190" Margin="5" ToolTip="Must match a DateTimePart of the DateTimePicker Format."/>
          </Grid>

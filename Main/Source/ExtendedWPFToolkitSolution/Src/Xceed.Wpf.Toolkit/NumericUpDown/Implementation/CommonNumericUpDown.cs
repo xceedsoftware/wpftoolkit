@@ -18,13 +18,14 @@ using System;
 using System.Windows;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using Xceed.Wpf.Toolkit.Primitives;
 
 namespace Xceed.Wpf.Toolkit
 {
   public abstract class CommonNumericUpDown<T> : NumericUpDown<T?> where T : struct, IFormattable, IComparable<T>
   {
-    protected delegate T FromText( string s, NumberStyles style, IFormatProvider provider );
+    protected delegate bool FromText( string s, NumberStyles style, IFormatProvider provider, out T result );
     protected delegate T FromDecimal( decimal d );
 
     private FromText _fromText;
@@ -51,7 +52,7 @@ namespace Xceed.Wpf.Toolkit
     protected CommonNumericUpDown( FromText fromText, FromDecimal fromDecimal, Func<T, T, bool> fromLowerThan, Func<T, T, bool> fromGreaterThan )
     {
       if( fromText == null )
-        throw new ArgumentNullException( "parseMethod" );
+        throw new ArgumentNullException( "tryParseMethod" );
 
       if( fromDecimal == null )
         throw new ArgumentNullException( "fromDecimal" );
@@ -156,8 +157,20 @@ namespace Xceed.Wpf.Toolkit
     {
       if( !HandleNullSpin() )
       {
-        T result = IncrementValue( Value.Value, Increment.Value );
-        Value = CoerceValueMinMax( result );
+        // if UpdateValueOnEnterKey is true, 
+        // Sync Value on Text only when Enter Key is pressed.
+        if( this.UpdateValueOnEnterKey )
+        {
+          var currentValue = this.ConvertTextToValue( this.TextBox.Text );
+          var result = this.IncrementValue( currentValue.Value, Increment.Value );
+          var newValue = this.CoerceValueMinMax( result );
+          this.TextBox.Text = newValue.Value.ToString( this.FormatString, this.CultureInfo );
+        }
+        else
+        {
+          var result = this.IncrementValue( Value.Value, Increment.Value );
+          this.Value = this.CoerceValueMinMax( result );
+        }
       }
     }
 
@@ -165,8 +178,40 @@ namespace Xceed.Wpf.Toolkit
     {
       if( !HandleNullSpin() )
       {
-        T result = DecrementValue( Value.Value, Increment.Value );
-        Value = CoerceValueMinMax( result );
+        // if UpdateValueOnEnterKey is true, 
+        // Sync Value on Text only when Enter Key is pressed.
+        if( this.UpdateValueOnEnterKey )
+        {
+          var currentValue = this.ConvertTextToValue( this.TextBox.Text );
+          var result = this.DecrementValue( currentValue.Value, Increment.Value );
+          var newValue = this.CoerceValueMinMax( result );
+          this.TextBox.Text = newValue.Value.ToString( this.FormatString, this.CultureInfo );
+        }
+        else
+        {
+          var result = this.DecrementValue( Value.Value, Increment.Value );
+          this.Value = this.CoerceValueMinMax( result );
+        }
+      }
+    }
+
+    protected override void OnMinimumChanged( T? oldValue, T? newValue )
+    {
+      base.OnMinimumChanged( oldValue, newValue );
+
+      if( this.Value.HasValue && this.ClipValueToMinMax )
+      {
+        this.Value = this.CoerceValueMinMax( this.Value.Value );
+      }
+    }
+
+    protected override void OnMaximumChanged( T? oldValue, T? newValue )
+    {
+      base.OnMaximumChanged( oldValue, newValue );
+
+      if( this.Value.HasValue && this.ClipValueToMinMax )
+      {
+        this.Value = this.CoerceValueMinMax( this.Value.Value );
       }
     }
 
@@ -183,13 +228,11 @@ namespace Xceed.Wpf.Toolkit
       if( object.Equals( currentValueText, text ) )
         return this.Value;
 
-      result =  this.IsPercent( this.FormatString )
-        ? _fromDecimal( ParsePercent( text, CultureInfo ) )
-        : _fromText( text, this.ParsingNumberStyle, CultureInfo );
+      result = this.ConvertTextToValueCore( currentValueText, text );
 
       if( this.ClipValueToMinMax )
       {
-        return this.GetClippedMinMaxValue();
+        return this.GetClippedMinMaxValue( result );
       }
 
       ValidateDefaultMinMax( result );
@@ -201,6 +244,10 @@ namespace Xceed.Wpf.Toolkit
     {
       if( Value == null )
         return string.Empty;
+
+      //Manage FormatString of type "{}{0:N2} °" (in xaml) or "{0:N2} °" in code-behind.
+      if( FormatString.Contains( "{0" ) )
+        return string.Format( CultureInfo, FormatString, Value.Value );
 
       return Value.Value.ToString( FormatString, CultureInfo );
     }
@@ -237,12 +284,55 @@ namespace Xceed.Wpf.Toolkit
       return false;
     }
 
-    private T? GetClippedMinMaxValue()
+    private T? ConvertTextToValueCore( string currentValueText, string text )
     {
-      T? result = this.IsPercent( this.FormatString )
-                ? _fromDecimal( ParsePercent( this.Text, CultureInfo ) )
-                : _fromText( this.Text, this.ParsingNumberStyle, CultureInfo );
+      T? result;
 
+      if( this.IsPercent( this.FormatString ) )
+      {
+        result = _fromDecimal( ParsePercent( text, CultureInfo ) );
+      }
+      else
+      {
+        T outputValue = new T();
+        // Problem while converting new text
+        if( !_fromText( text, this.ParsingNumberStyle, CultureInfo, out outputValue ) )
+        {
+          bool shouldThrow = true;
+
+          // case 164198: Throw when replacing only the digit part of 99° through UI.
+          // Check if CurrentValueText is also failing => it also contains special characters. ex : 90°
+          T currentValueTextOutputValue;
+          if( !_fromText( currentValueText, this.ParsingNumberStyle, CultureInfo, out currentValueTextOutputValue ) )
+          {
+            // extract non-digit characters
+            var currentValueTextSpecialCharacters = currentValueText.Where( c => !Char.IsDigit( c ) );
+            var textSpecialCharacters = text.Where( c => !Char.IsDigit( c ) );
+            // same non-digit characters on currentValueText and new text => remove them on new Text to parse it again.
+            if( currentValueTextSpecialCharacters.Except( textSpecialCharacters ).ToList().Count == 0 )
+            {
+              foreach( var character in textSpecialCharacters )
+              {
+                text = text.Replace( character.ToString(), string.Empty );
+              }
+              // if without the special characters, parsing is good, do not throw
+              if( _fromText( text, this.ParsingNumberStyle, CultureInfo, out outputValue ) )
+              {
+                shouldThrow = false;
+              }
+            }
+          }
+
+          if( shouldThrow )
+            throw new InvalidDataException( "Input string was not in a correct format." );
+        }
+        result = outputValue;
+      }
+      return result;
+    }
+
+    private T? GetClippedMinMaxValue( T? result )
+    {
       if( this.IsGreaterThan( result, this.Maximum ) )
         return this.Maximum;
       else if( this.IsLowerThan( result, this.Minimum ) )

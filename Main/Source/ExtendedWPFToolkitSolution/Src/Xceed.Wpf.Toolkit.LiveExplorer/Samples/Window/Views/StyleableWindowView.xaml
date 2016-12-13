@@ -1,14 +1,14 @@
 ﻿<!--**************************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2015 Xceed Software Inc.
+   Copyright (C) 2007-2016 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -29,8 +29,8 @@
          <LineBreak />
          <Run>The "Plus" version provides a new control called StyleableWindow, which consists of a window that has all the functions of a normal window, but which can be styled in the same way as ChildWindow or MessageBox.</Run>
             <LineBreak />
-            <Hyperlink NavigateUri="http://www.xceed.com/Extended_WPF_Toolkit_Intro.html" RequestNavigate="Hyperlink_RequestNavigate">
-               Click here for more details about Xceed Extended WPF Toolkit Plus.
+            <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
+               Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
 
       </Paragraph>
@@ -51,6 +51,7 @@
             <Setter Property="WindowBorderThickness" Value="{Binding WindowBorderThickness}" />
             <Setter Property="WindowInactiveBackground" Value="{Binding WindowInactiveBackground}" />
             <Setter Property="WindowOpacity" Value="{Binding WindowOpacity}" />
+            <Setter Property="CaptionFontSize" Value="{Binding TitleFontSize}" />
             <Setter Property="CaptionForeground" Value="{Binding TitleForeground}" />
             <Setter Property="CaptionShadowBrush" Value="{Binding TitleShadowBrush}" />
             <Setter Property="CloseButtonStyle" Value="{Binding CloseButtonStyle}" />
@@ -74,7 +75,7 @@
       <!--A model containing the brushes and other properties was created to share theses values
       between ChildWindow, MessageBox, and StyleableWindow.-->
       <view:WindowModel
-         WindowBackground="#FFEFAC27"
+         WindowBackground="#FFC72035"
          WindowBorderBrush="Black"
          WindowBorderThickness="2"
          WindowInactiveBackground="LightGray"
@@ -82,6 +83,7 @@
          WindowStyle="SingleBorderWindow"
          TitleForeground="Brown"
          TitleShadowBrush="White"
+         TitleFontSize="15"
          ResizeMode="CanResize"
          CloseButtonVisibility="Visible" 
          CloseButtonStyle="{StaticResource FancyButtonCloseStyle}"
@@ -150,7 +152,7 @@
                         BorderBrush="Black" >
                   <xctk:WindowContainer >
                      <xctk:ChildWindow x:Name="_childWindow" Width="325" Height="100"
-                                    Caption="Extended WPF Toolkit ChildWindow"
+                                    Caption="Toolkit for WPF ChildWindow"
                                     WindowStartupLocation="Center"
                                     IsModal="True"
                                     WindowState="Open" 

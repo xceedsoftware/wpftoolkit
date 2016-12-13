@@ -16,6 +16,9 @@
 
 using System.Windows.Controls;
 using System.Windows;
+#if !VS2008
+using System.ComponentModel.DataAnnotations;
+#endif
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
@@ -25,6 +28,17 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     {
       return new PropertyGridEditorTextBox();
     }
+
+#if !VS2008
+    protected override void SetControlProperties( PropertyItem propertyItem )
+    {
+      var displayAttribute = PropertyGridUtilities.GetAttribute<DisplayAttribute>( propertyItem.PropertyDescriptor );
+      if( displayAttribute != null )
+      {
+        this.Editor.Watermark = displayAttribute.GetPrompt();
+      }
+    }
+#endif
 
     protected override void SetValueDependencyProperty()
     {

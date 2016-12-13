@@ -1,14 +1,14 @@
 ﻿<!--**************************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2015 Xceed Software Inc.
+   Copyright (C) 2007-2016 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -66,6 +66,18 @@
          <TextBlock Text="WindowOpacity:" VerticalAlignment="Center" IsEnabled="{Binding IsStyleEnabled, ElementName=_windowModelEditor}" Style="{StaticResource DisableGrayText}"/>
          <xctk:DoubleUpDown IsEnabled="{Binding IsStyleEnabled, ElementName=_windowModelEditor}"
                             Value="{Binding WindowOpacity}" Minimum="0" Maximum="1" Increment="0.1" FormatString="N1" ClipValueToMinMax="True" Margin="5,0,0,0"/>
+      </DockPanel>
+      <DockPanel Margin="0,5,0,5">
+         <TextBlock Text="TitleFontSize:"
+                    VerticalAlignment="Center"
+                    IsEnabled="{Binding IsStyleEnabled, ElementName=_windowModelEditor}"
+                    Style="{StaticResource DisableGrayText}" />
+         <xctk:DoubleUpDown IsEnabled="{Binding IsStyleEnabled, ElementName=_windowModelEditor}"
+                            Value="{Binding TitleFontSize}"
+                            Minimum="5"
+                            Maximum="50"
+                            ClipValueToMinMax="True"
+                            Margin="5,0,0,0" />
       </DockPanel>
       <DockPanel Margin="0,5,0,5">
          <TextBlock Text="TitleForeground:" VerticalAlignment="Center" IsEnabled="{Binding IsStyleEnabled, ElementName=_windowModelEditor}" Style="{StaticResource DisableGrayText}" />

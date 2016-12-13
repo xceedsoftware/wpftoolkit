@@ -1,14 +1,14 @@
 ﻿/***************************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2015 Xceed Software Inc.
+   Copyright (C) 2007-2016 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -123,6 +124,15 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       set;
     }
 
+    [Range(0, 10)]
+    [Category( "Other" )]
+    [Description( "This property uses the [Range(0,10)] attribute to set the Minimum and Maximum properties." )]
+    public double RangeDouble
+    {
+      get;
+      set;
+    }
+
     public override string ToString()
     {
       return FirstName + " " + LastName;
@@ -145,8 +155,12 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
   // of the property.
   public class Man : Person
   {
-    [Category( "Information" )]
-    [Description( "This property has no special attribute besides [Categroy(\"Information\")] and [Description(...)]" )]
+    [Display( Name = "Favorite Sport"
+            , Prompt = "Enter your favorite sport"
+            , Description = "This property uses the Display attribute to set different PropertyItem fields."
+            , GroupName = "Information"
+            , AutoGenerateField = true
+            , AutoGenerateFilter = false )]
     public string FavoriteSport { get; set; }
     public Man() { this.IsMale = true; }
   }

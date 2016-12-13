@@ -22,6 +22,10 @@
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
+   <ResourceDictionary.MergedDictionaries>
+      <ResourceDictionary Source="..\..\Themes\Generic\Glyphs.xaml" />
+   </ResourceDictionary.MergedDictionaries>
+
    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
@@ -66,7 +70,12 @@
                         <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
 
                         <Grid x:Name="arrowGlyph" IsHitTestVisible="False" Grid.Column="1" Margin="5">
-                           <Path x:Name="Arrow" Width="7" Height="4" Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z" Fill="#FF000000" />
+                           <Path x:Name="Arrow"
+                                 Width="9"
+                                 Height="5"
+                                 Data="{StaticResource DownArrowGeometry}"
+                                 Fill="#FF000000"
+                                 Margin="0,1,0,0"/>
                         </Grid>
                      </Grid>
                   </chrome:ButtonChrome>
@@ -212,6 +221,13 @@
                            Value="False">
                      <Setter Property="Foreground"
                              Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                  </Trigger>
+                  <!--Binding one-way when UpdateValueOnEnterKey is True-->
+                  <Trigger Property="UpdateValueOnEnterKey"
+                           Value="True">
+                     <Setter Property="Value"
+                             Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"
+                             TargetName="PART_TimeUpDown" />
                   </Trigger>
                </ControlTemplate.Triggers>
             </ControlTemplate>

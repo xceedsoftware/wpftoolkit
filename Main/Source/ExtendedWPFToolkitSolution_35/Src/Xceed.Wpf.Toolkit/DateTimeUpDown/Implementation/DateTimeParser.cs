@@ -52,8 +52,44 @@ namespace Xceed.Wpf.Toolkit
 
       UpdateSortableDateTimeString( ref dateTime, ref format, cultureInfo );
 
-      var dateTimeParts = dateTime.Split( dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries ).ToList();
-      var formats = format.Split( dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries ).ToList();
+      var dateTimeParts = new List<string>();
+      var formats = new List<string>();
+      var isContainingDateTimeSeparators = dateTimeSeparators.Any( s => dateTime.Contains( s ) );
+      if( isContainingDateTimeSeparators )
+      {
+        dateTimeParts = dateTime.Split( dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries ).ToList();
+        formats = format.Split( dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries ).ToList();
+      }
+      else
+      {
+        string currentformat = "";
+        string currentString = "";
+        var formatArray = format.ToCharArray();
+        for( int i = 0; i < formatArray.Count(); ++i )
+        {
+          var c = formatArray[ i ];
+          if( !currentformat.Contains( c ) )
+          {
+            if( !string.IsNullOrEmpty( currentformat ) )
+            {
+              formats.Add( currentformat );
+              dateTimeParts.Add( currentString );
+            }
+            currentformat = c.ToString();
+            currentString = dateTime[ i ].ToString();
+          }
+          else
+          {
+            currentformat = string.Concat( currentformat, c );
+            currentString = string.Concat( currentString, dateTime[ i ] );
+          }
+        }
+        if( !string.IsNullOrEmpty( currentformat ) )
+        {
+          formats.Add( currentformat );
+          dateTimeParts.Add( currentString );
+        }
+      }
 
       //Auto-complete missing date parts
       if( dateTimeParts.Count < formats.Count )

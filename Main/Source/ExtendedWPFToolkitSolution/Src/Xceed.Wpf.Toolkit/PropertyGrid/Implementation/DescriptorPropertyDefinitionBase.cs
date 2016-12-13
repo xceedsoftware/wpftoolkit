@@ -29,6 +29,9 @@ using System.ComponentModel;
 using System.Windows.Markup.Primitives;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
+#if !VS2008
+using System.ComponentModel.DataAnnotations;
+#endif
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
@@ -134,7 +137,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
-    internal virtual ITypeEditor CreateDefaultEditor()
+    internal virtual ITypeEditor CreateDefaultEditor( PropertyItem propertyItem )
     {
       return null;
     }
@@ -222,6 +225,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
+
     internal object ComputeDescriptionForItem( object item )
     {
       PropertyDescriptor pd = item as PropertyDescriptor;
@@ -229,7 +233,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       //We do not simply rely on the "Description" property of PropertyDescriptor
       //since this value is cached by PropertyDescriptor and the localized version 
       //(e.g., LocalizedDescriptionAttribute) value can dynamicaly change.
-      DescriptionAttribute descriptionAtt = PropertyGridUtilities.GetAttribute<DescriptionAttribute>( pd );
+      #if !VS2008
+      var displayAttribute = PropertyGridUtilities.GetAttribute<DisplayAttribute>( pd );
+      if( displayAttribute != null )
+      {
+        return displayAttribute.GetDescription();
+      }
+      #endif
+
+      var descriptionAtt = PropertyGridUtilities.GetAttribute<DescriptionAttribute>( pd );
       return ( descriptionAtt != null )
               ? descriptionAtt.Description
               : pd.Description;
@@ -252,6 +264,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     internal object ComputeDisplayOrderForItem( object item )
     {
       PropertyDescriptor pd = item as PropertyDescriptor;
+      #if !VS2008
+      var displayAttribute = PropertyGridUtilities.GetAttribute<DisplayAttribute>( PropertyDescriptor );
+      if( displayAttribute != null )
+      {
+        var order = displayAttribute.GetOrder();
+        if( order.HasValue )
+          return displayAttribute.GetOrder();
+      }
+      #endif
+
       List<PropertyOrderAttribute> list = pd.Attributes.OfType<PropertyOrderAttribute>().ToList();
 
       if( list.Count > 0 )
@@ -316,7 +338,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private string ComputeDisplayName()
     {
-      string displayName = PropertyDescriptor.DisplayName;
+      #if VS2008
+        var displayName = PropertyDescriptor.DisplayName;
+      #else
+        var displayAttribute = PropertyGridUtilities.GetAttribute<DisplayAttribute>( PropertyDescriptor );
+        var displayName = (displayAttribute != null) ? displayAttribute.GetName() : PropertyDescriptor.DisplayName;
+      #endif
+
       var attribute = PropertyGridUtilities.GetAttribute<ParenthesizePropertyNameAttribute>( PropertyDescriptor );
       if( ( attribute != null ) && attribute.NeedParenthesis )
       {

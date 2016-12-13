@@ -44,7 +44,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       base.ResolveValueBinding( propertyItem );
     }
 
-    protected override void SetControlProperties()
+    protected override void SetControlProperties( PropertyItem propertyItem )
     {
       Editor.DisplayMemberPath = "DisplayName";
       Editor.SelectedValuePath = "Value";

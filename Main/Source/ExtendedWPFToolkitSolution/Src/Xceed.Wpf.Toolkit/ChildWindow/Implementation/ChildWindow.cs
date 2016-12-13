@@ -55,6 +55,7 @@ namespace Xceed.Wpf.Toolkit
     private Grid _windowRoot;  
     private WindowControl _windowControl;
     private bool _ignorePropertyChanged;
+    private bool _hasChildren;
     private bool _hasWindowContainer;  
 
     #endregion //Private Members
@@ -333,6 +334,8 @@ namespace Xceed.Wpf.Toolkit
 
       _modalLayer.Fill = OverlayBrush;
       _modalLayer.Opacity = OverlayOpacity;
+
+      this.IsVisibleChanged += this.ChildWindow_IsVisibleChanged;
     }
 
     #endregion //Constructors
@@ -423,10 +426,46 @@ namespace Xceed.Wpf.Toolkit
       Action action = () =>
       {
         if( FocusedElement != null )
+        {
+          _hasChildren = true;
           FocusedElement.Focus();
+        }
+        else
+        {
+          //Focus first Focusable Child element of ChildWindow
+          var focusableChild = TreeHelper.FindChild<FrameworkElement>( this.Content as DependencyObject, x => x.Focusable );
+          if( focusableChild != null )
+          {
+            _hasChildren = true;
+            focusableChild.Focus();
+          }
+          else
+          {
+            _hasChildren = false;
+          }
+        }
       };
 
       Dispatcher.BeginInvoke( DispatcherPriority.ApplicationIdle, action );
+    }
+
+    protected override void OnPreviewKeyDown( KeyEventArgs e )
+    {
+      base.OnPreviewKeyDown( e );
+
+      if( this.IsModal )
+      {
+        // Prevent MenuItem shortcuts while ChildWindow is modal.
+        if( Keyboard.IsKeyDown( Key.LeftAlt ) || Keyboard.IsKeyDown( Key.RightAlt ) )
+        {
+          e.Handled = true;
+        }
+        // Prevent Tab when no children
+        else if( (e.Key == Key.Tab) && !_hasChildren )
+        {
+          e.Handled = true;
+        }
+      }
     }
 
     protected override void OnKeyDown( KeyEventArgs e )
@@ -615,6 +654,14 @@ namespace Xceed.Wpf.Toolkit
       //reposition our window
       Left = GetRestrictedLeft();
       Top = GetRestrictedTop();
+    }
+
+    private void ChildWindow_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )
+    {
+      if( (bool)e.NewValue && this.IsModal )
+      {
+        this.Focus();
+      }
     }
 
 

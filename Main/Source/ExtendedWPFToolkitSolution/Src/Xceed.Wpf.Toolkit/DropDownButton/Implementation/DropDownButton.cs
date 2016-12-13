@@ -107,6 +107,24 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //DropDownContent
 
+    #region DropDownPosition
+
+    public static readonly DependencyProperty DropDownPositionProperty = DependencyProperty.Register( "DropDownPosition", typeof( PlacementMode )
+      , typeof( DropDownButton ), new UIPropertyMetadata( PlacementMode.Bottom ) );
+    public PlacementMode DropDownPosition
+    {
+      get
+      {
+        return (PlacementMode)GetValue( DropDownPositionProperty );
+      }
+      set
+      {
+        SetValue( DropDownPositionProperty, value );
+      }
+    }
+
+    #endregion
+
     #region IsOpen
 
     public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register( "IsOpen", typeof( bool ), typeof( DropDownButton ), new UIPropertyMetadata( false, OnIsOpenChanged ) );

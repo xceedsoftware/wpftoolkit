@@ -26,7 +26,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       return new PropertyGridEditorCheckBox();
     }
 
-    protected override void SetControlProperties()
+    protected override void SetControlProperties( PropertyItem propertyItem )
     {
       Editor.Margin = new Thickness( 5, 0, 0, 0 );
     }

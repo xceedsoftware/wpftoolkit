@@ -91,6 +91,23 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #endregion //Caption
 
+    #region CaptionFontSize
+
+    public static readonly DependencyProperty CaptionFontSizeProperty = DependencyProperty.Register( "CaptionFontSize", typeof( double ), typeof( WindowControl ), new UIPropertyMetadata( 15d ) );
+    public double CaptionFontSize
+    {
+      get
+      {
+        return (double)GetValue( CaptionFontSizeProperty );
+      }
+      set
+      {
+        SetValue( CaptionFontSizeProperty, value );
+      }
+    }
+
+    #endregion //CaptionFontSize
+
     #region CaptionForeground
 
     public static readonly DependencyProperty CaptionForegroundProperty = DependencyProperty.Register( "CaptionForeground", typeof( Brush ), typeof( WindowControl ), new UIPropertyMetadata( null ) );

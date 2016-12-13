@@ -19,7 +19,7 @@
 internal static class _XceedVersionInfo
 {
   [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields" )]
-  public const string BaseVersion = "2.9";
+  public const string BaseVersion = "3.0";
   [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields" )]
   public const string Version = BaseVersion + ".0.0";
   [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields" )]

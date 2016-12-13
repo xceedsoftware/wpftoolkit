@@ -24,6 +24,7 @@
 
    <ResourceDictionary.MergedDictionaries>
       <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
+      <ResourceDictionary Source="../../Themes/Aero2/Glyphs.xaml" />
    </ResourceDictionary.MergedDictionaries>
 
    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -155,10 +156,11 @@
                               Grid.Column="1"
                               Margin="5">
                            <Path x:Name="Arrow"
-                                 Width="7"
-                                 Height="4"
-                                 Data="M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z"
-                                 Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                                 Width="9"
+                                 Height="5"
+                                 Data="{StaticResource DownArrowGeometry}"
+                                 Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                 Margin="0,1,0,0"/>
                         </Grid>
                      </chrome:ButtonChrome>
                   </Grid>

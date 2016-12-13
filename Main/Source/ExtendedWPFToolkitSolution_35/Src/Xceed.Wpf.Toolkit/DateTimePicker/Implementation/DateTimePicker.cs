@@ -240,6 +240,28 @@ namespace Xceed.Wpf.Toolkit
       }
 
       _timePicker = GetTemplateChild( PART_TimeUpDown ) as TimePicker;
+      _timePicker.ValueChanged += _timePicker_ValueChanged;
+    }
+
+    private void _timePicker_ValueChanged( object sender, RoutedPropertyChangedEventArgs<object> e )
+    {
+      e.Handled = true;
+
+      // if UpdateValueOnEnterKey is true, 
+      // Sync Value on Text only when Enter Key is pressed.
+      if( this.UpdateValueOnEnterKey )
+      {
+        var newTime = e.NewValue as DateTime?;
+        if( newTime != null )
+        {
+          _fireSelectionChangedEvent = false;
+          var currentDate = this.ConvertTextToValue( this.TextBox.Text );
+          var date = currentDate ?? this.ContextNow;
+          var newValue = new DateTime( date.Year, date.Month, date.Day, newTime.Value.Hour, newTime.Value.Minute, newTime.Value.Second, newTime.Value.Millisecond, date.Kind );
+          this.TextBox.Text = newValue.ToString( this.GetFormatString( this.Format ), this.CultureInfo );
+          _fireSelectionChangedEvent = true;
+        }
+      }
     }
 
     protected override void OnPreviewMouseUp( MouseButtonEventArgs e )
@@ -372,9 +394,19 @@ namespace Xceed.Wpf.Toolkit
           }
         }
 
-
-        if( !object.Equals( newDate, Value ) )
-          Value = newDate;
+        if( this.UpdateValueOnEnterKey )
+        {
+          _fireSelectionChangedEvent = false;
+          this.TextBox.Text = newDate.Value.ToString( this.GetFormatString( this.Format ), this.CultureInfo );
+          _fireSelectionChangedEvent = true;
+        }
+        else
+        {
+          if( !object.Equals( newDate, Value ) )
+          {
+            this.Value = newDate;
+          }
+        }
       }
     }
 
