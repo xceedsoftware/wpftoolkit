@@ -2,7 +2,7 @@
 
 # Controls
 
-*   [AutoSelectTextBox](/wikipage?title=AutoSelectTextBox&referringTitle=Documentation)
+*   [AutoSelectTextBox](/docs/AutoSelectTextBox.md)
 *   [AvalonDock](/wikipage?title=AvalonDock&referringTitle=Documentation)
 *   [BusyIndicator](/wikipage?title=BusyIndicator&referringTitle=Documentation)
 *   [ButtonSpinner](/wikipage?title=ButtonSpinner&referringTitle=Documentation)
