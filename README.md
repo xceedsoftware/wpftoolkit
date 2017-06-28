@@ -1,5 +1,7 @@
 **December 13, 2016:** Community Edition v3.0.0 released with [1 new control and 28 bug fixes and improvements](http://wpftoolkit.codeplex.com/wikipage?title=Improvements300). Users of the [Plus Edition](http://wpftoolkit.codeplex.com/wikipage?title=Compare%20Editions) received v3.1.0 on July 13, 2016 with [Windows 10 theme and 55 other improvements and bug fixes](http://wpftoolkit.codeplex.com/wikipage?title=Improvements300#Plus310) and v3.2.0 on November 21, 2016 with [2 new controls and 44 bug fixes and improvements](http://wpftoolkit.codeplex.com/wikipage?title=Improvements300#Plus320).
 
+TEST
+
 ![Extended WPF Toolkit Plus](Home_big-banner-toolkit.png|https://wpftoolkit.codeplex.com/wikipage?title=Compare%20Editions)
 
 Extended WPF Toolkit™ is the number one collection of WPF controls, components and utilities for creating next generation Windows applications. Use it to build professional looking, modern, and easy to use line of business applications. The Extended WPF Toolkit project has been downloaded more than 1 million times here and on [NuGet](http://www.nuget.org/packages/Extended.Wpf.Toolkit/).
