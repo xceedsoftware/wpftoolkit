@@ -13,7 +13,7 @@ The free, open source Community Edition is provided under the Microsoft Public L
 
 **Controls included in the Community Edition:**
 
-| [AvalonDock](/wiki/AvalonDock) | [AutoSelectTextBox](AutoSelectTextBox) | [BusyIndicator](BusyIndicator) | [ButtonSpinner](ButtonSpinner) | 
+| [AvalonDock](AvalonDock) | [AutoSelectTextBox](AutoSelectTextBox) | [BusyIndicator](BusyIndicator) | [ButtonSpinner](ButtonSpinner) | 
 | [ByteUpDown](ByteUpDown) | [Calculator](Calculator) | [CalculatorUpDown](CalculatorUpDown) | [CheckComboBox](CheckComboBox) |
 | [CheckListBox](CheckListBox) | [ChildWindow](ChildWindow) | [CollectionControl](CollectionControl) | [CollectionControlDialog](CollectionControlDialog) |
 | [ColorCanvas](ColorCanvas) | [ColorPicker](ColorPicker) | [DataGrid](DataGrid) | [DateTimePicker](DateTimePicker) |
