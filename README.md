@@ -13,18 +13,55 @@ The free, open source Community Edition is provided under the Microsoft Public L
 
 **Controls included in the Community Edition:**
 
-| [AvalonDock](../../wiki/AvalonDock) | [AutoSelectTextBox](AutoSelectTextBox) | [BusyIndicator](BusyIndicator) | [ButtonSpinner](ButtonSpinner) | 
-| [ByteUpDown](ByteUpDown) | [Calculator](Calculator) | [CalculatorUpDown](CalculatorUpDown) | [CheckComboBox](CheckComboBox) |
-| [CheckListBox](CheckListBox) | [ChildWindow](ChildWindow) | [CollectionControl](CollectionControl) | [CollectionControlDialog](CollectionControlDialog) |
-| [ColorCanvas](ColorCanvas) | [ColorPicker](ColorPicker) | [DataGrid](DataGrid) | [DateTimePicker](DateTimePicker) |
-| [DateTimeUpDown](DateTimeUpDown) | [DecimalUpDown](DecimalUpDown) | [DoubleUpDown](DoubleUpDown) | [DropDownButton](DropDownButton) |
-| [IntegerUpDown](IntegerUpDown) | [LongUpDown](LongUpDown) | [Magnifier](Magnifier) | [MaskedTextBox](MaskedTextBox) |
-| [MessageBox](MessageBox) | [MultiLineTextEditor](MultiLineTextEditor) | [PieChart](PieChart) | [PrimitiveTypeCollEditor](https://wpftoolkit.codeplex.com/wikipage?title=PrimitiveTypeCollectionEditor) |
-| [PropertyGrid](PropertyGrid) | [RangeSlider](RangeSlider) | [RichTextBox](RichTextBox) | [RichTextBoxFormatBar](RichTextBoxFormatBar) |
-| [ShortUpDown](ShortUpDown) | [SingleUpDown](SingleUpDown) | [SplitButton](SplitButton) | [SwitchPanel](SwitchPanel) | 
-| [TimelinePanel](TimelinePanel) | [TimePicker](TimePicker) | [TimeSpanUpDown](TimeSpanUpDown) | [ValueRangeTextBox](ValueRangeTextBox) |
-| [WatermarkPasswordBox](WatermarkPasswordBox) | [WatermarkTextBox](WatermarkTextBox) | [WatermarkComboBox](WatermarkComboBox) | [WindowContainer](WindowContainer) |
-| [WindowControl](WindowControl) | [Wizard](Wizard) | [Zoombox](Zoombox) | Windows 8 Theme |
+[AvalonDock](../../wiki/AvalonDock) ⸺
+[AutoSelectTextBox](../../wiki/AutoSelectTextBox) ⸺ 
+[BusyIndicator](../../wiki/BusyIndicator) ⸺
+[ButtonSpinner](../../wiki/ButtonSpinner) ⸺
+[ByteUpDown](../../wiki/ByteUpDown) ⸺
+[Calculator](../../wiki/Calculator) ⸺
+[CalculatorUpDown](../../wiki/CalculatorUpDown) ⸺
+[CheckComboBox](../../wiki/CheckComboBox) ⸺
+[CheckListBox](../../wiki/CheckListBox) ⸺
+[ChildWindow](../../wiki/ChildWindow) ⸺
+[CollectionControl](../../wiki/CollectionControl) ⸺
+[CollectionControlDialog](../../wiki/CollectionControlDialog) ⸺ 
+[ColorCanvas](../../wiki/ColorCanvas) ⸺
+[ColorPicker](../../wiki/ColorPicker) ⸺
+[DataGrid](../../wiki/DataGrid) ⸺
+[DateTimePicker](../../wiki/DateTimePicker) ⸺
+[DateTimeUpDown](../../wiki/DateTimeUpDown) ⸺
+[DecimalUpDown](../../wiki/DecimalUpDown) ⸺
+[DoubleUpDown](../../wiki/DoubleUpDown) ⸺
+[DropDownButton](../../wiki/DropDownButton) ⸺
+[IntegerUpDown](../../wiki/IntegerUpDown) ⸺
+[LongUpDown](../../wiki/LongUpDown) ⸺
+[Magnifier](../../wiki/Magnifier)
+[MaskedTextBox](../../wiki/MaskedTextBox)
+[MessageBox](../../wiki/MessageBox)
+[MultiLineTextEditor](../../wiki/MultiLineTextEditor)
+[PieChart](../../wiki/PieChart)
+[PrimitiveTypeCollEditor](../../wiki/PrimitiveTypeCollectionEditor)
+[PropertyGrid](../../wiki/PropertyGrid)
+[RangeSlider](../../wiki/RangeSlider)
+[RichTextBox](../../wiki/RichTextBox)
+[RichTextBoxFormatBar](../../wiki/RichTextBoxFormatBar)
+[ShortUpDown](../../wiki/ShortUpDown)
+[SingleUpDown](../../wiki/SingleUpDown)
+[SplitButton](../../wiki/SplitButton)
+[SwitchPanel](../../wiki/SwitchPanel)
+[TimelinePanel](../../wiki/TimelinePanel)
+[TimePicker](../../wiki/TimePicker)
+[TimeSpanUpDown](../../wiki/TimeSpanUpDown)
+[ValueRangeTextBox](../../wiki/ValueRangeTextBox)
+[WatermarkPasswordBox](../../wiki/WatermarkPasswordBox)
+[WatermarkTextBox](../../wiki/WatermarkTextBox)
+[WatermarkComboBox](../../wiki/WatermarkComboBox)
+[WindowContainer](../../wiki/WindowContainer)
+[WindowControl](../../wiki/WindowControl)
+[Wizard](../../wiki/Wizard)
+[Zoombox](../../wiki/Zoombox)
+[Windows 8 Theme](../../wiki/Windows-8-Theme)
+
 **Additional controls and features in the Plus Edition:**
 
 | [Charts](Charts) | [ChildWindow Plus](ChildWindow-Plus) | [FilePicker Plus](FilePicker-Plus) | [IconButton](IconButton) |
