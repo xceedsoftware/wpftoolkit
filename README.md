@@ -35,51 +35,74 @@ The free, open source Community Edition is provided under the Microsoft Public L
 [DropDownButton](../../wiki/DropDownButton) ⸺
 [IntegerUpDown](../../wiki/IntegerUpDown) ⸺
 [LongUpDown](../../wiki/LongUpDown) ⸺
-[Magnifier](../../wiki/Magnifier)
-[MaskedTextBox](../../wiki/MaskedTextBox)
-[MessageBox](../../wiki/MessageBox)
-[MultiLineTextEditor](../../wiki/MultiLineTextEditor)
-[PieChart](../../wiki/PieChart)
-[PrimitiveTypeCollEditor](../../wiki/PrimitiveTypeCollectionEditor)
-[PropertyGrid](../../wiki/PropertyGrid)
-[RangeSlider](../../wiki/RangeSlider)
-[RichTextBox](../../wiki/RichTextBox)
-[RichTextBoxFormatBar](../../wiki/RichTextBoxFormatBar)
-[ShortUpDown](../../wiki/ShortUpDown)
-[SingleUpDown](../../wiki/SingleUpDown)
-[SplitButton](../../wiki/SplitButton)
-[SwitchPanel](../../wiki/SwitchPanel)
-[TimelinePanel](../../wiki/TimelinePanel)
-[TimePicker](../../wiki/TimePicker)
-[TimeSpanUpDown](../../wiki/TimeSpanUpDown)
-[ValueRangeTextBox](../../wiki/ValueRangeTextBox)
-[WatermarkPasswordBox](../../wiki/WatermarkPasswordBox)
-[WatermarkTextBox](../../wiki/WatermarkTextBox)
-[WatermarkComboBox](../../wiki/WatermarkComboBox)
-[WindowContainer](../../wiki/WindowContainer)
-[WindowControl](../../wiki/WindowControl)
-[Wizard](../../wiki/Wizard)
-[Zoombox](../../wiki/Zoombox)
-[Windows 8 Theme](../../wiki/Windows-8-Theme)
+[Magnifier](../../wiki/Magnifier) ⸺
+[MaskedTextBox](../../wiki/MaskedTextBox) ⸺
+[MessageBox](../../wiki/MessageBox) ⸺
+[MultiLineTextEditor](../../wiki/MultiLineTextEditor) ⸺
+[PieChart](../../wiki/PieChart) ⸺
+[PrimitiveTypeCollEditor](../../wiki/PrimitiveTypeCollectionEditor) ⸺
+[PropertyGrid](../../wiki/PropertyGrid) ⸺
+[RangeSlider](../../wiki/RangeSlider) ⸺
+[RichTextBox](../../wiki/RichTextBox) ⸺
+[RichTextBoxFormatBar](../../wiki/RichTextBoxFormatBar) ⸺
+[ShortUpDown](../../wiki/ShortUpDown) ⸺
+[SingleUpDown](../../wiki/SingleUpDown) ⸺
+[SplitButton](../../wiki/SplitButton) ⸺
+[SwitchPanel](../../wiki/SwitchPanel) ⸺
+[TimelinePanel](../../wiki/TimelinePanel) ⸺
+[TimePicker](../../wiki/TimePicker) ⸺
+[TimeSpanUpDown](../../wiki/TimeSpanUpDown) ⸺
+[ValueRangeTextBox](../../wiki/ValueRangeTextBox) ⸺
+[WatermarkPasswordBox](../../wiki/WatermarkPasswordBox) ⸺
+[WatermarkTextBox](../../wiki/WatermarkTextBox) ⸺
+[WatermarkComboBox](../../wiki/WatermarkComboBox) ⸺
+[WindowContainer](../../wiki/WindowContainer) ⸺
+[WindowControl](../../wiki/WindowControl) ⸺
+[Wizard](../../wiki/Wizard) ⸺
+[Zoombox](../../wiki/Zoombox) ⸺
+Windows 8 Theme
 
 **Additional controls and features in the Plus Edition:**
 
-| [Charts](Charts) | [ChildWindow Plus](ChildWindow-Plus) | [FilePicker Plus](FilePicker-Plus) | [IconButton](IconButton) |
-| [Material Design controls](Material-Design-controls) | [MessageBox Plus](MessageBox-Plus) | [MultiCalendar](MultiCalendar) | [MultiColumnComboBox](MultiColumnComboBox) |
-| [PileFlowPanel](PileFlowPanel) | [PropertyGrid Plus](PropertyGrid-Plus) | [RadialGauge](RadialGauge) | [Rating](Rating) |
-| [SlideShow](SlideShow) | [StyleableWindow](StyleableWindow) | [SwitchPanel Plus](SwitchPanel-Plus) | [ToggleSwitch](ToggleSwitch) |
-| [TokenizedTextBox](TokenizedTextBox) | [Ultimate ListBox](Ultimate-ListBox) | [WatermarkPasswordBox](WatermarkPasswordBox) | [WindowControl Plus](WindowControl-Plus) |
-| Windows 10 theme | Metro theme | Office theme | Technical support |
-| 1+ release ahead |
+[Charts](Charts) ⸺
+[ChildWindow Plus](ChildWindow-Plus) ⸺
+[FilePicker Plus](FilePicker-Plus) ⸺
+[IconButton](IconButton) ⸺
+[Material Design controls](Material-Design-controls) ⸺
+[MessageBox Plus](MessageBox-Plus) ⸺
+[MultiCalendar](MultiCalendar) ⸺
+[MultiColumnComboBox](MultiColumnComboBox) ⸺
+[PileFlowPanel](PileFlowPanel) ⸺
+[PropertyGrid Plus](PropertyGrid-Plus) ⸺
+[RadialGauge](RadialGauge) ⸺
+[Rating](Rating) ⸺
+[SlideShow](SlideShow) ⸺
+[StyleableWindow](StyleableWindow) ⸺
+[SwitchPanel Plus](SwitchPanel-Plus) ⸺
+[ToggleSwitch](ToggleSwitch) ⸺
+[TokenizedTextBox](TokenizedTextBox) ⸺
+[Ultimate ListBox](Ultimate-ListBox) ⸺
+[WatermarkPasswordBox](WatermarkPasswordBox) ⸺
+[WindowControl Plus](WindowControl-Plus) ⸺
+Windows 10 theme  ⸺
+Metro theme  ⸺
+Office theme  ⸺
+Technical support  ⸺
+1+ release ahead
+
 **Additional controls and features in the Business Suite for WPF:**
 
-| [Advanced DataGrid](Advanced-DataGrid) | 3D Views for WPF | More themes | Themes all base WPF controls too |
+[Advanced DataGrid](Advanced-DataGrid)  ⸺
+3D Views for WPF  ⸺
+More themes  ⸺
+Also themes all base WPF controls 
+
 # Latest News
 
->![Bitcoin](Home_bitcoin-logo-96x20.png|http://bitcoin.org) You can purchase the Plus Edition with credit card, PayPal, and also with [bitcoins](http://bitcoin.org). Just visit [this page](https://xceed.com/product/xceed-toolkit-plus-for-wpf/), select the license type and quantity, then later select the payment type in the payment options.
+You can purchase the Plus Edition with credit card. Just visit [Xceed](https://xceed.com/product/xceed-toolkit-plus-for-wpf/)'s site, select the license type and quantity, then later select the payment type in the payment options.
 
-* Dec. 13, 2016, released Community Edition v3.0.0 with [1 new control and 28 bug fixes and improvements](http://wpftoolkit.codeplex.com/wikipage?title=Improvements300).
-* Nov. 21, 2016, released Plus Edition v3.2.0 with [2 new controls and 44 bug fixes and improvements](http://wpftoolkit.codeplex.com/wikipage?title=Improvements300#Plus320).
+* Dec. 13, 2016, released Community Edition v3.0.0 with [1 new control and 28 bug fixes and improvements](../../wiki/Improvements-in-v3.0.0).
+* Nov. 21, 2016, released Plus Edition v3.2.0 with [2 new controls and 44 bug fixes and improvements](../../wiki/Improvements-in-v3.0.0#Plus320).
 * July 13, 2016, released Plus Edition v3.1.0 with [Windows 10 theme and 56 bug fixes and improvements](http://wpftoolkit.codeplex.com/wikipage?title=Improvements290#Plus310).
 * June 14, 2016, released Community Edition v2.9.0 with [32 bug fixes and improvements](http://wpftoolkit.codeplex.com/wikipage?title=Improvements290).
 * May 6, 2016, released Community Edition v2.8.0 with [23 bug fixes and improvements](http://wpftoolkit.codeplex.com/wikipage?title=Improvements280).
