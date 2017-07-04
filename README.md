@@ -1,10 +1,3 @@
-||||
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
-||||
-
 **July 5, 2017:** The project's new home is Github. Community Edition v3.1.0 is scheduled for release here by July 12, 2017. 
 
 **December 13, 2016:** Community Edition v3.0.0 released with [1 new control and 28 bug fixes and improvements](http://wpftoolkit.codeplex.com/wikipage?title=Improvements300). Users of the [Plus Edition](http://wpftoolkit.codeplex.com/wikipage?title=Compare%20Editions) received v3.1.0 on July 13, 2016 with [Windows 10 theme and 55 other improvements and bug fixes](http://wpftoolkit.codeplex.com/wikipage?title=Improvements300#Plus310) and v3.2.0 on November 21, 2016 with [2 new controls and 44 bug fixes and improvements](http://wpftoolkit.codeplex.com/wikipage?title=Improvements300#Plus320).
@@ -14,101 +7,42 @@
   [1]: https://user-images.githubusercontent.com/21266763/27752263-1db10e9c-5dae-11e7-92f8-93671674a8be.png
   [2]: ../../wiki/Xceed-Toolkit-Plus-for-WPF (Learn about Xceed Toolkit Plus for WPF here on Github)
 
-Extended WPF Toolkit™ is the number one collection of WPF controls, components and utilities for creating next generation Windows applications. Use it to build professional looking, modern, and easy to use line of business applications. The Extended WPF Toolkit project has been downloaded more than 1 million times here and on [NuGet](http://www.nuget.org/packages/Extended.Wpf.Toolkit/).
+Extended WPF Toolkit™ is the number one collection of WPF controls, components and utilities for creating next generation Windows applications. Use it to build professional looking, modern, and easy to use line of business applications. The Extended WPF Toolkit project has been downloaded more than 1 million times here, on Codeplex, and on [NuGet](http://www.nuget.org/packages/Extended.Wpf.Toolkit/).
 
 The free, open source Community Edition is provided under the Microsoft Public License. The [Plus Edition](https://wpftoolkit.codeplex.com/wikipage?title=Compare%20Editions) adds additional controls and features, and is at least one release version ahead. Get it with a subscription to also get updates and email support for 1 year. The [Business Suite for WPF](https://xceed.com/xceed-business-suite-for-wpf/) adds the full-featured version of the industry's best datagrid.
 
 **Controls included in the Community Edition:**
 
-||||||
-|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|
+|||||||
+|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|
 |[AvalonDock](../../wiki/AvalonDock)|[AutoSelectTextBox](../../wiki/AutoSelectTextBox)|[BusyIndicator](../../wiki/BusyIndicator)|[ButtonSpinner](../../wiki/ButtonSpinner)|[ByteUpDown](../../wiki/ByteUpDown)|
-|||||
-
-
-[AvalonDock](../../wiki/AvalonDock) ⸺
-[AutoSelectTextBox](../../wiki/AutoSelectTextBox) ⸺ 
-[BusyIndicator](../../wiki/BusyIndicator) ⸺
-[ButtonSpinner](../../wiki/ButtonSpinner) ⸺
-[ByteUpDown](../../wiki/ByteUpDown) ⸺
-[Calculator](../../wiki/Calculator) ⸺
-[CalculatorUpDown](../../wiki/CalculatorUpDown) ⸺
-[CheckComboBox](../../wiki/CheckComboBox) ⸺
-[CheckListBox](../../wiki/CheckListBox) ⸺
-[ChildWindow](../../wiki/ChildWindow) ⸺
-[CollectionControl](../../wiki/CollectionControl) ⸺
-[CollectionControlDialog](../../wiki/CollectionControlDialog) ⸺ 
-[ColorCanvas](../../wiki/ColorCanvas) ⸺
-[ColorPicker](../../wiki/ColorPicker) ⸺
-[DataGrid](../../wiki/DataGrid) ⸺
-[DateTimePicker](../../wiki/DateTimePicker) ⸺
-[DateTimeUpDown](../../wiki/DateTimeUpDown) ⸺
-[DecimalUpDown](../../wiki/DecimalUpDown) ⸺
-[DoubleUpDown](../../wiki/DoubleUpDown) ⸺
-[DropDownButton](../../wiki/DropDownButton) ⸺
-[IntegerUpDown](../../wiki/IntegerUpDown) ⸺
-[LongUpDown](../../wiki/LongUpDown) ⸺
-[Magnifier](../../wiki/Magnifier) ⸺
-[MaskedTextBox](../../wiki/MaskedTextBox) ⸺
-[MessageBox](../../wiki/MessageBox) ⸺
-[MultiLineTextEditor](../../wiki/MultiLineTextEditor) ⸺
-[PieChart](../../wiki/PieChart) ⸺
-[PrimitiveTypeCollEditor](../../wiki/PrimitiveTypeCollectionEditor) ⸺
-[PropertyGrid](../../wiki/PropertyGrid) ⸺
-[RangeSlider](../../wiki/RangeSlider) ⸺
-[RichTextBox](../../wiki/RichTextBox) ⸺
-[RichTextBoxFormatBar](../../wiki/RichTextBoxFormatBar) ⸺
-[ShortUpDown](../../wiki/ShortUpDown) ⸺
-[SingleUpDown](../../wiki/SingleUpDown) ⸺
-[SplitButton](../../wiki/SplitButton) ⸺
-[SwitchPanel](../../wiki/SwitchPanel) ⸺
-[TimelinePanel](../../wiki/TimelinePanel) ⸺
-[TimePicker](../../wiki/TimePicker) ⸺
-[TimeSpanUpDown](../../wiki/TimeSpanUpDown) ⸺
-[ValueRangeTextBox](../../wiki/ValueRangeTextBox) ⸺
-[WatermarkPasswordBox](../../wiki/WatermarkPasswordBox) ⸺
-[WatermarkTextBox](../../wiki/WatermarkTextBox) ⸺
-[WatermarkComboBox](../../wiki/WatermarkComboBox) ⸺
-[WindowContainer](../../wiki/WindowContainer) ⸺
-[WindowControl](../../wiki/WindowControl) ⸺
-[Wizard](../../wiki/Wizard) ⸺
-[Zoombox](../../wiki/Zoombox) ⸺
-Windows 8 Theme
+|[Calculator](../../wiki/Calculator)|[CalculatorUpDown](../../wiki/CalculatorUpDown)|[CheckComboBox](../../wiki/CheckComboBox)|[CheckListBox](../../wiki/CheckListBox)|[ChildWindow](../../wiki/ChildWindow)|[CollectionControl](../../wiki/CollectionControl)|
+|[CollectionControlDialog](../../wiki/CollectionControlDialog)|[ColorCanvas](../../wiki/ColorCanvas)|[ColorPicker](../../wiki/ColorPicker)|[DataGrid](../../wiki/DataGrid)|[DateTimePicker](../../wiki/DateTimePicker)|[DateTimeUpDown](../../wiki/DateTimeUpDown)|
+|[DecimalUpDown](../../wiki/DecimalUpDown)|[DoubleUpDown](../../wiki/DoubleUpDown)|[DropDownButton](../../wiki/DropDownButton)|[IntegerUpDown](../../wiki/IntegerUpDown)|[LongUpDown](../../wiki/LongUpDown)|[Magnifier](../../wiki/Magnifier)|
+|[MaskedTextBox](../../wiki/MaskedTextBox)|[MessageBox](../../wiki/MessageBox)|[MultiLineTextEditor](../../wiki/MultiLineTextEditor)|[PieChart](../../wiki/PieChart)|[PrimitiveTypeCollEditor](../../wiki/PrimitiveTypeCollectionEditor)|[PropertyGrid](../../wiki/PropertyGrid)|
+|[RangeSlider](../../wiki/RangeSlider)|[RichTextBox](../../wiki/RichTextBox)|[RichTextBoxFormatBar](../../wiki/RichTextBoxFormatBar)|[ShortUpDown](../../wiki/ShortUpDown)|[SingleUpDown](../../wiki/SingleUpDown)|[SplitButton](../../wiki/SplitButton)|
+|[SwitchPanel](../../wiki/SwitchPanel)|[TimelinePanel](../../wiki/TimelinePanel)|[TimePicker](../../wiki/TimePicker)|[TimeSpanUpDown](../../wiki/TimeSpanUpDown)|[ValueRangeTextBox](../../wiki/ValueRangeTextBox)|[WatermarkPasswordBox](../../wiki/WatermarkPasswordBox)|
+|[WatermarkTextBox](../../wiki/WatermarkTextBox)|[WatermarkComboBox](../../wiki/WatermarkComboBox)|[WindowContainer](../../wiki/WindowContainer)|[WindowControl](../../wiki/WindowControl)|[Wizard](../../wiki/Wizard)|[Zoombox](../../wiki/Zoombox)|
+|Windows 8 Theme||||||
+|||||||
 
 **Additional controls and features in the Plus Edition:**
 
-[Charts](Charts) ⸺
-[ChildWindow Plus](ChildWindow-Plus) ⸺
-[FilePicker Plus](FilePicker-Plus) ⸺
-[IconButton](IconButton) ⸺
-[Material Design controls](Material-Design-controls) ⸺
-[MessageBox Plus](MessageBox-Plus) ⸺
-[MultiCalendar](MultiCalendar) ⸺
-[MultiColumnComboBox](MultiColumnComboBox) ⸺
-[PileFlowPanel](PileFlowPanel) ⸺
-[PropertyGrid Plus](PropertyGrid-Plus) ⸺
-[RadialGauge](RadialGauge) ⸺
-[Rating](Rating) ⸺
-[SlideShow](SlideShow) ⸺
-[StyleableWindow](StyleableWindow) ⸺
-[SwitchPanel Plus](SwitchPanel-Plus) ⸺
-[ToggleSwitch](ToggleSwitch) ⸺
-[TokenizedTextBox](TokenizedTextBox) ⸺
-[Ultimate ListBox](Ultimate-ListBox) ⸺
-[WatermarkPasswordBox](WatermarkPasswordBox) ⸺
-[WindowControl Plus](WindowControl-Plus) ⸺
-Windows 10 theme  ⸺
-Metro theme  ⸺
-Office theme  ⸺
-Technical support  ⸺
-1+ release ahead
+|||||||
+|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|
+|[Charts](Charts)|[ChildWindow Plus](ChildWindow-Plus)|[FilePicker Plus](FilePicker-Plus)|[IconButton](IconButton)|[Material Design controls](Material-Design-controls)|[MessageBox Plus](MessageBox-Plus)|
+|[MultiCalendar](MultiCalendar)|[MultiColumnComboBox](MultiColumnComboBox)|[PileFlowPanel](PileFlowPanel)|[PropertyGrid Plus](PropertyGrid-Plus)|[RadialGauge](RadialGauge)|[Rating](Rating)|
+|[SlideShow](SlideShow)|[StyleableWindow](StyleableWindow)|[SwitchPanel Plus](SwitchPanel-Plus)|[ToggleSwitch](ToggleSwitch)|[TokenizedTextBox](TokenizedTextBox)|[Ultimate ListBox](Ultimate-ListBox)|
+|[WatermarkPasswordBox](WatermarkPasswordBox)|[WindowControl Plus](WindowControl-Plus)|Windows 10 theme|Metro theme|Office theme||
+|Technical support|1+ release ahead|Proprietary License|Email subscription|||
+|||||||
 
 **Additional controls and features in the Business Suite for WPF:**
 
-[Advanced DataGrid](Advanced-DataGrid)  ⸺
-3D Views for WPF  ⸺
-More themes  ⸺
-Also themes all base WPF controls 
+|||||
+|:-------------:|:-------------:|:-------------:|:-------------:|
+|[Advanced DataGrid](Advanced-DataGrid)|3D Views for WPF|More themes|All base WPF controls themed|
+|||||
 
 # Latest News
 
