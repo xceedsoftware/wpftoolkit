@@ -16,28 +16,17 @@ The free, open source Community Edition is provided under the Microsoft Public L
 |||||
 |:-------------:|:-------------:|:-------------:|:-------------:|
 |[AvalonDock](../../wiki/AvalonDock)|[AutoSelectTextBox](../../wiki/AutoSelectTextBox)|[BusyIndicator](../../wiki/BusyIndicator)|[Calculator](../../wiki/Calculator)|
-
 |[CalculatorUpDown](../../wiki/CalculatorUpDown)|[CheckComboBox](../../wiki/CheckComboBox)|[CheckListBox](../../wiki/CheckListBox)|[ChildWindow](../../wiki/ChildWindow)|
-
 |[CollectionControl](../../wiki/CollectionControl)|[ButtonSpinner](../../wiki/ButtonSpinner)|[ByteUpDown](../../wiki/ByteUpDown)|[CollectionControlDialog](../../wiki/CollectionControlDialog)|
-
 |[ColorCanvas](../../wiki/ColorCanvas)|[ColorPicker](../../wiki/ColorPicker)|[DataGrid](../../wiki/DataGrid)|[DateTimePicker](../../wiki/DateTimePicker)|
-
 |[DateTimeUpDown](../../wiki/DateTimeUpDown)|[DecimalUpDown](../../wiki/DecimalUpDown)|[DoubleUpDown](../../wiki/DoubleUpDown)|[DropDownButton](../../wiki/DropDownButton)|
-
 |[IntegerUpDown](../../wiki/IntegerUpDown)|[LongUpDown](../../wiki/LongUpDown)|[Magnifier](../../wiki/Magnifier)|[MaskedTextBox](../../wiki/MaskedTextBox)|
-
 |[MessageBox](../../wiki/MessageBox)|[MultiLineTextEditor](../../wiki/MultiLineTextEditor)|[PieChart](../../wiki/PieChart)|[PrimitiveTypeCollEditor](../../wiki/PrimitiveTypeCollectionEditor)|
-
 |[PropertyGrid](../../wiki/PropertyGrid)|[RangeSlider](../../wiki/RangeSlider)|[RichTextBox](../../wiki/RichTextBox)
 |[RichTextBoxFormatBar](../../wiki/RichTextBoxFormatBar)|
-
 |[ShortUpDown](../../wiki/ShortUpDown)|[SingleUpDown](../../wiki/SingleUpDown)|[SplitButton](../../wiki/SplitButton)|[SwitchPanel](../../wiki/SwitchPanel)|
-
 |[TimelinePanel](../../wiki/TimelinePanel)|[TimePicker](../../wiki/TimePicker)|[TimeSpanUpDown](../../wiki/TimeSpanUpDown)|[ValueRangeTextBox](../../wiki/ValueRangeTextBox)|
-
 |[WatermarkPasswordBox](../../wiki/WatermarkPasswordBox)|[WatermarkTextBox](../../wiki/WatermarkTextBox)|[WatermarkComboBox](../../wiki/WatermarkComboBox)|[WindowContainer](../../wiki/WindowContainer)|
-
 |[WindowControl](../../wiki/WindowControl)|[Wizard](../../wiki/Wizard)|[Zoombox](../../wiki/Zoombox)|Windows 8 Theme|
 |||||
 
