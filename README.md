@@ -1,7 +1,9 @@
+||||
 | ------------- |:-------------:| -----:|
 | col 3 is      | right-aligned | $1600 |
 | col 2 is      | centered      |   $12 |
 | zebra stripes | are neat      |    $1 |
+||||
 
 **July 5, 2017:** The project's new home is Github. Community Edition v3.1.0 is scheduled for release here by July 12, 2017. 
 
@@ -17,6 +19,12 @@ Extended WPF Toolkit™ is the number one collection of WPF controls, components
 The free, open source Community Edition is provided under the Microsoft Public License. The [Plus Edition](https://wpftoolkit.codeplex.com/wikipage?title=Compare%20Editions) adds additional controls and features, and is at least one release version ahead. Get it with a subscription to also get updates and email support for 1 year. The [Business Suite for WPF](https://xceed.com/xceed-business-suite-for-wpf/) adds the full-featured version of the industry's best datagrid.
 
 **Controls included in the Community Edition:**
+
+||||||
+|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|
+|[AvalonDock](../../wiki/AvalonDock)|[AutoSelectTextBox](../../wiki/AutoSelectTextBox)|[BusyIndicator](../../wiki/BusyIndicator)|[ButtonSpinner](../../wiki/ButtonSpinner)|[ByteUpDown](../../wiki/ByteUpDown)|
+|||||
+
 
 [AvalonDock](../../wiki/AvalonDock) ⸺
 [AutoSelectTextBox](../../wiki/AutoSelectTextBox) ⸺ 
