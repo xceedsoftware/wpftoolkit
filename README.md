@@ -12,6 +12,8 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 
 **December 13, 2016:** v3.0.0 released with [1 new control and 28 bug fixes and improvements](http://wpftoolkit.codeplex.com/wikipage?title=Improvements300). Users of the [Plus Edition](http://wpftoolkit.codeplex.com/wikipage?title=Compare%20Editions) received v3.1.0 on July 13, 2016 with [Windows 10 theme and 55 other improvements and bug fixes](http://wpftoolkit.codeplex.com/wikipage?title=Improvements300#Plus310) and v3.2.0 on November 21, 2016 with [2 new controls and 44 bug fixes and improvements](http://wpftoolkit.codeplex.com/wikipage?title=Improvements300#Plus320).
 
+<img src="https://user-images.githubusercontent.com/21266763/27752265-1db3056c-5dae-11e7-8ef4-9728f01494e7.png" width="172"/>
+
 ## Controls included
 
 <table style="width:100%">
@@ -192,5 +194,6 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 * Follow [@datagrid](http://twitter.com/datagrid) on Twitter for WPF and Toolkit news
 * Like Xceed's [WPF page on Facebook](http://facebook.com/datagrids)
 * Add bugs or feature requests with the Issues tab
-
-![](Home_community-full.png)
+<br>
+<br>
+<a href="https://xceed.com/"><img src="https://user-images.githubusercontent.com/21266763/27974888-eecc663c-632d-11e7-8f3b-abf39b8fa913.png" width="278"/></a>
