@@ -17,10 +17,10 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 
 <table style="width:100%">
 <colgroup>
-   <col span="1" style="width: 25%;">
-   <col span="1" style="width: 25%;">
-   <col span="1" style="width: 25%;">
-   <col span="1" style="width: 25%;">
+   <col width="120" align="center">
+   <col width="120" align="center">
+   <col width="120" align="center">
+   <col width="120" align="center">
 </colgroup>
 <tr>
 <td><a href="../../wiki/AvalonDock">AvalonDock</a></td>
