@@ -22,8 +22,7 @@ The free, open source Community Edition is provided under the Microsoft Public L
 |[DateTimeUpDown](../../wiki/DateTimeUpDown)|[DecimalUpDown](../../wiki/DecimalUpDown)|[DoubleUpDown](../../wiki/DoubleUpDown)|[DropDownButton](../../wiki/DropDownButton)|
 |[IntegerUpDown](../../wiki/IntegerUpDown)|[LongUpDown](../../wiki/LongUpDown)|[Magnifier](../../wiki/Magnifier)|[MaskedTextBox](../../wiki/MaskedTextBox)|
 |[MessageBox](../../wiki/MessageBox)|[MultiLineTextEditor](../../wiki/MultiLineTextEditor)|[PieChart](../../wiki/PieChart)|[PrimitiveTypeCollEditor](../../wiki/PrimitiveTypeCollectionEditor)|
-|[PropertyGrid](../../wiki/PropertyGrid)|[RangeSlider](../../wiki/RangeSlider)|[RichTextBox](../../wiki/RichTextBox)
-|[RichTextBoxFormatBar](../../wiki/RichTextBoxFormatBar)|
+|[PropertyGrid](../../wiki/PropertyGrid)|[RangeSlider](../../wiki/RangeSlider)|[RichTextBox](../../wiki/RichTextBox)|[RichTextBoxFormatBar](../../wiki/RichTextBoxFormatBar)|
 |[ShortUpDown](../../wiki/ShortUpDown)|[SingleUpDown](../../wiki/SingleUpDown)|[SplitButton](../../wiki/SplitButton)|[SwitchPanel](../../wiki/SwitchPanel)|
 |[TimelinePanel](../../wiki/TimelinePanel)|[TimePicker](../../wiki/TimePicker)|[TimeSpanUpDown](../../wiki/TimeSpanUpDown)|[ValueRangeTextBox](../../wiki/ValueRangeTextBox)|
 |[WatermarkPasswordBox](../../wiki/WatermarkPasswordBox)|[WatermarkTextBox](../../wiki/WatermarkTextBox)|[WatermarkComboBox](../../wiki/WatermarkComboBox)|[WindowContainer](../../wiki/WindowContainer)|
