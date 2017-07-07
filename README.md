@@ -15,13 +15,13 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 
 **Controls included in the Community Edition:**
 
-<table>
-    <colgroup>
-       <col span="1" style="width: 25%;">
-       <col span="1" style="width: 25%;">
-       <col span="1" style="width: 25%;">
-	   <col span="1" style="width: 25%;">
-    </colgroup>
+<table style="width:100%">
+<colgroup>
+   <col span="1" style="width: 25%;">
+   <col span="1" style="width: 25%;">
+   <col span="1" style="width: 25%;">
+   <col span="1" style="width: 25%;">
+</colgroup>
 <tr>
 <td><a href="../../wiki/AvalonDock">AvalonDock</a></td>
 <td><a href="../../wiki/AutoSelectTextBox">AutoSelectTextBox</a></td>
@@ -29,10 +29,10 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <td><a href="../../wiki/Calculator">Calculator</a></td>
 </tr>
 <tr>
-<td><a href="../../wiki/AvalonDock">AvalonDock</a></td>
-<td><a href="../../wiki/AutoSelectTextBox">AutoSelectTextBox</a></td>
-<td><a href="../../wiki/BusyIndicator">BusyIndicator</a></td>
-<td><a href="../../wiki/Calculator">Calculator</a></td>
+<td><a href="../../wiki/CalculatorUpDown">CalculatorUpDown</a></td>
+<td><a href="../../wiki/CheckComboBox">CheckComboBox</a></td>
+<td><a href="../../wiki/CheckListBox">CheckListBox</a></td>
+<td><a href="../../wiki/ChildWindow">ChildWindow</a></td>
 </tr>
 </table>
 
