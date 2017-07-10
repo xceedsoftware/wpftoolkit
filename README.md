@@ -15,12 +15,12 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 
 ## Controls included
 
-<table style="width:640px">
+<table style="width:100%">
 <tr>
-<td style="width:160px"><a href="../../wiki/AvalonDock">AvalonDock</a></td>
-<td style="width:160px"><a href="../../wiki/AutoSelectTextBox">AutoSelectTextBox</a></td>
-<td style="width:160px"><a href="../../wiki/BusyIndicator">BusyIndicator</a></td>
-<td style="width:160px"><a href="../../wiki/Calculator">Calculator</a></td>
+<td style="width:25%"><a href="../../wiki/AvalonDock">AvalonDock</a></td>
+<td style="width:25%"><a href="../../wiki/AutoSelectTextBox">AutoSelectTextBox</a></td>
+<td style="width:25%"><a href="../../wiki/BusyIndicator">BusyIndicator</a></td>
+<td style="width:25%"><a href="../../wiki/Calculator">Calculator</a></td>
 </tr>
 <tr>
 <td><a href="../../wiki/CalculatorUpDown">CalculatorUpDown</a></td>
