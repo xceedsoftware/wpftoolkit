@@ -124,7 +124,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public void GenerateProperties()
     {
-      if( PropertyItems.Count == 0 )
+      if( (PropertyItems.Count == 0)
+        )
       {
         this.RegenerateProperties();
       }
@@ -161,6 +162,29 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
 
+
+
+
+
+    protected internal override void SetPropertiesExpansion( bool isExpanded )
+    {
+      if( this.Properties.Count == 0 )
+      {
+        this.GenerateProperties();
+      }
+
+      base.SetPropertiesExpansion( isExpanded );
+    }
+
+    protected internal override void SetPropertiesExpansion( string propertyName, bool isExpanded )
+    {
+      if( this.Properties.Count == 0 )
+      {
+        this.GenerateProperties();
+      }
+
+      base.SetPropertiesExpansion( propertyName, isExpanded );
+    }
 
     private void UpdateFilter()
     {
@@ -220,8 +244,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private void RegenerateProperties()
     {
       IEnumerable<PropertyItem> subProperties = this.GenerateSubPropertiesCore();
-
-      var uiParent = PropertyContainer as UIElement;
 
       foreach( var propertyItem in subProperties )
       {

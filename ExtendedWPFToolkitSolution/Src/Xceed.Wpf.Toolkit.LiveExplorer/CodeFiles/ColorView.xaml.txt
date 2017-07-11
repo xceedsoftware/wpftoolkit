@@ -39,7 +39,7 @@
             </Trigger>
          </Style.Triggers>
       </Style>
-
+      
       <ObjectDataProvider x:Key="ColorModeOptions" MethodName="GetValues"
                           ObjectType="{x:Type sys:Enum}">
          <ObjectDataProvider.MethodParameters>
@@ -219,6 +219,7 @@
                   <RowDefinition Height="Auto" />
                   <RowDefinition Height="Auto" />
                   <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
                </Grid.RowDefinitions>
                <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="Auto" />
@@ -297,21 +298,29 @@
                          IsChecked="{Binding ElementName=_colorPicker, Path=UsingAlphaChannel, Mode=TwoWay}" />
                <TextBlock Grid.Column="0"
                           Grid.Row="12"
-                          Text="AdvancedButtonHeader:" />
-               <TextBox Grid.Column="1"
-                        Grid.Row="12"
-                        Text="{Binding ElementName=_colorPicker, Path=AdvancedButtonHeader, Mode=TwoWay}" />
+                          Text="MaxDropDownWidth:" />
+               <xctk:IntegerUpDown Grid.Column="1"
+                                   Grid.Row="12"
+                                   Minimum="50"
+                                   Maximum="550"
+                                   Value="{Binding ElementName=_colorPicker, Path=MaxDropDownWidth}" />
                <TextBlock Grid.Column="0"
                           Grid.Row="13"
-                          Text="StandardButtonHeader:" />
+                          Text="AdvancedButtonHeader:" />
                <TextBox Grid.Column="1"
                         Grid.Row="13"
-                        Text="{Binding ElementName=_colorPicker, Path=StandardButtonHeader, Mode=TwoWay}" />
+                        Text="{Binding ElementName=_colorPicker, Path=AdvancedButtonHeader, Mode=TwoWay}" />
                <TextBlock Grid.Column="0"
                           Grid.Row="14"
-                          Text="SelectedColorText:" />
+                          Text="StandardButtonHeader:" />
                <TextBox Grid.Column="1"
                         Grid.Row="14"
+                        Text="{Binding ElementName=_colorPicker, Path=StandardButtonHeader, Mode=TwoWay}" />
+               <TextBlock Grid.Column="0"
+                          Grid.Row="15"
+                          Text="SelectedColorText:" />
+               <TextBox Grid.Column="1"
+                        Grid.Row="15"
                         IsEnabled="False"
                         Text="{Binding ElementName=_colorPicker, Path=SelectedColorText}" />
             </Grid>

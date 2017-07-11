@@ -15,7 +15,7 @@
   ***********************************************************************************/
 
 using System.Windows;
-using Xceed.Wpf.Toolkit.Core.Utilities;
+
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class PrimitiveTypeCollectionEditor : TypeEditor<PrimitiveTypeCollectionControl>
@@ -42,7 +42,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       }
       else
       {
-        Editor.ItemType = ListUtilities.GetListItemType( type );
+        var typeArguments = type.GetGenericArguments();
+        if( typeArguments.Length > 0 )
+        {
+          Editor.ItemType = typeArguments[ 0 ];
+        }
       }
 
       base.ResolveValueBinding( propertyItem );

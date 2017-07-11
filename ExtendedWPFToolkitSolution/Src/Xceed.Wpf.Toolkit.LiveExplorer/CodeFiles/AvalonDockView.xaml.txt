@@ -26,7 +26,7 @@
          The AvalonDock layout system allows developers to create customizable layouts using a window docking system similar to what is found in many popular integrated development environements.
       </Paragraph>
    </local:DemoView.Description>
-
+      
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />

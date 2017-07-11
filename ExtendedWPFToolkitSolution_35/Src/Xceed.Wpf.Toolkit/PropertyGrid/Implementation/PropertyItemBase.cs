@@ -391,6 +391,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region Methods
 
+    protected virtual Type GetPropertyItemType()
+    {
+      return null;
+    }
+
+    protected virtual string GetPropertyItemName()
+    {
+      return this.DisplayName;
+    }
+
     public override void OnApplyTemplate()
     {
       base.OnApplyTemplate();
@@ -430,9 +440,41 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
+    private PropertyDefinitionCollection GetPropertItemPropertyDefinitions()
+    {
+      if( (this.ParentNode != null) && (this.ParentNode.PropertyDefinitions != null) )
+      {
+        var name = this.GetPropertyItemName();
+        foreach( var pd in this.ParentNode.PropertyDefinitions )
+        {
+          if( pd.TargetProperties.Contains( name ) )
+          {
+            // PropertyDefinitions contains a PropertyDefinition for this PropertyItem Name => return its PropertyDefinitions.
+            return pd.PropertyDefinitions;
+          }
+          else
+          {
+            var type = this.GetPropertyItemType();
+            if( type != null )
+            {
+              foreach( var targetProperty in pd.TargetProperties )
+              {
+                var targetPropertyType = targetProperty as Type;
+                // PropertyDefinitions contains a PropertyDefinition for this PropertyItem Type => return its PropertyDefinitions.
+                if( (targetPropertyType != null) && targetPropertyType.IsAssignableFrom( type ) )
+                  return pd.PropertyDefinitions;
+              }
+            }
+          }
+        }
+      }
+      return null;
+    }
+
     #endregion //Methods
 
     #region IPropertyContainer Members
+
 
 
 
@@ -453,7 +495,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     PropertyDefinitionCollection IPropertyContainer.PropertyDefinitions
     {
-      get { return null; }
+      get
+      {
+        return this.GetPropertItemPropertyDefinitions();
+      }
     }
 
     ContainerHelperBase IPropertyContainer.ContainerHelper 
@@ -482,7 +527,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     bool IPropertyContainer.AutoGenerateProperties
     {
-      get { return true; }
+      get
+      {
+        if( this.ParentNode != null )
+        {
+          var propertyItemPropertyDefinitions = this.GetPropertItemPropertyDefinitions();
+          // No PropertyDefinitions specified : show all properties of this PropertyItem.
+          if( (propertyItemPropertyDefinitions == null) || (propertyItemPropertyDefinitions.Count == 0) )
+            return true;
+
+          // A PropertyDefinitions is specified : show only the properties of the PropertyDefinitions from this PropertyItem.
+          return this.ParentNode.AutoGenerateProperties;
+        }
+        return true;
+      }
     }
 
     bool IPropertyContainer.HideInheritedProperties

@@ -790,6 +790,8 @@ namespace Xceed.Wpf.Toolkit
     {
       if( ( _parentContainer != null ) && ( _windowRoot != null ) )
       {
+        _windowRoot.UpdateLayout();
+
         Left = ( _parentContainer.ActualWidth - _windowRoot.ActualWidth ) / 2.0;
         Top = ( _parentContainer.ActualHeight - _windowRoot.ActualHeight ) / 2.0;
       }

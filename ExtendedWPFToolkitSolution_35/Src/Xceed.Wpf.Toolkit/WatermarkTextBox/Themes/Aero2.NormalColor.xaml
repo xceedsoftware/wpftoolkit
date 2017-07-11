@@ -60,13 +60,13 @@
                            <Grid>
                               <ScrollViewer x:Name="PART_ContentHost" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                  <ContentPresenter x:Name="PART_WatermarkHost"
-                                             Content="{TemplateBinding Watermark}"
-                                             ContentTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DefaultWatermarkTemplate}}"
-                                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                             IsHitTestVisible="False"
-                                             Margin="{TemplateBinding Padding}"
-                                             Visibility="Collapsed" />
+                                                   Content="{TemplateBinding Watermark}"
+                                                   ContentTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DefaultWatermarkTemplate}}"
+                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                   IsHitTestVisible="False"
+                                                   Margin="{TemplateBinding Padding}"
+                                                   Visibility="Collapsed" />
                              </Grid>
                         </Border>
                        <Border x:Name="MouseOverVisual" Opacity="0" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{StaticResource TextBox_MouseOver}" CornerRadius="1" />
@@ -76,7 +76,7 @@
                   <ControlTemplate.Triggers>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
-                                <Condition Property="KeepWatermarkOnGotFocus" Value="False" />
+                        <Condition Property="KeepWatermarkOnGotFocus" Value="False" />
                                 <Condition Property="IsFocused" Value="False" />
                                 <Condition Property="Text" Value="" />
                             </MultiTrigger.Conditions>
@@ -84,20 +84,16 @@
                                 <Setter Property="Visibility" TargetName="PART_WatermarkHost" Value="Visible" />
                             </MultiTrigger.Setters>
                         </MultiTrigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="KeepWatermarkOnGotFocus"
-                                   Value="True" />
-                                <Condition Property="Text"
-                                   Value="" />
-                            </MultiTrigger.Conditions>
-                            <MultiTrigger.Setters>
-                                <Setter Property="Visibility"
-                                TargetName="PART_WatermarkHost"
-                                Value="Visible" />
-                            </MultiTrigger.Setters>
-                        </MultiTrigger>
-                        <Trigger Property="IsMouseOver" Value="True">
+                  <MultiTrigger>
+                     <MultiTrigger.Conditions>
+                        <Condition Property="KeepWatermarkOnGotFocus" Value="True" />
+                        <Condition Property="Text" Value="" />
+                     </MultiTrigger.Conditions>
+                     <MultiTrigger.Setters>
+                        <Setter Property="Visibility" TargetName="PART_WatermarkHost" Value="Visible" />
+                     </MultiTrigger.Setters>
+                  </MultiTrigger>
+                  <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocusWithin" Value="True">

@@ -241,6 +241,36 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //IsOpen
 
+    #region MaxDropDownWidth
+
+    public static readonly DependencyProperty MaxDropDownWidthProperty = DependencyProperty.Register( "MaxDropDownWidth", typeof( double )
+      , typeof( ColorPicker ), new UIPropertyMetadata( 214d ) );
+    public double MaxDropDownWidth
+    {
+      get
+      {
+        return ( double )GetValue( MaxDropDownWidthProperty );
+      }
+      set
+      {
+        SetValue( MaxDropDownWidthProperty, value );
+      }
+    }
+
+    private static void OnMaxDropDownWidthChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var colorPicker = o as ColorPicker;
+      if( colorPicker != null )
+        colorPicker.OnMaxDropDownWidthChanged( ( double )e.OldValue, ( double )e.NewValue );
+    }
+
+    protected virtual void OnMaxDropDownWidthChanged( double oldValue, double newValue )
+    {
+
+    }
+
+    #endregion
+
     #region RecentColors
 
     public static readonly DependencyProperty RecentColorsProperty = DependencyProperty.Register( "RecentColors", typeof( ObservableCollection<ColorItem> ), typeof( ColorPicker ), new UIPropertyMetadata( null ) );
@@ -614,6 +644,10 @@ namespace Xceed.Wpf.Toolkit
       {
         var colorItem = ( ColorItem )e.AddedItems[ 0 ];
         SelectedColor = colorItem.Color;
+        if( !string.IsNullOrEmpty( colorItem.Name ) )
+        {
+          this.SelectedColorText = colorItem.Name;
+        }
         UpdateRecentColors( colorItem );
         _selectionChanged = true;
         lb.SelectedIndex = -1; //for now I don't care about keeping track of the selected color
@@ -623,7 +657,9 @@ namespace Xceed.Wpf.Toolkit
     private void Popup_Opened( object sender, EventArgs e )
     {
       if( ( _availableColors != null ) && ShowAvailableColors )
+      {
         FocusOnListBoxItem( _availableColors );
+      }
       else if( ( _standardColors != null ) && ShowStandardColors )
         FocusOnListBoxItem( _standardColors );
       else if( ( _recentColors != null ) && ShowRecentColors )

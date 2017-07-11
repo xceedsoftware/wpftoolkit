@@ -39,11 +39,16 @@
                The following properties will be displayed in the PropertyGrid 
                Some data of properties will be overriden-->
             <xctk:PropertyDefinition TargetProperties="FirstName,PetNames" DisplayOrder="0"/>
-            <xctk:PropertyDefinition TargetProperties="FavoriteColor" 
-                                     DisplayName="Shirt Color" 
+            <xctk:PropertyDefinition TargetProperties="FavoriteColor"
+                                     DisplayName="Shirt Color"
                                      Category="Clothes"
                                      Description="The color of the Person's shirt can be changed with the ColorPicker."
-                                     IsExpandable="True"/>
+                                     IsExpandable="True">
+               <!--The following properties will be displayed in the "Shirt Color" expandable PropertyItem--> 
+               <xctk:PropertyDefinition.PropertyDefinitions>
+                  <xctk:PropertyDefinition TargetProperties="R,G,B"/>
+               </xctk:PropertyDefinition.PropertyDefinitions>
+            </xctk:PropertyDefinition>
             <!-- And all properties of type Boolean will be displayed in the PropertyGrid-->
             <xctk:PropertyDefinition TargetProperties="{x:Type s:Boolean}" DisplayOrder="1"/>
 

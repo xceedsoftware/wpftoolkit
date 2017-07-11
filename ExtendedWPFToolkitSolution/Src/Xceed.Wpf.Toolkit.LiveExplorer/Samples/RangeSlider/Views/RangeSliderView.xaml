@@ -19,12 +19,31 @@
                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
                 xmlns:xctkconv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters;assembly=Xceed.Wpf.Toolkit"
+                xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.RangeSlider.Converters"
                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                 Title="RangeSlider">
 
    <local:DemoView.Resources>
 
       <xctkconv:SolidColorBrushToColorConverter x:Key="SolidColorBrushToColorConverter" />
+      <conv:AbsoluteAdditionConverter x:Key="AbsoluteAdditionConverter"/>
+      <conv:RangeSliderEnabledConverter x:Key="RangeSliderEnabledConverter"/>
+
+      <ObjectDataProvider x:Key="TickPlacement"
+                          MethodName="GetValues"
+                          ObjectType="{x:Type sys:Enum}">
+         <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="TickPlacement" />
+         </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+
+      <ObjectDataProvider x:Key="AutoToolTipPlacement"
+                          MethodName="GetValues"
+                          ObjectType="{x:Type sys:Enum}">
+         <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="AutoToolTipPlacement" />
+         </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
 
       <Style x:Key="LowerRangeStyle1"
              TargetType="{x:Type RepeatButton}">
@@ -448,15 +467,16 @@
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="75" />
                <ColumnDefinition Width="100" />
                <ColumnDefinition Width="160" />
-               <ColumnDefinition Width="100" />
-               <ColumnDefinition Width="118" />
-               <ColumnDefinition Width="100" />
+               <ColumnDefinition Width="105" />
+               <ColumnDefinition Width="155" />
+               <ColumnDefinition Width="105" />
             </Grid.ColumnDefinitions>
 
             <!-- Column 1 -->
@@ -505,12 +525,14 @@
             <TextBlock Text="Step:"
                        Grid.Row="4"
                        VerticalAlignment="Center" />
+            <!-- #// TODODOC -->
             <xctk:DoubleUpDown Value="{Binding Step, ElementName=_rangeSlider}"
                                Grid.Row="4"
                                Grid.Column="1"
                                FormatString="0.00"
                                VerticalAlignment="Center"
-                               Margin="5" />
+                               Margin="5"
+                               ToolTip="Identify the RangeSlider's size of individual move, while clicking on the LowerRange or HigherRange."/>
 
             <TextBlock Text="Orientation:"
                        Grid.Row="5"
@@ -580,17 +602,35 @@
                               VerticalAlignment="Center"
                               Margin="5" />
 
-            <TextBlock Text="Is Deferred Update Values:"
+            <TextBlock Text="Auto ToolTip Placement:"
                        Grid.Row="5"
                        Grid.Column="2"
                        VerticalAlignment="Center"
                        Margin="10,5,5,5" />
-            <CheckBox Grid.Row="5"
+            <!-- //# TODODOC -->
+            <ComboBox Grid.Row="5"
                       Grid.Column="3"
-                      IsChecked="{Binding IsDeferredUpdateValues, ElementName=_rangeSlider}"
+                      ItemsSource="{Binding Source={StaticResource AutoToolTipPlacement}}"
+                      SelectedItem="{Binding AutoToolTipPlacement, ElementName=_rangeSlider}"
                       VerticalAlignment="Center"
                       Margin="5"
-                      ToolTip="Gets/Sets if the LowerValue and HigherValue should be updated only on mouse up."/>
+                      ToolTip="Gets/sets whether a tooltip that contains the current value of a RangeSlider Thumb displays when the Thumb is pressed. If a tooltip is displayed, this property also specifies the placement of the tooltip.">
+            </ComboBox>
+
+            <TextBlock Text="Auto ToolTip Precision:"
+                       Grid.Row="6"
+                       Grid.Column="2"
+                       VerticalAlignment="Center"
+                       Margin="10,5,5,5" />
+            <!-- //# TODODOC -->
+            <xctk:IntegerUpDown Value="{Binding AutoToolTipPrecision, ElementName=_rangeSlider}"
+                                Grid.Row="6"
+                                Grid.Column="3"
+                                Minimum="0"
+                                Maximum="10"
+                                VerticalAlignment="Center"
+                                Margin="5"
+                                ToolTip="Gets/sets the number of digits that are displayed to the right side of the decimal point for the Value of a RangeSlider Thumb in a tooltip." />
 
             <!-- Column 3 -->
             <TextBlock Text="Lower Range Style:"
@@ -662,6 +702,72 @@
                <ComboBoxItem Content="Style 3"
                              Tag="{StaticResource HigherRangeStyle3}" />
             </ComboBox>
+
+            <TextBlock Text="Is Deferred Update Values:"
+                       Grid.Row="3"
+                       Grid.Column="4"
+                       VerticalAlignment="Center"
+                       Margin="10,5,5,5" />
+            <CheckBox Grid.Row="3"
+                      Grid.Column="5"
+                      IsChecked="{Binding IsDeferredUpdateValues, ElementName=_rangeSlider}"
+                      VerticalAlignment="Center"
+                      Margin="5"
+                      ToolTip="Gets/Sets if the LowerValue and HigherValue should be updated only on mouse up." />
+
+            <TextBlock Text="Is Snap To Tick Enabled:"
+                       Grid.Row="4"
+                       Grid.Column="4"
+                       VerticalAlignment="Center"
+                       Margin="10,5,5,5" />
+            <CheckBox Grid.Row="4"
+                      Grid.Column="5"
+                      IsChecked="{Binding IsSnapToTickEnabled, ElementName=_rangeSlider}"
+                      VerticalAlignment="Center"
+                      Margin="5"
+                      ToolTip="Gets/sets a value that indicates whether the RangeSlider automatically moves the selected Thumb to the closest tick mark." />
+
+            <TextBlock Text="Tick Placement:"
+                       Grid.Row="5"
+                       Grid.Column="4"
+                       VerticalAlignment="Center"
+                       Margin="10,5,5,5" />
+            <ComboBox x:Name="_tickPlacementComboBox"
+                      Grid.Row="5"
+                      Grid.Column="5"
+                      ItemsSource="{Binding Source={StaticResource TickPlacement}}"
+                      SelectedItem="{Binding TickPlacement, ElementName=_rangeSlider}"
+                      VerticalAlignment="Center"
+                      Margin="5"
+                      ToolTip="Gets/sets the position of tick marks with respect to the Track of the RangeSlider.">
+            </ComboBox>
+
+            <TextBlock Text="Tick Frequency:"
+                       Grid.Row="6"
+                       Grid.Column="4"
+                       VerticalAlignment="Center"
+                       Margin="10,5,5,5"
+                       IsEnabled="{Binding IsEnabled, ElementName=_tickFrequency}"
+                       Style="{StaticResource DisableGrayText}"/>
+            <xctk:DoubleUpDown x:Name="_tickFrequency"
+                               Value="{Binding TickFrequency, ElementName=_rangeSlider}"
+                               Grid.Row="6"
+                               Grid.Column="5"
+                               FormatString="0.00"
+                               Minimum="0"
+                               VerticalAlignment="Center"
+                               Margin="5"
+                               ToolTip="Gets/sets the interval between tick marks."
+                               IsEnabled="{Binding SelectedItem, ElementName=_tickPlacementComboBox, Converter={StaticResource RangeSliderEnabledConverter}}">
+               <xctk:DoubleUpDown.Maximum>
+                  <MultiBinding Converter="{StaticResource AbsoluteAdditionConverter}">
+                     <Binding ElementName="_rangeSlider"
+                              Path="Minimum" />
+                     <Binding ElementName="_rangeSlider"
+                              Path="Maximum" />
+                  </MultiBinding>
+               </xctk:DoubleUpDown.Maximum>
+            </xctk:DoubleUpDown>
          </Grid>
       </GroupBox>
 
@@ -686,7 +792,12 @@
                            HigherRangeStyle="{x:Null}"
                            RangeStyle="{x:Null}"
                            LowerRangeStyle="{x:Null}"
-                           IsDeferredUpdateValues="False">
+                           IsDeferredUpdateValues="False"
+                           IsSnapToTickEnabled="False"
+                           TickPlacement="None"
+                           TickFrequency="1"
+                           AutoToolTipPlacement="None"
+                           AutoToolTipPrecision="0">
             <xctk:RangeSlider.Resources>
                <Style TargetType="xctk:RangeSlider">
                   <Style.Triggers>

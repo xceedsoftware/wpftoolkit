@@ -1123,16 +1123,17 @@
                               <local:WatermarkTextBox x:Name="_txtFilter"
                                                       Background="Transparent"
                                                       Text="{Binding Filter, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"
-                                                      Watermark="{TemplateBinding FilterWatermark}">
+                                                      Watermark="{TemplateBinding FilterWatermark}"
+                                                      BorderThickness="1">
                                  <local:WatermarkTextBox.Style>
                                     <Style TargetType="Control">
-                                       <Setter Property="BorderThickness"
-                                               Value="0" />
+                                       <Setter Property="BorderBrush"
+                                               Value="Transparent" />
                                        <Style.Triggers>
                                           <Trigger Property="IsMouseOver"
                                                    Value="True">
-                                             <Setter Property="BorderThickness"
-                                                     Value="1" />
+                                             <Setter Property="BorderBrush"
+                                                     Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonMouseOverOuterBorderKey}}" />
                                           </Trigger>
                                        </Style.Triggers>
                                     </Style>

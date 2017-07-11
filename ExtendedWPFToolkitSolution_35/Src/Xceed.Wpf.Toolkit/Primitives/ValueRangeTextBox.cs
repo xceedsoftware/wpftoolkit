@@ -818,6 +818,10 @@ namespace Xceed.Wpf.Toolkit.Primitives
       }
       catch
       {
+        if( this.BeepOnError )
+        {
+          System.Media.SystemSounds.Beep.Play();
+        }
         return false;
       }
 
@@ -1069,6 +1073,11 @@ namespace Xceed.Wpf.Toolkit.Primitives
       catch( Exception exception )
       {
         hasValidationError = true;
+
+        if( this.BeepOnError )
+        {
+          System.Media.SystemSounds.Beep.Play();
+        }
 
         if( exception is ArgumentOutOfRangeException )
           this.SetIsValueOutOfRange( true );

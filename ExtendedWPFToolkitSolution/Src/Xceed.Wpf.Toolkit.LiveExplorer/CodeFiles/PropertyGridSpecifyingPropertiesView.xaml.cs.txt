@@ -87,6 +87,8 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
         set;
       }
 
+      //# TODODOC
+      //# Those attribute will be overrien in xaml
       [Category( "Information" )]
       [DisplayName( "Favorite Color" )]
       [Description( "This property uses the ColorPicker as the default editor." )]

@@ -85,12 +85,13 @@
       <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
       <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
       <Setter Property="BorderThickness" Value="1,1,0,1" />
-      <Setter Property="Focusable" Value="False" />
+      <Setter Property="IsTabStop" Value="False" />
       <Setter Property="HorizontalContentAlignment" Value="Right" />
       <Setter Property="TextAlignment" Value="Right" />
       <Setter Property="TimeWatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
       <Setter Property="VerticalContentAlignment" Value="Center"/>
       <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
+      <Setter Property="CalendarWidth" Value="178"/>
       <Setter Property="Template">
          <Setter.Value>
             <ControlTemplate TargetType="{x:Type local:DateTimePicker}">
@@ -123,7 +124,7 @@
                                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                                    IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
-                                                   IsTabStop="{TemplateBinding IsTabStop}"
+                                                   IsTabStop="True"
                                                    MinWidth="20"
                                                    AcceptsReturn="False"
                                                    Padding="{TemplateBinding Padding}"
@@ -163,23 +164,39 @@
                            <StackPanel>
                               <Calendar x:Name="PART_Calendar"
                                         BorderThickness="0"
-                                        DisplayMode="{Binding CalendarDisplayMode, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        DisplayMode="{Binding CalendarDisplayMode, RelativeSource={RelativeSource TemplatedParent}}">
+                                 <Calendar.Template>
+                                    <ControlTemplate TargetType="{x:Type Calendar}">
+                                       <Viewbox Width="{Binding CalendarWidth, RelativeSource={RelativeSource AncestorType={x:Type local:DateTimePicker}}}">
+                                          <StackPanel x:Name="PART_Root"
+                                                      HorizontalAlignment="Center">
+                                             <CalendarItem x:Name="PART_CalendarItem"
+                                                           BorderBrush="{TemplateBinding BorderBrush}"
+                                                           BorderThickness="{TemplateBinding BorderThickness}"
+                                                           Background="{TemplateBinding Background}"
+                                                           Style="{TemplateBinding CalendarItemStyle}" />
+                                          </StackPanel>
+                                       </Viewbox>
+                                    </ControlTemplate>
+                                 </Calendar.Template>
+                              </Calendar>
                               <local:TimePicker x:Name="PART_TimeUpDown"
-                                                          Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
-                                                          Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" 
-                                                          Format="{TemplateBinding TimeFormat}"
-                                                          FormatString="{TemplateBinding TimeFormatString}"
-                                                          Kind="{Binding Kind, RelativeSource={RelativeSource TemplatedParent}}"
-                                                          Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
-                                                          Minimum="{Binding Minimum, RelativeSource={RelativeSource TemplatedParent}}"
-                                                          Maximum="{Binding Maximum, RelativeSource={RelativeSource TemplatedParent}}"
-                                                          ClipValueToMinMax="{Binding ClipValueToMinMax, RelativeSource={RelativeSource TemplatedParent}}"
-                                                          IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
-                                                          AllowSpin="{TemplateBinding TimePickerAllowSpin}"
-                                                          ShowButtonSpinner="{TemplateBinding TimePickerShowButtonSpinner}"
-                                                          Watermark="{TemplateBinding TimeWatermark}"
-                                                          WatermarkTemplate="{TemplateBinding TimeWatermarkTemplate}"
-                                                          Visibility="{TemplateBinding TimePickerVisibility}"/>
+                                                Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+                                                Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" 
+                                                Format="{TemplateBinding TimeFormat}"
+                                                FormatString="{TemplateBinding TimeFormatString}"
+                                                Kind="{Binding Kind, RelativeSource={RelativeSource TemplatedParent}}"
+                                                Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"
+                                                Minimum="{Binding Minimum, RelativeSource={RelativeSource TemplatedParent}}"
+                                                Maximum="{Binding Maximum, RelativeSource={RelativeSource TemplatedParent}}"
+                                                ClipValueToMinMax="{Binding ClipValueToMinMax, RelativeSource={RelativeSource TemplatedParent}}"
+                                                IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
+                                                AllowSpin="{TemplateBinding TimePickerAllowSpin}"
+                                                Step="{TemplateBinding Step}"
+                                                ShowButtonSpinner="{TemplateBinding TimePickerShowButtonSpinner}"
+                                                Watermark="{TemplateBinding TimeWatermark}"
+                                                WatermarkTemplate="{TemplateBinding TimeWatermarkTemplate}"
+                                                Visibility="{TemplateBinding TimePickerVisibility}"/>
                            </StackPanel>
                         </Border>
                      </Popup>

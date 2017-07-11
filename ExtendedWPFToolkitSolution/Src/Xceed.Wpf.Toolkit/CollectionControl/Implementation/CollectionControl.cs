@@ -395,6 +395,16 @@ namespace Xceed.Wpf.Toolkit
     private void AddNew( object sender, ExecutedRoutedEventArgs e )
     {
       var newItem = CreateNewItem( ( Type )e.Parameter );
+      var properties = newItem.GetType().GetProperties();
+      foreach( var property in properties )
+      {
+        // For Generic Types, add an empty collection/list of T.
+        if( property.CanWrite && property.PropertyType.IsGenericType )
+        {
+          var genericCollection = Activator.CreateInstance( property.PropertyType );
+          property.SetValue( newItem, genericCollection, null );
+        }
+      }
 
       var eventArgs = new ItemAddingEventArgs( ItemAddingEvent, newItem );
       this.RaiseEvent( eventArgs );

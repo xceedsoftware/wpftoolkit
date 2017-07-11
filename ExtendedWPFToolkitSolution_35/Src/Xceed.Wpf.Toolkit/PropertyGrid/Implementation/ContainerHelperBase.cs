@@ -189,5 +189,41 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public abstract void UpdateValuesFromSource();
 
+    protected internal virtual void SetPropertiesExpansion( bool isExpanded )
+    {
+      foreach( var item in this.Properties )
+      {
+        var propertyItem = item as PropertyItemBase;
+        if( (propertyItem != null) && propertyItem.IsExpandable )
+        {
+          if( propertyItem.ContainerHelper != null )
+          {
+            propertyItem.ContainerHelper.SetPropertiesExpansion( isExpanded );
+          }
+          propertyItem.IsExpanded = isExpanded;
+        }
+      }
+    }
+
+    protected internal virtual void SetPropertiesExpansion( string propertyName, bool isExpanded )
+    {
+      foreach( var item in this.Properties )
+      {
+        var propertyItem = item as PropertyItemBase;
+        if( (propertyItem != null) && propertyItem.IsExpandable )
+        {
+          if( propertyItem.DisplayName == propertyName )
+          {
+            propertyItem.IsExpanded = isExpanded;
+            break;
+          }
+
+          if( propertyItem.ContainerHelper != null )
+          {
+            propertyItem.ContainerHelper.SetPropertiesExpansion( propertyName, isExpanded );
+          }
+        }
+      }
+    }
   }
 }

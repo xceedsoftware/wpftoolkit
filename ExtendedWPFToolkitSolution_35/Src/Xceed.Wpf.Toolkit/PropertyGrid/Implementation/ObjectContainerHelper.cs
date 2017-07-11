@@ -15,6 +15,7 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 #if !VS2008
@@ -58,7 +59,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         try
         {
-          List<PropertyDescriptor> descriptors = ObjectContainerHelperBase.GetPropertyDescriptors( SelectedObject, this.PropertyContainer.HideInheritedProperties );
+          List<PropertyDescriptor> descriptors = new List<PropertyDescriptor>();
+          {
+            descriptors = ObjectContainerHelperBase.GetPropertyDescriptors( SelectedObject, this.PropertyContainer.HideInheritedProperties );
+          }
+
           foreach( var descriptor in descriptors )
           {
             var propertyDef = this.GetPropertyDefinition( descriptor );
@@ -115,7 +120,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private PropertyItem CreatePropertyItem( PropertyDescriptor property, PropertyDefinition propertyDef )
     {
-      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property, SelectedObject, this.PropertyContainer.IsCategorized );
+      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property,
+                                                                                  SelectedObject, 
+                                                                                  this.PropertyContainer.IsCategorized
+                                                                                 );
       definition.InitProperties();
 
       this.InitializeDescriptorDefinition( definition, propertyDef );

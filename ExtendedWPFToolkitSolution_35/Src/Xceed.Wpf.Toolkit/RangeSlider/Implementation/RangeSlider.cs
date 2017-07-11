@@ -70,6 +70,57 @@ namespace Xceed.Wpf.Toolkit
 
     #region Properties
 
+    #region AutoToolTipPlacement
+
+    public static readonly DependencyProperty AutoToolTipPlacementProperty = DependencyProperty.Register( "AutoToolTipPlacement", typeof( AutoToolTipPlacement ), typeof( RangeSlider ),
+        new FrameworkPropertyMetadata( AutoToolTipPlacement.None, RangeSlider.OnAutoToolTipPlacementChanged ) );
+
+    public AutoToolTipPlacement AutoToolTipPlacement
+    {
+      get
+      {
+        return (AutoToolTipPlacement)GetValue( RangeSlider.AutoToolTipPlacementProperty );
+      }
+      set
+      {
+        SetValue( RangeSlider.AutoToolTipPlacementProperty, value );
+      }
+    }
+
+    private static void OnAutoToolTipPlacementChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    {
+      var rangeSlider = sender as RangeSlider;
+      if( rangeSlider != null )
+      {
+        rangeSlider.OnAutoToolTipPlacementChanged( (AutoToolTipPlacement)e.OldValue, (AutoToolTipPlacement)e.NewValue );
+      }
+    }
+
+    protected virtual void OnAutoToolTipPlacementChanged( AutoToolTipPlacement oldValue, AutoToolTipPlacement newValue )
+    {
+    }
+
+    #endregion //AutoToolTipPlacement
+
+    #region AutoToolTipPrecision
+
+    public static readonly DependencyProperty AutoToolTipPrecisionProperty = DependencyProperty.Register( "AutoToolTipPrecision", typeof( int ), typeof( RangeSlider ),
+        new FrameworkPropertyMetadata( 0 ) );
+
+    public int AutoToolTipPrecision
+    {
+      get
+      {
+        return (int)GetValue( RangeSlider.AutoToolTipPrecisionProperty );
+      }
+      set
+      {
+        SetValue( RangeSlider.AutoToolTipPrecisionProperty, value );
+      }
+    }
+
+    #endregion //AutoToolTipPrecision
+
     #region HigherRangeBackground
     /// <summary>
     /// # TODODOC
@@ -242,6 +293,25 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion IsDeferredUpdateValues
+
+    #region IsSnapToTickEnabled
+
+    public static readonly DependencyProperty IsSnapToTickEnabledProperty = DependencyProperty.Register( "IsSnapToTickEnabled", typeof( bool ), typeof( RangeSlider )
+      , new FrameworkPropertyMetadata( false ) );
+
+    public bool IsSnapToTickEnabled
+    {
+      get
+      {
+        return (bool)GetValue( RangeSlider.IsSnapToTickEnabledProperty );
+      }
+      set
+      {
+        SetValue( RangeSlider.IsSnapToTickEnabledProperty, value );
+      }
+    }
+
+    #endregion IsSnapToTickEnabled
 
     #region LowerRangeBackground
     /// <summary>
@@ -601,6 +671,72 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion
+
+    #region TickFrequency
+    /// <summary>       
+    /// Gets or sets the interval between tick marks.
+    /// </summary>
+    public static readonly DependencyProperty TickFrequencyProperty = DependencyProperty.Register( "TickFrequency", typeof( double ), typeof( RangeSlider )
+      , new FrameworkPropertyMetadata( 1d, RangeSlider.OnTickFrequencyChanged ) );
+
+    public double TickFrequency
+    {
+      get
+      {
+        return (double)GetValue( RangeSlider.TickFrequencyProperty );
+      }
+      set
+      {
+        SetValue( RangeSlider.TickFrequencyProperty, value );
+      }
+    }
+
+    private static void OnTickFrequencyChanged( DependencyObject sender, DependencyPropertyChangedEventArgs args )
+    {
+      var rangeSlider = sender as RangeSlider;
+      if( rangeSlider != null )
+      {
+        rangeSlider.OnTickFrequencyChanged( (double)args.OldValue, (double)args.NewValue );
+      }
+    }
+
+    protected virtual void OnTickFrequencyChanged( double oldValue, double newValue )
+    {
+    }
+
+    #endregion TickFrequency
+
+    #region TickPlacement
+
+    public static readonly DependencyProperty TickPlacementProperty = DependencyProperty.Register( "TickPlacement", typeof( TickPlacement ), typeof( RangeSlider ),
+        new FrameworkPropertyMetadata( TickPlacement.None, RangeSlider.OnTickPlacementChanged ) );
+
+    public TickPlacement TickPlacement
+    {
+      get
+      {
+        return (TickPlacement)GetValue( RangeSlider.TickPlacementProperty );
+      }
+      set
+      {
+        SetValue( RangeSlider.TickPlacementProperty, value );
+      }
+    }
+
+    private static void OnTickPlacementChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    {
+      var rangeSlider = sender as RangeSlider;
+      if( rangeSlider != null )
+      {
+        rangeSlider.OnTickPlacementChanged( (TickPlacement)e.OldValue, (TickPlacement)e.NewValue );
+      }
+    }
+
+    protected virtual void OnTickPlacementChanged( TickPlacement oldValue, TickPlacement newValue )
+    {
+    }
+
+    #endregion //TickPlacement
 
     #endregion Properties
 

@@ -196,7 +196,7 @@
                     </Grid>
 
                     <!-- Content Border -->
-                    <Border x:Name="ContentOuterBorder" Grid.Row="1" BorderBrush="Gray" BorderThickness="1">
+                    <Border x:Name="ContentOuterBorder" Grid.Row="1">
                         <Border.Margin>
                             <MultiBinding Converter="{StaticResource WindowContentBorderMarginConverter}" ConverterParameter="0">
                                 <Binding Path="WindowThickness.Left" RelativeSource="{RelativeSource TemplatedParent}" />
@@ -207,9 +207,11 @@
                                         BorderThickness="{TemplateBinding BorderThickness}"
                                         Background="{TemplateBinding Background}" 
                                         BorderBrush="{TemplateBinding BorderBrush}" >
-                            <ContentPresenter x:Name="Content"
-                                                    Content="{TemplateBinding Content}" 
-                                                    ContentTemplate="{TemplateBinding ContentTemplate}" />
+                           <AdornerDecorator>
+                              <ContentPresenter x:Name="Content"
+                                                Content="{TemplateBinding Content}"
+                                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+                           </AdornerDecorator>
                         </Border>
                     </Border>
 

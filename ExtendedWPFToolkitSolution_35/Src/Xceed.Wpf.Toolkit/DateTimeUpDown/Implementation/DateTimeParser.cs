@@ -76,12 +76,12 @@ namespace Xceed.Wpf.Toolkit
               dateTimeParts.Add( currentString );
             }
             currentformat = c.ToString();
-            currentString = dateTime[ i ].ToString();
+            currentString = (i < dateTime.Length) ? dateTime[ i ].ToString() : "";
           }
           else
           {
             currentformat = string.Concat( currentformat, c );
-            currentString = string.Concat( currentString, dateTime[ i ] );
+            currentString = string.Concat( currentString, (i < dateTime.Length) ? dateTime[ i ] : '\0' );
           }
         }
         if( !string.IsNullOrEmpty( currentformat ) )

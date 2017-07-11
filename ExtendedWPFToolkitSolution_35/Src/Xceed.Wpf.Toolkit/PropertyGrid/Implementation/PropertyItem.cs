@@ -110,6 +110,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //Properties
 
+    #region Overrides
+
+    protected override string GetPropertyItemName()
+    {
+      return this.PropertyName;
+    }
+
+    protected override Type GetPropertyItemType()
+    {
+      return this.PropertyType;
+    }
+
+    #endregion
+
     #region Methods
 
     protected override void OnIsExpandedChanged( bool oldValue, bool newValue )
@@ -155,12 +169,30 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private void OnDefinitionContainerHelperInvalidated( object sender, EventArgs e )
     {
+      if( this.ContainerHelper != null )
+      {
+        this.ContainerHelper.ClearHelper();
+      }
       var helper = this.DescriptorDefinition.CreateContainerHelper( this );
       this.ContainerHelper = helper;
       if( this.IsExpanded )
       {
         helper.GenerateProperties();
       }
+    }
+
+    private void Init( DescriptorPropertyDefinitionBase definition )
+    {
+      if( definition == null )
+        throw new ArgumentNullException( "definition" );
+
+      if( this.ContainerHelper != null )
+      {
+        this.ContainerHelper.ClearHelper();
+      }
+      this.DescriptorDefinition = definition;
+      this.ContainerHelper = definition.CreateContainerHelper( this );
+      definition.ContainerHelperInvalidated += new EventHandler( OnDefinitionContainerHelperInvalidated );
     }
 
     #endregion
@@ -170,12 +202,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     internal PropertyItem( DescriptorPropertyDefinitionBase definition )
       : base( definition.IsPropertyGridCategorized, !definition.PropertyType.IsArray )
     {
-      if( definition == null )
-        throw new ArgumentNullException( "definition" );
-
-      this.DescriptorDefinition = definition;
-      this.ContainerHelper = definition.CreateContainerHelper( this );
-      definition.ContainerHelperInvalidated += new EventHandler( OnDefinitionContainerHelperInvalidated );
+      this.Init( definition );
     }
 
     #endregion //Constructors

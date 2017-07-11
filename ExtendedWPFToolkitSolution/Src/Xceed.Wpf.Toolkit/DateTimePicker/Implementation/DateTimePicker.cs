@@ -81,6 +81,24 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //CalendarDisplayMode
 
+    #region CalendarWidth
+
+    public static readonly DependencyProperty CalendarWidthProperty = DependencyProperty.Register( "CalendarWidth", typeof( double )
+      , typeof( DateTimePicker ), new UIPropertyMetadata( 178d ) );
+    public double CalendarWidth
+    {
+      get
+      {
+        return ( double )GetValue( CalendarWidthProperty );
+      }
+      set
+      {
+        SetValue( CalendarWidthProperty, value );
+      }
+    }
+
+    #endregion //CalendarWidth
+
     #region TimeFormat
 
     public static readonly DependencyProperty TimeFormatProperty = DependencyProperty.Register( "TimeFormat", typeof( DateTimeFormat ), typeof( DateTimePicker ), new UIPropertyMetadata( DateTimeFormat.ShortTime ) );
@@ -212,6 +230,7 @@ namespace Xceed.Wpf.Toolkit
     static DateTimePicker()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( DateTimePicker ), new FrameworkPropertyMetadata( typeof( DateTimePicker ) ) );
+      UpdateValueOnEnterKeyProperty.OverrideMetadata( typeof( DateTimePicker ), new FrameworkPropertyMetadata( true ) );
     }
 
     public DateTimePicker()
@@ -239,28 +258,14 @@ namespace Xceed.Wpf.Toolkit
         this.SetBlackOutDates();
       }
 
-      _timePicker = GetTemplateChild( PART_TimeUpDown ) as TimePicker;
-      _timePicker.ValueChanged += _timePicker_ValueChanged;
-    }
-
-    private void _timePicker_ValueChanged( object sender, RoutedPropertyChangedEventArgs<object> e )
-    {
-      e.Handled = true;
-
-      // if UpdateValueOnEnterKey is true, 
-      // Sync Value on Text only when Enter Key is pressed.
-      if( this.UpdateValueOnEnterKey )
+      if( _timePicker != null )
       {
-        var newTime = e.NewValue as DateTime?;
-        if( newTime != null )
-        {
-          _fireSelectionChangedEvent = false;
-          var currentDate = this.ConvertTextToValue( this.TextBox.Text );
-          var date = currentDate ?? this.ContextNow;
-          var newValue = new DateTime( date.Year, date.Month, date.Day, newTime.Value.Hour, newTime.Value.Minute, newTime.Value.Second, newTime.Value.Millisecond, date.Kind );
-          this.TextBox.Text = newValue.ToString( this.GetFormatString( this.Format ), this.CultureInfo );
-          _fireSelectionChangedEvent = true;
-        }
+        _timePicker.ValueChanged -= this.TimePicker_ValueChanged;
+      }
+      _timePicker = GetTemplateChild( PART_TimeUpDown ) as TimePicker;
+      if( _timePicker != null )
+      {
+        _timePicker.ValueChanged += this.TimePicker_ValueChanged;
       }
     }
 
@@ -352,6 +357,27 @@ namespace Xceed.Wpf.Toolkit
         return;
 
       base.HandleKeyDown( sender, e );
+    }
+
+    private void TimePicker_ValueChanged( object sender, RoutedPropertyChangedEventArgs<object> e )
+    {
+      e.Handled = true;
+
+      // if UpdateValueOnEnterKey is true, 
+      // Sync Value on Text only when Enter Key is pressed.
+      if( this.UpdateValueOnEnterKey )
+      {
+        var newTime = e.NewValue as DateTime?;
+        if( newTime != null )
+        {
+          _fireSelectionChangedEvent = false;
+          var currentDate = this.ConvertTextToValue( this.TextBox.Text );
+          var date = currentDate ?? this.ContextNow;
+          var newValue = new DateTime( date.Year, date.Month, date.Day, newTime.Value.Hour, newTime.Value.Minute, newTime.Value.Second, newTime.Value.Millisecond, date.Kind );
+          this.TextBox.Text = newValue.ToString( this.GetFormatString( this.Format ), this.CultureInfo );
+          _fireSelectionChangedEvent = true;
+        }
+      }
     }
 
     private void Calendar_SelectedDatesChanged( object sender, SelectionChangedEventArgs e )

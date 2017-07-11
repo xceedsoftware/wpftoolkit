@@ -15,13 +15,9 @@
   **************************************************************************************/
 
 
-using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using Xceed.Wpf.Toolkit.Panels;
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.MaterialControls.Views
 {
   /// <summary>
@@ -34,5 +30,21 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.MaterialControls.Views
       InitializeComponent();
     }
 
+#if !OPEN_SOURCE
+    private void ToastButton_Click( object sender, RoutedEventArgs e )
+    {
+      var materialToast = new MaterialToast( ( ( ComboBoxItem )toastOwnerComboBox.SelectedItem ).Tag as FrameworkElement );
+      materialToast.MaterialAccentBrush = (SolidColorBrush)toastMaterialAccentBrushComboBox.SelectedItem;
+      materialToast.Location = ( MaterialToastLocationEnum )toastLocationComboBox.SelectedItem;
+      materialToast.SlidingDirection = ( Orientation )toastSlidingDirectionComboBox.SelectedItem;
+      materialToast.Content = "Simple Toast";
+      materialToast.DisplayTime = System.TimeSpan.FromMilliseconds( toastDisplayTimeIntegerUpDown.Value.Value );
+      materialToast.HideOnClick = toastHideOnclickCheckBox.IsChecked.Value;
+      materialToast.IsCloseButtonVisible = toastIsCloseButtonVisibleCheckBox.IsChecked.Value;
+      materialToast.CloseButtonStyle = ( ( ComboBoxItem )toastClosebuttonStyleComboBox.SelectedItem ).Tag as Style;
+      materialToast.CornerRadius = new CornerRadius( toastCornerRadiusIntegerUpDown.Value.Value );
+      materialToast.ShowToast();
+    }
+#endif
   }
 }

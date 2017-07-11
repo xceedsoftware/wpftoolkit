@@ -1,0 +1,212 @@
+﻿/***************************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2016 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ************************************************************************************/
+  
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
+{
+  /// <summary>
+  /// Interaction logic for PropertyGridExpandingNonPrimitivesView.xaml
+  /// </summary>
+  public partial class PropertyGridExpandingNonPrimitivesView : DemoView
+  {
+    public PropertyGridExpandingNonPrimitivesView()
+    {
+      InitializeComponent();
+
+#if !OPEN_SOURCE
+      var supervisor = new Supervisor()
+      {
+        Name = "Micheal Jones",
+        Department = DepartmentEnum.Production,
+        Managers = new List<Manager>()
+        {
+          new Manager()
+          {
+            Name = "Ken Clark",
+            Skills = "Negociation",
+            Workers = new ObservableCollection<Worker>()
+            {
+              new Worker()
+              {
+                Name = "Martina Kanes",
+                YearExperience = 5
+              },
+              new Worker()
+              {
+                Name = "Kelly Stewart",
+                YearExperience = 3
+              },
+              new Worker()
+              {
+                Name = "Mark Applebum",
+                YearExperience = 7
+              }
+            }
+          },
+          new Manager()
+          {
+            Name = "Julia Benetton",
+            Skills = "Creative",
+            Workers = new ObservableCollection<Worker>()
+            {
+              new Worker()
+              {
+                Name = "John Quick",
+                YearExperience = 1
+              },
+              new Worker()
+              {
+                Name = "Martha Adrian",
+                YearExperience = 2
+              },
+              new Worker()
+              {
+                Name = "Kevin Stevens",
+                YearExperience = 5
+              }
+            }
+          }
+        },
+        Info = new Info()
+        {
+          Address = "64 Main Street",
+          City = "New York",
+          Country = "USA",
+          Phone = "1-800-555-9636"
+        }
+      };
+
+      this.DataContext = supervisor;
+#endif
+    }
+  }
+
+#if !OPEN_SOURCE
+  public enum DepartmentEnum
+  {
+    Production,
+    Marketing,
+    Sales,
+    Accounting
+  }
+
+  public class Supervisor
+  {
+    public string Name
+    {
+      get;
+      set;
+    }
+
+    public DepartmentEnum Department
+    {
+      get;
+      set;
+    }
+
+    public List<Manager> Managers
+    {
+      get;
+      set;
+    }
+
+    public Info Info
+    {
+      get;
+      set;
+    }
+  }
+
+  public class Manager
+  {
+    public string Name
+    {
+      get;
+      set;
+    }
+
+    public string Skills
+    {
+      get;
+      set;
+    }
+
+    public ObservableCollection<Worker> Workers
+    {
+      get;
+      set;
+    }
+
+    public override string ToString()
+    {
+      return this.Name;
+    }
+  }
+
+  public class Worker
+  {
+    public string Name
+    {
+      get;
+      set;
+    }
+
+    public int YearExperience
+    {
+      get;
+      set;
+    }
+
+    public override string ToString()
+    {
+      return this.Name;
+    }
+  }
+
+  public class Info
+  {
+    public string Address
+    {
+      get;
+      set;
+    }
+
+    public string Phone
+    {
+      get;
+      set;
+    }
+
+    public string City
+    {
+      get;
+      set;
+    }
+
+    public string Country
+    {
+      get; set;
+    }
+
+    public override string ToString()
+    {
+      return "Info";
+    }
+  }
+#endif
+}

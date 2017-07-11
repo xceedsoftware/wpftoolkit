@@ -99,7 +99,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 Height = 0,
             });
 
-            _internalHost_ContentRendered = false;
+            //_internalHost_ContentRendered = false;
             _internalHwndSource.ContentRendered += _internalHwndSource_ContentRendered;
             _internalHwndSource.RootVisual = _internalHostPresenter;
             AddLogicalChild(_internalHostPresenter);
@@ -107,22 +107,23 @@ namespace Xceed.Wpf.AvalonDock.Controls
             return new HandleRef(this, _internalHwndSource.Handle);
         }
 
-        private bool _internalHost_ContentRendered = false;
+      //  private bool _internalHost_ContentRendered = false;
 
         void _internalHwndSource_ContentRendered(object sender, EventArgs e)
         {
-            _internalHost_ContentRendered = true;
+        //    _internalHost_ContentRendered = true;
         }
 
-        protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            if (msg == Win32Helper.WM_WINDOWPOSCHANGING)
-            {
-                if (_internalHost_ContentRendered)
-                    Win32Helper.SetWindowPos(_internalHwndSource.Handle, Win32Helper.HWND_TOP, 0, 0, 0, 0, Win32Helper.SetWindowPosFlags.IgnoreMove | Win32Helper.SetWindowPosFlags.IgnoreResize);
-            }
-            return base.WndProc(hwnd, msg, wParam, lParam, ref handled);
-        }
+
+        //protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        //{
+        //    if (msg == Win32Helper.WM_WINDOWPOSCHANGING)
+        //    {
+        //        if (_internalHost_ContentRendered)
+        //            Win32Helper.SetWindowPos(_internalHwndSource.Handle, Win32Helper.HWND_TOP, 0, 0, 0, 0, Win32Helper.SetWindowPosFlags.IgnoreMove | Win32Helper.SetWindowPosFlags.IgnoreResize);
+        //    }
+        //    return base.WndProc(hwnd, msg, wParam, lParam, ref handled);
+        //}
 
         protected override void DestroyWindowCore(System.Runtime.InteropServices.HandleRef hwnd)
         {

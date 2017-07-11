@@ -18,7 +18,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:media="clr-namespace:Xceed.Wpf.Toolkit.Core.Media"
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
-                    xmlns:primitives="clr-namespace:Xceed.Wpf.Toolkit.Primitives">
+                    xmlns:primitives="clr-namespace:Xceed.Wpf.Toolkit.Primitives"
+                    xmlns:s="clr-namespace:System;assembly=mscorlib">
 
 
     <!-- =============================================================================== -->
@@ -43,7 +44,8 @@
    <BitmapImage x:Key="minimize_pressed"
                 UriSource="Images/minimize_pressed.png" />
    <BitmapImage x:Key="minimize_inactive"
-                UriSource="Images/minimize_inactive.png" />    
+                UriSource="Images/minimize_inactive.png" />
+
     <!-- Maximize -->
    <BitmapImage x:Key="maximize_normal"
                 UriSource="Images/maximize_normal.png" />
@@ -98,9 +100,10 @@
    <BitmapImage x:Key="close_toolwindow_inactive"
                 UriSource="Images/close_toolwindow_inactive.png" />
 
+
     <!-- =============================================================================== -->
     <!-- Common Styles                                                                   -->
-    <!-- Need to find a way to share these for WindowControl and StylableWindow          -->
+   <!-- Need to find a way to share these for WindowControl and StyleableWindow          -->
     <!-- =============================================================================== -->
 
     <!-- Button template -->
@@ -187,11 +190,13 @@
 
    <SolidColorBrush x:Key="Window_Background"  Color="White"/>
 
-    <SolidColorBrush x:Key="Window_BorderBrush" Color="#5D6C7A" />
+   <SolidColorBrush x:Key="Window_BorderBrush" Color="#5D6C7A" />
 
-    <Thickness x:Key="Window_BorderThickness" Left="1" Right="1" Bottom="1" Top="1" />
+   <s:Double x:Key="Window_CaptionFontSize">15</s:Double>
 
-    <conv:ColorBlendConverter x:Key="Window_WindowInactiveBackground_converter" BlendedColor="#FFF0F0F0" BlendedColorRatio="0.67" />
+   <Thickness x:Key="Window_BorderThickness" Left="1" Right="1" Bottom="1" Top="1" />
+
+   <conv:ColorBlendConverter x:Key="Window_WindowInactiveBackground_converter" BlendedColor="#FFF0F0F0" BlendedColorRatio="0.67" />
    <SolidColorBrush x:Key="Window_WindowInactiveBackground" 
                     Color="{Binding 
                         Source={x:Static media:WindowColors.ColorizationColor}, 

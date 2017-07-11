@@ -1360,20 +1360,20 @@
         <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
         <Setter Property="SizeToContent" Value="WidthAndHeight"/>
         <Setter Property="ResizeMode" Value="NoResize"/>
-        <Setter Property="shell:WindowChrome.WindowChrome">
+        <!--<Setter Property="shell:WindowChrome.WindowChrome">
             <Setter.Value>
                 <shell:WindowChrome
                     ResizeBorderThickness="10"
                     CaptionHeight="16"
                     GlassFrameThickness="4"/>
             </Setter.Value>
-        </Setter>
+        </Setter>-->
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type avalonDockControls:NavigatorWindow}">
                     <Grid>
                         <Border x:Name="WindowBorder" BorderThickness="1"
-                                Background="{DynamicResource AvalonDock_ThemeMetro_BaseColor2}"
+                                Background="White"
                                 BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}">
                             <Grid>
                                 <Grid.RowDefinitions>

@@ -24,6 +24,7 @@ using Xceed.Wpf.Toolkit.Primitives;
 using System.Windows.Controls;
 using System.Linq;
 using Xceed.Wpf.Toolkit.Core.Utilities;
+using System.Windows.Threading;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -189,10 +190,7 @@ namespace Xceed.Wpf.Toolkit
       DefaultStyleKeyProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( typeof( DateTimeUpDown ) ) );
       MaximumProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( DateTime.MaxValue ) );
       MinimumProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( DateTime.MinValue ) );
-    }
-
-    public DateTimeUpDown()
-    {
+      UpdateValueOnEnterKeyProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( true ) );
     }
 
     #endregion //Constructors
@@ -313,7 +311,6 @@ namespace Xceed.Wpf.Toolkit
 
     protected override void OnValueChanged( DateTime? oldValue, DateTime? newValue )
     {
-      _fireSelectionChangedEvent = false;
       DateTimeInfo info = _selectedDateTimeInfo;
 
       //this only occurs when the user manually type in a value for the Value Property
@@ -335,9 +332,10 @@ namespace Xceed.Wpf.Toolkit
       if( TextBox != null )
       {
         //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event
+        _fireSelectionChangedEvent = false;
         TextBox.Select( info.StartPosition, info.Length );
+        _fireSelectionChangedEvent = true;
       }
-      _fireSelectionChangedEvent = true;
     }
 
     protected override bool IsCurrentValueValid()
@@ -746,7 +744,7 @@ namespace Xceed.Wpf.Toolkit
           info.Length = info.Content.Length;
           text += info.Content;
         }
-        else
+        else if( newDate != null )
         {
           DateTime date = newDate.Value;
           info.StartPosition = text.Length;

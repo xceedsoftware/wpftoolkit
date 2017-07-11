@@ -310,6 +310,8 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     private void CenterChild( WindowControl windowControl )
     {
+      windowControl.UpdateLayout();
+
       if( ( windowControl.ActualWidth != 0 ) && ( windowControl.ActualHeight != 0 ) )
       {
         windowControl.Left = ( this.ActualWidth - windowControl.ActualWidth ) / 2.0;
