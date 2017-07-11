@@ -102,7 +102,7 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnTextChanged( string oldValue, string newValue )
     {
-      if( !this.IsInitialized || _ignoreTextValueChanged )
+      if( !this.IsInitialized || _ignoreTextValueChanged || !this.IsEditable )
         return;
 
       this.UpdateFromText();
@@ -270,17 +270,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region Methods
 
-    private void UpdateDisplayMemberPathValuesBindings()
-    {
-      _displayMemberPathValuesChangeHelper.UpdateValueSource( ItemsCollection, this.DisplayMemberPath );
-    }
-
-    private void OnDisplayMemberPathValuesChanged()
-    {
-      this.UpdateText();
-    }
-
-    private void UpdateText()
+    protected virtual void UpdateText()
     {
 #if VS2008
       string newValue = String.Join( Delimiter, SelectedItems.Cast<object>().Select( x => GetItemDisplayValue( x ).ToString() ).ToArray() ); 
@@ -291,9 +281,23 @@ namespace Xceed.Wpf.Toolkit
       if( String.IsNullOrEmpty( Text ) || !Text.Equals( newValue ) )
       {
         _ignoreTextValueChanged = true;
+#if VS2008
         Text = newValue;
+#else
+        this.SetCurrentValue( CheckComboBox.TextProperty, newValue );
+#endif
         _ignoreTextValueChanged = false;
       }
+    }
+
+    private void UpdateDisplayMemberPathValuesBindings()
+    {
+      _displayMemberPathValuesChangeHelper.UpdateValueSource( ItemsCollection, this.DisplayMemberPath );
+    }
+
+    private void OnDisplayMemberPathValuesChanged()
+    {
+      this.UpdateText();
     }
 
     /// <summary>
@@ -313,13 +317,36 @@ namespace Xceed.Wpf.Toolkit
 
     protected object GetItemDisplayValue( object item )
     {
-      if( !String.IsNullOrEmpty( DisplayMemberPath ) )
+      if( String.IsNullOrEmpty( this.DisplayMemberPath ) )
+        return item;
+
+      string[] nameParts = this.DisplayMemberPath.Split( '.' );
+      if( nameParts.Length == 1 )
       {
-        var property = item.GetType().GetProperty( DisplayMemberPath );
+        var property = item.GetType().GetProperty( this.DisplayMemberPath );
         if( property != null )
           return property.GetValue( item, null );
+        return item;
       }
 
+      for( int i = 0; i < nameParts.Count(); ++i )
+      {
+        var type = item.GetType();
+        var info = type.GetProperty( nameParts[ i ] );
+        if( info == null )
+        {
+          return item;
+        }
+
+        if( i == nameParts.Count() - 1 )
+        {
+          return info.GetValue( item, null );
+        }
+        else
+        {
+          item = info.GetValue( item, null );
+        }
+      }
       return item;
     }
 
@@ -333,6 +360,6 @@ namespace Xceed.Wpf.Toolkit
         Focus();
     }
 
-    #endregion //Methods
+#endregion //Methods
   }
 }

@@ -195,6 +195,10 @@ namespace Xceed.Wpf.Toolkit
       {
         // Initialized a new object with default values
         result = FormatterServices.GetUninitializedObject( sourceType );
+        var constructor = sourceType.GetConstructor( Type.EmptyTypes );
+        if( constructor == null )
+          return null;
+        constructor.Invoke( result, null );
       }
       Debug.Assert( result != null );
       if( result != null )
@@ -203,21 +207,53 @@ namespace Xceed.Wpf.Toolkit
 
         foreach( var propertyInfo in properties )
         {
-          var propertyInfoValue = propertyInfo.GetValue( source, null );
+          var parameters = propertyInfo.GetIndexParameters();
+          var index = parameters.GetLength( 0 ) == 0 ? null : new object[] { parameters.GetLength( 0 ) - 1 };
+          var propertyInfoValue = propertyInfo.GetValue( source, index );
 
           if( propertyInfo.CanWrite )
           {
-            //Look for nested object
+            // Look for nested object
             if( propertyInfo.PropertyType.IsClass 
               && (propertyInfo.PropertyType != typeof( Transform ))
               && !propertyInfo.PropertyType.Equals( typeof( string ) ) )
             {
-              var nestedObject = this.Clone( propertyInfoValue );
-              propertyInfo.SetValue( result, nestedObject, null );
+              // We have a Collection/List of T.
+              if( propertyInfo.PropertyType.IsGenericType )
+              {
+                // Clone sub-objects if the T are non-primitive types objects. 
+                var arg = propertyInfo.PropertyType.GetGenericArguments().FirstOrDefault();
+                if( (arg != null) && !arg.IsPrimitive && !arg.Equals( typeof( String ) ) && !arg.IsEnum )
+                {
+                  var nestedObject = this.Clone( propertyInfoValue );
+                  propertyInfo.SetValue( result, nestedObject, null );
+                }
+                else
+                {
+                  // copy object if the T are primitive types objects.
+                  propertyInfo.SetValue( result, propertyInfoValue, null );
+                }
+              }
+              else
+              {
+                var nestedObject = this.Clone( propertyInfoValue );
+                if( nestedObject != null )
+                {
+                  // For T object included in List/Collections, Add it to the List/Collection of T.
+                  if( index != null )
+                  {
+                    result.GetType().GetMethod( "Add" ).Invoke( result, new[] { nestedObject } );
+                  }
+                  else
+                  {
+                    propertyInfo.SetValue( result, nestedObject, null );
+                  }
+                }
+              }
             }
             else
             {
-              // copy object
+              // copy regular object
               propertyInfo.SetValue( result, propertyInfoValue, null );
             }
           }

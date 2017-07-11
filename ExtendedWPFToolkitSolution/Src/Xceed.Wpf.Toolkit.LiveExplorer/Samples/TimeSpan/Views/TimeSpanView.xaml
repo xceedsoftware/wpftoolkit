@@ -50,6 +50,7 @@
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="Auto" />
@@ -78,21 +79,31 @@
                       VerticalAlignment="Center"
                       Margin="5,5,25,5" />
             <TextBlock Grid.Row="2"
+                       Text="ShowSeconds:"
+                       VerticalAlignment="Center" />
+            <CheckBox x:Name="_showSeconds"
+                      Grid.Row="2"
+                      Grid.Column="1"
+                      IsChecked="{Binding ShowSeconds, ElementName=_timeSpanUpDown}"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Center"
+                      Margin="5,5,25,5" />
+            <TextBlock Grid.Row="3"
                        Text="FractionalSecondsDigitsCount:"
                        VerticalAlignment="Center" />
             <xctk:IntegerUpDown x:Name="_fractionalSecondsDigitsCount"
-                                Grid.Row="2"
+                                Grid.Row="3"
                                 Grid.Column="1"
                                 Value="{Binding FractionalSecondsDigitsCount, ElementName=_timeSpanUpDown}"
                                 Maximum="3"
                                 Minimum="0"
                                 HorizontalAlignment="Left"
                                 Margin="5,5,25,5" />
-            <TextBlock Grid.Row="3" 
+            <TextBlock Grid.Row="4" 
                        Text="CurrentDateTimePart:" 
                        VerticalAlignment="Center"/>
             <ComboBox x:Name="_currentDateTimePart"
-                      Grid.Row="3"
+                      Grid.Row="4"
                       Grid.Column="1"
                       ItemsSource="{Binding Source={StaticResource enumDateTimePart}}"
                       SelectedItem="{Binding CurrentDateTimePart, ElementName=_timeSpanUpDown}"
@@ -169,6 +180,7 @@
                               Maximum="5.00:00:00"
                               Minimum="-5.00:00:00"
                               ClipValueToMinMax="False"
+                              ShowSeconds="True"
                               FractionalSecondsDigitsCount="0"
                               CurrentDateTimePart="Hour24"
                               Step="1"/>

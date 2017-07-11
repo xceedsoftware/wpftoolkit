@@ -30,6 +30,7 @@
    </ResourceDictionary.MergedDictionaries>
 
    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+   <conv:ObjectTypeToNameConverter x:Key="ObjectTypeToNameConverter" />
    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
    <DataTemplate x:Key="DefaultWatermarkTemplate">
@@ -117,7 +118,7 @@
       <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
       <Setter Property="BorderThickness" Value="1,1,0,1" />
       <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
-      <Setter Property="Focusable" Value="False" />
+      <Setter Property="IsTabStop" Value="False" />
       <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
       <Setter Property="HorizontalContentAlignment" Value="Right" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -153,7 +154,7 @@
                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                              IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
-                                             IsTabStop="{TemplateBinding IsTabStop}"
+                                             IsTabStop="True"
                                              MinWidth="20"
                                              AcceptsReturn="False"
                                              Padding="{TemplateBinding Padding}"
@@ -226,6 +227,18 @@
                      <Setter Property="Foreground"
                              Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                   </Trigger>
+                  <!--ToggleButton can be closed when TimePicker is included in DateTimePicker-->
+                  <MultiDataTrigger>
+                     <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                   Value="True" />
+                        <Condition Binding="{Binding TemplatedParent, RelativeSource={RelativeSource Self}, Converter={StaticResource ObjectTypeToNameConverter}}"
+                                   Value="DateTimePicker" />
+                     </MultiDataTrigger.Conditions>
+                     <Setter Property="IsHitTestVisible"
+                             Value="True"
+                             TargetName="_timePickerToggleButton" />
+                  </MultiDataTrigger>
                </ControlTemplate.Triggers>
             </ControlTemplate>
          </Setter.Value>

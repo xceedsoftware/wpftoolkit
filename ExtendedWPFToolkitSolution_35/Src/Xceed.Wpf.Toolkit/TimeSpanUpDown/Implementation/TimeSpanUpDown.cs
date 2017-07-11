@@ -93,6 +93,39 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //FractionalSecondsDigitsCount
 
+    #region ShowSeconds
+
+    public static readonly DependencyProperty ShowSecondsProperty = DependencyProperty.Register( "ShowSeconds", typeof( bool ), typeof( TimeSpanUpDown ), new UIPropertyMetadata( true, OnShowSecondsChanged ) );
+    public bool ShowSeconds
+    {
+      get
+      {
+        return ( bool )GetValue( ShowSecondsProperty );
+      }
+      set
+      {
+        SetValue( ShowSecondsProperty, value );
+      }
+    }
+
+    private static void OnShowSecondsChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      TimeSpanUpDown timeSpanUpDown = o as TimeSpanUpDown;
+      if( timeSpanUpDown != null )
+        timeSpanUpDown.OnShowSecondsChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+    }
+
+    protected virtual void OnShowSecondsChanged( bool oldValue, bool newValue )
+    {
+      var value = this.UpdateValueOnEnterKey
+                  ? ( this.TextBox != null ) ? this.ConvertTextToValue( this.TextBox.Text ) : null
+                  : this.Value;
+      this.InitializeDateTimeInfoList( value );
+      this.SyncTextAndValueProperties( false, this.Text );
+    }
+
+    #endregion //ShowSeconds
+
     #endregion
 
     #region BaseClass Overrides
@@ -279,8 +312,11 @@ namespace Xceed.Wpf.Toolkit
       _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Hour24, Length = 2, Format = "hh" } );
       _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Other, Length = 1, Content = ":", IsReadOnly = true } );
       _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Minute, Length = 2, Format = "mm" } );
-      _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Other, Length = 1, Content = ":", IsReadOnly = true } );
-      _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Second, Length = 2, Format = "ss" } );
+      if( this.ShowSeconds )
+      {
+        _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Other, Length = 1, Content = ":", IsReadOnly = true } );
+        _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Second, Length = 2, Format = "ss" } );
+      }
 
       if( this.FractionalSecondsDigitsCount > 0 )
       {

@@ -50,10 +50,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="WPFToolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\2.5.0\Bin\Release\WPFToolkit.dll</HintPath>
-    </Reference>
+    <Reference Include="WPFToolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="BusyIndicator\Themes\Aero2.NormalColor.xaml">
@@ -411,6 +408,7 @@
     <Compile Include="CollectionControl\Implementation\PrimitiveTypeCollectionControl.cs" />
     <Compile Include="ColorPicker\Implementation\ColorSorter.cs" />
     <Compile Include="Core\CancelRoutedEventArgs.cs" />
+    <Compile Include="Core\Converters\AditionConverter.cs" />
     <Compile Include="Core\Converters\CenterTitleConverter.cs" />
     <Compile Include="Core\Converters\ColorBlendConverter.cs" />
     <Compile Include="Core\Converters\CornerRadiusToDoubleConverter.cs" />

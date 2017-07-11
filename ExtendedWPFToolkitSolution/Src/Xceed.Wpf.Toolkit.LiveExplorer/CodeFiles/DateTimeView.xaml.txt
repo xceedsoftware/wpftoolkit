@@ -27,7 +27,7 @@
             The DateTimePicker and TimePicker controls let you select the date and the time in several ways. The TimePicker is used in the DateTimePicker.
         </Paragraph>
     </local:DemoView.Description>
-
+    
     <local:DemoView.Resources>
       <conv:DateTimeToTimeSpanConverter x:Key="dateTimeToTimeSpanConverter" />
       <conv:CustomFormatToBoolConverter x:Key="CustomFormatToBoolConverter" />
@@ -83,6 +83,7 @@
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="Auto"/>
@@ -105,12 +106,14 @@
             <ComboBox x:Name="_kind" Grid.Row="5" Grid.Column="1" SelectedIndex="2" ItemsSource="{Binding Source={StaticResource enumKind}}" Width="190" Margin="5,5,25,5"/>
             <TextBlock Text="CalendarDisplayMode:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center"/>
             <ComboBox x:Name="_calendarDisplayMode" Grid.Row="6" Grid.Column="1" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumCalendarDisplayMode}}" Width="190" Margin="5,5,25,5"/>
-            <TextBlock Text="ShowDropDownButton:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center"/>
-            <CheckBox x:Name="_showDropDownButton" Grid.Row="7" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
-            <TextBlock Text="TimePickerVisibility:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center"/>
-            <ComboBox x:Name="_timePickerVisibility" Grid.Row="8" Grid.Column="1" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumVisibility}}" Width="190" Margin="5,5,25,5"/>
-            <TextBlock Text="TimePickerShowButtonSpinner:" Grid.Row="9" Grid.Column="0" VerticalAlignment="Center"/>
-            <CheckBox x:Name="_timePickerShowButtonSpinner" Grid.Row="9" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
+            <TextBlock Text="CalendarWidth:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center"/>
+            <xctk:DoubleUpDown x:Name="_calendarWidth" Grid.Row="7" Grid.Column="1" Value="178" Minimum="100" Maximum="500" Width="190" Margin="5,5,25,5"/>
+            <TextBlock Text="ShowDropDownButton:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="_showDropDownButton" Grid.Row="8" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
+            <TextBlock Text="TimePickerVisibility:" Grid.Row="9" Grid.Column="0" VerticalAlignment="Center"/>
+            <ComboBox x:Name="_timePickerVisibility" Grid.Row="9" Grid.Column="1" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumVisibility}}" Width="190" Margin="5,5,25,5"/>
+            <TextBlock Text="TimePickerShowButtonSpinner:" Grid.Row="10" Grid.Column="0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="_timePickerShowButtonSpinner" Grid.Row="10" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5,5,25,5"/>
 
             <TextBlock Text="TimeFormat:" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" />
             <ComboBox x:Name="_timeFormat" Grid.Row="0" Grid.Column="3" SelectedIndex="7" ItemsSource="{Binding Source={StaticResource enumDateFormatData}}" Width="190" Margin="5"/>
@@ -147,6 +150,7 @@
                                  Maximum="{Binding Value, ElementName=_maximum}"
                                  Kind="{Binding SelectedItem, ElementName=_kind}"
                                  CalendarDisplayMode="{Binding SelectedItem, ElementName=_calendarDisplayMode}"
+                                 CalendarWidth="{Binding Value, ElementName=_calendarWidth}"
                                  ShowDropDownButton="{Binding IsChecked, ElementName=_showDropDownButton}"
                                  CurrentDateTimePart="{Binding SelectedItem, ElementName=_currentDateTimePart, Mode=TwoWay}"/>
         </StackPanel>

@@ -30,6 +30,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       ValueProperty = CollectionControlButton.ItemsSourceProperty;
     }
 
+
     protected override void ResolveValueBinding( PropertyItem propertyItem )
     {
       var type = propertyItem.PropertyType;
@@ -83,6 +84,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 
       base.ResolveValueBinding( propertyItem );
     }
+
   }
 
   public class PropertyGridEditorCollectionControl : CollectionControlButton

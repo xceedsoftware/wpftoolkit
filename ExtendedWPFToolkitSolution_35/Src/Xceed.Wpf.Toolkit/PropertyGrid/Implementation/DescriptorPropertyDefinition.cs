@@ -40,30 +40,21 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
   {
     #region Members
 
-    private readonly object _selectedObject;
-    private readonly PropertyDescriptor _propertyDescriptor;
-    private readonly DependencyPropertyDescriptor _dpDescriptor;
-    private readonly MarkupObject _markupObject;
+    private object _selectedObject;
+    private PropertyDescriptor _propertyDescriptor;
+    private DependencyPropertyDescriptor _dpDescriptor;
+    private MarkupObject _markupObject;
 
     #endregion
 
     #region Constructor
 
+
     internal DescriptorPropertyDefinition( PropertyDescriptor propertyDescriptor, object selectedObject, bool isPropertyGridCategorized )
       : base( isPropertyGridCategorized )
     {
-      if( propertyDescriptor == null )
-        throw new ArgumentNullException( "propertyDescriptor" );
-
-      if( selectedObject == null )
-        throw new ArgumentNullException( "selectedObject" );
-
-      _propertyDescriptor = propertyDescriptor;
-      _selectedObject = selectedObject;
-      _dpDescriptor = DependencyPropertyDescriptor.FromProperty( propertyDescriptor );
-      _markupObject = MarkupWriter.GetMarkupObjectFor( SelectedObject );
+      this.Init( propertyDescriptor, selectedObject );
     }
-
     #endregion
 
     #region Custom Properties
@@ -101,10 +92,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected override BindingBase CreateValueBinding()
     {
+      var selectedObject = this.SelectedObject;
+      var propertyName = this.PropertyDescriptor.Name;
+
       //Bind the value property with the source object.
-      var binding = new Binding( PropertyDescriptor.Name )
+      var binding = new Binding( propertyName )
       {
-        Source = this.GetValueInstance( SelectedObject ),
+        Source = this.GetValueInstance( selectedObject ),
         Mode = PropertyDescriptor.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay,
         ValidatesOnDataErrors = true,
         ValidatesOnExceptions = true,
@@ -160,7 +154,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected override bool ComputeIsExpandable()
     {
-      return ( this.Value != null );
+      return ( this.Value != null )
+        ;
     }
 
     protected override IList<Type> ComputeNewItemTypes()
@@ -215,6 +210,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private T GetAttribute<T>() where T : Attribute
     {
       return PropertyGridUtilities.GetAttribute<T>( PropertyDescriptor );
+    }
+
+    private void Init( PropertyDescriptor propertyDescriptor, object selectedObject )
+    {
+      if( propertyDescriptor == null )
+        throw new ArgumentNullException( "propertyDescriptor" );
+
+      if( selectedObject == null )
+        throw new ArgumentNullException( "selectedObject" );
+
+      _propertyDescriptor = propertyDescriptor;
+      _selectedObject = selectedObject;
+      _dpDescriptor = DependencyPropertyDescriptor.FromProperty( propertyDescriptor );
+      _markupObject = MarkupWriter.GetMarkupObjectFor( SelectedObject );
     }
 
     #endregion //Private Methods

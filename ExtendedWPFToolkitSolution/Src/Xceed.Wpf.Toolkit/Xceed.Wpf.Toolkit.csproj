@@ -409,6 +409,7 @@
     <Compile Include="CollectionControl\Implementation\PrimitiveTypeCollectionControl.cs" />
     <Compile Include="ColorPicker\Implementation\ColorSorter.cs" />
     <Compile Include="Core\CancelRoutedEventArgs.cs" />
+    <Compile Include="Core\Converters\AditionConverter.cs" />
     <Compile Include="Core\Converters\CenterTitleConverter.cs" />
     <Compile Include="Core\Converters\ColorBlendConverter.cs" />
     <Compile Include="Core\Converters\CornerRadiusToDoubleConverter.cs" />

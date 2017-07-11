@@ -42,7 +42,7 @@
               Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
       <Setter Property="HorizontalContentAlignment"
               Value="Right" />
-      <Setter Property="Focusable"
+      <Setter Property="IsTabStop"
               Value="False" />
       <Setter Property="TextAlignment"
               Value="Right" />
@@ -50,8 +50,6 @@
               Value="{StaticResource DefaultWatermarkTemplate}" />
       <Setter Property="VerticalContentAlignment"
               Value="Center" />
-      <Setter Property="IsTabStop"
-              Value="False" />
       <Setter Property="Template">
          <Setter.Value>
             <ControlTemplate TargetType="{x:Type local:DateTimeUpDown}">
@@ -78,7 +76,7 @@
                                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                           IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
-                                          IsTabStop="{TemplateBinding IsTabStop}"
+                                          IsTabStop="True"
                                           MinWidth="20"
                                           AcceptsReturn="False"
                                           Padding="{TemplateBinding Padding}"

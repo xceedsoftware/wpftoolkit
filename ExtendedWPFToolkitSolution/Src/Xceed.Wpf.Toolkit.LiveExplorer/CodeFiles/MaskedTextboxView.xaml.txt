@@ -25,7 +25,7 @@
            The MaskedTextBox control lets you display and edit values based on a mask.
         </Paragraph>
     </local:DemoView.Description>
-
+    
    <Grid>
 
       <Grid.RowDefinitions>

@@ -26,7 +26,7 @@
    <local:DemoView.Description>
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
-         <Run>Changes the themes of the AvalonDock controls. Available themes are System, Aero, VS2010, Metro, Office2007, and Metro with accent color. The Xceed.Wpf.AvalonDock.Themes.xxx.dll assemblies are necessary to use these themes.</Run>
+         <Run>Changes the themes of the AvalonDock controls. Available themes are System, Aero, VS2010, Metro, Office2007, Windows10 and Metro with accent color. The Xceed.Wpf.AvalonDock.Themes.xxx.dll assemblies are necessary to use these themes.</Run>
             <LineBreak />
             <Run>Some features of this sample are only available in the "Plus" version.</Run>
             <LineBreak />
@@ -37,6 +37,11 @@
    </local:DemoView.Description>
 
    <local:DemoView.Resources>
+      <ResourceDictionary>
+         <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="../ItemTemplates/Common.xaml" />
+         </ResourceDictionary.MergedDictionaries>
+
 
 
       <Style x:Key="plusSuffix" TargetType="TextBlock">
@@ -69,6 +74,26 @@
             </Setter.Value>
          </Setter>
       </Style>
+
+      <Style x:Key="plusNewItem"
+             TargetType="ComboBoxItem">
+         <Setter Property="HorizontalContentAlignment"
+                 Value="Stretch" />
+         <Setter Property="ContentTemplate">
+            <Setter.Value>
+               <DataTemplate>
+                  <DockPanel>
+                     <TextBlock DockPanel.Dock="Left"
+                                Text="{Binding}" />
+                     <TextBlock TextAlignment="Right"
+                                Style="{StaticResource newSuffix}" />
+                     <TextBlock TextAlignment="Right" Style="{StaticResource plusSuffix}" />
+                  </DockPanel>
+               </DataTemplate>
+            </Setter.Value>
+         </Setter>
+       </Style>
+     </ResourceDictionary>
    </local:DemoView.Resources>
 
    <Grid>
@@ -135,6 +160,11 @@
                                                Content="Office2007 Silver"
                                                Selected="DefaultComboBoxItem_Selected"
                                                ThemeEnum="{x:Static view:AvalonDockThemesEnum.Office2007Silver}">
+                  </view:AvalonDockComboBoxItem>
+                  <view:AvalonDockComboBoxItem Style="{StaticResource plusNewItem}"
+                                               Content="Windows 10"
+                                               Selected="DefaultComboBoxItem_Selected"
+                                               ThemeEnum="{x:Static view:AvalonDockThemesEnum.Windows10}">
                   </view:AvalonDockComboBoxItem>
                   <view:AvalonDockComboBoxItem x:Name="metroDarkComboBoxItem"
                                                Style="{StaticResource plusItem}"

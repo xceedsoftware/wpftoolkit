@@ -499,36 +499,79 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     private bool? GetSelectedMemberPathValue( object item )
     {
-      PropertyInfo prop = this.GetSelectedMemberPathProperty(item);
+      if( String.IsNullOrEmpty( this.SelectedMemberPath ) )
+        return null;
+      if( item == null )
+        return null;
 
-      return ( prop != null )
-        ? ( bool )prop.GetValue( item, null )
-        : ( bool? )null;
+      string[] nameParts = this.SelectedMemberPath.Split( '.' );
+      if( nameParts.Length == 1 )
+      {
+        var property = item.GetType().GetProperty( this.SelectedMemberPath );
+        if( (property != null) && (property.PropertyType == typeof( bool )) )
+          return property.GetValue( item, null ) as bool?;
+        return null;
+      }
+
+      for( int i = 0; i < nameParts.Count(); ++i )
+      {
+        var type = item.GetType();
+        var info = type.GetProperty( nameParts[ i ] );
+        if( info == null )
+        {
+          return null;
+        }
+
+        if( i == nameParts.Count() - 1 )
+        {
+          if( info.PropertyType == typeof( bool ) )
+            return info.GetValue( item, null ) as bool?;
+        }
+        else
+        {
+          item = info.GetValue( item, null );
+        }
+      }
+      return null;
     }
 
     private void SetSelectedMemberPathValue( object item, bool value )
     {
-      PropertyInfo prop = this.GetSelectedMemberPathProperty(item);
+      if( String.IsNullOrEmpty( this.SelectedMemberPath ) )
+        return;
+      if( item == null )
+        return;
 
-      if( prop != null )
+      string[] nameParts = this.SelectedMemberPath.Split( '.' );
+      if( nameParts.Length == 1 )
       {
-        prop.SetValue( item, value, null );
-      }
-    }
-
-    private PropertyInfo GetSelectedMemberPathProperty(object item)
-    {
-      PropertyInfo propertyInfo = null;
-      if( !String.IsNullOrEmpty( SelectedMemberPath ) && ( item != null ) )
-      {
-        var property = item.GetType().GetProperty( SelectedMemberPath );
-        if( property != null && property.PropertyType == typeof( bool ) )
+        var property = item.GetType().GetProperty( this.SelectedMemberPath );
+        if( (property != null) && (property.PropertyType == typeof( bool )) )
         {
-          propertyInfo = property;
+          property.SetValue( item, value, null );
+        }
+        return;
+      }
+
+      for( int i = 0; i < nameParts.Count(); ++i )
+      {
+        var type = item.GetType();
+        var info = type.GetProperty( nameParts[ i ] );
+        if( info == null )
+          return;
+
+        if( i == nameParts.Count() - 1 )
+        {
+          if( info.PropertyType == typeof( bool ) )
+          {
+            info.SetValue( item, value, null );
+          }
+        }
+        else
+        {
+          item = info.GetValue( item, null );
         }
       }
-
-      return propertyInfo;
     }
 
     /// <summary>
@@ -607,6 +650,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     private void UpdateSelectedMemberPathValuesBindings()
     {
       _selectedMemberPathValuesHelper.UpdateValueSource( ItemsCollection, SelectedMemberPath );
+      this.UpdateFromSelectedMemberPathValues();
     }
 
     private void UpdateValueMemberPathValuesBindings()

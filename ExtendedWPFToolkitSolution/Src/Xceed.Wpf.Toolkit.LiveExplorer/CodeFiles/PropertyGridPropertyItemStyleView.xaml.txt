@@ -29,7 +29,7 @@
          <Bold>PreparePropertyItem</Bold> event to customize the display of the PropertyGrid content.
       </Paragraph>
     </local:DemoView.Description>
-
+    
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />

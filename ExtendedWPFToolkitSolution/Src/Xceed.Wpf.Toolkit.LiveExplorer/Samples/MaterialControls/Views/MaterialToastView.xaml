@@ -51,5 +51,7 @@
 
 
 
+
+
     <Image Source="..\OpenSourceImages\MaterialToast.png" Width="600" Height="400"/>
 </local:MaterialDemoView>

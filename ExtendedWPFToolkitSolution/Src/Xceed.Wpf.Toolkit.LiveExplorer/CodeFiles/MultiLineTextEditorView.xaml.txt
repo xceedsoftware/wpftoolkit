@@ -26,7 +26,7 @@
            The MultiLineTextEditor is a TextBox that allows you to edit text that is too long to display in a regular TextBox. The popup is resizable to accommodate any text.
         </Paragraph>
     </local:DemoView.Description>
-
+    
     <local:DemoView.Resources>
         <DataTemplate x:Key="multiLineTextEditorStyle" >
             <xctk:MultiLineTextEditor
@@ -38,7 +38,7 @@
                Height="24" />
         </DataTemplate>
     </local:DemoView.Resources>
-
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

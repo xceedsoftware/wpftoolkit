@@ -97,7 +97,7 @@
       <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
       <Setter Property="BorderThickness" Value="1,1,0,1" />
       <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
-      <Setter Property="Focusable" Value="False" />
+      <Setter Property="IsTabStop" Value="False" />
       <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="HorizontalContentAlignment" Value="Right" />
@@ -133,7 +133,7 @@
                                              Foreground="{TemplateBinding Foreground}" 
                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                              IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
-                                             IsTabStop="{TemplateBinding IsTabStop}"
+                                             IsTabStop="True"
                                              MinWidth="20"
                                              AcceptsReturn="False"
                                              Padding="{TemplateBinding Padding}"

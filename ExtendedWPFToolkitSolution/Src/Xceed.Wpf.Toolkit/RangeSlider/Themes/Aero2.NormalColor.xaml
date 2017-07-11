@@ -67,7 +67,8 @@
          <Rectangle x:Name="BackgroundFadingRect"
                     Fill="Black"
                     Width="11"
-                    Height="20" />
+                    Height="20"
+                    SnapsToDevicePixels="True" />
          <Rectangle x:Name="MainBorder"
                     Fill="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background, TargetNullValue=#FFF0F0F0}"
                     StrokeThickness="1"
@@ -75,7 +76,6 @@
                     Opacity="1"
                     Width="11"
                     Height="20"
-                    ToolTip="{Binding RelativeSource={RelativeSource AncestorType={x:Type Slider}}, Path=Value, StringFormat=\{0:00.00\}}"
                     SnapsToDevicePixels="True" />
       </Grid>
       <ControlTemplate.Triggers>
@@ -139,30 +139,165 @@
       </ControlTemplate.Triggers>
    </ControlTemplate>
 
-    <!-- ********************** -->
-    <!-- Slider Template     -->
-    <!-- ********************** -->
+   <!-- ********************** -->
+   <!-- Slider Template     -->
+   <!-- ********************** -->
    <ControlTemplate x:Key="SliderTemplate"
                     TargetType="{x:Type Slider}">
-      <Border SnapsToDevicePixels="true"
+      <Border SnapsToDevicePixels="True"
               BorderBrush="{TemplateBinding BorderBrush}"
               BorderThickness="{TemplateBinding BorderThickness}">
+         <Track x:Name="PART_Track"
+                  Orientation="{TemplateBinding Orientation}">
+            <Track.Thumb>
+               <Thumb x:Name="Thumb"
+                        Focusable="True"
+                        FocusVisualStyle="{StaticResource ThumbFocusVisualStyle}"
+                        Background="{TemplateBinding Background}"
+                        Template="{StaticResource ThumbTemplate}">
+               </Thumb>
+            </Track.Thumb>
+         </Track>
+      </Border>
+   </ControlTemplate>
+
+   <!-- ********************** -->
+   <!-- HorizontalTickSlider Template     -->
+   <!-- ********************** -->
+   <ControlTemplate x:Key="HorizontalTickSliderTemplate"
+                    TargetType="{x:Type Slider}">
+      <Grid>
+         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+         </Grid.RowDefinitions>
+
+         <TickBar Name="TopTick"
+                  Grid.Row="0"
+                  SnapsToDevicePixels="True"
+                  Placement="Top"
+                  Fill="Black"
+                  Height="4"
+                  Visibility="Collapsed" />
+
+         <Border Grid.Row="1"
+                 SnapsToDevicePixels="true"
+                 Visibility="Hidden">
             <Track x:Name="PART_Track"
-                   Orientation="{TemplateBinding Orientation}"
-                   Grid.Row="1">
+                   Orientation="{TemplateBinding Orientation}">
                <Track.Thumb>
                   <Thumb x:Name="Thumb"
                          Focusable="True"
-                         FocusVisualStyle="{StaticResource ThumbFocusVisualStyle}"
-                         Background="{TemplateBinding Background}"
                          Template="{StaticResource ThumbTemplate}">
                   </Thumb>
                </Track.Thumb>
             </Track>
-      </Border>
+         </Border>
+
+         <TickBar Name="BottomTick"
+                  Grid.Row="2"
+                  SnapsToDevicePixels="True"
+                  Fill="Black"
+                  Placement="Bottom"
+                  Height="4"
+                  Visibility="Collapsed" />
+      </Grid>
+
+      <ControlTemplate.Triggers>
+         <DataTrigger Binding="{Binding TickPlacement, RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}}"
+                      Value="TopLeft">
+            <Setter TargetName="TopTick"
+                    Property="Visibility"
+                    Value="Visible" />
+         </DataTrigger>
+         <DataTrigger Binding="{Binding TickPlacement, RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}}"
+                      Value="BottomRight">
+            <Setter TargetName="BottomTick"
+                    Property="Visibility"
+                    Value="Visible" />
+         </DataTrigger>
+         <DataTrigger Binding="{Binding TickPlacement, RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}}"
+                      Value="Both">
+            <Setter TargetName="TopTick"
+                    Property="Visibility"
+                    Value="Visible" />
+            <Setter TargetName="BottomTick"
+                    Property="Visibility"
+                    Value="Visible" />
+         </DataTrigger>
+      </ControlTemplate.Triggers>
    </ControlTemplate>
 
-    <!-- ********************** -->
+   <!-- ********************** -->
+   <!-- VerticalTickSlider Template     -->
+   <!-- ********************** -->
+   <ControlTemplate x:Key="VerticalTickSliderTemplate"
+                    TargetType="{x:Type Slider}">
+      <Grid>
+         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto" />
+         </Grid.ColumnDefinitions>
+
+         <TickBar Name="LeftTick"
+                  Grid.Column="0"
+                  SnapsToDevicePixels="True"
+                  Placement="Left"
+                  Fill="Black"
+                  Width="4"
+                  Visibility="Collapsed" />
+
+         <Border Grid.Column="1"
+                 SnapsToDevicePixels="true"
+                 Visibility="Hidden">
+            <Track x:Name="PART_Track"
+                   Orientation="{TemplateBinding Orientation}">
+               <Track.Thumb>
+                  <Thumb x:Name="Thumb"
+                         Focusable="True"
+                         Template="{StaticResource ThumbTemplate}">
+                  </Thumb>
+               </Track.Thumb>
+            </Track>
+         </Border>
+
+         <TickBar Name="RightTick"
+                  Grid.Column="2"
+                  SnapsToDevicePixels="True"
+                  Fill="Black"
+                  Placement="Right"
+                  Width="4"
+                  Visibility="Collapsed"/>
+      </Grid>
+
+      <ControlTemplate.Triggers>
+         <DataTrigger Binding="{Binding TickPlacement, RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}}"
+                      Value="TopLeft">
+            <Setter TargetName="LeftTick"
+                    Property="Visibility"
+                    Value="Visible" />
+         </DataTrigger>
+         <DataTrigger Binding="{Binding TickPlacement, RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}}"
+                      Value="BottomRight">
+            <Setter TargetName="RightTick"
+                    Property="Visibility"
+                    Value="Visible" />
+         </DataTrigger>
+         <DataTrigger Binding="{Binding TickPlacement, RelativeSource={RelativeSource AncestorType={x:Type local:RangeSlider}}}"
+                      Value="Both">
+            <Setter TargetName="LeftTick"
+                    Property="Visibility"
+                    Value="Visible" />
+            <Setter TargetName="RightTick"
+                    Property="Visibility"
+                    Value="Visible" />
+         </DataTrigger>
+      </ControlTemplate.Triggers>
+   </ControlTemplate>
+
+   <!-- ********************** -->
     <!-- Vertical RangeSlider Template -->
     <!-- ********************** -->
    <ControlTemplate x:Key="VerticalRangeSlider"
@@ -172,6 +307,13 @@
               Background="{TemplateBinding Background}">
          <Grid HorizontalAlignment="Left"
                VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+               <ColumnDefinition x:Name="LeftColumn"
+                                 Width="0"/>
+               <ColumnDefinition Width="Auto" />
+               <ColumnDefinition x:Name="RightColumn"
+                                 Width="0" />
+            </Grid.ColumnDefinitions>
             <!-- //#TODODOC 
              Get Thumbs's height to set the good RangeSlider height.-->
             <Grid.RowDefinitions>
@@ -184,6 +326,7 @@
 
             <Border Grid.Row="1"
                     Grid.RowSpan="3"
+                    Grid.Column="1"
                     BorderThickness="1"
                     BorderBrush="#FFD6D6D6"
                     Background="#FFE7EAEA"
@@ -191,15 +334,30 @@
                     HorizontalAlignment="Center"
                     Width="4" />
 
+            <!-- Create a Hidden Slider to only display its Ticks -->
+            <Slider x:Name="TickSlider"
+                    Orientation="Vertical"
+                    Grid.RowSpan="5"
+                    Grid.ColumnSpan="3"
+                    Focusable="False"
+                    Margin="0,5.5,0,5.5"
+                    Template="{StaticResource VerticalTickSliderTemplate}"
+                    Minimum="{Binding Minimum, ElementName=PART_LowerSlider}"
+                    Maximum="{Binding Maximum, ElementName=PART_HigherSlider}"
+                    TickFrequency="{TemplateBinding TickFrequency}">
+            </Slider>
+
             <RepeatButton x:Name="PART_LowerRange"
                           Height="{TemplateBinding LowerRangeWidth}"
                           Grid.Row="3"
+                          Grid.Column="1"
                           Background="{TemplateBinding LowerRangeBackground}"
                           Style="{Binding LowerRangeStyle, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DefaultRangeStyle}}"
                           SnapsToDevicePixels="True" />
 
             <RepeatButton Height="{TemplateBinding RangeWidth}"
                           Grid.Row="2"
+                          Grid.Column="1"
                           Background="{TemplateBinding RangeBackground}"
                           Style="{Binding RangeStyle, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DefaultRangeStyle}}"
                           SnapsToDevicePixels="True" />
@@ -207,6 +365,7 @@
             <RepeatButton x:Name="PART_HigherRange"
                           Height="{TemplateBinding HigherRangeWidth}"
                           Grid.Row="1"
+                          Grid.Column="1"
                           Background="{TemplateBinding HigherRangeBackground}"
                           Style="{Binding HigherRangeStyle, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DefaultRangeStyle}}"
                           SnapsToDevicePixels="True" />
@@ -215,21 +374,56 @@
             <Slider x:Name="PART_LowerSlider"
                     Orientation="Vertical"
                     Grid.RowSpan="5"
+                    Grid.Column="1"
                     Focusable="False"
                     Background="{TemplateBinding LowerThumbBackground}"
-                    Template="{StaticResource SliderTemplate}">
+                    Template="{StaticResource SliderTemplate}"
+                    IsSnapToTickEnabled="{TemplateBinding IsSnapToTickEnabled}"
+                    TickFrequency="{TemplateBinding TickFrequency}"
+                    HorizontalAlignment="Left"
+                    AutoToolTipPlacement="{TemplateBinding AutoToolTipPlacement}"
+                    AutoToolTipPrecision="{TemplateBinding AutoToolTipPrecision}">
             </Slider>
 
             <!-- Margin is set in CodeBehind, based on LowerSlider's Thumb width -->
             <Slider x:Name="PART_HigherSlider"
                     Grid.RowSpan="5"
+                    Grid.Column="1"
                     Orientation="Vertical"
                     Focusable="False"
                     Background="{TemplateBinding HigherThumbBackground}"
-                    Template="{StaticResource SliderTemplate}">
+                    Template="{StaticResource SliderTemplate}"
+                    IsSnapToTickEnabled="{TemplateBinding IsSnapToTickEnabled}"
+                    TickFrequency="{TemplateBinding TickFrequency}"
+                    HorizontalAlignment="Left"
+                    AutoToolTipPlacement="{TemplateBinding AutoToolTipPlacement}"
+                    AutoToolTipPrecision="{TemplateBinding AutoToolTipPrecision}">
             </Slider>
          </Grid>
       </Border>
+      <ControlTemplate.Triggers>
+         <Trigger Property="TickPlacement"
+                  Value="TopLeft">
+            <Setter TargetName="LeftColumn"
+                    Property="Width"
+                    Value="4" />
+         </Trigger>
+         <Trigger Property="TickPlacement"
+                  Value="BottomRight">
+            <Setter TargetName="RightColumn"
+                    Property="Width"
+                    Value="4" />
+         </Trigger>
+         <Trigger Property="TickPlacement"
+                  Value="Both">
+            <Setter TargetName="LeftColumn"
+                    Property="Width"
+                    Value="4" />
+            <Setter TargetName="RightColumn"
+                    Property="Width"
+                    Value="4" />
+         </Trigger>
+      </ControlTemplate.Triggers>
    </ControlTemplate>
 
     <!-- ********************** -->
@@ -246,6 +440,13 @@
                        Background="{TemplateBinding Background}">
                   <Grid HorizontalAlignment="Left"
                         VerticalAlignment="Top">
+                     <Grid.RowDefinitions>
+                        <RowDefinition x:Name="TopRow"
+                                       Height="0" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition x:Name="BottomRow"
+                                       Height="0" />
+                     </Grid.RowDefinitions>
                      <!-- //#TODODOC 
                         Get Thumbs's width to set the good RangeSlider width.-->
                      <Grid.ColumnDefinitions>
@@ -256,14 +457,26 @@
                         <ColumnDefinition Width="11" />
                      </Grid.ColumnDefinitions>
 
-                     <Border Grid.Row="1"
-                             Grid.Column="1"
+                     <Border Grid.Column="1"
                              Grid.ColumnSpan="3"
+                             Grid.Row="1"
                              BorderThickness="1"
                              BorderBrush="#FFD6D6D6"
                              Background="#FFE7EAEA"
                              VerticalAlignment="Center"
                              Height="4" />
+
+                     <!-- Create a Hidden Slider to only display its Ticks -->
+                     <Slider x:Name="TickSlider"
+                             Grid.ColumnSpan="5"
+                             Grid.RowSpan="3"
+                             Focusable="False"
+                             Margin="5.5,0,5.5,0"
+                             Template="{StaticResource HorizontalTickSliderTemplate}"
+                             Minimum="{Binding Minimum, ElementName=PART_LowerSlider}"
+                             Maximum="{Binding Maximum, ElementName=PART_HigherSlider}"
+                             TickFrequency="{TemplateBinding TickFrequency}">
+                     </Slider>
 
                      <RepeatButton x:Name="PART_LowerRange"
                                    Width="{TemplateBinding LowerRangeWidth}"
@@ -274,39 +487,70 @@
                                    SnapsToDevicePixels="True" />
 
                      <RepeatButton Width="{TemplateBinding RangeWidth}"
-                                   Grid.Row="1"
                                    Grid.Column="2"
+                                   Grid.Row="1"
                                    Background="{TemplateBinding RangeBackground}"
                                    Style="{Binding RangeStyle, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DefaultRangeStyle}}"
                                    SnapsToDevicePixels="True" />
 
                      <RepeatButton x:Name="PART_HigherRange"
                                    Width="{TemplateBinding HigherRangeWidth}"
-                                   Grid.Row="1"
                                    Grid.Column="3"
+                                   Grid.Row="1"
                                    Background="{TemplateBinding HigherRangeBackground}"
                                    Style="{Binding HigherRangeStyle, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DefaultRangeStyle}}"
                                    SnapsToDevicePixels="True" />
 
                      <!-- Margin is set in CodeBehind, based on HigherSlider's Thumb width -->
                      <Slider x:Name="PART_LowerSlider"
-                             Grid.Row="1"
                              Grid.ColumnSpan="5"
+                             Grid.Row="1"
                              Focusable="False"
                              Background="{TemplateBinding LowerThumbBackground}"
-                             Template="{StaticResource SliderTemplate}">
+                             Template="{StaticResource SliderTemplate}"
+                             IsSnapToTickEnabled="{TemplateBinding IsSnapToTickEnabled}"
+                             TickFrequency="{TemplateBinding TickFrequency}"
+                             AutoToolTipPlacement="{TemplateBinding AutoToolTipPlacement}"
+                             AutoToolTipPrecision="{TemplateBinding AutoToolTipPrecision}">
                      </Slider>
 
                      <!-- Margin is set in CodeBehind, based on LowerSlider's Thumb width -->
                      <Slider x:Name="PART_HigherSlider"
-                             Grid.Row="1"
                              Grid.ColumnSpan="5"
+                             Grid.Row="1"
                              Focusable="False"
                              Background="{TemplateBinding HigherThumbBackground}"
-                             Template="{StaticResource SliderTemplate}">
+                             Template="{StaticResource SliderTemplate}"
+                             IsSnapToTickEnabled="{TemplateBinding IsSnapToTickEnabled}"
+                             TickFrequency="{TemplateBinding TickFrequency}"
+                             AutoToolTipPlacement="{TemplateBinding AutoToolTipPlacement}"
+                             AutoToolTipPrecision="{TemplateBinding AutoToolTipPrecision}">
                      </Slider>
                   </Grid>
                </Border>
+               <ControlTemplate.Triggers>
+                  <Trigger Property="TickPlacement"
+                           Value="TopLeft">
+                     <Setter TargetName="TopRow"
+                             Property="Height"
+                             Value="4" />
+                  </Trigger>
+                  <Trigger Property="TickPlacement"
+                           Value="BottomRight">
+                     <Setter TargetName="BottomRow"
+                             Property="Height"
+                             Value="4" />
+                  </Trigger>
+                  <Trigger Property="TickPlacement"
+                           Value="Both">
+                     <Setter TargetName="TopRow"
+                             Property="Height"
+                             Value="4" />
+                     <Setter TargetName="BottomRow"
+                             Property="Height"
+                             Value="4" />
+                  </Trigger>
+               </ControlTemplate.Triggers>
             </ControlTemplate>
          </Setter.Value>
       </Setter>

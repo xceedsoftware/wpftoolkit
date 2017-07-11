@@ -45,6 +45,10 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
     {
       InitializeComponent();
       this.Loaded += new RoutedEventHandler( this.MainWindow_Loaded );
+
+      var assembly = Assembly.GetExecutingAssembly();
+      var fvi = FileVersionInfo.GetVersionInfo( assembly.Location );
+      VersionTextBlock.Text = "Version: " + fvi.FileVersion;
     }
 
 

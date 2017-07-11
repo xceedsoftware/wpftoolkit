@@ -24,7 +24,7 @@
 
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-         <Run>Changes the themes of the WPF controls. Available themes are System, Office2007, and Metro with accent color. The Xceed.Wpf.Themes.Office2007.dll or Xceed.Wpf.Themes.Metro.dll assemblies are necessary to use these themes.</Run>
+         <Run>Changes the themes of the WPF controls. Available themes are System, Office2007, Windows10 and Metro with accent color. The Xceed.Wpf.Themes.Office2007.dll or Xceed.Wpf.Themes.Metro.dll assemblies are necessary to use these themes.</Run>
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
@@ -33,6 +33,7 @@
             </Hyperlink>
         </Paragraph>
     </local:DemoView.Description>
+
 
 
 

@@ -94,6 +94,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
         bool isPlusPanel = ( comboBoxItem.ThemeEnum == AvalonDockThemesEnum.Office2007Black 
                           || comboBoxItem.ThemeEnum == AvalonDockThemesEnum.Office2007Blue
                           || comboBoxItem.ThemeEnum == AvalonDockThemesEnum.Office2007Silver
+                          || comboBoxItem.ThemeEnum == AvalonDockThemesEnum.Windows10
                           || comboBoxItem.ThemeEnum == AvalonDockThemesEnum.MetroDark
                           || comboBoxItem.ThemeEnum == AvalonDockThemesEnum.MetroLight );
 
@@ -119,6 +120,9 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
               break;
             case AvalonDockThemesEnum.Office2007Silver:
               bitmapImage.UriSource = new Uri( "..\\OpenSourceImages\\AvalonDockOffice2007Silver.png", UriKind.Relative );
+              break;
+            case AvalonDockThemesEnum.Windows10:
+              bitmapImage.UriSource = new Uri( "..\\OpenSourceImages\\AvalonDockWindows10.png", UriKind.Relative );
               break;
             case AvalonDockThemesEnum.MetroDark:
               bitmapImage.UriSource = new Uri( "..\\OpenSourceImages\\AvalonDockMetroDark.png", UriKind.Relative );
@@ -155,6 +159,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
     Office2007Black,
     Office2007Blue,
     Office2007Silver,
+    Windows10,
     MetroDark,
     MetroLight
   }

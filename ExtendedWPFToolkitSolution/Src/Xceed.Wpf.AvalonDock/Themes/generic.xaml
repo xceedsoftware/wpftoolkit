@@ -823,6 +823,9 @@
                         <Trigger Property="WindowState" Value="Maximized">
                             <Setter Property="Padding" Value="3" TargetName="WindowBorder"/>
                         </Trigger>
+                        <DataTrigger Binding="{Binding Model.RootDocument.IsActive, RelativeSource={RelativeSource Self}}" Value="True">
+                              <Setter TargetName="WindowBorder" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                        </DataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -930,9 +933,9 @@
                         <Trigger Property="WindowState" Value="Maximized">
                             <Setter Property="Padding" Value="3" TargetName="WindowBorder"/>
                         </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="WindowBorder"  Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                        </Trigger>
+                           <DataTrigger Binding="{Binding Model.SinglePane.SelectedContent.IsActive, RelativeSource={RelativeSource Self}}" Value="True">
+                              <Setter TargetName="WindowBorder" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                        </DataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

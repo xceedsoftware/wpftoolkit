@@ -109,7 +109,7 @@
       </Setter>
       <Setter Property="BorderThickness" Value="1,1,0,1" />
       <Setter Property="Content" Value="{StaticResource DefaultContent}" />
-      <Setter Property="Focusable" Value="False" />
+      <Setter Property="IsTabStop" Value="False" />
       <Setter Property="Padding" Value="2,0,0,0" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />

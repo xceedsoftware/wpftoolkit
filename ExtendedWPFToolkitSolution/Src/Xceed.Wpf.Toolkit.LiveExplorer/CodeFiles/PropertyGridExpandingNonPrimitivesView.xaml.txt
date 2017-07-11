@@ -1,0 +1,93 @@
+﻿<!--**************************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2016 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ************************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views.PropertyGridExpandingNonPrimitivesView"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                xmlns:s="clr-namespace:System;assembly=mscorlib"
+                VerticalScrollBarVisibility="Disabled"
+                Title="PropertyGrid">
+   <local:DemoView.Description>
+      <!-- //# TODODOC -->
+      <Paragraph FontSize="14"
+                 FontFamily="Segoe">
+         The PropertyGrid allows you to expand non-primitive type properties from the SelectedObject to view or edit their sub-properties. It also allows you to expand collections or lists properties to view their items and drill down on these items properties, directly from the propertyGrid, instead of passing by the CollectionEditor.
+         <!--##INCLUDE_OPEN_SOURCE
+            <LineBreak />
+            <Run>This feature is only available in the "Plus" version.</Run>
+            <LineBreak />
+            <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
+               Click here for more details about Xceed Toolkit Plus for WPF.
+            </Hyperlink>
+        ##END-->
+      </Paragraph>
+   </local:DemoView.Description>
+
+   <!--##EXCLUDE_OPEN_SOURCE-->
+   <Grid>
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <GroupBox Header="Features"
+                Grid.Row="0"
+                Margin="5">
+         <Grid Margin="5">
+            <Grid.RowDefinitions>
+               <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+               <ColumnDefinition Width="Auto" />
+               <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- 1st column-->
+            <TextBlock Text="Is Expanding Non Primitive Types:"
+                       VerticalAlignment="Center" />
+            <!-- //# TODODOC -->
+            <CheckBox Grid.Column="1"
+                      IsChecked="{Binding IsExpandingNonPrimitiveTypes, ElementName=_propertyGrid}"
+                      VerticalAlignment="Center"
+                      Margin="5"
+                      ToolTip="Expand the the non-primitive type properties on the SelectedObject." />
+         </Grid>
+      </GroupBox>
+
+      <DockPanel Grid.Row="1"
+                 Margin="10">
+
+         <TextBlock DockPanel.Dock="Top"
+                    Text="Usage:"
+                    Style="{StaticResource Header}" />
+        
+         <Grid Margin="10">
+            <xctk:PropertyGrid x:Name="_propertyGrid"
+                                 SelectedObject="{Binding}"
+                                 IsExpandingNonPrimitiveTypes="True"
+                                 Width="500"
+                                 MaxHeight="650" />
+            
+         </Grid>
+      </DockPanel>
+   </Grid>
+   <!--##END-->
+
+   <!--##INCLUDE_OPEN_SOURCE
+    <Image Source="..\OpenSourceImages\ExpandingNonPrimitives.png" Width="660" Height="430"/>
+##END-->
+</local:DemoView>

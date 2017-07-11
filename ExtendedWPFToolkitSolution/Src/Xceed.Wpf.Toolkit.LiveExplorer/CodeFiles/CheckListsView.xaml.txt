@@ -26,7 +26,7 @@
             The CheckListBox and CheckComboBox controls represent a list of selected items that are displayed as CheckBoxes. Besides the common SelectedItem and SelectedItems properties, these controls give developers more alternatives for managing and handling selections.
         </Paragraph>
     </local:DemoView.Description>
-
+    
    <local:DemoView.Resources>
       <x:Array x:Key="personProperties" Type="s:String">
          <s:String>ID</s:String>
@@ -34,7 +34,7 @@
          <s:String>LastName</s:String>
       </x:Array>
    </local:DemoView.Resources>
-
+   
    <Grid >
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
@@ -56,7 +56,7 @@
                <ColumnDefinition Width="Auto"/>
                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-
+            
             <TextBlock Grid.Row="0" Grid.Column="0" 
                        Text="Delimiter:" 
                        Margin="2,5,5,5"/>
@@ -98,7 +98,7 @@
                      HorizontalAlignment="Left"
                      IsEnabled="False"
                      Text="IsSelected" />
-
+            
             <TextBlock Grid.Row="0" Grid.Column="2" 
                        Text="DisplayMemberPath:" 
                        Margin="5"/>
@@ -149,12 +149,12 @@
             </StackPanel>
          </Grid>
       </GroupBox>
-
+      
       <GroupBox Header="Item Models" Grid.Row="1" Margin="5">
          <ListBox DisplayMemberPath="ModelDisplay" FontFamily="Global Monospace"
                   ItemsSource="{Binding}"/>
       </GroupBox>
-
+      
       <Grid Grid.Row="2">
          <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

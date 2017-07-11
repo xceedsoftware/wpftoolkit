@@ -32,6 +32,7 @@
          <LineBreak/>
          <LineBreak/>
            It can also be used to specify a specific default editor when a property type does not resolve to a valid editor (e.g., Object).
+         <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
            <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
@@ -39,6 +40,7 @@
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
+        ##END-->
       </Paragraph>
     </local:DemoView.Description>
 
@@ -54,7 +56,13 @@
          <TextBlock Text="The ReferenceNo property, declare a DefinitionKey to 'int?' to displayed the content with a IntegerUpDown dispite it's type is 'object'" 
                     TextWrapping="Wrap"
                     Margin="0,0,0,10"/>
+         <!--##EXCLUDE_OPEN_SOURCE-->
+         <TextBlock Text="(Click XAML and Code tabs to see details)" 
+                    FontStyle="Italic"
+                    Margin="0,10,0,0"/>
+         <!--##END-->
       </StackPanel>
+      <!--##INCLUDE_OPEN_SOURCE
       <ScrollViewer Grid.Row="1" 
                     VerticalScrollBarVisibility="Auto"
                     HorizontalScrollBarVisibility="Auto">
@@ -65,5 +73,15 @@
             <local:XamlBox CodeSource="/Samples/PropertyGrid/OpenSourceImages/DefinitionKey.xaml.txt" />
          </StackPanel>
       </ScrollViewer>      
+      ##END-->
+      <!--##EXCLUDE_OPEN_SOURCE-->
+      <xctk:PropertyGrid x:Name="_propertyGrid" Grid.Row="1" HorizontalAlignment="Stretch" Width="350" MaxHeight="200"
+                         SelectedObject="{Binding}">
+         <xctk:PropertyGrid.EditorDefinitions>
+            <!-- This EditorDefinition will be used for FirstName and LastName -->
+            <xctk:EditorTextDefinition TargetProperties="nameType" FontStyle="Italic" FontWeight="Bold" />
+         </xctk:PropertyGrid.EditorDefinitions>
+      </xctk:PropertyGrid>
+      <!--##END-->
    </Grid>
 </local:DemoView>

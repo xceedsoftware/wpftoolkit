@@ -156,7 +156,7 @@
                         </Grid>
 
                         <!-- Content Border -->
-                        <Border x:Name="ContentOuterBorder" Grid.Row="1" BorderBrush="#FFDFEEFD" BorderThickness="1">
+                        <Border x:Name="ContentOuterBorder" Grid.Row="1">
                             <Border.Margin>
                                 <MultiBinding Converter="{StaticResource WindowContentBorderMarginConverter}" ConverterParameter="0">
                                     <Binding Path="WindowThickness.Left" RelativeSource="{RelativeSource TemplatedParent}" />
@@ -165,7 +165,9 @@
                             </Border.Margin>
                             <Border x:Name="ContentBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" >
                                 <Border x:Name="ContentInnerBorder" BorderBrush="#FFF2F2F2" BorderThickness="0"> <!-- only visible for ToolWindow -->
-                                    <ContentPresenter x:Name="Content" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                  <AdornerDecorator>
+                                     <ContentPresenter x:Name="Content" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                  </AdornerDecorator>
                                 </Border>
                             </Border>
                         </Border>

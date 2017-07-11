@@ -42,7 +42,7 @@
               Value="1" />
       <Setter Property="HorizontalContentAlignment"
               Value="Right" />
-      <Setter Property="Focusable"
+      <Setter Property="IsTabStop"
               Value="False" />
       <Setter Property="VerticalContentAlignment"
               Value="Center" />
@@ -75,7 +75,7 @@
                                           Foreground="{TemplateBinding Foreground}"
                                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
-                                          IsTabStop="{TemplateBinding IsTabStop}"
+                                          IsTabStop="True"
                                           MinWidth="20"
                                           AcceptsReturn="False"
                                           Padding="{TemplateBinding Padding}"

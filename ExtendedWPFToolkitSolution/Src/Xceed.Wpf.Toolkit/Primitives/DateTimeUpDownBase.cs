@@ -160,20 +160,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
           }
           _fireSelectionChangedEvent = false;
           break;
-        case Key.OemSemicolon:
-          if( this.IsCurrentValueValid() && ( Keyboard.Modifiers == ModifierKeys.Shift ) )
-          {
-            this.PerformKeyboardSelection( selectionStart + selectionLength );
-            e.Handled = true;
-          }
-          _fireSelectionChangedEvent = false;
-          break;
-        case Key.OemPeriod:
-        case Key.OemComma:
-        case Key.OemQuotes:
-        case Key.OemMinus:
-        case Key.Divide:
-        case Key.Decimal: 
         case Key.Right:
           if( this.IsCurrentValueValid() )
           {

@@ -26,7 +26,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ProductName>Xceed Extended WPF Toolkit LiveExplorer</ProductName>
+    <ProductName>Xceed Toolkit Plus for WPF LiveExplorer</ProductName>
     <PublisherName>Xceed Software Inc.</PublisherName>
     <ApplicationRevision>5</ApplicationRevision>
     <ApplicationVersion>2.0.0.%2a</ApplicationVersion>
@@ -331,9 +331,14 @@
     <Compile Include="Samples\PropertyGrid\Views\PropertyGridSpecifyingPropertiesView.xaml.cs">
       <DependentUpon>PropertyGridSpecifyingPropertiesView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridExpandingNonPrimitivesView.xaml.cs">
+      <DependentUpon>PropertyGridExpandingNonPrimitivesView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Samples\PropertyGrid\Views\PropertyGridView.xaml.cs">
       <DependentUpon>PropertyGridView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Samples\RangeSlider\Converters\AbsoluteAdditionConverter.cs" />
+    <Compile Include="Samples\RangeSlider\Converters\RangeSliderEnabledConverter.cs" />
     <Compile Include="Samples\RangeSlider\Views\RangeSliderView.xaml.cs">
       <DependentUpon>RangeSliderView.xaml</DependentUpon>
     </Compile>
@@ -712,6 +717,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridExpandingNonPrimitivesView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Samples\PropertyGrid\Views\PropertyGridView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -751,6 +760,10 @@
     <Page Include="Samples\Text\Views\WatermarkTextboxView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\Theming\ItemTemplates\Common.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Samples\Theming\Views\ThemingAvalonDockView.xaml">
       <SubType>Designer</SubType>
@@ -1364,6 +1377,16 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\toolkitIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\PropertyGridExpandingNonPrimitivesView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridExpandingNonPrimitivesView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\OpenSourceImages\ExpandingNonPrimitives.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockWindows10.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

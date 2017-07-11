@@ -38,9 +38,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     internal CustomPropertyItem( bool isPropertyGridCategorized, bool isSortedAlphabetically )
     {
-      _isPropertyGridCategorized = isPropertyGridCategorized;
-      _isSortedAlphabetically = isSortedAlphabetically;
+      this.Init( isPropertyGridCategorized, isSortedAlphabetically );
     }
+
+
 
     #endregion
 
@@ -157,6 +158,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region Overrides
 
+    protected override Type GetPropertyItemType()
+    {
+      return this.Value.GetType();
+    }
+
     protected override void OnEditorChanged( FrameworkElement oldValue, FrameworkElement newValue )
     {
       if( oldValue != null )
@@ -164,6 +170,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       if( newValue != null )
         newValue.DataContext = this;
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void Init( bool isPropertyGridCategorized, bool isSortedAlphabetically )
+    {
+      _isPropertyGridCategorized = isPropertyGridCategorized;
+      _isSortedAlphabetically = isSortedAlphabetically;
     }
 
     #endregion

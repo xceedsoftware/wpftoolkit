@@ -16,15 +16,12 @@
 
 using System;
 using System.Collections;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Controls.Primitives;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Collections.Generic;
 using Xceed.Wpf.Toolkit.Primitives;
-using System.Linq;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -232,6 +229,7 @@ namespace Xceed.Wpf.Toolkit
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( TimePicker ), new FrameworkPropertyMetadata( typeof( TimePicker ) ) );
       FormatProperty.OverrideMetadata( typeof( TimePicker ), new UIPropertyMetadata( DateTimeFormat.ShortTime ) );
+      UpdateValueOnEnterKeyProperty.OverrideMetadata( typeof( TimePicker ), new FrameworkPropertyMetadata( true ) );
     }
 
     #endregion //Constructors
@@ -308,38 +306,53 @@ namespace Xceed.Wpf.Toolkit
       {
         this.UpdateListBoxItems();
 
-        TimeSpan time = ( Value != null ) ? Value.Value.TimeOfDay : StartTimeDefaultValue;
-        TimeItem nearestItem = this.GetNearestTimeItem( time );
+        var time = (this.Value != null) ? this.Value.Value.TimeOfDay : TimePicker.StartTimeDefaultValue;
+        var nearestItem = this.GetNearestTimeItem( time );
         if( nearestItem != null )
         {
           _timeListBox.ScrollIntoView( nearestItem );
-          ListBoxItem listBoxItem = ( ListBoxItem )_timeListBox.ItemContainerGenerator.ContainerFromItem( nearestItem );
-          if( listBoxItem != null )
-          {
-            listBoxItem.Focus();
-          }
+          this.UpdateListBoxSelectedItem();
         }
+        _timeListBox.Focus();
       }
     }
 
     public override void OnApplyTemplate()
     {
-      base.OnApplyTemplate();
-
-      if( _timeListBox != null )
+      if( this.TextBox != null )
       {
-        _timeListBox.SelectionChanged -= TimeListBox_SelectionChanged;
-        _timeListBox.MouseUp -= TimeListBox_MouseUp;
+        this.TextBox.GotKeyboardFocus -= this.TextBoxSpinner_GotKeyboardFocus;
+      }
+      if( this.Spinner != null )
+      {
+        this.Spinner.GotKeyboardFocus -= this.TextBoxSpinner_GotKeyboardFocus;
       }
 
-      _timeListBox = GetTemplateChild( PART_TimeListItems ) as ListBox;
+      base.OnApplyTemplate();
+
+      if( this.TextBox != null )
+      {
+        this.TextBox.GotKeyboardFocus += this.TextBoxSpinner_GotKeyboardFocus;
+      }
+      if( this.Spinner != null )
+      {
+        this.Spinner.GotKeyboardFocus += this.TextBoxSpinner_GotKeyboardFocus;
+      }
 
       if( _timeListBox != null )
       {
-        _timeListBox.SelectionChanged += TimeListBox_SelectionChanged;
-        _timeListBox.MouseUp += TimeListBox_MouseUp;
+        _timeListBox.SelectionChanged -= this.TimeListBox_SelectionChanged;
+        _timeListBox.MouseUp -= this.TimeListBox_MouseUp;
+      }
 
-        InvalidateListBoxItems();
+      _timeListBox = this.GetTemplateChild( PART_TimeListItems ) as ListBox;
+
+      if( _timeListBox != null )
+      {
+        _timeListBox.SelectionChanged += this.TimeListBox_SelectionChanged;
+        _timeListBox.MouseUp += this.TimeListBox_MouseUp;
+
+        this.InvalidateListBoxItems();
       }
     }
 
@@ -369,9 +382,14 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    private void TextBoxSpinner_GotKeyboardFocus( object sender, KeyboardFocusChangedEventArgs e )
+    {
+      this.ClosePopup( true );
+    }
+
     private void TimeListBox_MouseUp( object sender, MouseButtonEventArgs e )
     {
-      ClosePopup( true );
+      this.ClosePopup( true );
     }
 
     #endregion //Event Handlers

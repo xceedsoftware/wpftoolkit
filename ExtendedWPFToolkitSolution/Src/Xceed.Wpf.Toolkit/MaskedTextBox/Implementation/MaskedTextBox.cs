@@ -512,6 +512,7 @@ namespace Xceed.Wpf.Toolkit
       {
         provider = maskedTextBox.CreateMaskedTextProvider( MaskedTextBox.NullMaskString );
         maskedTextBox.m_maskIsNull = true;
+        maskedTextBox.Text = "";
       }
       else
       {

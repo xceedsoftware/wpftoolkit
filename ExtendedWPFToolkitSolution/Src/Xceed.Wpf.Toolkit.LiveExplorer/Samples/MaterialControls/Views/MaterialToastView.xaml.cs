@@ -15,13 +15,9 @@
   **************************************************************************************/
 
 
-using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using Xceed.Wpf.Toolkit.Panels;
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.MaterialControls.Views
 {
   /// <summary>

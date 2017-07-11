@@ -107,12 +107,16 @@ namespace Xceed.Wpf.Toolkit.Primitives
       base.OnApplyTemplate();
 
       if( _popup != null )
-        _popup.Opened -= Popup_Opened;
+      {
+        _popup.Opened -= this.Popup_Opened;
+      }
 
-      _popup = GetTemplateChild( PART_Popup ) as Popup;
+      _popup = this.GetTemplateChild( PART_Popup ) as Popup;
 
       if( _popup != null )
-        _popup.Opened += Popup_Opened;
+      {
+        _popup.Opened += this.Popup_Opened;
+      }
     }
 
     #endregion //Base Class Overrides
@@ -173,7 +177,10 @@ namespace Xceed.Wpf.Toolkit.Primitives
     protected void ClosePopup( bool isFocusOnTextBox )
     {
       if( IsOpen )
+      {
         IsOpen = false;
+      }
+
       ReleaseMouseCapture();
 
       if( isFocusOnTextBox && ( TextBox != null ) )
