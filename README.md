@@ -9,18 +9,18 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 ## Latest news
 
 
-**July 11, 2017:** The project's new home is Github, and v3.1.0 released with [37 bug fixes and improvements](../../wiki/Improvements-in-v3.1.0). Users of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) received v3.1.0 on July 13, 2016 with [Windows 10 theme and 56 other improvements and bug fixes](../../wiki/Improvements-in-v2.9.0#Plus310), v3.2.0 on November 21, 2016 with [2 new controls and 44 bug fixes and improvements](../../wiki/Improvements-in-v3.0.0#Plus320), v3.3.0 on March 1, 2017 with [45 bug fixes and improvements](../../wiki/Improvements-in-v3.1.0#Plus330), v3.4.0 on June 5, 2017 with [52 bug fixes and improvements](../../wiki/Improvements-in-v3.1.0#Plus340).
+**July 11, 2017:** The project's new home is Github, and v3.1.0 is released with [37 bug fixes and improvements](../../wiki/Improvements-in-v3.1.0). Users of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) received v3.1.0 on July 13, 2016 with [Windows 10 theme and 56 other improvements and bug fixes](../../wiki/Improvements-in-v2.9.0#Plus310), v3.2.0 on November 21, 2016 with [2 new controls and 44 bug fixes and improvements](../../wiki/Improvements-in-v3.0.0#Plus320), v3.3.0 on March 1, 2017 with [45 bug fixes and improvements](../../wiki/Improvements-in-v3.1.0#Plus330), v3.4.0 on June 5, 2017 with [52 bug fixes and improvements](../../wiki/Improvements-in-v3.1.0#Plus340).
 
 <a href=""><img src="https://user-images.githubusercontent.com/21266763/27752265-1db3056c-5dae-11e7-8ef4-9728f01494e7.png" width="172"/></a>
 
 ## Controls included
 
-<table style="width:100%">
+<table>
 <tr>
-<td style="width:25%"><a href="../../wiki/AvalonDock">AvalonDock</a></td>
-<td style="width:25%"><a href="../../wiki/AutoSelectTextBox">AutoSelectTextBox</a></td>
-<td style="width:25%"><a href="../../wiki/BusyIndicator">BusyIndicator</a></td>
-<td style="width:25%"><a href="../../wiki/Calculator">Calculator</a></td>
+<td><a href="../../wiki/AvalonDock">AvalonDock</a></td>
+<td><a href="../../wiki/AutoSelectTextBox">AutoSelectTextBox</a></td>
+<td><a href="../../wiki/BusyIndicator">BusyIndicator</a></td>
+<td><a href="../../wiki/Calculator">Calculator</a></td>
 </tr>
 <tr>
 <td><a href="../../wiki/CalculatorUpDown">CalculatorUpDown</a></td>
@@ -92,13 +92,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 
 ## Additional controls and features in the Plus Edition
 
-<table style="width:100%">
-<colgroup>
-   <col width="180" align="center">
-   <col width="180" align="center">
-   <col width="180" align="center">
-   <col width="180" align="center">
-</colgroup>
+<table>
 <tr>
 <td><a href="../../wiki/Charts">Charts</a></td>
 <td><a href="../../wiki/ChildWindow-Plus">ChildWindow Plus</a></td>
@@ -139,13 +133,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 
 ## Additional controls and features in the Business Suite for WPF
 
-<table style="width:100%">
-<colgroup>
-   <col width="180" align="center">
-   <col width="180" align="center">
-   <col width="180" align="center">
-   <col width="180" align="center">
-</colgroup>
+<table>
 <tr>
 <td><a href="../../wiki/Advanced-DataGrid">Advanced DataGrid</a></td>
 <td><a href="">3D Views for WPF</a></td>
