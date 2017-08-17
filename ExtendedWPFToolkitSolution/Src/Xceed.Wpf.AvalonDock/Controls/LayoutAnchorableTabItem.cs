@@ -116,8 +116,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         #endregion
 
-        bool _isMouseDown = false;
-        static LayoutAnchorableTabItem _draggingItem = null;
+        private bool _isMouseDown = false;
+        private static LayoutAnchorableTabItem _draggingItem = null;
+        // There's an issue with panes resizing when selecting another tab, causing a
+        // mouse leave event to make the tab undock. This fixes that.
+        private static bool _cancelNextMouseLeave = false;
 
         internal static bool IsDraggingItem()
         {
@@ -131,6 +134,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
         internal static void ResetDraggingItem()
         {
             _draggingItem = null;
+        }
+        internal static void CancelNextMouseLeave()
+        {
+            _cancelNextMouseLeave = true;
         }
 
         protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
@@ -150,6 +157,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 _isMouseDown = false;
                 _draggingItem = null;
             }
+            else
+            {
+                _cancelNextMouseLeave = false;
+            }
+
         }
 
         protected override void OnMouseLeftButtonUp(System.Windows.Input.MouseButtonEventArgs e)
@@ -167,10 +179,18 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
             if (_isMouseDown && e.LeftButton == MouseButtonState.Pressed)
             {
-                _draggingItem = this;
+                if (!_cancelNextMouseLeave)
+                {
+                    _draggingItem = this;
+                }
+                else
+                {
+                    _draggingItem = null;
+                }
             }
 
             _isMouseDown = false;
+            _cancelNextMouseLeave = false;
         }
 
         protected override void OnMouseEnter(MouseEventArgs e)
