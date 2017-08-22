@@ -127,6 +127,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
                         parentSelector.SelectedContentIndex = _isSelected ? parentSelector.IndexOf(this) : -1;
                     OnIsSelectedChanged(oldValue, value);
                     RaisePropertyChanged("IsSelected");
+                    Controls.LayoutAnchorableTabItem.CancelNextMouseLeave();
                 }
             }
         }
