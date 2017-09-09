@@ -30,6 +30,28 @@ namespace Xceed.Wpf.Toolkit
 
       if( string.IsNullOrEmpty( value ) || string.IsNullOrEmpty( format ) )
         return false;
+       
+      // === Sometimes the format string contains the text in single quotation marks. For example:
+      // "d MMMM yyyy 'г.' H:mm:ss". These parts should be removed from "format" string and from the "value" string
+      // - otherwise the parsing mechanism is not working correctly
+      while (true)
+      {
+          int pos = format.IndexOf('\'');
+          if (pos > -1)
+          {
+              int end = format.IndexOf('\'', pos + 1);
+              if (end > -1)
+              {
+                  int sz = end - pos + 1;
+                  var ff = format.Substring(pos, sz);
+                  format = format.Remove(pos, sz);
+                  if (sz > 2)
+                      value = value.Replace(ff.Substring(1, sz - 2), string.Empty);
+              }
+          }
+          else break;
+      }
+      // ===
 
       var dateTimeString = ComputeDateTimeString( value, format, currentDate, cultureInfo ).Trim();
 
