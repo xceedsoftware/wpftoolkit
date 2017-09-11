@@ -825,6 +825,8 @@ namespace Xceed.Wpf.Toolkit
       //this only occurs when the user manually type in a value for the Value Property
       if( info == null )
         info = (this.CurrentDateTimePart != DateTimePart.Other) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
+      else if (string.IsNullOrWhiteSpace(info.Content))  //romasz: possible that the user will select empty space in between
+          info = _dateTimeInfoList[_dateTimeInfoList.IndexOf(_selectedDateTimeInfo) - 1];
 
       DateTime? result = null;
 
