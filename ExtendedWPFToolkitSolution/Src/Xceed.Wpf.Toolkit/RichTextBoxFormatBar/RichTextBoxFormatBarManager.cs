@@ -210,13 +210,25 @@ namespace Xceed.Wpf.Toolkit
       //top
       if( top < 0 )
       {
-        top = mousePosition.Y + 10;
+       top = Math.Max( mousePosition.Y + 10, 5 );
+      }
+      
+      // bottom 
+      if ( top + adorningEditor.ActualHeight > _richTextBox.ActualHeight - 20 )
+      {
+       top = _richTextBox.ActualHeight - adorningEditor.ActualHeight - 20;
+      }
+
+      // left boundary 
+      if ( left < 0 )
+      {
+       left = 5;
       }
 
       //right boundary
       if( left + adorningEditor.ActualWidth > _richTextBox.ActualWidth - 20 )
       {
-        left = left - ( adorningEditor.ActualWidth - ( _richTextBox.ActualWidth - left ) );
+       left = _richTextBox.ActualWidth - adorningEditor.ActualWidth - 20;
       }
 
       _adorner.SetOffsets( left, top );

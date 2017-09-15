@@ -388,6 +388,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 {
                     prevChildModel.DockWidth = new GridLength(prevChildModel.DockWidth.Value * (prevChildActualSize.Width + delta) / prevChildActualSize.Width, GridUnitType.Star);
                 }
+                else if (prevChildModel.DockWidth.IsAuto)
+                {
+                    prevChildModel.DockWidth = new GridLength(prevChildActualSize.Width + delta, GridUnitType.Pixel);
+                }
                 else
                 {
                     prevChildModel.DockWidth = new GridLength(prevChildModel.DockWidth.Value + delta, GridUnitType.Pixel);
@@ -396,6 +400,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 if (nextChildModel.DockWidth.IsStar)
                 {
                     nextChildModel.DockWidth = new GridLength(nextChildModel.DockWidth.Value * (nextChildActualSize.Width - delta) / nextChildActualSize.Width, GridUnitType.Star);
+                }
+                else if (nextChildModel.DockWidth.IsAuto)
+                {
+                    nextChildModel.DockWidth = new GridLength(nextChildActualSize.Width - delta, GridUnitType.Pixel);
                 }
                 else
                 {
@@ -408,6 +416,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 {
                     prevChildModel.DockHeight = new GridLength(prevChildModel.DockHeight.Value * (prevChildActualSize.Height + delta) / prevChildActualSize.Height, GridUnitType.Star);
                 }
+                else if (prevChildModel.DockHeight.IsAuto)
+                {
+                    prevChildModel.DockHeight = new GridLength(prevChildActualSize.Height + delta, GridUnitType.Pixel);
+                }
                 else
                 {
                     prevChildModel.DockHeight = new GridLength(prevChildModel.DockHeight.Value + delta, GridUnitType.Pixel);
@@ -416,6 +428,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 if (nextChildModel.DockHeight.IsStar)
                 {
                     nextChildModel.DockHeight = new GridLength(nextChildModel.DockHeight.Value * (nextChildActualSize.Height - delta) / nextChildActualSize.Height, GridUnitType.Star);
+                }
+                else if (nextChildModel.DockHeight.IsAuto)
+                {
+                    nextChildModel.DockHeight = new GridLength(nextChildActualSize.Height - delta, GridUnitType.Pixel);
                 }
                 else
                 {

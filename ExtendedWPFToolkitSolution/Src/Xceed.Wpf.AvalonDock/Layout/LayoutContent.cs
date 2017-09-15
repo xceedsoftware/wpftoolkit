@@ -84,25 +84,31 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         #region ContentId
 
-        private string _contentId = null;
+        //Added to make ContentId bindable
+        public static DependencyProperty ContentIdProperty =
+            DependencyProperty.Register(nameof(ContentId),
+              typeof(string), typeof(LayoutContent), new FrameworkPropertyMetadata(null, (s, e) =>
+               {
+                  (s as LayoutContent)?.RaisePropertyChanged(nameof(ContentId));
+              }));
+
         public string ContentId
         {
-            get 
+            get
             {
-                if (_contentId == null)
-                { 
+                if (GetValue(ContentIdProperty) == null)
+                {
                     var contentAsControl = _content as FrameworkElement;
                     if (contentAsControl != null && !string.IsNullOrWhiteSpace(contentAsControl.Name))
                         return contentAsControl.Name;
                 }
-                return _contentId; 
+                return (string)GetValue(ContentIdProperty);
             }
             set
             {
-                if (_contentId != value)
+                if (!String.Equals(GetValue(ContentIdProperty) as string, value))
                 {
-                    _contentId = value;
-                    RaisePropertyChanged("ContentId");
+                    SetValue(ContentIdProperty, value);
                 }
             }
         }
@@ -127,6 +133,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
                         parentSelector.SelectedContentIndex = _isSelected ? parentSelector.IndexOf(this) : -1;
                     OnIsSelectedChanged(oldValue, value);
                     RaisePropertyChanged("IsSelected");
+                    Controls.LayoutAnchorableTabItem.CancelNextMouseLeave();
                 }
             }
         }
