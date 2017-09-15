@@ -72,8 +72,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
             _model.ChildrenTreeChanged += (s, args) =>
                 {
-                    if (args.Change != ChildrenTreeChange.DirectChildrenChanged)
-                        return;
                     if (_asyncRefreshCalled.HasValue &&
                         _asyncRefreshCalled.Value == args.Change)
                         return;
