@@ -430,6 +430,7 @@
 
       </ResourceDictionary>
    </Window.Resources>
+   <Grid>
    <Grid Margin="30,30,0,0">
       <Grid.ColumnDefinitions>
          <ColumnDefinition MinWidth="260"
@@ -488,8 +489,7 @@
                                                  SampleType="{x:Type samples:PropertyGrid.Views.PropertyGridCategoryOrderView}" />
                   <core:LiveExplorerTreeViewItem Header="Expanding non-primitives"
                                                  SampleType="{x:Type samples:PropertyGrid.Views.PropertyGridExpandingNonPrimitivesView}"
-                                                 IsPlusOnlyFeature="True"
-                                                 IsNewFeature="True"/>
+                                                 IsPlusOnlyFeature="True"/>
                   <core:LiveExplorerTreeViewItem Header="Localization"
                                                  SampleType="{x:Type samples:PropertyGrid.Views.PropertyGridDisplayLocalizationView}"
                                                  IsPlusOnlyFeature="True" />
@@ -579,7 +579,10 @@
                                         ItemContainerStyle="{StaticResource TreeViewItemStyle}">
             <core:LiveExplorerTreeViewItem Header="DropDown and Split Buttons"
                                            SampleType="{x:Type samples:Button.Views.DropDownSplitButtonView}" />
-         </core:LiveExplorerTreeViewItem>
+            <core:LiveExplorerTreeViewItem Header="IconButton"
+                                           SampleType="{x:Type samples:Button.Views.IconButtonView}"
+                                           IsNewFeature="True"/>
+          </core:LiveExplorerTreeViewItem>
          <core:LiveExplorerTreeViewItem Header="Charts"
                                         Style="{StaticResource TreeViewHeaderStyle}"
                                         ItemContainerStyle="{StaticResource TreeViewItemStyle}"
@@ -652,6 +655,9 @@
                                               SampleType="{x:Type samples:MaterialControls.Views.MaterialDropDownView}" />
                <core:LiveExplorerTreeViewItem Header="Frame"
                                               SampleType="{x:Type samples:MaterialControls.Views.MaterialFrameView}" />
+               <core:LiveExplorerTreeViewItem Header="Hamburger"
+                                              IsNewFeature="True"
+                                              SampleType="{x:Type samples:MaterialControls.Views.MaterialHamburgerView}" />
                <core:LiveExplorerTreeViewItem Header="ListBox"
                                               SampleType="{x:Type samples:MaterialControls.Views.MaterialListBoxView}" />
                <core:LiveExplorerTreeViewItem Header="ProgressBar"
@@ -861,5 +867,6 @@
             </TabItem>
          </TabControl>
       </Grid>
+   </Grid>
    </Grid>
 </Window>

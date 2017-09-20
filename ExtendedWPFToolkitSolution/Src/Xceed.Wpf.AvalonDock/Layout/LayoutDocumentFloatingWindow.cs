@@ -20,6 +20,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Markup;
 using System.Diagnostics;
+using System.Xml.Serialization;
+using System.Xml;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
@@ -92,6 +94,51 @@ namespace Xceed.Wpf.AvalonDock.Layout
             get { return RootDocument != null; }
         }
 
+        public override void ReadXml( XmlReader reader )
+        {
+          reader.MoveToContent();
+          if( reader.IsEmptyElement )
+          {
+            reader.Read();
+            return;
+          }
+
+          var localName = reader.LocalName;
+          reader.Read();
+
+          while( true )
+          {
+            if( reader.LocalName.Equals(localName) && (reader.NodeType == XmlNodeType.EndElement) )
+            {
+              break;
+            }
+
+            if( reader.NodeType == XmlNodeType.Whitespace )
+            {
+              reader.Read();
+              continue;
+            }
+
+            XmlSerializer serializer;
+            if( reader.LocalName.Equals( "LayoutDocument" ) )
+            {
+              serializer = new XmlSerializer( typeof( LayoutDocument ) );
+            }
+            else
+            {
+              var type = LayoutRoot.FindType( reader.LocalName );
+              if( type == null )
+              {
+                throw new ArgumentException( "AvalonDock.LayoutDocumentFloatingWindow doesn't know how to deserialize " + reader.LocalName );
+              }
+              serializer = new XmlSerializer( type );
+            }
+
+            RootDocument = ( LayoutDocument )serializer.Deserialize( reader );
+          }
+
+          reader.ReadEndElement();
+        }
 
 #if TRACE
         public override void ConsoleDump(int tab)
@@ -102,6 +149,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
           RootDocument.ConsoleDump(tab + 1);
         }
 #endif
-    }
+  }
 
 }

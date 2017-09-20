@@ -24,6 +24,10 @@ namespace Xceed.Wpf.AvalonDock.Themes
 {
   public abstract class DictionaryTheme : Theme
   {
+    public DictionaryTheme()
+    {
+    }
+
     public DictionaryTheme( ResourceDictionary themeResourceDictionary )
     {
       this.ThemeResourceDictionary = themeResourceDictionary;

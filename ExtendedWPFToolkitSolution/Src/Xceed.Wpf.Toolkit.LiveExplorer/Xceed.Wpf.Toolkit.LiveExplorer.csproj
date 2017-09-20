@@ -116,6 +116,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="CodeBox.cs" />
+    <Compile Include="Core\Converters\ZeroToBoolConverter.cs" />
     <Compile Include="Core\CSharpFormatter.cs" />
     <Compile Include="Core\XamlFormatter.cs" />
     <Compile Include="HomeView.xaml.cs">
@@ -133,6 +134,9 @@
     </Compile>
     <Compile Include="Samples\BusyIndicator\Views\BusyIndicatorView.xaml.cs">
       <DependentUpon>BusyIndicatorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\Button\Views\IconButtonView.xaml.cs">
+      <DependentUpon>IconButtonView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Samples\Button\Views\ButtonSpinnerView.xaml.cs">
       <DependentUpon>ButtonSpinnerView.xaml</DependentUpon>
@@ -204,6 +208,9 @@
     </Compile>
     <Compile Include="Samples\MaterialControls\Converters\EqualsMinusOneConverter.cs" />
     <Compile Include="Samples\MaterialControls\Data\RequiredRule.cs" />
+    <Compile Include="Samples\MaterialControls\Views\MaterialHamburgerView.xaml.cs">
+      <DependentUpon>MaterialHamburgerView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Samples\MaterialControls\Views\MaterialComboBoxView.xaml.cs">
       <DependentUpon>MaterialComboBoxView.xaml</DependentUpon>
     </Compile>
@@ -388,7 +395,6 @@
     <Compile Include="Samples\TimeSpan\Views\TimeSpanView.xaml.cs">
       <DependentUpon>TimeSpanView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Samples\ToggleSwitch\Converters\ZeroToBoolConverter.cs" />
     <Compile Include="Samples\ToggleSwitch\Views\ToggleSwitchView.xaml.cs">
       <DependentUpon>ToggleSwitchView.xaml</DependentUpon>
     </Compile>
@@ -477,6 +483,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Samples\Button\Views\IconButtonView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Samples\Button\Views\ButtonSpinnerView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -560,6 +570,10 @@
     <Page Include="Samples\MaterialControls\Resources\CommonResources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\MaterialControls\Views\MaterialHamburgerView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Samples\MaterialControls\Views\MaterialComboBoxView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -1387,6 +1401,30 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockWindows10.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\MaterialHamburgerView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\MaterialHamburgerView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\IconButtonView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\IconButtonView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Button\Resources\PencilTool16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\Button\Resources\Default.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\MaterialControls\Resources\Business.png" />
+    <Resource Include="Samples\MaterialControls\Resources\DataGrid.png" />
+    <Resource Include="Samples\MaterialControls\Resources\SFTP.png" />
+    <Resource Include="Samples\MaterialControls\Resources\Toolkit.png" />
+    <Resource Include="Samples\MaterialControls\Resources\Zip.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialHamburger.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

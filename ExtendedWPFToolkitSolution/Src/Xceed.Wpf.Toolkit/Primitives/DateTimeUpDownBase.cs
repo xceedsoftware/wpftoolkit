@@ -21,6 +21,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Xceed.Wpf.Toolkit.Primitives;
 
 namespace Xceed.Wpf.Toolkit.Primitives
@@ -218,7 +219,19 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     protected virtual void PerformMouseSelection()
     {
-      this.Select( this.GetDateTimeInfo( TextBox.SelectionStart ) );
+      var dateTimeInfo = this.GetDateTimeInfo( TextBox.SelectionStart );
+      if( (dateTimeInfo != null) && (dateTimeInfo.Type == DateTimePart.Other) )
+      {
+        this.Dispatcher.BeginInvoke( DispatcherPriority.Background, new Action( () =>
+        {
+          // Select the next dateTime part
+          this.Select( this.GetDateTimeInfo( dateTimeInfo.StartPosition + dateTimeInfo.Length ) );
+        }
+        ) );
+        return;
+      }     
+
+      this.Select( dateTimeInfo );
     }
 
     protected virtual bool IsLowerThan( T value1, T value2 )

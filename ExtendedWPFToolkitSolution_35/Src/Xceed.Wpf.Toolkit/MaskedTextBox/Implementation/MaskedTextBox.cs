@@ -842,14 +842,23 @@ namespace Xceed.Wpf.Toolkit
         int notUsed;
         MaskedTextResultHint hint;
 
-        if( provider.Set( text, out notUsed, out hint ) )
+        //0 – Digit zero to 9[ Required ]
+        //9 – Digit 0 – 9[ Optional ]
+        //A – Alpha Numeric. [Required]
+        //a – Alpha Numeric. [Optional]
+        //L – Letters a-z, A-Z[ Required ]
+        //? – Letters a-z, A-Z[ Optional ]
+        //C – Any non-control character [Optional]
+        //< - When first, all following characters are in lower case.
+        //> - When first, all following characters are in upper case.
+        if( provider.Set( text, out notUsed, out hint ) || provider.Mask.StartsWith( ">" ) || provider.Mask.StartsWith( "<" ) )
         {
-          coercedText = this.GetFormattedString( provider );
+          coercedText = this.GetFormattedString( provider, text );
         }
         else
         {
           // Coerce the text to remain the same.
-          coercedText = this.GetFormattedString( m_maskedTextProvider );
+          coercedText = this.GetFormattedString( m_maskedTextProvider, text );
 
           // The TextPropertyChangedCallback won't be called.
           // Therefore, we must sync the maskedTextProvider.
@@ -864,12 +873,12 @@ namespace Xceed.Wpf.Toolkit
 
         if( this.CanReplace( provider, text, 0, m_maskedTextProvider.Length, this.RejectInputOnFirstFailure, out caretIndex ) )
         {
-          coercedText = this.GetFormattedString( provider );
+          coercedText = this.GetFormattedString( provider, text );
         }
         else
         {
           // Coerce the text to remain the same.
-          coercedText = this.GetFormattedString( m_maskedTextProvider );
+          coercedText = this.GetFormattedString( m_maskedTextProvider, text );
 
           // The TextPropertyChangedCallback won't be called.
           // Therefore, we must sync the maskedTextProvider.
@@ -896,12 +905,19 @@ namespace Xceed.Wpf.Toolkit
           {
             m_maskedTextProvider.Set( newText );
 
-            int caretIndex = m_maskedTextProvider.FindUnassignedEditPositionFrom( 0, true );
+            if( m_maskedTextProvider.Mask.StartsWith( ">" ) || m_maskedTextProvider.Mask.StartsWith( "<" ) )
+            {
+              this.CaretIndex = newText.Length;
+            }
+            else
+            {
+              int caretIndex = m_maskedTextProvider.FindUnassignedEditPositionFrom( 0, true );
 
-            if( caretIndex == -1 )
-              caretIndex = m_maskedTextProvider.Length;
+              if( caretIndex == -1 )
+                caretIndex = m_maskedTextProvider.Length;
 
-            this.CaretIndex = caretIndex;
+              this.CaretIndex = caretIndex;
+            }
           }
         }
       }
@@ -1441,7 +1457,9 @@ namespace Xceed.Wpf.Toolkit
 
     internal override bool GetIsEditTextEmpty()
     {
-      return ( this.MaskedTextProvider.AssignedEditPositionCount == 0 );
+      if( !m_maskIsNull )
+        return ( this.MaskedTextProvider.AssignedEditPositionCount == 0 );
+      return true;
     }
 
     #endregion INTERNAL PROPERTIES
@@ -1453,7 +1471,7 @@ namespace Xceed.Wpf.Toolkit
       if( m_maskIsNull )
         return base.GetCurrentText();
 
-      string displayText = this.GetFormattedString( m_maskedTextProvider );
+      string displayText = this.GetFormattedString( m_maskedTextProvider, this.Text );
 
       return displayText;
     }
@@ -1889,9 +1907,14 @@ namespace Xceed.Wpf.Toolkit
       return MaskedTextBox.GetRawText( m_maskedTextProvider );
     }
 
-    private string GetFormattedString( MaskedTextProvider provider )
+    private string GetFormattedString( MaskedTextProvider provider, string text )
     {
-      System.Diagnostics.Debug.Assert( provider.EditPositionCount > 0 );
+      if( provider.Mask.StartsWith( ">" ) )
+        return text.ToUpper();
+      if( provider.Mask.StartsWith( "<" ) )
+        return text.ToLower();
+
+      //System.Diagnostics.Debug.Assert( provider.EditPositionCount > 0 );
 
 
       bool includePrompt = ( this.IsReadOnly ) ? false : ( !this.HidePromptOnLeave || this.IsFocused );

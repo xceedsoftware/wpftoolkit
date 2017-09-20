@@ -269,8 +269,8 @@
                <CheckBox Grid.Column="0"
                          Grid.Row="6"
                          Grid.ColumnSpan="2"
-                         Content="ShowAdvancedButton"
-                         IsChecked="{Binding ElementName=_colorPicker, Path=ShowAdvancedButton, Mode=TwoWay}" />
+                         Content="ShowTabHeaders"
+                         IsChecked="{Binding ElementName=_colorPicker, Path=ShowTabHeaders, Mode=TwoWay}" />
                <CheckBox Grid.Column="0"
                          Grid.Row="7"
                          Grid.ColumnSpan="2"

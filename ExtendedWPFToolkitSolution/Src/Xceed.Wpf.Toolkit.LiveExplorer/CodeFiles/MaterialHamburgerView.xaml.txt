@@ -1,0 +1,610 @@
+﻿<!--*************************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2016 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************-->
+<local:MaterialDemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.MaterialControls.Views.MaterialHamburgerView"
+                        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                        xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                        xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Converters"
+                        Title="MaterialHamburger">
+  <local:DemoView.Description>
+    <!-- TODODOC-->
+    <Paragraph FontSize="14"
+               FontFamily="Segoe">
+      <Run>A ToggleButton that pops a menu from left, right, top or bottom of a Window (or any FrameworkElement). The menu can be an animated HamburgerMenu or any customized content. It uses the Material Brushes.</Run>
+      <!--##INCLUDE_OPEN_SOURCE
+         <LineBreak />
+         <LineBreak />
+         <Run>This feature is only available in the "Plus" version.</Run>
+         <LineBreak />
+         <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
+            Click here for more details about Xceed Toolkit Plus for WPF.
+         </Hyperlink>
+       ##END-->
+    </Paragraph>
+  </local:DemoView.Description>
+
+  <!--##EXCLUDE_OPEN_SOURCE-->
+  <local:DemoView.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="../Resources/CommonResources.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+
+      <ObjectDataProvider x:Key="HamburgerLocationEnumData"
+                          MethodName="GetValues"
+                          ObjectType="{x:Type sys:Enum}">
+        <ObjectDataProvider.MethodParameters>
+          <x:Type TypeName="xctk:HamburgerLocation" />
+        </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+
+      <ObjectDataProvider x:Key="LocationEnumData"
+                          MethodName="GetValues"
+                          ObjectType="{x:Type sys:Enum}">
+        <ObjectDataProvider.MethodParameters>
+          <x:Type TypeName="xctk:Location" />
+        </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+
+      <conv:ZeroToBoolConverter x:Key="ZeroToBoolConverter" />
+
+      <ContentControl x:Key="CheckedContent1"
+                      Content="Close" />
+      <ContentControl x:Key="UncheckedContent1"
+                      Content="Open" />
+
+      <DataTemplate x:Key="MenuHeaderTemplate1">
+        <StackPanel Margin="20">
+          <TextBlock Text="{Binding}"
+                     Margin="5" />
+          <Button Content="Test"
+                  Margin="5" />
+        </StackPanel>
+      </DataTemplate>
+
+      <Path x:Key="LeftArrowPath"
+            x:Shared="False"
+            Data="F1M-218.342,2910.79L-234.066,2926.52 -233.954,2926.63 -225.428,2926.63 -210.87,2912.07 -206.495,2907.7 -225.313,2888.88 -234.066,2888.88 -218.342,2904.6 -259.829,2904.6 -259.829,2910.79 -218.342,2910.79z"
+            Stretch="Uniform"
+            Fill="White"
+            Width="16"
+            Height="16"
+            RenderTransformOrigin="0.5,0.5">
+        <Path.RenderTransform>
+          <ScaleTransform ScaleX="-1"
+                          ScaleY="1" />
+        </Path.RenderTransform>
+      </Path>
+
+      <Path x:Key="RightArrowPath"
+            x:Shared="False"
+            Data="F1M-218.342,2910.79L-234.066,2926.52 -233.954,2926.63 -225.428,2926.63 -210.87,2912.07 -206.495,2907.7 -225.313,2888.88 -234.066,2888.88 -218.342,2904.6 -259.829,2904.6 -259.829,2910.79 -218.342,2910.79z"
+            Stretch="Uniform"
+            Fill="White"
+            Width="16"
+            Height="16">
+      </Path>
+
+      <Path x:Key="TopArrowPath"
+            x:Shared="False"
+            Data="F1M-218.342,2910.79L-234.066,2926.52 -233.954,2926.63 -225.428,2926.63 -210.87,2912.07 -206.495,2907.7 -225.313,2888.88 -234.066,2888.88 -218.342,2904.6 -259.829,2904.6 -259.829,2910.79 -218.342,2910.79z"
+            Stretch="Uniform"
+            Fill="White"
+            Width="16"
+            Height="16"
+            RenderTransformOrigin="0.5,0.5">
+        <Path.RenderTransform>
+          <RotateTransform Angle="-90" />
+        </Path.RenderTransform>
+      </Path>
+
+      <Path x:Key="BottomArrowPath"
+            x:Shared="False"
+            Data="F1M-218.342,2910.79L-234.066,2926.52 -233.954,2926.63 -225.428,2926.63 -210.87,2912.07 -206.495,2907.7 -225.313,2888.88 -234.066,2888.88 -218.342,2904.6 -259.829,2904.6 -259.829,2910.79 -218.342,2910.79z"
+            Stretch="Uniform"
+            Fill="White"
+            Width="16"
+            Height="16"
+            RenderTransformOrigin="0.5,0.5">
+        <Path.RenderTransform>
+          <RotateTransform Angle="90" />
+        </Path.RenderTransform>
+      </Path>
+
+      <Style x:Key="DefaultHamburgerMenuCloseButtonStyle"
+             TargetType="{x:Type Button}">
+        <Setter Property="Content"
+                Value="{StaticResource LeftArrowPath}" />
+        <Setter Property="Foreground"
+                Value="White" />
+        <Setter Property="Margin"
+                Value="4" />
+        <Setter Property="Background"
+                Value="Transparent" />
+        <Setter Property="BorderBrush"
+                Value="Transparent" />
+        <Setter Property="Cursor"
+                Value="Hand" />
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type Button}">
+              <Border Background="{TemplateBinding Background}"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}">
+                <ContentPresenter HorizontalAlignment="Center"
+                                  VerticalAlignment="Center" />
+              </Border>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+          <!--Right Arrow when Menu is positionned on right-->
+          <DataTrigger Binding="{Binding MenuLocation, RelativeSource={RelativeSource AncestorType={x:Type xctk:MaterialHamburgerMenu}}}"
+                       Value="Right">
+            <Setter Property="Content"
+                    Value="{StaticResource RightArrowPath}" />
+          </DataTrigger>
+          <!--Top Arrow when Menu is positionned on top-->
+          <DataTrigger Binding="{Binding MenuLocation, RelativeSource={RelativeSource AncestorType={x:Type xctk:MaterialHamburgerMenu}}}"
+                       Value="Top">
+            <Setter Property="Content"
+                    Value="{StaticResource TopArrowPath}" />
+          </DataTrigger>
+          <!--Bottom Arrow when Menu is positionned on Bottom-->
+          <DataTrigger Binding="{Binding MenuLocation, RelativeSource={RelativeSource AncestorType={x:Type xctk:MaterialHamburgerMenu}}}"
+                       Value="Bottom">
+            <Setter Property="Content"
+                    Value="{StaticResource BottomArrowPath}" />
+          </DataTrigger>
+        </Style.Triggers>
+      </Style>
+
+      <Style x:Key="HamburgerMenuCloseButtonStyle1"
+             TargetType="{x:Type Button}">
+        <Setter Property="Content"
+                Value="OK" />
+      </Style>
+
+      <Border x:Key="CustomizedHamburgerContent"
+              Background="White"
+              BorderBrush="Black"
+              BorderThickness="1"
+              Margin="5">
+        <StackPanel>
+          <xctk:MaterialTextField Text="Mike"
+                                  Watermark="Your Name"
+                                  Margin="10,30,10,10" />
+          <StackPanel Orientation="Horizontal"
+                      Margin="10">
+            <TextBlock Text="Volume:"
+                       Margin="3" />
+            <xctk:MaterialComboBox SelectedIndex="1"
+                                   Width="130">
+              <xctk:MaterialComboBoxItem Content="High" />
+              <xctk:MaterialComboBoxItem Content="Medium" />
+              <xctk:MaterialComboBoxItem Content="Low" />
+              <xctk:MaterialComboBoxItem Content="Vibration" />
+            </xctk:MaterialComboBox>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal"
+                      Margin="10">
+            <TextBlock Text="Music: "
+                       Margin="5" />
+            <xctk:MaterialRadioButton GroupName="Choice"
+                                      IsChecked="True"
+                                      Content="On"
+                                      Margin="5" />
+            <xctk:MaterialRadioButton GroupName="Choice"
+                                      Content="Off"
+                                      Margin="5" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal"
+                      Margin="10">
+            <TextBlock Text="Plane Mode:"
+                       Margin="5,0,5,0" />
+            <xctk:MaterialSwitch />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal"
+                      Margin="10">
+            <xctk:MaterialCheckBox IsChecked="True"
+                                   Content="English"
+                                   Margin="0,5,5,5" />
+            <xctk:MaterialCheckBox IsChecked="False"
+                                   Content="French"
+                                   Margin="5" />
+          </StackPanel>
+          <xctk:MaterialButton Content="Apply"
+                               Margin="10"
+                               Padding="8"
+                               Click="ApplyButton_Click" />
+        </StackPanel>
+      </Border>
+
+      <Style x:Key="IconButtonStyle"
+             TargetType="{x:Type xctk:IconButton}">
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="MouseOverForeground"
+                Value="{Binding MaterialAccentBrush, RelativeSource={RelativeSource AncestorType={x:Type xctk:MaterialHamburgerMenu}}}" />
+        <Setter Property="MousePressedForeground"
+                Value="{Binding MaterialAccentBrush, RelativeSource={RelativeSource AncestorType={x:Type xctk:MaterialHamburgerMenu}}}" />
+        <Setter Property="Background"
+                Value="White" />
+        <Setter Property="MouseOverBackground"
+                Value="White" />
+        <Setter Property="MousePressedBackground"
+                Value="White" />
+        <Setter Property="IconLocation"
+                Value="Left" />
+        <Setter Property="HorizontalAlignment"
+                Value="Left" />
+        <Setter Property="Margin"
+                Value="5" />
+      </Style>
+    </ResourceDictionary>
+  </local:DemoView.Resources>
+
+  <Grid>
+    <StackPanel Margin="10,5,10,5">
+
+      <GroupBox Header="Features"
+                Margin="0,3,0,3">
+        <Grid Margin="3">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="190" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="160" />
+          </Grid.ColumnDefinitions>
+
+          <!-- First Column -->
+          <TextBlock Text="MaterialHamburger:"
+                     Foreground="#FFC72035"
+                     Grid.ColumnSpan="2" />
+
+          <TextBlock Grid.Column="0"
+                     Grid.Row="1"
+                     Text="Material Accent Brush: "
+                     VerticalAlignment="Center" />
+          <ComboBox Grid.Column="1"
+                    Grid.Row="1"
+                    ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
+                    SelectedItem="{Binding MaterialAccentBrush, ElementName=materialHamburger}"
+                    ItemTemplate="{StaticResource ColorItemTemplate}"
+                    VerticalAlignment="Center"
+                    Margin="5,3,5,3" />
+
+          <TextBlock Grid.Column="0"
+                     Grid.Row="2"
+                     Text="MenuLocation: "
+                     VerticalAlignment="Center" />
+          <ComboBox Grid.Column="1"
+                    Grid.Row="2"
+                    ItemsSource="{Binding Source={StaticResource HamburgerLocationEnumData}}"
+                    SelectedItem="{Binding MenuLocation, ElementName=materialHamburger}"
+                    SelectionChanged="MenuLocationComboBox_SelectionChanged"
+                    Margin="5,3,5,3"
+                    VerticalContentAlignment="Center" />
+
+          <TextBlock Grid.Column="0"
+                     Grid.Row="3"
+                     Text="Checked Content: "
+                     VerticalAlignment="Center" />
+          <ComboBox Grid.Column="1"
+                    Grid.Row="3"
+                    Margin="5,3,5,3"
+                    VerticalContentAlignment="Center"
+                    SelectedIndex="0"
+                    SelectionChanged="CheckedContentComboBox_SelectionChanged">
+            <ComboBoxItem Content="Default"
+                          Tag="{x:Null}" />
+            <ComboBoxItem Content="Content 1"
+                          Tag="{StaticResource CheckedContent1}" />
+          </ComboBox>
+
+          <TextBlock Grid.Column="0"
+                     Grid.Row="4"
+                     Text="Unchecked Content: "
+                     VerticalAlignment="Center" />
+          <ComboBox Grid.Column="1"
+                    Grid.Row="4"
+                    Margin="5,3,5,3"
+                    VerticalContentAlignment="Center"
+                    SelectedIndex="0"
+                    SelectionChanged="UncheckedContentComboBox_SelectionChanged">
+            <ComboBoxItem Content="Default"
+                          Tag="{x:Null}" />
+            <ComboBoxItem Content="Content 1"
+                          Tag="{StaticResource UncheckedContent1}" />
+          </ComboBox>
+
+          <TextBlock Grid.Column="0"
+                     Grid.Row="5"
+                     Text="Menu Owner: "
+                     VerticalAlignment="Center" />
+          <ComboBox x:Name="toastOwnerComboBox"
+                    Grid.Column="1"
+                    Grid.Row="5"
+                    Margin="5,3,5,3"
+                    SelectedValue="{Binding MenuOwner, ElementName=materialHamburger}"
+                    SelectedValuePath="Tag"
+                    VerticalContentAlignment="Center">
+            <ComboBoxItem Content="Sample Window"
+                          Tag="{x:Null}" />
+            <ComboBoxItem Content="LightBlue Border"
+                          Tag="{Binding ElementName=LightBlueBorder}" />
+            <ComboBoxItem Content="LightGreen Border"
+                          Tag="{Binding ElementName=LightGreenBorder}" />
+          </ComboBox>
+
+          <TextBlock Grid.Column="0"
+                     Grid.Row="6"
+                     Text="Menu Content: "
+                     VerticalAlignment="Center" />
+          <ComboBox x:Name="menuContentComboBox"
+                    Grid.Column="1"
+                    Grid.Row="6"
+                    Margin="5,3,5,3"
+                    SelectedIndex="0"
+                    VerticalContentAlignment="Center">
+            <ComboBoxItem Content="HamburgerMenu with items">
+              <ComboBoxItem.Tag>
+                <xctk:MaterialHamburgerMenu x:Name="materialHamburgerMenu"
+                                            Header="Xceed Products"
+                                            HeaderTemplate="{x:Null}"
+                                            CloseButtonLocation="Right"
+                                            Padding="0"
+                                            CloseButtonStyle="{StaticResource DefaultHamburgerMenuCloseButtonStyle}"
+                                            IsAnimatingItems="True">
+                  <TextBlock Text="WPF Controls"
+                             Foreground="Gray"
+                             HorizontalAlignment="Center"
+                             Margin="5" />
+                  <xctk:IconButton Content="DataGrid For WPF"
+                                   Tag="https://xceed.com/xceed-datagrid-for-wpf/"
+                                   Click="IconButton_Click"
+                                   Style="{StaticResource IconButtonStyle}">
+                    <xctk:IconButton.Icon>
+                      <Image Source="../Resources/DataGrid.png"
+                             Width="20"
+                             Margin="5" />
+                    </xctk:IconButton.Icon>
+                  </xctk:IconButton>
+                  <xctk:IconButton Content="Toolkit For WPF"
+                                   Tag="https://xceed.com/xceed-toolkit-plus-for-wpf/"
+                                   Click="IconButton_Click"
+                                   Style="{StaticResource IconButtonStyle}">
+                    <xctk:IconButton.Icon>
+                      <Image Source="../Resources/Toolkit.png"
+                             Width="20"
+                             Margin="5" />
+                    </xctk:IconButton.Icon>
+                  </xctk:IconButton>
+                  <xctk:IconButton Content="Business Suite For WPF"
+                                   Tag="https://xceed.com/xceed-business-suite-for-wpf/"
+                                   Click="IconButton_Click"
+                                   Style="{StaticResource IconButtonStyle}">
+                    <xctk:IconButton.Icon>
+                      <Image Source="../Resources/Business.png"
+                             Width="20"
+                             Margin="5" />
+                    </xctk:IconButton.Icon>
+                  </xctk:IconButton>
+                  <Separator Margin="0,20" />
+                  <TextBlock Text=".NET Libraries"
+                             HorizontalAlignment="Center"
+                             Foreground="Gray"
+                             Margin="5,0,5,5" />
+                  <xctk:IconButton Content="Zip For .NET"
+                                   Tag="https://xceed.com/xceed-zip-for-net/"
+                                   Click="IconButton_Click"
+                                   Style="{StaticResource IconButtonStyle}">
+                    <xctk:IconButton.Icon>
+                      <Image Source="../Resources/Zip.png"
+                             Width="20"
+                             Margin="5" />
+                    </xctk:IconButton.Icon>
+                  </xctk:IconButton>
+                  <xctk:IconButton Content="SFTP For .NET"
+                                   Tag="https://xceed.com/xceed-sftp-for-net/"
+                                   Click="IconButton_Click"
+                                   Style="{StaticResource IconButtonStyle}">
+                    <xctk:IconButton.Icon>
+                      <Image Source="../Resources/SFTP.png"
+                             Width="20"
+                             Margin="5" />
+                    </xctk:IconButton.Icon>
+                  </xctk:IconButton>
+                  <xctk:IconButton Content="Real-Time Zip For .NET"
+                                   Tag="https://xceed.com/xceed-real-time-zip-for-net/"
+                                   Click="IconButton_Click"
+                                   Style="{StaticResource IconButtonStyle}">
+                    <xctk:IconButton.Icon>
+                      <Image Source="../Resources/Zip.png"
+                             Width="20"
+                             Margin="5" />
+                    </xctk:IconButton.Icon>
+                  </xctk:IconButton>
+                </xctk:MaterialHamburgerMenu>
+              </ComboBoxItem.Tag>
+            </ComboBoxItem>
+            <ComboBoxItem Content="Customized content"
+                          Tag="{StaticResource CustomizedHamburgerContent}" />
+          </ComboBox>
+
+          <TextBlock Grid.Column="0"
+                     Grid.Row="7"
+                     Text="Can Resize Menu: "
+                     VerticalAlignment="Center" />
+          <CheckBox Grid.Column="1"
+                    Grid.Row="7"
+                    Margin="5,3,5,3"
+                    IsChecked="{Binding CanResizeMenu, ElementName=materialHamburger}"
+                    VerticalContentAlignment="Center" />
+
+          <!-- Second Column -->
+          <TextBlock Text="MaterialHamburgerMenu:"
+                     Foreground="#FFC72035"
+                     Grid.Column="2"
+                     Grid.ColumnSpan="2"
+                     Margin="10,0,0,0" />
+
+          <TextBlock Grid.Column="2"
+                     Grid.Row="1"
+                     Text="Material Accent Brush: "
+                     VerticalAlignment="Center"
+                     Margin="10,0,0,0"
+                     IsEnabled="{Binding SelectedIndex, ElementName=menuContentComboBox, Converter={StaticResource ZeroToBoolConverter}}"
+                     Style="{StaticResource DisableGrayText}" />
+          <ComboBox Grid.Column="3"
+                    Grid.Row="1"
+                    ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
+                    SelectedItem="{Binding MaterialAccentBrush, ElementName=materialHamburgerMenu}"
+                    ItemTemplate="{StaticResource ColorItemTemplate}"
+                    VerticalAlignment="Center"
+                    Margin="5,3,5,3"
+                    IsEnabled="{Binding SelectedIndex, ElementName=menuContentComboBox, Converter={StaticResource ZeroToBoolConverter}}"
+                    Style="{StaticResource DisableGrayComboBox}" />
+
+          <TextBlock Grid.Column="2"
+                     Grid.Row="2"
+                     Text="Header: "
+                     VerticalAlignment="Center"
+                     Margin="10,0,0,0"
+                     IsEnabled="{Binding SelectedIndex, ElementName=menuContentComboBox, Converter={StaticResource ZeroToBoolConverter}}"
+                     Style="{StaticResource DisableGrayText}" />
+          <TextBox Grid.Column="3"
+                   Grid.Row="2"
+                   Text="{Binding Header, ElementName=materialHamburgerMenu}"
+                   VerticalAlignment="Center"
+                   Margin="5,3,5,3"
+                   IsEnabled="{Binding SelectedIndex, ElementName=menuContentComboBox, Converter={StaticResource ZeroToBoolConverter}}" />
+
+          <TextBlock Grid.Column="2"
+                     Grid.Row="3"
+                     Text="Header Template: "
+                     VerticalAlignment="Center"
+                     Margin="10,0,0,0"
+                     IsEnabled="{Binding SelectedIndex, ElementName=menuContentComboBox, Converter={StaticResource ZeroToBoolConverter}}"
+                     Style="{StaticResource DisableGrayText}" />
+          <ComboBox Grid.Column="3"
+                    Grid.Row="3"
+                    SelectedValue="{Binding HeaderTemplate, ElementName=materialHamburgerMenu}"
+                    SelectedValuePath="Tag"
+                    VerticalAlignment="Center"
+                    Margin="5,3,5,3"
+                    IsEnabled="{Binding SelectedIndex, ElementName=menuContentComboBox, Converter={StaticResource ZeroToBoolConverter}}"
+                    Style="{StaticResource DisableGrayComboBox}">
+            <ComboBoxItem Content="Default"
+                          Tag="{x:Null}" />
+            <ComboBoxItem Content="Template 1"
+                          Tag="{StaticResource MenuHeaderTemplate1}" />
+          </ComboBox>
+
+          <TextBlock Grid.Column="2"
+                     Grid.Row="4"
+                     Text="Close Button Location: "
+                     VerticalAlignment="Center"
+                     Margin="10,0,0,0"
+                     IsEnabled="{Binding SelectedIndex, ElementName=menuContentComboBox, Converter={StaticResource ZeroToBoolConverter}}"
+                     Style="{StaticResource DisableGrayText}" />
+          <ComboBox Grid.Column="3"
+                    Grid.Row="4"
+                    ItemsSource="{Binding Source={StaticResource LocationEnumData}}"
+                    SelectedItem="{Binding CloseButtonLocation, ElementName=materialHamburgerMenu}"
+                    VerticalAlignment="Center"
+                    Margin="5,3,5,3"
+                    IsEnabled="{Binding SelectedIndex, ElementName=menuContentComboBox, Converter={StaticResource ZeroToBoolConverter}}"
+                    Style="{StaticResource DisableGrayComboBox}" />
+
+          <TextBlock Grid.Column="2"
+                     Grid.Row="5"
+                     Text="Close Button Style: "
+                     VerticalAlignment="Center"
+                     Margin="10,0,0,0"
+                     IsEnabled="{Binding SelectedIndex, ElementName=menuContentComboBox, Converter={StaticResource ZeroToBoolConverter}}"
+                     Style="{StaticResource DisableGrayText}" />
+          <ComboBox Grid.Column="3"
+                    Grid.Row="5"
+                    SelectedValue="{Binding CloseButtonStyle, ElementName=materialHamburgerMenu}"
+                    SelectedValuePath="Tag"
+                    VerticalAlignment="Center"
+                    Margin="5,3,5,3"
+                    IsEnabled="{Binding SelectedIndex, ElementName=menuContentComboBox, Converter={StaticResource ZeroToBoolConverter}}"
+                    Style="{StaticResource DisableGrayComboBox}">
+            <ComboBoxItem Content="Default"
+                          Tag="{StaticResource DefaultHamburgerMenuCloseButtonStyle}" />
+            <ComboBoxItem Content="Style 1"
+                          Tag="{StaticResource HamburgerMenuCloseButtonStyle1}" />
+          </ComboBox>
+
+          <TextBlock Grid.Column="2"
+                     Grid.Row="6"
+                     Text="Is Animating Items: "
+                     VerticalAlignment="Center"
+                     Margin="10,0,0,0"
+                     IsEnabled="{Binding SelectedIndex, ElementName=menuContentComboBox, Converter={StaticResource ZeroToBoolConverter}}"
+                     Style="{StaticResource DisableGrayText}" />
+          <CheckBox Grid.Column="3"
+                    Grid.Row="6"
+                    IsChecked="{Binding IsAnimatingItems, ElementName=materialHamburgerMenu}"
+                    VerticalAlignment="Center"
+                    Margin="5,3,5,3"
+                    IsEnabled="{Binding SelectedIndex, ElementName=menuContentComboBox, Converter={StaticResource ZeroToBoolConverter}}" />
+        </Grid>
+      </GroupBox>
+
+      <StackPanel>
+        <TextBlock Text="Usage:"
+                   Style="{StaticResource Header}" />
+
+        <xctk:MaterialHamburger x:Name="materialHamburger"
+                                Margin="5"
+                                MenuContent="{Binding SelectedItem.Tag, ElementName=menuContentComboBox}" />
+
+        <StackPanel Orientation="Horizontal">
+          <Border x:Name="LightBlueBorder"
+                  Background="LightBlue"
+                  Width="335"
+                  Height="330"
+                  Margin="5" />
+          <Border x:Name="LightGreenBorder"
+                  Background="LightGreen"
+                  Width="335"
+                  Height="330"
+                  Margin="5" />
+        </StackPanel>
+      </StackPanel>
+    </StackPanel>
+  </Grid>
+  <!--##END-->
+
+  <!--##INCLUDE_OPEN_SOURCE
+    <Image Source="..\OpenSourceImages\MaterialHamburger.png" Width="600" Height="400"/>
+   ##END-->
+</local:MaterialDemoView>

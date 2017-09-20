@@ -41,6 +41,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
   {
     private const string PART_VerticalScrollBar = "PART_VerticalScrollBar";
     private const string PART_HorizontalScrollBar = "PART_HorizontalScrollBar";
+    private bool _isUpdatingVisualTree = false;
 
     #region Constructors
 
@@ -859,7 +860,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     private static readonly DependencyPropertyKey ViewFinderPropertyKey =
       DependencyProperty.RegisterReadOnly( "ViewFinder", typeof( FrameworkElement ), typeof( Zoombox ),
-        new FrameworkPropertyMetadata( null ) );
+        new FrameworkPropertyMetadata( null, new PropertyChangedCallback( Zoombox.OnViewFinderChanged ) ) );
 
     public static readonly DependencyProperty ViewFinderProperty = Zoombox.ViewFinderPropertyKey.DependencyProperty;
 
@@ -869,6 +870,20 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       {
         return ( FrameworkElement )this.GetValue( Zoombox.ViewFinderProperty );
       }
+      set
+      {
+        this.SetValue( Zoombox.ViewFinderPropertyKey, value );
+      }
+    }
+
+    private static void OnViewFinderChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      ( ( Zoombox )d ).OnViewFinderChanged( e );
+    }
+
+    private void OnViewFinderChanged( DependencyPropertyChangedEventArgs e )
+    {
+      this.AttachToVisualTree();
     }
 
     #endregion
@@ -2038,6 +2053,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     private void AttachToVisualTree()
     {
+      if( _isUpdatingVisualTree )
+        return;
+
+      _isUpdatingVisualTree = true;
+
       // detach from the old tree
       this.DetachFromVisualTree();
 
@@ -2067,23 +2087,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       if( _contentPresenter == null )
         throw new InvalidTemplateException( ErrorMessages.GetMessage( "ZoomboxTemplateNeedsContent" ) );
 
-      //locate the vertical scrollBar
-      if( _verticalScrollBar != null )
-      {
-        _verticalScrollBar.Scroll -= this.VerticalScrollBar_Scroll;
-      }
-
       _verticalScrollBar = this.GetTemplateChild( PART_VerticalScrollBar ) as ScrollBar;
       if( _verticalScrollBar == null )
         throw new InvalidTemplateException( ErrorMessages.GetMessage( "Zoombox vertical scrollBar not found." ) );
 
       _verticalScrollBar.Scroll += this.VerticalScrollBar_Scroll;
-
-      //locate the horizontal scrollBar
-      if( _horizontalScrollBar != null )
-      {
-        _horizontalScrollBar.Scroll -= this.HorizontalScrollBar_Scroll;
-      }
 
       _horizontalScrollBar = this.GetTemplateChild( PART_HorizontalScrollBar ) as ScrollBar;
       if( _horizontalScrollBar == null )
@@ -2120,11 +2128,24 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       // If we don't do the following, the content is not laid out correctly (centered) initially.
       VisualTreeHelperEx.FindDescendantWithPropertyValue( this, Button.IsPressedProperty, true );
 
-      // set a reference to the ViewFinder element, if present
-      this.SetValue( Zoombox.ViewFinderPropertyKey, this.Template.FindName( "ViewFinder", this ) as FrameworkElement );
+      // User has not defined a ViewFinder, use the one from this template
+      if( this.GetValue( Zoombox.ViewFinderPropertyKey.DependencyProperty ) == null )
+      {
+        // set a reference to the ViewFinder element, if present
+        this.SetValue( Zoombox.ViewFinderPropertyKey, this.Template.FindName( "ViewFinder", this ) as FrameworkElement );
+        Zoombox.SetViewFinderVisibility( this, Visibility.Collapsed );
+      }
+      else
+      {
+        //user has defined a ViewFinder, hide the one from this template
+        Zoombox.SetViewFinderVisibility( this, Visibility.Hidden );
+      }
 
       // locate the view finder display panel
-      _viewFinderDisplay = VisualTreeHelperEx.FindDescendantByType( this, typeof( ZoomboxViewFinderDisplay ) ) as ZoomboxViewFinderDisplay;
+      if( this.ViewFinder != null )
+      {
+        _viewFinderDisplay = VisualTreeHelperEx.FindDescendantByType( this.ViewFinder, typeof( ZoomboxViewFinderDisplay ) ) as ZoomboxViewFinderDisplay;
+      }
 
       // if a ViewFinder was specified but no display panel is present, throw an exception
       if( this.ViewFinder != null && _viewFinderDisplay == null )
@@ -2149,8 +2170,12 @@ namespace Xceed.Wpf.Toolkit.Zoombox
         _viewFinderDisplay.SetBinding( ZoomboxViewFinderDisplay.ViewportRectProperty, binding );
       }
 
+      this.UpdateViewFinderDisplayContentBounds();
+
       // set up event handler to run once the content presenter has been arranged
       _contentPresenter.LayoutUpdated += new EventHandler( this.ContentPresenterFirstArranged );
+
+      _isUpdatingVisualTree = false;
     }
 
     private void CreateVisualBrushForViewFinder( Visual visual )
@@ -2244,12 +2269,14 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       {
         IsAnimated = oldAnimated;
       }
+      //When ViewFinder is modified, this will refresh the ZoomboxViewFinderDisplay
+      this.ZoomTo( this.Scale );
     }
 
     private void DetachFromVisualTree()
     {
       // remove the drag adorner
-      if( _dragAdorner != null )
+      if( (_dragAdorner != null) && ( AdornerLayer.GetAdornerLayer( this ) != null ) )
         AdornerLayer.GetAdornerLayer( this ).Remove( _dragAdorner );
 
       // remove the layout updated handler, if present
@@ -2258,9 +2285,25 @@ namespace Xceed.Wpf.Toolkit.Zoombox
         _contentPresenter.LayoutUpdated -= new EventHandler( this.ContentPresenterFirstArranged );
       }
 
+      //locate the vertical scrollBar
+      if( _verticalScrollBar != null )
+      {
+        _verticalScrollBar.Scroll -= this.VerticalScrollBar_Scroll;
+      }
+
+      //locate the horizontal scrollBar
+      if( _horizontalScrollBar != null )
+      {
+        _horizontalScrollBar.Scroll -= this.HorizontalScrollBar_Scroll;
+      }
+
       // remove the view finder display panel's visual brush and adorner
       if( _viewFinderDisplay != null )
       {
+        _viewFinderDisplay.MouseMove -= new MouseEventHandler( this.ViewFinderDisplayMouseMove );
+        _viewFinderDisplay.MouseLeftButtonDown -= new MouseButtonEventHandler( this.ViewFinderDisplayBeginCapture );
+        _viewFinderDisplay.MouseLeftButtonUp -= new MouseButtonEventHandler( this.ViewFinderDisplayEndCapture );
+        BindingOperations.ClearBinding( _viewFinderDisplay, ZoomboxViewFinderDisplay.ViewportRectProperty );
         _viewFinderDisplay = null;
       }
 
@@ -2275,8 +2318,18 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     private void VerticalScrollBar_Scroll( object sender, ScrollEventArgs e )
     {
-      double diff = e.NewValue + _relativePosition.Y;
-      this.OnDrag( new DragDeltaEventArgs( 0d, -diff / this.Scale ), false );
+      double diff = -(e.NewValue + _relativePosition.Y);
+
+      if( e.ScrollEventType == ScrollEventType.LargeIncrement )
+      {
+        diff = -_verticalScrollBar.ViewportSize;
+      }
+      else if( e.ScrollEventType == ScrollEventType.LargeDecrement )
+      {
+        diff = _verticalScrollBar.ViewportSize;
+      }
+
+      this.OnDrag( new DragDeltaEventArgs( 0d, diff / this.Scale ), false );
 
       // Raise the Scroll event to user
       EventHandler<ScrollEventArgs> handler = this.Scroll;
@@ -2288,8 +2341,17 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     private void HorizontalScrollBar_Scroll( object sender, ScrollEventArgs e )
     {
-      double diff = e.NewValue + _relativePosition.X;
-      this.OnDrag( new DragDeltaEventArgs( -diff / this.Scale, 0d ), false );
+      double diff = -( e.NewValue + _relativePosition.X );
+      if( e.ScrollEventType == ScrollEventType.LargeIncrement )
+      {
+        diff = -_horizontalScrollBar.ViewportSize;
+      }
+      else if( e.ScrollEventType == ScrollEventType.LargeDecrement )
+      {
+        diff = _horizontalScrollBar.ViewportSize;
+      }
+
+      this.OnDrag( new DragDeltaEventArgs( diff / this.Scale, 0d ), false );
 
       // Raise the Scroll event to user
       EventHandler<ScrollEventArgs> handler = this.Scroll;
@@ -2439,6 +2501,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       Point relativePosition = _relativePosition;
       double scale = this.Scale;
       Point newPosition = relativePosition + ( this.ContentOffset * scale ) + new Vector( e.HorizontalChange * scale, e.VerticalChange * scale );
+      if( this.IsUsingScrollBars )
+      {
+        newPosition.X = Math.Max( Math.Min( newPosition.X, 0d ), -_horizontalScrollBar.Maximum );
+        newPosition.Y = Math.Max( Math.Min( newPosition.Y, 0d ), -_verticalScrollBar.Maximum );
+      }
 
       // update the transform
       this.UpdateView( new ZoomboxView( scale, newPosition ), false, end );

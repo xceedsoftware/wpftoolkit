@@ -21,14 +21,14 @@ using System.Text;
 using System.Windows.Markup;
 using System.Windows;
 using System.Xml.Serialization;
+using System.Xml.Schema;
+using System.Xml;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
     [Serializable]
-    [XmlInclude(typeof(LayoutAnchorableFloatingWindow))]
-    [XmlInclude(typeof(LayoutDocumentFloatingWindow))]
-    public abstract class LayoutFloatingWindow : LayoutElement, ILayoutContainer
-    {
+    public abstract class LayoutFloatingWindow : LayoutElement, ILayoutContainer, IXmlSerializable
+  {
         public LayoutFloatingWindow()
         { 
 
@@ -45,8 +45,22 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         public abstract bool IsValid { get; }
 
+        public XmlSchema GetSchema()
+        {
+          return null;
+        }
 
+        public abstract void ReadXml( XmlReader reader );
 
+        public virtual void WriteXml( XmlWriter writer )
+        {
+          foreach( var child in Children )
+          {
+            var type = child.GetType();
+            var serializer = new XmlSerializer( type );
+            serializer.Serialize( writer, child );
+          }
+        }
 
-    }
+  }
 }

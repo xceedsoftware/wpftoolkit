@@ -276,6 +276,24 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //IsMiscCategoryLabelHidden
 
+    #region IsVirtualizing
+
+    public static readonly DependencyProperty IsVirtualizingProperty = DependencyProperty.Register( "IsVirtualizing", typeof( bool ), typeof( PropertyGrid )
+      , new UIPropertyMetadata( false ) );
+    public bool IsVirtualizing
+    {
+      get
+      {
+        return ( bool )GetValue( IsVirtualizingProperty );
+      }
+      set
+      {
+        SetValue( IsVirtualizingProperty, value );
+      }
+    }
+
+    #endregion //IsVirtualizing
+
 
 
 
@@ -812,7 +830,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       //ref : http://www.codeproject.com/Tips/124556/How-to-suppress-the-System-Windows-Data-Error-warn
       TranslateTransform _moveTransform = new TranslateTransform();
       _moveTransform.X = NameColumnWidth;
-      _dragThumb.RenderTransform = _moveTransform;
+      if( _dragThumb != null )
+      {
+        _dragThumb.RenderTransform = _moveTransform;
+      }
 
       this.UpdateThumb();
     }
@@ -1010,7 +1031,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       if( (_containerHelper != null) && (_containerHelper.ChildrenItemsControl != null) )
       {
-        return TreeHelper.FindParent<ScrollViewer>( _containerHelper.ChildrenItemsControl );
+        return TreeHelper.FindChild<ScrollViewer>( _containerHelper.ChildrenItemsControl );
       }
       return null;
     }
@@ -1073,6 +1094,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         _containerHelper.ChildrenItemsControl = childrenItemsControl;
       }
+
+      this.ScrollToTop();
+
       // Since the template will bind on this property and this property
       // will be different when the property parent is updated.
       this.Notify( this.PropertyChanged, () => this.Properties );

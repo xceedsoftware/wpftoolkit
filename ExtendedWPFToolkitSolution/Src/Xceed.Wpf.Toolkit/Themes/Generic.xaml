@@ -39,6 +39,7 @@
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="ColorCanvas/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="ColorPicker/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="DropDownButton/Themes/Generic.xaml" />
+      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="IconButton/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Magnifier/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="MessageBox/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="DateTimeUpDown/Themes/Generic.xaml" />

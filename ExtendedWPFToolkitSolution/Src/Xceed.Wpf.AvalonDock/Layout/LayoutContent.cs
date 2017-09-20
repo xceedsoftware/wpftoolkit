@@ -24,6 +24,7 @@ using System.Windows;
 using System.Globalization;
 using System.Windows.Media;
 using System.ComponentModel;
+using Xceed.Wpf.AvalonDock.Controls;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
@@ -84,31 +85,25 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         #region ContentId
 
-        //Added to make ContentId bindable
-        public static DependencyProperty ContentIdProperty =
-            DependencyProperty.Register(nameof(ContentId),
-              typeof(string), typeof(LayoutContent), new FrameworkPropertyMetadata(null, (s, e) =>
-               {
-                  (s as LayoutContent)?.RaisePropertyChanged(nameof(ContentId));
-              }));
-
+        private string _contentId = null;
         public string ContentId
         {
-            get
+            get 
             {
-                if (GetValue(ContentIdProperty) == null)
-                {
+                if (_contentId == null)
+                { 
                     var contentAsControl = _content as FrameworkElement;
                     if (contentAsControl != null && !string.IsNullOrWhiteSpace(contentAsControl.Name))
                         return contentAsControl.Name;
                 }
-                return (string)GetValue(ContentIdProperty);
+                return _contentId; 
             }
             set
             {
-                if (!String.Equals(GetValue(ContentIdProperty) as string, value))
+                if (_contentId != value)
                 {
-                    SetValue(ContentIdProperty, value);
+                    _contentId = value;
+                    RaisePropertyChanged("ContentId");
                 }
             }
         }
@@ -133,7 +128,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
                         parentSelector.SelectedContentIndex = _isSelected ? parentSelector.IndexOf(this) : -1;
                     OnIsSelectedChanged(oldValue, value);
                     RaisePropertyChanged("IsSelected");
-                    Controls.LayoutAnchorableTabItem.CancelNextMouseLeave();
+		    LayoutAnchorableTabItem.CancelMouseLeave();
                 }
             }
         }

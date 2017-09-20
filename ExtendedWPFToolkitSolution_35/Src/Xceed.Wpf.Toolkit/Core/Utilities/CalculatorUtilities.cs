@@ -78,6 +78,9 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
 
     public static Button FindButtonByCalculatorButtonType( DependencyObject parent, Calculator.CalculatorButtonType type )
     {
+      if( parent == null )
+        return null;
+
       for( int i = 0; i < VisualTreeHelper.GetChildrenCount( parent ); i++ )
       {
         var child = VisualTreeHelper.GetChild( parent, i );

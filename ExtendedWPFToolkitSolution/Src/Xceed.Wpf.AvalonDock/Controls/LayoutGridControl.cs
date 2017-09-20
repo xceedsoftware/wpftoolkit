@@ -380,62 +380,50 @@ namespace Xceed.Wpf.AvalonDock.Controls
             var prevChildModel = (ILayoutPositionableElement)(prevChild as ILayoutControl).Model;
             var nextChildModel = (ILayoutPositionableElement)(nextChild as ILayoutControl).Model;
 
-            if (Orientation == System.Windows.Controls.Orientation.Horizontal)
-            {
-                if (prevChildModel.DockWidth.IsStar)
-                {
-                    prevChildModel.DockWidth = new GridLength(prevChildModel.DockWidth.Value * (prevChildActualSize.Width + delta) / prevChildActualSize.Width, GridUnitType.Star);
-                }
-                else if (prevChildModel.DockWidth.IsAuto)
-                {
-                    prevChildModel.DockWidth = new GridLength(prevChildActualSize.Width + delta, GridUnitType.Pixel);
-                }
-                else
-                {
-                    prevChildModel.DockWidth = new GridLength(prevChildModel.DockWidth.Value + delta, GridUnitType.Pixel);
-                }
+      if( Orientation == System.Windows.Controls.Orientation.Horizontal )
+      {
+        if( prevChildModel.DockWidth.IsStar )
+        {
+          prevChildModel.DockWidth = new GridLength( prevChildModel.DockWidth.Value * ( prevChildActualSize.Width + delta ) / prevChildActualSize.Width, GridUnitType.Star );
+        }
+        else
+        {
+          var width = ( prevChildModel.DockWidth.IsAuto ) ? prevChildActualSize.Width : prevChildModel.DockWidth.Value;
+          prevChildModel.DockWidth = new GridLength( width + delta, GridUnitType.Pixel );
+        }
 
-                if (nextChildModel.DockWidth.IsStar)
-                {
-                    nextChildModel.DockWidth = new GridLength(nextChildModel.DockWidth.Value * (nextChildActualSize.Width - delta) / nextChildActualSize.Width, GridUnitType.Star);
-                }
-                else if (nextChildModel.DockWidth.IsAuto)
-                {
-                    nextChildModel.DockWidth = new GridLength(nextChildActualSize.Width - delta, GridUnitType.Pixel);
-                }
-                else
-                {
-                    nextChildModel.DockWidth = new GridLength(nextChildModel.DockWidth.Value - delta, GridUnitType.Pixel);
-                }
-            }
-            else
-            {
-                if (prevChildModel.DockHeight.IsStar)
-                {
-                    prevChildModel.DockHeight = new GridLength(prevChildModel.DockHeight.Value * (prevChildActualSize.Height + delta) / prevChildActualSize.Height, GridUnitType.Star);
-                }
-                else if (prevChildModel.DockHeight.IsAuto)
-                {
-                    prevChildModel.DockHeight = new GridLength(prevChildActualSize.Height + delta, GridUnitType.Pixel);
-                }
-                else
-                {
-                    prevChildModel.DockHeight = new GridLength(prevChildModel.DockHeight.Value + delta, GridUnitType.Pixel);
-                }
+        if( nextChildModel.DockWidth.IsStar )
+        {
+          nextChildModel.DockWidth = new GridLength( nextChildModel.DockWidth.Value * ( nextChildActualSize.Width - delta ) / nextChildActualSize.Width, GridUnitType.Star );
+        }
+        else
+        {
+          var width = ( nextChildModel.DockWidth.IsAuto ) ? nextChildActualSize.Width : nextChildModel.DockWidth.Value;
+          nextChildModel.DockWidth = new GridLength( width - delta, GridUnitType.Pixel );
+        }
+      }
+      else
+      {
+        if( prevChildModel.DockHeight.IsStar )
+        {
+          prevChildModel.DockHeight = new GridLength( prevChildModel.DockHeight.Value * ( prevChildActualSize.Height + delta ) / prevChildActualSize.Height, GridUnitType.Star );
+        }
+        else
+        {
+          var height = ( prevChildModel.DockHeight.IsAuto ) ? prevChildActualSize.Height : prevChildModel.DockHeight.Value;
+          prevChildModel.DockHeight = new GridLength( height + delta, GridUnitType.Pixel );
+        }
 
-                if (nextChildModel.DockHeight.IsStar)
-                {
-                    nextChildModel.DockHeight = new GridLength(nextChildModel.DockHeight.Value * (nextChildActualSize.Height - delta) / nextChildActualSize.Height, GridUnitType.Star);
-                }
-                else if (nextChildModel.DockHeight.IsAuto)
-                {
-                    nextChildModel.DockHeight = new GridLength(nextChildActualSize.Height - delta, GridUnitType.Pixel);
-                }
-                else
-                {
-                    nextChildModel.DockHeight = new GridLength(nextChildModel.DockHeight.Value - delta, GridUnitType.Pixel);
-                }
-            }
+        if( nextChildModel.DockHeight.IsStar )
+        {
+          nextChildModel.DockHeight = new GridLength( nextChildModel.DockHeight.Value * ( nextChildActualSize.Height - delta ) / nextChildActualSize.Height, GridUnitType.Star );
+        }
+        else
+        {
+          var height = ( nextChildModel.DockHeight.IsAuto ) ? nextChildActualSize.Height : nextChildModel.DockHeight.Value;
+          nextChildModel.DockHeight = new GridLength( height - delta, GridUnitType.Pixel );
+        }
+      }
 
             HideResizerOverlayWindow();
         }

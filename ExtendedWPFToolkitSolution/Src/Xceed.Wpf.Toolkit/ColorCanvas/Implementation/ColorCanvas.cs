@@ -393,25 +393,34 @@ namespace Xceed.Wpf.Toolkit
 
     void ColorShadingCanvas_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
     {
-      Point p = e.GetPosition( _colorShadingCanvas );
-      UpdateColorShadeSelectorPositionAndCalculateColor( p, true );
-      _colorShadingCanvas.CaptureMouse();
-      //Prevent from closing ColorCanvas after mouseDown in ListView
-      e.Handled = true; 
+      if( _colorShadingCanvas != null )
+      {
+        Point p = e.GetPosition( _colorShadingCanvas );
+        UpdateColorShadeSelectorPositionAndCalculateColor( p, true );
+        _colorShadingCanvas.CaptureMouse();
+        //Prevent from closing ColorCanvas after mouseDown in ListView
+        e.Handled = true;
+      }
     }
 
     void ColorShadingCanvas_MouseLeftButtonUp( object sender, MouseButtonEventArgs e )
     {
-      _colorShadingCanvas.ReleaseMouseCapture();
+      if( _colorShadingCanvas != null )
+      {
+        _colorShadingCanvas.ReleaseMouseCapture();
+      }
     }
 
     void ColorShadingCanvas_MouseMove( object sender, MouseEventArgs e )
     {
-      if( e.LeftButton == MouseButtonState.Pressed )
+      if( _colorShadingCanvas != null )
       {
-        Point p = e.GetPosition( _colorShadingCanvas );
-        UpdateColorShadeSelectorPositionAndCalculateColor( p, true );
-        Mouse.Synchronize();
+        if( e.LeftButton == MouseButtonState.Pressed )
+        {
+          Point p = e.GetPosition( _colorShadingCanvas );
+          UpdateColorShadeSelectorPositionAndCalculateColor( p, true );
+          Mouse.Synchronize();
+        }
       }
     }
 
@@ -493,7 +502,10 @@ namespace Xceed.Wpf.Toolkit
 
     private void UpdateColorShadeSelectorPositionAndCalculateColor( Point p, bool calculateColor )
     {
-      if( p.Y < 0 )
+      if( (_colorShadingCanvas == null) || ( _colorShadeSelector == null) )
+        return;
+
+        if( p.Y < 0 )
         p.Y = 0;
 
       if( p.X < 0 )
@@ -541,6 +553,9 @@ namespace Xceed.Wpf.Toolkit
 
     private void CalculateColor( Point p )
     {
+      if( _spectrumSlider == null )
+        return;
+
       HsvColor hsv = new HsvColor( 360 - _spectrumSlider.Value, 1, 1 )
       {
         S = p.X,

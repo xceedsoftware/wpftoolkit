@@ -45,7 +45,6 @@ namespace Xceed.Wpf.Toolkit
   [TemplatePart( Name = PART_RecentColors, Type = typeof( ListBox ) )]
   [TemplatePart( Name = PART_ColorPickerToggleButton, Type = typeof( ToggleButton ) )]
   [TemplatePart( Name = PART_ColorPickerPalettePopup, Type = typeof( Popup ) )]
-  [TemplatePart( Name = PART_ColorModeButton, Type = typeof( Button ) )]
   public class ColorPicker : Control
   {
     private const string PART_AvailableColors = "PART_AvailableColors";
@@ -53,7 +52,6 @@ namespace Xceed.Wpf.Toolkit
     private const string PART_RecentColors = "PART_RecentColors";
     private const string PART_ColorPickerToggleButton = "PART_ColorPickerToggleButton";
     private const string PART_ColorPickerPalettePopup = "PART_ColorPickerPalettePopup";
-    private const string PART_ColorModeButton = "PART_ColorModeButton";
 
     #region Members
 
@@ -62,7 +60,6 @@ namespace Xceed.Wpf.Toolkit
     private ListBox _recentColors;
     private ToggleButton _toggleButton;
     private Popup _popup;
-    private Button _colorModeButton;
     private Color? _initialColor;
     private bool _selectionChanged;
 
@@ -355,22 +352,22 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //SelectedColorText
 
-    #region ShowAdvancedButton
+    #region ShowTabHeaders
 
-    public static readonly DependencyProperty ShowAdvancedButtonProperty = DependencyProperty.Register( "ShowAdvancedButton", typeof( bool ), typeof( ColorPicker ), new UIPropertyMetadata( true ) );
-    public bool ShowAdvancedButton
+    public static readonly DependencyProperty ShowTabHeadersProperty = DependencyProperty.Register( "ShowTabHeaders", typeof( bool ), typeof( ColorPicker ), new UIPropertyMetadata( true ) );
+    public bool ShowTabHeaders
     {
       get
       {
-        return ( bool )GetValue( ShowAdvancedButtonProperty );
+        return ( bool )GetValue( ShowTabHeadersProperty );
       }
       set
       {
-        SetValue( ShowAdvancedButtonProperty, value );
+        SetValue( ShowTabHeadersProperty, value );
       }
     }
 
-    #endregion //ShowAdvancedButton
+    #endregion //ShowTabHeaders
 
     #region ShowAvailableColors
 
@@ -578,14 +575,6 @@ namespace Xceed.Wpf.Toolkit
         _popup.Opened += Popup_Opened;
 
       _toggleButton = this.Template.FindName( PART_ColorPickerToggleButton, this ) as ToggleButton;
-
-      if( _colorModeButton != null )
-        _colorModeButton.Click -= new RoutedEventHandler( this.ColorModeButton_Clicked );
-
-      _colorModeButton = this.Template.FindName( PART_ColorModeButton, this ) as Button;
-
-      if( _colorModeButton != null )
-        _colorModeButton.Click += new RoutedEventHandler( this.ColorModeButton_Clicked );
     }
 
     protected override void OnMouseUp( MouseButtonEventArgs e )
@@ -673,11 +662,6 @@ namespace Xceed.Wpf.Toolkit
         listBoxItem = ( ListBoxItem )listBox.ItemContainerGenerator.ContainerFromItem( listBox.Items[ 0 ] );
       if( listBoxItem != null )
         listBoxItem.Focus();
-    }
-
-    private void ColorModeButton_Clicked( object sender, RoutedEventArgs e )
-    {
-      this.ColorMode = ( this.ColorMode == ColorMode.ColorPalette ) ? ColorMode.ColorCanvas : ColorMode.ColorPalette;
     }
 
     #endregion //Event Handlers
@@ -769,35 +753,35 @@ namespace Xceed.Wpf.Toolkit
 
     private static ObservableCollection<ColorItem> CreateStandardColors()
     {
-      ObservableCollection<ColorItem> _standardColors = new ObservableCollection<ColorItem>();
-      _standardColors.Add( new ColorItem( Colors.Transparent, "Transparent" ) );
-      _standardColors.Add( new ColorItem( Colors.White, "White" ) );
-      _standardColors.Add( new ColorItem( Colors.Gray, "Gray" ) );
-      _standardColors.Add( new ColorItem( Colors.Black, "Black" ) );
-      _standardColors.Add( new ColorItem( Colors.Red, "Red" ) );
-      _standardColors.Add( new ColorItem( Colors.Green, "Green" ) );
-      _standardColors.Add( new ColorItem( Colors.Blue, "Blue" ) );
-      _standardColors.Add( new ColorItem( Colors.Yellow, "Yellow" ) );
-      _standardColors.Add( new ColorItem( Colors.Orange, "Orange" ) );
-      _standardColors.Add( new ColorItem( Colors.Purple, "Purple" ) );
-      return _standardColors;
+      ObservableCollection<ColorItem> standardColors = new ObservableCollection<ColorItem>();
+      standardColors.Add( new ColorItem( Colors.Transparent, "Transparent" ) );
+      standardColors.Add( new ColorItem( Colors.White, "White" ) );
+      standardColors.Add( new ColorItem( Colors.Gray, "Gray" ) );
+      standardColors.Add( new ColorItem( Colors.Black, "Black" ) );
+      standardColors.Add( new ColorItem( Colors.Red, "Red" ) );
+      standardColors.Add( new ColorItem( Colors.Green, "Green" ) );
+      standardColors.Add( new ColorItem( Colors.Blue, "Blue" ) );
+      standardColors.Add( new ColorItem( Colors.Yellow, "Yellow" ) );
+      standardColors.Add( new ColorItem( Colors.Orange, "Orange" ) );
+      standardColors.Add( new ColorItem( Colors.Purple, "Purple" ) );
+      return standardColors;
     }
 
     private static ObservableCollection<ColorItem> CreateAvailableColors()
     {
-      ObservableCollection<ColorItem> _standardColors = new ObservableCollection<ColorItem>();
+      ObservableCollection<ColorItem> standardColors = new ObservableCollection<ColorItem>();
 
       foreach( var item in ColorUtilities.KnownColors )
       {
         if( !String.Equals( item.Key, "Transparent" ) )
         {
           var colorItem = new ColorItem( item.Value, item.Key );
-          if( !_standardColors.Contains( colorItem ) )
-            _standardColors.Add( colorItem );
+          if( !standardColors.Contains( colorItem ) )
+            standardColors.Add( colorItem );
         }
       }
 
-      return _standardColors;
+      return standardColors;
     }
 
     #endregion //Methods

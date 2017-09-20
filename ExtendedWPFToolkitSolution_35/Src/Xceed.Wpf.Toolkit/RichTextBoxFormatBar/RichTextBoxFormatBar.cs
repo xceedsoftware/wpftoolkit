@@ -113,7 +113,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void Bullets_Clicked( object sender, RoutedEventArgs e )
     {
-      if( BothSelectionListsAreChecked() )
+      if( BothSelectionListsAreChecked() && ( _btnNumbers != null) )
       {
         _btnNumbers.IsChecked = false;
       }
@@ -121,7 +121,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void Numbers_Clicked( object sender, RoutedEventArgs e )
     {
-      if( BothSelectionListsAreChecked() )
+      if( BothSelectionListsAreChecked() && ( _btnBullets != null) )
       {
         _btnBullets.IsChecked = false;
       }
@@ -265,9 +265,12 @@ namespace Xceed.Wpf.Toolkit
       if( currentValue == DependencyProperty.UnsetValue )
         return;
 
-      button.IsChecked = ( currentValue == null )
-                          ? false
-                          : currentValue != null && currentValue.Equals( expectedValue );
+      if( button != null )
+      {
+        button.IsChecked = ( currentValue == null )
+                            ? false
+                            : currentValue != null && currentValue.Equals( expectedValue );
+      }
     }
 
     private void UpdateSelectedFontFamily()
@@ -282,7 +285,7 @@ namespace Xceed.Wpf.Toolkit
         return;
 
       FontFamily currentFontFamily = ( FontFamily )value;
-      if( currentFontFamily != null )
+      if( (currentFontFamily != null) && ( _cmbFontFamilies != null) )
       {
         _cmbFontFamilies.SelectedItem = currentFontFamily;
       }
@@ -299,7 +302,10 @@ namespace Xceed.Wpf.Toolkit
       if( value == DependencyProperty.UnsetValue )
         return;
 
-      _cmbFontSizes.SelectedValue = value;
+      if( _cmbFontSizes != null )
+      {
+        _cmbFontSizes.SelectedValue = value;
+      }
     }
 
     private void UpdateFontColor()
@@ -316,7 +322,10 @@ namespace Xceed.Wpf.Toolkit
       Color? currentColor =  ( ( value == null )
                               ? null
                               : ( Color? )( ( SolidColorBrush )value ).Color );
-      _cmbFontColor.SelectedColor = currentColor;
+      if( _cmbFontColor != null )
+      {
+        _cmbFontColor.SelectedColor = currentColor;
+      }
     }
 
     private void UpdateFontBackgroundColor()
@@ -333,7 +342,10 @@ namespace Xceed.Wpf.Toolkit
       Color? currentColor = ( ( value == null )
                               ? null
                               : ( Color? )( ( SolidColorBrush )value ).Color );
-      _cmbFontBackgroundColor.SelectedColor = currentColor;
+      if( _cmbFontBackgroundColor != null )
+      {
+        _cmbFontBackgroundColor.SelectedColor = currentColor;
+      }
     }
 
     /// <summary>
@@ -341,6 +353,9 @@ namespace Xceed.Wpf.Toolkit
     /// </summary>
     private void UpdateSelectionListType()
     {
+      if( (_btnNumbers == null) || ( _btnBullets == null) )
+        return;
+
       //uncheck both
       _btnBullets.IsChecked = false;
       _btnNumbers.IsChecked = false;
@@ -371,7 +386,8 @@ namespace Xceed.Wpf.Toolkit
     /// <returns></returns>
     private bool BothSelectionListsAreChecked()
     {
-      return _btnBullets.IsChecked == true && _btnNumbers.IsChecked == true;
+      return (( _btnBullets != null) && (_btnBullets.IsChecked == true) )
+          && (( _btnNumbers != null) && (_btnNumbers.IsChecked == true));
     }
 
     void ApplyPropertyValueToSelectedText( DependencyProperty formattingProperty, object value )
@@ -427,8 +443,11 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( _cmbFontFamilies.IsDropDownOpen || _cmbFontSizes.IsDropDownOpen ||
-               _cmbFontBackgroundColor.IsOpen || _cmbFontColor.IsOpen || _waitingForMouseOver );
+        return ( (( _cmbFontFamilies != null) && _cmbFontFamilies.IsDropDownOpen)
+              || (( _cmbFontSizes != null) && _cmbFontSizes.IsDropDownOpen)
+              ||  (( _cmbFontBackgroundColor != null) && _cmbFontBackgroundColor.IsOpen)
+              || (( _cmbFontColor != null) && _cmbFontColor.IsOpen)
+              || _waitingForMouseOver );
       }
     }
 

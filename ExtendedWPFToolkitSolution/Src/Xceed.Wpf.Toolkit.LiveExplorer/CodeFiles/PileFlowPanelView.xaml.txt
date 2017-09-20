@@ -219,6 +219,14 @@
       <TextBlock Grid.Row="1" Text="Usage:" Style="{StaticResource Header}" />
 
       <ScrollViewer Grid.Row="2" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Visible" CanContentScroll="true">
+         <!-- For MVVM : An ItemsControl can be used :
+         <ItemsControl ItemsSource="{Binding TheItems}">
+            <ItemsControl.ItemsPanel>
+               <ItemsPanelTemplate>
+                  <xctk:PileFlowPanel />
+               </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+         </ItemsControl>-->
          <xctk:PileFlowPanel x:Name="_pileFlowPanel" 
                               MinHeight="175"
                               ContentLabelOffsetY="100" 

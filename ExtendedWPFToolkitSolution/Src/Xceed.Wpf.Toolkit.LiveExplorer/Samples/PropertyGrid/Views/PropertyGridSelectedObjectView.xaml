@@ -53,7 +53,10 @@
          </StackPanel>
             <!-- The SelectedObject property will be assigned in code-behind when one
          of the 3 controls receives focus. -->
-         <xctk:PropertyGrid x:Name="_propertyGrid" Grid.Column="1" HorizontalAlignment="Stretch" />
+         <xctk:PropertyGrid x:Name="_propertyGrid" 
+                            Grid.Column="1" 
+                            HorizontalAlignment="Stretch"
+                            IsVirtualizing="True"/>
       </Grid>
    </Grid>
 </local:DemoView>

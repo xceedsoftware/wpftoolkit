@@ -211,7 +211,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #region IsActive
 
-    public static readonly DependencyProperty IsActiveProperty = DependencyProperty.Register( "IsActive", typeof( bool ), typeof( WindowControl ), new UIPropertyMetadata( true, null, OnCoerceIsActive ) );
+    public static readonly DependencyProperty IsActiveProperty = DependencyProperty.Register( "IsActive", typeof( bool ), typeof( WindowControl ), new UIPropertyMetadata( true, OnIsActiveChanged, OnCoerceIsActive ) );
     public bool IsActive
     {
       get
@@ -231,6 +231,24 @@ namespace Xceed.Wpf.Toolkit.Primitives
         throw new InvalidOperationException( "Cannot set IsActive directly. This is handled by the underlying system" );
 
       return basevalue;
+    }
+
+    private static void OnIsActiveChanged( DependencyObject obj, DependencyPropertyChangedEventArgs e )
+    {
+      var windowControl = obj as WindowControl;
+      if( windowControl != null )
+        windowControl.OnIsActiveChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+    }
+
+    protected virtual void OnIsActiveChanged( bool oldValue, bool newValue )
+    {
+      if( newValue )
+      {
+        if( this.GetType() == typeof( WindowControl ) )
+        {
+          this.RaiseEvent( new RoutedEventArgs( ActivatedEvent, this ) );
+        }
+      }
     }
 
     internal void SetIsActiveInternal( bool isActive )
@@ -630,6 +648,23 @@ namespace Xceed.Wpf.Toolkit.Primitives
     #endregion //Base Class Overrides
 
     #region Events
+
+    #region ActivatedEvent
+
+    public static readonly RoutedEvent ActivatedEvent = EventManager.RegisterRoutedEvent( "Activated", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( WindowControl ) );
+    public event RoutedEventHandler Activated
+    {
+      add
+      {
+        AddHandler( ActivatedEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( ActivatedEvent, value );
+      }
+    }
+
+    #endregion //ActivatedEvent
 
     #region HeaderMouseLeftButtonClickedEvent
 

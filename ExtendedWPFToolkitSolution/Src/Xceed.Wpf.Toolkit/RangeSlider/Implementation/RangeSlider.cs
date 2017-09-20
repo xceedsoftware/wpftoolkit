@@ -1054,7 +1054,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void LowerSlider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
     {
-      if( _lowerSlider.IsLoaded )
+      if( (_lowerSlider != null) && _lowerSlider.IsLoaded )
       {
         if( !this.IsDeferredUpdateValues )
         {
@@ -1069,7 +1069,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void HigherSlider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
     {
-      if( _higherSlider.IsLoaded )
+      if( ( _higherSlider != null) && _higherSlider.IsLoaded )
       {
         if( !this.IsDeferredUpdateValues )
         {

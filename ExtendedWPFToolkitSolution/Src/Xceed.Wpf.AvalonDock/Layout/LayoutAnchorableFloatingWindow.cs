@@ -21,6 +21,7 @@ using System.Text;
 using System.Windows.Markup;
 using System.Diagnostics;
 using System.Xml.Serialization;
+using System.Xml;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
@@ -156,16 +157,67 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         void ILayoutElementWithVisibility.ComputeVisibility()
         {
-            if (RootPanel != null)
-                IsVisible = RootPanel.IsVisible;
-            else
-                IsVisible = false;
+            ComputeVisibility();
+        }
 
+        private void ComputeVisibility()
+        {
+          if( RootPanel != null )
+            IsVisible = RootPanel.IsVisible;
+          else
+            IsVisible = false;
         }
 
         public override bool IsValid
         {
             get { return RootPanel != null; }
+        }
+
+        public override void ReadXml( XmlReader reader )
+        {
+          reader.MoveToContent();
+          if( reader.IsEmptyElement )
+          {
+            reader.Read();
+            ComputeVisibility();
+            return;
+          }
+
+          var localName = reader.LocalName;
+          reader.Read();
+
+          while( true )
+          {
+            if( reader.LocalName.Equals( localName ) && (reader.NodeType == XmlNodeType.EndElement) )
+            {
+              break;
+            }
+
+            if( reader.NodeType == XmlNodeType.Whitespace )
+            {
+              reader.Read();
+              continue;
+            }
+
+            XmlSerializer serializer;
+            if( reader.LocalName.Equals("LayoutAnchorablePaneGroup") )
+            {
+              serializer = new XmlSerializer( typeof( LayoutAnchorablePaneGroup ) );
+            }
+            else
+            {
+              var type = LayoutRoot.FindType( reader.LocalName );
+              if( type == null )
+              {
+                throw new ArgumentException( "AvalonDock.LayoutAnchorableFloatingWindow doesn't know how to deserialize " + reader.LocalName );
+              }
+              serializer = new XmlSerializer( type );
+            }
+
+            RootPanel = ( LayoutAnchorablePaneGroup )serializer.Deserialize( reader );
+          }
+
+          reader.ReadEndElement();
         }
 
 #if TRACE
@@ -176,6 +228,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
           RootPanel.ConsoleDump(tab + 1);
         }
-#endif        
-    }
+#endif
+  }
 }

@@ -27,6 +27,7 @@ namespace Xceed.Wpf.Toolkit
 
     private Magnifier _magnifier;
     private Point _currentMousePosition;
+    private double _currentZoomFactor;
 
     #endregion
 
@@ -36,12 +37,14 @@ namespace Xceed.Wpf.Toolkit
       : base( element )
     {
       _magnifier = magnifier;
+      _currentZoomFactor = _magnifier.ZoomFactor;
       UpdateViewBox();
       AddVisualChild( _magnifier );
 
       Loaded += ( s, e ) => InputManager.Current.PostProcessInput += OnProcessInput;
       Unloaded += ( s, e ) => InputManager.Current.PostProcessInput -= OnProcessInput;
     }
+
 
     #endregion
 
@@ -51,10 +54,11 @@ namespace Xceed.Wpf.Toolkit
     {
       Point pt = Mouse.GetPosition( this );
 
-      if( _currentMousePosition == pt )
+      if( (_currentMousePosition == pt) && (_magnifier.ZoomFactor == _currentZoomFactor) )
         return;
 
       _currentMousePosition = pt;
+      _currentZoomFactor = _magnifier.ZoomFactor;
       UpdateViewBox();
       InvalidateArrange();
     }

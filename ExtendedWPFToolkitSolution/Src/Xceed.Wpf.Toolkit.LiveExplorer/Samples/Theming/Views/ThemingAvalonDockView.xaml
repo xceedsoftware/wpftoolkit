@@ -161,7 +161,7 @@
                                                Selected="DefaultComboBoxItem_Selected"
                                                ThemeEnum="{x:Static view:AvalonDockThemesEnum.Office2007Silver}">
                   </view:AvalonDockComboBoxItem>
-                  <view:AvalonDockComboBoxItem Style="{StaticResource plusNewItem}"
+                  <view:AvalonDockComboBoxItem Style="{StaticResource plusItem}"
                                                Content="Windows 10"
                                                Selected="DefaultComboBoxItem_Selected"
                                                ThemeEnum="{x:Static view:AvalonDockThemesEnum.Windows10}">

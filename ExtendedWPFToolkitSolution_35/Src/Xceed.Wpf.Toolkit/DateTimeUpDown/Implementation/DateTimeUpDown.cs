@@ -63,7 +63,7 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnFormatChanged( DateTimeFormat oldValue, DateTimeFormat newValue )
     {
-        FormatUpdated();
+      FormatUpdated();
     }
 
     #endregion //Format
@@ -191,6 +191,11 @@ namespace Xceed.Wpf.Toolkit
       MaximumProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( DateTime.MaxValue ) );
       MinimumProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( DateTime.MinValue ) );
       UpdateValueOnEnterKeyProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( true ) );
+    }
+
+    public DateTimeUpDown()
+    {
+      this.Loaded += this.DateTimeUpDown_Loaded;
     }
 
     #endregion //Constructors
@@ -432,6 +437,7 @@ namespace Xceed.Wpf.Toolkit
                 {
                   IsReadOnly = true,
                   Type = DateTimePart.DayName,
+                  Length = elementLength,
                   Format = d
                 };
               else
@@ -439,6 +445,7 @@ namespace Xceed.Wpf.Toolkit
                 {
                   IsReadOnly = false,
                   Type = DateTimePart.Day,
+                  Length = elementLength,
                   Format = d
                 };
               break;
@@ -454,6 +461,7 @@ namespace Xceed.Wpf.Toolkit
               {
                 IsReadOnly = false,
                 Type = DateTimePart.Millisecond,
+                Length = elementLength,
                 Format = f
               };
               break;
@@ -468,6 +476,7 @@ namespace Xceed.Wpf.Toolkit
               {
                 IsReadOnly = false,
                 Type = DateTimePart.Hour12,
+                Length = elementLength,
                 Format = h
               };
               break;
@@ -482,6 +491,7 @@ namespace Xceed.Wpf.Toolkit
               {
                 IsReadOnly = false,
                 Type = DateTimePart.Hour24,
+                Length = elementLength,
                 Format = H
               };
               break;
@@ -497,6 +507,7 @@ namespace Xceed.Wpf.Toolkit
                 {
                   IsReadOnly = false,
                   Type = DateTimePart.MonthName,
+                  Length = elementLength,
                   Format = M
                 };
               else
@@ -504,6 +515,7 @@ namespace Xceed.Wpf.Toolkit
                 {
                   IsReadOnly = false,
                   Type = DateTimePart.Month,
+                  Length = elementLength,
                   Format = M
                 };
               break;
@@ -519,6 +531,7 @@ namespace Xceed.Wpf.Toolkit
               {
                 IsReadOnly = false,
                 Type = DateTimePart.Second,
+                Length = elementLength,
                 Format = s
               };
               break;
@@ -534,6 +547,7 @@ namespace Xceed.Wpf.Toolkit
               {
                 IsReadOnly = false,
                 Type = DateTimePart.AmPmDesignator,
+                Length = elementLength,
                 Format = t
               };
               break;
@@ -549,6 +563,7 @@ namespace Xceed.Wpf.Toolkit
               {
                 IsReadOnly = false,
                 Type = DateTimePart.Year,
+                Length = elementLength,
                 Format = y
               };
               break;
@@ -578,6 +593,7 @@ namespace Xceed.Wpf.Toolkit
               {
                 IsReadOnly = true,
                 Type = DateTimePart.Period,
+                Length = elementLength,
                 Format = format.Substring( 0, elementLength )
               };
               break;
@@ -592,6 +608,7 @@ namespace Xceed.Wpf.Toolkit
               {
                 IsReadOnly = false,
                 Type = DateTimePart.Minute,
+                Length = elementLength,
                 Format = m
               };
               break;
@@ -606,6 +623,7 @@ namespace Xceed.Wpf.Toolkit
               {
                 IsReadOnly = true,
                 Type = DateTimePart.TimeZone,
+                Length = elementLength,
                 Format = z
               };
               break;
@@ -643,7 +661,12 @@ namespace Xceed.Wpf.Toolkit
         return false;
 
       return (value1.Value > value2.Value);
-    }  
+    }
+
+    protected override void OnUpdateValueOnEnterKeyChanged( bool oldValue, bool newValue )
+    {
+      throw new NotSupportedException( "DateTimeUpDown controls do not support modifying UpdateValueOnEnterKey property." );
+    }
 
     #endregion //Base Class Overrides
 
@@ -942,5 +965,17 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //Methods
+
+    #region Event Handlers
+
+    private void DateTimeUpDown_Loaded( object sender, RoutedEventArgs e )
+    {
+      if( ( this.Format == DateTimeFormat.Custom ) && ( string.IsNullOrEmpty( this.FormatString ) ) )
+      {
+        throw new InvalidOperationException( "A FormatString is necessary when Format is set to Custom." );
+      }
+    }
+
+    #endregion
   }
 }

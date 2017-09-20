@@ -209,7 +209,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
                             yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetTop.GetScreenArea(), DropTargetType.AnchorablePaneDockTop);
                             yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetRight.GetScreenArea(), DropTargetType.AnchorablePaneDockRight);
                             yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetBottom.GetScreenArea(), DropTargetType.AnchorablePaneDockBottom);
-                            yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetInto.GetScreenArea(), DropTargetType.AnchorablePaneDockInside);
+                            if( _anchorablePaneDropTargetInto.IsVisible )
+                              yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetInto.GetScreenArea(), DropTargetType.AnchorablePaneDockInside);
 
                             var parentPaneModel = dropAreaAnchorablePane.AreaElement.Model as LayoutAnchorablePane;
                             LayoutAnchorableTabItem lastAreaTabItem = null;
@@ -342,6 +343,137 @@ namespace Xceed.Wpf.AvalonDock.Controls
             _floatingWindow = null;
         }
 
+        /// <summary>
+        /// This method controls the DropTargetInto button of the overlay window.
+        /// It checks that only 1 of the defined ContentLayouts can be present on the LayoutDocumentPane or LayoutAnchorablePane.
+        /// The combination between the ContentLayout Title and the ContentId is the search key, and has to be unique.
+        /// If a floating window is dropped on a LayoutDocumentPane or LayoutAnchorablePane, it checks if one of the containing LayoutContents
+        /// is already present on the LayoutDocumentPane or LayoutAnchorablePane. If so, then it will disable the DropTargetInto button.
+        /// </summary>
+        /// <param name="positionableElement">The given LayoutDocumentPane or LayoutAnchorablePane</param>
+        private void SetDropTargetIntoVisibility( ILayoutPositionableElement positionableElement )
+        {
+          if( positionableElement is LayoutAnchorablePane )
+          {
+            _anchorablePaneDropTargetInto.Visibility = Visibility.Visible;
+          }
+          else if( positionableElement is LayoutDocumentPane )
+          {
+            _documentPaneDropTargetInto.Visibility = Visibility.Visible;
+          }
+
+          if( positionableElement == null || _floatingWindow.Model == null || positionableElement.AllowDuplicateContent )
+          {
+            return;
+          }
+
+          // Find all content layouts in the anchorable pane (object to drop on)
+          var contentLayoutsOnPositionableElementPane = GetAllLayoutContents( positionableElement );
+
+          // Find all content layouts in the floating window (object to drop)
+          var contentLayoutsOnFloatingWindow = GetAllLayoutContents( _floatingWindow.Model );
+
+          // If any of the content layouts is present in the drop area, then disable the DropTargetInto button.
+          foreach( var content in contentLayoutsOnFloatingWindow )
+          {
+            if( !contentLayoutsOnPositionableElementPane.Any( item =>
+                 item.Title == content.Title &&
+                 item.ContentId == content.ContentId ) )
+            {
+              continue;
+            }
+
+            if( positionableElement is LayoutAnchorablePane )
+            {
+              _anchorablePaneDropTargetInto.Visibility = Visibility.Hidden;
+            }
+            else if( positionableElement is LayoutDocumentPane )
+            {
+              _documentPaneDropTargetInto.Visibility = Visibility.Hidden;
+            }
+            break;
+          }
+        }
+
+        /// <summary>
+        /// Find any LayoutDocument or LayoutAnchorable from a given source (e.g. LayoutDocumentPane, LayoutAnchorableFloatingWindow, etc.)
+        /// </summary>
+        /// <param name="source">The given source to search in</param>
+        /// <returns>A list of all LayoutContent's</returns>
+        private List<LayoutContent> GetAllLayoutContents( object source )
+        {
+          var result = new List<LayoutContent>();
+
+          var documentFloatingWindow = source as LayoutDocumentFloatingWindow;
+          if( documentFloatingWindow != null )
+          {
+            foreach( var layoutElement in documentFloatingWindow.Children )
+            {
+              result.AddRange( GetAllLayoutContents( layoutElement ) );
+            }
+          }
+
+          var anchorableFloatingWindow = source as LayoutAnchorableFloatingWindow;
+          if( anchorableFloatingWindow != null )
+          {
+            foreach( var layoutElement in anchorableFloatingWindow.Children )
+            {
+              result.AddRange( GetAllLayoutContents( layoutElement ) );
+            }
+          }
+
+          var documentPaneGroup = source as LayoutDocumentPaneGroup;
+          if( documentPaneGroup != null )
+          {
+            foreach( var layoutDocumentPane in documentPaneGroup.Children )
+            {
+              result.AddRange( GetAllLayoutContents( layoutDocumentPane ) );
+            }
+          }
+
+          var anchorablePaneGroup = source as LayoutAnchorablePaneGroup;
+          if( anchorablePaneGroup != null )
+          {
+            foreach( var layoutDocumentPane in anchorablePaneGroup.Children )
+            {
+              result.AddRange( GetAllLayoutContents( layoutDocumentPane ) );
+            }
+          }
+
+          var documentPane = source as LayoutDocumentPane;
+          if( documentPane != null )
+          {
+            foreach( var layoutContent in documentPane.Children )
+            {
+              result.Add( layoutContent );
+            }
+          }
+
+          var anchorablePane = source as LayoutAnchorablePane;
+          if( anchorablePane != null )
+          {
+            foreach( var layoutContent in anchorablePane.Children )
+            {
+              result.Add( layoutContent );
+            }
+          }
+
+          var document = source as LayoutDocument;
+          if( document != null )
+          {
+            result.Add( document );
+          }
+
+          var anchorable = source as LayoutAnchorable;
+          if( anchorable != null )
+          {
+            result.Add( anchorable );
+          }
+
+          return result;
+        }
+
+
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e);
@@ -361,7 +493,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
                     break;
                 case DropAreaType.AnchorablePane:
                     areaElement = _gridAnchorablePaneDropTargets;
-                    break;
+
+                    var dropAreaAnchorablePaneGroup = area as DropArea<LayoutAnchorablePaneControl>;
+                    var layoutAnchorablePane = dropAreaAnchorablePaneGroup.AreaElement.Model as LayoutAnchorablePane;
+                    SetDropTargetIntoVisibility( layoutAnchorablePane );
+                break;
                 case DropAreaType.DocumentPaneGroup:
                     {
                         areaElement = _gridDocumentPaneDropTargets;
@@ -385,6 +521,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
                             var dropAreaDocumentPaneGroup = area as DropArea<LayoutDocumentPaneControl>;
                             var layoutDocumentPane = dropAreaDocumentPaneGroup.AreaElement.Model as LayoutDocumentPane;
                             var parentDocumentPaneGroup = layoutDocumentPane.Parent as LayoutDocumentPaneGroup;
+
+                            SetDropTargetIntoVisibility( layoutDocumentPane );
 
                             if (parentDocumentPaneGroup != null &&
                                 parentDocumentPaneGroup.Children.Where(c => c.IsVisible).Count() > 1)
@@ -474,6 +612,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
                             var dropAreaDocumentPaneGroup = area as DropArea<LayoutDocumentPaneControl>;
                             var layoutDocumentPane = dropAreaDocumentPaneGroup.AreaElement.Model as LayoutDocumentPane;
                             var parentDocumentPaneGroup = layoutDocumentPane.Parent as LayoutDocumentPaneGroup;
+
+                            SetDropTargetIntoVisibility( layoutDocumentPane );
 
                             if (parentDocumentPaneGroup != null &&
                                 parentDocumentPaneGroup.Children.Where(c => c.IsVisible).Count() > 1)

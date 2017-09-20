@@ -255,6 +255,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       get
       {
+        if( _containerHelper == null )
+        {
+          _containerHelper = new ObjectContainerHelper( this, null );
+        }
         return _containerHelper.Properties;
       }
     }
@@ -359,8 +363,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     internal PropertyItemBase()
     {
-      _containerHelper = new ObjectContainerHelper( this, null );
       this.GotFocus += new RoutedEventHandler( PropertyItemBase_GotFocus );
+      this.RequestBringIntoView += this.PropertyItemBase_RequestBringIntoView;
       AddHandler( PropertyItemsControl.PreparePropertyItemEvent, new PropertyItemEventHandler( OnPreparePropertyItemInternal ) );
       AddHandler( PropertyItemsControl.ClearPropertyItemEvent, new PropertyItemEventHandler( OnClearPropertyItemInternal ) );
     }
@@ -385,6 +389,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       args.PropertyItem.Level = 0;
 
       args.Handled = true;
+    }
+
+    private void PropertyItemBase_RequestBringIntoView( object sender, RequestBringIntoViewEventArgs e )
+    {
+      e.Handled = true;
     }
 
     #endregion  //Event Handlers
@@ -434,7 +443,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       // First check that the raised property is actually a real CLR property.
       // This could be something else like an Attached DP.
-      if( ReflectionHelper.IsPublicInstanceProperty( GetType(), e.Property.Name ) )
+      if( ReflectionHelper.IsPublicInstanceProperty( GetType(), e.Property.Name ) 
+        && this.IsLoaded 
+        && (_parentNode != null) 
+        && !_parentNode.ContainerHelper.IsCleaning)
       {
         this.RaisePropertyChanged( e.Property.Name );
       }

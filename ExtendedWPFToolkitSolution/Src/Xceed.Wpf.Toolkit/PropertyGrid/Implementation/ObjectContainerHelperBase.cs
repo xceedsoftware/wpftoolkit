@@ -357,7 +357,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         {
           descriptorDef.Description = propertyDefinition.Description;
         }
-
         if( propertyDefinition.DisplayName != null )
         {
           descriptorDef.DisplayName = propertyDefinition.DisplayName;
@@ -407,6 +406,32 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           propertyItem.CommandBindings.Add( commandBinding );
         }
       }
+
+      // PropertyItem.PropertyType's defaultValue equals current PropertyItem's value => set the DefaultValue attribute
+      if( pd.DefaultValue != null )
+      {
+        var typeDefaultValue = this.GetTypeDefaultValue( propertyItem.PropertyType );
+
+        if( ( (propertyItem.Value != null) && propertyItem.Value.Equals( typeDefaultValue ) )
+              || ( (propertyItem.Value == null) && ( typeDefaultValue == propertyItem.Value ) ) ) 
+        {
+#if VS2008
+        propertyItem.Value = pd.DefaultValue;
+#else
+          propertyItem.SetCurrentValue( PropertyItem.ValueProperty, pd.DefaultValue );
+#endif
+        }
+      }
+    }
+
+    private object GetTypeDefaultValue( Type type )
+    {
+      if( type.IsGenericType && type.GetGenericTypeDefinition() == typeof( Nullable<> ) )
+      {
+        type = type.GetProperty( "Value" ).PropertyType;
+      }
+
+      return ( type.IsValueType ? Activator.CreateInstance( type ) : null ) ;
     }
 
     private void SetupDefinitionBinding<T>(
@@ -441,7 +466,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         editorElement = editor.ResolveEditor( propertyItem );
 
 
-      if( editorElement == null && definitionKey == null )
+      if( (editorElement == null) && (definitionKey == null) && ( propertyItem.PropertyDescriptor != null ) )
         editorElement = this.GenerateCustomEditingElement( propertyItem.PropertyDescriptor.Name, propertyItem );
 
       if( editorElement == null && definitionKeyAsType == null )

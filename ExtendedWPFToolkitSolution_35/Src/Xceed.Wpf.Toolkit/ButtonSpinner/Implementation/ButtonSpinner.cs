@@ -250,7 +250,7 @@ namespace Xceed.Wpf.Toolkit
           {
             if( this.AllowSpin )
             {
-              this.OnSpin( new SpinEventArgs( SpinDirection.Increase ) );
+              this.OnSpin( new SpinEventArgs( Spinner.SpinnerSpinEvent, SpinDirection.Increase ) );
               e.Handled = true;
             }
 
@@ -260,7 +260,7 @@ namespace Xceed.Wpf.Toolkit
           {
             if( this.AllowSpin )
             {
-              this.OnSpin( new SpinEventArgs( SpinDirection.Decrease ) );
+              this.OnSpin( new SpinEventArgs( Spinner.SpinnerSpinEvent, SpinDirection.Decrease ) );
               e.Handled = true;
             }
 
@@ -269,7 +269,8 @@ namespace Xceed.Wpf.Toolkit
           case Key.Enter:
           {
             //Do not Spin on enter Key when spinners have focus
-            if( this.IncreaseButton.IsFocused || this.DecreaseButton.IsFocused )
+            if( ((this.IncreaseButton != null) && (this.IncreaseButton.IsFocused)) 
+              || (( this.DecreaseButton != null ) && this.DecreaseButton.IsFocused ))
             {
               e.Handled = true;
             }
@@ -282,18 +283,14 @@ namespace Xceed.Wpf.Toolkit
     {
       base.OnMouseWheel( e );
 
-      if( this.IsKeyboardFocusWithin && !e.Handled && this.AllowSpin )
+      if( !e.Handled && this.AllowSpin )
       {
-        if( e.Delta < 0 )
+        if( e.Delta != 0 )
         {
-          this.OnSpin( new SpinEventArgs( SpinDirection.Decrease, true ) );
+          var spinnerEventArgs = new SpinEventArgs( Spinner.SpinnerSpinEvent, ( e.Delta < 0 ) ? SpinDirection.Decrease : SpinDirection.Increase, true );
+          this.OnSpin( spinnerEventArgs );
+          e.Handled = spinnerEventArgs.Handled;
         }
-        else if( 0 < e.Delta )
-        {
-          this.OnSpin( new SpinEventArgs( SpinDirection.Increase, true ) );
-        }
-
-        e.Handled = true;
       }
     }
 
@@ -322,7 +319,7 @@ namespace Xceed.Wpf.Toolkit
       if( AllowSpin )
       {
         SpinDirection direction = sender == IncreaseButton ? SpinDirection.Increase : SpinDirection.Decrease;
-        OnSpin( new SpinEventArgs( direction ) );
+        OnSpin( new SpinEventArgs( Spinner.SpinnerSpinEvent, direction ) );
       }
     }
 

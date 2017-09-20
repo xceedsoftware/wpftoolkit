@@ -100,7 +100,7 @@
         <xctk:WindowContainer ModalBackgroundBrush="LightGray">
             <xctk:ChildWindow x:Name="_childWindow"
                            Width="350"
-                           Height="220"
+                           Height="230"
                            Caption="{Binding Text, ElementName=_txtCaption}"
                            IsModal="{Binding IsChecked, ElementName=_chkIsModal}"
                            Left="{Binding Value, ElementName=_txtLeft, Mode=TwoWay}"

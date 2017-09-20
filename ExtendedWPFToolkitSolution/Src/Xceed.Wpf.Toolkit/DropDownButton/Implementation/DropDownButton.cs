@@ -47,12 +47,16 @@ namespace Xceed.Wpf.Toolkit
     static DropDownButton()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( DropDownButton ), new FrameworkPropertyMetadata( typeof( DropDownButton ) ) );
+
+      EventManager.RegisterClassHandler( typeof( DropDownButton ), AccessKeyManager.AccessKeyPressedEvent, new AccessKeyPressedEventHandler( OnAccessKeyPressed ) );
     }
 
     public DropDownButton()
     {
       Keyboard.AddKeyDownHandler( this, OnKeyDown );
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );
+      //case 166525 : Do no inherit an implicit style of Button
+      this.InheritanceBehavior = InheritanceBehavior.SkipToThemeNow;
     }
 
     #endregion //Constructors
@@ -124,6 +128,42 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion
+
+    #region IsDefault
+
+    public static readonly DependencyProperty IsDefaultProperty = DependencyProperty.Register( "IsDefault", typeof( bool ), typeof( DropDownButton ), new UIPropertyMetadata( false, OnIsDefaultChanged ) );
+    public bool IsDefault
+    {
+      get
+      {
+        return ( bool )GetValue( IsDefaultProperty );
+      }
+      set
+      {
+        SetValue( IsDefaultProperty, value );
+      }
+    }
+
+    private static void OnIsDefaultChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var dropDownButton = o as DropDownButton;
+      if( dropDownButton != null )
+        dropDownButton.OnIsDefaultChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+    }
+
+    protected virtual void OnIsDefaultChanged( bool oldValue, bool newValue )
+    {
+      if( newValue )
+      {
+        AccessKeyManager.Register( "\r", this );
+      }
+      else
+      {
+        AccessKeyManager.Unregister( "\r", this );
+      }
+    }
+
+    #endregion //IsDefault
 
     #region IsOpen
 
@@ -225,6 +265,18 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    protected override void OnAccessKey( AccessKeyEventArgs e )
+    {
+      if( e.IsMultiple )
+      {
+        base.OnAccessKey( e );
+      }
+      else
+      {
+        this.OnClick();
+      }
+    }
+
     #endregion //Base Class Overrides
 
     #region Events
@@ -271,6 +323,14 @@ namespace Xceed.Wpf.Toolkit
     #endregion //Events
 
     #region Event Handlers
+
+    private static void OnAccessKeyPressed( object sender, AccessKeyPressedEventArgs e )
+    {
+      if( !e.Handled && ( e.Scope == null ) && ( e.Target == null ) )
+      {
+        e.Target = sender as DropDownButton;
+      }
+    }
 
     private void OnKeyDown( object sender, KeyEventArgs e )
     {

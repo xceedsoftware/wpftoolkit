@@ -44,6 +44,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private string _categoryValue;
     private string _description;
     private string _displayName;
+    private object _defaultValue;
     private int _displayOrder;
     private bool _expandableAttribute;
     private bool _isReadOnly;
@@ -93,6 +94,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     protected virtual bool ComputeExpandableAttribute()
     {
       return false;
+    }
+
+    protected virtual object ComputeDefaultValueAttribute()
+    {
+      return null;
     }
 
     protected abstract bool ComputeIsExpandable();
@@ -219,7 +225,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     internal void UpdateValueFromSource()
     {
-      BindingOperations.GetBindingExpressionBase( this, DescriptorPropertyDefinitionBase.ValueProperty ).UpdateTarget();
+      var bindingExpr = BindingOperations.GetBindingExpressionBase( this, DescriptorPropertyDefinitionBase.ValueProperty );
+      if( bindingExpr != null )
+      {
+        bindingExpr.UpdateTarget();
+      }
     }
 
 
@@ -320,6 +330,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         sourceObject = customTypeDescriptor.GetPropertyOwner( PropertyDescriptor );
 
       return sourceObject;
+    }
+
+    internal object ComputeDefaultValueAttributeForItem( object item )
+    {
+      var pd = ( PropertyDescriptor )item;
+
+      var defaultValue = PropertyGridUtilities.GetAttribute<DefaultValueAttribute>( pd );
+      return ( defaultValue != null ) ? defaultValue.Value : null;
     }
 
     #endregion
@@ -474,6 +492,18 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
+    public object DefaultValue
+    {
+      get
+      {
+        return _defaultValue;
+      }
+      set
+      {
+        _defaultValue = value;
+      }
+    }
+
 
 
     public string Description
@@ -592,6 +622,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       _categoryValue = ComputeCategoryValue();
       _description = ComputeDescription();
       _displayName = ComputeDisplayName();
+      _defaultValue = ComputeDefaultValueAttribute();
       _displayOrder = ComputeDisplayOrder( this.IsPropertyGridCategorized );
 
       _expandableAttribute = ComputeExpandableAttribute();

@@ -23,12 +23,14 @@ using System.Collections.ObjectModel;
 using System.Windows.Markup;
 using System.Xml.Serialization;
 using Standard;
+using System.Xml;
+using System.Xml.Schema;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
     [ContentProperty("RootPanel")]
     [Serializable]
-    public class LayoutRoot : LayoutElement, ILayoutContainer, ILayoutRoot
+    public class LayoutRoot : LayoutElement, ILayoutContainer, ILayoutRoot, IXmlSerializable
     {
         public LayoutRoot()
         { 
@@ -660,7 +662,289 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         public event EventHandler<LayoutElementEventArgs> ElementRemoved;
 
-        #endregion
+    #endregion
+
+        public XmlSchema GetSchema()
+        {
+          return null;
+        }
+
+        public void ReadXml( XmlReader reader )
+        {
+          reader.MoveToContent();
+          if( reader.IsEmptyElement )
+          {
+            reader.Read();
+            return;
+          }
+
+          var layoutPanelElements = ReadRootPanel( reader );
+          if( layoutPanelElements != null )
+          {
+            //Create the RootPanel with the first child
+            RootPanel = new LayoutPanel( layoutPanelElements.First() );
+            //Add all children to RootPanel
+            for( int i = 1; i < layoutPanelElements.Count; ++i )
+            {
+              RootPanel.Children.Add( layoutPanelElements[ i ] );
+            }
+          }
+
+          TopSide = ( LayoutAnchorSide )ReadElement( reader );
+          if( TopSide != null )
+          {
+            TopSide.Children.Add( ( LayoutAnchorGroup )ReadElement( reader ) );
+            reader.Read();
+          }
+          RightSide = ( LayoutAnchorSide )ReadElement( reader );
+          if( RightSide != null )
+          {
+            RightSide.Children.Add( ( LayoutAnchorGroup )ReadElement( reader ) );
+            reader.Read();
+          }
+          LeftSide = ( LayoutAnchorSide )ReadElement( reader );
+          if( LeftSide != null )
+          {
+            LeftSide.Children.Add( ( LayoutAnchorGroup )ReadElement( reader ) );
+            reader.Read();
+          }
+          BottomSide = ( LayoutAnchorSide )ReadElement( reader );
+          if( BottomSide != null )
+          {
+            BottomSide.Children.Add( ( LayoutAnchorGroup )ReadElement( reader ) );
+            reader.Read();
+          }
+
+          FloatingWindows.Clear();
+          var floatingWindows = ReadElementList( reader );
+          foreach( var floatingWindow in floatingWindows )
+          {
+            FloatingWindows.Add( ( LayoutFloatingWindow )floatingWindow );
+          }
+
+          Hidden.Clear();
+          var hidden = ReadElementList( reader );
+          foreach( var hiddenObject in hidden )
+          {
+            Hidden.Add( ( LayoutAnchorable )hiddenObject );
+          }
+        }
+
+        private List<ILayoutPanelElement> ReadRootPanel( XmlReader reader )
+        {
+          var result = new List<ILayoutPanelElement>();
+
+          var startElementName = reader.LocalName;
+          reader.Read();
+          if( reader.LocalName.Equals(startElementName) && (reader.NodeType == XmlNodeType.EndElement) )
+          {
+            return null;
+          }
+
+          while( reader.NodeType == XmlNodeType.Whitespace )
+          {
+            reader.Read();
+          }
+
+          if( reader.LocalName.Equals("RootPanel"))
+          {
+            reader.Read();
+
+            while( true )
+            {
+              //Read all RootPanel children
+              var element = ReadElement( reader ) as ILayoutPanelElement;
+              if( element != null )
+              {
+                result.Add( element );
+              }
+              else if( reader.NodeType == XmlNodeType.EndElement )
+              {
+                break;
+              }
+            }
+          }
+
+          reader.ReadEndElement();
+
+          return result;
+        }
+
+        private List<object> ReadElementList( XmlReader reader )
+        {
+          var resultList = new List<object>();
+
+          if( reader.IsEmptyElement )
+          {
+            reader.Read();
+            return resultList;
+          }
+
+          var startElementName = reader.LocalName;
+          reader.Read();
+          if( reader.LocalName.Equals(startElementName) && (reader.NodeType == XmlNodeType.EndElement) )
+          {
+            return null;
+          }
+
+          while( reader.NodeType == XmlNodeType.Whitespace )
+          {
+            reader.Read();
+          }
+
+          while( true )
+          {
+            var result = ReadElement( reader ) as LayoutFloatingWindow;
+            if( result == null )
+            {
+              break;
+            }
+
+            resultList.Add( result );
+          }
+
+          reader.ReadEndElement();
+
+          return resultList;
+        }
+
+        private object ReadElement( XmlReader reader )
+        {
+          if( reader.NodeType == XmlNodeType.EndElement )
+          {
+            return null;
+          }
+
+          while( reader.NodeType == XmlNodeType.Whitespace )
+          {
+            reader.Read();
+          }
+
+          XmlSerializer serializer;
+          switch( reader.LocalName )
+          {
+            case "LayoutAnchorablePaneGroup":
+              serializer = new XmlSerializer( typeof( LayoutAnchorablePaneGroup ) );
+              break;
+            case "LayoutAnchorablePane":
+              serializer = new XmlSerializer( typeof( LayoutAnchorablePane ) );
+              break;
+            case "LayoutAnchorable":
+              serializer = new XmlSerializer( typeof( LayoutAnchorable ) );
+              break;
+            case "LayoutDocumentPaneGroup":
+              serializer = new XmlSerializer( typeof( LayoutDocumentPaneGroup ) );
+              break;
+            case "LayoutDocumentPane":
+              serializer = new XmlSerializer( typeof( LayoutDocumentPane ) );
+              break;
+            case "LayoutDocument":
+              serializer = new XmlSerializer( typeof( LayoutDocument ) );
+              break;
+            case "LayoutAnchorGroup":
+              serializer = new XmlSerializer( typeof( LayoutAnchorGroup ) );
+              break;
+            case "LayoutPanel":
+              serializer = new XmlSerializer( typeof( LayoutPanel ) );
+              break;
+            case "LayoutDocumentFloatingWindow":
+              serializer = new XmlSerializer( typeof( LayoutDocumentFloatingWindow ) );
+              break;
+            case "LayoutAnchorableFloatingWindow":
+              serializer = new XmlSerializer( typeof( LayoutAnchorableFloatingWindow ) );
+              break;
+            case "LeftSide":
+            case "RightSide":
+            case "TopSide":
+            case "BottomSide":
+              if( reader.IsEmptyElement )
+              {
+                reader.Read();
+                return null;
+              }
+              reader.Read();
+              return new LayoutAnchorSide();
+            default:
+              var type = LayoutRoot.FindType( reader.LocalName );
+              if( type == null )
+              {
+                throw new ArgumentException( "AvalonDock.LayoutRoot doesn't know how to deserialize " + reader.LocalName );
+              }
+              serializer = new XmlSerializer( type );
+              break;
+          }
+
+          return serializer.Deserialize( reader );
+        }
+
+        public void WriteXml( XmlWriter writer )
+        {
+          writer.WriteStartElement( "RootPanel" );
+          if( RootPanel != null )
+          {
+            RootPanel.WriteXml( writer );
+          }
+          writer.WriteEndElement();
+
+          writer.WriteStartElement( "TopSide" );
+          if( TopSide != null )
+          {
+            TopSide.WriteXml( writer );
+          }
+          writer.WriteEndElement();
+
+          writer.WriteStartElement( "RightSide" );
+          if( RightSide != null )
+          {
+            RightSide.WriteXml( writer );
+          }
+          writer.WriteEndElement();
+
+          writer.WriteStartElement( "LeftSide" );
+          if( LeftSide != null )
+          {
+            LeftSide.WriteXml( writer );
+          }
+          writer.WriteEndElement();
+
+          writer.WriteStartElement( "BottomSide" );
+          if( BottomSide != null )
+          {
+            BottomSide.WriteXml( writer );
+          }
+          writer.WriteEndElement();
+
+          // Write all floating windows (can be LayoutDocumentFloatingWindow or LayoutAnchorableFloatingWindow).
+          // To prevent "can not create instance of abstract type", the type is retrieved with GetType().Name
+          writer.WriteStartElement( "FloatingWindows" );
+          foreach( var layoutFloatingWindow in FloatingWindows )
+          {
+            writer.WriteStartElement( layoutFloatingWindow.GetType().Name );
+            layoutFloatingWindow.WriteXml( writer );
+            writer.WriteEndElement();
+          }
+          writer.WriteEndElement();
+
+          writer.WriteStartElement( "Hidden" );
+          foreach( var layoutAnchorable in Hidden )
+          {
+            layoutAnchorable.WriteXml( writer );
+          }
+          writer.WriteEndElement();
+        }
+
+        internal static Type FindType( string name )
+        {
+          foreach( var assembly in AppDomain.CurrentDomain.GetAssemblies() )
+          {
+            foreach( var type in assembly.GetTypes() )
+            {
+              if( type.Name.Equals( name ) )
+                return type;
+            }
+          }
+          return null;
+        }
 
 #if TRACE
         public override void ConsoleDump(int tab)

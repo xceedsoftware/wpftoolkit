@@ -179,15 +179,18 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnCalculatorValueChanged( object sender, RoutedPropertyChangedEventArgs<object> e )
     {
-      if( IsValid( _calculator.Value ) )
+      if( _calculator != null )
       {
-        if( this.UpdateValueOnEnterKey )
+        if( IsValid( _calculator.Value ) )
         {
-          this.TextBox.Text = (_calculator.Value != null) ? _calculator.Value.Value.ToString( this.FormatString, this.CultureInfo ) : null;
-        }
-        else
-        {
-          this.Value = _calculator.Value;
+          if( this.UpdateValueOnEnterKey )
+          {
+            this.TextBox.Text = ( _calculator.Value != null ) ? _calculator.Value.Value.ToString( this.FormatString, this.CultureInfo ) : null;
+          }
+          else
+          {
+            this.Value = _calculator.Value;
+          }
         }
       }
     }

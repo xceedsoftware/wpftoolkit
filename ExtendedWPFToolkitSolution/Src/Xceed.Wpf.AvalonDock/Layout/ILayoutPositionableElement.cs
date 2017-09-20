@@ -39,7 +39,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
         double DockMinWidth { get; set; }
         double DockMinHeight { get; set; }
 
-
+        bool AllowDuplicateContent { get; set; }
 
         bool IsVisible { get; }
     }

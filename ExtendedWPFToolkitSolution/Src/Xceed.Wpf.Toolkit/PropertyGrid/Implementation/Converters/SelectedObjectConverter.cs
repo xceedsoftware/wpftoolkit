@@ -76,6 +76,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
 
       Type newType = value.GetType();
 
+      //ICustomTypeProvider is only available in .net 4.5 and over. Use reflection so the .net 4.0 and .net 3.5 still works.
+      if( newType.GetInterface( "ICustomTypeProvider", true ) != null )
+      {
+        var methodInfo = newType.GetMethod( "GetCustomType" );
+        newType = methodInfo.Invoke( value, null ) as Type;
+      }
+
       DisplayNameAttribute displayNameAttribute = newType.GetCustomAttributes( false ).OfType<DisplayNameAttribute>().FirstOrDefault();
 
       return (displayNameAttribute == null)

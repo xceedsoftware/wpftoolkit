@@ -226,8 +226,6 @@
                            <DockPanel>
                               <TextBlock DockPanel.Dock="Left"
                                          Text="Windows 10" />
-                              <TextBlock TextAlignment="Right"
-                                         Style="{StaticResource newSuffix}" />
                            </DockPanel>
                         </ComboBoxItem.Content>
                       </ComboBoxItem>

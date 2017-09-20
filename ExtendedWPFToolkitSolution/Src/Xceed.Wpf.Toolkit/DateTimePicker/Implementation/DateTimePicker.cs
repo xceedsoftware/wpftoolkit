@@ -275,7 +275,7 @@ namespace Xceed.Wpf.Toolkit
       {
         Mouse.Capture( null );
 
-        if( AutoCloseCalendar && ( _calendar.DisplayMode == CalendarMode.Month ) )
+        if( AutoCloseCalendar && (_calendar != null) && ( _calendar.DisplayMode == CalendarMode.Month ) )
         {
           ClosePopup( true );
         }
@@ -299,8 +299,7 @@ namespace Xceed.Wpf.Toolkit
       //If we change any part of the datetime without
       //using the calendar when the actual date is temporary,
       //clear the temporary value. 
-      if( _calendarTemporaryDateTime != null &&
-        newValue != _calendarTemporaryDateTime )
+      if( (_calendar != null) && (_calendarTemporaryDateTime != null) && (newValue != _calendarTemporaryDateTime ))
       {
         _calendarTemporaryDateTime = null;
         _calendarIntendedDateTime = null;
@@ -352,6 +351,7 @@ namespace Xceed.Wpf.Toolkit
       //Do not close the Calendar if the call is handled
       //by the TimePicker inside the DateTimePicker template
       if( IsOpen
+        && ( _timePicker != null)
         && _timePicker.IsKeyboardFocusWithin
         && ( _timePicker.IsOpen || e.Handled ) )
         return;

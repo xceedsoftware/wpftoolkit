@@ -40,6 +40,7 @@
    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
    <conv:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
    <conv:AdditionConverter x:Key="AdditionConverter" />
+   <conv:ColorModeToTabItemSelectedConverter x:Key="ColorModeToTabItemSelectedConverter" />
 
    <LinearGradientBrush x:Key="ColorPickerDarkBorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
       <GradientStop Color="#FFA3AEB9" Offset="0" />
@@ -205,6 +206,48 @@
       <Setter Property="SelectionMode" Value="Single" />
    </Style>
 
+   <ControlTemplate x:Key="TabItemTemplate"
+                    TargetType="{x:Type local:ColorPickerTabItem}">
+      <Grid x:Name="templateRoot"
+            SnapsToDevicePixels="true">
+         <Border x:Name="mainBorder"
+                 BorderBrush="{TemplateBinding BorderBrush}"
+                 BorderThickness="1,1,1,0"
+                 Background="#FFF0F0F0"
+                 Margin="0">
+            <Border x:Name="innerBorder"
+                    BorderBrush="#ACACAC"
+                    BorderThickness="1,1,1,0"
+                    Background="#FFF0F0F0"
+                    Margin="-1"
+                    Opacity="0" />
+         </Border>
+         <ContentPresenter x:Name="contentPresenter"
+                           ContentSource="Header"
+                           Focusable="False"
+                           HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                           Margin="{TemplateBinding Padding}"
+                           RecognizesAccessKey="True"
+                           SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                           VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+      </Grid>
+      <ControlTemplate.Triggers>
+         <MultiDataTrigger>
+            <MultiDataTrigger.Conditions>
+               <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
+                          Value="true" />
+            </MultiDataTrigger.Conditions>
+            <Setter Property="Panel.ZIndex"
+                    Value="1" />
+            <Setter Property="Margin"
+                    Value="-2,-2,-2,0" />
+            <Setter Property="Opacity"
+                    TargetName="innerBorder"
+                    Value="1" />
+         </MultiDataTrigger>
+      </ControlTemplate.Triggers>
+   </ControlTemplate>
+
    <Style TargetType="{x:Type local:ColorPicker}">
       <Setter Property="Background" Value="White" />
       <Setter Property="BorderBrush" Value="{StaticResource ColorPickerDarkBorderBrush}" />
@@ -265,14 +308,13 @@
                         </Style>
                      </Popup.Resources>
                      <Border BorderThickness="1" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource ColorPickerDarkBorderBrush}" Padding="3">
-                        <Grid>
-                           <Grid.RowDefinitions>
-                              <RowDefinition Height="Auto" />
-                              <RowDefinition />
-                              <RowDefinition Height="Auto" />
-                           </Grid.RowDefinitions>
-
-                           <Grid x:Name="_colorPaletteHost" Visibility="Collapsed" Margin="4">
+                        <TabControl x:Name="ColorPickerTabControl"
+                                    Background="Transparent"
+                                    SelectedIndex="{Binding ColorMode, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ColorModeToTabItemSelectedConverter}}">
+                           <local:ColorPickerTabItem x:Name="StandardTabItem"
+                                                     Header="{Binding StandardButtonHeader, RelativeSource={RelativeSource TemplatedParent}}"
+                                                     Template="{StaticResource TabItemTemplate}">
+                              <Grid x:Name="_colorPaletteHost" Margin="4">
                               <Grid.RowDefinitions>
                                  <RowDefinition Height="Auto" />
                                  <RowDefinition Height="Auto" />
@@ -325,24 +367,20 @@
                                  </Grid>
                               </Grid>
                            </Grid>
-
-                           <!-- ColorCanvas -->
-                           <Grid x:Name="_colorCanvasHost" Visibility="Collapsed">
-                              <local:ColorCanvas Background="Transparent"
-                                                 BorderThickness="0"
-                                                 UsingAlphaChannel="{Binding UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}}"
-                                                 SelectedColor="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}"
-                                                 Width="{Binding MaxDropDownWidth, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource AdditionConverter}, ConverterParameter=-18}" />
-                           </Grid>
-
-                           <Separator Grid.Row="1"
-                                      HorizontalAlignment="Stretch"
-                                      Margin="5,0,5,0"
-                                      Visibility="{TemplateBinding ShowAdvancedButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
-
-                           <!-- More Colors Button -->
-                           <Button x:Name="PART_ColorModeButton" Grid.Row="2" Margin="5" Visibility="{TemplateBinding ShowAdvancedButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                        </Grid>
+                           </local:ColorPickerTabItem>
+                           <local:ColorPickerTabItem x:Name="AdvancedTabItem"
+                                                     Header="{Binding AdvancedButtonHeader, RelativeSource={RelativeSource TemplatedParent}}"
+                                                     Template="{StaticResource TabItemTemplate}">
+                              <!-- ColorCanvas -->
+                              <Grid x:Name="_colorCanvasHost">
+                                 <local:ColorCanvas Background="Transparent"
+                                                    BorderThickness="0"
+                                                    UsingAlphaChannel="{Binding UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}}"
+                                                    SelectedColor="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}"
+                                                    Width="{Binding MaxDropDownWidth, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource AdditionConverter}, ConverterParameter=-18}" />
+                              </Grid>
+                           </local:ColorPickerTabItem>
+                        </TabControl>
                      </Border>
                   </Popup>
                </Grid>
@@ -352,20 +390,14 @@
                      <Setter TargetName="ColorAndName" Property="Visibility" Value="Visible" />
                   </Trigger>
 
-                  <Trigger Property="ColorMode" Value="ColorPalette">
-                     <Setter TargetName="_colorPaletteHost" Property="Visibility" Value="Visible" />
-                     <Setter TargetName="_colorCanvasHost" Property="Visibility" Value="Collapsed" />
-                     <Setter TargetName="PART_ColorModeButton"
-                             Property="Content"
-                             Value="{Binding AdvancedButtonHeader, RelativeSource={RelativeSource TemplatedParent}}" />
-                  </Trigger>
-
-                  <Trigger Property="ColorMode" Value="ColorCanvas">
-                     <Setter TargetName="_colorPaletteHost" Property="Visibility" Value="Collapsed" />
-                     <Setter TargetName="_colorCanvasHost" Property="Visibility" Value="Visible" />
-                     <Setter TargetName="PART_ColorModeButton"
-                             Property="Content"
-                             Value="{Binding StandardButtonHeader, RelativeSource={RelativeSource TemplatedParent}}" />
+                  <Trigger Property="ShowTabHeaders"
+                           Value="False">
+                     <Setter Property="Visibility"
+                             Value="Collapsed"
+                             TargetName="StandardTabItem" />
+                     <Setter Property="Visibility"
+                             Value="Collapsed"
+                             TargetName="AdvancedTabItem" />
                   </Trigger>
 
                   <Trigger Property="ShowDropDownButton" Value="False">

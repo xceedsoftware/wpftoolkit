@@ -124,9 +124,10 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       set;
     }
 
-    [Range(0, 10)]
+    [Range(0d, 10d)]
     [Category( "Other" )]
-    [Description( "This property uses the [Range(0,10)] attribute to set the Minimum and Maximum properties." )]
+    [DefaultValue(5d)]
+    [Description( "This property uses the [Range(0,10)] and DefaultValue attributes to set the Minimum, Maximum and default properties." )]
     public double RangeDouble
     {
       get;

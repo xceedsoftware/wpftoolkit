@@ -80,13 +80,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion IsThreeState Property
 
-    public override void OnApplyTemplate()
-    {
-      base.OnApplyTemplate();
-
-      ChildCheckBox.Background = new System.Windows.Media.SolidColorBrush( System.Windows.Media.Colors.Blue );
-    }
-
     public static readonly RoutedEvent CheckedEvent;
     public static readonly RoutedEvent UncheckedEvent;
     public static readonly RoutedEvent IndeterminateEvent;

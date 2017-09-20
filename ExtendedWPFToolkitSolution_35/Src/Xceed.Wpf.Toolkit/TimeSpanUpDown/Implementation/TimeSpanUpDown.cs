@@ -222,6 +222,24 @@ namespace Xceed.Wpf.Toolkit
       TimeSpan current = this.Value.HasValue ? this.Value.Value : new TimeSpan();
       TimeSpan result;
       var success = TimeSpan.TryParse( currentValue, out result );
+      if( !success )
+      {
+        // Validate when more than 60 seconds (or more than 60 minutes, or more than 24 hours) are entered.
+        var separators = currentValue.Where( x => x == ':' || x == '.' ).ToList();
+        var values = currentValue.Split( new char[] { ':', '.' } );
+        if( values.Count() >= 2 )
+        {
+          bool haveDays = separators.First() == '.';
+          bool haveMS = ( separators.Count() > 1 ) && ( separators.Last() == '.' );
+
+          result = new TimeSpan( haveDays ? int.Parse( values[ 0 ] ) : 0,  //Days
+                                 haveDays ? int.Parse( values[ 1 ] ) : int.Parse( values[ 0 ] ),  //Hours
+                                 haveDays ? int.Parse( values[ 2 ] ) : int.Parse( values[ 1 ] ),  //Minutes
+                                 (haveDays && this.ShowSeconds) ? int.Parse( values[ 3 ] ) : this.ShowSeconds ? int.Parse( values[ 2 ] ) : 0,  //Seconds
+                                 haveMS ? int.Parse( values.Last() ) : 0 );  //Milliseconds
+        }
+      }
+
       currentValue = result.ToString();
 
       // When text is typed, if UpdateValueOnEnterKey is true, 

@@ -63,7 +63,7 @@
          <Style x:Key="MaterialToastCloseButtonStyle1"
                 TargetType="{x:Type Button}">
             <Setter Property="Margin"
-                    Value="12,0,0,0" />
+                    Value="2" />
             <Setter Property="Content"
                     Value="OK" />
             <Setter Property="Foreground"

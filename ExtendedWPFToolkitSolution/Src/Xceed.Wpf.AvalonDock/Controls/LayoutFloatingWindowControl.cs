@@ -36,6 +36,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
   public abstract class LayoutFloatingWindowControl : Window, ILayoutControl
   {
     private ResourceDictionary currentThemeResourceDictionary; // = null
+    private bool _isInternalChange; //false
 
     static LayoutFloatingWindowControl()
     {
@@ -387,7 +388,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
         posElement.IsMaximized = isMaximized;
       }
       IsMaximized = isMaximized;
+      _isInternalChange = true;
       WindowState = isMaximized ? WindowState.Maximized : WindowState.Normal;
+      _isInternalChange = false;
     }
 
 
@@ -529,19 +532,21 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void OnStateChanged( EventArgs e )
     {
-      //Windows sometimes send unwanted state changes (when minimizing application for instance)
-      //We force internal state to be used
-      WindowState = IsMaximized ? WindowState.Maximized : WindowState.Normal;
+      if( !_isInternalChange )
+      {
+        if( WindowState == WindowState.Maximized )
+        {
+          UpdateMaximizedState( true );
+        }
+        else
+        {
+          WindowState = IsMaximized ? WindowState.Maximized : WindowState.Normal;
+        }
+      }
+
       base.OnStateChanged( e );
     }
 
     #endregion
-
-
-
-
-
-
-
   }
 }

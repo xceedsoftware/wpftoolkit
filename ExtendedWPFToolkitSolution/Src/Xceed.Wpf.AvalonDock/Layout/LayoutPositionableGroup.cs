@@ -80,6 +80,34 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         }
 
+        #region AllowDuplicateContent
+
+        private bool _allowDuplicateContent = true;
+        /// <summary>
+        /// Gets or sets the AllowDuplicateContent property.
+        /// When this property is true, then the LayoutDocumentPane or LayoutAnchorablePane allows dropping
+        /// duplicate content (according to its Title and ContentId). When this dependency property is false,
+        /// then the LayoutDocumentPane or LayoutAnchorablePane hides the OverlayWindow.DropInto button to prevent dropping of duplicate content.
+        /// </summary>
+        public bool AllowDuplicateContent
+        {
+          get
+          {
+            return _allowDuplicateContent;
+          }
+          set
+          {
+            if( _allowDuplicateContent != value )
+            {
+              RaisePropertyChanging( "AllowDuplicateContent" );
+              _allowDuplicateContent = value;
+              RaisePropertyChanged( "AllowDuplicateContent" );
+            }
+          }
+        }
+
+        #endregion
+
         #region CanRepositionItems
 
         private bool _canRepositionItems = true;
@@ -101,7 +129,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
         }
 
         #endregion
-
 
         #region DockMinWidth
 

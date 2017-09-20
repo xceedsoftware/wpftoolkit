@@ -144,25 +144,6 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion
 
-    #region SelectAllOnGotFocus (Obsolete)
-
-    [Obsolete( "This property is obsolete and should no longer be used. Use NumericUpDown.AutoSelectBehavior instead." )]
-    public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register( "SelectAllOnGotFocus", typeof( bool ), typeof( NumericUpDown<T> ), new PropertyMetadata( true ) );
-    [Obsolete( "This property is obsolete and should no longer be used. Use NumericUpDown.AutoSelectBehavior instead." )]
-    public bool SelectAllOnGotFocus
-    {
-      get
-      {
-        return ( bool )GetValue( SelectAllOnGotFocusProperty );
-      }
-      set
-      {
-        SetValue( SelectAllOnGotFocusProperty, value );
-      }
-    }
-
-    #endregion //SelectAllOnGotFocus
-
     #endregion //Properties
 
     #region Methods

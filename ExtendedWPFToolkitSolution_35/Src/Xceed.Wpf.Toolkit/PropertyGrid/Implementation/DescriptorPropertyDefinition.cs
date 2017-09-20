@@ -152,6 +152,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return ( bool )this.ComputeExpandableAttributeForItem( PropertyDescriptor );
     }
 
+    protected override object ComputeDefaultValueAttribute()
+    {
+      return this.ComputeDefaultValueAttributeForItem( PropertyDescriptor );
+    }
+
     protected override bool ComputeIsExpandable()
     {
       return ( this.Value != null )
@@ -183,7 +188,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       var editorAttribute = GetAttribute<EditorAttribute>();
       if( editorAttribute != null )
       {
-        Type type = Type.GetType( editorAttribute.EditorTypeName );
+#if VS2008
+        var type = Type.GetType( editorAttribute.EditorTypeName );
+#else
+        var type = Type.GetType( editorAttribute.EditorTypeName, ( name ) => { return AppDomain.CurrentDomain.GetAssemblies().Where( l => l.FullName == name.FullName ).FirstOrDefault(); }, null, true );
+#endif
 
         // If the editor does not have any public parameterless constructor, forget it.
         if( typeof( ITypeEditor ).IsAssignableFrom( type )

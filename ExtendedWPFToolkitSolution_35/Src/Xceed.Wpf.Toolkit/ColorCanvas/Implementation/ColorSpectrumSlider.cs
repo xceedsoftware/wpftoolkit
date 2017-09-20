@@ -103,7 +103,10 @@ namespace Xceed.Wpf.Toolkit
       }
 
       _pickerBrush.GradientStops[ i - 1 ].Offset = 1.0;
-      _spectrumDisplay.Fill = _pickerBrush;
+      if( _spectrumDisplay != null )
+      {
+        _spectrumDisplay.Fill = _pickerBrush;
+      }
     }
 
     #endregion //Methods

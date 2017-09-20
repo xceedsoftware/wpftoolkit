@@ -91,7 +91,7 @@
                            Value="false">
                      <Setter Property="Fill"
                              TargetName="Arrow"
-                             Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                             Value="#AFAFAF" />
                   </Trigger>
                   <DataTrigger Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type local:CheckComboBox}}}"
                                Value="True">

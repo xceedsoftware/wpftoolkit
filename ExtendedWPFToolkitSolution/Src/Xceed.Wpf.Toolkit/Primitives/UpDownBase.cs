@@ -364,9 +364,8 @@ UpDownBase<T> ), new UIPropertyMetadata( true ) );
 
     #region UpdateValueOnEnterKey
 
-    public static readonly DependencyProperty UpdateValueOnEnterKeyProperty = DependencyProperty.Register( "UpdateValueOnEnterKey", typeof( bool ),
-
-typeof( UpDownBase<T> ), new FrameworkPropertyMetadata( false ) );
+    public static readonly DependencyProperty UpdateValueOnEnterKeyProperty = DependencyProperty.Register( "UpdateValueOnEnterKey", typeof( bool ), typeof( UpDownBase<T> ), 
+      new FrameworkPropertyMetadata( false, OnUpdateValueOnEnterKeyChanged ) );
     public bool UpdateValueOnEnterKey
     {
       get
@@ -379,15 +378,23 @@ typeof( UpDownBase<T> ), new FrameworkPropertyMetadata( false ) );
       }
     }
 
+    private static void OnUpdateValueOnEnterKeyChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var upDownBase = o as UpDownBase<T>;
+      if( upDownBase != null )
+        upDownBase.OnUpdateValueOnEnterKeyChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+    }
+
+    protected virtual void OnUpdateValueOnEnterKeyChanged( bool oldValue, bool newValue )
+    {
+    }
+
     #endregion //UpdateValueOnEnterKey
 
     #region Value
 
-    public static readonly DependencyProperty ValueProperty = DependencyProperty.Register( "Value", typeof( T ), typeof( UpDownBase<T> ), new
-
-FrameworkPropertyMetadata( default( T ), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue, false,
-
-UpdateSourceTrigger.PropertyChanged ) );
+    public static readonly DependencyProperty ValueProperty = DependencyProperty.Register( "Value", typeof( T ), typeof( UpDownBase<T> ), 
+      new FrameworkPropertyMetadata( default( T ), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue, false, UpdateSourceTrigger.PropertyChanged ) );
     public T Value
     {
       get
@@ -583,11 +590,12 @@ true );
         var activeTrigger = this.MouseWheelActiveTrigger;
         bool spin = !e.UsingMouseWheel;
         spin |= (activeTrigger == MouseWheelActiveTrigger.MouseOver);
-        spin |= (TextBox.IsFocused && (activeTrigger == MouseWheelActiveTrigger.FocusedMouseOver));
-        spin |= (TextBox.IsFocused && (activeTrigger == MouseWheelActiveTrigger.Focused) && (Mouse.Captured is Spinner));
+        spin |= ( (TextBox  != null) && TextBox.IsFocused && (activeTrigger == MouseWheelActiveTrigger.FocusedMouseOver));
+        spin |= ( (TextBox != null) && TextBox.IsFocused && (activeTrigger == MouseWheelActiveTrigger.Focused) && (Mouse.Captured is Spinner));
 
         if( spin )
         {
+          e.Handled = true;
           OnSpin( e );
         }
       }

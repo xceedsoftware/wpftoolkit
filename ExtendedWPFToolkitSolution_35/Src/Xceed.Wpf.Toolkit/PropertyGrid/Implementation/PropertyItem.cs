@@ -122,21 +122,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return this.PropertyType;
     }
 
-    #endregion
-
-    #region Methods
-
     protected override void OnIsExpandedChanged( bool oldValue, bool newValue )
     {
-      if( newValue )
+      if( newValue && this.IsLoaded )
       {
-        // This withholds the generation of all PropertyItem instances (recursively)
-        // until the PropertyItem is expanded.
-        var objectContainerHelper = ContainerHelper as ObjectContainerHelperBase;
-        if( objectContainerHelper != null )
-        {
-          objectContainerHelper.GenerateProperties();
-        }
+        this.GenerateExpandedPropertyItems();
       }
     }
 
@@ -152,7 +142,22 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     protected override void OnValueChanged( object oldValue, object newValue )
     {
       base.OnValueChanged( oldValue, newValue );
+
+      // A Default Value is defined and newValue is null => set the Default Value
+      if( ( newValue == null ) && ( this.DescriptorDefinition != null ) && ( this.DescriptorDefinition.DefaultValue != null ) )
+      {
+#if VS2008
+        this.Value = this.DescriptorDefinition.DefaultValue;
+#else
+        this.SetCurrentValue( PropertyItem.ValueProperty, this.DescriptorDefinition.DefaultValue );
+#endif
+      }
+      this.SetValueFontWeight();
     }
+
+    #endregion
+
+    #region Internal Methods
 
     internal void SetRedInvalidBorder( BindingExpression be )
     {
@@ -166,6 +171,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         }
       }
     }
+
+    #endregion
+
+    #region Private Methods
 
     private void OnDefinitionContainerHelperInvalidated( object sender, EventArgs e )
     {
@@ -193,6 +202,47 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       this.DescriptorDefinition = definition;
       this.ContainerHelper = definition.CreateContainerHelper( this );
       definition.ContainerHelperInvalidated += new EventHandler( OnDefinitionContainerHelperInvalidated );
+      this.Loaded += this.PropertyItem_Loaded;
+    }
+
+    private void GenerateExpandedPropertyItems()
+    {
+      if( this.IsExpanded )
+      {
+        // This withholds the generation of all PropertyItem instances (recursively)
+        // until the PropertyItem is expanded.
+        var objectContainerHelper = ContainerHelper as ObjectContainerHelperBase;
+        if( objectContainerHelper != null )
+        {
+          objectContainerHelper.GenerateProperties();
+        }
+      }
+    }
+
+    private void SetValueFontWeight()
+    {
+      if( this.ValueContainer == null )
+        return;
+
+      // If Value equals the Default Value => set it Bold
+       this.ValueContainer.FontWeight = ( ( this.DescriptorDefinition != null )
+                                          && ( this.DescriptorDefinition.DefaultValue != null )
+                                          && ( this.Value != null )
+                                          && ( this.Value.Equals( this.DescriptorDefinition.DefaultValue ) )
+                                          && !(this.Editor is ComboBox) )   
+                                        ? FontWeights.Bold 
+                                        : FontWeights.Normal;
+    }
+
+    #endregion
+
+    #region Event Handlers
+
+    private void PropertyItem_Loaded( object sender, RoutedEventArgs e )
+    {
+      this.GenerateExpandedPropertyItems();
+
+      this.SetValueFontWeight();
     }
 
     #endregion

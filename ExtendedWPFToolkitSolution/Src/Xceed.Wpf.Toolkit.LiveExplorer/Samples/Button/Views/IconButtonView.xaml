@@ -1,0 +1,180 @@
+﻿<!--*************************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2016 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Button.Views.IconButtonView"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                 Title="IconButton">
+     <local:DemoView.Description>
+        <!-- #// TODODOC -->
+        <Paragraph FontSize="14" FontFamily="Segoe">
+            The IconButton control is a Button that contains an icon and some data. The Foreground, Background and BorderBrush can be easily modified with properties while the Icon location is customizable.
+        </Paragraph>
+    </local:DemoView.Description>
+
+   <local:DemoView.Resources>
+      <xctk:SolidColorBrushToColorConverter x:Key="SolidColorBrushToColorConverter" />
+
+      <Image x:Key="Image1"
+             Source="../Resources/PencilTool16.png"
+             Width="20"
+             Margin="5" />
+      <Image x:Key="Image2"
+             Source="../Resources/Default.jpg"
+             Width="25"
+             Margin="5"/>
+
+      <ObjectDataProvider x:Key="ButtonLocationEnumData"
+                          MethodName="GetValues"
+                          ObjectType="{x:Type sys:Enum}">
+         <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="xctk:Location" />
+         </ObjectDataProvider.MethodParameters>
+      </ObjectDataProvider>
+   </local:DemoView.Resources>
+
+   <Grid>
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <GroupBox Header="Features" Grid.Row="0" Margin="5">
+         <Grid Margin="5">
+            <Grid.RowDefinitions>
+               <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
+               <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+               <ColumnDefinition Width="Auto" />
+               <ColumnDefinition Width="100" />
+               <ColumnDefinition Width="Auto" />
+               <ColumnDefinition Width="100" />
+            </Grid.ColumnDefinitions>
+
+            <!-- 1st Column -->
+            <TextBlock Text="Icon:" 
+                       VerticalAlignment="Center" />
+            <ComboBox Grid.Column="1"
+                      Margin="5"
+                      VerticalContentAlignment="Center"
+                      SelectedValue="{Binding Icon, ElementName=_iconButton}"
+                      SelectedValuePath="Tag">
+               <ComboBoxItem Content="None"
+                             Tag="{x:Null}" />
+               <ComboBoxItem Content="Image 1"
+                             Tag="{StaticResource Image1}" />
+               <ComboBoxItem Content="Image 2"
+                             Tag="{StaticResource Image2}" />
+            </ComboBox>
+
+            <TextBlock Grid.Row="1"
+                       Text="Icon Location: "
+                       VerticalAlignment="Center" />
+            <ComboBox Grid.Column="1"
+                      Grid.Row="1"
+                      ItemsSource="{Binding Source={StaticResource ButtonLocationEnumData}}"
+                      SelectedItem="{Binding IconLocation, ElementName=_iconButton}"
+                      Margin="5"
+                      VerticalContentAlignment="Center" />
+
+            <!-- 2nd Column -->
+            <TextBlock Text="MouseOver Foreground:"
+                       Grid.Column="2"
+                       VerticalAlignment="Center"
+                       Margin="10,0,0,0" />
+            <xctk:ColorPicker Grid.Column="3"
+                              Margin="5"
+                              SelectedColor="{Binding MouseOverForeground, ElementName=_iconButton, Converter={StaticResource SolidColorBrushToColorConverter}}" />
+
+            <TextBlock Text="MousePressed Foreground:"
+                       Grid.Row="1"
+                       Grid.Column="2"
+                       VerticalAlignment="Center"
+                       Margin="10,0,0,0" />
+            <xctk:ColorPicker Grid.Row="1"
+                              Grid.Column="3"
+                              Margin="5"
+                              SelectedColor="{Binding MousePressedForeground, ElementName=_iconButton, Converter={StaticResource SolidColorBrushToColorConverter}}" />
+
+            <TextBlock Text="MouseOver Background:"
+                       Grid.Row="2"
+                       Grid.Column="2"
+                       VerticalAlignment="Center"
+                       Margin="10,0,0,0" />
+            <xctk:ColorPicker Grid.Row="2"
+                              Grid.Column="3"
+                              Margin="5"
+                              SelectedColor="{Binding MouseOverBackground, ElementName=_iconButton, Converter={StaticResource SolidColorBrushToColorConverter}}" />
+
+            <TextBlock Text="MousePressed Background:"
+                       Grid.Row="3"
+                       Grid.Column="2"
+                       VerticalAlignment="Center"
+                       Margin="10,0,0,0" />
+            <xctk:ColorPicker Grid.Row="3"
+                              Grid.Column="3"
+                              Margin="5"
+                              SelectedColor="{Binding MousePressedBackground, ElementName=_iconButton, Converter={StaticResource SolidColorBrushToColorConverter}}" />
+
+            <TextBlock Text="MouseOver BorderBrush:"
+                       Grid.Row="4"
+                       Grid.Column="2"
+                       VerticalAlignment="Center"
+                       Margin="10,0,0,0" />
+            <xctk:ColorPicker Grid.Row="4"
+                              Grid.Column="3"
+                              Margin="5"
+                              SelectedColor="{Binding MouseOverBorderBrush, ElementName=_iconButton, Converter={StaticResource SolidColorBrushToColorConverter}}" />
+
+            <TextBlock Text="MousePressed BorderBrush:"
+                       Grid.Row="5"
+                       Grid.Column="2"
+                       VerticalAlignment="Center"
+                       Margin="10,0,0,0" />
+            <xctk:ColorPicker Grid.Row="5"
+                              Grid.Column="3"
+                              Margin="5"
+                              SelectedColor="{Binding MousePressedBorderBrush, ElementName=_iconButton, Converter={StaticResource SolidColorBrushToColorConverter}}" />
+         </Grid>
+      </GroupBox>
+
+      <StackPanel Grid.Row="1" Margin="10">
+         <TextBlock Text="Usage:" Style="{StaticResource Header}" />
+
+         <xctk:IconButton x:Name="_iconButton"
+                          Content="Test"
+                          Icon="{StaticResource Image1}"
+                          IconLocation="Left"
+                          MouseOverForeground="Black"
+                          MousePressedForeground="White"
+                          MouseOverBackground="LightBlue"
+                          MousePressedBackground="Blue"
+                          MouseOverBorderBrush="LightGray"
+                          MousePressedBorderBrush="LightGray"
+                          Margin="10"
+                          Padding="20,3"
+                          HorizontalAlignment="Center">
+         </xctk:IconButton>
+      </StackPanel>
+   </Grid>
+</local:DemoView>

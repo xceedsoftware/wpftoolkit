@@ -97,8 +97,11 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnIsOpenChanged( bool oldValue, bool newValue )
     {
-      // Focus the content of the popup, after its loaded
-      Dispatcher.BeginInvoke(new Action(()=>_textBox.Focus()), DispatcherPriority.Background);
+      if( _textBox != null )
+      {
+        // Focus the content of the popup, after its loaded
+        Dispatcher.BeginInvoke( new Action( () => _textBox.Focus() ), DispatcherPriority.Background );
+      }
     }
 
     #endregion //IsOpen
@@ -280,7 +283,10 @@ namespace Xceed.Wpf.Toolkit
         IsOpen = false;
       ReleaseMouseCapture();
 
-      _toggleButton.Focus();
+      if( _toggleButton != null )
+      {
+        _toggleButton.Focus();
+      }
     }
 
     #endregion //Methods

@@ -27,25 +27,6 @@ namespace Xceed.Wpf.Toolkit
   {
     #region Properties
 
-    #region SelectAllOnGotFocus (Obsolete)
-
-    [Obsolete( "This property is obsolete and should no longer be used. Use AutoSelectTextBox.AutoSelectBehavior instead." )]
-    public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register( "SelectAllOnGotFocus", typeof( bool ), typeof( WatermarkTextBox ), new PropertyMetadata( false ) );
-    [Obsolete( "This property is obsolete and should no longer be used. Use AutoSelectTextBox.AutoSelectBehavior instead." )]
-    public bool SelectAllOnGotFocus
-    {
-      get
-      {
-        return ( bool )GetValue( SelectAllOnGotFocusProperty );
-      }
-      set
-      {
-        SetValue( SelectAllOnGotFocusProperty, value );
-      }
-    }
-
-    #endregion //SelectAllOnGotFocus
-
     #region KeepWatermarkOnGotFocus
 
     public static readonly DependencyProperty KeepWatermarkOnGotFocusProperty = DependencyProperty.Register( "KeepWatermarkOnGotFocus", typeof( bool ), typeof( WatermarkTextBox ), new UIPropertyMetadata( false ) );
@@ -107,29 +88,6 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //Constructors
-
-    #region Base Class Overrides
-
-    protected override void OnGotFocus( RoutedEventArgs e )
-    {
-      base.OnGotFocus( e );
-
-      if( SelectAllOnGotFocus )
-        SelectAll();
-    }
-
-    protected override void OnPreviewMouseLeftButtonDown( MouseButtonEventArgs e )
-    {
-      if( !IsKeyboardFocused && SelectAllOnGotFocus )
-      {
-        e.Handled = true;
-        Focus();
-      }
-
-      base.OnPreviewMouseLeftButtonDown( e ); //Focus AutoSelectTextBox and eat the event
-    }
-
-    #endregion //Base Class Overrides
   }
 
 #pragma warning restore 0618

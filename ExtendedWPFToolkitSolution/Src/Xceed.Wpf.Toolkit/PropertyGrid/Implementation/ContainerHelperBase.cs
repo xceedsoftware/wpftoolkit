@@ -76,8 +76,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       set;
     }
 
+    internal bool IsCleaning
+    {
+      get;
+      private set;
+    }
+
     public virtual void ClearHelper()
     {
+      this.IsCleaning = true;
+
       var propChange = PropertyContainer as INotifyPropertyChanged;
       if( propChange != null )
       {
@@ -94,6 +102,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         ( ( IItemContainerGenerator )ChildrenItemsControl.ItemContainerGenerator ).RemoveAll();
       }
+      this.IsCleaning = false;
     }
 
     public virtual void PrepareChildrenPropertyItem( PropertyItemBase propertyItem, object item ) 

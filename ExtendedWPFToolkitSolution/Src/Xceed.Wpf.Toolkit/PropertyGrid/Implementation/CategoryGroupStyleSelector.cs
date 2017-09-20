@@ -39,7 +39,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       var group = item as CollectionViewGroup;
       // Category is not "Misc" => use regular ItemGroupStyle
-      if( !group.Name.Equals( CategoryAttribute.Default.Category ) )
+      if( (group.Name != null) && !group.Name.Equals( CategoryAttribute.Default.Category ) )
         return this.ItemGroupStyle;
 
       // Category is "Misc"
