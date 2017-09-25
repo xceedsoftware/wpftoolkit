@@ -8,7 +8,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 
 ## Latest news
 
-**September 25, 2017** v3.2.0 released with [24 bug fixes and improvements](../../wiki/Improvements-in-v3.2.0). Users of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) received v3.2.0 on November 21, 2016 with [2 new controls and 44 bug fixes and improvements](../../wiki/Improvements-in-v3.2.0#Plus320), v3.3.0 on March 1, 2017 with [45 bug fixes and improvements](../../wiki/Improvements-in-v3.2.0#Plus330), v3.4.0 on June 5, 2017 with [52 bug fixes and improvements](../../wiki/Improvements-in-v3.2.0#Plus340), and v3.5.0 on September 12, 2017 with [29 bug fixes and improvements](../../wiki/Improvements-in-v3.2.0#Plus350)
+**September 25, 2017** v3.2.0 released with [1 new control and 24 bug fixes and improvements](../../wiki/Improvements-in-v3.2.0). Users of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) received v3.2.0 on November 21, 2016 with [2 new controls and 44 bug fixes and improvements](../../wiki/Improvements-in-v3.2.0#Plus320), v3.3.0 on March 1, 2017 with [45 bug fixes and improvements](../../wiki/Improvements-in-v3.2.0#Plus330), v3.4.0 on June 5, 2017 with [52 bug fixes and improvements](../../wiki/Improvements-in-v3.2.0#Plus340), and v3.5.0 on September 12, 2017 with [29 bug fixes and improvements](../../wiki/Improvements-in-v3.2.0#Plus350)
 
 **July 11, 2017:** The project's new home is Github. All issues from Codeplex are now located here.
 
@@ -48,45 +48,48 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <td><a href="../../wiki/DropDownButton">DropDownButton</a></td>
 </tr>
 <tr>
+<td>IconButton</td>
 <td><a href="../../wiki/IntegerUpDown">IntegerUpDown</a></td>
 <td><a href="../../wiki/LongUpDown">LongUpDown</a></td>
 <td><a href="../../wiki/Magnifier">Magnifier</a></td>
-<td><a href="../../wiki/MaskedTextBox">MaskedTextBox</a></td>
 </tr>
 <tr>
+<td><a href="../../wiki/MaskedTextBox">MaskedTextBox</a></td>
 <td><a href="../../wiki/MessageBox">MessageBox</a></td>
 <td><a href="../../wiki/MultiLineTextEditor">MultiLineTextEditor</a></td>
 <td><a href="../../wiki/PieChart">PieChart</a></td>
-<td><a href="../../wiki/PrimitiveTypeCollectionEditor">PrimitiveTypeCollEditor</a></td>
 </tr>
 <tr>
+<td><a href="../../wiki/PrimitiveTypeCollectionEditor">PrimitiveTypeCollEditor</a></td>
 <td><a href="../../wiki/PropertyGrid">PropertyGrid</a></td>
 <td><a href="../../wiki/RangeSlider">RangeSlider</a></td>
 <td><a href="../../wiki/RichTextBox">RichTextBox</a></td>
-<td><a href="../../wiki/RichTextBoxFormatBar">RichTextBoxFormatBar</a></td>
 </tr>
 <tr>
+<td><a href="../../wiki/RichTextBoxFormatBar">RichTextBoxFormatBar</a></td>
 <td><a href="../../wiki/ShortUpDown">ShortUpDown</a></td>
 <td><a href="../../wiki/SingleUpDown">SingleUpDown</a></td>
 <td><a href="../../wiki/SplitButton">SplitButton</a></td>
-<td><a href="../../wiki/SwitchPanel">SwitchPanel</a></td>
 </tr>
 <tr>
+<td><a href="../../wiki/SwitchPanel">SwitchPanel</a></td>
 <td><a href="../../wiki/TimelinePanel">TimelinePanel</a></td>
 <td><a href="../../wiki/TimePicker">TimePicker</a></td>
 <td><a href="../../wiki/TimeSpanUpDown">TimeSpanUpDown</a></td>
-<td><a href="../../wiki/ValueRangeTextBox">ValueRangeTextBox</a></td>
 </tr>
 <tr>
+<td><a href="../../wiki/ValueRangeTextBox">ValueRangeTextBox</a></td>
 <td><a href="../../wiki/WatermarkPasswordBox">WatermarkPasswordBox</a></td>
 <td><a href="../../wiki/WatermarkTextBox">WatermarkTextBox</a></td>
 <td><a href="../../wiki/WatermarkComboBox">WatermarkComboBox</a></td>
-<td><a href="../../wiki/WindowContainer">WindowContainer</a></td>
 </tr>
 <tr>
+<td><a href="../../wiki/WindowContainer">WindowContainer</a></td>
 <td><a href="../../wiki/WindowControl">WindowControl</a></td>
 <td><a href="../../wiki/Wizard">Wizard</a></td>
 <td><a href="../../wiki/Zoombox">Zoombox</a></td>
+</tr>
+<tr>
 <td><a href="">Windows 8 Theme</a></td>
 </tr>
 </table>
@@ -145,7 +148,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 
 ## Release history
 
-* **September 25, 2017, released v3.2.0 with [24 bug fixes and improvements](../../wiki/Improvements-in-v3.2.0).**
+* **September 25, 2017, released v3.2.0 with [1 new control and 24 bug fixes and improvements](../../wiki/Improvements-in-v3.2.0).**
 * September 12, 2017, released [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) v3.5.0 with [29 bug fixes and improvements](../../wiki/Improvements-in-v3.2.0#Plus350).
 * **July 11, 2017, released v3.1.0 with [37 bug fixes and improvements](../../wiki/Improvements-in-v3.1.0).**
 * **July 11, 2017, project moved to Github from Codeplex.** Over 440K downloads on Codeplex. 800K on NuGet. 
