@@ -177,7 +177,6 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 * Enjoy WPF!
 * Buy [Xceed Toolkit Plus for WPF](https://xceed.com/xceed-toolkit-plus-for-wpf/)
 * Follow [@datagrid](http://twitter.com/datagrid) on Twitter for WPF and Toolkit news
-* Like Xceed's [WPF page on Facebook](http://facebook.com/datagrids)
 * Add bugs or feature requests with the Issues tab
 <br>
 <br>
