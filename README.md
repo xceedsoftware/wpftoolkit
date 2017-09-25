@@ -146,7 +146,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 
 ## Release history
 
-* **July 11, 2017, released v3.1.0 with [37 bug fixes and improvements](http://wpftoolkit.codeplex.com/wikipage?title=Improvements310).**
+* **July 11, 2017, released v3.1.0 with [37 bug fixes and improvements](../../wiki/Improvements-in-v3.1.0).**
 * **July 11, 2017, project moved to Github from Codeplex.** Over 440K downloads on Codeplex. 800K on NuGet. 
 * June 5, 2017, released [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) v3.4.0 with [52 bug fixes and improvements](../../wiki/Improvements-in-v3.1.0#Plus340).
 * March 1, 2017, released [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) v3.3.0 with [45 bug fixes and improvements](../../wiki/Improvements-in-v3.1.0#Plus330).
