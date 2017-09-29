@@ -48,7 +48,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <td><a href="../../wiki/DropDownButton">DropDownButton</a></td>
 </tr>
 <tr>
-<td>IconButton</td>
+<td><a href="../../wiki/IconButton">IconButton</a></td>
 <td><a href="../../wiki/IntegerUpDown">IntegerUpDown</a></td>
 <td><a href="../../wiki/LongUpDown">LongUpDown</a></td>
 <td><a href="../../wiki/Magnifier">Magnifier</a></td>
