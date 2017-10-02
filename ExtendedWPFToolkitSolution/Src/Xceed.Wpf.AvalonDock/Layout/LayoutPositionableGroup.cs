@@ -88,16 +88,16 @@ namespace Xceed.Wpf.AvalonDock.Layout
             }
             set {
                 if (ForceFixedDockSize != value) {
-                    RaisePropertyChanging("HasFixedDockSize");
+                    RaisePropertyChanging("ForceFixedDockSize");
                     _forceFixedDockSize = value;
-                    RaisePropertyChanging("HasFixedDockSize");
+                    RaisePropertyChanging("ForceFixedDockSize");
 
-                    OnHasFixedDockSizeChanged();
+                    OnForceFixedDockSizeChanged();
                 }
             }
         }
 
-        protected virtual void OnHasFixedDockSizeChanged()
+        protected virtual void OnForceFixedDockSizeChanged()
         {
 
         }
