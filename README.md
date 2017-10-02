@@ -12,7 +12,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 
 **July 11, 2017:** The project's new home is Github. All issues from Codeplex are now located here.
 
-<a href=""><img src="https://user-images.githubusercontent.com/21266763/27752265-1db3056c-5dae-11e7-8ef4-9728f01494e7.png" width="172"/></a>
+<img src="https://user-images.githubusercontent.com/21266763/27752265-1db3056c-5dae-11e7-8ef4-9728f01494e7.png" width="172"/>
 
 ## Controls included
 
@@ -90,7 +90,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <td><a href="../../wiki/Zoombox">Zoombox</a></td>
 </tr>
 <tr>
-<td><a href="">Windows 8 Theme</a></td>
+<td>Windows 8 Theme</td>
 </tr>
 </table>
 
@@ -128,10 +128,10 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <td><a href="../../wiki/WindowControl-Plus">WindowControl Plus</a></td>
 </tr>
 <tr>
-<td><a href="">Windows 10 theme</a></td>
-<td><a href="">Metro theme</a></td>
-<td><a href="">Office theme</a></td>
-<td><a href="">1+ release ahead</a></td>
+<td>Windows 10 theme</td>
+<td>Metro theme</td>
+<td>Office theme</td>
+<td>1+ release ahead</td>
 </tr>
 </table>
 
@@ -140,9 +140,9 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <table>
 <tr>
 <td><a href="../../wiki/Advanced-DataGrid">Advanced DataGrid</a></td>
-<td><a href="">3D Views for WPF</a></td>
-<td><a href="">More themes</a></td>
-<td><a href="">All base WPF controls themed</a></td>
+<td>3D Views for WPF</td>
+<td>More themes</td>
+<td>All base WPF controls themed</td>
 </tr>
 </table>
 
