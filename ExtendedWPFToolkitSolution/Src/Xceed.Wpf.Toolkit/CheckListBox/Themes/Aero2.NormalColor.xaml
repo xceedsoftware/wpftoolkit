@@ -19,8 +19,12 @@
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit">
 
-    <Style TargetType="{x:Type local:CheckListBox}">
-       <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
+   <ResourceDictionary.MergedDictionaries>
+      <ResourceDictionary Source="../../FilterBox/Themes/Aero2.NormalColor.xaml" />
+   </ResourceDictionary.MergedDictionaries>
+
+   <Style TargetType="{x:Type local:CheckListBox}">
+        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
         <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="KeyboardNavigation.TabNavigation" Value="Once" />
@@ -29,7 +33,14 @@
                 <ControlTemplate TargetType="{x:Type local:CheckListBox}">
                     <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                         <ScrollViewer Padding="{TemplateBinding Padding}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                           <DockPanel>
+                              <local:FilterBox x:Name="PART_FilterBox"
+                                               DockPanel.Dock="Top"
+                                               Header="Type here to filter"
+                                               TargetControl="{Binding Path=., RelativeSource={RelativeSource TemplatedParent}}"
+                                               FilterTextBindingPath="{TemplateBinding DisplayMemberPath}" />
+                              <ItemsPresenter DockPanel.Dock="Top" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                           </DockPanel>
                         </ScrollViewer>
                     </Border>
                 </ControlTemplate>

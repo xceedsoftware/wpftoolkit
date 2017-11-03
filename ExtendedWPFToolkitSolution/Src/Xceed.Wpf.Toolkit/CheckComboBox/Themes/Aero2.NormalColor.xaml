@@ -21,6 +21,10 @@
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
                     xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes">
 
+   <ResourceDictionary.MergedDictionaries>
+      <ResourceDictionary Source="../../FilterBox/Themes/Aero2.NormalColor.xaml" />
+   </ResourceDictionary.MergedDictionaries>
+
    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
 
    <Geometry x:Key="DownArrowGeometry">M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z</Geometry>
@@ -50,8 +54,9 @@
                   <Grid>
                      <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition MinWidth="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}"
-                                          Width="0" />
+                        <ColumnDefinition
+                           MinWidth="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}"
+                           Width="0" />
                      </Grid.ColumnDefinitions>
 
                      <TextBox x:Name="TextBox"
@@ -93,8 +98,9 @@
                              TargetName="Arrow"
                              Value="#AFAFAF" />
                   </Trigger>
-                  <DataTrigger Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type local:CheckComboBox}}}"
-                               Value="True">
+                  <DataTrigger
+                     Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type local:CheckComboBox}}}"
+                     Value="True">
                      <Setter Property="IsReadOnly"
                              Value="False"
                              TargetName="TextBox" />
@@ -165,18 +171,25 @@
                                                Height="{Binding ActualHeight, ElementName=DropDownBorder}"
                                                Width="{Binding ActualWidth, ElementName=DropDownBorder}" />
                                  </Canvas>
-                                 <ItemsPresenter x:Name="PART_ItemsPresenter"
-                                                 KeyboardNavigation.DirectionalNavigation="Contained"
-                                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                 <DockPanel>
+                                    <local:FilterBox x:Name="PART_FilterBox"
+                                                     DockPanel.Dock="Top"
+                                                     Header="Type here to filter"
+                                                     TargetControl="{Binding Path=., RelativeSource={RelativeSource TemplatedParent}}"
+                                                     FilterTextBindingPath="{TemplateBinding DisplayMemberPath}" />
+                                    <ItemsPresenter x:Name="PART_ItemsPresenter"
+                                                    KeyboardNavigation.DirectionalNavigation="Contained"
+                                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                 </DockPanel>
                               </Grid>
                            </ScrollViewer>
                         </Border>
                      </Grid>
                   </Popup>
 
-                  <Border  Background="{TemplateBinding Background}"
-                           BorderBrush="{TemplateBinding BorderBrush}"
-                           BorderThickness="{TemplateBinding BorderThickness}" />
+                  <Border Background="{TemplateBinding Background}"
+                          BorderBrush="{TemplateBinding BorderBrush}"
+                          BorderThickness="{TemplateBinding BorderThickness}" />
                   <ToggleButton x:Name="PART_DropDownButton"
                                 Content="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                                 BorderBrush="{TemplateBinding BorderBrush}"

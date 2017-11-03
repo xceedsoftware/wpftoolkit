@@ -49,6 +49,7 @@
                <RowDefinition />
                <RowDefinition />
                <RowDefinition />
+               <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="Auto"/>
@@ -98,6 +99,16 @@
                      HorizontalAlignment="Left"
                      IsEnabled="False"
                      Text="IsSelected" />
+
+            <TextBlock Grid.Row="4" Grid.Column="0" 
+                       Text="AllowFilter:" 
+                       Margin="2,5,5,5"/>
+            <CheckBox x:Name="_isAllowFilter" 
+                      Grid.Row="4" Grid.Column="1"
+                      Margin="5"
+                      HorizontalAlignment="Left"
+                      ClickMode="Press"
+                      IsChecked="False" />
 
             <TextBlock Grid.Row="0" Grid.Column="2" 
                        Text="DisplayMemberPath:" 
@@ -151,8 +162,7 @@
       </GroupBox>
 
       <GroupBox Header="Item Models" Grid.Row="1" Margin="5">
-         <ListBox DisplayMemberPath="ModelDisplay" FontFamily="Global Monospace"
-                  ItemsSource="{Binding}"/>
+         <ListBox x:Name="_itemModels" DisplayMemberPath="ModelDisplay" FontFamily="Global Monospace"/>
       </GroupBox>
 
       <Grid Grid.Row="2">
@@ -171,11 +181,11 @@
                             Grid.Row="1"
                             Margin="5"
                             VerticalAlignment="Stretch"
-                            ItemsSource="{Binding}"
                             Delimiter="{Binding ElementName=_delimiter, Path=Text}"
                             ValueMemberPath="{Binding ElementName=_valueMemberPath, Path=SelectedItem}"
                             SelectedMemberPath="{Binding ElementName=_selectedMemberPath, Path=Text}"
-                            DisplayMemberPath="{Binding ElementName=_displayMemberPath, Path=SelectedItem}" />
+                            DisplayMemberPath="{Binding ElementName=_displayMemberPath, Path=SelectedItem}"
+                            AllowFilter="{Binding ElementName=_isAllowFilter, Path=IsChecked}" />
 
          <TextBlock Text="CheckComboBox Usage:" Grid.Column="1" Margin="5" Style="{StaticResource Header}"/>
          <xctk:CheckComboBox Grid.Column="1"
@@ -183,11 +193,11 @@
                              Grid.Row="1"
                              Margin="5"
                              VerticalAlignment="Top"
-                             ItemsSource="{Binding}"
                              Delimiter="{Binding ElementName=_delimiter, Path=Text}"
                              ValueMemberPath="{Binding ElementName=_valueMemberPath, Path=SelectedItem}"
                              SelectedMemberPath="{Binding ElementName=_selectedMemberPath, Path=Text}"
                              DisplayMemberPath="{Binding ElementName=_displayMemberPath, Path=SelectedItem}" 
+                             AllowFilter="{Binding ElementName=_isAllowFilter, Path=IsChecked}" 
                              IsEditable="False"
                              IsDropDownOpen="false"
                              MaxDropDownHeight="100"/>

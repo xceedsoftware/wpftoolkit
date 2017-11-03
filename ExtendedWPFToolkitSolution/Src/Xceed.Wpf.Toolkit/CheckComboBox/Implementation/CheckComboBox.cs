@@ -5,7 +5,7 @@
    Copyright (C) 2007-2013 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at http://xceed.com/wpf_toolkit
@@ -18,26 +18,28 @@ using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Xceed.Wpf.Toolkit.Primitives;
-using Xceed.Wpf.Toolkit.Core.Utilities;
-using System.Windows.Controls;
-using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Controls.Primitives;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
+
   [TemplatePart( Name = PART_Popup, Type = typeof( Popup ) )]
+  [TemplatePart(Name = PART_FilterBox, Type = typeof(FilterBox))]
   public class CheckComboBox : Xceed.Wpf.Toolkit.Primitives.Selector
   {
     private const string PART_Popup = "PART_Popup";
+    private const string PART_FilterBox = "PART_FilterBox";
 
     #region Members
 
-    private ValueChangeHelper _displayMemberPathValuesChangeHelper;
+    private readonly ValueChangeHelper _displayMemberPathValuesChangeHelper;
     private bool _ignoreTextValueChanged;
     private Popup _popup;
-    private List<object> _initialValue = new List<object>();
+    private FilterBox _filterBox;
+    private readonly List<object> _initialValue = new List<object>();
+    private bool _allowFilter;
 
     #endregion
 
@@ -179,6 +181,48 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion
 
+    #region AllowFilter
+    public static readonly DependencyProperty AllowFilterProperty = DependencyProperty.Register(
+      "AllowFilter",
+      typeof(bool),
+      typeof(CheckComboBox),
+      new UIPropertyMetadata(true, AllowFilterChanged));
+
+    private static void AllowFilterChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+      var selector = d as CheckComboBox;
+      if (selector != null)
+        selector.AllowFilterChanged((bool) e.NewValue);
+    }
+
+    protected void AllowFilterChanged(bool value)
+    {
+      _allowFilter = value;
+      if (_filterBox != null)
+      {
+        SetFilter(value);
+      }
+    }
+
+    public bool AllowFilter
+    {
+      get
+      {
+        return (bool)GetValue(AllowFilterProperty);
+      }
+      set
+      {
+        SetValue(AllowFilterProperty, value);
+      }
+    }
+
+    private void SetFilter(bool value)
+    {
+      _filterBox.Clear(false);
+      _filterBox.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+    }
+    #endregion //AllowFilter
+
     #endregion //Properties
 
     #region Base Class Overrides
@@ -212,6 +256,9 @@ namespace Xceed.Wpf.Toolkit
 
       if( _popup != null )
         _popup.Opened += Popup_Opened;
+
+      _filterBox = GetTemplateChild( PART_FilterBox ) as FilterBox;
+      SetFilter(_allowFilter);
     }
 
     #endregion //Base Class Overrides
@@ -273,7 +320,7 @@ namespace Xceed.Wpf.Toolkit
     protected virtual void UpdateText()
     {
 #if VS2008
-      string newValue = String.Join( Delimiter, SelectedItems.Cast<object>().Select( x => GetItemDisplayValue( x ).ToString() ).ToArray() ); 
+      string newValue = String.Join( Delimiter, SelectedItems.Cast<object>().Select( x => GetItemDisplayValue( x ).ToString() ).ToArray() );
 #else
       string newValue = String.Join( Delimiter, SelectedItems.Cast<object>().Select( x => GetItemDisplayValue( x ) ) );
 #endif
