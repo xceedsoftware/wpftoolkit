@@ -295,7 +295,7 @@ namespace Xceed.Wpf.AvalonDock
                 SetupAutoHideWindow();
 
                 //load windows not already loaded!
-                foreach (var fw in Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)))
+                foreach (var fw in Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)).ToArray())
                     _fwList.Add(CreateUIElementForModel(fw) as LayoutFloatingWindowControl);
 
                 //create the overlaywindow if it's possible
