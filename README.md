@@ -4,7 +4,7 @@ Extended WPF Toolkit™ by [Xceed](https://xceed.com) is the number one collecti
 
 This free and open source toolkit is provided under the [Microsoft Public License](https://opensource.org/licenses/MS-PL). A summary can be found on [tl;drLegal](https://tldrlegal.com/license/microsoft-public-license-(ms-pl)).
 
-<a href="../../wiki/Xceed-Toolkit-Plus-for-WPF"><img align="right" src="https://user-images.githubusercontent.com/21266763/27969643-a5977614-6319-11e7-828e-b40fd1f8a283.png" width="233" style="margin:0px 30px" alt="Learn about Xceed Toolkit Plus for WPF here on Github"></a>Xceed offers the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) for developers that want to support the project, get additional controls and features, get updates and professional support, and have a version at least one release ahead.
+<a href="../../wiki/Xceed-Toolkit-Plus-for-WPF"><img align="right" src="https://user-images.githubusercontent.com/21266763/27969643-a5977614-6319-11e7-828e-b40fd1f8a283.png" width="233" style="margin:0px 30px" alt="Learn about Xceed Toolkit Plus for WPF here on Github"></a>Xceed offers the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) for developers that want to support the project, get additional controls and features, get updates and professional support, and work with a version at least one release ahead.
 
 ## Latest news
 
