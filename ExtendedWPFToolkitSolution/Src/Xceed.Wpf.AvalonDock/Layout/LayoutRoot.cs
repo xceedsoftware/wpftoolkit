@@ -678,62 +678,65 @@ namespace Xceed.Wpf.AvalonDock.Layout
             return;
           }
 
-          var layoutPanelElements = ReadRootPanel( reader );
-          if( layoutPanelElements != null )
-          {
-            //Create the RootPanel with the first child
-            RootPanel = new LayoutPanel( layoutPanelElements.First() );
-            //Add all children to RootPanel
-            for( int i = 1; i < layoutPanelElements.Count; ++i )
-            {
-              RootPanel.Children.Add( layoutPanelElements[ i ] );
-            }
-          }
+          RootPanel = ReadRootPanel( reader );
 
           TopSide = ( LayoutAnchorSide )ReadElement( reader );
           if( TopSide != null )
           {
-            TopSide.Children.Add( ( LayoutAnchorGroup )ReadElement( reader ) );
+            foreach(var g in ReadElements<LayoutAnchorGroup>(reader))
+              TopSide.Children.Add( g );
             reader.Read();
+          } else {
+            TopSide = new LayoutAnchorSide();
           }
+
           RightSide = ( LayoutAnchorSide )ReadElement( reader );
           if( RightSide != null )
           {
-            RightSide.Children.Add( ( LayoutAnchorGroup )ReadElement( reader ) );
+            foreach(var g in ReadElements<LayoutAnchorGroup>(reader))
+              RightSide.Children.Add( g );
             reader.Read();
+          } else {
+            RightSide = new LayoutAnchorSide();
           }
+
           LeftSide = ( LayoutAnchorSide )ReadElement( reader );
           if( LeftSide != null )
           {
-            LeftSide.Children.Add( ( LayoutAnchorGroup )ReadElement( reader ) );
+            foreach(var g in ReadElements<LayoutAnchorGroup>(reader))
+              LeftSide.Children.Add( g );
             reader.Read();
+          } else {
+            LeftSide = new LayoutAnchorSide();
           }
+
           BottomSide = ( LayoutAnchorSide )ReadElement( reader );
           if( BottomSide != null )
           {
-            BottomSide.Children.Add( ( LayoutAnchorGroup )ReadElement( reader ) );
+            foreach(var g in ReadElements<LayoutAnchorGroup>(reader))
+              BottomSide.Children.Add( g );
             reader.Read();
+          } else {
+            BottomSide = new LayoutAnchorSide();
           }
 
           FloatingWindows.Clear();
-          var floatingWindows = ReadElementList( reader );
+          var floatingWindows = ReadElementList<LayoutFloatingWindow>( reader );
           foreach( var floatingWindow in floatingWindows )
           {
-            FloatingWindows.Add( ( LayoutFloatingWindow )floatingWindow );
+            FloatingWindows.Add( floatingWindow );
           }
 
           Hidden.Clear();
-          var hidden = ReadElementList( reader );
+          var hidden = ReadElementList<LayoutAnchorable>( reader );
           foreach( var hiddenObject in hidden )
           {
-            Hidden.Add( ( LayoutAnchorable )hiddenObject );
+            Hidden.Add( hiddenObject );
           }
         }
 
-        private List<ILayoutPanelElement> ReadRootPanel( XmlReader reader )
+        private LayoutPanel ReadRootPanel( XmlReader reader )
         {
-          var result = new List<ILayoutPanelElement>();
-
           var startElementName = reader.LocalName;
           reader.Read();
           if( reader.LocalName.Equals(startElementName) && (reader.NodeType == XmlNodeType.EndElement) )
@@ -746,33 +749,36 @@ namespace Xceed.Wpf.AvalonDock.Layout
             reader.Read();
           }
 
+          LayoutPanel rootPanel = null;
           if( reader.LocalName.Equals("RootPanel"))
           {
-            reader.Read();
-
-            while( true )
-            {
-              //Read all RootPanel children
-              var element = ReadElement( reader ) as ILayoutPanelElement;
-              if( element != null )
-              {
-                result.Add( element );
-              }
-              else if( reader.NodeType == XmlNodeType.EndElement )
-              {
-                break;
-              }
-            }
+            rootPanel = ReadElement( reader ) as LayoutPanel;
+          } else {
+            reader.ReadInnerXml();
           }
 
-          reader.ReadEndElement();
-
-          return result;
+          return rootPanel;
         }
 
-        private List<object> ReadElementList( XmlReader reader )
+        private List<T> ReadElements<T>(XmlReader reader) where T : class 
         {
-          var resultList = new List<object>();
+          var resultList = new List<T>();
+
+          while(true) {
+            var result = ReadElement(reader) as T;
+            if(result == null) {
+              break;
+            }
+
+            resultList.Add(result);
+          }
+
+          return resultList;
+        }
+
+        private List<T> ReadElementList<T>( XmlReader reader ) where T: class
+        {
+          var resultList = new List<T>();
 
           if( reader.IsEmptyElement )
           {
@@ -784,7 +790,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
           reader.Read();
           if( reader.LocalName.Equals(startElementName) && (reader.NodeType == XmlNodeType.EndElement) )
           {
-            return null;
+            return resultList;
           }
 
           while( reader.NodeType == XmlNodeType.Whitespace )
@@ -792,16 +798,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
             reader.Read();
           }
 
-          while( true )
-          {
-            var result = ReadElement( reader ) as LayoutFloatingWindow;
-            if( result == null )
-            {
-              break;
-            }
-
-            resultList.Add( result );
-          }
+          resultList = ReadElements<T>(reader);
 
           reader.ReadEndElement();
 
@@ -823,6 +820,9 @@ namespace Xceed.Wpf.AvalonDock.Layout
           XmlSerializer serializer;
           switch( reader.LocalName )
           {
+            case "RootPanel":
+              serializer = new XmlSerializer( typeof( LayoutPanel ), new XmlRootAttribute("RootPanel") );
+              break;
             case "LayoutAnchorablePaneGroup":
               serializer = new XmlSerializer( typeof( LayoutAnchorablePaneGroup ) );
               break;
