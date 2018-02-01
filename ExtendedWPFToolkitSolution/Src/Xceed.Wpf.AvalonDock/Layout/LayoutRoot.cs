@@ -792,21 +792,31 @@ namespace Xceed.Wpf.AvalonDock.Layout
             reader.Read();
           }
 
-          while( true )
-          {
-            var result = ReadElement( reader ) as LayoutFloatingWindow;
-            if( result == null )
-            {
-              break;
-            }
+          bool done = false;
 
-            resultList.Add( result );
+          while(!done)
+          {
+            var element = ReadElement(reader);
+
+            switch (element)
+            {
+                case LayoutFloatingWindow w:
+                    resultList.Add(element);
+                    break;
+                case LayoutAnchorable a:
+                    resultList.Add(element);
+                    break;
+                default:
+                    done = true;
+                    break;
+            }
           }
 
           reader.ReadEndElement();
 
           return resultList;
         }
+        
 
         private object ReadElement( XmlReader reader )
         {
@@ -924,11 +934,13 @@ namespace Xceed.Wpf.AvalonDock.Layout
             writer.WriteEndElement();
           }
           writer.WriteEndElement();
-
-          writer.WriteStartElement( "Hidden" );
-          foreach( var layoutAnchorable in Hidden )
+            
+          writer.WriteStartElement("Hiddens");
+          foreach (var layoutAnchorable in Hidden)
           {
-            layoutAnchorable.WriteXml( writer );
+            writer.WriteStartElement(layoutAnchorable.GetType().Name);
+            layoutAnchorable.WriteXml(writer);
+            writer.WriteEndElement();
           }
           writer.WriteEndElement();
         }
