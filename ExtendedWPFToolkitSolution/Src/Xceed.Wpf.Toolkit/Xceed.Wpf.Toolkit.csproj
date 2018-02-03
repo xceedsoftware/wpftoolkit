@@ -393,6 +393,14 @@
     <Compile Include="BusyIndicator\Implementation\Converters\ProgressBarWidthConverter.cs" />
     <Compile Include="ColorPicker\Implementation\ColorPickerTabItem.cs" />
     <Compile Include="Core\Converters\ColorModeToTabItemSelectedConverter.cs" />
+    <Compile Include="Core\Html\CssStylesheet.cs" />
+    <Compile Include="Core\Html\HtmlCSSParser.cs" />
+    <Compile Include="Core\Html\HtmlFromXamlConverter.cs" />
+    <Compile Include="Core\Html\HtmlLexicalAnalyzer.cs" />
+    <Compile Include="Core\Html\HtmlParser.cs" />
+    <Compile Include="Core\Html\HtmlSchema.cs" />
+    <Compile Include="Core\Html\HtmlTokenType.cs" />
+    <Compile Include="Core\Html\HtmlToXamlConverter.cs" />
     <Compile Include="Core\LocationEnum.cs" />
     <Compile Include="IconButton\Implementation\IconButton.cs" />
     <Compile Include="ButtonSpinner\Implementation\ButtonSpinner.cs" />
@@ -631,6 +639,7 @@
     <Compile Include="RichTextBoxFormatBar\RichTextBoxFormatBar.cs" />
     <Compile Include="RichTextBoxFormatBar\RichTextBoxFormatBarManager.cs" />
     <Compile Include="Core\UIElementAdorner.cs" />
+    <Compile Include="RichTextBox\Formatters\HtmlFormatter.cs" />
     <Compile Include="RichTextBox\Formatters\ITextFormatter.cs" />
     <Compile Include="RichTextBox\Formatters\PlainTextFormatter.cs" />
     <Compile Include="RichTextBox\Formatters\RtfFormatter.cs" />

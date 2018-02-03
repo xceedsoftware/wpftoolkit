@@ -35,16 +35,5 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     }
   }
 
-#if !OPEN_SOURCE
-  public struct Coords
-  {
-    public int X { get; set; }
-    public int Y { get; set; }
 
-    public override string ToString()
-    {
-      return string.Format( "{0}, {1}", X, Y );
-    }
-  }
-#endif
 }

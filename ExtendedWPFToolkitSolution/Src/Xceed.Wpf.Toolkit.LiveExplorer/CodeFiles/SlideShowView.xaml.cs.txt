@@ -38,29 +38,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.SlideShow.Views
         {
             InitializeComponent();
 
-#if !OPEN_SOURCE            
 
-            ObservableCollection<PictureItem> pictures = new ObservableCollection<PictureItem>();
-            for (int i = 1; i <= 9; i++)
-            {
-                BitmapImage image = new BitmapImage();
-                image.BeginInit();
-                string filename = ("pack://application:,,,/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/SlideShow/Resources/photo_" + i + ".jpg");
-                image.UriSource = new Uri(filename, UriKind.RelativeOrAbsolute);
-                pictures.Add(new PictureItem("Picture " + i , image));
-                image.EndInit();
-            }
-            foreach (PictureItem picItem in pictures)
-            {
-                SlideShowItem aSlideShowItem = new SlideShowItem();
-                Image image = new Image();
-                image.Source = picItem.Photo;
-                image.Stretch = Stretch.Fill;
-                aSlideShowItem.Item = image;
-                aSlideShowItem.Description = picItem.Description;
-                _slideShow.Items.Add(aSlideShowItem);
-            }
-#endif
         }
 
     }

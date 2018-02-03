@@ -39,9 +39,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     public PropertyGridMultiSelectedObjectsView()
     {
       InitializeComponent();
-#if !OPEN_SOURCE
-      _propertyGrid.SelectedObjectsOverride = new List<object>() { _textBox, _button, _comboBox };
-#endif
     }
   }
 }

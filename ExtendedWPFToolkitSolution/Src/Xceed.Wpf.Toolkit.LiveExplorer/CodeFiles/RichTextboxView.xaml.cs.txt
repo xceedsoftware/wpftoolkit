@@ -27,7 +27,8 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Text.Views
   {
     PlainText,
     Rtf,
-    Xaml
+    Xaml,
+    Html
   };
 
   /// <summary>
@@ -62,6 +63,10 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Text.Views
         else if( object.Equals( TextFormatterEnum.Xaml, tagValue ) )
         {
           _richTextBox.TextFormatter = new XamlFormatter();
+        }
+        else if (object.Equals(TextFormatterEnum.Html, tagValue))
+        {
+          _richTextBox.TextFormatter = new HtmlFormatter();
         }
       }
     }

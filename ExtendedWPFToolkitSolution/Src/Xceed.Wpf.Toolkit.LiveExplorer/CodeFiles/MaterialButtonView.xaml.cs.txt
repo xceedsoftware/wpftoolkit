@@ -31,13 +31,5 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.MaterialControls.Views
       InitializeComponent();
     }
 
-#if !OPEN_SOURCE
-    private void ModeComboBox_SelectionChanged( object sender, SelectionChangedEventArgs e )
-    {
-      materialButton.Content = e.AddedItems[ 0 ].Equals( MaterialButtonModeEnum.Circle )
-                                ? ((ComboBoxItem)contentComboBox.Items.GetItemAt( 1 )).Tag
-                                : ((ComboBoxItem)contentComboBox.Items.GetItemAt( 0 )).Tag;
-    }
-#endif
   }
 }

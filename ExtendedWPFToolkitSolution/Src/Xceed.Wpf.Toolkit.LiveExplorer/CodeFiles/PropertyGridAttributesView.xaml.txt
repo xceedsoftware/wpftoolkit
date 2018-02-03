@@ -71,7 +71,7 @@
          LocalizedDescriptionAttribute
       </Paragraph>
     </local:DemoView.Description>
-    
+
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
@@ -89,11 +89,11 @@
                     FontStyle="Italic"
                     Margin="0,10,0,0"/>
       </StackPanel>
-      
+
       <xctk:PropertyGrid Grid.Row="1" x:Name="_propertyGrid" Width="450" MaxHeight="650" Margin="10" 
                          SelectedObject="{Binding}"
                          ShowDescriptionByTooltip="True">
       </xctk:PropertyGrid>      
-      
+
    </Grid>
 </local:DemoView>

@@ -40,7 +40,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
     {
       InitializeComponent();
 
-      //# Use translucent colors in the Available Colors Tab from ColorPicker
       ObservableCollection<ColorItem> alphaAvailableColors = new ObservableCollection<ColorItem>();
       foreach( ColorItem item in _modalBackgroundColorPicker.AvailableColors )
       {

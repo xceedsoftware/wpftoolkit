@@ -24,7 +24,7 @@
             This example demonstrates how to define your own custom content. This is done by setting the BusyContent property.
         </Paragraph>
     </local:DemoView.Description>
-    
+
    <local:DemoView.Resources>
       <ResourceDictionary>
          <ResourceDictionary.MergedDictionaries>
