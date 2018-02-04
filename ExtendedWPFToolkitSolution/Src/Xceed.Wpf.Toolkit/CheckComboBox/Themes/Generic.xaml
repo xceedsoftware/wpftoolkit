@@ -20,6 +20,10 @@
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
                     xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes">
 
+   <ResourceDictionary.MergedDictionaries>
+      <ResourceDictionary Source="../../FilterBox/Themes/Genreric.xaml" />
+   </ResourceDictionary.MergedDictionaries>
+
    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
 
    <SolidColorBrush x:Key="ButtonNormalBorder"
@@ -167,9 +171,16 @@
                                                Height="{Binding ActualHeight, ElementName=DropDownBorder}"
                                                Width="{Binding ActualWidth, ElementName=DropDownBorder}" />
                                  </Canvas>
-                                 <ItemsPresenter x:Name="PART_ItemsPresenter"
-                                                 KeyboardNavigation.DirectionalNavigation="Contained"
-                                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                 <DockPanel>
+                                    <local:FilterBox x:Name="PART_FilterBox"
+                                                     DockPanel.Dock="Top"
+                                                     Header="Type here to filter"
+                                                     TargetControl="{Binding Path=., RelativeSource={RelativeSource TemplatedParent}}"
+                                                     FilterTextBindingPath="{TemplateBinding DisplayMemberPath}" />
+                                    <ItemsPresenter x:Name="PART_ItemsPresenter"
+                                                    KeyboardNavigation.DirectionalNavigation="Contained"
+                                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                 </DockPanel>
                               </Grid>
                            </ScrollViewer>
                         </Border>

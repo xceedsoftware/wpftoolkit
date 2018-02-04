@@ -15,7 +15,6 @@
   *************************************************************************************/
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.CheckLists.Views
@@ -28,20 +27,26 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.CheckLists.Views
     public CheckListsView()
     {
       InitializeComponent();
-      this.DataContext = new List<Person>()
-      {
-        new Person(){ID=101, FirstName="John", LastName="Smith"},
-        new Person(){ID=102, FirstName="Janel", LastName="Leverling"},
-        new Person(){ID=103, FirstName="Laura", LastName="Callahan"},
-        new Person(){ID=104, FirstName="Robert", LastName="King"},
-        new Person(){ID=105, FirstName="Margaret", LastName="Peacock"},
-        new Person(){ID=106, FirstName="Andrew", LastName="Fuller"},
-        new Person(){ID=107, FirstName="Anne", LastName="Dodsworth"},
-        new Person(){ID=108, FirstName="Nancy", LastName="Davolio"},
-        new Person(){ID=109, FirstName="Naomi", LastName="Suyama"},
-      };
+      _itemModels.ItemsSource = GetData();
+      _checkListBox.ItemsSource = GetData();
+      _checkComboBox.ItemsSource = GetData();
     }
 
+    private static List<Person> GetData()
+    {
+      return new List<Person>
+      {
+        new Person {ID=101, FirstName="John", LastName="Smith"},
+        new Person {ID=102, FirstName="Janel", LastName="Leverling"},
+        new Person {ID=103, FirstName="Laura", LastName="Callahan"},
+        new Person {ID=104, FirstName="Robert", LastName="King"},
+        new Person {ID=105, FirstName="Margaret", LastName="Peacock"},
+        new Person {ID=106, FirstName="Andrew", LastName="Fuller"},
+        new Person {ID=107, FirstName="Anne", LastName="Dodsworth"},
+        new Person {ID=108, FirstName="Nancy", LastName="Davolio"},
+        new Person {ID=109, FirstName="Naomi", LastName="Suyama"},
+      };
+    }
   }
 
   public class Person : INotifyPropertyChanged

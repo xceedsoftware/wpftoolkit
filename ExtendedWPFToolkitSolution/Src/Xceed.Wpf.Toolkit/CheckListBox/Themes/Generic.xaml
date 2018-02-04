@@ -18,6 +18,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit">
 
+   <ResourceDictionary.MergedDictionaries>
+      <ResourceDictionary Source="../../FilterBox/Themes/Genreric.xaml" />
+   </ResourceDictionary.MergedDictionaries>
+
    <Style TargetType="{x:Type local:CheckListBox}">
       <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
       <Setter Property="BorderBrush" Value="#FF707070" />
@@ -30,7 +34,14 @@
                        BorderBrush="{TemplateBinding BorderBrush}"
                        BorderThickness="{TemplateBinding BorderThickness}">
                   <ScrollViewer Padding="{TemplateBinding Padding}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                     <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                     <DockPanel>
+                        <local:FilterBox x:Name="PART_FilterBox"
+                                         DockPanel.Dock="Top"
+                                         Header="Type here to filter"
+                                         TargetControl="{Binding Path=., RelativeSource={RelativeSource TemplatedParent}}"
+                                         FilterTextBindingPath="{TemplateBinding DisplayMemberPath}" />
+                        <ItemsPresenter DockPanel.Dock="Top" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                     </DockPanel>
                   </ScrollViewer>
                </Border>
             </ControlTemplate>
