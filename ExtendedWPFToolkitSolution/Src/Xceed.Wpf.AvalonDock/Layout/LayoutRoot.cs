@@ -703,6 +703,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
             var hidden = ReadElementList(reader);
             foreach (var hiddenObject in hidden)
             {
+
                 Hidden.Add((LayoutAnchorable)hiddenObject);
             }
         }
@@ -917,7 +918,9 @@ namespace Xceed.Wpf.AvalonDock.Layout
             writer.WriteStartElement("Hidden");
             foreach (var layoutAnchorable in Hidden)
             {
+                writer.WriteStartElement(layoutAnchorable.GetType().Name);
                 layoutAnchorable.WriteXml(writer);
+                writer.WriteEndElement();
             }
             writer.WriteEndElement();
         }
