@@ -33,7 +33,7 @@ namespace Xceed.Wpf.Toolkit
       using( MemoryStream ms = new MemoryStream() )
       {
         tr.Save( ms, DataFormats.Xaml );
-        return ASCIIEncoding.Default.GetString( ms.ToArray() );
+        return Encoding.UTF8.GetString( ms.ToArray() );
       }
     }
 
@@ -50,7 +50,7 @@ namespace Xceed.Wpf.Toolkit
         else
         {
           TextRange tr = new TextRange( document.ContentStart, document.ContentEnd );
-          using( MemoryStream ms = new MemoryStream( Encoding.ASCII.GetBytes( text ) ) )
+          using( MemoryStream ms = new MemoryStream( Encoding.UTF8.GetBytes( text ) ) )
           {
             tr.Load( ms, DataFormats.Xaml );
           }

@@ -16,14 +16,14 @@ namespace Xceed.Wpf.Toolkit.Tests
 
         public FlowDocument CreateSimpleFlowDocument()
         {
-            var r = new Run("Hallo Welt!");
+            var r = new Run("Hallo Welt! ÄÖÜ äöü ^ \" ß ' & <>");
             var b = new Bold(r);
             var p = new Paragraph(b);
             return  new FlowDocument(p);
         }
 
         public string CreateSimpleHtml() =>
-            "<html><body><p><b>Hallo Welt!</b></p><body></html>";
+            "<html><body><p><b>Hallo Welt! &#196;&#214;&#220; &#228;&#246;&#252; ^ &quot; &#223; &#39; &amp; &lt;&gt;</b></p><body></html>";
 
         [Test]
         public void GetText_ShouldReturnAHtmlText()
@@ -33,7 +33,7 @@ namespace Xceed.Wpf.Toolkit.Tests
 
             var actual = sut.GetText(doc);
 
-            const string expectedText = "Hallo Welt!";
+            const string expectedText = "Hallo Welt! &#196;&#214;&#220; &#228;&#246;&#252; ^ &quot; &#223; &#39; &amp; &lt;&gt;";
             const string expectedBoldStyle = "bold";
             const string expectedHtmlTag = "<html>";
 
@@ -56,7 +56,7 @@ namespace Xceed.Wpf.Toolkit.Tests
 
             var actual = new XamlFormatter().GetText(doc);
 
-            const string expectedText = "Hallo Welt!";
+            const string expectedText = "Hallo Welt! ÄÖÜ äöü ^ \" ß ' &amp; &lt;&gt;";
             const string expectedBoldStyle = "Bold";
             const string expectedSection = "Section";
 

@@ -395,6 +395,7 @@
     <Compile Include="Core\Converters\ColorModeToTabItemSelectedConverter.cs" />
     <Compile Include="Core\Html\CssStylesheet.cs" />
     <Compile Include="Core\Html\HtmlCSSParser.cs" />
+    <Compile Include="Core\Html\HtmlEncodedTextWriter.cs" />
     <Compile Include="Core\Html\HtmlFromXamlConverter.cs" />
     <Compile Include="Core\Html\HtmlLexicalAnalyzer.cs" />
     <Compile Include="Core\Html\HtmlParser.cs" />
