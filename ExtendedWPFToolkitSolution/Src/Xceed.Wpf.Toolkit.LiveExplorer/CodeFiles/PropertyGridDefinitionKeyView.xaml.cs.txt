@@ -28,26 +28,8 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     public PropertyGridDefinitionKeyView()
     {
       InitializeComponent();
-#if !OPEN_SOURCE      
-      var person = new Person();
-      person.FirstName = "John";
-      person.LastName = "Smith";
-      person.ReferenceNo = 252521;
 
-      this.DataContext = person;
-#endif
     }
 
-#if !OPEN_SOURCE
-    private class Person
-    {
-      [DefinitionKey( "nameType" )]
-      public string FirstName { get; set; }
-      [DefinitionKey( "nameType" )]
-      public string LastName { get; set; }
-      [DefinitionKey( typeof( int? ) )]
-      public object ReferenceNo { get; set; }
-    }
-#endif
   }
 }

@@ -39,7 +39,7 @@
             </Trigger>
          </Style.Triggers>
       </Style>
-      
+
       <ObjectDataProvider x:Key="ColorModeOptions" MethodName="GetValues"
                           ObjectType="{x:Type sys:Enum}">
          <ObjectDataProvider.MethodParameters>

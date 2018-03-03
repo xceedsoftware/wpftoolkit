@@ -27,7 +27,7 @@
             The DateTimePicker and TimePicker controls let you select the date and the time in several ways. The TimePicker is used in the DateTimePicker.
         </Paragraph>
     </local:DemoView.Description>
-    
+
     <local:DemoView.Resources>
       <conv:DateTimeToTimeSpanConverter x:Key="dateTimeToTimeSpanConverter" />
       <conv:CustomFormatToBoolConverter x:Key="CustomFormatToBoolConverter" />

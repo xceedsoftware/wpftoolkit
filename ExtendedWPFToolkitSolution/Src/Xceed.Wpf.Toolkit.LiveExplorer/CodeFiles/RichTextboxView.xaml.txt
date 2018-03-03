@@ -27,7 +27,7 @@
            The RichTextBox is a TextBox that allows you to edit formatted text based on TextFormatters. The RichTextBoxFormatBar is a contextual formatting toolbar that mimics the behavior of the Microsoft Office 2010 formatting bar on selection.
         </Paragraph>
     </local:DemoView.Description>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -49,6 +49,7 @@
                     <ComboBoxItem Tag="{x:Static rich:TextFormatterEnum.PlainText}">Plain Text</ComboBoxItem>
                     <ComboBoxItem Tag="{x:Static rich:TextFormatterEnum.Rtf}">RTF</ComboBoxItem>
                     <ComboBoxItem Tag="{x:Static rich:TextFormatterEnum.Xaml}">Xaml</ComboBoxItem>
+                    <ComboBoxItem Tag="{x:Static rich:TextFormatterEnum.Html}">Html</ComboBoxItem>
                 </ComboBox>
                 <TextBlock Text="Text:" Grid.Row="1" VerticalAlignment="Center"/>
                 <TextBox x:Name="_text" Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True" Width="500" Height="70" Margin="5" ScrollViewer.VerticalScrollBarVisibility="Auto"

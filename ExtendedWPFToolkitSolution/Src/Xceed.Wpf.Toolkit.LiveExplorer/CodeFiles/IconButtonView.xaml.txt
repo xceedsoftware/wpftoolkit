@@ -29,7 +29,7 @@
 
    <local:DemoView.Resources>
       <xctk:SolidColorBrushToColorConverter x:Key="SolidColorBrushToColorConverter" />
-      
+
       <Image x:Key="Image1"
              Source="../Resources/PencilTool16.png"
              Width="20"
@@ -47,7 +47,7 @@
          </ObjectDataProvider.MethodParameters>
       </ObjectDataProvider>
    </local:DemoView.Resources>
-    
+
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
@@ -96,7 +96,7 @@
                       SelectedItem="{Binding IconLocation, ElementName=_iconButton}"
                       Margin="5"
                       VerticalContentAlignment="Center" />
-            
+
             <!-- 2nd Column -->
             <TextBlock Text="MouseOver Foreground:"
                        Grid.Column="2"

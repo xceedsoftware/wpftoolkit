@@ -34,7 +34,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     public PropertyGridAttributesView()
     {
       InitializeComponent();
-      
+
       var person = new Man();
       person.FirstName = "John";
       person.LastName = "Doe";
@@ -53,9 +53,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
   [CategoryOrder("Information", 0)]
   [CategoryOrder( "Conections", 1 )]
   [CategoryOrder( "Other", 2 )]
-#if !OPEN_SOURCE
-  [ExpandedCategory( "Conections", false )]
-#endif
   public abstract class Person : INotifyPropertyChanged
   {
     // All properties have their own "[Category(...)]" attribute to specify which category they
@@ -69,9 +66,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     [Category( "Information" )]
     [Description( "This property uses the [Editor(..)] attribute to provide a custom editor using the 'FirstNameEditor' class. In the Plus version, it also depends on the IsMale property to change its foreground and source." )]
     [Editor( typeof( FirstNameEditor ), typeof( FirstNameEditor ) )]
-#if !OPEN_SOURCE
-    [DependsOn( "IsMale" )]
-#endif
     public string FirstName
     {
       get{ return _firstName; }
@@ -122,7 +116,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     public string NameInParentheses { get; set; }
 
     [Category( "Other" )]
-    //# TODODOC
     [Description( "This property uses the [Browsable(false)] attribute to not display the property" )]
     [BrowsableAttribute( false )]
     public string InvisibleProperty
@@ -134,7 +127,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     [Range(0d, 10d)]
     [Category( "Other" )]
     [DefaultValue(5d)]
-    //# TODODOC
     [Description( "This property uses the [Range(0,10)] and DefaultValue attributes to set the Minimum, Maximum and default properties." )]
     public double RangeDouble
     {
@@ -191,36 +183,16 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
   {
     public FrameworkElement ResolveEditor( Xceed.Wpf.Toolkit.PropertyGrid.PropertyItem propertyItem )
     {
-#if !OPEN_SOURCE
-      ComboBox comboBox = new ComboBox();
-      if( ( ( Person )propertyItem.Instance ).IsMale )
-      {
-        comboBox.Foreground = new SolidColorBrush( Colors.Green );
-        comboBox.ItemsSource = new List<string>() {"Tom", "Mark", "Bryan"};
-      }
-      else
-      {
-        comboBox.Foreground = new SolidColorBrush( Colors.Red );
-        comboBox.ItemsSource = new List<string>() { "Jane", "Christine", "Kathy" };
-      }
-      comboBox.SelectedIndex = 0;
-#else
       TextBox textBox = new TextBox();
       textBox.Background = new SolidColorBrush( Colors.Red );
-#endif
       //create the binding from the bound property item to the editor
       var _binding = new Binding( "Value" ); //bind to the Value property of the PropertyItem
       _binding.Source = propertyItem;
       _binding.ValidatesOnExceptions = true;
       _binding.ValidatesOnDataErrors = true;
       _binding.Mode = propertyItem.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay;
-#if !OPEN_SOURCE
-      BindingOperations.SetBinding( comboBox, ComboBox.SelectedItemProperty, _binding );
-      return comboBox;
-#else
       BindingOperations.SetBinding( textBox, TextBox.TextProperty, _binding );
       return textBox;
-#endif
     }
   }
 
