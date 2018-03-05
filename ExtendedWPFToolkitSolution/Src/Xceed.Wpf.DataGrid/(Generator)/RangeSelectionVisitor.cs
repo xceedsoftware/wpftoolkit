@@ -57,11 +57,6 @@ namespace Xceed.Wpf.DataGrid
           if( intersectionSelectionRange.IsEmpty )
             continue;
 
-#if DEBUG
-          string action = ( m_unselect ) ? "Removing" : "Adding";
-          Debug.WriteLine( "Selection : " + action + " cell : (" + startSourceDataItemIndex.ToString() + " - " + endSourceDataItemIndex.ToString() + ") - ("
-             + intersectionSelectionRange.StartIndex.ToString() + " - " + intersectionSelectionRange.EndIndex.ToString() + ")" );
-#endif
 
           var cellRange = new SelectionCellRangeWithItems( new SelectionRange( startSourceDataItemIndex, endSourceDataItemIndex ), null, intersectionSelectionRange );
 
@@ -77,10 +72,6 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-#if DEBUG
-        string action = ( m_unselect ) ? "Removing" : "Adding";
-        Debug.WriteLine( "Selection : " + action + " Adding item : " + startSourceDataItemIndex.ToString() + " - " + endSourceDataItemIndex.ToString() );
-#endif
         var itemRange = new SelectionRangeWithItems( new SelectionRange( startSourceDataItemIndex, endSourceDataItemIndex ), null );
 
         if( m_unselect )

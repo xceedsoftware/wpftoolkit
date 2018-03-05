@@ -413,8 +413,8 @@ namespace Xceed.Wpf.Toolkit
         time = StartTimeDefaultValue;
       }
 
-      //Limit the content of the list to the Minimum or Maximum
-      //if the date is set to the minimum or maximum.
+      // Limit the content of the list to the Minimum or Maximum
+      // if the date is set to the Minimum or Maximum.
       if( this.Value.HasValue )
       {
         DateTime date = this.Value.Value;

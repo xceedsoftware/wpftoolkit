@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -38,7 +38,7 @@
    <local:DemoView.Resources>
         <xctkconv:SolidColorBrushToColorConverter x:Key="SolidColorBrushToColorConverter" />
         <conv:WindowStateToBoolConverter x:Key="WindowStateToBoolConverter" />
-        
+
         <ObjectDataProvider x:Key="GenderEnum" MethodName="GetValues"
                           ObjectType="{x:Type sys:Enum}">
          <ObjectDataProvider.MethodParameters>
@@ -52,25 +52,25 @@
              <RowDefinition Height="Auto" />
              <RowDefinition Height="*" />
        </Grid.RowDefinitions>
-        
+
        <GroupBox Header="Features" Grid.Row="0" Margin="5">
          <Grid Margin="5">
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="Auto" />
                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-     
+
             <TextBlock Text="ModalBackgroundBrush:" VerticalAlignment="Center" />
             <xctk:ColorPicker x:Name="_modalBackgroundColorPicker" Grid.Column="1" SelectedColor="{Binding ModalBackgroundBrush, ElementName=_windowContainer, Converter={StaticResource SolidColorBrushToColorConverter}}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5"/>
          </Grid>
       </GroupBox>
-        
+
        <Grid Grid.Row="1" Margin="10">
            <Grid.RowDefinitions>
              <RowDefinition Height="Auto" />
              <RowDefinition Height="*" />
           </Grid.RowDefinitions>
-          
+
           <TextBlock Text="Usage:" Style="{StaticResource Header}" />
 
           <Grid Grid.Row="1">
@@ -84,7 +84,7 @@
                 <CheckBox x:Name="_modalChildWindowCheckBox" Content="Modal Child Window" Margin="5" IsChecked="{Binding WindowState, ElementName=_modalChildWindow, Converter={StaticResource WindowStateToBoolConverter}}" />
                 <CheckBox x:Name="_messageBoxCheckBox" Content="MessageBox" Margin="5" Checked="OnMessageBoxCheckBoxChecked" Unchecked="OnMessageBoxCheckBoxUnchecked" />
             </StackPanel>
-              
+
             <Grid Column="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="80" />
@@ -105,7 +105,7 @@
                 <TextBox Grid.Row="1" Grid.Column="1" Width="150" Height="30" Text="Thompson" HorizontalAlignment="Left"/>
                 <TextBlock Grid.Row="2" Text="Address:" VerticalAlignment="Center" Margin="10"/>
                 <TextBox Grid.Row="2" Grid.Column="1" Width="150" Height="30" Text="65 Main street" HorizontalAlignment="Left"/>
-                
+
                 <!-- 2nd Column-->
                 <TextBlock Grid.Column="2" Text="Gender:" VerticalAlignment="Center" Margin="10"/>
                 <ComboBox Grid.Column="3" Width="100" Height="30" ItemsSource="{Binding Source={StaticResource GenderEnum}}" SelectedIndex="0" Margin="5" HorizontalAlignment="Left"/>
@@ -114,7 +114,7 @@
                 <TextBlock Grid.Row="2" Grid.Column="2" Text="Salary:" VerticalAlignment="Center" Margin="10"/>
                 <xctk:IntegerUpDown Grid.Row="2" Width="100" Grid.Column="3" Height="30" Value="30000" Increment="5000" Margin="5" HorizontalAlignment="Left"/>
             </Grid>
-             
+
             <Border Grid.Column="1"
                     BorderBrush="Black"
                     BorderThickness="2"
@@ -131,7 +131,7 @@
                                   WindowState="Open">
                         <TextBlock Text="This is a regular Child Window" Padding="10"/>
                 </xctk:ChildWindow>
-                    
+
                   <xctk:ChildWindow x:Name="_modalChildWindow" 
                                   Caption="Modal ChildWindow"
                                   IsModal="True"
@@ -142,13 +142,13 @@
                                   WindowState="Open">
                         <TextBlock Text="This is a modal Child Window" Padding="10"/>
                 </xctk:ChildWindow>
-                    
+
                   <xctk:MessageBox x:Name="_messageBox"
                                  Caption="MessageBox" 
                                  Text="This is a MessageBox, always modal"
                                  Closed="OnMessageBoxClose" />
                </xctk:WindowContainer>
-               
+
             </Border>
         </Grid>
       </Grid>

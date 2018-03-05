@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -24,7 +24,6 @@
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
          <Run>A DropDownButton from the Xceed Wpf Toolkit with animations when opening the popup. It uses the MaterialButton animations and the Material Brushes.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -32,147 +31,19 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
-       ##END-->
       </Paragraph>
    </local:DemoView.Description>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-      <ResourceDictionary>
-         <ResourceDictionary.MergedDictionaries>
-            <ResourceDictionary Source="../Resources/CommonResources.xaml" />
-         </ResourceDictionary.MergedDictionaries>
 
-         <ObjectDataProvider x:Key="DropDownPlacementMode"
-                             MethodName="GetValues"
-                             ObjectType="{x:Type sys:Enum}">
-            <ObjectDataProvider.MethodParameters>
-               <x:Type TypeName="PlacementMode" />
-            </ObjectDataProvider.MethodParameters>
-         </ObjectDataProvider>
 
-         <xctk:SolidColorBrushToColorConverter x:Key="SolidColorBrushToColorConverter" />
-      </ResourceDictionary>
-   </local:DemoView.Resources>   
 
-   <Grid>
-      <StackPanel Margin="10">
 
-         <GroupBox Header="Features"
-                   Margin="0,5,0,5">
-            <Grid Margin="5">
-               <Grid.RowDefinitions>
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="Auto" />
-               </Grid.RowDefinitions>
-               <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="120" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-               </Grid.ColumnDefinitions>
 
-               <!-- First Column-->
-               <TextBlock Text="DropDown Position: "
-                          VerticalAlignment="Center"/>
-               <ComboBox Grid.Column="1"
-                         ItemsSource="{Binding Source={StaticResource DropDownPlacementMode}}"
-                         SelectedItem="{Binding DropDownPosition, ElementName=materialDropDown}"
-                         HorizontalAlignment="Left"
-                         Width="110"
-                         VerticalAlignment="Center"
-                         Margin="5" />
 
-               <TextBlock Grid.Column="0"
-                          Grid.Row="1"
-                          Text="Material Accent Brush: "
-                          VerticalAlignment="Center" />
-               <ComboBox Grid.Column="1"
-                         Grid.Row="1"
-                         ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                         SelectedItem="{Binding MaterialAccentBrush, ElementName=materialDropDown}"
-                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                         VerticalAlignment="Center"
-                         Margin="5" />
 
-               <TextBlock Text="Is Using fade Animation: "
-                          Grid.Row="2"
-                          Grid.Column="0"
-                          VerticalAlignment="Center"/>
-               <CheckBox Grid.Column="1"
-                         Grid.Row="2"
-                         IsChecked="{Binding IsUsingFadeAnimation, ElementName=materialDropDown}"
-                         VerticalAlignment="Center"
-                         Margin="5" />
 
-               <!-- Second Column-->
-               <TextBlock Grid.Column="2"
-                          Grid.Row="0"
-                          Text="Is Ink Effect Active: "
-                          VerticalAlignment="Center" 
-                          Margin="10,0,0,0"/>
-               <CheckBox x:Name="inkEffectActiveCheckBox"
-                         Grid.Column="3"
-                         Grid.Row="0"
-                         IsChecked="{Binding IsInkEffectActive, ElementName=materialDropDown}"
-                         VerticalAlignment="Center"
-                         Margin="5" />
-               <TextBlock Grid.Column="2"
-                          Grid.Row="1"
-                          Text="Ink Effect Brush: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0"
-                          IsEnabled="{Binding IsChecked, ElementName=inkEffectActiveCheckBox}"
-                          Style="{StaticResource DisableGrayText}" />
-               <xctk:ColorPicker Grid.Column="3"
-                                 Grid.Row="1"
-                                 SelectedColor="{Binding InkEffectBrush, ElementName=materialDropDown, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                 DisplayColorAndName="True"
-                                 VerticalAlignment="Center"
-                                 Width="125"
-                                 Margin="5"
-                                 IsEnabled="{Binding IsChecked, ElementName=inkEffectActiveCheckBox}" />
-               <TextBlock Grid.Column="2"
-                          Grid.Row="2"
-                          Text="Ink Effect Opacity: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0"
-                          IsEnabled="{Binding IsChecked, ElementName=inkEffectActiveCheckBox}"
-                          Style="{StaticResource DisableGrayText}" />
-               <xctk:DoubleUpDown Grid.Column="3"
-                                  Grid.Row="2"
-                                  Value="{Binding InkEffectOpacity, ElementName=materialDropDown}"
-                                  Minimum="0"
-                                  Maximum="1"
-                                  Increment="0.05"
-                                  FormatString="N2"
-                                  VerticalAlignment="Center"
-                                  Margin="5"
-                                  IsEnabled="{Binding IsChecked, ElementName=inkEffectActiveCheckBox}" />
-            </Grid>
-         </GroupBox>
 
-         <StackPanel>
-            <TextBlock Text="Usage:"
-                       Style="{StaticResource Header}" />
 
-            <xctk:MaterialDropDown x:Name="materialDropDown"
-                                   Content="Click Me"
-                                   HorizontalAlignment="Center"
-                                   DropDownPosition="Bottom"
-                                   IsUsingFadeAnimation="True"
-                                   IsInkEffectActive="True">
-               <xctk:DropDownButton.DropDownContent>
-                  <xctk:ColorCanvas Foreground="Black"/>
-               </xctk:DropDownButton.DropDownContent>
-            </xctk:MaterialDropDown>
-         </StackPanel>
-      </StackPanel>
-   </Grid>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
     <Image Source="..\OpenSourceImages\MaterialDropDown.png" Width="600" Height="400"/>
-   ##END-->
 </local:MaterialDemoView>

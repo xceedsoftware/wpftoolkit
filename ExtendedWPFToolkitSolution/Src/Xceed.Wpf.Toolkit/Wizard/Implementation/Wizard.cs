@@ -227,7 +227,7 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    public static readonly DependencyProperty FinishButtonVisibilityProperty = DependencyProperty.Register( "FinishButtonVisibility", typeof( Visibility ), typeof( Wizard ), new UIPropertyMetadata( Visibility.Visible ) );
+    public static readonly DependencyProperty FinishButtonVisibilityProperty = DependencyProperty.Register( "FinishButtonVisibility", typeof( Visibility ), typeof( Wizard ), new UIPropertyMetadata( Visibility.Collapsed ) );
     public Visibility FinishButtonVisibility
     {
       get
@@ -339,7 +339,7 @@ namespace Xceed.Wpf.Toolkit
       foreach( object o in this.Items )
       {
         if( !( o is WizardPage ) )
-          throw new NotSupportedException( "Wizard should only contains WizardPages." );
+          throw new NotSupportedException( "Wizard should only contain WizardPages." );
       }
 
       if( Items.Count > 0 && CurrentPage == null )
@@ -356,6 +356,9 @@ namespace Xceed.Wpf.Toolkit
         CommandManager.InvalidateRequerySuggested();
       }
     }
+
+
+
 
     #endregion //Base Class Overrides
 

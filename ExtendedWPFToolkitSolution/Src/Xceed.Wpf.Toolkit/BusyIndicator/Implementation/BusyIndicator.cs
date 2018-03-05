@@ -67,6 +67,7 @@ namespace Xceed.Wpf.Toolkit
       ChangeVisualState( false );
     }
 
+
     #endregion //Base Class Overrides
 
     #region Properties
@@ -257,7 +258,7 @@ namespace Xceed.Wpf.Toolkit
         new PropertyMetadata( null ) );
 
     /// <summary>
-    /// Gets or sets a Control that should get focus when the busy indicator disapears.
+    /// Gets or sets a Control that should get the focus when the busy indicator disapears.
     /// </summary>
     public Control FocusAfterBusy
     {

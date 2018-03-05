@@ -180,8 +180,8 @@ namespace Xceed.Wpf.DataGrid
         if( !disposing )
           return;
 
-        var ownerRef = m_owner;
-        if( Interlocked.CompareExchange<WeakReference>( ref m_owner, null, ownerRef ) == null )
+        var ownerRef = Interlocked.Exchange( ref m_owner, null );
+        if( ownerRef == null )
           return;
 
         var owner = ( UpdateColumnSortCommand )ownerRef.Target;
@@ -192,11 +192,6 @@ namespace Xceed.Wpf.DataGrid
 
         m_sortDescriptions = null;
         m_columns = null;
-      }
-
-      ~ResortCallback()
-      {
-        this.Dispose( false );
       }
 
       private WeakReference m_owner;

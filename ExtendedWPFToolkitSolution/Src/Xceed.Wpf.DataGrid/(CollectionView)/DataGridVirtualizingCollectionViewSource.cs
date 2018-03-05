@@ -75,14 +75,6 @@ namespace Xceed.Wpf.DataGrid
         this.QueryItems( this, e );
     }
 
-    internal event EventHandler<QueryAutoFilterDistinctValuesEventArgs> QueryAutoFilterDistinctValues;
-
-    internal void OnQueryAutoFilterDistinctValues( QueryAutoFilterDistinctValuesEventArgs e )
-    {
-      if( this.QueryAutoFilterDistinctValues != null )
-        this.QueryAutoFilterDistinctValues( this, e );
-    }
-
     #endregion DATA VIRTUALIZATION EVENTS
 
 

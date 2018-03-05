@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -26,7 +26,6 @@
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
          <Run>The Rating control fills icons to represent a value on a scale. It can be interactive and is also fully customizable.</Run>
-      <!--##INCLUDE_OPEN_SOURCE
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -34,409 +33,38 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
-       ##END-->
       </Paragraph>
    </local:DemoView.Description>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-      <conv:SolidColorBrushToColorConverter x:Key="SolidColorBrushToColorConverter" />
-   </local:DemoView.Resources>
-
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-
-      <GroupBox Header="Features"
-                Grid.Row="0"
-                Margin="5">
-         <Grid Margin="5">
-            <!-- Add Rating Control properties-->
-            <Grid.RowDefinitions>
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="75" />
-               <ColumnDefinition Width="100" />
-               <ColumnDefinition Width="10" />
-               <ColumnDefinition Width="90" />
-               <ColumnDefinition Width="100" />
-               <ColumnDefinition Width="10" />
-               <ColumnDefinition Width="90" />
-               <ColumnDefinition Width="100" />
-               <ColumnDefinition Width="10" />
-            </Grid.ColumnDefinitions>
-
-            <!-- Column 1 -->
-            <TextBlock Text="Value Type:"
-                       VerticalAlignment="Center" />
-            <ComboBox x:Name="_valueType"
-                      Grid.Column="1"
-                      SelectionChanged="ValueType_SelectionChanged"
-                      VerticalAlignment="Center"
-                      Margin="5"
-                      ToolTip="Gets/Sets the ValueType used for the Rating control."
-                      SelectedValue="{Binding ValueType, ElementName=_rating}"
-                      SelectedValuePath="Tag">
-               <ComboBoxItem Content="Exact"
-                             Tag="{x:Static xctk:RatingValueType.Exact}" />
-               <ComboBoxItem Content="Percentage"
-                             Tag="{x:Static xctk:RatingValueType.Percentage}" />
-            </ComboBox>
-
-            <TextBlock Text="Value:"
-                       VerticalAlignment="Center"
-                       Grid.Row="1" />
-            <xctk:DecimalUpDown x:Name="_value"
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                Minimum="0.00"
-                                Maximum="{Binding ItemCount, ElementName=_rating}"
-                                Increment="0.05"
-                                VerticalAlignment="Center"
-                                Margin="5"
-                                ToolTip="Indicates the current Rating value (exact)."
-                                Value="{Binding Value, ElementName=_rating}" />
-            <xctk:DecimalUpDown x:Name="_percentage"
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                Minimum="0.00"
-                                Maximum="1.00"
-                                Increment="0.02"
-                                VerticalAlignment="Center"
-                                Margin="5"
-                                ToolTip="Indicates the current Rating value (percentage)."
-                                Visibility="Collapsed"
-                                Value="{Binding Value, ElementName=_rating}" />
-
-            <TextBlock Text="Item Count:"
-                       VerticalAlignment="Center"
-                       Grid.Row="2" />
-            <xctk:IntegerUpDown x:Name="_itemCount"
-                                Grid.Row="2"
-                                Grid.Column="1"
-                                Minimum="0"
-                                Maximum="10"
-                                VerticalAlignment="Center"
-                                Margin="5"
-                                ToolTip="Indicates the amount of elements in the Rating control."
-                                Value="{Binding ItemCount, ElementName=_rating}" />
-
-            <TextBlock Text="Stroke:"
-                       VerticalAlignment="Center"
-                       Grid.Row="3" />
-            <xctk:DoubleUpDown x:Name="_strokeThickness"
-                               Grid.Row="3"
-                               Grid.Column="1"
-                               Minimum="0"
-                               Maximum="5"
-                               VerticalAlignment="Center"
-                               Margin="5"
-                               ToolTip="Gets/Sets the icon's stroke thickness."
-                               Value="{Binding IconStrokeThickness, ElementName=_rating}" />
-
-            <TextBlock Text="Precision:"
-                       VerticalAlignment="Center"
-                       Grid.Row="4" />
-            <ComboBox x:Name="_precision"
-                      Grid.Row="4"
-                      Grid.Column="1"
-                      VerticalAlignment="Center"
-                      Margin="5"
-                      ToolTip="Gets/Sets the Precision used for the Rating control."
-                      SelectedValue="{Binding Precision, ElementName=_rating}"
-                      SelectedValuePath="Tag">
-               <ComboBoxItem Content="Full"
-                             Tag="{x:Static xctk:RatingPrecision.Full}" />
-               <ComboBoxItem Content="Half"
-                             Tag="{x:Static xctk:RatingPrecision.Half}" />
-               <ComboBoxItem Content="Exact"
-                             Tag="{x:Static xctk:RatingPrecision.Exact}" />
-            </ComboBox>
-
-            <TextBlock Text="Orientation:"
-                       VerticalAlignment="Center"
-                       Grid.Row="5" />
-            <ComboBox x:Name="_orientation"
-                      Grid.Row="5"
-                      Grid.Column="1"
-                      VerticalAlignment="Center"
-                      Margin="5"
-                      ToolTip="Gets/Sets the Orientation used for the Rating control."
-                      SelectedValue="{Binding Orientation, ElementName=_rating}"
-                      SelectedValuePath="Tag">
-               <ComboBoxItem Content="Horizontal"
-                             Tag="{x:Static xctk:RatingOrientation.Horizontal}" />
-               <ComboBoxItem Content="Vertical"
-                             Tag="{x:Static xctk:RatingOrientation.Vertical}" />
-            </ComboBox>
-
-            <TextBlock Text="FillDirection:"
-                       VerticalAlignment="Center"
-                       Grid.Row="6" />
-            <ComboBox x:Name="_fillDirection"
-                      Grid.Row="6"
-                      Grid.Column="1"
-                      VerticalAlignment="Center"
-                      Margin="5"
-                      ToolTip="Gets/Sets the Layout Direction used for the Rating control."
-                      SelectedValue="{Binding FillDirection, ElementName=_rating}"
-                      SelectedValuePath="Tag">
-               <ComboBoxItem Content="Right"
-                             Tag="{x:Static xctk:RatingFillDirection.Right}" />
-               <ComboBoxItem Content="Left"
-                             Tag="{x:Static xctk:RatingFillDirection.Left}" />
-               <ComboBoxItem Content="Up"
-                             Tag="{x:Static xctk:RatingFillDirection.Up}" />
-               <ComboBoxItem Content="Down"
-                             Tag="{x:Static xctk:RatingFillDirection.Down}" />
-            </ComboBox>
-
-            <TextBlock Text="Rating Items"
-                       VerticalAlignment="Center"
-                       Grid.Row="7" />
-            <Button x:Name="_ratingItemsButton"
-                    Grid.Row="7"
-                    Grid.Column="1"
-                    VerticalAlignment="Center"
-                    Margin="5"
-                    Content="Rating Items"
-                    Click="RatingItemsButton_Click" />
 
 
-            <!-- Column 2 -->
-            <TextBlock Text="ReadOnly:"
-                       VerticalAlignment="Center"
-                       Grid.Column="3" />
-            <CheckBox x:Name="_readOnly"
-                      Grid.Column="4"
-                      VerticalAlignment="Center"
-                      Margin="5"
-                      IsChecked="{Binding ReadOnly, ElementName=_rating}" />
-
-            <TextBlock Text="Height:"
-                       VerticalAlignment="Center"
-                       Grid.Row="1"
-                       Grid.Column="3" />
-            <xctk:IntegerUpDown x:Name="_height"
-                                Grid.Row="1"
-                                Grid.Column="4"
-                                Minimum="10"
-                                Maximum="100"
-                                VerticalAlignment="Center"
-                                Margin="5"
-                                ToolTip="Indicates the height of the Rating control."
-                                Value="{Binding IconHeight, ElementName=_rating}" />
-
-            <TextBlock Text="Icon Padding:"
-                       VerticalAlignment="Center"
-                       Grid.Row="2"
-                       Grid.Column="3" />
-            <xctk:DecimalUpDown x:Name="_iconPadding"
-                                Grid.Row="2"
-                                Grid.Column="4"
-                                Minimum="0.0"
-                                Maximum="20.0"
-                                Increment="1.0"
-                                VerticalAlignment="Center"
-                                Margin="5"
-                                ToolTip="Indicates the padding used between each icon."
-                                Value="{Binding IconPadding, ElementName=_rating}" />
-
-            <TextBlock Text="Icon Type:"
-                       VerticalAlignment="Center"
-                       Grid.Row="3"
-                       Grid.Column="3" />
-            <ComboBox x:Name="_iconType"
-                      Grid.Row="3"
-                      Grid.Column="4"
-                      VerticalAlignment="Center"
-                      Margin="5"
-                      ToolTip="Gets/Sets the IconType used for the Rating control."
-                      SelectedValue="{Binding IconType, ElementName=_rating}"
-                      SelectedValuePath="Tag">
-               <ComboBoxItem Content="Star"
-                             Tag="{x:Static xctk:RatingIconType.Star}" />
-               <ComboBoxItem Content="Circle"
-                             Tag="{x:Static xctk:RatingIconType.Circle}" />
-               <ComboBoxItem Content="Square"
-                             Tag="{x:Static xctk:RatingIconType.Square}" />
-               <ComboBoxItem Content="Triangle"
-                             Tag="{x:Static xctk:RatingIconType.Triangle}" />
-               <ComboBoxItem Content="Custom"
-                             Tag="{x:Static xctk:RatingIconType.Custom}" />
-            </ComboBox>
-
-            <TextBlock Text="Custom Path:"
-                       VerticalAlignment="Center"
-                       Grid.Row="4"
-                       Grid.Column="3" />
-            <TextBox x:Name="_customPath"
-                     Grid.Row="4"
-                     Grid.Column="4"
-                     VerticalAlignment="Center"
-                     Margin="5"
-                     IsEnabled="False"
-                     ToolTip="Gets/Sets the path for the custom icon used for the Rating control."
-                     Text="{Binding CustomPath, ElementName=_rating}" />
-
-            <TextBlock Text="Value Tooltip"
-                       VerticalAlignment="Center"
-                       Grid.Row="5"
-                       Grid.Column="3" />
-            <CheckBox x:Name="_showTooltip"
-                      Grid.Row="5"
-                      Grid.Column="4"
-                      VerticalAlignment="Center"
-                      Margin="5"
-                      IsChecked="{Binding ShowValueTooltip, ElementName=_rating}" />
-
-            <TextBlock Text="Show Labels"
-                       VerticalAlignment="Center"
-                       Grid.Row="6"
-                       Grid.Column="3" />
-            <CheckBox x:Name="_showLabels"
-                      Grid.Row="6"
-                      Grid.Column="4"
-                      VerticalAlignment="Center"
-                      Margin="5"
-                      IsChecked="{Binding ShowLabels, ElementName=_rating}" />
-
-            <TextBlock Text="Label Position:"
-                       VerticalAlignment="Center"
-                       Grid.Row="7"
-                       Grid.Column="3" />
-            <ComboBox x:Name="_labelPosition"
-                      Grid.Row="7"
-                      Grid.Column="4"
-                      VerticalAlignment="Center"
-                      Margin="5"
-                      ToolTip="Gets/Sets the Position for the Labels."
-                      SelectedValue="{Binding LabelPosition, ElementName=_rating}"
-                      SelectedValuePath="Tag">
-               <ComboBoxItem Content="Before"
-                             Tag="{x:Static xctk:RatingLabelPosition.Before}" />
-               <ComboBoxItem Content="After"
-                             Tag="{x:Static xctk:RatingLabelPosition.After}" />
-            </ComboBox>
 
 
-            <!-- Column 3 -->
-            <TextBlock Text="Active Border:"
-                       VerticalAlignment="Center"
-                       Grid.Column="6" />
-            <xctk:ColorPicker x:Name="_activeBorder"
-                              Grid.Column="7"
-                              VerticalAlignment="Center"
-                              Margin="5"
-                              ToolTip="Gets/Sets the color of the icon's border [active state]."
-                              SelectedColor="{Binding ActiveBorderColor, ElementName=_rating, Converter={StaticResource SolidColorBrushToColorConverter}}" />
 
-            <TextBlock Text="Active Fill:"
-                       VerticalAlignment="Center"
-                       Grid.Row="1"
-                       Grid.Column="6" />
-            <xctk:ColorPicker x:Name="_activeFill"
-                              Grid.Row="1"
-                              Grid.Column="7"
-                              VerticalAlignment="Center"
-                              Margin="5"
-                              ToolTip="Gets/Sets the color of the icon's fill [active state]."
-                              SelectedColor="{Binding ActiveFillColor, ElementName=_rating, Converter={StaticResource SolidColorBrushToColorConverter}}" />
 
-            <TextBlock Text="Inactive Border:"
-                       VerticalAlignment="Center"
-                       Grid.Row="2"
-                       Grid.Column="6" />
-            <xctk:ColorPicker x:Name="_inactiveBorder"
-                              Grid.Row="2"
-                              Grid.Column="7"
-                              VerticalAlignment="Center"
-                              Margin="5"
-                              ToolTip="Gets/Sets the color of the icon's border [inactive state]."
-                              SelectedColor="{Binding InactiveBorderColor, ElementName=_rating, Converter={StaticResource SolidColorBrushToColorConverter}}" />
 
-            <TextBlock Text="Inactive Fill:"
-                       VerticalAlignment="Center"
-                       Grid.Row="3"
-                       Grid.Column="6" />
-            <xctk:ColorPicker x:Name="_inactiveFill"
-                              Grid.Row="3"
-                              Grid.Column="7"
-                              VerticalAlignment="Center"
-                              Margin="5"
-                              ToolTip="Gets/Sets the color of the icon's fill [inactive state]."
-                              SelectedColor="{Binding InactiveFillColor, ElementName=_rating, Converter={StaticResource SolidColorBrushToColorConverter}}" />
 
-            <TextBlock Text="Hover Border:"
-                       VerticalAlignment="Center"
-                       Grid.Row="4"
-                       Grid.Column="6" />
-            <xctk:ColorPicker x:Name="_hoverBorder"
-                              Grid.Row="4"
-                              Grid.Column="7"
-                              VerticalAlignment="Center"
-                              Margin="5"
-                              ToolTip="Gets/Sets the color of the icon's border [hover state]."
-                              SelectedColor="{Binding HoverBorderColor, ElementName=_rating, Converter={StaticResource SolidColorBrushToColorConverter}}" />
 
-            <TextBlock Text="Hover Fill:"
-                       VerticalAlignment="Center"
-                       Grid.Row="5"
-                       Grid.Column="6" />
-            <xctk:ColorPicker x:Name="_hoverFill"
-                              Grid.Row="5"
-                              Grid.Column="7"
-                              VerticalAlignment="Center"
-                              Margin="5"
-                              ToolTip="Gets/Sets the color of the icon's fill [hover state]."
-                              SelectedColor="{Binding HoverFillColor, ElementName=_rating, Converter={StaticResource SolidColorBrushToColorConverter}}" />
-         </Grid>
-      </GroupBox>
 
-      <StackPanel Grid.Row="1"
-                  Margin="10">
-         <TextBlock Text="Usage:"
-                    Style="{StaticResource Header}" />
 
-         <xctk:Rating Name="_rating"
-                      VerticalAlignment="top"
-                      HorizontalAlignment="Left"
-                      ValueType="Exact"
-                      ReadOnly="True"
-                      IconHeight="50"
-                      ItemCount="5"
-                      Value="2.5"
-                      Orientation="Horizontal"
-                      FillDirection="Right"
-                      Precision="Exact"
-                      IconType="Star"
-                      CustomPath="M 0,19 L 35,39 24,45 55,63 47,68 100,100 67,58 75,54 51,32 58,28 39,0 z"
-                      IconPadding="2"
-                      IconStrokeThickness="1"
-                      ActiveBorderColor="Black"
-                      ActiveFillColor="Orange"
-                      InactiveBorderColor="Blue"
-                      InactiveFillColor="AliceBlue"
-                      HoverBorderColor="Red"
-                      HoverFillColor="Yellow"
-                      ShowValueTooltip="False"
-                      RatingValueChanged="Rating_RatingValueChanged" />
 
-      </StackPanel>
-   </Grid>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <Image Source="..\OpenSourceImages\Rating.png" Width="600" Height="400"/>
-   ##END-->
 </local:DemoView>

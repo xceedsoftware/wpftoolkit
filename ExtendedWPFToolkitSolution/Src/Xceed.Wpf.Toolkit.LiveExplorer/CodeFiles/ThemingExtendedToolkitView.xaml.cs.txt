@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -16,12 +16,6 @@
 
 using System.Diagnostics;
 using System.Windows;
-#if !OPEN_SOURCE
-using Xceed.Wpf.Themes;
-using Xceed.Wpf.Toolkit.Themes.Office2007;
-using Xceed.Wpf.Toolkit.Themes.Metro;
-using Xceed.Wpf.Themes.Metro;
-#endif
 using System;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -35,122 +29,31 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
   /// </summary>
   public partial class ThemingExtendedToolkitView : DemoView
   {
-#if !OPEN_SOURCE
-    #region Members
 
-    private Brush _accentBrush = new SolidColorBrush( System.Windows.Media.Color.FromRgb( 255, 152, 29 ) );
-    private Brush whiteBrush = new SolidColorBrush( Colors.White );
-    private Brush blackBrush = new SolidColorBrush( Colors.Black );
 
-    #endregion
-#endif
 
     public ThemingExtendedToolkitView()
     {
-#if !OPEN_SOURCE
-      this.Initialized += new EventHandler( ToolkitControlsThemes_Initialized );
-#endif
       InitializeComponent();
     }
 
-#if !OPEN_SOURCE
-    private void RadioButton_Checked( object sender, RoutedEventArgs e )
-    {
-      RadioButton button = sender as RadioButton;
-      if( button == null )
-        return;
 
-      _accentBrush = button.Background;
-      if( _accentBrush == null )
-        return;
 
-      if( themeComboBox.SelectedItem == null )
-        return;
 
-      if( themeComboBox.SelectedItem.Equals( metroDarkComboBoxItem ) )
-      {
-        this.ChangeMetroTheme( new Xceed.Wpf.Toolkit.Themes.Metro.ToolkitMetroDarkThemeResourceDictionary()
-                               , blackBrush );
-      }
-      else if( themeComboBox.SelectedItem.Equals( metroLightComboBoxItem ) )
-      {
-        this.ChangeMetroTheme( new Xceed.Wpf.Toolkit.Themes.Metro.ToolkitMetroLightThemeResourceDictionary()
-                              , whiteBrush );
-      }
-    }
 
-    private void ToolkitControlsThemes_Initialized( object sender,EventArgs e )
-    {
-      themeComboBox.SelectedIndex = 0;
-    }
 
-    private void SystemComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      this.ChangeTheme( null );
-    }
 
-    private void Office2007BlueComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      this.ChangeTheme( new Xceed.Wpf.Toolkit.Themes.Office2007.Office2007BlueResourceDictionary() );
-    }
 
-    private void Office2007SilverComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      this.ChangeTheme( new Xceed.Wpf.Toolkit.Themes.Office2007.Office2007SilverResourceDictionary() );
-    }
 
-    private void Office2007BlackComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      this.ChangeTheme( new Xceed.Wpf.Toolkit.Themes.Office2007.Office2007BlackResourceDictionary() );
-    }
 
-    private void Windows10ComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      this.ChangeTheme( new Xceed.Wpf.Toolkit.Themes.Windows10.Windows10ResourceDictionary() );
-    }
 
-    private void MetroDarkComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      this.ChangeMetroTheme( new Xceed.Wpf.Toolkit.Themes.Metro.ToolkitMetroDarkThemeResourceDictionary()
-                            , blackBrush );
-    }
 
-    private void MetroLightComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      this.ChangeMetroTheme( new Xceed.Wpf.Toolkit.Themes.Metro.ToolkitMetroLightThemeResourceDictionary()
-                             , whiteBrush );
-    }
 
-    private void ChangeTheme( ThemeResourceDictionary toolkitTheme)
-    {
-      _accentColorPanel.Visibility = Visibility.Hidden;
 
-      SampleBorder.Resources.MergedDictionaries.Clear();
-      if( toolkitTheme != null )
-      {
-        SampleBorder.Resources.MergedDictionaries.Add( toolkitTheme );
-      }
 
-      SampleBorder.Background = SystemColors.WindowBrush;
-      TextElement.SetForeground( SampleBorder, blackBrush );
-    }
 
-    private void ChangeMetroTheme( MetroThemeResourceDictionaryBase metroToolkitThemeResourceDictionary
-                                   , Brush sampleBrush)
-    {
-      _accentColorPanel.Visibility = Visibility.Visible;
 
-      if( metroToolkitThemeResourceDictionary != null )
-      {
-        metroToolkitThemeResourceDictionary.AccentBrush = _accentBrush;
 
-        SampleBorder.Resources.MergedDictionaries.Clear();
-        SampleBorder.Resources.MergedDictionaries.Add( metroToolkitThemeResourceDictionary );
-      }
 
-      SampleBorder.Background = sampleBrush;
-      TextElement.SetForeground( SampleBorder, ( sampleBrush == blackBrush ) ? whiteBrush : blackBrush );
-    }
-#endif
   }
 }

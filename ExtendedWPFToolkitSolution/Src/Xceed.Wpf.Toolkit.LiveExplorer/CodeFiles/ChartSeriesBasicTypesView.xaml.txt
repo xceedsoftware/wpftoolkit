@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -25,139 +25,26 @@
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
             <Run>A series contains DataPoint objects and are layed out in an area (Area class) of a chart. They can be displayed with predefined layouts, such as column (bar), line, area, or pie, or they can be displayed using a custom layout (not implemented in this sample).</Run>
-       <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->
         </Paragraph>
     </local:DemoView.Description>
-    
-<!--##EXCLUDE_OPEN_SOURCE-->
-    <local:DemoView.Resources>
-        <ObjectDataProvider x:Key="SeriesLayout" MethodName="GetValues"
-                          ObjectType="{x:Type sys:Enum}">
-         <ObjectDataProvider.MethodParameters>
-            <x:Type TypeName="xctk:PredefinedLayoutTypes" />
-         </ObjectDataProvider.MethodParameters>
-      </ObjectDataProvider>
-        
-        <conv:LayoutEngineToPredefinedLayoutConverter x:Key="LayoutEngineToPredefinedLayoutConverter" />
-        <conv:PredefinedLayoutToPropertyEnabledConverter x:Key="PredefinedLayoutToPropertyEnabledConverter" />
-        <conv:LineLengthToPropertyEnabledConverter x:Key="LineLengthToPropertyEnabledConverter" />
-        <xctkconv:SolidColorBrushToColorConverter x:Key="SolidColorBrushToColorConverter" />
-               
-        <Style x:Key="ComboBoxItemStyle" TargetType="{x:Type ComboBoxItem}">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding}" Value="Custom">
-                    <Setter Property="IsEnabled" Value="False"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-    </local:DemoView.Resources>
-    
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="Auto" />
-      </Grid.RowDefinitions>
 
 
-      <GroupBox Header="Features" Grid.Row="0" Margin="5">
-         <Grid Margin="5">
-            <Grid.RowDefinitions>
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
 
-            <!-- 1st column-->
-            <TextBlock Text="Layout: " VerticalAlignment="Center" />
-            <ComboBox x:Name="_layoutComboBox" Grid.Column="1" SelectedValue="{Binding Layout, ElementName=_series, Converter={StaticResource LayoutEngineToPredefinedLayoutConverter}}" SelectedValuePath="Content" ItemContainerStyle="{StaticResource ComboBoxItemStyle}" SelectionChanged="OnLayoutSelectionChanged" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5">
-               <ComboBoxItem Content="{x:Static xctk:PredefinedLayoutTypes.Area}" />
-               <ComboBoxItem Content="{x:Static xctk:PredefinedLayoutTypes.Column}" />
-               <ComboBoxItem Content="{x:Static xctk:PredefinedLayoutTypes.Line}" />
-               <ComboBoxItem Content="{x:Static xctk:PredefinedLayoutTypes.Pie}" />
-            </ComboBox>
-            <TextBlock Grid.Row="1" Text="Title: " VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_title}"/>
-            <TextBox x:Name="_title" Grid.Row="1" Grid.Column="1" Text="{Binding Title, ElementName=_series, UpdateSourceTrigger=PropertyChanged}" Width="75" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=title}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Grid.Row="2" Text="Default Interior: " VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_defaultInterior}"/>
-            <xctk:ColorPicker x:Name="_defaultInterior" Grid.Row="2" Grid.Column="1"  SelectedColor="{Binding DefaultInterior, ElementName=_series, Converter={StaticResource SolidColorBrushToColorConverter}}" Width="75" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=defaultInterior}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            
-            <!-- 2nd column-->
-            <TextBlock Grid.Column="2" Text="Show Hint Labels: " VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_showHintLabels}" Margin="10,0,0,0" Style="{StaticResource DisableGrayText}"/>
-            <CheckBox x:Name="_showHintLabels" Grid.Column="3" IsChecked="{Binding ShowHintLabels, ElementName=_series}" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=showHintLabels}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Grid.Row="1" Grid.Column="2" Text="Show Points in Legend: " IsEnabled="{Binding IsEnabled, ElementName=_showPointsInLegend}" VerticalAlignment="Center" Margin="10,0,0,0" Style="{StaticResource DisableGrayText}"/>
-            <CheckBox x:Name="_showPointsInLegend" Grid.Row="1" Grid.Column="3" IsChecked="{Binding ShowPointsInLegend, ElementName=_series}" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=showPointsInLegend}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />         
-            
-            <!-- 3rd column-->
-            <TextBlock Grid.Column="4" Text="Hint Line Length: " VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_hintLineLength}" Margin="10,0,0,0" Style="{StaticResource DisableGrayText}"/>
-            <xctk:IntegerUpDown x:Name="_hintLineLength" Grid.Column="5" Minimum="0" Maximum="200" Value="{Binding HintLineLength, ElementName=_series}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5">
-                <xctk:IntegerUpDown.IsEnabled>
-                    <MultiBinding Converter="{StaticResource LineLengthToPropertyEnabledConverter}">
-                        <Binding Path="SelectedItem" ElementName="_layoutComboBox" Converter="{StaticResource PredefinedLayoutToPropertyEnabledConverter}" ConverterParameter="hintLineLength" />
-                        <Binding Path="IsChecked" ElementName="_showHintLabels" />
-                    </MultiBinding>
-                </xctk:IntegerUpDown.IsEnabled>
-            </xctk:IntegerUpDown>
-            <TextBlock Grid.Row="1" Grid.Column="4" Text="Spacing: " VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_spacing}" Margin="10,0,0,0" Style="{StaticResource DisableGrayText}"/>
-            <xctk:IntegerUpDown x:Name="_spacing" Grid.Row="1" Grid.Column="5" Minimum="0" Maximum="100" Value="{Binding Spacing, ElementName=_series}" Width="75" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=spacing}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-        </Grid>
-      </GroupBox>
-      
-      <TextBlock  Grid.Row="1" Text="Usage:" Style="{StaticResource Header}" Margin="10"/>
 
-      <xctk:Chart Grid.Row="2" MinHeight="200">
-            <xctk:Chart.Areas>
-               <xctk:Area x:Name="_area1" Title="Area #1">
-                  <xctk:Area.Series>
-                        <xctk:Series x:Name="_series"
-                                    DefaultInterior="BlueViolet"
-                                    Spacing="20"
-                                    Title="Average"
-                                    ShowPointsInLegend="false"
-                                    ShowHintLabels="false"
-                                    HintLineLength="20">
-                           <xctk:Series.Layout>
-                              <xctk:LineLayout />
-                           </xctk:Series.Layout>
-                           <xctk:Series.DataPoints>
-                              <xctk:DataPoint X="1" Y="1" Label="Oct" />
-                              <xctk:DataPoint X="2" Y="2" Label="Jan"/>
-                              <xctk:DataPoint X="2.5" Y="1.5" Label="Feb" />
-                              <xctk:DataPoint X="4" Y="1" Label="Jun"/>
-                              <xctk:DataPoint X="1.5" Y="3" Label="Dec"/>
-                              <xctk:DataPoint X="5" Y="5" Label="Apr"/>
-                              <xctk:DataPoint X="3" Y="1" Label="Nov"/>
-                              <xctk:DataPoint X="4.5" Y="7" Label="Jul"/>
-                              <xctk:DataPoint X="3.5" Y="4.5" Label="Aug"/>
-                           </xctk:Series.DataPoints>
-                        </xctk:Series>
-                  </xctk:Area.Series>
-               </xctk:Area>
-            </xctk:Chart.Areas>
-      </xctk:Chart>
-          
-      <TextBlock Grid.Row="3" Text="A collection of Series instances can be added to an Area. Use the following Checkbox to display 3 new Series along with the current one." TextWrapping="Wrap" Margin="0,15,0,5" />
-      <CheckBox Grid.Row="4" x:Name="_seriesCollectionCheckBox" IsChecked="False" Checked="OnSeriesCollectionChecked" Unchecked="OnSeriesCollectionUnchecked" Content="Display 4 Series in one Area" Margin="0,0,0,10" />
-   </Grid>
- <!--##END-->
-    
-<!--##INCLUDE_OPEN_SOURCE
+
+
+
+
+
+
+
+
+
     <Image Source="..\OpenSourceImages\ChartBasicTypes.png" Width="600" Height="400"/>
-##END-->
 </local:DemoView>

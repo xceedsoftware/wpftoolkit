@@ -15,10 +15,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -27,28 +23,33 @@ using System.Windows.Threading;
 
 namespace Xceed.Utils.Wpf.DragDrop
 {
-  internal class AutoScrollManager : DependencyObject
+  internal sealed class AutoScrollManager : DependencyObject
   {
-    public const int AutoScrollInterval_DefaultValue = 50;
-    public const int AutoScrollTreshold_DefaultValue = 5;
+    #region Static Fields
 
-    public AutoScrollManager(ScrollViewer scrollViewer)
+    internal static readonly TimeSpan AutoScrollInterval_DefaultValue = TimeSpan.FromMilliseconds( 50d );
+    internal const int AutoScrollThreshold_DefaultValue = 5;
+
+    #endregion
+
+    internal AutoScrollManager( ScrollViewer scrollViewer )
     {
       if( scrollViewer == null )
         throw new ArgumentNullException( "scrollViewer" );
 
       m_scrollViewer = scrollViewer;
+
       m_timer = new System.Windows.Threading.DispatcherTimer();
-      m_timer.Interval = new TimeSpan( 0, 0, 0, 0, 0 );
+      m_timer.Interval = AutoScrollManager.AutoScrollInterval_DefaultValue;
       m_timer.Tick += new EventHandler( this.OnAutoScrollTimer_Tick );
 
-      this.AutoScrollInterval = AutoScrollInterval_DefaultValue;
-      this.AutoScrollTreshold = AutoScrollTreshold_DefaultValue;
+      this.AutoScrollInterval = AutoScrollManager.AutoScrollInterval_DefaultValue;
+      this.AutoScrollThreshold = AutoScrollManager.AutoScrollThreshold_DefaultValue;
     }
 
     #region AutoScrollInterval Property
 
-    public int AutoScrollInterval
+    internal TimeSpan AutoScrollInterval
     {
       get;
       set;
@@ -56,9 +57,9 @@ namespace Xceed.Utils.Wpf.DragDrop
 
     #endregion
 
-    #region AutoScrollTreshold Property
+    #region AutoScrollThreshold Property
 
-    public int AutoScrollTreshold
+    internal int AutoScrollThreshold
     {
       get;
       set;
@@ -66,74 +67,110 @@ namespace Xceed.Utils.Wpf.DragDrop
 
     #endregion
 
-    #region property ScrollViewer Property
+    #region ScrollViewer Internal Property
 
-    public ScrollViewer ScrollViewer
+    internal ScrollViewer ScrollViewer
     {
-      get { return m_scrollViewer; }
+      get
+      {
+        return m_scrollViewer;
+      }
     }
 
     #endregion
 
-    public event EventHandler AutoScrolled;
+    #region AutoScrolled Internal Event
 
-    private void OnAutoScrollTimer_Tick( object sender, EventArgs e )
+    internal event EventHandler AutoScrolled;
+
+    private void OnAutoScrolled()
     {
-      this.PerformAutoScroll();
+      var handler = this.AutoScrolled;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, EventArgs.Empty );
     }
 
-    public void StopAutoScroll()
+    #endregion
+
+    internal void Start()
     {
+      m_isStarted = true;
+    }
+
+    internal void Stop()
+    {
+      m_isStarted = false;
       m_timer.Stop();
     }
 
-    internal void ProcessMouseMove( MouseEventArgs e )
+    internal void HandleMouseMove( MouseEventArgs e )
     {
-      Point clientMousePosition = e.GetPosition( m_scrollViewer );
+      if( !m_isStarted )
+        return;
 
-      Size scrollViewerRenderSize = m_scrollViewer.RenderSize;
+      this.HandleMove( e.GetPosition );
+    }
+
+    internal void HandleMove( Func<IInputElement, Point> getCursorPosition )
+    {
+      if( !m_isStarted )
+        return;
+
+      var position = getCursorPosition.Invoke( m_scrollViewer );
+      var renderSize = m_scrollViewer.RenderSize;
+      var treshold = this.AutoScrollThreshold;
+      var horizontalSpeed = 0d;
+      var verticalSpeed = 0d;
 
       m_autoScrollDirection = AutoScrollDirection.None;
-      if( m_scrollViewer.ScrollableWidth > 0 && scrollViewerRenderSize.Width > 0)
+
+      if( ( m_scrollViewer.ScrollableWidth > 0d ) && ( m_scrollViewer.ViewportWidth > 0d ) )
       {
-        double mouseEdgeDistance = 0d;
-        if( ( clientMousePosition.X < AutoScrollTreshold ) && ( m_scrollViewer.HorizontalOffset > 0 ) )
+        var distance = 0d;
+
+        if( ( position.X < treshold ) && ( m_scrollViewer.HorizontalOffset > 0d ) )
         {
           m_autoScrollDirection |= AutoScrollDirection.Left;
-          mouseEdgeDistance = clientMousePosition.X - AutoScrollTreshold;
+          distance = position.X - treshold;
         }
-        //Scrolling right
-        else if( ( clientMousePosition.X > scrollViewerRenderSize.Width - AutoScrollTreshold ) && ( m_scrollViewer.HorizontalOffset < m_scrollViewer.ScrollableWidth ) )
+        else if( ( position.X > renderSize.Width - treshold ) && ( m_scrollViewer.HorizontalOffset < m_scrollViewer.ScrollableWidth ) )
         {
           m_autoScrollDirection |= AutoScrollDirection.Right;
-          mouseEdgeDistance = ( clientMousePosition.X - ( scrollViewerRenderSize.Width - AutoScrollTreshold ) );
+          distance = position.X - ( renderSize.Width - treshold );
         }
 
-        //We need a scroll value in units that can be pixels or units (eg. rows)
-        //Store a distance ratio based mouse edge distance in relation to the view width
-        m_horizontalPageScrollRatio = mouseEdgeDistance / scrollViewerRenderSize.Width;
+        horizontalSpeed = distance / m_scrollViewer.ViewportWidth;
       }
 
-      if( m_scrollViewer.ScrollableHeight > 0 )
+      if( ( m_scrollViewer.ScrollableHeight > 0d ) && ( m_scrollViewer.ViewportHeight > 0d ) )
       {
-        if( ( clientMousePosition.Y < AutoScrollTreshold ) && ( m_scrollViewer.VerticalOffset > 0 ) )
+        var distance = 0d;
+
+        if( ( position.Y < treshold ) && ( m_scrollViewer.VerticalOffset > 0d ) )
         {
           m_autoScrollDirection |= AutoScrollDirection.Up;
+          distance = position.Y - treshold;
         }
-        else if( ( clientMousePosition.Y > scrollViewerRenderSize.Height - AutoScrollTreshold )
-            && ( m_scrollViewer.VerticalOffset < m_scrollViewer.ScrollableHeight ) )
+        else if( ( position.Y > renderSize.Height - treshold ) && ( m_scrollViewer.VerticalOffset < m_scrollViewer.ScrollableHeight ) )
         {
           m_autoScrollDirection |= AutoScrollDirection.Down;
+          distance = position.Y - ( renderSize.Height - treshold );
         }
+
+        verticalSpeed = distance / m_scrollViewer.ViewportHeight;
       }
+
+      m_scrollSpeed = new Vector( horizontalSpeed, verticalSpeed );
 
       if( m_autoScrollDirection == AutoScrollDirection.None )
       {
-        this.StopAutoScroll();
+        m_timer.Stop();
       }
       else
       {
-        // The DispatcherTimer is not a priority event. The Tick event won't fire while  the user moves the mouse pointer. That's why we manually call the 
+        // The DispatcherTimer is not a priority event. The Tick event won't fire while the user moves the mouse pointer. That's why we manually call the 
         // PerformAutoScroll method (on each MouseMove, i.e. Drag). When the user doesn't move the mouse pointer, the timer will take over to do the AutoScroll.
         if( !m_timer.IsEnabled )
         {
@@ -146,82 +183,101 @@ namespace Xceed.Utils.Wpf.DragDrop
 
     private void PerformAutoScroll()
     {
-      if(  m_timer.IsEnabled )
+      if( !m_timer.IsEnabled )
+        return;
+
+      var elapsedTime = DateTime.UtcNow - m_timestamp;
+      if( elapsedTime < this.AutoScrollInterval )
+        return;
+
+      var scaleFactor = Matrix.Identity;
+      scaleFactor.Scale( m_scrollViewer.ViewportWidth, m_scrollViewer.ViewportHeight );
+
+      var scrollUnits = m_scrollSpeed * scaleFactor;
+
+      if( ( m_autoScrollDirection & AutoScrollDirection.Left ) == AutoScrollDirection.Left )
       {
-        TimeSpan timeSpanSinceLastScroll = ( TimeSpan )( DateTime.UtcNow - m_lastAutoScrollTime );
-
-        // This method may be called before its time (on the MouseMove event). We make sure that the AutoScroll is not performed before the desired time span has elapsed.
-        if( timeSpanSinceLastScroll.Milliseconds >= AutoScrollInterval )
+        if( m_scrollSpeed.X <= -1d )
         {
-          double scrollUnits = ( m_horizontalPageScrollRatio * m_scrollViewer.ViewportWidth );
-
-          if( ( m_autoScrollDirection & AutoScrollDirection.Left ) == AutoScrollDirection.Left )
-          {
-            //Minimum 1 unit
-            scrollUnits = System.Math.Min( -1d, scrollUnits );
-            double scrollOffset = m_scrollViewer.HorizontalOffset + scrollUnits;
-
-            //Maximum 1 page
-            if(m_horizontalPageScrollRatio <= -1d)
-            {
-              m_scrollViewer.PageLeft();
-            }
-            else
-            {
-              //Make sure the grid stops scrolling.
-              if( scrollOffset < 0 )
-              {
-                scrollOffset = 0;
-              }
-              m_scrollViewer.ScrollToHorizontalOffset( scrollOffset );
-            }
-          }
-          else if( ( m_autoScrollDirection & AutoScrollDirection.Right ) == AutoScrollDirection.Right )
-          {
-            //Minimum 1 unit
-            scrollUnits = System.Math.Max( 1d, scrollUnits );
-            double scrollOffset = m_scrollViewer.HorizontalOffset + scrollUnits;
-
-            //Maxium 1 page
-            if( m_horizontalPageScrollRatio >= 1d )
-            {
-              m_scrollViewer.PageRight();
-            }
-            else
-            {
-              //Make sure the grid does not scroll pass the last right column.
-              if( scrollOffset > m_scrollViewer.ScrollableWidth )
-              {
-                scrollOffset = m_scrollViewer.ScrollableWidth;
-              }
-              m_scrollViewer.ScrollToHorizontalOffset( scrollOffset );
-            }
-          }
-          else if( ( m_autoScrollDirection & AutoScrollDirection.Up ) == AutoScrollDirection.Up )
-          {
-            m_scrollViewer.LineUp();
-          }
-          else if( ( m_autoScrollDirection & AutoScrollDirection.Down ) == AutoScrollDirection.Down )
-          {
-            m_scrollViewer.LineDown();
-          }
-
-          m_lastAutoScrollTime = DateTime.UtcNow;
-
-          if( this.AutoScrolled != null )
-          {
-            this.AutoScrolled( this, EventArgs.Empty );
-          }
-
+          m_scrollViewer.PageLeft();
         }
+        else
+        {
+          var unit = System.Math.Min( -1d, scrollUnits.X );
+          var offset = System.Math.Max( 0d, m_scrollViewer.HorizontalOffset + unit );
+
+          m_scrollViewer.ScrollToHorizontalOffset( offset );
+        }
+      }
+      else if( ( m_autoScrollDirection & AutoScrollDirection.Right ) == AutoScrollDirection.Right )
+      {
+        if( m_scrollSpeed.X >= 1d )
+        {
+          m_scrollViewer.PageRight();
+        }
+        else
+        {
+          var unit = System.Math.Max( 1d, scrollUnits.X );
+          var offset = System.Math.Min( m_scrollViewer.ScrollableWidth, m_scrollViewer.HorizontalOffset + unit );
+
+          m_scrollViewer.ScrollToHorizontalOffset( offset );
+        }
+      }
+
+      if( ( m_autoScrollDirection & AutoScrollDirection.Up ) == AutoScrollDirection.Up )
+      {
+        if( m_scrollSpeed.Y <= -1d )
+        {
+          m_scrollViewer.PageUp();
+        }
+        else
+        {
+          var unit = System.Math.Min( -1d, scrollUnits.Y );
+          var offset = System.Math.Max( 0d, m_scrollViewer.VerticalOffset + unit );
+
+          m_scrollViewer.ScrollToVerticalOffset( offset );
+        }
+      }
+      else if( ( m_autoScrollDirection & AutoScrollDirection.Down ) == AutoScrollDirection.Down )
+      {
+        if( m_scrollSpeed.Y >= 1d )
+        {
+          m_scrollViewer.PageDown();
+        }
+        else
+        {
+          var unit = System.Math.Max( 1d, scrollUnits.Y );
+          var offset = System.Math.Min( m_scrollViewer.ScrollableHeight, m_scrollViewer.VerticalOffset + unit );
+
+          m_scrollViewer.ScrollToVerticalOffset( offset );
+        }
+      }
+
+      m_timestamp = DateTime.UtcNow;
+
+      this.OnAutoScrolled();
+    }
+
+    private void OnAutoScrollTimer_Tick( object sender, EventArgs e )
+    {
+      if( m_isStarted )
+      {
+        this.PerformAutoScroll();
+      }
+      else
+      {
+        ( ( DispatcherTimer )sender ).Stop();
       }
     }
 
     private AutoScrollDirection m_autoScrollDirection = AutoScrollDirection.None;
-    private ScrollViewer m_scrollViewer;
-    private DispatcherTimer m_timer = null;
-    private DateTime m_lastAutoScrollTime;
-    private double m_horizontalPageScrollRatio;
+    private readonly ScrollViewer m_scrollViewer;
+    private readonly DispatcherTimer m_timer;
+    private DateTime m_timestamp;
+    private Vector m_scrollSpeed = new Vector( 0d, 0d );
+    private bool m_isStarted; //false
+
+    #region AutoScrollManager Private Enum
 
     [Flags()]
     private enum AutoScrollDirection
@@ -232,5 +288,7 @@ namespace Xceed.Utils.Wpf.DragDrop
       Up = 4,
       Down = 8
     }
+
+    #endregion
   }
 }

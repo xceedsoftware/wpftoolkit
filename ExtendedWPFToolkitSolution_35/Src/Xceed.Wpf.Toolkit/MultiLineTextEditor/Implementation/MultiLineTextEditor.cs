@@ -230,6 +230,9 @@ namespace Xceed.Wpf.Toolkit
       _toggleButton = GetTemplateChild( PART_DropDownButton ) as ToggleButton;
     }
 
+
+
+
     #endregion //Bass Class Overrides
 
     #region Event Handlers

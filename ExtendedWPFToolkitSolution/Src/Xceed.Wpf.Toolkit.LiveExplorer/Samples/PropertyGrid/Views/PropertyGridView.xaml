@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -47,9 +47,10 @@
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
-          <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="Auto" />
@@ -71,7 +72,7 @@
                                Grid.Column="1"
                                Width="175"
                                Watermark="Search"
-                               Text="{Binding Filter, ElementName=_propertyGrid}"
+                               Text="{Binding Filter, ElementName=_propertyGrid, UpdateSourceTrigger=PropertyChanged}"
                                VerticalAlignment="Center"
                                Margin="5"
                                ToolTip="Filters the properties within the PropertyGrid." />
@@ -85,21 +86,11 @@
                   VerticalAlignment="Center"
                   Margin="5"
                   ToolTip="Set the IsReadOnly property to true or false." />
-        <TextBlock Text="IsVirtualizing:"
+        <TextBlock Text="ShowPreview:"
                    VerticalAlignment="Center"
                    Grid.Row="3"
                    Grid.Column="0" />
         <CheckBox Grid.Row="3"
-                  Grid.Column="1"
-                  IsChecked="{Binding IsVirtualizing, ElementName=_propertyGrid}"
-                  VerticalAlignment="Center"
-                  Margin="5"
-                  ToolTip="Set if the PropertyGrid is using virtualization. Using virtualization will load the PropertyGrid faster with large dataSets." />
-        <TextBlock Text="ShowPreview:"
-                   VerticalAlignment="Center"
-                   Grid.Row="4"
-                   Grid.Column="0" />
-        <CheckBox Grid.Row="4"
                   Grid.Column="1"
                   IsChecked="{Binding ShowPreview, ElementName=_propertyGrid}"
                   VerticalAlignment="Center"
@@ -149,19 +140,39 @@
                   VerticalAlignment="Center"
                   Margin="5"
                   ToolTip="Update the source of a TextBox when True and Enter key is pressed." />
+
+        <!--Third Column-->
+        <TextBlock Text="Show Horizontal ScrollBar:"
+                   VerticalAlignment="Center"
+                   Grid.Column="4"
+                   Margin="10,0,0,0" />
+        <CheckBox Grid.Column="5"
+                  IsChecked="{Binding ShowHorizontalScrollBar, ElementName=_propertyGrid}"
+                  VerticalAlignment="Center"
+                  Margin="5"
+                  ToolTip="Gets/Sets if the horizontal scrollBar will be showned." />
         <TextBlock Text="HideInheritedProperties:"
                    VerticalAlignment="Center"
-                   Grid.Row="4"
-                   Grid.Column="2"
+                   Grid.Row="1"
+                   Grid.Column="4"
                    Margin="10,0,0,0" />
-        <CheckBox Grid.Row="4"
-                  Grid.Column="3"
+        <CheckBox Grid.Row="1"
+                  Grid.Column="5"
                   IsChecked="{Binding HideInheritedProperties, ElementName=_propertyGrid}"
                   VerticalAlignment="Center"
                   Margin="5"
                   ToolTip="When True, inherited properties are hidden." />
-
-
+        <TextBlock Text="IsVirtualizing:"
+                   VerticalAlignment="Center"
+                   Grid.Row="2"
+                   Grid.Column="4"
+                   Margin="10,0,0,0" />
+        <CheckBox Grid.Row="2"
+                  Grid.Column="5"
+                  IsChecked="{Binding IsVirtualizing, ElementName=_propertyGrid}"
+                  VerticalAlignment="Center"
+                  Margin="5"
+                  ToolTip="Set if the PropertyGrid is using virtualization. Using virtualization will load the PropertyGrid faster with large dataSets." />
       </Grid>
     </GroupBox>
 
@@ -198,6 +209,7 @@
                            IsMiscCategoryLabelHidden="False"
                            ShowPreview="True"
                            HideInheritedProperties="False"
+                           ShowHorizontalScrollBar="False"
                            SelectedObject="{Binding ElementName=_button}">
         </xctk:PropertyGrid>
       </Grid>

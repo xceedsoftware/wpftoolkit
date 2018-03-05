@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data;
+using System.Collections;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -28,14 +29,17 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
+    public override object GetValueFromKey( object key, ForeignKeyConfiguration configuration )
+    {
+      return this.GetValueFromKeyCore( key, configuration.ItemsSource, configuration.ValuePath, configuration.DisplayMemberPath, true );
+    }
+
     public override object GetKeyFromValue( object value, ForeignKeyConfiguration configuration )
     {
-      // When the Key changes, try to find the data row that has the new key.
-      // If it is not found, return null.
-      DataView dataView = configuration.ItemsSource as DataView;
+      var dataView = configuration.ItemsSource as DataView;
       if( dataView == null )
       {
-        DataTable dataTable = configuration.ItemsSource as DataTable;
+        var dataTable = configuration.ItemsSource as DataTable;
         if( dataTable != null )
         {
           dataView = dataTable.DefaultView;
@@ -47,7 +51,7 @@ namespace Xceed.Wpf.DataGrid
         return value;
       }
 
-      DataRowView dataRow = value as DataRowView;
+      var dataRow = value as DataRowView;
 
       if( dataRow == null )
       {
@@ -59,14 +63,17 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    public override object GetValueFromKey( object key, ForeignKeyConfiguration configuration )
+    public override object GetValueFromKey( object key, DataGridForeignKeyDescription description )
     {
-      // When the Key changes, try to find the data row that has the new key.
-      // If it is not found, return null.
-      DataView dataView = configuration.ItemsSource as DataView;
+      return this.GetValueFromKeyCore( key, description.ItemsSource, description.ValuePath, description.DisplayMemberPath, false );
+    }
+
+    private object GetValueFromKeyCore( object key, IEnumerable itemsSource, string valuePath, string displayMemberPath, bool isConfiguration )
+    {
+      var dataView = itemsSource as DataView;
       if( dataView == null )
       {
-        DataTable dataTable = configuration.ItemsSource as DataTable;
+        var dataTable = itemsSource as DataTable;
         if( dataTable != null )
         {
           dataView = dataTable.DefaultView;
@@ -77,8 +84,6 @@ namespace Xceed.Wpf.DataGrid
       {
         return key;
       }
-
-      string valuePath = configuration.ValuePath;
 
       if( string.IsNullOrEmpty( valuePath ) )
       {
@@ -111,18 +116,19 @@ namespace Xceed.Wpf.DataGrid
         dataRow = dataView[ index ];
       }
 
-      object value = dataRow;
-
       // Use the DisplayMemberPath if defined
       if( dataRow != null )
       {
-        if( !string.IsNullOrEmpty( configuration.DisplayMemberPath ) )
+        if( !string.IsNullOrEmpty( displayMemberPath ) )
         {
-          value = dataRow[ configuration.DisplayMemberPath ];
+          return dataRow[ displayMemberPath ];
         }
       }
 
-      return value;
+      if( isConfiguration )
+        return dataRow;
+
+      return key;
     }
   }
 }

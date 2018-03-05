@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -27,7 +27,7 @@
            The RichTextBox is a TextBox that allows you to edit formatted text based on TextFormatters. The RichTextBoxFormatBar is a contextual formatting toolbar that mimics the behavior of the Microsoft Office 2010 formatting bar on selection.
         </Paragraph>
     </local:DemoView.Description>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

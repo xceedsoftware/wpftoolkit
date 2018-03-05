@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -19,12 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-#if !OPEN_SOURCE
-using System.Windows.Input;
-using System.Windows.Media.Animation;
-using System.Windows.Threading;
-using Xceed.Wpf.Toolkit.MaterialControls;
-#endif
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.MaterialControls.Views
 {
   /// <summary>
@@ -32,15 +26,8 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.MaterialControls.Views
   /// </summary>
   public partial class MaterialControlsView : MaterialDemoView
   {
-#if !OPEN_SOURCE
-    #region Members
 
-    private Storyboard _toastStoryboard = new Storyboard();
-    private Random _rand = new Random();
-    private List<MaterialToast> _toastList = new List<MaterialToast>();
 
-    #endregion
-#endif
 
     #region Constructors
 
@@ -51,130 +38,22 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.MaterialControls.Views
 
     #endregion
 
-#if !OPEN_SOURCE
 
-    #region Private Methods
 
-    private int GetRandomInteger( int max )
-    {
-      return _rand.Next( max );
-    }
 
-    private void PopToast()
-    {
-      MaterialAccentEnum accent;
-      MaterialToastLocationEnum location;
-      string text;
 
-      switch( this.GetRandomInteger( 8 ) )
-      {
-        case 0: accent = MaterialAccentEnum.Blue; break;
-        case 1: accent = MaterialAccentEnum.LightBlue; break;
-        case 2: accent = MaterialAccentEnum.Cyan; break;
-        case 3: accent = MaterialAccentEnum.Teal; break;
-        case 4: accent = MaterialAccentEnum.Green; break;
-        case 5: accent = MaterialAccentEnum.LightGreen; break;
-        case 6: accent = MaterialAccentEnum.Lime; break;
-        default: accent = MaterialAccentEnum.Yellow; break;
-      }
-      switch( this.GetRandomInteger( 6 ) )
-      {
-        case 0: location = MaterialToastLocationEnum.Bottom; break;
-        case 1: location = MaterialToastLocationEnum.BottomLeft; break;
-        case 2: location = MaterialToastLocationEnum.BottomRight; break;
-        case 3: location = MaterialToastLocationEnum.Top; break;
-        case 4: location = MaterialToastLocationEnum.TopLeft; break;
-        default: location = MaterialToastLocationEnum.TopRight; break;
-      }
-      switch( this.GetRandomInteger( 6 ) )
-      {
-        case 0: text = "Warning"; break;
-        case 1: text = "New Appointments"; break;
-        case 2: text = "New Mail"; break;
-        case 3: text = "New Message"; break;
-        case 4: text = "Times Up!"; break;
-        default: text = "Task Completed!";break;
-      }
-      var materialToast = new MaterialToast( _toastGrid );
-      materialToast.MaterialAccent = accent;
-      materialToast.Location = location;
-      materialToast.Content = text;
-      materialToast.DisplayTime = System.TimeSpan.FromMilliseconds( 3000 );
-      materialToast.HideCompleted += this.MaterialToast_HideCompleted;
-      _toastList.Add( materialToast );
-      materialToast.ShowToast();
-    }
 
-    private void StartToastCircularProgressBar()
-    {
-      Storyboard storyboard = new Storyboard();
 
-      var valueAnim = new DoubleAnimation( 0d, 100d, System.TimeSpan.FromMilliseconds( 3000 ) );
-      Storyboard.SetTarget( valueAnim, _toastProgressBarCircular );
-      Storyboard.SetTargetProperty( valueAnim, new PropertyPath( MaterialProgressBarCircular.ValueProperty ) );
-      storyboard.Children.Add( valueAnim );
 
-      storyboard.Completed += this.ToastCircularPropgressBarAnimation_Completed;
-      storyboard.Begin( _toastProgressBarCircular );
-    }
 
-    #endregion
 
-    #region Event Handlers
 
-    private void MaterialProgressBar_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
-    {
-      var progressBar = sender as MaterialProgressBarBase;
-      if( progressBar != null )
-      {
-        var storyboard = new Storyboard();
 
-        // Animate ProgressBar
-        var valueAnim = new DoubleAnimation( progressBar.Minimum, progressBar.Maximum, System.TimeSpan.FromMilliseconds( 4000 ) );
-        Storyboard.SetTarget( valueAnim, progressBar );
-        Storyboard.SetTargetProperty( valueAnim, new PropertyPath( MaterialProgressBarBase.ValueProperty ) );
-        storyboard.Children.Add( valueAnim );
 
-        storyboard.Begin( this );
-      }
-    }
 
-    private void MaterialTabControl_SelectionChanged( object sender, SelectionChangedEventArgs e )
-    {
-      var materialTabItem = e.AddedItems[ 0 ] as MaterialTabItem;
-      if( (materialTabItem != null) && materialTabItem.Equals( _materialTabItem5 ) )
-      {
-        this.StartToastCircularProgressBar();
-      }
-      else
-      {
-        foreach( var toast in _toastList )
-        {
-          toast.HideToast();
-        }
-      }
-    }
 
-    private void MaterialToast_HideCompleted( object sender, RoutedEventArgs e )
-    {
-      _toastList.Remove( sender as MaterialToast );
-    }
 
-    private void MaterialToastButton_Click( object sender, RoutedEventArgs e )
-    {
-      this.PopToast();
-    }
 
-    private void ToastCircularPropgressBarAnimation_Completed( object sender, EventArgs e )
-    {
-      if( _materialTabControl.SelectedItem.Equals( _materialTabItem5 ) )
-      {
-        this.PopToast();
-        this.StartToastCircularProgressBar();
-      }
-    }
 
-    #endregion
-#endif
   }
 }

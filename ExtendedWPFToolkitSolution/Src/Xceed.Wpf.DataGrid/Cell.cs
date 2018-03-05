@@ -32,7 +32,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Xceed.Utils.Wpf;
-using Xceed.Wpf.DataGrid.Automation;
+using Xceed.Wpf.DataGrid.Utils;
 using Xceed.Wpf.DataGrid.ValidationRules;
 using Xceed.Wpf.DataGrid.Views;
 using Xceed.Wpf.Toolkit.Core;
@@ -42,6 +42,8 @@ namespace Xceed.Wpf.DataGrid
   [TemplatePart( Name = "PART_CellContentPresenter", Type = typeof( ContentPresenter ) )]
   public class Cell : ContentControl, INotifyPropertyChanged, IWeakEventListener
   {
+    internal static readonly string FieldNamePropertyName = PropertyHelper.GetPropertyName( ( Cell c ) => c.FieldName );
+
     // This validation rule is meant to be used as the rule in error set in a Cell's ValidationError when the CellEditor's HasError attached property returns true.
     private static readonly CellEditorErrorValidationRule CellEditorErrorValidationRule = new CellEditorErrorValidationRule();
 
@@ -53,9 +55,7 @@ namespace Xceed.Wpf.DataGrid
     static Cell()
     {
       Cell.ContentProperty.OverrideMetadata( typeof( Cell ),
-          new FrameworkPropertyMetadata(
-          new PropertyChangedCallback( OnContentChanged ),
-          new CoerceValueCallback( OnCoerceContent ) ) );
+          new FrameworkPropertyMetadata( new PropertyChangedCallback( OnContentChanged ), new CoerceValueCallback( OnCoerceContent ) ) );
 
       //This configures the TAB key to go trough the controls of the cell once... then continue with other controls
       KeyboardNavigation.TabNavigationProperty.OverrideMetadata( typeof( Cell ), new FrameworkPropertyMetadata( KeyboardNavigationMode.None ) );
@@ -84,7 +84,6 @@ namespace Xceed.Wpf.DataGrid
 
       Cell.IsBeingEditedProperty = Cell.IsBeingEditedPropertyKey.DependencyProperty;
       Cell.IsDirtyProperty = Cell.IsDirtyPropertyKey.DependencyProperty;
-      Cell.IsDirtyFromInitializingInsertionRowProperty = Cell.IsDirtyFromInitializingInsertionRowPropertyKey.DependencyProperty;
 
       // We do this last to ensure all the Static content of the cell is done before using 
       // any static read-only field of the row.
@@ -135,8 +134,8 @@ namespace Xceed.Wpf.DataGrid
       // Remove the error template by default.
       this.SetValue( Validation.ErrorTemplateProperty, null );
 
-      Validation.AddErrorHandler( this, Cell.ContentBinding_ValidationError );
-      this.TargetUpdated += new EventHandler<DataTransferEventArgs>( this.ContentBinding_TargetUpdated );
+      Validation.AddErrorHandler( this, Cell.OnContentBindingNotifyValidationError );
+      this.TargetUpdated += new EventHandler<DataTransferEventArgs>( this.OnContentBindingTargetUpdated );
       this.LayoutUpdated += new EventHandler( this.Cell_LayoutUpdated );
     }
 
@@ -282,19 +281,19 @@ namespace Xceed.Wpf.DataGrid
           cellState.SetIsBeingEdited( value );
         }
 
-        if( !this.ParentRow.IsClearingContainer )
-        {
-          //If cell is being edited
-          if( value )
-          {
-            //Raise the RoutedEvent that notifies any Row that the cell is being edited.
-            RoutedEventArgs eventArgs = new RoutedEventArgs( Cell.IsBeingEditedEvent );
-            this.RaiseEvent( eventArgs );
-            this.FocusEditor = true;
-          }
+        if( this.ParentRow.IsClearingContainer )
+          return;
 
-          this.RefreshDisplayedTemplate();
+        //If cell is being edited
+        if( value )
+        {
+          //Raise the RoutedEvent that notifies any Row that the cell is being edited.
+          RoutedEventArgs eventArgs = new RoutedEventArgs( Cell.IsBeingEditedEvent );
+          this.RaiseEvent( eventArgs );
+          this.FocusEditor = true;
         }
+
+        this.RefreshDisplayedTemplate();
       }
     }
 
@@ -344,41 +343,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion IsDirty Read-Only Property
 
-    #region IsDirtyFromInitializingInsertionRow Read-Only Property
-
-    private static readonly DependencyPropertyKey IsDirtyFromInitializingInsertionRowPropertyKey = DependencyProperty.RegisterReadOnly(
-      "IsDirtyFromInitializingInsertionRow",
-      typeof( bool ),
-      typeof( Cell ),
-      new PropertyMetadata( false ) );
-
-    internal static readonly DependencyProperty IsDirtyFromInitializingInsertionRowProperty;
-
-    internal bool IsDirtyFromInitializingInsertionRow
-    {
-      get
-      {
-        return ( bool )this.GetValue( Cell.IsDirtyFromInitializingInsertionRowProperty );
-      }
-    }
-
-    internal void SetIsDirtyFromInitializingInsertionRow( bool value )
-    {
-      if( value != this.IsDirtyFromInitializingInsertionRow )
-      {
-        if( value )
-        {
-          this.SetValue( Cell.IsDirtyFromInitializingInsertionRowPropertyKey, value );
-        }
-        else
-        {
-          this.SetValue( Cell.IsDirtyFromInitializingInsertionRowPropertyKey, DependencyProperty.UnsetValue );
-        }
-      }
-    }
-
-    #endregion IsDirtyFromInitializingInsertionRow Read-Only Property
-
     #region IsCellEditorDisplayed Read-Only Property
 
     public bool IsCellEditorDisplayed
@@ -402,8 +366,8 @@ namespace Xceed.Wpf.DataGrid
 
     #region CurrentBackground Property
 
-    public static readonly DependencyProperty CurrentBackgroundProperty =
-      DependencyProperty.Register( "CurrentBackground",
+    public static readonly DependencyProperty CurrentBackgroundProperty = DependencyProperty.Register(
+      "CurrentBackground",
       typeof( Brush ),
       typeof( Cell ),
       new FrameworkPropertyMetadata( null ) );
@@ -463,8 +427,7 @@ namespace Xceed.Wpf.DataGrid
 
     #region CellErrorStyle Property
 
-    public static readonly DependencyProperty CellErrorStyleProperty =
-      DataGridControl.CellErrorStyleProperty.AddOwner( typeof( Cell ) );
+    public static readonly DependencyProperty CellErrorStyleProperty = DataGridControl.CellErrorStyleProperty.AddOwner( typeof( Cell ) );
 
     public Style CellErrorStyle
     {
@@ -483,17 +446,13 @@ namespace Xceed.Wpf.DataGrid
 
     #region HasValidationError Read-Only Property
 
-    private static readonly DependencyPropertyKey HasValidationErrorPropertyKey =
-      DependencyProperty.RegisterReadOnly(
+    private static readonly DependencyPropertyKey HasValidationErrorPropertyKey = DependencyProperty.RegisterReadOnly(
       "HasValidationError",
       typeof( bool ),
       typeof( Cell ),
-      new UIPropertyMetadata(
-        false,
-        new PropertyChangedCallback( Cell.OnHasValidationErrorChanged ) ) );
+      new UIPropertyMetadata( false, new PropertyChangedCallback( Cell.OnHasValidationErrorChanged ) ) );
 
-    public static readonly DependencyProperty HasValidationErrorProperty =
-      HasValidationErrorPropertyKey.DependencyProperty;
+    public static readonly DependencyProperty HasValidationErrorProperty = HasValidationErrorPropertyKey.DependencyProperty;
 
     public bool HasValidationError
     {
@@ -523,13 +482,12 @@ namespace Xceed.Wpf.DataGrid
       Cell cell = ( Cell )sender;
 
       // If we are in the process of clearing the cell, don't refresh the error style.
-      // It is imperative to take care of resetting all the flags used by the DelayedRefreshErrorStyle architecture in the
-      // Cell's ClearContainer method though.
-      if( ( cell.ParentRow != null ) && ( cell.ParentRow.IsClearingContainer ) )
+      // It is imperative to take care of resetting all the flags used by the DelayedRefreshErrorStyle architecture in the Cell's ClearContainer method though.
+      var parentRow = cell.ParentRow;
+      if( ( parentRow != null ) && parentRow.IsClearingContainer )
         return;
 
-      // This flag is used to optimize the synchronization of error flags on the parent row/column so that
-      // it is done only once at the end of the UpdateHasErrorFlags method.
+      // This flag is used to optimize the synchronization of error flags on the parent row/column so that it is done only once at the end of the UpdateHasErrorFlags method.
       cell.HasPendingSyncParentErrorFlags = true;
 
       if( cell.HasPendingErrorStyleRefresh )
@@ -575,7 +533,7 @@ namespace Xceed.Wpf.DataGrid
     {
       m_delayedRefreshErrorStyleDispatcherOperation = null;
       System.Diagnostics.Debug.Assert( this.HasPendingErrorStyleRefresh, "The operation should have been aborted." );
-      System.Diagnostics.Debug.Assert( ( this.ParentRow != null ) && ( !this.ParentRow.IsClearingContainer ), "The operation should have been aborted." );
+      System.Diagnostics.Debug.Assert( ( ( this.ParentRow != null ) && !this.ParentRow.IsClearingContainer ), "The operation should have been aborted." );
 
       if( !this.IsLoaded )
       {
@@ -641,8 +599,7 @@ namespace Xceed.Wpf.DataGrid
       typeof( Cell ),
       new PropertyMetadata( false ) );
 
-    public static readonly DependencyProperty IsValidationErrorRestrictiveProperty =
-      Cell.IsValidationErrorRestrictivePropertyKey.DependencyProperty;
+    public static readonly DependencyProperty IsValidationErrorRestrictiveProperty = Cell.IsValidationErrorRestrictivePropertyKey.DependencyProperty;
 
     public bool IsValidationErrorRestrictive
     {
@@ -677,7 +634,8 @@ namespace Xceed.Wpf.DataGrid
 
     #region ValidationError Read-Only Property
 
-    public static readonly RoutedEvent ValidationErrorChangingEvent = EventManager.RegisterRoutedEvent( "ValidationErrorChanging", RoutingStrategy.Bubble, typeof( CellValidationErrorRoutedEventHandler ), typeof( Cell ) );
+    public static readonly RoutedEvent ValidationErrorChangingEvent =
+                  EventManager.RegisterRoutedEvent( "ValidationErrorChanging", RoutingStrategy.Bubble, typeof( CellValidationErrorRoutedEventHandler ), typeof( Cell ) );
 
     public event CellValidationErrorRoutedEventHandler ValidationErrorChanging
     {
@@ -696,15 +654,13 @@ namespace Xceed.Wpf.DataGrid
       this.RaiseEvent( e );
     }
 
-    private static readonly DependencyPropertyKey ValidationErrorPropertyKey =
-        DependencyProperty.RegisterReadOnly( "ValidationError", typeof( CellValidationError ), typeof( Cell ),
-        new FrameworkPropertyMetadata(
-          null,
-          new PropertyChangedCallback( Cell.OnValidationErrorChanged ),
-          new CoerceValueCallback( Cell.OnCoerceValidationError ) ) );
+    private static readonly DependencyPropertyKey ValidationErrorPropertyKey = DependencyProperty.RegisterReadOnly(
+      "ValidationError",
+      typeof( CellValidationError ),
+      typeof( Cell ),
+      new FrameworkPropertyMetadata( null, new PropertyChangedCallback( Cell.OnValidationErrorChanged ), new CoerceValueCallback( Cell.OnCoerceValidationError ) ) );
 
-    public static readonly DependencyProperty ValidationErrorProperty =
-      ValidationErrorPropertyKey.DependencyProperty;
+    public static readonly DependencyProperty ValidationErrorProperty = ValidationErrorPropertyKey.DependencyProperty;
 
     public CellValidationError ValidationError
     {
@@ -735,12 +691,10 @@ namespace Xceed.Wpf.DataGrid
 
       CellValidationError newCellValidationError = e.NewValue as CellValidationError;
 
-      // Update the flags telling us wether or not the current validation error is CellEditor error, or a UI error and
-      // update the HasValidationError dependency property.
+      // Update the flags telling us wether or not the current validation error is CellEditor error, or a UI error and update the HasValidationError dependency property.
       cell.UpdateHasErrorFlags( newCellValidationError );
 
-      // Refresh which content template is displayed (editTemplate or not) in case there was a CellEditor validation error on the cell
-      // and now there isn't one anymore.
+      // Refresh which content template is displayed (editTemplate or not) in case there was a CellEditor validation error on the cell and now there isn't one anymore.
       cell.RefreshDisplayedTemplate();
     }
 
@@ -778,7 +732,9 @@ namespace Xceed.Wpf.DataGrid
           ColumnBase column = this.ParentColumn;
 
           if( column != null )
+          {
             column.SetHasValidationError( hasValidationError );
+          }
 
           Row row = this.ParentRow;
 
@@ -810,7 +766,9 @@ namespace Xceed.Wpf.DataGrid
         CellState cellState = this.GetEditCachedState();
 
         if( cellState != null )
+        {
           cellState.SetCellValidationError( value );
+        }
       }
     }
 
@@ -824,9 +782,11 @@ namespace Xceed.Wpf.DataGrid
 
     #region CellDisplayEditorMatchingConditions Property
 
-    private static readonly DependencyProperty CellDisplayEditorMatchingConditionsProperty =
-        DependencyProperty.Register( "CellDisplayEditorMatchingConditions", typeof( CellEditorDisplayConditions ), typeof( Cell ),
-                                     new UIPropertyMetadata( CellEditorDisplayConditions.None, new PropertyChangedCallback( OnMatchingDisplayEditorChanged ) ) );
+    private static readonly DependencyProperty CellDisplayEditorMatchingConditionsProperty = DependencyProperty.Register(
+      "CellDisplayEditorMatchingConditions",
+      typeof( CellEditorDisplayConditions ),
+      typeof( Cell ),
+      new UIPropertyMetadata( CellEditorDisplayConditions.None, new PropertyChangedCallback( OnMatchingDisplayEditorChanged ) ) );
 
     internal void SetDisplayEditorMatchingCondition( CellEditorDisplayConditions condition )
     {
@@ -943,7 +903,9 @@ namespace Xceed.Wpf.DataGrid
     #region ParentCell Property
 
     private static readonly DependencyPropertyKey ParentCellPropertyKey = DependencyProperty.RegisterAttachedReadOnly(
-      "ParentCell", typeof( Cell ), typeof( Cell ),
+      "ParentCell",
+      typeof( Cell ),
+      typeof( Cell ),
       new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.Inherits ) );
 
     public static readonly DependencyProperty ParentCellProperty;
@@ -961,7 +923,7 @@ namespace Xceed.Wpf.DataGrid
       "ParentColumn",
       typeof( ColumnBase ),
       typeof( Cell ),
-      new PropertyMetadata( null ) );
+      new PropertyMetadata( null, new PropertyChangedCallback( Cell.OnParentColumnChanged ) ) );
 
     public static readonly DependencyProperty ParentColumnProperty;
 
@@ -971,55 +933,40 @@ namespace Xceed.Wpf.DataGrid
       {
         return ( ColumnBase )this.GetValue( Cell.ParentColumnProperty );
       }
+      private set
+      {
+        this.SetValue( Cell.ParentColumnPropertyKey, value );
+      }
     }
 
-    internal virtual void SetParentColumn( ColumnBase value )
+    internal virtual void OnParentColumnChanged( ColumnBase oldColumn, ColumnBase newColumn )
     {
-      if( value == null )
-        throw new ArgumentNullException( "value" );
+      if( oldColumn != null )
+      {
+        PropertyChangedEventManager.RemoveListener( oldColumn, this, string.Empty );
+      }
 
-      // There is nothing to do if the parent column is the same.
-      var parentColumn = this.ParentColumn;
-      if( value == parentColumn )
+      if( newColumn != null )
+      {
+        PropertyChangedEventManager.AddListener( newColumn, this, string.Empty );
+      }
+
+      this.UpdateFocusable();
+    }
+
+    private static void OnParentColumnChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    {
+      var self = sender as Cell;
+      if( self == null )
         return;
 
-      // Unregister from the old Parent Column's event.
-      if( parentColumn != null )
-      {
-        CellEditorDisplayConditionsChangedEventManager.RemoveListener( parentColumn, this );
-        CellContentTemplateChangedEventManager.RemoveListener( parentColumn, this );
-        CanBeCurrentWhenReadOnlyChangedEventManager.RemoveListener( parentColumn, this );
-        CellContentStringFormatChangedEventManager.RemoveListener( parentColumn, this );
+      self.OnParentColumnChanged( ( ColumnBase )e.OldValue, ( ColumnBase )e.NewValue );
 
-        var dataBoundParentColumn = parentColumn as Column;
-        if( dataBoundParentColumn != null )
-        {
-          ForeignKeyConfigurationChangedEventManager.RemoveListener( dataBoundParentColumn, this );
-        }
-      }
-
-      this.SetValue( Cell.ParentColumnPropertyKey, value );
-      this.UpdateAnimatedColumnReorderingBindings( Row.GetIsTemplateCell( this ) );
-
-      Debug.Assert( value == this.ParentColumn );
-
-      // Register to the new Parent Column's event.
-      if( value != null )
-      {
-        CellEditorDisplayConditionsChangedEventManager.AddListener( value, this );
-        CellContentTemplateChangedEventManager.AddListener( value, this );
-        CanBeCurrentWhenReadOnlyChangedEventManager.AddListener( value, this );
-        CellContentStringFormatChangedEventManager.AddListener( value, this );
-
-        var dataBoundParentColumn = value as Column;
-        if( dataBoundParentColumn != null )
-        {
-          ForeignKeyConfigurationChangedEventManager.AddListener( dataBoundParentColumn, this );
-        }
-      }
+      // Since Cell.FieldName in fact returns Cell.ParentColumn.FieldName, a PropertyChanged corresponding to FieldName must be raised when the ParentColumn has changed.
+      self.OnPropertyChanged( Cell.FieldNamePropertyName );
     }
 
-    #endregion ParentColumn Read-Only Property
+    #endregion
 
     #region ParentRow Read-Only Property
 
@@ -1037,17 +984,13 @@ namespace Xceed.Wpf.DataGrid
       {
         return ( Row )this.GetValue( Cell.ParentRowProperty );
       }
+      private set
+      {
+        this.SetValue( Cell.ParentRowPropertyKey, value );
+      }
     }
 
-    private void SetParentRow( Row value )
-    {
-      if( value == null )
-        throw new ArgumentNullException( "value" );
-
-      this.SetValue( Cell.ParentRowPropertyKey, value );
-    }
-
-    #endregion ParentRow Read-Only Property
+    #endregion
 
     #region FieldName Property
 
@@ -1070,10 +1013,11 @@ namespace Xceed.Wpf.DataGrid
           throw new InvalidOperationException( "An attempt was made to change the FieldName of a cell already associated with a column." );
 
         m_fieldName = value;
+        this.OnPropertyChanged( Cell.FieldNamePropertyName );
       }
     }
 
-    internal void SetFieldName( string fieldName )
+    private void SetFieldName( string fieldName )
     {
       m_fieldName = fieldName;
     }
@@ -1119,6 +1063,14 @@ namespace Xceed.Wpf.DataGrid
                                  : viewerTemplate;
 
       this.SetValue( Cell.CoercedContentTemplatePropertyKey, newContentTemplate );
+    }
+
+    private void UpdateCoercedContentTemplate( bool force )
+    {
+      if( force || this.IsContainerPrepared )
+      {
+        this.SetCoercedContentTemplate( this.GetCoercedCellContentTemplate(), null );
+      }
     }
 
     #endregion
@@ -1251,7 +1203,11 @@ namespace Xceed.Wpf.DataGrid
       var self = ( Cell )sender;
       Debug.Assert( self != null );
 
-      var manager = TableflowView.GetColumnReorderingDragSourceManager( self.ParentColumn );
+      var parentColumn = self.ParentColumn;
+      if( parentColumn == null )
+        return newValue;
+
+      var manager = TableflowView.GetColumnReorderingDragSourceManager( parentColumn );
       if( manager == null )
         return newValue;
 
@@ -1308,8 +1264,8 @@ namespace Xceed.Wpf.DataGrid
 
     #region SelectionBackground Property
 
-    public static readonly DependencyProperty SelectionBackgroundProperty =
-      DependencyProperty.Register( "SelectionBackground",
+    public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register(
+      "SelectionBackground",
       typeof( Brush ),
       typeof( Cell ),
       new FrameworkPropertyMetadata( null ) );
@@ -1330,8 +1286,8 @@ namespace Xceed.Wpf.DataGrid
 
     #region SelectionForeground Property
 
-    public static readonly DependencyProperty SelectionForegroundProperty =
-      DependencyProperty.Register( "SelectionForeground",
+    public static readonly DependencyProperty SelectionForegroundProperty = DependencyProperty.Register(
+      "SelectionForeground",
       typeof( Brush ),
       typeof( Cell ),
       new FrameworkPropertyMetadata( null ) );
@@ -1352,8 +1308,8 @@ namespace Xceed.Wpf.DataGrid
 
     #region InactiveSelectionBackground Property
 
-    public static readonly DependencyProperty InactiveSelectionBackgroundProperty =
-      DependencyProperty.Register( "InactiveSelectionBackground",
+    public static readonly DependencyProperty InactiveSelectionBackgroundProperty = DependencyProperty.Register(
+      "InactiveSelectionBackground",
       typeof( Brush ),
       typeof( Cell ),
       new FrameworkPropertyMetadata( null ) );
@@ -1374,8 +1330,8 @@ namespace Xceed.Wpf.DataGrid
 
     #region InactiveSelectionForeground Property
 
-    public static readonly DependencyProperty InactiveSelectionForegroundProperty =
-      DependencyProperty.Register( "InactiveSelectionForeground",
+    public static readonly DependencyProperty InactiveSelectionForegroundProperty = DependencyProperty.Register(
+      "InactiveSelectionForeground",
       typeof( Brush ),
       typeof( Cell ),
       new FrameworkPropertyMetadata( null ) );
@@ -1503,15 +1459,28 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
+    #region IsContainerPartiallyCleared Property
+
+    internal bool IsContainerPartiallyCleared
+    {
+      get
+      {
+        return m_flags[ ( int )CellFlags.IsContainerPartiallyCleared ];
+      }
+      private set
+      {
+        m_flags[ ( int )CellFlags.IsContainerPartiallyCleared ] = value;
+      }
+    }
+
+    #endregion
+
     #region CanBeRecycled Property
 
     protected internal virtual bool CanBeRecycled
     {
       get
       {
-        if( this.IsDirty || this.HasValidationError || this.HasCellEditorError )
-          return false;
-
         if( !this.IsErrorStyleApplied )
         {
           // We should not recycle the cell if the user has set a style or template explicitly.
@@ -1526,6 +1495,25 @@ namespace Xceed.Wpf.DataGrid
         }
 
         return true;
+      }
+    }
+
+    #endregion
+
+    #region CanBeCollapsed Property
+
+    internal virtual bool CanBeCollapsed
+    {
+      get
+      {
+        if( this.IsCurrent || this.IsDirty || this.HasValidationError || this.IsBeingEdited || this.IsKeyboardFocused || this.IsKeyboardFocusWithin )
+          return false;
+
+        var parentColumn = this.ParentColumn;
+        if( parentColumn == null )
+          return true;
+
+        return !TableflowView.GetIsBeingDraggedAnimated( parentColumn );
       }
     }
 
@@ -1781,18 +1769,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region UpdateContentBindingTargetOnPrepareContainer Property
-
-    protected virtual bool UpdateContentBindingTargetOnPrepareContainer
-    {
-      get
-      {
-        return true;
-      }
-    }
-
-    #endregion
-
     public static Cell FindFromChild( DependencyObject child )
     {
       return Cell.FindFromChild( ( DataGridContext )null, child );
@@ -1892,18 +1868,18 @@ namespace Xceed.Wpf.DataGrid
     [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate" )]
     public double GetFittedWidth()
     {
-      if( ( this.IsContainerPrepared ) && ( !this.IsContainerVirtualized ) && ( this.VisualChildrenCount > 0 ) )
-      {
-        UIElement element = this.GetVisualChild( 0 ) as UIElement;
+      if( !this.IsContainerPrepared || this.IsContainerVirtualized )
+        return -1d;
 
-        if( element != null )
-        {
-          element.Measure( new Size( double.PositiveInfinity, this.ActualHeight ) );
-          return element.DesiredSize.Width;
-        }
-      }
+      this.ApplyTemplate();
 
-      return -1;
+      var child = ( this.VisualChildrenCount > 0 ) ? this.GetVisualChild( 0 ) as UIElement : null;
+      if( child == null )
+        return -1d;
+
+      child.Measure( new Size( double.PositiveInfinity, this.ActualHeight ) );
+
+      return child.DesiredSize.Width;
     }
 
     protected override void OnMouseLeftButtonDown( MouseButtonEventArgs e )
@@ -1989,14 +1965,12 @@ namespace Xceed.Wpf.DataGrid
       if( e.Handled )
         return;
 
-      Row parentRow = this.ParentRow;
-
+      var parentRow = this.ParentRow;
       if( parentRow == null )
         return;
 
       //Do not try to process the Activation Gesture if the Cell is readonly!
-      bool readOnly = this.GetInheritedReadOnly();
-
+      var readOnly = this.GetInheritedReadOnly();
       if( readOnly )
         return;
 
@@ -2004,7 +1978,7 @@ namespace Xceed.Wpf.DataGrid
       if( !( parentRow.IsEditTriggerSet( EditTriggers.ActivationGesture ) ) )
         return;
 
-      CellEditor editor = this.GetCellEditor();
+      var editor = this.GetCellEditor();
 
       //This condition is more complex and is used to filter cases were a TextInput is done and there is no need to process for activation keys...
       //Condition is: Editor is not null, editor is not displaued and editor is not pending showing.
@@ -2084,33 +2058,33 @@ namespace Xceed.Wpf.DataGrid
     {
       base.OnVisualParentChanged( oldParent );
 
+      // Since the parent property isn't a DP, we must update the binding ourself.
       this.UpdateParentForeground();
     }
 
-    protected override AutomationPeer OnCreateAutomationPeer()
+
+    protected override void OnPropertyChanged( DependencyPropertyChangedEventArgs e )
     {
-      return new CellAutomationPeer( this );
+      base.OnPropertyChanged( e );
+      this.OnPropertyChanged( e.Property.Name );
     }
 
     protected virtual void InitializeCore( DataGridContext dataGridContext, Row parentRow, ColumnBase parentColumn )
     {
-      //Initialize the Cell's Properties.
-      this.SetParentRow( parentRow );
-      this.SetParentColumn( parentColumn );
+      this.ParentRow = parentRow;
+      this.ParentColumn = parentColumn;
+
+      this.UpdateAnimatedColumnReorderingBindings( dataGridContext, Row.GetIsTemplateCell( this ) );
 
       if( !this.IsInternalyInitialized )
       {
         Binding rowMatchingConditionsBinding = new Binding();
-        rowMatchingConditionsBinding.Path = new PropertyPath( "(0).(1)",
-          Cell.ParentRowProperty,
-          Row.RowDisplayEditorMatchingConditionsProperty );
+        rowMatchingConditionsBinding.Path = new PropertyPath( "(0).(1)", Cell.ParentRowProperty, Row.RowDisplayEditorMatchingConditionsProperty );
         rowMatchingConditionsBinding.Source = this;
         rowMatchingConditionsBinding.Mode = BindingMode.OneWay;
 
         //Initialize the RowDisplayEditorMatchingConditions binding to the ParentRow
-        BindingOperations.SetBinding(
-          this, Cell.RowDisplayEditorMatchingConditionsProperty,
-          rowMatchingConditionsBinding );
+        BindingOperations.SetBinding( this, Cell.RowDisplayEditorMatchingConditionsProperty, rowMatchingConditionsBinding );
 
         // Clear the FieldName since it will be taken from the column instead of directly from the Cell.
         this.SetFieldName( string.Empty );
@@ -2122,46 +2096,49 @@ namespace Xceed.Wpf.DataGrid
       if( !this.IsInternalyInitialized )
         return null;
 
-      ColumnBase parentColumn = this.ParentColumn;
+      var parentColumnBase = this.ParentColumn;
 
-      if( parentColumn == null )
+      if( parentColumnBase == null )
         return null;
 
-      if( parentColumn.CellEditor != null )
-        return parentColumn.CellEditor;
+      //Since the CellEditor property is set by default, first verify if the CelLEditorSelector property has been explicitly set.
+      if( parentColumnBase.CellEditorSelector != null )
+        return parentColumnBase.CellEditorSelector.SelectCellEditor( parentColumnBase, this.DataContext );
 
-      Column column = parentColumn as Column;
+      if( parentColumnBase.CellEditor != null )
+        return parentColumnBase.CellEditor;
 
-      if( column != null )
+      var parentColumn = parentColumnBase as Column;
+
+      if( parentColumn != null )
       {
         // Try to get a CellEditor from the ParentColumn.ForeignKeyConfiguration
-        ForeignKeyConfiguration configuration = column.ForeignKeyConfiguration;
+        var foreignKeyConfiguration = parentColumn.ForeignKeyConfiguration;
 
-        if( configuration != null )
+        if( foreignKeyConfiguration != null )
         {
-          return configuration.DefaultCellEditor;
+          return foreignKeyConfiguration.DefaultCellEditor;
         }
       }
 
-      object content = this.Content;
+      var content = this.Content;
 
       if( content == null )
         return null;
 
-      Type contentType = content.GetType();
+      var contentType = content.GetType();
 
-      CellEditor cellEditor = DefaultCellEditorSelector.SelectCellEditor( contentType );
+      var cellEditor = DefaultCellEditorSelector.SelectCellEditor( contentType );
 
       if( cellEditor != null )
         return cellEditor;
 
-      TypeConverter typeConverter = TypeDescriptor.GetConverter( contentType );
+      var typeConverter = TypeDescriptor.GetConverter( contentType );
 
       if( typeConverter == null )
         return null;
 
-      if( typeConverter.CanConvertFrom( typeof( string ) )
-        && ( typeConverter.CanConvertTo( typeof( string ) ) ) )
+      if( typeConverter.CanConvertFrom( typeof( string ) ) && typeConverter.CanConvertTo( typeof( string ) ) )
       {
         return DefaultCellEditorSelector.TextBoxEditor;
       }
@@ -2225,51 +2202,47 @@ namespace Xceed.Wpf.DataGrid
 
     protected internal virtual void PrepareContainer( DataGridContext dataGridContext, object item )
     {
-      object dataContext = this.DataContext;
+      this.IsContainerPartiallyCleared = false;
 
       // If the container is already prepared and not virtualized and the DataContext is the same, just ignore this call.
       // For example, a cell generated through the xaml parser can already be prepared (went through this method once) but
       // still have its DataContext set only after it has been prepared, thus the need to excute this method once more.
-      if( ( this.IsContainerPrepared ) && ( !this.IsContainerVirtualized ) &&
-        ( ( dataContext == item ) || ( ( dataContext is UnboundDataItem ) && ( this.IsSameUnboundItem( dataContext, item ) ) ) ) )
+      var dataContext = this.DataContext;
+      if( this.IsContainerPrepared && !this.IsContainerVirtualized &&
+        ( ( dataContext == item ) || ( ( dataContext is UnboundDataItem ) && this.IsSameUnboundItem( dataContext, item ) ) ) )
         return;
 
       //Make sure that the DataGridContext is set appropriatly on the cells that are already created.
-      //This is to ensure that teh value is appropriate when the container is recycled within another DataGridContext ( another detail on the same level ).
+      //This is to ensure that the value is appropriate when the container is recycled within another DataGridContext ( another detail on the same level ).
       DataGridControl.SetDataGridContext( this, dataGridContext );
 
-      bool isNewDataContext;
-      ColumnBase parentColumn = this.ParentColumn;
+      var parentColumn = this.ParentColumn;
+      var isSameDataContext = Cell.AssignDataContext( this, item, null, parentColumn );
 
-      Cell.AssignDataContext( this, item, null, parentColumn, out isNewDataContext );
-
-      if( !isNewDataContext && this.UpdateContentBindingTargetOnPrepareContainer )
+      // In some scenarios, there may be validation errors on the content binding that is not reflected on the cell or the row, so make sure it is.
+      if( isSameDataContext && ( item is IDataErrorInfo ) && ( Validation.GetErrors( this ).Count > 0 ) && !this.HasValidationError
+          && !this.IsDirty)
       {
-        // The DataContext is already this item, update the cell's Content binding target in order for the validation to be once again evaluated.
-        this.UpdateContentBindingTarget();
+        this.NotifyContentBindingValidationError();
       }
 
-      Row parentRow = this.ParentRow;
-      ColumnBase currentColumn = dataGridContext.CurrentColumn;
-
       // If there is a current column on the DataGridContext, try to restore the currency of the cell
+      var parentRow = this.ParentRow;
+      var currentColumn = dataGridContext.CurrentColumn;
       if( ( parentRow != null ) && ( parentRow.IsCurrent ) && ( currentColumn != null ) && ( currentColumn == parentColumn ) )
       {
         this.SetIsCurrent( true );
       }
 
       // This will force invalidation of the CoercedContentTemplate, only if the content is null after the prepare
-      // and if the content template is set to somethign else than default. However, when binded to an EmptyDataItem,
-      // our content will always be null but a CellContentTemplate will be applied. In this case, we do NOT want to 
-      // reapplied the template every time.
+      // and if the content template is set to something else than default. However, when binded to an EmptyDataItem,
+      // our content will always be null but a CellContentTemplate will be applied. In this case, we do NOT want to  reapplied the template every time.
       if( ( this.Content == null ) && ( !( this.GetRealDataContext() is EmptyDataItem ) ) )
       {
         this.ClearValue( Cell.CoercedContentTemplatePropertyKey );
       }
 
-      //Determine the default CellContentTemplate for the cell.
-      this.SetCoercedContentTemplate( this.GetCoercedCellContentTemplate(), null );
-
+      this.UpdateCoercedContentTemplate( true );
       this.UpdateMatchingDisplayConditions();
 
       // Ensure to reset both container recycling flags
@@ -2287,26 +2260,7 @@ namespace Xceed.Wpf.DataGrid
         return;
 
       this.IsContainerPrepared = false;
-
-      // In DP's PropertyChanged Callbacks, for the sake of performance, you could
-      // return immediatly if the cell is in process of being cleared.
-
-      this.ClearValue( Cell.IsCurrentPropertyKey );
-      this.ClearValue( Cell.IsBeingEditedPropertyKey );
-      this.SetIsSelected( false );
-      this.SetIsCellEditorDisplayed( false );
-      this.CurrentEditorPendingDisplayState = EditorDisplayState.None;
-      this.IsContainerVirtualized = true;
-
-      // We must not clear the IsDirty flag of the Cell here since its
-      // Content could have been edited and this flag is checked
-      // to determine if the new value is commited or not in the source
-
-      this.ClearValue( Cell.ValidationErrorPropertyKey );
-
-      // No need to clear the Cell.CellDisplayEditorMatchingConditionsProperty
-      // neither DataGridControl.CellEditorDisplayConditionsProperty since
-      // both will be updated when Cell.PrepareContainer is called again
+      this.IsContainerPartiallyCleared = false;
 
       this.AbortRefreshErrorStyle();
       this.AbortHideEditTemplate();
@@ -2317,17 +2271,59 @@ namespace Xceed.Wpf.DataGrid
         m_loadedRoutedEventHandler = null;
       }
 
+      // In DP's PropertyChanged Callbacks, for the sake of performance, you could return immediatly if the cell is in process of being cleared.
+
+      this.ClearValue( Cell.StyleProperty );
+      this.ClearValue( Cell.IsCurrentPropertyKey );
+      this.ClearValue( Cell.IsSelectedPropertyKey );
+      this.ClearValue( Cell.IsBeingEditedPropertyKey );
+      this.ClearValue( Cell.ValidationErrorPropertyKey );
+      this.ClearValue( Cell.HasValidationErrorPropertyKey );
+      this.ClearValue( Cell.IsValidationErrorRestrictivePropertyKey );
+
+      // We must not clear the IsDirty flag of the Cell here since its Content could have been edited and this flag is checked
+      // to determine if the new value is commited or not in the source
+
+      // No need to clear the Cell.CellDisplayEditorMatchingConditionsProperty neither DataGridControl.CellEditorDisplayConditionsProperty since
+      // both will be updated when Cell.PrepareContainer is called again
+
+      m_cellValidationRules = null;
+      m_styleBeforeError = DependencyProperty.UnsetValue;
+      this.CurrentEditorPendingDisplayState = EditorDisplayState.None;
+      this.IsContainerVirtualized = true;
+
+      this.SetIsCellEditorDisplayed( false );
+
+      // This will reset every flags maintained in m_flags
+      this.ResetNonTransientFlags();
+    }
+
+    protected internal virtual void PartialClearContainer()
+    {
+      // If the container is not prepared just ignore this call.
+      if( !this.IsContainerPrepared )
+        return;
+
+      this.IsContainerPartiallyCleared = true;
+
+      this.AbortRefreshErrorStyle();
+      this.AbortHideEditTemplate();
+
+      this.ClearValue( Cell.StyleProperty );
+      this.ClearValue( Cell.IsCurrentPropertyKey );
+      this.ClearValue( Cell.IsSelectedPropertyKey );
+      this.ClearValue( Cell.IsBeingEditedPropertyKey );
+      this.ClearValue( Cell.ValidationErrorPropertyKey );
       this.ClearValue( Cell.HasValidationErrorPropertyKey );
       this.ClearValue( Cell.IsValidationErrorRestrictivePropertyKey );
 
       m_styleBeforeError = DependencyProperty.UnsetValue;
-      this.ClearValue( Cell.StyleProperty );
-      this.ClearValue( Cell.IsSelectedPropertyKey );
+      this.CurrentEditorPendingDisplayState = EditorDisplayState.None;
+
+      this.SetIsCellEditorDisplayed( false );
 
       // This will reset every flags maintained in m_flags
       this.ResetNonTransientFlags();
-
-      m_cellValidationRules = null;
     }
 
     protected internal virtual void PrepareDefaultStyleKey( Xceed.Wpf.DataGrid.Views.ViewBase view )
@@ -2345,6 +2341,21 @@ namespace Xceed.Wpf.DataGrid
 
     protected internal virtual void RemoveContentBinding()
     {
+    }
+
+    protected internal virtual void CleanUpOnRemove()
+    {
+      this.AbortRefreshErrorStyle();
+      this.AbortHideEditTemplate();
+
+      if( m_loadedRoutedEventHandler != null )
+      {
+        this.Loaded -= m_loadedRoutedEventHandler;
+        m_loadedRoutedEventHandler = null;
+      }
+
+      //This is done so the WeakEventListener on ParentColumn is removed.
+      this.ParentColumn = null;
     }
 
     internal static Cell FindFromChildOrSelf( DataGridControl dataGridControl, DependencyObject child )
@@ -2472,24 +2483,16 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    internal static void AssignDataContext( Cell cell, object dataContext, UnboundDataItem unboundDataItemContext, ColumnBase parentColumn, out bool isNewDataContext )
+    internal static bool AssignDataContext( Cell cell, object dataContext, UnboundDataItem unboundDataItemContext, ColumnBase parentColumn )
     {
-      Column column = parentColumn as Column;
-
+      var column = parentColumn as Column;
       if( ( column != null ) && ( column.IsBoundToDataGridUnboundItemProperty ) )
       {
-        if( unboundDataItemContext == null )
-        {
-          UnboundDataItem.GetUnboundDataItemNode( dataContext, out unboundDataItemContext );
-        }
-
-        dataContext = unboundDataItemContext;
+        dataContext = unboundDataItemContext ?? UnboundDataItem.GetUnboundDataItem( dataContext );
       }
 
-      // Read the LocalValue of the DataContext to avoid
-      // getting the one inherited from the ParentRow.
-      // This prevent the DataContext to become null
-      // when the Cell is virtualized.
+      // Read the LocalValue of the DataContext to avoid getting the one inherited from the ParentRow.
+      // This prevent the DataContext to become null when the Cell is virtualized.
       object localDataContext = cell.ReadLocalValue( Cell.DataContextProperty );
 
       if( localDataContext != dataContext )
@@ -2502,12 +2505,11 @@ namespace Xceed.Wpf.DataGrid
           cell.DataContext = null;
         }
         cell.DataContext = dataContext;
-        isNewDataContext = true;
+
+        return false;
       }
-      else
-      {
-        isNewDataContext = false;
-      }
+
+      return true;
     }
 
     //This ensures the CellEditorContext is set on the Cell to avoid problems with RelativeSource causing undesired behaviors when ComboBox is used as default CellEditor
@@ -2515,27 +2517,26 @@ namespace Xceed.Wpf.DataGrid
     {
       ForeignKeyConfiguration configuration = null;
 
-      Column parentColumn = this.ParentColumn as Column;
+      var parentColumn = this.ParentColumn as Column;
 
       if( parentColumn != null )
       {
         configuration = parentColumn.ForeignKeyConfiguration;
-        CellEditorContext context = new CellEditorContext( this.ParentColumn, configuration );
+        CellEditorContext context = new CellEditorContext( parentColumn, configuration );
         Cell.SetCellEditorContext( this, context );
       }
     }
 
     internal void RefreshDisplayedTemplate()
     {
-      // Never refresh any templates when the Cell is not prepared
-      // or virtualized
+      // Never refresh any templates when the Cell is not prepared or virtualized
       if( !this.IsContainerPrepared || this.IsContainerVirtualized )
         return;
 
       Row parentRow = this.ParentRow;
 
       // Never refresh template while clearing container
-      if( ( parentRow == null ) || ( parentRow.IsClearingContainer ) )
+      if( ( parentRow == null ) || parentRow.IsClearingContainer )
         return;
 
       if( this.ShouldDisplayEditor )
@@ -2590,16 +2591,14 @@ namespace Xceed.Wpf.DataGrid
       }
 
       this.SetIsDirty( false );
-      this.SetIsDirtyFromInitializingInsertionRow( false );
     }
 
     internal void UpdateContentBindingTarget()
     {
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-
       // Never update the target of a binding to a an item if the Cell is dirty
-      if( ( !this.IsDirty ) && ( !this.IsDirtyFromInitializingInsertionRow ) )
+      if( ( !this.IsDirty ) )
       {
+        // We need to refresh the Cell.Content target binding in case the dataObject value was coerced to something else.
         BindingExpressionBase bindingExpression = this.GetContentBindingExpression();
 
         if( bindingExpression != null )
@@ -2647,7 +2646,7 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      if( ( savedState.IsBeingEdited ) && ( this.ParentColumn == currentColumn ) )
+      if( ( savedState.IsBeingEdited ) && ( parentColumn == currentColumn ) )
         this.BeginEdit();
 
 
@@ -2656,20 +2655,19 @@ namespace Xceed.Wpf.DataGrid
 
     internal void OnIsTemplateCellChanged( bool newValue )
     {
-      this.UpdateAnimatedColumnReorderingBindings( newValue );
+      this.UpdateAnimatedColumnReorderingBindings( DataGridControl.GetDataGridContext( this ), newValue );
     }
 
     internal ValidationResult UpdateContentBindingSource( out Exception exception, out CellValidationRule ruleInErrorWrapper )
     {
-      Debug.Assert( ( ( this.IsDirty ) || ( this.IsDirtyFromInitializingInsertionRow ) || ( this.IsInCascadingValidation ) ),
+      Debug.Assert( ( ( this.IsDirty ) || ( this.IsInCascadingValidation ) ),
         "UpdateContentBindingSource should not be called when the cell isn't dirty beside when cascading validation.  Call ValidateContentBindingRules instead." );
 
       exception = null;
       ruleInErrorWrapper = null;
 
-      ValidationResult validationResult = ValidationResult.ValidResult;
-
-      BindingExpressionBase contentBindingExpression = this.GetContentBindingExpression();
+      var validationResult = ValidationResult.ValidResult;
+      var contentBindingExpression = this.GetContentBindingExpression();
 
       if( contentBindingExpression != null )
       {
@@ -2693,13 +2691,9 @@ namespace Xceed.Wpf.DataGrid
       if( ( validationResult.IsValid ) || ( !( Cell.GetIsRuleInErrorRestrictive( ruleInErrorWrapper ) ) ) )
       {
         this.ContentCommitted();
-
-        //Update StatsCells right away.
-        this.InvalidateStatsFunctions();
       }
 
-      // The dirty flag will only be lowered when the row ends or cancels edition, or if the cell cancels edition and it wasn't dirty
-      // when begining edition.
+      // The dirty flag will only be lowered when the row ends or cancels edition, or if the cell cancels edition and it wasn't dirty when begining edition.
       return validationResult;
     }
 
@@ -2758,51 +2752,21 @@ namespace Xceed.Wpf.DataGrid
 
     internal virtual bool GetCalculatedCanBeCurrent()
     {
-      if( this.GetInheritedReadOnly() )
-        return ParentColumn.CanBeCurrentWhenReadOnly;
-      else
+      var column = this.ParentColumn;
+      if( ( column == null ) || ( this.ParentRow == null ) )
+        return false;
+
+      if( column.CanBeCurrentWhenReadOnly )
         return true;
+
+      return !this.GetInheritedReadOnly();
     }
 
     internal virtual void ContentCommitted()
     {
     }
 
-    internal virtual void UpdateAnimatedColumnReorderingBindings( bool isTemplateCell )
-    {
-      // Only set the Binding if the View is a TableflowView
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-
-      if( dataGridContext != null )
-      {
-        TableflowView tableflowView = dataGridContext.DataGridControl.GetView() as TableflowView;
-
-        if( tableflowView == null )
-          return;
-      }
-
-      if( isTemplateCell )
-      {
-        // No need to enable animated Column reordering when TemplateCell is used
-        BindingOperations.ClearBinding( this, Cell.RenderTransformProperty );
-        BindingOperations.ClearBinding( this, Cell.ParentColumnIsBeingDraggedProperty );
-        BindingOperations.ClearBinding( this, Cell.ParentColumnReorderingDragSourceManagerProperty );
-        this.AnimatedColumnReorderingBindingApplied = false;
-      }
-      else
-      {
-        if( !this.AnimatedColumnReorderingBindingApplied )
-        {
-          // To enable animated Column reordering
-          BindingOperations.SetBinding( this, Cell.RenderTransformProperty, Cell.ParentColumnTranslationBinding );
-          BindingOperations.SetBinding( this, Cell.ParentColumnIsBeingDraggedProperty, Cell.ParentColumnIsBeingDraggedBinding );
-          BindingOperations.SetBinding( this, Cell.ParentColumnReorderingDragSourceManagerProperty, Cell.ParentColumnReorderingDragSourceManagerBinding );
-          this.AnimatedColumnReorderingBindingApplied = true;
-        }
-      }
-    }
-
-    internal virtual void EnsureInVisualTree()
+    internal void EnsureInVisualTree()
     {
       DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
       if( dataGridContext == null )
@@ -2852,11 +2816,11 @@ namespace Xceed.Wpf.DataGrid
 
     private static object OnCoerceContent( DependencyObject sender, object value )
     {
-      Cell cell = sender as Cell;
+      var cell = sender as Cell;
 
       // If we are updating the Content binding source and content is refreshed as a result, hold-on.
       // We will manually update Content from the source by calling UpdateTarget on the binding later.
-      if( cell.IsUpdatingContentBindingSource )
+      if( ( cell != null ) && cell.IsUpdatingContentBindingSource )
         return DependencyProperty.UnsetValue;
 
       return value;
@@ -2864,23 +2828,25 @@ namespace Xceed.Wpf.DataGrid
 
     private static void OnContentChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      Cell cell = ( Cell )sender;
-      Row parentRow = cell.ParentRow;
+      var cell = sender as Cell;
+      if( cell == null )
+        return;
 
+      var parentRow = cell.ParentRow;
       if( parentRow == null )
         return;
 
-      bool doCellValidation = false;
-      ColumnBase parentColumn = cell.ParentColumn;
+      var doCellValidation = false;
+      var parentColumn = cell.ParentColumn;
 
-      bool changeDuringRowIsInEdit = ( cell.IsInternalyInitialized )
+      var changeDuringRowIsInEdit = ( cell.IsInternalyInitialized )
         && ( !cell.IsContainerRecycled )
         && ( !parentRow.IsBeginningEdition )
         && ( !cell.IsUpdatingContentBindingSource )
         && ( !cell.IsRestoringEditionState )
         && ( parentRow.IsBeingEdited );
 
-      if( ( changeDuringRowIsInEdit ) || ( parentRow.IsInitializingInsertionRow ) )
+      if( changeDuringRowIsInEdit )
       {
         if( parentColumn != null )
         {
@@ -2896,19 +2862,7 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      if( parentRow.IsInitializingInsertionRow )
-      {
-        Nullable<DataGridUpdateSourceTrigger> dataGridUpdateSourceTrigger = cell.GetContentBindingUpdateSourceTrigger();
-
-        if( ( dataGridUpdateSourceTrigger == DataGridUpdateSourceTrigger.CellContentChanged )
-          || ( dataGridUpdateSourceTrigger == DataGridUpdateSourceTrigger.CellEndingEdit ) )
-        {
-          doCellValidation = true;
-        }
-
-        cell.SetIsDirtyFromInitializingInsertionRow( true );
-      }
-      else if( changeDuringRowIsInEdit )
+      if( changeDuringRowIsInEdit )
       {
         if( !object.Equals( e.OldValue, e.NewValue ) )
         {
@@ -2917,9 +2871,7 @@ namespace Xceed.Wpf.DataGrid
 
         if( !cell.PreventValidateAndSetAllErrors )
         {
-          Nullable<DataGridUpdateSourceTrigger> dataGridUpdateSourceTrigger = cell.GetContentBindingUpdateSourceTrigger();
-
-          if( dataGridUpdateSourceTrigger == DataGridUpdateSourceTrigger.CellContentChanged )
+          if( cell.GetContentBindingUpdateSourceTrigger() == DataGridUpdateSourceTrigger.CellContentChanged )
           {
             doCellValidation = true;
           }
@@ -2933,31 +2885,35 @@ namespace Xceed.Wpf.DataGrid
         // We would be surprised of such a usage, but this fail-safe will take care of this possibility.
         if( !cell.GetIsSiblingUpdatingContentBindingSource() )
         {
+          // The CellEditorRules must not be ckecked when UpdateSourceTrigger is set to CellContentChanged because the editor's HasValidationError property
+          // changes only AFTER the new cell value is commited.  It would thus result in nothing being processed here if it were to be checked.
+
           Exception exception;
           CellValidationRule ruleInError;
-
-
-
-          ValidationResult validationResult = cell.ValidateCellRules( out exception, out ruleInError );
-
+          var validationResult = cell.ValidateCellRules( out exception, out ruleInError );
           if( validationResult.IsValid )
+          {
             cell.ValidateAndSetAllErrors( false, false, true, true, out exception, out ruleInError );
+          }
         }
       }
 
       //When the content changes, check if the CellContentTemplateSelector needs to be updated.
       //This depdends on several factor, including if a Selector is present and if the editor is not displayed
-      if( cell.ShouldInvalidateCellContentTemplateSelector() )
+      if( cell.ShouldInvalidateCellContentTemplateSelector( parentColumn ) )
       {
-        cell.SetCoercedContentTemplate( cell.GetCoercedCellContentTemplate(), null );
+        cell.UpdateCoercedContentTemplate( false );
       }
     }
 
     private static void OnIsDirtyChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
+      var cell = sender as Cell;
+      if( cell == null )
+        return;
+
       if( ( bool )e.NewValue )
       {
-        Cell cell = ( Cell )sender;
         //Raise the RoutedEvent that notifies any Row that the cell is becoming dirty.
         RoutedEventArgs eventArgs = new RoutedEventArgs( Cell.IsDirtyEvent );
         cell.RaiseEvent( eventArgs );
@@ -2966,22 +2922,27 @@ namespace Xceed.Wpf.DataGrid
 
     private static void OnMatchingDisplayEditorChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      Cell obj = ( Cell )sender;
+      var cell = sender as Cell;
+      if( cell == null )
+        return;
 
       //performing this check because at the end of the Initializing function, I will call this explicitelly, to ensure 
       //proper display of the Editor if the appropriate conditions are met.
-      if( obj.IsInternalyInitialized )
+      if( cell.IsInternalyInitialized )
       {
-        obj.RefreshDisplayedTemplate();
+        cell.RefreshDisplayedTemplate();
       }
     }
 
     private static void OnCellEditorDisplayConditionsChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      Cell cell = ( Cell )sender;
+      var cell = sender as Cell;
+      if( cell == null )
+        return;
 
       // The cell.ParentRow can be null if this Cell is a TemplateCell
-      if( ( cell.ParentRow != null ) && cell.ParentRow.IsClearingContainer )
+      var parentRow = cell.ParentRow;
+      if( ( parentRow != null ) && parentRow.IsClearingContainer )
         return;
 
       cell.UpdateMatchingDisplayConditions();
@@ -2989,9 +2950,7 @@ namespace Xceed.Wpf.DataGrid
 
     private static void OnContentTemplateChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      Cell cell = sender as Cell;
-      Debug.Assert( cell != null );
-
+      var cell = sender as Cell;
       if( cell == null )
         return;
 
@@ -2999,15 +2958,13 @@ namespace Xceed.Wpf.DataGrid
 
       if( ( cell.CurrentEditorPendingDisplayState != EditorDisplayState.PendingShow ) && ( !cell.IsCellEditorDisplayed ) )
       {
-        cell.SetCoercedContentTemplate( cell.GetCoercedCellContentTemplate(), null );
+        cell.UpdateCoercedContentTemplate( false );
       }
     }
 
     private static void OnContentTemplateSelectorChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      Cell cell = sender as Cell;
-      Debug.Assert( cell != null );
-
+      var cell = sender as Cell;
       if( cell == null )
         return;
 
@@ -3015,18 +2972,17 @@ namespace Xceed.Wpf.DataGrid
 
       if( ( cell.CurrentEditorPendingDisplayState != EditorDisplayState.PendingShow ) && ( !cell.IsCellEditorDisplayed ) )
       {
-        cell.SetCoercedContentTemplate( cell.GetCoercedCellContentTemplate(), null );
+        cell.UpdateCoercedContentTemplate( false );
       }
     }
 
     private static void OnIsTemplateCellChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      Cell cell = sender as Cell;
+      var cell = sender as Cell;
+      if( cell == null )
+        return;
 
-      if( cell != null )
-      {
-        cell.OnIsTemplateCellChanged( ( bool )e.NewValue );
-      }
+      cell.OnIsTemplateCellChanged( ( bool )e.NewValue );
     }
 
     private bool GetInheritedReadOnly()
@@ -3084,7 +3040,7 @@ namespace Xceed.Wpf.DataGrid
         isReadOnly = this.ReadOnly;
       }
 
-      if( ( bool )isReadOnly )
+      if( isReadOnly )
         return true;
 
       var contentBindingExpression = this.GetContentBindingExpression();
@@ -3104,48 +3060,36 @@ namespace Xceed.Wpf.DataGrid
       return ( contentBindingMode.HasValue ) && ( contentBindingMode.Value != BindingMode.TwoWay );
     }
 
-    private bool ShouldInvalidateCellContentTemplateSelector()
+    private bool ShouldInvalidateCellContentTemplateSelector( ColumnBase parentColumn )
     {
-      ColumnBase parentColumn = this.ParentColumn;
+      if( parentColumn == null )
+        return false;
 
-      bool onlyInternalContentTemplateSelectorAvailable =
-        ( ( this.ContentTemplateInternal == null ) && ( this.ContentTemplateSelectorInternal != null ) );
+      var onlyInternalContentTemplateSelectorAvailable = ( ( this.ContentTemplateInternal == null ) && ( this.ContentTemplateSelectorInternal != null ) );
+      var onlyColumnContentTemplateSelectorAvailable = ( ( parentColumn.CellContentTemplate == null ) && ( parentColumn.CellContentTemplateSelector != null ) );
+      var onlyTemplateSelectorAvailable = onlyColumnContentTemplateSelectorAvailable || onlyInternalContentTemplateSelectorAvailable;
+      var editorHiddenAndNotPendingShow = !this.IsCellEditorDisplayed && ( this.CurrentEditorPendingDisplayState != EditorDisplayState.PendingShow );
 
-      bool onlyColumnContentTemplateSelectorAvailable =
-        ( ( parentColumn.CellContentTemplate == null ) && ( parentColumn.CellContentTemplateSelector != null ) );
-
-      bool onlyTemplateSelectorAvailable = onlyColumnContentTemplateSelectorAvailable
-        || onlyInternalContentTemplateSelectorAvailable;
-
-      bool editorHiddenAndNotPendingShow = !this.IsCellEditorDisplayed
-        && ( this.CurrentEditorPendingDisplayState != EditorDisplayState.PendingShow );
-
-      // Only TemplateSelectors are avaiable and editor is not hidden and pending showing
+      // Only TemplateSelectors are available and editor is not hidden and pending showing
       return ( onlyTemplateSelectorAvailable && editorHiddenAndNotPendingShow );
     }
 
     private bool GetIsContentBindingSupportingSourceUpdate()
     {
-      BindingExpressionBase binding = this.GetContentBindingExpression();
-
+      var binding = this.GetContentBindingExpression();
       if( binding == null )
         return false;
 
       BindingMode mode;
-      Binding singleBinding = binding.ParentBindingBase as Binding;
+      var singleBinding = binding.ParentBindingBase as Binding;
 
       if( singleBinding == null )
       {
-        MultiBinding multiBinding = binding.ParentBindingBase as MultiBinding;
-
+        var multiBinding = binding.ParentBindingBase as MultiBinding;
         if( multiBinding == null )
-        {
           return false;
-        }
-        else
-        {
-          mode = multiBinding.Mode;
-        }
+
+        mode = multiBinding.Mode;
       }
       else
       {
@@ -3160,8 +3104,7 @@ namespace Xceed.Wpf.DataGrid
       // This method is called to make sure we are not calling ValidateAndSetAllErrors at all nor triggering a cascade validation
       // as a side-effect of updating a cell's content binding source while another cell is bound to the very same source.
       // We would be surprised of such a usage, but this fail-safe will take care of this possibility.
-      Row parentRow = this.ParentRow;
-
+      var parentRow = this.ParentRow;
       if( parentRow != null )
       {
         foreach( Cell siblingCell in parentRow.CreatedCells )
@@ -3200,7 +3143,7 @@ namespace Xceed.Wpf.DataGrid
       var parentColumn = this.ParentColumn;
 
       //If there was no ContentTemplateSelector on Cell or if the output of the selector was Null.
-      if( ( !this.OverrideColumnCellContentTemplate ) && ( contentTemplate == null ) )
+      if( ( !this.OverrideColumnCellContentTemplate ) && ( contentTemplate == null ) && ( parentColumn != null ) )
       {
         contentTemplate = this.GetForeignKeyDataTemplate();
         if( contentTemplate != null )
@@ -3230,15 +3173,12 @@ namespace Xceed.Wpf.DataGrid
         contentTemplate = GenericContentTemplateSelector.Instance.SelectTemplate( content, this );
       }
 
-      if( contentTemplate != null )
+      if( ( contentTemplate != null ) && ( parentColumn != null ) && !string.IsNullOrEmpty( parentColumn.CellContentStringFormat ) )
       {
-        if( ( parentColumn != null ) && !string.IsNullOrEmpty( parentColumn.CellContentStringFormat ) )
+        var newContentTemplate = this.GetCellStringFormatDataTemplate( contentTemplate );
+        if( newContentTemplate != null )
         {
-          var newContentTemplate = this.GetCellStringFormatDataTemplate( contentTemplate );
-          if( newContentTemplate != null )
-          {
-            contentTemplate = newContentTemplate;
-          }
+          contentTemplate = newContentTemplate;
         }
       }
 
@@ -3302,6 +3242,32 @@ namespace Xceed.Wpf.DataGrid
       return unboundDataItem.DataItem == item;
     }
 
+    private void UpdateAnimatedColumnReorderingBindings( DataGridContext dataGridContext, bool isTemplateCell )
+    {
+      // Only set the Binding if the view is a TableflowView.
+      var setBindings = ( !isTemplateCell )
+                     && ( dataGridContext != null )
+                     && ( dataGridContext.DataGridControl.GetView() is TableflowView );
+
+      if( setBindings == this.AnimatedColumnReorderingBindingApplied )
+        return;
+
+      if( setBindings )
+      {
+        BindingOperations.SetBinding( this, Cell.RenderTransformProperty, Cell.ParentColumnTranslationBinding );
+        BindingOperations.SetBinding( this, Cell.ParentColumnIsBeingDraggedProperty, Cell.ParentColumnIsBeingDraggedBinding );
+        BindingOperations.SetBinding( this, Cell.ParentColumnReorderingDragSourceManagerProperty, Cell.ParentColumnReorderingDragSourceManagerBinding );
+      }
+      else
+      {
+        BindingOperations.ClearBinding( this, Cell.RenderTransformProperty );
+        BindingOperations.ClearBinding( this, Cell.ParentColumnIsBeingDraggedProperty );
+        BindingOperations.ClearBinding( this, Cell.ParentColumnReorderingDragSourceManagerProperty );
+      }
+
+      this.AnimatedColumnReorderingBindingApplied = setBindings;
+    }
+
     private void ShowEditTemplate()
     {
       this.AbortHideEditTemplate();
@@ -3310,11 +3276,9 @@ namespace Xceed.Wpf.DataGrid
       if( this.CurrentEditorPendingDisplayState != EditorDisplayState.PendingShow )
       {
         // If it is not displayed or pending hiding
-        if( !this.IsCellEditorDisplayed
-            || ( this.CurrentEditorPendingDisplayState == EditorDisplayState.PendingHide ) )
+        if( !this.IsCellEditorDisplayed || ( this.CurrentEditorPendingDisplayState == EditorDisplayState.PendingHide ) || m_forceEditorRefresh )
         {
-          CellEditor cellEditor = this.GetCellEditor();
-
+          var cellEditor = this.GetCellEditor();
           if( cellEditor != null )
           {
             this.SetCoercedContentTemplate( this.GetCoercedCellContentTemplate(), cellEditor.EditTemplate );
@@ -3340,8 +3304,7 @@ namespace Xceed.Wpf.DataGrid
       if( ( !this.IsCellEditorDisplayed ) && ( this.CurrentEditorPendingDisplayState != EditorDisplayState.PendingShow ) )
         return;
 
-      m_delayedHideEditTemplateDispatcherOperation = this.Dispatcher.BeginInvoke(
-        new Action( this.HideEditTemplate ), DispatcherPriority.DataBind );
+      m_delayedHideEditTemplateDispatcherOperation = this.Dispatcher.BeginInvoke( new Action( this.HideEditTemplate ), DispatcherPriority.DataBind );
     }
 
     private void AbortHideEditTemplate()
@@ -3364,8 +3327,7 @@ namespace Xceed.Wpf.DataGrid
       if( !this.IsContainerPrepared || this.IsContainerVirtualized )
         return;
 
-      if( ( !this.IsCellEditorDisplayed )
-          && ( this.CurrentEditorPendingDisplayState != EditorDisplayState.PendingShow ) )
+      if( !this.IsCellEditorDisplayed && ( this.CurrentEditorPendingDisplayState != EditorDisplayState.PendingShow ) )
         return;
 
       this.SetCoercedContentTemplate( this.GetCoercedCellContentTemplate(), null );
@@ -3427,32 +3389,51 @@ namespace Xceed.Wpf.DataGrid
       this.SetValue( Cell.CellDisplayEditorMatchingConditionsProperty, newEffectiveValue );
     }
 
-    private void InvalidateStatsFunctions()
+    private void UpdateFocusable()
     {
-      //Make sure to update StatFunctions as soon as cell content changes (this part of the code is executed only if UpdateSourceTrigger is set to CellContentChanged).
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-      DataGridControl dataGridControl = dataGridContext.DataGridControl;
+      var isFocusable = false;
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
 
-      if( dataGridControl != null )
+      if( dataGridContext != null )
       {
-        DataGridCollectionView dataGridCollectionView = dataGridControl.ItemsSource as DataGridCollectionView;
+        var column = this.ParentColumn;
+        var dataGridControl = dataGridContext.DataGridControl;
 
-        if( ( dataGridCollectionView != null ) && ( dataGridCollectionView.StatFunctions.Count > 0 ) )
+        Debug.Assert( dataGridControl != null );
+
+        if( ( !this.GetCalculatedCanBeCurrent() ) && ( column != null ) && ( column == dataGridContext.CurrentColumn ) )
         {
-          int currentIndex;
+          try
+          {
+            dataGridContext.SetCurrentColumnCore( null, false, dataGridControl.SynchronizeSelectionWithCurrent, AutoScrollCurrentItemSourceTriggers.CurrentColumnChanged );
+          }
+          catch( DataGridException )
+          {
+            // We swallow the exception if it occurs because of a validation error or Cell was read-only or
+            // any other GridException.
+          }
+        }
 
-          //If -1 is returned, it means the corresponding data item is not yet in the source (e.g insertion cell), so no stats to update at this point.
-          if( ( currentIndex = dataGridCollectionView.IndexOf( this.ParentRow.DataContext ) ) == -1 )
-            return;
+        isFocusable = true;
 
-          RawItem item = dataGridCollectionView.GetRawItemAt( currentIndex );
-
-          DataGridCollectionViewGroup parentGroup = item.ParentGroup;
-
-          if( parentGroup != null )
-            dataGridCollectionView.DeferredOperationManager.InvalidateGroupStats( parentGroup );
+        if( !this.IsBeingEdited )
+        {
+          var row = this.ParentRow;
+          if( row != null )
+          {
+            switch( row.NavigationBehavior )
+            {
+              case NavigationBehavior.None:
+              case NavigationBehavior.RowOnly:
+                isFocusable = false;
+                break;
+            }
+          }
         }
       }
+
+      //force an update of the NavigationBehavior characteristics
+      this.Focusable = isFocusable && this.GetCalculatedCanBeCurrent();
     }
 
     private void OnBeginEditExecuted( object sender, ExecutedRoutedEventArgs e )
@@ -3482,8 +3463,9 @@ namespace Xceed.Wpf.DataGrid
         }
         else
         {
-          e.CanExecute = ( !this.IsBeingEdited ) && ( !this.GetInheritedReadOnly() )
-            && ( this.ParentRow.IsEditTriggerSet( EditTriggers.BeginEditCommand ) );
+          e.CanExecute = ( !this.IsBeingEdited )
+                      && ( !this.GetInheritedReadOnly() )
+                      && ( this.ParentRow.IsEditTriggerSet( EditTriggers.BeginEditCommand ) );
         }
       }
     }
@@ -3519,13 +3501,7 @@ namespace Xceed.Wpf.DataGrid
         //If the Cell is marked to be pending the display of the editor, then
         //this LayoutUpdated means that Editor has been effectively displayed
 
-        // Notify the UIAutomation if any children have changed.
-        AutomationPeer automationPeer = UIElementAutomationPeer.FromElement( this );
 
-        if( automationPeer != null )
-        {
-          automationPeer.ResetChildrenCache();
-        }
 
         //Change the IsCellEditorDisplayed flag accordingly
         this.SetIsCellEditorDisplayed( true );
@@ -3535,13 +3511,7 @@ namespace Xceed.Wpf.DataGrid
         //If the Cell is marked to be pending the Display of the viewer, then
         //this LayoutUpdated means that Editor has been effectively hidden
 
-        // Notify the UIAutomation if any children have changed.
-        AutomationPeer automationPeer = UIElementAutomationPeer.FromElement( this );
 
-        if( automationPeer != null )
-        {
-          automationPeer.ResetChildrenCache();
-        }
 
         //Change the IsCellEditorDisplayed flag accordingly
         this.SetIsCellEditorDisplayed( false );
@@ -3732,19 +3702,16 @@ namespace Xceed.Wpf.DataGrid
       if( this.IsBeingEdited )
         return;
 
-      bool readOnly = this.GetInheritedReadOnly();
-
+      var readOnly = this.GetInheritedReadOnly();
       if( readOnly )
         throw new DataGridException( "An attempt was made to edit a read-only cell or the cell content is not bound using two way binding." );
 
       // If there is no dataItem mapped to this container, we don't want to
       // enter in edition
       var dataGridContext = DataGridControl.GetDataGridContext( this );
-
       if( dataGridContext != null )
       {
-        object dataItem = dataGridContext.GetItemFromContainer( this );
-
+        var dataItem = dataGridContext.GetItemFromContainer( this );
         if( dataItem == null )
           return;
       }
@@ -3823,7 +3790,9 @@ namespace Xceed.Wpf.DataGrid
       if( !this.IsBeingEdited )
         return;
 
-      bool updateContentBindingSource = this.GetContentBindingUpdateSourceTrigger() == DataGridUpdateSourceTrigger.CellEndingEdit;
+      var dataGridUpdateSourceTrigger = this.GetContentBindingUpdateSourceTrigger();
+      var updateContentBindingSource = ( dataGridUpdateSourceTrigger == DataGridUpdateSourceTrigger.CellEndingEdit )
+                                        || ( dataGridUpdateSourceTrigger == DataGridUpdateSourceTrigger.CellContentChanged );
 
       this.EndEdit( true, true, updateContentBindingSource );
     }
@@ -3873,11 +3842,9 @@ namespace Xceed.Wpf.DataGrid
             this.PreventValidateAndSetAllErrors = false;
           }
 
-          Nullable<DataGridUpdateSourceTrigger> dataGridUpdateSourceTrigger = this.GetContentBindingUpdateSourceTrigger();
-
-          bool updateContentBindingSource =
-            ( dataGridUpdateSourceTrigger == DataGridUpdateSourceTrigger.CellEndingEdit ) ||
-            ( dataGridUpdateSourceTrigger == DataGridUpdateSourceTrigger.CellContentChanged );
+          var dataGridUpdateSourceTrigger = this.GetContentBindingUpdateSourceTrigger();
+          var updateContentBindingSource = ( dataGridUpdateSourceTrigger == DataGridUpdateSourceTrigger.CellEndingEdit )
+                                           || ( dataGridUpdateSourceTrigger == DataGridUpdateSourceTrigger.CellContentChanged );
 
           Exception exception;
           CellValidationRule ruleInError;
@@ -3893,7 +3860,6 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      this.SetIsDirtyFromInitializingInsertionRow( false );
       this.SetIsBeingEdited( false );
       this.OnEditCanceled();
     }
@@ -3937,10 +3903,10 @@ namespace Xceed.Wpf.DataGrid
       if( !this.IsBeingEdited )
         return;
 
-      CancelRoutedEventArgs e = new CancelRoutedEventArgs( Cell.EditEndingEvent, this );
-
       try
       {
+        var e = new CancelRoutedEventArgs( Cell.EditEndingEvent, this );
+
         this.OnEditEnding( e );
 
         // Throwing a DataGridValidationException will be caught by the grid and will make the cell stay in edition.
@@ -3951,15 +3917,14 @@ namespace Xceed.Wpf.DataGrid
         //This has been identified, and only the places where it caused problems were fixed... This comment is only here to remind developpers of the flaw
         if( ( !this.IsKeyboardFocused ) && ( this.IsKeyboardFocusWithin ) )
         {
-          DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
+          var dataGridContext = DataGridControl.GetDataGridContext( this );
 
           if( ( dataGridContext != null ) && ( !dataGridContext.DataGridControl.IsSetFocusInhibited ) )
           {
             // Prevent the focus to make a RequestBringIntoView
             using( this.InhibitMakeVisible() )
             {
-              // We want to try to focus the Cell before we continue the EndEdit to ensure 
-              // any validation or process in the lost focus is done
+              // We want to try to focus the Cell before we continue the EndEdit to ensure  any validation or process in the lost focus is done
               if( !dataGridContext.DataGridControl.SetFocusHelper( this.ParentRow, this.ParentColumn, false, false ) )
                 throw new DataGridFocusException( "Unable to set focus on the Cell." );
             }
@@ -3969,7 +3934,9 @@ namespace Xceed.Wpf.DataGrid
       catch( Exception exception )
       {
         if( exception is TargetInvocationException )
+        {
           exception = exception.InnerException;
+        }
 
         // In the case it's the focus that failed, we don't want to make that a ValidationError since it 
         // must be retained by the editor itself with his own error mechanic.
@@ -3980,11 +3947,7 @@ namespace Xceed.Wpf.DataGrid
         if( exception is DataGridFocusException )
           throw;
 
-        this.SetValidationError( new CellValidationError(
-          Cell.CustomCellValidationExceptionValidationRule,
-          this,
-          exception.Message,
-          exception ) );
+        this.SetValidationError( new CellValidationError( Cell.CustomCellValidationExceptionValidationRule, this, exception.Message, exception ) );
 
         // Throwing a DataGridValidationException will be caught by the grid and will make the cell stay in edition.
         throw new DataGridValidationException( "An error occurred while attempting to end the edit process.", exception );
@@ -3992,17 +3955,15 @@ namespace Xceed.Wpf.DataGrid
 
       Exception notUsed;
       CellValidationRule ruleInError;
+      var result = this.ValidateAndSetAllErrors( validateCellEditorRules, validateUIRules, updateContentBindingSource, true, out notUsed, out ruleInError );
 
-      ValidationResult result =
-        this.ValidateAndSetAllErrors( validateCellEditorRules, validateUIRules, updateContentBindingSource, true, out notUsed, out ruleInError );
-
-
-      CellState cellState = this.GetEditCachedState();
-
+      var cellState = this.GetEditCachedState();
       if( cellState != null )
       {
         if( result.IsValid )
+        {
           cellState.SetContentBeforeCellEdition( DependencyProperty.UnsetValue );
+        }
 
         cellState.SetIsDirtyBeforeEdition( null );
       }
@@ -4077,7 +4038,7 @@ namespace Xceed.Wpf.DataGrid
               DataGridControl.GetDataGridContext( this ).DataGridControl );
       }
 
-      ValidationResult result = ValidationResult.ValidResult;
+      var result = ValidationResult.ValidResult;
       exception = null;
       ruleInError = null;
 
@@ -4104,16 +4065,14 @@ namespace Xceed.Wpf.DataGrid
       {
         // Only need to update the Content binding source if the cell is dirty or if we are cascading the validation.
         if( ( updateContentBindingSource )
-          && ( ( this.IsDirty ) || ( this.IsDirtyFromInitializingInsertionRow ) || ( this.IsInCascadingValidation ) ) )
+          && ( ( this.IsDirty ) || ( this.IsInCascadingValidation ) ) )
         {
           // Update the Content binding's source and check for errors.
           result = this.UpdateContentBindingSource( out exception, out ruleInError );
         }
         else
         {
-          // Just check for errors.
-          // We must validate even if the cell isn't dirty since its value might have been in error even before
-          // entering edit on the row. 
+          // Just check for errors. We must validate even if the cell isn't dirty since its value might have been in error even before entering edit on the row. 
           // ie: DataErrorInfo or any other non-restrictive validation error.
           result = this.ValidateContentBindingRules( out exception, out ruleInError );
         }
@@ -4126,7 +4085,9 @@ namespace Xceed.Wpf.DataGrid
         this.SetAllError( result, exception, ruleInError );
 
         if( cascadeValidate )
+        {
           this.CascadeValidation();
+        }
       }
 
       return result;
@@ -4159,50 +4120,50 @@ namespace Xceed.Wpf.DataGrid
       this.SetAllError( ValidationResult.ValidResult, null, null );
     }
 
-    private static void ContentBinding_ValidationError( object sender, ValidationErrorEventArgs e )
+    private static void OnContentBindingNotifyValidationError( object sender, ValidationErrorEventArgs e )
     {
       Cell cell = ( Cell )sender;
 
-      if( cell.PreventValidateAndSetAllErrors )
+      cell.NotifyContentBindingValidationError();
+    }
+
+    internal void NotifyContentBindingValidationError()
+    {
+      if( this.PreventValidateAndSetAllErrors )
         return;
 
       // Proceed only if the isn't any UI ValidationRules error flagged since last UI validation pass.
-      if( cell.HasUIValidationError )
+      if( this.HasUIValidationError )
         return;
 
-      ValidationError cellContentBindingValidationError = cell.GetContentBindingValidationError();
+      var validationError = this.GetContentBindingValidationError();
 
-      // In order to minimize switching of styles when we need to update the Content Binding's source,
-      // the SetAllError method will not do anything while it is being prevented.
-      //
-      // ie: When we need to update the ContentBinding's source manually through EndEdit.
-      if( cellContentBindingValidationError != null )
+      // In order to minimize switching of styles when we need to update the Content Binding's source, the SetAllError method will not do anything while it is being prevented.
+      // e.g. : When we need to update the ContentBinding's source manually through EndEdit.
+      if( validationError != null )
       {
-        cell.SetAllError(
-          new ValidationResult( false, cellContentBindingValidationError.ErrorContent ),
-          cellContentBindingValidationError.Exception,
-          new CellContentBindingValidationRule( cellContentBindingValidationError.RuleInError ) );
+        this.SetAllError( new ValidationResult( false, validationError.ErrorContent ), validationError.Exception,
+                          new CellContentBindingValidationRule( validationError.RuleInError ) );
       }
       else
       {
-        cell.SetAllError( ValidationResult.ValidResult, null, null );
+        this.SetAllError( ValidationResult.ValidResult, null, null );
       }
     }
 
-    private void ContentBinding_TargetUpdated( object sender, DataTransferEventArgs e )
+    private void OnContentBindingTargetUpdated( object sender, DataTransferEventArgs e )
     {
       if( e.Property != Cell.ContentProperty )
         return;
 
-      Cell cell = e.TargetObject as Cell;
+      var cell = e.TargetObject as Cell;
 
-      // Under certain circumstances which have not yet been clearly identified, the TargetObject
-      // is the ContentPresenter of the ScrollTip. This would raise a NullReferenceException when
-      // trying to access cell's members, as the previous cast would return null.
+      // Under certain circumstances which have not yet been clearly identified, the TargetObject is the ContentPresenter of the ScrollTip.
+      // This would raise a NullReferenceException when trying to access cell's members, as the previous cast would return null.
       if( cell == null )
         return;
 
-      Row parentRow = cell.ParentRow;
+      var parentRow = cell.ParentRow;
 
       if( ( cell.IsUpdatingContentBindingSource ) || ( cell.PreventValidateAndSetAllErrors )
         || ( parentRow == null ) || ( !parentRow.IsBeingEdited ) || ( !parentRow.IsDirty ) )
@@ -4218,24 +4179,23 @@ namespace Xceed.Wpf.DataGrid
 
       Exception exception;
       CellValidationRule ruleInError;
-
       cell.ValidateAndSetAllErrors( false, true, false, true, out exception, out ruleInError );
     }
 
     private void CascadeValidation()
     {
-      Row parentRow = this.ParentRow;
+      var parentRow = this.ParentRow;
 
       if( parentRow == null )
         return;
 
-      bool updateContentBindingSource = ( parentRow.IsEndingEdition || parentRow.IsCancelingEdition )
-        || ( this.GetContentBindingUpdateSourceTrigger() == DataGridUpdateSourceTrigger.CellEndingEdit )
-        || ( this.GetContentBindingUpdateSourceTrigger() == DataGridUpdateSourceTrigger.CellContentChanged );
+      var dataGridUpdateSourceTrigger = this.GetContentBindingUpdateSourceTrigger();
+      var updateContentBindingSource = ( parentRow.IsEndingEdition || parentRow.IsCancelingEdition )
+                                        || ( dataGridUpdateSourceTrigger == DataGridUpdateSourceTrigger.CellEndingEdit )
+                                        || ( dataGridUpdateSourceTrigger == DataGridUpdateSourceTrigger.CellContentChanged );
 
-      // Create a clone of the list to avoid concurrent access when iterating 
-      // and a Cell is added to CreatedCells because of ColumnVirtualization
-      List<Cell> createdCells = new List<Cell>( parentRow.CreatedCells );
+      // Create a clone of the list to avoid concurrent access when iterating and a Cell is added to CreatedCells because of ColumnVirtualization
+      var createdCells = new List<Cell>( parentRow.CreatedCells );
 
       foreach( Cell siblingCell in createdCells )
       {
@@ -4252,7 +4212,6 @@ namespace Xceed.Wpf.DataGrid
         {
           Exception exception;
           CellValidationRule ruleInError;
-
           siblingCell.ValidateAndSetAllErrors( false, true, updateContentBindingSource, false, out exception, out ruleInError );
         }
         finally
@@ -4268,8 +4227,7 @@ namespace Xceed.Wpf.DataGrid
 
       if( invalid )
       {
-        CellValidationError validationError =
-          new CellValidationError( ruleInError, this, result.ErrorContent, validationException );
+        CellValidationError validationError = new CellValidationError( ruleInError, this, result.ErrorContent, validationException );
 
         this.SetValidationError( validationError );
       }
@@ -4285,8 +4243,7 @@ namespace Xceed.Wpf.DataGrid
       ruleInError = null;
       validationException = null;
 
-      CellValidationContext cellValidationContext =
-        new CellValidationContext( this.GetRealDataContext(), this );
+      CellValidationContext cellValidationContext = new CellValidationContext( this.GetRealDataContext(), this );
 
       CultureInfo culture = this.Language.GetSpecificCulture();
 
@@ -4382,142 +4339,82 @@ namespace Xceed.Wpf.DataGrid
 
     bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
-      return this.OnReceivedWeakEvent( managerType, sender, e );
+      return this.OnReceiveWeakEvent( managerType, sender, e );
     }
 
-    protected internal virtual bool OnReceivedWeakEvent( Type managerType, object sender, EventArgs e )
+    protected virtual bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
-      bool retval = false;
-
-      if( managerType == typeof( CanBeCurrentWhenReadOnlyChangedEventManager ) )
+      if( managerType == typeof( PropertyChangedEventManager ) )
       {
-        ColumnBase column = sender as ColumnBase;
-
-        if( this.ProcessEvent( column, out retval ) )
+        var column = sender as ColumnBase;
+        if( ( column != null ) && ( column == this.ParentColumn ) )
         {
-          this.OnParentColumnCanBeCurrentWhenReadOnlyChanged( column );
+          this.OnParentColumnPropertyChanged( ( PropertyChangedEventArgs )e );
         }
       }
-      else if( managerType == typeof( CellEditorDisplayConditionsChangedEventManager ) )
+      else
       {
-        ColumnBase column = sender as ColumnBase;
-
-        if( this.ProcessEvent( column, out retval ) )
-        {
-          this.OnParentColumnCellEditorDisplayConditionsChanged();
-        }
-      }
-      else if( managerType == typeof( CellContentTemplateChangedEventManager ) )
-      {
-        ColumnBase column = sender as ColumnBase;
-
-        if( this.ProcessEvent( column, out retval ) )
-        {
-          this.OnParentColumnCellContentTemplateChanged( false );
-        }
-      }
-      else if( managerType == typeof( CellContentStringFormatChangedEventManager ) )
-      {
-        ColumnBase column = sender as ColumnBase;
-
-        if( this.ProcessEvent( column, out retval ) )
-        {
-          this.OnParentColumnCellContentTemplateChanged( true );
-        }
-      }
-      else if( managerType == typeof( ForeignKeyConfigurationChangedEventManager ) )
-      {
-        Column column = sender as Column;
-
-        if( this.ProcessEvent( column, out retval ) )
-        {
-          this.OnParentColumnForeignKeyConfigurationChanged();
-        }
+        return false;
       }
 
-      return retval;
+      return true;
     }
 
-    private bool ProcessEvent( ColumnBase column, out bool handled )
+    internal virtual void OnParentColumnPropertyChanged( PropertyChangedEventArgs e )
     {
-      handled = ( column != null ) && ( column.DataGridControl != null );
-
-      return ( handled ) && ( this.IsContainerPrepared ) && ( !this.IsContainerVirtualized );
-    }
-
-    private void OnParentColumnCanBeCurrentWhenReadOnlyChanged( ColumnBase column )
-    {
-      DataGridControl dataGridControl = column.DataGridControl;
-      DataGridContext dataGridContext = dataGridControl.DataGridContext;
-
-      if( ( !this.GetCalculatedCanBeCurrent() ) && ( column == dataGridContext.CurrentColumn ) )
-      {
-        try
-        {
-          dataGridContext.SetCurrentColumnCore( null, false, dataGridControl.SynchronizeSelectionWithCurrent, AutoScrollCurrentItemSourceTriggers.CurrentColumnChanged );
-        }
-        catch( DataGridException )
-        {
-          // We swallow the exception if it occurs because of a validation error or Cell was read-only or
-          // any other GridException.
-        }
-      }
-
-      bool cellFocusable = true;
-
-      if( !this.IsBeingEdited )
-      {
-        switch( this.ParentRow.NavigationBehavior )
-        {
-          case NavigationBehavior.None:
-            cellFocusable = false;
-            break;
-          case NavigationBehavior.RowOnly:
-            cellFocusable = false;
-            break;
-          case NavigationBehavior.RowOrCell:
-            cellFocusable = true;
-            break;
-          case NavigationBehavior.CellOnly:
-            cellFocusable = true;
-            break;
-        }
-      }
-
-      //force an update of the NavigationBehavior characteristics
-      this.Focusable = ( cellFocusable && this.GetCalculatedCanBeCurrent() );
-    }
-
-    private void OnParentColumnCellEditorDisplayConditionsChanged()
-    {
-      this.UpdateMatchingDisplayConditions();
-    }
-
-    private void OnParentColumnCellContentTemplateChanged( bool ignoreTemplateConditions )
-    {
-      //If the editor is displayed, I want to take no actions for this event.
-      if( ( this.CurrentEditorPendingDisplayState == EditorDisplayState.PendingShow ) || ( this.IsCellEditorDisplayed ) )
+      if( !this.IsContainerPrepared || this.IsContainerVirtualized )
         return;
 
-      //If there is no local value for the ContentTemplate and ContentTemplateSelector properties, then it is possible that
-      //the template to use changed.
-      if( ignoreTemplateConditions
-        || ( ( this.ContentTemplateInternal == null ) && ( this.ContentTemplateSelectorInternal == null ) ) )
+      var propertyName = e.PropertyName;
+
+      if( string.IsNullOrEmpty( propertyName ) )
       {
-        //force a re-evaluation of the CellContentTemplate.
-        this.SetCoercedContentTemplate( this.GetCoercedCellContentTemplate(), null );
+        if( !this.IsCellEditorDisplayed && ( this.CurrentEditorPendingDisplayState != EditorDisplayState.PendingShow ) )
+        {
+          this.UpdateCoercedContentTemplate( false );
+        }
+
+        this.UpdateFocusable();
+        this.UpdateMatchingDisplayConditions();
+      }
+      else if( propertyName == ColumnBase.CanBeCurrentWhenReadOnlyProperty.Name )
+      {
+        this.UpdateFocusable();
+      }
+      else if( propertyName == ColumnBase.CellEditorDisplayConditionsProperty.Name )
+      {
+        this.UpdateMatchingDisplayConditions();
+      }
+      else if( ( propertyName == ColumnBase.CellContentTemplateProperty.Name )
+            || ( propertyName == ColumnBase.CellContentTemplateSelectorProperty.Name ) )
+      {
+        if( !this.IsCellEditorDisplayed && ( this.CurrentEditorPendingDisplayState != EditorDisplayState.PendingShow ) )
+        {
+          if( ( this.ContentTemplateInternal == null ) && ( this.ContentTemplateSelectorInternal == null ) )
+          {
+            this.UpdateCoercedContentTemplate( false );
+          }
+        }
+      }
+      else if( ( propertyName == ColumnBase.CellContentStringFormatProperty.Name )
+            || ( propertyName == ColumnBase.DefaultCultureProperty.Name )
+            || ( propertyName == Column.ForeignKeyConfigurationProperty.Name ) )
+      {
+        if( !this.IsCellEditorDisplayed && ( this.CurrentEditorPendingDisplayState != EditorDisplayState.PendingShow ) )
+        {
+          this.UpdateCoercedContentTemplate( false );
+        }
+      }
+      else if( propertyName == ColumnBase.CellEditorSelectorProperty.Name )
+      {
+        //Make sure the editor is refreshed even if it is currently displayed.
+        m_forceEditorRefresh = true;
+        this.RefreshDisplayedTemplate();
+        m_forceEditorRefresh = false;
       }
     }
 
-    private void OnParentColumnForeignKeyConfigurationChanged()
-    {
-      if( ( this.CurrentEditorPendingDisplayState != EditorDisplayState.PendingShow ) && ( !this.IsCellEditorDisplayed ) )
-      {
-        this.SetCoercedContentTemplate( this.GetCoercedCellContentTemplate(), null );
-      }
-    }
-
-    #endregion IWeakEventListener Members
+    #endregion
 
     private KeyActivationGesture m_keyGesture; // = null
     private TextCompositionEventArgs m_textInputArgs; // = null
@@ -4529,6 +4426,7 @@ namespace Xceed.Wpf.DataGrid
     private DispatcherOperation m_delayedHideEditTemplateDispatcherOperation;
 
     private BitVector32 m_flags = new BitVector32();
+    private bool m_forceEditorRefresh;
 
     // Binding used by the animated Column reordering feature
     private static Binding ParentColumnTranslationBinding;
@@ -4564,7 +4462,8 @@ namespace Xceed.Wpf.DataGrid
       IsContainerVirtualized = 32768,
       AnimatedColumnReorderingBindingApplied = 65536,
       PreventMakeVisible = 131072,
-      IsContainerRecycled = 262144
+      IsContainerRecycled = 262144,
+      IsContainerPartiallyCleared = 524288
     }
 
     #endregion

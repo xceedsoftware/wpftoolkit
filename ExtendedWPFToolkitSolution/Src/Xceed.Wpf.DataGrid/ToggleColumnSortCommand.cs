@@ -57,7 +57,7 @@ namespace Xceed.Wpf.DataGrid
       get;
     }
 
-    #endregion       
+    #endregion
 
     #region MaxSortLevels Protected Property
 
@@ -83,8 +83,7 @@ namespace Xceed.Wpf.DataGrid
 
     public bool CanExecute( ColumnBase column, bool resetSort )
     {
-      return ( column != null )
-          && ( this.CanExecuteCore( column, resetSort ) );
+      return this.CanExecuteCore( column, resetSort );
     }
 
     public void Execute( ColumnBase column, bool resetSort )
@@ -92,39 +91,67 @@ namespace Xceed.Wpf.DataGrid
       if( !this.CanExecute( column, resetSort ) )
         return;
 
+      var currentSortDirection = column.SortDirection;
+      var nextSortDirection = currentSortDirection;
+      var pattern = column.SortDirectionCycle;
+
+      if( ( pattern != null ) && ( pattern.Count > 0 ) )
+      {
+        var index = pattern.IndexOf( currentSortDirection );
+
+        nextSortDirection = ( ( index < 0 ) || ( index == pattern.Count - 1 ) )
+                              ? pattern[ 0 ]
+                              : pattern[ index + 1 ];
+      }
+
+      var dataGridContext = this.DataGridContext;
+      if( dataGridContext == null )
+        return;
+
+      var eventArgs = new ColumnSortDirectionChangingEventArgs( DataGridControl.SortDirectionChangingEvent, column, dataGridContext, currentSortDirection, nextSortDirection );
+      dataGridContext.DataGridControl.RaiseSortDirectionChanging( eventArgs );
+
+      nextSortDirection = eventArgs.NextSortDirection;
+
+      if( currentSortDirection == nextSortDirection )
+        return;
+
+      if( currentSortDirection == SortDirection.None )
+      {
+        var maxSortCount = this.MaxSortLevels;
+
+        // Cannot insert sort description since it would go beyond the max sort description count, but only if Shift key is pressed
+        if( !resetSort && ( maxSortCount >= 0 ) && ( this.SortDescriptions.Count >= maxSortCount ) )
+          return;
+
+        //When Shift key is not pressed, simply evaluate if one sort description can be added, since all others will be cleared.
+        if( resetSort && maxSortCount == 0 )
+          return;
+      }
+
       using( this.SetQueueBringIntoViewRestrictions( AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged ) )
       {
-        this.ExecuteCore( column, resetSort );
+        this.ExecuteCore( column, nextSortDirection, resetSort );
       }
     }
 
     protected virtual bool CanExecuteCore( ColumnBase column, bool resetSort )
     {
-      if( string.IsNullOrEmpty( column.FieldName ) )
+      if( ( column == null ) || string.IsNullOrEmpty( column.FieldName ) )
         return false;
 
       if( !this.CanSort || !this.Columns.Contains( column ) )
         return false;
 
-      if( column.SortDirection == SortDirection.None )
-      {
-        int maxSortCount = this.MaxSortLevels;
-
-        // Cannot insert sort description since it would go beyond the max sort description count, but only if Shift key is pressed
-        if( !resetSort && ( maxSortCount >= 0 ) && ( this.SortDescriptions.Count >= maxSortCount ) )
-          return false;
-
-        //When Shift key is not pressed, simply evaluate if one sort description can be added, since all others will be cleared.
-        if( resetSort && maxSortCount == 0 )
-          return false;
-      }
-
       return true;
     }
 
-    protected virtual void ExecuteCore( ColumnBase column, bool resetSort )
+    protected virtual void ExecuteCore( ColumnBase column, SortDirection direction, bool resetSort )
     {
-      if( !this.ToggleColumnSort( column, resetSort ) )
+      if( column == null )
+        return;
+
+      if( !this.ToggleColumnSort( column, direction, resetSort ) )
         return;
 
       this.UpdateColumnSort();
@@ -187,21 +214,6 @@ namespace Xceed.Wpf.DataGrid
       this.Execute( parameter as ColumnBase, true );
     }
 
-    protected static SortDirection GetNextSortDirection( SortDirection direction )
-    {
-      switch( direction )
-      {
-        case SortDirection.Ascending:
-          return SortDirection.Descending;
-
-        case SortDirection.Descending:
-          return SortDirection.None;
-
-        default:
-          return SortDirection.Ascending;
-      }
-    }
-
     protected static void DeferRestoreStateOnLevel( Disposer disposer, DataGridContext dataGridContext )
     {
       ToggleColumnSortCommand.ThrowIfNull( disposer, "disposer" );
@@ -236,10 +248,8 @@ namespace Xceed.Wpf.DataGrid
       return ListSortDirection.Ascending;
     }
 
-    private bool ToggleColumnSort( ColumnBase column, bool resetSort )
+    private bool ToggleColumnSort( ColumnBase column, SortDirection direction, bool resetSort )
     {
-      ToggleColumnSortCommand.ThrowIfNull( column, "column" );
-
       this.ValidateToggleColumnSort();
 
       using( var synchronizationContext = this.StartSynchronizing( this.GetSortDescriptionsSyncContext() ) )
@@ -254,8 +264,7 @@ namespace Xceed.Wpf.DataGrid
           var sortDescriptions = this.SortDescriptions;
           disposer.Add( this.DeferResortHelper( sortDescriptions ), DisposableType.DeferResort );
 
-          var newSortDirection = ToggleColumnSortCommand.GetNextSortDirection( column.SortDirection );
-          string columnName = column.FieldName;
+          var columnName = column.FieldName;
           int insertionIndex;
 
           if( ( resetSort ) &&
@@ -281,18 +290,18 @@ namespace Xceed.Wpf.DataGrid
 
           if( insertionIndex < sortDescriptions.Count )
           {
-            if( newSortDirection == SortDirection.None )
+            if( direction == SortDirection.None )
             {
               sortDescriptions.RemoveAt( insertionIndex );
             }
             else
             {
-              sortDescriptions[ insertionIndex ] = new SortDescription( columnName, ToggleColumnSortCommand.Convert( newSortDirection ) );
+              sortDescriptions[ insertionIndex ] = new SortDescription( columnName, ToggleColumnSortCommand.Convert( direction ) );
             }
           }
-          else if( newSortDirection != SortDirection.None )
+          else if( direction != SortDirection.None )
           {
-            sortDescriptions.Add( new SortDescription( columnName, ToggleColumnSortCommand.Convert( newSortDirection ) ) );
+            sortDescriptions.Add( new SortDescription( columnName, ToggleColumnSortCommand.Convert( direction ) ) );
           }
         }
       }

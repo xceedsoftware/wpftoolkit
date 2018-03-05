@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -37,140 +37,30 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PileFlowPanel.Views
 
     public PileFlowPanelView()
     {
-#if !OPEN_SOURCE
-      this.DataContext = SampleDataProvider.SharedEmployees;
-#endif
 
       InitializeComponent();
-#if !OPEN_SOURCE
-      _pileFlowPanel.PileFlowItemActivated += new Xceed.Wpf.Toolkit.PileFlowPanel.PileFlowItemActivatedHandler( this.PileFlowItemActivated );
-      _pileFlowPanel.PileFlowItemDeactivated += new Xceed.Wpf.Toolkit.PileFlowPanel.PileFlowItemDeactivatedHandler( this.PileFlowItemDeactivated );
 
-      ObservableCollection<Product> products = SampleDataProvider.GetProducts();
-      foreach( Product product in products )
-      {
-        this.AddImage( product );
-      }
-#endif
     }
 
     #endregion
 
-#if !OPEN_SOURCE
-    #region Event Handlers
 
-    private void PileFlowItemActivated( object sender, Xceed.Wpf.Toolkit.PileFlowPanel.PileFlowActivationEventArgs e )
-    {
-      //# Modify the text label.
-      _pileFlowPanel.ContentLabel.Visibility = Visibility.Visible;
-      _pileFlowLabel.Text = e.Item.Element.Tag as string;
 
-      //# Enable the first PileFlowItem.
-      if( object.Equals( ( ( PileFlowItem )sender ).Element, _employeesPileFlowCard ) )
-      {
-        _employeeListBox.IsEnabled = true;
-      }
-    }
 
-    private void PileFlowItemDeactivated( object sender, EventArgs e )
-    {
-      //# Hide the text Label.
-      _pileFlowPanel.ContentLabel.Visibility = Visibility.Collapsed;
-      _pileFlowLabel.Text = null;
 
-      //# Enable the first PileFlowItem.
-      if( object.Equals( ( ( PileFlowItem )sender ).Element, _employeesPileFlowCard ) )
-      {
-        _employeeListBox.IsEnabled = false;
-      }
-    }
 
-    private void OnEmployeeButtonPress( object sender, EventArgs e )
-    {
-      Xceed.Wpf.Toolkit.MessageBox.Show( "Employee data has been saved.", "Employee", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-    }
 
-    private void OnShowReflectionsClick( object sender, RoutedEventArgs e )
-    {
-      CheckBox checkBox = ( CheckBox )sender;
-      foreach( UIElement item in _pileFlowPanel.Children )
-      {
-        if( item is PileFlowCard )
-        {
-          (( PileFlowCard )item).ShowReflection = ( bool )checkBox.IsChecked;
-        }
-      }
-    }
 
-    private void OnBeginReflectionOpacityChanged( object sender, RoutedPropertyChangedEventArgs<object> e )
-    {
-      this.ModifyReflection( sender, true );      
-    }
 
-    private void OnEndReflectionOpacityChanged( object sender, RoutedPropertyChangedEventArgs<object> e )
-    {
-      this.ModifyReflection( sender, false );        
-    }
-    
-    #endregion
 
-#endif
+
 
     #region Implementation
 
-#if !OPEN_SOURCE
-    private void ModifyReflection( object sender, bool isBeginReflectionOpacity )
-    {
-      if( _pileFlowPanel != null )
-      {
-        DoubleUpDown opacity = ( DoubleUpDown )sender;
-        foreach( UIElement item in _pileFlowPanel.Children )
-        {
-          if( item is PileFlowCard )
-          {
-            PileFlowCard card = ( PileFlowCard )item;
-            double opacityValue = ( opacity.Value != null ) ? ( double )opacity.Value : 0d;
-            if( isBeginReflectionOpacity )
-            {
-              card.BeginReflectionOpacity = opacityValue;
-            }
-            else
-            {
-              card.EndReflectionOpacity = opacityValue;
-            }
-          }
-        }
-      }
-    }
 
-    private void AddImage( Product product )
-    {
-      BitmapImage imageSource = null;
-      byte[] imageBytes = product.Photo;
-      if( imageBytes != null )
-      {
-        Stream imageStream = new MemoryStream( imageBytes );
-        imageSource = new BitmapImage();
-        imageSource.BeginInit();
-        imageSource.CacheOption = BitmapCacheOption.OnLoad;
-        imageSource.StreamSource = imageStream;
-        imageSource.EndInit();
 
-        //# Use a border to delimit the photos
-        Border border = new Border();
-        border.BorderBrush = new SolidColorBrush( Colors.Black );
-        border.BorderThickness = new Thickness( 2 );        
-        border.Background = new ImageBrush( imageSource );
 
-        //# Use a PileFlowCard to use Reflection.
-        PileFlowCard card = new PileFlowCard();
-        card.Child = border;
-        card.Tag = product.ProductName;
 
-        _pileFlowPanel.Children.Add( card );
-      }
-    }
-#endif
 
     #endregion
   }

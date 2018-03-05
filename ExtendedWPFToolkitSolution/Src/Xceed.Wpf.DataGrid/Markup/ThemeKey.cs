@@ -159,19 +159,29 @@ namespace Xceed.Wpf.DataGrid.Markup
 
     public override int GetHashCode()
     {
+      var hashCode = 0;
+
       var elementType = this.TargetElementType;
       if( elementType != null )
-        return elementType.GetHashCode();
+      {
+        hashCode += elementType.GetHashCode();
+      }
 
       var viewType = this.TargetViewType;
       if( viewType != null )
-        return viewType.GetHashCode();
+      {
+        hashCode *= 11;
+        hashCode += viewType.GetHashCode();
+      }
 
       var themeType = this.ThemeType;
       if( themeType != null )
-        return themeType.GetHashCode();
+      {
+        hashCode *= 17;
+        hashCode += themeType.GetHashCode();
+      }
 
-      return 0;
+      return hashCode;
     }
   }
 }

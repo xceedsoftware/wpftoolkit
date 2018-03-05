@@ -29,6 +29,7 @@ namespace Xceed.Wpf.DataGrid
   {
     public GeneratorNodeFactory( NotifyCollectionChangedEventHandler itemsChangedHandler,
                                  NotifyCollectionChangedEventHandler groupsChangedHandler,
+                                 NotifyCollectionChangedEventHandler headersFootersChangedHandler,
                                  EventHandler<ExpansionStateChangedEventArgs> expansionStateChangedHandler,
                                  EventHandler isExpandedChangingHandler,
                                  EventHandler isExpandedChangedHandler,
@@ -39,6 +40,9 @@ namespace Xceed.Wpf.DataGrid
 
       if( groupsChangedHandler == null )
         throw new ArgumentNullException( "groupsChangedHandler" );
+
+      if( headersFootersChangedHandler == null )
+        throw new ArgumentNullException( "headersFootersChangedHandler" );
 
       if( expansionStateChangedHandler == null )
         throw new ArgumentNullException( "expansionStateChangedHandler" );
@@ -51,6 +55,7 @@ namespace Xceed.Wpf.DataGrid
 
       m_itemsChangedHandler = itemsChangedHandler;
       m_groupsChangedHandler = groupsChangedHandler;
+      m_headersFootersChangedHandler = headersFootersChangedHandler;
       m_expansionStateChangedHandler = expansionStateChangedHandler;
       m_isExpandedChangingHandler = isExpandedChangingHandler;
       m_isExpandedChangedHandler = isExpandedChangedHandler;
@@ -102,7 +107,7 @@ namespace Xceed.Wpf.DataGrid
       }
       node.Next = next;
 
-      node.IsExpanded = groupConfig.InitiallyExpanded;
+      node.SetIsExpandedAtInitialization( groupConfig.InitiallyExpanded );
 
       if( !collectionViewGroup.IsBottomLevel )
       {
@@ -129,11 +134,9 @@ namespace Xceed.Wpf.DataGrid
       IList collection,
       GeneratorNode parent,
       GeneratorNode previous,
-      GeneratorNode next,
-      CustomItemContainerGenerator generator )
+      GeneratorNode next )
     {
       Debug.Assert( collection != null, "collection cannot be null for CreateItemsGeneratorNode()" );
-      Debug.Assert( generator != null );
 
       INotifyCollectionChanged notifyCollection = collection as INotifyCollectionChanged;
 
@@ -152,7 +155,6 @@ namespace Xceed.Wpf.DataGrid
       ItemsGeneratorNode node = new ItemsGeneratorNode( collection, parent );
 
       this.SetupCollectionGeneratorNode( node, parent, previous, next );
-
 
       node.AdjustLeafCount( node.Items.Count );
 
@@ -339,9 +341,7 @@ namespace Xceed.Wpf.DataGrid
 
     private void UnregisterNodeCollectionChanged( INotifyCollectionChanged source )
     {
-      bool existed = m_nodesCollectionChangedEventHandlers.Remove( source );
-
-      if( existed )
+      if( m_nodesCollectionChangedEventHandlers.Remove( source ) )
       {
         CollectionChangedEventManager.RemoveListener( source, this );
       }
@@ -351,13 +351,21 @@ namespace Xceed.Wpf.DataGrid
 
     bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
+      return this.OnReceiveWeakEvent( managerType, sender, e );
+    }
+
+    protected virtual bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
       if( managerType == typeof( CollectionChangedEventManager ) )
       {
         this.OnCollectionChanged( ( INotifyCollectionChanged )sender, ( NotifyCollectionChangedEventArgs )e );
-        return true;
+      }
+      else
+      {
+        return false;
       }
 
-      return false;
+      return true;
     }
 
     private void OnCollectionChanged( INotifyCollectionChanged source, NotifyCollectionChangedEventArgs e )
@@ -371,17 +379,9 @@ namespace Xceed.Wpf.DataGrid
       }
       else if( m_headersFootersMapping.TryGetValue( source, out nodeList ) )
       {
-        try
-        {
-          foreach( var node in nodeList )
-          {
-            m_itemsChangedHandler.Invoke( node, e );
-          }
-        }
-        catch( Exception ex )
-        {
-          throw new DataGridInternalException( ex.Message, ex, this.DataGridControl );
-        }
+        Debug.Assert( nodeList.Count > 0 );
+
+        m_headersFootersChangedHandler.Invoke( nodeList, e );
       }
     }
 
@@ -389,11 +389,12 @@ namespace Xceed.Wpf.DataGrid
 
     #region Private Fields
 
-    private readonly NotifyCollectionChangedEventHandler m_itemsChangedHandler; // = null
-    private readonly NotifyCollectionChangedEventHandler m_groupsChangedHandler; // = null
-    private readonly EventHandler<ExpansionStateChangedEventArgs> m_expansionStateChangedHandler; // = null
-    private readonly EventHandler m_isExpandedChangedHandler; // = null
-    private readonly EventHandler m_isExpandedChangingHandler; // = null
+    private readonly NotifyCollectionChangedEventHandler m_itemsChangedHandler;
+    private readonly NotifyCollectionChangedEventHandler m_groupsChangedHandler;
+    private readonly NotifyCollectionChangedEventHandler m_headersFootersChangedHandler;
+    private readonly EventHandler<ExpansionStateChangedEventArgs> m_expansionStateChangedHandler;
+    private readonly EventHandler m_isExpandedChangedHandler;
+    private readonly EventHandler m_isExpandedChangingHandler;
 
     private readonly Dictionary<INotifyCollectionChanged, ICollection<HeadersFootersGeneratorNode>> m_headersFootersMapping = new Dictionary<INotifyCollectionChanged, ICollection<HeadersFootersGeneratorNode>>( 32 );
     private readonly Dictionary<object, NotifyCollectionChangedEventHandler> m_nodesCollectionChangedEventHandlers = new Dictionary<object, NotifyCollectionChangedEventHandler>( 32 );

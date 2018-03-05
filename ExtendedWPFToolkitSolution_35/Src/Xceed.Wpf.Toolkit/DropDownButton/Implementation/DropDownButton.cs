@@ -55,8 +55,6 @@ namespace Xceed.Wpf.Toolkit
     {
       Keyboard.AddKeyDownHandler( this, OnKeyDown );
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );
-      //case 166525 : Do no inherit an implicit style of Button
-      this.InheritanceBehavior = InheritanceBehavior.SkipToThemeNow;
     }
 
     #endregion //Constructors
@@ -110,6 +108,23 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //DropDownContent
+
+    #region DropDownContentBackground
+
+    public static readonly DependencyProperty DropDownContentBackgroundProperty = DependencyProperty.Register( "DropDownContentBackground", typeof( Brush ), typeof( DropDownButton ), new UIPropertyMetadata( null ) );
+    public Brush DropDownContentBackground
+    {
+      get
+      {
+        return ( Brush )GetValue( DropDownContentBackgroundProperty );
+      }
+      set
+      {
+        SetValue( DropDownContentBackgroundProperty, value );
+      }
+    }
+
+    #endregion //DropDownContentBackground
 
     #region DropDownPosition
 

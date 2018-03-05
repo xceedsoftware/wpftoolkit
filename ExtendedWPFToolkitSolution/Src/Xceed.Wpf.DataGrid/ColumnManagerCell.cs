@@ -14,8 +14,10 @@
 
   ***********************************************************************************/
 
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
@@ -24,7 +26,6 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Xceed.Utils.Wpf.DragDrop;
-using Xceed.Wpf.DataGrid.Automation;
 using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
@@ -35,8 +36,8 @@ namespace Xceed.Wpf.DataGrid
   {
     static ColumnManagerCell()
     {
-      FocusableProperty.OverrideMetadata( typeof( ColumnManagerCell ), new FrameworkPropertyMetadata( false ) );
-      ReadOnlyProperty.OverrideMetadata( typeof( ColumnManagerCell ), new FrameworkPropertyMetadata( true ) );
+      UIElement.FocusableProperty.OverrideMetadata( typeof( ColumnManagerCell ), new FrameworkPropertyMetadata( false ) );
+      Cell.ReadOnlyProperty.OverrideMetadata( typeof( ColumnManagerCell ), new FrameworkPropertyMetadata( true ) );
 
       ColumnManagerCell.IsPressedProperty = ColumnManagerCell.IsPressedPropertyKey.DependencyProperty;
 
@@ -151,13 +152,26 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region ColumnReordering Internal Event
+    #region CanBeCollapsed Property
 
-    internal static readonly RoutedEvent ColumnReorderingEvent =
-          EventManager.RegisterRoutedEvent( "ColumnReordering",
-             RoutingStrategy.Bubble,
-             typeof( ColumnReorderingEventHandler ),
-             typeof( ColumnManagerCell ) );
+    internal override bool CanBeCollapsed
+    {
+      get
+      {
+        // A ColumnManagerCell is always collapsible (except when it, or it's parent column, is being dragged), since it can't be edited.
+        if( ( bool )this.GetValue( ColumnManagerCell.IsBeingDraggedProperty ) )
+        {
+          return false;
+        }
+
+        var parentColumn = this.ParentColumn;
+        if( parentColumn == null )
+          return true;
+
+        return !TableflowView.GetIsBeingDraggedAnimated( parentColumn );
+
+      }
+    }
 
     #endregion
 
@@ -172,15 +186,11 @@ namespace Xceed.Wpf.DataGrid
     {
       base.InitializeCore( dataGridContext, parentRow, parentColumn );
 
-      this.SetColumnBinding( ColumnManagerCell.ContentProperty, parentColumn, ColumnBase.TitleProperty );
-      this.SetColumnBinding( ColumnManagerCell.ContentTemplateProperty, parentColumn, ColumnBase.TitleTemplateProperty );
-      this.SetColumnBinding( ColumnManagerCell.ContentTemplateSelectorProperty, parentColumn, ColumnBase.TitleTemplateSelectorProperty );
+      this.SetColumnBinding( ColumnManagerCell.ContentProperty, "ParentColumn.Title" );
+      this.SetColumnBinding( ColumnManagerCell.ContentTemplateProperty, "ParentColumn.TitleTemplate" );
+      this.SetColumnBinding( ColumnManagerCell.ContentTemplateSelectorProperty, "ParentColumn.TitleTemplateSelector" );
     }
 
-    protected override AutomationPeer OnCreateAutomationPeer()
-    {
-      return new ColumnManagerCellAutomationPeer( this );
-    }
 
     protected internal override void PrepareDefaultStyleKey( ViewBase view )
     {
@@ -226,8 +236,7 @@ namespace Xceed.Wpf.DataGrid
             UIViewBase uiViewBase = dataGridContext.DataGridControl.GetView() as UIViewBase;
 
             m_dragSourceManager.DropOutsideCursor = ( uiViewBase != null ) ? uiViewBase.CannotDropDraggedElementCursor : UIViewBase.DefaultCannotDropDraggedElementCursor;
-
-            m_dragSourceManager.ProcessMouseLeftButtonDown( e );
+            m_dragSourceManager.DragStart( e );
           }
         }
 
@@ -243,7 +252,7 @@ namespace Xceed.Wpf.DataGrid
       {
         if( m_dragSourceManager != null )
         {
-          m_dragSourceManager.ProcessMouseMove( e );
+          m_dragSourceManager.DragMove( e );
         }
 
         if( !this.IsBeingDragged )
@@ -270,7 +279,7 @@ namespace Xceed.Wpf.DataGrid
 
       if( m_dragSourceManager != null )
       {
-        m_dragSourceManager.ProcessMouseLeftButtonUp( e );
+        m_dragSourceManager.Drop( e );
       }
 
       if( isMouseCaptured )
@@ -312,7 +321,7 @@ namespace Xceed.Wpf.DataGrid
     {
       if( m_dragSourceManager != null )
       {
-        m_dragSourceManager.ProcessLostMouseCapture( e );
+        m_dragSourceManager.DragCancel( e );
       }
 
       if( this.IsPressed )
@@ -367,8 +376,6 @@ namespace Xceed.Wpf.DataGrid
       Debug.Assert( dataGridContext != null );
 
       var toggleColumnSortCommand = dataGridContext.ToggleColumnSortCommand;
-      if( !toggleColumnSortCommand.CanExecute( column, shiftUnpressed ) )
-        return;
 
       toggleColumnSortCommand.Execute( column, shiftUnpressed );
     }
@@ -433,7 +440,7 @@ namespace Xceed.Wpf.DataGrid
       m_originalWidth = -1d;
     }
 
-    internal void ShowDropMark( Point mousePosition )
+    internal void ShowDropMark( RelativePoint mousePosition )
     {
       if( m_dropMarkAdorner == null )
       {
@@ -532,9 +539,9 @@ namespace Xceed.Wpf.DataGrid
 
     private void SetupDragManager()
     {
+      // Prevent any drag operation if columns layout is changing.
       var dataGridContext = this.DataGridContext;
-      // Can be null in design-time (edition of a style TargetType ColumnManagerCell).
-      if( dataGridContext == null )
+      if( ( dataGridContext == null ) || ( dataGridContext.ColumnManager.IsUpdateDeferred ) )
         return;
 
       // We do not support DragDrop when there are no AdornerLayer because there wouldn't be any visual feedback for the operation.
@@ -553,8 +560,7 @@ namespace Xceed.Wpf.DataGrid
       }
 
       var dataGridControl = dataGridContext.DataGridControl;
-      if( dataGridControl == null )
-        return;
+      Debug.Assert( dataGridControl != null );
 
       if( m_dragSourceManager != null )
       {
@@ -579,13 +585,14 @@ namespace Xceed.Wpf.DataGrid
       binding.Path = new PropertyPath( "(0).(1)", DataGridControl.DataGridContextProperty, TableView.AutoScrollIntervalProperty );
       binding.Mode = BindingMode.OneWay;
       binding.Source = this;
+      binding.Converter = new MillisecondsConverter();
       BindingOperations.SetBinding( m_dragSourceManager, DragSourceManager.AutoScrollIntervalProperty, binding );
 
       binding = new Binding();
-      binding.Path = new PropertyPath( "(0).(1)", DataGridControl.DataGridContextProperty, TableView.AutoScrollTresholdProperty );
+      binding.Path = new PropertyPath( "(0).(1)", DataGridControl.DataGridContextProperty, TableView.AutoScrollThresholdProperty );
       binding.Mode = BindingMode.OneWay;
       binding.Source = this;
-      BindingOperations.SetBinding( m_dragSourceManager, DragSourceManager.AutoScrollTresholdProperty, binding );
+      BindingOperations.SetBinding( m_dragSourceManager, DragSourceManager.AutoScrollThresholdProperty, binding );
     }
 
     private void DragSourceManager_PropertyChanged( object sender, PropertyChangedEventArgs e )
@@ -663,7 +670,11 @@ namespace Xceed.Wpf.DataGrid
 
     private ColumnManagerCell GetPreviousVisibleColumnManagerCell()
     {
-      var previousVisibleColumn = this.ParentColumn.PreviousVisibleColumn;
+      var parentColumn = this.ParentColumn;
+      if( parentColumn == null )
+        return null;
+
+      var previousVisibleColumn = parentColumn.PreviousVisibleColumn;
       if( previousVisibleColumn == null )
         return null;
 
@@ -715,12 +726,12 @@ namespace Xceed.Wpf.DataGrid
       previousColumnManagerCell.ColumnResizerThumb_DragCompleted( previousColumnManagerCell, e );
     }
 
-    private void SetColumnBinding( DependencyProperty targetProperty, ColumnBase parentColumn, DependencyProperty sourceProperty )
+    private void SetColumnBinding( DependencyProperty targetProperty, string sourceProperty )
     {
-      if( this.HasColumnBinding( targetProperty, parentColumn, sourceProperty ) )
+      if( BindingOperations.GetBinding( this, targetProperty ) != null )
         return;
 
-      var binding = ColumnManagerCell.CreateColumnBinding( parentColumn, sourceProperty );
+      var binding = ColumnManagerCell.CreateColumnBinding( sourceProperty );
       if( binding != null )
       {
         BindingOperations.SetBinding( this, targetProperty, binding );
@@ -731,35 +742,12 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private bool HasColumnBinding( DependencyProperty targetProperty, ColumnBase parentColumn, DependencyProperty sourceProperty )
+    private static Binding CreateColumnBinding( string sourceProperty )
     {
-      if( parentColumn == null )
-        return false;
-
-      var binding = BindingOperations.GetBinding( this, targetProperty );
-      if( binding == null )
-        return false;
-
-      var path = binding.Path;
-      if( path == null )
-        return false;
-
-      var pathParameters = path.PathParameters;
-
-      return ( binding.Source == parentColumn )
-          && ( pathParameters.Count == 1 )
-          && ( pathParameters[ 0 ] == sourceProperty );
-    }
-
-    private static Binding CreateColumnBinding( ColumnBase parentColumn, DependencyProperty sourceProperty )
-    {
-      if( parentColumn == null )
-        return null;
-
       var binding = new Binding();
       binding.Path = new PropertyPath( sourceProperty );
       binding.Mode = BindingMode.OneWay;
-      binding.Source = parentColumn;
+      binding.RelativeSource = new RelativeSource( RelativeSourceMode.Self );
       binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
 
       return binding;
@@ -767,38 +755,63 @@ namespace Xceed.Wpf.DataGrid
 
     #region IDropTarget Members
 
-    bool IDropTarget.CanDropElement( UIElement draggedElement )
+    bool IDropTarget.CanDropElement( UIElement draggedElement, RelativePoint mousePosition )
     {
-      ColumnManagerCell draggedCell = draggedElement as ColumnManagerCell;
+      var draggedCell = draggedElement as ColumnManagerCell;
       if( ( draggedCell == null ) || ( this == draggedCell ) )
         return false;
 
-      ColumnManagerRow parentRow = this.ParentRow as ColumnManagerRow;
+      var parentRow = this.ParentRow as ColumnManagerRow;
       if( ( parentRow == null ) || !parentRow.AllowColumnReorder )
         return false;
 
-      if( !ColumnManagerCell.CanMove( draggedCell ) || !ColumnManagerCell.CanMove( this ) )
-        return false;
-
-      DataGridContext draggedDetailContext = draggedCell.DataGridContext;
-      DataGridContext sourceDetailContext = this.DataGridContext;
+      var draggedDetailContext = draggedCell.DataGridContext;
+      var sourceDetailContext = this.DataGridContext;
       Debug.Assert( ( draggedDetailContext != null ) && ( sourceDetailContext != null ) );
 
-      return ( sourceDetailContext.SourceDetailConfiguration == draggedDetailContext.SourceDetailConfiguration ) &&
-             ( sourceDetailContext.GroupLevelDescriptions == draggedDetailContext.GroupLevelDescriptions );
+      if( ( sourceDetailContext.SourceDetailConfiguration != draggedDetailContext.SourceDetailConfiguration ) ||
+          ( sourceDetailContext.GroupLevelDescriptions != draggedDetailContext.GroupLevelDescriptions ) )
+        return false;
+
+      if( !ColumnManagerCell.CanMove( draggedCell ) )
+        return false;
+
+      var manager = draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
+      if( ( manager != null ) && ( manager.IsAnimatedColumnReorderingEnabled ) )
+      {
+        if( !manager.CanReorder( draggedCell, this, mousePosition ) )
+          return false;
+      }
+      else
+      {
+        var relativePosition = mousePosition.GetPoint( this );
+        var moveBefore = ( relativePosition.X <= this.ActualWidth / 2d );
+
+        if( moveBefore )
+        {
+          if( !draggedCell.CanMoveBefore( this.ParentColumn ) )
+            return false;
+        }
+        else
+        {
+          if( !draggedCell.CanMoveAfter( this.ParentColumn ) )
+            return false;
+        }
+      }
+
+      return true;
     }
 
     void IDropTarget.DragEnter( UIElement draggedElement )
     {
     }
 
-    void IDropTarget.DragOver( UIElement draggedElement, Point mousePosition )
+    void IDropTarget.DragOver( UIElement draggedElement, RelativePoint mousePosition )
     {
-      ColumnManagerCell draggedCell = draggedElement as ColumnManagerCell;
-
+      var draggedCell = draggedElement as ColumnManagerCell;
       if( draggedCell != null )
       {
-        ColumnReorderingDragSourceManager manager = draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
+        var manager = draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
 
         // No need for drop mark when performing animated Column reordering
         if( ( manager != null ) && ( manager.IsAnimatedColumnReorderingEnabled ) )
@@ -810,11 +823,10 @@ namespace Xceed.Wpf.DataGrid
 
     void IDropTarget.DragLeave( UIElement draggedElement )
     {
-      ColumnManagerCell draggedCell = draggedElement as ColumnManagerCell;
-
+      var draggedCell = draggedElement as ColumnManagerCell;
       if( draggedCell != null )
       {
-        ColumnReorderingDragSourceManager manager = draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
+        var manager = draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
 
         // No need for drop mark when performing animated Column reordering
         if( ( manager != null ) && ( manager.IsAnimatedColumnReorderingEnabled ) )
@@ -824,19 +836,18 @@ namespace Xceed.Wpf.DataGrid
       this.HideDropMark();
     }
 
-    void IDropTarget.Drop( UIElement draggedElement )
+    void IDropTarget.Drop( UIElement draggedElement, RelativePoint mousePosition )
     {
-      ColumnManagerCell draggedCell = draggedElement as ColumnManagerCell;
-
+      var draggedCell = draggedElement as ColumnManagerCell;
       if( draggedCell == null )
         return;
 
-      this.ProcessDrop( draggedCell );
+      this.ProcessDrop( draggedCell, mousePosition );
     }
 
-    internal void ProcessDrop( ColumnManagerCell draggedCell )
+    internal void ProcessDrop( ColumnManagerCell draggedCell, RelativePoint mousePosition )
     {
-      ColumnReorderingDragSourceManager manager = null;
+      var manager = default( ColumnReorderingDragSourceManager );
 
       if( draggedCell != null )
       {
@@ -849,52 +860,91 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        int oldPosition = draggedCell.ParentColumn.VisiblePosition;
-        int newPosition = this.ParentColumn.VisiblePosition;
+        this.HideDropMark();
 
-        if( m_dropMarkAdorner != null )
+        var dataGridContext = this.DataGridContext;
+        Debug.Assert( dataGridContext != null );
+
+        if( dataGridContext != null )
         {
-          DropMarkAlignment alignment = m_dropMarkAdorner.Alignment;
+          var targetColumn = draggedCell.ParentColumn;
+          var pivotColumn = this.ParentColumn;
 
-          this.HideDropMark();
+          Debug.Assert( targetColumn != null );
+          Debug.Assert( pivotColumn != null );
 
-          if( draggedCell.ParentColumn.VisiblePosition < newPosition )
+          var relativePosition = mousePosition.GetPoint( this );
+          var offset = Point.Subtract( mousePosition.GetPoint( draggedCell ), relativePosition );
+          var moveBefore = true;
+
+          // We assumme the cells are layouted horizontally.
+          if( Math.Abs( offset.X ) >= Math.Abs( offset.Y ) )
           {
-            if( alignment == DropMarkAlignment.Near )
-            {
-              draggedCell.ParentColumn.VisiblePosition = newPosition - 1;
-            }
-            else
-            {
-              draggedCell.ParentColumn.VisiblePosition = newPosition;
-            }
+            // Consider the case where the columns are layouted from left to right in reverse order.
+            var reverse = ( ( offset.X > 0d ) == ( targetColumn.VisiblePosition >= pivotColumn.VisiblePosition ) );
+
+            moveBefore = ( ( relativePosition.X < this.ActualWidth / 2d ) != reverse );
           }
+          // We assume the cells are layouted vertically.
           else
           {
-            if( alignment == DropMarkAlignment.Near )
-            {
-              draggedCell.ParentColumn.VisiblePosition = newPosition;
-            }
-            else
-            {
-              draggedCell.ParentColumn.VisiblePosition = newPosition + 1;
-            }
+            // Consider the case where the columns are layouted from top to bottom in reverse order.
+            var reverse = ( ( offset.Y > 0d ) == ( targetColumn.VisiblePosition >= pivotColumn.VisiblePosition ) );
+
+            moveBefore = ( ( relativePosition.Y < this.ActualHeight / 2d ) != reverse );
           }
 
-          // This will force every Rows to update there layout
-          ColumnReorderingEventArgs e = new ColumnReorderingEventArgs( ColumnManagerCell.ColumnReorderingEvent, oldPosition, newPosition );
-          this.RaiseEvent( e );
+          var success = ( moveBefore )
+                          ? dataGridContext.MoveColumnBefore( targetColumn, pivotColumn )
+                          : dataGridContext.MoveColumnAfter( targetColumn, pivotColumn );
 
+          Debug.Assert( success );
         }
       }
     }
 
-    private static bool CanMove( ColumnManagerCell cell )
+    internal bool CanMoveBefore( ColumnBase column )
     {
-      if( cell == null )
+      // A column that is locked cannot move.
+      var parentColumn = this.ParentColumn;
+      if( ( parentColumn == null ) || ( parentColumn.DraggableStatus != ColumnDraggableStatus.Draggable ) )
         return false;
 
-      var dataGridContext = cell.DataGridContext;
+      // The cell cannot move before a column that is locked in the first position.
+      if( ( column == null ) || ( column.DraggableStatus == ColumnDraggableStatus.FirstUndraggable ) )
+        return false;
+
+      var dataGridContext = this.DataGridContext;
+      if( dataGridContext == null )
+        return false;
+
+      if( dataGridContext.AreDetailsFlatten )
+      {
+        // Column reordering is not allowed for a ColumnManagerCell that is located at a detail level
+        // when details are flatten.
+        if( dataGridContext.SourceDetailConfiguration != null )
+          return false;
+
+        // The main column is always the first column when details are flatten.
+        if( column.IsMainColumn )
+          return false;
+      }
+
+      return true;
+    }
+
+    internal bool CanMoveAfter( ColumnBase column )
+    {
+      // A column that is locked cannot move.
+      var parentColumn = this.ParentColumn;
+      if( ( parentColumn == null ) || ( parentColumn.DraggableStatus != ColumnDraggableStatus.Draggable ) )
+        return false;
+
+      // The cell cannot move after a column that is locked in the last position.
+      if( ( column == null ) || ( column.DraggableStatus == ColumnDraggableStatus.LastUndraggable ) )
+        return false;
+
+      var dataGridContext = this.DataGridContext;
       if( dataGridContext == null )
         return false;
 
@@ -906,15 +956,43 @@ namespace Xceed.Wpf.DataGrid
           return false;
 
         // The main column is not allowed to be reordered when details are flatten.
-        var parentColumn = cell.ParentColumn;
-        if( ( parentColumn == null ) || ( parentColumn.IsMainColumn ) )
+        if( column.IsMainColumn )
           return false;
       }
 
       return true;
     }
 
-    #endregion IDropTarget Members
+    internal static bool CanMove( ColumnManagerCell cell )
+    {
+      if( cell == null )
+        return false;
+
+      var dataGridContext = cell.DataGridContext;
+      if( dataGridContext == null )
+        return false;
+
+      // A column that is locked cannot move.
+      var parentColumn = cell.ParentColumn;
+      if( ( parentColumn == null ) || ( parentColumn.DraggableStatus != ColumnDraggableStatus.Draggable ) )
+        return false;
+
+      if( dataGridContext.AreDetailsFlatten )
+      {
+        // Column reordering is not allowed for a ColumnManagerCell that is located at a detail level
+        // when details are flatten.
+        if( dataGridContext.SourceDetailConfiguration != null )
+          return false;
+
+        // The main column is not allowed to be reordered when details are flatten.
+        if( parentColumn.IsMainColumn )
+          return false;
+      }
+
+      return true;
+    }
+
+    #endregion
 
     // Will remain null when no AdornerLayer is found.
     private ColumnReorderingDragSourceManager m_dragSourceManager;
@@ -927,5 +1005,22 @@ namespace Xceed.Wpf.DataGrid
     private double m_originalWidth = -1d;
     private Thumb m_columnResizerThumb; // = null
     private Thumb m_columnResizerThumbLeft; // null
+
+    #region MillisecondsConverter Private Class
+
+    private sealed class MillisecondsConverter : IValueConverter
+    {
+      public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
+      {
+        return TimeSpan.FromMilliseconds( System.Convert.ToDouble( value ) );
+      }
+
+      public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
+      {
+        throw new NotSupportedException();
+      }
+    }
+
+    #endregion
   }
 }

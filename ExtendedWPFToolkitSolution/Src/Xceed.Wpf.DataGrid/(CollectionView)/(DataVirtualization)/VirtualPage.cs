@@ -16,19 +16,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Threading;
-using System.Collections.Specialized;
 
 namespace Xceed.Wpf.DataGrid
 {
-  internal class VirtualPage
-    : List<VirtualizedItemInfo>, IDisposable
+  internal class VirtualPage : List<VirtualizedItemInfo>, IDisposable
   {
-    #region CONSTRUCTORS
-
     internal static VirtualPage CreateEmptyPage( VirtualList parentVirtualList, int startSourceIndex, int entryCount )
     {
       if( parentVirtualList == null )
@@ -76,9 +71,7 @@ namespace Xceed.Wpf.DataGrid
       this.IsFilled = true;
     }
 
-    #endregion CONSTRUCTORS
-
-    #region RemoveAfterOperation
+    #region RemoveAfterOperation Property
 
     public bool RemoveAfterOperation
     {
@@ -118,7 +111,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion IsEmpty Property
+    #endregion
 
     #region IsFilled Property
 
@@ -137,7 +130,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion IsFilled Property
+    #endregion
 
     #region IsDisposed Read-Only Property
 
@@ -165,7 +158,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion IsCommitPending Property
+    #endregion
 
     #region IsDirty Property
 
@@ -188,7 +181,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion IsDirty Property
+    #endregion
 
     #region IsLocked Property
 
@@ -200,9 +193,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion IsLocked Property
+    #endregion
 
-    #region IsRemovable
+    #region IsRemovable Property
 
     public bool IsRemovable
     {
@@ -213,7 +206,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion IsRemovable
+    #endregion
 
     #region ParentVirtualList Property
 
@@ -225,8 +218,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion ParentVirtualList Property
-
+    #endregion
 
     #region StartDataIndex Property
 
@@ -238,7 +230,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion StartDataIndex Property
+    #endregion
 
     #region EndDataIndex Property
 
@@ -250,10 +242,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion EndDataIndex Property
-
-
-    #region PUBLIC METHODS
+    #endregion
 
     public VirtualizedItemInfo GetVirtualizedItemInfoAtIndex( int sourceIndex )
     {
@@ -271,8 +260,9 @@ namespace Xceed.Wpf.DataGrid
       string representation = string.Empty;
 
       if( !this.IsFilled )
+      {
         representation += "Fill Pending - ";
-
+      }
 
       if( this.IsEmpty )
       {
@@ -301,131 +291,14 @@ namespace Xceed.Wpf.DataGrid
       return items;
     }
 
-    #endregion PUBLIC METHODS
-
-
-    #region PRIVATE CALLBACKS
-
-    private void AsyncQueryInfo_BuiltInAbort( AsyncQueryInfo queryInfo )
-    {
-      if( this.IsDisposed )
-        return;
-
-      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
-
-      this.ParentVirtualList.PagingManager.OnBuiltInAbort( this, queryInfo );
-      this.IsAborting = false;
-    }
-
-    private void AsyncQueryInfo_BeginQueryItems( AsyncQueryInfo queryInfo )
-    {
-      if( this.IsDisposed )
-        return;
-
-      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
-
-      this.ParentVirtualList.PagingManager.OnQueryItems( this, queryInfo );
-    }
-
-    private void AsyncQueryInfo_AbortQueryItems( AsyncQueryInfo queryInfo )
-    {
-      if( this.IsDisposed )
-        return;
-
-      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
-
-      this.ParentVirtualList.PagingManager.OnAbortQueryItems( this, queryInfo );
-
-      this.IsAborting = false;
-
-      // If the page was removed, it was also disposed.
-      // This case means the page was not restarting
-      if( !this.RemoveAfterOperation && this.ParentVirtualList.IsRestarting )
-        this.Restart();
-    }
-
-    private void AsyncQueryInfo_EndQueryItems( AsyncQueryInfo queryInfo, object[] fetchedItems )
-    {
-      if( this.IsDisposed )
-        return;
-
-      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
-      Debug.Assert( !this.IsAborting );
-      this.ParentVirtualList.PagingManager.OnQueryItemsCompleted( this, queryInfo, fetchedItems );
-
-      if( this.ParentVirtualList.IsRestarting )
-        this.Restart();
-    }
-
-    private void AsyncQueryInfo_QueryErrorChanged( AsyncQueryInfo queryInfo )
-    {
-      if( this.IsDisposed )
-        return;
-
-      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
-
-      this.ParentVirtualList.PagingManager.OnQueryErrorChanged( this, queryInfo );
-
-      if( this.ParentVirtualList.IsRestarting )
-        this.Restart();
-    }
-
-    private void AsyncCommitInfo_BeginCommitItems( AsyncCommitInfo commitInfo )
-    {
-      if( this.IsDisposed )
-        return;
-
-      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
-
-      this.ParentVirtualList.PagingManager.OnCommitItems( this, commitInfo );
-    }
-
-    private void AsyncCommitInfo_EndCommitItems( AsyncCommitInfo commitInfo )
-    {
-      if( this.IsDisposed )
-        return;
-
-      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
-
-      this.ParentVirtualList.PagingManager.OnCommitItemsCompleted( this, commitInfo );
-
-      if( this.ParentVirtualList.IsRestarting )
-        this.Restart();
-    }
-
-    private void AsyncCommitInfo_CommitErrorChanged( AsyncCommitInfo commitInfo )
-    {
-      if( this.IsDisposed )
-        return;
-
-      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
-
-      this.ParentVirtualList.PagingManager.OnCommitErrorChanged( this, commitInfo );
-
-      if( this.ParentVirtualList.IsRestarting )
-        this.Restart();
-    }
-
-    #endregion PRIVATE CALLBACKS
-
-    #region INTERNAL METHODS
-
-    /// <summary>
-    /// Increments the page's lock count.  
-    /// Returns True if the lock count went from 0 to 1, meaning that the page is now considered locked and is not up for removal.
-    /// </summary>
     internal bool LockPage()
     {
       m_lockCount++;
 
-      // Returns True if the page just became locked or False if the call simply incremented the lock count.
+      // Returns True if the page just became locked (and is not up for removal) or False if the call simply incremented the lock count.
       return m_lockCount == 1;
     }
 
-    /// <summary>
-    /// Decrements the page's lock count.
-    /// Returns True if the lock count is down to 0, meaning that the page is now considered unlocked and is up for removal.
-    /// </summary>
     internal bool UnlockPage()
     {
       if( m_lockCount > 0 )
@@ -442,7 +315,7 @@ namespace Xceed.Wpf.DataGrid
         return false;
       }
 
-      // Returns True if the page just became unlocked or False if the call simply decremented the lock count.
+      // Returns True if the page just became unlocked (and is up for removal) or False if the call simply decremented the lock count.
       return m_lockCount == 0;
     }
 
@@ -455,7 +328,16 @@ namespace Xceed.Wpf.DataGrid
 
       if( m_asyncQueryInfo != null )
       {
-        this.IsAborting = true;
+        // This method can be reentered by another thread, while it's already being processed, with the result that the AbortQuery delegate may not be trigged by the CollectionView,
+        // and hence the client code not prevented it must abort the query/operation/connection.
+        lock( this )
+        {
+          if( this.IsAborting )
+            return;
+
+          this.IsAborting = true;
+        }
+
         m_asyncQueryInfo.AbortQuery();
       }
     }
@@ -463,7 +345,6 @@ namespace Xceed.Wpf.DataGrid
     internal void QueueQueryData( Dispatcher dispatcher )
     {
       Debug.Assert( !this.IsDisposed );
-
       Debug.Assert( m_asyncQueryInfo == null );
 
       m_asyncQueryInfo = new AsyncQueryInfo(
@@ -485,12 +366,12 @@ namespace Xceed.Wpf.DataGrid
 
       // This can occur when the user notify us that the QueryData is completed for an AsyncQueryInfo.StartIndex that refers to a Page which does exists
       // but that was removed, then re-created thus creating another asyncQueryInfo and queuing another QueryData.
-      // The only way to get rid of this situation would be to keep a ref to the queued asyncQueryInfo even if we get rid of the page and re-link the same instance
-      // to the newly created page.  This optimization could be done in a future version.  For now, let's return and the second asyncQueryInfo will take care of filling
-      // the newly created page.
+      // The only way to get rid of this situation would be to keep a ref to the queued asyncQueryInfo even if we get rid of the page and re-link the same instance to the newly
+      // created page.  This optimization could be done in a future version.  For now, let's return and the second asyncQueryInfo will take care of filling the newly created page.
       if( m_asyncQueryInfo != asyncQueryInfo )
       {
         Debug.Assert( false );
+
         return;
       }
 
@@ -511,6 +392,7 @@ namespace Xceed.Wpf.DataGrid
       }
 
       this.IsFilled = true;
+
       Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "Page Filled - " + this.ToString() );
     }
 
@@ -529,6 +411,7 @@ namespace Xceed.Wpf.DataGrid
         if( ( virtualizedItemInfo.IsDirty ) && ( !this.IsAsyncCommitInfoQueuedForItem( virtualizedItemInfo.DataItem ) ) )
         {
           Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "QueueCommitData for page " + this.ToString() + " and index " + virtualizedItemInfo.Index );
+
           dirtyItemInfoNotAlreadyPendingCommit.Add( virtualizedItemInfo );
         }
       }
@@ -587,6 +470,7 @@ namespace Xceed.Wpf.DataGrid
       if( !this.IsRestarting )
       {
         Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "Restart VirtualPage requested for " + this.ToString() );
+
         this.IsRestarting = true;
         this.ParentVirtualList.OnVirtualPageRestarting( this );
       }
@@ -600,16 +484,128 @@ namespace Xceed.Wpf.DataGrid
 
     internal void EndRestart()
     {
-      // VirtualPage will be disposed by the VirtualPageManager
-      // when it removes the page from is m_pageNodeList
+      // VirtualPage will be disposed by the VirtualPageManager when it removes the page from is m_pageNodeList
       Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "Restart VirtualPage completed for " + this.ToString() );
+
       this.IsRestarting = false;
       this.ParentVirtualList.OnVirtualPageRestarted( this );
     }
 
-    #endregion INTERNAL METHODS
+    private void AsyncQueryInfo_BuiltInAbort( AsyncQueryInfo queryInfo )
+    {
+      if( this.IsDisposed )
+        return;
 
-    #region PRIVATE METHODS
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+
+      this.ParentVirtualList.PagingManager.OnBuiltInAbort( this, queryInfo );
+      this.IsAborting = false;
+    }
+
+    private void AsyncQueryInfo_BeginQueryItems( AsyncQueryInfo queryInfo )
+    {
+      if( this.IsDisposed )
+        return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+
+      this.ParentVirtualList.PagingManager.OnQueryItems( this, queryInfo );
+    }
+
+    private void AsyncQueryInfo_AbortQueryItems( AsyncQueryInfo queryInfo )
+    {
+      if( this.IsDisposed )
+        return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+
+      this.ParentVirtualList.PagingManager.OnAbortQueryItems( this, queryInfo );
+
+      this.IsAborting = false;
+
+      // If the page was removed, it was also disposed. This case means the page was not restarting
+      if( !this.RemoveAfterOperation && this.ParentVirtualList.IsRestarting )
+      {
+        this.Restart();
+      }
+    }
+
+    private void AsyncQueryInfo_EndQueryItems( AsyncQueryInfo queryInfo, object[] fetchedItems )
+    {
+      if( this.IsDisposed )
+        return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+      Debug.Assert( !this.IsAborting );
+
+      // The page can be removed when the CollectionView raises a CollectionChanged and the selection is consequently updated, so make sure to lock it until the update operation is done.
+      this.LockPage();
+
+      this.ParentVirtualList.PagingManager.OnQueryItemsCompleted( this, queryInfo, fetchedItems );
+
+      this.UnlockPage();
+
+      if( this.ParentVirtualList.IsRestarting )
+      {
+        this.Restart();
+      }
+    }
+
+    private void AsyncQueryInfo_QueryErrorChanged( AsyncQueryInfo queryInfo )
+    {
+      if( this.IsDisposed )
+        return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+
+      this.ParentVirtualList.PagingManager.OnQueryErrorChanged( this, queryInfo );
+
+      if( this.ParentVirtualList.IsRestarting )
+      {
+        this.Restart();
+      }
+    }
+
+    private void AsyncCommitInfo_BeginCommitItems( AsyncCommitInfo commitInfo )
+    {
+      if( this.IsDisposed )
+        return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+
+      this.ParentVirtualList.PagingManager.OnCommitItems( this, commitInfo );
+    }
+
+    private void AsyncCommitInfo_EndCommitItems( AsyncCommitInfo commitInfo )
+    {
+      if( this.IsDisposed )
+        return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+
+      this.ParentVirtualList.PagingManager.OnCommitItemsCompleted( this, commitInfo );
+
+      // Make sure the page has not been removed by the previous call before accessing the parent virtual list.
+      if( !this.IsDisposed && this.ParentVirtualList.IsRestarting )
+      {
+        this.Restart();
+      }
+    }
+
+    private void AsyncCommitInfo_CommitErrorChanged( AsyncCommitInfo commitInfo )
+    {
+      if( this.IsDisposed )
+        return;
+
+      Debug.Assert( ( this.ParentVirtualList != null ) || ( this.ParentVirtualList.PagingManager != null ) );
+
+      this.ParentVirtualList.PagingManager.OnCommitErrorChanged( this, commitInfo );
+
+      if( this.ParentVirtualList.IsRestarting )
+      {
+        this.Restart();
+      }
+    }
 
     private int SourceIndexToPageEntryIndex( int sourceIndex )
     {
@@ -632,46 +628,16 @@ namespace Xceed.Wpf.DataGrid
       return false;
     }
 
-    #endregion PRIVATE METHODS
-
-    #region PRIVATE FIELDS
-
-    private BitVector32 m_flags;
-
-    private int m_startDataIndex;
-    private int m_lockCount;
-
-    private VirtualList m_parentVirtualList;
-
-    private AsyncQueryInfo m_asyncQueryInfo;
-    private List<AsyncCommitInfo> m_asyncCommitInfoList;
-
-    #endregion PRIVATE FIELDS
-
-    #region PRIVATE NESTED ENUMS
-
-    [Flags]
-    private enum VirtualItemPageFlags
-    {
-      IsFilled = 1,
-      IsDisposed = 2,
-    }
-
-    #endregion PRIVATE NESTED ENUMS
-
     #region IDisposable Members
 
     public void Dispose()
     {
-
       Debug.Assert( !this.IsDisposed );
-
       Debug.Assert( ( m_asyncCommitInfoList != null ) && ( m_asyncCommitInfoList.Count == 0 ), "Some async commit are not completed while disposing VirtualPage" );
 
       if( m_asyncQueryInfo != null )
       {
-        // We must dispose the AsyncQueryInfo to be sure
-        // it does not root this VirtualPage instance
+        // We must dispose the AsyncQueryInfo to be sure it does not root this VirtualPage instance
         m_asyncQueryInfo.Dispose();
         m_asyncQueryInfo = null;
       }
@@ -684,5 +650,22 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion
+
+    private BitVector32 m_flags;
+
+    private int m_startDataIndex;
+    private int m_lockCount;
+
+    private VirtualList m_parentVirtualList;
+
+    public AsyncQueryInfo m_asyncQueryInfo;
+    private List<AsyncCommitInfo> m_asyncCommitInfoList;
+
+    [Flags]
+    private enum VirtualItemPageFlags
+    {
+      IsFilled = 1,
+      IsDisposed = 2,
+    }
   }
 }

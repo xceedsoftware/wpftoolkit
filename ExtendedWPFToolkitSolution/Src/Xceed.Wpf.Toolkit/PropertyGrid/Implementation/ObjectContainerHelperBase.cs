@@ -188,10 +188,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private void UpdateFilter()
     {
-      FilterInfo filterInfo = PropertyContainer.FilterInfo;
+      FilterInfo filterInfo = this.PropertyContainer.FilterInfo;
 
-      PropertyItems.FilterPredicate = filterInfo.Predicate
-        ?? PropertyItemCollection.CreateFilter( filterInfo.InputString );
+      this.PropertyItems.FilterPredicate = filterInfo.Predicate
+        ?? PropertyItemCollection.CreateFilter( filterInfo.InputString, this.PropertyItems, this.PropertyContainer );
     }
 
     private void UpdateCategorization( bool updateSubPropertiesCategorization )

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -525,14 +525,13 @@
             <TextBlock Text="Step:"
                        Grid.Row="4"
                        VerticalAlignment="Center" />
-            <!-- #// TODODOC -->
             <xctk:DoubleUpDown Value="{Binding Step, ElementName=_rangeSlider}"
                                Grid.Row="4"
                                Grid.Column="1"
                                FormatString="0.00"
                                VerticalAlignment="Center"
                                Margin="5"
-                               ToolTip="Identify the RangeSlider's size of individual move, while clicking on the LowerRange or HigherRange."/>
+                               ToolTip="Identify the RangeSlider's size of individual move, when clicking on the LowerRange or HigherRange."/>
 
             <TextBlock Text="Orientation:"
                        Grid.Row="5"
@@ -607,14 +606,13 @@
                        Grid.Column="2"
                        VerticalAlignment="Center"
                        Margin="10,5,5,5" />
-            <!-- //# TODODOC -->
             <ComboBox Grid.Row="5"
                       Grid.Column="3"
                       ItemsSource="{Binding Source={StaticResource AutoToolTipPlacement}}"
                       SelectedItem="{Binding AutoToolTipPlacement, ElementName=_rangeSlider}"
                       VerticalAlignment="Center"
                       Margin="5"
-                      ToolTip="Gets/sets whether a tooltip that contains the current value of a RangeSlider Thumb displays when the Thumb is pressed. If a tooltip is displayed, this property also specifies the placement of the tooltip.">
+                      ToolTip="Gets/sets whether a tooltip that contains the current value of a RangeSlider's Thumb displays when the Thumb is pressed. If a tooltip is displayed, this property also specifies the placement of the tooltip.">
             </ComboBox>
 
             <TextBlock Text="Auto ToolTip Precision:"
@@ -622,7 +620,6 @@
                        Grid.Column="2"
                        VerticalAlignment="Center"
                        Margin="10,5,5,5" />
-            <!-- //# TODODOC -->
             <xctk:IntegerUpDown Value="{Binding AutoToolTipPrecision, ElementName=_rangeSlider}"
                                 Grid.Row="6"
                                 Grid.Column="3"
@@ -630,7 +627,7 @@
                                 Maximum="10"
                                 VerticalAlignment="Center"
                                 Margin="5"
-                                ToolTip="Gets/sets the number of digits that are displayed to the right side of the decimal point for the Value of a RangeSlider Thumb in a tooltip." />
+                                ToolTip="Gets/sets the number of digits that are displayed to the right side of the decimal point for the Value of a RangeSlider's Thumb in a tooltip." />
 
             <!-- Column 3 -->
             <TextBlock Text="Lower Range Style:"

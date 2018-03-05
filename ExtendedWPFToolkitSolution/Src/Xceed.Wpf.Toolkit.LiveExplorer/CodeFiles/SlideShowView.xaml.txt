@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -26,7 +26,6 @@
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
          <Run>The SlideShow is used to display SlideShowItems in a fashion similar to a diaporama. SlideShowItems are not limited to images and can be built using any UIElement.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
@@ -34,191 +33,28 @@
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-          ##END-->
       </Paragraph>
    </local:DemoView.Description>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-      <conv:CountToIndexConverter x:Key="CountToIndexConverter" />
-      <conv:IndexToPositionConverter x:Key="IndexToPositionConverter" />
-   </local:DemoView.Resources>
 
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="Auto" />
-      </Grid.RowDefinitions>
 
-      <GroupBox Header="Features"
-                Grid.Row="0"
-                Margin="5">
-         <Grid Margin="0,5,10,5">
-            <Grid.RowDefinitions>
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="180" />
-               <ColumnDefinition Width="30" />
-               <ColumnDefinition Width="180" />
-               <ColumnDefinition Width="150" />
-               <ColumnDefinition Width="75" />
-            </Grid.ColumnDefinitions>
 
-            <!-- 1st Column-->
 
-            <!--Display DisplayCountLabel-->
-            <TextBlock Text="DisplayCountLabel: "
-                       VerticalAlignment="Center" />
-            <CheckBox x:Name="_displayCountLabel"
-                      Grid.Column="1"
-                      IsChecked="{Binding DisplayCountLabel, ElementName=_slideShow}"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Center"
-                      Margin="5,5,2,5" />
 
-            <!--Display Caption-->
-            <TextBlock Grid.Row="1"
-                       Text="Display Caption: "
-                       VerticalAlignment="Center" />
-            <CheckBox Grid.Row="1"
-                      x:Name="_displayCaption"
-                      Grid.Column="1"
-                      IsChecked="{Binding DisplayCaption, ElementName=_slideShow}"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Center"
-                      Margin="5,5,2,5" />
 
-            <!--SliderNavigation Bar-->
-            <TextBlock Grid.Row="2"
-                       Text="Display SliderNavigationBar: "
-                       VerticalAlignment="Center" />
-            <CheckBox Grid.Row="2"
-                      x:Name="_displaySliderNavigationBar"
-                      Grid.Column="1"
-                      IsChecked="{Binding DisplaySliderNavigationBar, ElementName=_slideShow}"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Center"
-                      Margin="5,5,2,5" />
 
-            <!--Navigation Bar-->
-            <TextBlock Grid.Row="3"
-                       Text="Display NavigationBar: "
-                       VerticalAlignment="Center" />
-            <CheckBox Grid.Row="3"
-                      x:Name="_displayNavigationBar"
-                      Grid.Column="1"
-                      IsChecked="{Binding DisplayNavigationBar, ElementName=_slideShow}"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Center"
-                      Margin="5,5,2,5" />
 
-            <!--SideNavigation Bar-->
-            <TextBlock Grid.Row="4"
-                       Text="Display SideNavigationButtons: "
-                       VerticalAlignment="Center" />
-            <CheckBox Grid.Row="4"
-                      x:Name="_displaySideNavigationButtons"
-                      Grid.Column="1"
-                      IsChecked="{Binding DisplaySideNavigationButtons, ElementName=_slideShow}"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Center"
-                      Margin="5,5,2,5" />
 
-            <!--2nd Column-->
 
-            <!--PauseSlideShowOnMouseOver-->
-            <TextBlock Grid.Row="0"
-                       Text="PauseSlideShowOnMouseOver: "
-                       Grid.Column="2"
-                       VerticalAlignment="Bottom"
-                       Margin="10,0,5,5" />
-            <CheckBox Grid.Row="0"
-                      x:Name="_pauseSlideShowOnMouseOver"
-                      Grid.Column="3"
-                      IsChecked="{Binding PauseSlideShowOnMouseOver, ElementName=_slideShow}"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Center"
-                      Margin="5,5,2,5" />
 
-            <!--AllowLooping-->
-            <TextBlock Grid.Row="1"
-                       Text="Allow Looping: "
-                       Grid.Column="2"
-                       VerticalAlignment="Bottom"
-                       Margin="10,0,5,5" />
-            <CheckBox Grid.Row="1"
-                      x:Name="_allowRotation"
-                      Grid.Column="3"
-                      IsChecked="{Binding AllowLooping, ElementName=_slideShow}"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Center"
-                      Margin="5,5,2,5" />
 
-            <!--Interval-->
-            <TextBlock Grid.Row="2"
-                       Text="TimeInterval: "
-                       Grid.Column="2"
-                       VerticalAlignment="Center"
-                       Margin="10,5,5,5" />
-            <xctk:IntegerUpDown Grid.Row="2"
-                                x:Name="_interval"
-                                Grid.Column="3"
-                                Minimum="100"
-                                Maximum="10000"
-                                Value="{Binding TimeInterval, ElementName=_slideShow, Mode=TwoWay}"
-                                DisplayDefaultValueOnEmptyText="True"
-                                DefaultValue="500"
-                                Height="20"
-                                Width="50"
-                                Increment="100"
-                                Margin="5,5,16,5"
-                                HorizontalAlignment="Left" />
 
-            <!--TransitionMode-->
-            <TextBlock Grid.Row="3"
-                       Text="TransitionMode: "
-                       Grid.Column="2"
-                       VerticalAlignment="Center"
-                       Margin="10,5,5,5" />
-            <ComboBox Grid.Row="3"
-                      Grid.Column="3"
-                      SelectedIndex="0"
-                      Width="100"
-                      SelectedValue="{Binding TransitionMode, ElementName=_slideShow}"
-                      SelectedValuePath="Content"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Left"
-                      Margin="5,5,16,5">
-               <ComboBoxItem Content="Sliding" />
-               <ComboBoxItem Content="Fading" />
-               <ComboBoxItem Content="None" />
-            </ComboBox>
 
-         </Grid>
 
-      </GroupBox>
 
-      <StackPanel Grid.Row="1">
-         <TextBlock Text="Usage:"
-                    Style="{StaticResource Header}" />
 
-         <xctk:SlideShow x:Name="_slideShow"
-                         Height="280"
-                         Margin="-10,0,0,0">
-         </xctk:SlideShow>
 
-      </StackPanel>
 
-   </Grid>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
     <Image Source="..\OpenSourceImages\SlideShow.png" Width="600" Height="280"/>
-   ##END-->
 </local:DemoView>

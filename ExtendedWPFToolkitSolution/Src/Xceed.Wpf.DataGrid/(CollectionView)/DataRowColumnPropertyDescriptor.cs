@@ -15,36 +15,36 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Collections;
 using System.ComponentModel;
 using System.Data;
-using System.Collections;
 
 namespace Xceed.Wpf.DataGrid
 {
-  internal class DataRowColumnPropertyDescriptor : PropertyDescriptor
+  internal sealed class DataRowColumnPropertyDescriptor : PropertyDescriptor
   {
-    public DataRowColumnPropertyDescriptor( System.Data.DataColumn column )
+    internal DataRowColumnPropertyDescriptor( DataColumn column )
       : base( column.ColumnName, null )
     {
       if( column == null )
         throw new ArgumentNullException( "column" );
 
-      m_columnName = column.ColumnName;
-      m_columnDataType = ItemsSourceHelper.GetColumnDataType( column );
-      m_columnCaption = column.Caption;
-      m_columnReadOnly = column.ReadOnly;
-      m_columnHidden = ( column.ColumnMapping == MappingType.Hidden );
+      m_column = column;
     }
+
+    #region DisplayName Property
 
     public override string DisplayName
     {
       get
       {
-        return m_columnCaption;
+        return m_column.Caption;
       }
     }
+
+    #endregion
+
+    #region Attributes Property
 
     public override AttributeCollection Attributes
     {
@@ -52,7 +52,7 @@ namespace Xceed.Wpf.DataGrid
       {
         if( typeof( IList ).IsAssignableFrom( this.PropertyType ) )
         {
-          Attribute[] array = new Attribute[ base.Attributes.Count + 1 ];
+          var array = new Attribute[ base.Attributes.Count + 1 ];
           base.Attributes.CopyTo( array, 0 );
           array[ array.Length - 1 ] = new ListBindableAttribute( false );
           return new AttributeCollection( array );
@@ -62,6 +62,10 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    #endregion
+
+    #region ComponentType Property
+
     public override Type ComponentType
     {
       get
@@ -70,51 +74,64 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    #endregion
+
+    #region IsBrowsable Property
+
     public override bool IsBrowsable
     {
       get
       {
-        if( m_columnHidden )
-          return false;
-
-        return base.IsBrowsable;
+        return ( m_column.ColumnMapping != MappingType.Hidden )
+            && ( base.IsBrowsable );
       }
     }
+
+    #endregion
+
+    #region IsReadOnly Property
 
     public override bool IsReadOnly
     {
       get
       {
-        return m_columnReadOnly;
+        return m_column.ReadOnly;
       }
     }
+
+    #endregion
+
+    #region PropertyType Property
 
     public override Type PropertyType
     {
       get
       {
-        return m_columnDataType;
+        return ItemsSourceHelper.GetColumnDataType( m_column );
       }
     }
 
+    #endregion
+
     public override bool CanResetValue( object component )
     {
-      object value = this.GetValue( component );
-      return ( value != null ) && ( value != DBNull.Value );
+      var value = this.GetValue( component );
+
+      return ( value != null )
+          && ( value != DBNull.Value );
     }
 
     public override object GetValue( object component )
     {
-      System.Data.DataRow dataRow = component as System.Data.DataRow;
-
+      var dataRow = component as System.Data.DataRow;
       if( dataRow == null )
         return null;
 
-      object value = null;
+      var value = default( object );
 
       try
       {
-        value = dataRow[ m_columnName ];
+        value = dataRow[ m_column ];
       }
       catch
       {
@@ -133,15 +150,14 @@ namespace Xceed.Wpf.DataGrid
 
     public override void SetValue( object component, object value )
     {
-      System.Data.DataRow dataRow = component as System.Data.DataRow;
-
+      var dataRow = component as System.Data.DataRow;
       if( dataRow == null )
         throw new InvalidOperationException( "An attempt was made to set a value on a DataRow that does not exist." );
 
       if( this.IsReadOnly )
         throw new InvalidOperationException( "An attempt was made to set a value on a read-only field." );
 
-      object oldValue = dataRow[ m_columnName ];
+      var oldValue = dataRow[ m_column ];
 
       if( ( oldValue == null ) || ( oldValue == DBNull.Value ) )
       {
@@ -156,11 +172,11 @@ namespace Xceed.Wpf.DataGrid
 
       if( value == null )
       {
-        dataRow[ m_columnName ] = DBNull.Value;
+        dataRow[ m_column ] = DBNull.Value;
       }
       else
       {
-        dataRow[ m_columnName ] = value;
+        dataRow[ m_column ] = value;
       }
 
       this.OnValueChanged( component, EventArgs.Empty );
@@ -171,10 +187,6 @@ namespace Xceed.Wpf.DataGrid
       return false;
     }
 
-    private string m_columnName;
-    private Type m_columnDataType;
-    private string m_columnCaption;
-    private bool m_columnReadOnly;
-    private bool m_columnHidden;
+    private readonly DataColumn m_column;
   }
 }

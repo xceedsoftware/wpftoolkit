@@ -39,30 +39,30 @@ namespace Xceed.Wpf.DataGrid
       return m_parentCollectionView;
     }
 
-    internal void SortRootRawItems( SortDescriptionInfo[] sortDescriptionInfos, List<RawItem> globalRawItems )
+    internal void SortRootRawItems( IList<SortDescriptionInfo> sortDescriptionInfos, List<RawItem> globalRawItems )
     {
       Debug.Assert( this.IsBottomLevel );
 
-      int itemCount = m_sortedRawItems.Count;
+      var itemCount = m_sortedRawItems.Count;
       if( itemCount == 0 )
         return;
 
-      int[] indexes;
-      indexes = new int[ itemCount + 1 ];
+      var indexes = new int[ itemCount + 1 ];
+
       for( int i = 0; i < itemCount; i++ )
       {
         indexes[ i ] = m_sortedRawItems[ i ].Index;
       }
 
       // "Weak heap sort" sort array[0..NUM_ELEMENTS-1] to array[1..NUM_ELEMENTS]
-      DataGridCollectionViewSort collectionViewSort = new DataGridCollectionViewSort( indexes, sortDescriptionInfos );
+      var collectionViewSort = new DataGridCollectionViewSort( indexes, sortDescriptionInfos );
 
       collectionViewSort.Sort( itemCount );
-      int index = 0;
+      var index = 0;
 
       for( int i = 1; i <= itemCount; i++ )
       {
-        RawItem newRawItem = globalRawItems[ indexes[ i ] ];
+        var newRawItem = globalRawItems[ indexes[ i ] ];
         newRawItem.SetSortedIndex( index );
         m_sortedRawItems[ index ] = newRawItem;
         index++;

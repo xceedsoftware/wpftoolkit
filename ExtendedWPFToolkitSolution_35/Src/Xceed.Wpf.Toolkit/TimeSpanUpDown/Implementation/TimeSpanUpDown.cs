@@ -15,13 +15,9 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Primitives;
 
@@ -369,6 +365,7 @@ namespace Xceed.Wpf.Toolkit
 
       return (value1.Value > value2.Value);
     }
+
 
     #endregion
 

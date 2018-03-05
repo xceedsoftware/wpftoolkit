@@ -15,16 +15,12 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal struct SelectionCellRangeWithItems
   {
-    public static readonly SelectionCellRangeWithItems Empty = new SelectionCellRangeWithItems( 
-      SelectionRange.Empty, null, SelectionRange.Empty );
+    public static readonly SelectionCellRangeWithItems Empty = new SelectionCellRangeWithItems( SelectionRange.Empty, null, SelectionRange.Empty );
 
     public SelectionCellRangeWithItems( int itemIndex, object item, int columnIndex )
       : this( new SelectionRange( itemIndex ), new object[] { item }, new SelectionRange( columnIndex ) )
@@ -33,7 +29,7 @@ namespace Xceed.Wpf.DataGrid
 
     public SelectionCellRangeWithItems( SelectionRange itemRange, object[] items, SelectionRange columnRange )
     {
-      if( ( items != null ) && ( items.Length != itemRange.Length ) ) 
+      if( ( items != null ) && ( items.Length != itemRange.Length ) )
         throw new ArgumentException( "itemRange and items must have the same length." );
 
       m_itemRangeWithItems = new SelectionRangeWithItems( itemRange, items );
@@ -52,7 +48,7 @@ namespace Xceed.Wpf.DataGrid
 
     SelectionRangeWithItems m_itemRangeWithItems;
 
-    #endregion ItemRangeWithItems Property
+    #endregion
 
     #region ItemRange Property
 
@@ -64,7 +60,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion ItemRange Property
+    #endregion
 
     #region ColumnRange Property
 
@@ -78,7 +74,7 @@ namespace Xceed.Wpf.DataGrid
 
     SelectionRange m_columnRange;
 
-    #endregion ColumnRange Property
+    #endregion
 
     #region CellRange Property
 
@@ -90,7 +86,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion CellRange Property
+    #endregion
 
     #region Length Property
 
@@ -102,22 +98,18 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion Length Property
-
-    #region PUBLIC METHODS
+    #endregion
 
     public static bool operator ==( SelectionCellRangeWithItems rangeWithItems1, SelectionCellRangeWithItems rangeWithItems2 )
     {
-      return
-        ( rangeWithItems1.m_columnRange == rangeWithItems2.m_columnRange )
-        && ( rangeWithItems1.m_itemRangeWithItems == rangeWithItems2.m_itemRangeWithItems );
+      return ( rangeWithItems1.m_columnRange == rangeWithItems2.m_columnRange )
+          && ( rangeWithItems1.m_itemRangeWithItems == rangeWithItems2.m_itemRangeWithItems );
     }
 
     public static bool operator !=( SelectionCellRangeWithItems rangeWithItems1, SelectionCellRangeWithItems rangeWithItems2 )
     {
-      return
-        ( rangeWithItems1.m_columnRange != rangeWithItems2.m_columnRange )
-        || ( rangeWithItems1.m_itemRangeWithItems != rangeWithItems2.m_itemRangeWithItems );
+      return ( rangeWithItems1.m_columnRange != rangeWithItems2.m_columnRange )
+          || ( rangeWithItems1.m_itemRangeWithItems != rangeWithItems2.m_itemRangeWithItems );
     }
 
     public override int GetHashCode()
@@ -132,7 +124,5 @@ namespace Xceed.Wpf.DataGrid
 
       return ( ( SelectionCellRangeWithItems )obj ) == this;
     }
-
-    #endregion PUBLIC METHODS
   }
 }

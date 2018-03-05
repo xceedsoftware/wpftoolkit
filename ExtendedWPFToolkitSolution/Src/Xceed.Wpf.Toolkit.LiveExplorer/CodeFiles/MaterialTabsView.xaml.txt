@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -21,13 +21,11 @@
                         xmlns:sys="clr-namespace:System;assembly=mscorlib"
                         Title="MaterialTabControl &amp; MaterialTabItem">
    <local:DemoView.Description>
-      <!-- TODODOC-->
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
-         <Run>MaterialTabControl is a a TabControl with animated transitions when the current selection is changed. Is is using the Material Brushes and contains MaterialTabItems.</Run>
+         <Run>MaterialTabControl is a a TabControl with animated transitions when the current selection is changed. Is uses the Material Brushes and contains MaterialTabItems.</Run>
          <LineBreak />
-         <Run>MaterialTabItems are TabItems that are using the Material Brushes and who contains customizable ink animations on mouse press.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
+         <Run>MaterialTabItems are TabItems that use the Material Brushes and contain customizable ink animations on mouse press.</Run>
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -35,220 +33,24 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
-       ##END-->
       </Paragraph>
    </local:DemoView.Description>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-      <ResourceDictionary>
-         <ResourceDictionary.MergedDictionaries>
-            <ResourceDictionary Source="../Resources/CommonResources.xaml" />
-         </ResourceDictionary.MergedDictionaries>
-      </ResourceDictionary>
-   </local:DemoView.Resources>  
-
-   <Grid>
-      <StackPanel Margin="10">
-
-         <Grid>
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition />
-               <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-
-            <GroupBox Header="MaterialTabControl Features"
-                      Margin="0,5,0,5">
-               <Grid Margin="5">
-                  <Grid.ColumnDefinitions>
-                     <ColumnDefinition Width="Auto" />
-                     <ColumnDefinition Width="95" />
-                  </Grid.ColumnDefinitions>
-                  <Grid.RowDefinitions>
-                     <RowDefinition Height="Auto" />
-                     <RowDefinition Height="Auto" />
-                     <RowDefinition Height="Auto" />
-                  </Grid.RowDefinitions>
-
-                  <TextBlock Grid.Column="0"
-                             Grid.Row="0"
-                             Text="Is Ink Bar Active: "
-                             VerticalAlignment="Center" />
-                  <CheckBox x:Name="inkBarActiveCheckBox"
-                            Grid.Column="1"
-                            Grid.Row="0"
-                            IsChecked="{Binding IsInkBarActive, ElementName=materialTabControl}"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-
-                  <TextBlock Grid.Column="0"
-                             Grid.Row="1"
-                             Text="Ink Bar Brush: "
-                             VerticalAlignment="Center"
-                             IsEnabled="{Binding IsChecked, ElementName=inkBarActiveCheckBox}"
-                             Style="{StaticResource DisableGrayText}" />
-                  <ComboBox Grid.Column="1"
-                            Grid.Row="1"
-                            ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                            SelectedItem="{Binding InkBarBrush, ElementName=materialTabControl}"
-                            ItemTemplate="{StaticResource ColorItemTemplate}"
-                            IsEnabled="{Binding IsChecked, ElementName=inkBarActiveCheckBox}"
-                            Margin="5" />
-
-                  <TextBlock Grid.Column="0"
-                             Grid.Row="2"
-                             Text="Is Sliding Animation Active: "
-                             VerticalAlignment="Center" />
-                  <CheckBox Grid.Column="1"
-                            Grid.Row="2"
-                            IsChecked="{Binding IsSlidingAnimationActive, ElementName=materialTabControl}"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-               </Grid>
-            </GroupBox>
-
-            <GroupBox Header="MaterialTabItem Features"
-                      Grid.Column="1"
-                      Margin="10,5,0,5">
-               <Grid Margin="5">
-                  <Grid.ColumnDefinitions>
-                     <ColumnDefinition Width="Auto" />
-                     <ColumnDefinition Width="95" />
-                  </Grid.ColumnDefinitions>
-                  <Grid.RowDefinitions>
-                     <RowDefinition Height="Auto" />
-                     <RowDefinition Height="Auto" />
-                     <RowDefinition Height="Auto" />
-                     <RowDefinition Height="Auto" />
-                  </Grid.RowDefinitions>
-
-                  <TextBlock Grid.Column="0"
-                             Grid.Row="0"
-                             Text="Is Ink Effect Active: "
-                             VerticalAlignment="Center" />
-                  <CheckBox x:Name="inkEffectActiveCheckBox"
-                            Grid.Column="1"
-                            Grid.Row="0"
-                            IsChecked="{Binding IsInkEffectActive, ElementName=materialTabControl}"
-                            VerticalAlignment="Center"
-                            Margin="5"
-                            ToolTip="Can be set on a MaterialTabControl control or individually on each MaterialTabItem." />
-                  <TextBlock Grid.Column="0"
-                             Grid.Row="1"
-                             Text="Ink Effect Brush: "
-                             VerticalAlignment="Center"
-                             IsEnabled="{Binding IsChecked, ElementName=inkEffectActiveCheckBox}"
-                             Style="{StaticResource DisableGrayText}" />
-                  <ComboBox Grid.Column="1"
-                            Grid.Row="1"
-                            ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                            SelectedItem="{Binding InkEffectBrush, ElementName=materialTabControl}"
-                            ItemTemplate="{StaticResource ColorItemTemplate}"
-                            IsEnabled="{Binding IsChecked, ElementName=inkEffectActiveCheckBox}"
-                            Margin="5"
-                            ToolTip="Can be set on a MaterialTabControl control or individually on each MaterialTabItem." />
-                  <TextBlock Grid.Column="0"
-                             Grid.Row="2"
-                             Text="Ink Effect Opacity: "
-                             VerticalAlignment="Center"
-                             IsEnabled="{Binding IsChecked, ElementName=inkEffectActiveCheckBox}"
-                             Style="{StaticResource DisableGrayText}" />
-                  <xctk:DoubleUpDown Grid.Column="1"
-                                     Grid.Row="2"
-                                     Value="{Binding InkEffectOpacity, ElementName=materialTabControl}"
-                                     Minimum="0"
-                                     Maximum="1"
-                                     Increment="0.05"
-                                     FormatString="N2"
-                                     VerticalAlignment="Center"
-                                     Margin="5"
-                                     IsEnabled="{Binding IsChecked, ElementName=inkEffectActiveCheckBox}"
-                                     ToolTip="Can be set on a MaterialTabControl control or individually on each MaterialTabItem." />
-                  <TextBlock Grid.Column="0"
-                             Grid.Row="3"
-                             Text="Selected Foreground: "
-                             VerticalAlignment="Center" />
-                  <ComboBox Grid.Column="1"
-                            Grid.Row="3"
-                            ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                            SelectedItem="{Binding SelectedForeground, ElementName=materialTabControl}"
-                            ItemTemplate="{StaticResource ColorItemTemplate}"
-                            Margin="5"
-                            ToolTip="Can be set on a MaterialTabControl control or individually on each MaterialTabItem." />
-               </Grid>
-            </GroupBox>
-         </Grid>
 
 
-         <StackPanel>
-            <TextBlock Text="Usage:"
-                       Style="{StaticResource Header}" />
 
-            <StackPanel Orientation="Horizontal">
-               <TextBlock Text="TabStripPlacement is Top:"
-                          Margin="20" />
 
-               <xctk:MaterialTabControl x:Name="materialTabControl"
-                                        TabStripPlacement="Top"
-                                        IsInkEffectActive="True"
-                                        IsInkBarActive="True"
-                                        IsSlidingAnimationActive="True">
-                  <xctk:MaterialTabItem Header="First"
-                                        HorizontalContentAlignment="Center"
-                                        Content="MaterialTabItem #1" />
-                  <xctk:MaterialTabItem Header="Second"
-                                        HorizontalContentAlignment="Center"
-                                        Content="MaterialTabItem #2" />
-                  <xctk:MaterialTabItem Header="Third"
-                                        HorizontalContentAlignment="Center"
-                                        Content="MaterialTabItem #3" />
-                  <xctk:MaterialTabItem Header="Fourth"
-                                        HorizontalContentAlignment="Center"
-                                        Content="MaterialTabItem #4" />
-                  <xctk:MaterialTabItem Header="Fifth"
-                                        HorizontalContentAlignment="Center"
-                                        Content="MaterialTabItem #5" />
-               </xctk:MaterialTabControl>
-            </StackPanel>
 
-            <StackPanel Orientation="Horizontal"
-                        Margin="0,40,0,0">
-               <TextBlock Text="TabStripPlacement is Left:"
-                          Margin="20" />
 
-               <xctk:MaterialTabControl x:Name="leftMaterialTabs"
-                                        TabStripPlacement="Left"
-                                        IsInkEffectActive="{Binding IsInkEffectActive, ElementName=materialTabControl}"
-                                        InkEffectBrush="{Binding InkEffectBrush, ElementName=materialTabControl}"
-                                        InkEffectOpacity="{Binding InkEffectOpacity, ElementName=materialTabControl}"
-                                        InkBarBrush="{Binding InkBarBrush, ElementName=materialTabControl}"
-                                        SelectedForeground="{Binding SelectedForeground, ElementName=materialTabControl}"
-                                        IsInkBarActive="{Binding IsInkBarActive, ElementName=materialTabControl}"
-                                        IsSlidingAnimationActive="{Binding IsSlidingAnimationActive, ElementName=materialTabControl}">
-                  <xctk:MaterialTabItem Header="First"
-                                        VerticalContentAlignment="Center"
-                                        Content="MaterialTabItem #1" />
-                  <xctk:MaterialTabItem Header="Second"
-                                        VerticalContentAlignment="Center"
-                                        Content="MaterialTabItem #2" />
-                  <xctk:MaterialTabItem Header="Third"
-                                        VerticalContentAlignment="Center"
-                                        Content="MaterialTabItem #3" />
-                  <xctk:MaterialTabItem Header="Fourth"
-                                        VerticalContentAlignment="Center"
-                                        Content="MaterialTabItem #4" />
-                  <xctk:MaterialTabItem Header="Fifth"
-                                        VerticalContentAlignment="Center"
-                                        Content="MaterialTabItem #5" />
-               </xctk:MaterialTabControl>
-            </StackPanel>
 
-         </StackPanel>
-      </StackPanel>
-   </Grid>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
+
+
+
+
+
+
+
+
     <Image Source="..\OpenSourceImages\MaterialTabs.png" Width="600" Height="400"/>
-   ##END-->
 </local:MaterialDemoView>

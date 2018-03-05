@@ -15,16 +15,11 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
-using System.Windows.Data;
-using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Primitives;
 using System.Windows.Controls;
-using System.Linq;
 using Xceed.Wpf.Toolkit.Core.Utilities;
-using System.Windows.Threading;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -668,7 +663,8 @@ namespace Xceed.Wpf.Toolkit
       throw new NotSupportedException( "DateTimeUpDown controls do not support modifying UpdateValueOnEnterKey property." );
     }
 
-    #endregion //Base Class Overrides
+
+#endregion //Base Class Overrides
 
     #region Methods
 
@@ -708,50 +704,13 @@ namespace Xceed.Wpf.Toolkit
 
     private void Increment( int step )
     {
-      // if UpdateValueOnEnterKey is true, 
-      // Sync Value on Text only when Enter Key is pressed.
-      if( this.UpdateValueOnEnterKey )
+      if( this.Value.HasValue )
       {
-        _fireSelectionChangedEvent = false;
-
-        var currentValue = this.ConvertTextToValue( this.TextBox.Text );
-        if( currentValue.HasValue )
-        {
-          var newValue = this.UpdateDateTime( currentValue, step );
-          this.TextBox.Text = newValue.Value.ToString( this.GetFormatString( this.Format ), this.CultureInfo );
-        }
-        else
-        {
-          this.TextBox.Text = (this.DefaultValue != null)
-                              ? this.DefaultValue.Value.ToString( this.GetFormatString( this.Format ), this.CultureInfo )
-                              : this.ContextNow.ToString( this.GetFormatString( this.Format ), this.CultureInfo );
-        }
-
-        if( this.TextBox != null )
-        {
-          DateTimeInfo info = _selectedDateTimeInfo;
-          //this only occurs when the user manually type in a value for the Value Property
-          if( info == null )
-            info = (this.CurrentDateTimePart != DateTimePart.Other) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
-
-          //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
-          this.ParseValueIntoDateTimeInfo( this.ConvertTextToValue( this.TextBox.Text ) );
-
-          //we loose our selection when the Value is set so we need to reselect it without firing the selection changed event
-          this.TextBox.Select( info.StartPosition, info.Length );
-        }
-        _fireSelectionChangedEvent = true;
+        this.Value = this.UpdateDateTime( this.Value, step );
       }
       else
       {
-        if( this.Value.HasValue )
-        {
-          this.Value = this.UpdateDateTime( this.Value, step );
-        }
-        else
-        {
-          this.Value = this.DefaultValue ?? this.ContextNow;
-        }
+        this.Value = this.DefaultValue ?? this.ContextNow;
       }
     }
 

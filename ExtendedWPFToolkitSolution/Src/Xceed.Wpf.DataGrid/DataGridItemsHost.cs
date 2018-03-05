@@ -23,22 +23,19 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Xceed.Utils.Wpf;
 
 namespace Xceed.Wpf.DataGrid
 {
   public abstract class DataGridItemsHost : FrameworkElement, ICustomVirtualizingPanel
   {
-    #region Constructors
-
     static DataGridItemsHost()
     {
       DataGridControl.ParentDataGridControlPropertyKey.OverrideMetadata(
         typeof( DataGridItemsHost ),
         new FrameworkPropertyMetadata( new PropertyChangedCallback( OnParentDataGridControlChanged ) ) );
     }
-
-    #endregion
 
     #region ParentDataGridControl property
 
@@ -85,15 +82,14 @@ namespace Xceed.Wpf.DataGrid
 
       m_generator.ItemsChanged += this.HandleGeneratorItemsChanged;
       m_generator.ContainersRemoved += this.HandleGeneratorContainersRemoved;
+      m_generator.RecyclingCandidatesCleaned += this.HandleGeneratorRecyclingCandidatesCleaned;
 
       m_generatorInitialized = true;
     }
 
     #endregion
 
-    #region CachedRootDataGridContext internal property
-
-    private DataGridContext m_cachedRootDataGridContext;
+    #region CachedRootDataGridContext Internal property
 
     internal DataGridContext CachedRootDataGridContext
     {
@@ -108,6 +104,18 @@ namespace Xceed.Wpf.DataGrid
 
         return m_cachedRootDataGridContext;
       }
+    }
+
+    private DataGridContext m_cachedRootDataGridContext;
+
+    #endregion
+
+    #region DelayBringIntoView Internal Property
+
+    internal bool DelayBringIntoView
+    {
+      get;
+      private set;
     }
 
     #endregion
@@ -405,24 +413,42 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region Protected Methods
-
     protected virtual IList<UIElement> CreateChildCollection()
     {
       return new ItemsHostUIElementCollection( this );
     }
 
-    protected abstract void OnItemsAdded( GeneratorPosition position, int index, int itemCount );
+    [Obsolete( "This OnItemsAdded method is obsolete and is no longer called." )]
+    protected virtual void OnItemsAdded( GeneratorPosition position, int index, int itemCount )
+    {
+    }
 
-    protected abstract void OnItemsMoved( GeneratorPosition position, int index, GeneratorPosition oldPosition, int oldIndex, int itemCount, int itemUICount, IList<DependencyObject> affectedContainers );
+    [Obsolete( "This OnItemsRemoved method is obsolete and is no longer called." )]
+    protected virtual void OnItemsRemoved( GeneratorPosition position, int index, GeneratorPosition oldPosition, int oldIndex, int itemCount, int itemUICount, IList<DependencyObject> affectedContainers )
+    {
+    }
 
-    protected abstract void OnItemsReplaced( GeneratorPosition position, int index, GeneratorPosition oldPosition, int oldIndex, int itemCount, int itemUICount, IList<DependencyObject> affectedContainers );
+    [Obsolete( "The OnItemsMoved method is obsolete and is no longer called." )]
+    protected virtual void OnItemsMoved( GeneratorPosition position, int index, GeneratorPosition oldPosition, int oldIndex, int itemCount, int itemUICount, IList<DependencyObject> affectedContainers )
+    {
+    }
 
-    protected abstract void OnItemsRemoved( GeneratorPosition position, int index, GeneratorPosition oldPosition, int oldIndex, int itemCount, int itemUICount, IList<DependencyObject> affectedContainers );
+    [Obsolete( "The OnItemsReplaced method is obsolete and is no longer called." )]
+    protected virtual void OnItemsReplaced( GeneratorPosition position, int index, GeneratorPosition oldPosition, int oldIndex, int itemCount, int itemUICount, IList<DependencyObject> affectedContainers )
+    {
+    }
+
+    protected abstract void OnItemsAdded();
+
+    protected abstract void OnItemsRemoved( IList<DependencyObject> affectedContainers );
 
     protected abstract void OnItemsReset();
 
     protected abstract void OnContainersRemoved( IList<DependencyObject> removedContainers );
+
+    protected virtual void OnRecyclingCandidatesCleaned( IList<DependencyObject> recyclingCandidates )
+    {
+    }
 
     protected virtual void OnParentDataGridControlChanged( DataGridControl oldValue, DataGridControl newValue )
     {
@@ -459,24 +485,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    protected void InvalidateAutomationPeerChildren()
-    {
-      DataGridContext dataGridContext = this.CachedRootDataGridContext;
 
-      if( ( dataGridContext == null ) || ( dataGridContext.Peer == null ) )
-        return;
-
-      DataGridControl dataGridControl = dataGridContext.DataGridControl;
-
-      if( dataGridControl == null )
-        return;
-
-      dataGridControl.QueueDataGridContextPeerChlidrenRefresh( dataGridContext );
-    }
-
-    #endregion
-
-    #region Internal Methods
 
     internal static bool ProcessMoveFocus( Key key )
     {
@@ -625,7 +634,7 @@ namespace Xceed.Wpf.DataGrid
 
         if( ( ownerCell != null ) && ( ownerCell.ParentColumn == this.ParentDataGridControl.CurrentColumn ) )
         {
-          if( object.Equals( ownerCell.ParentRow.DataContext, this.ParentDataGridControl.CurrentItemInEdition ) )
+          if( object.Equals( ownerCell.ParentRow.GetEditingDataContext(), this.ParentDataGridControl.CurrentItemInEdition ) )
             return true;
         }
       }
@@ -633,9 +642,21 @@ namespace Xceed.Wpf.DataGrid
       return false;
     }
 
-    #endregion
+    internal bool CanRecycleContainer( DependencyObject container )
+    {
+      if( container == null )
+        return false;
 
-    #region Private Methods
+      var target = container as IDataGridItemContainer;
+      if( target != null )
+        return target.CanBeRecycled;
+
+      var element = container as UIElement;
+      if( ( element != null ) && ( element.IsKeyboardFocused || element.IsKeyboardFocusWithin ) )
+        return false;
+
+      return true;
+    }
 
     private static void OnParentDataGridControlChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
@@ -656,9 +677,15 @@ namespace Xceed.Wpf.DataGrid
         // Clean up the previous generator that was used by the ItemsHost
         m_generator.ItemsChanged -= this.HandleGeneratorItemsChanged;
         m_generator.ContainersRemoved -= this.HandleGeneratorContainersRemoved;
+        m_generator.RecyclingCandidatesCleaned -= this.HandleGeneratorRecyclingCandidatesCleaned;
       }
       m_generatorInitialized = false;
       m_cachedRootDataGridContext = null;
+    }
+
+    private void HandleGeneratorRecyclingCandidatesCleaned( object sender, RecyclingCandidatesCleanedEventArgs e )
+    {
+      this.OnRecyclingCandidatesCleaned( e.RecyclingCandidates );
     }
 
     private void HandleGeneratorContainersRemoved( object sender, ContainersRemovedEventArgs e )
@@ -668,41 +695,27 @@ namespace Xceed.Wpf.DataGrid
 
     private void HandleGeneratorItemsChanged( object sender, CustomGeneratorChangedEventArgs e )
     {
+      // We set this flag to delay any bring into view until a layout pass occured if there is one.
+      // We don't want the bring into view to occur on a container that may move around during the layout pass.
+      this.DelayBringIntoView = true;
+
       switch( e.Action )
       {
         case NotifyCollectionChangedAction.Add:
-          {
-            this.OnItemsAdded( e.Position, e.Index, e.ItemCount );
-            break;
-          }
-        case NotifyCollectionChangedAction.Move:
-          {
-            this.OnItemsMoved( e.Position, e.Index, e.OldPosition, e.OldIndex, e.ItemCount, e.ItemUICount, e.RemovedContainers );
-            break;
-          }
-        case NotifyCollectionChangedAction.Remove:
-          {
-            this.OnItemsRemoved( e.Position, e.Index, e.OldPosition, e.OldIndex, e.ItemCount, e.ItemUICount, e.RemovedContainers );
-            break;
-          }
-        case NotifyCollectionChangedAction.Replace:
-          {
-            this.OnItemsReplaced( e.Position, e.Index, e.OldPosition, e.OldIndex, e.ItemCount, e.ItemUICount, e.RemovedContainers );
-            break;
-          }
-        case NotifyCollectionChangedAction.Reset:
-          {
-            this.OnItemsReset();
-            break;
-          }
-        default:
-          {
-            throw new System.ComponentModel.InvalidEnumArgumentException( "An unknown action was specified." );
-          }
-      }
-    }
+          this.OnItemsAdded();
+          break;
 
-    #endregion
+        case NotifyCollectionChangedAction.Remove:
+          this.OnItemsRemoved( e.Containers );
+          break;
+
+        default:
+          this.OnItemsReset();
+          break;
+      }
+
+      this.Dispatcher.BeginInvoke( new Action( () => this.DelayBringIntoView = false ), DispatcherPriority.Loaded );
+    }
 
     #region ICustomVirtualizingPanel Members
 

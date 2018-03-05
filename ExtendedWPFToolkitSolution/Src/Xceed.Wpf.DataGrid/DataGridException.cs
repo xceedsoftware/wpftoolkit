@@ -15,8 +15,7 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Xceed.Wpf.DataGrid
@@ -66,41 +65,66 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    internal static void ThrowSystemException( string message, Type exceptionType, string source, string argument = "" )
+    internal static Exception Create<T>( string message, DataGridControl dataGridControl, string argument = "" )
     {
       Exception exception;
 
-      if( exceptionType == typeof( ArgumentException ) )
+      var exceptionType = typeof( T );
+
+      if( typeof( ArgumentException ) == exceptionType )
       {
         exception = new ArgumentException( message, argument );
       }
-      else if( exceptionType == typeof( ArgumentNullException ) )
+      else if( typeof( ArgumentNullException ) == exceptionType )
       {
         exception = new ArgumentNullException( message );
       }
-      else if( exceptionType == typeof( ArgumentOutOfRangeException ) )
+      else if( typeof( ArgumentOutOfRangeException ) == exceptionType )
       {
         exception = new ArgumentOutOfRangeException( argument, message );
       }
-      else if( exceptionType == typeof( IndexOutOfRangeException ) )
+      else if( typeof( IndexOutOfRangeException ) == exceptionType )
       {
         exception = new IndexOutOfRangeException( message );
       }
-      else if( exceptionType == typeof( InvalidOperationException ) )
+      else if( typeof( InvalidOperationException ) == exceptionType )
       {
         exception = new InvalidOperationException( message );
       }
-      else if( exceptionType == typeof( NotSupportedException ) )
+      else if( typeof( NotSupportedException ) == exceptionType )
       {
         exception = new NotSupportedException( message );
+      }
+      else if( typeof( DataGridException ) == exceptionType )
+      {
+        return new DataGridException( message, dataGridControl );
+      }
+      else if( typeof( DataGridInternalException ) == exceptionType )
+      {
+        return new DataGridInternalException( message, dataGridControl );
       }
       else
       {
         exception = new Exception( message );
       }
 
-      exception.Source = source;
-      throw exception;
+      if( dataGridControl != null )
+      {
+        var name = dataGridControl.GridUniqueName;
+        if( string.IsNullOrEmpty( name ) )
+        {
+          name = dataGridControl.Name;
+        }
+
+        if( !string.IsNullOrEmpty( name ) )
+        {
+          exception.Source = name;
+        }
+      }
+
+      Debug.Assert( exception != null );
+
+      return exception;
     }
   }
 }

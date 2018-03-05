@@ -14,228 +14,79 @@
 
   ***********************************************************************************/
 
-using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Diagnostics;
+using Xceed.Utils.Collections;
 
 namespace Xceed.Wpf.DataGrid
 {
-  internal class UnboundDataItem
+  internal sealed class UnboundDataItem
   {
-    #region CONSTRUCTORS
+    #region Static Fields
+
+    private static readonly WeakDictionary<object, UnboundDataItem> s_collection = new WeakDictionary<object, UnboundDataItem>( 0, new Comparer() );
+    private static readonly UnboundDataItem s_empty = new UnboundDataItem( null );
+
+    #endregion
 
     private UnboundDataItem( object dataItem )
     {
-      if( dataItem == null )
-      {
-        m_weakDataItem = null;
-      }
-      else
-      {
-        m_weakDataItem = new WeakReference( dataItem );
-      }
+      m_dataItem = dataItem;
     }
 
-    #endregion CONSTRUCTORS
+    #region DataItem Property
 
-    public static void FreeUnboundDataItem( UnboundDataItemNode unboundDataItemNode )
-    {
-      lock( UnboundDataItem.UnboundDataItems )
-      {
-        UnboundDataItems.Remove( unboundDataItemNode );
-      }
-    }
-
-    public static UnboundDataItemNode GetUnboundDataItemNode( object dataItem, out UnboundDataItem unboundDataItem )
-    {
-      lock( UnboundDataItem.UnboundDataItems )
-      {
-        UnboundDataItemNode current = UnboundDataItem.UnboundDataItems.FirstNode;
-
-        while( current != null )
-        {
-          object currentDataItem = current.DataItem;
-          unboundDataItem = current.UnboundDataItem;
-
-          if( !current.IsAlive )
-          {
-            UnboundDataItemNode next = current.Next;
-            UnboundDataItem.UnboundDataItems.Remove( current );
-            current = next;
-            continue;
-          }
-
-          if( object.Equals( currentDataItem, dataItem ) )
-            return current;
-
-          current = current.Next;
-        }
-
-        unboundDataItem = new UnboundDataItem( dataItem );
-        UnboundDataItemNode unboundDataItemNode = new UnboundDataItemNode( unboundDataItem );
-        UnboundDataItem.UnboundDataItems.Add( unboundDataItemNode );
-        return unboundDataItemNode;
-      }
-    }
-
-    public object DataItem
+    internal object DataItem
     {
       get
       {
-        return ( m_weakDataItem == null ) ? null : m_weakDataItem.Target;
+        return m_dataItem;
       }
     }
 
-    private WeakReference m_weakDataItem;
+    private readonly object m_dataItem;
 
-    private static UnboundDataItemList UnboundDataItems = new UnboundDataItemList();
+    #endregion
 
-    internal class UnboundDataItemNode
+    internal static UnboundDataItem GetUnboundDataItem( object dataItem )
     {
-      public UnboundDataItemNode( UnboundDataItem unboundDataItem )
-      {
-        if( unboundDataItem == null )
-          throw new ArgumentNullException( "unboundDataItem" );
+      if( dataItem == null )
+        return s_empty;
 
-        m_weakUnboundDataItem = new WeakReference( unboundDataItem );
-      }
+      var value = dataItem as UnboundDataItem;
+      if( value != null )
+        return value;
 
-      public object DataItem
+      lock( ( ( ICollection )s_collection ).SyncRoot )
       {
-        get
+        if( !s_collection.TryGetValue( dataItem, out value ) )
         {
-          UnboundDataItem unboundDataItem = m_weakUnboundDataItem.Target as UnboundDataItem;
-
-          if( unboundDataItem == null )
-            return null;
-
-          return unboundDataItem.DataItem;
+          value = new UnboundDataItem( dataItem );
+          s_collection.Add( dataItem, value );
         }
+
+        return value;
       }
-
-      public UnboundDataItem UnboundDataItem
-      {
-        get
-        {
-          if( m_weakUnboundDataItem == null )
-            return null;
-
-          return m_weakUnboundDataItem.Target as UnboundDataItem;
-        }
-      }
-
-      public UnboundDataItemNode Next
-      {
-        get;
-        set;
-      }
-
-      public UnboundDataItemNode Previous
-      {
-        get;
-        set;
-      }
-
-      public bool IsAlive
-      {
-        get
-        {
-          UnboundDataItem unboundDataItem = m_weakUnboundDataItem.Target as UnboundDataItem;
-
-          if( unboundDataItem == null )
-            return false;
-
-          WeakReference weakDataItem = unboundDataItem.m_weakDataItem;
-
-          return ( ( weakDataItem == null ) || ( weakDataItem.IsAlive ) )
-            && ( m_weakUnboundDataItem.IsAlive );
-        }
-      }
-
-      private WeakReference m_weakUnboundDataItem;
     }
 
-    private class UnboundDataItemList
+    #region Comparer Private Class
+
+    private sealed class Comparer : IEqualityComparer<object>
     {
-      public void Add( UnboundDataItemNode newNode )
+      int IEqualityComparer<object>.GetHashCode( object obj )
       {
-        newNode.Next = this.FirstNode;
+        if( obj == null )
+          return 0;
 
-        if( this.FirstNode != null )
-          this.FirstNode.Previous = newNode;
-
-        this.FirstNode = newNode;
-
-        if( this.LastNode == null )
-          this.LastNode = this.FirstNode;
-
-        m_count++;
+        return obj.GetHashCode();
       }
 
-      public void Remove( UnboundDataItemNode unboundDataItemNode )
+      bool IEqualityComparer<object>.Equals( object x, object y )
       {
-        bool removed = false;
-
-        if( this.LastNode == unboundDataItemNode )
-        {
-          this.LastNode = unboundDataItemNode.Previous;
-          removed = true;
-        }
-
-        if( this.FirstNode == unboundDataItemNode )
-        {
-          this.FirstNode = unboundDataItemNode.Next;
-          removed = true;
-        }
-
-        UnboundDataItemNode previous = unboundDataItemNode.Previous;
-
-        if( previous != null )
-        {
-          previous.Next = unboundDataItemNode.Next;
-          removed = true;
-        }
-
-        UnboundDataItemNode next = unboundDataItemNode.Next;
-
-        if( next != null )
-        {
-          next.Previous = unboundDataItemNode.Previous;
-          removed = true;
-        }
-
-        if( removed )
-        {
-          unboundDataItemNode.Previous = null;
-          unboundDataItemNode.Next = null;
-          m_count--;
-        }
+        return object.Equals( x, y );
       }
-
-      public UnboundDataItemNode FirstNode
-      {
-        get;
-        private set;
-      }
-
-      public UnboundDataItemNode LastNode
-      {
-        get;
-        private set;
-      }
-
-      public int Count
-      {
-        get
-        {
-          return m_count;
-        }
-      }
-
-      private int m_count;
     }
+
+    #endregion
   }
 }

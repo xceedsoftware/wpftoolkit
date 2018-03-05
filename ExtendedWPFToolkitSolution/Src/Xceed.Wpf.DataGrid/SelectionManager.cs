@@ -40,8 +40,6 @@ namespace Xceed.Wpf.DataGrid
       None = 99
     }
 
-    #region CONSTRUCTORS
-
     public SelectionManager( DataGridControl owner )
     {
       if( owner == null )
@@ -50,9 +48,7 @@ namespace Xceed.Wpf.DataGrid
       m_owner = owner;
     }
 
-    #endregion CONSTRUCTORS
-
-    #region PUBLIC PROPERTIES
+    #region IsActive Property
 
     public bool IsActive
     {
@@ -62,9 +58,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion PUBLIC PROPERTIES
-
-    #region PUBLIC METHODS
+    #endregion
 
     public IDisposable PushUpdateSelectionSource( UpdateSelectionSource updateSelectionSource )
     {
@@ -104,16 +98,16 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    public void End( bool itemsSourceChanged, bool allowCancelingOfSelection, bool allowSynchronizeSelectionWithCurrent )
+    public void End( bool allowCancelingOfSelection, bool allowSynchronizeSelectionWithCurrent )
     {
       Debug.Assert( m_isActive );
 
-      List<SelectionInfo> activatedSelectionDeltas = new List<SelectionInfo>();
-      SelectionInfo selectionInfo;
+      var activatedSelectionDeltas = new List<SelectionInfo>();
+      var selectionInfo = default( SelectionInfo );
 
       try
       {
-        foreach( SelectionChanger selectionChanger in m_activatedSelectionChanger.Values )
+        foreach( var selectionChanger in m_activatedSelectionChanger.Values )
         {
           selectionInfo = selectionChanger.GetSelectionInfo();
 
@@ -125,21 +119,20 @@ namespace Xceed.Wpf.DataGrid
 
         if( activatedSelectionDeltas.Count > 0 )
         {
-          DataGridSelectionChangingEventArgs eventArgs = new DataGridSelectionChangingEventArgs(
-            new ReadOnlyCollection<SelectionInfo>( activatedSelectionDeltas ), allowCancelingOfSelection );
+          var eventArgs = new DataGridSelectionChangingEventArgs( new ReadOnlyCollection<SelectionInfo>( activatedSelectionDeltas ), allowCancelingOfSelection );
 
           m_owner.RaiseSelectionChanging( eventArgs );
 
-          if( ( eventArgs.Cancel ) && ( allowCancelingOfSelection ) )
+          if( allowCancelingOfSelection && eventArgs.Cancel )
           {
             this.Cancel();
-            throw new DataGridException( "Selection modification canceled." );
+            return;
           }
         }
 
-        foreach( SelectionChanger selectionChanger in m_activatedSelectionChanger.Values )
+        foreach( var selectionChanger in m_activatedSelectionChanger.Values )
         {
-          this.CommitSelectionChanger( selectionChanger, itemsSourceChanged );
+          this.CommitSelectionChanger( selectionChanger );
         }
 
         if( ( allowSynchronizeSelectionWithCurrent ) && ( m_owner.SynchronizeSelectionWithCurrent ) )
@@ -164,19 +157,31 @@ namespace Xceed.Wpf.DataGrid
           selectionInfo.DataGridContext.InvokeSelectionChanged( selectionInfo );
         }
 
-        m_owner.RaiseSelectionChanged(
-          new DataGridSelectionChangedEventArgs(
-            new ReadOnlyCollection<SelectionInfo>( activatedSelectionDeltas ) ) );
-
+        m_owner.RaiseSelectionChanged( new DataGridSelectionChangedEventArgs( new ReadOnlyCollection<SelectionInfo>( activatedSelectionDeltas ) ) );
         m_owner.NotifyGlobalSelectedItemsChanged();
       }
     }
 
     public bool ToggleItemSelection( SelectionRangePoint rangePosition )
     {
-      return this.ToggleItemSelection( 
-        rangePosition.DataGridContext, 
-        rangePosition.ItemIndex, rangePosition.Item );
+      var group = rangePosition.Group;
+      if( group != null )
+      {
+        bool unselect = false;
+        var range = rangePosition.ToSelectionRangeWithItems();
+
+        // When [un]selecting a group, select all children, and recursively
+        // the expanded details nodes.
+        return this.AffectSelectionRecursivelyOnDetails(
+          rangePosition.DataGridContext, range.Range.StartIndex, range.Range.EndIndex,
+          unselect );
+      }
+      else
+      {
+        return this.ToggleItemSelection(
+          rangePosition.DataGridContext,
+          rangePosition.ItemIndex, rangePosition.Item );
+      }
     }
 
     public bool ToggleItemSelection( DataGridContext context, int itemIndex, object item )
@@ -193,7 +198,7 @@ namespace Xceed.Wpf.DataGrid
 
     public bool ToggleCellSelection( DataGridContext context, int itemIndex, object item, int columnIndex )
     {
-      if( this.IsCellSelected( context, itemIndex, columnIndex) )
+      if( this.IsCellSelected( context, itemIndex, columnIndex ) )
       {
         return this.UnselectCells( context, new SelectionCellRangeWithItems( itemIndex, item, columnIndex ) );
       }
@@ -203,10 +208,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    public bool ToggleItemCellsSelection(
-      DataGridContext dataGridContext,
-      int itemIndex,
-      object item )
+    public bool ToggleItemCellsSelection( DataGridContext dataGridContext, int itemIndex, object item )
     {
       SelectedCellsStorage tempStorage = this.GetItemCellStorage( dataGridContext, itemIndex, item );
 
@@ -238,7 +240,19 @@ namespace Xceed.Wpf.DataGrid
 
     public bool SelectItems( SelectionRangePoint position )
     {
-      return this.SelectItems( position.DataGridContext, position.ToSelectionRangeWithItems() );
+      if( position.Group != null )
+      {
+        // When [un]selecting a group, select all children, and recursively
+        // the expanded details nodes.
+        var range = position.ToSelectionRangeWithItems();
+        return this.AffectSelectionRecursivelyOnDetails(
+          position.DataGridContext, range.Range.StartIndex, range.Range.EndIndex,
+          false );
+      }
+      else
+      {
+        return this.SelectItems( position.DataGridContext, position.ToSelectionRangeWithItems() );
+      }
     }
 
     public bool SelectItems( DataGridContext dataGridContext, SelectionRangeWithItems rangeWithItems )
@@ -276,11 +290,7 @@ namespace Xceed.Wpf.DataGrid
       return selected;
     }
 
-    public bool SelectItemCells(
-      DataGridContext dataGridContext,
-      int itemIndex,
-      object item,
-      bool preserveSelection )
+    public bool SelectItemCells( DataGridContext dataGridContext, int itemIndex, object item, bool preserveSelection )
     {
       bool selected = false;
       SelectionChanger selectionChanger = this.GetSelectionChanger( dataGridContext );
@@ -318,12 +328,22 @@ namespace Xceed.Wpf.DataGrid
     public bool SelectJustThisItem( SelectionRangePoint point )
     {
       bool selected = false;
+      var group = point.Group;
 
-      var item = point.Item;
-      var itemIndex = point.ItemIndex;
-      if( itemIndex != -1 )
+      if( group != null )
       {
-        selected = this.SelectJustThisItem( point.DataGridContext, itemIndex, item );
+        this.UnselectAll();
+        // This will also recursively select all expanded detail childrens.
+        selected = this.SelectItems( point );
+      }
+      else
+      {
+        var item = point.Item;
+        var itemIndex = point.ItemIndex;
+        if( itemIndex != -1 )
+        {
+          selected = this.SelectJustThisItem( point.DataGridContext, itemIndex, item );
+        }
       }
 
       return selected;
@@ -370,67 +390,6 @@ namespace Xceed.Wpf.DataGrid
       return selectionChanger.UnselectItems( rangeWithItems );
     }
 
-    internal void UnselectAll()
-    {
-      // Add all the selected context to the activatedSelectionChanger since
-      // we will unselect all the selected item from it.
-      foreach( DataGridContext selectedDataGridContext in m_owner.SelectedContexts )
-      {
-        this.GetSelectionChanger( selectedDataGridContext );
-      }
-
-      // Unselect all items and cells.
-      foreach( SelectionChanger activatedSelectionChanger in m_activatedSelectionChanger.Values )
-      {
-        activatedSelectionChanger.UnselectAllItems();
-        activatedSelectionChanger.UnselectAllCells();
-      }
-    }
-
-    internal void UnselectAllItems()
-    {
-      // Add all the selected context to the activatedSelectionChanger since
-      // we will unselect all the selected item from it.
-      foreach( DataGridContext selectedDataGridContext in m_owner.SelectedContexts )
-      {
-        this.GetSelectionChanger( selectedDataGridContext );
-      }
-
-      // Unselect all item.
-      foreach( SelectionChanger activatedSelectionChanger in m_activatedSelectionChanger.Values )
-      {
-        activatedSelectionChanger.UnselectAllItems();
-      }
-    }
-
-    internal void UnselectAllItems( DataGridContext dataGridContext )
-    {
-      SelectionChanger selectionChanger = this.GetSelectionChanger( dataGridContext );
-      selectionChanger.UnselectAllItems();
-    }
-
-    internal void UnselectAllCells()
-    {
-      // Add all the selected context to the activatedSelectionChanger since
-      // we will unselect all the selected item from it.
-      foreach( DataGridContext selectedDataGridContext in m_owner.SelectedContexts )
-      {
-        this.GetSelectionChanger( selectedDataGridContext );
-      }
-
-      // Unselect all item.
-      foreach( SelectionChanger activatedSelectionChanger in m_activatedSelectionChanger.Values )
-      {
-        activatedSelectionChanger.UnselectAllCells();
-      }
-    }
-
-    internal void UnselectAllCells( DataGridContext dataGridContext )
-    {
-      SelectionChanger selectionChanger = this.GetSelectionChanger( dataGridContext );
-      selectionChanger.UnselectAllCells();
-    }
-
     public void CleanupDeferSelection( DataGridContext dataGridContext )
     {
       SelectionChanger selectionChanger = this.GetSelectionChanger( dataGridContext );
@@ -444,7 +403,7 @@ namespace Xceed.Wpf.DataGrid
         case NotifyCollectionChangedAction.Replace:
           {
             // When we get a replace with the same instance, we just have nothing to do.
-            if( ( e.NewItems.Count == 1 ) && ( e.OldItems.Count == 1 ) && ( e.OldItems[ 0 ] == e.NewItems[ 0 ] ) )
+            if( ( e.NewItems.Count == e.OldItems.Count ) && e.NewItems.Cast<object>().SequenceEqual( e.OldItems.Cast<object>() ) )
               break;
 
             this.Begin();
@@ -461,7 +420,7 @@ namespace Xceed.Wpf.DataGrid
             }
             finally
             {
-              this.End( true, false, true );
+              this.End( false, true );
             }
 
             break;
@@ -484,7 +443,7 @@ namespace Xceed.Wpf.DataGrid
             }
             finally
             {
-              this.End( true, false, true );
+              this.End( false, true );
             }
 
             break;
@@ -507,7 +466,7 @@ namespace Xceed.Wpf.DataGrid
             }
             finally
             {
-              this.End( true, false, true );
+              this.End( false, true );
             }
 
             break;
@@ -578,11 +537,12 @@ namespace Xceed.Wpf.DataGrid
                     for( int j = 0; j < itemsCount; j++ )
                     {
                       object item = items[ j ];
-                      int index = sourceItems.IndexOf( item );
+                      object replacement = e.GetReplacement( item ) ?? item;
 
-                      if( index != -1 )
+                      int index = sourceItems.IndexOf( replacement );
+                      if( index >= 0 )
                       {
-                        selectionChanger.SelectItems( new SelectionRangeWithItems( index, item ) );
+                        selectionChanger.SelectItems( new SelectionRangeWithItems( index, replacement ) );
                       }
                     }
                   }
@@ -637,7 +597,7 @@ namespace Xceed.Wpf.DataGrid
             }
             finally
             {
-              this.End( true, false, true );
+              this.End( false, true );
             }
 
             break;
@@ -652,6 +612,16 @@ namespace Xceed.Wpf.DataGrid
       bool rowIsBeingEditedAndCurrentRowNotChanged,
       Nullable<UpdateSelectionSource> updateSelectionSourceParam )
     {
+      if( oldPosition != null && oldPosition.Group != null )
+      {
+        oldPosition = null;
+      }
+
+      if( newPosition != null && newPosition.Group != null )
+      {
+        newPosition = null;
+      }
+
       if( newPosition == null )
         return;
 
@@ -683,7 +653,7 @@ namespace Xceed.Wpf.DataGrid
           case SelectionMode.Single:
             {
               this.DoSingleSelection(
-                newPosition, 
+                newPosition,
                 oldFocusWasInTheGrid, rowIsBeingEditedAndCurrentRowNotChanged, updateSelectionSource );
 
               break;
@@ -709,15 +679,69 @@ namespace Xceed.Wpf.DataGrid
       }
       finally
       {
-        try
-        {
-          this.End( false, true, false );
-        }
-        catch( DataGridException )
-        {
-          // This is to swallow when selection is aborted
-        }
+        this.End( true, false );
       }
+    }
+
+    internal void UnselectAll()
+    {
+      // Add all the selected context to the activatedSelectionChanger since
+      // we will unselect all the selected item from it.
+      foreach( DataGridContext selectedDataGridContext in m_owner.SelectedContexts )
+      {
+        this.GetSelectionChanger( selectedDataGridContext );
+      }
+
+      // Unselect all items and cells.
+      foreach( SelectionChanger activatedSelectionChanger in m_activatedSelectionChanger.Values )
+      {
+        activatedSelectionChanger.UnselectAllItems();
+        activatedSelectionChanger.UnselectAllCells();
+      }
+    }
+
+    internal void UnselectAllItems()
+    {
+      // Add all the selected context to the activatedSelectionChanger since
+      // we will unselect all the selected item from it.
+      foreach( DataGridContext selectedDataGridContext in m_owner.SelectedContexts )
+      {
+        this.GetSelectionChanger( selectedDataGridContext );
+      }
+
+      // Unselect all item.
+      foreach( SelectionChanger activatedSelectionChanger in m_activatedSelectionChanger.Values )
+      {
+        activatedSelectionChanger.UnselectAllItems();
+      }
+    }
+
+    internal void UnselectAllItems( DataGridContext dataGridContext )
+    {
+      SelectionChanger selectionChanger = this.GetSelectionChanger( dataGridContext );
+      selectionChanger.UnselectAllItems();
+    }
+
+    internal void UnselectAllCells()
+    {
+      // Add all the selected context to the activatedSelectionChanger since
+      // we will unselect all the selected item from it.
+      foreach( DataGridContext selectedDataGridContext in m_owner.SelectedContexts )
+      {
+        this.GetSelectionChanger( selectedDataGridContext );
+      }
+
+      // Unselect all item.
+      foreach( SelectionChanger activatedSelectionChanger in m_activatedSelectionChanger.Values )
+      {
+        activatedSelectionChanger.UnselectAllCells();
+      }
+    }
+
+    internal void UnselectAllCells( DataGridContext dataGridContext )
+    {
+      SelectionChanger selectionChanger = this.GetSelectionChanger( dataGridContext );
+      selectionChanger.UnselectAllCells();
     }
 
     private void EnsureNodeTreeCreatedOnAllSubContext( DataGridContext context )
@@ -738,7 +762,7 @@ namespace Xceed.Wpf.DataGrid
     {
 
       //Group selection is not valid in single selection mode.
-      if( newPosition == null )
+      if( newPosition == null || newPosition.Group != null )
         return;
 
       bool applySelection = true;
@@ -755,7 +779,7 @@ namespace Xceed.Wpf.DataGrid
         //Special cases where selection should not be applied:
         //1. Focus was not in the datagrid
         //2. Ctrl is pressed but not the "page keys".
-        if(!oldFocusWasInTheGrid || (isCtrlPressed && !isPageKeys))
+        if( !oldFocusWasInTheGrid || ( isCtrlPressed && !isPageKeys ) )
         {
           applySelection = false;
         }
@@ -778,16 +802,13 @@ namespace Xceed.Wpf.DataGrid
 
         this.ApplySelection( null, newPosition, m_fromRowSelector, isValid,
           doRangeSelection: false,
-          allowRangeUnselection:false,
+          allowRangeUnselection: false,
           toggleSelection: false,
           keepSelection: m_fromRowSelector && cellSelection );
       }
     }
 
-    private void DoMultipleSelection(
-      SelectionRangePoint newPosition,
-      bool rowIsBeingEditedAndCurrentRowNotChanged,
-      UpdateSelectionSource updateSelectionSource )
+    private void DoMultipleSelection( SelectionRangePoint newPosition, bool rowIsBeingEditedAndCurrentRowNotChanged, UpdateSelectionSource updateSelectionSource )
     {
       if( newPosition == null )
         return;
@@ -798,7 +819,7 @@ namespace Xceed.Wpf.DataGrid
 
       //Handle the case where the selected item is not a datarow/cell.
       bool isValid = ( m_owner.SelectionUnit == SelectionUnit.Row ) || fromRowSelector
-        ? ( newPosition.ItemIndex != -1 )
+        ? ( newPosition.Group != null ) || ( newPosition.ItemIndex != -1 )
         : ( newPosition.ItemIndex != -1 ) && ( newPosition.ColumnIndex != -1 );
 
       switch( updateSelectionSource )
@@ -811,7 +832,8 @@ namespace Xceed.Wpf.DataGrid
         case UpdateSelectionSource.MouseDown:
           {
             m_updateSelectionOnNextMouseUp =
-              newPosition.GetIsSelected( m_owner.SelectionUnit );
+              newPosition.GetIsSelected( m_owner.SelectionUnit )
+              && !m_owner.UseDragToSelectBehavior;
 
             if( m_updateSelectionOnNextMouseUp )
             {
@@ -860,11 +882,11 @@ namespace Xceed.Wpf.DataGrid
       {
         //Never do range selections, Always keep selection, always toggle.
         this.ApplySelection( null, newPosition,
-          fromRowSelector, isValid, 
-          doRangeSelection:false, 
-          allowRangeUnselection:false,
-          toggleSelection:toggleSelection, 
-          keepSelection:true );
+          fromRowSelector, isValid,
+          doRangeSelection: false,
+          allowRangeUnselection: false,
+          toggleSelection: toggleSelection,
+          keepSelection: true );
       }
     }
 
@@ -878,6 +900,7 @@ namespace Xceed.Wpf.DataGrid
       if( newPosition == null )
         return;
 
+      Group group = newPosition.Group;
       DataGridContext dataGridContext = newPosition.DataGridContext;
       object item = newPosition.Item;
       int sourceDataItemIndex = newPosition.ItemIndex;
@@ -902,7 +925,7 @@ namespace Xceed.Wpf.DataGrid
 
       //Handle the case where the selected item is not a datarow/cell.
       bool isValid = ( m_owner.SelectionUnit == SelectionUnit.Row || fromRowSelector )
-        ? ( newPosition.ItemIndex != -1 )
+        ? ( newPosition.Group != null ) || ( newPosition.ItemIndex != -1 )
         : ( newPosition.ItemIndex != -1 ) && ( newPosition.ColumnIndex != -1 );
 
       //Special case management in relation to update selection source
@@ -959,7 +982,9 @@ namespace Xceed.Wpf.DataGrid
               bool isSelected = ( cellSelection )
                 ? dataGridContext.SelectedCellsStore.Contains( sourceDataItemIndex, columnIndex )
                 : dataGridContext.SelectedItemsStore.Contains( sourceDataItemIndex );
-              if( isSelected && rowIsBeingEditedAndCurrentRowNotChanged )
+              if( group == null
+                && isSelected
+                && rowIsBeingEditedAndCurrentRowNotChanged )
               {
                 applySelection = false;
               }
@@ -976,7 +1001,8 @@ namespace Xceed.Wpf.DataGrid
             else
             {
               m_updateSelectionOnNextMouseUp =
-                newPosition.GetIsSelected( m_owner.SelectionUnit );
+                newPosition.GetIsSelected( m_owner.SelectionUnit )
+                && !m_owner.UseDragToSelectBehavior;
               // If the target item is already selected, do not update
               // the selection on mouse down, differ this to mouse up.
               if( m_updateSelectionOnNextMouseUp )
@@ -985,7 +1011,7 @@ namespace Xceed.Wpf.DataGrid
 
                 if( isValid )
                 {
-                  if( !(ctrl && !shift) )
+                  if( !( ctrl && !shift ) )
                   {
                     m_updateSelectionOnNextMouseUp = !rowIsBeingEditedAndCurrentRowNotChanged;
                   }
@@ -1010,7 +1036,8 @@ namespace Xceed.Wpf.DataGrid
                 // If the target item is already selected, do not update
                 // the selection on mouse down, differ this to mouse up.
                 m_updateSelectionOnNextMouseUp =
-                  newPosition.GetIsSelected( SelectionUnit.Row );
+                  newPosition.GetIsSelected( SelectionUnit.Row )
+                  && !m_owner.UseDragToSelectBehavior;
 
                 if( m_updateSelectionOnNextMouseUp )
                 {
@@ -1164,6 +1191,21 @@ namespace Xceed.Wpf.DataGrid
       // Un-select a range if we keep previous selection, and
       // the selection anchor is a unselected item.
 
+      //Group selection not supported. Be sure to have no ranges
+      //that will be relative to a group position.
+      if( newPosition != null && newPosition.Group != null )
+        return;
+
+      if( oldPosition != null && oldPosition.Group != null )
+      {
+        oldPosition = null;
+      }
+
+      if( m_selectionRangeStartPoint != null && m_selectionRangeStartPoint.Group != null )
+      {
+        m_selectionRangeStartPoint = null;
+      }
+
       if( m_selectionRangeStartPoint == null )
       {
         m_selectionRangeStartPoint = oldPosition ?? newPosition;
@@ -1187,11 +1229,7 @@ namespace Xceed.Wpf.DataGrid
       this.DoRangeSelectionNoGroupSupport( newPosition, keepPreviousSelection, fromRowSelector, unselect );
     }
 
-    private void DoRangeSelectionNoGroupSupport(
-      SelectionRangePoint newPosition,
-      bool keepPreviousSelection,
-      bool fromRowSelector,
-      bool unselect )
+    private void DoRangeSelectionNoGroupSupport( SelectionRangePoint newPosition, bool keepPreviousSelection, bool fromRowSelector, bool unselect )
     {
       int starting_index = m_selectionRangeStartPoint.ItemGlobalIndex;
       int ending_index = newPosition.ItemGlobalIndex;
@@ -1267,7 +1305,7 @@ namespace Xceed.Wpf.DataGrid
     private void AffectSelectionRange( List<SelectionRangePoint> startPath, List<SelectionRangePoint> endPath, bool unselect )
     {
       // For each DataContext depth of each path.
-      for( int i = Math.Max( startPath.Count, endPath.Count ) - 1; i >= 0;i--)
+      for( int i = Math.Max( startPath.Count, endPath.Count ) - 1; i >= 0; i-- )
       {
         DataGridContext startContext = null;
         DataGridContext endContext = null;
@@ -1326,10 +1364,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-
     private void AffectSelectionRecursivelyForSelectRange( DataGridContext dataGridContext, int startIndex, int endIndex, bool unselect )
     {
-      if( startIndex > endIndex)
+      if( startIndex > endIndex )
         return;
 
       // We do not Recursively select the last item since the children
@@ -1344,11 +1381,7 @@ namespace Xceed.Wpf.DataGrid
       this.AffectSelection( dataGridContext, selectionRange, unselect );
     }
 
-    private bool AffectSelectionRecursivelyOnDetails(
-      DataGridContext dataGridContext,
-      int startIndex,
-      int endIndex,
-      bool unselect )
+    private bool AffectSelectionRecursivelyOnDetails( DataGridContext dataGridContext, int startIndex, int endIndex, bool unselect )
     {
       if( startIndex < 0 || endIndex < 0 )
         return false;
@@ -1381,10 +1414,7 @@ namespace Xceed.Wpf.DataGrid
       return wasAlreadyDone;
     }
 
-    private bool AffectSelection( 
-      DataGridContext dataGridContext,
-      SelectionRangeWithItems selectionRange, 
-      bool unselect )
+    private bool AffectSelection( DataGridContext dataGridContext, SelectionRangeWithItems selectionRange, bool unselect )
     {
       return ( unselect )
         ? this.UnselectItems( dataGridContext, selectionRange )
@@ -1413,7 +1443,7 @@ namespace Xceed.Wpf.DataGrid
 
     private bool IsItemCellsSelected( SelectionRangePoint selectionPoint )
     {
-      SelectedCellsStorage itemCells = this.GetItemCellStorage( selectionPoint.DataGridContext, 
+      SelectedCellsStorage itemCells = this.GetItemCellStorage( selectionPoint.DataGridContext,
         selectionPoint.ItemIndex, selectionPoint.Item );
 
       return this.IsItemCellsSelected( selectionPoint.DataGridContext, itemCells );
@@ -1516,20 +1546,23 @@ namespace Xceed.Wpf.DataGrid
 
     private List<SelectionRangePoint> CreatePathForSelectionPoint( SelectionRangePoint rangePoint )
     {
-      List<SelectionRangePoint> indexList = new List<SelectionRangePoint>();
-
-      int firstIndex;
-      int lastIndex;
-      this.ExtractRangePositionIndexes( rangePoint, out firstIndex, out lastIndex );
+      var indexList = new List<SelectionRangePoint>();
 
       indexList.Insert( 0, rangePoint );
 
       var context = rangePoint.DataGridContext;
       var parentContext = context.ParentDataGridContext;
+
       while( parentContext != null )
       {
-        int parentIndex = parentContext.Items.IndexOf( context.ParentItem );
-        indexList.Insert( 0, new SelectionRangePoint( parentContext, context.ParentItem, parentIndex, -1 ) );
+        var parentIndex = parentContext.Items.IndexOf( context.ParentItem );
+
+        var parentRangePoint = SelectionRangePoint.TryCreateRangePoint( parentContext, context.ParentItem, parentIndex, -1 );
+        if( parentRangePoint != null )
+        {
+          indexList.Insert( 0, parentRangePoint );
+        }
+
         context = parentContext;
         parentContext = parentContext.ParentDataGridContext;
       }
@@ -1548,34 +1581,38 @@ namespace Xceed.Wpf.DataGrid
         firstIndex = rangePosition.ItemIndex;
         lastIndex = firstIndex;
       }
+      else if( rangePosition.Group != null )
+      {
+        var groupRange = rangePosition.Group.GetRange();
+        firstIndex = groupRange.StartIndex;
+        lastIndex = groupRange.EndIndex;
+      }
 
       Debug.Assert( firstIndex <= lastIndex );
     }
 
-    #endregion PUBLIC METHODS
-
-    #region PRIVATE METHODS
-
     private SelectionChanger GetSelectionChanger( DataGridContext dataGridContext )
     {
-      SelectionChanger selectionChanger = m_activatedSelectionChanger[ dataGridContext ] as SelectionChanger;
+      if( dataGridContext == null )
+        return null;
 
-      if( selectionChanger != null )
-        return selectionChanger;
+      var selectionChanger = default( SelectionChanger );
 
-      selectionChanger = new SelectionChanger( dataGridContext );
-      m_activatedSelectionChanger[ dataGridContext ] = selectionChanger;
+      if( !m_activatedSelectionChanger.TryGetValue( dataGridContext, out selectionChanger ) )
+      {
+        selectionChanger = new SelectionChanger( dataGridContext );
+        m_activatedSelectionChanger.Add( dataGridContext, selectionChanger );
+      }
+
       return selectionChanger;
     }
 
-    private void CommitSelectionChanger(
-      SelectionChanger selectionChanger,
-      bool itemsSourceChanged )
+    private void CommitSelectionChanger( SelectionChanger selectionChanger )
     {
       try
       {
-        selectionChanger.UpdateSelectedItemsInChangeOfDataGridContext( itemsSourceChanged );
-        selectionChanger.UpdateSelectedCellsInChangeOfDataGridContext( itemsSourceChanged );
+        selectionChanger.UpdateSelectedItemsInChangeOfDataGridContext();
+        selectionChanger.UpdateSelectedCellsInChangeOfDataGridContext();
       }
       finally
       {
@@ -1587,19 +1624,17 @@ namespace Xceed.Wpf.DataGrid
 
     private void UpdateCurrentToSelection()
     {
-      DataGridContext currentContext = m_owner.CurrentContext;
-      object currentItem;
-      int currentItemIndex;
-      ColumnBase currentColumn;
+      var currentContext = m_owner.CurrentContext;
+      var currentItemIndex = default( int );
+      var currentColumn = default( ColumnBase );
 
-      ColumnBase selectedColumn = null;
-      int selectedColumnIndex = -1;
-      int selectedItemIndex = -1;
-      object selectedItem = null;
+      var selectedColumn = default( ColumnBase );
+      var selectedColumnIndex = -1;
+      var selectedItemIndex = -1;
+      var selectedItem = default( object );
 
-      if( ( currentContext == null ) || ( !m_owner.SelectedContexts.Contains( currentContext ) ) )
+      if( ( currentContext == null ) || !m_owner.SelectedContexts.Contains( currentContext ) )
       {
-        currentItem = null;
         currentItemIndex = -1;
         currentColumn = null;
 
@@ -1611,7 +1646,6 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        currentItem = currentContext.CurrentItem;
         currentItemIndex = currentContext.CurrentItemIndex;
         currentColumn = currentContext.CurrentColumn;
         currentContext.GetFirstSelectedItemFromStore( true, out selectedItemIndex, out selectedItem, out selectedColumnIndex );
@@ -1623,40 +1657,36 @@ namespace Xceed.Wpf.DataGrid
       if( m_owner.SelectionUnit == SelectionUnit.Cell )
       {
         if( ( currentItemIndex != -1 ) && ( currentColumn != null )
-          && currentContext.SelectedCellsStore.GetIntersectedColumnRanges(
-            new SelectionCellRange( currentItemIndex, currentColumn.VisiblePosition ) ).Any() )
+          && currentContext.SelectedCellsStore.GetIntersectedColumnRanges( new SelectionCellRange( currentItemIndex, currentColumn.VisiblePosition ) ).Any() )
           return;
 
         selectedColumn = currentContext.ColumnsByVisiblePosition.ElementAtOrDefault( selectedColumnIndex );
       }
       else
       {
-        if( ( currentItemIndex != -1 ) && ( currentContext.SelectedItemsStore.Contains( currentItemIndex ) ) )
+        if( ( currentItemIndex != -1 ) && currentContext.SelectedItemsStore.Contains( currentItemIndex ) )
           return;
 
         selectedColumn = currentContext.CurrentColumn;
       }
 
+      // No need to change Current when the previous and subsequent current are both null, even if SelectionUnit is set to Cell and columns do not correspond,
+      // since there is no current anyway.  It will be correctly updated next time an item becomes current.
+      if( selectedItem == currentContext.CurrentItem )
+        return;
+
       currentContext.SetCurrent( selectedItem, null, selectedItemIndex, selectedColumn, false, true, false, AutoScrollCurrentItemSourceTriggers.SelectionChanged );
     }
 
-    #endregion PRIVATE METHODS
-
-    #region FIELDS
-
     private bool m_isActive;
-    private Hashtable m_activatedSelectionChanger = new Hashtable();
-    private DataGridControl m_owner;
-
+    private readonly Dictionary<DataGridContext, SelectionChanger> m_activatedSelectionChanger = new Dictionary<DataGridContext, SelectionChanger>();
+    private readonly DataGridControl m_owner;
     private SelectionRangePoint m_selectionRangeStartPoint;
-
     private bool m_updateSelectionOnNextMouseUp = true;
     private bool m_fromRowSelector; // = false;
 
     // = Navigation ?
-    private UpdateSelectionSource m_currentUpdateSelectionSource; 
-
-    #endregion FIELDS
+    private UpdateSelectionSource m_currentUpdateSelectionSource;
 
     private class UpdateSelectionSourceHelper : IDisposable
     {

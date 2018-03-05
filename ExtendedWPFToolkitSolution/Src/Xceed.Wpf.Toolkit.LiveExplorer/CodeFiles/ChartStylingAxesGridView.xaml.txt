@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -24,178 +24,32 @@
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
             <Run>This sample shows how AxesGrid elements can be styled using a DataTemplate.</Run>
-       <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->
         </Paragraph>
     </local:DemoView.Description>
-    
-<!--##EXCLUDE_OPEN_SOURCE-->
-    <local:DemoView.Resources>
-        <DataTemplate x:Key="BackgroundTemplate">
-			<Rectangle Margin="-5,-5,-5,-5" RadiusX="25" RadiusY="25" StrokeThickness="3" Stroke="Blue" Fill="#FFFFE1">
-				<Rectangle.BitmapEffect>
-					<DropShadowBitmapEffect/>
-				</Rectangle.BitmapEffect>
-			</Rectangle>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="AxisTitleTemplate">
-			<Border DockPanel.Dock="Top" BorderThickness="1" CornerRadius="4">
-				<Border.Background>
-					<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-						<GradientStop Color="White" Offset="0.0" />
-						<GradientStop Color="SkyBlue" Offset="1.0" />
-					</LinearGradientBrush>
-				</Border.Background>
 
-				<TextBlock FontFamily="Comic Sans MS" FontSize="18" Margin="2,2,2,1"
-				            HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=Text}">
-					<TextBlock.Foreground>
-						<SolidColorBrush Color="Black"/>
-					</TextBlock.Foreground>
-				</TextBlock>
-			</Border>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="GridTemplateX">
-			<Canvas Width="{Binding Path=W}" Height="{Binding Path=H}">
-				<Polyline Points="{Binding Path=Points}" StrokeThickness="1" Stroke="Red" StrokeDashArray="1 5 1 1" />
-			</Canvas>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="GridTemplateY">
-			<Canvas Width="{Binding Path=W}" Height="{Binding Path=H}">
-                <Polyline  Points="{Binding Path=Points}" StrokeThickness="1" Stroke="Green" StrokeDashArray="8 3 1 3"/>
-			</Canvas>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="TickTemplateX">
-			<Canvas Width="{Binding Path=W}" Height="{Binding Path=H}">
-				<Line X1="{Binding Path=XStart}" Y1="{Binding Path=YStart}" X2="{Binding Path=XEnd}" Y2="{Binding Path=YEnd}" StrokeThickness="5" Stroke="Red"/>
-			</Canvas>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="TickTemplateY">
-			<Canvas Width="{Binding Path=W}" Height="{Binding Path=H}">
-				<Line  X1="{Binding Path=XStart}" Y1="{Binding Path=YStart}" X2="{Binding Path=XEnd}" Y2="{Binding Path=YEnd}" StrokeThickness="5" Stroke="Green"/>
-			</Canvas>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="ArrowTemplate">
-			<Polyline Points="{Binding Path=Points}"
-					  StrokeThickness="2" Stroke="Blue"/>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="LabelTemplateX">
-			<Border DockPanel.Dock="Top" BorderThickness="1" CornerRadius="4">
-				<Border.Background>
-					<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-						<GradientStop Color="Yellow" Offset="0.0" />
-						<GradientStop Color="Red" Offset="1.0" />
-					</LinearGradientBrush>
-				</Border.Background>
 
-				<TextBlock FontFamily="Comic Sans MS" FontSize="18" Margin="2,2,2,1"
-				  HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=Text}">
-					<TextBlock.Foreground>
-						<SolidColorBrush Color="Black"/>
-					</TextBlock.Foreground>
-				</TextBlock>
-			</Border>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="LabelTemplateY">
-			<Border DockPanel.Dock="Top" BorderThickness="1" CornerRadius ="4">
-				<Border.Background>
-					<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-						<GradientStop Color="Yellow" Offset="0.0" />
-						<GradientStop Color="LimeGreen" Offset="1.0" />
-					</LinearGradientBrush>
-				</Border.Background>
 
-				<TextBlock FontFamily="Comic Sans MS" FontSize="18" Margin="2,2,2,1"
-				  HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=Text}">
-					<TextBlock.Foreground>
-						<SolidColorBrush Color="Black"/>
-					</TextBlock.Foreground>
-				</TextBlock>
-			</Border>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="AxisTemplate">
-			<Polyline Points="{Binding Path=Points}"
-				  StrokeThickness="2" Stroke="Blue"/>
-		</DataTemplate>
-    </local:DemoView.Resources>
-    
-   <Grid>
-            <xctk:Chart MinHeight="300" ShowLegend="False">
-                <xctk:Chart.Areas>
-                    <xctk:Area BackgroundTemplate="{StaticResource BackgroundTemplate}" Margin="25,25,25,25">
-                        <xctk:Area.XAxis>
-						    <xctk:Axis AxisTitleTemplate="{StaticResource AxisTitleTemplate}"
-                                        GridTemplate="{StaticResource GridTemplateX}"
-                                        TickTemplate="{StaticResource TickTemplateX}"
-                                        ArrowTemplate="{StaticResource ArrowTemplate}"
-                                        LabelTemplate="{StaticResource LabelTemplateX}">
-                                <xctk:Axis.Template>
-								    <ControlTemplate TargetType="{x:Type xctk:Axis}">
-									    <ContentPresenter ContentTemplate="{StaticResource AxisTemplate}"/>
-								    </ControlTemplate>
-							    </xctk:Axis.Template>
-                                
-                                <xctk:Axis.Arrow>
-								    <xctk:Arrow Length="20" Thickness="10"/>
-							    </xctk:Axis.Arrow>
-                            </xctk:Axis>
-					    </xctk:Area.XAxis>
 
-                        <xctk:Area.YAxis>
-                            <xctk:Axis Reversed="true"
-                                        AxisTitleTemplate="{StaticResource AxisTitleTemplate}"
-                                        GridTemplate="{StaticResource GridTemplateY}"
-                                        TickTemplate="{StaticResource TickTemplateY}"
-                                        ArrowTemplate="{StaticResource ArrowTemplate}"
-                                        LabelTemplate="{StaticResource LabelTemplateY}">
-                                <xctk:Axis.Template>
-								    <ControlTemplate TargetType="{x:Type xctk:Axis}">
-									    <ContentPresenter ContentTemplate="{StaticResource AxisTemplate}"/>
-								    </ControlTemplate>
-							    </xctk:Axis.Template>
-                                
-                                <xctk:Axis.Arrow>
-								    <xctk:Arrow Length="20" Thickness="10"/>
-							    </xctk:Axis.Arrow>
-                            </xctk:Axis>
-                        </xctk:Area.YAxis>
 
-                        <xctk:Area.Series>
-						    <xctk:Series>
-							    <xctk:Series.DataPoints>
-								    <xctk:DataPoint X="1" Y="1" />
-								    <xctk:DataPoint X="2" Y="3"/>
-								    <xctk:DataPoint X="3" Y="2"/>
-								    <xctk:DataPoint X="4" Y="5"/>
-								    <xctk:DataPoint X="5" Y="4"/>
-							    </xctk:Series.DataPoints>
-							    <xctk:Series.Layout>
-								    <xctk:LineLayout/>
-							    </xctk:Series.Layout>
-						    </xctk:Series>
-					    </xctk:Area.Series>
-                    </xctk:Area>
-                </xctk:Chart.Areas>
-            </xctk:Chart>
-    </Grid>
- <!--##END-->
-    
-<!--##INCLUDE_OPEN_SOURCE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <Image Source="..\OpenSourceImages\ChartStylingAxesGrid.png" Width="600" Height="400"/>
-##END-->
 </local:DemoView>

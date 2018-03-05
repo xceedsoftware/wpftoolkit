@@ -381,6 +381,7 @@ namespace Xceed.Wpf.Toolkit
       return renderSize;
     }
 
+
     #endregion //Base Class Overrides
 
     #region Methods

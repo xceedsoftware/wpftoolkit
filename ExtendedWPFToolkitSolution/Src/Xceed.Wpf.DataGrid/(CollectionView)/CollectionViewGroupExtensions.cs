@@ -46,7 +46,7 @@ namespace Xceed.Wpf.DataGrid
         startIndex = dataGridCollectionViewGroup.GetFirstRawItemGlobalSortedIndex();
         endIndex = startIndex + dataGridCollectionViewGroup.GlobalRawItemCount - 1;
       }
-      else if(collectionViewGroup.ItemCount > 0)
+      else if( collectionViewGroup.ItemCount > 0 )
       {
         if( dataGridContext == null )
           throw new DataGridInternalException( "This collectionViewGroup require a DataGridContext instance" );
@@ -61,8 +61,8 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      return (startIndex >= 0 ) && (startIndex <= endIndex)
-        ? new SelectionRange(startIndex, endIndex)
+      return ( startIndex >= 0 ) && ( startIndex <= endIndex )
+        ? new SelectionRange( startIndex, endIndex )
         : SelectionRange.Empty;
     }
 
@@ -96,7 +96,7 @@ namespace Xceed.Wpf.DataGrid
       {
         if( item is CollectionViewGroup )
         {
-          foreach(var subItem in ( ( CollectionViewGroup )item ).GetLeafItems())
+          foreach( var subItem in ( ( CollectionViewGroup )item ).GetLeafItems() )
           {
             yield return subItem;
           }
@@ -141,7 +141,6 @@ namespace Xceed.Wpf.DataGrid
 
     internal static IEnumerable<CollectionViewGroup> GetSubGroups( this CollectionViewGroup collectionViewGroup )
     {
-
       foreach( var item in collectionViewGroup.GetItems() )
       {
         var subGroup = item as CollectionViewGroup;

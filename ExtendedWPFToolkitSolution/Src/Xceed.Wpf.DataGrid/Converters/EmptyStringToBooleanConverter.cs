@@ -25,10 +25,7 @@ namespace Xceed.Wpf.DataGrid.Converters
   {
     public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
     {
-      string strValue = value as string;
-
-      // Not a mistake: returns true if *value* is null or *strValue* is "".
-      return ( value == null ) || ( strValue == string.Empty );
+      return string.IsNullOrWhiteSpace( value as string );
     }
 
     public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )

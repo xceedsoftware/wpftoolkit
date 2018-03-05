@@ -48,7 +48,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    internal DataItemPropertyDescriptorBase CreatePropertyDescriptor( PropertyDescriptor source )
+    internal DataItemPropertyDescriptor CreatePropertyDescriptor( PropertyDescriptor source )
     {
       if( !DataItemPropertyDescriptorFactory.IsReflected( source ) )
         return null;
@@ -86,6 +86,15 @@ namespace Xceed.Wpf.DataGrid
       return new DataItemPropertyDescriptor( m_typeDescriptor, source, componentType, propertyType, getter, setter, resetter );
     }
 
+    internal DataItemIndexerDescriptor CreateIndexerDescriptor( IndexerDescriptor source )
+    {
+      var propertyChangedEvent = this.GetPropertyChangedEvent( null );
+      if( propertyChangedEvent != null )
+        return new ValueChangeDataItemIndexerDescriptor( m_typeDescriptor, source, propertyChangedEvent );
+
+      return new DataItemIndexerDescriptor( m_typeDescriptor, source );
+    }
+
     private void InitializeEvents()
     {
       if( m_eventDescriptors != null )
@@ -110,6 +119,9 @@ namespace Xceed.Wpf.DataGrid
     private EventDescriptor GetSinglePropertyChangedEvent( string propertyName )
     {
       this.InitializeEvents();
+
+      if( string.IsNullOrEmpty( propertyName ) )
+        return null;
 
       var eventName = string.Format( CultureInfo.InvariantCulture, "{0}Changed", propertyName );
 
@@ -240,20 +252,35 @@ namespace Xceed.Wpf.DataGrid
           var d = ( ValueTypeGetter )Delegate.CreateDelegate( typeof( ValueTypeGetter ), methodInfo, false );
           if( d != null )
             return ( source ) =>
-              {
-                var s = ( TSource )source;
+            {
+              if( !( source is TSource ) )
+                return default( TProperty );
 
-                return d.Invoke( ref s );
-              };
+              var s = ( TSource )source;
+
+              return d.Invoke( ref s );
+            };
         }
         else
         {
           var d = ( Func<TSource, TProperty> )Delegate.CreateDelegate( typeof( Func<TSource, TProperty> ), methodInfo, false );
           if( d != null )
-            return ( source ) => d.Invoke( ( TSource )source );
+            return ( source ) =>
+            {
+              if( !( source is TSource ) )
+                return default( TProperty );
+
+              return d.Invoke( ( TSource )source );
+            };
         }
 
-        return ( source ) => methodInfo.Invoke( source, null );
+        return ( source ) =>
+        {
+          if( !( source is TSource ) )
+            return default( TProperty );
+
+          return methodInfo.Invoke( source, null );
+        };
       }
 
       public Action<object, object> CreateSetter( MethodInfo methodInfo )
@@ -267,10 +294,22 @@ namespace Xceed.Wpf.DataGrid
         {
           var d = ( Action<TSource, TProperty> )Delegate.CreateDelegate( typeof( Action<TSource, TProperty> ), methodInfo );
           if( d != null )
-            return ( source, value ) => d.Invoke( ( TSource )source, ( TProperty )value );
+            return ( source, value ) =>
+            {
+              if( !( source is TSource ) )
+                return;
+
+              d.Invoke( ( TSource )source, ( TProperty )value );
+            };
         }
 
-        return ( source, value ) => methodInfo.Invoke( source, new object[] { value } );
+        return ( source, value ) =>
+        {
+          if( !( source is TSource ) )
+            return;
+
+          methodInfo.Invoke( source, new object[] { value } );
+        };
       }
 
       public Action<object> CreateResetter( MethodInfo methodInfo )
@@ -283,10 +322,22 @@ namespace Xceed.Wpf.DataGrid
         {
           var d = ( Action<TSource> )Delegate.CreateDelegate( typeof( Action<TSource> ), methodInfo );
           if( d != null )
-            return ( source ) => d.Invoke( ( TSource )source );
+            return ( source ) =>
+            {
+              if( !( source is TSource ) )
+                return;
+
+              d.Invoke( ( TSource )source );
+            };
         }
 
-        return ( source ) => methodInfo.Invoke( source, null );
+        return ( source ) =>
+        {
+          if( !( source is TSource ) )
+            return;
+
+          methodInfo.Invoke( source, null );
+        };
       }
 
       private delegate TProperty ValueTypeGetter( ref TSource source );

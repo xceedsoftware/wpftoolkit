@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -31,308 +31,40 @@
             <LineBreak />
             <Run>
                 The PileFlowPanel class also contains a label that can be configured to display the PileFlowItem data via the property ContentLabel. When the PileFlowPanel has focus, this sample lets the arrow buttons or the mouse wheel modify the selection.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->
       </Paragraph>
    </local:DemoView.Description>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-      <Style TargetType="{x:Type Border}" x:Key="BorderStyle">
-      <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="CornerRadius" Value="5"/>
-      <Setter Property="BorderBrush">
-        <Setter.Value>
-          <SolidColorBrush Color="Black"/>
-        </Setter.Value>
-      </Setter>
-    </Style>
-      
-      <conv:SizeToIntegerConverter x:Key="SizeToIntegerConverter" />
-      <conv:FullNameStringConverter x:Key="FullNameStringConverter" />
-      
-      <SolidColorBrush x:Key="mouseOverBrush" Color="Blue" />
-      <SolidColorBrush x:Key="mouseOverLabelBrush" Color="LightBlue" />
-      <SolidColorBrush x:Key="normalLabelBrush" Color="Snow" />
-      
-      <DataTemplate x:Key="seriesTemplate">
-			<Canvas Width="{Binding Path=W}" Height="{Binding Path=H}">
-            <Rectangle x:Name="rect" RadiusX="5" RadiusY="5" Width="{Binding Path=W}" Height="{Binding Path=H}" Fill="{Binding Path=Interior}">
-               <Rectangle.Triggers>
-                  <EventTrigger RoutedEvent="Mouse.MouseEnter">
-							<EventTrigger.Actions>
-								<BeginStoryboard>
-									<Storyboard>
-										<ObjectAnimationUsingKeyFrames Storyboard.TargetName="rect" Storyboard.TargetProperty="Fill">
-                                 <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource mouseOverBrush}" />
-                              </ObjectAnimationUsingKeyFrames>
-									</Storyboard>
-								</BeginStoryboard>
-							</EventTrigger.Actions>
-						</EventTrigger>
-                  
-                  <EventTrigger RoutedEvent="Mouse.MouseLeave">
-							<EventTrigger.Actions>
-								<BeginStoryboard>
-									<Storyboard>
-										<ObjectAnimationUsingKeyFrames Storyboard.TargetName="rect" Storyboard.TargetProperty="Fill">
-                                 <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{Binding Path=Interior}" />
-                              </ObjectAnimationUsingKeyFrames>
-									</Storyboard>
-								</BeginStoryboard>
-							</EventTrigger.Actions>
-						</EventTrigger>
-               </Rectangle.Triggers>
-            </Rectangle>
-			</Canvas>
-		</DataTemplate>
-      
-       <DataTemplate x:Key="LabelTemplate">
-			<Border x:Name="border" DockPanel.Dock="Top" BorderThickness="1" CornerRadius ="4" Background="{StaticResource normalLabelBrush}">
-			   <Border.BorderBrush>
-				   <SolidColorBrush Color="Black"/>
-			   </Border.BorderBrush>
 
-			   <TextBlock FontFamily="Sans Serif" FontSize="12" Margin="2,2,2,1"
-			     HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=Text}">
-				   <TextBlock.Foreground>
-					   <SolidColorBrush Color="Navy"/>
-				   </TextBlock.Foreground>
-			   </TextBlock>
-            
-            <Border.Triggers>
-                  <EventTrigger RoutedEvent="Mouse.MouseEnter">
-							<EventTrigger.Actions>
-								<BeginStoryboard>
-									<Storyboard>
-										<ObjectAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="Background">
-                                 <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource mouseOverLabelBrush}" />
-                              </ObjectAnimationUsingKeyFrames>
-									</Storyboard>
-								</BeginStoryboard>
-							</EventTrigger.Actions>
-						</EventTrigger>
-                  
-                  <EventTrigger RoutedEvent="Mouse.MouseLeave">
-							<EventTrigger.Actions>
-								<BeginStoryboard>
-									<Storyboard>
-										<ObjectAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="Background">
-                                 <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource normalLabelBrush}" />
-                              </ObjectAnimationUsingKeyFrames>
-									</Storyboard>
-								</BeginStoryboard>
-							</EventTrigger.Actions>
-						</EventTrigger>
-               </Border.Triggers>
-		   </Border>
-		</DataTemplate>
-      
-   </local:DemoView.Resources>
 
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-      
-      <Grid.ColumnDefinitions>
-         <ColumnDefinition Width="Auto" />
-         <ColumnDefinition Width="*"/>
-      </Grid.ColumnDefinitions>
 
-      <GroupBox Header="PileFlowPanel Features" Grid.Row="0" Margin="0,5,0,5">
-         <Grid Margin="0,5,5,5" HorizontalAlignment="Left">
-            <Grid.RowDefinitions>
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="*" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
 
-            <!-- 1st column -->
-            <TextBlock Text="Content Label Offset Y: " VerticalAlignment="Center" />
-            <xctk:IntegerUpDown Grid.Column="1" Minimum="-150" Maximum="170" Value="{Binding ContentLabelOffsetY, ElementName=_pileFlowPanel}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Content Label Size X: " Grid.Row="1" VerticalAlignment="Center" />
-            <xctk:IntegerUpDown Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="500" Value="{Binding ContentLabelSize, ElementName=_pileFlowPanel, Converter={StaticResource SizeToIntegerConverter}, ConverterParameter=width}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Content Label Size Y: " Grid.Row="2" VerticalAlignment="Center" />
-            <xctk:IntegerUpDown Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="500" Value="{Binding ContentLabelSize, ElementName=_pileFlowPanel, Converter={StaticResource SizeToIntegerConverter}, ConverterParameter=height}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Animation Duration: " Grid.Row="3" VerticalAlignment="Center" />
-            <xctk:IntegerUpDown Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="3000" Increment="10" Value="{Binding AnimationDuration, ElementName=_pileFlowPanel}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Last Move decelarion Ratio: " Grid.Row="4" VerticalAlignment="Center" />
-            <xctk:DoubleUpDown Grid.Row="4" Grid.Column="1" FormatString="N1" Minimum="0" Maximum="1" Increment="0.1" Value="{Binding LastMoveDecelerationRatio, ElementName=_pileFlowPanel}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Center Offset X " Grid.Row="5" VerticalAlignment="Center" />
-            <xctk:IntegerUpDown Grid.Row="5" Grid.Column="1" Minimum="0" Maximum="300" Increment="2" Value="{Binding CenterOffsetX, ElementName=_pileFlowPanel}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            
-            <!-- 2nd column -->            
-            <TextBlock Text="Flow Items Count: " Grid.Column="2" VerticalAlignment="Center" Margin="5,0,0,0"/>
-            <xctk:IntegerUpDown Grid.Column="3" Minimum="1" Value="{Binding FlowItemsCount, ElementName=_pileFlowPanel}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Flow Items Ratio: " Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Margin="5,0,0,0"/>
-            <xctk:IntegerUpDown Grid.Row="1" Grid.Column="3" Minimum="0" Maximum="100" Value="{Binding FlowItemRatio, ElementName=_pileFlowPanel}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Item Width: " Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Margin="5,0,0,0"/>
-            <xctk:IntegerUpDown Grid.Row="2" Grid.Column="3" Minimum="0" Maximum="300" Value="{Binding ItemWidth, ElementName=_pileFlowPanel}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Item Height: " Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" Margin="5,0,0,0"/>
-            <xctk:IntegerUpDown Grid.Row="3" Grid.Column="3" Minimum="0" Maximum="300" Value="{Binding ItemHeight, ElementName=_pileFlowPanel}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Flow Offset X " Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" Margin="5,0,0,0"/>
-            <xctk:IntegerUpDown Grid.Row="4" Grid.Column="3" Minimum="0" Maximum="300" Value="{Binding FlowOffsetX, ElementName=_pileFlowPanel}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Flow Offset Y " Grid.Row="5" Grid.Column="2" VerticalAlignment="Center" Margin="5,0,0,0"/>
-            <xctk:IntegerUpDown Grid.Row="5" Grid.Column="3" Minimum="0" Maximum="300" Value="{Binding FlowOffsetY, ElementName=_pileFlowPanel}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-          </Grid>
-      </GroupBox>
-      
-      <GroupBox Header="PileFlowCard Features" Grid.Row="0" Grid.Column="1" Margin="0,5,2,5">
-         <Grid Margin="0,5,2,5" HorizontalAlignment="Left">
-            <Grid.RowDefinitions>
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Show Reflection: " VerticalAlignment="Center" />
-            <CheckBox x:Name="_showReflection" Grid.Column="1" IsChecked="True" Click="OnShowReflectionsClick" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,2,5" />
-            <TextBlock Text="Begin Reflection Opacity: " Grid.Row="1" VerticalAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=_showReflection}" Style="{StaticResource DisableGrayText}"/>
-            <xctk:DoubleUpDown Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="1" Increment="0.02" AllowInputSpecialValues="None" Value="0.58" ValueChanged="OnBeginReflectionOpacityChanged" IsEnabled="{Binding IsChecked, ElementName=_showReflection}" Width="50" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,2,5" />
-            <TextBlock Text="End Reflection Opacity: " Grid.Row="2" VerticalAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=_showReflection}" Style="{StaticResource DisableGrayText}"/>
-            <xctk:DoubleUpDown Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="1" Increment="0.02" AllowInputSpecialValues="None" Value="0" ValueChanged="OnEndReflectionOpacityChanged" IsEnabled="{Binding IsChecked, ElementName=_showReflection}" Width="50" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,2,5" />
-         </Grid>
-      </GroupBox>
-      
-      <TextBlock Grid.Row="1" Text="Usage:" Style="{StaticResource Header}" />
 
-      <ScrollViewer Grid.Row="2" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Visible" CanContentScroll="true">
-         <!-- For MVVM : An ItemsControl can be used :
-         <ItemsControl ItemsSource="{Binding TheItems}">
-            <ItemsControl.ItemsPanel>
-               <ItemsPanelTemplate>
-                  <xctk:PileFlowPanel />
-               </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-         </ItemsControl>-->
-         <xctk:PileFlowPanel x:Name="_pileFlowPanel" 
-                              MinHeight="175"
-                              ContentLabelOffsetY="100" 
-                              ContentLabelSize="200,28" 
-                              AnimationDuration="1000" 
-                              LastMoveDecelerationRatio="0.6" 
-                              FlowItemsCount="6" 
-                              FlowItemRatio="70" 
-                              ItemWidth="200" 
-                              ItemHeight="200" 
-                              FlowOffsetX="20" 
-                              FlowOffsetY="20" 
-                              CenterOffsetX="30">
-            <xctk:PileFlowPanel.ContentLabel>
-               <Border Background="#ffff50" DockPanel.Dock="Left" Style="{StaticResource BorderStyle}">
-                  <TextBlock x:Name="_pileFlowLabel" Margin="0,5,0,0" TextAlignment="Center" />
 
-                  <Border.BitmapEffect>
-                     <DropShadowBitmapEffect />
-                  </Border.BitmapEffect>
 
-               </Border>
-            </xctk:PileFlowPanel.ContentLabel>
 
-            <xctk:PileFlowCard x:Name="_employeesPileFlowCard" Tag="Employees">
-               <StackPanel>
-                  <TextBlock Text="List of Employees" TextAlignment="Center" />
-                  <xctk:CheckListBox x:Name="_employeeListBox" ItemsSource="{Binding}" DisplayMemberPath="LastName" />
-               </StackPanel>
-            </xctk:PileFlowCard>
 
-            <xctk:PileFlowCard>
-               <xctk:PileFlowCard.Tag>
-                  <MultiBinding Converter="{StaticResource FullNameStringConverter}">
-                     <Binding Path="[0].FirstName" />
-                     <Binding Path="[0].LastName" />
-                  </MultiBinding>
-               </xctk:PileFlowCard.Tag>
-               <Border Background="Beige">
-                  <Grid>
-                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="Auto" />
-                     </Grid.ColumnDefinitions>
-                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                     </Grid.RowDefinitions>
 
-                     <Image Grid.RowSpan="5" Source="{Binding Path=[0].Photo}" VerticalAlignment="Center" />
-                     <TextBlock Grid.Column="1" Text="{Binding Path=[0].FirstName}" />
-                     <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=[0].LastName}" />
-                     <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Path=[0].Title}" />
-                     <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Path=[0].Title}" />
-                     <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Path=[0].HomePhone}" />
-                     <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Path=[0].Address}" />
-                     <TextBlock Grid.Row="5" Grid.ColumnSpan="2" Text="This employee has been working at IBM since March 10, 1999." TextWrapping="Wrap" />
-                     <Button Grid.Row="6" Grid.ColumnSpan="2" Content="Save" Width="75" Click="OnEmployeeButtonPress" />
-                  </Grid>
-               </Border>
-            </xctk:PileFlowCard>
 
-            <xctk:PileFlowCard Tag="sale's price relative to distance">
-               <Border Background="LightGray">
-                  <xctk:Chart>
-                     <xctk:Chart.Legend>
-                        <xctk:Legend Visibility="Collapsed" />
-                     </xctk:Chart.Legend>
-                     <xctk:Chart.Areas>
-                        <xctk:Area>
-                           <xctk:Area.XAxis>
-                              <xctk:Axis AxisLabelsLayout="ShowToFit" ShowAxisLabel="False" LabelTemplate="{StaticResource LabelTemplate}"/>
-                           </xctk:Area.XAxis>
-                           <xctk:Area.YAxis>
-                              <xctk:Axis AxisLabelsLayout="ShowToFit" ShowAxisLabel="False" LabelTemplate="{StaticResource LabelTemplate}"/>
-                           </xctk:Area.YAxis>
-                           <xctk:Area.Series>
-                              <xctk:Series DefaultInterior="Red" Template="{StaticResource seriesTemplate}">
-                                 <xctk:Series.DataPoints>
-                                    <xctk:DataPoint X="125" Y="6" />
-                                    <xctk:DataPoint X="150" Y="7" />
-                                    <xctk:DataPoint X="50" Y="4" />
-                                    <xctk:DataPoint X="25" Y="2" />
-                                 </xctk:Series.DataPoints>
-                                 <xctk:Series.Layout>
-                                    <xctk:ColumnLayout />
-                                 </xctk:Series.Layout>
-                              </xctk:Series>
-                           </xctk:Area.Series>
-                        </xctk:Area>
-                     </xctk:Chart.Areas>
-                  </xctk:Chart>
-               </Border>
-            </xctk:PileFlowCard>
 
-         </xctk:PileFlowPanel>
-      </ScrollViewer>
-   </Grid>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
+
+
+
+
+
+
+
+
+
+
+
+
     <Image Source="..\OpenSourceImages\PileFlowPanel.png" Width="600" Height="400"/>
-##END-->
 </local:DemoView>

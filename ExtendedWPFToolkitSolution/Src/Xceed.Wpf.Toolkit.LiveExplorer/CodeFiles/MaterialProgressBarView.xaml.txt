@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -21,11 +21,9 @@
                         xmlns:sys="clr-namespace:System;assembly=mscorlib"
                         Title="MaterialProgressBar">   
    <local:DemoView.Description>
-      <!-- TODODOC-->
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
          <Run>A linear ProgressBar that uses the Material Brushes. It contains properties to animate the indeterminate state.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -33,10 +31,9 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
-       ##END-->
       </Paragraph>
    </local:DemoView.Description>
-   
+
    <local:DemoView.Resources>
       <ResourceDictionary>
          <ResourceDictionary.MergedDictionaries>
@@ -45,150 +42,15 @@
       </ResourceDictionary>
    </local:DemoView.Resources>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <Grid>
-      <StackPanel Margin="10">
 
-         <GroupBox Header="Features"
-                   Margin="0,5,0,5">
-            <Grid Margin="5">
-               <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="95" />
-               </Grid.ColumnDefinitions>
-               <Grid.RowDefinitions>
-                  <RowDefinition Height="Auto"/>
-                  <RowDefinition Height="Auto"/>
-                  <RowDefinition Height="Auto"/>
-               </Grid.RowDefinitions>
 
-               <!-- First Column-->
-               <TextBlock Grid.Column="0"
-                          Grid.Row="0"
-                          Text="Indeterminate Indicator Max Length: "
-                          VerticalAlignment="Center"/>
-               <xctk:DoubleUpDown x:Name="inteterminateIndicatorMaxLengthUpDown"
-                                  Grid.Column="1"
-                                  Grid.Row="0"
-                                  Value="{Binding IndeterminateIndicatorMaxLength, ElementName=materialIndeterminateProgressBar}"
-                                  Minimum="{Binding Value, ElementName=inteterminateIndicatorMinLengthUpDown}"
-                                  Maximum="1"
-                                  Increment="0.01"
-                                  Margin="5"
-                                  Width="50"
-                                  FormatString="N2"
-                                  VerticalContentAlignment="Center"
-                                  ToolTip="The maximum percentage of the progress bar's size that the indicator will accept. Must be between 0 and 1."/>
 
-               <TextBlock Grid.Column="0"
-                          Grid.Row="1"
-                          Text="Indeterminate Indicator Min Length: "
-                          VerticalAlignment="Center"/>
-               <xctk:DoubleUpDown x:Name="inteterminateIndicatorMinLengthUpDown"
-                                  Grid.Column="1"
-                                  Grid.Row="1"
-                                  Value="{Binding IndeterminateIndicatorMinLength, ElementName=materialIndeterminateProgressBar}"
-                                  Minimum="0"
-                                  Maximum="{Binding Value, ElementName=inteterminateIndicatorMaxLengthUpDown}"
-                                  Increment="0.01"
-                                  Margin="5"
-                                  Width="50"
-                                  FormatString="N2"
-                                  VerticalContentAlignment="Center"
-                                  ToolTip="The minimum percentage of the progress bar's size that the indicator will accept. Must be between 0 and 1."/>
 
-               <TextBlock Grid.Column="0"
-                          Grid.Row="2"
-                          Text="Indeterminate Indicator Speed Ratio: "
-                          VerticalAlignment="Center"/>
-               <xctk:DoubleUpDown Grid.Column="1"
-                                  Grid.Row="2"
-                                  Value="{Binding IndeterminateIndicatorSpeedRatio, ElementName=materialIndeterminateProgressBar}"
-                                  Minimum="0.1"
-                                  Maximum="5"
-                                  Increment="0.5"
-                                  Margin="5"
-                                  VerticalContentAlignment="Center" />
-               
-               <!-- Second Column -->
-               <TextBlock Grid.Column="2"
-                          Grid.Row="0"
-                          Text="Material Accent Brush: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0" />
-               <ComboBox Grid.Column="3"
-                         Grid.Row="0"
-                         ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                         SelectedItem="{Binding MaterialAccentBrush, ElementName=materialDeterminateProgressBar}"
-                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                         VerticalAlignment="Center"
-                         Margin="5" />
-            </Grid>
-         </GroupBox>
 
-         <StackPanel>
-            <TextBlock Text="Usage:"
-                       Style="{StaticResource Header}" />
 
-            <Grid HorizontalAlignment="Center">
-               <Grid.RowDefinitions>
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="Auto" />
-               </Grid.RowDefinitions>
-               <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-               </Grid.ColumnDefinitions>
 
-               <TextBlock Text="Determinate:" />
-               <StackPanel Grid.Row="0"
-                           Grid.Column="1"
-                           Orientation="Horizontal">
-                  <xctk:MaterialProgressBar x:Name="materialDeterminateProgressBar"
-                                            IsIndeterminate="False"
-                                            Width="400"
-                                            Height="10"
-                                            Maximum="100"
-                                            Minimum="0"
-                                            Margin="20" />
-                  <TextBlock Text="{Binding Value, ElementName=materialDeterminateProgressBar, StringFormat={}{0:N0}%}"
-                             FontSize="15"
-                             Width="45"
-                             VerticalAlignment="Center"
-                             HorizontalAlignment="Center"/>
-               </StackPanel>
-               <Button Grid.Row="0"
-                       Grid.Column="2"
-                       Content="Reset"
-                       Click="ResetButton_Click"
-                       VerticalAlignment="Center"
-                       Padding="10" />
 
-               <TextBlock Grid.Row="1"
-                          Grid.Column="0"
-                          Text="Indeterminate:" />
-               <xctk:MaterialProgressBar x:Name="materialIndeterminateProgressBar"
-                                         Grid.Row="1"
-                                         Grid.Column="1"
-                                         IsIndeterminate="True"
-                                         IndeterminateIndicatorSpeedRatio="1"
-                                         IndeterminateIndicatorMaxLength="0.25"
-                                         IndeterminateIndicatorMinLength="0"
-                                         MaterialAccentBrush="{Binding MaterialAccentBrush, ElementName=materialDeterminateProgressBar}"
-                                         Width="400"
-                                         Height="10"
-                                         Margin="20"
-                                         HorizontalAlignment="Left"/>
-            </Grid>
-         </StackPanel>
-      </StackPanel>
-   </Grid>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
+
     <Image Source="..\OpenSourceImages\MaterialProgressBar.png" Width="600" Height="400"/>
-   ##END-->
 </local:MaterialDemoView>

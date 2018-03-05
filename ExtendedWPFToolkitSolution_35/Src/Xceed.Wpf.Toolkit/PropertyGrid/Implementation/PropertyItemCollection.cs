@@ -25,6 +25,7 @@ using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using System.Linq;
 using System.Collections;
 using Xceed.Wpf.Toolkit.Core.Utilities;
+using System.Reflection;
 #if !VS2008
 using System.ComponentModel.DataAnnotations;
 #endif
@@ -80,7 +81,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public void Filter( string text )
     {
-      Predicate<object> filter = PropertyItemCollection.CreateFilter( text );
+      Predicate<object> filter = PropertyItemCollection.CreateFilter( text, this.Items, null );
       GetDefaultView().Filter = filter;
     }
 
@@ -151,7 +152,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       GetDefaultView().Refresh();
     }
 
-    internal static Predicate<object> CreateFilter( string text )
+    internal static Predicate<object> CreateFilter( string text, IList<PropertyItem> PropertyItems, IPropertyContainer propertyContainer )
     {
       Predicate<object> filter = null;
 
@@ -171,8 +172,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
                 return false;
             }
 #endif
-
-            return property.DisplayName.ToLower().Contains( text.ToLower() );
+            property.HighlightedText = property.DisplayName.ToLower().Contains( text.ToLower() ) ? text : null;
+            return (property.HighlightedText != null);
           }
 
           return false;
@@ -181,5 +182,30 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       return filter;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   }
 }

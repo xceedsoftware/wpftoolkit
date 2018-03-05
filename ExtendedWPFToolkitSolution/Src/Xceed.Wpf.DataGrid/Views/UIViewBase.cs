@@ -15,16 +15,12 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.ComponentModel;
-using System.Windows.Input;
+using System.IO;
 using System.Security;
-using System.Windows.Resources;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
@@ -43,9 +39,8 @@ namespace Xceed.Wpf.DataGrid.Views
         {
           try
           {
-            Uri uri = new Uri( _XceedVersionInfo.CurrentAssemblyPackUri + ";component/NoDrop.cur" );
-
-            StreamResourceInfo info = Application.GetResourceStream( uri );
+            var uri = new Uri( _XceedVersionInfo.CurrentAssemblyPackUri + ";component/NoDrop.cur" );
+            var info = Application.GetResourceStream( uri );
 
             if( info != null )
             {
@@ -57,7 +52,9 @@ namespace Xceed.Wpf.DataGrid.Views
           }
           catch( UriFormatException )
           {
-            // This will occur during the VisualStudio Toolbox refreshing.
+          }
+          catch( IOException )
+          {
           }
           finally
           {
@@ -79,19 +76,12 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion
 
-    #region CONSTRUCTORS
-
-    internal UIViewBase()
-      : base()
-    {
-    }
-
-    #endregion CONSTRUCTORS
-
     #region DropMarkPen Attached Property
 
     public static readonly DependencyProperty DropMarkPenProperty = DependencyProperty.RegisterAttached(
-      "DropMarkPen", typeof( Pen ), typeof( UIViewBase ),
+      "DropMarkPen",
+      typeof( Pen ),
+      typeof( UIViewBase ),
       new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.Inherits ) );
 
     public static Pen GetDropMarkPen( DependencyObject obj )
@@ -104,12 +94,14 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( UIViewBase.DropMarkPenProperty, value );
     }
 
-    #endregion DropMarkPen Attached Property
+    #endregion
 
     #region DropMarkOrientation Attached Property
 
     public static readonly DependencyProperty DropMarkOrientationProperty = DependencyProperty.RegisterAttached(
-      "DropMarkOrientation", typeof( DropMarkOrientation ), typeof( UIViewBase ),
+      "DropMarkOrientation",
+      typeof( DropMarkOrientation ),
+      typeof( UIViewBase ),
       new FrameworkPropertyMetadata( DropMarkOrientation.Default, FrameworkPropertyMetadataOptions.Inherits ) );
 
     public static DropMarkOrientation GetDropMarkOrientation( DependencyObject obj )
@@ -122,34 +114,33 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( UIViewBase.DropMarkOrientationProperty, value );
     }
 
-    #endregion DropMarkOrientation Attached Property
+    #endregion
 
     #region ShowScrollTip Property
 
-    public static readonly DependencyProperty ShowScrollTipProperty =
-      DependencyProperty.Register( "ShowScrollTip", typeof( bool ), typeof( UIViewBase ) );
+    public static readonly DependencyProperty ShowScrollTipProperty = DependencyProperty.Register(
+      "ShowScrollTip",
+      typeof( bool ),
+      typeof( UIViewBase ) );
 
     public bool ShowScrollTip
     {
       get
       {
-        return ( bool )GetValue( ShowScrollTipProperty );
+        return ( bool )this.GetValue( UIViewBase.ShowScrollTipProperty );
       }
       set
       {
-        SetValue( ShowScrollTipProperty, value );
+        this.SetValue( UIViewBase.ShowScrollTipProperty, value );
       }
     }
 
     #endregion
 
-    // View Properties
-
     #region DefaultDropMarkPen Property
 
     [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty DefaultDropMarkPenProperty =
-      DependencyProperty.Register(
+    public static readonly DependencyProperty DefaultDropMarkPenProperty = DependencyProperty.Register(
       "DefaultDropMarkPen",
       typeof( Pen ),
       typeof( UIViewBase ),
@@ -167,13 +158,16 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion DefaultDropMarkPen Property
+    #endregion
 
     #region DefaultDropMarkOrientation Property
 
     [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty DefaultDropMarkOrientationProperty =
-        DependencyProperty.Register( "DefaultDropMarkOrientation", typeof( DropMarkOrientation ), typeof( UIViewBase ), new UIPropertyMetadata( DropMarkOrientation.Vertical ) );
+    public static readonly DependencyProperty DefaultDropMarkOrientationProperty = DependencyProperty.Register(
+      "DefaultDropMarkOrientation",
+      typeof( DropMarkOrientation ),
+      typeof( UIViewBase ),
+      new UIPropertyMetadata( DropMarkOrientation.Vertical ) );
 
     public DropMarkOrientation DefaultDropMarkOrientation
     {
@@ -187,13 +181,13 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion DefaultDropMarkOrientation Property
+    #endregion
 
     #region CurrentItemGlyph Property
 
     [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty CurrentItemGlyphProperty =
-      DependencyProperty.Register( "CurrentItemGlyph",
+    public static readonly DependencyProperty CurrentItemGlyphProperty = DependencyProperty.Register(
+      "CurrentItemGlyph",
       typeof( DataTemplate ),
       typeof( UIViewBase ),
       new FrameworkPropertyMetadata( null ) );
@@ -210,13 +204,13 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion CurrentItemGlyph Property
+    #endregion
 
     #region EditingRowGlyph Property
 
     [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty EditingRowGlyphProperty =
-      DependencyProperty.Register( "EditingRowGlyph",
+    public static readonly DependencyProperty EditingRowGlyphProperty = DependencyProperty.Register(
+      "EditingRowGlyph",
       typeof( DataTemplate ),
       typeof( UIViewBase ),
       new FrameworkPropertyMetadata( null ) );
@@ -233,13 +227,13 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion EditingRowGlyph  Property
+    #endregion
 
     #region ValidationErrorGlyph Property
 
     [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty ValidationErrorGlyphProperty =
-      DependencyProperty.Register( "ValidationErrorGlyph",
+    public static readonly DependencyProperty ValidationErrorGlyphProperty = DependencyProperty.Register(
+      "ValidationErrorGlyph",
       typeof( DataTemplate ),
       typeof( UIViewBase ),
       new FrameworkPropertyMetadata( null ) );
@@ -256,52 +250,60 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion ValidationErrorGlyph Property
+    #endregion
 
     #region ScrollTipContentTemplate Property
+
+    [ViewProperty( ViewPropertyMode.ViewOnly )]
+    public static readonly DependencyProperty ScrollTipContentTemplateProperty = DependencyProperty.Register(
+      "ScrollTipContentTemplate",
+      typeof( DataTemplate ),
+      typeof( UIViewBase ) );
 
     public DataTemplate ScrollTipContentTemplate
     {
       get
       {
-        return ( DataTemplate )GetValue( ScrollTipContentTemplateProperty );
+        return ( DataTemplate )this.GetValue( UIViewBase.ScrollTipContentTemplateProperty );
       }
       set
       {
-        SetValue( ScrollTipContentTemplateProperty, value );
+        this.SetValue( UIViewBase.ScrollTipContentTemplateProperty, value );
       }
     }
 
-    [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty ScrollTipContentTemplateProperty =
-        DependencyProperty.Register( "ScrollTipContentTemplate", typeof( DataTemplate ), typeof( UIViewBase ) );
-
-    #endregion ScrollTipContentTemplate
+    #endregion
 
     #region ScrollTipContentTemplateSelector Property
+
+    [ViewProperty( ViewPropertyMode.ViewOnly )]
+    public static readonly DependencyProperty ScrollTipContentTemplateSelectorProperty = DependencyProperty.Register(
+      "ScrollTipContentTemplateSelector",
+      typeof( DataTemplateSelector ),
+      typeof( UIViewBase ) );
 
     public DataTemplateSelector ScrollTipContentTemplateSelector
     {
       get
       {
-        return ( DataTemplateSelector )GetValue( ScrollTipContentTemplateSelectorProperty );
+        return ( DataTemplateSelector )this.GetValue( UIViewBase.ScrollTipContentTemplateSelectorProperty );
       }
       set
       {
-        SetValue( ScrollTipContentTemplateSelectorProperty, value );
+        this.SetValue( UIViewBase.ScrollTipContentTemplateSelectorProperty, value );
       }
     }
 
-    [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty ScrollTipContentTemplateSelectorProperty =
-        DependencyProperty.Register( "ScrollTipContentTemplateSelector", typeof( DataTemplateSelector ), typeof( UIViewBase ) );
-
-    #endregion ScrollTipContentTemplateSelector
+    #endregion
 
     #region IsConnectionStateGlyphEnabled Property
+
     [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty IsConnectionStateGlyphEnabledProperty =
-      DependencyProperty.Register( "IsConnectionStateGlyphEnabled", typeof( bool ), typeof( UIViewBase ), new PropertyMetadata( true ) );
+    public static readonly DependencyProperty IsConnectionStateGlyphEnabledProperty = DependencyProperty.Register(
+      "IsConnectionStateGlyphEnabled",
+      typeof( bool ),
+      typeof( UIViewBase ),
+      new PropertyMetadata( true ) );
 
     public bool IsConnectionStateGlyphEnabled
     {
@@ -315,13 +317,13 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion IsConnectionStateGlyphEnabled Property
+    #endregion
 
     #region ConnectionStateLoadingGlyph Property
 
     [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty ConnectionStateLoadingGlyphProperty =
-      DependencyProperty.Register( "ConnectionStateLoadingGlyph",
+    public static readonly DependencyProperty ConnectionStateLoadingGlyphProperty = DependencyProperty.Register(
+      "ConnectionStateLoadingGlyph",
       typeof( DataTemplate ),
       typeof( UIViewBase ),
       new FrameworkPropertyMetadata( null ) );
@@ -338,13 +340,13 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion ConnectionStateLoadingGlyph Property
+    #endregion
 
     #region ConnectionStateCommittingGlyph Property
 
     [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty ConnectionStateCommittingGlyphProperty =
-      DependencyProperty.Register( "ConnectionStateCommittingGlyph",
+    public static readonly DependencyProperty ConnectionStateCommittingGlyphProperty = DependencyProperty.Register(
+      "ConnectionStateCommittingGlyph",
       typeof( DataTemplate ),
       typeof( UIViewBase ),
       new FrameworkPropertyMetadata( null ) );
@@ -361,13 +363,13 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion ConnectionStateCommittingGlyph Property
+    #endregion
 
     #region ConnectionStateErrorGlyph Property
 
     [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty ConnectionStateErrorGlyphProperty =
-      DependencyProperty.Register( "ConnectionStateErrorGlyph",
+    public static readonly DependencyProperty ConnectionStateErrorGlyphProperty = DependencyProperty.Register(
+      "ConnectionStateErrorGlyph",
       typeof( DataTemplate ),
       typeof( UIViewBase ),
       new FrameworkPropertyMetadata( null ) );
@@ -384,7 +386,7 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion ConnectionStateErrorGlyph Property
+    #endregion
 
     #region BusyCursor Property
 
@@ -477,6 +479,5 @@ namespace Xceed.Wpf.DataGrid.Views
     }
 
     #endregion
-
   }
 }

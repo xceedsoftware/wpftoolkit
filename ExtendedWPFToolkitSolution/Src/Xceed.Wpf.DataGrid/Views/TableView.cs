@@ -17,24 +17,63 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Security;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Resources;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
   public class TableView : UIViewBase
   {
+    // We must add a setter since this value is used as default value of a DependencyObject which will be instanciated before the static constructor is called
+    internal static Cursor DefaultFixedColumnSplitterCursor
+    {
+      get
+      {
+        if( TableView.DefaultFixedColumnSplitterCursorCache == null )
+        {
+          try
+          {
+            var uri = new Uri( _XceedVersionInfo.CurrentAssemblyPackUri + ";component/FixedColumnSplitter.cur" );
+            var info = Application.GetResourceStream( uri );
+
+            if( info != null )
+            {
+              TableView.DefaultFixedColumnSplitterCursorCache = new Cursor( info.Stream );
+            }
+          }
+          catch( SecurityException )
+          {
+          }
+          catch( UriFormatException )
+          {
+          }
+          catch( IOException )
+          {
+          }
+          finally
+          {
+            if( TableView.DefaultFixedColumnSplitterCursorCache == null )
+            {
+              TableView.DefaultFixedColumnSplitterCursorCache = Cursors.SizeWE;
+            }
+          }
+        }
+
+        return TableView.DefaultFixedColumnSplitterCursorCache;
+      }
+    }
+
+    private static Cursor DefaultFixedColumnSplitterCursorCache;
+
     internal static Cursor DefaultRowSelectorResizeNorthSouthCursor = Cursors.SizeNS;
     internal static Cursor DefaultRowSelectorResizeWestEastCursor = Cursors.SizeWE;
 
     static TableView()
     {
-      FrameworkContentElement.DefaultStyleKeyProperty.OverrideMetadata(
-        typeof( TableView ),
-        new FrameworkPropertyMetadata( TableView.GetDefaultStyleKey( typeof( TableView ), null ) ) );
+      FrameworkContentElement.DefaultStyleKeyProperty.OverrideMetadata( typeof( TableView ), new FrameworkPropertyMetadata( TableView.GetDefaultStyleKey( typeof( TableView ), null ) ) );
 
       TableView.CompensationOffsetProperty = TableView.CompensationOffsetPropertyKey.DependencyProperty;
 
@@ -57,8 +96,8 @@ namespace Xceed.Wpf.DataGrid.Views
 
     [EditorBrowsable( EditorBrowsableState.Never )]
     [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty AutoFillLastPageProperty =
-      DependencyProperty.RegisterAttached( "AutoFillLastPage",
+    public static readonly DependencyProperty AutoFillLastPageProperty = DependencyProperty.RegisterAttached(
+      "AutoFillLastPage",
       typeof( bool ),
       typeof( TableView ),
       new PropertyMetadata( true ) );
@@ -88,12 +127,15 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( TableView.AutoFillLastPageProperty, value );
     }
 
-    #endregion AutoFillLastPage Property
+    #endregion
 
     #region CanScrollHorizontally Attached Property
 
-    public static readonly DependencyProperty CanScrollHorizontallyProperty =
-        DependencyProperty.RegisterAttached( "CanScrollHorizontally", typeof( bool ), typeof( TableView ), new UIPropertyMetadata( true, new PropertyChangedCallback( TableView.OnCanScrollHorizontallyChanged ) ) );
+    public static readonly DependencyProperty CanScrollHorizontallyProperty = DependencyProperty.RegisterAttached(
+      "CanScrollHorizontally",
+      typeof( bool ),
+      typeof( TableView ),
+      new UIPropertyMetadata( true, new PropertyChangedCallback( TableView.OnCanScrollHorizontallyChanged ) ) );
 
     public static bool GetCanScrollHorizontally( DependencyObject obj )
     {
@@ -115,12 +157,14 @@ namespace Xceed.Wpf.DataGrid.Views
       TableViewScrollViewer.SetFixedTranslateTransform( element, ( bool )e.NewValue );
     }
 
-    #endregion CanScrollHorizontally Attached Property
+    #endregion
 
     #region CompensationOffset Attached Property
 
     internal static readonly DependencyPropertyKey CompensationOffsetPropertyKey = DependencyProperty.RegisterAttachedReadOnly(
-      "CompensationOffset", typeof( double ), typeof( TableView ),
+      "CompensationOffset",
+      typeof( double ),
+      typeof( TableView ),
       new FrameworkPropertyMetadata( 0d, FrameworkPropertyMetadataOptions.Inherits ) );
 
     internal static readonly DependencyProperty CompensationOffsetProperty;
@@ -135,15 +179,17 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( TableView.CompensationOffsetPropertyKey, value );
     }
 
-    #endregion CompensationOffset Attached Property
+    #endregion
 
     // View properties
 
     #region ColumnStretchMinWidth Property
 
     [ViewProperty( ViewPropertyMode.Routed )]
-    public static readonly DependencyProperty ColumnStretchMinWidthProperty =
-      DependencyProperty.RegisterAttached( "ColumnStretchMinWidth", typeof( double ), typeof( TableView ),
+    public static readonly DependencyProperty ColumnStretchMinWidthProperty = DependencyProperty.RegisterAttached(
+      "ColumnStretchMinWidth",
+      typeof( double ),
+      typeof( TableView ),
       new UIPropertyMetadata( 50d ),
       new ValidateValueCallback( TableView.ValidateColumnStretchMinWidthCallback ) );
 
@@ -185,13 +231,15 @@ namespace Xceed.Wpf.DataGrid.Views
       return true;
     }
 
-    #endregion ColumnStretchMinWidth Property
+    #endregion
 
     #region ColumnStretchMode Property
 
     [ViewProperty( ViewPropertyMode.Routed )]
-    public static readonly DependencyProperty ColumnStretchModeProperty =
-      DependencyProperty.RegisterAttached( "ColumnStretchMode", typeof( ColumnStretchMode ), typeof( TableView ),
+    public static readonly DependencyProperty ColumnStretchModeProperty = DependencyProperty.RegisterAttached(
+      "ColumnStretchMode",
+      typeof( ColumnStretchMode ),
+      typeof( TableView ),
       new UIPropertyMetadata( ColumnStretchMode.None, new PropertyChangedCallback( TableView.ColumnStretchModeChanged ) ) );
 
     public ColumnStretchMode ColumnStretchMode
@@ -301,13 +349,15 @@ namespace Xceed.Wpf.DataGrid.Views
       return modified;
     }
 
-    #endregion ColumnStretchMode Property
+    #endregion
 
     #region RemoveColumnStretchingOnResize Property
 
     [ViewProperty( ViewPropertyMode.Routed )]
-    public static readonly DependencyProperty RemoveColumnStretchingOnResizeProperty =
-      DependencyProperty.RegisterAttached( "RemoveColumnStretchingOnResize", typeof( bool ), typeof( TableView ),
+    public static readonly DependencyProperty RemoveColumnStretchingOnResizeProperty = DependencyProperty.RegisterAttached(
+      "RemoveColumnStretchingOnResize",
+      typeof( bool ),
+      typeof( TableView ),
       new UIPropertyMetadata( false ) );
 
     public bool RemoveColumnStretchingOnResize
@@ -332,13 +382,15 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( TableView.RemoveColumnStretchingOnResizeProperty, value );
     }
 
-    #endregion RemoveColumnStretchingOnResize Property
+    #endregion
 
     #region FixedColumnCount Property
 
     [ViewProperty( ViewPropertyMode.RoutedNoFallback, FlattenDetailBindingMode.MasterOneWay )]
-    public static readonly DependencyProperty FixedColumnCountProperty =
-      DependencyProperty.RegisterAttached( "FixedColumnCount", typeof( int ), typeof( TableView ),
+    public static readonly DependencyProperty FixedColumnCountProperty = DependencyProperty.RegisterAttached(
+      "FixedColumnCount",
+      typeof( int ),
+      typeof( TableView ),
       new UIPropertyMetadata( 0 ),
       new ValidateValueCallback( TableView.ValidateFixedColumnCountCallback ) );
 
@@ -369,13 +421,15 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( TableView.FixedColumnCountProperty, value );
     }
 
-    #endregion FixedColumnCount Property
+    #endregion
 
     #region FixedColumnDropMarkPen Property
 
     [ViewProperty( ViewPropertyMode.Routed )]
-    public static readonly DependencyProperty FixedColumnDropMarkPenProperty =
-        DependencyProperty.RegisterAttached( "FixedColumnDropMarkPen", typeof( Pen ), typeof( TableView ) );
+    public static readonly DependencyProperty FixedColumnDropMarkPenProperty = DependencyProperty.RegisterAttached(
+      "FixedColumnDropMarkPen",
+      typeof( Pen ),
+      typeof( TableView ) );
 
     public Pen FixedColumnDropMarkPen
     {
@@ -399,13 +453,16 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( TableView.FixedColumnDropMarkPenProperty, value );
     }
 
-    #endregion FixedColumnDropMarkPen Property
+    #endregion
 
     #region HorizontalGridLineBrush Property
 
     [ViewProperty( ViewPropertyMode.Routed )]
-    public static readonly DependencyProperty HorizontalGridLineBrushProperty =
-        DependencyProperty.RegisterAttached( "HorizontalGridLineBrush", typeof( Brush ), typeof( TableView ), new PropertyMetadata( null ) );
+    public static readonly DependencyProperty HorizontalGridLineBrushProperty = DependencyProperty.RegisterAttached(
+      "HorizontalGridLineBrush",
+      typeof( Brush ),
+      typeof( TableView ),
+      new PropertyMetadata( null ) );
 
     public Brush HorizontalGridLineBrush
     {
@@ -429,13 +486,16 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( TableView.HorizontalGridLineBrushProperty, value );
     }
 
-    #endregion HorizontalGridLineBrush Property
+    #endregion
 
     #region HorizontalGridLineThickness Property
 
     [ViewProperty( ViewPropertyMode.Routed )]
-    public static readonly DependencyProperty HorizontalGridLineThicknessProperty =
-        DependencyProperty.RegisterAttached( "HorizontalGridLineThickness", typeof( double ), typeof( TableView ), new PropertyMetadata() );
+    public static readonly DependencyProperty HorizontalGridLineThicknessProperty = DependencyProperty.RegisterAttached(
+      "HorizontalGridLineThickness",
+      typeof( double ),
+      typeof( TableView ),
+      new PropertyMetadata() );
 
     public double HorizontalGridLineThickness
     {
@@ -459,13 +519,16 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( TableView.HorizontalGridLineThicknessProperty, value );
     }
 
-    #endregion HorizontalGridLineThickness Property
+    #endregion
 
     #region VerticalGridLineBrush Property
 
     [ViewProperty( ViewPropertyMode.Routed )]
-    public static readonly DependencyProperty VerticalGridLineBrushProperty =
-        DependencyProperty.RegisterAttached( "VerticalGridLineBrush", typeof( Brush ), typeof( TableView ), new PropertyMetadata( null ) );
+    public static readonly DependencyProperty VerticalGridLineBrushProperty = DependencyProperty.RegisterAttached(
+      "VerticalGridLineBrush",
+      typeof( Brush ),
+      typeof( TableView ),
+      new PropertyMetadata( null ) );
 
     public Brush VerticalGridLineBrush
     {
@@ -489,13 +552,16 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( TableView.VerticalGridLineBrushProperty, value );
     }
 
-    #endregion VerticalGridLineBrush Property
+    #endregion
 
     #region VerticalGridLineThickness Property
 
     [ViewProperty( ViewPropertyMode.Routed )]
-    public static readonly DependencyProperty VerticalGridLineThicknessProperty =
-        DependencyProperty.RegisterAttached( "VerticalGridLineThickness", typeof( double ), typeof( TableView ), new PropertyMetadata() );
+    public static readonly DependencyProperty VerticalGridLineThicknessProperty = DependencyProperty.RegisterAttached(
+      "VerticalGridLineThickness",
+      typeof( double ),
+      typeof( TableView ),
+      new PropertyMetadata() );
 
     public double VerticalGridLineThickness
     {
@@ -519,7 +585,7 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( TableView.VerticalGridLineThicknessProperty, value );
     }
 
-    #endregion VerticalGridLineThickness Property
+    #endregion
 
     #region AllowRowResize Property
 
@@ -547,7 +613,7 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion AllowRowResize Property
+    #endregion
 
     #region RowSelectorPaneWidth Property
 
@@ -557,8 +623,7 @@ namespace Xceed.Wpf.DataGrid.Views
     //      property can be set on DetailConfigurations.
 
     [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty RowSelectorPaneWidthProperty =
-      TableViewScrollViewer.RowSelectorPaneWidthProperty.AddOwner( typeof( TableView ) );
+    public static readonly DependencyProperty RowSelectorPaneWidthProperty = TableViewScrollViewer.RowSelectorPaneWidthProperty.AddOwner( typeof( TableView ) );
 
     public double RowSelectorPaneWidth
     {
@@ -572,7 +637,7 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion RowSelectorPaneWidth Property
+    #endregion
 
     #region ShowRowSelectorPane Property
 
@@ -582,8 +647,11 @@ namespace Xceed.Wpf.DataGrid.Views
     //      property can be set on DetailConfigurations.
 
     [ViewProperty( ViewPropertyMode.ViewOnly )]
-    public static readonly DependencyProperty ShowRowSelectorPaneProperty =
-        DependencyProperty.Register( "ShowRowSelectorPane", typeof( bool ), typeof( TableView ), new PropertyMetadata( true ) );
+    public static readonly DependencyProperty ShowRowSelectorPaneProperty = DependencyProperty.Register(
+      "ShowRowSelectorPane",
+      typeof( bool ),
+      typeof( TableView ),
+      new PropertyMetadata( true ) );
 
     public bool ShowRowSelectorPane
     {
@@ -597,13 +665,16 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion ShowRowSelectorPane Property
+    #endregion
 
     #region GroupLevelIndicatorWidth Property
 
     [ViewProperty( ViewPropertyMode.Routed )]
-    public static readonly DependencyProperty GroupLevelIndicatorWidthProperty =
-        DependencyProperty.RegisterAttached( "GroupLevelIndicatorWidth", typeof( double ), typeof( TableView ), new UIPropertyMetadata() );
+    public static readonly DependencyProperty GroupLevelIndicatorWidthProperty = DependencyProperty.RegisterAttached(
+      "GroupLevelIndicatorWidth",
+      typeof( double ),
+      typeof( TableView ),
+      new UIPropertyMetadata() );
 
     public double GroupLevelIndicatorWidth
     {
@@ -627,13 +698,16 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( TableView.GroupLevelIndicatorWidthProperty, value );
     }
 
-    #endregion GroupLevelIndicatorWidth Property
+    #endregion
 
     #region DetailIndicatorWidth Property
 
     [ViewProperty( ViewPropertyMode.Routed )]
-    public static readonly DependencyProperty DetailIndicatorWidthProperty =
-        DependencyProperty.RegisterAttached( "DetailIndicatorWidth", typeof( double ), typeof( TableView ), new UIPropertyMetadata() );
+    public static readonly DependencyProperty DetailIndicatorWidthProperty = DependencyProperty.RegisterAttached(
+      "DetailIndicatorWidth",
+      typeof( double ),
+      typeof( TableView ),
+      new UIPropertyMetadata() );
 
     public double DetailIndicatorWidth
     {
@@ -657,17 +731,23 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( TableView.DetailIndicatorWidthProperty, value );
     }
 
-    #endregion DetailIndicatorWidth Property
+    #endregion
 
     #region IsColumnVirtualizationEnabled Property
 
-    [ViewProperty( ViewPropertyMode.Routed, FlattenDetailBindingMode.MasterOneWay )]
-    public static readonly DependencyProperty IsColumnVirtualizationEnabledProperty =
-        DependencyProperty.RegisterAttached( "IsColumnVirtualizationEnabled",
-          typeof( bool ),
-          typeof( TableView ),
-          new UIPropertyMetadata( true ) );
+    [Obsolete( "The IsColumnVirtualizationEnabled property is obsolete and has been replaced by the ColumnVirtualizationMode property.", false )]
+    [Browsable( false )]
+    [EditorBrowsable( EditorBrowsableState.Never )]
+    [ViewProperty( ViewPropertyMode.ViewOnly )]
+    public static readonly DependencyProperty IsColumnVirtualizationEnabledProperty = DependencyProperty.RegisterAttached(
+      "IsColumnVirtualizationEnabled",
+      typeof( bool ),
+      typeof( TableView ),
+      new UIPropertyMetadata( true ) );
 
+    [Obsolete( "The IsColumnVirtualizationEnabled property is obsolete and has been replaced by the ColumnVirtualizationMode property.", false )]
+    [Browsable( false )]
+    [EditorBrowsable( EditorBrowsableState.Never )]
     public bool IsColumnVirtualizationEnabled
     {
       get
@@ -682,12 +762,49 @@ namespace Xceed.Wpf.DataGrid.Views
 
     public static bool GetIsColumnVirtualizationEnabled( DependencyObject obj )
     {
+#pragma warning disable 618
       return ( bool )obj.GetValue( TableView.IsColumnVirtualizationEnabledProperty );
+#pragma warning restore 618
     }
 
     public static void SetIsColumnVirtualizationEnabled( DependencyObject obj, bool value )
     {
+#pragma warning disable 618
       obj.SetValue( TableView.IsColumnVirtualizationEnabledProperty, value );
+#pragma warning restore 618
+    }
+
+    #endregion
+
+    #region ColumnVirtualizationMode Property
+
+    [ViewProperty( ViewPropertyMode.ViewOnly )]
+    public static readonly DependencyProperty ColumnVirtualizationModeProperty = DependencyProperty.RegisterAttached(
+      "ColumnVirtualizationMode",
+      typeof( ColumnVirtualizationMode ),
+      typeof( TableView ),
+      new FrameworkPropertyMetadata( ColumnVirtualizationMode.Recycling ) );
+
+    public ColumnVirtualizationMode ColumnVirtualizationMode
+    {
+      get
+      {
+        return ( ColumnVirtualizationMode )this.GetValue( TableView.ColumnVirtualizationModeProperty );
+      }
+      set
+      {
+        this.SetValue( TableView.ColumnVirtualizationModeProperty, value );
+      }
+    }
+
+    public static ColumnVirtualizationMode GetColumnVirtualizationMode( DependencyObject obj )
+    {
+      return ( ColumnVirtualizationMode )obj.GetValue( TableView.ColumnVirtualizationModeProperty );
+    }
+
+    public static void SetColumnVirtualizationMode( DependencyObject obj, ColumnVirtualizationMode value )
+    {
+      obj.SetValue( TableView.ColumnVirtualizationModeProperty, value );
     }
 
     #endregion
@@ -695,8 +812,11 @@ namespace Xceed.Wpf.DataGrid.Views
     #region IsAlternatingRowStyleEnabled Property
 
     [ViewProperty( ViewPropertyMode.Routed, FlattenDetailBindingMode.MasterOneWay )]
-    public static readonly DependencyProperty IsAlternatingRowStyleEnabledProperty =
-      DependencyProperty.RegisterAttached( "IsAlternatingRowStyleEnabled", typeof( bool ), typeof( TableView ), new UIPropertyMetadata( false ) );
+    public static readonly DependencyProperty IsAlternatingRowStyleEnabledProperty = DependencyProperty.RegisterAttached(
+      "IsAlternatingRowStyleEnabled",
+      typeof( bool ),
+      typeof( TableView ),
+      new UIPropertyMetadata( false ) );
 
     public bool IsAlternatingRowStyleEnabled
     {
@@ -720,7 +840,7 @@ namespace Xceed.Wpf.DataGrid.Views
       obj.SetValue( TableView.IsAlternatingRowStyleEnabledProperty, value );
     }
 
-    #endregion IsAlternatingRowStyleEnabled Property
+    #endregion
 
     #region AutoScrollInterval Attached Property
 
@@ -743,23 +863,23 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion
 
-    #region AutoScrollTreshold Attached Property
+    #region AutoScrollThreshold Attached Property
 
     [ViewProperty( ViewPropertyMode.ViewOnly )]
-    internal static readonly DependencyProperty AutoScrollTresholdProperty = DependencyProperty.RegisterAttached(
-      "AutoScrollTreshold",
+    internal static readonly DependencyProperty AutoScrollThresholdProperty = DependencyProperty.RegisterAttached(
+      "AutoScrollThreshold",
       typeof( int ),
       typeof( TableView ),
       new FrameworkPropertyMetadata( 5 ) );
 
-    internal static int GetAutoScrollTreshold( DependencyObject obj )
+    internal static int GetAutoScrollThreshold( DependencyObject obj )
     {
-      return ( int )obj.GetValue( TableView.AutoScrollTresholdProperty );
+      return ( int )obj.GetValue( TableView.AutoScrollThresholdProperty );
     }
 
-    internal static void SetAutoScrollTreshold( DependencyObject obj, int value )
+    internal static void SetAutoScrollThreshold( DependencyObject obj, int value )
     {
-      obj.SetValue( TableView.AutoScrollTresholdProperty, value );
+      obj.SetValue( TableView.AutoScrollThresholdProperty, value );
     }
 
     #endregion

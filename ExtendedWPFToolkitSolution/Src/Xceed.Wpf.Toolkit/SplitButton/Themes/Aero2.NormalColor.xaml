@@ -21,148 +21,151 @@
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
 
-   <ResourceDictionary.MergedDictionaries>
-      <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
-      <ResourceDictionary Source="../../Themes/Aero2/Glyphs.xaml" />
-   </ResourceDictionary.MergedDictionaries>
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
+    <ResourceDictionary Source="../../Themes/Aero2/Glyphs.xaml" />
+  </ResourceDictionary.MergedDictionaries>
 
-   <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+  <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
 
 
-   <!-- =============================================================================== -->
-   <!-- SplitButton                                                                     -->
-   <!-- =============================================================================== -->
-   <conv:ThicknessSideRemovalConverter x:Key="ThicknessSideRemovalConverter"/>
+  <!-- =============================================================================== -->
+  <!-- SplitButton                                                                     -->
+  <!-- =============================================================================== -->
+  <conv:ThicknessSideRemovalConverter x:Key="ThicknessSideRemovalConverter" />
 
-   <Style TargetType="{x:Type local:SplitButton}">
-      <Setter Property="BorderThickness"
-              Value="1" />
-      <Setter Property="IsTabStop"
-              Value="False" />
-      <Setter Property="HorizontalContentAlignment"
-              Value="Center" />
-      <Setter Property="VerticalContentAlignment"
-              Value="Center" />
-      <Setter Property="Background"
-              Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalBackgroundKey}}" />
-      <Setter Property="BorderBrush"
-              Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalOuterBorderKey}}" />
-      <Setter Property="Padding"
-              Value="3" />
-      <Setter Property="Template">
-         <Setter.Value>
-            <ControlTemplate TargetType="{x:Type local:SplitButton}">
-               <Grid x:Name="MainGrid"
-                     SnapsToDevicePixels="True">
-                  <chrome:ButtonChrome x:Name="ControlChrome"
-                                       Background="{TemplateBinding Background}"
-                                       RenderEnabled="{TemplateBinding IsEnabled}">
-                     <Grid>
-                        <Grid.ColumnDefinitions>
-                           <ColumnDefinition Width="*" />
-                           <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Button x:Name="PART_ActionButton"
-                                Margin="0"
-                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                Padding="{TemplateBinding Padding}">
-                           <Button.Template>
-                              <ControlTemplate TargetType="Button">
-                                 <ContentPresenter />
-                              </ControlTemplate>
-                           </Button.Template>
-                           <Grid>
-                              <chrome:ButtonChrome x:Name="ActionButtonChrome"
-                                                   Background="{TemplateBinding Background}"
-                                                   Foreground="{TemplateBinding Foreground}"
-                                                   BorderThickness="{Binding BorderThickness, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ThicknessSideRemovalConverter}, ConverterParameter=2}"
-                                                   BorderBrush="{TemplateBinding BorderBrush}"
-                                                   RenderEnabled="{TemplateBinding IsEnabled}"
-                                                   RenderMouseOver="{Binding IsMouseOver, ElementName=PART_ActionButton}"
-                                                   RenderPressed="{Binding IsPressed, ElementName=PART_ActionButton}">
-                                 <ContentPresenter Name="ActionButtonContent"
-                                                   Margin="{TemplateBinding Padding}"
-                                                   Content="{TemplateBinding Content}"
-                                                   ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                   RecognizesAccessKey="true" />
-                              </chrome:ButtonChrome>
-                           </Grid>
-                        </Button>
-                        <ToggleButton x:Name="PART_ToggleButton"
-                                      Grid.Column="1"
-                                      IsTabStop="False"
-                                      IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                                      IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}">
-                           <ToggleButton.Template>
-                              <ControlTemplate TargetType="ToggleButton">
-                                 <ContentPresenter />
-                              </ControlTemplate>
-                           </ToggleButton.Template>
-                           <Grid>
-                              <chrome:ButtonChrome x:Name="ToggleButtonChrome"
-                                                   Background="{TemplateBinding Background}"
-                                                   BorderBrush="{TemplateBinding BorderBrush}"
-                                                   BorderThickness="{TemplateBinding BorderThickness}"
-                                                   Padding="1,0,1,0"
-                                                   RenderChecked="{TemplateBinding IsOpen}"
-                                                   RenderEnabled="{TemplateBinding IsEnabled}"
-                                                   RenderMouseOver="{Binding IsMouseOver, ElementName=PART_ToggleButton}"
-                                                   RenderPressed="{Binding IsPressed, ElementName=PART_ToggleButton}">
-                                 <Grid x:Name="arrowGlyph"
-                                       IsHitTestVisible="False"
-                                       Margin="4,3,4,3">
-                                    <Path x:Name="Arrow"
-                                          Width="9"
-                                          Height="5"
-                                          Data="{StaticResource DownArrowGeometry}"
-                                          Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
-                                          Margin="0,1,0,0"/>
-                                 </Grid>
-                              </chrome:ButtonChrome>
-                           </Grid>
-                        </ToggleButton>
-                     </Grid>
-                  </chrome:ButtonChrome>
+  <Style TargetType="{x:Type local:SplitButton}">
+    <Setter Property="BorderThickness"
+            Value="1" />
+    <Setter Property="IsTabStop"
+            Value="False" />
+    <Setter Property="HorizontalContentAlignment"
+            Value="Center" />
+    <Setter Property="VerticalContentAlignment"
+            Value="Center" />
+    <Setter Property="Background"
+            Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalBackgroundKey}}" />
+    <Setter Property="BorderBrush"
+            Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalOuterBorderKey}}" />
+    <Setter Property="DropDownContentBackground"
+            Value="{StaticResource PanelBackgroundBrush}" />
+    <Setter Property="Padding"
+            Value="3" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:SplitButton}">
+          <Grid x:Name="MainGrid"
+                SnapsToDevicePixels="True">
+            <chrome:ButtonChrome x:Name="ControlChrome"
+                                 Background="{TemplateBinding Background}"
+                                 RenderEnabled="{TemplateBinding IsEnabled}">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="PART_ActionButton"
+                        Margin="0"
+                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                        Padding="{TemplateBinding Padding}"
+                        Style="{x:Null}">
+                  <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                      <ContentPresenter />
+                    </ControlTemplate>
+                  </Button.Template>
+                  <Grid>
+                    <chrome:ButtonChrome x:Name="ActionButtonChrome"
+                                         Background="{TemplateBinding Background}"
+                                         Foreground="{TemplateBinding Foreground}"
+                                         BorderThickness="{Binding BorderThickness, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ThicknessSideRemovalConverter}, ConverterParameter=2}"
+                                         BorderBrush="{TemplateBinding BorderBrush}"
+                                         RenderEnabled="{TemplateBinding IsEnabled}"
+                                         RenderMouseOver="{Binding IsMouseOver, ElementName=PART_ActionButton}"
+                                         RenderPressed="{Binding IsPressed, ElementName=PART_ActionButton}">
+                      <ContentPresenter Name="ActionButtonContent"
+                                        Margin="{TemplateBinding Padding}"
+                                        Content="{TemplateBinding Content}"
+                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        RecognizesAccessKey="true" />
+                    </chrome:ButtonChrome>
+                  </Grid>
+                </Button>
+                <ToggleButton x:Name="PART_ToggleButton"
+                              Grid.Column="1"
+                              IsTabStop="False"
+                              IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                              IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}">
+                  <ToggleButton.Template>
+                    <ControlTemplate TargetType="ToggleButton">
+                      <ContentPresenter />
+                    </ControlTemplate>
+                  </ToggleButton.Template>
+                  <Grid>
+                    <chrome:ButtonChrome x:Name="ToggleButtonChrome"
+                                         Background="{TemplateBinding Background}"
+                                         BorderBrush="{TemplateBinding BorderBrush}"
+                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         Padding="1,0,1,0"
+                                         RenderChecked="{TemplateBinding IsOpen}"
+                                         RenderEnabled="{TemplateBinding IsEnabled}"
+                                         RenderMouseOver="{Binding IsMouseOver, ElementName=PART_ToggleButton}"
+                                         RenderPressed="{Binding IsPressed, ElementName=PART_ToggleButton}">
+                      <Grid x:Name="arrowGlyph"
+                            IsHitTestVisible="False"
+                            Margin="4,3,4,3">
+                        <Path x:Name="Arrow"
+                              Width="9"
+                              Height="5"
+                              Data="{StaticResource DownArrowGeometry}"
+                              Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                              Margin="0,1,0,0" />
+                      </Grid>
+                    </chrome:ButtonChrome>
+                  </Grid>
+                </ToggleButton>
+              </Grid>
+            </chrome:ButtonChrome>
 
-                  <Popup x:Name="PART_Popup"
-                         HorizontalOffset="1"
-                         VerticalOffset="1"
-                         AllowsTransparency="True"
-                         StaysOpen="False"
-                         Placement="{TemplateBinding DropDownPosition}"
-                         Focusable="False"
-                         IsOpen="{Binding IsChecked, ElementName=PART_ToggleButton}">
-                     <!-- TODO: Create Popup Styles that can be reused on all popups in the toolkit-->
-                     <Border BorderThickness="1"
-                             Background="{StaticResource PanelBackgroundBrush}"
-                             BorderBrush="{StaticResource PopupDarkBorderBrush}"
-                             MaxHeight="{TemplateBinding MaxDropDownHeight}">
-                        <ScrollViewer x:Name="DropDownScrollViewer"
-                                      VerticalScrollBarVisibility="Auto">
-                           <ContentPresenter x:Name="PART_ContentPresenter"
-                                             Content="{TemplateBinding DropDownContent}" />
-                        </ScrollViewer>
-                     </Border>
-                  </Popup>
+            <Popup x:Name="PART_Popup"
+                   HorizontalOffset="1"
+                   VerticalOffset="1"
+                   AllowsTransparency="True"
+                   StaysOpen="False"
+                   Placement="{TemplateBinding DropDownPosition}"
+                   Focusable="False"
+                   IsOpen="{Binding IsChecked, ElementName=PART_ToggleButton}">
+              <!-- TODO: Create Popup Styles that can be reused on all popups in the toolkit-->
+              <Border BorderThickness="1"
+                      Background="{TemplateBinding DropDownContentBackground}"
+                      BorderBrush="{StaticResource PopupDarkBorderBrush}"
+                      MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                <ScrollViewer x:Name="DropDownScrollViewer"
+                              VerticalScrollBarVisibility="Auto">
+                  <ContentPresenter x:Name="PART_ContentPresenter"
+                                    Content="{TemplateBinding DropDownContent}" />
+                </ScrollViewer>
+              </Border>
+            </Popup>
 
-               </Grid>
-               <ControlTemplate.Triggers>
-                  <Trigger Property="IsEnabled"
-                           Value="False">
-                     <Setter Property="Fill"
-                             TargetName="Arrow"
-                             Value="#AFAFAF" />
-                     <Setter TargetName="ActionButtonChrome"
-                             Property="Foreground"
-                             Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                  </Trigger>
-               </ControlTemplate.Triggers>
-            </ControlTemplate>
-         </Setter.Value>
-      </Setter>
-   </Style>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsEnabled"
+                     Value="False">
+              <Setter Property="Fill"
+                      TargetName="Arrow"
+                      Value="#AFAFAF" />
+              <Setter TargetName="ActionButtonChrome"
+                      Property="Foreground"
+                      Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 
 </ResourceDictionary>

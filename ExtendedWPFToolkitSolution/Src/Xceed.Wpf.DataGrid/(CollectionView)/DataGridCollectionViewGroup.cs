@@ -25,7 +25,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Windows.Data;
-using Xceed.Wpf.DataGrid.Stats;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -41,6 +40,7 @@ namespace Xceed.Wpf.DataGrid
     {
       m_nextSubGroupUnsortedIndex = template.m_nextSubGroupUnsortedIndex;
       m_subGroupBy = template.m_subGroupBy;
+      m_groupByName = template.GroupByName;
     }
 
     private DataGridCollectionViewGroup( object name, DataGridCollectionViewGroup parent, int unsortedIndex )
@@ -109,6 +109,24 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
+    #region GroupByName Property
+
+    internal string GroupByName
+    {
+      get
+      {
+        return m_groupByName;
+      }
+      set
+      {
+        m_groupByName = value;
+      }
+    }
+
+    private string m_groupByName;
+
+    #endregion
+
     #region SubGroupBy Property
 
     internal GroupDescription SubGroupBy
@@ -129,16 +147,6 @@ namespace Xceed.Wpf.DataGrid
       {
         return m_parent;
       }
-    }
-
-    #endregion
-
-    #region CalculateAllStats Property
-
-    internal bool CalculateAllStats
-    {
-      get;
-      set;
     }
 
     #endregion
@@ -219,20 +227,23 @@ namespace Xceed.Wpf.DataGrid
 
     internal int GetFirstRawItemGlobalSortedIndex()
     {
-      int index = 0;
-      DataGridCollectionViewGroup group = this;
-      DataGridCollectionViewGroup parent = this.Parent;
-      DataGridCollectionViewGroup currentGroup = null;
+      var index = 0;
+      var group = this;
+      var parent = this.Parent;
+      var currentGroup = default( DataGridCollectionViewGroup );
 
       while( parent != null )
       {
-        foreach( object value in parent.ProtectedItems )
+        var items = parent.ProtectedItems;
+        var count = items.Count;
+
+        for( int i = 0; i < count; i++ )
         {
+          var value = items[ i ];
           if( value == group )
             break;
 
           currentGroup = value as DataGridCollectionViewGroup;
-
           index += currentGroup.GlobalRawItemCount;
         }
 
@@ -297,31 +308,30 @@ namespace Xceed.Wpf.DataGrid
     }
 
     internal void SortItems(
-      SortDescriptionInfo[] sortDescriptionInfos,
+      IList<SortDescriptionInfo> sortDescriptionInfos,
       List<GroupSortComparer> groupSortComparers,
       int level,
       List<RawItem> globalRawItems,
       DataGridCollectionViewGroup newSortedGroup )
     {
-      int itemCount = this.ProtectedItemCount;
-
+      var itemCount = this.ProtectedItemCount;
       if( itemCount == 0 )
         return;
 
       if( this.IsBottomLevel )
       {
-        int[] indexes;
-        indexes = new int[ itemCount + 1 ];
+        var indexes = new int[ itemCount + 1 ];
+
         for( int i = 0; i < itemCount; i++ )
         {
           indexes[ i ] = m_sortedRawItems[ i ].Index;
         }
 
         // "Weak heap sort" sort array[0..NUM_ELEMENTS-1] to array[1..NUM_ELEMENTS]
-        DataGridCollectionViewSort collectionViewSort = new DataGridCollectionViewSort( indexes, sortDescriptionInfos );
+        var collectionViewSort = new DataGridCollectionViewSort( indexes, sortDescriptionInfos );
 
         collectionViewSort.Sort( itemCount );
-        int index = 0;
+        var index = 0;
 
         for( int i = 1; i <= itemCount; i++ )
         {
@@ -331,18 +341,18 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        int[] indexes;
-        indexes = new int[ itemCount + 1 ];
+        var indexes = new int[ itemCount + 1 ];
+
         for( int i = 0; i < itemCount; i++ )
         {
           indexes[ i ] = i;
         }
 
-        DataGridCollectionViewGroup[] subGroupsArray = new DataGridCollectionViewGroup[ itemCount ];
+        var subGroupsArray = new DataGridCollectionViewGroup[ itemCount ];
         m_subGroups.Values.CopyTo( subGroupsArray, 0 );
 
         // "Weak heap sort" sort array[0..NUM_ELEMENTS-1] to array[1..NUM_ELEMENTS]
-        DataGridCollectionViewGroupSort collectionViewSort = new DataGridCollectionViewGroupSort( indexes, groupSortComparers[ level ], subGroupsArray );
+        var collectionViewSort = new DataGridCollectionViewGroupSort( indexes, groupSortComparers[ level ], subGroupsArray );
 
         collectionViewSort.Sort( itemCount );
         int index = 0;
@@ -604,71 +614,6 @@ namespace Xceed.Wpf.DataGrid
       return ~low;
     }
 
-
-    internal object GetStatFunctionValue( string propertyName )
-    {
-      DataGridCollectionView view = this.GetCollectionView();
-
-      Debug.Assert( view != null );
-
-      if( view == null )
-        return null;
-
-      StatFunction statFunction = view.StatFunctions[ propertyName ];
-
-      Debug.Assert( view != null );
-
-      if( statFunction == null )
-        return null;
-
-      return this.GetStatFunctionResult( statFunction, view ).Value;
-    }
-
-    internal StatResult GetStatFunctionResult( StatFunction statFunction, DataGridCollectionView view )
-    {
-      StatResult result;
-
-      if( !m_statFunctionValues.TryGetValue( statFunction, out result ) )
-      {
-        result = null;
-        m_statFunctionValues[ statFunction ] = result;
-      }
-
-      return result;
-    }
-
-    // This clears the value of all the previously calculated StatFunction Results for  this group.
-    internal void ClearStatFunctionsResult()
-    {
-      m_statFunctionValues.Clear();
-    }
-
-    internal void InvokeStatFunctionsPropertyChanged( DataGridCollectionView collectionView )
-    {
-      if( this.HasPropertyChangedListeners )
-      {
-        if( collectionView.CalculateChangedPropertyStatsOnly && !this.CalculateAllStats )
-        {
-          foreach( StatFunction statFunction in collectionView.InvalidatedStatFunctions )
-          {
-            {
-              this.OnPropertyChanged( new PropertyChangedEventArgs( statFunction.ResultPropertyName ) );
-            }
-          }
-        }
-        else
-        {
-          foreach( PropertyDescriptor statFunctionPropertyDescriptor in collectionView.GetStatFunctionProperties() )
-          {
-            this.OnPropertyChanged( new PropertyChangedEventArgs( statFunctionPropertyDescriptor.Name ) );
-          }
-        }
-      }
-
-      this.CalculateAllStats = false;
-    }
-
-
     private int BinarySearchGroup( DataGridCollectionViewGroup value, IComparer<DataGridCollectionViewGroup> comparer )
     {
       if( comparer == null )
@@ -731,7 +676,13 @@ namespace Xceed.Wpf.DataGrid
                                                         List<GroupSortComparer> groupSortComparers )
     {
       // If sortComparers is null, we are in massive group creation, no order check.
-      DataGridCollectionViewGroup group = new DataGridCollectionViewGroup( groupName, this, m_nextSubGroupUnsortedIndex );
+      var group = new DataGridCollectionViewGroup( groupName, this, m_nextSubGroupUnsortedIndex );
+
+      var dataGridGroupDescription = groupByList[ level ] as DataGridGroupDescription;
+      if( dataGridGroupDescription != null )
+      {
+        group.GroupByName = dataGridGroupDescription.PropertyName;
+      }
 
       unchecked
       {
@@ -866,10 +817,8 @@ namespace Xceed.Wpf.DataGrid
             return TypeDescriptor.GetProperties( typeof( DataGridCollectionViewGroup ) );
 
           PropertyDescriptorCollection classProperties = TypeDescriptor.GetProperties( typeof( DataGridCollectionViewGroup ) );
-          PropertyDescriptorCollection statProperties = view.GetStatFunctionProperties();
-          PropertyDescriptor[] properties = new PropertyDescriptor[ classProperties.Count + statProperties.Count ];
+          PropertyDescriptor[] properties = new PropertyDescriptor[ classProperties.Count ];
           classProperties.CopyTo( properties, 0 );
-          statProperties.CopyTo( properties, classProperties.Count );
 
           m_classProperties = new PropertyDescriptorCollection( properties );
         }
@@ -880,12 +829,6 @@ namespace Xceed.Wpf.DataGrid
       {
         PropertyDescriptorCollection props = TypeDescriptor.GetProperties( this, attributes );
         DataGridCollectionView view = this.GetCollectionView();
-
-        if( view != null )
-        {
-          foreach( PropertyDescriptor property in view.GetStatFunctionProperties() )
-            props.Add( property );
-        }
 
         return props;
       }
@@ -939,7 +882,6 @@ namespace Xceed.Wpf.DataGrid
     #endregion
 
     private PropertyDescriptorCollection m_classProperties;
-    private readonly Dictionary<StatFunction, StatResult> m_statFunctionValues = new Dictionary<StatFunction, StatResult>( StatFunctionComparer.Default );
 
     protected int m_globalRawItemCount;
     protected readonly List<RawItem> m_sortedRawItems;
@@ -1022,7 +964,7 @@ namespace Xceed.Wpf.DataGrid
 
         var storage = ( s_getItems != null ) ? s_getItems.Invoke( source ) : null;
         if( storage == null )
-          throw new InvalidOperationException( "TODODOC: Unable to retrieve the ObservableCollection<>'s items storage." );
+          throw new InvalidOperationException( "Unable to retrieve the ObservableCollection<>'s items storage." );
 
         return storage;
       }
@@ -1034,7 +976,7 @@ namespace Xceed.Wpf.DataGrid
 
         var collectionChanged = ( s_collectionChanged != null ) ? s_collectionChanged.Invoke( source ) : null;
         if( collectionChanged == null )
-          throw new InvalidOperationException( "TODODOC: Unable to retrieve the ObservableCollection<>'s collection change method." );
+          throw new InvalidOperationException( "Unable to retrieve the ObservableCollection<>'s collection change method." );
 
         return collectionChanged;
       }
@@ -1043,11 +985,11 @@ namespace Xceed.Wpf.DataGrid
       {
         var propertyInfo = typeof( ObservableCollection<object> ).GetProperty( "Items", BindingFlags.Instance | BindingFlags.NonPublic, null, typeof( IList<object> ), new Type[ 0 ], null );
         if( ( propertyInfo == null ) || !propertyInfo.CanRead )
-          throw new InvalidOperationException( "TODODOC: Unable to retrieve the ObservableCollection<>.Items property." );
+          throw new InvalidOperationException( "Unable to retrieve the ObservableCollection<>.Items property." );
 
         var methodInfo = propertyInfo.GetGetMethod( true );
         if( ( methodInfo == null ) || !ObservableCollectionHelper.HasCallingConvention( methodInfo.CallingConvention, CallingConventions.HasThis ) )
-          throw new InvalidOperationException( "TODODOC: Unable to retrieve the ObservableCollection<>.Items property." );
+          throw new InvalidOperationException( "Unable to retrieve the ObservableCollection<>.Items property." );
 
         var methodBuilder = typeBuilder.DefineMethod(
                               ObservableCollectionHelper.GetItemsMethodName,
@@ -1071,11 +1013,11 @@ namespace Xceed.Wpf.DataGrid
       {
         var methodInfo = typeof( ObservableCollection<object> ).GetMethod( "OnCollectionChanged", BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[] { typeof( NotifyCollectionChangedEventArgs ) }, null );
         if( ( methodInfo == null ) || methodInfo.IsPrivate || !ObservableCollectionHelper.HasCallingConvention( methodInfo.CallingConvention, CallingConventions.HasThis ) )
-          throw new InvalidOperationException( "TODODOC: Unable to retrieve the ObservableCollection<>.OnCollectionChanged method." );
+          throw new InvalidOperationException( "Unable to retrieve the ObservableCollection<>.OnCollectionChanged method." );
 
         var constructorInfo = typeof( Action<NotifyCollectionChangedEventArgs> ).GetConstructor( new Type[] { typeof( object ), typeof( IntPtr ) } );
         if( ( constructorInfo == null ) || constructorInfo.IsPrivate || !ObservableCollectionHelper.HasCallingConvention( constructorInfo.CallingConvention, CallingConventions.HasThis ) )
-          throw new InvalidOperationException( "TODODOC: Unable to retrieve the Action<>'s constructor." );
+          throw new InvalidOperationException( "Unable to retrieve the Action<>'s constructor." );
 
         var methodBuilder = typeBuilder.DefineMethod(
                               ObservableCollectionHelper.GetCollectionChangedMethodName,

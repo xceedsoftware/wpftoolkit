@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -32,59 +32,10 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     public PropertyGridPropertiesSourceView()
     {
       InitializeComponent();
-#if !OPEN_SOURCE
-      var list = new ObservableCollection<object>();
-      list.Add( new MyData( "string", "First text" ) );
-      list.Add( new MyData( "Second string", "Second text" ) );
-      list.Add( new MyData( "Color", Colors.Blue ) );
-      list.Add( new MyData( "DateTime", System.DateTime.Now ) );
-      list.Add( new MyData( "TimeSpan", System.TimeSpan.FromMinutes( 120 ) ) );
-      list.Add( new MyData( "HorizontalAlignment", System.Windows.HorizontalAlignment.Center ) );
-      list.Add( new MyData( "bool", true ) );
-      list.Add( new MyData( "decimal", ( decimal )1 ) );
-      list.Add( new MyData( "int", ( int )2 ) );
-      list.Add( new MyData( "Second int", ( int )2 ) );
-      list.Add( new MyData( "short", ( short )3 ) );
-      list.Add( new MyData( "long", ( long )4 ) );
-      list.Add( new MyData( "float", ( float )5 ) );
-      list.Add( new MyData( "byte", ( byte )6 ) );
-      list.Add( new MyData( "sbyte", ( sbyte )7 ) );
-      list.Add( new MyData( "uint", ( uint )8 ) );
-      list.Add( new MyData( "ulong", ( ulong )8 ) );
-      list.Add( new MyData( "ushort", ( ushort )10 ) );
-      list.Add( new MyData( "FontFamily", Fonts.SystemFontFamilies.First() ) );
-      list.Add( new MyData( "FontStyle", FontStyles.Italic ) );
-      list.Add( new MyData( "FontStretch", FontStretches.ExtraExpanded ) );
-      
-      // PropertyGrid PropertiesSource property is bound to the DataContext
-      this.DataContext = list;
-#endif
+
     }
 
-#if !OPEN_SOURCE
-    private void InsertProperty( object sender, RoutedEventArgs e )
-    {
-      ( ( IList<object> )this.DataContext ).Insert( 0, new MyData( "New string", "new data" ) );
-    }
 
-    private void RemoveProperty( object sender, RoutedEventArgs e )
-    {
-      if( _propertyGrid.SelectedProperty != null )
-      {
-        ( ( IList<object> )this.DataContext ).Remove( _propertyGrid.SelectedProperty );
-      }
-    }
 
-    private class MyData
-    {
-      public MyData( string name, object value )
-      {
-        this.MyName = name;
-        this.MyValue = value;
-      }
-      public string MyName { get; set; }
-      public object MyValue { get; set; }
-    }
-#endif
   }
 }

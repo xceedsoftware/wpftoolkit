@@ -15,11 +15,14 @@
   ***********************************************************************************/
 
 using System.Windows.Data;
+using Xceed.Wpf.DataGrid.Utils;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal abstract class DataItemDataProviderBase : DataSourceProvider
   {
+    internal static readonly string DataPropertyName = PropertyHelper.GetPropertyName( ( DataItemDataProviderBase s ) => s.Data );
+
     #region IsEmpty Property
 
     public abstract bool IsEmpty

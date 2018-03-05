@@ -21,255 +21,366 @@
                     xmlns:core="clr-namespace:Xceed.Wpf.Toolkit.Core"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <ResourceDictionary.MergedDictionaries>
-         <ResourceDictionary Source="../../../Themes/Generic/Common.xaml" />
-    </ResourceDictionary.MergedDictionaries>
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="../../../Themes/Generic/Common.xaml" />
+  </ResourceDictionary.MergedDictionaries>
 
-   <sys:Double x:Key="TopBorderThumbHeight">5</sys:Double>
+  <sys:Double x:Key="TopBorderThumbHeight">5</sys:Double>
 
-    <conv:WindowContentBorderMarginConverter x:Key="WindowContentBorderMarginConverter" />
-    <conv:WindowControlBackgroundConverter x:Key="WindowControlBackgroundConverter" />
-    <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter"/>
+  <conv:WindowContentBorderMarginConverter x:Key="WindowContentBorderMarginConverter" />
+  <conv:WindowControlBackgroundConverter x:Key="WindowControlBackgroundConverter" />
+  <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
 
-   <conv:CenterTitleConverter x:Key="CenterTitleConverter" />
+  <conv:CenterTitleConverter x:Key="CenterTitleConverter" />
 
-   <!-- =============================================================================== -->
-   <!-- WindowControl                                                                    -->
-   <!-- =============================================================================== -->
+  <!-- =============================================================================== -->
+  <!-- WindowControl                                                                    -->
+  <!-- =============================================================================== -->
 
-    <ControlTemplate x:Key="WindowControlTemplate" TargetType="{x:Type local:WindowControl}">
-        <Grid>
-            <Border x:Name="PART_WindowRoot"
-                          BorderThickness="{TemplateBinding WindowBorderThickness}"
-                          BorderBrush="{TemplateBinding WindowBorderBrush}"
-                          CornerRadius="6"
-                          Width="{TemplateBinding Width}"
-                          Height="{TemplateBinding Height}">
-                <Border.Background>
-                    <MultiBinding Converter="{StaticResource WindowControlBackgroundConverter}">
-                        <Binding Path="WindowBackground" RelativeSource="{RelativeSource TemplatedParent}" />
-                        <Binding Path="WindowOpacity" RelativeSource="{RelativeSource TemplatedParent}" />
-                    </MultiBinding>
-                </Border.Background>
-                <Border x:Name="WindowRootInnerBorder" BorderThickness="1" BorderBrush="White" CornerRadius="6">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
+  <ControlTemplate x:Key="WindowControlTemplate"
+                   TargetType="{x:Type local:WindowControl}">
+    <Grid>
+      <Border x:Name="PART_WindowRoot"
+              BorderThickness="{TemplateBinding WindowBorderThickness}"
+              BorderBrush="{TemplateBinding WindowBorderBrush}"
+              CornerRadius="6"
+              Width="{TemplateBinding Width}"
+              Height="{TemplateBinding Height}">
+        <Border.Background>
+          <MultiBinding Converter="{StaticResource WindowControlBackgroundConverter}">
+            <Binding Path="WindowBackground"
+                     RelativeSource="{RelativeSource TemplatedParent}" />
+            <Binding Path="WindowOpacity"
+                     RelativeSource="{RelativeSource TemplatedParent}" />
+          </MultiBinding>
+        </Border.Background>
+        <Border x:Name="WindowRootInnerBorder"
+                BorderThickness="1"
+                BorderBrush="White"
+                CornerRadius="6">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition />
+            </Grid.RowDefinitions>
 
-                        <!-- Header Grid-->
-                        <Grid x:Name="PART_HeaderGrid">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="{Binding WindowThickness.Left, RelativeSource={RelativeSource TemplatedParent}}"/>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition x:Name="HeaderButtonsColumn" Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition x:Name="HeaderRow" MinHeight="28" />
-                                <RowDefinition Height="{Binding WindowThickness.Top, RelativeSource={RelativeSource TemplatedParent}}" />
-                            </Grid.RowDefinitions>
+            <!-- Header Grid-->
+            <Grid x:Name="PART_HeaderGrid">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{Binding WindowThickness.Left, RelativeSource={RelativeSource TemplatedParent}}" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition x:Name="HeaderButtonsColumn"
+                                  Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition x:Name="HeaderRow"
+                               MinHeight="28" />
+                <RowDefinition Height="{Binding WindowThickness.Top, RelativeSource={RelativeSource TemplatedParent}}" />
+              </Grid.RowDefinitions>
 
-                            <!-- Icon and Title -->
-                            <Image x:Name="PART_Icon"
-                                Grid.Row="0"
-                                Grid.RowSpan="2"
-                                Grid.Column="1"
-                                VerticalAlignment="Center"
-                                Source="{TemplateBinding CaptionIcon}"
-                                MaxWidth="15"
-                                MaxHeight="15"
-                                Margin="0,2,0,2">
-                            </Image>
-                           <Grid x:Name="Title"
-                                 Grid.Column="2"
-                                 Grid.Row="0"
-                                 Grid.RowSpan="2">
-                              <!-- Rectangle behind title to display a glow effect on title -->
-                               <Rectangle Width="{Binding ElementName=TitleGrid, Path=ActualWidth}" 
-                                          Height="{Binding ElementName=TitleGrid, Path=ActualHeight}" 
-                                          HorizontalAlignment="{Binding ElementName=TitleGrid, Path=HorizontalAlignment}" 
-                                          VerticalAlignment="{Binding ElementName=TitleGrid, Path=VerticalAlignment}"
-                                          Fill="{TemplateBinding CaptionShadowBrush}">
-                                   <Rectangle.Effect>
-                                       <BlurEffect Radius="10" />
-                                   </Rectangle.Effect>
-                              </Rectangle>
-                              <Grid x:Name="TitleGrid"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Center">
-                                 <TextBlock x:Name="TitleText"
-                                            FontSize="{TemplateBinding CaptionFontSize}"
-                                            Text="{TemplateBinding Caption}"
-                                            Foreground="{TemplateBinding CaptionForeground}"
-                                            TextTrimming="CharacterEllipsis"
-                                            Margin="5,0,5,0" />
-                              </Grid>
-                           </Grid>
+              <!-- Icon and Title -->
+              <Image x:Name="PART_Icon"
+                     Grid.Row="0"
+                     Grid.RowSpan="2"
+                     Grid.Column="1"
+                     VerticalAlignment="Center"
+                     Source="{TemplateBinding CaptionIcon}"
+                     MaxWidth="15"
+                     MaxHeight="15"
+                     Margin="0,2,0,2">
+              </Image>
+              <Grid x:Name="Title"
+                    Grid.Column="2"
+                    Grid.Row="0"
+                    Grid.RowSpan="2">
+                <!-- Rectangle behind title to display a glow effect on title -->
+                <Rectangle Width="{Binding ElementName=TitleGrid, Path=ActualWidth}"
+                           Height="{Binding ElementName=TitleGrid, Path=ActualHeight}"
+                           HorizontalAlignment="{Binding ElementName=TitleGrid, Path=HorizontalAlignment}"
+                           VerticalAlignment="{Binding ElementName=TitleGrid, Path=VerticalAlignment}"
+                           Fill="{TemplateBinding CaptionShadowBrush}">
+                  <Rectangle.Effect>
+                    <BlurEffect Radius="10" />
+                  </Rectangle.Effect>
+                </Rectangle>
+                <Grid x:Name="TitleGrid"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Center">
+                  <TextBlock x:Name="TitleText"
+                             FontSize="{TemplateBinding CaptionFontSize}"
+                             Text="{TemplateBinding Caption}"
+                             Foreground="{TemplateBinding CaptionForeground}"
+                             TextTrimming="CharacterEllipsis"
+                             Margin="5,0,5,0" />
+                </Grid>
+              </Grid>
 
-                        <!-- Close-Maximize-Minimize Buttons -->
-                        <StackPanel x:Name="ButtonsPanel" 
-                                    Grid.Row="0"
-                                    Grid.RowSpan="2"
-                                    Grid.Column="3"
-                                    Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
-                            <StackPanel.Margin>
-                                <MultiBinding Converter="{StaticResource WindowContentBorderMarginConverter}" ConverterParameter="2">
-                                    <Binding Path="WindowThickness.Right" RelativeSource="{RelativeSource TemplatedParent}" />
-                                    <Binding Path="WindowThickness.Right" RelativeSource="{RelativeSource TemplatedParent}" /> <!-- not used -->
-                                </MultiBinding>
-                            </StackPanel.Margin>
-                            <!--close button-->
-                           <Button x:Name="PART_CloseButton"
-                                    Style="{TemplateBinding CloseButtonStyle}" 
-                                    Visibility="{TemplateBinding CloseButtonVisibility}" />
-                        </StackPanel>
+              <!-- Close-Maximize-Minimize Buttons -->
+              <StackPanel x:Name="ButtonsPanel"
+                          Grid.Row="0"
+                          Grid.RowSpan="2"
+                          Grid.Column="3"
+                          Orientation="Horizontal"
+                          VerticalAlignment="Top"
+                          HorizontalAlignment="Right">
+                <StackPanel.Margin>
+                  <MultiBinding Converter="{StaticResource WindowContentBorderMarginConverter}"
+                                ConverterParameter="2">
+                    <Binding Path="WindowThickness.Right"
+                             RelativeSource="{RelativeSource TemplatedParent}" />
+                    <Binding Path="WindowThickness.Right"
+                             RelativeSource="{RelativeSource TemplatedParent}" />
+                    <!-- not used -->
+                  </MultiBinding>
+                </StackPanel.Margin>
+                <!--close button-->
+                <Button x:Name="PART_CloseButton"
+                        Style="{TemplateBinding CloseButtonStyle}"
+                        Visibility="{TemplateBinding CloseButtonVisibility}">
+                </Button>
+              </StackPanel>
 
-                        <!-- ToolWindow Close Button -->
-                        <Border x:Name="ToolWindowBorder"
-                                Grid.Row="0"
-                                 Grid.RowSpan="2"
-                                 Grid.Column="3"
-                                VerticalAlignment="Top"
-                                Visibility="Collapsed"
-                                HorizontalAlignment="Right">
-                            <Border.Margin>
-                                <MultiBinding Converter="{StaticResource WindowContentBorderMarginConverter}" ConverterParameter="2">
-                                    <Binding Path="WindowThickness.Right" RelativeSource="{RelativeSource TemplatedParent}" />
-                                    <Binding Path="WindowThickness.Right" RelativeSource="{RelativeSource TemplatedParent}" /> <!-- not used -->
-                                </MultiBinding>
-                            </Border.Margin>
-                            <Button x:Name="PART_ToolWindowCloseButton"
-                                    Margin="0,3,0,1"
-                                    Style="{TemplateBinding CloseButtonStyle}" >
-                            </Button>
-                        </Border>
+              <!-- ToolWindow Close Button -->
+              <Border x:Name="ToolWindowBorder"
+                      Grid.Row="0"
+                      Grid.RowSpan="2"
+                      Grid.Column="3"
+                      VerticalAlignment="Top"
+                      Visibility="Collapsed"
+                      HorizontalAlignment="Right">
+                <Border.Margin>
+                  <MultiBinding Converter="{StaticResource WindowContentBorderMarginConverter}"
+                                ConverterParameter="2">
+                    <Binding Path="WindowThickness.Right"
+                             RelativeSource="{RelativeSource TemplatedParent}" />
+                    <Binding Path="WindowThickness.Right"
+                             RelativeSource="{RelativeSource TemplatedParent}" />
+                    <!-- not used -->
+                  </MultiBinding>
+                </Border.Margin>
+                <Button x:Name="PART_ToolWindowCloseButton"
+                        Margin="0,3,0,1"
+                        Style="{TemplateBinding CloseButtonStyle}">
+                </Button>
+              </Border>
 
-                            <!-- Header Drag Thumb -->
-                            <Thumb x:Name="PART_HeaderThumb" 
-                                Grid.Row="0"
-                                Grid.RowSpan="2"
-                                Grid.Column="2"
-                                Opacity="0"
-                                IsTabStop="False"/>
-                        </Grid>
+              <!-- Header Drag Thumb -->
+              <Thumb x:Name="PART_HeaderThumb"
+                     Grid.Row="0"
+                     Grid.RowSpan="2"
+                     Grid.Column="2"
+                     Opacity="0"
+                     IsTabStop="False">
+              </Thumb>
+            </Grid>
 
-                        <!-- Content Border -->
-                        <Border x:Name="ContentOuterBorder" Grid.Row="1">
-                            <Border.Margin>
-                                <MultiBinding Converter="{StaticResource WindowContentBorderMarginConverter}" ConverterParameter="0">
-                                    <Binding Path="WindowThickness.Left" RelativeSource="{RelativeSource TemplatedParent}" />
-                                    <Binding Path="WindowThickness.Bottom" RelativeSource="{RelativeSource TemplatedParent}" />
-                                </MultiBinding>
-                            </Border.Margin>
-                            <Border x:Name="ContentBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" >
-                                <Border x:Name="ContentInnerBorder" BorderBrush="#FFF2F2F2" BorderThickness="0"> <!-- only visible for ToolWindow -->
-                                  <AdornerDecorator>
-                                     <ContentPresenter x:Name="Content" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
-                                  </AdornerDecorator>
-                                </Border>
-                            </Border>
-                        </Border>
-
-                    </Grid>
+            <!-- Content Border -->
+            <Border x:Name="ContentOuterBorder"
+                    Grid.Row="1">
+              <Border.Margin>
+                <MultiBinding Converter="{StaticResource WindowContentBorderMarginConverter}"
+                              ConverterParameter="0">
+                  <Binding Path="WindowThickness.Left"
+                           RelativeSource="{RelativeSource TemplatedParent}" />
+                  <Binding Path="WindowThickness.Bottom"
+                           RelativeSource="{RelativeSource TemplatedParent}" />
+                </MultiBinding>
+              </Border.Margin>
+              <Border x:Name="ContentBorder"
+                      Background="{TemplateBinding Background}"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}">
+                <Border x:Name="ContentInnerBorder"
+                        BorderBrush="#FFF2F2F2"
+                        BorderThickness="0">
+                  <!-- only visible for ToolWindow -->
+                  <AdornerDecorator>
+                    <ContentPresenter x:Name="Content"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}" />
+                  </AdornerDecorator>
                 </Border>
+              </Border>
             </Border>
 
-            <!-- Special Border to prevent all mouse inputs when this WindowControl is behind a modal window -->
-            <Border x:Name="PART_BlockMouseInputsBorder" Background="Transparent" Visibility="Collapsed"/>
-        </Grid>
-        <ControlTemplate.Triggers>
+          </Grid>
+        </Border>
+      </Border>
 
-            <Trigger Property="WindowStyle" Value="None">
-                <Setter Property="Height" Value="0" TargetName="HeaderRow" />
-                <Setter Property="Visibility" Value="Collapsed" TargetName="PART_Icon" />
-                <Setter Property="Visibility" Value="Collapsed" TargetName="Title" />
-                <Setter Property="Visibility" Value="Collapsed" TargetName="PART_HeaderThumb" />
-                <Setter Property="Visibility" Value="Collapsed" TargetName="ButtonsPanel" />
-               <Setter Property="Height" Value="0" TargetName="HeaderRow" />
-            </Trigger>
+      <!-- Special Border to prevent all mouse inputs when this WindowControl is behind a modal window -->
+      <Border x:Name="PART_BlockMouseInputsBorder"
+              Background="Transparent"
+              Visibility="Collapsed" />
+    </Grid>
+    <ControlTemplate.Triggers>
+
+      <Trigger Property="WindowStyle"
+               Value="None">
+        <Setter Property="Height"
+                Value="0"
+                TargetName="HeaderRow" />
+        <Setter Property="Visibility"
+                Value="Collapsed"
+                TargetName="PART_Icon" />
+        <Setter Property="Visibility"
+                Value="Collapsed"
+                TargetName="Title" />
+        <Setter Property="Visibility"
+                Value="Collapsed"
+                TargetName="PART_HeaderThumb" />
+        <Setter Property="Visibility"
+                Value="Collapsed"
+                TargetName="ButtonsPanel" />
+        <Setter Property="Height"
+                Value="0"
+                TargetName="HeaderRow" />
+      </Trigger>
 
 
 
-            <Trigger Property="WindowStyle" Value="ToolWindow">
-                <Setter Property="Height" Value="Auto" TargetName="HeaderRow" />
-                <Setter Property="Visibility" Value="Collapsed" TargetName="PART_Icon" />
-                <Setter Property="Visibility" Value="Collapsed" TargetName="ButtonsPanel" />
-                <Setter Property="Visibility" Value="Visible" TargetName="ToolWindowBorder" />
-                <Setter Property="CornerRadius" Value="0" TargetName="PART_WindowRoot" />
-                <Setter Property="CornerRadius" Value="0" TargetName="WindowRootInnerBorder" />
-                <Setter Property="BorderBrush" Value="White" TargetName="ContentOuterBorder" />
-                <Setter Property="BorderBrush" Value="Black" TargetName="ContentBorder" />
-                <Setter Property="BorderThickness" Value="1" TargetName="ContentInnerBorder" />
-            </Trigger>
+      <Trigger Property="WindowStyle"
+               Value="ToolWindow">
+        <Setter Property="Height"
+                Value="Auto"
+                TargetName="HeaderRow" />
+        <Setter Property="Visibility"
+                Value="Collapsed"
+                TargetName="PART_Icon" />
+        <Setter Property="Visibility"
+                Value="Collapsed"
+                TargetName="ButtonsPanel" />
+        <Setter Property="Visibility"
+                Value="Visible"
+                TargetName="ToolWindowBorder" />
+        <Setter Property="CornerRadius"
+                Value="0"
+                TargetName="PART_WindowRoot" />
+        <Setter Property="CornerRadius"
+                Value="0"
+                TargetName="WindowRootInnerBorder" />
+        <Setter Property="BorderBrush"
+                Value="White"
+                TargetName="ContentOuterBorder" />
+        <Setter Property="BorderBrush"
+                Value="Black"
+                TargetName="ContentBorder" />
+        <Setter Property="BorderThickness"
+                Value="1"
+                TargetName="ContentInnerBorder" />
+      </Trigger>
 
-            <Trigger Property="IsActive" Value="False">
-                <Setter Property="Background" Value="{Binding WindowInactiveBackground, RelativeSource={RelativeSource TemplatedParent}}" TargetName="PART_WindowRoot" />
-                <Setter Property="BorderBrush" Value="#FF666666" TargetName="PART_WindowRoot" />
-                <Setter Property="BorderBrush" Value="#FF7B7B7B" TargetName="ContentBorder" />
-               <Setter Property="IsEnabled" Value="False" TargetName="Content" />
-            </Trigger>
+      <Trigger Property="IsActive"
+               Value="False">
+        <Setter Property="Background"
+                Value="{Binding WindowInactiveBackground, RelativeSource={RelativeSource TemplatedParent}}"
+                TargetName="PART_WindowRoot" />
+        <Setter Property="BorderBrush"
+                Value="#FF666666"
+                TargetName="PART_WindowRoot" />
+        <Setter Property="BorderBrush"
+                Value="#FF7B7B7B"
+                TargetName="ContentBorder" />
+        <Setter Property="IsEnabled"
+                Value="False"
+                TargetName="Content" />
+      </Trigger>
 
-            <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                <Setter Property="KeyboardNavigation.TabNavigation" Value="Cycle" />
-            </Trigger>
+      <Trigger Property="IsKeyboardFocusWithin"
+               Value="True">
+        <Setter Property="KeyboardNavigation.TabNavigation"
+                Value="Cycle" />
+      </Trigger>
 
-            <!-- #TODODOC-->
-            <!--Remove the Margin when no title to remove the TitleShadow glow effect.-->
-            <Trigger Property="Text" Value="" SourceName="TitleText">
-               <Setter Property="Margin" Value="0" TargetName="TitleText" />
-            </Trigger>
+      <!-- Remove the Margin when there's no title to remove the TitleShadow glow effect. -->
+      <Trigger Property="Text"
+               Value=""
+               SourceName="TitleText">
+        <Setter Property="Margin"
+                Value="0"
+                TargetName="TitleText" />
+      </Trigger>
 
-            <Trigger Property="Text" Value="{x:Null}" SourceName="TitleText">
-               <Setter Property="Margin" Value="0" TargetName="TitleText" />
-            </Trigger>
+      <Trigger Property="Text"
+               Value="{x:Null}"
+               SourceName="TitleText">
+        <Setter Property="Margin"
+                Value="0"
+                TargetName="TitleText" />
+      </Trigger>
 
-            <!-- Center the Window Title on the entire window -->
-            <DataTrigger Value="1">
-                <DataTrigger.Binding>
-                    <MultiBinding Converter="{StaticResource CenterTitleConverter}">
-                        <Binding ElementName="TitleText" Path="DesiredSize" />
-                        <Binding ElementName="PART_HeaderGrid" Path="ActualWidth" />
-                        <Binding ElementName="PART_HeaderGrid" Path="ColumnDefinitions" />
-                    </MultiBinding>
-                </DataTrigger.Binding>
-                <Setter TargetName="Title" Property="Column" Value="0" />
-                <Setter TargetName="Title" Property="ColumnSpan" Value="4" />
-                <Setter TargetName="TitleGrid" Property="HorizontalAlignment" Value="Center" />
-            </DataTrigger>
+      <!-- Center the Window Title on the entire window -->
+      <DataTrigger Value="1">
+        <DataTrigger.Binding>
+          <MultiBinding Converter="{StaticResource CenterTitleConverter}">
+            <Binding ElementName="TitleText"
+                     Path="DesiredSize" />
+            <Binding ElementName="PART_HeaderGrid"
+                     Path="ActualWidth" />
+            <Binding ElementName="PART_HeaderGrid"
+                     Path="ColumnDefinitions" />
+          </MultiBinding>
+        </DataTrigger.Binding>
+        <Setter TargetName="Title"
+                Property="Column"
+                Value="0" />
+        <Setter TargetName="Title"
+                Property="ColumnSpan"
+                Value="4" />
+        <Setter TargetName="TitleGrid"
+                Property="HorizontalAlignment"
+                Value="Center" />
+      </DataTrigger>
 
-            <!-- Center the Window Title in it's own column -->
-            <DataTrigger Value="2">
-                <DataTrigger.Binding>
-                    <MultiBinding Converter="{StaticResource CenterTitleConverter}">
-                        <Binding ElementName="TitleText" Path="DesiredSize" />
-                        <Binding ElementName="PART_HeaderGrid" Path="ActualWidth" />
-                        <Binding ElementName="PART_HeaderGrid" Path="ColumnDefinitions" />
-                    </MultiBinding>
-                </DataTrigger.Binding>
-                <Setter TargetName="TitleGrid" Property="HorizontalAlignment" Value="Center" />
-            </DataTrigger>
+      <!-- Center the Window Title in it's own column -->
+      <DataTrigger Value="2">
+        <DataTrigger.Binding>
+          <MultiBinding Converter="{StaticResource CenterTitleConverter}">
+            <Binding ElementName="TitleText"
+                     Path="DesiredSize" />
+            <Binding ElementName="PART_HeaderGrid"
+                     Path="ActualWidth" />
+            <Binding ElementName="PART_HeaderGrid"
+                     Path="ColumnDefinitions" />
+          </MultiBinding>
+        </DataTrigger.Binding>
+        <Setter TargetName="TitleGrid"
+                Property="HorizontalAlignment"
+                Value="Center" />
+      </DataTrigger>
 
-      </ControlTemplate.Triggers>
-    </ControlTemplate>
+    </ControlTemplate.Triggers>
+  </ControlTemplate>
 
-    <Style TargetType="{x:Type local:WindowControl}" >
-      <Setter Property="CloseButtonStyle" Value="{StaticResource {ComponentResourceKey 
+  <Style TargetType="{x:Type local:WindowControl}">
+    <Setter Property="CloseButtonStyle"
+            Value="{StaticResource {ComponentResourceKey 
                   TypeInTargetAssembly={x:Type local:WindowControl}, 
                   ResourceId=DefaultCloseButtonStyle}}" />
-        <Setter Property="BorderBrush" Value="{StaticResource Window_BorderBrush}" />
-        <Setter Property="BorderThickness" Value="{StaticResource Window_BorderThickness}" />       
-        <Setter Property="Background" Value="{StaticResource Window_Background}" />
-        <Setter Property="CaptionFontSize" Value="{StaticResource Window_CaptionFontSize}" />
-        <Setter Property="CaptionForeground" Value="{StaticResource Window_CaptionForeground}" />
-        <Setter Property="WindowBorderBrush" Value="{StaticResource Window_WindowBorderBrush}" />
-        <Setter Property="WindowBackground" Value="{StaticResource Window_WindowBackground}" />
-        <Setter Property="WindowBorderThickness" Value="{StaticResource Window_WindowBorderThickness}" />
-        <Setter Property="WindowInactiveBackground" Value="{StaticResource Window_WindowInactiveBackground}" />
-        <Setter Property="IsTabStop" Value="False" />
-        <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
-        <Setter Property="Template" Value="{StaticResource WindowControlTemplate}" />
-    </Style>
+    <Setter Property="BorderBrush"
+            Value="{StaticResource Window_BorderBrush}" />
+    <Setter Property="BorderThickness"
+            Value="{StaticResource Window_BorderThickness}" />
+    <Setter Property="Background"
+            Value="{StaticResource Window_Background}" />
+    <Setter Property="CaptionFontSize"
+            Value="{StaticResource Window_CaptionFontSize}" />
+    <Setter Property="CaptionForeground"
+            Value="{StaticResource Window_CaptionForeground}" />
+    <Setter Property="WindowBorderBrush"
+            Value="{StaticResource Window_WindowBorderBrush}" />
+    <Setter Property="WindowBackground"
+            Value="{StaticResource Window_WindowBackground}" />
+    <Setter Property="WindowBorderThickness"
+            Value="{StaticResource Window_WindowBorderThickness}" />
+    <Setter Property="WindowInactiveBackground"
+            Value="{StaticResource Window_WindowInactiveBackground}" />
+    <Setter Property="IsTabStop"
+            Value="False" />
+    <Setter Property="KeyboardNavigation.TabNavigation"
+            Value="None" />
+    <Setter Property="Template"
+            Value="{StaticResource WindowControlTemplate}" />
+  </Style>
 
 </ResourceDictionary>

@@ -27,7 +27,7 @@ using System.Reflection;
 
 namespace Xceed.Wpf.DataGrid.Utils
 {
-  [Obsolete( "TODODOC: This class is inefficient.  You should derive from System.Windows.WeakEventManager instead." )]
+  [Obsolete( "This class is inefficient. You should derive from System.Windows.WeakEventManager instead." )]
   [Browsable( false )]
   [EditorBrowsable( EditorBrowsableState.Never )]
   public sealed class WeakEventHandler<TEventArgs>

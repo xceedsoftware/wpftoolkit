@@ -81,6 +81,16 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //IsUsingZoomOnMouseWheel
 
+    #region IsFrozen
+
+    public bool IsFrozen
+    {
+      get;
+      private set;
+    }
+
+    #endregion
+
     #region Radius
 
     public static readonly DependencyProperty RadiusProperty = DependencyProperty.Register( "Radius", typeof( double ), typeof( Magnifier ), new FrameworkPropertyMetadata( ( Magnifier.DEFAULT_SIZE / 2 ), new PropertyChangedCallback( OnRadiusPropertyChanged ) ) );
@@ -275,7 +285,16 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion // Base Class Overrides
 
-    #region Methods
+    #region Public Methods
+
+    public void Freeze( bool freeze )
+    {
+      this.IsFrozen = freeze;
+    }
+
+    #endregion
+
+    #region Private Methods
 
     private void UpdateViewBox()
     {

@@ -205,20 +205,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       this.Loaded += this.PropertyItem_Loaded;
     }
 
-    private void GenerateExpandedPropertyItems()
-    {
-      if( this.IsExpanded )
-      {
-        // This withholds the generation of all PropertyItem instances (recursively)
-        // until the PropertyItem is expanded.
-        var objectContainerHelper = ContainerHelper as ObjectContainerHelperBase;
-        if( objectContainerHelper != null )
-        {
-          objectContainerHelper.GenerateProperties();
-        }
-      }
-    }
-
     private void SetValueFontWeight()
     {
       if( this.ValueContainer == null )
@@ -232,6 +218,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
                                           && !(this.Editor is ComboBox) )   
                                         ? FontWeights.Bold 
                                         : FontWeights.Normal;
+    }
+
+    private void GenerateExpandedPropertyItems()
+    {
+      if( this.IsExpanded )
+      {
+        // This withholds the generation of all PropertyItem instances (recursively)
+        // until the PropertyItem is expanded.
+        var objectContainerHelper = ContainerHelper as ObjectContainerHelperBase;
+        if( objectContainerHelper != null )
+        {
+          objectContainerHelper.GenerateProperties();
+        }
+      }
     }
 
     #endregion

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -26,30 +26,17 @@
            By default the propertyGrid will autogenerate all the properties for a given object.  You can override this behavior by setting the AutoGenerateProperties property to False, and then provide a collection of PropertyDefinitions of the properties you would like to show.
         </Paragraph>
     </local:DemoView.Description>
-    
+
    <Grid>      
       <xctk:PropertyGrid x:Name="_propertyGrid"
                          Width="450" 
                          MaxHeight="245"
                          Margin="10"
                          AutoGenerateProperties="False">
-         <!--##EXCLUDE_OPEN_SOURCE-->
-         <!-- //# TODODOC
-         The following categories DisplayOrder will be overriden -->
-         <xctk:PropertyGrid.CategoryDefinitions>
-            <xctk:CategoryDefinition Name="Information"
-                                     DisplayOrder="0" />
-            <xctk:CategoryDefinition Name="Connections"
-                                     DisplayOrder="2" />
-            <xctk:CategoryDefinition Name="Clothes"
-                                     DisplayOrder="1" />
-         </xctk:PropertyGrid.CategoryDefinitions>
-         <!--##END-->
-         
+
          <xctk:PropertyGrid.PropertyDefinitions>
-            <!-- //# TODODOC 
-               The following properties will be displayed in the PropertyGrid 
-               Some data of properties will be overriden-->
+            <!-- The following properties will be displayed in the PropertyGrid 
+                 Some properties' data will be overriden-->
             <xctk:PropertyDefinition TargetProperties="FirstName,PetNames" DisplayOrder="0"/>
             <xctk:PropertyDefinition TargetProperties="FavoriteColor"
                                      DisplayName="Shirt Color"
@@ -63,9 +50,8 @@
             </xctk:PropertyDefinition>
             <!-- And all properties of type Boolean will be displayed in the PropertyGrid-->
             <xctk:PropertyDefinition TargetProperties="{x:Type s:Boolean}" DisplayOrder="1"/>
-            
-            <!-- //# TODODOC
-               This Property won't be displayed -->
+
+            <!-- This Property won't be displayed -->
              <xctk:PropertyDefinition TargetProperties="WritingHand" IsBrowsable="False"/>
          </xctk:PropertyGrid.PropertyDefinitions>
       </xctk:PropertyGrid>

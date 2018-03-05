@@ -15,9 +15,7 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
@@ -26,10 +24,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using Xceed.Wpf.AvalonDock.Layout;
-using System.Diagnostics;
 using System.Windows.Documents;
 using Xceed.Wpf.AvalonDock.Themes;
-using Microsoft.Windows.Shell;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
@@ -50,7 +46,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       return new FloatingWindowContentHost( sender as LayoutFloatingWindowControl ) { Content = content as UIElement };
     }
 
-    protected class FloatingWindowContentHost : HwndHost
+    protected internal class FloatingWindowContentHost : HwndHost
     {
       LayoutFloatingWindowControl _owner;
       public FloatingWindowContentHost( LayoutFloatingWindowControl owner )
@@ -301,6 +297,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       //Debug.Assert(this.Owner != null);
       base.OnInitialized( e );
     }
+
 
     public abstract ILayoutElement Model
     {

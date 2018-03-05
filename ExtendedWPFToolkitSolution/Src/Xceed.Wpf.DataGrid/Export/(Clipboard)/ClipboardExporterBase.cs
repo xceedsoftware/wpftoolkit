@@ -15,11 +15,9 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Windows;
 
 namespace Xceed.Wpf.DataGrid.Export
@@ -209,7 +207,7 @@ namespace Xceed.Wpf.DataGrid.Export
         this.UpdateExporterIndentation( detailLevel );
 
         // Get master indexes that have mapped expanded details
-        List<int> indexesToMasterItemList = dataGridContext.CustomItemContainerGenerator.GetMasterIndexexWithExpandedDetails();
+        List<int> indexesToMasterItemList = dataGridContext.CustomItemContainerGenerator.GetMasterIndexesWithExpandedDetails();
 
         // Get the index of the next detail to export in case
         // it is expanded before the first selected index of the
@@ -290,28 +288,24 @@ namespace Xceed.Wpf.DataGrid.Export
         }
       }
 
-      private void ExportDataItemCore( DataGridContext dataGridContext, ClipboardExporterBase clipboardExporter, int itemIndex, object item, int[] exportedVisiblePositions,
-                                       ColumnBase[] columnsByVisiblePosition )
+      private void ExportDataItemCore( DataGridContext dataGridContext, ClipboardExporterBase clipboardExporter, int itemIndex, object item,
+                                       int[] exportedVisiblePositions, ColumnBase[] columnsByVisiblePosition )
       {
-        DataGridCollectionViewBase dataGridCollectionViewBase = dataGridContext.ItemsSourceCollection as DataGridCollectionViewBase;
+        var dataGridCollectionViewBase = dataGridContext.ItemsSourceCollection as DataGridCollectionViewBase;
 
         clipboardExporter.StartDataItem( dataGridContext, item );
 
         // Ensure the count does not exceeds the columns count
-        int exportedVisiblePositionsCount = exportedVisiblePositions.Length;
+        var exportedVisiblePositionsCount = exportedVisiblePositions.Length;
         exportedVisiblePositionsCount = Math.Min( exportedVisiblePositionsCount, columnsByVisiblePosition.Length );
 
-        HashSet<int> intersectedIndexes = this.GetIntersectedRangesForIndex( dataGridContext, itemIndex, exportedVisiblePositions, exportedVisiblePositionsCount );
-
-        object fieldValue = null;
-        Column column = null;
+        var intersectedIndexes = this.GetIntersectedRangesForIndex( dataGridContext, itemIndex, exportedVisiblePositions, exportedVisiblePositionsCount );
 
         for( int i = 0; i < exportedVisiblePositionsCount; i++ )
         {
-          // Reset field value
-          fieldValue = null;
-
-          int visiblePosition = exportedVisiblePositions[ i ];
+          var fieldValue = default( object );
+          var column = default( Column );
+          var visiblePosition = exportedVisiblePositions[ i ];
 
           // Export null if not intersected by a SelectionRange
           if( intersectedIndexes.Contains( visiblePosition ) )
@@ -322,29 +316,25 @@ namespace Xceed.Wpf.DataGrid.Export
             if( column == null )
               continue;
 
-            // Use DataGridCollectionView directly since the DataGridItemProperty uses PropertyDescriptor which increase
-            // the read of the field value
-            DataGridItemPropertyBase dataGridItemProperty = null;
+            // Use DataGridCollectionView directly since the DataGridItemProperty uses PropertyDescriptor which increase the read of the field value
+            var dataGridItemProperty = default( DataGridItemPropertyBase );
 
-            // Try to get a DataGridItemProperty matching the column FieldName
-            // and get the value from it
+            // Try to get a DataGridItemProperty matching the column FieldName and get the value from it
             if( dataGridCollectionViewBase != null )
             {
-              dataGridItemProperty = dataGridCollectionViewBase.ItemProperties[ column.FieldName ];
+              dataGridItemProperty = ItemsSourceHelper.GetItemPropertyFromProperty( dataGridCollectionViewBase.ItemProperties, column.FieldName );
 
               if( dataGridItemProperty != null )
               {
-                fieldValue = dataGridItemProperty.GetValue( item );
+                fieldValue = ItemsSourceHelper.GetValueFromItemProperty( dataGridItemProperty, item );
               }
             }
 
             // If none was found, create a BindingPathValueExtractor from this column
             if( ( dataGridCollectionViewBase == null ) || ( dataGridItemProperty == null ) )
             {
-              // We don't have a DataGridCollectionView, use a BindingPathValueExtractor
-              // to create a binding to help us get the value for the Column in the 
-              // data item
-              BindingPathValueExtractor extractorForRead = null;
+              // We don't have a DataGridCollectionView, use a BindingPathValueExtractor to create a binding to help us get the value for the Column in the data item
+              var extractorForRead = default( BindingPathValueExtractor );
 
               if( m_columnToBindingPathExtractor.TryGetValue( column, out extractorForRead ) == false )
               {
@@ -359,19 +349,27 @@ namespace Xceed.Wpf.DataGrid.Export
           if( fieldValue != null )
           {
             //Verify if the value should be converted to the displayed value for exporting.
-            ForeignKeyConfiguration foreignKeyConfiguration = column.ForeignKeyConfiguration;
-
+            var foreignKeyConfiguration = column.ForeignKeyConfiguration;
             if( foreignKeyConfiguration != null && foreignKeyConfiguration.UseDisplayedValueWhenExporting )
             {
               fieldValue = foreignKeyConfiguration.GetDisplayMemberValue( fieldValue );
             }
-            else if( column.DisplayedValueConverter != null )
+            else
             {
-              fieldValue = column.DisplayedValueConverter.Convert( fieldValue, typeof( object ), column.DisplayedValueConverterParameter, column.GetCulture( column.DisplayedValueConverterCulture ) );
-            }
-            else if( !string.IsNullOrEmpty( column.CellContentStringFormat ) )
-            {
-              fieldValue = string.Format( column.GetCulture(), column.CellContentStringFormat, fieldValue );
+              var valueConverter = column.DisplayedValueConverter;
+              if( valueConverter != null )
+              {
+                fieldValue = valueConverter.Convert( fieldValue, typeof( object ), column.DisplayedValueConverterParameter,
+                                                     column.GetCulture( column.DisplayedValueConverterCulture ) );
+              }
+              else
+              {
+                var valueFormat = column.CellContentStringFormat;
+                if( !string.IsNullOrEmpty( valueFormat ) )
+                {
+                  fieldValue = string.Format( column.GetCulture(), valueFormat, fieldValue );
+                }
+              }
             }
           }
 
@@ -482,7 +480,6 @@ namespace Xceed.Wpf.DataGrid.Export
       private void ExportDataItem( DataGridContext dataGridContext, int itemIndex, object item, int detailLevel, int[] exportedVisiblePositions,
                                    ColumnBase[] columnsByVisiblePosition )
       {
-        Debug.WriteLine( string.Format( "ExportDataItem for detail level {0}, itemIndex {1}", detailLevel, itemIndex ) );
 
         foreach( ClipboardExporterBase clipboardExporter in m_clipboardExporters )
         {
@@ -503,7 +500,6 @@ namespace Xceed.Wpf.DataGrid.Export
         if( m_lastExportedHeaderDetailLevel == detailLevel )
           return;
 
-        Debug.WriteLine( string.Format( "ExportHeaders for detail level {0}", detailLevel ) );
 
         foreach( ClipboardExporterBase clipboardExporter in m_clipboardExporters )
         {

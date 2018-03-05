@@ -14,13 +14,10 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Data;
-using System.Collections;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -91,7 +88,7 @@ namespace Xceed.Wpf.DataGrid
     protected object GetPropertyValue( object item )
     {
       if( m_contextProperty != null )
-        return m_contextProperty.GetValue( item );
+        return ItemsSourceHelper.GetValueFromItemProperty( m_contextProperty, item );
 
       return m_propertyGroupDescription.GroupNameFromItem( item, 0, CultureInfo.InvariantCulture );
     }
@@ -104,7 +101,7 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        string propertyName = m_propertyGroupDescription.PropertyName;
+        var propertyName = m_propertyGroupDescription.PropertyName;
 
         if( string.IsNullOrEmpty( propertyName ) )
         {
@@ -112,7 +109,7 @@ namespace Xceed.Wpf.DataGrid
         }
         else
         {
-          m_contextProperty = collectionView.ItemProperties[ propertyName ];
+          m_contextProperty = ItemsSourceHelper.GetItemPropertyFromProperty( collectionView.ItemProperties, propertyName );
         }
       }
     }

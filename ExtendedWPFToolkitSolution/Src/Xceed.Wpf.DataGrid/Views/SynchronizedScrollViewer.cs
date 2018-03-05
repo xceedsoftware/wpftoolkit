@@ -15,13 +15,11 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using Xceed.Utils.Math;
-using System.Diagnostics;
 using System.Windows.Input;
+using System.Windows.Threading;
+using Xceed.Utils.Math;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
@@ -31,18 +29,11 @@ namespace Xceed.Wpf.DataGrid.Views
 
     static SynchronizedScrollViewer()
     {
-      ScrollViewer.HorizontalScrollBarVisibilityProperty.OverrideMetadata(
-        typeof( SynchronizedScrollViewer ),
-        new FrameworkPropertyMetadata( ScrollBarVisibility.Hidden ) );
-
-      ScrollViewer.VerticalScrollBarVisibilityProperty.OverrideMetadata(
-        typeof( SynchronizedScrollViewer ),
-        new FrameworkPropertyMetadata( ScrollBarVisibility.Hidden ) );
+      ScrollViewer.HorizontalScrollBarVisibilityProperty.OverrideMetadata( typeof( SynchronizedScrollViewer ), new FrameworkPropertyMetadata( ScrollBarVisibility.Hidden ) );
+      ScrollViewer.VerticalScrollBarVisibilityProperty.OverrideMetadata( typeof( SynchronizedScrollViewer ), new FrameworkPropertyMetadata( ScrollBarVisibility.Hidden ) );
 
       // By default, we never want item scrolling.
-      ScrollViewer.CanContentScrollProperty.OverrideMetadata(
-        typeof( SynchronizedScrollViewer ),
-        new FrameworkPropertyMetadata( false ) );
+      ScrollViewer.CanContentScrollProperty.OverrideMetadata( typeof( SynchronizedScrollViewer ), new FrameworkPropertyMetadata( false ) );
     }
 
     public SynchronizedScrollViewer()
@@ -66,7 +57,7 @@ namespace Xceed.Wpf.DataGrid.Views
       set
       {
 
-        bool valueChanged = ( m_deferScrollChange != value );
+        var valueChanged = ( m_deferScrollChange != value );
 
         m_deferScrollChange = value;
 
@@ -75,7 +66,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
         if( !m_deferScrollChange && valueChanged )
         {
-          ScrollOrientation scrollOrientation = this.ScrollOrientation;
+          var scrollOrientation = this.ScrollOrientation;
 
           if( ( scrollOrientation & ScrollOrientation.Horizontal ) == ScrollOrientation.Horizontal )
           {
@@ -94,8 +85,8 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region ScrollOrientation property
 
-    public static readonly DependencyProperty ScrollOrientationProperty =
-      DependencyProperty.Register( "ScrollOrientation",
+    public static readonly DependencyProperty ScrollOrientationProperty = DependencyProperty.Register(
+      "ScrollOrientation",
       typeof( ScrollOrientation ),
       typeof( SynchronizedScrollViewer ),
       new PropertyMetadata( ScrollOrientation.Horizontal ) );
@@ -113,31 +104,29 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion ScrollOrientation property
+    #endregion
 
-    #region LimitScrolling Property
+    #region LimitScrolling Internal Property
 
-    internal static readonly DependencyProperty LimitScrollingProperty =
-        DependencyProperty.Register( "LimitScrolling",
-        typeof( bool ),
-        typeof( SynchronizedScrollViewer ),
-        new UIPropertyMetadata( true ) );
+    internal static readonly DependencyProperty LimitScrollingProperty = DependencyProperty.Register(
+      "LimitScrolling",
+      typeof( bool ),
+      typeof( SynchronizedScrollViewer ),
+      new UIPropertyMetadata( true ) );
 
     internal bool LimitScrolling
     {
       get
       {
-        return ( bool )GetValue( SynchronizedScrollViewer.LimitScrollingProperty );
+        return ( bool )this.GetValue( SynchronizedScrollViewer.LimitScrollingProperty );
       }
       set
       {
-        SetValue( SynchronizedScrollViewer.LimitScrollingProperty, value );
+        this.SetValue( SynchronizedScrollViewer.LimitScrollingProperty, value );
       }
     }
 
-    #endregion LimitScrolling Property
-
-    #region Protected Overrides
+    #endregion
 
     public override void OnApplyTemplate()
     {
@@ -146,12 +135,16 @@ namespace Xceed.Wpf.DataGrid.Views
       if( this.TemplatedParent != m_mainScrollViewer )
       {
         if( m_mainScrollViewer != null )
-          m_mainScrollViewer.ScrollChanged -= this.OnMainScrollViewer_ScrollChanged;
+        {
+          m_mainScrollViewer.ScrollChanged -= new ScrollChangedEventHandler( this.OnMainScrollViewer_ScrollChanged );
+        }
 
         m_mainScrollViewer = this.TemplatedParent as ScrollViewer;
 
         if( m_mainScrollViewer != null )
-          m_mainScrollViewer.ScrollChanged += this.OnMainScrollViewer_ScrollChanged;
+        {
+          m_mainScrollViewer.ScrollChanged += new ScrollChangedEventHandler( this.OnMainScrollViewer_ScrollChanged );
+        }
       }
     }
 
@@ -161,8 +154,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
       base.OnScrollChanged( e );
 
-      // m_mainScrollViewer will remain null in design mode.
-      // and if it's null, nothing to update
+      // m_mainScrollViewer will remain null in design mode and if it's null, nothing to update
       if( m_mainScrollViewer == null )
         return;
 
@@ -170,51 +162,23 @@ namespace Xceed.Wpf.DataGrid.Views
       // not triggered by the main ScrollViewer scrolling. In that case, we want
       // to update the main ScrollViewer. A typical example is when a Row's cell is 
       // brought into view by, let's say, activating the cell editor.
-      ScrollOrientation orientation = this.ScrollOrientation;
+      var invalidateMainScrollViewerMeasure = false;
 
-      bool invalidateMainScrollViewerMeasure = false;
-
-      if( ( orientation & ScrollOrientation.Horizontal ) == ScrollOrientation.Horizontal )
+      // If the Extent is 0, there is no reason to update the main ScrollViewer offset since this means there are no children.
+      if( this.CanScrollHorizontally() )
       {
-        invalidateMainScrollViewerMeasure = !DoubleUtil.AreClose( 0, e.ExtentWidthChange );
+        invalidateMainScrollViewerMeasure = invalidateMainScrollViewerMeasure || !DoubleUtil.AreClose( 0, e.ExtentWidthChange );
 
-        // If the Extent is 0, there is no reason to update
-        // the main ScrollViewer offset since this means there
-        // are no children
-        if( this.ExtentWidth == 0 )
-          return;
-
-        double offset = ( m_originalScrollChangedEventArgs != null )
-          ? m_originalScrollChangedEventArgs.HorizontalOffset
-          : e.HorizontalOffset;
-
-        if( offset != m_mainScrollViewer.HorizontalOffset )
-        {
-          m_mainScrollViewer.ScrollToHorizontalOffset( offset );
-        }
+        this.BeginUpdateMainScrollViewer( e );
       }
 
-      if( ( orientation & ScrollOrientation.Vertical ) == ScrollOrientation.Vertical )
+      // If the Extent is 0, there is no reason to update the main ScrollViewer offset since this means there are no children.
+      if( this.CanScrollVertically() )
       {
-        invalidateMainScrollViewerMeasure = !DoubleUtil.AreClose( 0, e.ExtentHeightChange );
+        invalidateMainScrollViewerMeasure = invalidateMainScrollViewerMeasure || !DoubleUtil.AreClose( 0, e.ExtentHeightChange );
 
-        // If the Extent is 0, there is no reason to update
-        // the main ScrollViewer offset since this means there
-        // are no children
-        if( this.ExtentHeight == 0 )
-          return;
-
-        double offset = ( m_originalScrollChangedEventArgs != null )
-          ? m_originalScrollChangedEventArgs.VerticalOffset
-          : e.VerticalOffset;
-
-        if( ( offset != m_mainScrollViewer.VerticalOffset ) && ( this.ExtentHeight > 0 ) )
-        {
-          m_mainScrollViewer.ScrollToVerticalOffset( offset );
-        }
+        this.BeginUpdateMainScrollViewer( e );
       }
-
-      m_originalScrollChangedEventArgs = null;
 
       // In some situations, the Extent*Change event is received AFTER the 
       // layout pass of the mainScrollViewer is done. Since the measure of the
@@ -222,12 +186,10 @@ namespace Xceed.Wpf.DataGrid.Views
       // call InvalidateMeasure on the mainScrollViewer to ensure it is correctly
       // layouted
       if( invalidateMainScrollViewerMeasure )
+      {
         m_mainScrollViewer.InvalidateMeasure();
+      }
     }
-
-    #endregion
-
-    #region  PreviewKeyDown and KeyDown handling overrides
 
     protected override void OnPreviewKeyDown( KeyEventArgs e )
     {
@@ -405,7 +367,9 @@ namespace Xceed.Wpf.DataGrid.Views
       // Mark the key as handled to avoid the DataGridScrollViewer
       // to process the PageUp.
       if( !e.Handled && this.IsKeyboardFocusWithin )
+      {
         e.Handled = true;
+      }
     }
 
     protected virtual void HandlePageDownKey( KeyEventArgs e )
@@ -420,7 +384,9 @@ namespace Xceed.Wpf.DataGrid.Views
       // Mark the key as handled to avoid the DataGridScrollViewer
       // to process the PageDown.
       if( !e.Handled && this.IsKeyboardFocusWithin )
+      {
         e.Handled = true;
+      }
     }
 
     protected virtual void HandleHomeKey( KeyEventArgs e )
@@ -451,32 +417,64 @@ namespace Xceed.Wpf.DataGrid.Views
       e.Handled = DataGridItemsHost.ProcessMoveFocus( e.Key );
     }
 
-    #endregion
+    private bool CanScrollHorizontally()
+    {
+      return ( ( this.ScrollOrientation & ScrollOrientation.Horizontal ) == ScrollOrientation.Horizontal )
+          && ( this.ExtentWidth > 0d );
+    }
 
-    #region Private Methods
+    private bool CanScrollVertically()
+    {
+      return ( ( this.ScrollOrientation & ScrollOrientation.Vertical ) == ScrollOrientation.Vertical )
+          && ( this.ExtentHeight > 0d );
+    }
+
+    private void BeginUpdateMainScrollViewer( ScrollChangedEventArgs e )
+    {
+      if( m_scrollChangedEventArgs == null )
+      {
+        m_scrollChangedEventArgs = e;
+      }
+
+      if( m_updateMainScrollViewer == null )
+      {
+        m_updateMainScrollViewer = this.Dispatcher.BeginInvoke( new Action( this.UpdateMainScrollViewer ), DispatcherPriority.Send );
+      }
+    }
+
+    private void UpdateMainScrollViewer()
+    {
+      var e = m_scrollChangedEventArgs;
+
+      m_updateMainScrollViewer = null;
+      m_scrollChangedEventArgs = null;
+
+      if( ( m_mainScrollViewer == null ) || ( e == null ) )
+        return;
+
+      if( this.CanScrollHorizontally() && ( e.HorizontalOffset != m_mainScrollViewer.HorizontalOffset ) )
+      {
+        m_mainScrollViewer.ScrollToHorizontalOffset( e.HorizontalOffset );
+      }
+
+      if( this.CanScrollVertically() && ( e.VerticalOffset != m_mainScrollViewer.VerticalOffset ) )
+      {
+        m_mainScrollViewer.ScrollToVerticalOffset( e.VerticalOffset );
+      }
+    }
 
     private void OnMainScrollViewer_ScrollChanged( object sender, ScrollChangedEventArgs e )
     {
-      if( e.OriginalSource != m_mainScrollViewer )
+      if( ( e.OriginalSource != m_mainScrollViewer ) || m_deferScrollChange )
         return;
 
-      if( m_deferScrollChange )
-        return;
+      var orientation = this.ScrollOrientation;
+      var limitScrolling = this.LimitScrolling;
 
-      ScrollOrientation orientation = this.ScrollOrientation;
-      bool limitScrolling = this.LimitScrolling;
-
-      if( ( orientation & ScrollOrientation.Horizontal ) == ScrollOrientation.Horizontal )
+      // If the Extent is 0, there is no reason to update the main ScrollViewer offset since this means there are no children.
+      if( this.CanScrollHorizontally() )
       {
-        // If the Extent is 0, there is no reason to update
-        // the main ScrollViewer offset since this means there
-        // are no children
-        if( this.ExtentWidth == 0 )
-          return;
-
-        double offset = ( limitScrolling )
-          ? Math.Min( e.HorizontalOffset, this.ExtentWidth - this.ViewportWidth )
-          : e.HorizontalOffset;
+        var offset = ( limitScrolling ) ? Math.Min( e.HorizontalOffset, this.ExtentWidth - this.ViewportWidth ) : e.HorizontalOffset;
 
         if( offset != this.HorizontalOffset )
         {
@@ -486,22 +484,15 @@ namespace Xceed.Wpf.DataGrid.Views
           // to scroll to that value. Since changing our offset will trigger the OnScrollChanged
           // that will update the m_mainScrollViewer, we want to changer it's offset to 
           // the right value.
-          m_originalScrollChangedEventArgs = e;
+          m_scrollChangedEventArgs = e;
           this.ScrollToHorizontalOffset( offset );
         }
       }
 
-      if( ( orientation & ScrollOrientation.Vertical ) == ScrollOrientation.Vertical )
+      // If the Extent is 0, there is no reason to update the main ScrollViewer offset since this means there are no children.
+      if( this.CanScrollVertically() )
       {
-        // If the Extent is 0, there is no reason to update
-        // the main ScrollViewer offset since this means there
-        // are no children
-        if( this.ExtentHeight == 0 )
-          return;
-
-        double offset = ( limitScrolling )
-          ? Math.Min( e.VerticalOffset, this.ExtentHeight - this.ViewportHeight )
-          : e.VerticalOffset;
+        var offset = ( limitScrolling ) ? Math.Min( e.VerticalOffset, this.ExtentHeight - this.ViewportHeight ) : e.VerticalOffset;
 
         if( offset != this.VerticalOffset )
         {
@@ -511,19 +502,18 @@ namespace Xceed.Wpf.DataGrid.Views
           // to scroll to that value. Since changing our offset will trigger the OnScrollChanged
           // that will update the m_mainScrollViewer, we want to changer it's offset to 
           // the right value.
-          m_originalScrollChangedEventArgs = e;
+          m_scrollChangedEventArgs = e;
           this.ScrollToVerticalOffset( offset );
         }
       }
     }
 
-    #endregion
-
     #region Private Fields
 
-    private ScrollViewer m_mainScrollViewer; // = null
-    private bool m_deferScrollChange; // = false 
-    private ScrollChangedEventArgs m_originalScrollChangedEventArgs = null;
+    private ScrollViewer m_mainScrollViewer; //null
+    private bool m_deferScrollChange; //false 
+    private ScrollChangedEventArgs m_scrollChangedEventArgs; //null
+    private DispatcherOperation m_updateMainScrollViewer; //null
 
     #endregion
   }

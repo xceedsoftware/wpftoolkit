@@ -21,11 +21,8 @@ namespace Xceed.Wpf.DataGrid
 {
   public class DataTableForeignKeyDescription : DataGridForeignKeyDescription
   {
-    #region CONSTRUCTORS
-
     public DataTableForeignKeyDescription()
     {
-      this.ForeignKeyConverter = new DataTableForeignKeyConverter();
     }
 
     internal DataTableForeignKeyDescription( ForeignKeyConstraint constraint )
@@ -33,8 +30,6 @@ namespace Xceed.Wpf.DataGrid
     {
       this.ForeignKeyConstraint = constraint;
     }
-
-    #endregion
 
     #region ForeignKeyConstraint Property
 
@@ -70,7 +65,10 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region PRIVATE METHODS
+    protected override void SetForeignKeyConverter()
+    {
+      this.ForeignKeyConverter = new DataTableForeignKeyConverter();
+    }
 
     private void UpdateValuePath()
     {
@@ -111,7 +109,5 @@ namespace Xceed.Wpf.DataGrid
 
       this.ItemsSource = relatedTable.DefaultView;
     }
-
-    #endregion
   }
 }

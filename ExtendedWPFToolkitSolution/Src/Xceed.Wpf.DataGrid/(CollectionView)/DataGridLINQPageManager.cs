@@ -150,7 +150,7 @@ namespace Xceed.Wpf.DataGrid
       try
       {
         if( items.Count() != requestedItemCount )
-          throw new InvalidOperationException( "TODODOC : The number of non-null items return by the source must be equal to the provided item count" );
+          throw new InvalidOperationException( "The number of non-null items returned by the source must be equal to the provided item count." );
       }
       catch
       {

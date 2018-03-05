@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -28,7 +28,6 @@
          <LineBreak/>
          <LineBreak/>
            The sample also demonstrate the usage of CategoryGroupDescription to control the categorization of the elements.
-         <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
            <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
@@ -36,10 +35,9 @@
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->           
       </Paragraph>
     </local:DemoView.Description>
-    
+
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
@@ -48,13 +46,7 @@
       <StackPanel Grid.Row="0" Margin="10">
          <TextBlock Text="This sample adds Employee items directly under the Properties property and defines the editor through the DefaultEditorDefinition property."
                     TextWrapping="Wrap"/>
-         <!--##EXCLUDE_OPEN_SOURCE-->
-         <TextBlock Text="(Click the XAML and Code tabs to see details.)" 
-                    FontStyle="Italic"
-                    Margin="0,10,0,0"/>
-         <!--##END-->
       </StackPanel>
-      <!--##INCLUDE_OPEN_SOURCE
       <ScrollViewer Grid.Row="1" 
                     VerticalScrollBarVisibility="Auto"
                     HorizontalScrollBarVisibility="Auto">
@@ -65,72 +57,11 @@
             <local:XamlBox CodeSource="/Samples/PropertyGrid/OpenSourceImages/Properties.xaml.txt" />
          </StackPanel>
       </ScrollViewer>      
-      ##END-->      
-<!--##EXCLUDE_OPEN_SOURCE-->
-      <!-- 
-      PropertyNameBinding will be used to determine the property name's display text.
-      Value will be specified through DefaultEditorDefinition.
-      -->
-      <DockPanel Grid.Row="1">
-         <StackPanel DockPanel.Dock="Top" Margin="20" 
-                     Orientation="Horizontal">
-            <TextBlock Margin="0,0,10,0" VerticalAlignment="Center"
-                       Text="Category GroupDescription Property:" />
-            <ComboBox x:Name="categoryGroupCombo" Width="150"
-                      IsEnabled="{Binding IsCategorized, ElementName=_propertyGrid}"
-                      DisplayMemberPath="PropertyName"
-                      SelectedIndex="0">
-               <PropertyGroupDescription PropertyName="Department"/>
-               <PropertyGroupDescription PropertyName="IsConfirmed"/>
-            </ComboBox>
 
-         </StackPanel>
 
-         <xctk:PropertyGrid x:Name="_propertyGrid" Width="350" MaxHeight="275" VerticalAlignment="Top"
-                         PropertyNameBinding="{Binding Name}"
-                         CategoryGroupDescription="{Binding SelectedItem, ElementName=categoryGroupCombo}"
-                         SelectedObjectName="Meeting" >
-            <xctk:PropertyGrid.Properties>
-               <!--Here we define the items to be displayed in the property grid (a list of Employees). -->
-               <v:Employee Name="Tom" IsConfirmed="True" Department="Sales"/>
-               <v:Employee Name="John" IsConfirmed="false" Department="Management"/>
-               <v:Representent Name="Brad" IsConfirmed="True" 
-                            Department="Sales"
-                            Details="On the phone"/>
-               <v:Employee Name="Kevin" IsConfirmed="false" Department="Management"/>
-               <v:Employee Name="Jane" IsConfirmed="True" Department="Management"/>
-               <v:Employee Name="Sean" IsConfirmed="True" Department="Sales"/>
-            </xctk:PropertyGrid.Properties>
 
-            <xctk:PropertyGrid.DefaultEditorDefinition>
-               <!-- This editor will be the default editor for items of the property grid. -->
-               <xctk:EditorCheckBoxDefinition Binding="{Binding IsConfirmed}"/>
-            </xctk:PropertyGrid.DefaultEditorDefinition>
 
-            <xctk:PropertyGrid.EditorDefinitions>
-               <!--
-            Define a specific editor for the Representent with a "details" field.
-            
-            Since no PropertyValueBinding is defined, the type of the item itself
-            will be used as a key to detect the possible defined editor.
-            -->
-               <xctk:EditorTemplateDefinition TargetProperties="{x:Type v:Representent}">
-                  <xctk:EditorTemplateDefinition.EditingTemplate>
-                     <DataTemplate >
-                        <StackPanel HorizontalAlignment="Stretch">
-                           <CheckBox IsChecked="{Binding IsConfirmed}" Margin="5,0,0,0" />
-                           <DockPanel HorizontalAlignment="Stretch">
-                              <TextBlock DockPanel.Dock="Left" Text="Details: " VerticalAlignment="Center"/>
-                              <TextBox Text="{Binding Details}" FontStyle="Italic" HorizontalAlignment="Stretch" />
-                           </DockPanel>
-                        </StackPanel>
-                     </DataTemplate>
-                  </xctk:EditorTemplateDefinition.EditingTemplate>
-               </xctk:EditorTemplateDefinition>
 
-            </xctk:PropertyGrid.EditorDefinitions>
-         </xctk:PropertyGrid>
-      </DockPanel>
-<!--##END-->
+
    </Grid>      
 </local:DemoView>

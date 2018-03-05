@@ -22,194 +22,196 @@
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-   <ResourceDictionary.MergedDictionaries>
-      <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
-      <ResourceDictionary Source="../../Themes/Aero2/Glyphs.xaml" />
-   </ResourceDictionary.MergedDictionaries>
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
+    <ResourceDictionary Source="../../Themes/Aero2/Glyphs.xaml" />
+  </ResourceDictionary.MergedDictionaries>
 
-   <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+  <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
 
-   <Image x:Key="DefaultContent"
-          x:Shared="False"
-          Height="16"
-          Width="18"
-          Source="./../Images/Notes16.png" />
+  <Image x:Key="DefaultContent"
+         x:Shared="False"
+         Height="16"
+         Width="18"
+         Source="./../Images/Notes16.png" />
 
-   <Style x:Key="ToggleButtonStyle"
-          TargetType="ToggleButton">
-      <Setter Property="Template">
-         <Setter.Value>
-            <ControlTemplate TargetType="ToggleButton">
-               <Grid SnapsToDevicePixels="True">
+  <Style x:Key="ToggleButtonStyle"
+         TargetType="ToggleButton">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ToggleButton">
+          <Grid SnapsToDevicePixels="True">
 
-                  <Grid>
-                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                     </Grid.ColumnDefinitions>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
 
-                     <Border Background="{TemplateBinding Background}"
-                             BorderBrush="{TemplateBinding BorderBrush}"
-                             BorderThickness="{TemplateBinding BorderThickness}"
-                             Padding="{TemplateBinding Padding}"
-                             SnapsToDevicePixels="True">
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}"
-                                          ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
-                     </Border>
+              <Border Background="{TemplateBinding Background}"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}"
+                      Padding="{TemplateBinding Padding}"
+                      SnapsToDevicePixels="True">
+                <ContentPresenter Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+              </Border>
 
-                     <chrome:ButtonChrome x:Name="ToggleButtonChrome"
-                                          Grid.Column="1"
-                                          CornerRadius="0"
-                                          RenderChecked="{Binding IsOpen, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MultiLineTextEditor}}"
-                                          RenderEnabled="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MultiLineTextEditor}}"
-                                          RenderMouseOver="{TemplateBinding IsMouseOver}"
-                                          RenderPressed="{TemplateBinding IsPressed}">
-                        <Grid x:Name="arrowGlyph"
-                              IsHitTestVisible="False"
-                              Grid.Column="1"
-                              Margin="5">
-                           <Path x:Name="Arrow"
-                                 Width="9"
-                                 Height="5"
-                                 Data="{StaticResource DownArrowGeometry}"
-                                 Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
-                                 Margin="0,1,0,0"/>
+              <chrome:ButtonChrome x:Name="ToggleButtonChrome"
+                                   Grid.Column="1"
+                                   CornerRadius="0"
+                                   RenderChecked="{Binding IsOpen, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MultiLineTextEditor}}"
+                                   RenderEnabled="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MultiLineTextEditor}}"
+                                   RenderMouseOver="{TemplateBinding IsMouseOver}"
+                                   RenderPressed="{TemplateBinding IsPressed}">
+                <Grid x:Name="arrowGlyph"
+                      IsHitTestVisible="False"
+                      Grid.Column="1"
+                      Margin="5">
+                  <Path x:Name="Arrow"
+                        Width="9"
+                        Height="5"
+                        Data="{StaticResource DownArrowGeometry}"
+                        Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                        Margin="0,1,0,0" />
+                </Grid>
+              </chrome:ButtonChrome>
+            </Grid>
+
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsEnabled"
+                     Value="False">
+              <Setter Property="Fill"
+                      TargetName="Arrow"
+                      Value="#AFAFAF" />
+              <Setter Property="Foreground"
+                      Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+
+  <!-- =============================================================================== -->
+  <!-- MultiLineTextEditor                                                             -->
+  <!-- =============================================================================== -->
+
+  <Style TargetType="{x:Type local:MultiLineTextEditor}">
+    <Setter Property="Background"
+            Value="White" />
+    <Setter Property="BorderBrush"
+            Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
+    <Setter Property="BorderThickness"
+            Value="1,1,0,1" />
+    <Setter Property="Content"
+            Value="{StaticResource DefaultContent}" />
+    <Setter Property="IsTabStop"
+            Value="False" />
+    <Setter Property="Padding"
+            Value="2,0,0,0" />
+    <Setter Property="HorizontalContentAlignment"
+            Value="Center" />
+    <Setter Property="VerticalContentAlignment"
+            Value="Center" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:MultiLineTextEditor}">
+          <Grid x:Name="Root">
+            <ToggleButton x:Name="PART_DropDownButton"
+                          Grid.Column="1"
+                          IsTabStop="True"
+                          MinHeight="22"
+                          SnapsToDevicePixels="True"
+                          Background="{TemplateBinding Background}"
+                          BorderBrush="{TemplateBinding BorderBrush}"
+                          BorderThickness="{TemplateBinding BorderThickness}"
+                          Padding="{TemplateBinding Padding}"
+                          Content="{TemplateBinding Content}"
+                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                          ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                          IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                          Style="{StaticResource ToggleButtonStyle}"
+                          IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}">
+            </ToggleButton>
+            <Popup IsOpen="{Binding IsChecked, ElementName=PART_DropDownButton}"
+                   StaysOpen="False"
+                   Placement="Bottom"
+                   SnapsToDevicePixels="True"
+                   AllowsTransparency="True"
+                   Focusable="False"
+                   PopupAnimation="Slide"
+                   Width="{TemplateBinding DropDownWidth}"
+                   Height="{TemplateBinding DropDownHeight}"
+                   ToolTip="{x:Static sys:String.Empty}">
+              <Popup.Resources>
+                <Style TargetType="ToolTip">
+                  <Style.Triggers>
+                    <Trigger Property="Content"
+                             Value="{x:Static sys:String.Empty}">
+                      <Setter Property="Visibility"
+                              Value="Collapsed" />
+                    </Trigger>
+                  </Style.Triggers>
+                </Style>
+              </Popup.Resources>
+              <Border BorderThickness="1"
+                      Background="White"
+                      BorderBrush="{StaticResource PopupDarkBorderBrush}">
+                <Grid>
+                  <TextBox x:Name="PART_TextBox"
+                           AcceptsReturn="true"
+                           TextWrapping="{TemplateBinding TextWrapping}"
+                           Padding="{TemplateBinding Padding}"
+                           VerticalScrollBarVisibility="Auto"
+                           HorizontalScrollBarVisibility="Auto"
+                           SpellCheck.IsEnabled="{TemplateBinding IsSpellCheckEnabled}"
+                           IsReadOnly="{TemplateBinding IsReadOnly}"
+                           Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
+                           TextAlignment="{TemplateBinding TextAlignment}"
+                           Margin="3">
+                  </TextBox>
+                  <Thumb x:Name="PART_ResizeThumb"
+                         HorizontalAlignment="Right"
+                         VerticalAlignment="Bottom"
+                         Cursor="SizeNWSE">
+                    <Thumb.Template>
+                      <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Grid Background="Transparent">
+                          <Path Data="M0.5,6.5 L6.5,0.5 M6.5,3.5 L3.5,6.5"
+                                Stroke="Black"
+                                StrokeThickness="1" />
                         </Grid>
-                     </chrome:ButtonChrome>
-                  </Grid>
+                      </ControlTemplate>
+                    </Thumb.Template>
+                  </Thumb>
+                </Grid>
+              </Border>
+            </Popup>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
 
-               </Grid>
-               <ControlTemplate.Triggers>
-                  <Trigger Property="IsEnabled"
-                           Value="False">
-                     <Setter Property="Fill"
-                             TargetName="Arrow"
-                             Value="#AFAFAF" />
-                     <Setter Property="Foreground"
-                             Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                  </Trigger>
-               </ControlTemplate.Triggers>
-            </ControlTemplate>
-         </Setter.Value>
-      </Setter>
-   </Style>
-
-
-   <!-- =============================================================================== -->
-   <!-- MultiLineTextEditor                                                             -->
-   <!-- =============================================================================== -->
-
-   <Style TargetType="{x:Type local:MultiLineTextEditor}">
-      <Setter Property="Background"
-              Value="White" />
-      <Setter Property="BorderBrush"
-              Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
-      <Setter Property="BorderThickness"
-              Value="1,1,0,1" />
-      <Setter Property="Content"
-              Value="{StaticResource DefaultContent}" />
-      <Setter Property="IsTabStop"
-              Value="False" />
-      <Setter Property="Padding"
-              Value="2,0,0,0" />
-      <Setter Property="HorizontalContentAlignment"
-              Value="Center" />
-      <Setter Property="VerticalContentAlignment"
-              Value="Center" />
-      <Setter Property="Template">
-         <Setter.Value>
-            <ControlTemplate TargetType="{x:Type local:MultiLineTextEditor}">
-               <Grid x:Name="Root">
-                  <ToggleButton x:Name="PART_DropDownButton"
-                                Grid.Column="1"
-                                IsTabStop="True"
-                                MinHeight="22"
-                                SnapsToDevicePixels="True"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Padding="{TemplateBinding Padding}"
-                                Content="{TemplateBinding Content}"
-                                ContentTemplate="{TemplateBinding ContentTemplate}"
-                                ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
-                                IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
-                                Style="{StaticResource ToggleButtonStyle}"
-                                IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
-                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
-                  <Popup IsOpen="{Binding IsChecked, ElementName=PART_DropDownButton}"
-                         StaysOpen="False"
-                         Placement="Bottom"
-                         SnapsToDevicePixels="True"
-                         AllowsTransparency="True"
-                         Focusable="False"
-                         PopupAnimation="Slide"
-                         Width="{TemplateBinding DropDownWidth}"
-                         Height="{TemplateBinding DropDownHeight}"
-                         ToolTip="{x:Static sys:String.Empty}">
-                     <Popup.Resources>
-                        <Style TargetType="ToolTip">
-                           <Style.Triggers>
-                              <Trigger Property="Content"
-                                                Value="{x:Static sys:String.Empty}">
-                                 <Setter Property="Visibility"
-                                                  Value="Collapsed" />
-                              </Trigger>
-                           </Style.Triggers>
-                        </Style>
-                     </Popup.Resources>
-                     <Border BorderThickness="1"
-                             Background="White"
-                             BorderBrush="{StaticResource PopupDarkBorderBrush}">
-                        <Grid>
-                           <TextBox x:Name="PART_TextBox"
-                                    AcceptsReturn="true"
-                                    TextWrapping="{TemplateBinding TextWrapping}"
-                                    Padding="{TemplateBinding Padding}"
-                                    VerticalScrollBarVisibility="Auto"
-                                    HorizontalScrollBarVisibility="Auto"
-                                    SpellCheck.IsEnabled="{TemplateBinding IsSpellCheckEnabled}"
-                                    IsReadOnly="{TemplateBinding IsReadOnly}"
-                                    Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
-                                    TextAlignment="{TemplateBinding TextAlignment}"
-                                    Margin="3" />
-                           <Thumb x:Name="PART_ResizeThumb"
-                                  HorizontalAlignment="Right"
-                                  VerticalAlignment="Bottom"
-                                  Cursor="SizeNWSE">
-                              <Thumb.Template>
-                                 <ControlTemplate TargetType="{x:Type Thumb}">
-                                    <Grid Background="Transparent">
-                                       <Path Data="M0.5,6.5 L6.5,0.5 M6.5,3.5 L3.5,6.5"
-                                             Stroke="Black"
-                                             StrokeThickness="1" />
-                                    </Grid>
-                                 </ControlTemplate>
-                              </Thumb.Template>
-                           </Thumb>
-                        </Grid>
-                     </Border>
-                  </Popup>
-               </Grid>
-            </ControlTemplate>
-         </Setter.Value>
-      </Setter>
-
-      <Style.Triggers>
-         <Trigger Property="IsMouseOver"
-                  Value="True">
-            <Setter Property="BorderBrush"
-                    Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
-         </Trigger>
-         <Trigger Property="IsKeyboardFocusWithin"
-                  Value="True">
-            <Setter Property="BorderBrush"
-                    Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
-         </Trigger>
-      </Style.Triggers>
-   </Style>
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver"
+               Value="True">
+        <Setter Property="BorderBrush"
+                Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
+      </Trigger>
+      <Trigger Property="IsKeyboardFocusWithin"
+               Value="True">
+        <Setter Property="BorderBrush"
+                Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
 
 </ResourceDictionary>

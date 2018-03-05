@@ -36,7 +36,7 @@ using System.Windows.Markup;
 
 [assembly: AssemblyCompany( "Xceed Software Inc." )]
 [assembly: AssemblyProduct( "Xceed Toolkit for WPF - DataGrid" )]
-[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2016" )]
+[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2017" )]
 
 
 [assembly: CLSCompliant( true )]
@@ -47,9 +47,7 @@ using System.Windows.Markup;
 [assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.Converters")]
 [assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.Markup")]
 [assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.Views")]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.Automation")]
 [assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.ValidationRules")]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/datagrid", "Xceed.Wpf.DataGrid.FilterCriteria")]
 
 
 [assembly: SecurityRules( SecurityRuleSet.Level1 )]

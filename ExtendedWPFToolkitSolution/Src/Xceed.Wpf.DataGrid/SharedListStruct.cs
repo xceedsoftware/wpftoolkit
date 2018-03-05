@@ -46,7 +46,10 @@ namespace Xceed.Wpf.DataGrid
 
     public int Count
     {
-      get { return m_localCount; }
+      get
+      {
+        return m_localCount;
+      }
     }
 
     public void EnsureCapacity( int capacity )
@@ -85,7 +88,7 @@ namespace Xceed.Wpf.DataGrid
       if( ( startIndex < 0 )
         || ( length < 0 )
         || ( startIndex + length > m_localCount ) )
-        throw new DataGridInternalException( "specified range is invalid" );
+        throw new DataGridInternalException( "Specified range is invalid" );
 
       m_internalList.CopyTo( startIndex, array, arrayIndex, length );
     }

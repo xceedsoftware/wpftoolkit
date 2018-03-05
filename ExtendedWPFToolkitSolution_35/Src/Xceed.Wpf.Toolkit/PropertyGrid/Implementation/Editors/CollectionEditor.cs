@@ -30,6 +30,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       ValueProperty = CollectionControlButton.ItemsSourceProperty;
     }
 
+    protected override CollectionControlButton CreateEditor()
+    {
+      return new PropertyGridEditorCollectionControl();
+    }
+
 
     protected override void ResolveValueBinding( PropertyItem propertyItem )
     {

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -14,9 +14,6 @@
 
   ************************************************************************************/
 
-#if !OPEN_SOURCE
-using Xceed.Wpf.Toolkit.Chart;
-#endif
 using System.Windows.Media;
 using System.Windows.Controls;
 using System;
@@ -29,119 +26,33 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Chart.Views
   /// </summary>
   public partial class ChartAxisView : DemoView
   {
-#if !OPEN_SOURCE
-    #region Members
-
-    private static DataPointsList<DataPoint> _numericDataPoints = new DataPointsList<DataPoint>() 
-                                                                  {   new DataPoint(1, 1)
-                                                                    , new DataPoint(2, 2)
-                                                                    , new DataPoint(1.5, 3)
-                                                                    , new DataPoint(5, 3.5) 
-                                                                  };
-    private static DataPointsList<DataPoint> _dateTimeDataPoints = new DataPointsList<DataPoint>()
-                                                                  {
-                                                                      new DataPoint( new System.DateTime( 2000, 1, 1 ).ToOADate(), 1 )
-                                                                    , new DataPoint( new System.DateTime( 2001, 1, 1 ).ToOADate(), 2 )
-                                                                    , new DataPoint( new System.DateTime( 2002, 5, 5 ).ToOADate(), 4 )
-                                                                    , new DataPoint( new System.DateTime( 2003, 1, 1 ).ToOADate(), 3 )
-                                                                  };
-    private static DataPointsList<DataPoint> _labelsDataPoints = new DataPointsList<DataPoint>()
-                                                                  {
-                                                                      new DataPoint( 0, 5, "Zeus" )
-                                                                    , new DataPoint( 0, 2, "Poseidon" )
-                                                                    , new DataPoint( 0, 3, "Hades" )
-                                                                    , new DataPoint( 0, 4, "Hestia" )
-                                                                    , new DataPoint( 0, 1, "Hera" )
-                                                                  };
-    #endregion
 
 
-    #region Dependency Properties
 
-    public static readonly DependencyProperty SelectedAxisProperty = DependencyProperty.Register(
-     "SelectedAxis",
-     typeof( Axis ),
-     typeof( ChartAxisView ),
-     new UIPropertyMetadata( null ) );
 
-    #endregion
 
-    #region Properties
 
-    public Axis SelectedAxis
-    {
-      get
-      {
-        return ( Axis )GetValue( SelectedAxisProperty );
-      }
-      set
-      {
-        SetValue( SelectedAxisProperty, value );
-      }
-    }
 
-    #endregion
-#endif
+
 
     #region Initialization
 
     public ChartAxisView()
     {
       InitializeComponent();
-#if !OPEN_SOURCE
-      _axisComboBox.SelectedIndex = 0;
-      _xAxis.DateTimeFormat = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-#endif
     }
 
     #endregion
 
-#if !OPEN_SOURCE
-    #region Event Handlers
 
-    private void OnAxisComboBoxSelectionChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox comboBox = ( ComboBox )sender;
-      
-      this.SelectedAxis = ( comboBox.SelectedIndex == 0 ) ? _xAxis : _yAxis;
-    }
 
-    private void OnAxisLabelsTypeChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox comboBox = ( ComboBox )sender;
 
-      switch( (LabelsType)comboBox.SelectedItem )
-      {
-        case LabelsType.Numeric: 
-          this.SetSeriesDataPoints( _numericDataPoints ); 
-          break;
-        case LabelsType.DateTime:
-          this.SetSeriesDataPoints( _dateTimeDataPoints );
-          break;
-        case LabelsType.Labels : 
-          this.SetSeriesDataPoints( _labelsDataPoints ); 
-          this.SelectedAxis.GraduationMode = AxisGraduationMode.Manual; 
-          break;
-      }
-    }
 
-    #endregion
-#endif
+
 
     #region Implementation
 
-#if !OPEN_SOURCE
-    private void SetSeriesDataPoints( DataPointsList<DataPoint> list )
-    {
-      if( _series != null )
-      {
-        _series.DataPoints.Clear();
 
-        foreach( DataPoint dataPoint in list )
-          _series.DataPoints.Add( dataPoint );
-      }
-    }
-#endif
     #endregion
   }
 }

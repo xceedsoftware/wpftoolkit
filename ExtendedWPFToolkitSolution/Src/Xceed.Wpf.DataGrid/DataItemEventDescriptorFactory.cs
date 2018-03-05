@@ -30,8 +30,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region Constructor
-
     static DataItemEventDescriptorFactory()
     {
       s_reflectEventDescriptorType = Assembly.GetAssembly( typeof( EventDescriptor ) ).GetType( "System.ComponentModel.ReflectEventDescriptor" );
@@ -45,9 +43,7 @@ namespace Xceed.Wpf.DataGrid
       m_typeDescriptor = typeDescriptor;
     }
 
-    #endregion
-
-    internal DataItemEventDescriptorBase CreateEventDescriptor( EventDescriptor source )
+    internal DataItemEventDescriptor CreateEventDescriptor( EventDescriptor source )
     {
       if( !DataItemEventDescriptorFactory.IsReflected( source ) )
         return null;
@@ -154,10 +150,22 @@ namespace Xceed.Wpf.DataGrid
         {
           var d = ( Action<TSource, THandler> )Delegate.CreateDelegate( typeof( Action<TSource, THandler> ), methodInfo, false );
           if( d != null )
-            return ( source, handler ) => d.Invoke( ( TSource )source, ( THandler )handler );
+            return ( source, handler ) =>
+              {
+                if( !( source is TSource ) )
+                  return;
+
+                d.Invoke( ( TSource )source, ( THandler )handler );
+              };
         }
 
-        return ( source, handler ) => methodInfo.Invoke( source, new object[] { handler } );
+        return ( source, handler ) =>
+          {
+            if( !( source is TSource ) )
+              return;
+
+            methodInfo.Invoke( source, new object[] { handler } );
+          };
       }
     }
 

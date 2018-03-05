@@ -20,23 +20,15 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Data;
+using Xceed.Utils.Wpf;
 using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal sealed class ColumnSynchronizationManager : IWeakEventListener
   {
-    #region Static Fields
-
-    private static readonly string DetailConfigurationDataGridControlPropertyName = "DataGridControl";
-    private static readonly string DetailConfigurationIsAttachedToDetailDescriptionPropertyName = "IsAttachedToDetailDescription";
-    private static readonly string ColumnCollectionMainColumnPropertyName = "MainColumn";
-
-    #endregion
-
     #region Constructor
 
     internal ColumnSynchronizationManager( DetailConfiguration configuration )
@@ -47,32 +39,17 @@ namespace Xceed.Wpf.DataGrid
       m_detailConfiguration = configuration;
       m_itemPropertyMap = configuration.ItemPropertyMap;
 
-      PropertyChangedEventManager.AddListener( configuration, this, ColumnSynchronizationManager.DetailConfigurationDataGridControlPropertyName );
-      PropertyChangedEventManager.AddListener( configuration, this, ColumnSynchronizationManager.DetailConfigurationIsAttachedToDetailDescriptionPropertyName );
-      CollectionChangedEventManager.AddListener( ( INotifyCollectionChanged )m_itemPropertyMap, this );
+      PropertyChangedEventManager.AddListener( configuration, this, string.Empty );
+      MappingChangedEventManager.AddListener( m_itemPropertyMap, this );
 
       using( this.DeferSynchronization() )
       {
         this.DataGridControl = configuration.DataGridControl;
-        this.DetailColumns = configuration.Columns;
+        this.DetailColumnManager = configuration.ColumnManager;
 
-        Debug.Assert( this.DetailColumns != null );
+        Debug.Assert( m_detailColumnManager != null );
       }
     }
-
-    #endregion
-
-    #region DetailConfiguration Private Property
-
-    private DetailConfiguration DetailConfiguration
-    {
-      get
-      {
-        return m_detailConfiguration;
-      }
-    }
-
-    private readonly DetailConfiguration m_detailConfiguration;
 
     #endregion
 
@@ -102,14 +79,14 @@ namespace Xceed.Wpf.DataGrid
           {
             ViewChangedEventManager.AddListener( m_dataGridControl, this );
 
-            this.MasterColumns = m_dataGridControl.Columns;
+            this.MasterColumnManager = m_dataGridControl.DataGridContext.ColumnManager;
           }
           else
           {
-            this.MasterColumns = null;
+            this.MasterColumnManager = null;
           }
 
-          this.InvalidateSynchronization();
+          m_isSynchronizationValid = false;
         }
       }
     }
@@ -118,99 +95,71 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region ItemPropertyMap Private Property
+    #region MasterColumnManager Private Property
 
-    private FieldNameMap ItemPropertyMap
+    private ColumnHierarchyManager MasterColumnManager
     {
       get
       {
-        return m_itemPropertyMap;
-      }
-    }
-
-    private readonly FieldNameMap m_itemPropertyMap;
-
-    #endregion
-
-    #region MasterColumns Private Property
-
-    private ColumnCollection MasterColumns
-    {
-      get
-      {
-        return m_masterColumns;
+        return m_masterColumnManager;
       }
       set
       {
-        if( value == m_masterColumns )
+        if( value == m_masterColumnManager )
           return;
 
-        if( m_masterColumns != null )
+        if( m_masterColumnManager != null )
         {
-          CollectionChangedEventManager.RemoveListener( m_masterColumns, this );
-          PropertyChangedEventManager.RemoveListener( m_masterColumns, this, ColumnSynchronizationManager.ColumnCollectionMainColumnPropertyName );
-          VisibleColumnsUpdatedEventManager.RemoveListener( m_masterColumns, this );
+          ColumnsLayoutChangedEventManager.RemoveListener( m_masterColumnManager, this );
+          CollectionChangedEventManager.RemoveListener( m_masterColumnManager.Columns, this );
+          PropertyChangedEventManager.RemoveListener( m_masterColumnManager.Columns, this, ColumnCollection.MainColumnPropertyName );
         }
 
-        m_masterColumns = value;
+        m_masterColumnManager = value;
 
-        if( m_masterColumns != null )
+        if( m_masterColumnManager != null )
         {
-          CollectionChangedEventManager.AddListener( m_masterColumns, this );
-          PropertyChangedEventManager.AddListener( m_masterColumns, this, ColumnSynchronizationManager.ColumnCollectionMainColumnPropertyName );
-          VisibleColumnsUpdatedEventManager.AddListener( m_masterColumns, this );
+          ColumnsLayoutChangedEventManager.AddListener( m_masterColumnManager, this );
+          CollectionChangedEventManager.AddListener( m_masterColumnManager.Columns, this );
+          PropertyChangedEventManager.AddListener( m_masterColumnManager.Columns, this, ColumnCollection.MainColumnPropertyName );
         }
       }
     }
 
-    private ColumnCollection m_masterColumns;
+    private ColumnHierarchyManager m_masterColumnManager;
 
     #endregion
 
-    #region DetailColumns Private Property
+    #region DetailColumnManager Private Property
 
-    private ColumnCollection DetailColumns
+    private ColumnHierarchyManager DetailColumnManager
     {
       get
       {
-        return m_detailColumns;
+        return m_detailColumnManager;
       }
       set
       {
-        if( value == m_detailColumns )
+        if( value == m_detailColumnManager )
           return;
 
-        if( m_detailColumns != null )
+        if( m_detailColumnManager != null )
         {
-          CollectionChangedEventManager.RemoveListener( m_detailColumns, this );
-          VisibleColumnsUpdatedEventManager.RemoveListener( m_detailColumns, this );
+          ColumnsLayoutChangedEventManager.RemoveListener( m_detailColumnManager, this );
+          CollectionChangedEventManager.RemoveListener( m_detailColumnManager.Columns, this );
         }
 
-        m_detailColumns = value;
+        m_detailColumnManager = value;
 
-        if( m_detailColumns != null )
+        if( m_detailColumnManager != null )
         {
-          CollectionChangedEventManager.AddListener( m_detailColumns, this );
-          VisibleColumnsUpdatedEventManager.AddListener( m_detailColumns, this );
+          ColumnsLayoutChangedEventManager.AddListener( m_detailColumnManager, this );
+          CollectionChangedEventManager.AddListener( m_detailColumnManager.Columns, this );
         }
       }
     }
 
-    private ColumnCollection m_detailColumns;
-
-    #endregion
-
-    #region PairedColumns Private Property
-
-    private Dictionary<SynchronizationKey, SynchronizationEntry> PairedColumns
-    {
-      get
-      {
-        return m_pairedColumns;
-      }
-    }
-
-    private readonly Dictionary<SynchronizationKey, SynchronizationEntry> m_pairedColumns = new Dictionary<SynchronizationKey, SynchronizationEntry>( 0 );
+    private ColumnHierarchyManager m_detailColumnManager;
 
     #endregion
 
@@ -220,24 +169,10 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return ( this.MasterColumns != null )
-            && ( this.DetailConfiguration.IsAttachedToDetailDescription );
+        return ( m_masterColumnManager != null )
+            && ( m_detailConfiguration.DetailDescription != null );
       }
     }
-
-    #endregion
-
-    #region IsUpdatingColumns Private Property
-
-    private bool IsUpdatingColumns
-    {
-      get
-      {
-        return m_isUpdatingColumns;
-      }
-    }
-
-    private bool m_isUpdatingColumns;
 
     #endregion
 
@@ -247,10 +182,8 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        var dataGridControl = this.DataGridControl;
-
-        return ( dataGridControl != null )
-            && ( dataGridControl.AreDetailsFlatten );
+        return ( m_dataGridControl != null )
+            && ( m_dataGridControl.AreDetailsFlatten );
       }
     }
 
@@ -260,28 +193,15 @@ namespace Xceed.Wpf.DataGrid
 
     private IDisposable DeferSynchronization()
     {
-      return new DeferSynchronizationHelper( this );
+      return new DeferredDisposable( new DeferState( this ) );
     }
 
-    private bool IsSynchronizationDefered
+    private bool IsSynchronizationDeferred
     {
       get
       {
-        return ( Interlocked.CompareExchange( ref m_deferSynchronizationCount, 0, 0 ) != 0 );
+        return ( m_deferSynchronizationCount != 0 );
       }
-    }
-
-    private bool IsSynchronizationValid
-    {
-      get
-      {
-        return m_isSynchronizationValid;
-      }
-    }
-
-    private void InvalidateSynchronization()
-    {
-      m_isSynchronizationValid = false;
     }
 
     private int m_deferSynchronizationCount; //0
@@ -289,18 +209,19 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    private void Refresh()
+    internal void Refresh()
     {
-      if( this.IsUpdatingColumns )
+      if( m_isUpdatingColumns )
         return;
 
-      this.InvalidateSynchronization();
+      m_isSynchronizationValid = false;
+
       this.UpdateColumns();
     }
 
     private void UpdateColumns()
     {
-      if( this.IsSynchronizationDefered || this.IsSynchronizationValid || this.IsUpdatingColumns )
+      if( this.IsSynchronizationDeferred || m_isSynchronizationValid || m_isUpdatingColumns )
         return;
 
       try
@@ -310,19 +231,24 @@ namespace Xceed.Wpf.DataGrid
 
         if( this.IsSynchronizationReady && this.AreDetailsFlatten )
         {
-          var keys = new HashSet<SynchronizationKey>( this.GetNewKeys() );
+          Debug.Assert( m_detailColumnManager != null );
 
-          foreach( var key in this.PairedColumns.Keys.Except( keys ).ToArray() )
+          using( m_detailColumnManager.DeferUpdate() )
           {
-            this.Desynchronize( key );
-          }
+            var keys = new HashSet<SynchronizationKey>( this.GetNewKeys() );
 
-          foreach( var key in keys.OrderBy( item => item.OrderKey ) )
-          {
-            this.Synchronize( key );
-          }
+            foreach( var key in m_pairedColumns.Keys.Except( keys ).ToArray() )
+            {
+              this.Desynchronize( key );
+            }
 
-          this.SetMainColumn();
+            foreach( var key in keys.OrderBy( item => item.OrderKey ) )
+            {
+              this.Synchronize( key );
+            }
+
+            this.SetMainColumn();
+          }
         }
         else
         {
@@ -340,18 +266,18 @@ namespace Xceed.Wpf.DataGrid
       if( key == null )
         return;
 
-      var collection = this.PairedColumns;
+      var collection = m_pairedColumns;
 
       SynchronizationEntry pair;
       if( !collection.TryGetValue( key, out pair ) )
       {
         if( key.MasterColumn != null )
         {
-          pair = new BoundColumn( key );
+          pair = new BoundColumn( this, key );
         }
         else
         {
-          pair = new UnboundColumn( key );
+          pair = new UnboundColumn( this, key );
         }
 
         collection.Add( key, pair );
@@ -365,7 +291,7 @@ namespace Xceed.Wpf.DataGrid
       if( key == null )
         return;
 
-      var collection = this.PairedColumns;
+      var collection = m_pairedColumns;
 
       SynchronizationEntry pair;
       if( !collection.TryGetValue( key, out pair ) )
@@ -377,7 +303,7 @@ namespace Xceed.Wpf.DataGrid
 
     private void Desynchronize()
     {
-      var collection = this.PairedColumns;
+      var collection = m_pairedColumns;
       while( collection.Count > 0 )
       {
         this.Desynchronize( collection.First().Key );
@@ -389,16 +315,17 @@ namespace Xceed.Wpf.DataGrid
       if( !this.IsSynchronizationReady || !this.AreDetailsFlatten )
         return;
 
-      var detailColumns = this.DetailColumns;
-      ColumnBase detailColumn = null;
+      Debug.Assert( m_detailColumnManager != null );
 
-      var mainColumn = this.MasterColumns.MainColumn;
+      var detailColumns = m_detailColumnManager.Columns;
+      var detailColumn = default( ColumnBase );
+
+      var mainColumn = m_masterColumnManager.Columns.MainColumn;
       if( mainColumn != null )
       {
-        string targetName;
-        if( this.ItemPropertyMap.TryGetItemPropertyName( mainColumn, out targetName ) )
+        if( !DataGridItemPropertyMapHelper.TryGetDetailColumn( m_itemPropertyMap, detailColumns, mainColumn, out detailColumn ) )
         {
-          detailColumn = detailColumns[ targetName ];
+          detailColumn = null;
         }
       }
 
@@ -407,33 +334,20 @@ namespace Xceed.Wpf.DataGrid
 
     private IEnumerable<SynchronizationKey> GetNewKeys()
     {
-      var detailConfig = this.DetailConfiguration;
-      var map = this.ItemPropertyMap;
-
-      foreach( var detailColumn in this.DetailColumns )
+      foreach( var detailColumn in m_detailColumnManager.Columns )
       {
-        ColumnBase masterColumn;
-        string targetName;
+        var masterColumn = default( ColumnBase );
 
-        if( map.TryGetColumnFieldName( detailColumn, out targetName ) )
-        {
-          masterColumn = this.MasterColumns[ targetName ];
-        }
-        else
+        if( !DataGridItemPropertyMapHelper.TryGetMasterColumn( m_itemPropertyMap, m_masterColumnManager.Columns, detailColumn, out masterColumn ) )
         {
           masterColumn = null;
         }
 
-        yield return new SynchronizationKey( masterColumn, detailColumn, detailConfig );
+        yield return new SynchronizationKey( masterColumn, detailColumn, m_detailConfiguration );
       }
     }
 
     private void OnViewChanged()
-    {
-      this.Refresh();
-    }
-
-    private void OnUserSettingsLoaded()
     {
       this.Refresh();
     }
@@ -443,7 +357,7 @@ namespace Xceed.Wpf.DataGrid
       var propertyName = e.PropertyName;
       bool mayHaveChanged = string.IsNullOrEmpty( propertyName );
 
-      if( mayHaveChanged || ( propertyName == ColumnSynchronizationManager.ColumnCollectionMainColumnPropertyName ) )
+      if( mayHaveChanged || ( propertyName == ColumnCollection.MainColumnPropertyName ) )
       {
         this.SetMainColumn();
       }
@@ -454,22 +368,14 @@ namespace Xceed.Wpf.DataGrid
       var propertyName = e.PropertyName;
       bool mayHaveChanged = string.IsNullOrEmpty( propertyName );
 
-      if( mayHaveChanged || ( propertyName == ColumnSynchronizationManager.DetailConfigurationDataGridControlPropertyName ) )
+      if( mayHaveChanged || ( propertyName == DetailConfiguration.DataGridControlPropertyName ) )
       {
-        this.DataGridControl = this.DetailConfiguration.DataGridControl;
-      }
-
-      if( mayHaveChanged || ( propertyName == ColumnSynchronizationManager.DetailConfigurationIsAttachedToDetailDescriptionPropertyName ) )
-      {
-        this.Refresh();
+        this.DataGridControl = m_detailConfiguration.DataGridControl;
       }
     }
 
-    private void OnItemPropertyMapCollectionChanged( NotifyCollectionChangedEventArgs e )
+    private void OnItemPropertyMapMappingChanged( EventArgs e )
     {
-      if( e.Action == NotifyCollectionChangedAction.Move )
-        return;
-
       this.Refresh();
     }
 
@@ -503,124 +409,105 @@ namespace Xceed.Wpf.DataGrid
 
     bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
+      Debug.Assert( sender != null );
+
       if( managerType == typeof( CollectionChangedEventManager ) )
       {
-        if( sender == this.MasterColumns )
+        if( ( m_masterColumnManager != null ) && ( sender == m_masterColumnManager.Columns ) )
         {
-          Debug.Assert( sender != null );
-
           this.OnMasterColumnsCollectionChanged( ( NotifyCollectionChangedEventArgs )e );
         }
-        else if( sender == this.DetailColumns )
+        else if( ( m_detailColumnManager != null ) && ( sender == m_detailColumnManager.Columns ) )
         {
-          Debug.Assert( sender != null );
-
           this.OnDetailColumnsCollectionChanged( ( NotifyCollectionChangedEventArgs )e );
         }
-        else if( sender == this.ItemPropertyMap )
-        {
-          Debug.Assert( sender != null );
-
-          this.OnItemPropertyMapCollectionChanged( ( NotifyCollectionChangedEventArgs )e );
-        }
-
-        return true;
       }
       else if( managerType == typeof( PropertyChangedEventManager ) )
       {
-        if( sender == this.MasterColumns )
+        if( ( m_masterColumnManager != null ) && ( sender == m_masterColumnManager.Columns ) )
         {
-          Debug.Assert( sender != null );
-
           this.OnMasterColumnsPropertyChanged( ( PropertyChangedEventArgs )e );
         }
-        else if( sender == this.DetailConfiguration )
+        else if( sender == m_detailConfiguration )
         {
-          Debug.Assert( sender != null );
-
           this.OnDetailConfigurationPropertyChanged( ( PropertyChangedEventArgs )e );
         }
-
-        return true;
       }
-      else if( managerType == typeof( VisibleColumnsUpdatedEventManager ) )
+      else if( managerType == typeof( ColumnsLayoutChangedEventManager ) )
       {
-        if( sender == this.MasterColumns )
+        if( sender == m_masterColumnManager )
         {
-          Debug.Assert( sender != null );
-
           this.OnMasterVisibleColumnsUpdated( e );
         }
-        else if( sender == this.DetailColumns )
+        else if( sender == m_detailColumnManager )
         {
-          Debug.Assert( sender != null );
-
           this.OnDetailVisibleColumnsUpdated( e );
         }
-
-        return true;
+      }
+      else if( managerType == typeof( MappingChangedEventManager ) )
+      {
+        if( sender == m_itemPropertyMap )
+        {
+          this.OnItemPropertyMapMappingChanged( e );
+        }
       }
       else if( managerType == typeof( ViewChangedEventManager ) )
       {
-        if( sender == this.DataGridControl )
+        if( sender == m_dataGridControl )
         {
-          Debug.Assert( sender != null );
-
           this.OnViewChanged();
         }
-
-        return true;
+      }
+      else
+      {
+        return false;
       }
 
-      return false;
+      return true;
     }
 
     #endregion
 
-    #region DeferSynchronizationHelper Private Class
+    private readonly DetailConfiguration m_detailConfiguration;
+    private readonly DataGridItemPropertyMap m_itemPropertyMap;
+    private readonly Dictionary<SynchronizationKey, SynchronizationEntry> m_pairedColumns = new Dictionary<SynchronizationKey, SynchronizationEntry>( 0 );
 
-    private sealed class DeferSynchronizationHelper : IDisposable
+    private bool m_isUpdatingColumns;
+
+    #region DeferState Private Class
+
+    private sealed class DeferState : DeferredDisposableState
     {
-      internal DeferSynchronizationHelper( ColumnSynchronizationManager owner )
+      internal DeferState( ColumnSynchronizationManager target )
       {
-        if( owner == null )
-          throw new ArgumentNullException( "owner" );
-
-        m_owner = owner;
-
-        Interlocked.Increment( ref owner.m_deferSynchronizationCount );
+        Debug.Assert( target != null );
+        m_target = target;
       }
 
-      void IDisposable.Dispose()
+      protected override bool IsDeferred
       {
-        this.Dispose( true );
-        GC.SuppressFinalize( this );
+        get
+        {
+          return m_target.IsSynchronizationDeferred;
+        }
       }
 
-      private void Dispose( bool disposing )
+      protected override void Increment()
       {
-        Debug.Assert( disposing );
-
-        var owner = m_owner;
-        if( Interlocked.CompareExchange<ColumnSynchronizationManager>( ref m_owner, null, owner ) == null )
-          return;
-
-        if( Interlocked.Decrement( ref owner.m_deferSynchronizationCount ) != 0 )
-          return;
-
-        owner.UpdateColumns();
+        m_target.m_deferSynchronizationCount++;
       }
 
-      ~DeferSynchronizationHelper()
+      protected override void Decrement()
       {
-        this.Dispose( false );
+        m_target.m_deferSynchronizationCount--;
       }
 
-      #region Private Fields
+      protected override void OnDeferEnded( bool disposing )
+      {
+        m_target.UpdateColumns();
+      }
 
-      private ColumnSynchronizationManager m_owner;
-
-      #endregion
+      private readonly ColumnSynchronizationManager m_target;
     }
 
     #endregion
@@ -733,13 +620,31 @@ namespace Xceed.Wpf.DataGrid
 
     private abstract class SynchronizationEntry
     {
-      protected SynchronizationEntry( SynchronizationKey key )
+      protected SynchronizationEntry( ColumnSynchronizationManager owner, SynchronizationKey key )
       {
+        if( owner == null )
+          throw new ArgumentNullException( "owner" );
+
         if( key == null )
           throw new ArgumentNullException( "key" );
 
+        m_owner = owner;
         m_key = key;
       }
+
+      #region Owner Protected Property
+
+      protected ColumnSynchronizationManager Owner
+      {
+        get
+        {
+          return m_owner;
+        }
+      }
+
+      private readonly ColumnSynchronizationManager m_owner;
+
+      #endregion
 
       #region MasterColumn Protected Property
 
@@ -801,201 +706,334 @@ namespace Xceed.Wpf.DataGrid
 
     private sealed class BoundColumn : SynchronizationEntry
     {
-      internal BoundColumn( SynchronizationKey key )
-        : base( key )
+      internal BoundColumn( ColumnSynchronizationManager owner, SynchronizationKey key )
+        : base( owner, key )
       {
         if( key.MasterColumn == null )
           throw new ArgumentException( "The master column is not set.", "key" );
-
-        m_bindings = BoundColumn.CreateBindings( key.MasterColumn ).ToArray();
       }
-
-      #region IsListeningEvents Private Property
-
-      private bool IsListeningEvents
-      {
-        get
-        {
-          return m_isListeningEvents;
-        }
-        set
-        {
-          m_isListeningEvents = value;
-        }
-      }
-
-      private bool m_isListeningEvents; //false
-
-      #endregion
 
       public override void Synchronize()
       {
-        this.SubscribeEvents();
+        var masterColumn = this.MasterColumn;
+        var detailColumn = this.DetailColumn;
 
-        var targetColumn = this.DetailColumn;
-
-        foreach( var entry in m_bindings )
+        if( m_localValues == null )
         {
-          var dp = entry.Key;
-          var binding = entry.Value;
+          m_localValues = new Dictionary<DependencyProperty, object>( 8 );
 
-          // The appropriate binding is still in place.
-          var currentBinding = BindingOperations.GetBindingBase( targetColumn, dp );
-          if( currentBinding == binding )
-            continue;
+          masterColumn.PropertyChanged += new PropertyChangedEventHandler( this.OnMasterColumnPropertyChanged );
+          masterColumn.FittedWidthRequested += new FittedWidthRequestedEventHandler( this.OnMasterColumnFittedWidthRequested );
 
-          if( currentBinding != null )
-          {
-            m_localValues[ dp ] = currentBinding;
-          }
-          else
-          {
-            var localValue = targetColumn.ReadLocalValue( dp );
-            if( localValue != DependencyProperty.UnsetValue )
-            {
-              m_localValues[ dp ] = localValue;
-            }
-            else
-            {
-              m_localValues.Remove( dp );
-            }
-          }
-
-          BindingOperations.SetBinding( targetColumn, dp, binding );
+          BoundColumn.StoreLocalValue( m_localValues, detailColumn, ColumnBase.WidthProperty );
+          BoundColumn.StoreLocalValue( m_localValues, detailColumn, ColumnBase.MinWidthProperty );
+          BoundColumn.StoreLocalValue( m_localValues, detailColumn, ColumnBase.MaxWidthProperty );
+          BoundColumn.StoreLocalValue( m_localValues, detailColumn, ColumnBase.DesiredWidthProperty );
+          BoundColumn.StoreLocalValue( m_localValues, detailColumn, ColumnBase.VisibleProperty );
+          BoundColumn.StoreLocalValue( m_localValues, detailColumn, ColumnReorderingDragSourceManager.AnimatedColumnReorderingTranslationProperty );
+          BoundColumn.StoreLocalValue( m_localValues, detailColumn, TableflowView.IsBeingDraggedAnimatedProperty );
+          BoundColumn.StoreLocalValue( m_localValues, detailColumn, TableflowView.ColumnReorderingDragSourceManagerProperty );
         }
 
-        var visiblePosition = this.GetTargetVisiblePosition();
-        if( visiblePosition.HasValue )
-        {
-          targetColumn.VisiblePosition = visiblePosition.Value;
-        }
-        else
-        {
-          targetColumn.ClearValue( ColumnBase.VisiblePositionProperty );
-        }
+        BoundColumn.SetValue( masterColumn, detailColumn, ColumnBase.WidthProperty );
+        BoundColumn.SetValue( masterColumn, detailColumn, ColumnBase.MinWidthProperty );
+        BoundColumn.SetValue( masterColumn, detailColumn, ColumnBase.MaxWidthProperty );
+        BoundColumn.SetValue( masterColumn, detailColumn, ColumnBase.DesiredWidthProperty );
+        BoundColumn.SetValue( masterColumn, detailColumn, ColumnBase.VisibleProperty );
+        BoundColumn.SetValue( masterColumn, detailColumn, ColumnReorderingDragSourceManager.AnimatedColumnReorderingTranslationProperty );
+        BoundColumn.SetValue( masterColumn, detailColumn, TableflowView.IsBeingDraggedAnimatedProperty );
+        BoundColumn.SetValue( masterColumn, detailColumn, TableflowView.ColumnReorderingDragSourceManagerProperty );
+
+        this.UpdateTargetPosition();
       }
 
       public override void Desynchronize()
       {
-        this.UnsubscribeEvents();
+        if( m_localValues == null )
+          return;
 
-        var targetColumn = this.DetailColumn;
-
-        foreach( var entry in m_bindings )
-        {
-          var dp = entry.Key;
-          var binding = entry.Value;
-
-          // The appropriate binding is still in place.
-          var currentBinding = BindingOperations.GetBindingBase( targetColumn, dp );
-          if( currentBinding == binding )
-          {
-            object oldValue;
-
-            if( m_localValues.TryGetValue( dp, out oldValue ) )
-            {
-              var oldBinding = oldValue as BindingBase;
-              if( oldBinding != null )
-              {
-                BindingOperations.SetBinding( targetColumn, dp, oldBinding );
-              }
-              else
-              {
-                targetColumn.SetValue( dp, oldValue );
-              }
-            }
-            else
-            {
-              BindingOperations.ClearBinding( targetColumn, dp );
-            }
-          }
-
-          m_localValues.Remove( dp );
-        }
-
-        targetColumn.ClearValue( ColumnBase.VisiblePositionProperty );
-      }
-
-      private static IEnumerable<KeyValuePair<DependencyProperty, BindingBase>> CreateBindings( ColumnBase source )
-      {
-        yield return BoundColumn.CreateBinding( ColumnBase.WidthProperty, source );
-        yield return BoundColumn.CreateBinding( ColumnBase.MinWidthProperty, source );
-        yield return BoundColumn.CreateBinding( ColumnBase.MaxWidthProperty, source );
-        yield return BoundColumn.CreateBinding( ColumnBase.DesiredWidthProperty, source );
-        yield return BoundColumn.CreateBinding( ColumnBase.VisibleProperty, source );
-        yield return BoundColumn.CreateBinding( ColumnReorderingDragSourceManager.AnimatedColumnReorderingTranslationProperty, source );
-        yield return BoundColumn.CreateBinding( TableflowView.IsBeingDraggedAnimatedProperty, source );
-        yield return BoundColumn.CreateBinding( TableflowView.ColumnReorderingDragSourceManagerProperty, source );
-      }
-
-      private static KeyValuePair<DependencyProperty, BindingBase> CreateBinding( DependencyProperty dp, ColumnBase source )
-      {
-        if( dp == null )
-          throw new ArgumentNullException( "property" );
-
-        if( source == null )
-          throw new ArgumentNullException( "source" );
-
-        var binding = new Binding();
-        binding.Path = new PropertyPath( dp );
-        binding.Source = source;
-
-        return new KeyValuePair<DependencyProperty, BindingBase>( dp, binding );
-      }
-
-      private Nullable<int> GetTargetVisiblePosition()
-      {
-        var detailConfig = this.DetailConfiguration;
-
-        var dataGridControl = detailConfig.DataGridControl;
-        if( dataGridControl == null )
-          return null;
+        var localValues = m_localValues;
+        m_localValues = null;
 
         var masterColumn = this.MasterColumn;
-        int visiblePosition = masterColumn.VisiblePosition;
-        if( visiblePosition < 0 )
-          return null;
+        masterColumn.PropertyChanged -= new PropertyChangedEventHandler( this.OnMasterColumnPropertyChanged );
+        masterColumn.FittedWidthRequested -= new FittedWidthRequestedEventHandler( this.OnMasterColumnFittedWidthRequested );
 
-        var masterColumnNode = dataGridControl.ColumnsByVisiblePosition.Find( masterColumn );
-        if( masterColumnNode == null )
-          return null;
+        var detailColumn = this.DetailColumn;
+        BoundColumn.RestoreLocalValue( localValues, detailColumn, ColumnBase.WidthProperty );
+        BoundColumn.RestoreLocalValue( localValues, detailColumn, ColumnBase.MinWidthProperty );
+        BoundColumn.RestoreLocalValue( localValues, detailColumn, ColumnBase.MaxWidthProperty );
+        BoundColumn.RestoreLocalValue( localValues, detailColumn, ColumnBase.DesiredWidthProperty );
+        BoundColumn.RestoreLocalValue( localValues, detailColumn, ColumnBase.VisibleProperty );
+        BoundColumn.RestoreLocalValue( localValues, detailColumn, ColumnReorderingDragSourceManager.AnimatedColumnReorderingTranslationProperty );
+        BoundColumn.RestoreLocalValue( localValues, detailColumn, TableflowView.IsBeingDraggedAnimatedProperty );
+        BoundColumn.RestoreLocalValue( localValues, detailColumn, TableflowView.ColumnReorderingDragSourceManagerProperty );
 
-        var map = this.DetailConfiguration.ItemPropertyMap;
+        detailColumn.ClearValue( ColumnBase.VisiblePositionProperty );
+      }
 
-        // Remove master columns that are not linked to a detail column from the VisiblePosition count.
-        masterColumnNode = masterColumnNode.Previous;
-        while( masterColumnNode != null )
+      private static void StoreLocalValue( Dictionary<DependencyProperty, object> store, ColumnBase column, DependencyProperty property )
+      {
+        Debug.Assert( store != null );
+        Debug.Assert( column != null );
+        Debug.Assert( property != null );
+
+        var binding = BindingOperations.GetBindingBase( column, property );
+        if( binding != null )
         {
-          string detailColumnName;
-          if( !map.TryGetItemPropertyName( masterColumnNode.Value, out detailColumnName ) )
+          store[ property ] = binding;
+        }
+        else
+        {
+          var value = column.ReadLocalValue( property );
+          if( value != DependencyProperty.UnsetValue )
           {
-            visiblePosition--;
+            store[ property ] = value;
           }
+          else
+          {
+            store.Remove( property );
+          }
+        }
+      }
 
-          masterColumnNode = masterColumnNode.Previous;
+      private static void RestoreLocalValue( Dictionary<DependencyProperty, object> store, ColumnBase column, DependencyProperty property )
+      {
+        Debug.Assert( store != null );
+        Debug.Assert( column != null );
+        Debug.Assert( property != null );
+
+        object value;
+        if( !store.TryGetValue( property, out value ) || ( value == DependencyProperty.UnsetValue ) )
+        {
+          column.ClearValue( property );
+        }
+        else if( value is BindingBase )
+        {
+          BindingOperations.SetBinding( column, property, ( BindingBase )value );
+        }
+        else
+        {
+          column.SetValue( property, value );
+        }
+      }
+
+      private static void SetValue( ColumnBase source, ColumnBase destination, DependencyProperty property, string propertyName )
+      {
+        Debug.Assert( property != null );
+
+        if( string.IsNullOrEmpty( propertyName ) || ( propertyName == property.Name ) )
+        {
+          BoundColumn.SetValue( source, destination, property );
+        }
+      }
+
+      private static void SetValue( ColumnBase source, ColumnBase destination, DependencyProperty property )
+      {
+        Debug.Assert( source != null );
+        Debug.Assert( destination != null );
+        Debug.Assert( property != null );
+
+        destination.SetValue( property, source.GetValue( property ) );
+      }
+
+      private void UpdateTargetPosition()
+      {
+        var detailConfig = this.DetailConfiguration;
+        var dataGridControl = detailConfig.DataGridControl;
+
+        if( dataGridControl == null )
+          return;
+
+        var masterColumn = this.MasterColumn;
+        var masterColumnManager = DataGridControl.GetDataGridContext( dataGridControl ).ColumnManager;
+        var masterColumnLocation = masterColumnManager.GetColumnLocationFor( masterColumn );
+
+        if( masterColumnLocation == null )
+          return;
+
+        var detailColumn = this.DetailColumn;
+        var detailColumnManager = detailConfig.ColumnManager;
+        var detailColumnLocation = detailColumnManager.GetColumnLocationFor( detailColumn );
+
+        if( detailColumnLocation == null )
+          return;
+
+        var map = detailConfig.ItemPropertyMap;
+        var previousMasterLocation = masterColumnLocation.GetPreviousSiblingOrCousin();
+        Debug.Assert( previousMasterLocation != null );
+
+        switch( previousMasterLocation.Type )
+        {
+          case LocationType.Start:
+          case LocationType.Splitter:
+            {
+              for( var previousDetailLocation = detailColumnLocation.GetPreviousSiblingOrCousin(); previousDetailLocation != null; previousDetailLocation = previousDetailLocation.GetPreviousSiblingOrCousin() )
+              {
+                // The detail column is at the appropriate location.
+                if( previousDetailLocation.Type == previousMasterLocation.Type )
+                  return;
+
+                if( previousDetailLocation.Type != LocationType.Column )
+                  break;
+
+                ColumnBase unused;
+                if( DataGridItemPropertyMapHelper.TryGetMasterColumn( map, masterColumnManager.Columns, ( ( ColumnHierarchyManager.IColumnLocation )previousDetailLocation ).Column, out unused ) )
+                  break;
+              }
+            }
+            break;
+
+          case LocationType.Column:
+            {
+              var previousMasterColumn = ( ( ColumnHierarchyManager.IColumnLocation )previousMasterLocation ).Column;
+
+              for( var previousDetailLocation = detailColumnLocation.GetPreviousSiblingOrCousin(); previousDetailLocation != null; previousDetailLocation = previousDetailLocation.GetPreviousSiblingOrCousin() )
+              {
+                if( previousDetailLocation.Type != LocationType.Column )
+                  break;
+
+                ColumnBase targetMasterColumn;
+                if( DataGridItemPropertyMapHelper.TryGetMasterColumn( map, masterColumnManager.Columns, ( ( ColumnHierarchyManager.IColumnLocation )previousDetailLocation ).Column, out targetMasterColumn ) )
+                {
+                  // The detail column is at the appropriate location.
+                  if( previousMasterColumn == targetMasterColumn )
+                    return;
+                }
+              }
+            }
+            break;
+
+          default:
+            // Unexpected location.
+            throw new NotSupportedException();
         }
 
-        Debug.Assert( visiblePosition >= 0 );
+        var nextMasterLocation = masterColumnLocation.GetNextSiblingOrCousin();
+        Debug.Assert( nextMasterLocation != null );
 
-        return visiblePosition;
+        switch( nextMasterLocation.Type )
+        {
+          case LocationType.Splitter:
+          case LocationType.Orphan:
+            {
+              for( var nextDetailLocation = detailColumnLocation.GetNextSiblingOrCousin(); nextDetailLocation != null; nextDetailLocation = nextDetailLocation.GetNextSiblingOrCousin() )
+              {
+                // The detail column is at the appropriate location.
+                if( nextDetailLocation.Type == nextMasterLocation.Type )
+                  return;
+
+                if( nextDetailLocation.Type != LocationType.Column )
+                  break;
+
+                ColumnBase unused;
+                if( DataGridItemPropertyMapHelper.TryGetMasterColumn( map, masterColumnManager.Columns, ( ( ColumnHierarchyManager.IColumnLocation )nextDetailLocation ).Column, out unused ) )
+                  break;
+              }
+            }
+            break;
+
+          case LocationType.Column:
+            {
+              var nextMasterColumn = ( ( ColumnHierarchyManager.IColumnLocation )nextMasterLocation ).Column;
+
+              for( var nextDetailLocation = detailColumnLocation.GetNextSiblingOrCousin(); nextDetailLocation != null; nextDetailLocation = nextDetailLocation.GetNextSiblingOrCousin() )
+              {
+                if( nextDetailLocation.Type != LocationType.Column )
+                  break;
+
+                ColumnBase targetMasterColumn;
+                if( DataGridItemPropertyMapHelper.TryGetMasterColumn( map, masterColumnManager.Columns, ( ( ColumnHierarchyManager.IColumnLocation )nextDetailLocation ).Column, out targetMasterColumn ) )
+                {
+                  // The detail column is at the appropriate location.
+                  if( nextMasterColumn == targetMasterColumn )
+                    return;
+                }
+              }
+            }
+            break;
+
+          default:
+            // Unexpected location.
+            throw new NotSupportedException();
+        }
+
+        // If we get here, it means that the column is really not at the appropriate location.
+        for( var pivotMasterLocation = previousMasterLocation; pivotMasterLocation != null; pivotMasterLocation = pivotMasterLocation.GetPreviousSiblingOrCousin() )
+        {
+          if( pivotMasterLocation.Type == LocationType.Column )
+          {
+            ColumnBase pivotDetailColumn;
+            if( !DataGridItemPropertyMapHelper.TryGetDetailColumn( map, detailColumnManager.Columns, ( ( ColumnHierarchyManager.IColumnLocation )pivotMasterLocation ).Column, out pivotDetailColumn ) )
+              continue;
+
+            var pivotDetailLocation = ( pivotDetailColumn != null ) ? detailColumnManager.GetColumnLocationFor( pivotDetailColumn ) : null;
+            if( pivotDetailLocation == null )
+              continue;
+
+            Debug.Assert( detailColumnLocation.CanMoveAfter( pivotDetailLocation ) );
+            detailColumnLocation.MoveAfter( pivotDetailLocation );
+          }
+          else
+          {
+            switch( pivotMasterLocation.Type )
+            {
+              case LocationType.Start:
+                {
+                  var pivotDetailLocation = detailColumnManager.GetLevelMarkersFor( detailColumnManager.Columns ).Start;
+
+                  if( !detailColumnLocation.CanMoveAfter( pivotDetailLocation ) )
+                    throw new NotSupportedException();
+
+                  detailColumnLocation.MoveAfter( pivotDetailLocation );
+                }
+                break;
+
+              case LocationType.Splitter:
+                {
+                  var pivotDetailLocation = detailColumnManager.GetLevelMarkersFor( detailColumnManager.Columns ).Splitter;
+
+                  if( !detailColumnLocation.CanMoveAfter( pivotDetailLocation ) )
+                    throw new NotSupportedException();
+
+                  detailColumnLocation.MoveAfter( pivotDetailLocation );
+                }
+                break;
+
+              default:
+                // Unexpected location.
+                throw new NotSupportedException();
+            }
+          }
+
+          // The detail column is now at the appropriate location.
+          return;
+        }
       }
 
-      private void SubscribeEvents()
+      private void OnMasterColumnPropertyChanged( object sender, PropertyChangedEventArgs e )
       {
-        if( this.IsListeningEvents )
+        var masterColumn = sender as ColumnBase;
+        if( masterColumn == null )
           return;
 
-        this.MasterColumn.FittedWidthRequested += new FittedWidthRequestedEventHandler( this.OnMasterColumnFittedWidthRequested );
-        this.IsListeningEvents = true;
-      }
+        Debug.Assert( masterColumn == this.MasterColumn );
 
-      private void UnsubscribeEvents()
-      {
-        if( !this.IsListeningEvents )
+        var masterColumnManager = this.Owner.MasterColumnManager;
+        if( ( masterColumnManager == null ) || masterColumnManager.IsUpdateDeferred )
           return;
 
-        this.MasterColumn.FittedWidthRequested -= new FittedWidthRequestedEventHandler( this.OnMasterColumnFittedWidthRequested );
-        this.IsListeningEvents = false;
+        var detailColumn = this.DetailColumn;
+        var propertyName = e.PropertyName;
+
+        BoundColumn.SetValue( masterColumn, detailColumn, ColumnBase.WidthProperty, propertyName );
+        BoundColumn.SetValue( masterColumn, detailColumn, ColumnBase.MinWidthProperty, propertyName );
+        BoundColumn.SetValue( masterColumn, detailColumn, ColumnBase.MaxWidthProperty, propertyName );
+        BoundColumn.SetValue( masterColumn, detailColumn, ColumnBase.DesiredWidthProperty, propertyName );
+        BoundColumn.SetValue( masterColumn, detailColumn, ColumnBase.VisibleProperty, propertyName );
+        BoundColumn.SetValue( masterColumn, detailColumn, ColumnReorderingDragSourceManager.AnimatedColumnReorderingTranslationProperty, propertyName );
+        BoundColumn.SetValue( masterColumn, detailColumn, TableflowView.IsBeingDraggedAnimatedProperty, propertyName );
+        BoundColumn.SetValue( masterColumn, detailColumn, TableflowView.ColumnReorderingDragSourceManagerProperty, propertyName );
       }
 
       private void OnMasterColumnFittedWidthRequested( object sender, FittedWidthRequestedEventArgs e )
@@ -1009,12 +1047,7 @@ namespace Xceed.Wpf.DataGrid
         e.SetValue( fittedWidth );
       }
 
-      #region Private Fields
-
-      private readonly KeyValuePair<DependencyProperty, BindingBase>[] m_bindings;
-      private readonly Dictionary<DependencyProperty, object> m_localValues = new Dictionary<DependencyProperty, object>( 0 );
-
-      #endregion
+      private Dictionary<DependencyProperty, object> m_localValues;
     }
 
     #endregion
@@ -1023,8 +1056,8 @@ namespace Xceed.Wpf.DataGrid
 
     private sealed class UnboundColumn : SynchronizationEntry
     {
-      internal UnboundColumn( SynchronizationKey key )
-        : base( key )
+      internal UnboundColumn( ColumnSynchronizationManager owner, SynchronizationKey key )
+        : base( owner, key )
       {
         if( key.MasterColumn != null )
           throw new ArgumentException( "The master column should not be set.", "key" );
@@ -1085,11 +1118,7 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      #region Private Fields
-
       private object m_localValue = DependencyProperty.UnsetValue;
-
-      #endregion
     }
 
     #endregion

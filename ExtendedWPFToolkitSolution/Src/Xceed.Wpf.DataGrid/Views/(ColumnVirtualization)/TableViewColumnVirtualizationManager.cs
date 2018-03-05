@@ -124,6 +124,48 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion
 
+    #region MergedNameToOffset Property
+
+    internal override IList<IColumnInfoCollection<double>> MergedNameToOffset
+    {
+      get
+      {
+        return m_mergedNameToOffset;
+      }
+    }
+
+    private readonly IList<IColumnInfoCollection<double>> m_mergedNameToOffset = new List<IColumnInfoCollection<double>>();
+
+    #endregion
+
+    #region MergedNameToWidth Property
+
+    internal override IList<IColumnInfoCollection<double>> MergedNameToWidth
+    {
+      get
+      {
+        return m_mergedNameToWidth;
+      }
+    }
+
+    private readonly IList<IColumnInfoCollection<double>> m_mergedNameToWidth = new List<IColumnInfoCollection<double>>();
+
+    #endregion
+
+    #region MergedNameToPostion Property
+
+    internal override IList<IColumnInfoCollection<int>> MergedNameToPostion
+    {
+      get
+      {
+        return m_mergedNameToPostion;
+      }
+    }
+
+    private readonly IList<IColumnInfoCollection<int>> m_mergedNameToPostion = new List<IColumnInfoCollection<int>>();
+
+    #endregion
+
     #region FixedFieldNames Internal Property
 
     internal override IColumnNameCollection FixedFieldNames
@@ -152,24 +194,32 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion
 
-    #region FirstViewportColumnFieldNameIndex Internal Property
+    #region FixedMergedNames Internal Property
 
-    internal override int FirstViewportColumnFieldNameIndex
+    internal override IList<IColumnNameCollection> FixedMergedNames
     {
       get
       {
-        return m_firstViewportColumnFieldNameIndex;
+        return m_fixedMergedNames;
       }
     }
 
-    protected override void SetFirstViewportColumnFieldNameIndex( int value )
+    private readonly List<IColumnNameCollection> m_fixedMergedNames = new List<IColumnNameCollection>();
+
+    #endregion
+
+    #region ScrollingMergedNames Internal Property
+
+    internal override IList<IColumnNameCollection> ScrollingMergedNames
     {
-      m_firstViewportColumnFieldNameIndex = value;
+      get
+      {
+        return m_scrollingMergedNames;
+      }
     }
 
-    private int m_firstViewportColumnFieldNameIndex;
+    private readonly List<IColumnNameCollection> m_scrollingMergedNames = new List<IColumnNameCollection>();
 
     #endregion
   }
 }
-

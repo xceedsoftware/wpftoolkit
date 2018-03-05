@@ -30,8 +30,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region Constructor
-
     protected DataItemPropertyDescriptorBase(
       DataItemTypeDescriptor owner,
       PropertyDescriptor parent,
@@ -51,8 +49,6 @@ namespace Xceed.Wpf.DataGrid
       m_setter = setter;
       m_resetter = resetter;
     }
-
-    #endregion
 
     #region IsReadOnly Property
 

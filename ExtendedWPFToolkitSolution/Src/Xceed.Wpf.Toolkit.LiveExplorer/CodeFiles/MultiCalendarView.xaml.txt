@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -25,12 +25,10 @@
    <local:DemoView.Description>
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
-         <!-- //# TODODOC-->
          <Run>The MultiCalendar combines X Microsoft Calendars that can be positioned in a grid with rows and columns. The selected dates, blackout dates and highlighted dates can be chosen from any calendar. The MultiCalendar will have a fast response no matter how many CalendarDayButtons are selected.</Run>
          <LineBreak />
          <LineBreak />
          <Run>The Background/Foreground of any CalendarDayButton can be easily customized based on its state(selected/highlighted/blackout/mouseOver/focused/today) and the background of any Calendar can be customized with an image or a brush.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -38,728 +36,72 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
-       ##END-->
       </Paragraph>
    </local:DemoView.Description>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-      <conv:SolidColorBrushToColorConverter x:Key="SolidColorBrushToColorConverter"/>
-      <conv:ThicknessToDoubleConverter x:Key="ThicknessToDoubleConverter"/>
-      
-      <ObjectDataProvider x:Key="SelectModes"
-                          MethodName="GetValues"
-                          ObjectType="{x:Type sys:Enum}">
-         <ObjectDataProvider.MethodParameters>
-            <x:Type TypeName="CalendarSelectionMode" />
-         </ObjectDataProvider.MethodParameters>
-      </ObjectDataProvider>
 
-      <ObjectDataProvider x:Key="OrientationModes"
-                          MethodName="GetValues"
-                          ObjectType="{x:Type sys:Enum}">
-         <ObjectDataProvider.MethodParameters>
-            <x:Type TypeName="Orientation" />
-         </ObjectDataProvider.MethodParameters>
-      </ObjectDataProvider>
 
-      <Style x:Key="ButtonStyle1Base"
-             TargetType="Button">
-         <Setter Property="Background"
-                 Value="Green" />
-         <Setter Property="Foreground"
-                 Value="White" />
-         <Setter Property="Template">
-            <Setter.Value>
-               <ControlTemplate TargetType="{x:Type Button}">
-                  <Border Cursor="Hand"
-                          Background="{TemplateBinding Background}"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center">
-                     <ContentPresenter Margin="2" />
-                  </Border>
-                  <ControlTemplate.Triggers>
-                     <Trigger Property="IsEnabled"
-                              Value="False">
-                        <Setter Property="Opacity"
-                                Value="0.5" />
-                     </Trigger>
-                  </ControlTemplate.Triggers>
-               </ControlTemplate>
-            </Setter.Value>
-         </Setter>
-         <Style.Triggers>
-            <Trigger Property="IsMouseOver"
-                     Value="True">
-               <Setter Property="Background"
-                       Value="LightGreen" />
-            </Trigger>
-         </Style.Triggers>
-      </Style>
 
-      <Style x:Key="NextButtonStyle1"
-             TargetType="Button"
-             BasedOn="{StaticResource ButtonStyle1Base}">
-         <Setter Property="Content"
-                 Value="Next"/>
-      </Style>
 
-      <Style x:Key="PreviousButtonStyle1"
-             TargetType="Button"
-             BasedOn="{StaticResource ButtonStyle1Base}">
-         <Setter Property="Content"
-                 Value="Prev" />
-      </Style>
 
-      <Style x:Key="ButtonStyle2Base"
-             TargetType="Button"
-             BasedOn="{StaticResource ButtonStyle1Base}">
-         <Setter Property="Background"
-                 Value="Blue" />
-         <Style.Triggers>
-            <Trigger Property="IsMouseOver"
-                     Value="True">
-               <Setter Property="Background"
-                       Value="LightBlue" />
-            </Trigger>
-         </Style.Triggers>
-      </Style>
 
-      <Style x:Key="NextButtonStyle2"
-             TargetType="Button"
-             BasedOn="{StaticResource ButtonStyle2Base}">
-         <Setter Property="Content">
-            <Setter.Value>
-               <Path Stroke="White"
-                     Data="M 3 10 L 8 5 L 3 0"
-                     Stretch="Uniform" 
-                     Margin="3"/>
-            </Setter.Value>
-         </Setter>
-      </Style>      
 
-      <Style x:Key="PreviousButtonStyle2"
-             TargetType="Button"
-             BasedOn="{StaticResource ButtonStyle2Base}">
-         <Setter Property="Content">
-            <Setter.Value>
-               <Path Stroke="White"
-                     Data="M 3 10 L -2 5 L 3 0"
-                     Stretch="Uniform"
-                     Margin="3" />
-            </Setter.Value>
-         </Setter>
-      </Style>
 
-      <Style x:Key="HeaderButtonStyle1"
-             TargetType="Button">
-         <Setter Property="FontWeight"
-                 Value="Bold" />
-         <Setter Property="Focusable"
-                 Value="False" />
-         <Setter Property="FontSize"
-                 Value="15" />
-         <Setter Property="Background"
-                 Value="Green" />
-         <Setter Property="Foreground"
-                 Value="White" />
-         <Setter Property="Margin"
-                 Value="1" />
-         <Setter Property="HorizontalContentAlignment"
-                 Value="Center" />
-         <Setter Property="VerticalContentAlignment"
-                 Value="Center" />
-         <Setter Property="HorizontalAlignment"
-                 Value="Center" />
-         <Setter Property="VerticalAlignment"
-                 Value="Center" />
-         <Setter Property="Template">
-            <Setter.Value>
-               <ControlTemplate TargetType="{x:Type Button}">
-                  <Border Cursor="Hand"
-                          BorderBrush="Yellow"
-                          BorderThickness="2"
-                          CornerRadius="3"
-                          Background="{TemplateBinding Background}">
-                     <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                       Margin="1"/>
-                  </Border>
-                  <ControlTemplate.Triggers>
-                     <Trigger Property="IsMouseOver"
-                              Value="True">
-                        <Setter Property="Background"
-                                Value="Gray" />
-                     </Trigger>
-                  </ControlTemplate.Triggers>
-               </ControlTemplate>
-            </Setter.Value>
-         </Setter>
-      </Style>
-      
-      <Style x:Key="HeaderButtonStyle2"
-             TargetType="Button">
-         <Setter Property="Focusable"
-                 Value="False" />
-         <Setter Property="Background"
-                 Value="Transparent"/>
-         <Setter Property="BorderThickness"
-                 Value="0"/>
-         <Setter Property="FontStyle"
-                 Value="Italic"/>
-         <Setter Property="Foreground"
-                 Value="Blue" />
-         <Setter Property="Margin"
-                 Value="1" />
-      </Style>
 
-      <DataTemplate x:Key="DayTitleTemplate1">
-         <TextBlock Foreground="#FF333333"
-                    FontWeight="Bold"
-                    FontSize="9.5"
-                    FontFamily="Verdana"
-                    Margin="0,6,0,6"
-                    Text="{Binding}"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center" />
-      </DataTemplate>
 
-      <DataTemplate x:Key="DayTitleTemplate2">
-         <TextBlock Foreground="Green"
-                    FontWeight="Bold"
-                    FontSize="15"
-                    FontStyle="Italic"
-                    Text="{Binding}"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center" />
-      </DataTemplate>
 
-      <DataTemplate x:Key="BlackoutTemplate1">
-         <Border Background="Red"
-                 Margin="5,4" />
-      </DataTemplate>
 
-      <DataTemplate x:Key="BlackoutTemplate2">
-         <Path Margin="3"
-               Fill="Red"
-               Stretch="Fill"
-               Data="M8.1772461,11.029181 L10.433105,11.029181 L11.700684,12.801641 L12.973633,11.029181 L15.191895,11.029181 L12.844727,13.999395 L15.21875,17.060919 L12.962891,17.060919 L11.673828,15.256231 L10.352539,17.060919 L8.1396484,17.060919 L10.519043,14.042364 z" />
 
-      </DataTemplate>
 
-      <DataTemplate x:Key="BlackoutDefaultTemplate">
-         <Path Opacity="0.2"
-               Margin="3"
-               Fill="#FF000000"
-               Stretch="Fill"
-               Data="M8.1772461,11.029181 L10.433105,11.029181 L11.700684,12.801641 L12.973633,11.029181 L15.191895,11.029181 L12.844727,13.999395 L15.21875,17.060919 L12.962891,17.060919 L11.673828,15.256231 L10.352539,17.060919 L8.1396484,17.060919 L10.519043,14.042364 z" />
-      </DataTemplate>
-   </local:DemoView.Resources>
 
-   <TabControl>
-      <TabItem Header="Main">
-         <Grid>
-            <Grid.RowDefinitions>
-               <RowDefinition />
-               <RowDefinition />
-            </Grid.RowDefinitions>
 
-            <GroupBox Header="Features"
-                      Margin="5">
 
-               <GroupBox.Resources>
 
-                  <Style x:Key="TextBlockStyle"
-                         TargetType="TextBlock">
-                     <Setter Property="Width"
-                             Value="130" />
-                     <Setter Property="Margin"
-                             Value="0,10,0,0" />
-                     <Setter Property="VerticalAlignment"
-                             Value="Center" />
-                  </Style>
-               </GroupBox.Resources>
 
-               <Grid Margin="5">
 
-                  <Grid.RowDefinitions>
-                     <RowDefinition />
-                     <RowDefinition />
-                  </Grid.RowDefinitions>
 
-                  <Grid.ColumnDefinitions>
-                     <ColumnDefinition Width="*" />
-                     <ColumnDefinition Width="*" />
-                  </Grid.ColumnDefinitions>
 
-                  <!--first Column-->
-                  <StackPanel Grid.Column="0">
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Selection Mode:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <ComboBox Width="110"
-                                  ItemsSource="{Binding Source={StaticResource SelectModes}}"
-                                  SelectedItem="{Binding SelectionMode, ElementName=_multiCalendar}"
-                                  ToolTip="Gets/Sets the Selection mode used for the control."
-                                  Margin="0,10,0,0" />
-                     </StackPanel>
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Orientation:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <ComboBox VerticalAlignment="Center"
-                                  Width="110"
-                                  Margin="0,10,0,0"
-                                  ToolTip="Gets/Sets the Orientation used for the control."
-                                  ItemsSource="{Binding Source={StaticResource OrientationModes}}"
-                                  SelectedItem="{Binding Orientation, ElementName=_multiCalendar}" />
-                     </StackPanel>
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Month Count:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <xctk:IntegerUpDown Minimum="1"
-                                            Maximum="36"
-                                            VerticalAlignment="Center"
-                                            Margin="0,10,0,0"
-                                            ToolTip="Gets/Sets how many calendars are displayed."
-                                            Value="{Binding MonthCount, ElementName=_multiCalendar}" />
-                     </StackPanel>
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Row Count:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <xctk:IntegerUpDown Minimum="1"
-                                            Maximum="18"
-                                            VerticalAlignment="Center"
-                                            Margin="0,10,0,0"
-                                            ToolTip="Gets/Sets how many rows are used to display the calendars."
-                                            Value="{Binding RowCount, ElementName=_multiCalendar}" />
-                        <TextBlock Text=" *"
-                                   Style="{StaticResource TextBlockStyle}" />
-                     </StackPanel>
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Column Count:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <xctk:IntegerUpDown Minimum="1"
-                                            Maximum="18"
-                                            VerticalAlignment="Center"
-                                            Margin="0,10,0,0"
-                                            ToolTip="Gets/Sets how many columns are used to display the calendars."
-                                            Value="{Binding ColumnCount, ElementName=_multiCalendar}" />
-                        <TextBlock Text=" *"
-                                   Style="{StaticResource TextBlockStyle}" />
-                     </StackPanel>
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Display Date Start:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <DatePicker Width="110"
-                                    Margin="0,10,0,0"
-                                    HorizontalContentAlignment="Left"
-                                    ToolTip="Gets/Sets the first Calendar of the MultiCalendar control."
-                                    SelectedDate="{Binding DisplayDateStart, ElementName=_multiCalendar}" />
-                     </StackPanel>
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Display Date End:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <DatePicker Width="110"
-                                    Margin="0,10,0,0"
-                                    HorizontalContentAlignment="Left"
-                                    ToolTip="Gets/Sets the last Calendar of the MultiCalendar control."
-                                    SelectedDate="{Binding DisplayDateEnd, ElementName=_multiCalendar}" />
-                     </StackPanel>
 
-                  </StackPanel>
 
-                  <!--Second Column-->
-                  <StackPanel Grid.Column="1">
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Selected Date:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <TextBlock Style="{StaticResource TextBlockStyle}"
-                                   ToolTip="Gets/Sets the selected date of the MultiCalendar control."
-                                   Text="{Binding SelectedDate, ElementName=_multiCalendar, UpdateSourceTrigger=PropertyChanged}" />
-                     </StackPanel>
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Selected Dates:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <ListBox Height="100"
-                                 Width="150"
-                                 Margin="0,10,0,0"
-                                 ToolTip="Gets/Sets the Selected dates collection of the MultiCalendar control."
-                                 ItemsSource="{Binding SelectedDates, ElementName=_multiCalendar, UpdateSourceTrigger=PropertyChanged}" />
-                     </StackPanel>
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="BlackoutDates:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <CheckBox Width="80"
-                                  Margin="0,10,0,0"
-                                  ToolTip="Gets/Sets the blackout dates collection of the MultiCalendar control."
-                                  Click="BlackoutDates_Click" />
-                     </StackPanel>
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="HighlightedDates:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <CheckBox Width="80"
-                                  Margin="0,10,0,0"
-                                  ToolTip="Gets/Sets the highlighted dates collection of the MultiCalendar control."
-                                  Click="HighlightedDates_Click" />
-                     </StackPanel>
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Hide Inactive Dates:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <CheckBox Width="80"
-                                  Margin="0,10,0,0"
-                                  ToolTip="Gets/Sets if inactive dates are hidden."
-                                  IsChecked="{Binding HideInactiveDates, ElementName=_multiCalendar}" />
-                     </StackPanel>
 
-                  </StackPanel>
 
-                  <!-- //# TODODOC-->
-                  <TextBlock Grid.Row="1"
-                              Grid.ColumnSpan="2"
-                              Margin="0,10,0,0"
-                              TextWrapping="WrapWithOverflow"
-                              Text="* The value is adjusted automatically when MonthCount changes. However, as soon as a custom value is assigned manually, this custom value will remain and no longer be adjusted automatically." />
 
-               </Grid>
-            </GroupBox>
 
-            <StackPanel Grid.Row="1"
-                        Margin="10">
 
-               <TextBlock Text="Usage:"
-                          Style="{StaticResource Header}" />
 
-               <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                             VerticalScrollBarVisibility="Auto"
-                             MaxHeight="400">
-                  <xctk:MultiCalendar x:Name="_multiCalendar"
-                                      MonthCount="3"
-                                      Orientation="Horizontal"
-                                      SelectionMode="SingleRange" />
-               </ScrollViewer>
 
-            </StackPanel>
 
-         </Grid>
-      </TabItem>
 
-      <TabItem Header="Customization">
-         <Grid>
-            <Grid.RowDefinitions>
-               <RowDefinition />
-               <RowDefinition />
-            </Grid.RowDefinitions>
 
-            <GroupBox Header="Features"
-                      Margin="5">
 
-               <GroupBox.Resources>
 
-                  <Style x:Key="TextBlockStyle"
-                         TargetType="TextBlock">
-                     <Setter Property="Width"
-                             Value="180" />
-                     <Setter Property="Margin"
-                             Value="0,5,0,0" />
-                     <Setter Property="VerticalAlignment"
-                             Value="Center" />
-                  </Style>
 
-                  <Style x:Key="TextBlockStyle2"
-                         TargetType="TextBlock"
-                         BasedOn="{StaticResource TextBlockStyle}">
-                     <Setter Property="Width"
-                             Value="230" />
-                  </Style>
-               </GroupBox.Resources>
 
-               <Grid Margin="5,0,5,5">
 
-                  <Grid.ColumnDefinitions>
-                     <ColumnDefinition Width="*" />
-                     <ColumnDefinition Width="*" />
-                  </Grid.ColumnDefinitions>
 
-                  <!-- first Column-->
-                  <StackPanel Grid.Column="0">
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendars Background:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <xctk:ColorPicker Width="85"
-                                          ToolTip="Gets/Sets the Background used for each individual calendar of the MultiCalendar control. MonthlyBackgrounds property should not be set in order to use this property."
-                                          SelectedColor="{Binding CalendarsBackground, ElementName=_multiCalendar2, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                          Margin="0,5,0,0" />
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendars BorderBrush:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <xctk:ColorPicker Width="85"
-                                          ToolTip="Gets/Sets the BorderBrush used for each individual calendar of the MultiCalendar control."
-                                          SelectedColor="{Binding CalendarsBorderBrush, ElementName=_multiCalendar2, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                          Margin="0,5,0,0" />
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendars BorderThickness:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <xctk:DoubleUpDown Width="85"
-                                           ToolTip="Gets/Sets the BorderThickness used for each individual calendar of the MultiCalendar control."
-                                           Value="{Binding CalendarsBorderThickness, ElementName=_multiCalendar2, Converter={StaticResource ThicknessToDoubleConverter}}"
-                                           Maximum="5"
-                                           Minimum="0"
-                                           Margin="0,5,0,0" />
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendar Header Button Style:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <ComboBox Width="85"
-                                  Margin="0,5,0,0"
-                                  ToolTip="Gets/Sets the Header Button style used for each individual calendar of the MultiCalendar control."
-                                  SelectedValue="{Binding CalendarHeaderButtonStyle, ElementName=_multiCalendar2}"
-                                  SelectedValuePath="Tag">
-                           <ComboBoxItem Tag="{StaticResource HeaderButtonStyle1}"
-                                         Content="Style1" />
-                           <ComboBoxItem Tag="{StaticResource HeaderButtonStyle2}"
-                                         Content="Style2" />
-                           <ComboBoxItem Tag="{x:Null}"
-                                         Content="Default" />
-                        </ComboBox>
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendar Day Title DataTemplate:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <ComboBox Width="85"
-                                  Margin="0,5,0,0"
-                                  ToolTip="Gets/Sets the day dataTemplate used in each individual calendar of the MultiCalendar control."
-                                  SelectedValue="{Binding CalendarDayTitleDataTemplate, ElementName=_multiCalendar2}"
-                                  SelectedValuePath="Tag">
-                           <ComboBoxItem Tag="{StaticResource DayTitleTemplate1}"
-                                         Content="Default" />
-                           <ComboBoxItem Tag="{StaticResource DayTitleTemplate2}"
-                                         Content="Template1" />
-                           <ComboBoxItem Tag="{x:Null}"
-                                         Content="Null" />
-                        </ComboBox>
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Next Button Style:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <ComboBox Width="85"
-                                  Margin="0,5,0,0"
-                                  ToolTip="Gets/Sets the Next Button style of the MultiCalendar control."
-                                  SelectedValue="{Binding NextButtonStyle, ElementName=_multiCalendar2}"
-                                  SelectedValuePath="Tag">
-                           <ComboBoxItem Tag="{StaticResource NextButtonStyle1}"
-                                         Content="Style1"/>
-                           <ComboBoxItem Tag="{StaticResource NextButtonStyle2}"
-                                         Content="Style2" />
-                           <ComboBoxItem Tag="{x:Null}"
-                                         Content="Default" />
-                        </ComboBox>
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Previous Button Style:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <ComboBox Width="85"
-                                  Margin="0,5,0,0"
-                                  ToolTip="Gets/Sets the Previous Button style of the MultiCalendar control."
-                                  SelectedValue="{Binding PreviousButtonStyle, ElementName=_multiCalendar2}"
-                                  SelectedValuePath="Tag">
-                           <ComboBoxItem Tag="{StaticResource PreviousButtonStyle1}"
-                                         Content="Style1" />
-                           <ComboBoxItem Tag="{StaticResource PreviousButtonStyle2}"
-                                         Content="Style2" />
-                           <ComboBoxItem Tag="{x:Null}"
-                                         Content="Default" />
-                        </ComboBox>
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Monthly Backgrounds:"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <!-- //# TODODOC-->
-                        <CheckBox Width="85"
-                                  Margin="0,5,0,0"
-                                  ToolTip="Gets/Sets the monthly backgrounds collection of the MultiCalendar control."
-                                  Click="MonthlyBackgrounds_Click" />
-                     </StackPanel>
-                  </StackPanel>
 
-                  <!--second column-->
-                  <StackPanel Grid.Column="1">
 
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendar Button Hightlighted Background:"
-                                   Style="{StaticResource TextBlockStyle2}" />
-                        <!-- //# TODODOC-->
-                        <xctk:ColorPicker Width="85"
-                                          ToolTip="Gets/Sets the Background used for highlighted dates in the MultiCalendar control."
-                                          SelectedColor="{Binding CalendarButtonHighlightedBackground, ElementName=_multiCalendar2, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                          Margin="0,5,0,0" />
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendar Button Hightlighted Foreground:"
-                                   Style="{StaticResource TextBlockStyle2}" />
-                        <!-- //# TODODOC-->
-                        <xctk:ColorPicker Width="85"
-                                          ToolTip="Gets/Sets the Foreground used for highlighted dates in the MultiCalendar control."
-                                          SelectedColor="{Binding CalendarButtonHighlightedForeground, ElementName=_multiCalendar2, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                          Margin="0,5,0,0" />
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendar Button Selected Background:"
-                                   Style="{StaticResource TextBlockStyle2}" />
-                        <!-- //# TODODOC-->
-                        <xctk:ColorPicker Width="85"
-                                          ToolTip="Gets/Sets the Background used for selected dates in the MultiCalendar control."
-                                          SelectedColor="{Binding CalendarButtonSelectedBackground, ElementName=_multiCalendar2, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                          Margin="0,5,0,0" />
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendar Button Selected Foreground:"
-                                   Style="{StaticResource TextBlockStyle2}" />
-                        <!-- //# TODODOC-->
-                        <xctk:ColorPicker Width="85"
-                                          ToolTip="Gets/Sets the Foreground used for selected dates in the MultiCalendar control."
-                                          SelectedColor="{Binding CalendarButtonSelectedForeground, ElementName=_multiCalendar2, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                          Margin="0,5,0,0" />
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendar Button Today Background:"
-                                   Style="{StaticResource TextBlockStyle2}" />
-                        <!-- //# TODODOC-->
-                        <xctk:ColorPicker Width="85"
-                                          ToolTip="Gets/Sets the Background used for today date in the MultiCalendar control."
-                                          SelectedColor="{Binding CalendarButtonTodayBackground, ElementName=_multiCalendar2, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                          Margin="0,5,0,0" />
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendar Button Today Foreground:"
-                                   Style="{StaticResource TextBlockStyle2}" />
-                        <!-- //# TODODOC-->
-                        <xctk:ColorPicker Width="85"
-                                          ToolTip="Gets/Sets the Foreground used for today date in the MultiCalendar control."
-                                          SelectedColor="{Binding CalendarButtonTodayForeground, ElementName=_multiCalendar2, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                          Margin="0,5,0,0" />
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendar Button MouseOver Background:"
-                                   Style="{StaticResource TextBlockStyle2}" />
-                        <!-- //# TODODOC-->
-                        <xctk:ColorPicker Width="85"
-                                          ToolTip="Gets/Sets the Background used for the date under the mouse in the MultiCalendar control."
-                                          SelectedColor="{Binding CalendarButtonMouseOverBackground, ElementName=_multiCalendar2, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                          Margin="0,5,0,0" />
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendar Button MouseOver Foreground:"
-                                   Style="{StaticResource TextBlockStyle2}" />
-                        <!-- //# TODODOC-->
-                        <xctk:ColorPicker Width="85"
-                                          ToolTip="Gets/Sets the Foreground used for the date under the mouse in the MultiCalendar control."
-                                          SelectedColor="{Binding CalendarButtonMouseOverForeground, ElementName=_multiCalendar2, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                          Margin="0,5,0,0" />
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendar Button CurrentDate BorderBrush:"
-                                   Style="{StaticResource TextBlockStyle2}" />
-                        <!-- //# TODODOC-->
-                        <xctk:ColorPicker Width="85"
-                                          ToolTip="Gets/Sets the BorderBrush used for the current date in the MultiCalendar control."
-                                          SelectedColor="{Binding CalendarButtonCurrentDateBorderBrush, ElementName=_multiCalendar2, Converter={StaticResource SolidColorBrushToColorConverter}}"
-                                          Margin="0,5,0,0" />
-                     </StackPanel>
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Calendar Button Blackout DataTemplate:"
-                                   Style="{StaticResource TextBlockStyle2}" />
-                        <!-- //# TODODOC-->
-                        <ComboBox Width="85"
-                                  Margin="0,5,0,0"
-                                  ToolTip="Gets/Sets the Blackout DataTemplate used for the Blackout dates in the MultiCalendar control."
-                                  SelectedValue="{Binding CalendarButtonBlackoutDataTemplate, ElementName=_multiCalendar2}"
-                                  SelectedValuePath="Tag">
-                           <ComboBoxItem Tag="{StaticResource BlackoutTemplate1}"
-                                         Content="Template1" />
-                           <ComboBoxItem Tag="{StaticResource BlackoutTemplate2}"
-                                         Content="Template2" />
-                           <ComboBoxItem Tag="{StaticResource BlackoutDefaultTemplate}"
-                                         Content="Default" />
-                        </ComboBox>
-                     </StackPanel>
 
-                  </StackPanel>
-               </Grid>
-            </GroupBox>
 
-            <StackPanel Grid.Row="1"
-                        Margin="10">
 
-               <TextBlock Text="Usage:"
-                          Style="{StaticResource Header}" />
 
-               <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                             VerticalScrollBarVisibility="Auto"
-                             MaxHeight="400">
-                  <xctk:MultiCalendar x:Name="_multiCalendar2"
-                                      SelectionMode="SingleRange"
-                                      MonthCount="3"
-                                      CalendarsBackground="White"
-                                      CalendarsBorderBrush="Blue"
-                                      CalendarsBorderThickness="0"
-                                      NextButtonStyle="{x:Null}"
-                                      PreviousButtonStyle="{x:Null}"
-                                      CalendarHeaderButtonStyle="{x:Null}"
-                                      CalendarDayTitleDataTemplate="{StaticResource DayTitleTemplate1}"
-                                      CalendarButtonHighlightedBackground="Yellow"
-                                      CalendarButtonHighlightedForeground="Black"
-                                      CalendarButtonSelectedBackground="Blue"
-                                      CalendarButtonSelectedForeground="White"
-                                      CalendarButtonTodayBackground="Gray"
-                                      CalendarButtonTodayForeground="White"
-                                      CalendarButtonMouseOverBackground="LightBlue"
-                                      CalendarButtonMouseOverForeground="Black"
-                                      CalendarButtonCurrentDateBorderBrush="DarkOrange"
-                                      CalendarButtonBlackoutDataTemplate="{StaticResource BlackoutDefaultTemplate}"/>
-               </ScrollViewer>
 
-            </StackPanel>
 
-         </Grid>
-      </TabItem>
-   </TabControl>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
+
+
     <Image Source="..\OpenSourceImages\MultiCalendar.png" Width="600" Height="400"/>
-   ##END-->
 </local:DemoView>

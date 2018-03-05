@@ -22,251 +22,284 @@
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
-      <ResourceDictionary Source="../../Themes/Aero2/Glyphs.xaml" />
-   </ResourceDictionary.MergedDictionaries>
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
+    <ResourceDictionary Source="../../Themes/Aero2/Glyphs.xaml" />
+  </ResourceDictionary.MergedDictionaries>
 
-    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
-   <conv:ObjectTypeToNameConverter x:Key="ObjectTypeToNameConverter"/>
-    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+  <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+  <conv:ObjectTypeToNameConverter x:Key="ObjectTypeToNameConverter" />
+  <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-    <DataTemplate x:Key="DefaultWatermarkTemplate">
-        <ContentControl Content="{Binding}" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Focusable="False" Margin="0,0,3,0" />
-    </DataTemplate>
+  <DataTemplate x:Key="DefaultWatermarkTemplate">
+    <ContentControl Content="{Binding}"
+                    Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+                    Focusable="False"
+                    Margin="0,0,3,0" />
+  </DataTemplate>
 
-    <Style x:Key="TimePickerToggleButtonStyle" TargetType="ToggleButton">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ToggleButton">
-                    <Grid SnapsToDevicePixels="True">
-                        <chrome:ButtonChrome x:Name="ToggleButtonChrome"
-                                       CornerRadius="0"
-                                       RenderChecked="{Binding IsOpen, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TimePicker}}"
-                                       RenderEnabled="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TimePicker}}"
-                                       RenderMouseOver="{TemplateBinding IsMouseOver}"
-                                       RenderPressed="{TemplateBinding IsPressed}">
+  <Style x:Key="TimePickerToggleButtonStyle"
+         TargetType="ToggleButton">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ToggleButton">
+          <Grid SnapsToDevicePixels="True">
+            <chrome:ButtonChrome x:Name="ToggleButtonChrome"
+                                 CornerRadius="0"
+                                 RenderChecked="{Binding IsOpen, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TimePicker}}"
+                                 RenderEnabled="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TimePicker}}"
+                                 RenderMouseOver="{TemplateBinding IsMouseOver}"
+                                 RenderPressed="{TemplateBinding IsPressed}">
 
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                                <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                <ContentPresenter HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
 
-                                <Grid x:Name="arrowGlyph" IsHitTestVisible="False" Grid.Column="1" Margin="5">
-                           <Path x:Name="Arrow"
-                                 Width="9"
-                                 Height="5"
-                                 Data="{StaticResource DownArrowGeometry}" 
-                                 Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
-                                 Margin="0,1,0,0"/>
-                                </Grid>
-                            </Grid>
-                        </chrome:ButtonChrome>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Fill" TargetName="Arrow" Value="#AFAFAF" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+                <Grid x:Name="arrowGlyph"
+                      IsHitTestVisible="False"
+                      Grid.Column="1"
+                      Margin="5">
+                  <Path x:Name="Arrow"
+                        Width="9"
+                        Height="5"
+                        Data="{StaticResource DownArrowGeometry}"
+                        Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                        Margin="0,1,0,0" />
+                </Grid>
+              </Grid>
+            </chrome:ButtonChrome>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsEnabled"
+                     Value="False">
+              <Setter Property="Fill"
+                      TargetName="Arrow"
+                      Value="#AFAFAF" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 
-    <Style x:Key="TimeItemStyle" TargetType="ListBoxItem">
-      <Style.Setters>
-         <Setter Property="Padding"
-                 Value="4" />
-      </Style.Setters>
-      <Style.Triggers>
-         <!-- MouseOver Only -->
-         <MultiTrigger>
-            <MultiTrigger.Conditions>
-               <Condition Property="IsMouseOver"
-                          Value="True" />
-               <Condition Property="IsSelected"
-                          Value="False" />
-            </MultiTrigger.Conditions>
-            <Setter Property="Background"
-                    Value="#FFB8E0F3" />
-            <Setter Property="BorderBrush"
-                    Value="#FF26A0DA" />
-         </MultiTrigger>
+  <Style x:Key="TimeItemStyle"
+         TargetType="ListBoxItem">
+    <Style.Setters>
+    <Setter Property="Padding"
+              Value="4" />
+    </Style.Setters>
+    <Style.Triggers>
+      <!-- MouseOver Only -->
+      <MultiTrigger>
+        <MultiTrigger.Conditions>
+          <Condition Property="IsMouseOver"
+                     Value="True" />
+          <Condition Property="IsSelected"
+                     Value="False" />
+        </MultiTrigger.Conditions>
+        <Setter Property="Background"
+                Value="#FFB8E0F3" />
+        <Setter Property="BorderBrush"
+                Value="#FF26A0DA" />
+      </MultiTrigger>
 
-         <!-- Selected Only -->
-         <MultiTrigger>
-            <MultiTrigger.Conditions>
-               <Condition Property="IsMouseOver"
-                          Value="False" />
-               <Condition Property="IsSelected"
-                          Value="True" />
-            </MultiTrigger.Conditions>
-            <Setter Property="Background"
-                    Value="#FFC4E5F6" />
-            <Setter Property="BorderBrush"
-                    Value="#FF26A0DA" />
-         </MultiTrigger>
+      <!-- Selected Only -->
+      <MultiTrigger>
+        <MultiTrigger.Conditions>
+          <Condition Property="IsMouseOver"
+                     Value="False" />
+          <Condition Property="IsSelected"
+                     Value="True" />
+        </MultiTrigger.Conditions>
+        <Setter Property="Background"
+                Value="#FFC4E5F6" />
+        <Setter Property="BorderBrush"
+                Value="#FF26A0DA" />
+      </MultiTrigger>
 
-         <!-- MouseOver + Selected -->
-         <MultiTrigger>
-            <MultiTrigger.Conditions>
-               <Condition Property="IsMouseOver"
-                          Value="True" />
-               <Condition Property="IsSelected"
-                          Value="True" />
-            </MultiTrigger.Conditions>
-            <Setter Property="Background"
-                    Value="#FFD1E8FF" />
-            <Setter Property="BorderBrush"
-                    Value="#FF66A7E8" />
-         </MultiTrigger>
-      </Style.Triggers>
-    </Style>
+      <!-- MouseOver + Selected -->
+      <MultiTrigger>
+        <MultiTrigger.Conditions>
+          <Condition Property="IsMouseOver"
+                     Value="True" />
+          <Condition Property="IsSelected"
+                     Value="True" />
+        </MultiTrigger.Conditions>
+        <Setter Property="Background"
+                Value="#FFD1E8FF" />
+        <Setter Property="BorderBrush"
+                Value="#FF66A7E8" />
+      </MultiTrigger>
+    </Style.Triggers>
+  </Style>
 
 
-    <!-- =============================================================================== -->
-    <!-- TimePicker                                                                      -->
-    <!-- =============================================================================== -->
+  <!-- =============================================================================== -->
+  <!-- TimePicker                                                                      -->
+  <!-- =============================================================================== -->
 
-    <Style TargetType="{x:Type local:TimePicker}">
-        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
-        <Setter Property="BorderThickness" Value="1,1,0,1" />
-        <Setter Property="IsTabStop" Value="False" />
-        <Setter Property="HorizontalContentAlignment" Value="Right" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="TextAlignment" Value="Right" />
-        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
-        <Setter Property="Template">
-            <Setter.Value>
-            <ControlTemplate TargetType="{x:Type local:TimePicker}">
-               <Grid x:Name="root">
-                  <Grid.ColumnDefinitions>
-                     <ColumnDefinition Width="*" />
-                     <ColumnDefinition Width="Auto" />
-                  </Grid.ColumnDefinitions>
-                  <local:ButtonSpinner x:Name="PART_Spinner"
-                                       IsTabStop="False"
-                                       Background="{TemplateBinding Background}"
-                                       BorderThickness="{TemplateBinding BorderThickness}"
-                                       HorizontalContentAlignment="Stretch"
-                                       VerticalContentAlignment="Stretch"
-                                       BorderBrush="{TemplateBinding BorderBrush}"
-                                       ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
-                                       AllowSpin="{TemplateBinding AllowSpin}"
-                                       ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
-                     <local:WatermarkTextBox x:Name="PART_TextBox"
-                                             BorderThickness="0"
-                                             Background="Transparent"
-                                             FontFamily="{TemplateBinding FontFamily}"
-                                             FontSize="{TemplateBinding FontSize}"
-                                             FontStretch="{TemplateBinding FontStretch}"
-                                             FontStyle="{TemplateBinding FontStyle}"
-                                             FontWeight="{TemplateBinding FontWeight}"
-                                             Foreground="{TemplateBinding Foreground}"
-                                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                             VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                             IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
-                                             IsTabStop="True"
-                                             MinWidth="20"
-                                             AcceptsReturn="False"
-                                             Padding="{TemplateBinding Padding}"
-                                             TextAlignment="{TemplateBinding TextAlignment}"
-                                             TextWrapping="NoWrap"
-                                             Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
-                                             TabIndex="{TemplateBinding TabIndex}"
-                                             Watermark="{TemplateBinding Watermark}"
-                                             WatermarkTemplate="{TemplateBinding WatermarkTemplate}" />
-                  </local:ButtonSpinner>
-                  <ToggleButton x:Name="_timePickerToggleButton"
-                                Grid.Column="1"
-                                Background="White"
-                                Focusable="False"
-                                IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
-                                Style="{StaticResource TimePickerToggleButtonStyle}"
-                                IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
-                                IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
-                                Visibility="{TemplateBinding ShowDropDownButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                  <Popup x:Name="PART_Popup"
-                         IsOpen="{Binding IsChecked, ElementName=_timePickerToggleButton}"
-                         AllowsTransparency="True"
-                         StaysOpen="False"
-                         ToolTip="{x:Static sys:String.Empty}">
-                     <Popup.Resources>
-                        <Style TargetType="ToolTip">
-                           <Style.Triggers>
-                              <Trigger Property="Content"
-                                                Value="{x:Static sys:String.Empty}">
-                                 <Setter Property="Visibility"
-                                                  Value="Collapsed" />
-                              </Trigger>
-                           </Style.Triggers>
-                        </Style>
-                     </Popup.Resources>
-                     <Border BorderThickness="1"
-                             MinWidth="{Binding ActualWidth, ElementName=root}"
-                             MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                             Background="{StaticResource PanelBackgroundBrush}"
-                             BorderBrush="{StaticResource PopupDarkBorderBrush}">
-                        <Grid>
-                           <ListBox x:Name="PART_TimeListItems"
-                                    BorderThickness="0"
-                                    DisplayMemberPath="Display"
-                                    ItemContainerStyle="{StaticResource TimeItemStyle}"/>
-                        </Grid>
-                     </Border>
-                  </Popup>
-               </Grid>
-               <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
-                  </Trigger>
-                  <MultiDataTrigger>
-                     <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource Self}}"
-                                   Value="False" />
-                        <Condition Binding="{Binding AllowTextInput, RelativeSource={RelativeSource Self}}"
-                                   Value="False" />
-                     </MultiDataTrigger.Conditions>
-                     <Setter Property="IsReadOnly"
-                             Value="True"
-                             TargetName="PART_TextBox" />
-                  </MultiDataTrigger>
-                  <DataTrigger Binding="{Binding IsReadOnly, RelativeSource={RelativeSource Self}}"
-                               Value="True">
-                     <Setter Property="IsReadOnly"
-                             Value="True"
-                             TargetName="PART_TextBox" />
-                  </DataTrigger>
-                     <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
-                  </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                  </Trigger>
-                        <Trigger Property="IsFocused" Value="True">
-                            <Setter TargetName="PART_TextBox" Property="FocusManager.FocusedElement" Value="{Binding ElementName=PART_TextBox}" />
-                  </Trigger>
-                  <!--ToggleButton can be closed when TimePicker is included in DateTimePicker-->
-                  <MultiDataTrigger>
-                     <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
-                                   Value="True" />
-                        <Condition Binding="{Binding TemplatedParent, RelativeSource={RelativeSource Self}, Converter={StaticResource ObjectTypeToNameConverter}}"
-                                   Value="DateTimePicker" />
-                     </MultiDataTrigger.Conditions>
-                     <Setter Property="IsHitTestVisible"
-                             Value="True"
-                             TargetName="_timePickerToggleButton"/>
-                  </MultiDataTrigger>
-               </ControlTemplate.Triggers>
-            </ControlTemplate>
-         </Setter.Value>
-        </Setter>
-    </Style>
+  <Style TargetType="{x:Type local:TimePicker}">
+    <Setter Property="Background"
+            Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
+    <Setter Property="Foreground"
+            Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+    <Setter Property="BorderBrush"
+            Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
+    <Setter Property="BorderThickness"
+            Value="1,1,0,1" />
+    <Setter Property="IsTabStop"
+            Value="False" />
+    <Setter Property="HorizontalContentAlignment"
+            Value="Right" />
+    <Setter Property="VerticalContentAlignment"
+            Value="Center" />
+    <Setter Property="TextAlignment"
+            Value="Right" />
+    <Setter Property="WatermarkTemplate"
+            Value="{StaticResource DefaultWatermarkTemplate}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:TimePicker}">
+          <Grid x:Name="root">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <local:ButtonSpinner x:Name="PART_Spinner"
+                                 IsTabStop="False"
+                                 Background="{TemplateBinding Background}"
+                                 BorderThickness="{TemplateBinding BorderThickness}"
+                                 HorizontalContentAlignment="Stretch"
+                                 VerticalContentAlignment="Stretch"
+                                 BorderBrush="{TemplateBinding BorderBrush}"
+                                 ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
+                                 AllowSpin="{TemplateBinding AllowSpin}"
+                                 ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
+              <local:WatermarkTextBox x:Name="PART_TextBox"
+                                      BorderThickness="0"
+                                      Background="Transparent"
+                                      FontFamily="{TemplateBinding FontFamily}"
+                                      FontSize="{TemplateBinding FontSize}"
+                                      FontStretch="{TemplateBinding FontStretch}"
+                                      FontStyle="{TemplateBinding FontStyle}"
+                                      FontWeight="{TemplateBinding FontWeight}"
+                                      Foreground="{TemplateBinding Foreground}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
+                                      IsTabStop="True"
+                                      MinWidth="20"
+                                      AcceptsReturn="False"
+                                      Padding="{TemplateBinding Padding}"
+                                      TextAlignment="{TemplateBinding TextAlignment}"
+                                      TextWrapping="NoWrap"
+                                      Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"
+                                      TabIndex="{TemplateBinding TabIndex}"
+                                      Watermark="{TemplateBinding Watermark}"
+                                      WatermarkTemplate="{TemplateBinding WatermarkTemplate}" />
+            </local:ButtonSpinner>
+            <ToggleButton x:Name="_timePickerToggleButton"
+                          Grid.Column="1"
+                          Background="White"
+                          Focusable="False"
+                          IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                          Style="{StaticResource TimePickerToggleButtonStyle}"
+                          IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                          IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                          Visibility="{TemplateBinding ShowDropDownButton, Converter={StaticResource BooleanToVisibilityConverter}}">
+            </ToggleButton>
+            <Popup x:Name="PART_Popup"
+                   IsOpen="{Binding IsChecked, ElementName=_timePickerToggleButton}"
+                   AllowsTransparency="True"
+                   StaysOpen="False"
+                   ToolTip="{x:Static sys:String.Empty}">
+              <Popup.Resources>
+                <Style TargetType="ToolTip">
+                  <Style.Triggers>
+                    <Trigger Property="Content"
+                             Value="{x:Static sys:String.Empty}">
+                      <Setter Property="Visibility"
+                              Value="Collapsed" />
+                    </Trigger>
+                  </Style.Triggers>
+                </Style>
+              </Popup.Resources>
+              <Border BorderThickness="1"
+                      MinWidth="{Binding ActualWidth, ElementName=root}"
+                      MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                      Background="{StaticResource PanelBackgroundBrush}"
+                      BorderBrush="{StaticResource PopupDarkBorderBrush}">
+                <Grid>
+                  <ListBox x:Name="PART_TimeListItems"
+                           BorderThickness="0"
+                           DisplayMemberPath="Display"
+                           ItemContainerStyle="{StaticResource TimeItemStyle}" >
+                  </ListBox>
+                </Grid>
+              </Border>
+            </Popup>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver"
+                     Value="True">
+              <Setter Property="BorderBrush"
+                      Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
+            </Trigger>
+            <MultiDataTrigger>
+              <MultiDataTrigger.Conditions>
+                <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource Self}}"
+                           Value="False" />
+                <Condition Binding="{Binding AllowTextInput, RelativeSource={RelativeSource Self}}"
+                           Value="False" />
+              </MultiDataTrigger.Conditions>
+              <Setter Property="IsReadOnly"
+                      Value="True"
+                      TargetName="PART_TextBox" />
+            </MultiDataTrigger>
+            <DataTrigger Binding="{Binding IsReadOnly, RelativeSource={RelativeSource Self}}"
+                         Value="True">
+              <Setter Property="IsReadOnly"
+                      Value="True"
+                      TargetName="PART_TextBox" />
+            </DataTrigger>
+            <Trigger Property="IsKeyboardFocusWithin"
+                     Value="True">
+              <Setter Property="BorderBrush"
+                      Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
+            </Trigger>
+            <Trigger Property="IsEnabled"
+                     Value="False">
+              <Setter Property="Foreground"
+                      Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+            </Trigger>
+            <Trigger Property="IsFocused"
+                     Value="True">
+              <Setter TargetName="PART_TextBox"
+                      Property="FocusManager.FocusedElement"
+                      Value="{Binding ElementName=PART_TextBox}" />
+            </Trigger>
+            <!--ToggleButton can be closed when TimePicker is included in DateTimePicker-->
+            <MultiDataTrigger>
+              <MultiDataTrigger.Conditions>
+                <Condition Binding="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                           Value="True" />
+                <Condition Binding="{Binding TemplatedParent, RelativeSource={RelativeSource Self}, Converter={StaticResource ObjectTypeToNameConverter}}"
+                           Value="DateTimePicker" />
+              </MultiDataTrigger.Conditions>
+              <Setter Property="IsHitTestVisible"
+                      Value="True"
+                      TargetName="_timePickerToggleButton" />
+            </MultiDataTrigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 
 </ResourceDictionary>

@@ -53,7 +53,7 @@ namespace Xceed.Wpf.DataGrid
       {
         lock( this )
         {
-          return ( m_pendingFlags.Data != 0 ) || ( !m_isProcessingOperations && m_deferredOperations.Count > 0 );
+          return ( m_pendingFlags.Data != 0 ) || ( m_deferredOperations.Count > 0 );
         }
       }
     }
@@ -153,7 +153,7 @@ namespace Xceed.Wpf.DataGrid
         lock( this )
         {
           //Make sure that stats calculation that have been defer are processed before defering again!
-          if( value && m_deferredOperationsToProcess > 0 )
+          if( value && ( m_deferredOperationsToProcess > 0 ) )
           {
             m_forceProcessOfInvalidatedGroupStats = true;
           }
@@ -203,24 +203,24 @@ namespace Xceed.Wpf.DataGrid
     {
       if( m_deferredOperations.Count >= 2 )
       {
-        DeferredOperation addOperation = m_deferredOperations[ 0 ];
+        var addOperation = m_deferredOperations[ 0 ];
 
         if( addOperation.Action != DeferredOperation.DeferredOperationAction.Add )
           return;
 
-        int addIndex = addOperation.NewStartingIndex;
-        int addCount = addOperation.NewItems.Count;
+        var addIndex = addOperation.NewStartingIndex;
+        var addCount = addOperation.NewItems.Count;
 
-        int firstIndexToRemove = 1;
-        int lastIndexToRemove = -1;
+        var firstIndexToRemove = 1;
+        var lastIndexToRemove = -1;
 
-        int count = m_deferredOperations.Count;
+        var count = m_deferredOperations.Count;
         for( int i = 1; i < count; i++ )
         {
-          DeferredOperation operation = m_deferredOperations[ i ];
+          var operation = m_deferredOperations[ i ];
 
-          bool replaced = ( operation.Action == DeferredOperation.DeferredOperationAction.Replace );
-          bool removed = ( operation.Action == DeferredOperation.DeferredOperationAction.Remove );
+          var replaced = ( operation.Action == DeferredOperation.DeferredOperationAction.Replace );
+          var removed = ( operation.Action == DeferredOperation.DeferredOperationAction.Remove );
 
           if( replaced || removed )
           {
@@ -230,8 +230,7 @@ namespace Xceed.Wpf.DataGrid
               return;
             }
 
-            if( ( addIndex == operation.OldStartingIndex )
-              && ( addCount == operation.OldItems.Count ) )
+            if( ( addIndex == operation.OldStartingIndex ) && ( addCount == operation.OldItems.Count ) )
             {
               lastIndexToRemove = i;
 
@@ -248,8 +247,7 @@ namespace Xceed.Wpf.DataGrid
           }
           else
           {
-            // Can be normal, we can receive 2 add for the same item and same position
-            // when we are bound to an IBindingList ( like a DataView )
+            // Can be normal, we can receive 2 adds for the same item and same position when we are bound to an IBindingList ( like a DataView )
             return;
           }
         }
@@ -358,7 +356,7 @@ namespace Xceed.Wpf.DataGrid
       this.Process( true );
     }
 
-    public void InvalidateGroupStats( DataGridCollectionViewGroup group, bool calculateAllStats = false )
+    public void InvalidateGroupStats( DataGridCollectionViewGroup group, bool calculateAllStats = false, bool resortGroups = true )
     {
       if( group == null )
         return;
@@ -368,8 +366,11 @@ namespace Xceed.Wpf.DataGrid
         if( this.RefreshPending )
           return;
 
-        DataGridCollectionViewGroup parent = group;
+        // When set to false, this will prevent group resorting when the DataGridCollectionView.ProcessInvalidatedGroupStats() is called through the disptached call below.
+        // If the current method is called again and this variable is set to true before groups are processed, it will be fine, as the grid is now in a state that will support group resorting.
+        m_resortGroups = resortGroups;
 
+        var parent = group;
         while( parent != null )
         {
           if( !m_invalidatedGroups.Contains( parent ) )
@@ -377,8 +378,6 @@ namespace Xceed.Wpf.DataGrid
             m_invalidatedGroups.Add( parent );
           }
 
-          parent.ClearStatFunctionsResult();
-          parent.CalculateAllStats = calculateAllStats;
           parent = parent.Parent;
         }
 
@@ -395,37 +394,6 @@ namespace Xceed.Wpf.DataGrid
           }
         }
       }
-    }
-
-    public bool ContainsItemForRemoveOperation( object item )
-    {
-      if( item == null )
-        throw new ArgumentNullException( "item" );
-
-      if( m_deferredOperations.Count == 0 )
-        return false;
-
-      int deferredOperationsCount = m_deferredOperations.Count;
-
-      for( int i = 0; i < deferredOperationsCount; i++ )
-      {
-        DeferredOperation deferredOperation = m_deferredOperations[ i ];
-
-        if( deferredOperation.Action == DeferredOperation.DeferredOperationAction.Remove )
-        {
-          int oldItemsCount = ( deferredOperation.OldItems == null ) ? 0 : deferredOperation.OldItems.Count;
-
-          for( int j = 0; j < oldItemsCount; j++ )
-          {
-            object oldItem = deferredOperation.OldItems[ j ];
-
-            if( object.Equals( oldItem, item ) )
-              return true;
-          }
-        }
-      }
-
-      return false;
     }
 
     private object Dispatched_Process( object e )
@@ -472,9 +440,12 @@ namespace Xceed.Wpf.DataGrid
             m_hasNewOperationsSinceStartTime = false;
           }
 
-          // The fact of processing a deferredOperations can cause other DeferRefresh on the CollectionView that will finaly call this Process() again even if not yet completed.
-          // So we must cache all the flags in local variable to prevent double execution of the operation, except for m_deferredOperation which has its own flag is set.
-          m_isProcessingOperations = true;
+          // A deferredOperation can cause a DeferRefresh to be disposed of, hence provoking a re-entry in this method.
+          // As a result, all variables must be cached to prevent re-executing the same deferredOperation.
+
+          List<DeferredOperation> deferredOperations = m_deferredOperations;
+          //Set a new list in case new operations are added while processing the current operations. 
+          m_deferredOperations = new List<DeferredOperation>( 10 );
           bool refreshDistincValuesWithFilteredItemChangedPending = this.RefreshDistincValuesWithFilteredItemChangedPending;
           this.RefreshDistincValuesWithFilteredItemChangedPending = false;
           bool refreshDistincValuesPending = this.RefreshDistincValuesPending;
@@ -504,35 +475,48 @@ namespace Xceed.Wpf.DataGrid
             m_collectionView.ExecuteSourceItemOperation( new DeferredOperation( DeferredOperation.DeferredOperationAction.Resort, -1, null ), out refreshForced );
           }
 
-          if( ( m_deferredOperations.Count > 0 ) && ( !refreshForced ) )
+          if( ( deferredOperations.Count > 0 ) && ( !refreshForced ) )
           {
-            int count = m_deferredOperations.Count;
+            int count = deferredOperations.Count;
             int operationIndex = 0;
 
             while( ( operationIndex < count ) && ( !refreshForced ) && ( processAll || ( DateTime.UtcNow.Subtract( startTime ) < DeferredOperationManager.MaxProcessDuration ) ) )
             {
-              m_collectionView.ExecuteSourceItemOperation( m_deferredOperations[ operationIndex ], out refreshForced );
+              m_collectionView.ExecuteSourceItemOperation( deferredOperations[ operationIndex ], out refreshForced );
               operationIndex++;
             }
 
             if( ( operationIndex < count ) && ( !refreshForced ) )
             {
-              m_deferredOperations.RemoveRange( 0, operationIndex );
+              deferredOperations.RemoveRange( 0, operationIndex );
               m_deferredOperationsToProcess -= operationIndex;
             }
             else
             {
-              m_deferredOperations.Clear();
+              deferredOperations.Clear();
               m_deferredOperationsToProcess = 0;
             }
           }
 
-          m_isProcessingOperations = false;
+          if( m_deferredOperations.Count == 0 )
+          {
+            m_deferredOperations = deferredOperations;
+          }
+          else
+          {
+            // When this method is re-entered, the processAll parameter should be true, which means all deferredOperations should have been processed. When assigning it back to m_deferredOperations,
+            // it's count should be 0.  Thus in the previous call on the stack, the "if" condition should always be true, hence this assert.
+            Debug.Assert( false, "Should never get there." );
+
+            //To be GC friendly, keep the original list, which at one point is the one created with a capacity of a 1000 items.
+            deferredOperations.InsertRange( deferredOperations.Count, m_deferredOperations );
+            m_deferredOperations = deferredOperations;
+          }
 
           // The recalculation of the StatFunctions is performed last.
           if( ( m_deferredOperationsToProcess <= 0 || m_forceProcessOfInvalidatedGroupStats ) && ( m_invalidatedGroups.Count != 0 ) )
           {
-            m_collectionView.ProcessInvalidatedGroupStats( m_invalidatedGroups );
+            m_collectionView.ProcessInvalidatedGroupStats( m_invalidatedGroups, m_resortGroups );
             m_invalidatedGroups.Clear();
             m_forceProcessOfInvalidatedGroupStats = false;
           }
@@ -594,8 +578,8 @@ namespace Xceed.Wpf.DataGrid
     private HashSet<DataGridCollectionViewGroup> m_invalidatedGroups;
     private int m_deferredOperationsToProcess;
     private BitVector32 m_pendingFlags;
-    private bool m_isProcessingOperations;
     private bool m_forceProcessOfInvalidatedGroupStats;
+    private bool m_resortGroups;
 
     private readonly Dispatcher m_dispatcher;
     private DispatcherOperation m_dispatcherOperation;

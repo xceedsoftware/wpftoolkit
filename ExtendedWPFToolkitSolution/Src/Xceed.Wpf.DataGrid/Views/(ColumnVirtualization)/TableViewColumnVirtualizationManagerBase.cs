@@ -21,12 +21,10 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Threading;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
@@ -35,43 +33,41 @@ namespace Xceed.Wpf.DataGrid.Views
     protected TableViewColumnVirtualizationManagerBase( DataGridContext dataGridContext )
       : base( dataGridContext )
     {
-      RoutedEventManager.Instance.Register();
     }
 
-    #region IsVirtualizing Property
+    #region VirtualizationMode Property
 
-    protected static readonly DependencyProperty IsVirtualizingProperty = DependencyProperty.Register(
-      "IsVirtualizing",
-      typeof( bool ),
+    protected static readonly DependencyProperty VirtualizationModeProperty = DependencyProperty.Register(
+      "VirtualizationMode",
+      typeof( ColumnVirtualizationMode ),
       typeof( TableViewColumnVirtualizationManagerBase ),
-      new UIPropertyMetadata(
-        true,
-        new PropertyChangedCallback( TableViewColumnVirtualizationManagerBase.OnIsVirtualizingChanged ) ) );
+      new UIPropertyMetadata( ColumnVirtualizationMode.Recycling, new PropertyChangedCallback( TableViewColumnVirtualizationManagerBase.OnVirtualizationModeChanged ) ) );
 
-    public bool IsVirtualizing
+    public ColumnVirtualizationMode VirtualizationMode
     {
       get
       {
-        return ( bool )this.GetValue( TableViewColumnVirtualizationManagerBase.IsVirtualizingProperty );
+        return ( ColumnVirtualizationMode )this.GetValue( TableViewColumnVirtualizationManagerBase.VirtualizationModeProperty );
       }
       set
       {
-        this.SetValue( TableViewColumnVirtualizationManagerBase.IsVirtualizingProperty, value );
+        this.SetValue( TableViewColumnVirtualizationManagerBase.VirtualizationModeProperty, value );
       }
     }
 
-    protected virtual void OnIsVirtualizingChanged( bool oldValue, bool newValue )
+    protected virtual void OnVirtualizationModeChanged( ColumnVirtualizationMode oldValue, ColumnVirtualizationMode newValue )
     {
-      this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.VirtualizationStateChanged ) );
+      this.OnVirtualizingCellCollectionUpdateRequired(
+             new VirtualizingCellCollectionUpdateRequiredEventArgs( VirtualizingCellCollectionUpdateTriggeredAction.VirtualizationModeChanged ) );
     }
 
-    private static void OnIsVirtualizingChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    private static void OnVirtualizationModeChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
       var manager = sender as TableViewColumnVirtualizationManagerBase;
       if( manager == null )
         return;
 
-      manager.OnIsVirtualizingChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+      manager.OnVirtualizationModeChanged( ( ColumnVirtualizationMode )e.OldValue, ( ColumnVirtualizationMode )e.NewValue );
     }
 
     #endregion
@@ -122,10 +118,10 @@ namespace Xceed.Wpf.DataGrid.Views
       typeof( int ),
       typeof( TableViewColumnVirtualizationManagerBase ),
       new UIPropertyMetadata( 0, new PropertyChangedCallback( TableViewColumnVirtualizationManagerBase.OnFixedColumnCountChanged ),
-                                 new CoerceValueCallback( TableViewColumnVirtualizationManagerBase.FixedColumnCountCoerceCallback ) ) );
+                                 new CoerceValueCallback( TableViewColumnVirtualizationManagerBase.CoerceFixedColumnCount ) ) );
 
     // Only used to back the dp.  The dp itself is used as the API for the user to change the fixed column count (through TableView binding),
-    // and the PropertyChangedCallback redirect the value to the top most manager row.  FixedColumnCountInternal reflects the value for the regular CMR (-1 level).
+    // and the PropertyChangedCallback redirect the value to the top most manager row.
     protected int FixedColumnCount
     {
       get
@@ -138,78 +134,48 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    private void OnFixedColumnCountChanged( int oldValue, int newValue )
-    {
-      // To prevent reentrance
-      if( !m_updatingFixedColumnCount.IsSet )
-      {
-        using( m_updatingFixedColumnCount.Set() )
-        {
-          int level = -1;
-          int correctionValue = ( newValue > 0 ) ? 1 : 0;
-
-          this.SetFixedColumnCount( level, newValue, correctionValue );
-        }
-      }
-
-      // We want to be sure the cells won't be inserted in ScrollingPanel, but added to it
-      if( m_incrementVersionDispatcherOperation == null )
-      {
-        m_incrementVersionDispatcherOperation = this.Dispatcher.BeginInvoke(
-                                                  DispatcherPriority.Render,
-                                                  new Action<UpdateMeasureRequiredEventArgs>( this.IncrementVersion ),
-                                                  new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.ColumnReordering ) );
-      }
-    }
-
     private static void OnFixedColumnCountChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      var manager = ( TableViewColumnVirtualizationManagerBase )sender;
+      var self = sender as TableViewColumnVirtualizationManagerBase;
+      if( self == null )
+        return;
 
-      manager.OnFixedColumnCountChanged( ( int )e.OldValue, ( int )e.NewValue );
+      self.OnFixedColumnCountChanged( ( int )e.OldValue, ( int )e.NewValue );
     }
 
-    private static object FixedColumnCountCoerceCallback( DependencyObject sender, object value )
+    private static object CoerceFixedColumnCount( DependencyObject sender, object value )
     {
-      var fixedColumnCount = ( int )value;
-      if( fixedColumnCount == 0 )
+      var self = sender as TableViewColumnVirtualizationManagerBase;
+      var count = ( int )value;
+
+      if( ( count == 0 ) || ( self == null ) )
         return value;
 
-      if( fixedColumnCount < 0 )
+      var dataGridContext = self.DataGridContext;
+      if( dataGridContext == null )
+        return value;
+
+      if( count < 0 )
         return 0;
 
-      var manager = ( TableViewColumnVirtualizationManagerBase )sender;
-      var dataGridContext = manager.DataGridContext;
-      int maxValue = 0;
+      var columns = dataGridContext.VisibleColumns;
+      var max = columns.Count;
 
-      if( dataGridContext != null )
-      {
-        var columns = dataGridContext.VisibleColumns;
-        if( columns.Any() )
-        {
-          maxValue = columns.Count;
-        }
-      }
-
-      if( fixedColumnCount > maxValue )
-        return maxValue;
+      if( count > max )
+        return max;
 
       return value;
     }
 
-    private int FixedColumnCountInternal
+    private void OnFixedColumnCountChanged( int oldValue, int newValue )
     {
-      get;
-      set;
-    }
+      var dataGridContext = this.DataGridContext;
+      if( dataGridContext == null )
+        return;
 
-    private void UpdateFixedColumnCount()
-    {
-      this.CoerceValue( TableViewColumnVirtualizationManagerBase.FixedColumnCountProperty );
+      var columnManager = dataGridContext.ColumnManager;
+      columnManager.SetFixedColumnCount( newValue );
     }
-
-    private readonly AutoResetFlag m_updatingFixedColumnCount = AutoResetFlagFactory.Create();
-    private DispatcherOperation m_incrementVersionDispatcherOperation;
 
     #endregion
 
@@ -275,6 +241,33 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion
 
+    #region MergedNameToOffset Internal Property
+
+    internal abstract IList<IColumnInfoCollection<double>> MergedNameToOffset
+    {
+      get;
+    }
+
+    #endregion
+
+    #region MergedNameToWidth Internal Property
+
+    internal abstract IList<IColumnInfoCollection<double>> MergedNameToWidth
+    {
+      get;
+    }
+
+    #endregion
+
+    #region MergedNameToPostion Internal Property
+
+    internal abstract IList<IColumnInfoCollection<int>> MergedNameToPostion
+    {
+      get;
+    }
+
+    #endregion
+
     #region FixedFieldNames Internal Property
 
     internal abstract IColumnNameCollection FixedFieldNames
@@ -305,14 +298,48 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion
 
-    #region FirstViewportColumnFieldNameIndex Internal Property
+    #region FixedMergedNames Internal Property
 
-    internal abstract int FirstViewportColumnFieldNameIndex
+    internal abstract IList<IColumnNameCollection> FixedMergedNames
     {
       get;
     }
 
-    protected abstract void SetFirstViewportColumnFieldNameIndex( int value );
+    #endregion
+
+    #region ScrollingMergedNames Internal Property
+
+    internal abstract IList<IColumnNameCollection> ScrollingMergedNames
+    {
+      get;
+    }
+
+    #endregion
+
+    #region VisibleMergedFieldNames Internal Property
+
+    internal IList<IColumnNameCollection> VisibleMergedFieldNames
+    {
+      get
+      {
+        var fixedFieldNames = this.FixedMergedNames;
+        var scrollingFieldNames = this.ScrollingMergedNames;
+
+        Debug.Assert( fixedFieldNames != null );
+        Debug.Assert( scrollingFieldNames != null );
+        Debug.Assert( fixedFieldNames.Count == scrollingFieldNames.Count );
+
+        var count = fixedFieldNames.Count;
+        var retval = new List<IColumnNameCollection>( count );
+
+        for( int i = 0; i < count; i++ )
+        {
+          retval.Add( new ColumnNameLookup( new IColumnNameCollection[] { fixedFieldNames[ i ], scrollingFieldNames[ i ] } ) );
+        }
+
+        return retval.AsReadOnly();
+      }
+    }
 
     #endregion
 
@@ -345,6 +372,14 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private void ScrollViewer_ScrollChanged( object sender, ScrollChangedEventArgs e )
     {
+      //If only scrolling vertically, there is no changes to columns in view, thus no need to update this manager, and therefore no need to make FixedCellPanels update.
+      if( e.VerticalChange != 0 )
+      {
+        if( ( e.ExtentHeightChange == 0 ) && ( e.ExtentWidthChange == 0 ) && ( e.HorizontalChange == 0 ) &&
+            ( e.ViewportHeightChange == 0 ) && ( e.ViewportWidthChange == 0 ) )
+          return;
+      }
+
       var dataGridContext = this.DataGridContext;
       if( dataGridContext == null )
         return;
@@ -361,20 +396,9 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private void UpdateScrollViewer()
     {
-      DataGridContext dataGridContext = this.DataGridContext;
+      var dataGridContext = this.DataGridContext;
 
-      if( dataGridContext == null )
-      {
-        this.ScrollViewer = null;
-      }
-      else
-      {
-        var scrollViewer = dataGridContext.DataGridControl.ScrollViewer;
-
-        Debug.Assert( ( scrollViewer != null ) || ( DesignerProperties.GetIsInDesignMode( this ) ) );
-
-        this.ScrollViewer = scrollViewer;
-      }
+      this.ScrollViewer = ( dataGridContext != null ) ? dataGridContext.DataGridControl.ScrollViewer : null;
     }
 
     private ScrollViewer m_scrollViewer; //null;
@@ -386,12 +410,37 @@ namespace Xceed.Wpf.DataGrid.Views
     // This event will be use to notify every listener that the DataGridControl's layout has changed and they must at least call MeasureOverride
     public event EventHandler UpdateMeasureRequired;
 
-    protected void RaiseUpdateMeasureRequired( UpdateMeasureRequiredEventArgs args )
+    protected void OnUpdateMeasureRequired( UpdateMeasureRequiredEventArgs e )
     {
-      if( this.UpdateMeasureRequired != null )
-      {
-        this.UpdateMeasureRequired( this, args );
-      }
+      // If the manager is detached, it means it will be soon collected, thus don't send update notifications to FixedCellPanels that can still be hook to it (but being recycled).
+      if( this.DataGridContext == null )
+        return;
+
+      var handler = this.UpdateMeasureRequired;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, e );
+    }
+
+    #endregion
+
+    #region VirtualizingCellCollectionUpdateRequired Public Event
+
+    // This event is raised so FixedCellPanels can update their cell collections accordingly to changes in columns in the ColumnVirtualizingMode they are currently in.
+    public event EventHandler VirtualizingCellCollectionUpdateRequired;
+
+    protected void OnVirtualizingCellCollectionUpdateRequired( VirtualizingCellCollectionUpdateRequiredEventArgs e )
+    {
+      // If the manager is detached, it means it will be soon collected, thus don't send update notifications to FixedCellPanels that can still be hook to it (but being recycled).
+      if( this.DataGridContext == null )
+        return;
+
+      var handler = this.VirtualizingCellCollectionUpdateRequired;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, e );
     }
 
     #endregion
@@ -404,37 +453,32 @@ namespace Xceed.Wpf.DataGrid.Views
       CollectionChangedEventManager.AddListener( this.DataGridContext.Items.GroupDescriptions, this );
       ColumnActualWidthEventManager.AddListener( this.DataGridContext.Columns, this );
       DataGridControlTemplateChangedEventManager.AddListener( this.DataGridContext.DataGridControl, this );
-      if( this.DataGridContext.SourceDetailConfiguration != null )
-      {
-        FixedColumnCountInfoEventManager.AddListener( this.DataGridContext.SourceDetailConfiguration, this );
-      }
 
       this.UpdateScrollViewer();
 
-      Binding fixedColumnCountBindingBase = new Binding( "FixedColumnCount" );
+      var fixedColumnCountBindingBase = new Binding( TableView.FixedColumnCountProperty.Name );
       fixedColumnCountBindingBase.Source = this.DataGridContext;
       fixedColumnCountBindingBase.Mode = BindingMode.TwoWay;
       BindingOperations.SetBinding( this, TableViewColumnVirtualizationManagerBase.FixedColumnCountProperty, fixedColumnCountBindingBase );
 
-      Binding isColumnVirtualizingEnabledBindingBase = new Binding();
-      isColumnVirtualizingEnabledBindingBase.Source = this.DataGridContext;
-      isColumnVirtualizingEnabledBindingBase.Path = new PropertyPath( TableView.IsColumnVirtualizationEnabledProperty );
-      isColumnVirtualizingEnabledBindingBase.Mode = BindingMode.OneWay;
-      BindingOperations.SetBinding( this, TableViewColumnVirtualizationManagerBase.IsVirtualizingProperty, isColumnVirtualizingEnabledBindingBase );
-
-      Binding compensationOffsetBinding = new Binding();
+      var compensationOffsetBinding = new Binding();
       compensationOffsetBinding.Path = new PropertyPath( TableView.CompensationOffsetProperty );
       compensationOffsetBinding.Source = this.DataGridContext;
       compensationOffsetBinding.Mode = BindingMode.OneWay;
       BindingOperations.SetBinding( this, TableViewColumnVirtualizationManagerBase.FirstColumnCompensationOffsetProperty, compensationOffsetBinding );
+
+      var columnVirtualizationModeBindingBase = new Binding();
+      columnVirtualizationModeBindingBase.Source = this.DataGridContext;
+      columnVirtualizationModeBindingBase.Path = new PropertyPath( TableView.ColumnVirtualizationModeProperty.Name );
+      columnVirtualizationModeBindingBase.Mode = BindingMode.OneWay;
+      BindingOperations.SetBinding( this, TableViewColumnVirtualizationManagerBase.VirtualizationModeProperty, columnVirtualizationModeBindingBase );
     }
 
     protected override void Uninitialize()
     {
-      BindingOperations.ClearBinding( this, TableViewColumnVirtualizationManagerBase.FixedColumnCountProperty );
-
-      BindingOperations.ClearBinding( this, TableViewColumnVirtualizationManagerBase.IsVirtualizingProperty );
+      BindingOperations.ClearBinding( this, TableViewColumnVirtualizationManagerBase.VirtualizationModeProperty );
       BindingOperations.ClearBinding( this, TableViewColumnVirtualizationManagerBase.FirstColumnCompensationOffsetProperty );
+      BindingOperations.ClearBinding( this, TableViewColumnVirtualizationManagerBase.FixedColumnCountProperty );
 
       this.ScrollViewer = null;
 
@@ -442,11 +486,6 @@ namespace Xceed.Wpf.DataGrid.Views
       CollectionChangedEventManager.RemoveListener( this.DataGridContext.Items.GroupDescriptions, this );
       ColumnActualWidthEventManager.RemoveListener( this.DataGridContext.Columns, this );
       DataGridControlTemplateChangedEventManager.RemoveListener( this.DataGridContext.DataGridControl, this );
-
-      if( this.DataGridContext.SourceDetailConfiguration != null )
-      {
-        FixedColumnCountInfoEventManager.RemoveListener( this.DataGridContext.SourceDetailConfiguration, this );
-      }
 
       base.Uninitialize();
     }
@@ -456,182 +495,156 @@ namespace Xceed.Wpf.DataGrid.Views
       this.SetFixedColumnsWidth( 0d );
       this.SetScrollingColumnsWidth( 0d );
       this.SetVisibleColumnsWidth( 0d );
-      this.SetFirstViewportColumnFieldNameIndex( -1 );
 
       this.FieldNameToOffset.Clear();
       this.FieldNameToWidth.Clear();
       this.FieldNameToPosition.Clear();
+      this.MergedNameToOffset.Clear();
+      this.MergedNameToPostion.Clear();
+      this.MergedNameToWidth.Clear();
 
       this.FixedFieldNames.Clear();
       this.ScrollingFieldNames.Clear();
+      this.FixedMergedNames.Clear();
+      this.ScrollingMergedNames.Clear();
     }
 
     protected override void DoUpdate()
     {
-      this.UpdateFixedColumnCount();
-
       var dataGridContext = this.DataGridContext;
-      var columnsByVisiblePosition = dataGridContext.ColumnsByVisiblePosition;
+      Debug.Assert( dataGridContext != null );
 
-      // We can't compute any values if Colums are not yet added to DataGrid
-      if( columnsByVisiblePosition.Count == 0 )
+      var columnManager = dataGridContext.ColumnManager;
+      Debug.Assert( columnManager != null );
+
+      // Make sure the fixed column count is up-to-date.
+      this.CoerceValue( TableViewColumnVirtualizationManagerBase.FixedColumnCountProperty );
+
+      //It can happen that the columnManager has not been initialized yet (e.g. when creating a grid in code behind), so make sure markers are not null.
+      var levelMarkers = columnManager.GetLevelMarkersFor( dataGridContext.Columns );
+      if( levelMarkers == null )
         return;
 
-      LinkedListNode<ColumnBase> currentColumnNode = columnsByVisiblePosition.First;
-      int currentColumnIndex = 0;
-      double currentTotalWidth = 0d;
-      double currentColumnActualWidth = 0d;
+      var currentLocation = levelMarkers.Start;
+      Debug.Assert( currentLocation != null );
+      Debug.Assert( currentLocation.Type == LocationType.Start );
 
-      int currentFixedColumnCount = 0;
-      ColumnBase currentColumnDataGridContext = dataGridContext.CurrentColumn;
+      var columnPosition = 0;
+      var visibleColumnsTotalWidth = 0d;
 
-      double fixedFieldNamesWidth = 0d;
-      double fixedColumnsWidth = 0d;
-
-      if( this.FixedColumnCountInternal > 0 )
+      // Fill the data structures for the fixed columns.
+      while( currentLocation.Type != LocationType.Splitter )
       {
-        while( currentColumnNode != null )
+        var columnLocation = currentLocation as ColumnHierarchyManager.IColumnLocation;
+        if( columnLocation != null )
         {
-          // If all Fixed Columns were found
-          if( this.FixedColumnCountInternal == currentFixedColumnCount )
-            break;
+          var column = columnLocation.Column;
+          Debug.Assert( column != null );
 
-          ColumnBase column = currentColumnNode.Value;
+          // Ensure we keep the correct visible offset for all columns even if they are collpased
+          this.FieldNameToOffset[ column ] = visibleColumnsTotalWidth;
 
-          // Ensure we keep the correct visible offset for every columns even if they are Collpased
-          this.FieldNameToOffset[ column ] = currentTotalWidth;
-
-          // The Column is not visible
-          if( !column.Visible )
+          if( column.Visible )
           {
-            // Move next
-            currentColumnNode = currentColumnNode.Next;
-            currentColumnIndex++;
+            var width = column.ActualWidth;
+
+            this.FixedFieldNames.Add( column );
+            this.FieldNameToPosition[ column ] = columnPosition;
+            this.FieldNameToWidth[ column ] = width;
+
+            visibleColumnsTotalWidth += width;
           }
-          else
+
+          columnPosition++;
+        }
+        else
+        {
+          Debug.Assert( currentLocation.Type != LocationType.Column );
+        }
+
+        currentLocation = currentLocation.GetNextSiblingOrCousin();
+        Debug.Assert( currentLocation != null );
+      }
+
+      this.SetFixedColumnsWidth( visibleColumnsTotalWidth );
+
+      var horizontalOffset = this.GetHorizontalOffset();
+      var viewportWidth = this.GetViewportWidth();
+
+      if( this.VirtualizationMode != ColumnVirtualizationMode.None )
+      {
+        // We increment the horizontalOffset to take the fixed columns width into consideration.
+        horizontalOffset += visibleColumnsTotalWidth;
+        viewportWidth = Math.Max( 0d, viewportWidth - visibleColumnsTotalWidth );
+      }
+
+      // We must consider the fixed columns width when calculating visible indexes in viewport
+      var viewportMaximumOffset = horizontalOffset + viewportWidth;
+      var visibleScrollingColumnsTotalWidth = 0d;
+
+      // Fill the data structures for the scrolling columns.
+      while( currentLocation.Type != LocationType.Orphan )
+      {
+        var columnLocation = currentLocation as ColumnHierarchyManager.IColumnLocation;
+        if( columnLocation != null )
+        {
+          var column = columnLocation.Column;
+          Debug.Assert( column != null );
+
+          // Ensure we keep the correct visible offset for all columns even if they are collapsed
+          this.FieldNameToOffset[ column ] = visibleColumnsTotalWidth;
+
+          if( column.Visible )
           {
-            this.FieldNameToPosition[ column ] = currentColumnIndex;
+            var width = column.ActualWidth;
+            var leftEdgeOffset = visibleColumnsTotalWidth;
+            var rightEdgeOffset = leftEdgeOffset + width;
 
-            currentColumnActualWidth = column.ActualWidth;
+            this.FieldNameToPosition[ column ] = columnPosition;
+            this.FieldNameToWidth[ column ] = width;
 
-            fixedFieldNamesWidth += currentColumnActualWidth;
-            currentTotalWidth += currentColumnActualWidth;
+            visibleColumnsTotalWidth += width;
+            visibleScrollingColumnsTotalWidth += width;
 
-            this.FieldNameToWidth[ column ] = currentColumnActualWidth;
-
-            // We found a FixedCell
-            if( this.FixedColumnCountInternal > currentFixedColumnCount )
+            if( this.VirtualizationMode != ColumnVirtualizationMode.None )
             {
-              fixedColumnsWidth += currentColumnActualWidth;
-
-              this.FixedFieldNames.Add( column );
-
-              currentColumnNode = currentColumnNode.Next;
-              currentColumnIndex++;
-              currentFixedColumnCount++;
+              // The column is in the viewport.
+              if( ( leftEdgeOffset < viewportMaximumOffset ) && ( rightEdgeOffset > horizontalOffset ) )
+              {
+                this.ScrollingFieldNames.Add( column );
+              }
             }
             else
             {
-              Debug.Assert( this.FixedColumnCount == currentFixedColumnCount );
+              this.ScrollingFieldNames.Add( column );
             }
           }
+
+          columnPosition++;
         }
-      }
-
-      this.SetFixedColumnsWidth( fixedColumnsWidth );
-
-      double horizontalOffset = this.GetHorizontalOffset();
-      double viewportWidth = this.GetViewportWidth();
-
-      if( this.IsVirtualizing )
-      {
-        // We increment the horizontalOffset to take the fixed columns width into consideration.
-        horizontalOffset += fixedFieldNamesWidth;
-        viewportWidth = Math.Max( 0d, viewportWidth - fixedFieldNamesWidth );
-      }
-
-      // We must consider the fixedFieldNamesWidth width when calculating visible indexes in Viewport
-      double viewportMaximumOffset = horizontalOffset + viewportWidth;
-      double scrollingColumnsWidth = 0d;
-
-      while( currentColumnNode != null )
-      {
-        ColumnBase column = currentColumnNode.Value;
-
-        // Ensure we keep the correct visible offset for every columns even if they are collapsed
-        this.FieldNameToOffset[ column ] = currentTotalWidth;
-
-        if( column.Visible )
+        else
         {
-          bool visibleColumnFieldNameMustBeAdded = false;
-
-          this.FieldNameToPosition[ column ] = currentColumnIndex;
-          currentColumnActualWidth = column.ActualWidth;
-
-          double columnLeftEdgeOffset = currentTotalWidth;
-          double columnRightEdgeOffset = columnLeftEdgeOffset + currentColumnActualWidth;
-
-          currentTotalWidth += currentColumnActualWidth;
-          scrollingColumnsWidth += currentColumnActualWidth;
-
-          this.FieldNameToWidth[ column ] = currentColumnActualWidth;
-
-          if( this.IsVirtualizing )
-          {
-            // The cell is before the ViewPort
-            // Cell .... | --- ViewPort --- |
-            bool beforeViewPort = ( horizontalOffset >= columnRightEdgeOffset );
-
-            // The cell is after the ViewPort
-            // | --- ViewPort --- | .... Cell
-            bool afterViewPort = ( viewportMaximumOffset <= columnLeftEdgeOffset );
-
-            // Columns are in the ViewPort
-            if( !beforeViewPort && !afterViewPort )
-            {
-              // We keep the index of the first viewport column index to ease the FixedColumn splitter change
-              if( this.FirstViewportColumnFieldNameIndex == -1 )
-              {
-                this.SetFirstViewportColumnFieldNameIndex( this.ScrollingFieldNames.Count );
-              }
-
-              visibleColumnFieldNameMustBeAdded = true;
-            }
-          }
-          else
-          {
-            visibleColumnFieldNameMustBeAdded = true;
-          }
-
-          if( visibleColumnFieldNameMustBeAdded && ( !this.FixedFieldNames.Contains( column ) ) && ( !this.ScrollingFieldNames.Contains( column ) ) )
-          {
-            this.ScrollingFieldNames.Add( column );
-          }
+          Debug.Assert( currentLocation.Type != LocationType.Column );
         }
 
-        currentColumnNode = currentColumnNode.Next;
-        currentColumnIndex++;
+        currentLocation = currentLocation.GetNextSiblingOrCousin();
+        Debug.Assert( currentLocation != null );
       }
 
-      this.SetScrollingColumnsWidth( scrollingColumnsWidth );
-      this.SetVisibleColumnsWidth( currentTotalWidth );
+      this.SetScrollingColumnsWidth( visibleScrollingColumnsTotalWidth );
+      this.SetVisibleColumnsWidth( visibleColumnsTotalWidth );
     }
 
-    protected override void IncrementVersion( object parameters )
+    protected override void IncrementVersion( UpdateMeasureRequiredEventArgs e )
     {
-      // If the manager is detached, it means it will be soon collected, thus don't send update notifications to FixedCellPanels that can still be hook to it (but being recycled).
-      if( !m_detached )
-      {
-        base.IncrementVersion( parameters );
-        this.RaiseUpdateMeasureRequired( parameters as UpdateMeasureRequiredEventArgs );
-      }
+      base.IncrementVersion( e );
 
-      m_incrementVersionDispatcherOperation = null;
+      this.OnUpdateMeasureRequired( e );
     }
 
-    protected override void DataGridContext_PropertyChanged( object sender, PropertyChangedEventArgs e )
+    protected override void OnDataGridContextPropertyChanged( PropertyChangedEventArgs e )
     {
-      base.DataGridContext_PropertyChanged( sender, e );
+      base.OnDataGridContextPropertyChanged( e );
 
       Debug.Assert( !string.IsNullOrEmpty( e.PropertyName ) );
 
@@ -646,23 +659,120 @@ namespace Xceed.Wpf.DataGrid.Views
 
         case "CurrentItem":
           // No need to increment version, only notify the current item to invalidate measure
-          this.RaiseUpdateMeasureRequired( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.CurrentItemChanged ) );
+          this.OnUpdateMeasureRequired( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.CurrentItemChanged ) );
           break;
       }
     }
 
-    internal int GetFixedColumnCount()
+    protected override void OnColumnsLayoutChanging()
     {
-      return this.GetFixedColumnCount( -1 );
+      m_columnsVisibilitySnapshot.Clear();
+
+      var dataGridContext = this.DataGridContext;
+      if( dataGridContext != null )
+      {
+        // We consult the VisibleColumns collection to figure if a column was visible or not instead
+        // of the ColumnBase.Visible property because the property may already be tainted by a change
+        // at this step.
+        var visibleColumns = ( ReadOnlyColumnCollection )dataGridContext.VisibleColumns;
+
+        foreach( var column in dataGridContext.Columns )
+        {
+          // This line of code is equivalent to
+          //   m_columnsVisibilitySnapshot[ column ] = visibleColumns.Contains( column );
+          // However, the result is found in O(1) instead of O(n).
+          m_columnsVisibilitySnapshot[ column ] = ( visibleColumns[ column.FieldName ] == column );
+        }
+      }
+
+      base.OnColumnsLayoutChanging();
     }
 
-    internal int GetFixedColumnCount( int level )
+    protected override void OnColumnsLayoutChanged()
     {
-      if( level < 0 )
-        return this.FixedColumnCountInternal;
+      var columnsVisibilitySnapshot = new Dictionary<ColumnBase, bool>( m_columnsVisibilitySnapshot );
+      m_columnsVisibilitySnapshot.Clear();
 
-      //If the list is empty, it means there is no column in the grid right now, so return 0.
-      return 0;
+      var dataGridContext = this.DataGridContext;
+      if( dataGridContext != null )
+      {
+        // When details are flatten, the detail DataGridContext's FixedColumnCount property is bound to the 
+        // DataGridControl's FixedColumnCount property.  Allowing the value to be changed here would destroy the binding.
+        if( !dataGridContext.IsAFlattenDetail )
+        {
+          var columnManager = dataGridContext.ColumnManager;
+          var fixedColumnCount = columnManager.GetFixedColumnCount();
+
+          Debug.Assert( fixedColumnCount >= 0 );
+
+          this.FixedColumnCount = fixedColumnCount;
+        }
+
+        this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.ColumnReordering ) );
+
+        var columns = dataGridContext.Columns;
+
+        if( this.VirtualizationMode == ColumnVirtualizationMode.Virtualizing )
+        {
+          // Notify the FixedCellPanel that some cells need to be created for new columns.
+          if( ( columnsVisibilitySnapshot.Count < columns.Count ) || ( columns.Any( c => !columnsVisibilitySnapshot.ContainsKey( c ) ) ) )
+          {
+            this.OnVirtualizingCellCollectionUpdateRequired( new VirtualizingCellCollectionUpdateRequiredEventArgs( VirtualizingCellCollectionUpdateTriggeredAction.VisibleColumnsAdded ) );
+          }
+        }
+
+        // Figure out the columns that have changed visibility
+        if( columnsVisibilitySnapshot.Count > 0 )
+        {
+          var columnChanges = new List<ColumnBase>();
+
+          foreach( var column in columns )
+          {
+            bool visible;
+
+            if( columnsVisibilitySnapshot.TryGetValue( column, out visible ) && ( column.Visible != visible ) )
+            {
+              columnChanges.Add( column );
+            }
+          }
+
+          if( columnChanges.Count > 0 )
+          {
+            this.OnVirtualizingCellCollectionUpdateRequired( new VirtualizingCellCollectionUpdateRequiredEventArgs( columnChanges ) );
+          }
+        }
+      }
+
+      base.OnColumnsLayoutChanged();
+    }
+
+    protected virtual void OnSortDescriptionsChanged( NotifyCollectionChangedEventArgs e )
+    {
+      this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.SortingChanged ) );
+    }
+
+    protected virtual void OnGroupDescriptionsChanged( NotifyCollectionChangedEventArgs e )
+    {
+      this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.GroupingChanged ) );
+    }
+
+    protected virtual void OnColumnActualWidthChanged( ColumnActualWidthChangedEventArgs e )
+    {
+      // We pass the delta between the old and new value to tell the Panel to reduce the horizontal offset when a column is auto-resized to a smaller value
+      if( e != null )
+      {
+        this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.ColumnActualWidthChanged, e.OldValue - e.NewValue ) );
+      }
+      else
+      {
+        this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.ColumnActualWidthChanged ) );
+      }
+    }
+
+    protected virtual void OnDataGridControlTemplateChanged()
+    {
+      this.UpdateScrollViewer();
+      this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.Unspecified ) );
     }
 
     internal IColumnInfoCollection<double> GetFieldNameToOffset()
@@ -674,6 +784,10 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       if( level < 0 )
         return this.FieldNameToOffset;
+
+      var collection = this.MergedNameToOffset;
+      if( collection.Count > 0 )
+        return collection[ level ];
 
       //If the list is empty, it means there is no column in the grid right now, so return an empty collection, as does the FieldNameToOffset property.
       return new ColumnInfoCollection<double>();
@@ -689,6 +803,10 @@ namespace Xceed.Wpf.DataGrid.Views
       if( level < 0 )
         return this.FieldNameToWidth;
 
+      var collection = this.MergedNameToWidth;
+      if( collection.Count > 0 )
+        return collection[ level ];
+
       //If the list is empty, it means there is no column in the grid right now, so return an empty collection, as does the FieldNameToWidth property.
       return new ColumnInfoCollection<double>();
     }
@@ -702,6 +820,10 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       if( level < 0 )
         return this.FieldNameToPosition;
+
+      var collection = this.MergedNameToPostion;
+      if( collection.Count > 0 )
+        return collection[ level ];
 
       //If the list is empty, it means there is no column in the grid right now, so return an empty collection, as does the FieldNameToPosition property.
       return new ColumnInfoCollection<int>();
@@ -717,6 +839,10 @@ namespace Xceed.Wpf.DataGrid.Views
       if( level < 0 )
         return this.FixedFieldNames;
 
+      var collection = this.FixedMergedNames;
+      if( collection.Count > 0 )
+        return collection[ level ];
+
       //If the list is empty, it means there is no column in the grid right now, so return an empty collection, as does the FixedFieldNames property.
       return new ColumnNameCollection();
     }
@@ -730,6 +856,10 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       if( level < 0 )
         return this.ScrollingFieldNames;
+
+      var collection = this.ScrollingMergedNames;
+      if( collection.Count > 0 )
+        return collection[ level ];
 
       //If the list is empty, it means there is no column in the grid right now, so return an empty collection, as does the ScrollingFieldNames property.
       return new ColumnNameCollection();
@@ -745,89 +875,12 @@ namespace Xceed.Wpf.DataGrid.Views
       if( level < 0 )
         return this.VisibleFieldNames;
 
+      var collection = this.VisibleMergedFieldNames;
+      if( collection.Count > 0 )
+        return collection[ level ];
+
       //If the list is empty, it means there is no column in the grid right now, so return an empty collection, as does the VisibleFieldNames property.
       return new ColumnNameCollection();
-    }
-
-    internal void SetFixedColumnCount( int level, int fixedColumnCount, int correctionValue )
-    {
-      var dataGridContext = this.DataGridContext;
-
-      // When details are flatten, the detail DataGridContext's FixedColumnCount property is bound to the 
-      // DataGridControl's FixedColumnCount property.  Allowing the value to be changed here would destroy the binding.
-      if( dataGridContext.IsAFlattenDetail )
-        return;
-
-      if( level == -1 )
-      {
-        this.FixedColumnCountInternal = fixedColumnCount;
-      }
-
-      //Set the top level FixedColumnCount property (at this point, either there is no MergedHeaders so level = -1, or fixedColumnCount has been calculated for level 0).
-      if( !m_updatingFixedColumnCount.IsSet )
-      {
-        using( m_updatingFixedColumnCount.Set() )
-        {
-          this.FixedColumnCount = fixedColumnCount;
-        }
-      }
-    }
-
-    internal int GetFirstViewportColumnFieldNameIndex()
-    {
-      return this.GetFirstViewportColumnFieldNameIndex( -1 );
-    }
-
-    internal int GetFirstViewportColumnFieldNameIndex( int level )
-    {
-      if( level < 0 )
-        return this.FirstViewportColumnFieldNameIndex;
-
-      //If the list is empty, it means there is no merged column in the grid right now, so return 0.
-      return 0;
-    }
-
-    internal void UpdateFixedColumnCountInfo( FixedColumnCountInfoEventArgs e )
-    {
-      this.DataGridContext.IsSettingFixedColumnCount = true;
-
-      //Gather the necessary info to update the FixedColumnCount at each MergedHeader level.
-      m_fixedColumnCountInfo = new FixedColumnCountInfo();
-
-      ColumnBase triggeringColumn = e.TriggeringColumn;
-      if( triggeringColumn == null )
-      {
-        m_fixedColumnCountInfo.Level = e.Level;
-      }
-      else
-      {
-        m_fixedColumnCountInfo.Level = -1;
-      }
-
-      switch( e.UpdateType )
-      {
-        case FixedColumnUpdateType.Hide:
-        case FixedColumnUpdateType.Remove:
-          {
-            m_fixedColumnCountInfo.FixedColumnCount = this.GetFixedColumnCount( m_fixedColumnCountInfo.Level ) - 1;
-            m_fixedColumnCountInfo.CorrectionValue = m_fixedColumnCountInfo.FixedColumnCount >= ( this.GetVisibleColumns( m_fixedColumnCountInfo.Level ).Count - 1 ) ? 1 : 0;
-            break;
-          }
-
-        case FixedColumnUpdateType.Show:
-          {
-            m_fixedColumnCountInfo.FixedColumnCount = this.GetFixedColumnCount( m_fixedColumnCountInfo.Level ) + 1;
-            m_fixedColumnCountInfo.CorrectionValue = m_fixedColumnCountInfo.FixedColumnCount > 0 ? 1 : 0;
-            break;
-          }
-
-        case FixedColumnUpdateType.Update:
-          {
-            m_fixedColumnCountInfo.FixedColumnCount = this.GetFixedColumnCount( m_fixedColumnCountInfo.Level );
-            m_fixedColumnCountInfo.CorrectionValue = m_fixedColumnCountInfo.FixedColumnCount >= ( this.GetVisibleColumns( m_fixedColumnCountInfo.Level ).Count - 1 ) ? 1 : 0;
-            break;
-          }
-      }
     }
 
     private string FindFirstVisibleFocusableColumnFieldName( LinkedListNode<ColumnBase> startNode, Func<LinkedListNode<ColumnBase>, LinkedListNode<ColumnBase>> getNextNodeHandler )
@@ -887,7 +940,7 @@ namespace Xceed.Wpf.DataGrid.Views
     private double GetViewportWidth()
     {
       // Viewport is only required when UI Virtualization is on.
-      if( !this.IsVirtualizing )
+      if( this.VirtualizationMode == ColumnVirtualizationMode.None )
         return 0d;
 
       IScrollInfo scrollInfo = null;
@@ -913,170 +966,103 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private IList<ColumnBase> GetVisibleColumns( int level )
     {
-
-      if( level != -1 )
-        throw new ArgumentException( "Not expecting merged headers in this version of the datagrid" );
-
       return this.DataGridContext.VisibleColumns;
     }
 
-    private void OnColumnReordering( FixedCellPanel panel, ColumnReorderingEventArgs e )
+    private ColumnCollection GetColumnCollectionForLevel( int level )
     {
-      // We must be sure the VisiblePosition is converted to visible index since some Columns can be Visible = false
-      int oldVisiblePosition = FixedCellPanel.CalculateVisibleIndex( e.OldVisiblePosition, panel.ColumnsByVisiblePosition );
-      int newVisiblePosition = FixedCellPanel.CalculateVisibleIndex( e.NewVisiblePosition, panel.ColumnsByVisiblePosition );
+      var dataGridContext = this.DataGridContext;
+      if( dataGridContext == null )
+        return null;
 
-      int correctionValue = 0;
-      int level = panel.ParentRow.LevelCache;
-      int columnCount = this.GetFixedColumnCount( level );
+      if( level < 0 )
+        return dataGridContext.Columns;
 
-      if( ( oldVisiblePosition < columnCount ) && ( newVisiblePosition >= columnCount ) )
+      return null;
+    }
+
+    private IEnumerable<ColumnHierarchyManager.ILocation> GetChildLocations( ColumnHierarchyManager.ILocation location )
+    {
+      if( location == null )
+        yield break;
+
+      location = location.GetFirstChild();
+
+      while( location != null )
       {
-        // A column has moved from the fixedPanel to the scrollingPanel.  Do not increment version, it will be done by the FixedColumnCount changed
-        columnCount--;
-        if( columnCount > 0 )
+        yield return location;
+
+        location = location.GetNextSibling();
+      }
+    }
+
+    private IEnumerable<ColumnHierarchyManager.IColumnLocation> GetColumnLocations( IEnumerable<ColumnHierarchyManager.ILocation> locations )
+    {
+      if( locations == null )
+        return Enumerable.Empty<ColumnHierarchyManager.IColumnLocation>();
+
+      return ( from location in locations
+               let columnLocation = location as ColumnHierarchyManager.IColumnLocation
+               where ( columnLocation != null )
+               select columnLocation );
+    }
+
+    private double GetVisibleChildColumnsWidth( ColumnHierarchyManager.ILocation parentLocation )
+    {
+      var width = 0d;
+
+      foreach( var columnLocation in this.GetColumnLocations( this.GetChildLocations( parentLocation ) ) )
+      {
+        var column = columnLocation.Column;
+        if( column.Visible )
         {
-          correctionValue = 1;
+          width += column.ActualWidth;
         }
-
-        //Set fixed column count at all merged header levels.
-        this.SetFixedColumnCount( level, columnCount, correctionValue );
-
-      }
-      else if( ( oldVisiblePosition >= columnCount ) && ( newVisiblePosition < columnCount ) )
-      {
-        // A column has moved from the scrollingPanel to the fixedPanel.  Do not increment version, it will be done by the FixedColumnCount changed
-        columnCount++;
-        if( columnCount == this.GetVisibleColumns( level ).Count )
-        {
-          correctionValue = 1;
-        }
-
-        //Set fixed column count at all merged header levels.
-        this.SetFixedColumnCount( level, columnCount, correctionValue );
-      }
-      else
-      {
-        this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.ColumnReordering ) );
       }
 
-      // This must be done to stop progation of the event even if only one ColumnManagerCell will raise it.
-      e.Handled = true;
+      return width;
     }
 
     #region IWeakEventListener Members
 
-    protected override bool OnReceivedWeakEvent( Type managerType, object sender, EventArgs e )
+    protected override bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
-      bool handled = true;
-      bool detach = false;
-      DataGridContext dataGridContext = this.DataGridContext;
+      var handled = true;
+      var dataGridContext = this.DataGridContext;
 
-      if( managerType == typeof( VisibleColumnsUpdatedEventManager ) )
-      {
-        var eventArgs = e as VisibleColumnsUpdatedEventArgs;
-
-        //If flag is true, no need to update all the FixedCellPanel's at this time, but make sure it will be update before it is used again.
-        if( eventArgs != null && eventArgs.OnlyIncrementFlag )
-        {
-          base.IncrementVersion( null );
-        }
-        else
-        {
-          var detailConfig = this.DataGridContext.SourceDetailConfiguration;
-
-          //Make sure the FixedColumnCount is valid at each MergedHeader level
-          if( this.FixedColumnCount != 0 && ( this.DataGridContext.IsSettingFixedColumnCount || ( detailConfig != null && detailConfig.IsSettingFixedColumnCount ) ) )
-          {
-            if( m_fixedColumnCountInfo != null )
-            {
-              this.SetFixedColumnCount( m_fixedColumnCountInfo.Level, m_fixedColumnCountInfo.FixedColumnCount, m_fixedColumnCountInfo.CorrectionValue );
-              m_fixedColumnCountInfo = null;
-            }
-
-            this.DataGridContext.IsSettingFixedColumnCount = false;
-            if( detailConfig != null )
-            {
-              detailConfig.IsSettingFixedColumnCount = false;
-            }
-          }
-
-          this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.ColumnReordering ) );
-        }
-      }
-      else if( managerType == typeof( CollectionChangedEventManager ) )
+      if( managerType == typeof( CollectionChangedEventManager ) )
       {
         if( sender == dataGridContext.Items.SortDescriptions )
         {
-          this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.SortingChanged ) );
+          this.OnSortDescriptionsChanged( ( NotifyCollectionChangedEventArgs )e );
         }
         else if( sender == dataGridContext.Items.GroupDescriptions )
         {
-          this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.GroupingChanged ) );
+          this.OnGroupDescriptionsChanged( ( NotifyCollectionChangedEventArgs )e );
         }
       }
       else if( managerType == typeof( ColumnActualWidthEventManager ) )
       {
-        var args = e as ColumnActualWidthChangedEventArgs;
-
-        // We pass the delta between the old and new value to tell the Panel to reduce the horizontal offset when a column is auto-resized to a smaller value
-        if( args != null )
-        {
-          double delta = args.OldValue - args.NewValue;
-          this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.ColumnActualWidthChanged, delta ) );
-        }
-        else
-        {
-          this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.ColumnActualWidthChanged ) );
-        }
-      }
-      else if( managerType == typeof( FixedColumnCountInfoEventManager ) )
-      {
-        var infoEventArgs = e as FixedColumnCountInfoEventArgs;
-        this.UpdateFixedColumnCountInfo( infoEventArgs );
-      }
-      else if( managerType == typeof( ViewChangedEventManager ) )
-      {
-        this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.Unspecified ) );
-
-        detach = true;
-      }
-      else if( managerType == typeof( ThemeChangedEventManager ) )
-      {
-        this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.Unspecified ) );
-
-        detach = true;
+        this.OnColumnActualWidthChanged( e as ColumnActualWidthChangedEventArgs );
       }
       else if( managerType == typeof( DataGridControlTemplateChangedEventManager ) )
       {
-        this.UpdateScrollViewer();
-        this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.Unspecified ) );
-      }
-      else if( managerType == typeof( ItemsSourceChangeCompletedEventManager ) )
-      {
-        detach = true;
+        this.OnDataGridControlTemplateChanged();
       }
       else
       {
         handled = false;
       }
 
-      if( detach && ( dataGridContext != null ) )
-      {
-        // Detach the ColumnVirtualizationManager from the DataGridContext.
-        ColumnVirtualizationManager.SetColumnVirtualizationManager( dataGridContext, null );
-        m_detached = true;
+      if( !base.OnReceiveWeakEvent( managerType, sender, e ) )
+        return handled;
 
-        this.Uninitialize();
-      }
-
-      return handled;
+      return true;
     }
 
     #endregion
 
-    private FixedColumnCountInfo m_fixedColumnCountInfo;
-    private bool m_detached;
+    private readonly Dictionary<ColumnBase, bool> m_columnsVisibilitySnapshot = new Dictionary<ColumnBase, bool>();
 
     internal sealed class ColumnNameCollection : IColumnNameCollection
     {
@@ -1361,80 +1347,6 @@ namespace Xceed.Wpf.DataGrid.Views
       }
 
       private readonly List<IColumnNameCollection> m_collection;
-    }
-
-    private sealed class RoutedEventManager
-    {
-      private static RoutedEventManager Singleton;
-      private static int Registered; //0
-
-      private RoutedEventManager()
-      {
-      }
-
-      internal static RoutedEventManager Instance
-      {
-        get
-        {
-          if( RoutedEventManager.Singleton == null )
-          {
-            Interlocked.CompareExchange<RoutedEventManager>( ref RoutedEventManager.Singleton, new RoutedEventManager(), null );
-          }
-
-          return RoutedEventManager.Singleton;
-        }
-      }
-
-      internal void Register()
-      {
-        if( Interlocked.CompareExchange( ref RoutedEventManager.Registered, 1, 0 ) == 1 )
-          return;
-
-        // Register to ColumnManagerCell.ColumnReorderingEvent on FixedCellPanel type
-        // to be notified the corret DataGridContext level
-        EventManager.RegisterClassHandler(
-          typeof( FixedCellPanel ),
-          ColumnManagerCell.ColumnReorderingEvent,
-          new ColumnReorderingEventHandler( RoutedEventManager.OnColumnReordering ) );
-      }
-
-      private static void OnColumnReordering( object sender, ColumnReorderingEventArgs e )
-      {
-        var panel = sender as FixedCellPanel;
-        if( panel == null )
-          return;
-
-        var dataGridContext = DataGridControl.GetDataGridContext( panel );
-        if( dataGridContext == null )
-          return;
-
-        var manager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManagerBase;
-        if( manager == null )
-          return;
-
-        manager.OnColumnReordering( panel, e );
-      }
-    }
-
-    private class FixedColumnCountInfo
-    {
-      internal int Level
-      {
-        get;
-        set;
-      }
-
-      internal int FixedColumnCount
-      {
-        get;
-        set;
-      }
-
-      internal int CorrectionValue
-      {
-        get;
-        set;
-      }
     }
   }
 }

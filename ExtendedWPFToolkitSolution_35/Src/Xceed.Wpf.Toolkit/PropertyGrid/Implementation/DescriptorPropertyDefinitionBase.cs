@@ -60,7 +60,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region Initialization
 
-    internal DescriptorPropertyDefinitionBase( bool isPropertyGridCategorized )
+
+    internal DescriptorPropertyDefinitionBase( bool isPropertyGridCategorized
+                                             )
     {
       this.IsPropertyGridCategorized = isPropertyGridCategorized;
     }
@@ -212,15 +214,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     internal void UpdateAdvanceOptions()
     {
-      // Only set the Tooltip. the Icon will be added in XAML based on the Tooltip.
+      // Only set the Tooltip. The Icon will be added in XAML based on the Tooltip.
       this.AdvancedOptionsTooltip = this.ComputeAdvancedOptionsTooltip();
     }
 
     internal void UpdateIsExpandable()
     {
-      this.IsExpandable =
-        this.ExpandableAttribute
-        && this.ComputeIsExpandable();
+      this.IsExpandable = this.ComputeIsExpandable() 
+                          && ( this.ExpandableAttribute
+                             );
     }
 
     internal void UpdateValueFromSource()
@@ -576,11 +578,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
+
     internal bool IsPropertyGridCategorized
     {
       get;
       set;
     }
+
 
 
     #region Value Property (DP)
@@ -624,7 +628,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       _displayName = ComputeDisplayName();
       _defaultValue = ComputeDefaultValueAttribute();
       _displayOrder = ComputeDisplayOrder( this.IsPropertyGridCategorized );
-
       _expandableAttribute = ComputeExpandableAttribute();
 
 

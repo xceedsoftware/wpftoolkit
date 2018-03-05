@@ -22,167 +22,201 @@
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
-      <ResourceDictionary Source="../../Themes/Aero2/Glyphs.xaml" />
-   </ResourceDictionary.MergedDictionaries>
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
+    <ResourceDictionary Source="../../Themes/Aero2/Glyphs.xaml" />
+  </ResourceDictionary.MergedDictionaries>
 
-    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+  <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
 
-    <DataTemplate x:Key="DefaultWatermarkTemplate">
-        <ContentControl Content="{Binding}" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Focusable="False" Margin="0,0,3,0" />
-    </DataTemplate>
+  <DataTemplate x:Key="DefaultWatermarkTemplate">
+    <ContentControl Content="{Binding}"
+                    Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+                    Focusable="False"
+                    Margin="0,0,3,0" />
+  </DataTemplate>
 
-    <Style x:Key="CalculatorToggleButtonStyle" TargetType="ToggleButton">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ToggleButton">
-                    <Grid SnapsToDevicePixels="True">
-                        <chrome:ButtonChrome x:Name="ToggleButtonChrome"
-                                       CornerRadius="0"
-                                       RenderChecked="{Binding IsOpen, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:CalculatorUpDown}}"
-                                       RenderEnabled="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:CalculatorUpDown}}"
-									   RenderMouseOver="{TemplateBinding IsMouseOver}"
-									   RenderPressed="{TemplateBinding IsPressed}">
+  <Style x:Key="CalculatorToggleButtonStyle"
+         TargetType="ToggleButton">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ToggleButton">
+          <Grid SnapsToDevicePixels="True">
+            <chrome:ButtonChrome x:Name="ToggleButtonChrome"
+                                 CornerRadius="0"
+                                 RenderChecked="{Binding IsOpen, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:CalculatorUpDown}}"
+                                 RenderEnabled="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:CalculatorUpDown}}"
+                                 RenderMouseOver="{TemplateBinding IsMouseOver}"
+                                 RenderPressed="{TemplateBinding IsPressed}">
 
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                                <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                <ContentPresenter HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
 
-                                <Grid x:Name="arrowGlyph" IsHitTestVisible="False" Grid.Column="1" Margin="5">
-                           <Path x:Name="Arrow"
-                                 Width="9"
-                                 Height="5"
-                                 Data="{StaticResource DownArrowGeometry}" 
-                                 Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
-                                 Margin="0,1,0,0"/>
-                                </Grid>
-                            </Grid>
-                        </chrome:ButtonChrome>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Fill" TargetName="Arrow" Value="#AFAFAF" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+                <Grid x:Name="arrowGlyph"
+                      IsHitTestVisible="False"
+                      Grid.Column="1"
+                      Margin="5">
+                  <Path x:Name="Arrow"
+                        Width="9"
+                        Height="5"
+                        Data="{StaticResource DownArrowGeometry}"
+                        Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                        Margin="0,1,0,0" />
+                </Grid>
+              </Grid>
+            </chrome:ButtonChrome>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsEnabled"
+                     Value="False">
+              <Setter Property="Fill"
+                      TargetName="Arrow"
+                      Value="#AFAFAF" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 
-    <!-- =============================================================================== -->
-    <!-- CalculatorUpDown                                                                -->
-    <!-- =============================================================================== -->
+  <!-- =============================================================================== -->
+  <!-- CalculatorUpDown                                                                -->
+  <!-- =============================================================================== -->
 
-    <Style TargetType="{x:Type local:CalculatorUpDown}">
-        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
-        <Setter Property="BorderThickness" Value="1,1,0,1" />
-        <Setter Property="IsTabStop" Value="False" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="HorizontalContentAlignment" Value="Right" />
-        <Setter Property="TextAlignment" Value="Right" />
-        <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:CalculatorUpDown}">
-                    <Grid>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <local:ButtonSpinner x:Name="PART_Spinner"
-                                          IsTabStop="False"
-                                          Background="{TemplateBinding Background}"
-                                          BorderThickness="{TemplateBinding BorderThickness}"
-                                          BorderBrush="{TemplateBinding BorderBrush}"
-                                          ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
-                                          AllowSpin="{TemplateBinding AllowSpin}"
-                                          ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
-                                          VerticalContentAlignment="Stretch"
-                                          HorizontalAlignment="Stretch">
-                        <local:WatermarkTextBox x:Name="PART_TextBox"
-                                                BorderThickness="0" 
-                                                Background="{TemplateBinding Background}"
-                                                ContextMenu="{TemplateBinding ContextMenu}"
-                                                FontFamily="{TemplateBinding FontFamily}" 
-                                                FontSize="{TemplateBinding FontSize}" 
-                                                FontStretch="{TemplateBinding FontStretch}"
-                                                FontStyle="{TemplateBinding FontStyle}" 
-                                                FontWeight="{TemplateBinding FontWeight}" 
-                                                Foreground="{TemplateBinding Foreground}" 
-                                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
-                                                IsTabStop="True"
-                                                MinWidth="20"
-                                                AcceptsReturn="False"
-                                                Padding="{TemplateBinding Padding}"
-                                                AutoSelectBehavior="{TemplateBinding AutoSelectBehavior}"
-                                                AutoMoveFocus="{TemplateBinding AutoMoveFocus}"
-                                                TextAlignment="{TemplateBinding TextAlignment}"
-                                                TextWrapping="NoWrap" 
-                                                TabIndex="{TemplateBinding TabIndex}"
-                                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                Watermark="{TemplateBinding Watermark}"
-                                                WatermarkTemplate="{TemplateBinding WatermarkTemplate}" />
-                            </local:ButtonSpinner>
-                            <ToggleButton x:Name="_calculatorToggleButton"
-                                   Grid.Column="1"
-                                   Focusable="False"
-                                   IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
-                                   Style="{StaticResource CalculatorToggleButtonStyle}"
-                                   IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}" />
-                        </Grid>
-                        <Popup x:Name="PART_CalculatorPopup"
-                               IsOpen="{Binding IsChecked, ElementName=_calculatorToggleButton}"
-                               StaysOpen="False"
-                               ToolTip="{x:Static sys:String.Empty}">
-                           <Popup.Resources>
-                              <Style TargetType="ToolTip">
-                                 <Style.Triggers>
-                                    <Trigger Property="Content"
-                                                Value="{x:Static sys:String.Empty}">
-                                       <Setter Property="Visibility"
-                                                  Value="Collapsed" />
-                                    </Trigger>
-                                 </Style.Triggers>
-                              </Style>
-                           </Popup.Resources>
-                           <Border BorderThickness="1" Background="{StaticResource PanelBackgroundBrush}" BorderBrush="{StaticResource PopupDarkBorderBrush}" Padding="3">
-                                <StackPanel>
-                                    <local:Calculator x:Name="PART_Calculator"
-                                             Background="Transparent"
-                                             BorderThickness="0"
-                                             DisplayText="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}"
-                                             Memory="{Binding Memory, RelativeSource={RelativeSource TemplatedParent}}"
-                                             Precision="{Binding Precision, RelativeSource={RelativeSource TemplatedParent}}" />
-                                </StackPanel>
-                            </Border>
-                        </Popup>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                        </Trigger>
-                        <Trigger Property="IsFocused" Value="True">
-                            <Setter TargetName="PART_TextBox" Property="FocusManager.FocusedElement" Value="{Binding ElementName=PART_TextBox}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+  <Style TargetType="{x:Type local:CalculatorUpDown}">
+    <Setter Property="Background"
+            Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
+    <Setter Property="Foreground"
+            Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+    <Setter Property="BorderBrush"
+            Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
+    <Setter Property="BorderThickness"
+            Value="1,1,0,1" />
+    <Setter Property="IsTabStop"
+            Value="False" />
+    <Setter Property="VerticalContentAlignment"
+            Value="Center" />
+    <Setter Property="HorizontalContentAlignment"
+            Value="Right" />
+    <Setter Property="TextAlignment"
+            Value="Right" />
+    <Setter Property="WatermarkTemplate"
+            Value="{StaticResource DefaultWatermarkTemplate}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:CalculatorUpDown}">
+          <Grid>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <local:ButtonSpinner x:Name="PART_Spinner"
+                                   IsTabStop="False"
+                                   Background="{TemplateBinding Background}"
+                                   BorderThickness="{TemplateBinding BorderThickness}"
+                                   BorderBrush="{TemplateBinding BorderBrush}"
+                                   ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
+                                   AllowSpin="{TemplateBinding AllowSpin}"
+                                   ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
+                                   VerticalContentAlignment="Stretch"
+                                   HorizontalAlignment="Stretch">
+                <local:WatermarkTextBox x:Name="PART_TextBox"
+                                        BorderThickness="0"
+                                        Background="{TemplateBinding Background}"
+                                        ContextMenu="{TemplateBinding ContextMenu}"
+                                        FontFamily="{TemplateBinding FontFamily}"
+                                        FontSize="{TemplateBinding FontSize}"
+                                        FontStretch="{TemplateBinding FontStretch}"
+                                        FontStyle="{TemplateBinding FontStyle}"
+                                        FontWeight="{TemplateBinding FontWeight}"
+                                        Foreground="{TemplateBinding Foreground}"
+                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
+                                        IsTabStop="True"
+                                        MinWidth="20"
+                                        AcceptsReturn="False"
+                                        Padding="{TemplateBinding Padding}"
+                                        AutoSelectBehavior="{TemplateBinding AutoSelectBehavior}"
+                                        AutoMoveFocus="{TemplateBinding AutoMoveFocus}"
+                                        TextAlignment="{TemplateBinding TextAlignment}"
+                                        TextWrapping="NoWrap"
+                                        TabIndex="{TemplateBinding TabIndex}"
+                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Watermark="{TemplateBinding Watermark}"
+                                        WatermarkTemplate="{TemplateBinding WatermarkTemplate}" />
+              </local:ButtonSpinner>
+              <ToggleButton x:Name="_calculatorToggleButton"
+                            Grid.Column="1"
+                            Focusable="False"
+                            IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                            Style="{StaticResource CalculatorToggleButtonStyle}"
+                            IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}">
+              </ToggleButton>
+            </Grid>
+            <Popup x:Name="PART_CalculatorPopup"
+                   IsOpen="{Binding IsChecked, ElementName=_calculatorToggleButton}"
+                   StaysOpen="False"
+                   ToolTip="{x:Static sys:String.Empty}">
+              <Popup.Resources>
+                <Style TargetType="ToolTip">
+                  <Style.Triggers>
+                    <Trigger Property="Content"
+                             Value="{x:Static sys:String.Empty}">
+                      <Setter Property="Visibility"
+                              Value="Collapsed" />
+                    </Trigger>
+                  </Style.Triggers>
+                </Style>
+              </Popup.Resources>
+              <Border BorderThickness="1"
+                      Background="{StaticResource PanelBackgroundBrush}"
+                      BorderBrush="{StaticResource PopupDarkBorderBrush}"
+                      Padding="3">
+                <StackPanel>
+                  <local:Calculator x:Name="PART_Calculator"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    DisplayText="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}"
+                                    Memory="{Binding Memory, RelativeSource={RelativeSource TemplatedParent}}"
+                                    Precision="{Binding Precision, RelativeSource={RelativeSource TemplatedParent}}" />
+                </StackPanel>
+              </Border>
+            </Popup>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver"
+                     Value="True">
+              <Setter Property="BorderBrush"
+                      Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocusWithin"
+                     Value="True">
+              <Setter Property="BorderBrush"
+                      Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
+            </Trigger>
+            <Trigger Property="IsEnabled"
+                     Value="False">
+              <Setter Property="Foreground"
+                      Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+            </Trigger>
+            <Trigger Property="IsFocused"
+                     Value="True">
+              <Setter TargetName="PART_TextBox"
+                      Property="FocusManager.FocusedElement"
+                      Value="{Binding ElementName=PART_TextBox}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 
 </ResourceDictionary>

@@ -14,19 +14,15 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Windows.Data;
 using System.Windows;
+using System.Windows.Data;
+using System.Windows.Threading;
 
 namespace Xceed.Wpf.DataGrid
 {
   public class DataGridVirtualizingQueryableCollectionViewSource : DataGridVirtualizingCollectionViewSourceBase
   {
-    #region CONSTRUCTORS
-
     static DataGridVirtualizingQueryableCollectionViewSource()
     {
       CollectionViewSource.CollectionViewTypeProperty.OverrideMetadata(
@@ -34,49 +30,48 @@ namespace Xceed.Wpf.DataGrid
         new FrameworkPropertyMetadata( typeof( DataGridVirtualizingQueryableCollectionView ) ) );
     }
 
-    public DataGridVirtualizingQueryableCollectionViewSource()
-      : base()
-    {
-    }
-
-    #endregion CONSTRUCTORS
-
-    #region QueryableSource
+    #region QueryableSource Property
 
     public static readonly DependencyProperty QueryableSourceProperty = DependencyProperty.Register(
-      "QueryableSource", typeof( IQueryable ), typeof( DataGridVirtualizingQueryableCollectionViewSource ),
+      "QueryableSource",
+      typeof( IQueryable ),
+      typeof( DataGridVirtualizingQueryableCollectionViewSource ),
       new FrameworkPropertyMetadata(
         null,
         new PropertyChangedCallback( DataGridVirtualizingQueryableCollectionViewSource.OnQueryableSourcePropertyChanged ) ) );
 
     public IQueryable QueryableSource
     {
-      get { return ( IQueryable )GetValue( DataGridVirtualizingQueryableCollectionViewSource.QueryableSourceProperty ); }
-      set { this.SetValue( DataGridVirtualizingQueryableCollectionViewSource.QueryableSourceProperty, value ); }
+      get
+      {
+        return ( IQueryable )GetValue( DataGridVirtualizingQueryableCollectionViewSource.QueryableSourceProperty );
+      }
+      set
+      {
+        this.SetValue( DataGridVirtualizingQueryableCollectionViewSource.QueryableSourceProperty, value );
+      }
     }
 
     private static void OnQueryableSourcePropertyChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      DataGridCollectionViewSourceBase source = sender as DataGridCollectionViewSourceBase;
-
+      var source = sender as DataGridCollectionViewSourceBase;
       if( source == null )
         return;
 
       source.AdviseForwardedPropertyChanged();
 
-      if( source.DataSourceProvider != null )
-        source.DataSourceProvider.DelayRefresh( source.Dispatcher, System.Windows.Threading.DispatcherPriority.DataBind );
+      var provider = source.DataSourceProvider;
+      if( provider != null )
+      {
+        provider.DelayRefresh( source.Dispatcher, DispatcherPriority.DataBind );
+      }
     }
 
-    #endregion QueryableSource
-
-    #region OVERRIDES
+    #endregion
 
     internal override DataGridCollectionViewBaseDataProvider CreateDataProvider()
     {
       return new DataGridVirtualizingQueryableCollectionViewDataProvider( this );
     }
-
-    #endregion OVERRIDES
   }
 }

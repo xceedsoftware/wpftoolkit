@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -24,28 +24,10 @@
                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                 VerticalScrollBarVisibility="Disabled"
                 Title="Ready-to-use EditorDefinitions">
-<!--##EXCLUDE_OPEN_SOURCE-->   
-   <local:DemoView.Resources>
-      
-      <x:Array x:Key="comboSource1" Type="s:String" >
-         <s:String>String Value 1</s:String>
-         <s:String>String Value 2</s:String>
-         <s:String>String Value 3</s:String>
-      </x:Array>
 
-      <x:Array x:Key="comboSource2" Type="s:Object" >
-         <v:ColorSampleItem Color="{x:Null}" DisplayString="(No color selected)"/>
-         <v:ColorSampleItem Color="{x:Static sm:Colors.Red}" DisplayString="Red Color"/>
-         <v:ColorSampleItem Color="{x:Static sm:Colors.Green}" DisplayString="Green Color"/>
-         <v:ColorSampleItem Color="{x:Static sm:Colors.Blue}" DisplayString="Blue Color"/>
-      </x:Array>
-      
-      <Style x:Key="textBoxStyle" TargetType="TextBox">
-         <Setter Property="Background" Value="LightBlue"/>
-      </Style>
-      
-   </local:DemoView.Resources>
-<!--##END-->   
+
+
+
    <local:DemoView.Description>
       <Paragraph FontSize="14" FontFamily="Segoe">
          Using the various EditorDefinitions provided with the PropertyGrid, you can easily customize and reuse the existing default editor to suit your needs. Style the editing element or use one of the common properties directly provided on the editor definition class. The provided editor definitions are the following:
@@ -72,7 +54,6 @@
          EditorIntegerUpDownDefinition
          <LineBreak />
          EditorDoubleUpDownDefinition
-         <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
          <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
@@ -80,7 +61,6 @@
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->
          etc.
       </Paragraph>
    </local:DemoView.Description>
@@ -89,13 +69,7 @@
       <StackPanel DockPanel.Dock="Top">
          <TextBlock Text="Each of the displayed properties has their display or behavior affected by an different EditorDefinition "
                  TextWrapping="Wrap"/>
-         <!--##EXCLUDE_OPEN_SOURCE-->
-         <TextBlock Text="(Click XAML and Code tabs to see details)" 
-                    FontStyle="Italic"
-                    Margin="0,10,0,0"/>
-         <!--##END-->
       </StackPanel>
-      <!--##INCLUDE_OPEN_SOURCE
       <ScrollViewer VerticalScrollBarVisibility="Auto"
                     HorizontalScrollBarVisibility="Auto">
          <StackPanel>
@@ -103,72 +77,13 @@
             <local:XamlBox CodeSource="/Samples/PropertyGrid/OpenSourceImages/EditorDefinitions.xaml.txt" />
          </StackPanel>
       </ScrollViewer>      
-      ##END-->      
-      <!--##EXCLUDE_OPEN_SOURCE-->
-      <xctk:PropertyGrid x:Name="_propertyGrid" SelectedObject="{Binding}"  Width="450" MaxHeight="320" Margin="10" >
-         <xctk:PropertyGrid.EditorDefinitions>
-            <!-- 
-            Only the "integer" is demonstrated here. 
-            But all other numeric types are also supported (eg. EditorDoubleUpDownDefinition, etc.)  
-            -->
-            <xctk:EditorIntegerUpDownDefinition TargetProperties="{x:Type s:Int32}" 
-                                                TextAlignment="Right" />
-            <!-- CheckBox -->
-            <xctk:EditorCheckBoxDefinition TargetProperties="{x:Type s:Boolean}" 
-                                           IsThreeState="True" />
 
-            <!-- ColorPicker -->
-            <xctk:EditorColorPickerDefinition TargetProperties="{x:Type sm:Color}" 
-                                              DisplayColorAndName="False" 
-                                              ShowDropDownButton="False"/>
 
-            <!-- FilePicker -->
-            <xctk:EditorFilePickerDefinition TargetProperties="{x:Type sys:FileInfo}"
-                                             Filter="Text file | *.txt"
-                                             Title="Select your file"/>
 
-            <!-- DateTimeUpDown -->
-            <xctk:EditorDateTimeUpDownDefinition TargetProperties="{x:Type s:DateTime}" 
-                                                 Format="Custom" 
-                                                 FormatString="yyyy-MM" />
 
-            <!-- TextBox -->
-            <!-- On any EditorDefintion, you can use the "EditingElementStyle" to have a more complete customization 
-            of the underlying editor -->
-            <xctk:EditorTextDefinition TargetProperties="{x:Type s:String}" 
-                                       FontStyle="Italic" 
-                                       FontWeight="Bold" 
-                                       EditingElementStyle="{StaticResource textBoxStyle}" />
 
-            <!-- ComboBox (simple) -->
-            <!-- When using SelectedObject[s], the DataContext will be the PropertyItem. Bind to the "Value" property. -->
-            <xctk:EditorComboBoxDefinition TargetProperties="StringCombo"
-                                           ItemsSource="{StaticResource comboSource1}"
-                                           SelectedItemBinding="{Binding Value}" />
 
-            <!-- ComboBox (complex) -->
-            <xctk:EditorComboBoxDefinition TargetProperties="ColorCombo"
-                                           ItemsSource="{StaticResource comboSource2}"
-                                           DisplayMemberPath="DisplayString"
-                                           SelectedValuePath="Color"
-                                           SelectedValueBinding="{Binding Value}" />
 
-            <!-- Custom DataTemplate -->
-            <xctk:EditorTemplateDefinition TargetProperties="PersonTemplate">
-               <xctk:EditorTemplateDefinition.EditingTemplate>
-                  <DataTemplate>
-                     <StackPanel Orientation="Horizontal">
-                        <!-- When using SelectedObject[s], the DataContext will be the PropertyItem. Bind to the "Value" property. -->
-                        <TextBlock Text="{Binding Value.LastName}" FontWeight="Bold" />
-                        <TextBlock Text=", " />
-                        <TextBlock Text="{Binding Value.FirstName}" />
-                     </StackPanel>
-                  </DataTemplate>
-               </xctk:EditorTemplateDefinition.EditingTemplate>
-            </xctk:EditorTemplateDefinition>
-         </xctk:PropertyGrid.EditorDefinitions>
-      </xctk:PropertyGrid>
-      <!--##END-->
    </DockPanel>
 
 

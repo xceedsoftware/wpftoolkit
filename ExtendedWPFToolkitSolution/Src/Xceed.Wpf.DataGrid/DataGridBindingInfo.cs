@@ -31,8 +31,6 @@ namespace Xceed.Wpf.DataGrid
 {
   public class DataGridBindingInfo
   {
-    #region CONSTRUCTORS
-
     public DataGridBindingInfo()
     {
       m_binding = new Binding();
@@ -47,8 +45,6 @@ namespace Xceed.Wpf.DataGrid
       m_binding.NotifyOnTargetUpdated = true;
       m_binding.NotifyOnValidationError = true;
     }
-
-    #endregion CONSTRUCTORS
 
     #region BindsDirectlyToSource Property
 
@@ -273,19 +269,11 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion Path Property
 
-    #region INTERNAL METHODS
-
     internal Binding GetBinding()
     {
       return m_binding;
     }
 
-    #endregion INTERNAL METHODS
-
-    #region PRIVATE FIELDS
-
     private Binding m_binding;
-
-    #endregion PRIVATE FIELDS
   }
 }

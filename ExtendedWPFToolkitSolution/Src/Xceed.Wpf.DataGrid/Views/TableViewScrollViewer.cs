@@ -319,14 +319,13 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private FixedCellPanel LocateFixedCellPanel( DependencyObject obj )
     {
-      DependencyObject child;
-      FixedCellPanel foundPanel;
+      if( obj == null )
+        return null;
 
       for( int i = VisualTreeHelper.GetChildrenCount( obj ) - 1; i >= 0; i-- )
       {
-        child = VisualTreeHelper.GetChild( obj, i );
-
-        foundPanel = child as FixedCellPanel;
+        var child = VisualTreeHelper.GetChild( obj, i );
+        var foundPanel = child as FixedCellPanel;
 
         if( foundPanel != null )
           return foundPanel;
@@ -336,8 +335,7 @@ namespace Xceed.Wpf.DataGrid.Views
         if( foundPanel != null )
         {
           // The FixedCellPanel found can be one of the recycled container in the visual tree
-          DataGridContext dataGridContext = DataGridControl.GetDataGridContext( foundPanel );
-
+          var dataGridContext = DataGridControl.GetDataGridContext( foundPanel );
           if( dataGridContext != null )
           {
             if( dataGridContext.GetItemFromContainer( foundPanel ) != null )

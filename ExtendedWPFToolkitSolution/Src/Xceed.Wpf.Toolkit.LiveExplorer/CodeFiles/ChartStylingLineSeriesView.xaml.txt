@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -24,144 +24,23 @@
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
             <Run>This sample demonstrates how a series with a line layout type and a legend can be styled via DataTemplates. The legend contains a button to add new DataPoints.</Run>
-            <!--##EXCLUDE_OPEN_SOURCE-->
-            <Run>Please move mouse along the line and over the markers to see simple effects.</Run>
-            <!--##END-->
-            
-       <!--##INCLUDE_OPEN_SOURCE
+
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->
         </Paragraph>
     </local:DemoView.Description>
-    
-<!--##EXCLUDE_OPEN_SOURCE-->
-    <local:DemoView.Resources>
-        <DataTemplate x:Key="legendTemplate">
-			<DockPanel VerticalAlignment="Center">
-				<Path Width="32" Height="32" StrokeThickness="3" Data="M 0,24 Q 8,0 16,16 Q 24,32 32,8" >
-					<Path.Stroke>
-						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-							<GradientStop Color="Green" Offset="1" />
-							<GradientStop Color="Yellow" Offset="0.5" />
-							<GradientStop Color="Red" Offset="0" />
-						</LinearGradientBrush>
-					</Path.Stroke>
-				</Path>
-				<TextBlock Text="{Binding Path=Text}" FontSize="11" VerticalAlignment="Center" Margin="5,1,2,1"/>
-                <Button Click="LegendButtonClick">Add DataPoint</Button>
-			</DockPanel>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="seriesTemplate">
-			<Canvas Width="{Binding Path=W}" Height="{Binding Path=H}">
-				<Polyline Points="{Binding Path=Points}" StrokeThickness="10" >
-					<Polyline.Triggers>
-						<EventTrigger RoutedEvent="Mouse.MouseEnter">
-							<EventTrigger.Actions>
-								<BeginStoryboard>
-									<Storyboard>
-										<DoubleAnimation Storyboard.TargetProperty="StrokeThickness" To="20" Duration="0:0:0.4"/>
-									</Storyboard>
-								</BeginStoryboard>
-							</EventTrigger.Actions>
-						</EventTrigger>
 
-						<EventTrigger RoutedEvent="Mouse.MouseLeave">
-							<EventTrigger.Actions>
-								<BeginStoryboard>
-									<Storyboard>
-										<DoubleAnimation Storyboard.TargetProperty="StrokeThickness" To="10" Duration="0:0:0.4" />
-									</Storyboard>
-								</BeginStoryboard>
-							</EventTrigger.Actions>
-						</EventTrigger>
-					</Polyline.Triggers>
-					
-					<Polyline.Stroke>
-						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-							<GradientStop Color="Green" Offset="1" />
-							<GradientStop Color="Yellow" Offset="0.75" />
-							<GradientStop Color="Red" Offset="0" />
-						</LinearGradientBrush>
-					</Polyline.Stroke>
-				</Polyline>
-			</Canvas>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="markerTemplate">
-			<Ellipse Width="20" Height="20" >
-				<Ellipse.Triggers>
-					<EventTrigger RoutedEvent="Mouse.MouseEnter">
-						<EventTrigger.Actions>
-							<BeginStoryboard>
-								<Storyboard>
-									<DoubleAnimation Storyboard.TargetProperty="Width" To="30" Duration="0:0:0.4"/>
-									<DoubleAnimation Storyboard.TargetProperty="Height"	To="30" Duration="0:0:0.4"/>
-								</Storyboard>
-							</BeginStoryboard>
-						</EventTrigger.Actions>
-					</EventTrigger>
 
-					<EventTrigger RoutedEvent="Mouse.MouseLeave">
-						<EventTrigger.Actions>
-							<BeginStoryboard>
-								<Storyboard>
-									<DoubleAnimation Storyboard.TargetProperty="Width" To="20" Duration="0:0:0.4" />
-									<DoubleAnimation Storyboard.TargetProperty="Height"	To="20" Duration="0:0:0.4"/>
-								</Storyboard>
-							</BeginStoryboard>
-						</EventTrigger.Actions>
-					</EventTrigger>
-				</Ellipse.Triggers>
-				
-				<Ellipse.Fill>
-					<RadialGradientBrush Center="0.3, 0.3" RadiusX="0.6" RadiusY="0.6">
-						<GradientStop Color="LightBlue" Offset="0" />
-						<GradientStop Color="Blue" Offset="1" />
-					</RadialGradientBrush>
-				</Ellipse.Fill>			
-		</Ellipse>
-		</DataTemplate>
-    </local:DemoView.Resources>
-    
-   <Grid>
-     <xctk:Chart MinHeight="300">
-        <xctk:Chart.Legend>
-            <xctk:Legend ItemTemplate="{StaticResource legendTemplate}"/>
-        </xctk:Chart.Legend>
-        <xctk:Chart.Areas>
-            <xctk:Area Title="Area1">
-                <xctk:Area.Series>
-					<xctk:Series x:Name="_series"
-                                  Title="Average/Month"
-                                  Template="{StaticResource seriesTemplate}"
-                                  MarkerTemplate="{StaticResource markerTemplate}">
-						<xctk:Series.DataPoints>
-						    <xctk:DataPoint X="0" Y="0" />
-						    <xctk:DataPoint X="1" Y="0.1" />
-						    <xctk:DataPoint X="2" Y="0.3" />
-						    <xctk:DataPoint X="3" Y="0.5" />
-						    <xctk:DataPoint X="4" Y="0.88" />
-						    <xctk:DataPoint X="5" Y="0.9" />
-						    <xctk:DataPoint X="6" Y="0.95" />
-					    </xctk:Series.DataPoints>
-					    <xctk:Series.Layout>
-						    <xctk:LineLayout/>
-					    </xctk:Series.Layout>
-				    </xctk:Series>
-			    </xctk:Area.Series>
-            </xctk:Area>
-        </xctk:Chart.Areas>
-     </xctk:Chart>
-   </Grid>
- <!--##END-->
-    
-<!--##INCLUDE_OPEN_SOURCE
+
+
+
+
+
+
+
     <Image Source="..\OpenSourceImages\ChartStylingLineSeries.png" Width="600" Height="400"/>
-##END-->
 </local:DemoView>

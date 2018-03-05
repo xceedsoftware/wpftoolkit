@@ -21,6 +21,7 @@
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
                     xmlns:pgconv="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid.Converters"
                     xmlns:editor="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid.Editors"
+                    xmlns:prim="clr-namespace:Xceed.Wpf.Toolkit.Primitives"
                     xmlns:utilities="clr-namespace:Xceed.Wpf.Toolkit.Core.Utilities"
                     xmlns:commands="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid.Commands"
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
@@ -54,8 +55,13 @@
             Member="sys:String.Empty" />
 
   <!-- PropertyGrid numeric Editors -->
-  <Style TargetType="{x:Type editor:PropertyGridEditorByteUpDown}"
+  <Style x:Key="PropertyGridNumericUpDown"
+         TargetType="{x:Type prim:InputBase}"
          BasedOn="{StaticResource NumericUpDown}">
+  </Style>
+
+  <Style TargetType="{x:Type editor:PropertyGridEditorByteUpDown}"
+         BasedOn="{StaticResource PropertyGridNumericUpDown}">
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -73,7 +79,7 @@
   </Style>
 
   <Style TargetType="{x:Type editor:PropertyGridEditorDecimalUpDown}"
-         BasedOn="{StaticResource NumericUpDown}">
+         BasedOn="{StaticResource PropertyGridNumericUpDown}">
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -91,7 +97,7 @@
   </Style>
 
   <Style TargetType="{x:Type editor:PropertyGridEditorDoubleUpDown}"
-         BasedOn="{StaticResource NumericUpDown}">
+         BasedOn="{StaticResource PropertyGridNumericUpDown}">
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -109,7 +115,7 @@
   </Style>
 
   <Style TargetType="{x:Type editor:PropertyGridEditorIntegerUpDown}"
-         BasedOn="{StaticResource NumericUpDown}">
+         BasedOn="{StaticResource PropertyGridNumericUpDown}">
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -127,7 +133,7 @@
   </Style>
 
   <Style TargetType="{x:Type editor:PropertyGridEditorLongUpDown}"
-         BasedOn="{StaticResource NumericUpDown}">
+         BasedOn="{StaticResource PropertyGridNumericUpDown}">
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -145,7 +151,7 @@
   </Style>
 
   <Style TargetType="{x:Type editor:PropertyGridEditorShortUpDown}"
-         BasedOn="{StaticResource NumericUpDown}">
+         BasedOn="{StaticResource PropertyGridNumericUpDown}">
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -163,7 +169,7 @@
   </Style>
 
   <Style TargetType="{x:Type editor:PropertyGridEditorSingleUpDown}"
-         BasedOn="{StaticResource NumericUpDown}">
+         BasedOn="{StaticResource PropertyGridNumericUpDown}">
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -273,6 +279,11 @@
             Value="Gray" />
   </Style>
 
+  <!-- PropertyGrid MaskedTextBox Editors -->
+  <Style TargetType="{x:Type editor:PropertyGridEditorMaskedTextBox}"
+         BasedOn="{StaticResource {x:Type TextBox}}">
+  </Style>
+
   <!-- PropertyGrid ColorPicker Editors -->
   <Style TargetType="{x:Type editor:PropertyGridEditorColorPicker}"
          BasedOn="{StaticResource ColorPicker}">
@@ -311,13 +322,13 @@
   <!-- Style for all internal derived types of NumericUpDown will be done in code-behind -->
   <!-- for external themes to redefine the default style. The reason is that the         -->
   <!-- toolkit.dll uses the InternalsVisibleTo attribute which makes internal data only  -->
-  <!-- available in code-behind(not xaml).                                               -->
+  <!-- available in code-behind (not xaml).                                              -->
   <!-- (ex. Office2007 theme)                                                            -->
   <!-- ===============================================================================   -->
 
   <!-- Internal PropertyGrid numeric Editors -->
   <Style TargetType="{x:Type editor:PropertyGridEditorSByteUpDown}"
-         BasedOn="{StaticResource NumericUpDown}">
+         BasedOn="{StaticResource PropertyGridNumericUpDown}">
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -335,7 +346,7 @@
   </Style>
 
   <Style TargetType="{x:Type editor:PropertyGridEditorUIntegerUpDown}"
-         BasedOn="{StaticResource NumericUpDown}">
+         BasedOn="{StaticResource PropertyGridNumericUpDown}">
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -353,7 +364,7 @@
   </Style>
 
   <Style TargetType="{x:Type editor:PropertyGridEditorULongUpDown}"
-         BasedOn="{StaticResource NumericUpDown}">
+         BasedOn="{StaticResource PropertyGridNumericUpDown}">
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -371,7 +382,7 @@
   </Style>
 
   <Style TargetType="{x:Type editor:PropertyGridEditorUShortUpDown}"
-         BasedOn="{StaticResource NumericUpDown}">
+         BasedOn="{StaticResource PropertyGridNumericUpDown}">
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -854,15 +865,18 @@
                                   Template="{StaticResource ExpanderToggleButton}"
                                   OverridesDefaultStyle="True"
                                   IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
-                                  Visibility="{Binding IsExpandable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                  Visibility="{Binding IsExpandable, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    </ToggleButton>
 
                     <pg:TrimmedTextBlock x:Name="_text"
                                          Grid.Column="1"
                                          Text="{Binding DisplayName, RelativeSource={RelativeSource TemplatedParent}}"
+                                         HighlightedText="{Binding HighlightedText, RelativeSource={RelativeSource TemplatedParent}}"
                                          HorizontalAlignment="Stretch"
                                          VerticalAlignment="Center"
                                          TextTrimming="CharacterEllipsis"
-                                         IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}, Converter={StaticResource InverseBoolConverter}}" />
+                                         IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}, Converter={StaticResource InverseBoolConverter}}" >
+                      </pg:TrimmedTextBlock>
                   </Grid>
 
                   <Grid Grid.Column="1"
@@ -872,10 +886,12 @@
                         utilities:ContextMenuUtilities.OpenOnMouseLeftButtonClick="True"
                         ContextMenu="{Binding AdvancedOptionsMenu, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}}">
 
+                    <!-- ImageSource is set in Triggers for others Themes to set their proper icons -->
                     <Image x:Name="_optionsImage"
                            Width="11"
                            Height="11"
-                           ToolTip="{Binding AdvancedOptionsTooltip, RelativeSource={RelativeSource TemplatedParent}}" />
+                           ToolTip="{Binding AdvancedOptionsTooltip, RelativeSource={RelativeSource TemplatedParent}}" >
+                    </Image>
                   </Grid>
                 </Grid>
               </Border>
@@ -1085,12 +1101,14 @@
                   <Grid MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource HalfConverter}, ConverterParameter=17}">
                     <pg:TrimmedTextBlock Text="{TemplateBinding SelectedObjectTypeName}"
                                          TextTrimming="CharacterEllipsis"
-                                         FontWeight="Bold" />
+                                         FontWeight="Bold" >
+                    </pg:TrimmedTextBlock>
                   </Grid>
                   <Grid MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource HalfConverter}, ConverterParameter=17}"
                         Margin="5,0,0,0">
                     <pg:TrimmedTextBlock Text="{TemplateBinding SelectedObjectName}"
-                                         TextTrimming="CharacterEllipsis" />
+                                         TextTrimming="CharacterEllipsis">
+                    </pg:TrimmedTextBlock>
                   </Grid>
                 </StackPanel>
               </StackPanel>
@@ -1114,7 +1132,8 @@
                                  ToolTip="Categorized">
                       <Image Source="./../Images/Categorize16.png"
                              Width="16"
-                             Height="16" />
+                             Height="16" >
+                      </Image>
                     </RadioButton>
                     <RadioButton IsChecked="{Binding IsCategorized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}"
                                  VerticalAlignment="Center"
@@ -1122,7 +1141,8 @@
                                  ToolTip="Alphabetical">
                       <Image Source="./../Images/SortAscending16.png"
                              Width="16"
-                             Height="16" />
+                             Height="16" >
+                      </Image>
                     </RadioButton>
                   </StackPanel>
                 </Grid>
@@ -1166,7 +1186,8 @@
                             HorizontalAlignment="Left">
                       <Image Source="./../Images/ClearFilter16.png"
                              Width="16"
-                             Height="16" />
+                             Height="16" >
+                      </Image>
                     </Button>
                   </Grid>
                 </Border>
@@ -1201,13 +1222,22 @@
                               BorderBrush="{TemplateBinding BorderBrush}"
                               Background="{TemplateBinding Background}"
                               SnapsToDevicePixels="True">
-                        <ScrollViewer Padding="{TemplateBinding Padding}"
+                        <ScrollViewer x:Name="ScrollBar"
+                                      Padding="{TemplateBinding Padding}"
                                       Focusable="False"
                                       VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Auto">
+                                      HorizontalScrollBarVisibility="Disabled">
                           <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                         </ScrollViewer>
                       </Border>
+                      <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding ShowHorizontalScrollBar, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}}"
+                                     Value="True">
+                          <Setter Property="HorizontalScrollBarVisibility"
+                                  Value="Auto"
+                                  TargetName="ScrollBar" />
+                        </DataTrigger>
+                      </ControlTemplate.Triggers>
                     </ControlTemplate>
                   </ItemsControl.Template>
 
@@ -1230,16 +1260,19 @@
               <GridSplitter Height="3"
                             Grid.Row="3"
                             HorizontalAlignment="Stretch"
-                            Visibility="{Binding ShowSummary, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            Visibility="{Binding ShowSummary, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
+              </GridSplitter>
               <StackPanel Grid.Row="4"
                           Margin="0,0,0,5"
                           Visibility="{Binding ShowSummary, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <TextBlock Padding="2 2 2 0"
                            FontWeight="Bold"
-                           Text="{Binding SelectedPropertyItem.DisplayName, RelativeSource={RelativeSource TemplatedParent}}" />
+                           Text="{Binding SelectedPropertyItem.DisplayName, RelativeSource={RelativeSource TemplatedParent}}">
+                </TextBlock>
                 <TextBlock Padding="5 2 2 0"
                            TextWrapping="WrapWithOverflow"
-                           Text="{Binding SelectedPropertyItem.Description, RelativeSource={RelativeSource TemplatedParent}}" />
+                           Text="{Binding SelectedPropertyItem.Description, RelativeSource={RelativeSource TemplatedParent}}">
+                </TextBlock>
               </StackPanel>
             </Grid>
           </Border>

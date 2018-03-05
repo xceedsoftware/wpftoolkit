@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -20,9 +20,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-#if !OPEN_SOURCE
-using Xceed.Wpf.Toolkit.Core.Attributes;
-#endif
 using Xceed.Wpf.Toolkit.Core;
 using System.Windows.Controls;
 using System.Globalization;
@@ -41,90 +38,16 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     public PropertyGridDisplayLocalizationView()
     {
       InitializeComponent();
-#if !OPEN_SOURCE
-      var person = new Person();
-      person.FirstName = "John";
-      person.LastName = "Doe";
-      person.FavoriteActor1 = ActorNoDisplayName.billcosby;
-      person.FavoriteActor2 = ActorWithDisplayName.bradpitt;
-      person.FavoriteActor3 = ActorWithDisplayName.NotInThisList;
 
-      _propertyGrid.SelectedObject = person;
-#endif
     }
 
-#if !OPEN_SOURCE
-    private void ComboBox_SelectionChanged( object sender, System.Windows.Controls.SelectionChangedEventArgs e )
-    {
-      DisplayLocalizationRes.Culture = object.Equals(( ( ComboBox )sender ).SelectedItem,"French" )
-        ? new CultureInfo( "fr" )
-        : CultureInfo.InvariantCulture;
 
-      // This will refresh the PropertyGrid.
-      if( _propertyGrid != null )
-      {
-        var selected = _propertyGrid.SelectedObject;
-        _propertyGrid.SelectedObject = null;
-        _propertyGrid.SelectedObject = selected;
-      }
-    }
 
-    public enum ActorNoDisplayName
-    {
-      alpacino,
-      arnoldschwarzenegger,
-      benaffleck,
-      billcosby,
-      bradpitt,
-      NotInThisList
-    };
 
-    [TypeConverter(typeof(EnumDisplayNameConverter))]
-    public enum ActorWithDisplayName
-    {
-      [ExtendedDisplayName( "Al Pacino" )]
-      alpacino,
-      [ExtendedDisplayName( "Arnold Schwarzenegger" )]
-      arnoldschwarzenegger,
-      [ExtendedDisplayName( "Ben Affleck" )]
-      benaffleck,
-      [ExtendedDisplayName( "Bill Cosby" )]
-      billcosby,
-      [ExtendedDisplayName( "Brad Pitt" )]
-      bradpitt,
-      [LocalizedDisplayName( "NotListed", typeof(DisplayLocalizationRes) )]
-      NotInThisList
-    };
 
-    [CategoryOrder( "InfoCategory", 1 )]
-    [CategoryOrder( "DetailsCategory", 2 )]
-    public class Person
-    {
-      [LocalizedDisplayName( "FirstName", typeof( DisplayLocalizationRes ) )]
-      [LocalizedDescription( "FirstNameDesc", typeof( DisplayLocalizationRes ) )]
-      [LocalizedCategory( "InfoCategory", typeof( DisplayLocalizationRes ) )]
-      public string FirstName { get; set; }
 
-      [LocalizedDisplayName( "LastName", typeof( DisplayLocalizationRes ) )]
-      [LocalizedDescription( "LastNameDesc", typeof( DisplayLocalizationRes ) )]
-      [LocalizedCategory( "InfoCategory", typeof( DisplayLocalizationRes ) )]
-      public string LastName { get; set; }
 
-      [LocalizedDisplayName( "FavoriteActor1", typeof( DisplayLocalizationRes ) )]
-      [LocalizedDescription( "FavoriteActor1Desc", typeof( DisplayLocalizationRes ) )]
-      [LocalizedCategory( "DetailsCategory", typeof( DisplayLocalizationRes ) )]
-      public ActorNoDisplayName FavoriteActor1 { get; set; }
 
-      [LocalizedDisplayName( "FavoriteActor2", typeof( DisplayLocalizationRes ) )]
-      [LocalizedDescription( "FavoriteActor2Desc", typeof( DisplayLocalizationRes ) )]
-      [LocalizedCategory( "DetailsCategory", typeof( DisplayLocalizationRes ) )]
-      public ActorWithDisplayName FavoriteActor2 { get; set; }
 
-      [LocalizedDisplayName( "FavoriteActor3", typeof( DisplayLocalizationRes ) )]
-      [LocalizedDescription( "FavoriteActor3Desc", typeof( DisplayLocalizationRes ) )]
-      [LocalizedCategory( "DetailsCategory", typeof( DisplayLocalizationRes ) )]
-      public ActorWithDisplayName FavoriteActor3 { get; set; }
-    }
-#endif
   }
 }

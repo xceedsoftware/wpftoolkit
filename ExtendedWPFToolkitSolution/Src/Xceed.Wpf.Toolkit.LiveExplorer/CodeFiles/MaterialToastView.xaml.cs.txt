@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -30,21 +30,5 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.MaterialControls.Views
       InitializeComponent();
     }
 
-#if !OPEN_SOURCE
-    private void ToastButton_Click( object sender, RoutedEventArgs e )
-    {
-      var materialToast = new MaterialToast( ( ( ComboBoxItem )toastOwnerComboBox.SelectedItem ).Tag as FrameworkElement );
-      materialToast.MaterialAccentBrush = (SolidColorBrush)toastMaterialAccentBrushComboBox.SelectedItem;
-      materialToast.Location = ( MaterialToastLocationEnum )toastLocationComboBox.SelectedItem;
-      materialToast.SlidingDirection = ( Orientation )toastSlidingDirectionComboBox.SelectedItem;
-      materialToast.Content = "Simple Toast";
-      materialToast.DisplayTime = System.TimeSpan.FromMilliseconds( toastDisplayTimeIntegerUpDown.Value.Value );
-      materialToast.HideOnClick = toastHideOnclickCheckBox.IsChecked.Value;
-      materialToast.IsCloseButtonVisible = toastIsCloseButtonVisibleCheckBox.IsChecked.Value;
-      materialToast.CloseButtonStyle = ( ( ComboBoxItem )toastClosebuttonStyleComboBox.SelectedItem ).Tag as Style;
-      materialToast.CornerRadius = new CornerRadius( toastCornerRadiusIntegerUpDown.Value.Value );
-      materialToast.ShowToast();
-    }
-#endif
   }
 }

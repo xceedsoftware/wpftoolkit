@@ -20,7 +20,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -28,8 +27,6 @@ namespace Xceed.Wpf.DataGrid
 {
   internal sealed class LateGroupLevelDescription : IGroupLevelDescription, INotifyPropertyChanged, IWeakEventListener
   {
-    #region Constructor
-
     internal LateGroupLevelDescription( GroupDescription groupDescription, IEnumerable<GroupLevelDescription> groupLevelDescriptions )
     {
       if( groupDescription == null )
@@ -52,8 +49,6 @@ namespace Xceed.Wpf.DataGrid
         PropertyChangedEventManager.AddListener( m_groupLevelDescription, this, string.Empty );
       }
     }
-
-    #endregion
 
     #region GroupDescription Property
 
@@ -287,23 +282,20 @@ namespace Xceed.Wpf.DataGrid
       if( typeof( PropertyChangedEventManager ) == managerType )
       {
         this.OnGroupLevelDescriptionPropertyChanged( sender, ( PropertyChangedEventArgs )e );
-        return true;
+      }
+      else
+      {
+        return false;
       }
 
-      return false;
+      return true;
     }
 
     #endregion
 
-    #region Private Fields
-
     private GroupLevelDescription m_groupLevelDescription;
     private GroupLevelDescriptionFinder m_finder;
     private bool m_raiseEventOnGroupLevelDescriptionFound; //false
-
-    #endregion
-
-    #region GroupLevelDescriptionFinder Private Class
 
     private sealed class GroupLevelDescriptionFinder : INotifyPropertyChanged, IWeakEventListener, IDisposable
     {
@@ -324,6 +316,8 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
+      #region GroupLevelDescription Property
+
       internal GroupLevelDescription GroupLevelDescription
       {
         get
@@ -331,6 +325,8 @@ namespace Xceed.Wpf.DataGrid
           return m_groupLevelDescription;
         }
       }
+
+      #endregion
 
       public event PropertyChangedEventHandler PropertyChanged;
 
@@ -361,13 +357,18 @@ namespace Xceed.Wpf.DataGrid
 
       private static bool TryFind( IEnumerable<GroupLevelDescription> collection, GroupDescription description, out GroupLevelDescription result )
       {
-        if( ( collection == null ) || ( description == null ) )
+        result = default( GroupLevelDescription );
+
+        if( ( collection != null ) && ( description != null ) )
         {
-          result = null;
-        }
-        else
-        {
-          result = collection.Where( item => ( item.GroupDescription == description ) ).FirstOrDefault();
+          foreach( var item in collection )
+          {
+            if( ( item == null ) || ( item.GroupDescription != description ) )
+              continue;
+
+            result = item;
+            break;
+          }
         }
 
         return ( result != null );
@@ -425,7 +426,5 @@ namespace Xceed.Wpf.DataGrid
       private GroupLevelDescription m_groupLevelDescription; //null
       private IEnumerable<GroupLevelDescription> m_groupLevelDescriptions; //null
     }
-
-    #endregion
   }
 }

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -24,137 +24,25 @@
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
             <Run>The multi-column combo box uses the power of Xceed's datagrid control to create an advanced ComboBox.</Run>
-       <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <Run>This Control is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->
         </Paragraph>
     </local:DemoView.Description>
-    
-<!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-      <xcdg:DataGridCollectionViewSource x:Key="cvsOrder" 
-                                         Source="{Binding}" >
-         <xcdg:DataGridCollectionViewSource.GroupDescriptions>
-            <PropertyGroupDescription PropertyName="ShipCountry" />
-            <PropertyGroupDescription PropertyName="ShipCity" />
-         </xcdg:DataGridCollectionViewSource.GroupDescriptions>
-      </xcdg:DataGridCollectionViewSource>
-      
-      <!--Important! Base the style on the predefined default style for the DataGrid-->
-      <Style x:Key="baseStyle" TargetType="{x:Type xcdg:DataGridControl}"
-                   BasedOn="{StaticResource {x:Static xcdg:MultiColumnComboBox.DefaultDataGridStyleResourceKey}}">
-          <Setter Property="View">
-            <Setter.Value>
-               <!-- Setting a view to allow group drop-down navigation. -->
-               <!-- Because it declare a new view, this style can only -->
-               <!-- be used by one MultiColumnComboBox instance -->
-               <xcdg:TableflowView />
-            </Setter.Value>
-         </Setter>
-      </Style>
 
-      <Style x:Key="coloredDataGridStyle" TargetType="{x:Type xcdg:DataGridControl}" BasedOn="{StaticResource baseStyle}" >
-         <Style.Resources>
-            <Style TargetType="{x:Type xcdg:DataRow}">
-               <Setter Property="Background" Value="LemonChiffon" />
-            </Style>
-         </Style.Resources>
-      </Style>
- 
-      <conv:FlagPathConverter x:Key="flagPathConverter" />
-      
-       <!-- DataTemplate to display a Country -->
-      <DataTemplate x:Key="countryDataTemplate">
-         <StackPanel Orientation="Horizontal"
-                     VerticalAlignment="Center"
-                     Margin="5,0,0,0">
-            <!--The flagPathConverter resource changes the value of a
-                               group (e.g., "Canada") to an image. -->
-            <Image MaxHeight="15"
-                   Margin="0, 0, 5, 0"
-                   Source="{Binding Converter={StaticResource flagPathConverter}}" />
 
-            <TextBlock Text="{Binding}"
-                       TextTrimming="WordEllipsis"
-                       VerticalAlignment="Center" />
-         </StackPanel>
-      </DataTemplate>
 
-   </local:DemoView.Resources>
-   <StackPanel>
-      <GroupBox Header="Features" Grid.Row="0" Margin="5">
-         <Grid Margin="5">
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-               <RowDefinition />
-               <RowDefinition />
-            </Grid.RowDefinitions>
-            <!-- Show headers option -->
-            <TextBlock  Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
-                        Text="ShowColumnHeaders: "/>
-            <CheckBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="5"
-                      IsChecked="{Binding ShowColumnHeaders, ElementName=_combo}" />
 
-            <!-- Show GroupBy control option -->
-            <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
-                       Text="ShowGroupByControl: " />
-            <CheckBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="5"
-                      IsChecked="{Binding ShowGroupByControl, ElementName=_combo}" />
 
-            <!-- Group source option -->
-            <TextBlock  Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0"
-                        Text="Grouped: " />
-            <CheckBox Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" Margin="5"
-                      IsChecked="True"
-                      Click="OnGroupCheck"/>
 
-            <!-- DataGrid Styling -->
-            <TextBlock  Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0"
-                        Text="Applied DataGrid Style: "/>
-            <ComboBox x:Name="styles" Grid.Row="1" Grid.Column="3" SelectedIndex="0" Width="225" VerticalAlignment="Center" Margin="5">
-               <ComboBoxItem Content="No Style" Tag="{StaticResource baseStyle}" />
-               <ComboBoxItem Content="Styled with yellow row background" Tag="{StaticResource coloredDataGridStyle}" />
-            </ComboBox>
 
-         </Grid>
-      </GroupBox>
-      <TextBlock Text="Usage:" Style="{StaticResource Header}" />
-      <xcdg:MultiColumnComboBox x:Name="_combo" 
-                                Width="200" 
-                                HorizontalAlignment="Left" 
-                                AutoCreateColumns="False"
-                                ItemsSource="{Binding Source={StaticResource cvsOrder}}" 
-                                DataGridStyle="{Binding ElementName=styles, Path=SelectedItem.Tag}">
-         <xcdg:MultiColumnComboBox.Columns>
-            <xcdg:Column FieldName="OrderID" Title="Order ID" />
-            <xcdg:Column FieldName="CustomerID" Title="Customer ID" />
-            <xcdg:Column FieldName="ShipCountry" Title="Ship Country" CellContentTemplate="{StaticResource countryDataTemplate}"/>
-            <xcdg:Column FieldName="ShipCity" Title="Ship City" />
-         </xcdg:MultiColumnComboBox.Columns>
-         <xcdg:MultiColumnComboBox.ItemTemplate>
-            <DataTemplate>
-               <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="{Binding OrderID}" />
-                  <TextBlock Margin="10,0,0,0"
-                             Text="{Binding CustomerID, StringFormat= ({0})}"/>
-               </StackPanel>
-            </DataTemplate>
-         </xcdg:MultiColumnComboBox.ItemTemplate>
-      </xcdg:MultiColumnComboBox>
-   </StackPanel>
-<!--##END-->
-    
-<!--##INCLUDE_OPEN_SOURCE
+
+
+
+
+
     <Image Source="..\OpenSourceImages\MultiColumnsComboBox.png" Width="500" Height="300"/>
-##END-->
 </local:DemoView>

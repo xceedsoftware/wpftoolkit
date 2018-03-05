@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -22,9 +22,10 @@
                 xmlns:s="clr-namespace:System;assembly=mscorlib"
                 VerticalScrollBarVisibility="Disabled"
                 Title="Custom Properties">
-    <local:DemoView.Description>
-        <Paragraph FontSize="14" FontFamily="Segoe">
-         Using the CustomPropertyItems class, you can flexibly modify the display of each of your properties.
+  <local:DemoView.Description>
+    <Paragraph FontSize="14"
+               FontFamily="Segoe">
+      Using the CustomPropertyItems class, you can flexibly modify the display of each of your properties.
             <LineBreak />
            <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
@@ -32,18 +33,19 @@
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-      </Paragraph>
-    </local:DemoView.Description>
+    </Paragraph>
+  </local:DemoView.Description>
 
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-      <StackPanel Grid.Row="0" Margin="10">
-         <TextBlock Text="This sample adds 'CustomPropertyItem' to the 'Properties' collection and directly controls the display of each item."
-                    TextWrapping="Wrap"/>
-      </StackPanel>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+    <StackPanel Grid.Row="0"
+                Margin="10">
+      <TextBlock Text="This sample adds 'CustomPropertyItem' to the 'Properties' collection and directly controls the display of each item."
+                 TextWrapping="Wrap" />
+    </StackPanel>
       <ScrollViewer Grid.Row="1" 
                     VerticalScrollBarVisibility="Auto"
                     HorizontalScrollBarVisibility="Auto">
@@ -57,5 +59,5 @@
 
 
 
-   </Grid>      
+  </Grid>
 </local:DemoView>

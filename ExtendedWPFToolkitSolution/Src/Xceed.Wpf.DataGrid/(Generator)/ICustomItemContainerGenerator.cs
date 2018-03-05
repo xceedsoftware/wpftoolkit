@@ -14,8 +14,8 @@
 
   ***********************************************************************************/
 
-using System.Windows.Controls.Primitives;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -37,7 +37,7 @@ namespace Xceed.Wpf.DataGrid
     int GetRealizedIndexForContainer( DependencyObject container );
 
     void SetCurrentIndex( int newCurrentIndex );
-    int GetCurrentIndex( );
+    int GetCurrentIndex();
 
     void RestoreFocus( DependencyObject container );
   }

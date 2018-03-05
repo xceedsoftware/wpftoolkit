@@ -24,15 +24,9 @@ namespace Xceed.Wpf.DataGrid
 {
   public abstract class ForeignKeyConverter
   {
-    #region Constructors
-
     public ForeignKeyConverter()
     {
     }
-
-    #endregion
-
-    #region Public Virtual Methods
 
     public virtual object GetValueFromKey( object key, ForeignKeyConfiguration configuration )
     {
@@ -44,6 +38,9 @@ namespace Xceed.Wpf.DataGrid
       return value;
     }
 
-    #endregion
+    public virtual object GetValueFromKey( object key, DataGridForeignKeyDescription description )
+    {
+      return key;
+    }
   }
 }

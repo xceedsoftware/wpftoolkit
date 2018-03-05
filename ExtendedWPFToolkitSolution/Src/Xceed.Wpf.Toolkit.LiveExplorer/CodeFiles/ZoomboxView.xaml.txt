@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -25,7 +25,7 @@
            The Zoombox control provides zoom and pan functionality for any UIElement (its content) that has a discrete size. It allows the content to be scaled up (zoomed in) or scaled down (zoomed out) using the mouse wheel, key bindings, or programmatically through methods and properties exposed by the control. Similarly, the content can be panned (translated) in any direction by dragging it with the mouse, using key bindings, or programmatically through methods and properties exposed by the control.&#x0a;&#x0a;The Zoombox control also provides a view finder that acts as a reduced-scale map of the contained element, showing exactly which portion of the content is visible within the Zoombox's viewport.
         </Paragraph>
     </local:DemoView.Description>
-    
+
 
    <Grid Grid.Row="1" 
          HorizontalAlignment="Stretch"

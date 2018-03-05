@@ -47,6 +47,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       _model = model;
       HideWindowCommand = new RelayCommand( ( p ) => OnExecuteHideWindowCommand( p ), ( p ) => CanExecuteHideWindowCommand( p ) );
+      CloseWindowCommand = new RelayCommand( ( p ) => OnExecuteCloseWindowCommand( p ), ( p ) => CanExecuteCloseWindowCommand( p ) );
       UpdateThemeResources();
     }
 
@@ -359,6 +360,61 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         var anchorableLayoutItem = manager.GetLayoutItemFromModel( anchorable ) as LayoutAnchorableItem;
         anchorableLayoutItem.HideCommand.Execute( parameter );
+      }
+    }
+    #endregion
+
+    #region CloseWindowCommand
+    public ICommand CloseWindowCommand
+    {
+      get;
+      private set;
+    }
+
+    private bool CanExecuteCloseWindowCommand( object parameter )
+    {
+      if( Model == null )
+        return false;
+
+      var root = Model.Root;
+      if( root == null )
+        return false;
+
+      var manager = root.Manager;
+      if( manager == null )
+        return false;
+
+      bool canExecute = false;
+      foreach( var anchorable in this.Model.Descendents().OfType<LayoutAnchorable>().ToArray() )
+      {
+        if( !anchorable.CanClose )
+        {
+          canExecute = false;
+          break;
+        }
+
+        var anchorableLayoutItem = manager.GetLayoutItemFromModel( anchorable ) as LayoutAnchorableItem;
+        if( anchorableLayoutItem == null ||
+            anchorableLayoutItem.CloseCommand == null ||
+            !anchorableLayoutItem.CloseCommand.CanExecute( parameter ) )
+        {
+          canExecute = false;
+          break;
+        }
+
+        canExecute = true;
+      }
+
+      return canExecute;
+    }
+
+    private void OnExecuteCloseWindowCommand( object parameter )
+    {
+      var manager = Model.Root.Manager;
+      foreach( var anchorable in this.Model.Descendents().OfType<LayoutAnchorable>().ToArray() )
+      {
+        var anchorableLayoutItem = manager.GetLayoutItemFromModel( anchorable ) as LayoutAnchorableItem;
+        anchorableLayoutItem.CloseCommand.Execute( parameter );
       }
     }
     #endregion

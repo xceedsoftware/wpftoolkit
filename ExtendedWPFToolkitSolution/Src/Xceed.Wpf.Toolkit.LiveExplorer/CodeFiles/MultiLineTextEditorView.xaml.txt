@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -26,7 +26,7 @@
            The MultiLineTextEditor is a TextBox that allows you to edit text that is too long to display in a regular TextBox. The popup is resizable to accommodate any text.
         </Paragraph>
     </local:DemoView.Description>
-    
+
     <local:DemoView.Resources>
         <DataTemplate x:Key="multiLineTextEditorStyle" >
             <xctk:MultiLineTextEditor
@@ -38,7 +38,7 @@
                Height="24" />
         </DataTemplate>
     </local:DemoView.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

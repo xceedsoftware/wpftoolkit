@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -24,51 +24,18 @@
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
             <Run>When many objects are assigned to a PropertyGrid, the PpropertyGrid will show all the common properties so that they can be changed simultaneously on each object.</Run>
-       <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->
         </Paragraph>
     </local:DemoView.Description>
- 
-<!--##EXCLUDE_OPEN_SOURCE-->
-    <local:DemoView.Resources>
-        <x:Array Type="sys:String" x:Key="_comboBoxSource" >
-            <sys:String>Green</sys:String>
-            <sys:String>Red</sys:String>
-            <sys:String>Blue</sys:String>
-        </x:Array>
-    </local:DemoView.Resources>
 
-        <Grid Margin="10">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
 
-        <StackPanel >
-            <TextBlock Text="Selected Object 1 : a TextBox" />
-            <TextBox x:Name="_textBox" Text="This is my TextBox" Margin="10" Width="150" Foreground="Red"/>
-            <TextBlock Text="Selected Object 2 : a Button"/>
-            <Button x:Name="_button" Content="My Button" Margin="10" Width="150" Foreground="Red"/>
-            <TextBlock Text="Selected Object 3 : a ComboBox" />
-            <ComboBox x:Name="_comboBox" ItemsSource="{StaticResource _comboBoxSource}" SelectedIndex="0" Margin="10" Width="150" Foreground="Red"/>
-        </StackPanel>
 
-         <xctk:PropertyGrid Grid.Column="1" x:Name="_propertyGrid" ShowAdvancedOptions="True" AutoGenerateProperties="False" MaxHeight="350" VerticalAlignment="Top">
-            <xctk:PropertyGrid.PropertyDefinitions>
-                  <xctk:PropertyDefinition 
-                     TargetProperties="FontSize,FontWeight,Foreground,Background,HorizontalContentAlignment,Width,Margin,ToolTip" />
-            </xctk:PropertyGrid.PropertyDefinitions>
-         </xctk:PropertyGrid>
-    </Grid>
-<!--##END-->
-    
-<!--##INCLUDE_OPEN_SOURCE
+
+
     <Image Source="..\OpenSourceImages\MultiSelectedObjects.png" Width="660" Height="430"/>
-##END-->
 </local:DemoView>

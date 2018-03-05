@@ -19,7 +19,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
-using System.Windows.Data;
+using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -29,8 +29,6 @@ namespace Xceed.Wpf.DataGrid
 {
   public class DataRow : Row, IEditableObject
   {
-    #region CONSTRUCTORS
-
     public DataRow()
     {
       this.CommandBindings.Add( new CommandBinding( DataGridCommands.ExpandDetails,
@@ -46,15 +44,8 @@ namespace Xceed.Wpf.DataGrid
                                                     new CanExecuteRoutedEventHandler( OnToggleDetailsCanExecute ) ) );
     }
 
-    #endregion CONSTRUCTORS
-
     private void OnExpandDetailsExecuted( object sender, ExecutedRoutedEventArgs e )
     {
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-      if( ( dataGridContext != null ) && ( this.DataContext != null ) )
-      {
-        dataGridContext.ExpandDetails( this.DataContext );
-      }
     }
 
     private void OnExpandDetailsCanExecute( object sender, CanExecuteRoutedEventArgs e )
@@ -73,11 +64,6 @@ namespace Xceed.Wpf.DataGrid
 
     private void OnCollapseDetailsExecuted( object sender, ExecutedRoutedEventArgs e )
     {
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-      if( ( dataGridContext != null ) && ( this.DataContext != null ) )
-      {
-        dataGridContext.CollapseDetails( this.DataContext );
-      }
     }
 
     private void OnCollapseDetailsCanExecute( object sender, CanExecuteRoutedEventArgs e )
@@ -99,7 +85,6 @@ namespace Xceed.Wpf.DataGrid
       DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
       if( ( dataGridContext != null ) && ( this.DataContext != null ) )
       {
-        dataGridContext.ToggleDetailExpansion( this.DataContext );
       }
     }
 
@@ -150,6 +135,55 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion TitleBarContent Private Property
 
+    #region ResortPending property
+
+    private bool ResortPending
+    {
+      get
+      {
+        return m_flags[ ( int )DataRowFlags.ResortPending ];
+      }
+      set
+      {
+        m_flags[ ( int )DataRowFlags.ResortPending ] = value;
+      }
+    }
+
+    #endregion
+
+    #region RegroupPending property
+
+    private bool RegroupPending
+    {
+      get
+      {
+        return m_flags[ ( int )DataRowFlags.RegroupPending ];
+      }
+      set
+      {
+        m_flags[ ( int )DataRowFlags.RegroupPending ] = value;
+      }
+    }
+
+    #endregion
+
+    #region RepositionPending property
+
+    private bool RepositionPending
+    {
+      get
+      {
+        return m_flags[ ( int )DataRowFlags.RepositionPending ];
+      }
+      set
+      {
+        m_flags[ ( int )DataRowFlags.RepositionPending ] = value;
+      }
+    }
+
+    #endregion
+
+
     protected override void OnMouseEnter( MouseEventArgs e )
     {
       base.OnMouseEnter( e );
@@ -184,8 +218,7 @@ namespace Xceed.Wpf.DataGrid
     {
       DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
 
-      // When TableflowViewItemsHost is used and an EmptyDataItem is detected
-      // We also want to avoid getting an animation when the container is sticky
+      // When TableflowViewItemsHost is used and an EmptyDataItem is detected.  We also want to avoid getting an animation when the container is sticky
       if( !( item is EmptyDataItem )
           && ( dataGridContext != null )
           && ( dataGridContext.DataGridControl.GetView() is TableflowView )
@@ -195,19 +228,16 @@ namespace Xceed.Wpf.DataGrid
         this.ApplyAnimationClock( Row.CellContentOpacityProperty, null );
         this.SetValue( Row.CellContentOpacityProperty, 0d );
 
-        // We set the DataContext to an EmptyDataItem to have the 
-        // real data item set later on with an opacity animation.
+        // We set the DataContext to an EmptyDataItem to have the real data item set later on with an opacity animation.
         this.DataContext = this.EmptyDataItem;
         this.UpdateUnboundDataItemContext();
 
-        Debug.Assert( m_affectDataContextOperation == null );
-
-        // Dispatch a call to SetDataContextDispatched that will update
-        // the DataContext of the Row and every CreatedCells to the
-        // DataItem the Row must display. We use a low priority to limit
-        // the impact on scrolling.
-        m_affectDataContextOperation = this.Dispatcher.BeginInvoke(
-          new Action<object>( this.SetDataContextDispatched ), DispatcherPriority.Background, item );
+        // Dispatch a call to SetDataContextDispatched that will update the DataContext of the Row and every CreatedCells to the
+        // DataItem the Row must display. We use a low priority to limit the impact on scrolling.
+        if( m_affectDataContextOperation == null )
+        {
+          m_affectDataContextOperation = this.Dispatcher.BeginInvoke( new Action<object>( this.SetDataContextDispatched ), DispatcherPriority.Background, item );
+        }
       }
       else
       {
@@ -221,16 +251,17 @@ namespace Xceed.Wpf.DataGrid
 
     protected override void BeginEditCore()
     {
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
 
-      DataGridCollectionViewBase dataGridCollectionViewBase =
-          ( dataGridContext == null ) ? null : dataGridContext.ItemsSourceCollection as DataGridCollectionViewBase;
+      var dataGridCollectionViewBase = dataGridContext == null ? null : dataGridContext.ItemsSourceCollection as DataGridCollectionViewBase;
 
       if( dataGridCollectionViewBase != null )
       {
         // We do not want to call EditItem when the item is the one in the insertionrow
         if( dataGridCollectionViewBase.CurrentAddItem != this.DataContext )
+        {
           dataGridCollectionViewBase.EditItem( this.DataContext );
+        }
       }
       else
       {
@@ -238,7 +269,9 @@ namespace Xceed.Wpf.DataGrid
 
         // editableObject can be equal to this when the datarow is directly inserted as Item in the DataGridControl.
         if( ( editableObject != null ) && ( editableObject != this ) )
+        {
           editableObject.BeginEdit();
+        }
       }
 
       base.BeginEditCore();
@@ -246,19 +279,20 @@ namespace Xceed.Wpf.DataGrid
 
     protected override void EndEditCore()
     {
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
 
       base.EndEditCore();
 
-      DataGridCollectionViewBase dataGridCollectionViewBase =
-          ( dataGridContext == null ) ? null : dataGridContext.ItemsSourceCollection as DataGridCollectionViewBase;
+      var dataGridCollectionViewBase = dataGridContext == null ? null : dataGridContext.ItemsSourceCollection as DataGridCollectionViewBase;
 
       try
       {
         if( dataGridCollectionViewBase != null )
         {
           if( dataGridCollectionViewBase.CurrentEditItem == this.DataContext )
+          {
             dataGridCollectionViewBase.CommitEdit();
+          }
         }
         else
         {
@@ -266,7 +300,9 @@ namespace Xceed.Wpf.DataGrid
 
           // editableObject can be equal to this when the datarow is directly inserted as Items in the DataGridControl.
           if( ( editableObject != null ) && ( editableObject != this ) )
+          {
             editableObject.EndEdit();
+          }
         }
       }
       catch( Exception exception )
@@ -283,16 +319,16 @@ namespace Xceed.Wpf.DataGrid
 
           // editableObject can be equal to this when the datarow is directly inserted as Items in the DataGridControl.
           if( ( editableObject != null ) && ( editableObject != this ) )
+          {
             editableObject.BeginEdit();
+          }
         }
 
-        // This method will set a validation error on the row and throw back a DataGridValidationException so that 
-        // the row stays in edition.
+        // This method will set a validation error on the row and throw back a DataGridValidationException so that  the row stays in edition.
         Row.SetRowValidationErrorOnException( this, exception );
       }
 
-      // Update the created cell's Content from the source in case the IEditableObject EndEdit implementation rectified
-      // some values.
+      // Update the created cell's Content from the source in case the IEditableObject EndEdit implementation rectified some values.
       this.UpdateCellsContentBindingTarget();
     }
 
@@ -324,16 +360,17 @@ namespace Xceed.Wpf.DataGrid
 
     protected override void CancelEditCore()
     {
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
 
-      DataGridCollectionViewBase dataGridCollectionViewBase =
-          ( dataGridContext == null ) ? null : dataGridContext.ItemsSourceCollection as DataGridCollectionViewBase;
+      var dataGridCollectionViewBase = dataGridContext == null ? null : dataGridContext.ItemsSourceCollection as DataGridCollectionViewBase;
 
       if( dataGridCollectionViewBase != null )
       {
         // We do not want to call EditItem when the item is the one in the insertionrow
         if( dataGridCollectionViewBase.CurrentEditItem == this.DataContext )
+        {
           dataGridCollectionViewBase.CancelEdit();
+        }
       }
       else
       {
@@ -341,7 +378,9 @@ namespace Xceed.Wpf.DataGrid
 
         // editableObject can be equal to this when the datarow is directly inserted as Items in the DataGridControl.
         if( ( editableObject != null ) && ( editableObject != this ) )
+        {
           editableObject.CancelEdit();
+        }
       }
 
       base.CancelEditCore();
@@ -376,8 +415,7 @@ namespace Xceed.Wpf.DataGrid
       }
 
       // Ensure to stop the opacity animation if it is currently active
-      if( ( m_opacityAnimationClock != null )
-          && ( m_opacityAnimationClock.CurrentState != ClockState.Stopped ) )
+      if( ( m_opacityAnimationClock != null ) && ( m_opacityAnimationClock.CurrentState != ClockState.Stopped ) )
       {
         m_opacityAnimationClock.Completed -= this.OpacityAnimationClock_Completed;
         m_opacityAnimationClock.Controller.Stop();
@@ -393,6 +431,31 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    protected override void PartialClearContainer()
+    {
+      if( m_affectDataContextOperation != null )
+      {
+        m_affectDataContextOperation.Abort();
+        m_affectDataContextOperation = null;
+      }
+
+      // Ensure to stop the opacity animation if it is currently active
+      if( ( m_opacityAnimationClock != null ) && ( m_opacityAnimationClock.CurrentState != ClockState.Stopped ) )
+      {
+        m_opacityAnimationClock.Completed -= this.OpacityAnimationClock_Completed;
+        m_opacityAnimationClock.Controller.Stop();
+        m_opacityAnimationClock = null;
+      }
+
+      if( m_storedDataGridContext != null )
+      {
+        ( ( INotifyPropertyChanged )m_storedDataGridContext.Columns ).PropertyChanged -= new PropertyChangedEventHandler( Columns_PropertyChanged );
+        m_storedDataGridContext = null;
+      }
+
+      base.PartialClearContainer();
+    }
+
     protected override Cell CreateCell( ColumnBase column )
     {
       if( column == null )
@@ -404,16 +467,6 @@ namespace Xceed.Wpf.DataGrid
     protected override bool IsValidCellType( Cell cell )
     {
       return ( cell is DataCell );
-    }
-
-    internal static IDisposable DeferCollectionViewRefresh( DataGridContext dataGridContext )
-    {
-      Debug.Assert( dataGridContext != null );
-
-      if( dataGridContext != null )
-        return dataGridContext.Items.DeferRefresh();
-
-      return null;
     }
 
     private void EnsureResort( DataGridContext dataGridContext )
@@ -527,42 +580,35 @@ namespace Xceed.Wpf.DataGrid
     [EditorBrowsable( EditorBrowsableState.Never )]
     protected virtual void SetTitleBarContentBinding( DataGridContext dataGridContext )
     {
-      if( dataGridContext != null )
+      if( dataGridContext == null )
+        return;
+
+      var view = dataGridContext.DataGridControl.GetView();
+      if( ( view is TableView ) || ( view is TableflowView ) )
+        return;
+
+      var headerColumn = dataGridContext.Columns.MainColumn as Column;
+      if( headerColumn == null )
+        return;
+
+      var displayMemberBinding = headerColumn.GetDisplayMemberBinding();
+      if( displayMemberBinding == null )
       {
-        Xceed.Wpf.DataGrid.Views.ViewBase view = dataGridContext.DataGridControl.GetView();
+        var dataItem = this.DataContext;
+        var itemType = ( dataItem != null ) ? dataItem.GetType() : null;
 
-        if( ( view is TableView ) || ( view is TableflowView ) )
-          return;
+        displayMemberBinding = ItemsSourceHelper.CreateDefaultBinding(
+                                 ItemsSourceHelper.CreateOrGetPropertyDescriptionFromColumn( dataGridContext, headerColumn, itemType ) );
+      }
 
-        Column headerColumn = dataGridContext.Columns.MainColumn as Column;
-
-        if( headerColumn != null )
-        {
-          BindingBase displayMemberBinding = headerColumn.GetDisplayMemberBinding();
-
-          if( displayMemberBinding == null )
-          {
-            if( dataGridContext.ItemsSourceFieldDescriptors == null )
-              throw new InvalidOperationException( "An attempt was made to create a DisplayMemberBinding before the DataGridContext has been initialized." );
-
-            string name = headerColumn.FieldName;
-            ItemsSourceHelper.FieldDescriptor fieldDescriptor;
-            dataGridContext.ItemsSourceFieldDescriptors.TryGetValue( name, out fieldDescriptor );
-
-            displayMemberBinding = ItemsSourceHelper.CreateDefaultBinding( this.DataContext is DataRow, name, fieldDescriptor, headerColumn, true, typeof( object ) );
-
-          }
-
-          if( displayMemberBinding == null )
-          {
-            Debug.Assert( false, "displayMemberBinding is null." );
-            this.ClearValue( DataRow.TitleBarContentProperty );
-          }
-          else
-          {
-            this.SetBinding( DataRow.TitleBarContentProperty, displayMemberBinding );
-          }
-        }
+      if( displayMemberBinding == null )
+      {
+        Debug.Assert( false, "displayMemberBinding is null." );
+        this.ClearValue( DataRow.TitleBarContentProperty );
+      }
+      else
+      {
+        this.SetBinding( DataRow.TitleBarContentProperty, displayMemberBinding );
       }
     }
 
@@ -608,15 +654,12 @@ namespace Xceed.Wpf.DataGrid
     {
       object dataContext = this.DataContext;
       UnboundDataItem unboundDataItemContext = this.UnboundDataItemContext;
-      bool isNewContext;
 
       foreach( Cell cell in this.CreatedCells )
       {
-        Cell.AssignDataContext( cell, dataContext, unboundDataItemContext, cell.ParentColumn, out isNewContext );
+        Cell.AssignDataContext( cell, dataContext, unboundDataItemContext, cell.ParentColumn );
 
-        // We must refresh the Displayed template
-        // since ShouldDisplayEditor always return
-        // false when an EmptyDataItem is detected
+        // We must refresh the Displayed template since ShouldDisplayEditor always return false when an EmptyDataItem is detected
         cell.RefreshDisplayedTemplate();
       }
 
@@ -650,54 +693,10 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region PRIVATE PROPERTIES
-
-    private bool ResortPending
-    {
-      get
-      {
-        return m_flags[ ( int )DataRowFlags.ResortPending ];
-      }
-      set
-      {
-        m_flags[ ( int )DataRowFlags.ResortPending ] = value;
-      }
-    }
-
-    private bool RegroupPending
-    {
-      get
-      {
-        return m_flags[ ( int )DataRowFlags.RegroupPending ];
-      }
-      set
-      {
-        m_flags[ ( int )DataRowFlags.RegroupPending ] = value;
-      }
-    }
-
-    private bool RepositionPending
-    {
-      get
-      {
-        return m_flags[ ( int )DataRowFlags.RepositionPending ];
-      }
-      set
-      {
-        m_flags[ ( int )DataRowFlags.RepositionPending ] = value;
-      }
-    }
-
-    #endregion PRIVATE PROPERTIES
-
-    #region PRIVATE FIELDS
-
     private BitVector32 m_flags = new BitVector32();
 
     private DataGridContext m_storedDataGridContext; // = null
     private DispatcherOperation m_affectDataContextOperation; // = null;
-
-    #endregion PRIVATE FIELDS
 
     #region Flags Enum
 

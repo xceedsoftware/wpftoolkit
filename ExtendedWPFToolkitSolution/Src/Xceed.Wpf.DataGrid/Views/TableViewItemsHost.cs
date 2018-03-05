@@ -16,9 +16,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -31,8 +31,6 @@ namespace Xceed.Wpf.DataGrid.Views
 {
   public class TableViewItemsHost : DataGridItemsHost, IScrollInfo, IDeferableScrollInfoRefresh
   {
-    #region Constructors
-
     static TableViewItemsHost()
     {
       KeyboardNavigation.DirectionalNavigationProperty.OverrideMetadata(
@@ -61,8 +59,6 @@ namespace Xceed.Wpf.DataGrid.Views
       this.AddHandler( FrameworkElement.RequestBringIntoViewEvent, new RequestBringIntoViewEventHandler( this.OnRequestBringIntoView ) );
     }
 
-    #endregion CONSTRUCTORS
-
     #region Orientation Property
 
     [Obsolete( "The Orientation property is obsolete. Only a vertical orientation is supported.", false )]
@@ -86,7 +82,7 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion Orientation Property
+    #endregion
 
     #region StableScrollingEnabled Property
 
@@ -111,7 +107,7 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion StableScrollingEnabled Property
+    #endregion
 
     #region StableScrollingProportion Property
 
@@ -136,7 +132,7 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion StableScrollingProportion Property
+    #endregion
 
     #region ScrollInfo Property
 
@@ -148,7 +144,7 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion ScrollInfo Property
+    #endregion
 
     #region PreviousTabNavigationMode ( private attached property )
 
@@ -168,7 +164,7 @@ namespace Xceed.Wpf.DataGrid.Views
       d.SetValue( TableViewItemsHost.PreviousTabNavigationModeProperty, value );
     }
 
-    #endregion PreviousTabNavigationMode ( private attached property )
+    #endregion
 
     #region PreviousDirectionalNavigationMode ( private attached property )
 
@@ -188,7 +184,7 @@ namespace Xceed.Wpf.DataGrid.Views
       d.SetValue( TableViewItemsHost.PreviousDirectionalNavigationModeProperty, value );
     }
 
-    #endregion PreviousDirectionalNavigationMode ( private attached property )
+    #endregion
 
     #region RowSelectorPane Property
 
@@ -212,7 +208,7 @@ namespace Xceed.Wpf.DataGrid.Views
           && ( rowSelectorPane.Visibility == Visibility.Visible );
     }
 
-    #endregion RowSelectorPane Property
+    #endregion
 
     #region Measure/Arrange Methods
 
@@ -350,12 +346,19 @@ namespace Xceed.Wpf.DataGrid.Views
 
       CommandManager.InvalidateRequerySuggested();
 
-      // We must not call Mouse.Synchronize if we are currently dragging rows. 
+      // The call to Mouse.Synchronize must not start dragging rows.
       // Update the mouse status to make sure no container has invalid mouse over status.
-      // Only do this when the mouse is over the panel, to prevent unescessary update when scrolling with thumb
-      if( ( this.ParentDataGridControl.DragDataObject == null ) && ( this.IsMouseOver ) )
+      // Only do this when the mouse is over the panel, to prevent unescessary update when scrolling with thumb.
+      if( this.IsMouseOver )
       {
-        Mouse.Synchronize();
+        var dataGridControl = this.ParentDataGridControl;
+        if( dataGridControl != null )
+        {
+          using( dataGridControl.InhibitDrag() )
+          {
+            Mouse.Synchronize();
+          }
+        }
       }
 
       m_lastLayoutedPage = m_lastGeneratedPage;
@@ -393,12 +396,14 @@ namespace Xceed.Wpf.DataGrid.Views
       if( ( item == null ) || ( VisualTreeHelper.GetChildrenCount( item ) == 0 ) )
         return null;
 
-      DependencyObject firstChild = VisualTreeHelper.GetChild( item, 0 );
-      PassiveLayoutDecorator decorator = firstChild as PassiveLayoutDecorator;
+      var child = VisualTreeHelper.GetChild( item, 0 );
+      if( child == null )
+        return null;
 
-      if( ( decorator == null ) && ( VisualTreeHelper.GetChildrenCount( firstChild ) > 0 ) )
+      var decorator = child as PassiveLayoutDecorator;
+      if( ( decorator == null ) && ( VisualTreeHelper.GetChildrenCount( child ) > 0 ) )
       {
-        decorator = VisualTreeHelper.GetChild( firstChild, 0 ) as PassiveLayoutDecorator;
+        decorator = VisualTreeHelper.GetChild( child, 0 ) as PassiveLayoutDecorator;
       }
 
       return decorator;
@@ -529,7 +534,7 @@ namespace Xceed.Wpf.DataGrid.Views
       return new Size( m_viewportWidth, desiredHeight );
     }
 
-    #endregion Measure/Arrange Methods
+    #endregion
 
     #region Containers Methods
 
@@ -598,25 +603,39 @@ namespace Xceed.Wpf.DataGrid.Views
       return m_lastGeneratedPage;
     }
 
-    private void RecycleContainer( ICustomItemContainerGenerator generator, LayoutedContainerInfo containerInfo )
+    private void RecycleContainer( ICustomItemContainerGenerator generator, UIElement element, int realizedIndex, bool clearContainer = true )
     {
-      Debug.Assert( containerInfo != null );
+      if( !clearContainer )
+      {
+        var container = element as IDataGridItemContainer;
+        if( container != null )
+        {
+          container.IsRecyclingCandidate = true;
+        }
+      }
+      else
+      {
+        this.ClearContainer( element );
+      }
 
-      var index = containerInfo.RealizedIndex;
-      if( ( generator != null ) && ( index >= 0 ) )
+      if( ( generator != null ) && ( realizedIndex >= 0 ) )
       {
         try
         {
-          var position = generator.GeneratorPositionFromIndex( index );
+          var position = generator.GeneratorPositionFromIndex( realizedIndex );
           generator.Remove( position, 1 );
         }
         catch
         {
-          Debug.Fail( "Unable to remove container for containerIndex " + index );
+          Debug.Fail( "Unable to remove container for realized index " + realizedIndex );
         }
       }
+    }
 
-      this.ClearContainer( containerInfo.Container );
+    private void CleanRecyclingCandidates()
+    {
+      var generator = this.CustomItemContainerGenerator as CustomItemContainerGenerator;
+      generator.CleanRecyclingCandidates();
     }
 
     private UIElement GenerateContainer( ICustomItemContainerGenerator generator, int index, bool forceMeasure )
@@ -691,9 +710,10 @@ namespace Xceed.Wpf.DataGrid.Views
 
       container.Visibility = Visibility.Collapsed;
 
+      // The call to DataGridControl.ClearItemContainer will be done by the CustomItemContainerGenerator.
     }
 
-    #endregion Containers Methods
+    #endregion
 
     #region Scrolling Management
 
@@ -721,10 +741,6 @@ namespace Xceed.Wpf.DataGrid.Views
         {
           this.InvalidateArrange();
         }
-      }
-      else
-      {
-        this.InvalidateAutomationPeerChildren();
       }
     }
 
@@ -776,7 +792,6 @@ namespace Xceed.Wpf.DataGrid.Views
       }
 
       this.InvalidateScrollInfo();
-      this.InvalidateAutomationPeerChildren();
 
       return generatedPage;
     }
@@ -834,9 +849,9 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private bool SetCurrent( int index, bool changeColumn, out bool isDataRow )
     {
-      ICustomItemContainerGenerator generator = this.CustomItemContainerGenerator;
-      GeneratorPosition position = generator.GeneratorPositionFromIndex( index );
-      UIElement container = null;
+      var generator = this.CustomItemContainerGenerator;
+      var position = generator.GeneratorPositionFromIndex( index );
+      var container = default( UIElement );
 
       using( generator.StartAt( position, GeneratorDirection.Forward, true ) )
       {
@@ -849,29 +864,39 @@ namespace Xceed.Wpf.DataGrid.Views
       {
         isDataRow = ( container is DataRow );
 
-        if( m_layoutedContainers.IndexOfContainer( container ) == -1 )
+        if( m_layoutedContainers.IndexOfContainer( container ) < 0 )
         {
           m_layoutedContainers.Add( new LayoutedContainerInfo( index, container ) );
         }
 
         var dataGridContext = DataGridControl.GetDataGridContext( container );
-        var column = ( changeColumn ) ? dataGridContext.CurrentColumn : null;
+        var currentContext = dataGridContext.DataGridControl.CurrentContext;
+        var column = default( ColumnBase );
 
-        // if the current column is null or is (for an unknown reason) set to current but is readOnly, 
-        // try to set a new current column
-        if( ( isDataRow )
-          && ( ( changeColumn ) && ( ( column == null ) || ( !column.CanBeCurrentWhenReadOnly && column.ReadOnly ) ) ) )
+        if( changeColumn )
         {
-          var focusableIndex = NavigationHelper.GetFirstVisibleFocusableColumnIndex( dataGridContext );
-          if( focusableIndex >= 0 )
+          column = dataGridContext.CurrentColumn;
+
+          if( isDataRow )
           {
-            column = dataGridContext.VisibleColumns[ focusableIndex ];
+            if( ( currentContext != dataGridContext ) && dataGridContext.AreDetailsFlatten )
+            {
+              column = dataGridContext.GetMatchingColumn( currentContext, currentContext.CurrentColumn ) ?? column;
+            }
+
+            if( ( column == null ) || ( !column.CanBeCurrentWhenReadOnly && column.ReadOnly ) )
+            {
+              var focusableIndex = NavigationHelper.GetFirstVisibleFocusableColumnIndex( dataGridContext );
+              if( focusableIndex >= 0 )
+              {
+                column = dataGridContext.VisibleColumns[ focusableIndex ];
+              }
+            }
           }
         }
 
         try
         {
-          var currentContext = dataGridContext.DataGridControl.CurrentContext;
           if( currentContext != null )
           {
             currentContext.EndEdit();
@@ -882,17 +907,21 @@ namespace Xceed.Wpf.DataGrid.Views
           return false;
         }
 
-        if( dataGridContext.DataGridControl.SetFocusHelper( container, column, true, true ) )
+        var containerIndex = generator.GetRealizedIndexForContainer( container );
+        if( containerIndex >= 0 )
         {
-          generator.SetCurrentIndex( index );
-          return true;
+          if( dataGridContext.DataGridControl.SetFocusHelper( container, column, true, true ) )
+          {
+            generator.SetCurrentIndex( containerIndex );
+            return true;
+          }
         }
       }
 
       return false;
     }
 
-    #endregion Scrolling Management
+    #endregion
 
     #region BringIntoView Methods
 
@@ -1101,58 +1130,18 @@ namespace Xceed.Wpf.DataGrid.Views
       return currentChanged;
     }
 
-    #endregion BringIntoView Methods
+    #endregion
 
     #region DataGridItemsHost Overrides
 
-    protected override void OnItemsAdded(
-      GeneratorPosition position,
-      int index,
-      int itemCount )
+    protected override void OnItemsAdded()
     {
       // We are calling InvalidateMeasure to regenerate the current 
       // page and forcing the recycling of out-of-view containers.
       this.InvalidateMeasure();
     }
 
-    protected override void OnItemsMoved(
-      GeneratorPosition position,
-      int index,
-      GeneratorPosition oldPosition,
-      int oldIndex,
-      int itemCount,
-      int itemUICount,
-      IList<DependencyObject> affectedContainers )
-    {
-      System.Diagnostics.Debug.Fail( "When is this called?" );
-
-      // Everything will be recalculated and redrawn in the measure pass.
-      this.InvalidateMeasure();
-    }
-
-    protected override void OnItemsReplaced(
-      GeneratorPosition position,
-      int index,
-      GeneratorPosition oldPosition,
-      int oldIndex,
-      int itemCount,
-      int itemUICount,
-      IList<DependencyObject> affectedContainers )
-    {
-      System.Diagnostics.Debug.Fail( "When is this called?" );
-
-      // Everything will be recalculated and redrawn in the measure pass.
-      this.InvalidateMeasure();
-    }
-
-    protected override void OnItemsRemoved(
-      GeneratorPosition position,
-      int index,
-      GeneratorPosition oldPosition,
-      int oldIndex,
-      int itemCount,
-      int itemUICount,
-      IList<DependencyObject> affectedContainers )
+    protected override void OnItemsRemoved( IList<DependencyObject> containers )
     {
       // We are calling InvalidateMeasure to regenerate the current 
       // page and forcing the recycling of out-of-view containers.
@@ -1161,7 +1150,8 @@ namespace Xceed.Wpf.DataGrid.Views
 
     protected override void OnItemsReset()
     {
-      // Everything will be recalculated and redrawn in the measure pass.
+      // We are calling InvalidateMeasure to regenerate the current 
+      // page and forcing the recycling of out-of-view containers.
       this.InvalidateMeasure();
     }
 
@@ -1171,11 +1161,8 @@ namespace Xceed.Wpf.DataGrid.Views
       {
         this.ClearContainer( container );
 
-        // Avoid checking if Children already contains
-        // the element. No exception will be thrown
-        // if the item is not found. This ensure to
-        // at parse all the children only 1 time as
-        // worst scenario
+        // Avoid checking if Children already contains the element. No exception will be thrown if the item is not found.
+        // This ensures to parse all children only one time.
         this.Children.Remove( container );
 
         int index = m_layoutedContainers.IndexOfContainer( container );
@@ -1186,7 +1173,15 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion DataGridItemsHost Overrides
+    protected override void OnRecyclingCandidatesCleaned( IList<DependencyObject> recyclingCandidates )
+    {
+      foreach( UIElement candidate in recyclingCandidates )
+      {
+        this.ClearContainer( candidate );
+      }
+    }
+
+    #endregion
 
     #region PreviewKeyDown and KeyDown Handling
 
@@ -1629,18 +1624,22 @@ namespace Xceed.Wpf.DataGrid.Views
 
     protected override void BringIntoViewCore( int index )
     {
-      if( m_lastGeneratedPage == TableViewPage.Empty )
-        return;
+      if( !this.DelayBringIntoView )
+      {
+        if( m_lastGeneratedPage == TableViewPage.Empty )
+          return;
 
-      var pageInfo = m_lastGeneratedPage.InnerPage;
-      if( ( index >= pageInfo.Start ) && ( index < pageInfo.End ) )
-        return;
+        var pageInfo = m_lastGeneratedPage.InnerPage;
+        if( ( index >= pageInfo.Start ) && ( index < pageInfo.End ) )
+          return;
+      }
 
       this.InvalidateMeasure();
+
       m_indexToBringIntoView = index;
     }
 
-    #endregion ICustomVirtualizingPanel Members
+    #endregion
 
     #region IScrollInfo Members
 
@@ -1886,7 +1885,7 @@ namespace Xceed.Wpf.DataGrid.Views
       return rectangle;
     }
 
-    #endregion IScrollInfo Members
+    #endregion
 
     #region IDeferableScrollInfoRefresh Members
 
@@ -1898,13 +1897,9 @@ namespace Xceed.Wpf.DataGrid.Views
       return null;
     }
 
-    #endregion IDeferableScrollInfoRefresh Members
+    #endregion
 
-    #region Internal Methods
-
-    internal static bool ComputedCanScrollHorizontally(
-      FrameworkElement target,
-      DataGridItemsHost itemsHost )
+    internal static bool ComputedCanScrollHorizontally( FrameworkElement target, DataGridItemsHost itemsHost )
     {
       Debug.Assert( target != null );
 
@@ -1926,10 +1921,7 @@ namespace Xceed.Wpf.DataGrid.Views
       return retval;
     }
 
-    internal static double GetVisibleDimensionForRequestBringIntoViewTarget(
-      double targetDimension,
-      double targetToItemsHostOffset,
-      double viewportDimension )
+    internal static double GetVisibleDimensionForRequestBringIntoViewTarget( double targetDimension, double targetToItemsHostOffset, double viewportDimension )
     {
       // The items left upper corner is in the Viewport
       if( targetToItemsHostOffset >= 0 )
@@ -1981,10 +1973,7 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    internal static bool TargetRequiresBringIntoView(
-      double targetToItemsHostPosition,
-      double targetDesiredSizeDimension,
-      double itemsHostRenderSizeDimension )
+    internal static bool TargetRequiresBringIntoView( double targetToItemsHostPosition, double targetDesiredSizeDimension, double itemsHostRenderSizeDimension )
     {
       //If the Offset is negative, then it's sure its not totally visible
       if( targetToItemsHostPosition < 0 )
@@ -2260,10 +2249,6 @@ namespace Xceed.Wpf.DataGrid.Views
       return 0;
     }
 
-    #endregion Internal Methods
-
-    #region PRIVATE METHODS
-
     private static void MoveFocusForwardExecuted( object sender, ExecutedRoutedEventArgs e )
     {
       var itemsHost = ( TableViewItemsHost )sender;
@@ -2373,22 +2358,12 @@ namespace Xceed.Wpf.DataGrid.Views
       this.GeneratePageAndUpdateIScrollInfoValues();
     }
 
-    #endregion PRIVATE METHODS
-
-    #region CONSTANTS
-
     private const int MaxDataRowFailFocusCount = 50;
     private const int NullIndex = int.MinValue;
 
     private static readonly Point OriginPoint = new Point( 0d, 0d );
     private static readonly Size EmptySize = new Size( 0d, 0d );
     private static readonly Rect OutOfViewRect = new Rect( new Point( -999999d, -999999d ), TableViewItemsHost.EmptySize );
-
-    #endregion CONSTANTS
-
-    #region PRIVATE FIELDS
-
-
 
     private readonly LayoutedContainerInfoList m_layoutedContainers = new LayoutedContainerInfoList();
 
@@ -2405,8 +2380,6 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private AutoResetFlag m_layoutSuspended = AutoResetFlagFactory.Create( false );
     private bool m_layoutInvalidatedDuringSuspend;
-
-    #endregion PRIVATE FIELDS
 
     #region LayoutSuspendedHelper Private Class
 
@@ -2429,11 +2402,19 @@ namespace Xceed.Wpf.DataGrid.Views
 
       private void Dispose( bool disposing )
       {
-        m_disposable.Dispose();
+        var owner = Interlocked.Exchange( ref m_owner, null );
+        if( owner == null )
+          return;
 
-        if( !m_owner.m_layoutSuspended.IsSet && m_owner.m_layoutInvalidatedDuringSuspend )
+        if( m_disposable != null )
         {
-          m_owner.InvalidateMeasure();
+          m_disposable.Dispose();
+          m_disposable = null;
+        }
+
+        if( !owner.m_layoutSuspended.IsSet && owner.m_layoutInvalidatedDuringSuspend )
+        {
+          owner.InvalidateMeasure();
         }
       }
 
@@ -2442,8 +2423,8 @@ namespace Xceed.Wpf.DataGrid.Views
         this.Dispose( false );
       }
 
-      private readonly TableViewItemsHost m_owner;
-      private readonly IDisposable m_disposable;
+      private TableViewItemsHost m_owner;
+      private IDisposable m_disposable;
     }
 
     #endregion
@@ -2644,6 +2625,7 @@ namespace Xceed.Wpf.DataGrid.Views
             return null;
 
           m_remainingViewportHeight -= container.DesiredSize.Height;
+          m_nonRecyclableContainers.Remove( container );
           m_oldLayoutedContainers.Remove( container );
 
           var containerInfo = new LayoutedContainerInfo( realizedIndex, container );
@@ -2660,10 +2642,11 @@ namespace Xceed.Wpf.DataGrid.Views
 
         m_generator.IsRecyclingEnabled = true;
 
+        // We call ItemCount before any other call to make sure the internal state of the generator is up-to-date.
         m_itemCount = m_generator.ItemCount;
-        m_focusedContainer = DataGridItemsHost.GetItemsHostContainerFromElement( m_itemsHost, Keyboard.FocusedElement as DependencyObject );
 
         var lastGeneratedPageSize = lastGeneratedPage.OuterPage.Length;
+        m_nonRecyclableContainers = new HashSet<UIElement>();
         m_oldLayoutedContainers = new Dictionary<UIElement, int>( lastGeneratedPageSize );
         m_newLayoutedContainers = null;
 
@@ -2672,14 +2655,19 @@ namespace Xceed.Wpf.DataGrid.Views
         {
           var newRealizedIndex = m_generator.GetRealizedIndexForContainer( container );
 
-          if( ( newRealizedIndex >= 0 ) || ( container == m_focusedContainer ) )
+          if( !m_itemsHost.CanRecycleContainer( container ) )
+          {
+            m_nonRecyclableContainers.Add( container );
+            m_oldLayoutedContainers.Add( container, newRealizedIndex );
+          }
+          else if( newRealizedIndex >= 0 )
           {
             m_oldLayoutedContainers.Add( container, newRealizedIndex );
           }
           // The container is lost, recycle it.
           else
           {
-            m_itemsHost.RecycleContainer( m_generator, new LayoutedContainerInfo( newRealizedIndex, container ) );
+            m_itemsHost.RecycleContainer( m_generator, container, newRealizedIndex );
           }
         }
 
@@ -2697,15 +2685,15 @@ namespace Xceed.Wpf.DataGrid.Views
           var fillLastPage = ( dataGridContext != null ) && TableView.GetAutoFillLastPage( dataGridContext );
           var pageInfo = this.GenerateContainers( m_startIndex, m_itemCount, m_availableHeight, extendedHeight, fillLastPage );
 
-          // Keep the focused container active by putting it in the layouted containers collection.
-          if( m_focusedContainer != null )
+          // Keep active the containers that cannot be recycled by putting them in the layouted containers collection.
+          foreach( var entry in m_nonRecyclableContainers )
           {
-            int newRealizedIndex;
-            if( m_oldLayoutedContainers.TryGetValue( m_focusedContainer, out newRealizedIndex ) )
-            {
-              m_oldLayoutedContainers.Remove( m_focusedContainer );
-              m_newLayoutedContainers.Add( new LayoutedContainerInfo( newRealizedIndex, m_focusedContainer ) );
-            }
+            int realizedIndex;
+            if( !m_oldLayoutedContainers.TryGetValue( entry, out realizedIndex ) )
+              continue;
+
+            m_oldLayoutedContainers.Remove( entry );
+            m_newLayoutedContainers.Add( new LayoutedContainerInfo( realizedIndex, entry ) );
           }
 
           result = new TableViewPageResult( pageInfo, m_newLayoutedContainers );
@@ -2718,8 +2706,10 @@ namespace Xceed.Wpf.DataGrid.Views
         // Recycle the containers that have not been reused.
         foreach( var entry in m_oldLayoutedContainers )
         {
-          m_itemsHost.RecycleContainer( m_generator, new LayoutedContainerInfo( entry.Value, entry.Key ) );
+          m_itemsHost.RecycleContainer( m_generator, entry.Key, entry.Value );
         }
+
+        m_itemsHost.CleanRecyclingCandidates();
 
         return result;
       }
@@ -2830,23 +2820,16 @@ namespace Xceed.Wpf.DataGrid.Views
 
       private void RecycleCandidate( UIElement container )
       {
+        //Do not recycle the focused container
+        if( m_nonRecyclableContainers.Contains( container ) )
+          return;
+
         int realizedIndex;
         if( !m_oldLayoutedContainers.TryGetValue( container, out realizedIndex ) )
           return;
 
         m_oldLayoutedContainers.Remove( container );
-
-        var containerInfo = new LayoutedContainerInfo( realizedIndex, container );
-
-        // Keep the focused container active by putting it in the layouted containers collection.
-        if( container == m_focusedContainer )
-        {
-          m_newLayoutedContainers.Add( containerInfo );
-        }
-        else
-        {
-          m_itemsHost.RecycleContainer( m_generator, containerInfo );
-        }
+        m_itemsHost.RecycleContainer( m_generator, container, realizedIndex, false );
       }
 
       private readonly TableViewItemsHost m_itemsHost;
@@ -2856,7 +2839,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
       private ICustomItemContainerGenerator m_generator;
       private int m_itemCount;
-      private UIElement m_focusedContainer;
+      private HashSet<UIElement> m_nonRecyclableContainers;
       private Dictionary<UIElement, int> m_oldLayoutedContainers;
       private List<LayoutedContainerInfo> m_newLayoutedContainers;
 

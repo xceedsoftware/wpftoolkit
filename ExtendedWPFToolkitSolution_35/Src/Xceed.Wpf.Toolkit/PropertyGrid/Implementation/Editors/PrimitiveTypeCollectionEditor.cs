@@ -31,6 +31,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       ValueProperty = PrimitiveTypeCollectionControl.ItemsSourceProperty;
     }
 
+    protected override PrimitiveTypeCollectionControl CreateEditor()
+    {
+      return new PropertyGridEditorPrimitiveTypeCollectionControl();
+    }
+
     protected override void ResolveValueBinding( PropertyItem propertyItem )
     {
       var type = propertyItem.PropertyType;

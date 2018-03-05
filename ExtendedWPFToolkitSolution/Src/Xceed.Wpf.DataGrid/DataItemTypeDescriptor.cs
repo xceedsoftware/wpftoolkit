@@ -19,7 +19,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -57,7 +59,7 @@ namespace Xceed.Wpf.DataGrid
         return sourceEvents;
 
       var entry = this.GetEntry();
-      var replaceEvents = default( Dictionary<EventDescriptor, DataItemEventDescriptorBase> );
+      var replaceEvents = default( Dictionary<EventDescriptor, DataItemEventDescriptor> );
 
       lock( entry )
       {
@@ -65,7 +67,7 @@ namespace Xceed.Wpf.DataGrid
 
         if( replaceEvents == null )
         {
-          replaceEvents = new Dictionary<EventDescriptor, DataItemEventDescriptorBase>();
+          replaceEvents = new Dictionary<EventDescriptor, DataItemEventDescriptor>();
           entry.Events = replaceEvents;
 
           var factory = new DataItemEventDescriptorFactory( this );
@@ -90,7 +92,7 @@ namespace Xceed.Wpf.DataGrid
       {
         var sourceEvent = sourceEvents[ i ];
 
-        DataItemEventDescriptorBase destinationEvent;
+        DataItemEventDescriptor destinationEvent;
         if( replaceEvents.TryGetValue( sourceEvent, out destinationEvent ) )
         {
           destinationEvents[ i ] = destinationEvent;
@@ -116,7 +118,7 @@ namespace Xceed.Wpf.DataGrid
         return sourceProperties;
 
       var entry = this.GetEntry();
-      var replaceProperties = default( Dictionary<PropertyDescriptor, DataItemPropertyDescriptorBase> );
+      var replaceProperties = default( Dictionary<PropertyDescriptor, DataItemPropertyDescriptor> );
 
       lock( entry )
       {
@@ -124,7 +126,7 @@ namespace Xceed.Wpf.DataGrid
 
         if( replaceProperties == null )
         {
-          replaceProperties = new Dictionary<PropertyDescriptor, DataItemPropertyDescriptorBase>();
+          replaceProperties = new Dictionary<PropertyDescriptor, DataItemPropertyDescriptor>();
           entry.Properties = replaceProperties;
 
           var factory = new DataItemPropertyDescriptorFactory( this );
@@ -149,7 +151,7 @@ namespace Xceed.Wpf.DataGrid
       {
         var sourceProperty = sourceProperties[ i ];
 
-        DataItemPropertyDescriptorBase destinationProperty;
+        DataItemPropertyDescriptor destinationProperty;
         if( replaceProperties.TryGetValue( sourceProperty, out destinationProperty ) )
         {
           destinationProperties[ i ] = destinationProperty;
@@ -161,6 +163,70 @@ namespace Xceed.Wpf.DataGrid
       }
 
       return new PropertyDescriptorCollection( destinationProperties );
+    }
+
+    internal DataItemIndexerDescriptor GetIndexer( object[] indexValues )
+    {
+      if( ( indexValues == null ) || ( indexValues.Length <= 0 ) || ( m_targetType == null ) )
+        return null;
+
+      var entry = this.GetEntry();
+
+      lock( entry )
+      {
+        var indexers = entry.Indexers;
+        var descriptor = default( DataItemIndexerDescriptor );
+        var key = new IndexerKey( indexValues );
+
+        if( ( indexers != null ) && ( indexers.TryGetValue( key, out descriptor ) ) )
+          return descriptor;
+
+        var indexer = this.CreateIndexerDescriptor( indexValues );
+        if( indexer == null )
+          return null;
+
+        var factory = new DataItemPropertyDescriptorFactory( this );
+
+        descriptor = factory.CreateIndexerDescriptor( indexer );
+        if( descriptor == null )
+          return null;
+
+        if( indexers == null )
+        {
+          indexers = new Dictionary<IndexerKey, DataItemIndexerDescriptor>();
+          entry.Indexers = indexers;
+        }
+
+        indexers.Add( key, descriptor );
+
+        return descriptor;
+      }
+    }
+
+    private IndexerDescriptor CreateIndexerDescriptor( object[] indexValues )
+    {
+      if( ( indexValues == null ) || ( indexValues.Length <= 0 ) || ( m_targetType == null ) )
+        return null;
+
+      var best = default( IndexerChoice );
+
+      foreach( var propertyInfo in m_targetType.GetProperties() )
+      {
+        var candidate = IndexerChoice.GetMatch( propertyInfo, indexValues );
+        if( candidate == null )
+          continue;
+
+        if( ( best == null ) || ( candidate.CompareTo( best ) > 0 ) )
+        {
+          best = candidate;
+        }
+      }
+
+      // No matching indexer was found.
+      if( best == null )
+        return null;
+
+      return IndexerDescriptor.Create( best.Property, indexValues, best.Values );
     }
 
     private Entry GetEntry()
@@ -203,6 +269,12 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private static bool IsNullableType( Type type )
+    {
+      return ( !type.IsValueType )
+          || ( type.IsGenericType && ( type.GetGenericTypeDefinition() == typeof( Nullable<> ) ) );
+    }
+
     #region Private Fields
 
     private readonly Type m_targetType;
@@ -236,16 +308,202 @@ namespace Xceed.Wpf.DataGrid
         private set;
       }
 
-      internal Dictionary<EventDescriptor, DataItemEventDescriptorBase> Events
+      internal Dictionary<EventDescriptor, DataItemEventDescriptor> Events
       {
         get;
         set;
       }
 
-      internal Dictionary<PropertyDescriptor, DataItemPropertyDescriptorBase> Properties
+      internal Dictionary<PropertyDescriptor, DataItemPropertyDescriptor> Properties
       {
         get;
         set;
+      }
+
+      internal Dictionary<IndexerKey, DataItemIndexerDescriptor> Indexers
+      {
+        get;
+        set;
+      }
+    }
+
+    #endregion
+
+    #region IndexerKey Private Class
+
+    private sealed class IndexerKey
+    {
+      internal IndexerKey( object[] parameters )
+      {
+        Debug.Assert( ( parameters != null ) && ( parameters.Length > 0 ) );
+
+        m_parameters = parameters;
+      }
+
+      public override int GetHashCode()
+      {
+        var count = Math.Min( m_parameters.Length, 3 );
+        var hashCode = 0;
+
+        for( int i = 0; i < count; i++ )
+        {
+          unchecked
+          {
+            hashCode *= 13;
+            hashCode += m_parameters[ i ].GetHashCode();
+          }
+        }
+
+        return hashCode;
+      }
+
+      public override bool Equals( object obj )
+      {
+        var target = obj as IndexerKey;
+        if( target == null )
+          return false;
+
+        var targetParameters = target.m_parameters;
+        if( targetParameters.Length != m_parameters.Length )
+          return false;
+
+        for( int i = 0; i < m_parameters.Length; i++ )
+        {
+          if( !object.Equals( targetParameters[ i ], m_parameters[ i ] ) )
+            return false;
+        }
+
+        return true;
+      }
+
+      private readonly object[] m_parameters;
+    }
+
+    #endregion
+
+    #region IndexerChoice Private Class
+
+    private sealed class IndexerChoice
+    {
+      private IndexerChoice( PropertyInfo propertyInfo, object[] values, FitType[] fitTypes )
+      {
+        m_propertyInfo = propertyInfo;
+        m_values = values;
+        m_fitTypes = fitTypes;
+      }
+
+      internal PropertyInfo Property
+      {
+        get
+        {
+          return m_propertyInfo;
+        }
+      }
+
+      internal object[] Values
+      {
+        get
+        {
+          return m_values;
+        }
+      }
+
+      internal static IndexerChoice GetMatch( PropertyInfo propertyInfo, object[] parameterValues )
+      {
+        if( ( propertyInfo == null ) || ( parameterValues == null ) )
+          return null;
+
+        var parameters = propertyInfo.GetIndexParameters();
+        if( ( parameters == null ) || ( parameters.Length != parameterValues.Length ) )
+          return null;
+
+        var values = new object[ parameters.Length ];
+        var fitTypes = new FitType[ parameters.Length ];
+
+        for( int i = 0; i < parameters.Length; i++ )
+        {
+          var parameterType = parameters[ i ].ParameterType;
+          var parameterValue = parameterValues[ i ];
+          var parameterValueType = ( parameterValue != null ) ? parameterValue.GetType() : typeof( object );
+
+          if( parameterValue == null )
+          {
+            if( !DataItemTypeDescriptor.IsNullableType( parameterType ) )
+              return null;
+
+            fitTypes[ i ] = FitType.KeepAsType;
+          }
+          else if( !parameterType.IsAssignableFrom( parameterValueType ) )
+          {
+            var converter = TypeDescriptor.GetConverter( parameterType );
+            if( ( converter == null ) || !converter.CanConvertFrom( parameterValueType ) )
+              return null;
+
+            try
+            {
+              parameterValue = converter.ConvertFrom( null, CultureInfo.InvariantCulture, parameterValue );
+            }
+            catch
+            {
+              return null;
+            }
+
+            // An indexer that takes a parameter of any other type than string is considered a better candidate than
+            // an indexer that takes a parameter of type string.
+            fitTypes[ i ] = ( typeof( string ).IsAssignableFrom( parameterType ) ) ? FitType.ConvertToString : FitType.ConvertToType;
+          }
+          else
+          {
+            if( typeof( string ) == parameterType )
+            {
+              fitTypes[ i ] = FitType.KeepAsString;
+            }
+            else if( typeof( object ) == parameterType )
+            {
+              fitTypes[ i ] = FitType.KeepAsObject;
+            }
+            else
+            {
+              fitTypes[ i ] = FitType.KeepAsType;
+            }
+          }
+
+          values[ i ] = parameterValue;
+        }
+
+        return new IndexerChoice( propertyInfo, values, fitTypes );
+      }
+
+      internal int CompareTo( IndexerChoice comparand )
+      {
+        if( comparand == null )
+          throw new ArgumentNullException( "comparand" );
+
+        if( comparand.m_fitTypes.Length != m_fitTypes.Length )
+          throw new ArgumentException( "The indexer does not have the same number of parameters.", "comparand" );
+
+        for( int i = 0; i < m_fitTypes.Length; i++ )
+        {
+          var compare = m_fitTypes[ i ].CompareTo( comparand.m_fitTypes[ i ] );
+          if( compare != 0 )
+            return compare;
+        }
+
+        return 0;
+      }
+
+      private readonly PropertyInfo m_propertyInfo;
+      private readonly object[] m_values;
+      private readonly FitType[] m_fitTypes;
+
+      private enum FitType
+      {
+        None = 0,
+        ConvertToString,
+        KeepAsObject,
+        KeepAsString,
+        ConvertToType,
+        KeepAsType,
       }
     }
 

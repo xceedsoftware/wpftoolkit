@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -20,11 +20,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using Xceed.Wpf.Toolkit;
-#if !OPEN_SOURCE
-using Xceed.Wpf.Themes;
-using Xceed.Wpf.DataGrid.Themes.Metro;
-using Xceed.Wpf.DataGrid.Themes;
-#endif
 using System.Windows.Controls.Primitives;
 using System;
 using Xceed.Wpf.Samples.SampleData;
@@ -41,103 +36,21 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
   /// </summary>
   public partial class ThemingDataGridView : DemoView
   {
-#if !OPEN_SOURCE
-    #region Members
 
-    private Brush _accentBrush = new SolidColorBrush( System.Windows.Media.Color.FromRgb( 255, 152, 29 ) );
 
-    #endregion
-#endif
 
     public ThemingDataGridView()
     {
-#if !OPEN_SOURCE
-      this.DataContext = SampleDataProvider.GetOrders();
-#endif
       InitializeComponent();
     }
 
-#if !OPEN_SOURCE
-    private void RadioButton_Checked( object sender, RoutedEventArgs e )
-    {
-      RadioButton button = sender as RadioButton;
 
-      if( button == null )
-        return;
 
-      _accentBrush = button.Background;
-      if( _accentBrush == null )
-        return;
 
-      if( themeComboBox.SelectedItem.Equals( metroDarkComboBoxItem ) )
-      {
-        this.ChangeMetroTheme( new Xceed.Wpf.DataGrid.Themes.Metro.MetroDarkThemeResourceDictionary() );
-      }
-      else if( themeComboBox.SelectedItem.Equals( metroLightComboBoxItem ) )
-      {
-        this.ChangeMetroTheme( new Xceed.Wpf.DataGrid.Themes.Metro.MetroLightThemeResourceDictionary() );
-      }
-    }
 
-    private void ThemeComboBoxSelectionChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox comboBox = sender as ComboBox;
-      if( (comboBox != null) && (_dataGrid != null) )
-      {
-        switch( comboBox.SelectedIndex )
-        {
-          case 1:
-            this.ChangeTheme( new Xceed.Wpf.DataGrid.Themes.Office2007BlueTheme() );
-            break;
-          case 2:
-            this.ChangeTheme( new Xceed.Wpf.DataGrid.Themes.Office2007BlackTheme() );
-            break;
-          case 3:
-            this.ChangeTheme( new Xceed.Wpf.DataGrid.Themes.Office2007SilverTheme() );
-            break;
-          case 4:
-            this.ChangeTheme( new Xceed.Wpf.DataGrid.Themes.Windows10Theme() );
-            break;
-          case 5:
-            //# TODODOC
-            // Using a new instance of Brush to prevent the bug of AccentBrush in MetroTheme :
-            // if using the same instance of AccentBrush, ThemeKey won't make the difference 
-            // between MetroLight and MetroDark and new Theme won't be applied (see case 156588).
-            _accentBrush = _accentBrush.Clone();
-            this.ChangeMetroTheme( new Xceed.Wpf.DataGrid.Themes.Metro.MetroDarkThemeResourceDictionary() );
-            break;
-          case 6:
-            _accentBrush = _accentBrush.Clone();
-            this.ChangeMetroTheme( new Xceed.Wpf.DataGrid.Themes.Metro.MetroLightThemeResourceDictionary() );
-            break;
-          default:
-            this.ChangeTheme( null );
-            break;
-        }
-      }
-    }
 
-    private void ChangeTheme( Theme dataGridTheme )
-    {
-      _accentColorPanel.Visibility = Visibility.Hidden;
-      _dataGrid.View.Theme = dataGridTheme;
-    }
 
-    private void ChangeMetroTheme( DataGridMetroThemeResourceDictionaryBase metroDataGridThemeResourceDictionary )
-    {
-      _accentColorPanel.Visibility = Visibility.Visible;
 
-      if( metroDataGridThemeResourceDictionary != null )
-      {
-        if( !string.IsNullOrEmpty( Xceed.Wpf.Toolkit.Licenser.LicenseKey ) )
-        {
-          metroDataGridThemeResourceDictionary.LicenseKey = Xceed.Wpf.Toolkit.Licenser.LicenseKey;
-        }
 
-        metroDataGridThemeResourceDictionary.AccentBrush = _accentBrush;
-        _dataGrid.View.Theme = new Xceed.Wpf.DataGrid.Themes.Metro.MetroTheme( metroDataGridThemeResourceDictionary );
-      }
-    }
-#endif
   }
 }

@@ -111,9 +111,9 @@ namespace Xceed.Wpf.DataGrid
     {
       delta = this.AdjustItemCountOverride( delta );
 
-      if( ( this.Parent != null ) && (  delta != 0 ) )
+      if( ( this.Parent != null ) && ( delta != 0 ) )
       {
-        this.Parent.AdjustItemCount( delta);
+        this.Parent.AdjustItemCount( delta );
       }
     }
 
@@ -123,7 +123,7 @@ namespace Xceed.Wpf.DataGrid
 
       if( ( this.Parent != null ) && ( delta != 0 ) )
       {
-        this.Parent.AdjustLeafCount( delta);
+        this.Parent.AdjustLeafCount( delta );
       }
     }
 
@@ -143,10 +143,11 @@ namespace Xceed.Wpf.DataGrid
 
     protected void OnExpansionStateChanged( bool newExpansionState, int itemOffset, int count )
     {
-      if( this.ExpansionStateChanged != null )
-      {
-        this.ExpansionStateChanged( this, new ExpansionStateChangedEventArgs( newExpansionState, itemOffset, count ) );
-      }
+      var handler = this.ExpansionStateChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, new ExpansionStateChangedEventArgs( newExpansionState, itemOffset, count ) );
     }
   }
 }

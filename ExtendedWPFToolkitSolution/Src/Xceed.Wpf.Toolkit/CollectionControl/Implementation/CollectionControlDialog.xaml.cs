@@ -24,6 +24,8 @@ using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Security;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -105,7 +107,7 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-#endregion //Properties
+    #endregion //Properties
 
 #region Constructors
 
@@ -134,7 +136,7 @@ namespace Xceed.Wpf.Toolkit
     {
       base.OnSourceInitialized( e );
 
-      //Backup data in case "Cancel" is clicked.
+      //Backup data if case "Cancel" is clicked.
       if( this.ItemsSource != null )
       {
         foreach( var item in this.ItemsSource )
@@ -184,8 +186,18 @@ namespace Xceed.Wpf.Toolkit
       object result = null;
       var sourceType = source.GetType();
 
+      if( source is Array )
+      {
+        using( var stream = new MemoryStream() )
+        {
+          var formatter = new BinaryFormatter();
+          formatter.Serialize( stream, source );
+          stream.Seek( 0, SeekOrigin.Begin );
+          result = ( Array )formatter.Deserialize( stream );
+        }
+      }
       // For IDictionary, we need to create EditableKeyValuePair to edit the Key-Value.
-      if( (this.ItemsSource is IDictionary)
+      else if( (this.ItemsSource is IDictionary)
         && sourceType.IsGenericType
         && typeof( KeyValuePair<,> ).IsAssignableFrom( sourceType.GetGenericTypeDefinition() ) )
       {
@@ -194,11 +206,23 @@ namespace Xceed.Wpf.Toolkit
       else
       {
         // Initialized a new object with default values
-        result = FormatterServices.GetUninitializedObject( sourceType );
+        try
+        {
+          result = FormatterServices.GetUninitializedObject( sourceType );
+        }
+        catch( Exception )
+        {
+        }
+
         var constructor = sourceType.GetConstructor( Type.EmptyTypes );
-        if( constructor == null )
-          return null;
-        constructor.Invoke( result, null );
+        if( constructor != null )
+        {
+          constructor.Invoke( result, null );          
+        }
+        else
+        {
+          result = source;
+        }
       }
       Debug.Assert( result != null );
       if( result != null )
@@ -253,8 +277,16 @@ namespace Xceed.Wpf.Toolkit
             }
             else
             {
-              // copy regular object
-              propertyInfo.SetValue( result, propertyInfoValue, null );
+              // For T object included in List/Collections, Add it to the List/Collection of T.
+              if( index != null )
+              {
+                result.GetType().GetMethod( "Add" ).Invoke( result, new[] { propertyInfoValue } );
+              }
+              else
+              {
+                // copy regular object
+                propertyInfo.SetValue( result, propertyInfoValue, null );
+              }
             }
           }
         }

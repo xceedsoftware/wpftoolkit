@@ -15,9 +15,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
 
 namespace Xceed.Wpf.DataGrid
@@ -33,7 +30,7 @@ namespace Xceed.Wpf.DataGrid
 
     public SelectionRangeWithItems( SelectionRange range, object[] items )
     {
-      if( ( items != null ) && ( items.Length != range.Length ) && ( !range.IsEmpty ) ) 
+      if( ( items != null ) && ( items.Length != range.Length ) && ( !range.IsEmpty ) )
         throw new ArgumentException( "selectionRange and items must have the same length." );
 
       m_items = ( items != null ) ? new OptimizedItemsList( items ) : null;
@@ -49,8 +46,6 @@ namespace Xceed.Wpf.DataGrid
       m_range = range;
     }
 
-
-
     #region SelectionRange Property
 
     public SelectionRange Range
@@ -63,7 +58,7 @@ namespace Xceed.Wpf.DataGrid
 
     private SelectionRange m_range;
 
-    #endregion SelectionRange Property
+    #endregion
 
     #region Items Property
 
@@ -80,7 +75,7 @@ namespace Xceed.Wpf.DataGrid
 
     private OptimizedItemsList m_items;
 
-    #endregion Items Property
+    #endregion
 
     #region ItemsList Property
 
@@ -95,7 +90,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion ItemsList Property
+    #endregion
 
     #region Length Property
 
@@ -107,9 +102,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion Length Property
+    #endregion
 
-    #region PUBLIC PROPERTIES
+    #region IsEmpty Property
 
     public bool IsEmpty
     {
@@ -119,9 +114,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion PUBLIC PROPERTIES
-
-    #region PUBLIC METHODS
+    #endregion
 
     public static bool operator ==( SelectionRangeWithItems rangeWithItems1, SelectionRangeWithItems rangeWithItems2 )
     {
@@ -164,7 +157,7 @@ namespace Xceed.Wpf.DataGrid
       }
 
       return true;
-    }    
+    }
 
     public object GetItem( DataGridContext dataGridContext, int offset )
     {
@@ -232,14 +225,14 @@ namespace Xceed.Wpf.DataGrid
       return ( ( SelectionRangeWithItems )obj ) == this;
     }
 
-    #endregion PUBLIC METHODS
+    #region OptimizedItemsList Private Class
 
     // Performance optimization.
-    // This wrapper class allow to store items as an array (exclusive)OR as an SharedList.
-    // This allow an uniform API to access the items, whether they are stored as an Array or an SharedList. 
+    // This wrapper class allows to store items as an array (exclusive)OR as a SharedList.
+    // This allows a uniform API to access the items, whether they are stored as an Array or as a SharedList. 
     //
-    // The SharedList allow us to be more efficient when we need to add items to the existing ones. 
-    // The Array allow to return a value to the SelectionRangeWithItems.Items property more efficiently.
+    // The SharedList allows us to be more efficient when we need to add items to the existing ones. 
+    // The Array allows the return of a value to the SelectionRangeWithItems.Items property more efficiently.
     private class OptimizedItemsList
     {
       public OptimizedItemsList( SharedList list )
@@ -257,7 +250,7 @@ namespace Xceed.Wpf.DataGrid
         m_itemsList = null;
       }
 
-      public object this[int index]
+      public object this[ int index ]
       {
         get
         {
@@ -275,7 +268,10 @@ namespace Xceed.Wpf.DataGrid
 
       public SharedList? SharedList
       {
-        get { return m_itemsList; }
+        get
+        {
+          return m_itemsList;
+        }
       }
 
       public object[] ItemsArray
@@ -311,5 +307,6 @@ namespace Xceed.Wpf.DataGrid
       private SharedList? m_itemsList;
     }
 
+    #endregion
   }
 }

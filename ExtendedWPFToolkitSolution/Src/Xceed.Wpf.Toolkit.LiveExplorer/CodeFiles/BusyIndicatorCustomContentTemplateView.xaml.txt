@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -24,7 +24,7 @@
             This example demonstrates how to create a custom content template by setting the BusyContentTemplate property to an instance of a custom DataTemplate. Take notice of how the default ProgressBar is being hidden by setting the PrgressBarStyle property.  The default OverlayStyle is also being set to a custom style.
         </Paragraph>
     </local:DemoView.Description>
-    
+
     <local:DemoView.Resources>
       <ResourceDictionary>
          <ResourceDictionary.MergedDictionaries>

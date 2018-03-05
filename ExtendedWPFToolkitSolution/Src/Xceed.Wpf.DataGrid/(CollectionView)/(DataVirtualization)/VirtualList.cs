@@ -26,9 +26,6 @@ namespace Xceed.Wpf.DataGrid
 {
   internal class VirtualList : IList, IList<object>, INotifyCollectionChanged, IDisposable
   {
-
-    #region CONSTRUCTORS
-
     public VirtualList( VirtualPageManager pagingManager )
       : this( pagingManager, -1 )
     {
@@ -46,8 +43,6 @@ namespace Xceed.Wpf.DataGrid
       m_virtualCount = virtualCount;
     }
 
-    #endregion CONSTRUCTORS
-
     #region VirtualPagingManager Property
 
     public VirtualPageManager PagingManager
@@ -58,9 +53,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion VirtualPagingManager Property
-
-
+    #endregion
 
     #region VirtualCount Property
 
@@ -78,27 +71,89 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion VirtualCount Property
+    #endregion
 
-    internal int IndexOf( object item )
+    #region TableOfContent Property
+
+    internal VirtualListTableOfContent TableOfContent
     {
-      if( ( item == null ) || ( this.IsDisposed ) )
-        return -1;
-
-      EmptyDataItem emptyDataItem = item as EmptyDataItem;
-
-      if( emptyDataItem != null )
+      get
       {
-        if( ( emptyDataItem.ParentVirtualList == this ) && ( emptyDataItem.Index < m_virtualCount ) )
-          return emptyDataItem.Index;
-
-        return -1;
+        return m_tableOfContent;
       }
-
-      return m_tableOfContent.IndexOf( item );
     }
 
-    #region PUBLIC METHODS
+    #endregion
+
+    #region VirtualPagingManager Property
+
+    internal VirtualPageManager VirtualPagingManager
+    {
+      get
+      {
+        return m_pagingManager;
+      }
+      set
+      {
+        // null is an acceptable value when disposing the list
+        if( ( m_pagingManager != null ) && ( value != null ) )
+          throw new InvalidOperationException( "An attempt was made to set a VirtualPageManager when one has already been provided." );
+
+        m_pagingManager = value;
+      }
+    }
+
+    #endregion
+
+    #region IsDisposed Property
+
+    internal bool IsDisposed
+    {
+      get
+      {
+        return m_flags[ ( int )VirtualItemBookFlags.Disposed ];
+      }
+      private set
+      {
+        m_flags[ ( int )VirtualItemBookFlags.Disposed ] = value;
+      }
+    }
+
+    #endregion
+
+    #region IsRestarting Property
+
+    internal bool IsRestarting
+    {
+      get
+      {
+        return m_flags[ ( int )VirtualItemBookFlags.Restarting ];
+      }
+      private set
+      {
+        m_flags[ ( int )VirtualItemBookFlags.Restarting ] = value;
+      }
+    }
+
+    #endregion
+
+    #region HasPagePendingCommit Property
+
+    internal bool HasPagePendingCommit
+    {
+      get
+      {
+        foreach( VirtualPage page in m_tableOfContent.VirtualPages )
+        {
+          if( page.IsCommitPending )
+            return true;
+        }
+
+        return false;
+      }
+    }
+
+    #endregion
 
 #if DEBUG
     public override string ToString()
@@ -119,40 +174,23 @@ namespace Xceed.Wpf.DataGrid
     }
 #endif
 
-    #endregion PUBLIC METHODS
-
-
-    #region INTERNAL PROPERTIES
-
-    internal VirtualListTableOfContent TableOfContent
+    internal int IndexOf( object item )
     {
-      get
+      if( ( item == null ) || ( this.IsDisposed ) )
+        return -1;
+
+      EmptyDataItem emptyDataItem = item as EmptyDataItem;
+
+      if( emptyDataItem != null )
       {
-        return m_tableOfContent;
+        if( ( emptyDataItem.ParentVirtualList == this ) && ( emptyDataItem.Index < m_virtualCount ) )
+          return emptyDataItem.Index;
+
+        return -1;
       }
+
+      return m_tableOfContent.IndexOf( item );
     }
-
-    internal VirtualPageManager VirtualPagingManager
-    {
-      get
-      {
-        return m_pagingManager;
-      }
-      set
-      {
-        // null is an acceptable value when disposing the list
-        if( ( m_pagingManager != null ) && ( value != null ) )
-          throw new InvalidOperationException( "An attempt was made to set a VirtualPageManager when one has already been provided." );
-
-        m_pagingManager = value;
-      }
-    }
-
-
-    #endregion INTERNAL PROPERTIES
-
-
-    #region INTERNAL METHODS
 
     internal bool IsPageDirty( int index )
     {
@@ -220,24 +258,6 @@ namespace Xceed.Wpf.DataGrid
         virtualizedItemInfo = page.GetVirtualizedItemInfoAtIndex( index );
 
         Debug.Assert( virtualizedItemInfo != null );
-
-
-        //if( ( virtualizedItemInfo == null ) && ( createPageIfLineNotFound ) )
-        //{
-        //  // No VirtualizedItemInfo was found at the requested index.
-        //  LinkedListNode<VirtualPage> firstPageNode = m_pageNodes.First;
-
-        //  Debug.Assert( firstPageNode != null, "If the page is not null, there should be at least one page in the book." );
-
-        //  if( firstPageNode.Value != page )
-        //  {
-        //    
-        //    page = this.CreateNewPage( index );
-
-        //    virtualizedItemInfo = page.GetVirtualizedItemInfoAtIndex( index );
-        //    this.AddPageToFront( page );
-        //  }
-        //}
       }
       else if( createPageIfLineNotFound )
       {
@@ -259,7 +279,9 @@ namespace Xceed.Wpf.DataGrid
       if( m_tableOfContent.TryGetPageForSourceIndex( sourceIndex, out page ) )
       {
         if( page.LockPage() )
+        {
           Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "List: " + this.GetHashCode().ToString() + " - LOCKING PAGE: " + page.ToString() + " for index: " + sourceIndex.ToString() + " NEW LOCKED PAGES COUNT: " + this.GetLockedPageCount().ToString() );
+        }
 
         this.PreEmptiveLoadPages( sourceIndex, page );
       }
@@ -277,7 +299,6 @@ namespace Xceed.Wpf.DataGrid
         if( page.UnlockPage() )
         {
           Debug.Assert( this.GetLockedPageCount() >= 0 );
-
           Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "List: " + this.GetHashCode().ToString() + " - UN-LOCKING PAGE: " + page.ToString() + " for index: " + sourceIndex.ToString() + " NEW LOCKED PAGES COUNT: " + this.GetLockedPageCount().ToString() );
 
           m_pagingManager.CleanUpAndDisposeUnused();
@@ -287,8 +308,7 @@ namespace Xceed.Wpf.DataGrid
 
     private void PreEmptiveLoadPages( int sourceIndex, VirtualPage page )
     {
-      // The VirtualList is disposed or part of a PagingManager
-      // that will be disposed (only disconnected when dispose is required)
+      // The VirtualList is disposed or part of a PagingManager that will be disposed (only disconnected when dispose is required)
       if( !this.PagingManager.IsConnected )
         return;
 
@@ -297,8 +317,7 @@ namespace Xceed.Wpf.DataGrid
       double preemptivePageQueryRatio = m_pagingManager.PreemptivePageQueryRatio;
       int pageSize = m_pagingManager.PageSize;
 
-      double pageRatio = ( preemptivePageQueryRatio > 0.5 ) ? 0.5 :
-        ( preemptivePageQueryRatio < 0.0 ) ? 0 : preemptivePageQueryRatio;
+      double pageRatio = ( preemptivePageQueryRatio > 0.5 ) ? 0.5 : ( preemptivePageQueryRatio < 0.0 ) ? 0 : preemptivePageQueryRatio;
 
       double boundariesItemCount = ( pageRatio * pageSize );
 
@@ -319,8 +338,7 @@ namespace Xceed.Wpf.DataGrid
       {
         VirtualPage preEmptivePage = null;
 
-        // We do not want to move the pre-emptive page to the front if it is already created since it does not count as a
-        // legitimate user-acess.
+        // We do not want to move the pre-emptive page to the front if it is already created since it does not count as a legitimate user-acess.
         preEmptivePage = this.GetPageOrDefaultForItemIndex( preEmptivePageStartIndex, true );
 
         if( preEmptivePage == null )
@@ -331,7 +349,6 @@ namespace Xceed.Wpf.DataGrid
         }
       }
     }
-
 
     internal bool IsAsyncCommitQueuedForItem( object item )
     {
@@ -351,7 +368,9 @@ namespace Xceed.Wpf.DataGrid
         Debug.Assert( page.ParentVirtualList == this );
 
         if( page.IsDirty )
+        {
           m_pagingManager.QueueCommitData( page );
+        }
       }
     }
 
@@ -361,6 +380,7 @@ namespace Xceed.Wpf.DataGrid
         return;
 
       Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "Restart VirtualList requested, checking for pages to commit or abort..." );
+
       this.IsRestarting = true;
       m_pagingManager.OnVirtualListRestarting( this );
 
@@ -373,10 +393,8 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        // Restart every pages this VirtualList contains 
-
-        // Keep a reference to the pages that need to restart
-        // in order to know when this VirtualList is restarted
+        // Restart every pages this VirtualList contains.
+        // Keep a reference to the pages that need to restart in order to know when this VirtualList is restarted
         m_restartingPages.AddRange( m_tableOfContent.VirtualPages );
 
         for( int i = virtualPagesCount - 1; i >= 0; i-- )
@@ -385,16 +403,16 @@ namespace Xceed.Wpf.DataGrid
           Debug.Assert( !page.IsDisposed );
 
           if( !page.IsRestarting )
+          {
             page.Restart();
+          }
         }
       }
     }
 
     internal void OnVirtualPageRestarting( VirtualPage page )
     {
-      // Notify the VirtualPageManager that this page is restarted
-      // to ensure it commits its data or aborts the QueryItems
-      // if already invoked
+      // Notify the VirtualPageManager that this page is restarted to ensure it commits its data or aborts the QueryItems if already invoked
       Debug.Assert( m_restartingPages.Contains( page ) );
       m_pagingManager.OnVirtualListPageRestarting( this, page );
     }
@@ -402,21 +420,16 @@ namespace Xceed.Wpf.DataGrid
     internal void OnVirtualPageRestarted( VirtualPage page )
     {
       Debug.Assert( m_restartingPages.Contains( page ) );
+
       // The page is restarted, remove it from the restarting pages
       m_restartingPages.Remove( page );
 
-      // Notify the manager that this page is restarted in order
-      // to let it remove it from its m_pageNodes and also
-      // from this VirtualList TableOfContent.
-      // NOTE: We do not remove it from the TableOfContent
-      // immediately to avoid have to insert a condition in 
-      // VirtualPageManager.RemovePage since this method
-      // used widely to ensure a page is removed from the 
-      // TableOfContent and from the m_pageNodes list.
+      // Notify the manager that this page is restarted in order to let it remove it from its m_pageNodes and also from this VirtualList TableOfContent.
+      // NOTE: We do not remove it from the TableOfContent immediately to avoid have to insert a condition in  VirtualPageManager.RemovePage since this method
+      // used widely to ensure a page is removed from the TableOfContent and from the m_pageNodes list.
       m_pagingManager.OnVirtualListPageRestarted( this, page );
 
-      // Ensure all restarted pages completed their commit or abort operation
-      // before notifying that this list is restarted
+      // Ensure all restarted pages completed their commit or abort operation before notifying that this list is restarted
       if( m_restartingPages.Count == 0 )
       {
         Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "Cleared VirtualList" );
@@ -424,22 +437,16 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion INTERNAL METHODS
-
-    #region INTERNAL CALLBACKS METHODS
-
     internal void FillEmptyPage( AsyncQueryInfo asyncQueryInfo, object[] fetchedItems )
     {
-      // The VirtualList is disposed or part of a PagingManager
-      // that will be disposed (only disconnected when dispose is required)
+      // The VirtualList is disposed or part of a PagingManager that will be disposed (only disconnected when dispose is required)
       if( !this.PagingManager.IsConnected )
         return;
 
       Debug.Assert( !this.IsDisposed );
       Debug.Assert( !asyncQueryInfo.IsDisposed );
 
-      // We do not want to move the page we are about to fill to the front since it does not count as a legitimate user-acess.
-      // It will get moved to the front when one of its item is accessed.
+      // We do not want to move the page we are about to fill to the front since it does not count as a legitimate user-acess.  It will get moved to the front when one of its item is accessed.
       VirtualPage page = null;
       page = this.GetPageOrDefaultForItemIndex( asyncQueryInfo.StartIndex, true );
 
@@ -469,18 +476,12 @@ namespace Xceed.Wpf.DataGrid
 
         Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "Replaced TOC items/index for page: " + page.ToString() );
 
-        this.OnCollectionChanged( new NotifyCollectionChangedEventArgs(
-          NotifyCollectionChangedAction.Replace,
-          fetchedItems, oldItems,
-          asyncQueryInfo.StartIndex ) );
+        this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Replace, fetchedItems, oldItems, asyncQueryInfo.StartIndex ) );
       }
       else
       {
-        // The expected count was not met.  Maybe the user told us the source was bigger than it really is, or maybe there
-        // were delete operations made on the source since the last restart.
-        //
-        // Let's refresh the CollectionView.
-        // This will restart the VirtualItemBook and raise the CollectionView's OnCollectionChanged Reset notification.
+        // The expected count was not met.  Maybe the user told us the source was bigger than it really is, or maybe there were delete operations made on the source since the last restart.
+        // Let's refresh the CollectionView. This will restart the VirtualItemBook and raise the CollectionView's OnCollectionChanged Reset notification.
         this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
       }
     }
@@ -492,7 +493,7 @@ namespace Xceed.Wpf.DataGrid
 
       int indexForItemInPage = asyncCommitInfo.VirtualizedItemInfos[ 0 ].Index;
 
-      // We do not want to move the page we are about flag has committed to the front since it does not count as a legitimate user-access.
+      // We do not want to move the page we are about to flag has committed to the front since it does not count as a legitimate user-access.
       // It will get moved to the front when one of its items is accessed.
       VirtualPage page = null;
       page = this.GetPageOrDefaultForItemIndex( indexForItemInPage, true );
@@ -535,70 +536,16 @@ namespace Xceed.Wpf.DataGrid
           }
           else
           {
-            // We just completed the last commit operation for a Restart request.  
-            // Send another reset action which will in turn call another restart request.
-            // This time, no pages should have to be committed and the restart will end correctly, synchronously with the reset.
-
-            //this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
             this.Restart();
           }
         }
       }
     }
 
-    #endregion INTERNAL CALLBACKS METHODS
-
-    #region INTERNAL PROPERTIES
-
-    internal bool IsDisposed
-    {
-      get
-      {
-        return m_flags[ ( int )VirtualItemBookFlags.Disposed ];
-      }
-      private set
-      {
-        m_flags[ ( int )VirtualItemBookFlags.Disposed ] = value;
-      }
-    }
-
-    internal bool IsRestarting
-    {
-      get
-      {
-        return m_flags[ ( int )VirtualItemBookFlags.Restarting ];
-      }
-      private set
-      {
-        m_flags[ ( int )VirtualItemBookFlags.Restarting ] = value;
-      }
-    }
-
-    #endregion
-
-    #region PRIVATE PROPERTIES
-
-    internal bool HasPagePendingCommit
-    {
-      get
-      {
-        foreach( VirtualPage page in m_tableOfContent.VirtualPages )
-        {
-          if( page.IsCommitPending )
-            return true;
-        }
-
-        return false;
-      }
-    }
-
-    #endregion PRIVATE PROPERTIES
-
-    #region PRIVATE METHODS
-
     private void EndRestart()
     {
       Debug.Assert( m_restartingPages.Count == 0 );
+
       m_virtualCount = -1;
       this.IsRestarting = false;
 
@@ -630,12 +577,14 @@ namespace Xceed.Wpf.DataGrid
 
       m_tableOfContent.AddPage( page );
 
-      // If we have a pending commit page, this brandly new created page will get its query data queued when we are notified
-      // of a commit completed and that we no longer have any pages awaiting commiting.
+      // If we have a pending commit page, this brandly new created page will get its query data queued when we are notified of a commit completed and that we no longer have any pages awaiting commiting.
       if( !this.HasPagePendingCommit )
+      {
         m_pagingManager.QueueQueryData( page );
+      }
 
       Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "Creating VirtualItemPlaceHolder for page: " + page.ToString() );
+
       return page;
     }
 
@@ -676,7 +625,9 @@ namespace Xceed.Wpf.DataGrid
         Debug.Assert( page != null );
 
         if( ( page != null ) && ( page.IsLocked ) )
+        {
           lockedPages.Add( page );
+        }
       }
 
       return lockedPages;
@@ -689,41 +640,21 @@ namespace Xceed.Wpf.DataGrid
       Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, ( count != -1 ) ? "QUERY VIRTUAL COUNT: " + count.ToString() : "QUERY VIRTUAL COUNT NOT HANDLED, SETTING COUNT TO ZERO." );
 
       if( count == -1 )
+      {
         count = 0;
+      }
 
       m_virtualCount = count;
     }
 
     private void OnCollectionChanged( NotifyCollectionChangedEventArgs e )
     {
-      if( this.CollectionChanged != null )
-        this.CollectionChanged( this, e );
+      var handler = this.CollectionChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, e );
     }
-
-    #endregion PRIVATE METHODS
-
-    #region PRIVATE FIELDS
-
-    private List<VirtualPage> m_restartingPages = new List<VirtualPage>();
-    private VirtualPageManager m_pagingManager;
-    private BitVector32 m_flags;
-    private int m_virtualCount;
-    private VirtualListTableOfContent m_tableOfContent;
-
-    #endregion PRIVATE FIELDS
-
-
-    #region PRIVATE NESTED ENUMS
-
-    [Flags]
-    private enum VirtualItemBookFlags
-    {
-      Restarting = 1,
-      Disposed = 2,
-    }
-
-    #endregion PRIVATE NESTED ENUMS
-
 
     #region IList<object> Members
 
@@ -925,8 +856,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-
-
     #region IDisposable Members
 
     public void Dispose()
@@ -935,6 +864,7 @@ namespace Xceed.Wpf.DataGrid
       if( m_tableOfContent != null )
       {
         Debug.Assert( m_tableOfContent.VirtualPages.Count == 0 );
+
         m_tableOfContent.Dispose();
         m_tableOfContent = null;
       }
@@ -945,5 +875,18 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion
+
+    private List<VirtualPage> m_restartingPages = new List<VirtualPage>();
+    private VirtualPageManager m_pagingManager;
+    private BitVector32 m_flags;
+    private int m_virtualCount;
+    private VirtualListTableOfContent m_tableOfContent;
+
+    [Flags]
+    private enum VirtualItemBookFlags
+    {
+      Restarting = 1,
+      Disposed = 2,
+    }
   }
 }

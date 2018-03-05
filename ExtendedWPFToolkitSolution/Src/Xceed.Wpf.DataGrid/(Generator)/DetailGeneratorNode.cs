@@ -15,24 +15,22 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal partial class DetailGeneratorNode : GeneratorNode
   {
-    public DetailGeneratorNode( DataGridContext context, CustomItemContainerGenerator generator )
+    internal DetailGeneratorNode( DataGridContext dataGridContext, CustomItemContainerGenerator generator )
       : base( null )
     {
+      if( dataGridContext == null )
+        throw new ArgumentNullException( "dataGridContext" );
+
       if( generator == null )
         throw new ArgumentNullException( "generator" );
 
-      if( context == null )
-        throw new ArgumentNullException( "context" );
-
+      m_dataGridContext = dataGridContext;
       m_generator = generator;
-      m_context = context;
       m_itemCount = generator.ItemCount;
     }
 
@@ -48,7 +46,7 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return m_context;
+        return m_dataGridContext;
       }
     }
 
@@ -65,7 +63,7 @@ namespace Xceed.Wpf.DataGrid
       base.CleanGeneratorNode();
 
       m_generator.CleanupGenerator( true );
-      m_context.CleanDataGridContext();
+      m_dataGridContext.CleanDataGridContext();
 
       m_generator = null;
     }
@@ -75,8 +73,8 @@ namespace Xceed.Wpf.DataGrid
       m_itemCount = m_generator.ItemCount;
     }
 
+    private readonly DataGridContext m_dataGridContext;
     private CustomItemContainerGenerator m_generator;
-    private DataGridContext m_context;
     private int m_itemCount;
   }
 }

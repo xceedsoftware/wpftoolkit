@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -22,11 +22,9 @@
                         xmlns:sample="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.MaterialControls.Data"
                         Title="MaterialTextField">
    <local:DemoView.Description>
-      <!-- TODODOC-->
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
          <Run>A TextBox containing a customizable animated watermark that remains active when text is entered. It uses the Material Brushes.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -34,207 +32,24 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
-       ##END-->
       </Paragraph>
    </local:DemoView.Description>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-      <ResourceDictionary>
-         <ResourceDictionary.MergedDictionaries>
-            <ResourceDictionary Source="../Resources/CommonResources.xaml" />
-         </ResourceDictionary.MergedDictionaries>
 
-         <ObjectDataProvider x:Key="TextFieldEnumData"
-                             MethodName="GetValues"
-                             ObjectType="{x:Type sys:Enum}">
-            <ObjectDataProvider.MethodParameters>
-               <x:Type TypeName="xctk:MaterialTextFieldModeEnum" />
-            </ObjectDataProvider.MethodParameters>
-         </ObjectDataProvider>
 
-         <DataTemplate x:Key="TextFieldTemplate1">
-            <Border Background="#FF49A9F5">
-               <TextBlock Text="{Binding}"
-                          Foreground="White" />
-            </Border>
-         </DataTemplate>
 
-         <DataTemplate x:Key="TextFieldTemplate2">
-            <StackPanel Orientation="Horizontal">
-               <Image Source="..\Resources\building16.png"
-                      Stretch="None" />
-               <TextBlock Text="{Binding}"
-                          Foreground="Black"
-                          Margin="4,0,0,0" />
-            </StackPanel>
-         </DataTemplate>
-      </ResourceDictionary>
-   </local:DemoView.Resources>  
 
-   <Grid>
 
-      <StackPanel Margin="10">
 
-         <GroupBox Header="Features"
-                   Margin="0,5,0,5">
-            <Grid Margin="5">
-               <Grid.RowDefinitions>
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="Auto" />
-               </Grid.RowDefinitions>
-               <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="100" />
-               </Grid.ColumnDefinitions>
 
-               <!-- First Column-->
-               <TextBlock Grid.Column="0"
-                          Text="Watermark: "
-                          VerticalAlignment="Center" />
-               <TextBox Grid.Column="1"
-                        Text="{Binding Watermark, ElementName=materialTextField, UpdateSourceTrigger=PropertyChanged}"
-                        VerticalAlignment="Center"
-                        Width="250"
-                        Margin="5" />
 
-               <TextBlock Grid.Column="0"
-                          Grid.Row="1"
-                          Text="Watermark Mode: "
-                          VerticalAlignment="Center" />
-               <ComboBox Grid.Column="1"
-                         Grid.Row="1"
-                         ItemsSource="{Binding Source={StaticResource TextFieldEnumData}}"
-                         SelectedItem="{Binding WatermarkMode, ElementName=materialTextField}"
-                         Width="95"
-                         HorizontalAlignment="Left"
-                         VerticalAlignment="Center"
-                         Margin="5" />
 
-               <TextBlock Grid.Column="0"
-                          Grid.Row="2"
-                          Text="Watermark Template: "
-                          VerticalAlignment="Center" />
-               <ComboBox Grid.Column="1"
-                         Grid.Row="2"
-                         SelectedValue="{Binding WatermarkTemplate, ElementName=materialTextField}"
-                         SelectedValuePath="Tag"
-                         Width="95"
-                         VerticalAlignment="Center"
-                         HorizontalAlignment="Left"
-                         Margin="5">
-                  <ComboBoxItem Content="None"
-                                Tag="{x:Null}" />
-                  <ComboBoxItem Content="Template1"
-                                Tag="{StaticResource TextFieldTemplate1}" />
-                  <ComboBoxItem Content="Template2"
-                                Tag="{StaticResource TextFieldTemplate2}" />
-               </ComboBox>
 
-               <TextBlock Grid.Column="0"
-                          Grid.Row="3"
-                          Text="Watermark Scale Factor: "
-                          VerticalAlignment="Center" />
-               <xctk:DoubleUpDown Grid.Column="1"
-                                  Grid.Row="3"
-                                  Value="{Binding WatermarkScaleFactor, ElementName=materialTextField}"
-                                  Minimum="0"
-                                  Maximum="5"
-                                  Increment="0.1"
-                                  FormatString="N1"
-                                  Width="70"
-                                  HorizontalAlignment="Left"
-                                  VerticalAlignment="Center"
-                                  Margin="5" />
 
-               <!-- Second Column-->
-               <TextBlock Grid.Column="2"
-                          Grid.Row="0"
-                          Text="Watermark Foreground: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0" />
-               <ComboBox Grid.Column="3"
-                         Grid.Row="0"
-                         ItemsSource="{Binding MaterialBrushes,RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                         SelectedItem="{Binding WatermarkForeground, ElementName=materialTextField}"
-                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                         VerticalAlignment="Center"
-                         Margin="5" />
-               <TextBlock Grid.Column="2"
-                          Grid.Row="1"
-                          Text="Watermark Focus Brush: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0" />
-               <ComboBox Grid.Column="3"
-                         Grid.Row="1"
-                         ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                         SelectedItem="{Binding WatermarkFocusBrush, ElementName=materialTextField}"
-                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                         VerticalAlignment="Center"
-                         Margin="5" />
-               <TextBlock Grid.Column="2"
-                          Grid.Row="2"
-                          Text="Line Brush: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0" />
-               <ComboBox Grid.Column="3"
-                         Grid.Row="2"
-                         ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                         SelectedItem="{Binding LineBrush, ElementName=materialTextField}"
-                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                         VerticalAlignment="Center"
-                         Margin="5" />
-               <TextBlock Grid.Column="2"
-                          Grid.Row="3"
-                          Text="Line Focus Brush: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0" />
-               <ComboBox Grid.Column="3"
-                         Grid.Row="3"
-                         ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                         SelectedItem="{Binding LineFocusBrush, ElementName=materialTextField}"
-                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                         VerticalAlignment="Center"
-                         Margin="5" />
-            </Grid>
-         </GroupBox>
 
-         <StackPanel>
-            <TextBlock Text="Usage:"
-                       Style="{StaticResource Header}" />
 
-            <xctk:MaterialTextField x:Name="materialTextField"
-                                    Watermark="Company"
-                                    Width="250"
-                                    Margin="100"
-                                    WatermarkForeground="{Binding MaterialBrushes[17], RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                                    WatermarkScaleFactor="0.7"
-                                    WatermarkMode="OnFocus"
-                                    LineBrush="{Binding MaterialBrushes[17], RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}">
-               <xctk:MaterialTextField.Text>
-                  <Binding Path="Text"
-                           ElementName="testTextBox"
-                           UpdateSourceTrigger="PropertyChanged">
-                     <Binding.ValidationRules>
-                        <sample:RequiredRule />
-                     </Binding.ValidationRules>
-                  </Binding>
-               </xctk:MaterialTextField.Text>
-            </xctk:MaterialTextField>
 
-            <TextBox x:Name="testTextBox"
-                     Visibility="Collapsed" />
-         </StackPanel>
-      </StackPanel>
 
-   </Grid>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
     <Image Source="..\OpenSourceImages\MaterialTextField.png" Width="600" Height="400"/>
-   ##END-->
 </local:MaterialDemoView>

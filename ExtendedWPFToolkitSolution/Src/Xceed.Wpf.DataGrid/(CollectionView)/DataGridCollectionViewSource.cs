@@ -20,7 +20,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
-using Xceed.Wpf.DataGrid.Stats;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -38,8 +37,6 @@ namespace Xceed.Wpf.DataGrid
     public DataGridCollectionViewSource()
       : base()
     {
-      m_statFunctions = new StatFunctionCollection();
-      m_statFunctions.CollectionChanged += new NotifyCollectionChangedEventHandler( this.ForwardedCollection_CollectionChanged );
     }
 
     #endregion CONSTRUCTORS
@@ -57,20 +54,6 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion CollectionViewType Property
-
-    #region StatFunctions Property
-
-    internal ObservableCollection<StatFunction> StatFunctions
-    {
-      get
-      {
-        return m_statFunctions;
-      }
-    }
-
-    private StatFunctionCollection m_statFunctions;
-
-    #endregion StatFunctions Property
 
     #region UpdateChangedPropertyStatsOnly Property
 
@@ -106,18 +89,7 @@ namespace Xceed.Wpf.DataGrid
 
     internal override void ApplyExtraPropertiesToView( DataGridCollectionViewBase currentView )
     {
-      base.ApplyExtraPropertiesToView( currentView );
-
-      DataGridCollectionView dataGridCollectionView = currentView as DataGridCollectionView;
-
-      dataGridCollectionView.StatFunctions.Clear();
-
-      foreach( var statFunction in m_statFunctions )
-      {
-        dataGridCollectionView.StatFunctions.Add( statFunction );
-      }
-
-      dataGridCollectionView.UpdateChangedPropertyStatsOnly = this.UpdateChangedPropertyStatsOnly;
+      base.ApplyExtraPropertiesToView( currentView );     
     }
 
     #endregion INTERNAL METHODS

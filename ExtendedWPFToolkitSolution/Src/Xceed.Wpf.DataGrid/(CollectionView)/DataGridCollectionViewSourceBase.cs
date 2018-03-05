@@ -15,21 +15,16 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
-using System.Windows;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Collections.Specialized;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
 
 namespace Xceed.Wpf.DataGrid
 {
   public abstract class DataGridCollectionViewSourceBase : CollectionViewSource
   {
-    #region CONSTRUCTORS
-
     static DataGridCollectionViewSourceBase()
     {
       CollectionViewSource.SourceProperty.OverrideMetadata(
@@ -41,8 +36,8 @@ namespace Xceed.Wpf.DataGrid
     }
 
     public DataGridCollectionViewSourceBase()
-      : base()
     {
+
       m_itemProperties = new ObservableCollection<DataGridItemPropertyBase>();
       m_itemProperties.CollectionChanged += new NotifyCollectionChangedEventHandler( this.ForwardedCollection_CollectionChanged );
       m_dataGridDetailDescriptions = new DataGridDetailDescriptionCollection();
@@ -56,8 +51,6 @@ namespace Xceed.Wpf.DataGrid
       this.Culture = CultureInfo.InvariantCulture;
     }
 
-    #endregion CONSTRUCTORS
-
     #region ItemProperties Property
 
     public ObservableCollection<DataGridItemPropertyBase> ItemProperties
@@ -70,7 +63,7 @@ namespace Xceed.Wpf.DataGrid
 
     private ObservableCollection<DataGridItemPropertyBase> m_itemProperties;
 
-    #endregion ItemProperties Property
+    #endregion
 
     #region DetailDescriptions Property
 
@@ -84,7 +77,7 @@ namespace Xceed.Wpf.DataGrid
 
     private ObservableCollection<DataGridDetailDescription> m_dataGridDetailDescriptions;
 
-    #endregion DetailDescriptions Property
+    #endregion
 
     #region ItemType Property
 
@@ -107,7 +100,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion ItemType Property
+    #endregion
 
     #region CollectionViewType Property
 
@@ -121,7 +114,7 @@ namespace Xceed.Wpf.DataGrid
       base.OnCollectionViewTypeChanged( oldCollectionViewType, newCollectionViewType );
     }
 
-    #endregion CollectionViewType Property
+    #endregion
 
     #region AutoCreateItemProperties Property
 
@@ -142,7 +135,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion AutoCreateItemProperties Property
+    #endregion
 
     #region AutoCreateDetailDescriptions Property
 
@@ -163,28 +156,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion AutoCreateDetailDescriptions Property
-
-    #region AutoFilterMode Property
-
-    internal static readonly DependencyProperty AutoFilterModeProperty = DependencyProperty.Register(
-      "AutoFilterMode", typeof( AutoFilterMode ), typeof( DataGridCollectionViewSourceBase ),
-      new UIPropertyMetadata( AutoFilterMode.None,
-        new PropertyChangedCallback( DataGridCollectionViewSourceBase.OnDataGridCollectionViewSourceBaseDependencyPropertyChanged ) ) );
-
-    internal AutoFilterMode AutoFilterMode
-    {
-      get
-      {
-        return ( AutoFilterMode )this.GetValue( AutoFilterModeProperty );
-      }
-      set
-      {
-        this.SetValue( AutoFilterModeProperty, value );
-      }
-    }
-
-    #endregion AutoFilterMode Property
+    #endregion
 
     #region DistinctValuesConstraints Property
 
@@ -205,7 +177,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion DistinctValuesConstraints Property
+    #endregion
 
     #region DistinctValuesUpdateMode Property
 
@@ -247,7 +219,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion DefaultCalculateDistinctValues Property
+    #endregion
 
     #region Culture Property
 
@@ -270,39 +242,6 @@ namespace Xceed.Wpf.DataGrid
 
         base.Culture = value;
       }
-    }
-
-    #endregion Culture Property
-
-    #region FilterCriteriaMode Property
-
-    public static readonly DependencyProperty FilterCriteriaModeProperty = DependencyProperty.Register(
-      "FilterCriteriaMode", typeof( FilterCriteriaMode ), typeof( DataGridCollectionViewSourceBase ),
-      new UIPropertyMetadata( FilterCriteriaMode.And,
-        new PropertyChangedCallback( DataGridCollectionViewSourceBase.OnDataGridCollectionViewSourceBaseDependencyPropertyChanged ) ) );
-
-    public FilterCriteriaMode FilterCriteriaMode
-    {
-      get
-      {
-        return ( FilterCriteriaMode )this.GetValue( DataGridCollectionViewSourceBase.FilterCriteriaModeProperty );
-      }
-      set
-      {
-        this.SetValue( DataGridCollectionViewSourceBase.FilterCriteriaModeProperty, value );
-      }
-    }
-
-    #endregion FilterCriteriaMode Property
-
-    #region AutoFilterValuesChanged Event
-
-    internal event EventHandler<AutoFilterValuesChangedEventArgs> AutoFilterValuesChanged;
-
-    internal void OnAutoFilterValuesChanged( AutoFilterValuesChangedEventArgs e )
-    {
-      if( this.AutoFilterValuesChanged != null )
-        this.AutoFilterValuesChanged( this, e );
     }
 
     #endregion
@@ -358,7 +297,7 @@ namespace Xceed.Wpf.DataGrid
 
     internal abstract DataGridCollectionViewBaseDataProvider CreateDataProvider();
 
-    #endregion Source property
+    #endregion
 
     #region OriginalSource Property
 
@@ -370,7 +309,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion OriginalSource Property
+    #endregion
 
     #region AutoCreateForeignKeyDescriptions Property
 
@@ -390,6 +329,18 @@ namespace Xceed.Wpf.DataGrid
       set
       {
         this.SetValue( DataGridCollectionViewSourceBase.AutoCreateForeignKeyDescriptionsProperty, value );
+      }
+    }
+
+    #endregion
+
+    #region DataSourceProvider Internal Property
+
+    internal DataGridCollectionViewBaseDataProvider DataSourceProvider
+    {
+      get
+      {
+        return m_dataSourceProvider;
       }
     }
 
@@ -519,74 +470,33 @@ namespace Xceed.Wpf.DataGrid
         this.ItemRemoved( this, e );
     }
 
-    #endregion EVENTS
-
-    #region INTERNAL PROPERTIES
-
-    internal DataGridCollectionViewBaseDataProvider DataSourceProvider
-    {
-      get
-      {
-        return m_dataSourceProvider;
-      }
-    }
-
-    #endregion INTERNAL PROPERTIES
-
-    #region INTERNAL METHODS
+    #endregion
 
     internal virtual void ApplyExtraPropertiesToView( DataGridCollectionViewBase currentView )
     {
-      DataGridItemPropertyCollection currentViewItemProperties = currentView.ItemProperties;
-      int count = m_itemProperties.Count;
+      var currentViewItemProperties = currentView.ItemProperties;
 
-      for( int i = 0; i < count; i++ )
+      foreach( var itemProperty in m_itemProperties )
       {
-        DataGridItemPropertyBase itemProperty = m_itemProperties[ i ];
-        int index = currentViewItemProperties.IndexOf( itemProperty.Name );
-
-        if( index == -1 )
-        {
-          currentViewItemProperties.Add( itemProperty );
-        }
-        else
-        {
-          currentViewItemProperties[ index ] = itemProperty;
-        }
+        currentViewItemProperties[ itemProperty.Name ] = itemProperty;
       }
 
-      count = currentView.ItemProperties.Count;
+      var defaultCalculateDistinctValues = this.DefaultCalculateDistinctValues;
 
-      bool defaultCalculateDistinctValues = this.DefaultCalculateDistinctValues;
-
-      for( int i = 0; i < count; i++ )
+      foreach( var itemProperty in currentViewItemProperties )
       {
-        DataGridItemPropertyBase dataGridItemProperty = currentView.ItemProperties[ i ];
-
         // Set default value for CalculateDistinctValues if not explicitly set
-        if( !dataGridItemProperty.IsCalculateDistinctValuesInitialized )
-          dataGridItemProperty.CalculateDistinctValues = defaultCalculateDistinctValues;
+        if( !itemProperty.IsCalculateDistinctValuesInitialized )
+        {
+          itemProperty.CalculateDistinctValues = defaultCalculateDistinctValues;
+        }
       }
 
-      count = m_dataGridDetailDescriptions.Count;
+      var autoCreateForeignKeyDescriptions = this.AutoCreateForeignKeyDescriptions;
 
-      bool autoCreateForeignKeyDescriptions = this.AutoCreateForeignKeyDescriptions;
-      DataGridDetailDescriptionCollection currentViewDetailDescriptions =
-        currentView.DetailDescriptions;
-
-      for( int i = 0; i < count; i++ )
+      for( int i = 0; i < m_dataGridDetailDescriptions.Count; i++ )
       {
         DataGridDetailDescription detailDescription = m_dataGridDetailDescriptions[ i ];
-        int index = currentViewDetailDescriptions.IndexOf( detailDescription.RelationName );
-
-        if( index == -1 )
-        {
-          currentViewDetailDescriptions.Add( detailDescription );
-        }
-        else
-        {
-          currentViewDetailDescriptions[ index ] = detailDescription;
-        }
 
         // We assume we want to auto-create ForeignKeyDescriptions for DetailDescriptions
         // if this.AutoCreateForeignKeyDescriptions is true and it was auto-created
@@ -595,16 +505,7 @@ namespace Xceed.Wpf.DataGrid
           detailDescription.AutoCreateForeignKeyDescriptions = autoCreateForeignKeyDescriptions;
         }
       }
-
-      currentView.AutoFilterMode = this.AutoFilterMode;
-      currentView.DistinctValuesConstraint = this.DistinctValuesConstraint;
-      currentView.DistinctValuesUpdateMode = this.DistinctValuesUpdateMode;
-      currentView.FilterCriteriaMode = this.FilterCriteriaMode;
     }
-
-    #endregion INTERNAL METHODS
-
-    #region PRIVATE METHODS
 
     internal static void OnDataGridCollectionViewSourceBaseDependencyPropertyChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
@@ -639,13 +540,11 @@ namespace Xceed.Wpf.DataGrid
       base.Culture = base.Culture;
     }
 
-    #endregion PRIVATE METHODS
-
-    #region PRIVATE FIELDS
+    #region Private Fields
 
     private DataGridCollectionViewBaseDataProvider m_dataSourceProvider;
     private object m_originalSource;
 
-    #endregion PRIVATE FIELDS
+    #endregion
   }
 }

@@ -23,7 +23,6 @@
    <ResourceDictionary.MergedDictionaries>
       <!-- Style definitions for specific controls (things that are not grid elements) -->
 
-      <markup:DataGridThemeResourceDictionary Source="/themes/Controls/FixedColumnSplitter.generic.xaml"/>
       <markup:DataGridThemeResourceDictionary Source="/themes/Controls/TableViewScrollViewer.generic.xaml"/>
 
       <!-- For each specific systeme theme ResourceDictionary, we only need to include 

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -20,11 +20,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using Xceed.Wpf.Toolkit;
-#if !OPEN_SOURCE
-using Xceed.Wpf.Toolkit.Themes;
-using Xceed.Wpf.Themes.Metro;
-using Xceed.Wpf.Themes;
-#endif
 using System.Windows.Controls.Primitives;
 using System;
 using System.Data;
@@ -40,194 +35,49 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
   /// </summary>
   public partial class ThemingCoreWPFView : DemoView
   {
-#if !OPEN_SOURCE
-    #region Members
 
-    public static string DefaultSearchString = "type in your search";
-    private Storyboard _progressStoryboard = null;
-    private Brush _accentBrush = new SolidColorBrush( System.Windows.Media.Color.FromRgb( 255, 152, 29 ) );
-    private Brush whiteBrush = new SolidColorBrush(Colors.White);
-    private Brush blackBrush = new SolidColorBrush(Colors.Black);
 
-    #endregion
 
-    #region Properties
 
-    public ObservableCollection<Xceed.Wpf.Samples.SampleData.Product> Products
-    {
-      get
-      {
-        return Xceed.Wpf.Samples.SampleData.SampleDataProvider.GetProducts();
-      }
-    }
 
-    #endregion
-#endif
 
     #region Constructors
 
     public ThemingCoreWPFView()
     {
-#if !OPEN_SOURCE
-      this.Initialized += new EventHandler( WPFControlsThemes_Initialized );
-      DataContext = this;
-#endif
       InitializeComponent();
     }
 
     #endregion
 
-#if !OPEN_SOURCE
 
-    #region EventHandlers
 
-    private void RadioButton_Checked( object sender, RoutedEventArgs e )
-    {
-      RadioButton button = sender as RadioButton;
-      if( button == null )
-        return;
 
-      _accentBrush = button.Background;
-      if( _accentBrush == null )
-        return;
 
-      if( themeComboBox.SelectedItem == null )
-        return;
 
-      if( themeComboBox.SelectedItem.Equals( metroDarkComboBoxItem ) )
-      {
-        this.ChangeMetroTheme( new Xceed.Wpf.Themes.Metro.MetroDarkThemeResourceDictionary() );
-        
-      }
-      else if( themeComboBox.SelectedItem.Equals( metroLightComboBoxItem ) )
-      {
-        this.ChangeMetroTheme( new Xceed.Wpf.Themes.Metro.MetroLightThemeResourceDictionary() );
-      }
-    }
 
-    #endregion
 
-    #region Methods (Private)
 
-    private void WPFControlsThemes_Initialized( object sender, EventArgs e )
-    {
-      themeComboBox.SelectedIndex = 0;
-    }
 
-    private void SystemComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      _accentColorPanel.Visibility = Visibility.Hidden;
-      ChangeTheme( null, null, null, null, null, SystemColors.WindowBrush );
-    }
 
-    private void Office2007BlueComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      _accentColorPanel.Visibility = Visibility.Hidden;
-      ChangeTheme( new Xceed.Wpf.Themes.Office2007.Office2007BlueResourceDictionary(), null, null, null, null,
-                    Xceed.Wpf.Themes.Office2007.Office2007BlueResources.ApplicationBackgroundBrush );
-    }
 
-    private void Office2007SilverComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      _accentColorPanel.Visibility = Visibility.Hidden;
-      ChangeTheme( new Xceed.Wpf.Themes.Office2007.Office2007SilverResourceDictionary(), null, null, null, null,
-                    Xceed.Wpf.Themes.Office2007.Office2007SilverResources.ApplicationBackgroundBrush );
-    }
 
-    private void Office2007BlackComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      _accentColorPanel.Visibility = Visibility.Hidden;
-      ChangeTheme( new Xceed.Wpf.Themes.Office2007.Office2007BlackResourceDictionary(),
-                    Xceed.Wpf.Themes.Office2007.Office2007BlackResources.ApplicationLightBackgroundBrush,
-                    Xceed.Wpf.Themes.Office2007.Office2007BlackResources.BorderBrush,
-                    Xceed.Wpf.Themes.Office2007.Office2007BlackResources.ApplicationLightBackgroundBrush,
-                    Xceed.Wpf.Themes.Office2007.Office2007BlackResources.ApplicationLightBackgroundBrush,
-                    Xceed.Wpf.Themes.Office2007.Office2007BlackResources.ApplicationBackgroundBrush );
-    }
 
-    private void Windows10ComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      _accentColorPanel.Visibility = Visibility.Hidden;
-      ChangeTheme( new Xceed.Wpf.Themes.Windows10.Windows10ResourceDictionary(), null, null, null, null,
-                    Xceed.Wpf.Themes.Windows10.Windows10Resources.ApplicationBackgroundBrush );
-    }
 
-    private void MetroDarkComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      this.ChangeMetroTheme( new Xceed.Wpf.Themes.Metro.MetroDarkThemeResourceDictionary() );
-    }
 
-    private void MetroLightComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      this.ChangeMetroTheme( new Xceed.Wpf.Themes.Metro.MetroLightThemeResourceDictionary() );
-    }
 
-    private void ChangeTheme( Xceed.Wpf.Themes.ThemeResourceDictionary theme, Brush groupBoxBackgroundBrush, Brush groupBoxBorderBrush,
-                              Brush treeViewBackgroundBrush, Brush treeViewBorderBrush, Brush sampleBackgroundBrush )
-    {
-      SampleBorder.Resources.MergedDictionaries.Clear();
 
-      if( theme != null )
-      {
-        //# The licenser will throw on the second call to this if we set a empty key
-        //# line if we set an empty key. 
-        //# See Licenser.LicenseKey {set;}, "Detect that license was set too soon".
-        if( !string.IsNullOrEmpty( Xceed.Wpf.Toolkit.Licenser.LicenseKey ) )
-        {
-          theme.LicenseKey = Xceed.Wpf.Toolkit.Licenser.LicenseKey;
-        }
-        SampleBorder.Resources.MergedDictionaries.Add( theme );
-      }
 
-      groupBoxBorder.Background = groupBoxBackgroundBrush == null ? Brushes.Transparent : groupBoxBackgroundBrush;
-      groupBoxBorder.BorderBrush = groupBoxBorderBrush == null ? Brushes.Transparent : groupBoxBorderBrush;
-      listItemTreeViewBorder.Background = treeViewBackgroundBrush == null ? Brushes.Transparent : treeViewBackgroundBrush;
-      listItemTreeViewBorder.BorderBrush = treeViewBorderBrush == null ? Brushes.Transparent : treeViewBorderBrush;
-      SampleBorder.Background = sampleBackgroundBrush;
-    }
 
-    private void ChangeMetroTheme( MetroThemeResourceDictionaryBase metroThemeResourceDictionary )
-    {
-      _accentColorPanel.Visibility = Visibility.Visible;
 
-      if( metroThemeResourceDictionary != null )
-      {
-        metroThemeResourceDictionary.AccentBrush = _accentBrush;
-        this.ChangeTheme( metroThemeResourceDictionary, null, null, null, null
-                      , ( metroThemeResourceDictionary.GetType() == typeof( MetroDarkThemeResourceDictionary ) ) ? blackBrush : whiteBrush );
-      }
-    }
 
-    private void animatedProgressToggleButton_Checked( object sender, RoutedEventArgs e )
-    {
-      _progressStoryboard = rootLayout.Resources[ "animatedProgressBarStoryboard" ] as Storyboard;
-      _progressStoryboard.Begin();
-    }
 
-    private void animatedProgressToggleButton_Unchecked( object sender, RoutedEventArgs e )
-    {
-      if( _progressStoryboard != null )
-        _progressStoryboard.Stop();
-    }
 
-    private void TextBox_PreviewGotKeyboardFocus( object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e )
-    {
-      System.Windows.Controls.TextBox textBox = sender as System.Windows.Controls.TextBox;
 
-      if( textBox != null && textBox.Text == ThemingCoreWPFView.DefaultSearchString )
-        textBox.Text = string.Empty;
-    }
 
-    private void TextBox_PreviewLostKeyboardFocus( object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e )
-    {
-      System.Windows.Controls.TextBox textBox = sender as System.Windows.Controls.TextBox;
 
-      if( textBox != null && string.IsNullOrEmpty( textBox.Text ) )
-        textBox.Text = ThemingCoreWPFView.DefaultSearchString;
-    }
 
-    #endregion
 
-#endif
+
   }
 }

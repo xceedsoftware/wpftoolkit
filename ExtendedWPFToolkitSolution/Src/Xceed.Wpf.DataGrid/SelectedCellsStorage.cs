@@ -19,20 +19,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Xceed.Utils.Collections;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal class SelectedCellsStorage : ICloneable, IEnumerable<SelectionCellRangeWithItems>, IEnumerable
   {
-    #region Constructors
-
     internal SelectedCellsStorage( DataGridContext dataGridContext )
     {
       // dataGridContext can be null for store that we don't want to auto-get Items from index
       m_dataGridContext = dataGridContext;
     }
-
-    #endregion
 
     #region Count Property
 
@@ -40,7 +37,7 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return m_unsortedRanges.Count;
+        return m_ranges.Count;
       }
     }
 
@@ -66,7 +63,7 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return m_unsortedRanges[ index ].Value;
+        return m_ranges[ index ].Value;
       }
       private set
       {
@@ -79,7 +76,7 @@ namespace Xceed.Wpf.DataGrid
 
     public void Add( SelectionCellRangeWithItems rangeWithItems )
     {
-      Debug.Assert( m_unsortedRanges.All( r => r.Value.CellRange.Intersect( rangeWithItems.CellRange ).IsEmpty ), "Part of this range is already selected" );
+      Debug.Assert( m_ranges.All( r => r.Value.CellRange.Intersect( rangeWithItems.CellRange ).IsEmpty ), "Part of this range is already selected" );
 
       var itemRangeWithItems = rangeWithItems.ItemRangeWithItems;
 
@@ -92,13 +89,13 @@ namespace Xceed.Wpf.DataGrid
 
     public void Clear()
     {
-      m_unsortedRanges.Clear();
-      m_sortedRanges.Clear();
+      m_ranges.Clear();
+      m_map.Clear();
     }
 
     public bool Contains( int itemIndex, int columnIndex )
     {
-      if( ( itemIndex < 0 ) || ( columnIndex < 0 ) )
+      if( ( itemIndex < 0 ) || ( itemIndex >= int.MaxValue ) || ( columnIndex < 0 ) || ( columnIndex >= int.MaxValue ) )
         return false;
 
       return this.Contains( new SelectionCellRange( itemIndex, columnIndex ) );
@@ -106,7 +103,7 @@ namespace Xceed.Wpf.DataGrid
 
     public bool Contains( SelectionCellRange range )
     {
-      if( ( m_unsortedRanges.Count <= 0 ) || ( SelectedCellsStorage.IsEmpty( range ) ) )
+      if( ( m_ranges.Count <= 0 ) || ( SelectedCellsStorage.IsEmpty( range ) ) )
         return false;
 
       return this.Contains( new SelectionCellRangeWithItems( range.ItemRange, null, range.ColumnRange ) );
@@ -114,7 +111,7 @@ namespace Xceed.Wpf.DataGrid
 
     public bool Contains( SelectionCellRangeWithItems rangeWithItems )
     {
-      if( ( m_unsortedRanges.Count <= 0 ) || ( SelectedCellsStorage.IsEmpty( rangeWithItems ) ) )
+      if( ( m_ranges.Count <= 0 ) || ( SelectedCellsStorage.IsEmpty( rangeWithItems ) ) )
         return false;
 
       if( rangeWithItems.Length == 1 )
@@ -125,7 +122,7 @@ namespace Xceed.Wpf.DataGrid
 
       foreach( var match in this.IndexOfOverlap( rangeWithItems ) )
       {
-        store.Remove( m_unsortedRanges[ match ].Value );
+        store.Remove( m_ranges[ match ].Value );
 
         if( store.Count == 0 )
           return true;
@@ -136,8 +133,12 @@ namespace Xceed.Wpf.DataGrid
 
     public bool Remove( SelectionCellRangeWithItems rangeWithItems )
     {
-      if( rangeWithItems.CellRange.IsEmpty )
+      if( SelectedCellsStorage.IsEmpty( rangeWithItems ) )
         return true;
+
+      // It improves performance to leave early and prevent empty enumerators creation.
+      if( m_ranges.Count <= 0 )
+        return false;
 
       // The SelectionCellRange.IsEmpty should be mapped to the item range's SelectionRange.IsEmpty property.
       Debug.Assert( !rangeWithItems.ItemRange.IsEmpty );
@@ -148,7 +149,7 @@ namespace Xceed.Wpf.DataGrid
       for( int i = matches.Count - 1; i >= 0; i-- )
       {
         var index = matches[ i ];
-        var currentRangeWithItems = m_unsortedRanges[ index ].Value;
+        var currentRangeWithItems = m_ranges[ index ].Value;
         var currentRange = currentRangeWithItems.CellRange;
         var overlap = rangeToRemove.Intersect( currentRange );
 
@@ -183,37 +184,18 @@ namespace Xceed.Wpf.DataGrid
 
     public void OffsetIndex( int startIndex, int offset )
     {
-      if( m_sortedRanges.Count == 0 )
+      if( m_map.Count == 0 )
         return;
 
       // Used to offset index after an add or remove from the data source of the grid.
       var offsetRange = new SelectionRange( startIndex, startIndex + Math.Abs( offset ) - 1 );
-      var comparer = new ItemRangeComparer( offsetRange );
 
-      // Find the first range that is greater or that overlaps the target range.
-      var index = this.FindIndex( comparer );
-      if( index < 0 )
-      {
-        index = ~index;
-      }
-      else
-      {
-        while( index > 0 )
-        {
-          if( comparer.Compare( m_sortedRanges[ index - 1 ] ) != 0 )
-            break;
-
-          index--;
-        }
-      }
-
-      var matches = m_sortedRanges.Skip( index ).OrderByDescending( item => item.Index ).ToList();
+      var entries = m_map.GetEntriesWithin( new RSTree2D<SelectionCellRangeWithItemsWrapper>.Area( startIndex, int.MaxValue - startIndex, 0, int.MaxValue ) ).OrderByDescending( e => e.Item.Index ).ToList();
 
       // Adjust the range of all ranges greater or that overlaps the target range.
-      foreach( var currentRangeWithItemsWrapper in matches )
+      foreach( var entry in entries )
       {
-        Debug.Assert( comparer.Compare( currentRangeWithItemsWrapper ) <= 0 );
-
+        var currentRangeWithItemsWrapper = entry.Item;
         var currentRangeIndex = currentRangeWithItemsWrapper.Index;
         var currentRangeWithItems = currentRangeWithItemsWrapper.Value;
         var currentRange = currentRangeWithItems.ItemRange;
@@ -361,16 +343,24 @@ namespace Xceed.Wpf.DataGrid
 
     public IEnumerable<SelectionRange> GetIntersectedColumnRanges( SelectionCellRange range )
     {
+      // It improves performance to leave early and prevent empty enumerators creation.
+      if( m_ranges.Count <= 0 )
+        return Enumerable.Empty<SelectionRange>();
+
       return ( from match in this.IndexOfOverlap( range )
-               let current = m_unsortedRanges[ match ].Value
+               let current = m_ranges[ match ].Value
                let intersection = current.CellRange.Intersect( range )
                select intersection.ColumnRange ).ToList();
     }
 
     public IEnumerable<SelectionCellRangeWithItems> GetIntersectedCellRangesWithItems( SelectionCellRange range )
     {
+      // It improves performance to leave early and prevent empty enumerators creation.
+      if( m_ranges.Count <= 0 )
+        return Enumerable.Empty<SelectionCellRangeWithItems>();
+
       return ( from match in this.IndexOfOverlap( range )
-               let current = m_unsortedRanges[ match ].Value
+               let current = m_ranges[ match ].Value
                let intersection = current.CellRange.Intersect( range )
                select new SelectionCellRangeWithItems(
                  intersection.ItemRange,
@@ -378,11 +368,50 @@ namespace Xceed.Wpf.DataGrid
                  intersection.ColumnRange ) ).ToList();
     }
 
+    private static RSTree2D<SelectionCellRangeWithItemsWrapper>.Area GetArea( SelectionCellRange range )
+    {
+      if( range.IsEmpty )
+        return RSTree2D<SelectionCellRangeWithItemsWrapper>.Area.Empty;
+
+      var itemRange = range.ItemRange;
+      var columnRange = range.ColumnRange;
+      int rs, re, cs, ce;
+
+      if( itemRange.StartIndex <= itemRange.EndIndex )
+      {
+        rs = itemRange.StartIndex;
+        re = itemRange.EndIndex;
+      }
+      else
+      {
+        rs = itemRange.EndIndex;
+        re = itemRange.StartIndex;
+      }
+
+      if( columnRange.StartIndex <= columnRange.EndIndex )
+      {
+        cs = columnRange.StartIndex;
+        ce = columnRange.EndIndex;
+      }
+      else
+      {
+        cs = columnRange.EndIndex;
+        ce = columnRange.StartIndex;
+      }
+
+      return new RSTree2D<SelectionCellRangeWithItemsWrapper>.Area( rs, re - rs + 1, cs, ce - cs + 1 );
+    }
+
+    private static RSTree2D<SelectionCellRangeWithItemsWrapper>.Area GetArea( SelectionCellRangeWithItems range )
+    {
+      return SelectedCellsStorage.GetArea( range.CellRange );
+    }
+
     private void Insert( int index, SelectionCellRangeWithItems item, bool repairIndex )
     {
       var wrapper = new SelectionCellRangeWithItemsWrapper( item, index );
 
-      m_unsortedRanges.Insert( index, wrapper );
+      m_ranges.Insert( index, wrapper );
 
       if( repairIndex )
       {
@@ -391,27 +420,36 @@ namespace Xceed.Wpf.DataGrid
 
       if( !SelectedCellsStorage.IsEmpty( item ) )
       {
-        var insertionIndex = ~this.FindIndex( new ItemComparer( wrapper ) );
-        Debug.Assert( insertionIndex >= 0 );
-
-        m_sortedRanges.Insert( insertionIndex, wrapper );
+        m_map.Add( SelectedCellsStorage.GetArea( item ), wrapper );
       }
     }
 
     private void RemoveAt( int index, bool repairIndex )
     {
-      var wrapper = m_unsortedRanges[ index ];
+      var wrapper = m_ranges[ index ];
+      var rangeWithItems = wrapper.Value;
+
       Debug.Assert( wrapper.Index == index );
 
-      if( !SelectedCellsStorage.IsEmpty( wrapper.Value ) )
+      if( !SelectedCellsStorage.IsEmpty( rangeWithItems ) )
       {
-        var removalIndex = this.FindIndex( new ItemComparer( wrapper ) );
-        Debug.Assert( removalIndex >= 0 );
+        var removed = m_map.Remove( SelectedCellsStorage.GetArea( rangeWithItems ), wrapper );
+        Debug.Assert( removed, "Failed to remove the selection range." );
 
-        m_sortedRanges.RemoveAt( removalIndex );
+        // Since there should be only a single instance of the wrapper within the collection, try an altenate strategy.
+        if( !removed )
+        {
+          var entry = m_map.FirstOrDefault( e => e.Item == wrapper );
+          if( entry.Item == wrapper )
+          {
+            removed = m_map.Remove( entry );
+          }
+
+          Debug.Assert( removed, "Failed to find the selection range." );
+        }
       }
 
-      m_unsortedRanges.RemoveAt( index );
+      m_ranges.RemoveAt( index );
 
       if( repairIndex )
       {
@@ -423,42 +461,28 @@ namespace Xceed.Wpf.DataGrid
     {
       Debug.Assert( index >= 0 );
 
-      for( int i = index; i < m_unsortedRanges.Count; i++ )
+      for( int i = index; i < m_ranges.Count; i++ )
       {
-        m_unsortedRanges[ i ].Index = i;
+        m_ranges[ i ].Index = i;
       }
     }
 
-    private IEnumerable<int> IndexOfOverlap( SelectionCellRange target )
+    private IEnumerable<int> IndexOfOverlap( SelectionCellRange range )
     {
-      if( ( m_sortedRanges.Count <= 0 ) || SelectedCellsStorage.IsEmpty( target ) )
+      // It improves performance to leave early.
+      if( m_map.Count <= 0 )
         yield break;
 
-      var comparer = new ItemRangeComparer( target.ItemRange );
-
-      var index = this.FindIndex( comparer );
-      if( index < 0 )
-        yield break;
-
-      while( index > 0 )
+      foreach( var entry in m_map.GetEntriesWithin( SelectedCellsStorage.GetArea( range ) ) )
       {
-        if( comparer.Compare( m_sortedRanges[ index - 1 ] ) != 0 )
-          break;
+        var candidate = entry.Item;
+        var target = candidate.Value;
+        var overlap = range.Intersect( target.CellRange );
 
-        index--;
-      }
-
-      for( int i = index; i < m_sortedRanges.Count; i++ )
-      {
-        var wrapper = m_sortedRanges[ i ];
-        if( comparer.Compare( wrapper ) != 0 )
-          break;
-
-        var currentRangeWithItems = wrapper.Value;
-        var overlap = target.Intersect( currentRangeWithItems.CellRange );
+        Debug.Assert( !SelectedCellsStorage.IsEmpty( overlap ) );
 
         if( !SelectedCellsStorage.IsEmpty( overlap ) )
-          yield return wrapper.Index;
+          yield return candidate.Index;
       }
     }
 
@@ -470,7 +494,7 @@ namespace Xceed.Wpf.DataGrid
 
       foreach( var match in this.IndexOfOverlap( targetRange ) )
       {
-        var currentRangeWithItems = m_unsortedRanges[ match ].Value;
+        var currentRangeWithItems = m_ranges[ match ].Value;
         var overlap = targetItemRange.Intersect( currentRangeWithItems.ItemRange );
 
         Debug.Assert( !overlap.IsEmpty );
@@ -478,41 +502,6 @@ namespace Xceed.Wpf.DataGrid
         if( targetRangeWithItems.IsItemsEqual( overlap, currentRangeWithItems.ItemRangeWithItems ) )
           yield return match;
       }
-    }
-
-    private int FindIndex( ISelectionRangeComparer comparer )
-    {
-      Debug.Assert( comparer != null );
-
-      var lowerBound = 0;
-      var upperBound = m_sortedRanges.Count - 1;
-
-      while( lowerBound <= upperBound )
-      {
-        var middle = lowerBound + ( upperBound - lowerBound ) / 2;
-        var compare = comparer.Compare( m_sortedRanges[ middle ] );
-
-        if( compare < 0 )
-        {
-          if( middle == lowerBound )
-            return ~middle;
-
-          upperBound = middle - 1;
-        }
-        else if( compare > 0 )
-        {
-          if( middle == upperBound )
-            return ~( middle + 1 );
-
-          lowerBound = middle + 1;
-        }
-        else
-        {
-          return middle;
-        }
-      }
-
-      return ~0;
     }
 
     private static bool IsEmpty( SelectionCellRange range )
@@ -533,9 +522,9 @@ namespace Xceed.Wpf.DataGrid
     {
       var copy = new SelectedCellsStorage( m_dataGridContext );
 
-      for( int i = 0; i < m_unsortedRanges.Count; i++ )
+      for( int i = 0; i < m_ranges.Count; i++ )
       {
-        copy.Insert( i, m_unsortedRanges[ i ].Value, false );
+        copy.Insert( i, m_ranges[ i ].Value, false );
       }
 
       return copy;
@@ -547,7 +536,7 @@ namespace Xceed.Wpf.DataGrid
 
     public IEnumerator<SelectionCellRangeWithItems> GetEnumerator()
     {
-      return m_unsortedRanges.Select( item => item.Value ).GetEnumerator();
+      return m_ranges.Select( item => item.Value ).GetEnumerator();
     }
 
     #endregion
@@ -561,12 +550,8 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region Private Fields
-
-    private readonly List<SelectionCellRangeWithItemsWrapper> m_unsortedRanges = new List<SelectionCellRangeWithItemsWrapper>();
-    private readonly List<SelectionCellRangeWithItemsWrapper> m_sortedRanges = new List<SelectionCellRangeWithItemsWrapper>();
-
-    #endregion
+    private readonly List<SelectionCellRangeWithItemsWrapper> m_ranges = new List<SelectionCellRangeWithItemsWrapper>();
+    private readonly RSTree2D<SelectionCellRangeWithItemsWrapper> m_map = new RSTree2D<SelectionCellRangeWithItemsWrapper>();
 
     #region SelectionCellRangeWithItemsWrapper Private Class
 
@@ -602,146 +587,6 @@ namespace Xceed.Wpf.DataGrid
 
       private readonly SelectionCellRangeWithItems m_value;
       private int m_index;
-    }
-
-    #endregion
-
-    #region ISelectionRangeComparer Private Interface
-
-    private interface ISelectionRangeComparer
-    {
-      int Compare( SelectionCellRangeWithItemsWrapper item );
-    }
-
-    #endregion
-
-    #region ItemComparer Private Class
-
-    private sealed class ItemComparer : ISelectionRangeComparer
-    {
-      internal ItemComparer( SelectionCellRangeWithItemsWrapper target )
-      {
-        if( target == null )
-          throw new ArgumentNullException( "target" );
-
-        if( SelectedCellsStorage.IsEmpty( target.Value ) )
-          throw new ArgumentException( "The selection range must not be empty.", "target" );
-
-        m_target = target;
-      }
-
-      public int Compare( SelectionCellRangeWithItemsWrapper item )
-      {
-        if( m_target == item )
-          return 0;
-
-        var xri = m_target.Value;
-        var yri = item.Value;
-
-        int compare;
-
-        compare = ItemComparer.Compare( xri.ItemRange, yri.ItemRange );
-        if( compare != 0 )
-        {
-          Debug.Assert( ( ( compare < 0 ) && ItemRangeComparer.Compare( xri.ItemRange, item ) <= 0 )
-                     || ( ( compare > 0 ) && ItemRangeComparer.Compare( xri.ItemRange, item ) >= 0 ) );
-
-          return compare;
-        }
-
-        Debug.Assert( ItemRangeComparer.Compare( xri.ItemRange, item ) == 0 );
-
-        compare = ItemComparer.Compare( xri.CellRange.ColumnRange, yri.CellRange.ColumnRange );
-        if( compare != 0 )
-          return compare;
-
-        Debug.Assert( xri.CellRange == yri.CellRange );
-
-        return ( m_target.Index - item.Index );
-      }
-
-      private static int Compare( SelectionRange xr, SelectionRange yr )
-      {
-        int xs, xe, ys, ye;
-        ItemComparer.GetBounds( xr, out xs, out xe );
-        ItemComparer.GetBounds( yr, out ys, out ye );
-
-        if( xs < ys )
-        {
-          return -1;
-        }
-        else if( xs > ys )
-        {
-          return 1;
-        }
-
-        Debug.Assert( !xr.Intersect( yr ).IsEmpty );
-
-        if( xe < ye )
-        {
-          return -1;
-        }
-        else if( xe > ye )
-        {
-          return 1;
-        }
-
-        Debug.Assert( xr == yr );
-        return 0;
-      }
-
-      private static void GetBounds( SelectionRange range, out int startIndex, out int endIndex )
-      {
-        if( range.StartIndex <= range.EndIndex )
-        {
-          startIndex = range.StartIndex;
-          endIndex = range.EndIndex;
-        }
-        else
-        {
-          endIndex = range.StartIndex;
-          startIndex = range.EndIndex;
-        }
-      }
-
-      private readonly SelectionCellRangeWithItemsWrapper m_target;
-    }
-
-    #endregion
-
-    #region ItemRangeComparer Private Class
-
-    private sealed class ItemRangeComparer : ISelectionRangeComparer
-    {
-      internal ItemRangeComparer( SelectionRange target )
-      {
-        if( target.IsEmpty )
-          throw new ArgumentException( "The selection range must not be empty.", "target" );
-
-        m_target = target;
-      }
-
-      public int Compare( SelectionCellRangeWithItemsWrapper item )
-      {
-        return ItemRangeComparer.Compare( m_target, item );
-      }
-
-      internal static int Compare( SelectionRange range, SelectionCellRangeWithItemsWrapper wrapper )
-      {
-        var itemRange = wrapper.Value.ItemRange;
-
-        if( range < itemRange )
-          return -1;
-
-        if( range > itemRange )
-          return 1;
-
-        Debug.Assert( !range.Intersect( itemRange ).IsEmpty );
-
-        return 0;
-      }
-
-      private readonly SelectionRange m_target;
     }
 
     #endregion

@@ -89,20 +89,28 @@ namespace Xceed.Wpf.DataGrid.Views
       // This can be null when the parent Row is not prepared yet.
       var columnVirtualizationManager = this.ColumnVirtualizationManager;
       if( columnVirtualizationManager == null )
-        return this.DesiredSize;
+        return new Size();
+
+      var parentRow = this.ParentPanel.ParentRow;
+      if( parentRow == null )
+        return new Size();
 
       var desiredSize = new Size();
-      var fieldNameToWidth = columnVirtualizationManager.GetFieldNameToWidth( m_parentPanel.ParentRow.LevelCache );
+      var fieldNameToWidth = columnVirtualizationManager.GetFieldNameToWidth( parentRow.LevelCache );
 
-      foreach( var cell in this.GetVisibleCells() )
+      //This using prevents a WeakEvent to be raised to execute UpdateChildren() in FixedCellPanel, as it is already up to date at this point.
+      using( this.ParentPanel.ParentRowCells.SetIsUpdating() )
       {
-        Debug.Assert( !Row.GetIsTemplateCell( cell ), "No template Cells should be added to FixedCellPanel" );
-
-        cell.Measure( new Size( fieldNameToWidth[ cell.FieldName ], constraint.Height ) );
-
-        if( cell.DesiredSize.Height > desiredSize.Height )
+        foreach( var cell in this.GetVisibleCells() )
         {
-          desiredSize.Height = cell.DesiredSize.Height;
+          Debug.Assert( !Row.GetIsTemplateCell( cell ), "No template Cells should be added to FixedCellPanel" );
+
+          cell.Measure( new Size( fieldNameToWidth[ cell.FieldName ], constraint.Height ) );
+
+          if( cell.DesiredSize.Height > desiredSize.Height )
+          {
+            desiredSize.Height = cell.DesiredSize.Height;
+          }
         }
       }
 
@@ -117,30 +125,30 @@ namespace Xceed.Wpf.DataGrid.Views
       // This can be null when the parent Row is not prepared yet.
       var columnVirtualizationManager = this.ColumnVirtualizationManager;
       if( columnVirtualizationManager == null )
-        return this.DesiredSize;
+        return new Size();
 
-      var columnToVisibleOffset = columnVirtualizationManager.GetFieldNameToOffset( m_parentPanel.ParentRow.LevelCache );
+      var parentRow = this.ParentPanel.ParentRow;
+      if( parentRow == null )
+        return new Size();
+
+      var columnToVisibleOffset = columnVirtualizationManager.GetFieldNameToOffset( parentRow.LevelCache );
       var finalRect = new Rect( arrangeSize );
 
-      foreach( var cell in this.GetVisibleCells() )
+      //This using prevents a WeakEvent to be raised to execute UpdateChildren() in FixedCellPanel, as it is already up to date at this point.
+      using( this.ParentPanel.ParentRowCells.SetIsUpdating() )
       {
-        // Never add Template Cells to FixedCellPanel
-        if( Row.GetIsTemplateCell( cell ) )
-          continue;
+        foreach( var cell in this.GetVisibleCells() )
+        {
+          Debug.Assert( !Row.GetIsTemplateCell( cell ), "No template Cells should be added to FixedCellPanel" );
 
-        // Calculate the offset of the Cell:
-        //    The original offset of the Column
-        //    - the horizontal offset of the ScrollViewer to scroll to the right
-        //    - the width of the fixed columns since we are in the Scrolling FixedCellSubPanel
-        //    + the compensation offset used in master detail to avoid scrolling when not required 
+          var offset = this.CalculateCellOffset( cell.ParentColumn, columnToVisibleOffset );
 
-        double cellOffset = columnToVisibleOffset[ cell.FieldName ];
+          finalRect.X = offset.X;
+          finalRect.Width = cell.DesiredSize.Width;
+          finalRect.Height = Math.Max( arrangeSize.Height, cell.DesiredSize.Height );
 
-        finalRect.X = cellOffset;
-        finalRect.Width = cell.DesiredSize.Width;
-        finalRect.Height = Math.Max( arrangeSize.Height, cell.DesiredSize.Height );
-
-        cell.Arrange( finalRect );
+          cell.Arrange( finalRect );
+        }
       }
 
       return arrangeSize;
@@ -157,15 +165,47 @@ namespace Xceed.Wpf.DataGrid.Views
 
     protected IEnumerable<Cell> GetVisibleCells()
     {
-      VirtualizingCellCollection collection = this.ParentPanel.ParentRowCells;
+      var parentRowCells = this.ParentPanel.ParentRowCells;
 
-      if( collection == null )
+      if( parentRowCells == null )
         yield break;
 
       foreach( string fieldName in this.GetVisibleFieldsName() )
       {
-        yield return collection.GetCell( fieldName, false );
+        yield return parentRowCells.GetCell( fieldName, false );
       }
+    }
+
+    internal virtual Point CalculateCellOffset( ColumnBase column )
+    {
+      Debug.Assert( column != null );
+      var row = this.ParentPanel.ParentRow;
+
+      if( ( column != null ) && ( row != null ) )
+      {
+        var columnVirtualizationManager = this.ColumnVirtualizationManager;
+        if( columnVirtualizationManager != null )
+        {
+          var columnToVisibleOffset = columnVirtualizationManager.GetFieldNameToOffset( row.LevelCache );
+
+          return this.CalculateCellOffset( column, columnToVisibleOffset );
+        }
+      }
+
+      return new Point();
+    }
+
+    private Point CalculateCellOffset( ColumnBase column, IColumnInfoCollection<double> columnsOffset )
+    {
+      if( column == null )
+        return new Point();
+
+      Debug.Assert( columnsOffset != null );
+      Debug.Assert( columnsOffset.Contains( column ) );
+
+      var columnOffset = columnsOffset[ column ];
+
+      return new Point( columnOffset, 0d );
     }
   }
 }

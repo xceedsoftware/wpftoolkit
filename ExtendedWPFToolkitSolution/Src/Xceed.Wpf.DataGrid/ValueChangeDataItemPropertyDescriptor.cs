@@ -24,8 +24,6 @@ namespace Xceed.Wpf.DataGrid
 {
   internal sealed class ValueChangeDataItemPropertyDescriptor : DataItemPropertyDescriptor
   {
-    #region Constructor
-
     internal ValueChangeDataItemPropertyDescriptor(
       DataItemTypeDescriptor owner,
       PropertyDescriptor parent,
@@ -43,8 +41,6 @@ namespace Xceed.Wpf.DataGrid
       m_eventDescriptor = eventDescriptor;
       m_eventProxy = new EventProxy( this, eventDescriptor );
     }
-
-    #endregion
 
     #region SupportsChangeEvents Property
 

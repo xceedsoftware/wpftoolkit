@@ -81,7 +81,7 @@ namespace Xceed.Wpf.DataGrid.Markup
             {
               var container = dictionaries[ index ].Value;
               if( container.Status == ResourceDictionaryStatus.NotSet )
-                throw new InvalidOperationException( "TODODOC: A circular reference has been detected in a ResourceDictionary." );
+                throw new InvalidOperationException( "A circular reference has been detected in a ResourceDictionary." );
 
               dictionary = container.Target;
             }
@@ -243,7 +243,7 @@ namespace Xceed.Wpf.DataGrid.Markup
             throw new ArgumentNullException( "value" );
 
           if( m_resource != null )
-            throw new InvalidOperationException( "TODODOC: The property can only be set once." );
+            throw new InvalidOperationException( "The property can only be set once." );
 
           m_resource = new WeakReference( value );
         }

@@ -444,7 +444,6 @@ namespace Xceed.Wpf.DataGrid
       if( managerType == typeof( CollectionChangedEventManager ) )
       {
         this.InvalidateMeasure();
-        return true;
       }
       else if( managerType == typeof( PropertyChangedEventManager ) )
       {
@@ -453,11 +452,13 @@ namespace Xceed.Wpf.DataGrid
         {
           this.InvalidateMeasure();
         }
-
-        return true;
+      }
+      else
+      {
+        return false;
       }
 
-      return false;
+      return true;
     }
 
     #endregion
@@ -471,7 +472,7 @@ namespace Xceed.Wpf.DataGrid
           return value;
 
         // When groupLevelConfig.GroupLevelIndicatorStyle is null, try to find an implicit style
-        // for the GroupLevelIndicator in the resource.
+        // for the GroupLevelIndicator in the resources.
         var gli = ( GroupLevelIndicator )parameter;
         var style = gli.TryFindResource( gli.GetType() );
         if( style != null )

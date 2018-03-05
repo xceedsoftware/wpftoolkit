@@ -20,12 +20,24 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Data;
+using Xceed.Wpf.DataGrid.Utils;
 
 namespace Xceed.Wpf.DataGrid
 {
   [DebuggerDisplay( "FieldName = {FieldName}" )]
   public class Column : ColumnBase
   {
+    #region Static Fields
+
+    internal static readonly string AllowSortPropertyName = PropertyHelper.GetPropertyName( ( Column c ) => c.AllowSort );
+    internal static readonly string AllowGroupPropertyName = PropertyHelper.GetPropertyName( ( Column c ) => c.AllowGroup );
+#pragma warning disable 618
+    internal static readonly string DisplayMemberBindingPropertyName = PropertyHelper.GetPropertyName( ( Column c ) => c.DisplayMemberBinding );
+#pragma warning restore 618
+    internal static readonly string DisplayMemberBindingInfoPropertyName = PropertyHelper.GetPropertyName( ( Column c ) => c.DisplayMemberBindingInfo );
+
+    #endregion
+
     public Column()
     {
     }
@@ -68,7 +80,7 @@ namespace Xceed.Wpf.DataGrid
 
         m_displayMemberBinding = value;
 
-        this.OnPropertyChanged( new PropertyChangedEventArgs( "DisplayMemberBinding" ) );
+        this.OnPropertyChanged( new PropertyChangedEventArgs( Column.DisplayMemberBindingPropertyName ) );
       }
     }
 
@@ -110,7 +122,7 @@ namespace Xceed.Wpf.DataGrid
           m_displayMemberBindingInfo = value;
           m_displayMemberBinding = m_displayMemberBindingInfo.GetBinding();
 
-          this.OnPropertyChanged( new PropertyChangedEventArgs( "DisplayMemberBindingInfo" ) );
+          this.OnPropertyChanged( new PropertyChangedEventArgs( Column.DisplayMemberBindingInfoPropertyName ) );
         }
       }
     }
@@ -131,7 +143,7 @@ namespace Xceed.Wpf.DataGrid
           return;
 
         m_allowSort = value;
-        this.OnPropertyChanged( new PropertyChangedEventArgs( "AllowSort" ) );
+        this.OnPropertyChanged( new PropertyChangedEventArgs( Column.AllowSortPropertyName ) );
       }
     }
 
@@ -153,7 +165,7 @@ namespace Xceed.Wpf.DataGrid
           return;
 
         m_allowGroup = value;
-        this.OnPropertyChanged( new PropertyChangedEventArgs( "AllowGroup" ) );
+        this.OnPropertyChanged( new PropertyChangedEventArgs( Column.AllowGroupPropertyName ) );
       }
     }
 

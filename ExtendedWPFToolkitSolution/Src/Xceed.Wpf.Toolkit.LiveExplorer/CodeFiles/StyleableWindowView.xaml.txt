@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -28,12 +28,10 @@
          <LineBreak />
          <LineBreak />
          <Run>The "Plus" version provides a new control called StyleableWindow, which consists of a window that has all the functions of a normal window, but which can be styled in the same way as ChildWindow or MessageBox.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->
 
       </Paragraph>
    </local:DemoView.Description>
@@ -57,11 +55,6 @@
             <Setter Property="CaptionForeground" Value="{Binding TitleForeground}" />
             <Setter Property="CaptionShadowBrush" Value="{Binding TitleShadowBrush}" />
             <Setter Property="CloseButtonStyle" Value="{Binding CloseButtonStyle}" />
-            <!--##EXCLUDE_OPEN_SOURCE-->
-            <Setter Property="MinimizeButtonStyle" Value="{Binding MinimizeButtonStyle}" />
-            <Setter Property="MaximizeButtonStyle" Value="{Binding MaximizeButtonStyle}" />
-            <Setter Property="RestoreButtonStyle" Value="{Binding RestoreButtonStyle}" />
-            <!--##END-->
          </Style>
 
          <!--Style for the MessageBox-->
@@ -73,35 +66,10 @@
             <Setter Property="NoButtonStyle" Value="{StaticResource FancyButtonStyle}" />
          </Style>
 
-         <!--##EXCLUDE_OPEN_SOURCE-->
-         <!--Style for the StyleableWindow-->
-         <Style x:Key="styleableWindowNoStyle" TargetType="xctk:StyleableWindow" >
-            <Setter Property="Icon" Value="..\Resources\xceed_icon.png" />
-            <Setter Property="CloseButtonVisibility" Value="{Binding CloseButtonVisibility}" />
-            <Setter Property="WindowStyleOverride" Value="{Binding WindowStyle}" />
-            <Setter Property="ResizeMode" Value="{Binding ResizeMode}" />
-            <Setter Property="Width" Value="375" />
-            <Setter Property="Height" Value="150" />
-         </Style>
-         <Style x:Key="styleableWindowStyle" TargetType="xctk:StyleableWindow" BasedOn="{StaticResource styleableWindowNoStyle}">
-            <Setter Property="WindowBackground" Value="{Binding WindowBackground}" />
-            <Setter Property="WindowBorderBrush" Value="{Binding WindowBorderBrush}" />
-            <Setter Property="WindowInactiveBackground" Value="{Binding WindowInactiveBackground}" />
-            <Setter Property="WindowBorderThickness" Value="{Binding WindowBorderThickness}" />
-            <Setter Property="WindowOpacity" Value="{Binding WindowOpacity}" />
-            <Setter Property="TitleFontSize" Value="{Binding TitleFontSize}" />
-            <Setter Property="TitleForeground" Value="{Binding TitleForeground}" />
-            <Setter Property="TitleShadowBrush" Value="{Binding TitleShadowBrush}" />
-            <Setter Property="CloseButtonStyle" Value="{Binding CloseButtonStyle}" />
-            <Setter Property="MinimizeButtonStyle" Value="{Binding MinimizeButtonStyle}" />
-            <Setter Property="MaximizeButtonStyle" Value="{Binding MaximizeButtonStyle}" />
-            <Setter Property="RestoreButtonStyle" Value="{Binding RestoreButtonStyle}" />
-         </Style>
-         <!--##END-->
       </ResourceDictionary>
    </local:DemoView.Resources>
-   
-  
+
+
 
    <local:DemoView.DataContext>
       <!--A model containing the brushes and other properties was created to share theses values
@@ -166,7 +134,6 @@
             <GroupBox Header="Styleable Window" DockPanel.Dock="Top" Margin="5" HorizontalAlignment="Stretch" >
                <Button Width="160" Height="30" Margin="10" HorizontalAlignment="Center"
                        Content="Show" Click="OnStyleableWindow_Click" >
-                  <!--##INCLUDE_OPEN_SOURCE                  
                   <Button.ContentTemplate>
                      <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -178,7 +145,6 @@
                         </StackPanel>
                      </DataTemplate>
                   </Button.ContentTemplate>
-                  ##END-->
                </Button>
             </GroupBox>
             <GroupBox Header="ChildWindow" Margin="5">
@@ -192,11 +158,6 @@
                                     WindowState="Open" 
                                     CloseButtonVisibility="{Binding CloseButtonVisibility}"
                                     WindowStyle="{Binding WindowStyle}" >
-                        <!--##EXCLUDE_OPEN_SOURCE-->
-                        <xctk:ChildWindow.ResizeMode>
-                           <Binding Path="ResizeMode"/>
-                        </xctk:ChildWindow.ResizeMode>
-                        <!--##END-->
                         <TextBlock>
                            This is the content of the child window.
                         </TextBlock>

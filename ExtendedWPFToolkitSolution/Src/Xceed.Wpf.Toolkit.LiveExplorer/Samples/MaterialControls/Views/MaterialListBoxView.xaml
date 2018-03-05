@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -21,7 +21,6 @@
                         xmlns:sys="clr-namespace:System;assembly=mscorlib"
                         Title="MaterialListBox &amp; MaterialListBoxItem">
    <local:DemoView.Description>
-      <!-- TODODOC-->
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
          <Run>MaterialListBox is a ListBox that is using the Material Brushes and contains MaterialListBoxItems.</Run>

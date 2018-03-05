@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -21,11 +21,9 @@
                         xmlns:sys="clr-namespace:System;assembly=mscorlib"
                         Title="MaterialRadioButton">
    <local:DemoView.Description>
-      <!-- TODODOC-->
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
          <Run>A RadioButton with transition animations when the checked state is changed. It uses the Material Brushes.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -33,78 +31,15 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
-       ##END-->
       </Paragraph>
    </local:DemoView.Description>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-      <ResourceDictionary>
-         <ResourceDictionary.MergedDictionaries>
-            <ResourceDictionary Source="../Resources/CommonResources.xaml" />
-         </ResourceDictionary.MergedDictionaries>
-      </ResourceDictionary>
-   </local:DemoView.Resources>  
 
-   <Grid>
-      <StackPanel Margin="10">
 
-         <GroupBox Header="Features"
-                   Margin="0,5,0,5">
-            <Grid Margin="5">
-               <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="95" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="95" />
-               </Grid.ColumnDefinitions>
 
-               <!-- First Column-->
-               <TextBlock Grid.Column="0"
-                          Text="Check Mark Brush: "
-                          VerticalAlignment="Center" />
-               <ComboBox Grid.Column="1"
-                         VerticalAlignment="Center"
-                         ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                         SelectedItem="{Binding CheckMarkBrush, ElementName=materialRadioButton}"
-                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                         Margin="5"/>
-               
-               <!-- Second Column -->
-               <TextBlock Grid.Column="2"
-                          Text="Material Accent Brush: "
-                          VerticalAlignment="Center" 
-                          Margin="10,0,0,0"/>
-               <ComboBox Grid.Column="3"
-                         ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                         SelectedItem="{Binding MaterialAccentBrush, ElementName=materialRadioButton}"
-                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                         VerticalAlignment="Center"
-                         Margin="5" />
-            </Grid>
-         </GroupBox>
 
-         <StackPanel>
-            <TextBlock Text="Usage:"
-                       Style="{StaticResource Header}" />
 
-            <StackPanel HorizontalAlignment="Center">
-               <xctk:MaterialRadioButton x:Name="materialRadioButton"
-                                         GroupName="Choice"
-                                         IsChecked="True"
-                                         Content="First" />
-               <xctk:MaterialRadioButton x:Name="materialRadioButton2"
-                                         GroupName="Choice"
-                                         Content="Second"
-                                         CheckMarkBrush="{Binding CheckMarkBrush, ElementName=materialRadioButton}"
-                                         MaterialAccentBrush="{Binding MaterialAccentBrush, ElementName=materialRadioButton}"/>
-            </StackPanel>
-         </StackPanel>
-      </StackPanel>
-   </Grid>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
+
     <Image Source="..\OpenSourceImages\MaterialRadioButton.png" Width="600" Height="400"/>
-   ##END-->
 </local:MaterialDemoView>

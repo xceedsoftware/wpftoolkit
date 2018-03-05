@@ -20,6 +20,8 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -61,6 +63,89 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private void OnIsTextTrimmedChanged( bool oldValue, bool newValue )
     {
         this.ToolTip = ( newValue ) ? this.Text : null;
+    }
+
+    #endregion
+
+    #region HighlightedBrush
+
+    public static readonly DependencyProperty HighlightedBrushProperty = DependencyProperty.Register( "HighlightedBrush", typeof( Brush ), typeof( TrimmedTextBlock ), new FrameworkPropertyMetadata( Brushes.Yellow ) );
+
+    public Brush HighlightedBrush
+    {
+      get
+      {
+        return ( Brush )GetValue( HighlightedBrushProperty );
+      }
+      set
+      {
+        SetValue( HighlightedBrushProperty, value );
+      }
+    }
+
+    #endregion
+
+    #region HighlightedText
+
+    public static readonly DependencyProperty HighlightedTextProperty = DependencyProperty.Register( "HighlightedText", typeof( string ), typeof( TrimmedTextBlock ), new FrameworkPropertyMetadata( null, HighlightedTextChanged ) );
+
+    public string HighlightedText
+    {
+      get
+      {
+        return ( string )GetValue( HighlightedTextProperty );
+      }
+      set
+      {
+        SetValue( HighlightedTextProperty, value );
+      }
+    }
+
+    private static void HighlightedTextChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    {
+      var trimmedTextBlock = sender as TrimmedTextBlock;
+      if( trimmedTextBlock != null )
+      {
+        trimmedTextBlock.HighlightedTextChanged( ( string )e.OldValue, ( string )e.NewValue );
+      }
+    }
+
+    protected virtual void HighlightedTextChanged( string oldValue, string newValue )
+    {
+      if( this.Text.Length == 0 )
+        return;
+
+      // Set original text without highlight.
+      if( newValue == null )
+      {
+        var newrRun = new Run( this.Text );
+        this.Inlines.Clear();        
+        this.Inlines.Add( newrRun );
+
+        return;
+      }
+
+      var startHighlightedIndex = this.Text.IndexOf( newValue, StringComparison.InvariantCultureIgnoreCase );
+      var endHighlightedIndex = startHighlightedIndex + newValue.Length;
+
+      var startUnHighlightedText = this.Text.Substring( 0, startHighlightedIndex );
+      var highlightedText = this.Text.Substring( startHighlightedIndex, newValue.Length );
+      var endUnHighlightedText = this.Text.Substring( endHighlightedIndex, this.Text.Length - endHighlightedIndex );
+
+      this.Inlines.Clear();
+
+      // Start Un-Highlighted text
+      var run = new Run( startUnHighlightedText );
+      this.Inlines.Add( run );
+
+      // Highlighted text
+      run = new Run( highlightedText );
+      run.Background = this.HighlightedBrush;
+      this.Inlines.Add( run );
+
+      // End Un-Highlighted text
+      run = new Run( endUnHighlightedText );
+      this.Inlines.Add( run );
     }
 
     #endregion

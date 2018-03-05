@@ -23,8 +23,6 @@ namespace Xceed.Wpf.DataGrid
 {
   internal sealed class DataGridItemContainerManager
   {
-    #region Constructor
-
     internal DataGridItemContainerManager( IDataGridItemContainer owner )
     {
       if( owner == null )
@@ -34,6 +32,22 @@ namespace Xceed.Wpf.DataGrid
         throw new ArgumentException( "The owner must derive from FrameworkElement.", "owner" );
 
       m_owner = owner;
+    }
+
+    #region CanBeRecycled Property
+
+    internal bool CanBeRecycled
+    {
+      get
+      {
+        if( m_preparedContainers.Any( item => !item.CanBeRecycled ) )
+          return false;
+
+        if( m_unpreparedContainers.Any( item => !item.CanBeRecycled ) )
+          return false;
+
+        return true;
+      }
     }
 
     #endregion
@@ -47,7 +61,7 @@ namespace Xceed.Wpf.DataGrid
       this.Update();
     }
 
-    internal void Clear()
+    internal void Clear( bool isRecyclingCandidate )
     {
       m_containersPrepared = false;
       m_dataGridContext = null;
@@ -55,12 +69,23 @@ namespace Xceed.Wpf.DataGrid
 
       try
       {
-        this.ClearContainers();
+        this.ClearContainers( isRecyclingCandidate );
       }
       finally
       {
         m_unpreparedContainers.Clear();
         m_preparedContainers.Clear();
+      }
+    }
+
+    internal void CleanRecyclingCandidates()
+    {
+      var newContainers = m_owner.GetTemplatedChildDataGridItemContainers().ToList();
+
+      foreach( var container in newContainers )
+      {
+        container.IsRecyclingCandidate = false;
+        container.CleanRecyclingCandidate();
       }
     }
 
@@ -70,7 +95,7 @@ namespace Xceed.Wpf.DataGrid
 
       try
       {
-        this.ClearContainers( newContainers );
+        this.ClearContainers( newContainers, false );
       }
       finally
       {
@@ -107,26 +132,26 @@ namespace Xceed.Wpf.DataGrid
             fe.ApplyTemplate();
           }
         }
-        else
-        {
-          // When dealing with a row, make sure its cells are properly initialized with their corresponding columns.
-          row.SynchronizeCellsWithColumns( m_dataGridContext.DataGridControl, null, false );
-        }
 
         container.PrepareContainer( m_dataGridContext, m_dataItem );
       }
     }
 
-    private void ClearContainers()
+    private void ClearContainers( bool isRecyclingCandidate )
     {
-      this.ClearContainers( new List<IDataGridItemContainer>( 0 ) );
+      this.ClearContainers( new List<IDataGridItemContainer>( 0 ), isRecyclingCandidate );
     }
 
-    private void ClearContainers( ICollection<IDataGridItemContainer> keep )
+    private void ClearContainers( ICollection<IDataGridItemContainer> keep, bool isRecyclingCandidate )
     {
       foreach( var container in m_unpreparedContainers.Except( keep ).ToList() )
       {
         m_unpreparedContainers.Remove( container );
+
+        container.IsRecyclingCandidate = isRecyclingCandidate;
+
+        if( isRecyclingCandidate )
+          continue;
 
         var row = container as Row;
         if( row != null )
@@ -139,11 +164,10 @@ namespace Xceed.Wpf.DataGrid
       {
         m_preparedContainers.Remove( container );
 
+        container.IsRecyclingCandidate = isRecyclingCandidate;
         container.ClearContainer();
       }
     }
-
-    #region Private Fields
 
     private readonly IDataGridItemContainer m_owner;
     private readonly ICollection<IDataGridItemContainer> m_unpreparedContainers = new HashSet<IDataGridItemContainer>();
@@ -152,7 +176,5 @@ namespace Xceed.Wpf.DataGrid
     private DataGridContext m_dataGridContext;
     private object m_dataItem;
     private bool m_containersPrepared; //false
-
-    #endregion
   }
 }

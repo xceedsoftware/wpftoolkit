@@ -15,9 +15,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
 
 namespace Xceed.Wpf.DataGrid
@@ -33,11 +30,11 @@ namespace Xceed.Wpf.DataGrid
       if( ( itemIndex == -1 || columnIndex == -1 ) && ( itemIndex != -1 || columnIndex != -1 ) )
         throw new ArgumentException( "itemIndex and columnIndex must be equal if the value of one is -1." );
 
-      if( itemIndex < -1 )  
-        throw new ArgumentOutOfRangeException( "itemIndex", "itemIndex must be equal to or greater than -1." );
+      if( ( itemIndex < -1 ) || ( itemIndex >= int.MaxValue ) )
+        throw new ArgumentOutOfRangeException( "itemIndex", "itemIndex must be equal to or greater than -1 and lower than int.MaxValue." );
 
-      if( columnIndex < -1 )  
-        throw new ArgumentOutOfRangeException( "columnIndex", "columnIndex must be equal to or greater than -1." );
+      if( ( columnIndex < -1 ) || ( columnIndex >= int.MaxValue ) )
+        throw new ArgumentOutOfRangeException( "columnIndex", "columnIndex must be equal to or greater than -1 and lower than int.MaxValue." );
 
       m_itemRange = new SelectionRange( itemIndex );
       m_columnRange = new SelectionRange( columnIndex );
@@ -45,17 +42,17 @@ namespace Xceed.Wpf.DataGrid
 
     public SelectionCellRange( int itemStartIndex, int columnStartIndex, int itemEndIndex, int columnEndIndex )
     {
-      if( itemStartIndex < 0 )  
-        throw new ArgumentOutOfRangeException( "itemStartIndex", "itemStartIndex must be equal to or greater than zero." );
+      if( ( itemStartIndex < 0 ) || ( itemStartIndex >= int.MaxValue ) )
+        throw new ArgumentOutOfRangeException( "itemStartIndex", "itemStartIndex must be equal to or greater than zero and lower than int.MaxValue." );
 
-      if( itemEndIndex < 0 )  
-        throw new ArgumentOutOfRangeException( "itemEndIndex", "itemEndIndex must be equal to or greater than zero." );
+      if( ( itemEndIndex < 0 ) || ( itemEndIndex >= int.MaxValue ) )
+        throw new ArgumentOutOfRangeException( "itemEndIndex", "itemEndIndex must be equal to or greater than zero and lower than int.MaxValue." );
 
-      if( columnStartIndex < 0 )  
-        throw new ArgumentOutOfRangeException( "columnStartIndex", "columnStartIndex must be equal to or greater than zero." );
+      if( ( columnStartIndex < 0 ) || ( columnStartIndex >= int.MaxValue ) )
+        throw new ArgumentOutOfRangeException( "columnStartIndex", "columnStartIndex must be equal to or greater than zero and lower than int.MaxValue." );
 
-      if( columnEndIndex < 0 )  
-        throw new ArgumentOutOfRangeException( "columnEndIndex", "columnEndIndex must be equal to or greater than zero." );
+      if( ( columnEndIndex < 0 ) || ( columnEndIndex >= int.MaxValue ) )
+        throw new ArgumentOutOfRangeException( "columnEndIndex", "columnEndIndex must be equal to or greater than zero and lower than int.MaxValue." );
 
       m_itemRange = new SelectionRange( itemStartIndex, itemEndIndex );
       m_columnRange = new SelectionRange( columnStartIndex, columnEndIndex );
@@ -67,7 +64,7 @@ namespace Xceed.Wpf.DataGrid
       m_columnRange = columnRange;
     }
 
-    #endregion CONSTRUCTORS
+    #endregion
 
     #region ItemRange Property
 
@@ -85,7 +82,7 @@ namespace Xceed.Wpf.DataGrid
 
     private SelectionRange m_itemRange;
 
-    #endregion ItemRange Property
+    #endregion
 
     #region ColumnRange Property
 
@@ -103,7 +100,7 @@ namespace Xceed.Wpf.DataGrid
 
     private SelectionRange m_columnRange;
 
-    #endregion ColumnRange Property
+    #endregion
 
     #region Length Property
 
@@ -115,7 +112,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion Length Property
+    #endregion
 
     #region IsEmpty Property
 
@@ -127,9 +124,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion IsEmpty Property
-
-    #region PUBLIC METHODS
+    #endregion
 
     public static bool operator ==( SelectionCellRange range1, SelectionCellRange range2 )
     {
@@ -206,11 +201,5 @@ namespace Xceed.Wpf.DataGrid
     {
       return ( m_itemRange.GetHashCode() ^ m_columnRange.GetHashCode() );
     }
-
-    #endregion PUBLIC METHODS
-
-    #region INTERNAL METHODS
-
-    #endregion INTERNAL METHODS
   }
 }

@@ -275,6 +275,7 @@ namespace Xceed.Wpf.Toolkit
       {
         Mouse.Capture( null );
 
+        // Do not close calendar on Year/Month Selection. Close only on Day selection.
         if( AutoCloseCalendar && (_calendar != null) && ( _calendar.DisplayMode == CalendarMode.Month ) )
         {
           ClosePopup( true );
@@ -347,9 +348,9 @@ namespace Xceed.Wpf.Toolkit
     protected override void HandleKeyDown( object sender, KeyEventArgs e )
     {
       // The base call will handle the Ctrl+Down, Enter and Esc keys
-      // in order to open o r close the popup.
-      //Do not close the Calendar if the call is handled
-      //by the TimePicker inside the DateTimePicker template
+      // in order to open or close the popup.
+      // Do not close the Calendar if the call is handled
+      // by the TimePicker inside the DateTimePicker template.
       if( IsOpen
         && ( _timePicker != null)
         && _timePicker.IsKeyboardFocusWithin

@@ -28,100 +28,18 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.MultiCalendar.Views
   {
     public MultiCalendarView()
     {
-#if !OPEN_SOURCE
-      this.Initialized += new EventHandler( this.MultiCalendarView_Initialized );
-#endif
       InitializeComponent();
     }
 
-#if !OPEN_SOURCE
-    private void MultiCalendarView_Initialized( object sender, EventArgs e )
-    {
-      int year = System.DateTime.Now.Year;
-      int month = System.DateTime.Now.Month;
-      _multiCalendar.DisplayDateStart = new System.DateTime( year - 1, 1, 1 );
-      _multiCalendar.DisplayDateEnd = new System.DateTime( year + 3, 12, 31 );
 
-      _multiCalendar2.DisplayDateStart = new System.DateTime( year, month, 1 );
-      var endYear = (month <= 9) ? year : year + 1;
-      var endMonth = (month + 3) % 12;
-      var endDay = System.DateTime.DaysInMonth( endYear, endMonth );
-      var endDate = new System.DateTime( endYear, endMonth, endDay );
-      _multiCalendar2.DisplayDateEnd = endDate;
-      _multiCalendar2.HighlightedDates.Add( new System.DateTime( year, month, 12 ) );
-      _multiCalendar2.HighlightedDates.Add( new System.DateTime( year, month, 20 ) );
-      _multiCalendar2.SelectedDates.Add( new System.DateTime( year, month, 21 ) );
-      _multiCalendar2.SelectedDates.Add( new System.DateTime( year, month, 22 ) );
-      _multiCalendar2.SelectedDates.Add( new System.DateTime( year, month, 23 ) );
-      var blackoutStart = _multiCalendar2.DisplayDateStart.AddMonths( 1 );
-      blackoutStart.AddDays( 10 );
-      _multiCalendar2.BlackoutDates.Add( new CalendarDateRange( blackoutStart.AddDays( 10 ), blackoutStart.AddDays( 15 ) ) );
-    }
 
-    private void BlackoutDates_Click( object sender, RoutedEventArgs e )
-    {
-      var cb = sender as CheckBox;
-      _multiCalendar.BlackoutDates.Clear();
 
-      if( cb.IsChecked.HasValue && cb.IsChecked.Value )
-      {
-        //We don't want to blackout selected dates
-        _multiCalendar.SelectedDates.Clear();
 
-        var firstDate = _multiCalendar.FirstDisplayedDate;
-        // Current Month
-        var startDate = new System.DateTime( firstDate.Year, firstDate.Month, 8 );
-        var endDate = new System.DateTime( firstDate.Year, firstDate.Month, 14 );
-        _multiCalendar.BlackoutDates.Add( new CalendarDateRange( startDate, endDate ) );
 
-        // Next Month
-        startDate = startDate.AddMonths( 1 );
-        endDate = endDate.AddMonths( 1 );
-        _multiCalendar.BlackoutDates.Add( new CalendarDateRange( startDate, endDate ) );
-      }
-    }
 
-    private void HighlightedDates_Click( object sender, RoutedEventArgs e )
-    {
-      var cb = sender as CheckBox;
-      _multiCalendar.HighlightedDates.Clear();
 
-      if( cb.IsChecked.HasValue && cb.IsChecked.Value )
-      {
-        for( int i = 0; i < 3; i++ )
-        {
-          System.DateTime date = _multiCalendar.FirstDisplayedDate.AddMonths( i );
 
-          for( int j = 1; j < 5; j++ )
-          {
-            _multiCalendar.HighlightedDates.Add( new System.DateTime( date.Year, date.Month, j * 5 ) );
-          }
-        }
-      }
-    }
 
-    private void MonthlyBackgrounds_Click( object sender, RoutedEventArgs e )
-    {
-      var cb = sender as CheckBox;
-      _multiCalendar2.MonthlyBackgrounds.Clear();
 
-      if( cb.IsChecked.HasValue && cb.IsChecked.Value )
-      {
-        // TODO : Replace these test images with our own custom examples
-        _multiCalendar2.MonthlyBackgrounds.Add( new MonthlyBackgroundData( 1,  new SolidColorBrush( System.Windows.Media.Color.FromArgb(128, 0, 0, 255 ) ) ) );
-        _multiCalendar2.MonthlyBackgrounds.Add( new MonthlyBackgroundData( 2, new Uri( "pack://application:,,,/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/MultiCalendar/Resources/February.jpg", UriKind.RelativeOrAbsolute ), 0.2 ) );
-        _multiCalendar2.MonthlyBackgrounds.Add( new MonthlyBackgroundData( 3, new Uri( "pack://application:,,,/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/MultiCalendar/Resources/March.jpg", UriKind.RelativeOrAbsolute ), 0.5 ) );
-        _multiCalendar2.MonthlyBackgrounds.Add( new MonthlyBackgroundData( 4, new Uri( "pack://application:,,,/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/MultiCalendar/Resources/April.jpg", UriKind.RelativeOrAbsolute ), 0.2 ) );
-        _multiCalendar2.MonthlyBackgrounds.Add( new MonthlyBackgroundData( 5, new SolidColorBrush( System.Windows.Media.Color.FromArgb( 128, 0, 255, 0 ) ) ) );
-        _multiCalendar2.MonthlyBackgrounds.Add( new MonthlyBackgroundData( 6, new Uri( "pack://application:,,,/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/MultiCalendar/Resources/June.jpg", UriKind.RelativeOrAbsolute ), 0.5 ) );
-        _multiCalendar2.MonthlyBackgrounds.Add( new MonthlyBackgroundData( 7, new Uri( "pack://application:,,,/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/MultiCalendar/Resources/July.jpg", UriKind.RelativeOrAbsolute ), 0.2 ) );
-        _multiCalendar2.MonthlyBackgrounds.Add( new MonthlyBackgroundData( 8, new SolidColorBrush( System.Windows.Media.Color.FromArgb( 128, 255, 0, 0 ) ) ) );
-        _multiCalendar2.MonthlyBackgrounds.Add( new MonthlyBackgroundData( 9, new Uri( "pack://application:,,,/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/MultiCalendar/Resources/September.jpg", UriKind.RelativeOrAbsolute ), 0.5 ) );
-        _multiCalendar2.MonthlyBackgrounds.Add( new MonthlyBackgroundData( 10, new Uri( "pack://application:,,,/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/MultiCalendar/Resources/October.jpg", UriKind.RelativeOrAbsolute ), 0.2 ) );
-        _multiCalendar2.MonthlyBackgrounds.Add( new MonthlyBackgroundData( 11, new SolidColorBrush( System.Windows.Media.Color.FromArgb( 128, 255, 255, 255 ) ) ) );
-        _multiCalendar2.MonthlyBackgrounds.Add( new MonthlyBackgroundData( 12, new Uri( "pack://application:,,,/Xceed.Wpf.Toolkit.LiveExplorer;component/Samples/MultiCalendar/Resources/December.jpg", UriKind.RelativeOrAbsolute ), 0.5 ) );
-      }
-    }
-#endif
   }
 }

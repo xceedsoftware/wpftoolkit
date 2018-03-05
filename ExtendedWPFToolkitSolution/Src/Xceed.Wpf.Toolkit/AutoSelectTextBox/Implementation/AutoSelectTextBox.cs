@@ -17,17 +17,12 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows;
-using System.Windows.Automation;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
   public class AutoSelectTextBox : TextBox
   {
-    static AutoSelectTextBox()
-    {
-      AutomationProperties.AutomationIdProperty.OverrideMetadata( typeof( AutoSelectTextBox ), new UIPropertyMetadata( "AutoSelectTextBox" ) );
-    }
 
     #region AutoSelectBehavior PROPERTY
 
@@ -164,6 +159,7 @@ namespace Xceed.Wpf.Toolkit
         }
       }
     }
+
 
     private bool CanMoveFocus( FocusNavigationDirection direction, bool reachedMax )
     {

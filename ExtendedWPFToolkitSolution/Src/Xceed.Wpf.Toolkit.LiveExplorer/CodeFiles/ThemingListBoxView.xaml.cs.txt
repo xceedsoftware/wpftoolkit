@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -20,14 +20,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using Xceed.Wpf.Toolkit;
-#if !OPEN_SOURCE
-using Xceed.Wpf.ListBox.Themes.Windows10;
-using Xceed.Wpf.ListBox.Themes.Office2007;
-using Xceed.Wpf.ListBox.Themes.LiveExplorer;
-using Xceed.Wpf.ListBox.Themes.Metro;
-using Xceed.Wpf.ListBox.Themes.WMP11;
-using Xceed.Wpf.ListBox;
-#endif
 using System.Windows.Controls.Primitives;
 using System;
 using Xceed.Wpf.Samples.SampleData;
@@ -38,177 +30,41 @@ using System.Windows.Threading;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
 {
-#if !OPEN_SOURCE
-  public enum ThemesEnum
-  {
-    System,
-    Office2007Blue,
-    Office2007Black,
-    Office2007Silver,
-    Windows10,
-    LiveExplorer,
-    MetroDark,
-    MetroLight,
-    MediaPlayer
-  }
-#endif
 
   /// <summary>
   /// Interaction logic for ThemingListBoxView.xaml
   /// </summary>
   public partial class ThemingListBoxView : DemoView
   {
-#if !OPEN_SOURCE
-    #region Members
 
-    private Brush _accentBrush = new SolidColorBrush( System.Windows.Media.Color.FromRgb( 255, 152, 29 ) );
-    private ThemesEnum _selectedTheme = ThemesEnum.System;
-    private DispatcherTimer _dispatcherTimer;
 
-    #endregion
-#endif
 
     #region Initialization
 
     public ThemingListBoxView()
     {
-#if !OPEN_SOURCE
-      this.DataContext = SampleDataProvider.GetOrders();
-#endif
       InitializeComponent();
 
-#if !OPEN_SOURCE
-      //Add the default GroupDescriptions to the ListBox's GroupDescriptions collection.
-      _listBox.GroupDescriptions.Add( this.Resources[ "shipCountryGroupDescription" ] as GroupDescription );
-      _listBox.GroupDescriptions.Add( this.Resources[ "shipCityGroupDescription" ] as GroupDescription );
-#endif
     }
 
     #endregion
 
-#if !OPEN_SOURCE
-    #region EventHandlers
 
-    private void ThemeComboBoxSelectionChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox comboBox = sender as ComboBox;
-      if( ( comboBox != null ) && ( _listBox != null ) )
-      {
-        _selectedTheme = ( ThemesEnum )((ComboBoxItem)comboBox.SelectedItem).Tag;
 
-        // Use a DispatcherTimer to update the Theme on the ListBox
-        // to avoid changing Theme very often.
-        if( _dispatcherTimer == null )
-        {
-          _dispatcherTimer = new DispatcherTimer();
-          _dispatcherTimer.Tick += new EventHandler( this.DispatcherTimer_Tick );
-          _dispatcherTimer.Interval = System.TimeSpan.FromMilliseconds( 250d );
-        }
 
-        _dispatcherTimer.Start();
-      }
-    }
 
-    private void RadioButton_Checked( object sender, RoutedEventArgs e )
-    {
-      RadioButton button = sender as RadioButton;
-      if( button == null )
-        return;
 
-      _accentBrush = button.Background;
-      if( _accentBrush == null )
-        return;
 
-      // Use a DispatcherTimer to update the Theme on the ListBox
-      // to avoid changing Theme very often.
-      if( _dispatcherTimer == null )
-      {
-        _dispatcherTimer = new DispatcherTimer();
-        _dispatcherTimer.Tick += new EventHandler( this.DispatcherTimer_Tick );
-        _dispatcherTimer.Interval = System.TimeSpan.FromMilliseconds( 250d );
-      }
 
-      _dispatcherTimer.Start();
-    }
 
-    private void DispatcherTimer_Tick( object sender, EventArgs e )
-    {
-      DispatcherTimer timer = sender as DispatcherTimer;
 
-      // Make sure the timer is still active.
-      if( timer == null || !timer.IsEnabled )
-        return;
 
-      timer.Stop();
 
-      this.ChangeTheme();
-    }
 
-    #endregion
-#endif
 
-#if !OPEN_SOURCE
-    private void ChangeTheme()
-    {
-      _listBox.Resources.MergedDictionaries.Clear();
 
-      ThemeResourceDictionary themeResourceDictionary;
 
-      switch( _selectedTheme )
-      {
-        case ThemesEnum.Office2007Blue:
-          themeResourceDictionary = new Office2007BlueThemeResourceDictionary();
-          this.InitTheme();
-          break;
-        case ThemesEnum.Office2007Black:
-          themeResourceDictionary = new Office2007BlackThemeResourceDictionary();
-          this.InitTheme();
-          break;
-        case ThemesEnum.Office2007Silver:
-          themeResourceDictionary = new Office2007SilverThemeResourceDictionary();
-          this.InitTheme();
-          break;
-        case ThemesEnum.Windows10:
-          themeResourceDictionary = new Windows10ThemeResourceDictionary();
-          this.InitTheme();
-          break;
-        case ThemesEnum.LiveExplorer:
-          themeResourceDictionary = new LiveExplorerThemeResourceDictionary();
-          this.InitTheme();
-          break;
-        case ThemesEnum.MetroDark:
-          _accentColorPanel.Visibility = Visibility.Visible;
-          MetroThemeResourceDictionaryBase metroDarkThemeResourceDictionary = new MetroDarkThemeResourceDictionary();
-          metroDarkThemeResourceDictionary.AccentBrush = _accentBrush;
-          themeResourceDictionary = metroDarkThemeResourceDictionary;
-          break;
-        case ThemesEnum.MetroLight:
-          _accentColorPanel.Visibility = Visibility.Visible;
-          MetroThemeResourceDictionaryBase metroLightThemeResourceDictionary = new MetroLightThemeResourceDictionary();
-          metroLightThemeResourceDictionary.AccentBrush = _accentBrush;
-          themeResourceDictionary = metroLightThemeResourceDictionary;
-          break;
-        case ThemesEnum.MediaPlayer:
-          themeResourceDictionary = new WMP11ThemeResourceDictionary();
-          this.InitTheme();
-          break;
-        default:
-          _accentColorPanel.Visibility = Visibility.Hidden;
-          themeResourceDictionary = null;
-          break;
-      }
 
-      if( themeResourceDictionary != null )
-      {
-        _listBox.Resources.MergedDictionaries.Add( themeResourceDictionary );
-      }
-    }
 
-    private void InitTheme()
-    {
-      _accentColorPanel.Visibility = Visibility.Hidden;
-      _listBox.ItemTemplate = Resources[ "orderListBoxItemTemplate" ] as DataTemplate;
-    }
-#endif
   }
 }

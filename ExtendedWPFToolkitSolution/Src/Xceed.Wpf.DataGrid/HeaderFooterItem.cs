@@ -229,6 +229,23 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
+    #region CanBeRecycled Protected Property
+
+    protected virtual bool CanBeRecycled
+    {
+      get
+      {
+        if( this.IsKeyboardFocused
+          || this.IsKeyboardFocusWithin
+          || this.IsBeingEdited )
+          return false;
+
+        return m_itemContainerManager.CanBeRecycled;
+      }
+    }
+
+    #endregion
+
     #region VisualRootElementType Property
 
     internal Type VisualRootElementType
@@ -289,10 +306,6 @@ namespace Xceed.Wpf.DataGrid
       return this.GetVisualChild( 0 );
     }
 
-    protected override AutomationPeer OnCreateAutomationPeer()
-    {
-      return new FrameworkElementAutomationPeer( this );
-    }
 
     protected void PrepareContainer( DataGridContext dataGridContext, object item )
     {
@@ -304,12 +317,7 @@ namespace Xceed.Wpf.DataGrid
 
       if( !this.IsLoaded )
       {
-        if( dataGridContext.DataGridControl.IsPrinting )
-        {
-          this.ApplyTemplate();
-          this.PrepareContainerWorker();
-        }
-        else if( dataGridContext.DataGridControl.ItemsHost.IsAncestorOf( this ) )
+        if( dataGridContext.DataGridControl.ItemsHost.IsAncestorOf( this ) )
         {
           this.ApplyTemplate();
           this.PrepareContainerWorker();
@@ -331,15 +339,17 @@ namespace Xceed.Wpf.DataGrid
 
     protected void ClearContainer()
     {
-      // Ensure we removed the HeaderFooterItem_Loaded event handler if
-      // it was not yet loaded
-      if( m_loadedHandler != null )
+      if( !m_isRecyclingCandidate )
       {
-        this.Loaded -= m_loadedHandler;
-        m_loadedHandler = null;
+        // Ensure we removed the HeaderFooterItem_Loaded event handler if it was not yet loaded
+        if( m_loadedHandler != null )
+        {
+          this.Loaded -= m_loadedHandler;
+          m_loadedHandler = null;
+        }
       }
 
-      m_itemContainerManager.Clear();
+      m_itemContainerManager.Clear( m_isRecyclingCandidate );
     }
 
     protected override void OnIsKeyboardFocusWithinChanged( DependencyPropertyChangedEventArgs e )
@@ -379,16 +389,39 @@ namespace Xceed.Wpf.DataGrid
 
     private void PrepareContainerWorker()
     {
+      m_isRecyclingCandidate = false;
+
       var rootContainer = this.AsVisual();
 
       this.SetContainer( rootContainer );
 
       m_itemContainerManager.Prepare( m_initializingDataGridContext, m_initializingDataItem );
+
       m_initializingDataGridContext = null;
       m_initializingDataItem = null;
     }
 
     #region IDataGridItemContainer Members
+
+    bool IDataGridItemContainer.CanBeRecycled
+    {
+      get
+      {
+        return this.CanBeRecycled;
+      }
+    }
+
+    bool IDataGridItemContainer.IsRecyclingCandidate
+    {
+      get
+      {
+        return m_isRecyclingCandidate;
+      }
+      set
+      {
+        m_isRecyclingCandidate = value;
+      }
+    }
 
     void IDataGridItemContainer.PrepareContainer( DataGridContext dataGridContext, object item )
     {
@@ -400,17 +433,17 @@ namespace Xceed.Wpf.DataGrid
       this.ClearContainer();
     }
 
-    #endregion
+    void IDataGridItemContainer.CleanRecyclingCandidate()
+    {
+      m_itemContainerManager.CleanRecyclingCandidates();
+    }
 
-    #region Private Fields
+    #endregion
 
     private readonly DataGridItemContainerManager m_itemContainerManager;
-
     private DataGridContext m_initializingDataGridContext; // = null
     private object m_initializingDataItem; // = null
-
     private RoutedEventHandler m_loadedHandler;
-
-    #endregion
+    private bool m_isRecyclingCandidate;
   }
 }

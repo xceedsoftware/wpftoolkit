@@ -34,5 +34,10 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //Constructors
+
+    #region Base Class Override
+
+
+    #endregion
   }
 }

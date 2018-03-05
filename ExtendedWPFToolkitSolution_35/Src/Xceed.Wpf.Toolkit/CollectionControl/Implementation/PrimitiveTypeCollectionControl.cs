@@ -195,6 +195,11 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Constructors
 
+    #region Overrides
+
+
+#endregion
+
     #region Methods
 
     private void PersistChanges()
@@ -208,9 +213,17 @@ namespace Xceed.Wpf.Toolkit
       //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
       list.Clear();
 
+      int counter = 0;
       foreach( var item in items )
       {
-        list.Add( item );
+        if( list is Array )
+        {
+           ( ( Array )list ).SetValue( item, counter++);
+        }
+        else
+        {
+          list.Add( item );
+        }
       };
 
       // if something went wrong during conversion we want to reload the text to show only valid entries

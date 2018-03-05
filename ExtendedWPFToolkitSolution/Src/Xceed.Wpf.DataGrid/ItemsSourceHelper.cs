@@ -25,6 +25,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -36,87 +37,67 @@ namespace Xceed.Wpf.DataGrid
 {
   internal static class ItemsSourceHelper
   {
-    public static bool IsSourceSupportingChangeNotification( object obj )
-    {
-      if( obj == null )
-        throw new ArgumentNullException( "obj" );
+    #region Static Fields
 
-      if( obj is INotifyCollectionChanged )
+    private static readonly Type EntityObjectType = Type.GetType(
+      "System.Data.Objects.DataClasses.EntityObject, System.Data.Entity, Version=" + _XceedVersionInfo.FrameworkVersion + ", Culture=neutral, PublicKeyToken=b77a5c561934e089",
+      false, false );
+
+    #endregion
+
+    internal static bool IsSourceSupportingChangeNotification( object source )
+    {
+      if( source is INotifyCollectionChanged )
         return true;
 
-      IBindingList bindingList = obj as IBindingList;
+      var collection = source as IBindingList;
 
-      return ( ( bindingList != null )
-            && ( bindingList.SupportsChangeNotification ) );
+      return ( collection != null )
+          && ( collection.SupportsChangeNotification );
     }
 
-    public static bool IsSourceSupportingDBNull( IEnumerable toCheck )
+    private static bool IsSupportingDBNull( IEnumerable source )
     {
-      if( toCheck is DataGridCollectionView )
-      {
-        // false because all the DBNull conversion should have been done in the DataGridCollectionView.ItemProperties converter.
+      // return false because all the DBNull conversion should have been done in the DataGridCollectionView.ItemProperties converter.
+      if( source is DataGridCollectionView )
         return false;
-      }
 
-      if( toCheck is DataView )
+      if( source is DataView )
         return true;
 
-      CollectionView cv = toCheck as CollectionView;
-
-      if( cv != null )
-        return ItemsSourceHelper.IsSourceSupportingDBNull( cv.SourceCollection );
+      var collectionView = source as CollectionView;
+      if( collectionView != null )
+        return ItemsSourceHelper.IsSupportingDBNull( collectionView.SourceCollection );
 
       return false;
     }
 
-    public static bool IsItemSupportingDBNull( object toCheck )
+    internal static bool IsItemSupportingDBNull( object source )
     {
-      return ( toCheck is System.Data.DataRow ) || ( toCheck is System.Data.DataRowView );
+      return ( source is System.Data.DataRow )
+          || ( source is DataRowView );
     }
 
-    public static bool IsDataView( IEnumerable toCheck )
+    internal static bool IsDataView( IEnumerable source )
     {
-      if( toCheck is DataGridCollectionView )
+      if( source is DataGridCollectionView )
         return false;
 
-      if( toCheck is DataView )
+      if( source is DataView )
         return true;
 
-      CollectionView cv = toCheck as CollectionView;
+      var collectionView = source as CollectionView;
 
-      if( ( cv != null ) && ( cv.SourceCollection is DataView ) )
-        return true;
-
-      return false;
+      return ( collectionView != null )
+          && ( collectionView.SourceCollection is DataView );
     }
 
-    [Obsolete( "You should use 'DataGridContext.ItemsSourceCollection as DataGridCollectionViewBase'" )]
-    public static DataGridCollectionViewBase TryGetDataGridCollectionViewBase( IEnumerable itemsSource )
+    internal static IList TryGetIList( IEnumerable itemsSourceCollection )
     {
-      // This method is intended to return null if not using a DataGridCollectionViewBase.
-      DataGridCollectionViewBase dataGridCollectionViewBase = itemsSource as DataGridCollectionViewBase;
-
-      // This is to ensure that this is not the master Generator ( and this CollectionView is the ItemsCollection )
-      if( dataGridCollectionViewBase == null )
-      {
-        CollectionView collectionView = itemsSource as CollectionView;
-
-        dataGridCollectionViewBase = ( collectionView == null ) ?
-          null : collectionView.SourceCollection as DataGridCollectionViewBase;
-      }
-
-      return dataGridCollectionViewBase;
-    }
-
-    public static IList TryGetIList( IEnumerable itemsSourceCollection )
-    {
-
-      CollectionView collectionView = itemsSourceCollection as ItemCollection;
-
+      var collectionView = itemsSourceCollection as ItemCollection;
       if( collectionView != null )
       {
-        IList list = collectionView.SourceCollection as IList;
-
+        var list = collectionView.SourceCollection as IList;
         if( list != null )
           return list;
       }
@@ -124,184 +105,206 @@ namespace Xceed.Wpf.DataGrid
       return itemsSourceCollection as IList;
     }
 
-    public static bool IsValueType( Type type )
+    private static bool IsValueType( Type itemType )
     {
-      bool isValueType = type.IsValueType;
+      if( typeof( string ) == itemType )
+        return true;
 
-      return ( ( ( isValueType ) && ( type.IsPrimitive ) ) ||
-        ( ( isValueType ) &&
-        ( ( type == typeof( decimal ) ) ||
-        ( type == typeof( DateTime ) ) ||
-        ( type == typeof( TimeSpan ) ) ||
-        ( type == typeof( Guid ) ) ) ) ||
-        ( type == typeof( string ) ) );
+      if( !itemType.IsValueType )
+        return false;
+
+      return ( itemType.IsPrimitive )
+          || ( typeof( decimal ) == itemType )
+          || ( typeof( DateTime ) == itemType )
+          || ( typeof( TimeSpan ) == itemType )
+          || ( typeof( Guid ) == itemType );
     }
 
-    public static bool IsEntityObjectLoadable( EntityObject entityObject )
+    internal static bool IsEntityObjectLoadable( EntityObject entityObject )
     {
-      return
-        ( ( entityObject.EntityState & EntityState.Added ) != EntityState.Added ) &&
-        ( ( entityObject.EntityState & EntityState.Detached ) != EntityState.Detached );
+      return ( ( entityObject.EntityState & EntityState.Added ) != EntityState.Added )
+          && ( ( entityObject.EntityState & EntityState.Detached ) != EntityState.Detached );
     }
 
-    public static bool IsEntityFramework( Type type )
+    private static bool IsEntityFramework( Type itemType )
     {
+      var entityObjectType = ItemsSourceHelper.EntityObjectType;
+
       // The EntityFramework assembly is not loaded.  We are running on the client framework.
-      if( EntityObjectType == null )
-        return false;
-
-      return EntityObjectType.IsAssignableFrom( type );
+      return ( entityObjectType != null )
+          && ( entityObjectType.IsAssignableFrom( itemType ) );
     }
 
-    public static bool IsEntityFramework( object o )
+    internal static bool IsEntityFramework( object source )
     {
-      if( o == null )
-        return false;
-
-      return ItemsSourceHelper.IsEntityFramework( o.GetType() );
+      return ( source != null )
+          && ( ItemsSourceHelper.IsEntityFramework( source.GetType() ) );
     }
 
-    public static object GetFirstItemByEnumerable( IEnumerable enumerable )
+    internal static object GetFirstItemByEnumerable( IEnumerable source )
     {
-      if( enumerable == null )
+      if( source == null )
         return null;
 
-      object current = null;
-      IList list = enumerable as IList;
-
-      if( list != null )
-        return ( ( list.Count > 0 ) ? list[ 0 ] : null );
-
-      try
-      {
-        IEnumerator enumerator = enumerable.GetEnumerator();
-
-
-        if( enumerator.MoveNext() )
-        {
-          current = enumerator.Current;
-        }
-
-      }
-      catch( NotSupportedException )
-      {
-        current = null;
-      }
-
-      return current;
+      return source.Cast<object>().FirstOrDefault();
     }
 
-    public static object AddNewDataItem( IEnumerable itemsSourceCollection, DataGridControl dataGridControl, out int itemIndex )
+    internal static DataGridItemPropertyCollection GetRootCollection( DataGridItemPropertyCollection collection )
     {
-      DataGridCollectionViewBase dataGridCollectionViewBase = itemsSourceCollection as DataGridCollectionViewBase;
+      if( collection == null )
+        return null;
 
+      var owner = collection.Owner;
+      if( owner == null )
+        return collection;
+
+      return ItemsSourceHelper.GetRootCollection( owner );
+    }
+
+    internal static DataGridItemPropertyCollection GetRootCollection( DataGridItemPropertyBase itemProperty )
+    {
+      if( itemProperty == null )
+        return null;
+
+      return ItemsSourceHelper.GetRootCollection( itemProperty.ContainingCollection );
+    }
+
+    internal static object AddNewDataItem( IEnumerable itemsSourceCollection, DataGridControl dataGridControl, out int itemIndex )
+    {
+      var dataGridCollectionViewBase = itemsSourceCollection as DataGridCollectionViewBase;
       if( dataGridCollectionViewBase != null )
       {
         if( !dataGridCollectionViewBase.CanAddNew )
           throw new InvalidOperationException( "An attempt was made to add a new data item to a source that does not support insertion." );
 
         itemIndex = dataGridCollectionViewBase.Count;
+
         return dataGridCollectionViewBase.AddNew();
       }
+
+      var newItem = default( object );
 
       if( ( dataGridControl != null ) && ( dataGridControl.ItemsSource == null ) )
       {
         //unbound
 #pragma warning disable 618
-        AddingNewDataItemEventArgs eventArgs = new AddingNewDataItemEventArgs();
+        var eventArgs = new AddingNewDataItemEventArgs();
         dataGridControl.OnAddingNewDataItem( eventArgs );
-        object newItem = eventArgs.DataItem;
+
+        newItem = eventArgs.DataItem;
 #pragma warning restore 618
 
         if( newItem == null )
           throw new InvalidOperationException( "The AddingNewDataItem event did not return a new data item because the grid is not bound to a data source." );
 
         itemIndex = dataGridControl.Items.Add( newItem );
+
         return newItem;
       }
 
-      DataView dataView = itemsSourceCollection as DataView;
-
+      var dataView = itemsSourceCollection as DataView;
       if( dataView == null )
       {
-        CollectionView collectionView = itemsSourceCollection as CollectionView;
+        var collectionView = itemsSourceCollection as CollectionView;
 
-        dataView = ( collectionView == null ) ?
-          null : collectionView.SourceCollection as DataView;
+        dataView = ( collectionView == null ) ? null : collectionView.SourceCollection as DataView;
       }
 
       if( dataView != null )
       {
         itemIndex = dataView.Count;
+
         return dataView.AddNew();
       }
 
-      IBindingList bindingList = itemsSourceCollection as IBindingList;
-
+      var bindingList = itemsSourceCollection as IBindingList;
       if( bindingList == null )
       {
-        CollectionView collectionView = itemsSourceCollection as CollectionView;
+        var collectionView = itemsSourceCollection as CollectionView;
 
-        bindingList = ( collectionView == null ) ?
-          null : collectionView.SourceCollection as IBindingList;
+        bindingList = ( collectionView == null ) ? null : collectionView.SourceCollection as IBindingList;
       }
 
       if( ( bindingList != null ) && ( bindingList.AllowNew ) )
       {
         itemIndex = bindingList.Count;
-        return bindingList.AddNew();
+        newItem = bindingList.AddNew();
+      }
+      else
+      {
+        var itemType = ItemsSourceHelper.GetItemTypeFromEnumeration( itemsSourceCollection );
+        if( itemType == null )
+          throw new InvalidOperationException( "An attempt was made to use a source whose item type cannot be determined." );
+
+        try
+        {
+          itemIndex = -1;
+          newItem = Activator.CreateInstance( itemType );
+        }
+        catch( MissingMethodException exception )
+        {
+          throw new InvalidOperationException( "An attempt was made to use a source whose item type does not have a default constructor.", exception );
+        }
+        catch( Exception exception )
+        {
+          throw new InvalidOperationException( "An unsuccessful attempt was made to create an instance of the source's item type using the item's default constructor.", exception );
+        }
       }
 
-      Type itemType = ItemsSourceHelper.GetItemTypeFromEnumeration( itemsSourceCollection );
+      var initializableObject = ItemsSourceHelper.GetSupportInitializeObject( newItem );
+      if( initializableObject != null )
+      {
+        initializableObject.BeginInit();
+      }
 
-      if( itemType == null )
-        throw new InvalidOperationException( "An attempt was made to use a source whose item type cannot be determined." );
+      var editableObject = ItemsSourceHelper.GetEditableObject( newItem );
+      if( editableObject != null )
+      {
+        editableObject.BeginEdit();
+      }
 
-      try
-      {
-        itemIndex = -1;
-        return Activator.CreateInstance( itemType );
-      }
-      catch( MissingMethodException exception )
-      {
-        throw new InvalidOperationException( "An attempt was made to use a source whose item type does not have a default constructor.", exception );
-      }
-      catch( Exception exception )
-      {
-        throw new InvalidOperationException( "An unsuccessful attempt was made to create an instance of the source's item type using the item's default constructor.", exception );
-      }
+      return newItem;
     }
 
-    public static void CancelNewDataItem( IEnumerable itemsSourceCollection, DataGridControl dataGridControl, object newItem, int newItemIndex )
+    internal static void CancelNewDataItem( IEnumerable itemsSourceCollection, DataGridControl dataGridControl, object newItem, int newItemIndex )
     {
-      DataGridCollectionViewBase dataGridCollectionViewBase = itemsSourceCollection as DataGridCollectionViewBase;
-
+      var dataGridCollectionViewBase = itemsSourceCollection as DataGridCollectionViewBase;
       if( dataGridCollectionViewBase != null )
       {
         if( dataGridCollectionViewBase.CurrentAddItem == newItem )
         {
-          // The DataGridCollectionViewBAse's CancelNew will take care of calling
-          // the item's CancelEdit if it must do so.
+          // The DataGridCollectionViewBase's CancelNew will take care of calling the item's CancelEdit if it must do so.
           dataGridCollectionViewBase.CancelNew();
         }
 
         return;
       }
 
+      //if unbound
       if( ( dataGridControl != null ) && ( dataGridControl.ItemsSource == null ) )
-      {
-        //unbound
         return;
+
+      var editableObject = ItemsSourceHelper.GetEditableObject( newItem );
+      if( editableObject != null )
+      {
+        editableObject.CancelEdit();
       }
 
-      ICancelAddNew cancelAddNew = itemsSourceCollection as ICancelAddNew;
+      var initializableObject = ItemsSourceHelper.GetSupportInitializeObject( newItem );
+      if( initializableObject != null )
+      {
+        initializableObject.EndInit();
+      }
 
+      if( ItemsSourceHelper.IsEditableObjectInsertedOrRemovedFromDataSourceAutomatically( editableObject ) )
+        return;
+
+      var cancelAddNew = itemsSourceCollection as ICancelAddNew;
       if( cancelAddNew == null )
       {
-        CollectionView collectionView = itemsSourceCollection as CollectionView;
+        var collectionView = itemsSourceCollection as CollectionView;
 
-        cancelAddNew = ( collectionView == null ) ?
-          null : collectionView.SourceCollection as ICancelAddNew;
+        cancelAddNew = ( collectionView == null ) ? null : collectionView.SourceCollection as ICancelAddNew;
       }
 
       if( cancelAddNew != null )
@@ -310,25 +313,14 @@ namespace Xceed.Wpf.DataGrid
         return;
       }
 
-      IEditableObject editableObject = ItemsSourceHelper.GetEditableObject( newItem );
-
-      // editableObject can be an xceed datarow when directly inserted as Items in the DataGridControl.
-      if( ( editableObject != null ) && ( !( editableObject is Xceed.Wpf.DataGrid.DataRow ) ) )
+      if( newItemIndex >= 0 )
       {
-        editableObject.CancelEdit();
-        return;
-      }
-
-      if( newItemIndex != -1 )
-      {
-        IList list = itemsSourceCollection as IList;
-
+        var list = itemsSourceCollection as IList;
         if( list == null )
         {
-          CollectionView collectionView = itemsSourceCollection as CollectionView;
+          var collectionView = itemsSourceCollection as CollectionView;
 
-          list = ( collectionView == null ) ?
-            null : collectionView.SourceCollection as IList;
+          list = ( collectionView == null ) ? null : collectionView.SourceCollection as IList;
         }
 
         if( ( list != null ) && ( !list.IsFixedSize ) )
@@ -338,36 +330,45 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    public static void EndNewDataItem( IEnumerable itemsSourceCollection, DataGridControl dataGridControl, object newItem, ref int newItemIndex )
+    internal static void EndNewDataItem( IEnumerable itemsSourceCollection, DataGridControl dataGridControl, object newItem, ref int newItemIndex )
     {
-      DataGridCollectionViewBase dataGridCollectionViewBase = itemsSourceCollection as DataGridCollectionViewBase;
-
+      var dataGridCollectionViewBase = itemsSourceCollection as DataGridCollectionViewBase;
       if( dataGridCollectionViewBase != null )
       {
         if( dataGridCollectionViewBase.CurrentAddItem == newItem )
         {
-          // The DataGridCollectionViewBase's EndNew will take care of calling
-          // the item's EndEdit if it must do so.
+          // The DataGridCollectionViewBase's EndNew will take care of calling the item's EndEdit if it must do so.
           dataGridCollectionViewBase.CommitNew();
         }
 
         return;
       }
 
+      //if unbound
       if( ( dataGridControl != null ) && ( dataGridControl.ItemsSource == null ) )
-      {
-        //unbound
         return;
+
+      var editableObject = ItemsSourceHelper.GetEditableObject( newItem );
+      if( editableObject != null )
+      {
+        editableObject.EndEdit();
       }
 
-      ICancelAddNew cancelAddNew = itemsSourceCollection as ICancelAddNew;
+      var initializableObject = ItemsSourceHelper.GetSupportInitializeObject( newItem );
+      if( initializableObject != null )
+      {
+        initializableObject.EndInit();
+      }
 
+      if( ItemsSourceHelper.IsEditableObjectInsertedOrRemovedFromDataSourceAutomatically( editableObject ) )
+        return;
+
+      var cancelAddNew = itemsSourceCollection as ICancelAddNew;
       if( cancelAddNew == null )
       {
-        CollectionView collectionView = itemsSourceCollection as CollectionView;
+        var collectionView = itemsSourceCollection as CollectionView;
 
-        cancelAddNew = ( collectionView == null ) ?
-          null : collectionView.SourceCollection as ICancelAddNew;
+        cancelAddNew = ( collectionView == null ) ? null : collectionView.SourceCollection as ICancelAddNew;
       }
 
       if( cancelAddNew != null )
@@ -376,39 +377,24 @@ namespace Xceed.Wpf.DataGrid
         return;
       }
 
-      IEditableObject editableObject = ItemsSourceHelper.GetEditableObject( newItem );
-
-      // editableObject can be a datarow when directly inserted as Items in the DataGridControl.
-      if( ( editableObject != null ) && ( !( editableObject is Xceed.Wpf.DataGrid.DataRow ) ) )
-      {
-        editableObject.EndEdit();
-        return;
-      }
-
-      IBindingList bindingList = itemsSourceCollection as IBindingList;
-
+      var bindingList = itemsSourceCollection as IBindingList;
       if( bindingList == null )
       {
-        CollectionView collectionView = itemsSourceCollection as CollectionView;
+        var collectionView = itemsSourceCollection as CollectionView;
 
-        bindingList = ( collectionView == null ) ?
-          null : collectionView.SourceCollection as IBindingList;
+        bindingList = ( collectionView == null ) ? null : collectionView.SourceCollection as IBindingList;
       }
 
+      // If the item is already added into the list by IBindingList.AddNew.
       if( ( bindingList != null ) && ( bindingList.AllowNew ) )
-      {
-        // In that case the item is already added into the list by IBindingList.AddNew.
         return;
-      }
 
-      IList list = itemsSourceCollection as IList;
-
+      var list = itemsSourceCollection as IList;
       if( list == null )
       {
-        CollectionView collectionView = itemsSourceCollection as CollectionView;
+        var collectionView = itemsSourceCollection as CollectionView;
 
-        list = ( collectionView == null ) ?
-          null : collectionView.SourceCollection as IList;
+        list = ( collectionView == null ) ? null : collectionView.SourceCollection as IList;
       }
 
       if( ( list == null ) || ( list.IsFixedSize ) )
@@ -418,217 +404,219 @@ namespace Xceed.Wpf.DataGrid
       list.Add( newItem );
     }
 
-    public static Dictionary<string, FieldDescriptor> GetFieldDescriptors( PropertyDescriptorCollection properties, bool supportDBNull )
+    private static PropertyDescription GetPropertyDescriptionFromItemProperty( PropertyDescriptionRouteDictionary propertyDescriptions, DataGridItemPropertyRoute itemPropertyRoute )
     {
-      int fieldCount = properties.Count;
-
-      Dictionary<string, FieldDescriptor> fieldDescriptors =
-        new Dictionary<string, FieldDescriptor>( fieldCount );
-
-      ItemsSourceHelper.ExtractFieldDescriptors( string.Empty, properties, supportDBNull, fieldDescriptors );
-
-      return fieldDescriptors;
-    }
-
-    public static void ExtractFieldDescriptors( string namePrefix, PropertyDescriptorCollection properties, bool supportDBNull, Dictionary<string, FieldDescriptor> fieldDescriptors )
-    {
-      int propertyCount = properties.Count;
-
-      for( int i = 0; i < propertyCount; i++ )
-      {
-        PropertyDescriptor propertyDescriptor = properties[ i ];
-        string name = propertyDescriptor.Name;
-
-        if( ( fieldDescriptors.ContainsKey( name ) ) && ( !string.IsNullOrEmpty( namePrefix ) ) )
-          name = namePrefix + "." + name;
-
-        Type type = propertyDescriptor.PropertyType;
-
-        DataGridForeignKeyDescription foreignKeyDescription = null;
-
-        // Try to retreive the ForeignKeyDescription if the field is an Enum
-        if( ( type != null ) && ( type.IsEnum ) )
-        {
-          foreignKeyDescription = ItemsSourceHelper.GetDataGridForeignKeyDescriptionForEnum( type );
-        }
-
-        fieldDescriptors[ name ] = new FieldDescriptor( name,
-                                                        propertyDescriptor.DisplayName,
-                                                        type,
-                                                        propertyDescriptor,
-                                                        null,
-                                                        null,
-                                                        propertyDescriptor.IsReadOnly,
-                                                        false,
-                                                        supportDBNull,
-                                                        propertyDescriptor.IsBrowsable,
-                                                        ItemsSourceHelper.IsASubRelationship( propertyDescriptor.PropertyType ),
-                                                        false,
-                                                        foreignKeyDescription );
-      }
-    }
-
-    public static void GenerateColumnsFromItemsSourceFields( ColumnCollection columns, IDictionary<Type, CellEditor> defaultCellEditors, Dictionary<string, FieldDescriptor> fields,
-                                                             bool autoCreateForeignKeyConfigurations )
-    {
-      using( columns.DeferColumnAdditionMessages() )
-      {
-        foreach( FieldDescriptor field in fields.Values )
-        {
-          string fieldName = field.Name;
-          ColumnBase column = columns[ fieldName ];
-          Column dataColumn = column as Column;
-          Type dataType = field.DataType;
-
-          if( column == null )
-          {
-            dataColumn = ItemsSourceHelper.CreateColumnFromItemsSourceField( defaultCellEditors, field, autoCreateForeignKeyConfigurations );
-
-            if( dataColumn != null )
-            {
-              columns.Add( dataColumn );
-            }
-          }
-          else if( dataColumn != null )
-          {
-            if( field.ReadOnly )
-            {
-              if( dataColumn.ReadLocalValue( Column.ReadOnlyProperty ) == DependencyProperty.UnsetValue )
-              {
-                dataColumn.ReadOnly = field.ReadOnly;
-              }
-            }
-
-            if( field.OverrideReadOnlyForInsertion )
-            {
-              if( dataColumn.ReadLocalValue( ColumnBase.OverrideReadOnlyForInsertionProperty ) == DependencyProperty.UnsetValue )
-              {
-                dataColumn.OverrideReadOnlyForInsertion = field.OverrideReadOnlyForInsertion;
-              }
-            }
-
-            if( dataColumn.ReadLocalValue( Column.TitleProperty ) == DependencyProperty.UnsetValue )
-            {
-              dataColumn.Title = field.DisplayName;
-            }
-
-            if( dataColumn.ReadLocalValue( Column.CellEditorProperty ) == DependencyProperty.UnsetValue )
-            {
-              CellEditor cellEditor = null;
-
-              if( defaultCellEditors != null )
-              {
-                defaultCellEditors.TryGetValue( dataType, out cellEditor );
-              }
-
-              if( cellEditor == null )
-              {
-                object descriptionItemsSource = null;
-                object configurationItemsSource = null;
-                ForeignKeyConfiguration configuration = dataColumn.ForeignKeyConfiguration;
-
-                if( field.ForeignKeyDescription != null )
-                {
-                  descriptionItemsSource = field.ForeignKeyDescription.ItemsSource;
-                }
-
-                if( configuration != null )
-                {
-                  configurationItemsSource = configuration.ItemsSource;
-
-                  if( configurationItemsSource == null )
-                  {
-                    configurationItemsSource = dataColumn.ReadLocalValue( Column.ForeignKeyConfigurationProperty );
-                  }
-                }
-
-                // A foreign key ItemsSource is set and we can auto-create configuration
-                // OR
-                // if the foreign key ItemsSource was found in the ForeignKeyConfiguration
-                //
-                // use the Default ForeignKey CellEditor.
-                if( ( ( descriptionItemsSource != null ) && ( autoCreateForeignKeyConfigurations ) )
-                    || ( configurationItemsSource != null ) )
-                {
-                  cellEditor = DefaultCellEditorSelector.ForeignKeyCellEditor;
-                }
-              }
-
-              if( cellEditor == null )
-              {
-                cellEditor = DefaultCellEditorSelector.SelectCellEditor( dataType );
-              }
-
-              dataColumn.CellEditor = cellEditor;
-            }
-
-            if( ( field.ForeignKeyDescription != null )
-                && ( field.ForeignKeyDescription.ItemsSource != null )
-                && ( autoCreateForeignKeyConfigurations ) )
-            {
-              // Update the ForeignKeyConfiguration from the ForeignKeyDescription
-              // found on the FieldDescriptor
-              ForeignKeyConfiguration.SynchronizeForeignKeyConfigurationFromForeignKeyDescription(
-                dataColumn,
-                field.ForeignKeyDescription,
-                autoCreateForeignKeyConfigurations );
-            }
-
-            if( dataColumn.GetDisplayMemberBinding() == null )
-            {
-              dataColumn.SetDisplayMemberBinding( ItemsSourceHelper.CreateDefaultBinding( false, field.Name, field, dataColumn, false, dataType ) );
-              dataColumn.IsBindingAutoCreated = true;
-              dataColumn.IsBoundToDataGridUnboundItemProperty = field.IsDataGridUnboundItemProperty;
-            }
-
-            column.DefaultCellRecyclingGroupDataType = dataType;
-          }
-        }
-      } //end using
-    }
-
-    public static Column CreateColumnFromItemsSourceField( IDictionary<Type, CellEditor> defaultCellEditors, FieldDescriptor field, bool autoCreateForeignKeyConfigurations )
-    {
-      if( ( field.IsASubRelationship ) || ( !field.Browsable ) )
+      if( ( propertyDescriptions == null ) || ( itemPropertyRoute == null ) )
         return null;
 
-      string fieldName = field.Name;
-      Type dataType = field.DataType;
+      var propertyRoute = PropertyRouteBuilder.ToPropertyRoute( itemPropertyRoute );
+      if( propertyRoute == null )
+        return null;
 
-      Column dataColumn = new Column();
-      dataColumn.IsAutoCreated = true;
-      dataColumn.FieldName = fieldName;
+      PropertyDescriptionRoute propertyDescription;
+      if( !propertyDescriptions.TryGetValue( propertyRoute, out propertyDescription ) )
+        return null;
 
-      bool readOnly = field.ReadOnly;
-      bool overrideReadOnlyForInsertion = field.OverrideReadOnlyForInsertion;
+      return propertyDescription.Current;
+    }
 
-      // We only set ReadOnly when the value is true in order for the inheritence chain to work.  
-      // Otherwise, the column value is always used instead of the row or grid value.
-      if( readOnly )
+    internal static void CreateAndAddItemPropertiesForPropertyDescriptions( DataGridItemPropertyCollection itemProperties, IEnumerable<PropertyDescriptionRoute> propertyDescriptions )
+    {
+      if( ( itemProperties == null ) || ( propertyDescriptions == null ) )
+        return;
+
+      using( itemProperties.DeferCollectionChanged() )
       {
-        dataColumn.ReadOnly = readOnly;
+        foreach( var propertyDescription in propertyDescriptions )
+        {
+          ItemsSourceHelper.CreateAndAddItemPropertyForPropertyDescription( itemProperties, propertyDescription );
+        }
+      }
+    }
+
+    internal static void CreateAndAddItemPropertyForPropertyDescription( DataGridItemPropertyCollection itemProperties, PropertyDescriptionRoute propertyDescription )
+    {
+      if( ( itemProperties == null ) || ( propertyDescription == null ) )
+        return;
+
+      if( !propertyDescription.Current.IsBrowsable )
+        return;
+
+      var ancestors = new Stack<PropertyDescription>();
+      for( var current = propertyDescription; current != null; current = current.Parent )
+      {
+        var description = current.Current;
+        if( description.IsSubRelationship )
+          return;
+
+        ancestors.Push( description );
       }
 
-      dataColumn.OverrideReadOnlyForInsertion = overrideReadOnlyForInsertion;
-      dataColumn.Title = field.DisplayName;
+      var parentItemProperty = default( DataGridItemPropertyBase );
+      var isRoot = true;
 
-      dataColumn.SetDisplayMemberBinding( ItemsSourceHelper.CreateDefaultBinding( false, field.Name, field, dataColumn, false, dataType ) );
-      dataColumn.IsBindingAutoCreated = true;
-      dataColumn.IsBoundToDataGridUnboundItemProperty = field.IsDataGridUnboundItemProperty;
-
-      CellEditor cellEditor = null;
-
-      if( defaultCellEditors != null )
+      while( ancestors.Count > 0 )
       {
-        defaultCellEditors.TryGetValue( dataType, out cellEditor );
+        var description = ancestors.Pop();
+        var itemProperty = ( isRoot ) ? itemProperties[ description.Name ] : parentItemProperty.ItemProperties[ description.Name ];
+
+        if( itemProperty == null )
+        {
+          itemProperty = ItemsSourceHelper.CreateItemPropertyFromPropertyDescription( description );
+          Debug.Assert( itemProperty != null );
+
+          if( isRoot )
+          {
+            itemProperties.Add( itemProperty );
+          }
+          else
+          {
+            Debug.Assert( parentItemProperty != null );
+            parentItemProperty.ItemProperties.Add( itemProperty );
+          }
+        }
+
+        parentItemProperty = itemProperty;
+        isRoot = false;
+      }
+    }
+
+    internal static void CreateColumnsFromPropertyDescriptions(
+      ColumnHierarchyManager columnManager,
+      IDictionary<Type, CellEditor> defaultCellEditors,
+      PropertyDescriptionRouteDictionary propertyDescriptions,
+      bool autoCreateForeignKeyConfigurations )
+    {
+      Debug.Assert( columnManager != null );
+
+      var columns = columnManager.Columns;
+
+      using( columnManager.DeferUpdate() )
+      {
+        using( columns.DeferNotifications() )
+        {
+          foreach( var propertyDescriptionRoute in propertyDescriptions.Values )
+          {
+            var fieldName = PropertyRouteParser.Parse( PropertyRouteBuilder.ToPropertyRoute( propertyDescriptionRoute ) );
+            var columnBase = columns[ fieldName ];
+            var column = columnBase as Column;
+
+            if( columnBase == null )
+            {
+              column = ItemsSourceHelper.CreateColumnFromPropertyDescription( defaultCellEditors, propertyDescriptionRoute, autoCreateForeignKeyConfigurations );
+
+              if( column != null )
+              {
+                columns.Add( column );
+              }
+            }
+            else if( column != null )
+            {
+              ItemsSourceHelper.UpdateColumnFromPropertyDescription( column, defaultCellEditors, autoCreateForeignKeyConfigurations, propertyDescriptionRoute );
+            }
+          }
+        }
+      }
+    }
+
+    internal static void UpdateColumnsFromPropertyDescriptions(
+      ColumnHierarchyManager columnManager,
+      IDictionary<Type, CellEditor> defaultCellEditors,
+      PropertyDescriptionRouteDictionary propertyDescriptions,
+      bool autoCreateForeignKeyConfigurations )
+    {
+      Debug.Assert( columnManager != null );
+
+      var columns = columnManager.Columns;
+
+      using( columnManager.DeferUpdate() )
+      {
+        using( columns.DeferNotifications() )
+        {
+          var columnsToRemove = new HashSet<ColumnBase>( ( from columnBase in columns
+                                                           let column = columnBase as Column
+                                                           where ( column != null ) && column.IsAutoCreated
+                                                           select column ) );
+
+          foreach( var propertyDescriptionRoute in propertyDescriptions.Values )
+          {
+            var fieldName = PropertyRouteParser.Parse( PropertyRouteBuilder.ToPropertyRoute( propertyDescriptionRoute ) );
+            var columnBase = columns[ fieldName ];
+            var column = columnBase as Column;
+
+            if( columnBase == null )
+            {
+              column = ItemsSourceHelper.CreateColumnFromPropertyDescription( defaultCellEditors, propertyDescriptionRoute, autoCreateForeignKeyConfigurations );
+
+              if( column != null )
+              {
+                columns.Add( column );
+              }
+            }
+            else if( column != null )
+            {
+              columnsToRemove.Remove( column );
+
+              ItemsSourceHelper.UpdateColumnFromPropertyDescription( column, defaultCellEditors, autoCreateForeignKeyConfigurations, propertyDescriptionRoute );
+            }
+          }
+
+          foreach( var column in columnsToRemove )
+          {
+            columns.Remove( column );
+          }
+        }
+      }
+    }
+
+    private static Column CreateColumnFromPropertyDescription( IDictionary<Type, CellEditor> defaultCellEditors, PropertyDescriptionRoute propertyDescriptionRoute, bool autoCreateForeignKeyConfigurations )
+    {
+      if( propertyDescriptionRoute == null )
+        return null;
+
+      var propertyDescription = propertyDescriptionRoute.Current;
+      var dataType = propertyDescription.DataType;
+
+      if( !propertyDescription.IsBrowsable || !propertyDescription.IsDisplayable )
+        return null;
+
+      for( var current = propertyDescriptionRoute; current != null; current = current.Parent )
+      {
+        var description = current.Current;
+        if( description.IsSubRelationship )
+          return null;
       }
 
-      if( ( field.ForeignKeyDescription != null )
-        && ( field.ForeignKeyDescription.ItemsSource != null )
-        && ( autoCreateForeignKeyConfigurations ) )
+      var name = PropertyRouteParser.Parse( PropertyRouteBuilder.ToPropertyRoute( propertyDescriptionRoute ) );
+      if( string.IsNullOrEmpty( name ) )
+        return null;
+
+      var column = new Column();
+      column.IsAutoCreated = true;
+      column.FieldName = name;
+      column.Title = propertyDescription.DisplayName;
+      column.OverrideReadOnlyForInsertion = propertyDescription.OverrideReadOnlyForInsertion;
+      column.SetDisplayMemberBinding( ItemsSourceHelper.CreateDefaultBinding( propertyDescriptionRoute ) );
+      column.IsBindingAutoCreated = true;
+      column.IsBoundToDataGridUnboundItemProperty = propertyDescription.IsDataGridUnboundItemProperty;
+
+      if( propertyDescription.IsReadOnly )
       {
-        // We will only use the default foreign key CellEditor
-        // if:
+        column.ReadOnly = true;
+      }
+
+      var cellEditor = default( CellEditor );
+
+      if( ( defaultCellEditors != null ) && !defaultCellEditors.TryGetValue( dataType, out cellEditor ) )
+      {
+        cellEditor = default( CellEditor );
+      }
+
+      var foreignKeyDescription = propertyDescription.ForeignKeyDescription;
+
+      if( ( foreignKeyDescription != null ) && ( foreignKeyDescription.ItemsSource != null ) && ( autoCreateForeignKeyConfigurations ) )
+      {
+        // We will only use the default foreign key CellEditor if:
         // - a ForeignKey ItemsSource was detected
         // - the grid allows the auto-creation of the ForeignKeyConfigurations
         // else, use the default CellEditor
@@ -637,12 +625,8 @@ namespace Xceed.Wpf.DataGrid
           cellEditor = DefaultCellEditorSelector.ForeignKeyCellEditor;
         }
 
-        // Update the ForeignKeyConfiguration from the ForeignKeyDescription
-        // found on the FieldDescriptor
-        ForeignKeyConfiguration.SynchronizeForeignKeyConfigurationFromForeignKeyDescription(
-          dataColumn,
-          field.ForeignKeyDescription,
-          autoCreateForeignKeyConfigurations );
+        // Update the ForeignKeyConfiguration from the ForeignKeyDescription found on the FieldDescriptor
+        ForeignKeyConfiguration.SynchronizeForeignKeyConfigurationFromForeignKeyDescription( column, foreignKeyDescription, autoCreateForeignKeyConfigurations );
       }
 
       if( cellEditor == null )
@@ -650,410 +634,617 @@ namespace Xceed.Wpf.DataGrid
         cellEditor = DefaultCellEditorSelector.SelectCellEditor( dataType );
       }
 
-      dataColumn.CellEditor = cellEditor;
-      dataColumn.DefaultCellRecyclingGroupDataType = dataType;
+      column.CellEditor = cellEditor;
+      column.DefaultCellRecyclingGroupDataType = dataType;
 
-      return dataColumn;
+      return column;
     }
 
-    public static ICustomTypeDescriptor GetCustomTypeDescriptor( IEnumerable itemsSource, Type itemType )
+    internal static void UpdateColumnFromPropertyDescription(
+      ColumnBase column,
+      IDictionary<Type, CellEditor> defaultCellEditors,
+      bool autoCreateForeignKeyConfigurations,
+      PropertyDescriptionRoute propertyDescription )
     {
-      var firstItem = ItemsSourceHelper.GetFirstItemByEnumerable( itemsSource );
+      if( ( column == null ) || ( propertyDescription == null ) )
+        return;
 
-      var descriptor = firstItem as ICustomTypeDescriptor;
-      if( descriptor != null )
+      var targetColumn = column as Column;
+      var targetPropertyDescription = propertyDescription.Current;
+
+      if( targetPropertyDescription.IsReadOnly )
       {
-        if( !( descriptor is DataItemTypeDescriptor ) )
+        if( column.ReadLocalValue( Column.ReadOnlyProperty ) == DependencyProperty.UnsetValue )
         {
-          descriptor = DataItemTypeDescriptionProvider.GetTypeDescriptor( itemType, descriptor );
+          column.ReadOnly = targetPropertyDescription.IsReadOnly;
         }
       }
-      else
+
+      if( targetPropertyDescription.OverrideReadOnlyForInsertion )
       {
-        descriptor = ItemsSourceHelper.GetCustomTypeDescriptor( firstItem, itemType );
+        if( column.ReadLocalValue( ColumnBase.OverrideReadOnlyForInsertionProperty ) == DependencyProperty.UnsetValue )
+        {
+          column.OverrideReadOnlyForInsertion = targetPropertyDescription.OverrideReadOnlyForInsertion;
+        }
       }
 
-      return descriptor;
+      if( column.ReadLocalValue( ColumnBase.TitleProperty ) == DependencyProperty.UnsetValue )
+      {
+        column.Title = targetPropertyDescription.DisplayName;
+      }
+
+      if( column.ReadLocalValue( ColumnBase.CellEditorProperty ) == DependencyProperty.UnsetValue )
+      {
+        var cellEditor = default( CellEditor );
+
+        if( defaultCellEditors != null )
+        {
+          defaultCellEditors.TryGetValue( targetPropertyDescription.DataType, out cellEditor );
+        }
+
+        if( ( cellEditor == null ) && ( targetColumn != null ) )
+        {
+          var descriptionItemsSource = default( object );
+          var configurationItemsSource = default( object );
+          var configuration = targetColumn.ForeignKeyConfiguration;
+
+          if( targetPropertyDescription.ForeignKeyDescription != null )
+          {
+            descriptionItemsSource = targetPropertyDescription.ForeignKeyDescription.ItemsSource;
+          }
+
+          if( configuration != null )
+          {
+            configurationItemsSource = configuration.ItemsSource;
+
+            if( configurationItemsSource == null )
+            {
+              configurationItemsSource = targetColumn.ReadLocalValue( Column.ForeignKeyConfigurationProperty );
+            }
+          }
+
+          // A foreign key ItemsSource is set and we can auto-create configuration, OR,
+          // if the foreign key ItemsSource was found in the ForeignKeyConfiguration, use the Default ForeignKey CellEditor.
+          if( ( ( descriptionItemsSource != null ) && ( autoCreateForeignKeyConfigurations ) ) || ( configurationItemsSource != null ) )
+          {
+            cellEditor = DefaultCellEditorSelector.ForeignKeyCellEditor;
+          }
+        }
+
+        if( cellEditor == null )
+        {
+          cellEditor = DefaultCellEditorSelector.SelectCellEditor( targetPropertyDescription.DataType );
+        }
+
+        column.CellEditor = cellEditor;
+      }
+
+      if( targetColumn != null )
+      {
+        if( ( targetPropertyDescription.ForeignKeyDescription != null ) && ( targetPropertyDescription.ForeignKeyDescription.ItemsSource != null ) && ( autoCreateForeignKeyConfigurations ) )
+        {
+          // Update the ForeignKeyConfiguration from the ForeignKeyDescription found on the FieldDescriptor
+          ForeignKeyConfiguration.SynchronizeForeignKeyConfigurationFromForeignKeyDescription( targetColumn, targetPropertyDescription.ForeignKeyDescription, autoCreateForeignKeyConfigurations );
+        }
+
+        if( targetColumn.GetDisplayMemberBinding() == null )
+        {
+          targetColumn.SetDisplayMemberBinding( ItemsSourceHelper.CreateDefaultBinding( propertyDescription ) );
+          targetColumn.IsBindingAutoCreated = true;
+          targetColumn.IsBoundToDataGridUnboundItemProperty = targetPropertyDescription.IsDataGridUnboundItemProperty;
+        }
+      }
+
+      column.DefaultCellRecyclingGroupDataType = targetPropertyDescription.DataType;
     }
 
-    public static ICustomTypeDescriptor GetCustomTypeDescriptor( object firstItem, Type itemType )
+    internal static DataGridItemPropertyBase GetItemPropertyFromProperty( DataGridItemPropertyCollection itemProperties, string propertyPath )
     {
-      var descriptionProvider = TypeDescriptor.GetProvider( itemType );
+      if( itemProperties == null )
+        return null;
+
+      return ItemsSourceHelper.GetItemPropertyFromProperty( itemProperties, PropertyRouteParser.Parse( propertyPath ) );
+    }
+
+    internal static DataGridItemPropertyBase GetItemPropertyFromProperty( DataGridItemPropertyCollection itemProperties, PropertyRoute propertyRoute )
+    {
+      if( ( itemProperties == null ) || ( propertyRoute == null ) )
+        return null;
+
+      if( propertyRoute.Parent != null )
+      {
+        var parentItemProperty = ItemsSourceHelper.GetItemPropertyFromProperty( itemProperties, propertyRoute.Parent );
+        if( parentItemProperty == null )
+          return null;
+
+        itemProperties = parentItemProperty.ItemPropertiesInternal;
+        if( itemProperties == null )
+          return null;
+      }
+
+      return itemProperties[ propertyRoute.Current.Name ];
+    }
+
+    internal static object GetValueFromItemProperty( DataGridItemPropertyBase itemProperty, object item )
+    {
+      return ItemsSourceHelper.GetValueFromItemProperty( itemProperty, item, null );
+    }
+
+    internal static object GetValueFromItemProperty( DataGridItemPropertyBase itemProperty, object item, object defaultValue )
+    {
+      if( itemProperty == null )
+        throw new ArgumentNullException( "itemProperty" );
+
+      // Make sure the DataGridItemProperty is still in use.
+      var collection = itemProperty.ContainingCollection;
+      if( collection == null )
+        return defaultValue;
+
+      var parentItemProperty = collection.Owner;
+      if( parentItemProperty != null )
+      {
+        item = ItemsSourceHelper.GetValueFromItemProperty( parentItemProperty, item );
+      }
+
+      if( item == null )
+        return defaultValue;
+
+      return itemProperty.GetValue( item );
+    }
+
+    internal static void SetValueForItemProperty( DataGridItemPropertyBase itemProperty, object item, object value )
+    {
+      if( itemProperty == null )
+        throw new ArgumentNullException( "itemProperty" );
+
+      // Make sure the DataGridItemProperty is still in use.
+      var collection = itemProperty.ContainingCollection;
+      if( collection == null )
+        return;
+
+      var parentItemProperty = collection.Owner;
+      if( parentItemProperty != null )
+      {
+        item = ItemsSourceHelper.GetValueFromItemProperty( parentItemProperty, item );
+      }
+
+      if( item == null )
+        return;
+
+      itemProperty.SetValue( item, value );
+    }
+
+    internal static void AutoDetectSynonyms( DataGridCollectionViewBase collectionView )
+    {
+      if( collectionView == null )
+        return;
+
+      // The root CollectionView does not need to have its ItemProperties binded.
+      var masterCollectionView = collectionView.RootDataGridCollectionViewBase;
+      if( ( masterCollectionView == null ) || ( masterCollectionView == collectionView ) )
+        return;
+
+      ItemsSourceHelper.AutoDetectSynonyms( masterCollectionView.ItemProperties, collectionView.ItemProperties );
+    }
+
+    internal static void AutoDetectSynonyms( DataGridCollectionViewBase collectionView, DataGridItemPropertyRoute detailItemPropertyRoute )
+    {
+      if( ( collectionView == null ) || ( detailItemPropertyRoute == null ) )
+        return;
+
+      // The root CollectionView does not need to have its ItemProperties binded.
+      var masterCollectionView = collectionView.RootDataGridCollectionViewBase;
+      if( ( masterCollectionView == null ) || ( masterCollectionView == collectionView ) )
+        return;
+
+      var masterItemProperty = ItemsSourceHelper.AutoDetectSynonyms( masterCollectionView.ItemProperties, detailItemPropertyRoute );
+      if( masterItemProperty == null )
+        return;
+
+      // Do the auto detection on child properties.
+      ItemsSourceHelper.AutoDetectSynonyms( masterItemProperty.ItemPropertiesInternal, detailItemPropertyRoute.Current.ItemPropertiesInternal );
+    }
+
+    private static void AutoDetectSynonyms( DataGridItemPropertyCollection masterItemProperties, DataGridItemPropertyCollection detailItemProperties )
+    {
+      if( ( masterItemProperties == null ) || ( detailItemProperties == null ) )
+        return;
+
+      foreach( var detailItemProperty in detailItemProperties )
+      {
+        ItemsSourceHelper.AutoDetectSynonyms( masterItemProperties, detailItemProperty, true );
+      }
+    }
+
+    private static DataGridItemPropertyBase AutoDetectSynonyms( DataGridItemPropertyCollection masterItemProperties, DataGridItemPropertyRoute detailItemPropertyRoute )
+    {
+      if( ( masterItemProperties == null ) || ( detailItemPropertyRoute == null ) )
+        return null;
+
+      if( detailItemPropertyRoute.Parent == null )
+        return ItemsSourceHelper.AutoDetectSynonyms( masterItemProperties, detailItemPropertyRoute.Current, false );
+
+      var masterParentItemProperty = ItemsSourceHelper.AutoDetectSynonyms( masterItemProperties, detailItemPropertyRoute.Parent );
+      if( masterParentItemProperty == null )
+        return null;
+
+      return ItemsSourceHelper.AutoDetectSynonyms( masterParentItemProperty.ItemPropertiesInternal, detailItemPropertyRoute.Current, false );
+    }
+
+    private static DataGridItemPropertyBase AutoDetectSynonyms( DataGridItemPropertyCollection masterItemProperties, DataGridItemPropertyBase detailItemProperty, bool autoDetectSubProperties )
+    {
+      if( ( masterItemProperties == null ) || ( detailItemProperty == null ) )
+        return null;
+
+      var masterItemProperty = default( DataGridItemPropertyBase );
+
+      if( string.IsNullOrEmpty( detailItemProperty.Synonym ) )
+      {
+        masterItemProperty = masterItemProperties[ detailItemProperty.Name ];
+
+        if( ( masterItemProperty != null ) && ( masterItemProperty.DataType == detailItemProperty.DataType ) )
+        {
+          detailItemProperty.SetSynonym( masterItemProperty.Name );
+        }
+        else
+        {
+          masterItemProperty = null;
+        }
+      }
+      else if( ( detailItemProperty.ItemPropertiesInternal != null ) && ( detailItemProperty.Synonym == detailItemProperty.Name ) )
+      {
+        masterItemProperty = masterItemProperties[ detailItemProperty.Name ];
+      }
+
+      if( autoDetectSubProperties && ( masterItemProperty != null ) && ( masterItemProperty.ItemPropertiesInternal != null ) && ( detailItemProperty.ItemPropertiesInternal != null ) )
+      {
+        ItemsSourceHelper.AutoDetectSynonyms( masterItemProperty.ItemPropertiesInternal, detailItemProperty.ItemPropertiesInternal );
+      }
+
+      return masterItemProperty;
+    }
+
+    internal static ICustomTypeDescriptor GetCustomTypeDescriptorFromItem( object item, Type itemType )
+    {
+      var descriptionProvider = default( TypeDescriptionProvider );
+      if( itemType != null )
+      {
+        descriptionProvider = TypeDescriptor.GetProvider( itemType );
+      }
+
       if( !( descriptionProvider is DataItemTypeDescriptionProvider ) )
       {
         descriptionProvider = new DataItemTypeDescriptionProvider( descriptionProvider );
       }
 
-      return descriptionProvider.GetTypeDescriptor( itemType, firstItem );
+      return descriptionProvider.GetTypeDescriptor( itemType, item );
     }
 
-    public static System.Windows.Data.Binding CreateDefaultBinding( bool dataItemIsDataRow, string fieldName, FieldDescriptor sourceField, ColumnBase column, bool supportDBNull,
-                                                                    Type dataType )
+    private static ICustomTypeDescriptor GetCustomTypeDescriptor( IEnumerable itemsSource, Type itemType )
     {
-      DataGridBindingInfo bindingInfo = new DataGridBindingInfo();
-      PropertyDescriptor propertyDescriptor = null;
-      string bindingPath = null;
-      string bindingXPath = null;
-      bool readOnly;
+      if( ( itemsSource == null ) && ( itemType == null ) )
+        return null;
 
-      if( sourceField != null )
-      {
-        dataType = sourceField.DataType;
-        supportDBNull = sourceField.SupportDBNull;
-        readOnly = ( sourceField.ReadOnly && !sourceField.OverrideReadOnlyForInsertion );
-        propertyDescriptor = sourceField.PropertyDescriptor;
-        bindingXPath = sourceField.BindingXPath;
-        bindingPath = sourceField.BindingPath;
-      }
-      else
-      {
-        readOnly = ( column.ReadOnly && !column.OverrideReadOnlyForInsertion );
-      }
+      var firstItem = ItemsSourceHelper.GetFirstItemByEnumerable( itemsSource );
 
-      if( dataItemIsDataRow )
-      {
-        bindingInfo.Path = new PropertyPath( "Cells[" + fieldName + "].Content" );
-      }
-      else
-      {
-        // We always use Path and XPath to be able to write back to a binding on self (".").
-        // Because the "propertyDescriptor" received is readonly, we must use the normal binding path to pass over that.
-        if( !string.IsNullOrEmpty( bindingXPath ) )
-        {
-          bindingInfo.XPath = bindingXPath;
-
-          if( !string.IsNullOrEmpty( bindingPath ) )
-            bindingInfo.Path = new PropertyPath( bindingPath, ItemsSourceHelper.EmptyObjectArray );
-        }
-        else
-        {
-          bindingInfo.Path = ItemsSourceHelper.CreatePropertyPath( fieldName, bindingPath, propertyDescriptor );
-        }
-      }
-
-      bindingInfo.ReadOnly = readOnly;
-      bindingInfo.Converter = new ReadOnlyConverter( column, supportDBNull );
-
-      bindingInfo.ValidationRules.Add( new SourceDataConverterValidationRule( supportDBNull, dataType ) );
-
-      return bindingInfo.GetBinding();
+      return ItemsSourceHelper.GetCustomTypeDescriptor( firstItem, itemType );
     }
 
-    public static PropertyPath CreatePropertyPath( string fieldName, string bindingPath, PropertyDescriptor propertyDescriptor )
+    private static ICustomTypeDescriptor GetCustomTypeDescriptor( object item, Type itemType )
     {
-      PropertyPath propertyPath = null;
+      var descriptor = item as ICustomTypeDescriptor;
+      if( descriptor == null )
+        return ItemsSourceHelper.GetCustomTypeDescriptorFromItem( item, itemType );
 
-      if( !string.IsNullOrEmpty( bindingPath ) )
-      {
-        // Using user defined column binding info.
-        propertyPath = new PropertyPath( bindingPath, ItemsSourceHelper.EmptyObjectArray );
-      }
-      else
-      {
-        if( propertyDescriptor != null )
-        {
-          if( propertyDescriptor is DataGridItemPropertyBase.PropertyDescriptorFromItemPropertyBase )
-          {
-            // Using a DataGridItemPropertyBase.
-            propertyPath = new PropertyPath( "(0)", propertyDescriptor );
-          }
-          else
-          {
-            // Not using our CollectionView.
-            propertyPath = new PropertyPath( "(0).(1)", EmptyDataItemSafePropertyDescriptor.Singleton, propertyDescriptor );
-          }
-        }
-        else
-        {
-          propertyPath = new PropertyPath( fieldName, ItemsSourceHelper.EmptyObjectArray );
-        }
-      }
+      if( !( descriptor is DataItemTypeDescriptor ) )
+        return DataItemTypeDescriptionProvider.GetTypeDescriptor( itemType, descriptor );
 
-      return propertyPath;
+      return descriptor;
     }
 
-    public static Dictionary<string, FieldDescriptor> GetFields( IEnumerable itemsSource, Type itemType )
+    internal static void ResetPropertyDescriptions( PropertyDescriptionRouteDictionary collection, DataGridItemPropertyMap itemPropertyMap, DataGridControl dataGridControl, IEnumerable itemsSource )
     {
-      DataView dataView = itemsSource as DataView;
+      if( collection == null )
+        throw new ArgumentNullException( "collection" );
 
-      if( dataView != null )
-        return ItemsSourceHelper.GetFieldsForDataView( dataView );
+      if( dataGridControl == null )
+        throw new ArgumentNullException( "dataGridControl" );
 
-      DataGridCollectionViewBase dataGridCollectionViewBase = itemsSource as DataGridCollectionViewBase;
+      collection.Clear();
 
-      if( dataGridCollectionViewBase != null )
-        return ItemsSourceHelper.GetFieldsForDataGridCollectionViewBase( dataGridCollectionViewBase, dataGridCollectionViewBase.ItemProperties );
+      var masterPropertyDescriptions = dataGridControl.ItemsSourcePropertyDescriptions;
 
-      bool supportsDBNull = ItemsSourceHelper.IsSourceSupportingDBNull( itemsSource );
-      ITypedList typedList = itemsSource as ITypedList;
-
-      if( typedList != null )
-        return ItemsSourceHelper.GetFieldDescriptors( typedList.GetItemProperties( null ), supportsDBNull );
-
-      if( itemType == null )
-        itemType = ItemsSourceHelper.GetItemTypeFromEnumeration( itemsSource );
-
-      return ItemsSourceHelper.GetFieldsForItemType( itemsSource, itemType, supportsDBNull );
-    }
-
-    public static Dictionary<string, FieldDescriptor> GetFields( Dictionary<string, FieldDescriptor> masterFields, FieldNameMap fieldMap, IEnumerable itemsSource, Type itemType )
-    {
-      Dictionary<string, FieldDescriptor> fieldDescriptors;
-      DataGridCollectionViewBase dataGridCollectionViewBase = itemsSource as DataGridCollectionViewBase;
-
-      if( dataGridCollectionViewBase != null )
+      if( ( collection != masterPropertyDescriptions ) && dataGridControl.AreDetailsFlatten )
       {
-        var itemProperties = dataGridCollectionViewBase.ItemProperties;
-
-        fieldDescriptors = new Dictionary<string, FieldDescriptor>( itemProperties.Count );
-
-        foreach( var itemProperty in itemProperties )
+        var collectionView = itemsSource as DataGridCollectionViewBase;
+        if( collectionView != null )
         {
-          string detailFieldName = itemProperty.Name;
-          string masterFieldName;
-
-          if( !fieldMap.TryGetColumnFieldName( detailFieldName, out masterFieldName ) )
-          {
-            Debug.WriteLine( string.Format( "No mapping was found for the item property." ) );
-            continue;
-          }
-
-          FieldDescriptor masterField;
-          if( !masterFields.TryGetValue( masterFieldName, out masterField ) )
-          {
-            Debug.WriteLine( string.Format( "An item property is mapped to a non-existent master field." ) );
-            continue;
-          }
-
-          FieldDescriptor detailField = ItemsSourceHelper.CreateFieldFromDataGridItemProperty( itemProperty );
-          if( detailField.DataType != masterField.DataType )
-          {
-            Debug.WriteLine( string.Format( "The data type of an item property doesn't match the data type of its master field." ) );
-            continue;
-          }
-
-          FieldDescriptor oldDetailField;
-          if( fieldDescriptors.TryGetValue( masterFieldName, out oldDetailField ) )
-          {
-            Debug.WriteLine( string.Format( "Another detail field is already linked to the master field." ) );
-            continue;
-          }
-
-          fieldDescriptors.Add( masterFieldName, detailField );
+          ItemsSourceHelper.SetPropertyDescriptions( collection, masterPropertyDescriptions, itemPropertyMap, collectionView );
         }
       }
       else
       {
-        fieldDescriptors = ItemsSourceHelper.GetFields( itemsSource, itemType );
-        var fieldNames = fieldDescriptors.Keys.ToArray();
+        ItemsSourceHelper.SetPropertyDescriptions( collection, null, itemsSource, null, true );
+      }
+    }
 
-        foreach( var fieldName in fieldNames )
+    internal static void SetPropertyDescriptions( PropertyDescriptionRouteDictionary collection, DataTable model, IEnumerable itemsSource, Type itemType, bool displayable )
+    {
+      if( collection == null )
+        throw new ArgumentNullException( "collection" );
+
+      var descriptions = default( IEnumerable<PropertyDescriptionRoute> );
+      var supportsDBNull = ItemsSourceHelper.IsSupportingDBNull( itemsSource );
+
+      if( model != null )
+      {
+        descriptions = ItemsSourceHelper.CreatePropertyDescriptionsFromDataTable( model, displayable );
+      }
+      else if( itemsSource is DataView )
+      {
+        descriptions = ItemsSourceHelper.CreatePropertyDescriptionsFromDataView( ( DataView )itemsSource, displayable );
+      }
+      else if( itemsSource is DataGridCollectionViewBase )
+      {
+        descriptions = ItemsSourceHelper.CreatePropertyDescriptionsFromDataGridCollectionView( ( DataGridCollectionViewBase )itemsSource );
+      }
+      else if( itemsSource is ITypedList )
+      {
+        descriptions = ItemsSourceHelper.CreatePropertyDescriptionsFromPropertyDescriptors( ( ( ITypedList )itemsSource ).GetItemProperties( null ), supportsDBNull, displayable );
+      }
+      else
+      {
+        if( itemType == null )
         {
-          string detailFieldName = fieldName;
-          string masterFieldName;
-
-          if( !fieldMap.TryGetColumnFieldName( detailFieldName, out masterFieldName ) )
-          {
-            fieldDescriptors.Remove( detailFieldName );
-            continue;
-          }
-
-          FieldDescriptor masterField;
-          if( !masterFields.TryGetValue( masterFieldName, out masterField ) )
-          {
-            fieldDescriptors.Remove( masterFieldName );
-
-            Debug.WriteLine( string.Format( "An item property is mapped to a non-existent master field." ) );
-            continue;
-          }
-
-          FieldDescriptor detailField = fieldDescriptors[ fieldName ];
-          if( detailField.DataType != masterField.DataType )
-          {
-            fieldDescriptors.Remove( fieldName );
-
-            Debug.WriteLine( string.Format( "The data type of an item property doesn't match the data type of its master field." ) );
-            continue;
-          }
+          itemType = ItemsSourceHelper.GetItemTypeFromEnumeration( itemsSource );
         }
+
+        descriptions = ItemsSourceHelper.CreatePropertyDescriptionsFromItemType( itemsSource, itemType, supportsDBNull, displayable );
       }
 
-      return fieldDescriptors;
+      if( descriptions != null )
+      {
+        foreach( var description in descriptions )
+        {
+          collection.Add( description, true );
+        }
+      }
     }
 
-    private static Dictionary<string, FieldDescriptor> GetFieldsForItemType( IEnumerable itemsSource, Type itemType, bool supportsDBNull )
+    private static void SetPropertyDescriptions( PropertyDescriptionRouteDictionary detailCollection, PropertyDescriptionRouteDictionary masterCollection, DataGridItemPropertyMap itemPropertyMap, DataGridCollectionViewBase collectionView )
     {
-      if( itemType == null )
-        return new Dictionary<string, FieldDescriptor>();
+      if( collectionView == null )
+        return;
 
-      if( typeof( XmlNode ).IsAssignableFrom( itemType ) )
-        return new Dictionary<string, FieldDescriptor>();
+      foreach( var itemProperty in collectionView.ItemProperties )
+      {
+        var masterItemProperty = default( DataGridItemPropertyBase );
+        if( !itemPropertyMap.TryGetMasterItemProperty( itemProperty, out masterItemProperty ) )
+        {
+          Debug.WriteLine( string.Format( "No mapping was found for the item property." ) );
+          continue;
+        }
 
-      if( itemType.IsArray )
-        return ItemsSourceHelper.GetFieldsForJaggedArray( itemType, itemsSource );
+        var masterPropertyRoute = PropertyRouteBuilder.ToPropertyRoute( DataGridItemPropertyRoute.Create( masterItemProperty ) );
+        if( masterPropertyRoute == null )
+        {
+          masterPropertyRoute = PropertyRouteBuilder.ToPropertyRoute( new PropertyRouteSegment( PropertyRouteSegmentType.Property, masterItemProperty.Name ) );
+        }
 
-      if( itemType.IsInterface )
-        return ItemsSourceHelper.GetFieldsForInterface( itemType );
+        var masterPropertyDescription = masterCollection[ masterPropertyRoute ];
+        if( masterPropertyDescription == null )
+        {
+          Debug.WriteLine( string.Format( "An item property is mapped to a non-existent master field." ) );
+          continue;
+        }
 
-      if( ItemsSourceHelper.IsEntityFramework( itemType ) )
-        return ItemsSourceHelper.GetFieldsForEntityFramework( itemType );
+        var detailPropertyDescription = ItemsSourceHelper.CreatePropertyDescriptionFromDataGridItemProperty( itemProperty );
+        if( detailPropertyDescription.Current.DataType != masterPropertyDescription.Current.DataType )
+        {
+          Debug.WriteLine( string.Format( "The data type of an item property doesn't match the data type of its master field." ) );
+          continue;
+        }
 
-      if( ItemsSourceHelper.IsValueType( itemType ) )
-        return ItemsSourceHelper.GetFieldsForValueType( itemType, supportsDBNull );
+        if( detailCollection.Contains( masterPropertyRoute ) )
+        {
+          Debug.WriteLine( string.Format( "Another detail field is already linked to the master field." ) );
+          continue;
+        }
 
-      var customTypeDescriptor = ItemsSourceHelper.GetCustomTypeDescriptor( itemsSource, itemType );
-      if( customTypeDescriptor != null )
-        return ItemsSourceHelper.GetFieldsForCustomTypeDescriptor( customTypeDescriptor, itemType, supportsDBNull );
-
-      return ItemsSourceHelper.GetFieldDescriptors( TypeDescriptor.GetProperties( itemType ), supportsDBNull );
+        detailCollection.Add( masterPropertyRoute, detailPropertyDescription, false );
+      }
     }
 
-    public static Type GetItemTypeFromEnumeration( IEnumerable source )
+    internal static void SetPropertyDescriptionsFromItemProperty( PropertyDescriptionRouteDictionary propertyDescriptions, DataTable model, IEnumerable itemsSource, Type itemType, DataGridItemPropertyRoute itemPropertyRoute )
+    {
+      if( ( propertyDescriptions == null ) || ( itemPropertyRoute == null ) )
+        return;
+
+      var key = PropertyRouteBuilder.ToPropertyRoute( itemPropertyRoute );
+      ItemsSourceHelper.SetPropertyDescriptions( propertyDescriptions, model, itemsSource, itemType, key );
+
+      var propertyDescription = default( PropertyDescriptionRoute );
+      if( !propertyDescriptions.TryGetValue( key, out propertyDescription ) )
+        return;
+
+      var itemProperty = itemPropertyRoute.Current;
+      if( itemProperty.ItemPropertiesInternal == null )
+        return;
+
+      foreach( var childItemProperty in itemProperty.ItemPropertiesInternal )
+      {
+        ItemsSourceHelper.SetPropertyDescriptionsFromItemProperty(
+          propertyDescriptions,
+          null,
+          null,
+          itemProperty.DataType,
+          DataGridItemPropertyRoute.Combine( childItemProperty, itemPropertyRoute ) );
+      }
+    }
+
+    internal static void InitializePropertyDescriptions( PropertyDescriptionRouteDictionary collection, DataGridItemPropertyRoute itemPropertyRoute, Type itemType, bool defaultPropertyDescriptionsCreated )
+    {
+      if( ( collection == null ) || ( itemPropertyRoute == null ) )
+        return;
+
+      var propertyDescription = ItemsSourceHelper.GetPropertyDescriptionFromItemProperty( collection, itemPropertyRoute );
+      var itemProperty = itemPropertyRoute.Current;
+
+      itemProperty.SetUnspecifiedPropertiesValues( propertyDescription, itemType, defaultPropertyDescriptionsCreated );
+
+      if( itemProperty.ItemPropertiesInternal != null )
+      {
+        foreach( var childItemProperty in itemProperty.ItemPropertiesInternal )
+        {
+          ItemsSourceHelper.InitializePropertyDescriptions( collection, DataGridItemPropertyRoute.Combine( childItemProperty, itemPropertyRoute ), itemProperty.DataType, defaultPropertyDescriptionsCreated );
+        }
+      }
+    }
+
+    internal static Type GetItemTypeFromEnumeration( IEnumerable source )
     {
       if( source == null )
         return null;
 
-      Type listType = source.GetType();
-
-      if( typeof( Array ).IsAssignableFrom( listType ) )
-        return listType.GetElementType();
-
-      Type itemType = ItemsSourceHelper.GetTypedListIndexerType( listType );
+      var enumerationType = source.GetType();
+      var itemType = ItemsSourceHelper.GetItemTypeFromEnumerationType( enumerationType );
 
       if( itemType != null )
         return itemType;
 
-      itemType = ItemsSourceHelper.GetTypedEnumerationItemType( listType );
-
-      if( itemType != null )
-        return itemType;
-
-      object item = ItemsSourceHelper.GetFirstItemByEnumerable( source );
-
+      var item = ItemsSourceHelper.GetFirstItemByEnumerable( source );
       if( item != null )
         return item.GetType();
 
       return typeof( object );
     }
 
-    public static IEditableObject GetEditableObject( object item )
+    internal static Type GetItemTypeFromEnumerationType( Type enumerationType )
     {
-      System.Data.DataRow dataRow = item as System.Data.DataRow;
+      if( enumerationType == null )
+        return null;
 
+      if( typeof( Array ).IsAssignableFrom( enumerationType ) )
+        return enumerationType.GetElementType();
+
+      var itemType = ItemsSourceHelper.GetTypedListIndexerType( enumerationType );
+      if( itemType != null )
+        return itemType;
+
+      return ItemsSourceHelper.GetTypedEnumerationItemType( enumerationType );
+    }
+
+    internal static IEditableObject GetEditableObject( object item )
+    {
+      var dataRow = item as System.Data.DataRow;
       if( dataRow != null )
         return new DataRowEditableWrapper( dataRow );
 
       return item as IEditableObject;
     }
 
-    public static bool IsASubRelationship( Type dataType )
+    internal static ISupportInitialize GetSupportInitializeObject( object item )
     {
-      if( ( !dataType.IsValueType ) && ( dataType != typeof( string ) ) )
-      {
-        if( typeof( IEnumerable ).IsAssignableFrom( dataType ) )
-        {
-          if( typeof( byte[] ).IsAssignableFrom( dataType ) )
-            return false;
-
-          return true;
-        }
-
-        if( typeof( IListSource ).IsAssignableFrom( dataType ) )
-          return true;
-      }
-
-      return false;
+      return item as ISupportInitialize;
     }
 
-    public static object TryGetDataRowFromDataItem( object dataItem )
+    internal static bool IsASubRelationship( Type dataType )
     {
-      DataRowView dataRowView = dataItem as DataRowView;
+      if( ( dataType == null ) || ( dataType.IsValueType ) || ( typeof( string ).IsAssignableFrom( dataType ) ) )
+        return false;
 
+      if( typeof( IEnumerable ).IsAssignableFrom( dataType ) )
+        return !typeof( byte[] ).IsAssignableFrom( dataType );
+
+      return typeof( IListSource ).IsAssignableFrom( dataType );
+    }
+
+    internal static object TryGetDataRowFromDataItem( object dataItem )
+    {
+      var dataRowView = dataItem as DataRowView;
       if( dataRowView != null )
-      {
         return dataRowView.Row;
-      }
 
       return dataItem;
     }
 
-    public static System.Data.DataView TryGetDataViewFromDataGridContext( DataGridContext context )
+    internal static DataView TryGetDataViewFromDataGridContext( DataGridContext context )
     {
       if( context == null )
         return null;
 
-      System.Data.DataView dataView = context.ItemsSourceCollection as System.Data.DataView;
+      var dataView = context.ItemsSourceCollection as DataView;
+      if( dataView != null )
+        return dataView;
 
-      // Maybe the context is a detail
-      if( dataView == null )
-      {
-        DataGridCollectionViewBase collectionViewBase =
-          context.ItemsSourceCollection as DataGridCollectionViewBase;
+      var collectionViewBase = context.ItemsSourceCollection as DataGridCollectionViewBase;
+      if( collectionViewBase != null )
+        return collectionViewBase.SourceCollection as DataView;
 
-        if( collectionViewBase != null )
-        {
-          dataView = collectionViewBase.SourceCollection as System.Data.DataView;
-        }
-      }
-
-      return dataView;
+      return null;
     }
 
-    public static Type GetColumnDataType( System.Data.DataColumn column )
+    internal static Type GetColumnDataType( DataColumn column )
     {
-      Type columnType;
+      if( !column.AllowDBNull )
+        return column.DataType;
 
-      if( column.AllowDBNull )
-      {
-        if( column.DataType == typeof( Boolean ) )
-          columnType = typeof( Nullable<Boolean> );
-        else if( column.DataType == typeof( Boolean ) )
-          columnType = typeof( Nullable<Boolean> );
-        else if( column.DataType == typeof( Byte ) )
-          columnType = typeof( Nullable<Byte> );
-        else if( column.DataType == typeof( Char ) )
-          columnType = typeof( Nullable<Char> );
-        else if( column.DataType == typeof( DateTime ) )
-          columnType = typeof( Nullable<DateTime> );
-        else if( column.DataType == typeof( Decimal ) )
-          columnType = typeof( Nullable<Decimal> );
-        else if( column.DataType == typeof( Double ) )
-          columnType = typeof( Nullable<Double> );
-        else if( column.DataType == typeof( Int16 ) )
-          columnType = typeof( Nullable<Int16> );
-        else if( column.DataType == typeof( Int32 ) )
-          columnType = typeof( Nullable<Int32> );
-        else if( column.DataType == typeof( Int64 ) )
-          columnType = typeof( Nullable<Int64> );
-        else if( column.DataType == typeof( SByte ) )
-          columnType = typeof( Nullable<SByte> );
-        else if( column.DataType == typeof( Single ) )
-          columnType = typeof( Nullable<Single> );
-        else if( column.DataType == typeof( TimeSpan ) )
-          columnType = typeof( Nullable<TimeSpan> );
-        else if( column.DataType == typeof( UInt16 ) )
-          columnType = typeof( Nullable<UInt16> );
-        else if( column.DataType == typeof( UInt32 ) )
-          columnType = typeof( Nullable<UInt32> );
-        else if( column.DataType == typeof( UInt64 ) )
-          columnType = typeof( Nullable<UInt64> );
-        else
-          columnType = column.DataType;
-      }
-      else
-        columnType = column.DataType;
-      return columnType;
+      if( column.DataType == typeof( Boolean ) )
+        return typeof( Nullable<Boolean> );
+
+      if( column.DataType == typeof( Byte ) )
+        return typeof( Nullable<Byte> );
+
+      if( column.DataType == typeof( Char ) )
+        return typeof( Nullable<Char> );
+
+      if( column.DataType == typeof( DateTime ) )
+        return typeof( Nullable<DateTime> );
+
+      if( column.DataType == typeof( Decimal ) )
+        return typeof( Nullable<Decimal> );
+
+      if( column.DataType == typeof( Double ) )
+        return typeof( Nullable<Double> );
+
+      if( column.DataType == typeof( Int16 ) )
+        return typeof( Nullable<Int16> );
+
+      if( column.DataType == typeof( Int32 ) )
+        return typeof( Nullable<Int32> );
+
+      if( column.DataType == typeof( Int64 ) )
+        return typeof( Nullable<Int64> );
+
+      if( column.DataType == typeof( SByte ) )
+        return typeof( Nullable<SByte> );
+
+      if( column.DataType == typeof( Single ) )
+        return typeof( Nullable<Single> );
+
+      if( column.DataType == typeof( TimeSpan ) )
+        return typeof( Nullable<TimeSpan> );
+
+      if( column.DataType == typeof( UInt16 ) )
+        return typeof( Nullable<UInt16> );
+
+      if( column.DataType == typeof( UInt32 ) )
+        return typeof( Nullable<UInt32> );
+
+      if( column.DataType == typeof( UInt64 ) )
+        return typeof( Nullable<UInt64> );
+
+      return column.DataType;
     }
 
-    public static void CleanUpColumns( ColumnCollection columns, bool deleteAutoCreatedColumn )
+    internal static void CleanUpColumns( ColumnCollection columns, bool deleteAutoCreatedColumn )
     {
-      ColumnBase[] tempColumns = new ColumnBase[ columns.Count ];
+      var tempColumns = new ColumnBase[ columns.Count ];
       columns.CopyTo( tempColumns, 0 );
 
       foreach( ColumnBase column in tempColumns )
       {
-        Column dataColumn = column as Column;
-
+        var dataColumn = column as Column;
         if( dataColumn == null )
           continue;
 
@@ -1070,176 +1261,143 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    public static FieldDescriptor CreateFieldFromDataGridItemProperty( DataGridItemPropertyBase itemProperty )
+    internal static PropertyDescriptionRoute CreateOrGetPropertyDescriptionFromColumn( DataGridContext dataGridContext, ColumnBase column, Type itemType )
     {
-      var propertyDescriptor = itemProperty.GetPropertyDescriptorForBinding();
+      if( ( dataGridContext == null ) || ( column == null ) || string.IsNullOrEmpty( column.FieldName ) )
+        return null;
 
-      string name = propertyDescriptor.Name;
-      Type type = propertyDescriptor.PropertyType;
+      var key = PropertyRouteParser.Parse( column.FieldName );
+      if( key == null )
+        return null;
 
-      // If an ItemProperty is in the public ItemProperties of the collection view,
-      // we always want to consider that property is not a detail and browsable.
-      return new FieldDescriptor( name,
-                                  propertyDescriptor.DisplayName,
-                                  propertyDescriptor.PropertyType,
-                                  propertyDescriptor,
-                                  null,
-                                  null,
-                                  itemProperty.IsReadOnly,
-                                  itemProperty.OverrideReadOnlyForInsertion.GetValueOrDefault( false ),
-                                  false,
-                                  true,
-                                  false,
-                                  itemProperty is DataGridUnboundItemProperty,
-                                  itemProperty.ForeignKeyDescription );
-    }
+      var propertyDescriptions = dataGridContext.ItemsSourcePropertyDescriptions;
+      if( propertyDescriptions == null )
+        return null;
 
-    public static void UpdateColumnsOnItemsPropertiesChanged( DataGridControl dataGridControl, ColumnCollection columns, bool autoCreateForeignKeyConfigurations,
-                                                              NotifyCollectionChangedEventArgs e, DataGridItemPropertyCollection itemProperties )
-    {
-      if( dataGridControl == null )
-        return;
-
-      switch( e.Action )
+      var propertyDescriptionRoute = default( PropertyDescriptionRoute );
+      if( !propertyDescriptions.TryGetValue( key, out propertyDescriptionRoute ) )
       {
-        case NotifyCollectionChangedAction.Add:
+        if( ( itemType == null ) || typeof( EmptyDataItem ).IsAssignableFrom( itemType ) )
+        {
+          var dataGridCollectionView = dataGridContext.ItemsSourceCollection as DataGridCollectionViewBase;
+          if( dataGridCollectionView != null )
           {
-            foreach( DataGridItemPropertyBase itemProperty in e.NewItems )
-            {
-              string name = itemProperty.Name;
-
-              if( columns[ name ] == null )
-              {
-                Column column = ItemsSourceHelper.CreateColumnFromItemsSourceField(
-                  dataGridControl.DefaultCellEditors,
-                  ItemsSourceHelper.CreateFieldFromDataGridItemProperty( itemProperty ),
-                  autoCreateForeignKeyConfigurations );
-
-                if( column != null )
-                {
-                  columns.Add( column );
-                }
-              }
-            }
+            itemType = dataGridCollectionView.ItemType;
           }
-
-          break;
-
-        case NotifyCollectionChangedAction.Remove:
+          else
           {
-            foreach( DataGridItemPropertyBase itemProperty in e.OldItems )
-            {
-              string name = itemProperty.Name;
-              Column column = columns[ name ] as Column;
+            var dataItem = ItemsSourceHelper.GetFirstItemByEnumerable( dataGridContext.Items );
 
-              if( ( column != null ) && ( column.IsAutoCreated ) )
-              {
-                columns.Remove( column );
-              }
-            }
-
-            break;
+            itemType = ( ( dataItem != null ) && !( dataItem is EmptyDataItem ) ) ? dataItem.GetType() : null;
           }
+        }
 
-        case NotifyCollectionChangedAction.Replace:
-          {
-            foreach( DataGridItemPropertyBase itemProperty in e.OldItems )
-            {
-              string name = itemProperty.Name;
-              Column column = columns[ name ] as Column;
+        ItemsSourceHelper.SetPropertyDescriptions( propertyDescriptions, null, dataGridContext.Items, itemType, key );
 
-              if( ( column != null ) && ( column.IsAutoCreated ) )
-              {
-                columns.Remove( column );
-              }
-            }
-
-            foreach( DataGridItemPropertyBase itemProperty in e.NewItems )
-            {
-              string name = itemProperty.Name;
-
-              if( columns[ name ] == null )
-              {
-                Column column = ItemsSourceHelper.CreateColumnFromItemsSourceField(
-                  dataGridControl.DefaultCellEditors,
-                  ItemsSourceHelper.CreateFieldFromDataGridItemProperty( itemProperty ),
-                  autoCreateForeignKeyConfigurations );
-
-                if( column != null )
-                {
-                  columns.Add( column );
-                }
-              }
-            }
-
-            break;
-          }
-
-        case NotifyCollectionChangedAction.Reset:
-          {
-            for( int i = columns.Count - 1; i >= 0; i-- )
-            {
-              Column dataColumn = columns[ i ] as Column;
-
-              if( ( dataColumn != null ) && ( dataColumn.IsAutoCreated ) )
-              {
-                columns.Remove( dataColumn );
-              }
-            }
-
-            foreach( DataGridItemPropertyBase itemProperty in itemProperties )
-            {
-              string name = itemProperty.Name;
-
-              if( columns[ name ] == null )
-              {
-                Column column = ItemsSourceHelper.CreateColumnFromItemsSourceField(
-                  dataGridControl.DefaultCellEditors,
-                  ItemsSourceHelper.CreateFieldFromDataGridItemProperty( itemProperty ),
-                  autoCreateForeignKeyConfigurations );
-
-                if( column != null )
-                {
-                  columns.Add( column );
-                }
-              }
-            }
-
-            break;
-          }
-
-        //case NotifyCollectionChangedAction.Move:
-        default:
-          break;
+        if( !propertyDescriptions.TryGetValue( key, out propertyDescriptionRoute ) )
+          return null;
       }
+
+      return propertyDescriptionRoute;
     }
 
-    internal static System.Windows.Data.Binding AutoCreateDisplayMemberBinding( Column column, DataGridContext dataGridContext, object dataItem, out bool isDataGridUnboundItemProperty )
+    internal static System.Windows.Data.Binding CreateDefaultBinding( PropertyDescriptionRoute propertyDescriptionRoute )
     {
-      System.Windows.Data.Binding displayMemberBinding = null;
+      if( propertyDescriptionRoute == null )
+        return null;
 
-      if( column == null )
-        throw new ArgumentNullException( "column" );
+      var propertyDescription = propertyDescriptionRoute.Current;
+      var bindingXPath = propertyDescription.XPath;
+      var bindingPath = new StringBuilder();
+      var isPropertyDescriptorFirstAccessor = false;
 
-      string name = column.FieldName;
-
-      // Don't create the default binding if FieldName is null and we're in design-time.
-      if( !string.IsNullOrEmpty( name ) )
+      var propertyDescriptors = new List<PropertyDescriptor>();
+      if( propertyDescription.PropertyDescriptor != null )
       {
-        ItemsSourceHelper.FieldDescriptor fieldDescriptor;
-        dataGridContext.ItemsSourceFieldDescriptors.TryGetValue( name, out fieldDescriptor );
+        bindingPath.Append( "(" ).Append( propertyDescriptors.Count ).Append( ")" );
+        propertyDescriptors.Add( propertyDescription.PropertyDescriptor );
+        isPropertyDescriptorFirstAccessor = true;
+      }
+      else if( !string.IsNullOrEmpty( propertyDescription.Path ) )
+      {
+        bindingPath.Append( propertyDescription.Path );
+      }
 
-        isDataGridUnboundItemProperty = ( fieldDescriptor == null ) ? false :
-          fieldDescriptor.IsDataGridUnboundItemProperty;
+      var currentPropertyDescriptionRoute = propertyDescriptionRoute.Parent;
 
-        displayMemberBinding = ItemsSourceHelper.CreateDefaultBinding( dataItem is DataRow, name, fieldDescriptor, column, false, typeof( object ) );
+      while( currentPropertyDescriptionRoute != null )
+      {
+        var currentPropertyDescription = currentPropertyDescriptionRoute.Current;
+
+        if( currentPropertyDescription.SupportDBNull )
+          throw new InvalidOperationException( "Cannot create binding when a parent property supports DBNull." );
+
+        if( currentPropertyDescription.IsDataGridUnboundItemProperty )
+          throw new InvalidOperationException( "Cannot create binding when a parent property is linked to an UnboundDataGridItemProperty." );
+
+        if( currentPropertyDescription.ForeignKeyDescription != null )
+          throw new InvalidOperationException( "Cannot create binding when a parent property is a foreign key." );
+
+        if( !string.IsNullOrEmpty( bindingXPath ) )
+          throw new InvalidOperationException( "Cannot create binding when a child property has an XPath." );
+
+        bindingXPath = currentPropertyDescription.XPath;
+
+        if( currentPropertyDescription.PropertyDescriptor != null )
+        {
+          isPropertyDescriptorFirstAccessor = true;
+
+          if( bindingPath.Length != 0 )
+          {
+            bindingPath.Insert( 0, "." );
+          }
+
+          bindingPath.Insert( 0, ")" ).Insert( 0, propertyDescriptors.Count ).Insert( 0, "(" );
+          propertyDescriptors.Add( currentPropertyDescription.PropertyDescriptor );
+        }
+        else if( !string.IsNullOrEmpty( currentPropertyDescription.Path ) )
+        {
+          isPropertyDescriptorFirstAccessor = false;
+
+          if( bindingPath.Length != 0 )
+          {
+            bindingPath.Insert( 0, "." );
+          }
+
+          bindingPath.Insert( 0, currentPropertyDescription.Path );
+        }
+
+        currentPropertyDescriptionRoute = currentPropertyDescriptionRoute.Parent;
+      }
+
+      var bindingInfo = new DataGridBindingInfo();
+
+      if( !string.IsNullOrEmpty( bindingXPath ) )
+      {
+        bindingInfo.XPath = bindingXPath;
       }
       else
       {
-        isDataGridUnboundItemProperty = false;
+        // We must insert a PropertyDescriptor to manage EmptyDataItem when the accessor is not from a DataGridItemPropertyBase.
+        if( isPropertyDescriptorFirstAccessor && !( propertyDescriptors.Last() is DataGridItemPropertyBase.PropertyDescriptorFromItemPropertyBase ) )
+        {
+          if( bindingPath.Length != 0 )
+          {
+            bindingPath.Insert( 0, "." );
+          }
+
+          bindingPath.Insert( 0, ")" ).Insert( 0, propertyDescriptors.Count ).Insert( 0, "(" );
+          propertyDescriptors.Add( EmptyDataItemSafePropertyDescriptor.Singleton );
+        }
       }
 
-      return displayMemberBinding;
+      bindingInfo.Path = new PropertyPath( bindingPath.ToString(), propertyDescriptors.ToArray() );
+      bindingInfo.ReadOnly = ( propertyDescription.IsReadOnly && !propertyDescription.OverrideReadOnlyForInsertion );
+      bindingInfo.Converter = new SourceDataConverter( propertyDescription.SupportDBNull );
+
+      bindingInfo.ValidationRules.Add( new SourceDataConverterValidationRule( propertyDescription.SupportDBNull, propertyDescription.DataType ) );
+
+      return bindingInfo.GetBinding();
     }
 
     private static Type GetTypedListIndexerType( Type listType )
@@ -1247,14 +1405,14 @@ namespace Xceed.Wpf.DataGrid
       if( ( !typeof( IList ).IsAssignableFrom( listType ) && !typeof( ITypedList ).IsAssignableFrom( listType ) ) && !typeof( IListSource ).IsAssignableFrom( listType ) )
         return null;
 
-      PropertyInfo info = null;
-      PropertyInfo[] properties = listType.GetProperties( BindingFlags.Public | BindingFlags.Instance );
+      var info = default( PropertyInfo );
+      var propertyInfos = listType.GetProperties( BindingFlags.Public | BindingFlags.Instance );
 
-      for( int i = 0; i < properties.Length; i++ )
+      foreach( var propertyInfo in propertyInfos )
       {
-        if( ( properties[ i ].GetIndexParameters().Length > 0 ) && ( properties[ i ].PropertyType != typeof( object ) ) )
+        if( ( propertyInfo.GetIndexParameters().Length > 0 ) && ( propertyInfo.PropertyType != typeof( object ) ) )
         {
-          info = properties[ i ];
+          info = propertyInfo;
 
           if( info.Name == "Item" )
             return info.PropertyType;
@@ -1269,6 +1427,9 @@ namespace Xceed.Wpf.DataGrid
 
     private static Type GetTypedEnumerationItemType( Type listType )
     {
+      if( listType == null )
+        return null;
+
       foreach( Type interfaceType in listType.GetInterfaces() )
       {
         if( ( interfaceType.IsGenericType ) && ( interfaceType.GetGenericTypeDefinition() == typeof( IEnumerable<> ) ) )
@@ -1278,283 +1439,291 @@ namespace Xceed.Wpf.DataGrid
       return null;
     }
 
-    private static Dictionary<string, FieldDescriptor> GetFieldsForDataView( DataView dataView )
+    private static void SetPropertyDescriptions( PropertyDescriptionRouteDictionary propertyDescriptions, DataTable model, IEnumerable itemsSource, Type itemType, PropertyRoute propertyRoute )
     {
-      PropertyDescriptorCollection itemProperties = ( ( ITypedList )dataView ).GetItemProperties( null );
-      int fieldCount = itemProperties.Count;
-      Dictionary<string, FieldDescriptor> fieldDescriptors = new Dictionary<string, FieldDescriptor>( fieldCount );
+      if( ( propertyDescriptions == null ) || ( propertyRoute == null ) || propertyDescriptions.Contains( propertyRoute ) )
+        return;
 
-      Dictionary<string, ForeignKeyConstraint> foreignKeyConstraints =
-        ItemsSourceHelper.GetForeignKeyConstraints( dataView.Table.Constraints );
-
-      DataColumnCollection columns = dataView.Table.Columns;
-
-      for( int i = 0; i < fieldCount; i++ )
+      var parentKey = propertyRoute.Parent;
+      if( parentKey != null )
       {
-        PropertyDescriptor propertyDescriptor = itemProperties[ i ];
+        ItemsSourceHelper.SetPropertyDescriptions( propertyDescriptions, model, itemsSource, itemType, parentKey );
 
-        string name = propertyDescriptor.Name;
-        DataColumn column = columns[ name ];
+        PropertyDescriptionRoute parentPropertyDescriptionRoute;
+        if( !propertyDescriptions.TryGetValue( parentKey, out parentPropertyDescriptionRoute ) )
+          return;
 
-        string displayName =
-          ( column == null ) ?
-          propertyDescriptor.DisplayName : column.Caption;
+        var parentItemType = parentPropertyDescriptionRoute.Current.DataType;
+        var childPropertyDescriptions = new PropertyDescriptionRouteDictionary();
 
-        bool allowBDNull =
-          ( column == null ) ?
-          false : column.AllowDBNull;
+        ItemsSourceHelper.SetPropertyDescriptions( childPropertyDescriptions, null, null, parentItemType, false );
 
-        ForeignKeyConstraint foreignKeyConstraint = null;
-        foreignKeyConstraints.TryGetValue( name, out foreignKeyConstraint );
-
-        DataTableForeignKeyDescription foreignKeyDescription =
-          ItemsSourceHelper.GetDataGridForeignKeyDescriptionForForeignKeyConstraint( foreignKeyConstraint );
-
-        fieldDescriptors[ name ] = new FieldDescriptor( name,
-                                                        displayName,
-                                                        propertyDescriptor.PropertyType,
-                                                        propertyDescriptor,
-                                                        null,
-                                                        name,
-                                                        propertyDescriptor.IsReadOnly,
-                                                        false,
-                                                        allowBDNull,
-                                                        propertyDescriptor.IsBrowsable,
-                                                        ( column == null ) && ItemsSourceHelper.IsASubRelationship( propertyDescriptor.PropertyType ),
-                                                        false,
-                                                        foreignKeyDescription );
-
-        Debug.Assert( ( column != null ) || ( ItemsSourceHelper.IsASubRelationship( propertyDescriptor.PropertyType ) ),
-          "If we don't have a column that corresponds to the property of a DataRowView, it is safe to assume that we have a sub relation." );
-      }
-
-      return fieldDescriptors;
-    }
-
-    private static Dictionary<string, FieldDescriptor> GetFieldsForDataTable( DataTable dataTable )
-    {
-      DataColumnCollection columns = dataTable.Columns;
-      int fieldCount = columns.Count;
-
-      Dictionary<string, FieldDescriptor> fieldDescriptors = new Dictionary<string, FieldDescriptor>( fieldCount );
-      Dictionary<string, ForeignKeyConstraint> foreignKeyConstraints =
-       ItemsSourceHelper.GetForeignKeyConstraints( dataTable.Constraints );
-
-      for( int i = 0; i < fieldCount; i++ )
-      {
-        DataColumn column = columns[ i ];
-
-        string name = column.Caption;
-
-        ForeignKeyConstraint foreignKeyConstraint = null;
-        foreignKeyConstraints.TryGetValue( name, out foreignKeyConstraint );
-
-        DataTableForeignKeyDescription foreignKeyDescription =
-          ItemsSourceHelper.GetDataGridForeignKeyDescriptionForForeignKeyConstraint( foreignKeyConstraint );
-
-        fieldDescriptors[ name ] = new FieldDescriptor( name,
-                                                        name,
-                                                        column.DataType,
-                                                        null,
-                                                        null,
-                                                        "[" + name + "]",
-                                                        column.ReadOnly,
-                                                        false,
-                                                        column.AllowDBNull,
-                                                        true,
-                                                        false,
-                                                        false,
-                                                        foreignKeyDescription );
-      }
-
-      return fieldDescriptors;
-    }
-
-    private static Dictionary<string, FieldDescriptor> GetFieldsForDataGridCollectionViewBase( DataGridCollectionViewBase dataGridCollectionViewBase,
-                                                                                               DataGridItemPropertyCollection itemProperties )
-    {
-      int fieldCount = itemProperties.Count;
-
-      Dictionary<string, FieldDescriptor> fieldDescriptors =
-        new Dictionary<string, FieldDescriptor>( fieldCount );
-
-      for( int i = 0; i < fieldCount; i++ )
-      {
-        DataGridItemPropertyBase itemProperty = itemProperties[ i ];
-        fieldDescriptors[ itemProperty.Name ] = ItemsSourceHelper.CreateFieldFromDataGridItemProperty( itemProperty );
-      }
-
-      return fieldDescriptors;
-    }
-
-    private static Dictionary<string, FieldDescriptor> GetFieldsForInterface( Type itemType )
-    {
-      Dictionary<string, FieldDescriptor> fieldDescriptors = new Dictionary<string, FieldDescriptor>();
-      ItemsSourceHelper.ExtractFieldDescriptors( string.Empty, TypeDescriptor.GetProperties( itemType ), false, fieldDescriptors );
-
-      foreach( Type interfaceType in itemType.GetInterfaces() )
-      {
-        ItemsSourceHelper.ExtractFieldDescriptors( interfaceType.FullName, TypeDescriptor.GetProperties( interfaceType ), false, fieldDescriptors );
-      }
-
-      return fieldDescriptors;
-    }
-
-    private static Dictionary<string, FieldDescriptor> GetFieldsForJaggedArray( Type itemType, IEnumerable jaggedArray )
-    {
-      int fieldCount = 0;
-      IEnumerator enumerator = jaggedArray.GetEnumerator();
-      enumerator.MoveNext();
-
-      try
-      {
-        Array arrayItem = enumerator.Current as Array;
-        fieldCount = arrayItem.GetLength( 0 );
-      }
-      catch
-      {
-      }
-
-      Dictionary<string, FieldDescriptor> fieldDescriptors =
-        new Dictionary<string, FieldDescriptor>( fieldCount );
-
-      Type fieldType = itemType.GetElementType();
-
-      for( int i = 0; i < fieldCount; i++ )
-      {
-        string name = ".[" + i.ToString( CultureInfo.InvariantCulture ) + "]";
-
-        DataGridForeignKeyDescription foreignKeyDescription = null;
-
-        // Try to retreive the ForeignKeyDescription if the field is an Enum
-        if( ( fieldType != null ) && ( fieldType.IsEnum ) )
+        foreach( var childPropertyDescriptionRoute in childPropertyDescriptions.Values )
         {
-          foreignKeyDescription = ItemsSourceHelper.GetDataGridForeignKeyDescriptionForEnum( fieldType );
+          var newPropertyDescriptionRoute = PropertyDescriptionRoute.Combine( childPropertyDescriptionRoute, parentPropertyDescriptionRoute );
+          var newPropertyRoute = PropertyRouteBuilder.ToPropertyRoute( newPropertyDescriptionRoute );
+
+          if( ( newPropertyRoute == null ) || propertyDescriptions.Contains( newPropertyRoute ) )
+            continue;
+
+          propertyDescriptions.Add( newPropertyRoute, newPropertyDescriptionRoute, false );
         }
 
-        fieldDescriptors[ name ] = new FieldDescriptor( name,
-                                                        name,
-                                                        fieldType,
-                                                        new JaggedArrayPropertyDescriptor( i, fieldType ),
-                                                        null,
-                                                        null,
-                                                        false,
-                                                        false,
-                                                        false,
-                                                        true,
-                                                        ItemsSourceHelper.IsASubRelationship( fieldType ),
-                                                        false,
-                                                        foreignKeyDescription );
-      }
-
-      return fieldDescriptors;
-    }
-
-    private static Dictionary<string, FieldDescriptor> GetFieldsForEntityFramework( Type itemType )
-    {
-      PropertyDescriptorCollection propertyDescriptors = TypeDescriptor.GetProperties( itemType );
-      Dictionary<string, FieldDescriptor> fieldDescriptors = new Dictionary<string, FieldDescriptor>( propertyDescriptors.Count );
-
-      foreach( PropertyDescriptor propertyDescriptor in propertyDescriptors )
-      {
-        bool isEntityKey = false;
-        bool allowNull = false;
-
-        EdmScalarPropertyAttribute attribute = propertyDescriptor.Attributes[ typeof( EdmScalarPropertyAttribute ) ] as EdmScalarPropertyAttribute;
-
-        if( attribute != null )
+        var currentSegment = propertyRoute.Current;
+        if( currentSegment.Type == PropertyRouteSegmentType.Indexer )
         {
-          isEntityKey = attribute.EntityKeyProperty;
-          allowNull = attribute.IsNullable;
+          var indexerDescriptionRoute = ItemsSourceHelper.CreateIndexerDescription( itemsSource, parentItemType, currentSegment.Name, false );
+          if( indexerDescriptionRoute != null )
+          {
+            var newIndexerDescriptionRoute = PropertyDescriptionRoute.Combine( indexerDescriptionRoute, parentPropertyDescriptionRoute );
+            if( newIndexerDescriptionRoute != null )
+            {
+              var newIndexerRoute = PropertyRouteBuilder.ToPropertyRoute( newIndexerDescriptionRoute );
+              if( ( newIndexerRoute != null ) && !propertyDescriptions.Contains( newIndexerRoute ) )
+              {
+                propertyDescriptions.Add( newIndexerRoute, newIndexerDescriptionRoute, false );
+              }
+            }
+          }
         }
-
-        string name = propertyDescriptor.Name;
-
-        fieldDescriptors[ name ] = new FieldDescriptor(
-          name,
-          propertyDescriptor.DisplayName,
-          propertyDescriptor.PropertyType,
-          propertyDescriptor,
-          null,
-          name,
-          ( propertyDescriptor.IsReadOnly || isEntityKey ), // A column must be read-only if it's an EntityKey (except for the InsertionRow)
-          ( !propertyDescriptor.IsReadOnly && isEntityKey ),
-          allowNull,
-          propertyDescriptor.IsBrowsable,
-          ItemsSourceHelper.IsASubRelationship( propertyDescriptor.PropertyType ),
-          false,
-          null );
       }
-
-      return fieldDescriptors;
-    }
-
-    private static Dictionary<string, FieldDescriptor> GetFieldsForValueType( Type itemType, bool supportsDBNull )
-    {
-      return ItemsSourceHelper.GetFieldsForValueType( itemType, supportsDBNull, null );
-    }
-
-    private static Dictionary<string, FieldDescriptor> GetFieldsForValueType( Type itemType, bool supportsDBNull, DataGridForeignKeyDescription foreignKeyDescription )
-    {
-      Dictionary<string, FieldDescriptor> fieldDescriptors = new Dictionary<string, FieldDescriptor>();
-      FieldDescriptor fieldDescriptor = new FieldDescriptor( ".",
-                                                             string.Empty,
-                                                             itemType,
-                                                             null,
-                                                             null,
-                                                             ".",
-                                                             true,
-                                                             false,
-                                                             supportsDBNull,
-                                                             true,
-                                                             ItemsSourceHelper.IsASubRelationship( itemType ),
-                                                             false,
-                                                             foreignKeyDescription );
-
-      fieldDescriptors.Add( ".", fieldDescriptor );
-
-      return fieldDescriptors;
-    }
-
-    private static Dictionary<string, FieldDescriptor> GetFieldsForCustomTypeDescriptor( ICustomTypeDescriptor customTypeDescriptor, Type itemType, bool supportsDBNull )
-    {
-      var className = customTypeDescriptor.GetClassName();
-      var customType = ( className == null ) ? null : Type.GetType( className );
-
-      if( ( customType != null ) && ( ItemsSourceHelper.IsValueType( customType ) ) )
+      else
       {
-        DataGridForeignKeyDescription foreignKeyDescription = null;
+        ItemsSourceHelper.SetPropertyDescriptions( propertyDescriptions, model, itemsSource, itemType, false );
 
-        // Try to retreive the ForeignKeyDescription if the field is an Enum
-        if( ( itemType != null ) && ( itemType.IsEnum ) )
+        var currentSegment = propertyRoute.Current;
+        if( currentSegment.Type == PropertyRouteSegmentType.Indexer )
         {
-          foreignKeyDescription = ItemsSourceHelper.GetDataGridForeignKeyDescriptionForEnum( itemType );
+          var newIndexerDescriptionRoute = ItemsSourceHelper.CreateIndexerDescription( itemsSource, itemType, currentSegment.Name, false );
+          if( newIndexerDescriptionRoute != null )
+          {
+            var newIndexerRoute = PropertyRouteBuilder.ToPropertyRoute( newIndexerDescriptionRoute );
+            if( ( newIndexerRoute != null ) && !propertyDescriptions.Contains( newIndexerRoute ) )
+            {
+              propertyDescriptions.Add( newIndexerRoute, newIndexerDescriptionRoute, false );
+            }
+          }
         }
+      }
+    }
 
-        return ItemsSourceHelper.GetFieldsForValueType( itemType, supportsDBNull, foreignKeyDescription );
+    private static IEnumerable<PropertyDescriptionRoute> CreatePropertyDescriptionsFromDataTable( DataTable source, bool displayable )
+    {
+      Debug.Assert( source != null );
+
+      var foreignKeyConstraints = ItemsSourceHelper.GetForeignKeyConstraints( source.Constraints );
+      var columns = source.Columns;
+
+      foreach( DataColumn column in columns )
+      {
+        yield return new PropertyDescriptionRoute(
+                           new DataTablePropertyDescription(
+                             new DataRowColumnPropertyDescriptor( column ),
+                             column,
+                             foreignKeyConstraints,
+                             displayable ) );
+      }
+    }
+
+    private static IEnumerable<PropertyDescriptionRoute> CreatePropertyDescriptionsFromDataView( DataView source, bool displayable )
+    {
+      Debug.Assert( source != null );
+
+      var itemProperties = ( ( ITypedList )source ).GetItemProperties( null );
+      var dataTable = source.Table;
+      var foreignKeyConstraints = ItemsSourceHelper.GetForeignKeyConstraints( dataTable.Constraints );
+      var columns = dataTable.Columns;
+
+      foreach( PropertyDescriptor propertyDescriptor in itemProperties )
+      {
+        yield return new PropertyDescriptionRoute( new DataTablePropertyDescription( propertyDescriptor, columns[ propertyDescriptor.Name ], foreignKeyConstraints, displayable ) );
+      }
+    }
+
+    private static IEnumerable<PropertyDescriptionRoute> CreatePropertyDescriptionsFromDataGridCollectionView( DataGridCollectionViewBase source )
+    {
+      if( source == null )
+        return Enumerable.Empty<PropertyDescriptionRoute>();
+
+      return ItemsSourceHelper.CreatePropertyDescriptionsFromItemProperties( source.ItemProperties );
+    }
+
+    private static IEnumerable<PropertyDescriptionRoute> CreatePropertyDescriptionsFromItemProperties( IEnumerable<DataGridItemPropertyBase> source )
+    {
+      if( source == null )
+        yield break;
+
+      foreach( var itemProperty in source )
+      {
+        yield return ItemsSourceHelper.CreatePropertyDescriptionFromDataGridItemProperty( itemProperty );
+
+        foreach( var childItemProperty in ItemsSourceHelper.CreatePropertyDescriptionsFromItemProperties( itemProperty.ItemPropertiesInternal ) )
+        {
+          yield return childItemProperty;
+        }
+      }
+    }
+
+    private static IEnumerable<PropertyDescriptionRoute> CreatePropertyDescriptionsFromPropertyDescriptors( PropertyDescriptorCollection source, bool supportsDBNull, bool displayable )
+    {
+      if( source == null )
+        yield break;
+
+      foreach( PropertyDescriptor propertyDescriptor in source )
+      {
+        yield return new PropertyDescriptionRoute( new PropertyDescriptorPropertyDescription( propertyDescriptor, supportsDBNull, displayable ) );
+      }
+    }
+
+    private static IEnumerable<PropertyDescriptionRoute> CreatePropertyDescriptionsFromItemType( IEnumerable itemsSource, Type itemType, bool supportsDBNull, bool displayable )
+    {
+      if( itemType == null )
+        return Enumerable.Empty<PropertyDescriptionRoute>();
+
+      if( typeof( XmlNode ).IsAssignableFrom( itemType ) )
+        return Enumerable.Empty<PropertyDescriptionRoute>();
+
+      if( itemType.IsArray )
+        return ItemsSourceHelper.CreatePropertyDescriptionsFromJaggedArray( itemType, itemsSource, displayable );
+
+      if( itemType.IsInterface )
+        return ItemsSourceHelper.CreatePropertyDescriptionsFromInterface( itemType, displayable );
+
+      if( ItemsSourceHelper.IsEntityFramework( itemType ) )
+        return ItemsSourceHelper.CreatePropertyDescriptionsFromEntityFramework( itemType, displayable );
+
+      if( ItemsSourceHelper.IsValueType( itemType ) )
+      {
+        var customTypeDescriptor = ItemsSourceHelper.GetCustomTypeDescriptor( itemsSource, itemType );
+
+        return ItemsSourceHelper.CreatePropertyDescriptionsFromValueType( itemType, supportsDBNull, null, displayable ).Concat(
+                 ( customTypeDescriptor != null )
+                   ? ItemsSourceHelper.CreatePropertyDescriptionsFromCustomTypeDescriptor( customTypeDescriptor, itemType, supportsDBNull, false )
+                   : ItemsSourceHelper.CreatePropertyDescriptionsFromPropertyDescriptors( TypeDescriptor.GetProperties( itemType ), supportsDBNull, false ) );
+      }
+      else
+      {
+        var customTypeDescriptor = ItemsSourceHelper.GetCustomTypeDescriptor( itemsSource, itemType );
+        if( customTypeDescriptor != null )
+          return ItemsSourceHelper.CreatePropertyDescriptionsFromCustomTypeDescriptor( customTypeDescriptor, itemType, supportsDBNull, displayable );
+
+        return ItemsSourceHelper.CreatePropertyDescriptionsFromPropertyDescriptors( TypeDescriptor.GetProperties( itemType ), supportsDBNull, displayable );
+      }
+    }
+
+    private static IEnumerable<PropertyDescriptionRoute> CreatePropertyDescriptionsFromJaggedArray( Type itemType, IEnumerable jaggedArray, bool displayable )
+    {
+      var firstItem = ItemsSourceHelper.GetFirstItemByEnumerable( jaggedArray ) as Array;
+      if( ( firstItem == null ) || ( itemType == null ) )
+        yield break;
+
+      var fieldCount = firstItem.GetLength( 0 );
+      var fieldType = itemType.GetElementType();
+
+      for( int i = 0; i < fieldCount; i++ )
+      {
+        yield return new PropertyDescriptionRoute( new JaggedArrayPropertyDescription( i, fieldType, displayable ) );
+      }
+    }
+
+    private static IEnumerable<PropertyDescriptionRoute> CreatePropertyDescriptionsFromInterface( Type itemType, bool displayable )
+    {
+      var propertyDescriptions = ItemsSourceHelper.CreatePropertyDescriptionsFromPropertyDescriptors( TypeDescriptor.GetProperties( itemType ), false, displayable ).ToList();
+      var names = new HashSet<string>( propertyDescriptions.Select( item => PropertyRouteParser.Parse( PropertyRouteBuilder.ToPropertyRoute( item ) ) ) );
+
+      foreach( var interfaceType in itemType.GetInterfaces() )
+      {
+        foreach( PropertyDescriptor propertyDescriptor in TypeDescriptor.GetProperties( interfaceType ) )
+        {
+          PropertyDescription propertyDescription;
+
+          if( names.Contains( propertyDescriptor.Name ) )
+          {
+            var newName = string.Format( "{0}.{1}", interfaceType.FullName, propertyDescriptor.Name );
+            propertyDescription = new NamedPropertyDescriptorPropertyDescription( newName, propertyDescriptor, false, displayable );
+          }
+          else
+          {
+            propertyDescription = new PropertyDescriptorPropertyDescription( propertyDescriptor, false, displayable );
+          }
+
+          Debug.Assert( propertyDescription != null );
+
+          names.Add( propertyDescription.Name );
+          propertyDescriptions.Add( new PropertyDescriptionRoute( propertyDescription ) );
+        }
       }
 
-      return ItemsSourceHelper.GetFieldDescriptors( customTypeDescriptor.GetProperties(), supportsDBNull );
+      return propertyDescriptions;
+    }
+
+    private static IEnumerable<PropertyDescriptionRoute> CreatePropertyDescriptionsFromEntityFramework( Type itemType, bool displayable )
+    {
+      foreach( PropertyDescriptor propertyDescriptor in TypeDescriptor.GetProperties( itemType ) )
+      {
+        yield return new PropertyDescriptionRoute( new EntityFrameworkPropertyDescription( propertyDescriptor, displayable ) );
+      }
+    }
+
+    private static IEnumerable<PropertyDescriptionRoute> CreatePropertyDescriptionsFromValueType( Type itemType, bool supportsDBNull, DataGridForeignKeyDescription foreignKeyDescription, bool displayable )
+    {
+      yield return new PropertyDescriptionRoute( new ValueTypePropertyDescription( itemType, supportsDBNull, foreignKeyDescription, displayable ) );
+    }
+
+    private static IEnumerable<PropertyDescriptionRoute> CreatePropertyDescriptionsFromCustomTypeDescriptor( ICustomTypeDescriptor customTypeDescriptor, Type itemType, bool supportsDBNull, bool displayable )
+    {
+      if( customTypeDescriptor == null )
+        return Enumerable.Empty<PropertyDescriptionRoute>();
+
+      return ItemsSourceHelper.CreatePropertyDescriptionsFromPropertyDescriptors( customTypeDescriptor.GetProperties(), supportsDBNull, displayable );
+    }
+
+    private static PropertyDescriptionRoute CreatePropertyDescriptionFromDataGridItemProperty( DataGridItemPropertyBase source )
+    {
+      if( source == null )
+        return null;
+
+      var collection = source.ContainingCollection;
+      var ancestors = ( collection != null ) ? ItemsSourceHelper.CreatePropertyDescriptionFromDataGridItemProperty( collection.Owner ) : null;
+
+      return PropertyDescriptionRoute.Combine( new ItemPropertyPropertyDescription( source ), ancestors );
+    }
+
+    private static PropertyDescriptionRoute CreateIndexerDescription( IEnumerable itemsSource, Type itemType, string index, bool displayable )
+    {
+      if( ( itemType == null ) || string.IsNullOrEmpty( index ) )
+        return null;
+
+      var typeDescriptor = ItemsSourceHelper.GetCustomTypeDescriptor( itemsSource, itemType ) as DataItemTypeDescriptor;
+      if( typeDescriptor == null )
+        return null;
+
+      var parameters = IndexerParametersParser.Parse( index ).ToArray();
+      if( parameters.Length <= 0 )
+        return null;
+
+      var indexerDescriptor = typeDescriptor.GetIndexer( parameters );
+      if( indexerDescriptor == null )
+        return null;
+
+      var supportsDBNull = ItemsSourceHelper.IsSupportingDBNull( itemsSource );
+
+      return new PropertyDescriptionRoute( new IndexerDescriptorPropertyDescription( indexerDescriptor, supportsDBNull, displayable ) );
     }
 
     private static Dictionary<string, ForeignKeyConstraint> GetForeignKeyConstraints( ConstraintCollection constraints )
     {
-      Dictionary<string, ForeignKeyConstraint> foreignKeyConstraints =
-        new Dictionary<string, ForeignKeyConstraint>();
+      var foreignKeyConstraints = new Dictionary<string, ForeignKeyConstraint>();
 
       // Detect every ForeignKeyConstraints
       foreach( Constraint constraint in constraints )
       {
-        ForeignKeyConstraint foreignKeyConstraint = constraint as ForeignKeyConstraint;
-
-        // Not a ForeignKeyConstraint
+        var foreignKeyConstraint = constraint as ForeignKeyConstraint;
         if( foreignKeyConstraint == null )
           continue;
 
-        // We only support auto-detection when the ForeignKey is composed of 
-        // a single column
-        if( ( foreignKeyConstraint.Columns != null )
-          && ( foreignKeyConstraint.Columns.Length == 1 ) )
+        // We only support auto-detection when the ForeignKey is composed of a single column
+        if( ( foreignKeyConstraint.Columns != null ) && ( foreignKeyConstraint.Columns.Length == 1 ) )
         {
           foreignKeyConstraints.Add( foreignKeyConstraint.Columns[ 0 ].ColumnName, foreignKeyConstraint );
         }
@@ -1563,169 +1732,265 @@ namespace Xceed.Wpf.DataGrid
       return foreignKeyConstraints;
     }
 
-    internal static DataGridForeignKeyDescription GetDataGridForeignKeyDescriptionForEnum( Type enumType )
+    private static DataGridForeignKeyDescription GetDataGridForeignKeyDescriptionForEnum( Type enumType )
     {
-      DataGridForeignKeyDescription foreignKeyDescription = null;
+      if( ( enumType == null ) || !enumType.IsEnum )
+        return null;
 
-      if( ( enumType != null ) && ( enumType.IsEnum ) )
-      {
-        foreignKeyDescription = new DataGridForeignKeyDescription();
+      var description = new DataGridForeignKeyDescription();
 
-        // Using "." as default value path will revert to Self when used as 
-        // SelectedValuePath when bound to a DataGridForeignKeyDictionary or
-        // ComboBox (default editor)
-        foreignKeyDescription.ValuePath = ".";
-        foreignKeyDescription.ItemsSource = Enum.GetValues( enumType );
-        foreignKeyDescription.IsAutoCreated = true;
-      }
+      // Using "." as default value path will revert to Self when used as SelectedValuePath when bound to a DataGridForeignKeyDictionary or ComboBox (default editor)
+      description.ValuePath = ".";
+      description.ItemsSource = Enum.GetValues( enumType );
+      description.IsAutoCreated = true;
 
-      return foreignKeyDescription;
+      return description;
     }
 
     private static DataTableForeignKeyDescription GetDataGridForeignKeyDescriptionForForeignKeyConstraint( ForeignKeyConstraint foreignKeyConstraint )
     {
-      DataTableForeignKeyDescription foreignKeyDescription = null;
+      if( foreignKeyConstraint == null )
+        return null;
 
-      if( foreignKeyConstraint != null )
-      {
-        if( ( foreignKeyConstraint.Columns != null )
-          && ( foreignKeyConstraint.Columns.Length == 1 ) )
-        {
-          foreignKeyDescription = new DataTableForeignKeyDescription();
-          ( ( DataTableForeignKeyDescription )foreignKeyDescription ).ForeignKeyConstraint = foreignKeyConstraint;
-          foreignKeyDescription.IsAutoCreated = true;
-        }
-      }
+      var columns = foreignKeyConstraint.Columns;
+      if( ( columns == null ) || ( columns.Length != 1 ) )
+        return null;
 
-      return foreignKeyDescription;
+      var description = new DataTableForeignKeyDescription();
+      description.ForeignKeyConstraint = foreignKeyConstraint;
+      description.IsAutoCreated = true;
+
+      return description;
     }
 
-    #region Static Fields
-
-    private static readonly object[] EmptyObjectArray = new object[ 0 ];
-
-    private static Type EntityObjectType = Type.GetType(
-      "System.Data.Objects.DataClasses.EntityObject, System.Data.Entity, Version=" + _XceedVersionInfo.FrameworkVersion + ", Culture=neutral, PublicKeyToken=b77a5c561934e089",
-      false, false );
-
-    #endregion
-
-    #region FieldDescriptor Nested Type
-
-    internal class FieldDescriptor
+    private static DataGridItemPropertyBase CreateItemPropertyFromPropertyDescription( PropertyDescription propertyDescription )
     {
-      public FieldDescriptor(
-        string name,
-        string displayName,
-        Type dataType,
-        PropertyDescriptor propertyDescriptor,
-        string bindingXPath,
-        string bindingPath,
-        bool readOnly,
-        bool overrideReadOnlyForInsertion,
-        bool supportDBNull,
-        bool browsable,
-        bool isASubRelationship,
-        bool isDataGridUnboundItemProperty,
-        DataGridForeignKeyDescription foreignKeyDescription )
+      if( propertyDescription == null )
+        return null;
+
+      return new DataGridItemProperty(
+                   propertyDescription.Name,
+                   propertyDescription.PropertyDescriptor,
+                   propertyDescription.DisplayName,
+                   propertyDescription.XPath,
+                   propertyDescription.Path,
+                   propertyDescription.DataType,
+                   true,
+                   propertyDescription.IsReadOnly,
+                   propertyDescription.OverrideReadOnlyForInsertion,
+                   propertyDescription.IsDisplayable,
+                   propertyDescription.IsSubRelationship,
+                   propertyDescription.ForeignKeyDescription );
+    }
+
+    internal static List<DataGridDetailDescription> CreateDetailDescriptions( Type itemType, IEnumerable enumeration )
+    {
+      var dataTable = enumeration as DataTable;
+      if( dataTable == null )
       {
-        if( name == null )
-          throw new ArgumentNullException( "name" );
+        var dataView = enumeration as DataView;
+        if( dataView != null )
+        {
+          dataTable = dataView.Table;
+        }
+      }
 
-        if( displayName == null )
-          throw new ArgumentNullException( "displayName" );
+      if( dataTable != null )
+        return ItemsSourceHelper.CreateDetailDescriptions( dataTable );
 
-        if( dataType == null )
-          throw new ArgumentNullException( "dataType" );
+      if( itemType != null )
+      {
+        //We do not support automatic Master/Detail detection with an Xml source
+        if( typeof( XmlNode ).IsAssignableFrom( itemType ) )
+          return new List<DataGridDetailDescription>( 0 );
 
-        this.ReadOnly = readOnly;
-        this.OverrideReadOnlyForInsertion = overrideReadOnlyForInsertion;
-        m_name = name;
-        m_displayName = displayName;
-        m_dataType = dataType;
+        //Unbound mode, we do not support Master/Detail in this scenario.
+        if( typeof( DataRow ).IsAssignableFrom( itemType ) )
+          return new List<DataGridDetailDescription>( 0 );
+
+        //we do not support Master/Details when Item is a Value type...
+        if( ItemsSourceHelper.IsValueType( itemType ) )
+          return new List<DataGridDetailDescription>( 0 );
+
+        //Check if the object is a Entity Framework Entity, before checking for IEnumerable (since Entity Framework does have IEnumerable
+        //properties, but require special handling )...
+        if( ItemsSourceHelper.IsEntityFramework( itemType ) )
+          return ItemsSourceHelper.CreateDetailDescriptionsForEntityFramework( itemType );
+
+        //If the first item maps to an object that implements IEnumerable, expand that as a Relation ( and only that )...
+        if( typeof( IEnumerable ).IsAssignableFrom( itemType ) )
+          return ItemsSourceHelper.CreateDetailDescriptionsForEnumerable();
+
+        if( typeof( IListSource ).IsAssignableFrom( itemType ) )
+          return ItemsSourceHelper.CreateDetailDescriptionsForListSource();
+      }
+
+      //If the Source collection implements ITypedList
+      var typedList = enumeration as ITypedList;
+      if( typedList != null )
+        return ItemsSourceHelper.GetDataGridDetailDescriptions( typedList.GetItemProperties( null ) );
+
+      var customTypeDescriptor = ItemsSourceHelper.GetCustomTypeDescriptor( enumeration, itemType );
+      if( customTypeDescriptor != null )
+        return ItemsSourceHelper.GetDataGridDetailDescriptions( customTypeDescriptor.GetProperties() );
+
+      if( itemType != null )
+        return ItemsSourceHelper.GetDataGridDetailDescriptions( TypeDescriptor.GetProperties( itemType ) );
+
+      return new List<DataGridDetailDescription>( 0 );
+    }
+
+    internal static List<DataGridDetailDescription> CreateDetailDescriptions( DataTable dataTable )
+    {
+      if( dataTable == null )
+        return new List<DataGridDetailDescription>( 0 );
+
+      return ItemsSourceHelper.CreateDetailDescriptionsForDataTable( dataTable );
+    }
+
+    private static List<DataGridDetailDescription> CreateDetailDescriptionsForDataTable( DataTable dataTable )
+    {
+      var detailDescriptions = new List<DataGridDetailDescription>( dataTable.ChildRelations.Count );
+
+      foreach( DataRelation relation in dataTable.ChildRelations )
+      {
+        var description = new DataRelationDetailDescription( relation );
+        description.IsAutoCreated = true;
+        description.IsInitialized = true;
+        detailDescriptions.Add( description );
+      }
+
+      return detailDescriptions;
+    }
+
+    private static List<DataGridDetailDescription> CreateDetailDescriptionsForEntityFramework( Type type )
+    {
+      var detailDescriptions = new List<DataGridDetailDescription>();
+
+      // Gets all the public properties of the type.
+      var propertyInfos = type.GetProperties( BindingFlags.Instance | BindingFlags.Public );
+
+      // Loop throught the properties to build up the detail descriptions.
+      foreach( var propertyInfo in propertyInfos )
+      {
+        // We must use Reflection to check for the EntityFramework types.
+        var propertyType = propertyInfo.PropertyType;
+
+        // The property must be of type RelatedEnd and IEnumerable to continue.
+        if( ( propertyType.BaseType != null )
+          && ( propertyType.BaseType.FullName == "System.Data.Objects.DataClasses.RelatedEnd" )
+          && ( typeof( IEnumerable ).IsAssignableFrom( propertyType ) ) )
+        {
+          detailDescriptions.Add( new EntityDetailDescription( propertyInfo.Name ) );
+        }
+      }
+
+      return detailDescriptions;
+    }
+
+    private static List<DataGridDetailDescription> CreateDetailDescriptionsForEnumerable()
+    {
+      var detailDescriptions = new List<DataGridDetailDescription>( 1 );
+
+      var description = new EnumerableDetailDescription();
+      description.IsAutoCreated = true;
+      description.IsInitialized = true;
+      detailDescriptions.Add( description );
+
+      return detailDescriptions;
+    }
+
+    private static List<DataGridDetailDescription> CreateDetailDescriptionsForListSource()
+    {
+      var detailDescriptions = new List<DataGridDetailDescription>( 1 );
+
+      var description = new ListSourceDetailDescription();
+      description.IsAutoCreated = true;
+      description.IsInitialized = true;
+      detailDescriptions.Add( description );
+
+      return detailDescriptions;
+    }
+
+    private static List<DataGridDetailDescription> GetDataGridDetailDescriptions( PropertyDescriptorCollection properties )
+    {
+      var detailDescriptions = new List<DataGridDetailDescription>( properties.Count );
+
+      foreach( PropertyDescriptor property in properties )
+      {
+        // We only create details for properties that are browsable.
+        if( !property.IsBrowsable )
+          continue;
+
+        if( ItemsSourceHelper.IsASubRelationship( property.PropertyType ) )
+        {
+          var description = new PropertyDetailDescription( property );
+          description.IsAutoCreated = true;
+          description.IsInitialized = true;
+          detailDescriptions.Add( description );
+        }
+      }
+
+      return detailDescriptions;
+    }
+
+    private static bool IsEditableObjectInsertedOrRemovedFromDataSourceAutomatically( IEditableObject item )
+    {
+      return ( item is DataRowView )
+          || ( item is DataRow );
+    }
+
+    #region DataTablePropertyDescription Private Class
+
+    private sealed class DataTablePropertyDescription : PropertyDescription
+    {
+      internal DataTablePropertyDescription( PropertyDescriptor propertyDescriptor, DataColumn column, IDictionary<string, ForeignKeyConstraint> constraints, bool isDisplayable )
+      {
+        if( propertyDescriptor == null )
+          throw new ArgumentNullException( "propertyDescriptor" );
+
         m_propertyDescriptor = propertyDescriptor;
-        m_bindingPath = bindingPath;
-        m_bindingXPath = bindingXPath;
-        this.SupportDBNull = supportDBNull;
-        this.Browsable = browsable;
-        this.IsASubRelationship = isASubRelationship;
-        this.IsDataGridUnboundItemProperty = isDataGridUnboundItemProperty;
-        this.ForeignKeyDescription = foreignKeyDescription;
-      }
+        m_column = column;
+        m_isDisplayable = isDisplayable;
 
-      #region Name PROPERTY
-
-      public string Name
-      {
-        get
+        if( constraints != null )
         {
-          return m_name;
+          ForeignKeyConstraint constraint;
+          if( constraints.TryGetValue( propertyDescriptor.Name, out constraint ) )
+          {
+            m_foreignKeyDescription = ItemsSourceHelper.GetDataGridForeignKeyDescriptionForForeignKeyConstraint( constraint );
+          }
         }
       }
 
-      private string m_name; // = null
-
-      #endregion Name PROPERTY
-
-      #region DisplayName PROPERTY
-
-      public string DisplayName
+      internal override string Name
       {
         get
         {
-          return m_displayName;
+          return m_propertyDescriptor.Name;
         }
       }
 
-      private string m_displayName; // = null
-
-      #endregion DisplayName PROPERTY
-
-      #region BindingPath PROPERTY
-
-      public string BindingPath
+      internal override string DisplayName
       {
         get
         {
-          return m_bindingPath;
+          if( m_column != null )
+            return m_column.Caption;
+
+          return m_propertyDescriptor.DisplayName;
         }
       }
 
-      private string m_bindingPath; // = null
-
-      #endregion BindingPath PROPERTY
-
-      #region BindingXPath PROPERTY
-
-      public string BindingXPath
+      internal override Type DataType
       {
         get
         {
-          return m_bindingXPath;
+          return m_propertyDescriptor.PropertyType;
         }
       }
 
-      private string m_bindingXPath; // = null
-
-      #endregion BindingXPath PROPERTY
-
-      #region DataType PROPERTY
-
-      public Type DataType
-      {
-        get
-        {
-          return m_dataType;
-        }
-      }
-
-      private Type m_dataType; // = null
-
-      #endregion DataType PROPERTY
-
-      #region PropertyDescriptor PROPERTY
-
-      public PropertyDescriptor PropertyDescriptor
+      internal override PropertyDescriptor PropertyDescriptor
       {
         get
         {
@@ -1733,158 +1998,720 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      private PropertyDescriptor m_propertyDescriptor; // = null
-
-      #endregion PropertyDescriptor PROPERTY
-
-      #region ReadOnly PROPERTY
-
-      public bool ReadOnly
+      internal override bool IsReadOnly
       {
         get
         {
-          return m_flags[ ( int )FieldDescriptorFlags.ReadOnly ];
-        }
-        private set
-        {
-          m_flags[ ( int )FieldDescriptorFlags.ReadOnly ] = value;
+          return m_propertyDescriptor.IsReadOnly;
         }
       }
 
-      #endregion ReadOnly PROPERTY
-
-      #region OverrideReadOnlyForInsertion Property
-
-      public bool OverrideReadOnlyForInsertion
+      internal override bool SupportDBNull
       {
         get
         {
-          return m_flags[ ( int )FieldDescriptorFlags.OverrideReadOnlyForInsertion ];
-        }
-        private set
-        {
-          m_flags[ ( int )FieldDescriptorFlags.OverrideReadOnlyForInsertion ] = value;
+          return ( m_column != null )
+              && ( m_column.AllowDBNull );
         }
       }
 
-      #endregion OverrideReadOnlyForInsertion Property
-
-      #region SupportDBNull PROPERTY
-
-      public bool SupportDBNull
+      internal override bool IsBrowsable
       {
         get
         {
-          return m_flags[ ( int )FieldDescriptorFlags.SupportDBNull ];
-        }
-        private set
-        {
-          m_flags[ ( int )FieldDescriptorFlags.SupportDBNull ] = value;
+          return m_propertyDescriptor.IsBrowsable;
         }
       }
 
-      #endregion SupportDBNull PROPERTY
-
-      #region Browsable Property
-
-      public bool Browsable
+      internal override bool IsDisplayable
       {
         get
         {
-          return m_flags[ ( int )FieldDescriptorFlags.Browsable ];
-        }
-        private set
-        {
-          m_flags[ ( int )FieldDescriptorFlags.Browsable ] = value;
+          return m_isDisplayable;
         }
       }
 
-      #endregion Browsable Property
-
-      #region IsASubRelationship Property
-
-      public bool IsASubRelationship
+      internal override bool IsSubRelationship
       {
         get
         {
-          return m_flags[ ( int )FieldDescriptorFlags.IsASubRelationship ];
-        }
-        private set
-        {
-          m_flags[ ( int )FieldDescriptorFlags.IsASubRelationship ] = value;
+          return ( m_column == null )
+              && ( ItemsSourceHelper.IsASubRelationship( this.DataType ) );
         }
       }
 
-      #endregion IsASubRelationship Property
-
-      #region IsDataGridUnboundItemProperty Property
-
-      public bool IsDataGridUnboundItemProperty
+      internal override DataGridForeignKeyDescription ForeignKeyDescription
       {
         get
         {
-          return m_flags[ ( int )FieldDescriptorFlags.IsDataGridUnboundItemProperty ];
+          return m_foreignKeyDescription;
         }
-        private set
+      }
+
+      public override int GetHashCode()
+      {
+        return m_propertyDescriptor.GetHashCode();
+      }
+
+      public override bool Equals( object obj )
+      {
+        var target = obj as DataTablePropertyDescription;
+        if( target == null )
+          return false;
+
+        return ( object.Equals( target.m_propertyDescriptor, m_propertyDescriptor ) )
+            && ( object.Equals( target.m_column, m_column ) );
+      }
+
+      private readonly PropertyDescriptor m_propertyDescriptor;
+      private readonly DataColumn m_column;
+      private readonly bool m_isDisplayable;
+      private readonly DataGridForeignKeyDescription m_foreignKeyDescription;
+    }
+
+    #endregion
+
+    #region ItemPropertyPropertyDescription Private Class
+
+    private sealed class ItemPropertyPropertyDescription : PropertyDescription
+    {
+      internal ItemPropertyPropertyDescription( DataGridItemPropertyBase itemProperty )
+      {
+        if( itemProperty == null )
+          throw new ArgumentNullException( "itemProperty" );
+
+        m_itemProperty = itemProperty;
+        m_propertyDescriptor = itemProperty.GetPropertyDescriptorForBinding();
+        Debug.Assert( m_propertyDescriptor != null );
+      }
+
+      internal override string Name
+      {
+        get
         {
-          m_flags[ ( int )FieldDescriptorFlags.IsDataGridUnboundItemProperty ] = value;
+          return m_itemProperty.Name;
         }
       }
 
-      #endregion IsDataGridUnboundItemProperty Property
-
-      #region ForeignKeyDescription Property
-
-      public DataGridForeignKeyDescription ForeignKeyDescription
+      internal override string DisplayName
       {
-        get;
-        private set;
+        get
+        {
+          return m_propertyDescriptor.DisplayName;
+        }
       }
 
-      #endregion
-
-      private BitVector32 m_flags = new BitVector32();
-
-      [Flags]
-      private enum FieldDescriptorFlags
+      internal override Type DataType
       {
-        ReadOnly = 1,
-        SupportDBNull = 2,
-        Browsable = 4,
-        IsASubRelationship = 8,
-        IsForeignKey = 16,
-        OverrideReadOnlyForInsertion = 32,
-        IsDataGridUnboundItemProperty = 64
+        get
+        {
+          return m_propertyDescriptor.PropertyType;
+        }
+      }
+
+      internal override PropertyDescriptor PropertyDescriptor
+      {
+        get
+        {
+          return m_propertyDescriptor;
+        }
+      }
+
+      internal override bool IsReadOnly
+      {
+        get
+        {
+          return m_propertyDescriptor.IsReadOnly;
+        }
+      }
+
+      internal override bool OverrideReadOnlyForInsertion
+      {
+        get
+        {
+          return m_itemProperty.OverrideReadOnlyForInsertion.GetValueOrDefault( false );
+        }
+      }
+
+      internal override bool IsBrowsable
+      {
+        get
+        {
+          return m_propertyDescriptor.IsBrowsable;
+        }
+      }
+
+      internal override bool IsDisplayable
+      {
+        get
+        {
+          return m_itemProperty.IsDisplayable;
+        }
+      }
+
+      internal override bool IsSubRelationship
+      {
+        get
+        {
+          return m_itemProperty.IsASubRelationship;
+        }
+      }
+
+      internal override DataGridForeignKeyDescription ForeignKeyDescription
+      {
+        get
+        {
+          return m_itemProperty.ForeignKeyDescription;
+        }
+      }
+
+      public override int GetHashCode()
+      {
+        return m_itemProperty.GetHashCode();
+      }
+
+      public override bool Equals( object obj )
+      {
+        var target = obj as ItemPropertyPropertyDescription;
+        if( target == null )
+          return false;
+
+        return object.Equals( target.m_itemProperty, m_itemProperty );
+      }
+
+      private readonly DataGridItemPropertyBase m_itemProperty;
+      private readonly PropertyDescriptor m_propertyDescriptor;
+    }
+
+    #endregion
+
+    #region PropertyDescriptorPropertyDescription Private Class
+
+    private class PropertyDescriptorPropertyDescription : PropertyDescription
+    {
+      internal PropertyDescriptorPropertyDescription( PropertyDescriptor propertyDescriptor, bool supportDBNull, bool isDisplayable )
+      {
+        if( propertyDescriptor == null )
+          throw new ArgumentNullException( "propertyDescriptor" );
+
+        m_propertyDescriptor = propertyDescriptor;
+        m_supportDBNull = supportDBNull;
+        m_isDisplayable = isDisplayable;
+        m_foreignKeyDescription = ItemsSourceHelper.GetDataGridForeignKeyDescriptionForEnum( propertyDescriptor.PropertyType );
+      }
+
+      internal override string Name
+      {
+        get
+        {
+          return m_propertyDescriptor.Name;
+        }
+      }
+
+      internal override string DisplayName
+      {
+        get
+        {
+          return m_propertyDescriptor.DisplayName;
+        }
+      }
+
+      internal override Type DataType
+      {
+        get
+        {
+          return m_propertyDescriptor.PropertyType;
+        }
+      }
+
+      internal override PropertyDescriptor PropertyDescriptor
+      {
+        get
+        {
+          return m_propertyDescriptor;
+        }
+      }
+
+      internal override bool IsReadOnly
+      {
+        get
+        {
+          return m_propertyDescriptor.IsReadOnly;
+        }
+      }
+
+      internal override bool SupportDBNull
+      {
+        get
+        {
+          return m_supportDBNull;
+        }
+      }
+
+      internal override bool IsBrowsable
+      {
+        get
+        {
+          return m_propertyDescriptor.IsBrowsable;
+        }
+      }
+
+      internal override bool IsDisplayable
+      {
+        get
+        {
+          return m_isDisplayable;
+        }
+      }
+
+      internal override bool IsSubRelationship
+      {
+        get
+        {
+          return ItemsSourceHelper.IsASubRelationship( this.DataType );
+        }
+      }
+
+      internal override DataGridForeignKeyDescription ForeignKeyDescription
+      {
+        get
+        {
+          return m_foreignKeyDescription;
+        }
+      }
+
+      public override int GetHashCode()
+      {
+        return m_propertyDescriptor.GetHashCode();
+      }
+
+      public override bool Equals( object obj )
+      {
+        var target = obj as PropertyDescriptorPropertyDescription;
+        if( target == null )
+          return false;
+
+        return ( object.Equals( target.m_propertyDescriptor, m_propertyDescriptor ) )
+            && ( target.m_supportDBNull == m_supportDBNull );
+      }
+
+      private readonly PropertyDescriptor m_propertyDescriptor;
+      private readonly bool m_supportDBNull;
+      private readonly bool m_isDisplayable;
+      private readonly DataGridForeignKeyDescription m_foreignKeyDescription;
+    }
+
+    #endregion
+
+    #region NamedPropertyDescriptorPropertyDescription Private Class
+
+    private sealed class NamedPropertyDescriptorPropertyDescription : PropertyDescriptorPropertyDescription
+    {
+      internal NamedPropertyDescriptorPropertyDescription( string name, PropertyDescriptor propertyDescriptor, bool supportDBNull, bool isDisplayable )
+        : base( propertyDescriptor, supportDBNull, isDisplayable )
+      {
+        if( name == null )
+          throw new ArgumentNullException( "name" );
+
+        m_name = name;
+      }
+
+      internal override string Name
+      {
+        get
+        {
+          return m_name;
+        }
+      }
+
+      public override int GetHashCode()
+      {
+        return m_name.GetHashCode();
+      }
+
+      public override bool Equals( object obj )
+      {
+        var target = obj as NamedPropertyDescriptorPropertyDescription;
+        if( target == null )
+          return false;
+
+        return ( target.m_name == m_name )
+            && ( base.Equals( target ) );
+      }
+
+      private readonly string m_name;
+    }
+
+    #endregion
+
+    #region IndexerDescriptorPropertyDescription Private Class
+
+    private class IndexerDescriptorPropertyDescription : PropertyDescriptorPropertyDescription
+    {
+      internal IndexerDescriptorPropertyDescription( DataItemIndexerDescriptor indexerDescriptor, bool supportDBNull, bool isDisplayable )
+        : base( indexerDescriptor, supportDBNull, isDisplayable )
+      {
+      }
+
+      public override int GetHashCode()
+      {
+        return base.GetHashCode();
+      }
+
+      public override bool Equals( object obj )
+      {
+        return ( obj is IndexerDescriptorPropertyDescription )
+            && ( base.Equals( obj ) );
+      }
+
+      internal override PropertyRouteSegment ToPropertyRouteSegment()
+      {
+        var descriptor = ( DataItemIndexerDescriptor )this.PropertyDescriptor;
+
+        return new PropertyRouteSegment( PropertyRouteSegmentType.Indexer, descriptor.IndexerParameters );
       }
     }
 
     #endregion
 
-    #region ReadOnlyConverter Private Class
+    #region JaggedArrayPropertyDescription Private Class
 
-    private sealed class ReadOnlyConverter : IValueConverter
+    private sealed class JaggedArrayPropertyDescription : PropertyDescription
     {
-      internal ReadOnlyConverter( ColumnBase column, bool supportDBNull )
+      internal JaggedArrayPropertyDescription( int index, Type dataType, bool isDisplayable )
       {
-        m_converter = new SourceDataConverter( supportDBNull );
-        m_column = column;
+        if( index < 0 )
+          throw new ArgumentException( "index" );
+
+        if( dataType == null )
+          throw new ArgumentNullException( "dataType" );
+
+        m_name = ".[" + index.ToString( CultureInfo.InvariantCulture ) + "]";
+        m_dataType = dataType;
+        m_isDisplayable = isDisplayable;
+        m_propertyDescriptor = new JaggedArrayPropertyDescriptor( index, dataType );
+        m_foreignKeyDescription = ItemsSourceHelper.GetDataGridForeignKeyDescriptionForEnum( dataType );
       }
 
-      public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
+      internal override string Name
       {
-        return m_converter.Convert( value, targetType, parameter, culture );
+        get
+        {
+          return m_name;
+        }
       }
 
-      public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
+      internal override string DisplayName
       {
-        if( ( m_column != null ) && ( m_column.ReadOnly ) && ( !m_column.OverrideReadOnlyForInsertion ) )
-          return Binding.DoNothing;
-
-        return m_converter.ConvertBack( value, targetType, parameter, culture );
+        get
+        {
+          return m_name;
+        }
       }
 
-      private readonly IValueConverter m_converter;
-      private readonly ColumnBase m_column;
+      internal override Type DataType
+      {
+        get
+        {
+          return m_dataType;
+        }
+      }
+
+      internal override PropertyDescriptor PropertyDescriptor
+      {
+        get
+        {
+          return m_propertyDescriptor;
+        }
+      }
+
+      internal override bool IsReadOnly
+      {
+        get
+        {
+          return false;
+        }
+      }
+
+      internal override bool IsDisplayable
+      {
+        get
+        {
+          return m_isDisplayable;
+        }
+      }
+
+      internal override bool IsSubRelationship
+      {
+        get
+        {
+          return ItemsSourceHelper.IsASubRelationship( this.DataType );
+        }
+      }
+
+      internal override DataGridForeignKeyDescription ForeignKeyDescription
+      {
+        get
+        {
+          return m_foreignKeyDescription;
+        }
+      }
+
+      public override int GetHashCode()
+      {
+        return m_name.GetHashCode();
+      }
+
+      public override bool Equals( object obj )
+      {
+        var target = obj as JaggedArrayPropertyDescription;
+        if( target == null )
+          return false;
+
+        return ( target.m_name == m_name )
+            && ( target.m_dataType == m_dataType );
+      }
+
+      private readonly string m_name;
+      private readonly Type m_dataType;
+      private readonly bool m_isDisplayable;
+      private readonly PropertyDescriptor m_propertyDescriptor;
+      private readonly DataGridForeignKeyDescription m_foreignKeyDescription;
+    }
+
+    #endregion
+
+    #region EntityFrameworkPropertyDescription Private Class
+
+    private sealed class EntityFrameworkPropertyDescription : PropertyDescription
+    {
+      internal EntityFrameworkPropertyDescription( PropertyDescriptor propertyDescriptor, bool isDisplayable )
+      {
+        if( propertyDescriptor == null )
+          throw new ArgumentNullException( "propertyDescriptor" );
+
+        var attribute = propertyDescriptor.Attributes[ typeof( EdmScalarPropertyAttribute ) ] as EdmScalarPropertyAttribute;
+        if( attribute != null )
+        {
+          m_isEntityKey = attribute.EntityKeyProperty;
+          m_supportDBNull = attribute.IsNullable;
+        }
+        else
+        {
+          m_isEntityKey = false;
+          m_supportDBNull = false;
+        }
+
+        m_isDisplayable = isDisplayable;
+        m_propertyDescriptor = propertyDescriptor;
+      }
+
+      internal override string Name
+      {
+        get
+        {
+          return m_propertyDescriptor.Name;
+        }
+      }
+
+      internal override string DisplayName
+      {
+        get
+        {
+          return m_propertyDescriptor.DisplayName;
+        }
+      }
+
+      internal override Type DataType
+      {
+        get
+        {
+          return m_propertyDescriptor.PropertyType;
+        }
+      }
+
+      internal override PropertyDescriptor PropertyDescriptor
+      {
+        get
+        {
+          return m_propertyDescriptor;
+        }
+      }
+
+      internal override bool IsReadOnly
+      {
+        get
+        {
+          return ( m_isEntityKey )
+              || ( m_propertyDescriptor.IsReadOnly );
+        }
+      }
+
+      internal override bool OverrideReadOnlyForInsertion
+      {
+        get
+        {
+          return ( m_isEntityKey )
+              && ( !m_propertyDescriptor.IsReadOnly );
+        }
+      }
+
+      internal override bool SupportDBNull
+      {
+        get
+        {
+          return m_supportDBNull;
+        }
+      }
+
+      internal override bool IsBrowsable
+      {
+        get
+        {
+          return m_propertyDescriptor.IsBrowsable;
+        }
+      }
+
+      internal override bool IsDisplayable
+      {
+        get
+        {
+          return m_isDisplayable;
+        }
+      }
+
+      internal override bool IsSubRelationship
+      {
+        get
+        {
+          return ItemsSourceHelper.IsASubRelationship( this.DataType );
+        }
+      }
+
+      public override int GetHashCode()
+      {
+        return m_propertyDescriptor.GetHashCode();
+      }
+
+      public override bool Equals( object obj )
+      {
+        var target = obj as EntityFrameworkPropertyDescription;
+        if( target == null )
+          return false;
+
+        return object.Equals( target.m_propertyDescriptor, m_propertyDescriptor );
+      }
+
+      private readonly PropertyDescriptor m_propertyDescriptor;
+      private readonly bool m_isEntityKey;
+      private readonly bool m_supportDBNull;
+      private readonly bool m_isDisplayable;
+    }
+
+    #endregion
+
+    #region ValueTypePropertyDescription Private Class
+
+    private sealed class ValueTypePropertyDescription : PropertyDescription
+    {
+      internal ValueTypePropertyDescription( Type dataType, bool supportDBNull, DataGridForeignKeyDescription foreignKeyDescription, bool isDisplayable )
+      {
+        if( dataType == null )
+          throw new ArgumentNullException( "dataType" );
+
+        m_dataType = dataType;
+        m_supportDBNull = supportDBNull;
+        m_isDisplayable = isDisplayable;
+        m_foreignKeyDescription = foreignKeyDescription;
+      }
+
+      internal override string Name
+      {
+        get
+        {
+          return ".";
+        }
+      }
+
+      internal override string DisplayName
+      {
+        get
+        {
+          return string.Empty;
+        }
+      }
+
+      internal override Type DataType
+      {
+        get
+        {
+          return m_dataType;
+        }
+      }
+
+      internal override string Path
+      {
+        get
+        {
+          return this.Name;
+        }
+      }
+
+      internal override bool SupportDBNull
+      {
+        get
+        {
+          return m_supportDBNull;
+        }
+      }
+
+      internal override bool IsDisplayable
+      {
+        get
+        {
+          return m_isDisplayable;
+        }
+      }
+
+      internal override bool IsSubRelationship
+      {
+        get
+        {
+          return ItemsSourceHelper.IsASubRelationship( this.DataType );
+        }
+      }
+
+      internal override DataGridForeignKeyDescription ForeignKeyDescription
+      {
+        get
+        {
+          return m_foreignKeyDescription;
+        }
+      }
+
+      public override int GetHashCode()
+      {
+        return m_dataType.GetHashCode();
+      }
+
+      public override bool Equals( object obj )
+      {
+        var target = obj as ValueTypePropertyDescription;
+        if( target == null )
+          return false;
+
+        return ( target.m_dataType == m_dataType );
+      }
+
+      internal override PropertyRouteSegment ToPropertyRouteSegment()
+      {
+        return PropertyRouteSegment.Self;
+      }
+
+      private readonly Type m_dataType;
+      private readonly bool m_supportDBNull;
+      private readonly bool m_isDisplayable;
+      private readonly DataGridForeignKeyDescription m_foreignKeyDescription;
     }
 
     #endregion

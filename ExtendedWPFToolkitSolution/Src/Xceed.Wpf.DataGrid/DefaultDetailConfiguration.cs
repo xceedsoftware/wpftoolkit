@@ -275,8 +275,6 @@ namespace Xceed.Wpf.DataGrid
         return;
 
       m_defaultHeadersFootersAdded = true;
-
-      DetailConfiguration.AddDefaultHeadersFooters( this.Headers, false );
     }
 
     private bool m_defaultHeadersFootersAdded = false;

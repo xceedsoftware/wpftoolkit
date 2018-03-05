@@ -15,23 +15,25 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections;
-using System.Windows.Controls;
-using System.Diagnostics;
-using System.Windows;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows.Data;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal class SelectionChanger
   {
-    #region CONSTRUCTORS
+    #region Static Fields
 
-    public SelectionChanger( DataGridContext owner )
+    private static readonly SelectedItemsStorage EmptyItemsStore = new SelectedItemsStorage( null );
+    private static readonly SelectedCellsStorage EmptyCellsStore = new SelectedCellsStorage( null );
+
+    #endregion
+
+    internal SelectionChanger( DataGridContext owner )
     {
       m_owner = owner;
       m_itemsToSelect = new SelectedItemsStorage( owner );
@@ -42,11 +44,9 @@ namespace Xceed.Wpf.DataGrid
       m_sourceChanges = new List<SourceChangeInfo>( 2 );
     }
 
-    #endregion CONSTRUCTORS
-
     #region Owner Property
 
-    public DataGridContext Owner
+    internal DataGridContext Owner
     {
       get
       {
@@ -54,11 +54,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private DataGridContext m_owner;
+    private readonly DataGridContext m_owner;
 
-    #endregion Owner Property
-
-    #region PUBLIC METHODS
+    #endregion
 
     public bool SelectItems( SelectionRangeWithItems rangeWithItems )
     {
@@ -252,7 +250,7 @@ namespace Xceed.Wpf.DataGrid
           {
             int index = Array.IndexOf( existingSelectionRangeWithItems.Items, itemToUnselect );
 
-            if( index > -1 )
+            if( index >= 0 )
             {
               index = existingSelectionRangeWithItems.Range.GetIndexFromItemOffset( index );
 
@@ -653,16 +651,15 @@ namespace Xceed.Wpf.DataGrid
       m_toDeferSelect.Clear();
     }
 
-    public void UpdateSelectedItemsInChangeOfDataGridContext( bool itemsSourceChanged )
+    public void UpdateSelectedItemsInChangeOfDataGridContext()
     {
-      List<SelectionRangeWithItems> removedRangeWithItems;
-      List<SelectionRangeWithItems> unselectedItemsFromRemove = this.GetUnselectedItemsFromRemove( out removedRangeWithItems );
-      SelectedItemsStorage ownerSelectedItems = m_owner.SelectedItemsStore;
-      int count = m_sourceChanges.Count;
+      var removedRangeWithItems = new List<SelectionRangeWithItems>();
+      var unselectedItemsFromRemove = this.GetUnselectedItemsFromRemove( removedRangeWithItems );
+      var ownerSelectedItems = m_owner.SelectedItemsStore;
 
-      for( int i = 0; i < count; i++ )
+      for( int i = 0; i < m_sourceChanges.Count; i++ )
       {
-        SourceChangeInfo sourceChangeInfo = m_sourceChanges[ i ];
+        var sourceChangeInfo = m_sourceChanges[ i ];
 
         switch( sourceChangeInfo.Action )
         {
@@ -690,14 +687,12 @@ namespace Xceed.Wpf.DataGrid
         ownerSelectedItems.OffsetIndex( rangeWithItems.Range.StartIndex, -rangeWithItems.Length );
       }
 
-      count = m_toDeferSelect.Count;
-
-      for( int i = count - 1; i >= 0; i-- )
+      for( int i = m_toDeferSelect.Count - 1; i >= 0; i-- )
       {
         object item = m_toDeferSelect[ i ];
         int itemIndex = m_owner.Items.IndexOf( item );
 
-        if( itemIndex != -1 )
+        if( itemIndex >= 0 )
         {
           if( !m_itemsToUnselect.Contains( itemIndex ) )
           {
@@ -708,16 +703,16 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      if( ( m_itemsToUnselect.Count > 0 ) || ( m_itemsToSelect.Count > 0 ) || ( unselectedItemsFromRemove.Count > 0 ) )
+      if( ( m_itemsToUnselect.Count > 0 ) || ( m_itemsToSelect.Count > 0 ) || ( unselectedItemsFromRemove.Any() ) )
       {
-        Dictionary<int, DataRow> realizedDataRows = new Dictionary<int, DataRow>();
+        var realizedDataRows = new Dictionary<int, DataRow>();
 
         // Only want to update the realizedDataRows if the selection change is from user interaction and not
         // from the source being updated.  When the source is updated, the generator will recreate needed container,
         // so the old one will have the correct selection state.
-        foreach( DependencyObject container in m_owner.CustomItemContainerGenerator.RealizedContainers )
+        foreach( var container in m_owner.CustomItemContainerGenerator.RealizedContainers )
         {
-          DataRow dataRow = container as DataRow;
+          var dataRow = container as DataRow;
 
           if( ( dataRow != null ) && ( DataGridControl.GetDataGridContext( dataRow ) == m_owner ) )
           {
@@ -725,28 +720,28 @@ namespace Xceed.Wpf.DataGrid
           }
         }
 
-        bool sourceItemIsDataRow = false;
+        var sourceItemIsDataRow = false;
 
-        foreach( SelectionRangeWithItems rangeWithItems in m_itemsToUnselect )
+        foreach( var rangeWithItems in m_itemsToUnselect )
         {
           sourceItemIsDataRow |= this.SetIsSelectedOnDataRow( realizedDataRows, rangeWithItems, false );
           ownerSelectedItems.Remove( rangeWithItems );
         }
 
-        foreach( SelectionRangeWithItems rangeWithItems in m_itemsToSelect )
+        foreach( var rangeWithItems in m_itemsToSelect )
         {
           sourceItemIsDataRow |= this.SetIsSelectedOnDataRow( realizedDataRows, rangeWithItems, true );
           ownerSelectedItems.Add( rangeWithItems );
         }
 
-        foreach( SelectionRangeWithItems rangeWithItems in unselectedItemsFromRemove )
+        foreach( var rangeWithItems in unselectedItemsFromRemove )
         {
           m_itemsToUnselect.Add( rangeWithItems );
         }
 
         if( !sourceItemIsDataRow )
         {
-          foreach( KeyValuePair<int, DataRow> realizedItemPair in realizedDataRows )
+          foreach( var realizedItemPair in realizedDataRows )
           {
             if( ownerSelectedItems.Contains( new SelectionRange( realizedItemPair.Key ) ) )
             {
@@ -761,16 +756,15 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    public void UpdateSelectedCellsInChangeOfDataGridContext( bool itemsSourceChanged )
+    public void UpdateSelectedCellsInChangeOfDataGridContext()
     {
-      List<SelectionCellRangeWithItems> removedCellsRangeWithItems;
-      List<SelectionCellRangeWithItems> unselectedCellsFromRemove = this.GetUnselectedCellsFromRemove( out removedCellsRangeWithItems );
-      SelectedCellsStorage ownerSelectedCells = m_owner.SelectedCellsStore;
-      int count = m_sourceChanges.Count;
+      var removedCellsRangeWithItems = new List<SelectionCellRangeWithItems>();
+      var unselectedCellsFromRemove = this.GetUnselectedCellsFromRemove( removedCellsRangeWithItems );
+      var ownerSelectedCells = m_owner.SelectedCellsStore;
 
-      for( int i = 0; i < count; i++ )
+      for( int i = 0; i < m_sourceChanges.Count; i++ )
       {
-        SourceChangeInfo sourceChangeInfo = m_sourceChanges[ i ];
+        var sourceChangeInfo = m_sourceChanges[ i ];
 
         switch( sourceChangeInfo.Action )
         {
@@ -792,22 +786,22 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      foreach( SelectionCellRangeWithItems cellRangeWithItems in removedCellsRangeWithItems )
+      foreach( var cellRangeWithItems in removedCellsRangeWithItems )
       {
         ownerSelectedCells.Remove( cellRangeWithItems );
         ownerSelectedCells.OffsetIndex( cellRangeWithItems.ItemRange.StartIndex, -cellRangeWithItems.ItemRange.Length );
       }
 
-      if( ( m_cellsToUnselect.Count > 0 ) || ( m_cellsToSelect.Count > 0 ) || ( unselectedCellsFromRemove.Count > 0 ) )
+      if( ( m_cellsToUnselect.Count > 0 ) || ( m_cellsToSelect.Count > 0 ) || ( unselectedCellsFromRemove.Any() ) )
       {
-        Dictionary<int, DataRow> realizedDataRows = new Dictionary<int, DataRow>();
+        var realizedDataRows = new Dictionary<int, DataRow>();
 
         // Only want to update the realizedCells if the selection change is from user interaction and not
         // from the source being updated.  When the source is updated, the generator will recreate needed container,
         // so the old one will have the correct selection state.
-        foreach( DependencyObject container in m_owner.CustomItemContainerGenerator.RealizedContainers )
+        foreach( var container in m_owner.CustomItemContainerGenerator.RealizedContainers )
         {
-          DataRow dataRow = container as DataRow;
+          var dataRow = container as DataRow;
 
           if( ( dataRow != null ) && ( DataGridControl.GetDataGridContext( dataRow ) == m_owner ) )
           {
@@ -816,10 +810,10 @@ namespace Xceed.Wpf.DataGrid
         }
 
         // We use the ColumnsByVisiblePosition for when column are changing position, we want to have the state before the change.
-        HashedLinkedList<ColumnBase> columnsByVisiblePositionLikedList = m_owner.ColumnsByVisiblePosition;
-        int columnIndex = 0;
-        Dictionary<ColumnBase, int> columnsVisiblePosition = new Dictionary<ColumnBase, int>( columnsByVisiblePositionLikedList.Count );
-        LinkedListNode<ColumnBase> columnNode = columnsByVisiblePositionLikedList.First;
+        var columnsByVisiblePositionLikedList = m_owner.ColumnsByVisiblePosition;
+        var columnIndex = 0;
+        var columnsVisiblePosition = new Dictionary<ColumnBase, int>( columnsByVisiblePositionLikedList.Count );
+        var columnNode = columnsByVisiblePositionLikedList.First;
 
         while( columnNode != null )
         {
@@ -828,19 +822,19 @@ namespace Xceed.Wpf.DataGrid
           columnNode = columnNode.Next;
         }
 
-        foreach( SelectionCellRangeWithItems cellRangeWithItems in m_cellsToUnselect )
+        foreach( var cellRangeWithItems in m_cellsToUnselect )
         {
           this.SetIsSelectedOnDataCell( columnsVisiblePosition, realizedDataRows, cellRangeWithItems, false );
           ownerSelectedCells.Remove( cellRangeWithItems );
         }
 
-        foreach( SelectionCellRangeWithItems cellRangeWithItems in m_cellsToSelect )
+        foreach( var cellRangeWithItems in m_cellsToSelect )
         {
           this.SetIsSelectedOnDataCell( columnsVisiblePosition, realizedDataRows, cellRangeWithItems, true );
           ownerSelectedCells.Add( cellRangeWithItems );
         }
 
-        foreach( SelectionCellRangeWithItems cellRangeWithItems in unselectedCellsFromRemove )
+        foreach( var cellRangeWithItems in unselectedCellsFromRemove )
         {
           m_cellsToUnselect.Add( cellRangeWithItems );
         }
@@ -929,7 +923,7 @@ namespace Xceed.Wpf.DataGrid
       int replacedItemCount = oldItems.Count;
       int cellRangeCount = selectedCellsStorage.Count;
 
-      if( oldItemIndex != -1 )
+      if( oldItemIndex >= 0 )
       {
         int itemIndex = oldItemIndex;
 
@@ -974,7 +968,7 @@ namespace Xceed.Wpf.DataGrid
           object newItem = newItems[ i ];
           int itemIndex = sourceItems.IndexOf( newItem );
 
-          if( itemIndex == -1 )
+          if( itemIndex < 0 )
             continue;
 
           if( selectedItemsStorage.Contains( itemIndex ) )
@@ -1007,59 +1001,61 @@ namespace Xceed.Wpf.DataGrid
 
     public SelectionInfo GetSelectionInfo()
     {
-      List<SelectionRangeWithItems> removedRangeWithItems;
-      List<SelectionRangeWithItems> unselectedItemsFromRemove = this.GetUnselectedItemsFromRemove( out removedRangeWithItems );
-      List<SelectionCellRangeWithItems> removedCellsRangeWithItems;
-      List<SelectionCellRangeWithItems> unselectedCellsFromRemove = this.GetUnselectedCellsFromRemove( out removedCellsRangeWithItems );
+      var unselectedItemsFromRemove = this.GetUnselectedItemsFromRemove();
+      var unselectedCellsFromRemove = this.GetUnselectedCellsFromRemove();
 
-      SelectedItemsStorage itemsToUnselect = ( SelectedItemsStorage )m_itemsToUnselect.Clone();
-      SelectedCellsStorage cellsToUnselect = ( SelectedCellsStorage )m_cellsToUnselect.Clone();
+      var itemsToUnselect = ( ( m_itemsToUnselect.Count > 0 ) || unselectedItemsFromRemove.Any() ) ? ( SelectedItemsStorage )m_itemsToUnselect.Clone() : SelectionChanger.EmptyItemsStore;
+      var itemsToSelect = ( m_itemsToSelect.Count > 0 ) ? ( SelectedItemsStorage )m_itemsToSelect.Clone() : SelectionChanger.EmptyItemsStore;
+      var cellsToUnselect = ( ( m_cellsToUnselect.Count > 0 ) || unselectedCellsFromRemove.Any() ) ? ( SelectedCellsStorage )m_cellsToUnselect.Clone() : SelectionChanger.EmptyCellsStore;
+      var cellsToSelect = ( m_cellsToSelect.Count > 0 ) ? ( SelectedCellsStorage )m_cellsToSelect.Clone() : SelectionChanger.EmptyCellsStore;
 
-      foreach( SelectionRangeWithItems rangeWithItems in unselectedItemsFromRemove )
+      foreach( var rangeWithItems in unselectedItemsFromRemove )
       {
         itemsToUnselect.Add( rangeWithItems );
       }
 
-      foreach( SelectionCellRangeWithItems cellRangeWithItems in unselectedCellsFromRemove )
+      foreach( var cellRangeWithItems in unselectedCellsFromRemove )
       {
         cellsToUnselect.Add( cellRangeWithItems );
       }
 
-      return new SelectionInfo(
-        m_owner, itemsToUnselect, ( SelectedItemsStorage )m_itemsToSelect.Clone(),
-        cellsToUnselect, ( SelectedCellsStorage )m_cellsToSelect.Clone() );
+      return new SelectionInfo( m_owner, itemsToUnselect, itemsToSelect, cellsToUnselect, cellsToSelect );
     }
 
-    #endregion PUBLIC METHODS
-
-    #region PRIVATE METHODS
-
-    private List<SelectionRangeWithItems> GetUnselectedItemsFromRemove( out List<SelectionRangeWithItems> removedRangeWithItems )
+    private IEnumerable<SelectionRangeWithItems> GetUnselectedItemsFromRemove()
     {
-      List<SelectionRangeWithItems> unselectedItemsFromRemove = new List<SelectionRangeWithItems>( 8 );
-      removedRangeWithItems = new List<SelectionRangeWithItems>( 8 );
+      return this.GetUnselectedItemsFromRemove( null );
+    }
 
-      int count = m_sourceChanges.Count;
+    private IEnumerable<SelectionRangeWithItems> GetUnselectedItemsFromRemove( ICollection<SelectionRangeWithItems> removedRangeWithItems )
+    {
+      var store = m_owner.SelectedItemsStore;
+      if( ( store.Count <= 0 ) || ( m_sourceChanges.Count <= 0 ) )
+        return Enumerable.Empty<SelectionRangeWithItems>();
 
-      for( int i = 0; i < count; i++ )
+      var unselectedItemsFromRemove = new List<SelectionRangeWithItems>();
+
+      for( int i = 0; i < m_sourceChanges.Count; i++ )
       {
-        SourceChangeInfo sourceChangeInfo = m_sourceChanges[ i ];
-
+        var sourceChangeInfo = m_sourceChanges[ i ];
         if( ( sourceChangeInfo.Action != NotifyCollectionChangedAction.Remove ) || ( sourceChangeInfo.StartIndex == -1 ) )
           continue;
 
-        int startIndex = sourceChangeInfo.StartIndex;
-        int removedItemCount = sourceChangeInfo.Count;
-        object[] removedItems = new object[ removedItemCount ];
+        var startIndex = sourceChangeInfo.StartIndex;
+        var removedItemCount = sourceChangeInfo.Count;
+        var removedItems = new object[ removedItemCount ];
+
         sourceChangeInfo.Items.CopyTo( removedItems, 0 );
 
-        SelectionRangeWithItems rangeWithItemsToRemove = new SelectionRangeWithItems(
-          new SelectionRange( startIndex, startIndex + removedItemCount - 1 ),
-          removedItems );
+        var range = new SelectionRange( startIndex, startIndex + removedItemCount - 1 );
+        var rangeWithItemsToRemove = new SelectionRangeWithItems( range, removedItems );
 
-        removedRangeWithItems.Add( rangeWithItemsToRemove );
+        if( removedRangeWithItems != null )
+        {
+          removedRangeWithItems.Add( rangeWithItemsToRemove );
+        }
 
-        if( m_owner.SelectedItemsStore.Contains( rangeWithItemsToRemove ) )
+        if( store.Contains( rangeWithItemsToRemove ) )
         {
           unselectedItemsFromRemove.Add( rangeWithItemsToRemove );
         }
@@ -1068,35 +1064,38 @@ namespace Xceed.Wpf.DataGrid
       return unselectedItemsFromRemove;
     }
 
-    private List<SelectionCellRangeWithItems> GetUnselectedCellsFromRemove( out List<SelectionCellRangeWithItems> removedCellsRangeWithItems )
+    private IEnumerable<SelectionCellRangeWithItems> GetUnselectedCellsFromRemove()
     {
-      removedCellsRangeWithItems = new List<SelectionCellRangeWithItems>( 8 );
-      List<SelectionCellRangeWithItems> unselectedCellsFromRemove = new List<SelectionCellRangeWithItems>( 8 );
+      return this.GetUnselectedCellsFromRemove( null );
+    }
 
-      int count = m_sourceChanges.Count;
+    private IEnumerable<SelectionCellRangeWithItems> GetUnselectedCellsFromRemove( ICollection<SelectionCellRangeWithItems> removedCellsRangeWithItems )
+    {
+      var store = m_owner.SelectedCellsStore;
+      if( ( store.Count <= 0 ) || ( m_sourceChanges.Count <= 0 ) )
+        return Enumerable.Empty<SelectionCellRangeWithItems>();
 
-      for( int i = 0; i < count; i++ )
+      var unselectedCellsFromRemove = new List<SelectionCellRangeWithItems>();
+
+      for( int i = 0; i < m_sourceChanges.Count; i++ )
       {
-        SourceChangeInfo sourceChangeInfo = m_sourceChanges[ i ];
-
+        var sourceChangeInfo = m_sourceChanges[ i ];
         if( ( sourceChangeInfo.Action != NotifyCollectionChangedAction.Remove ) || ( sourceChangeInfo.StartIndex == -1 ) )
           continue;
 
-        int startIndex = sourceChangeInfo.StartIndex;
-        int removedItemCount = sourceChangeInfo.Count;
-        object[] removedItems = new object[ removedItemCount ];
-        sourceChangeInfo.Items.CopyTo( removedItems, 0 );
+        var startIndex = sourceChangeInfo.StartIndex;
+        var removedItemCount = sourceChangeInfo.Count;
+        var range = new SelectionCellRange( new SelectionRange( startIndex, startIndex + removedItemCount - 1 ), new SelectionRange( 0, int.MaxValue - 1 ) );
 
-        SelectionCellRangeWithItems cellRangeWithItemsToRemove = new SelectionCellRangeWithItems(
-          new SelectionRange( startIndex, startIndex + removedItemCount - 1 ),
-          removedItems, new SelectionRange( 0, int.MaxValue - 1 ) );
+        if( removedCellsRangeWithItems != null )
+        {
+          var removedItems = new object[ removedItemCount ];
+          sourceChangeInfo.Items.CopyTo( removedItems, 0 );
 
-        removedCellsRangeWithItems.Add( cellRangeWithItemsToRemove );
+          removedCellsRangeWithItems.Add( new SelectionCellRangeWithItems( range.ItemRange, removedItems, range.ColumnRange ) );
+        }
 
-        IEnumerable<SelectionCellRangeWithItems> intersectedCellRangesWithItems =
-          m_owner.SelectedCellsStore.GetIntersectedCellRangesWithItems( cellRangeWithItemsToRemove.CellRange );
-
-        foreach( SelectionCellRangeWithItems cellRangeWithItems in intersectedCellRangesWithItems )
+        foreach( var cellRangeWithItems in store.GetIntersectedCellRangesWithItems( range ) )
         {
           unselectedCellsFromRemove.Add( cellRangeWithItems );
         }
@@ -1139,9 +1138,9 @@ namespace Xceed.Wpf.DataGrid
       SelectionCellRangeWithItems cellRangeWithItems,
       bool selected )
     {
-      object[] rangeItems = cellRangeWithItems.ItemRangeWithItems.Items;
-      bool selectionChanged = false;
-      SelectionRange columnRange = cellRangeWithItems.ColumnRange;
+      var rangeItems = cellRangeWithItems.ItemRangeWithItems.Items;
+      var selectionChanged = false;
+      var columnRange = cellRangeWithItems.ColumnRange;
 
       if( rangeItems != null )
       {
@@ -1149,13 +1148,13 @@ namespace Xceed.Wpf.DataGrid
 
         for( int i = 0; i < itemsCount; i++ )
         {
-          DataRow rangeItemAsDataRow = rangeItems[ i ] as DataRow;
+          var rangeItemAsDataRow = rangeItems[ i ] as DataRow;
 
           if( rangeItemAsDataRow != null )
           {
             selectionChanged = true;
 
-            foreach( DataCell dataCell in rangeItemAsDataRow.CreatedCells )
+            foreach( var dataCell in rangeItemAsDataRow.CreatedCells )
             {
               if( dataCell.IsContainerVirtualized )
                 continue;
@@ -1181,13 +1180,13 @@ namespace Xceed.Wpf.DataGrid
 
       if( !selectionChanged )
       {
-        SelectionRange itemRange = cellRangeWithItems.ItemRange;
+        var itemRange = cellRangeWithItems.ItemRange;
 
-        foreach( KeyValuePair<int, DataRow> realizedItemPair in realizedDataRows )
+        foreach( var realizedItemPair in realizedDataRows )
         {
           if( !itemRange.Intersect( new SelectionRange( realizedItemPair.Key ) ).IsEmpty )
           {
-            foreach( DataCell dataCell in realizedItemPair.Value.CreatedCells )
+            foreach( var dataCell in realizedItemPair.Value.CreatedCells )
             {
               if( dataCell.IsContainerVirtualized )
                 continue;
@@ -1207,24 +1206,18 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion PRIVATE METHODS
+    private readonly List<object> m_toDeferSelect;
+    private readonly SelectedItemsStorage m_itemsToSelect;
+    private readonly SelectedItemsStorage m_itemsToUnselect;
+    private readonly SelectedCellsStorage m_cellsToSelect;
+    private readonly SelectedCellsStorage m_cellsToUnselect;
+    private readonly List<SourceChangeInfo> m_sourceChanges;
 
-    #region FIELDS
+    #region SourceChangeInfo Private Class
 
-    private List<object> m_toDeferSelect;
-    private SelectedItemsStorage m_itemsToSelect;
-    private SelectedItemsStorage m_itemsToUnselect;
-    private SelectedCellsStorage m_cellsToSelect;
-    private SelectedCellsStorage m_cellsToUnselect;
-    private List<SourceChangeInfo> m_sourceChanges;
-
-    #endregion FIELDS
-
-    #region SourceChangeInfo Class
-
-    private class SourceChangeInfo
+    private sealed class SourceChangeInfo
     {
-      public SourceChangeInfo( NotifyCollectionChangedAction action, int startIndex, int count, IList items )
+      internal SourceChangeInfo( NotifyCollectionChangedAction action, int startIndex, int count, IList items )
       {
         this.Action = action;
         this.StartIndex = startIndex;
@@ -1232,31 +1225,31 @@ namespace Xceed.Wpf.DataGrid
         this.Items = items;
       }
 
-      public NotifyCollectionChangedAction Action
+      internal NotifyCollectionChangedAction Action
       {
         get;
         private set;
       }
 
-      public int StartIndex
+      internal int StartIndex
       {
         get;
         private set;
       }
 
-      public int Count
+      internal int Count
       {
         get;
         private set;
       }
 
-      public IList Items
+      internal IList Items
       {
         get;
         private set;
       }
     }
 
-    #endregion SourceChangeInfo Class
+    #endregion
   }
 }

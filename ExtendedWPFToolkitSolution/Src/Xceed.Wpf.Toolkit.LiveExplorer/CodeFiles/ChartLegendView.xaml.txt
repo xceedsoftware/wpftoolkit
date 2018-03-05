@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -28,135 +28,24 @@
             <LineBreak />
             <LineBreak />
             <Run>A legend can be moved around, resized, and docked. Please note that a legend can be resized only when its Dock property is set to Float and if the AllowResize property is set to true.</Run>
-       <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->      
         </Paragraph>
     </local:DemoView.Description>
-    
-<!--##EXCLUDE_OPEN_SOURCE-->
-    <local:DemoView.Resources>
-        <ObjectDataProvider x:Key="LegendDock" MethodName="GetValues"
-                          ObjectType="{x:Type sys:Enum}">
-         <ObjectDataProvider.MethodParameters>
-            <x:Type TypeName="xctk:LegendDock" />
-         </ObjectDataProvider.MethodParameters>
-      </ObjectDataProvider>
-    </local:DemoView.Resources>
-    
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
 
 
-      <GroupBox Header="Features" Grid.Row="0" Margin="5">
-         <Grid Margin="5">
-            <Grid.RowDefinitions>
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
 
-            <!-- 1st column-->
-            <TextBlock Text="Dock: " VerticalAlignment="Center" />
-            <ComboBox Grid.Column="1" ItemsSource="{Binding Source={StaticResource LegendDock}}" SelectedItem="{Binding Dock, ElementName=_legend}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Title: " Grid.Row="1" VerticalAlignment="Center" />
-            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Title, ElementName=_legend, UpdateSourceTrigger=PropertyChanged}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-             
-            <!-- 2nd column-->
-            <TextBlock Text="Allow Resize: " Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <CheckBox Grid.Column="3" IsChecked="{Binding AllowResize, ElementName=_legend}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="Allow Move: " Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <CheckBox x:Name="_allowMove" Grid.Row="1" Grid.Column="3" IsChecked="{Binding AllowMove, ElementName=_legend}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-            
-            <!--3rd column-->
-            <TextBlock Text="Allow Dock: " Grid.Column="4" VerticalAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=_allowMove}" Margin="10,0,0,0" Style="{StaticResource DisableGrayText}"/>
-            <CheckBox Grid.Column="5" IsChecked="{Binding AllowDock, ElementName=_legend}" IsEnabled="{Binding IsChecked, ElementName=_allowMove}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-        </Grid>
-      </GroupBox>
-      
-      <TextBlock Grid.Row="1" Text="Usage:" Style="{StaticResource Header}" Margin="10"/>
 
-      <xctk:Chart Grid.Row="2" MinHeight="350">
-         <xctk:Chart.Legend>
-               <xctk:Legend x:Name="_legend"
-                              Dock="Left"
-                              AllowResize="True"
-                              AllowDock="True"
-                              AllowMove="True"
-                              Title="Legend"/>
-            </xctk:Chart.Legend>
-         <xctk:Chart.Areas>
-            <xctk:Area Title="Wins/month">
-               <xctk:Area.XAxis>
-                     <xctk:Axis ShowAxisLabel="False" ShowTickLabels="False" ShowTicks="False"/>
-               </xctk:Area.XAxis>
-               <xctk:Area.YAxis>
-                     <xctk:Axis  ShowAxisLabel="False" ShowTickLabels="False" ShowTicks="False"/>
-               </xctk:Area.YAxis>
-               <xctk:Area.Series>
-                     <xctk:Series  Title="Months"
-                                 DefaultInterior="Green"
-                                 ShowPointsInLegend="True"
-                                 ShowHintLabels="True">
-                        <xctk:Series.Layout>
-                           <xctk:PieLayout />
-                        </xctk:Series.Layout>
-                        <xctk:Series.DataPoints>
-                           <xctk:DataPoint X="6" Y="6" Label="Jan" />
-                           <xctk:DataPoint X="7" Y="7" Label="Feb"/>
-                           <xctk:DataPoint X="4" Y="4" Label="Mar" />
-                           <xctk:DataPoint X="2" Y="2" Label="Apr"/>
-                        </xctk:Series.DataPoints>
-                     </xctk:Series>
-               </xctk:Area.Series>
-            </xctk:Area>
-                    
-            <xctk:Area Title="Goals/player">
-               <xctk:Area.XAxis>
-                     <xctk:Axis Title="Player's Name" LabelsType="Labels" GraduationMode="Manual"/>
-               </xctk:Area.XAxis>
-               <xctk:Area.YAxis>
-                     <xctk:Axis Title="Goals" AxisLabelsLayout="ShowToFit"/>
-               </xctk:Area.YAxis>
-               <xctk:Area.Series>
-                     <xctk:Series  Title="Players"
-                                 DefaultInterior="Orange">
-                        <xctk:Series.Layout>
-                           <xctk:ColumnLayout />
-                        </xctk:Series.Layout>
-                        <xctk:Series.DataPoints>
-                           <xctk:DataPoint Y="36" Label="Tom" />
-                           <xctk:DataPoint Y="7" Label="Steven"/>
-                           <xctk:DataPoint Y="24" Label="Kirk" />
-                           <xctk:DataPoint Y="12" Label="Erik"/>
-                           <xctk:DataPoint Y="10" Label="Scott"/>
-                        </xctk:Series.DataPoints>
-                     </xctk:Series>
-               </xctk:Area.Series>
-            </xctk:Area>
-         </xctk:Chart.Areas>
-      </xctk:Chart>
-   </Grid>
-<!--##END-->  
-    
-<!--##INCLUDE_OPEN_SOURCE
+
+
+
+
+
+
+
     <Image Source="..\OpenSourceImages\ChartLegend.png" Width="600" Height="400"/>
-##END-->
 </local:DemoView>

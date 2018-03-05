@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -25,175 +25,26 @@
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
             <Run>This sample shows how a series with a column layout type and a legend can be styled using DataTemplates.</Run>
-            <!--##EXCLUDE_OPEN_SOURCE-->
-            <Run>Please move mouse on line and markers to see simple effects.</Run>
-            <!--##END-->
-            
-       <!--##INCLUDE_OPEN_SOURCE
+
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->
         </Paragraph>
     </local:DemoView.Description>
-    
-<!--##EXCLUDE_OPEN_SOURCE-->
-    <local:DemoView.Resources>
-        <sample:Persons x:Key="persons"/>
-        <CollectionViewSource x:Key="PersonCollection" Source="{Binding Source={StaticResource persons}, Path=PersonList}"/>
-        
-        <DataTemplate x:Key="legendTemplate">
-          <DockPanel VerticalAlignment="Center">
-            <Image Source="{Binding Path=Photo}" Width="32"  Height="32" Margin="5,1,1,1"/>
-            <TextBlock Text="{Binding Path=Name}" FontSize="11" VerticalAlignment="Center" Margin="5,1,2,1"/>
-          </DockPanel>
-        </DataTemplate>
-        
-        <Style  x:Key="TextBoxTextStyle" TargetType="TextBlock">
-          <Setter Property="HorizontalAlignment" Value="Center" />
-          <Setter Property="FontFamily" Value="Comic Sans MS"/>
-          <Setter Property="FontSize" Value="12"/>
-          <Style.Triggers>
-            <EventTrigger RoutedEvent="Mouse.MouseEnter">
-              <EventTrigger.Actions>
-                <BeginStoryboard>
-                  <Storyboard>
-                    <DoubleAnimation Storyboard.TargetProperty="FontSize" To="19" Duration="0:0:0.4"/>
-                  </Storyboard>
-                </BeginStoryboard>
-              </EventTrigger.Actions>
-            </EventTrigger>
 
-            <EventTrigger RoutedEvent="Mouse.MouseLeave">
-              <EventTrigger.Actions>
-                <BeginStoryboard>
-                  <Storyboard>
-                    <DoubleAnimation Storyboard.TargetProperty="FontSize" To="12" Duration="0:0:0.4" />
-                  </Storyboard>
-                </BeginStoryboard>
-              </EventTrigger.Actions>
-            </EventTrigger>
-          </Style.Triggers>
-        </Style>
-        
-         <Style TargetType="Button">
-           <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <ContentPresenter/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-             
-             <Setter Property="ContentTemplate">
-                <Setter.Value>
-                   <DataTemplate>
-			           <Grid Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}" 
-                             Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
-				           <Rectangle RadiusX="5" RadiusY="5" >
-					            <Rectangle.Triggers>
-						            <EventTrigger RoutedEvent="Mouse.MouseEnter">
-							            <EventTrigger.Actions>
-								            <BeginStoryboard>
-									            <Storyboard>
-										            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0.5" Duration="0:0:0.4"/>
-									            </Storyboard>
-								            </BeginStoryboard>
-							            </EventTrigger.Actions>
-						            </EventTrigger>
 
-						            <EventTrigger RoutedEvent="Mouse.MouseLeave">
-							            <EventTrigger.Actions>
-								            <BeginStoryboard>
-									            <Storyboard>
-										            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.4" />
-									            </Storyboard>
-								            </BeginStoryboard>
-							            </EventTrigger.Actions>
-						            </EventTrigger>
-					            </Rectangle.Triggers>
-					
-					            <Rectangle.Fill>
-						            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-							            <GradientStop Color="Yellow" Offset="0.0" />
-							            <GradientStop Color="Orange" Offset="0.25" />
-							            <GradientStop Color="CornflowerBlue" Offset="0.75" />
-							            <GradientStop Color="LimeGreen" Offset="1.0" />
-						            </LinearGradientBrush>
-					            </Rectangle.Fill>
-				            </Rectangle> 
-                           <ContentPresenter VerticalAlignment="Center" Content="{Binding Path=Content, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}"/>
-			           </Grid>
-		            </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        
-        <DataTemplate x:Key="seriesTemplate">
-          <Button x:Name="Bar">
-            <StackPanel>
-              <DockPanel>
-                <TextBlock Text="Name: " Style="{StaticResource TextBoxTextStyle}" />
-                <TextBlock Text="{Binding Path=Content.Name}" Style="{StaticResource TextBoxTextStyle}" />
-              </DockPanel>
-              <DockPanel>
-                <TextBlock Text="Skill: " Style="{StaticResource TextBoxTextStyle}" />
-                <TextBlock Text="{Binding Path=Content.Skill}" Style="{StaticResource TextBoxTextStyle}" />
-              </DockPanel>
-              <TextBlock Text="Photo:" Style="{StaticResource TextBoxTextStyle}"/>
-              <Image Source="{Binding Path=Content.Photo}"/>
-            </StackPanel>
-          </Button>
-       </DataTemplate>
-    </local:DemoView.Resources>
-    
-   <Grid>
-     <xctk:Chart MinHeight="400">
-        <xctk:Chart.Legend>
-            <xctk:Legend ItemTemplate="{StaticResource legendTemplate}" ItemsSource="{Binding Source={StaticResource PersonCollection}}" Title="Persons"/>
-        </xctk:Chart.Legend>
-        <xctk:Chart.Areas>
-            <xctk:Area >
-                <xctk:Area.XAxis>
-                    <xctk:Axis GraduationMode="Manual" LabelsType="Labels"/>
-                </xctk:Area.XAxis>
-                <xctk:Area.YAxis>
-                    <xctk:Axis Title="Skill"/>
-                </xctk:Area.YAxis>
-                
-                <xctk:Area.Series>
-					<xctk:Series DataPointsSource="{Binding Source={StaticResource PersonCollection}}"
-                                  Template="{StaticResource seriesTemplate}"
-                                  ShowPointsInLegend="true">
-						<xctk:Series.DataPointBindings>
-                            <xctk:BindingInfo PropertyName="X">
-                              <xctk:BindingInfo.Binding>
-                                <Binding Path="Age"/>
-                              </xctk:BindingInfo.Binding>
-                            </xctk:BindingInfo>
-                            <xctk:BindingInfo PropertyName="Y">
-                              <xctk:BindingInfo.Binding>
-                                <Binding Path="Skill"/>
-                              </xctk:BindingInfo.Binding>
-                            </xctk:BindingInfo>
-                            <xctk:BindingInfo PropertyName="Label">
-                              <xctk:BindingInfo.Binding>
-                                <Binding Path="Name"/>
-                              </xctk:BindingInfo.Binding>
-                            </xctk:BindingInfo>
-                          </xctk:Series.DataPointBindings>
-				    </xctk:Series>
-			    </xctk:Area.Series>
-            </xctk:Area>
-        </xctk:Chart.Areas>
-     </xctk:Chart>
-   </Grid>
-<!--##END-->
-    
-<!--##INCLUDE_OPEN_SOURCE
+
+
+
+
+
+
+
+
+
+
     <Image Source="..\OpenSourceImages\ChartStylingColumnSeries.png" Width="600" Height="400"/>
-##END-->
 </local:DemoView>

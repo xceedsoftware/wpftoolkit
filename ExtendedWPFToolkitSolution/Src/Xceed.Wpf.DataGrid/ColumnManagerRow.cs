@@ -14,13 +14,18 @@
 
   ***********************************************************************************/
 
+using System;
 using System.Collections;
-using System.Diagnostics;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Automation.Peers;
-using Xceed.Wpf.DataGrid.Automation;
-using Xceed.Wpf.DataGrid.Views;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using Xceed.Utils.Wpf;
 using Xceed.Utils.Wpf.DragDrop;
+using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -28,7 +33,8 @@ namespace Xceed.Wpf.DataGrid
   {
     static ColumnManagerRow()
     {
-      NavigationBehaviorProperty.OverrideMetadata( typeof( ColumnManagerRow ), new FrameworkPropertyMetadata( NavigationBehavior.None ) );
+      Row.NavigationBehaviorProperty.OverrideMetadata( typeof( ColumnManagerRow ), new FrameworkPropertyMetadata( NavigationBehavior.None ) );
+      FrameworkElement.ContextMenuProperty.OverrideMetadata( typeof( ColumnManagerRow ), new FrameworkPropertyMetadata( null, new CoerceValueCallback( ColumnManagerRow.CoerceContextMenu ) ) );
     }
 
     public ColumnManagerRow()
@@ -42,8 +48,11 @@ namespace Xceed.Wpf.DataGrid
 
     #region AllowColumnReorder Property
 
-    public static readonly DependencyProperty AllowColumnReorderProperty =
-        DependencyProperty.Register( "AllowColumnReorder", typeof( bool ), typeof( ColumnManagerRow ), new UIPropertyMetadata( true ) );
+    public static readonly DependencyProperty AllowColumnReorderProperty = DependencyProperty.Register(
+      "AllowColumnReorder",
+      typeof( bool ),
+      typeof( ColumnManagerRow ),
+      new FrameworkPropertyMetadata( true, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback( ColumnManagerRow.OnAllowColumnReorderChanged ) ) );
 
     public bool AllowColumnReorder
     {
@@ -57,12 +66,28 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion AllowColumnReorder Property
+    private static void OnAllowColumnReorderChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    {
+      var self = sender as ColumnManagerRow;
+      if( self == null )
+        return;
+
+      var configuration = self.Configuration;
+      if( configuration == null )
+        return;
+
+      configuration.AllowColumnReorder = ( bool )e.NewValue;
+    }
+
+    #endregion
 
     #region AllowColumnResize Property
 
-    public static readonly DependencyProperty AllowColumnResizeProperty =
-        DependencyProperty.Register( "AllowColumnResize", typeof( bool ), typeof( ColumnManagerRow ), new UIPropertyMetadata( true ) );
+    public static readonly DependencyProperty AllowColumnResizeProperty = DependencyProperty.Register(
+      "AllowColumnResize",
+      typeof( bool ),
+      typeof( ColumnManagerRow ),
+      new UIPropertyMetadata( true ) );
 
     public bool AllowColumnResize
     {
@@ -76,12 +101,15 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion AllowColumnResize Property
+    #endregion
 
     #region AllowSort Property
 
-    public static readonly DependencyProperty AllowSortProperty =
-        DependencyProperty.Register( "AllowSort", typeof( bool ), typeof( ColumnManagerRow ), new UIPropertyMetadata( true ) );
+    public static readonly DependencyProperty AllowSortProperty = DependencyProperty.Register(
+      "AllowSort",
+      typeof( bool ),
+      typeof( ColumnManagerRow ),
+      new UIPropertyMetadata( true ) );
 
     public bool AllowSort
     {
@@ -95,12 +123,55 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion AllowSort Property
+    #endregion
 
-    protected override AutomationPeer OnCreateAutomationPeer()
+    #region IsUnfocusable Property
+
+    internal override bool IsUnfocusable
     {
-      return new ColumnManagerRowAutomationPeer( this );
+      get
+      {
+        return true;
+      }
     }
+
+    #endregion
+
+    #region Configuration Internal Property
+
+    internal ColumnManagerRowConfiguration Configuration
+    {
+      get
+      {
+        return m_configuration;
+      }
+      set
+      {
+        if( value == m_configuration )
+          return;
+
+        if( m_configuration != null )
+        {
+          PropertyChangedEventManager.RemoveListener( m_configuration, this, string.Empty );
+        }
+
+        m_configuration = value;
+
+        this.PushAllowColumnReorder();
+
+        if( m_configuration != null )
+        {
+          PropertyChangedEventManager.AddListener( m_configuration, this, string.Empty );
+        }
+
+        this.UpdateAllowColumnReorder();
+      }
+    }
+
+    private ColumnManagerRowConfiguration m_configuration;
+
+    #endregion
+
 
     protected override Cell CreateCell( ColumnBase column )
     {
@@ -112,14 +183,27 @@ namespace Xceed.Wpf.DataGrid
       return ( cell is ColumnManagerCell );
     }
 
-    protected internal override void PrepareDefaultStyleKey( ViewBase view )
+    protected internal override void PrepareDefaultStyleKey( Xceed.Wpf.DataGrid.Views.ViewBase view )
     {
-      object currentThemeKey = view.GetDefaultStyleKey( typeof( ColumnManagerRow ) );
+      var currentThemeKey = view.GetDefaultStyleKey( typeof( ColumnManagerRow ) );
+      if( currentThemeKey.Equals( this.DefaultStyleKey ) )
+        return;
 
-      if( currentThemeKey.Equals( this.DefaultStyleKey ) == false )
-      {
-        this.DefaultStyleKey = currentThemeKey;
-      }
+      this.DefaultStyleKey = currentThemeKey;
+    }
+
+    protected override void PrepareContainer( DataGridContext dataGridContext, object item )
+    {
+      base.PrepareContainer( dataGridContext, item );
+
+      this.Configuration = dataGridContext.ColumnManagerRowConfiguration;
+    }
+
+    protected override void ClearContainer()
+    {
+      this.Configuration = null;
+
+      base.ClearContainer();
     }
 
     protected override void OnPreviewMouseLeftButtonDown( System.Windows.Input.MouseButtonEventArgs e )
@@ -128,42 +212,92 @@ namespace Xceed.Wpf.DataGrid
       //This is because we do not want the ColumnManager Row to be selectable through the Mouse
     }
 
+    protected override void OnMouseRightButtonUp( MouseButtonEventArgs e )
+    {
+      if( e.Handled )
+        return;
+
+      base.OnMouseRightButtonUp( e );
+    }
+
+    private static object CoerceContextMenu( DependencyObject sender, object value )
+    {
+      if( value == null )
+        return value;
+
+      var self = sender as ColumnManagerRow;
+      if( ( self == null ) )
+        return value;
+
+      return null;
+    }
+
+    private void PushAllowColumnReorder()
+    {
+      var configuration = this.Configuration;
+      if( configuration == null )
+        return;
+
+      if( DependencyPropertyHelper.GetValueSource( this, ColumnManagerRow.AllowColumnReorderProperty ).BaseValueSource == BaseValueSource.Default )
+        return;
+
+      configuration.AllowColumnReorder = this.AllowColumnReorder;
+    }
+
+    private void UpdateAllowColumnReorder()
+    {
+      var configuration = this.Configuration;
+      if( configuration == null )
+        return;
+
+      this.AllowColumnReorder = configuration.AllowColumnReorder;
+    }
+
+    private void OnConfigurationPropertyChanged( PropertyChangedEventArgs e )
+    {
+      var propertyName = e.PropertyName;
+
+      if( string.IsNullOrEmpty( propertyName ) || propertyName == ColumnManagerRow.AllowColumnReorderProperty.Name )
+      {
+        this.UpdateAllowColumnReorder();
+      }
+    }
+
     #region IDropTarget Members
 
-    bool IDropTarget.CanDropElement( UIElement draggedElement )
+    bool IDropTarget.CanDropElement( UIElement draggedElement, RelativePoint mousePosition )
     {
-      bool canDrop = false;
-
-      ColumnManagerCell draggedCell = draggedElement as ColumnManagerCell;
-
+      var draggedCell = draggedElement as ColumnManagerCell;
       if( draggedCell == null )
         return false;
 
-      ColumnReorderingDragSourceManager manager = draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
-
-      if( ( manager != null ) && ( manager.IsAnimatedColumnReorderingEnabled ) )
+      var manager = draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
+      if( ( manager != null ) && manager.IsAnimatedColumnReorderingEnabled && draggedCell.IsBeingDragged )
       {
-        ColumnManagerCell cell = draggedElement as ColumnManagerCell;
+        var dataGridContext = DataGridControl.GetDataGridContext( this );
+        if( ( dataGridContext == null ) || !dataGridContext.Columns.Contains( draggedCell.ParentColumn ) )
+          return false;
 
-        if( ( cell != null ) && ( cell.IsBeingDragged ) )
-        {
-          DataGridContext rowDataGridContext = DataGridControl.GetDataGridContext( this );
+        // We are not interested by the y-axis.
+        var relativePoint = mousePosition.GetPoint( this );
+        var xPosition = new RelativePoint( this, new Point( relativePoint.X, this.ActualHeight / 2d ) );
 
-          if( ( rowDataGridContext != null ) && ( rowDataGridContext.Columns.Contains( cell.ParentColumn ) ) )
-          {
-            canDrop = true;
-          }
-        }
+        var targetCell = ( from dropTarget in manager.GetDropTargetsAtPoint( xPosition )
+                           let dropCell = dropTarget as ColumnManagerCell
+                           where ( dropCell != null )
+                           select dropCell ).FirstOrDefault();
+        if( ( targetCell == null ) || ( targetCell == draggedCell ) || ( ( IDropTarget )targetCell ).CanDropElement( draggedElement, xPosition ) )
+          return true;
       }
 
-      return canDrop;
+      return false;
     }
 
     void IDropTarget.DragEnter( UIElement draggedElement )
     {
     }
 
-    void IDropTarget.DragOver( UIElement draggedElement, Point mousePosition )
+    void IDropTarget.DragOver( UIElement draggedElement, RelativePoint mousePosition )
     {
     }
 
@@ -171,19 +305,40 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
-    void IDropTarget.Drop( UIElement draggedElement )
+    void IDropTarget.Drop( UIElement draggedElement, RelativePoint mousePosition )
     {
-      ColumnManagerCell draggedCell = draggedElement as ColumnManagerCell;
-
+      var draggedCell = draggedElement as ColumnManagerCell;
       if( draggedCell == null )
         return;
 
-      ColumnReorderingDragSourceManager manager = draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
-
+      var manager = draggedCell.DragSourceManager as ColumnReorderingDragSourceManager;
       if( ( manager != null ) && ( manager.IsAnimatedColumnReorderingEnabled ) )
       {
         manager.CommitReordering();
       }
+    }
+
+    #endregion
+
+    #region IWeakEventListener Members
+
+    protected override bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      var result = base.OnReceiveWeakEvent( managerType, sender, e );
+
+      if( typeof( PropertyChangedEventManager ) == managerType )
+      {
+        if( sender == m_configuration )
+        {
+          this.OnConfigurationPropertyChanged( ( PropertyChangedEventArgs )e );
+        }
+      }
+      else
+      {
+        return result;
+      }
+
+      return true;
     }
 
     #endregion

@@ -23,7 +23,6 @@
    <ResourceDictionary.MergedDictionaries>
       <!-- Style definitions for specific controls (things that are not grid elements) -->
 
-      <markup:DataGridThemeResourceDictionary Source="/themes/Controls/FixedColumnSplitter.generic.xaml"/>
       <markup:DataGridThemeResourceDictionary Source="/themes/Controls/TableViewScrollViewer.generic.xaml"/>
 
       <!-- For each specific systeme theme ResourceDictionary, we only need to include 
@@ -211,15 +210,15 @@
           BasedOn="{StaticResource tableflowViewAeroNormalColorHierarchicalGroupByItemStyle}" />
 
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationButton}"
-          TargetType="{x:Type local:GroupNavigationButton}"
+          TargetType="local:GroupNavigationButton"
           BasedOn="{StaticResource tableflowViewAeroNormalColorGroupNavigationButtonStyle}" />
 
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationControl}"
-          TargetType="{x:Type local:GroupNavigationControl}"
+          TargetType="local:GroupNavigationControl"
           BasedOn="{StaticResource tableflowViewAeroNormalColorGroupNavigationControlStyle}" />
 
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationControlItem}"
-          TargetType="{x:Type local:GroupNavigationControlItem}"
+          TargetType="local:GroupNavigationControlItem"
           BasedOn="{StaticResource tableflowViewAeroNormalColorGroupNavigationControlItemStyle}" />
 
 </ResourceDictionary>

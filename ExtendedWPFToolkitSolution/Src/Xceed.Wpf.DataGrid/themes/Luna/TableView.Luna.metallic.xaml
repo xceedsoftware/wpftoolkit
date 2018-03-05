@@ -585,16 +585,6 @@
                     Value="18,0,0,0" />
          </MultiDataTrigger>
 
-         <!-- Trigger related to the filteringToggleButton-->
-         <Trigger SourceName="toggleButton"
-                  Property="IsMouseOver"
-                  Value="True">
-
-            <Setter TargetName="toggleButton"
-                    Property="Opacity"
-                    Value="1" />
-         </Trigger>
-
          <Trigger Property="IsMouseOver"
                   Value="True">
 
@@ -781,12 +771,6 @@
             <Setter TargetName="PART_ColumnResizerThumbLeft"
                     Property="IsEnabled"
                     Value="False" />
-         </DataTrigger>
-
-         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.Visible}"
-                      Value="False">
-            <Setter Property="Visibility"
-                    Value="Collapsed" />
          </DataTrigger>
 
       </ControlTemplate.Triggers>
@@ -1435,6 +1419,10 @@
    <Style x:Key="tableViewLunaMetallicDataRowStyle"
           TargetType="local:DataRow"
           BasedOn="{StaticResource tableViewLunaMetallicRowStyle}">
+
+      <Setter Property="Template"
+              Value="{StaticResource tableViewDataRowTemplate}" />
+
    </Style>
 
    <!--**************************
@@ -1545,6 +1533,9 @@
       <Setter Property="Background"
               Value="Transparent" />
 
+      <Setter Property="ToolTip"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.Description}" />
+
       <!-- In TableView, each Cell has the same width as its ParentColum's ActualWidth -->
       <Setter Property="Width"
               Value="{Binding RelativeSource={RelativeSource Self},Path=ParentColumn.ActualWidth}" />
@@ -1562,7 +1553,6 @@
               Value="{StaticResource tableViewColumnManagerCellTemplate}" />
 
    </Style>
-
 
    <!--**************************
     * STYLE: GroupByControl 

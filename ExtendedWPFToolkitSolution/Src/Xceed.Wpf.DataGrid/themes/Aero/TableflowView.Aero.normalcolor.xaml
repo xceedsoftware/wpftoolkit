@@ -37,6 +37,15 @@
 
    </ResourceDictionary.MergedDictionaries>
 
+   <conv:GreaterThanZeroConverter x:Key="greaterThanZeroConverter" />
+   <conv:NullToBooleanConverter x:Key="nullToBooleanConverter" />
+   <conv:TypeToBooleanConverter x:Key="typeToBooleanConverter" />
+   <conv:ThicknessConverter x:Key="thicknessConverter" />
+   <conv:ThicknessConverter x:Key="inverseThicknessConverter"
+                            InverseValue="True" />
+   <conv:IntAdditionConverter x:Key="intAdditionConverter" />
+   <conv:SortingDirectionToBooleanConverter x:Key="sortingDirectionToBooleanConverter" />
+
    <!-- =================================================================== -->
    <!-- Resources specific to this View/Theme/ColorScheme                   -->
    <!-- =================================================================== -->
@@ -620,9 +629,113 @@
    <ControlTemplate x:Key="tableflowViewRowTemplate"
                     TargetType="local:Row">
 
-      <ControlTemplate.Resources>
-         <conv:TypeToBooleanConverter x:Key="typeToBooleanConverter" />
-      </ControlTemplate.Resources>
+      <Grid x:Name="rootGrid">
+         <Grid.ColumnDefinitions>
+            <!-- HierarchicalGroupLevelIndicatorPane -->
+            <ColumnDefinition Width="Auto" />
+            <!-- GroupLevelIndicatorPane -->
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+
+            <!-- CellsHost panel -->
+            <ColumnDefinition Width="*" />
+         </Grid.ColumnDefinitions>
+
+         <local:HierarchicalGroupLevelIndicatorPane views:TableView.CanScrollHorizontally="False"
+                                                    Grid.Column="0" />
+
+         <local:GroupLevelIndicatorPane x:Name="groupLevelIndicatorPane"
+                                        views:TableView.CanScrollHorizontally="False"
+                                        Grid.Column="1" />
+
+         <Border x:Name="outerBackground"
+                 Grid.Column="2"
+                 Grid.ColumnSpan="2"
+                 Background="{TemplateBinding Background}"
+                 BorderBrush="{TemplateBinding BorderBrush}"
+                 BorderThickness="{TemplateBinding BorderThickness}"
+                 views:TableView.CanScrollHorizontally="False" />
+
+         <Border x:Name="rowBorder"
+                 Grid.Column="2"
+                 Grid.ColumnSpan="2"
+                 BorderThickness="1"
+                 CornerRadius="3"
+                 views:TableView.CanScrollHorizontally="False">
+            <Border x:Name="innerBackground"
+                    BorderThickness="1"
+                    CornerRadius="2" />
+         </Border>
+
+         <!-- Space reserved for alignment with data rows. -->
+         <ContentPresenter x:Name="detailsToggle"
+                           Grid.Column="2"
+                           Content="{x:Null}"
+                           ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).ExpandGroupGlyph}"
+                           VerticalAlignment="Top"
+                           Margin="2"
+                           OverridesDefaultStyle="True"
+                           Focusable="False"
+                           Visibility="Collapsed"
+                           views:TableView.CanScrollHorizontally="False" />
+
+         <!-- The PART_CellsHost part designates the Panel to which this Row's Cells should be added.-->
+         <views:FixedCellPanel x:Name="PART_CellsHost"
+                               Grid.Column="3"
+                               ColumnStretchMinWidth="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).ColumnStretchMinWidth}"
+                               ColumnStretchMode="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).ColumnStretchMode}"
+                               FixedCellCount="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).FixedColumnCount, Mode=TwoWay}"
+                               FixedColumnDropMarkPen="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).FixedColumnDropMarkPen}"
+                               Margin="{TemplateBinding BorderThickness}" />
+
+      </Grid>
+
+      <ControlTemplate.Triggers>
+
+         <!-- This trigger is used to display Mouse Over look -->
+         <MultiDataTrigger>
+            <MultiDataTrigger.Conditions>
+               <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}"
+                          Value="True" />
+               <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).DataGridControl.SelectionUnit}"
+                          Value="Row" />
+            </MultiDataTrigger.Conditions>
+
+            <Setter TargetName="rowBorder"
+                    Property="BorderBrush"
+                    Value="{StaticResource hotRowBorderBrush}" />
+            <Setter TargetName="outerBackground"
+                    Property="Background"
+                    Value="{StaticResource hotOuterRowBackgroundBrush}" />
+            <Setter TargetName="innerBackground"
+                    Property="Background"
+                    Value="{StaticResource hotInnerRowBackgroundBrush}" />
+
+         </MultiDataTrigger>
+
+         <MultiDataTrigger>
+            <MultiDataTrigger.Conditions>
+               <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HasDetails}"
+                          Value="True" />
+               <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).AllowDetailToggle}"
+                          Value="True" />
+            </MultiDataTrigger.Conditions>
+
+            <Setter TargetName="detailsToggle"
+                    Property="Visibility"
+                    Value="Hidden" />
+
+         </MultiDataTrigger>
+
+      </ControlTemplate.Triggers>
+
+   </ControlTemplate>
+
+   <!--**************************
+    * TEMPLATE: DataRow 
+    ************************** -->
+   <ControlTemplate x:Key="tableflowViewDataRowTemplate"
+                    TargetType="local:DataRow">
 
       <!-- This Grid is used to layout the GroupLevelIndicatorPane placeholder and the CellsHost panel. -->
       <Grid x:Name="rootGrid">
@@ -665,24 +778,16 @@
                     CornerRadius="2" />
          </Border>
 
-         <!-- Button that is used to expand/collapse the group. -->
+         <!-- Button that is used to expand/collapse the details. -->
          <Button x:Name="detailsToggle"
+                 Grid.Column="2"
                  Template="{StaticResource detailsExpanderButtonTemplate}"
                  VerticalAlignment="Top"
-                 Grid.Column="2"
                  Margin="2"
-                 Command="{x:Static local:DataGridCommands.ToggleDetailExpansion}"
                  OverridesDefaultStyle="True"
                  Focusable="False"
                  Visibility="Collapsed"
                  views:TableView.CanScrollHorizontally="False" />
-
-         <!-- This TextBlock is used to ensure that the DesiredSize for 
-         the Row will never fall below the Height of a String using the inherited font size and face-->
-         <TextBlock Text=""
-                    Visibility="Hidden"
-                    Grid.Column="3"
-                    Margin="{TemplateBinding BorderThickness}" />
 
          <!-- The PART_CellsHost part designates the Panel to which this Row's Cells should be added.-->
          <views:FixedCellPanel x:Name="PART_CellsHost"
@@ -700,27 +805,21 @@
          <!-- This trigger is used to display the Active Selection look -->
          <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=IsSelected}"
                           Value="True" />
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).DataGridControl.IsKeyboardFocusWithin}"
                           Value="True" />
-
             </MultiDataTrigger.Conditions>
 
             <Setter TargetName="rowBorder"
                     Property="BorderBrush"
                     Value="{StaticResource selectionRowBorderBrush}" />
-
             <Setter TargetName="outerBackground"
                     Property="Background"
                     Value="{StaticResource selectionOuterRowBackgroundBrush}" />
-
             <Setter TargetName="innerBackground"
                     Property="Background"
                     Value="{StaticResource selectionInnerRowBackgroundBrush}" />
-
             <Setter TargetName="rootGrid"
                     Property="TextElement.Foreground"
                     Value="{Binding RelativeSource={RelativeSource TemplatedParent},Path=SelectionForeground}" />
@@ -730,30 +829,23 @@
          <!-- This trigger is used to display the Inactive Selection look -->
          <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=IsSelected}"
                           Value="True" />
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).DataGridControl.IsKeyboardFocusWithin}"
                           Value="False" />
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).DataGridControl.HideSelection}"
                           Value="False" />
-
             </MultiDataTrigger.Conditions>
 
             <Setter TargetName="rowBorder"
                     Property="BorderBrush"
                     Value="{StaticResource inactiveSelectionRowBorderBrush}" />
-
             <Setter TargetName="outerBackground"
                     Property="Background"
                     Value="{StaticResource inactiveSelectionOuterRowBackgroundBrush}" />
-
             <Setter TargetName="innerBackground"
                     Property="Background"
                     Value="{StaticResource inactiveSelectionInnerRowBackgroundBrush}" />
-
             <Setter TargetName="rootGrid"
                     Property="TextElement.Foreground"
                     Value="{Binding RelativeSource={RelativeSource TemplatedParent},Path=InactiveSelectionForeground}" />
@@ -763,23 +855,18 @@
          <!-- This trigger is used to display Mouse Over look -->
          <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}"
                           Value="True" />
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).DataGridControl.SelectionUnit}"
                           Value="Row" />
-
             </MultiDataTrigger.Conditions>
 
             <Setter TargetName="rowBorder"
                     Property="BorderBrush"
                     Value="{StaticResource hotRowBorderBrush}" />
-
             <Setter TargetName="outerBackground"
                     Property="Background"
                     Value="{StaticResource hotOuterRowBackgroundBrush}" />
-
             <Setter TargetName="innerBackground"
                     Property="Background"
                     Value="{StaticResource hotInnerRowBackgroundBrush}" />
@@ -789,26 +876,20 @@
          <!-- This trigger is used to display Mouse Over + Selected look -->
          <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}"
                           Value="True" />
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSelected}"
                           Value="True" />
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).DataGridControl.SelectionUnit}"
                           Value="Row" />
-
             </MultiDataTrigger.Conditions>
 
             <Setter TargetName="rowBorder"
                     Property="BorderBrush"
                     Value="{StaticResource hotSelectionRowBorderBrush}" />
-
             <Setter TargetName="outerBackground"
                     Property="Background"
                     Value="{StaticResource hotSelectionOuterRowBackgroundBrush}" />
-
             <Setter TargetName="innerBackground"
                     Property="Background"
                     Value="{StaticResource hotSelectionInnerRowBackgroundBrush}" />
@@ -858,12 +939,6 @@
    <ControlTemplate x:Key="tableflowViewColumnManagerRowTemplate"
                     TargetType="local:ColumnManagerRow">
 
-      <ControlTemplate.Resources>
-         <conv:ThicknessConverter x:Key="thicknessConverter"
-                                  InverseValue="True" />
-      </ControlTemplate.Resources>
-
-      <!-- This Grid is used to layout the GroupLevelIndicatorPane placeholder and the CellsHost panel. -->
       <Grid x:Name="rootGrid">
          <Grid.ColumnDefinitions>
             <!-- HierarchicalGroupLevelIndicatorPane -->
@@ -889,7 +964,7 @@
                  Padding="{TemplateBinding Padding}" />
 
          <!-- GroupLevelIndicatorPane is a placeholder for individual GroupLevelIndicator elements that are added
-                       whenever this Row is part of a group. -->
+              whenever this Row is part of a group. -->
          <local:HierarchicalGroupLevelIndicatorPane Grid.Column="0"
                                                     views:TableView.CanScrollHorizontally="False"
                                                     Background="{TemplateBinding Background}" />
@@ -898,17 +973,17 @@
                                         views:TableView.CanScrollHorizontally="False"
                                         Background="{TemplateBinding Background}" />
 
-         <!-- Button that is used to expand/collapse the group. -->
-         <Button x:Name="detailsToggle"
-                 Template="{StaticResource detailsExpanderButtonTemplate}"
-                 VerticalAlignment="Top"
-                 Grid.Column="2"
-                 Margin="2,4,2,0"
-                 Command="{x:Static local:DataGridCommands.ToggleDetailExpansion}"
-                 OverridesDefaultStyle="True"
-                 Focusable="False"
-                 Visibility="Collapsed"
-                 views:TableView.CanScrollHorizontally="False" />
+         <!-- Space reserved for alignment with data rows. -->
+         <ContentPresenter x:Name="detailsToggle"
+                           Grid.Column="2"
+                           Content="{x:Null}"
+                           ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).ExpandGroupGlyph}"
+                           VerticalAlignment="Top"
+                           Margin="2"
+                           OverridesDefaultStyle="True"
+                           Focusable="False"
+                           Visibility="Collapsed"
+                           views:TableView.CanScrollHorizontally="False" />
 
          <!-- The PART_CellsHost part designates the Panel to which this Row's Cells should be added.-->
          <Decorator x:Name="indentationDecorator"
@@ -922,25 +997,6 @@
          </Decorator>
 
       </Grid>
-      <ControlTemplate.Triggers>
-         <!-- When there are details, display the Toggle button for the expansion, collapsing of the details -->
-         <MultiDataTrigger>
-            <MultiDataTrigger.Conditions>
-               <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HasDetails}"
-                          Value="True" />
-
-               <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).AllowDetailToggle}"
-                          Value="True" />
-
-            </MultiDataTrigger.Conditions>
-
-            <Setter TargetName="detailsToggle"
-                    Property="Visibility"
-                    Value="Hidden" />
-
-         </MultiDataTrigger>
-
-      </ControlTemplate.Triggers>
 
    </ControlTemplate>
 
@@ -1210,12 +1266,6 @@
 
          </MultiDataTrigger>
 
-         <!-- When the Cell's content is Null and the row is not being edited, we want to ensure that the row/cell
-              will preserve a minimum height based on the current font size for the row/cell. To do this, we override
-              the ContentPresenter's content binding and replace it with an empty string (""), the textbox generated 
-              this way will then size to the default text's height. When the trigger is not active anymore, default binding
-              is restored automatically. -->
-
          <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.Visible}"
                       Value="False">
             <Setter Property="Visibility"
@@ -1229,6 +1279,7 @@
    <!--**************************
     * TEMPLATE: ColumnManagerCell 
     ************************** -->
+    <conv:IntAdditionConverter x:Key="IntAdditionConverter" />
     <conv:SortingDirectionToBooleanConverter x:Key="SortingDirectionToBooleanConverter" />
 
    <ControlTemplate x:Key="tableflowViewColumnManagerCellTemplate"
@@ -1321,16 +1372,6 @@
                     Property="Margin"
                     Value="19,0,0,0" />
          </MultiDataTrigger>
-
-         <!-- Trigger related to the filteringToggleButton-->
-         <Trigger SourceName="toggleButton"
-                  Property="IsMouseOver"
-                  Value="True">
-
-            <Setter TargetName="toggleButton"
-                    Property="Opacity"
-                    Value="1" />
-         </Trigger>
 
          <!-- The following 2 triggers allow the appropriate Sort Glyph to be displayed
               depending on the ParentColumn's SortDirection. -->
@@ -1473,12 +1514,6 @@
                     Value="False" />
          </DataTrigger>
 
-         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.Visible}"
-                      Value="False">
-            <Setter Property="Visibility"
-                    Value="Collapsed" />
-         </DataTrigger>
-
       </ControlTemplate.Triggers>
 
    </ControlTemplate>
@@ -1486,7 +1521,6 @@
    <!--**************************
     * TEMPLATE: GroupHeaderControl
     ************************** -->
-   <conv:IntAdditionConverter x:Key="groupHeaderControlGroupLevelConverter" />
    <ControlTemplate x:Key="tableflowViewGroupHeaderControlTemplate"
                     TargetType="local:GroupHeaderControl">
 
@@ -1501,7 +1535,7 @@
             <local:HierarchicalGroupLevelIndicatorPane DockPanel.Dock="Left" />
             <local:GroupLevelIndicatorPane DockPanel.Dock="Left"
                                            Indented="False"
-                                           local:GroupLevelIndicatorPane.GroupLevel="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:GroupLevelIndicatorPane.GroupLevel), Converter={StaticResource groupHeaderControlGroupLevelConverter}, ConverterParameter=-1}" />
+                                           local:GroupLevelIndicatorPane.GroupLevel="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:GroupLevelIndicatorPane.GroupLevel), Converter={StaticResource intAdditionConverter}, ConverterParameter=-1}" />
             <!-- Main Border for the GroupHeaderControl. It is Focusable to make the InputBindings work. -->
             <Border x:Name="mainBorder"
                     Background="{TemplateBinding Background}"
@@ -1591,7 +1625,7 @@
             <local:HierarchicalGroupLevelIndicatorPane DockPanel.Dock="Left" />
             <local:GroupLevelIndicatorPane DockPanel.Dock="Left"
                                            Indented="False"
-                                           local:GroupLevelIndicatorPane.GroupLevel="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:GroupLevelIndicatorPane.GroupLevel), Converter={StaticResource groupHeaderControlGroupLevelConverter}, ConverterParameter=-1}" />
+                                           local:GroupLevelIndicatorPane.GroupLevel="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:GroupLevelIndicatorPane.GroupLevel), Converter={StaticResource intAdditionConverter}, ConverterParameter=-1}" />
 
             <Grid>
                <Border x:Name="outerBorder"
@@ -2350,7 +2384,6 @@
    <!--**************************
     * STYLE: RowSelector 
     ************************** -->
-   <conv:TypeToBooleanConverter x:Key="rowTypeConverter" />
    <Style x:Key="tableflowViewAeroNormalColorRowSelectorStyle"
           TargetType="local:RowSelector">
 
@@ -2487,6 +2520,10 @@
    <Style x:Key="tableflowViewAeroNormalColorDataRowStyle"
           TargetType="local:DataRow"
           BasedOn="{StaticResource tableflowViewAeroNormalColorRowStyle}">
+
+      <Setter Property="Template"
+              Value="{StaticResource tableflowViewDataRowTemplate}" />
+
    </Style>
 
    <!--**************************
@@ -2602,6 +2639,9 @@
       <Setter Property="Background"
               Value="Transparent" />
 
+      <Setter Property="ToolTip"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.Description}" />
+
       <!-- In TableflowView, each Cell has the same width as its ParentColum's ActualWidth -->
       <Setter Property="Width"
               Value="{Binding RelativeSource={RelativeSource Self},Path=ParentColumn.ActualWidth}" />
@@ -2674,7 +2714,7 @@
               Value="Transparent" />
 
       <Setter Property="BorderThickness"
-              Value="1" />      
+              Value="1" />
 
       <Setter Property="Padding"
               Value="{StaticResource cellPadding}" />
@@ -3173,4 +3213,5 @@
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, ThemeType=views:AeroNormalColorTheme, TargetElementType=local:GroupNavigationControlItem}"
           TargetType="local:GroupNavigationControlItem"
           BasedOn="{StaticResource tableflowViewAeroNormalColorGroupNavigationControlItemStyle}" />
+
 </ResourceDictionary>

@@ -15,28 +15,30 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Windows.Threading;
-using System.Threading;
+using System.Diagnostics;
+using Xceed.Wpf.DataGrid.Utils;
 
 namespace Xceed.Wpf.DataGrid
 {
-  public class ColumnCollection : ObservableCollection<ColumnBase>
+  public class ColumnCollection : ObservableColumnCollection
   {
+    #region Static Fields
+
+    internal static readonly string MainColumnPropertyName = PropertyHelper.GetPropertyName( ( ColumnCollection c ) => c.MainColumn );
+
+    #endregion
+
 
     internal ColumnCollection( DataGridControl dataGridControl, DetailConfiguration parentDetailConfiguration )
-      : base()
     {
-      this.DataGridControl = dataGridControl;
-      this.ParentDetailConfiguration = parentDetailConfiguration;
+      m_dataGridControl = dataGridControl;
+      m_parentDetailConfiguration = parentDetailConfiguration;
     }
 
     #region MainColumn Property
 
-    public ColumnBase MainColumn
+    public virtual ColumnBase MainColumn
     {
       get
       {
@@ -44,11 +46,29 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
-        if( m_mainColumn == value )
+        if( value == m_mainColumn )
           return;
 
-        m_mainColumn = value;
-        this.OnPropertyChanged( new PropertyChangedEventArgs( "MainColumn" ) );
+        if( ( value != null ) && !this.Contains( value ) )
+          throw new ArgumentException( "The column was not found in the collection." );
+
+        using( this.DeferColumnsUpdate() )
+        {
+          var oldMainColumn = m_mainColumn;
+          m_mainColumn = value;
+
+          if( m_mainColumn != null )
+          {
+            m_mainColumn.RaiseIsMainColumnChanged();
+          }
+
+          if( oldMainColumn != null )
+          {
+            oldMainColumn.RaiseIsMainColumnChanged();
+          }
+        }
+
+        this.OnPropertyChanged( new PropertyChangedEventArgs( ColumnCollection.MainColumnPropertyName ) );
       }
     }
 
@@ -56,19 +76,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region FieldNameToColumnDictionary Property
-
-    internal Dictionary<string, ColumnBase> FieldNameToColumnDictionary
-    {
-      get
-      {
-        return m_fieldNameToColumns;
-      }
-    }
-
-    #endregion FieldNameToColumnDictionary Property
-
-    #region DataGridControl Property
+    #region DataGridControl Internal Property
 
     internal DataGridControl DataGridControl
     {
@@ -78,9 +86,12 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
+        if( value == m_dataGridControl )
+          return;
+
         m_dataGridControl = value;
 
-        foreach( ColumnBase column in this )
+        foreach( var column in this )
         {
           column.NotifyDataGridControlChanged();
         }
@@ -89,412 +100,190 @@ namespace Xceed.Wpf.DataGrid
 
     private DataGridControl m_dataGridControl;
 
-    #endregion DataGridControl Property
+    #endregion
 
-    #region ParentDetailConfiguration Property
+    #region ParentDetailConfiguration Internal Property
 
     internal DetailConfiguration ParentDetailConfiguration
     {
-      get;
-      set;
-    }
-
-    #endregion ParentDetailConfiguration Property
-
-    #region ProcessingVisibleColumnsUpdate Property
-
-    internal AutoResetFlag ProcessingVisibleColumnsUpdate
-    {
       get
       {
-        return m_processingVisibleColumnsUpdate;
+        return m_parentDetailConfiguration;
+      }
+      set
+      {
+        m_parentDetailConfiguration = value;
       }
     }
 
-    private readonly AutoResetFlag m_processingVisibleColumnsUpdate = AutoResetFlagFactory.Create();
+    private DetailConfiguration m_parentDetailConfiguration;
 
     #endregion
 
-    public ColumnBase this[ string fieldName ]
-    {
-      get
-      {
-        ColumnBase column = null;
-
-        m_fieldNameToColumns.TryGetValue( fieldName, out column );
-
-        return column;
-      }
-    }
-
-    #region IsDeferVisibleColumnsUpdate Internal Property
-
-    internal bool IsDeferVisibleColumnsUpdate
-    {
-      get
-      {
-        return ( m_deferVisibleColumnsUpdateCount > 0 );
-      }
-    }
-
-    #endregion
-
-    public IDisposable DeferVisibleColumnsUpdate()
-    {
-      return new DeferedColumnsVisibleUpdateDisposable( this );
-    }
-
-    protected override void RemoveItem( int index )
-    {
-      ColumnBase column = this[ index ];
-
-      if( column != null )
-      {
-        this.UnregisterColumnChangedEvent( column );
-
-        column.DetachFromContainingCollection();
-
-        m_fieldNameToColumns.Remove( column.FieldName );
-      }
-
-      base.RemoveItem( index );
-    }
-
-    protected override void InsertItem( int index, ColumnBase item )
-    {
-      if( item != null )
-      {
-        if( ( string.IsNullOrEmpty( item.FieldName ) == true ) && ( !DesignerProperties.GetIsInDesignMode( item ) ) )
-          throw new ArgumentException( "A column must have a fieldname.", "item" );
-
-        if( m_fieldNameToColumns.ContainsKey( item.FieldName ) )
-          throw new DataGridException( "A column with same field name already exists in collection." );
-
-        m_fieldNameToColumns.Add( item.FieldName, item );
-
-        item.AttachToContainingCollection( this );
-
-        this.RegisterColumnChangedEvent( item );
-      }
-
-      base.InsertItem( index, item );
-    }
-
-    protected override void ClearItems()
-    {
-      foreach( ColumnBase column in this )
-      {
-        this.UnregisterColumnChangedEvent( column );
-
-        column.DetachFromContainingCollection();
-      }
-
-      m_fieldNameToColumns.Clear();
-
-      base.ClearItems();
-    }
-
-    protected override void SetItem( int index, ColumnBase item )
-    {
-      if( ( item != null ) && ( string.IsNullOrEmpty( item.FieldName ) == true ) )
-        throw new ArgumentException( "A column must have a fieldname.", "item" );
-
-      if( m_fieldNameToColumns.ContainsKey( item.FieldName ) )
-        throw new DataGridException( "A column with same field name already exists in collection." );
-
-      ColumnBase column = this[ index ];
-
-      if( ( column != null ) && ( column != item ) )
-      {
-        this.UnregisterColumnChangedEvent( column );
-
-        column.DetachFromContainingCollection();
-
-        m_fieldNameToColumns.Remove( column.FieldName );
-      }
-
-      if( ( item != null ) && ( column != item ) )
-      {
-        m_fieldNameToColumns.Add( item.FieldName, item );
-
-        item.AttachToContainingCollection( this );
-
-        this.RegisterColumnChangedEvent( item );
-      }
-
-      base.SetItem( index, item );
-    }
-
-    protected override void OnCollectionChanged( NotifyCollectionChangedEventArgs e )
-    {
-      if( ( m_columnAdditionMessagesDeferedCount > 0 ) && ( e.Action == NotifyCollectionChangedAction.Add ) && ( e.NewStartingIndex == ( this.Count - e.NewItems.Count ) ) )
-      {
-        if( m_deferedColumnAdditionMessageStartIndex == -1 )
-        {
-          m_deferedColumnAdditionMessageStartIndex = e.NewStartingIndex;
-        }
-
-        foreach( object item in e.NewItems )
-        {
-          m_deferedColumns.Add( ( ColumnBase )item );
-        }
-      }
-      else
-      {
-        base.OnCollectionChanged( e );
-      }
-    }
-
-    internal IDisposable DeferColumnAdditionMessages()
-    {
-      return new DeferedColumnAdditionMessageDisposable( this );
-    }
-
-    internal void NotifyVisibleColumnsUpdating()
-    {
-      if( this.VisibleColumnsUpdating != null )
-      {
-        this.VisibleColumnsUpdating( this, EventArgs.Empty );
-      }
-    }
-
-    internal event EventHandler VisibleColumnsUpdating;
-
-    internal void DispatchNotifyVisibleColumnsUpdated()
-    {
-      //In all cases, make sure the ColumnVitualizationManager is flaged as outdate, but prevent to make updates to FixedCellPanels right away.
-      this.NotifyVisibleColumnsUpdated( true );
-
-      //In all cases, make sure we dipatch an operation to update the FixedCellPanels in case the update is not tiggered by other means (e.g. no scrolling, no DataRow in the grid).
-      if( m_visibleColumnsUpdatedDispatcherOperation == null && m_dataGridControl != null )
-      {
-        ////# Will be null at first in the case of a detail, so process directly
-
-        //This permits less updates = better performance.
-        m_visibleColumnsUpdatedDispatcherOperation =
-          m_dataGridControl.Dispatcher.BeginInvoke( DispatcherPriority.Render, new Action<bool>( this.NotifyVisibleColumnsUpdated ), false );
-      }
-    }
-
-    internal event EventHandler VisibleColumnsUpdated;
-
-    internal void OnRealizedContainersRequested( object sender, RealizedContainersRequestedEventArgs e )
-    {
-      if( this.RealizedContainersRequested != null )
-      {
-        this.RealizedContainersRequested( this, e );
-      }
-    }
+    #region RealizedContainersRequested Internal Event
 
     internal event RealizedContainersRequestedEventHandler RealizedContainersRequested;
 
-    internal void OnDistinctValuesRequested( object sender, DistinctValuesRequestedEventArgs e )
+    private void OnRealizedContainersRequested( RealizedContainersRequestedEventArgs e )
     {
-      if( this.DistinctValuesRequested != null )
-      {
-        this.DistinctValuesRequested( this, e );
-      }
+      var handler = this.RealizedContainersRequested;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, e );
     }
+
+    #endregion
+
+    #region DistinctValuesRequested Internal Event
 
     internal event DistinctValuesRequestedEventHandler DistinctValuesRequested;
 
-    internal void OnActualWidthChanged( object sender, ColumnActualWidthChangedEventArgs e )
+    private void OnDistinctValuesRequested( DistinctValuesRequestedEventArgs e )
     {
-      if( this.ActualWidthChanged != null )
+      var handler = this.DistinctValuesRequested;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, e );
+    }
+
+    #endregion
+
+    #region ActualWidthChanged Internal Event
+
+    internal event ColumnActualWidthChangedEventHandler ActualWidthChanged;
+
+    private void OnActualWidthChanged( ColumnActualWidthChangedEventArgs e )
+    {
+      var handler = this.ActualWidthChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, e );
+    }
+
+    #endregion
+
+    protected override void OnItemAdding( ColumnBase item )
+    {
+      base.OnItemAdding( item );
+
+      Debug.Assert( item != null );
+
+      if( item.IsMainColumn )
       {
-        this.ActualWidthChanged( this, e );
+        m_nextMainColumn = item;
+      }
+
+      item.AttachToContainingCollection( this );
+
+      item.PropertyChanged += new PropertyChangedEventHandler( this.OnColumnPropertyChanged );
+      item.RealizedContainersRequested += new RealizedContainersRequestedEventHandler( this.OnColumnRealizedContainersRequested );
+      item.ActualWidthChanged += new ColumnActualWidthChangedEventHandler( this.OnColumnActualWidthChanged );
+      item.DistinctValuesRequested += new DistinctValuesRequestedEventHandler( this.OnColumnDistinctValuesRequested );
+    }
+
+    protected override void OnItemAdded( ColumnBase item )
+    {
+      base.OnItemAdded( item );
+
+      this.UpdateMainColumn();
+    }
+
+    protected override void OnItemRemoving( ColumnBase item )
+    {
+      Debug.Assert( item != null );
+
+      item.PropertyChanged -= new PropertyChangedEventHandler( this.OnColumnPropertyChanged );
+      item.RealizedContainersRequested -= new RealizedContainersRequestedEventHandler( this.OnColumnRealizedContainersRequested );
+      item.ActualWidthChanged -= new ColumnActualWidthChangedEventHandler( this.OnColumnActualWidthChanged );
+      item.DistinctValuesRequested -= new DistinctValuesRequestedEventHandler( this.OnColumnDistinctValuesRequested );
+
+      item.DetachFromContainingCollection();
+
+      base.OnItemRemoving( item );
+    }
+
+    protected override void OnItemRemoved( ColumnBase item )
+    {
+      base.OnItemRemoved( item );
+
+      this.UpdateMainColumn();
+    }
+
+    private void UpdateMainColumn()
+    {
+      switch( this.Count )
+      {
+        case 0:
+          this.MainColumn = null;
+          break;
+
+        case 1:
+          this.MainColumn = this[ 0 ];
+          break;
+
+        default:
+          {
+            var column = m_nextMainColumn ?? m_mainColumn;
+
+            m_nextMainColumn = null;
+
+            if( ( column != null ) && this.Contains( column ) )
+            {
+              this.MainColumn = column;
+            }
+            else
+            {
+              this.MainColumn = null;
+            }
+          }
+          break;
       }
     }
 
-    internal event ColumnActualWidthChangedHandler ActualWidthChanged;
-
-    internal event EventHandler ColumnVisibilityChanging;
-    internal event EventHandler ColumnVisibilityChanged;
-
-    private void RegisterColumnChangedEvent( ColumnBase column )
+    private IDisposable DeferColumnsUpdate()
     {
-      column.PropertyChanged += new PropertyChangedEventHandler( this.OnColumnPropertyChanged );
-      column.TitleChanged += new EventHandler( this.OnColumnValueChanged );
-      column.VisiblePositionChanging += new EventHandler( this.OnColumnVisibilityChanging );
-      column.VisiblePositionChanged += new EventHandler( this.OnColumnValueChanged );
-      column.VisiblePositionChanged += new EventHandler( this.OnColumnVisibilityChanged );
-      column.VisibleChanged += new EventHandler( this.OnColumnVisibilityChanged );
-    }
+      if( m_parentDetailConfiguration != null )
+        return m_parentDetailConfiguration.DeferColumnsUpdate();
 
-    private void UnregisterColumnChangedEvent( ColumnBase column )
-    {
-      column.PropertyChanged -= new PropertyChangedEventHandler( this.OnColumnPropertyChanged );
-      column.TitleChanged -= new EventHandler( this.OnColumnValueChanged );
-      column.VisiblePositionChanging -= new EventHandler( this.OnColumnVisibilityChanging );
-      column.VisiblePositionChanged -= new EventHandler( this.OnColumnValueChanged );
-      column.VisiblePositionChanged -= new EventHandler( this.OnColumnVisibilityChanged );
-      column.VisibleChanged -= new EventHandler( this.OnColumnVisibilityChanged );
+      if( m_dataGridControl != null )
+        return m_dataGridControl.DeferColumnsUpdate();
+
+      return new EmptyDisposable();
     }
 
     private void OnColumnPropertyChanged( object sender, PropertyChangedEventArgs e )
     {
-      if( string.IsNullOrEmpty( e.PropertyName ) || e.PropertyName == "IsMainColumn" )
-      {
-        // The ColumnBase.IsMainColumn property impacts the columns visibility when details are flatten.
-        var dataGridControl = this.DataGridControl;
-        if( ( dataGridControl != null ) && ( dataGridControl.AreDetailsFlatten ) )
-        {
-          this.OnColumnVisibilityChanged( sender, EventArgs.Empty );
-        }
-      }
     }
 
-    private void OnColumnVisibilityChanging( object sender, EventArgs e )
+    private void OnColumnRealizedContainersRequested( object sender, RealizedContainersRequestedEventArgs e )
     {
-      if( this.ColumnVisibilityChanging != null )
-      {
-        this.ColumnVisibilityChanging( this, new WrappedEventEventArgs( sender, e ) );
-      }
+      this.OnRealizedContainersRequested( e );
     }
 
-    private void OnColumnVisibilityChanged( object sender, EventArgs e )
+    private void OnColumnDistinctValuesRequested( object sender, DistinctValuesRequestedEventArgs e )
     {
-      if( this.ColumnVisibilityChanged != null )
-      {
-        this.ColumnVisibilityChanged( this, new WrappedEventEventArgs( sender, e ) );
-      }
+      this.OnDistinctValuesRequested( e );
     }
 
-    private void OnColumnValueChanged( object sender, EventArgs e )
+    private void OnColumnActualWidthChanged( object sender, ColumnActualWidthChangedEventArgs e )
     {
-      ColumnBase column = ( ColumnBase )sender;
+      this.OnActualWidthChanged( e );
     }
 
-    private void NotifyVisibleColumnsUpdated( bool onlyIncrementFlag )
+    private ColumnBase m_nextMainColumn; //null
+
+    #region EmptyDisposable Private Class
+
+    private sealed class EmptyDisposable : IDisposable
     {
-      if( this.VisibleColumnsUpdated != null )
+      void IDisposable.Dispose()
       {
-        this.VisibleColumnsUpdated( this, new VisibleColumnsUpdatedEventArgs( onlyIncrementFlag ) );
-      }
-
-      //If only updating the flag, don't reset the DispatcherOperation, since if it is still alive, another call will be made which will reset it.
-      if( onlyIncrementFlag )
-        return;
-
-      m_visibleColumnsUpdatedDispatcherOperation = null;
-    }
-
-    private int m_columnAdditionMessagesDeferedCount = 0;
-    private int m_deferVisibleColumnsUpdateCount = 0;
-    private int m_deferedColumnAdditionMessageStartIndex = -1;
-    private List<ColumnBase> m_deferedColumns = new List<ColumnBase>();
-    private Dictionary<string, ColumnBase> m_fieldNameToColumns = new Dictionary<string, ColumnBase>(); // To optimize indexing speed for FieldName
-    private DispatcherOperation m_visibleColumnsUpdatedDispatcherOperation;
-
-    private sealed class DeferedColumnAdditionMessageDisposable : IDisposable
-    {
-      public DeferedColumnAdditionMessageDisposable( ColumnCollection columns )
-      {
-        if( columns == null )
-          throw new ArgumentNullException( "columns" );
-
-        m_columns = columns;
-
-        m_columns.m_columnAdditionMessagesDeferedCount++;
-      }
-
-      #region IDisposable Members
-
-      public void Dispose()
-      {
-        this.Dispose( true );
-        GC.SuppressFinalize( this );
-      }
-
-      #endregion
-
-      private void Dispose( bool disposing )
-      {
-        m_columns.m_columnAdditionMessagesDeferedCount--;
-
-        if( m_columns.m_columnAdditionMessagesDeferedCount == 0 )
-        {
-          if( m_columns.m_deferedColumns.Count > 0 )
-          {
-            m_columns.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Add, m_columns.m_deferedColumns, m_columns.m_deferedColumnAdditionMessageStartIndex ) );
-          }
-
-          m_columns.m_deferedColumnAdditionMessageStartIndex = -1;
-          m_columns.m_deferedColumns.Clear();
-        }
-      }
-
-      ~DeferedColumnAdditionMessageDisposable()
-      {
-        this.Dispose( false );
-      }
-
-      private ColumnCollection m_columns; // = null
-    }
-
-    private sealed class DeferedColumnsVisibleUpdateDisposable : IDisposable
-    {
-      public DeferedColumnsVisibleUpdateDisposable( ColumnCollection columns )
-      {
-        if( columns == null )
-          throw new ArgumentNullException( "columns" );
-
-        m_columns = columns;
-
-        Interlocked.Increment( ref m_columns.m_deferVisibleColumnsUpdateCount );
-      }
-
-      #region IDisposable Members
-
-      public void Dispose()
-      {
-        this.Dispose( true );
-        GC.SuppressFinalize( this );
-      }
-
-      #endregion
-
-      private void Dispose( bool disposing )
-      {
-        if( Interlocked.Decrement( ref m_columns.m_deferVisibleColumnsUpdateCount ) != 0 )
-          return;
-
-        m_columns.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
-      }
-
-      ~DeferedColumnsVisibleUpdateDisposable()
-      {
-        this.Dispose( false );
-      }
-
-      private ColumnCollection m_columns; // = null
-    }
-
-    internal class WrappedEventEventArgs : EventArgs
-    {
-      public WrappedEventEventArgs( object sender, EventArgs eventArgs )
-      {
-        if( sender == null )
-          throw new ArgumentNullException( "sender" );
-
-        if( eventArgs == null )
-          throw new ArgumentNullException( "eventArgs" );
-
-        this.WrappedSender = sender;
-        this.WrappedEventArgs = eventArgs;
-      }
-
-      public object WrappedSender
-      {
-        get;
-        private set;
-      }
-
-      public object WrappedEventArgs
-      {
-        get;
-        private set;
       }
     }
+
+    #endregion
   }
 }

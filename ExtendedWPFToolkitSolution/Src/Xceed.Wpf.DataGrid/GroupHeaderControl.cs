@@ -14,22 +14,26 @@
 
   ***********************************************************************************/
 
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using Xceed.Utils.Wpf;
+using Xceed.Wpf.DataGrid.Utils;
 
 namespace Xceed.Wpf.DataGrid
 {
   public class GroupHeaderControl : ContentControl, INotifyPropertyChanged, IDataGridItemContainer
   {
-    #region Constructors
+    #region Static Fields
+
+    internal static readonly string GroupPropertyName = PropertyHelper.GetPropertyName( ( GroupHeaderControl g ) => g.Group );
+
+    #endregion
 
     static GroupHeaderControl()
     {
@@ -58,8 +62,6 @@ namespace Xceed.Wpf.DataGrid
 
       m_itemContainerManager = new DataGridItemContainerManager( this );
     }
-
-    #endregion
 
     #region Group Internal Attached Property
 
@@ -95,7 +97,7 @@ namespace Xceed.Wpf.DataGrid
       this.Content = m_group;
       GroupHeaderControl.SetGroup( this, group );
 
-      this.RaisePropertyChanged( "Group" );
+      this.RaisePropertyChanged( GroupHeaderControl.GroupPropertyName );
     }
 
     private Group m_group;
@@ -174,7 +176,20 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion InactiveSelectionForeground Property
 
-    #region Public Overrides Methods
+    #region CanBeRecycled Protected Property
+
+    protected virtual bool CanBeRecycled
+    {
+      get
+      {
+        if( this.IsKeyboardFocused || this.IsKeyboardFocusWithin )
+          return false;
+
+        return m_itemContainerManager.CanBeRecycled;
+      }
+    }
+
+    #endregion
 
     public override void OnApplyTemplate()
     {
@@ -183,13 +198,11 @@ namespace Xceed.Wpf.DataGrid
       m_itemContainerManager.Update();
     }
 
-    #endregion
 
-    #region Protected Overrides Methods
-
-    protected override System.Windows.Automation.Peers.AutomationPeer OnCreateAutomationPeer()
+    protected override void OnPreviewMouseLeftButtonUp( MouseButtonEventArgs e )
     {
-      return new FrameworkElementAutomationPeer( this );
+      base.OnPreviewMouseLeftButtonUp( e );
+      return;
     }
 
     protected override void OnIsKeyboardFocusWithinChanged( DependencyPropertyChangedEventArgs e )
@@ -222,12 +235,10 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion
-
-    #region Protected Methods
-
     protected virtual void PrepareContainer( DataGridContext dataGridContext, object item )
     {
+      m_isRecyclingCandidate = false;
+
       if( m_isContainerPrepared )
         Debug.Fail( "A GroupHeaderControl can't be prepared twice, it must be cleaned before PrepareContainer is called again" );
 
@@ -252,7 +263,7 @@ namespace Xceed.Wpf.DataGrid
 
     protected virtual void ClearContainer()
     {
-      m_itemContainerManager.Clear();
+      m_itemContainerManager.Clear( m_isRecyclingCandidate );
       m_isContainerPrepared = false;
     }
 
@@ -264,16 +275,19 @@ namespace Xceed.Wpf.DataGrid
     protected internal virtual bool ShouldHandleSelectionEvent( InputEventArgs eventArgs )
     {
       var targetChild = eventArgs.OriginalSource as DependencyObject;
-      // If the event is comming from a control inside the header, ignore the event
-      // since it is not for selection purposes that the user targeted this control. 
-      // This handle the expand collapse butto, and the GroupNavigationControl
-      return TreeHelper.FindParent<Control>( targetChild, true, null, this ) == null;
+
+      // If the event is comming from a specific control inside the header (GroupNavigationControl or Collapsed button),
+      // ignore the event since it is not for selection purposes that the user targeted this control. 
+      var collapsedButtonParent = TreeHelper.FindParent<ToggleButton>( targetChild, true, null, this );
+      if( collapsedButtonParent != null )
+        return false;
+
+      var groupNavigationControlParent = TreeHelper.FindParent<GroupNavigationControl>( targetChild, true, null, this );
+      if( groupNavigationControlParent != null )
+        return false;
+
+      return true;
     }
-
-
-    #endregion
-
-    #region Private Static Methods
 
     private static void OnParentGridControlChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
@@ -285,10 +299,6 @@ namespace Xceed.Wpf.DataGrid
         groupHeaderControl.PrepareDefaultStyleKey( grid.GetView() );
       }
     }
-
-    #endregion
-
-    #region Private Methods
 
     private void OnExpandCanExecute( object sender, CanExecuteRoutedEventArgs e )
     {
@@ -370,15 +380,6 @@ namespace Xceed.Wpf.DataGrid
       return ( groupCommandTarget != null ) ? groupCommandTarget : this.Group;
     }
 
-    #endregion
-
-    #region Private Fields
-
-    private readonly DataGridItemContainerManager m_itemContainerManager;
-    private bool m_isContainerPrepared;
-
-    #endregion
-
     #region INotifyPropertyChanged Members
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -396,6 +397,26 @@ namespace Xceed.Wpf.DataGrid
 
     #region IDataGridItemContainer Members
 
+    bool IDataGridItemContainer.CanBeRecycled
+    {
+      get
+      {
+        return this.CanBeRecycled;
+      }
+    }
+
+    bool IDataGridItemContainer.IsRecyclingCandidate
+    {
+      get
+      {
+        return m_isRecyclingCandidate;
+      }
+      set
+      {
+        m_isRecyclingCandidate = value;
+      }
+    }
+
     void IDataGridItemContainer.PrepareContainer( DataGridContext dataGridContext, object item )
     {
       this.PrepareContainer( dataGridContext, item );
@@ -406,6 +427,15 @@ namespace Xceed.Wpf.DataGrid
       this.ClearContainer();
     }
 
+    void IDataGridItemContainer.CleanRecyclingCandidate()
+    {
+      m_itemContainerManager.CleanRecyclingCandidates();
+    }
+
     #endregion
+
+    private readonly DataGridItemContainerManager m_itemContainerManager;
+    private bool m_isContainerPrepared;
+    private bool m_isRecyclingCandidate;
   }
 }

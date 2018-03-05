@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -14,9 +14,6 @@
 
   *************************************************************************************/
 
-#if !OPEN_SOURCE
-using Xceed.Wpf.Toolkit.Chart;
-#endif
 using System.Windows.Media;
 using System.Windows;
 using Xceed.Wpf.Toolkit.Panels;
@@ -29,16 +26,8 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Chart.Views
   /// </summary>
   public partial class ChartSeriesBasicTypesView : DemoView
   {
-#if !OPEN_SOURCE
-    #region Members
 
-    private Series _columnSeries;
-    private Series _lineSeries;
-    private Series _pieSeries;
-    private Series _areaSeries;
 
-    #endregion
-#endif
 
     #region Initialization
 
@@ -49,126 +38,15 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Chart.Views
 
     #endregion
 
-#if !OPEN_SOURCE
-    #region Envent Handlers
 
-    private void OnSeriesCollectionChecked( object sender, RoutedEventArgs e )
-    {
-      this.AddDefaultSeries();
-    }
 
-    private void OnSeriesCollectionUnchecked( object sender, RoutedEventArgs e )
-    {
-      this.CleanDefaultSeries();
-    }
 
-    private void OnLayoutSelectionChanged( object sender, RoutedEventArgs e )
-    {
-      if( _seriesCollectionCheckBox.IsChecked.HasValue && _seriesCollectionCheckBox.IsChecked.Value )
-      {
-        this.CleanDefaultSeries();
-        this.AddDefaultSeries();
-      }
-    }
 
-    #endregion
-#endif
 
     #region Implementation
 
-#if !OPEN_SOURCE
 
-    private void CleanDefaultSeries()
-    {
-      if( _area1.Series.Contains( _pieSeries ) )
-      {
-        _area1.Series.Remove( _pieSeries );
-      }
-      if( _area1.Series.Contains( _areaSeries ) )
-      {
-        _area1.Series.Remove( _areaSeries );
-      }
-      if( _area1.Series.Contains( _columnSeries ) )
-      {
-        _area1.Series.Remove( _columnSeries );
-      }
-      if( _area1.Series.Contains( _lineSeries ) )
-      {
-        _area1.Series.Remove( _lineSeries );
-      }
-    }
 
-    private void AddDefaultSeries()
-    {
-      if( _series.Layout.LayoutType != PredefinedLayoutTypes.Pie )
-      {
-        if( _pieSeries == null )
-        {
-          //init pieSeries
-          _pieSeries = new Series();
-          _pieSeries.DataPoints.Add( new DataPoint( 0, 1, "Cars" ) );
-          _pieSeries.DataPoints.Add( new DataPoint( 1, 2, "Toys" ) );
-          _pieSeries.DataPoints.Add( new DataPoint( 2, 2.5, "Trees" ) );
-          _pieSeries.DataPoints.Add( new DataPoint( 3, 4, "Pens" ) );
-          _pieSeries.Layout = new PieLayout();
-          _pieSeries.Title = "Pie Series";
-          _pieSeries.ShowPointsInLegend = true;
-          _pieSeries.DefaultInterior = Brushes.YellowGreen;
-        }
-        _area1.Series.Add( _pieSeries );
-      }
-      if( _series.Layout.LayoutType != PredefinedLayoutTypes.Area )
-      {
-        if( _areaSeries == null )
-        {
-          //init areaSeries
-          _areaSeries = new Series();
-          _areaSeries.DataPoints.Add( new DataPoint( -2, 0 ) );
-          _areaSeries.DataPoints.Add( new DataPoint( 0, 3.5 ) );
-          _areaSeries.DataPoints.Add( new DataPoint( 3, 1 ) );
-          _areaSeries.DataPoints.Add( new DataPoint( 5, 2.8 ) );
-          _areaSeries.DataPoints.Add( new DataPoint( 4, 1.5 ) );
-          _areaSeries.Layout = new AreaLayout();
-          _areaSeries.Title = "Area Series";
-          _areaSeries.DefaultInterior = Brushes.Orange;
-        }
-        _area1.Series.Add( _areaSeries );
-      }
-      if( _series.Layout.LayoutType != PredefinedLayoutTypes.Column )
-      {
-        if( _columnSeries == null )
-        {
-          //init columnSeries
-          _columnSeries = new Series();
-          _columnSeries.DataPoints.Add( new DataPoint( 1, 1 ) );
-          _columnSeries.DataPoints.Add( new DataPoint( 2, 2 ) );
-          _columnSeries.DataPoints.Add( new DataPoint( 2.5, 4 ) );
-          _columnSeries.DataPoints.Add( new DataPoint( 4, 3 ) );
-          _columnSeries.Title = "Column Series";
-          _columnSeries.DefaultInterior = Brushes.Red;
-        }
-        _area1.Series.Add( _columnSeries );
-      }
-      if( _series.Layout.LayoutType != PredefinedLayoutTypes.Line )
-      {
-        if( _lineSeries == null )
-        {
-          //init lineSeries
-          _lineSeries = new Series();
-          _lineSeries.DataPoints.Add( new DataPoint( 1, 1 ) );
-          _lineSeries.DataPoints.Add( new DataPoint( 2, 1 ) );
-          _lineSeries.DataPoints.Add( new DataPoint( 0.5, 1.5 ) );
-          _lineSeries.DataPoints.Add( new DataPoint( 3, 3 ) );
-          _lineSeries.DataPoints.Add( new DataPoint( 6, 2 ) );
-          _lineSeries.DataPoints.Add( new DataPoint( 5, 0.5 ) );
-          _lineSeries.Layout = new LineLayout();
-          _lineSeries.Title = "Line Series";
-          _lineSeries.DefaultInterior = Brushes.Black;
-        }
-        _area1.Series.Add( _lineSeries );
-      }
-    }
-#endif
 
     #endregion
   }

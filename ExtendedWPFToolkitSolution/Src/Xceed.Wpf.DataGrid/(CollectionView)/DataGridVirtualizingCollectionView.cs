@@ -138,67 +138,11 @@ namespace Xceed.Wpf.DataGrid
         source.OnQueryItems( e );
     }
 
-
-    internal event EventHandler<QueryAutoFilterDistinctValuesEventArgs> QueryAutoFilterDistinctValues;
-
-    internal void OnQueryAutoFilterDistinctValues( QueryAutoFilterDistinctValuesEventArgs e )
-    {
-      if( this.QueryAutoFilterDistinctValues != null )
-        this.QueryAutoFilterDistinctValues( this, e );
-
-      DataGridVirtualizingCollectionViewSource source = this.ParentCollectionViewSourceBase as DataGridVirtualizingCollectionViewSource;
-
-      if( source != null )
-        source.OnQueryAutoFilterDistinctValues( e );
-    }
-
     #endregion DATA VIRTUALIZATION
 
     internal override IEnumerator GetVirtualEnumerator()
     {
       return ( ( DataGridVirtualizingCollectionViewGroupRoot )this.RootGroup ).GetVirtualPageManager().GetEnumerator();
-    }
-
-    internal override void RefreshDistinctValuesForField( DataGridItemPropertyBase dataGridItemProperty )
-    {
-      if( dataGridItemProperty == null )
-        return;
-
-      if( dataGridItemProperty.CalculateDistinctValues == false )
-        return;
-
-      // List containing current column distinct values
-      HashSet<object> currentColumnDistinctValues = new HashSet<object>();
-
-      ReadOnlyObservableHashList readOnlyColumnDistinctValues = null;
-
-      // If the key is not set in DistinctValues yet, do not calculate distinct values for this field
-      if( !( ( DistinctValuesDictionary )this.DistinctValues ).InternalTryGetValue( dataGridItemProperty.Name, out readOnlyColumnDistinctValues ) )
-        return;
-
-      ObservableHashList columnDistinctValues = readOnlyColumnDistinctValues.InnerObservableHashList;
-
-      // We use the DistinctValuesSortComparer if present, else the SortComparer for the DataGridItemProperty, else, 
-      // the Comparer used is the one of the base class.
-      IComparer distinctValuesSortComparer = dataGridItemProperty.DistinctValuesSortComparer;
-
-      if( distinctValuesSortComparer == null )
-        distinctValuesSortComparer = dataGridItemProperty.SortComparer;
-
-      using( columnDistinctValues.DeferINotifyCollectionChanged() )
-      {
-        QueryAutoFilterDistinctValuesEventArgs e = new QueryAutoFilterDistinctValuesEventArgs( dataGridItemProperty );
-        this.OnQueryAutoFilterDistinctValues( e );
-
-        foreach( object distinctValue in e.DistinctValues )
-        {
-          // Compute current value to be able to remove unused values
-          currentColumnDistinctValues.Add( distinctValue );
-        }
-
-        DataGridCollectionViewBase.RemoveUnusedDistinctValues( 
-          distinctValuesSortComparer, currentColumnDistinctValues, columnDistinctValues, null );
-      }
     }
 
     internal override DataGridVirtualizingCollectionViewGroupBase CreateNewRootGroup()

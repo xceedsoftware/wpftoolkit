@@ -160,6 +160,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       base.OnMouseLeftButtonDown( e );
     }
 
+
     private void SetIsActive()
     {
       if( this.Model != null )

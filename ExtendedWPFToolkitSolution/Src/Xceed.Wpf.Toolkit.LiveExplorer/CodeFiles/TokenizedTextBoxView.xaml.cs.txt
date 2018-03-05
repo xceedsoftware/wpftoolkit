@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -30,13 +30,6 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Data;
 using System.Collections.ObjectModel;
-#if !OPEN_SOURCE
-using Xceed.Wpf.Themes;
-using Xceed.Wpf.Toolkit.Themes.Office2007;
-using Xceed.Wpf.Toolkit.Themes.Metro;
-using Xceed.Wpf.Themes.Metro;
-using Xceed.Wpf.Samples.SampleData;
-#endif
 
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.TokenizedTextBox.Views
@@ -46,107 +39,25 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.TokenizedTextBox.Views
   /// </summary>
   public partial class TokenizedTextBoxView : DemoView
   {
-#if !OPEN_SOURCE
-    #region Members
 
-    private static ObservableCollection<Record> m_Records;
 
-    #endregion
-#endif
 
     public TokenizedTextBoxView()
     {
 
-#if !OPEN_SOURCE
-      InitDataSource();
-      DataContext = this;
-#endif
       InitializeComponent();
     }
 
-#if !OPEN_SOURCE
-    void InitDataSource()
-    {
-      NorthwindCollections northwind = new NorthwindCollections();
-      m_Records = new ObservableCollection<Record>();
-      foreach( var employee in northwind.Employees )
-      {
-        m_Records.Add( new Record( employee.FirstName, employee.LastName ) );
-      }
-    }
 
 
-    public static ObservableCollection<Record> EmployeeList
-    {
-      get
-      {
-        return m_Records;
-      }
-    }
 
-    private void OnDeleteToken( object sender, RoutedEventArgs e )
-    {
-      object item = ( ( FrameworkElement )e.OriginalSource ).DataContext;
-      this.customTokenizedTextBox.SelectedItems.Remove( item );
-    }
-#endif
   }
 
-#if !OPEN_SOURCE
-  public class Record : INotifyPropertyChanged
-  {
-    public Record()
-    {
-    }
-
-    public Record( string pFirstName, string pLastName )
-    {
-      FirstName = pFirstName;
-      LastName = pLastName;
-    }
-
-    private string m_firstName;
-    public string FirstName
-    {
-      get
-      {
-        return m_firstName;
-      }
-      set
-      {
-        m_firstName = value;
-        OnPropertyChanged( "FirstName" );
-      }
-    }
-
-    private string m_lastName;
-    public string LastName
-    {
-      get
-      {
-        return m_lastName;
-      }
-      set
-      {
-        m_lastName = value;
-        OnPropertyChanged( "LastName" );
-      }
-    }
 
 
-    #region INotifyPropertyChanged Members
 
-    public event PropertyChangedEventHandler PropertyChanged;
 
-    protected void OnPropertyChanged( string name )
-    {
-      PropertyChangedEventHandler handler = PropertyChanged;
-      if( handler != null )
-      {
-        handler( this, new PropertyChangedEventArgs( name ) );
-      }
-    }
-    #endregion
-  }
-#endif
+
+
+
 }

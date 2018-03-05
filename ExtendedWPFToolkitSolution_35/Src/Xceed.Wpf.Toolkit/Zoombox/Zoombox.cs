@@ -295,6 +295,10 @@ namespace Xceed.Wpf.Toolkit.Zoombox
           Viewbox viewbox = ( Viewbox )_content;
 
           BindingOperations.ClearAllBindings( viewbox );
+          if( viewbox.Child is FrameworkElement )
+          {
+            ( viewbox.Child as FrameworkElement ).RemoveHandler( FrameworkElement.SizeChangedEvent, new SizeChangedEventHandler( this.OnContentSizeChanged ) );
+          }
           ( viewbox as Viewbox ).Child = null;
 
           this.RemoveLogicalChild( viewbox );
@@ -331,6 +335,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
           viewbox.HorizontalAlignment = HorizontalAlignment.Left;
           viewbox.VerticalAlignment = VerticalAlignment.Top;
           this.IsContentWrapped = true;
+        }
+
+        if( ( _content is Viewbox ) && ( this.IsContentWrapped ) && ( _trueContent is FrameworkElement ) )
+        {
+          ( _trueContent as FrameworkElement ).AddHandler( FrameworkElement.SizeChangedEvent, new SizeChangedEventHandler( this.OnContentSizeChanged ), true );
         }
 
         if( _contentPresenter != null )
@@ -2044,6 +2053,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
       base.OnRender( drawingContext );
     }
+
+
+
 
     private static void RefocusView( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {

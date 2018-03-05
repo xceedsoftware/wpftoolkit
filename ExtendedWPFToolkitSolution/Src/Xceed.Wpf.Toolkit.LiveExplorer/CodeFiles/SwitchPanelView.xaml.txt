@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -29,7 +29,7 @@
             The SwitchPanel allows you to animate the children between different layouts.
         </Paragraph>
     </local:DemoView.Description>
-    
+
    <local:DemoView.Resources>
       <Style x:Key="panelElement" TargetType="{x:Type TextBlock}">
          <Setter Property="Background"
@@ -40,13 +40,13 @@
          <Setter Property="Height" Value="100" />
          <Setter Property="TextAlignment" Value="Center" />
       </Style>
-       
+
       <ObjectDataProvider x:Key="orientationCombo" MethodName="GetValues" ObjectType="{x:Type s:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="Orientation" />
             </ObjectDataProvider.MethodParameters>
       </ObjectDataProvider>
-       
+
       <Style x:Key="controlInError" TargetType="Control">
         <Style.Triggers>
             <Trigger Property="Validation.HasError" Value="true">
@@ -55,8 +55,7 @@
             </Trigger>
         </Style.Triggers>
      </Style>
-    
-<!--##INCLUDE_OPEN_SOURCE
+
       <Style x:Key="plusSuffix" TargetType="TextBlock">
           <Setter Property="Margin" Value="5,0,0,0"/>
           <Setter Property="Text" Value="Plus Only"/>
@@ -70,7 +69,6 @@
             </DataTrigger>
           </Style.Triggers>
       </Style>
-##END-->
 
       <Style x:Key="plusItem" TargetType="ComboBoxItem" >
          <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -79,9 +77,7 @@
                <DataTemplate>
                   <DockPanel>
                      <TextBlock DockPanel.Dock="Left" Text="{Binding}" />
-<!--##INCLUDE_OPEN_SOURCE
                      <TextBlock TextAlignment="Right" Style="{StaticResource plusSuffix}" />
-##END-->
                   </DockPanel>
                </DataTemplate>
             </Setter.Value>
@@ -104,82 +100,20 @@
       <s:String x:Key="animatedTimelinePanelDescription">Defines an area where items are positioned on a timeline.</s:String>
 
             <conv:ComboBoxToVisibilityConverter x:Key="comboBoxToVisibilityConverter" />
-      <!--##EXCLUDE_OPEN_SOURCE-->
-      <ObjectDataProvider x:Key="dockCombo" MethodName="GetValues" ObjectType="{x:Type s:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="Dock" />
-            </ObjectDataProvider.MethodParameters>
-       </ObjectDataProvider>
-       
-      <x:Array x:Key="canvasMovePositionCombo" x:Type="view:Coordinates">
-         <view:Coordinates X="600" Y="0" />
-         <view:Coordinates X="300" Y="200" />
-      </x:Array>
-       
-      <x:Array x:Key="gridCombo" x:Type="view:Coordinates">
-         <view:Coordinates X="3" Y="2" />
-         <view:Coordinates X="1" Y="0" />
-         <view:Coordinates X="0" Y="1" />
-      </x:Array>
-       
-      <x:Array x:Key="stakedStackPanelCombo" x:Type="s:Int32">
-          <s:Int32>2</s:Int32>
-          <s:Int32>0</s:Int32>
-      </x:Array>
 
-      <x:Array x:Key="relativeLeftTopCombo" x:Type="view:Coordinates">
-         <view:Coordinates X="0.2" Y="0.7" />
-         <view:Coordinates X="0.85" Y="0.25" />
-      </x:Array>
-       
-      <x:Array x:Key="relativeWidthHeightCombo" x:Type="view:Coordinates">
-          <view:Coordinates X="{x:Static s:Double.NaN}" Y="{x:Static s:Double.NaN}" />
-          <view:Coordinates X="0.1" Y="0.5" />
-          <view:Coordinates X="0.5" Y="0.1" />
-      </x:Array>
-       
-      <x:Array x:Key="relativePinPointCombo" x:Type="view:Coordinates">
-         <view:Coordinates X="0.5" Y="0.5" />
-         <view:Coordinates X="0" Y="1" />
-         <view:Coordinates X="1" Y="0" />
-      </x:Array>
-       
-      <x:Array x:Key="radialCanvasCenterCombo" x:Type="view:Coordinates">
-         <view:Coordinates X="0.5" Y="0.5" />
-         <view:Coordinates X="0.75" Y="0.25" />
-         <view:Coordinates X="0.2" Y="0.8" />
-      </x:Array>
-       
-      <x:Array x:Key="radialCanvasAngleCombo" x:Type="s:Int32">
-          <s:Int32>45</s:Int32>
-          <s:Int32>145</s:Int32>
-          <s:Int32>200</s:Int32>
-          <s:Int32>300</s:Int32>
-      </x:Array>
-       
-      <x:Array x:Key="radialCanvasRadiusCombo" x:Type="s:Int32">
-          <s:Int32>0</s:Int32>
-          <s:Int32>50</s:Int32>
-          <s:Int32>175</s:Int32>
-          <s:Int32>250</s:Int32>
-      </x:Array>
-       
-       <x:Array x:Key="animatedTimelinePanelDatesCombo" x:Type="s:String">
-          <s:String>1/3/2012 to 1/3/2012</s:String>
-          <s:String>1/3/2012 to 1/5/2012</s:String>
-          <s:String>1/5/2012 to 1/5/2012</s:String>
-      </x:Array>
-       
-      <ObjectDataProvider x:Key="overlapBehaviorCombo" MethodName="GetValues" ObjectType="{x:Type s:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="panels:OverlapBehaviorKind" />
-            </ObjectDataProvider.MethodParameters>
-       </ObjectDataProvider>
 
-      <xctk:InverseBoolConverter x:Key="inverseBoolConverter" />
-        <!--##END-->
+
+
+
+
+
+
+
+
+
+
    </local:DemoView.Resources>
-   
+
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
@@ -220,7 +154,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
          </Grid.RowDefinitions>
-          
+
          <TextBlock Grid.Row="0" Text="Usage:" Style="{StaticResource Header}" />
         <TextBlock Grid.Row="1" Text="Resize the window to see the layout animation." />
 
@@ -228,32 +162,6 @@
             <xctk:SwitchPanel.Layouts>
                <xctk:WrapPanel x:Name="_wrapPanel" ItemWidth="100" ItemHeight="100"/>
                <xctk:RandomPanel x:Name="_randomPanel" />
-               <!--##EXCLUDE_OPEN_SOURCE-->
-               <xctk:Canvas />
-               <xctk:Carousel x:Name="_carouselPanel" Tilt="70" MaximumRadius="290" MaximumAngularSeparation="45" />
-               <xctk:DockPanel />
-               <xctk:Grid x:Name="_grid" ShowGridLines="True">
-                    <xctk:Grid.ColumnDefinitions>
-                        <xctk:ColumnDefinition />
-                        <xctk:ColumnDefinition />
-                        <xctk:ColumnDefinition />
-                     </xctk:Grid.ColumnDefinitions>
-                      <xctk:Grid.RowDefinitions>
-                        <xctk:RowDefinition />
-                        <xctk:RowDefinition />
-                        <xctk:RowDefinition />
-                        <xctk:RowDefinition />
-                      </xctk:Grid.RowDefinitions>
-               </xctk:Grid>
-               <xctk:StackPanel x:Name="_stackPanel" Orientation="Horizontal"/>
-               <xctk:StackedStackPanel  x:Name="_stackedStackPanel"/>
-               <xctk:AutoStretchStackPanel x:Name="_autoStretchStackPanel" />
-               <xctk:RelativeCanvas />
-               <xctk:RadialCanvas x:Name="_radialCanvas"/>
-               <xctk:CameraPanel x:Name="_cameraPanel" CameraX="130" CameraY="140" CameraZ="310"/>
-               <xctk:PerspectivePanel x:Name="_perspectivePanel" AnchorX="250" AnchorY="50" ShiftX="150" ShiftY="70" AngleOfTwist="-10"  DecayConstant="0.2"/>
-               <xctk:AnimatedTimelinePanel x:Name="_animatedTimeLinePanel" OverlapBehavior="Stretch" BeginDate="1/01/12" EndDate="1/08/12" SwitchLayoutDeactivated="OnAnimatedTimelinePanelDeactivated"/>
-               <!--##END-->
             </xctk:SwitchPanel.Layouts>
             <TextBlock x:Name="_item1" Text="Item #1" Style="{StaticResource panelElement}"/>
             <TextBlock x:Name="_item2" Text="Item #2" Style="{StaticResource panelElement}"/>
@@ -265,7 +173,6 @@
             <TextBlock x:Name="_item8" Text="Item #8" Style="{StaticResource panelElement}"/>
          </xctk:SwitchPanel>
 
-         <!--##INCLUDE_OPEN_SOURCE
          <Image x:Name="_openSourceScreenShot" Grid.Row="2" Height="250" Visibility="Collapsed" />
          <TextBlock x:Name="_openSourceScreenShotDesc" Grid.Row="3" TextWrapping="Wrap" Visibility="Collapsed" />
          <StackPanel x:Name="_openSourceTextHyperlink" Grid.Row="4" Orientation="Horizontal" Visibility="Collapsed">
@@ -276,7 +183,6 @@
                  </Hyperlink>
              </TextBlock>
          </StackPanel>
-         ##END-->
 
          <GroupBox Header="WrapPanel Toolbox" 
                    Background="White"
@@ -290,7 +196,7 @@
                 <TextBlock TextWrapping="Wrap"
                             Text="Resize the Window to animate the WrapPanel." 
                             Margin="10,0" />
-                
+
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -302,7 +208,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                        
+
                     <TextBlock Text="Orientation:" VerticalAlignment="Center"/>
                     <ComboBox Grid.Column="1"
                               ItemsSource="{Binding Source={StaticResource orientationCombo}}" 
@@ -342,7 +248,7 @@
                 </Grid>
             </StackPanel>
         </GroupBox>
-          
+
          <GroupBox Header="RandomPanel Toolbox" 
                    Background="White"
                    Grid.Row="3" 
@@ -355,7 +261,7 @@
                 <TextBlock TextWrapping="Wrap"
                            Text="Modify the Minimum and Maximum values to affect the children size." 
                            Margin="10,0" />
-                
+
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -367,7 +273,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                        
+
                     <TextBlock Text="Minimum Width:" VerticalAlignment="Center"/>
                     <xctk:DoubleUpDown x:Name="_minimumWidth"
                                        Grid.Column="1"
@@ -421,756 +327,42 @@
                 </Grid>
             </StackPanel>
         </GroupBox>
-          
-          <!--##EXCLUDE_OPEN_SOURCE-->
-          <GroupBox Header="CanvasPanel Toolbox" 
-                    Background="White"
-                    Grid.Row="3" 
-                    Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=2}" 
-                    Margin="10" >
-            <StackPanel>
-                <TextBlock TextWrapping="Wrap"
-                           Text="{StaticResource canvasPanelDescription}" 
-                           Margin="10,0" />
-                <TextBlock TextWrapping="Wrap"
-                           Text="Use ComboBox to change the coordinates of item #8." 
-                           Margin="10,0" />
-                
-                <Grid Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    
-                    <TextBlock Text="Move Item #8 to (X,Y):" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
-                              ItemsSource="{Binding Source={StaticResource canvasMovePositionCombo}}" 
-                              SelectedIndex="0"
-                              SelectionChanged="OnCanvasMoveItemComboBoxChanged"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-          
-          <GroupBox Header="Carousel Toolbox" 
-                   Grid.Row="3" 
-                   Background="White"
-                   Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=3}" 
-                   Margin="10" >
-            <StackPanel>
-                <TextBlock TextWrapping="Wrap"
-                            Text="{StaticResource carouselDescription}" 
-                            Margin="10,0" />
-                
-                <Grid Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="100" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                        
-                    <!--First Column-->
-                    <TextBlock Text="Orientation:" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
-                              ItemsSource="{Binding Source={StaticResource orientationCombo}}" 
-                              SelectedItem="{Binding Orientation, ElementName=_carouselPanel}"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                    <TextBlock Grid.Row="1" Text="Are Children Scaled:" VerticalAlignment="Center"/>
-                    <CheckBox Grid.Row="1" 
-                              Grid.Column="1" 
-                              IsChecked="{Binding AreChildrenScaled, ElementName=_carouselPanel}" 
-                              ClickMode="Press" 
-                              VerticalAlignment="Center"
-                              Margin="5"/>
-                    <TextBlock Grid.Row="2" Text="Distant Child Scale:" VerticalAlignment="Center"/>
-                    <Slider Grid.Column="1"
-                            Grid.Row="2"
-                            Value="{Binding DistantChildScale, ElementName=_carouselPanel}"
-                            Minimum="-2"
-                            Maximum="2"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Grid.Row="3" Text="Tilt:" VerticalAlignment="Center"/>
-                    <Slider Grid.Column="1"
-                            Grid.Row="3"
-                            Minimum="-180"
-                            Maximum="180"
-                            Value="{Binding Tilt, ElementName=_carouselPanel}"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <!--Second Column-->
-                    <TextBlock Grid.Column="2" Text="Maximum Angular Separation:" VerticalAlignment="Center" Margin="25,0,0,0"/>
-                    <Slider Grid.Column="3"
-                            Value="{Binding MaximumAngularSeparation, ElementName=_carouselPanel}"
-                            Minimum="0"
-                            Maximum="45"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Maximum Radius:" VerticalAlignment="Center" Margin="25,0,0,0"/>
-                    <Slider Grid.Column="3"
-                            Grid.Row="1"
-                            Value="{Binding MaximumRadius, ElementName=_carouselPanel}"
-                            Minimum="-290"
-                            Maximum="290"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Grid.Row="2" Grid.Column="2" Text="Angular Extent:" VerticalAlignment="Center" Margin="25,0,0,0"/>
-                    <Slider Grid.Column="3"
-                            Grid.Row="2"
-                            Value="{Binding AngularExtent, ElementName=_carouselPanel}"
-                            Minimum="0"
-                            Maximum="360"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Grid.Row="3" Grid.Column="2" Text="Angular Offset:" VerticalAlignment="Center" Margin="25,0,0,0"/>
-                    <Slider Grid.Column="3"
-                            Grid.Row="3"
-                            Minimum="0"
-                            Maximum="360"
-                            Value="{Binding AngularOffset, ElementName=_carouselPanel}"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-          
-          <GroupBox Header="DockPanel Toolbox" 
-                    Grid.Row="3" 
-                    Background="White"
-                    Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=4}" 
-                    Margin="10" >
-            <StackPanel>
-                <TextBlock TextWrapping="Wrap"
-                           Text="{StaticResource dockPanelDescription}" 
-                           Margin="10,0" />
-                <TextBlock TextWrapping="Wrap"
-                           Text="Use ComboBox to dock item #2." 
-                           Margin="10,0" />
-                
-                <Grid Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    
-                   <TextBlock Text="Dock Item #2 to:" VerticalAlignment="Center" Margin="5"/>
-                    <ComboBox Grid.Column="1"
-                              ItemsSource="{Binding Source={StaticResource dockCombo}}" 
-                              SelectedIndex="0"
-                              SelectionChanged="OnDockComboBoxChanged"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-          
-          <GroupBox Header="Grid Toolbox" 
-                    Grid.Row="3" 
-                    Background="White"
-                    Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=5}" 
-                    Margin="10" >
-            <StackPanel>
-                <TextBlock TextWrapping="Wrap"
-                           Text="{StaticResource gridDescription}" 
-                           Margin="10,0" />
-                <TextBlock TextWrapping="Wrap"
-                           Text="Use the ComboBox to change the row and column of item #4." 
-                           Margin="10,0" />
-                
-                <Grid Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    
-                    <TextBlock Text="Show Grid Lines:" VerticalAlignment="Center"/>
-                    <CheckBox Grid.Column="1"
-                              IsChecked="{Binding ShowGridLines, ElementName=_grid}"
-                              Margin="5" />
-                    
-                    <TextBlock Grid.Row="1" Text="Move Item #4 to:" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Row="1"
-                              Grid.Column="1"
-                              ItemsSource="{Binding Source={StaticResource gridCombo}}" 
-                              SelectedIndex="0"
-                              SelectionChanged="OnGridComboBoxChanged"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-          
-          <GroupBox Header="StackPanel Toolbox" 
-                    Grid.Row="3" 
-                    Background="White"
-                    Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=6}" 
-                    Margin="10" >
-            <StackPanel>
-                <TextBlock TextWrapping="Wrap"
-                           Text="{StaticResource stackPanelDescription}" 
-                           Margin="10,0" />
 
-                <Grid Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Orientation:" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
-                              ItemsSource="{Binding Source={StaticResource orientationCombo}}" 
-                              SelectedItem="{Binding Orientation, ElementName=_stackPanel}"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-          
-          <GroupBox Header="StackedStackPanel Toolbox" 
-                   Grid.Row="3" 
-                   Background="White"
-                   Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=7}" 
-                   Margin="10" >
-            <StackPanel>
-                <TextBlock TextWrapping="Wrap"
-                           Text="{StaticResource stackedStackPanelDescription}" 
-                           Margin="10,0" />
-                <TextBlock TextWrapping="Wrap"
-                           Text="Use the ComboBox to move Item #5 from stack to stack." 
-                           Margin="10,0" />
 
-                <Grid Margin="5">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    
-                    <TextBlock Text="Orientation:" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
-                              ItemsSource="{Binding Source={StaticResource orientationCombo}}" 
-                              SelectedItem="{Binding Orientation, ElementName=_stackedStackPanel}"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                    <TextBlock Grid.Row="1" Text="Move Item #5 to Stack: " VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
-                              Grid.Row="1"
-                              ItemsSource="{Binding Source={StaticResource stakedStackPanelCombo}}" 
-                              SelectedIndex="0"
-                              SelectionChanged="OnStackedStackComboBoxChanged"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="2" />
-                    <TextBlock Grid.Column="2" Text="Default Stack Length:" VerticalAlignment="Center" Margin="20,0,0,0"/>
-                    <xctk:DoubleUpDown Grid.Column="3"
-                                       Value="NaN"
-                                       ValueChanged="OnStackedStackPanelStackLengthChanged"
-                                       AllowInputSpecialValues="NaN"
-                                       Minimum="0"
-                                       Maximum="250"
-                                       Width="100"
-                                       VerticalAlignment="Center"
-                                       Margin="5" />
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-          
-          <GroupBox Header="AutoStretchStackPanel Toolbox" 
-                   Grid.Row="3" 
-                   Background="White"
-                   Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=8}" 
-                   Margin="10" >
-            <StackPanel>
-                <TextBlock TextWrapping="Wrap"
-                           Text="{StaticResource autoStretchStackPanelDescription}" 
-                           Margin="10,0" />
 
-                <Grid Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    
-                    <TextBlock Text="Orientation:" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
-                              ItemsSource="{Binding Source={StaticResource orientationCombo}}" 
-                              SelectedItem="{Binding Orientation, ElementName=_autoStretchStackPanel}"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                    <TextBlock Text="Gap Ratio:" Grid.Row="1" VerticalAlignment="Center"/>
-                    <xctk:DoubleUpDown Grid.Row="1"
-                                       Grid.Column="1"
-                                       Value="{Binding GapRatio, ElementName=_autoStretchStackPanel}"
-                                       AllowInputSpecialValues="None"
-                                       Increment="0.5"
-                                       Minimum="0"
-                                       Maximum="5"
-                                       Style="{StaticResource controlInError}"
-                                       Width="100"
-                                       VerticalAlignment="Center"
-                                       Margin="5" />
-                    <TextBlock Text="Is Children Reversed:" Grid.Column="2" VerticalAlignment="Center" Margin="25,0,0,0"/>
-                    <CheckBox Grid.Column="3"
-                              IsChecked="{Binding IsChildOrderReversed, ElementName=_autoStretchStackPanel}"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-          
-          <GroupBox Header="RelativeCanvas Toolbox" 
-                   Grid.Row="3" 
-                   Background="White"
-                   Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=9}" 
-                   Margin="10" >
-            <StackPanel>
-                <TextBlock TextWrapping="Wrap"
-                           Text="{StaticResource relativeCanvasDescription}" 
-                           Margin="10,0" />
-                <TextBlock TextWrapping="Wrap"
-                           Text="Click on ComboBoxes to modify left, top, width, height, and pinPoint of item #6 relative to the panel." 
-                           Margin="10,0" />
 
-                <Grid Margin="5">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                     </Grid.RowDefinitions>
-                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <TextBlock Text="Move Item #6 with Relative (Left,Top):" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
-                              ItemsSource="{Binding Source={StaticResource relativeLeftTopCombo}}" 
-                              SelectedIndex="0"
-                              SelectionChanged="OnRelativeLeftTopComboBoxChanged"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                    <TextBlock Text="Use Item #6 with Relative (Width,Height):" Grid.Row="1" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
-                              Grid.Row="1"
-                              ItemsSource="{Binding Source={StaticResource relativeWidthHeightCombo}}" 
-                              SelectedIndex="0"
-                              SelectionChanged="OnRelativeWidthHeightComboBoxChanged"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                    <TextBlock Text="Change Item #6 pinPoint (X,Y):" Grid.Column="2" VerticalAlignment="Center" Margin="20,0,0,0"/>
-                    <ComboBox Grid.Column="3"
-                              ItemsSource="{Binding Source={StaticResource relativePinPointCombo}}" 
-                              SelectedIndex="0"
-                              SelectionChanged="OnRelativePinPointComboBoxChanged"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-          
-          <GroupBox Header="RadialCanvas Toolbox" 
-                   Grid.Row="3" 
-                   Background="White"
-                   Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=10}" 
-                   Margin="10" >
-            <StackPanel>
-                <TextBlock TextWrapping="Wrap"
-                           Text="{StaticResource radialCanvasDescription}" 
-                           Margin="10,0" />
-                <TextBlock TextWrapping="Wrap"
-                           Text="Use the ComboBoxes to modify the angle, radius, and pinPoint of Item #7." 
-                           Margin="10,0" />
 
-                <Grid Margin="5">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                     </Grid.RowDefinitions>
-                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <TextBlock Text="Is Auto Arrange:" VerticalAlignment="Center"/>
-                    <CheckBox x:Name="_autoArrangeCheckBox"
-                              Grid.Column="1"
-                              IsChecked="{Binding IsAutoArrange, ElementName=_radialCanvas}"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                    <TextBlock Grid.Row="1" Text="Center (X,Y):" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
-                              Grid.Row="1"
-                              ItemsSource="{Binding Source={StaticResource radialCanvasCenterCombo}}" 
-                              SelectedIndex="0"
-                              SelectionChanged="OnRadialCanvasCenterComboBoxChanged"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                    <TextBlock Grid.Column="2" Text="Angle for item #7:" VerticalAlignment="Center" Margin="20,0,0,0" IsEnabled="{Binding IsEnabled, ElementName=_radialAngleComboBox}" Style="{StaticResource DisableGrayText}"/>
-                    <ComboBox x:Name="_radialAngleComboBox"
-                              Grid.Column="3"
-                              ItemsSource="{Binding Source={StaticResource radialCanvasAngleCombo}}" 
-                              SelectedIndex="2"
-                              SelectionChanged="OnRadialCanvasAngleComboBoxChanged"
-                              IsEnabled="{Binding IsChecked, ElementName=_autoArrangeCheckBox, Converter={StaticResource inverseBoolConverter}}"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                    <TextBlock Grid.Column="2" Grid.Row="1" Text="Radius for item #7:" VerticalAlignment="Center" Margin="20,0,0,0" IsEnabled="{Binding IsEnabled, ElementName=_radialRadiusComboBox}" Style="{StaticResource DisableGrayText}"/>
-                    <ComboBox x:Name="_radialRadiusComboBox"
-                              Grid.Column="3"
-                              Grid.Row="1"
-                              ItemsSource="{Binding Source={StaticResource radialCanvasRadiusCombo}}" 
-                              SelectedIndex="2"
-                              SelectionChanged="OnRadialCanvasRadiusComboBoxChanged"
-                              IsEnabled="{Binding IsChecked, ElementName=_autoArrangeCheckBox, Converter={StaticResource inverseBoolConverter}}"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                    <TextBlock Grid.Column="2" Grid.Row="2" Text="PinPoint for item #7:" VerticalAlignment="Center" Margin="20,0,0,0"/>
-                    <ComboBox Grid.Column="3"
-                              Grid.Row="2"
-                              ItemsSource="{Binding Source={StaticResource relativePinPointCombo}}" 
-                              SelectedIndex="0"
-                              SelectionChanged="OnRadialCanvasPinPointComboBoxChanged"
-                              Width="100"
-                              Height="22"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-          
-          <GroupBox Header="CameraPanel Toolbox" 
-                   Grid.Row="3" 
-                   Background="White"
-                   Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=11}" 
-                   Margin="10" >
-            <StackPanel>
-                <TextBlock TextWrapping="Wrap"
-                           Text="{StaticResource cameraPanelDescription}" 
-                           Margin="10,0" />
 
-                <Grid Margin="5">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                     </Grid.RowDefinitions>
-                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="150"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <TextBlock Text="Camera X:" VerticalAlignment="Center"/>
-                    <Slider Grid.Column="1"
-                            Value="{Binding CameraX, ElementName=_cameraPanel}"
-                            Minimum="0"
-                            Maximum="400"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Text="Camera Y:" Grid.Row="1" VerticalAlignment="Center"/>
-                    <Slider Grid.Column="1"
-                            Grid.Row="1"
-                            Value="{Binding CameraY, ElementName=_cameraPanel}"
-                            Minimum="0"
-                            Maximum="300"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Text="Camera Z:" Grid.Row="2" VerticalAlignment="Center"/>
-                    <Slider Grid.Column="1"
-                            Grid.Row="2"
-                            Value="{Binding CameraZ, ElementName=_cameraPanel}"
-                            Minimum="0"
-                            Maximum="500"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Text="Z Scale Factor:" Grid.Row="3" VerticalAlignment="Center"/>
-                    <Slider Grid.Column="1"
-                            Grid.Row="3"
-                            Value="{Binding ZScaleFactor, ElementName=_cameraPanel}"
-                            Minimum="1"
-                            Maximum="400"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Grid.Column="2" Text="Position X for item #3:" VerticalAlignment="Center" Margin="20,0,0,0"/>
-                    <Slider Grid.Column="3"
-                            Value="{Binding (xctk:CameraPanel.Left), ElementName=_item3}"
-                            Minimum="0"
-                            Maximum="400"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Grid.Column="2" Grid.Row="1" Text="Position Y for item #3:" VerticalAlignment="Center" Margin="20,0,0,0"/>
-                    <Slider Grid.Column="3"
-                            Grid.Row="1"
-                            Value="{Binding (xctk:CameraPanel.Top), ElementName=_item3}"
-                            Minimum="0"
-                            Maximum="300"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Grid.Column="2" Grid.Row="2" Text="Position Z for item #3:" VerticalAlignment="Center" Margin="20,0,0,0"/>
-                    <Slider Grid.Column="3"
-                            Grid.Row="2"
-                            Value="{Binding (xctk:CameraPanel.Depth), ElementName=_item3}"
-                            Minimum="0"
-                            Maximum="300"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-          
-          <GroupBox Header="PerspectivePanel Toolbox" 
-                   Grid.Row="3" 
-                   Background="White"
-                   Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=12}" 
-                   Margin="10" >
-            <StackPanel>
-                <TextBlock TextWrapping="Wrap"
-                           Text="{StaticResource perspectivePanelDescription}" 
-                           Margin="10,0" />
 
-                <Grid Margin="5">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                     </Grid.RowDefinitions>
-                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="100"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="100"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="100"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <!--First Colummn -->
-                    <TextBlock Text="Active Child Index:" VerticalAlignment="Center"/>
-                    <xctk:IntegerUpDown Grid.Column="1"
-                                        Value="{Binding ActiveChildIndex, ElementName=_perspectivePanel}"
-                                        Minimum="0"
-                                        Maximum="7"
-                                        Style="{StaticResource controlInError}"
-                                        VerticalAlignment="Center"
-                                        Margin="5" />
-                    <TextBlock Text="Anchor X:" Grid.Row="1" VerticalAlignment="Center"/>
-                    <Slider Grid.Column="1"
-                            Grid.Row="1"
-                            Value="{Binding AnchorX, ElementName=_perspectivePanel}"
-                            Minimum="0"
-                            Maximum="500"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Text="Anchor Y:" Grid.Row="2" VerticalAlignment="Center"/>
-                    <Slider Grid.Column="1"
-                            Grid.Row="2"
-                            Value="{Binding AnchorY, ElementName=_perspectivePanel}"
-                            Minimum="0"
-                            Maximum="200"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <!--Second Column -->
-                    <TextBlock Text="Angle of Twist:" Grid.Column="2" VerticalAlignment="Center" Margin="15,0,0,0"/>
-                    <Slider Grid.Column="3"
-                            Value="{Binding AngleOfTwist, ElementName=_perspectivePanel}"
-                            Minimum="-50"
-                            Maximum="50"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Text="Shift X:" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center" Margin="15,0,0,0"/>
-                    <Slider Grid.Column="3"
-                            Grid.Row="1"
-                            Value="{Binding ShiftX, ElementName=_perspectivePanel}"
-                            Minimum="0"
-                            Maximum="350"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Text="Shift Y:" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Margin="15,0,0,0"/>
-                    <Slider Grid.Column="3"
-                            Grid.Row="2"
-                            Value="{Binding ShiftY, ElementName=_perspectivePanel}"
-                            Minimum="0"
-                            Maximum="200"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <!--Third Column-->
-                    <TextBlock Text="Decay Constant:" Grid.Column="4" VerticalAlignment="Center" Margin="15,0,0,0"/>
-                    <Slider Grid.Column="5"
-                            Value="{Binding DecayConstant, ElementName=_perspectivePanel}"
-                            Minimum="0"
-                            Maximum="1.5"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Text="Scale Factor X:" Grid.Row="1" Grid.Column="4" VerticalAlignment="Center" Margin="15,0,0,0"/>
-                    <Slider Grid.Column="5"
-                            Grid.Row="1"
-                            Value="{Binding ScaleFactorX, ElementName=_perspectivePanel}"
-                            Minimum="0"
-                            Maximum="1.25"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                    <TextBlock Text="Scale Factor Y:" Grid.Row="2" Grid.Column="4" VerticalAlignment="Center" Margin="15,0,0,0"/>
-                    <Slider Grid.Column="5"
-                            Grid.Row="2"
-                            Value="{Binding ScaleFactorY, ElementName=_perspectivePanel}"
-                            Minimum="0"
-                            Maximum="1.25"
-                            VerticalAlignment="Center"
-                            Margin="5" />
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-          
-          <GroupBox Header="AnimatedTimeLinePanel Toolbox" 
-                   Grid.Row="3" 
-                   Background="White"
-                   Visibility="{Binding SelectedIndex, ElementName=layoutCombo, Converter={StaticResource comboBoxToVisibilityConverter}, ConverterParameter=13}" 
-                   Margin="10" >
-            <StackPanel>
-                <TextBlock TextWrapping="Wrap"
-                           Text="{StaticResource animatedTimelinePanelDescription}" 
-                           Margin="10,0" />
-                <TextBlock TextWrapping="Wrap"
-                           Text="Change the position of Item #2 with the ComboBox." 
-                           Margin="10,0" />
 
-                <Grid Margin="5">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                     </Grid.RowDefinitions>
-                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="100"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <!--First Colummn -->
-                    <TextBlock Text="Orientation:" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
-                              ItemsSource="{Binding Source={StaticResource orientationCombo}}" 
-                              SelectedItem="{Binding Orientation, ElementName=_animatedTimeLinePanel}"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                    <TextBlock Text="Begin Date:" Grid.Row="1" VerticalAlignment="Center"/>
-                    <DatePicker Grid.Column="1"
-                                Grid.Row="1"
-                                SelectedDate="{Binding BeginDate, ElementName=_animatedTimeLinePanel}"
-                                DisplayDateStart="1/01/12" 
-                                DisplayDateEnd="1/07/12" 
-                                SelectedDateFormat="Short"
-                                VerticalAlignment="Center"
-                                Margin="5" />
-                    <TextBlock Text="End Date:" Grid.Row="2" VerticalAlignment="Center"/>
-                    <DatePicker Grid.Column="1"
-                                Grid.Row="2"
-                                SelectedDate="{Binding EndDate, ElementName=_animatedTimeLinePanel}"
-                                DisplayDateStart="1/01/12" 
-                                DisplayDateEnd="1/07/12" 
-                                SelectedDateFormat="Short"
-                                VerticalAlignment="Center"
-                                Margin="5" />
-                    <TextBlock Text="Overlap Behavior:" Grid.Row="3" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
-                              Grid.Row="3"
-                              ItemsSource="{Binding Source={StaticResource overlapBehaviorCombo}}" 
-                              SelectedItem="{Binding OverlapBehavior, ElementName=_animatedTimeLinePanel}"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                    <!--Second Colummn -->
-                    <TextBlock Text="Keep Original Order For Overlap:" Grid.Column="2" VerticalAlignment="Center" Margin="25,0,0,0"/>
-                    <CheckBox Grid.Column="3"
-                              IsChecked="{Binding KeepOriginalOrderForOverlap, ElementName=_animatedTimeLinePanel}"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                    <TextBlock Text="Unit Size:" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center" Margin="25,0,0,0" IsEnabled="{Binding Value, ElementName=_unitTimeSpan}" Style="{StaticResource DisableGrayText}"/>
-                    <xctk:DoubleUpDown Grid.Column="3"
-                                       Grid.Row="1"
-                                       Value="{Binding UnitSize, ElementName=_animatedTimeLinePanel}"
-                                       AllowInputSpecialValues="NaN"
-                                       Minimum="0"
-                                       Maximum="200"
-                                       IsEnabled="{Binding Value, ElementName=_unitTimeSpan}"
-                                       VerticalAlignment="Center"
-                                       Margin="5" />
-                    <TextBlock Text="Unit Time Span (Days):" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Margin="25,0,0,0"/>
-                    <xctk:IntegerUpDown x:Name="_unitTimeSpan"
-                                        Grid.Column="3"
-                                        Grid.Row="2"
-                                        Value="0"
-                                        ValueChanged="OnAnimatedTimelineUnitTimeSpanChanged"
-                                        Minimum="0"
-                                        Maximum="7"
-                                        VerticalAlignment="Center"
-                                        Margin="5" />
-                    <TextBlock Text="Change Item #2 Dates:" Grid.Column="2" Grid.Row="3" VerticalAlignment="Center" Margin="25,0,0,0"/>
-                    <ComboBox Grid.Column="3"
-                              Grid.Row="3"
-                              ItemsSource="{StaticResource animatedTimelinePanelDatesCombo}"
-                              SelectedIndex="0"
-                              SelectionChanged="OnAnimatedTimelineDatesChanged"
-                              VerticalAlignment="Center"
-                              Margin="5" />
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-          <!--##END-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
      </Grid>
    </Grid>
 </local:DemoView>

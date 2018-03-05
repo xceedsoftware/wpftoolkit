@@ -15,9 +15,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
@@ -56,7 +53,6 @@ namespace Xceed.Wpf.DataGrid.Views
     GroupingChanged,
     ScrollViewerChanged,
     SortingChanged,
-    VirtualizationStateChanged, // On / Off Virtualization
-    ViewPortWidthChanged, // Parent viewport resized
+    ViewPortWidthChanged // Parent viewport resized
   }
 }

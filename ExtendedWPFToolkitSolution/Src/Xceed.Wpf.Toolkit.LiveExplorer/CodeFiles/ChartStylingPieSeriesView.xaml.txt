@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -24,175 +24,26 @@
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
             <Run>This sample demonstrates how a series with a pie layout type can be styled via DataTemplates. The series, hint line, and hint label are all styled.</Run>
-            <!--##EXCLUDE_OPEN_SOURCE-->
-            <Run>Please move the mouse over the pie slices to view the tooltips of the pie layout DataTemplate.</Run>
-            <!--##END-->
 
-       <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->
         </Paragraph>
     </local:DemoView.Description>
-    
-<!--##EXCLUDE_OPEN_SOURCE-->
-    <local:DemoView.Resources>
-        <sys:String x:Key="Name1">Mary</sys:String>
-        <sys:String x:Key="Name2">Brad</sys:String>
-        <sys:String x:Key="Name3">Anne</sys:String>
-        <sys:String x:Key="Name4">Eric</sys:String>
-        <sys:String x:Key="Name5">Lisa</sys:String>
-        <sys:String x:Key="Name6">Carl</sys:String>
-        <sys:String x:Key="Name7">Whole Team</sys:String>
 
-        <DataTemplate x:Key="GridBackgroundTemplate">
-			<Rectangle Width="{Binding Path=W}" Height="{Binding Path=H}" Margin="-5,-5,-5,-5"
-					   RadiusX="25" RadiusY="25" StrokeThickness="1" Stroke="Gray" Fill="#FFFFE1">
-				<Rectangle.BitmapEffect>
-					<DropShadowBitmapEffect/>
-				</Rectangle.BitmapEffect>
-			</Rectangle>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="PieTemplate">
-			<Canvas Width="{Binding Path=W}" Height="{Binding Path=H}">
-				<Path x:Name="PieSlice" Stroke="Gray" StrokeThickness="2" Data="{Binding Path=Geometry}" Fill="{Binding Path=Interior}">
-					<Path.ToolTip>
-						<ToolTip>
-							<StackPanel Orientation="Vertical">
-								<TextBlock Text="Name:"/>
-								<TextBlock Text="{Binding Path=DataPoint.Label}"/>
-								<TextBlock Text="Skills:"/>
-								<TextBlock Text="{Binding Path=DataPoint.Y}"/>
-							</StackPanel>
-						</ToolTip>
-					</Path.ToolTip>
-					<Path.Triggers>
-						<EventTrigger RoutedEvent="Mouse.MouseEnter">
-							<EventTrigger.Actions>
-								<BeginStoryboard>
-									<Storyboard>
-										<DoubleAnimation Storyboard.TargetProperty="Opacity" To="0.3" Duration="0:0:0.4"/>
-									</Storyboard>
-								</BeginStoryboard>
-							</EventTrigger.Actions>
-						</EventTrigger>
 
-						<EventTrigger RoutedEvent="Mouse.MouseLeave">
-							<EventTrigger.Actions>
-								<BeginStoryboard>
-									<Storyboard>
-										<DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.4" />
-									</Storyboard>
-								</BeginStoryboard>
-							</EventTrigger.Actions>
-						</EventTrigger>
-					</Path.Triggers>
-				</Path>
-			</Canvas>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="HintLineTemplate">
-			<Canvas Width="{Binding Path=W}" Height="{Binding Path=H}">
-                <Polyline Points="{Binding Path=Points}" StrokeThickness="3" StrokeDashArray="2 1">
-                     <Polyline.Stroke>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                              <GradientStop Color="Orange" Offset="1" />
-                              <GradientStop Color="Blue" Offset="0.50" />
-                              <GradientStop Color="Green" Offset="0" />
-                        </LinearGradientBrush>
-                  </Polyline.Stroke>
-                </Polyline>
-            </Canvas>
-		</DataTemplate>
-        
-        <DataTemplate x:Key="HintLabelTemplate">
-			<Border DockPanel.Dock="Top" BorderThickness="1" CornerRadius ="4">
-				<Border.BorderBrush>
-					<SolidColorBrush Color="Gray"/>
-				</Border.BorderBrush>
-				<Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="White" Offset="0.0" />
-                        <GradientStop Color="SkyBlue" Offset="1.0" />
-                    </LinearGradientBrush>
-                </Border.Background>
 
-                <StackPanel>
-				    <TextBlock FontFamily="Sans Serif" FontSize="18" FontStyle="Oblique" Margin="2,2,2,1"
-				               HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=DataPoint.Label}"/>
-                    <Image x:Name="_image" Width="20" Height="20"/>
-                </StackPanel>
-			</Border>
-            
-            <DataTemplate.Triggers>
-                 <DataTrigger Binding="{Binding DataPoint.Label}" Value="{StaticResource Name1}">
-                    <Setter Property="Source" Value="../Photo/1.bmp" TargetName="_image" />
-                 </DataTrigger>
-                <DataTrigger Binding="{Binding DataPoint.Label}" Value="{StaticResource Name2}">
-                   <Setter Property="Source" Value="../Photo/2.bmp" TargetName="_image" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding DataPoint.Label}" Value="{StaticResource Name3}">
-                   <Setter Property="Source" Value="../Photo/3.bmp" TargetName="_image" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding DataPoint.Label}" Value="{StaticResource Name4}">
-                   <Setter Property="Source" Value="../Photo/4.bmp" TargetName="_image" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding DataPoint.Label}" Value="{StaticResource Name5}">
-                   <Setter Property="Source" Value="../Photo/5.bmp" TargetName="_image" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding DataPoint.Label}" Value="{StaticResource Name6}">
-                   <Setter Property="Source" Value="../Photo/6.bmp" TargetName="_image" />
-                </DataTrigger>
-            </DataTemplate.Triggers>
-		</DataTemplate>
 
-    </local:DemoView.Resources>
-    
-   <Grid>
-     <xctk:Chart  MinHeight="400">
-        <xctk:Chart.Areas >
-            <xctk:Area Title="Area1" BackgroundTemplate="{StaticResource GridBackgroundTemplate}" Margin="10,25,20,25">
-               <xctk:Area.XAxis>
-                    <xctk:Axis ShowAxisLabel="false" ShowGridLines="false" ShowAxis="false" ShowArrow="false" ShowTickLabels="false" ShowTicks="false" />
-                </xctk:Area.XAxis>
-				   <xctk:Area.YAxis>
-                    <xctk:Axis ShowAxisLabel="false" ShowGridLines="false" ShowAxis="false" ShowArrow="false" ShowTickLabels="false" ShowTicks="false" />
-                </xctk:Area.YAxis>
-                
-               <xctk:Area.Series>
-					   <xctk:Series Title="Family Members"
-                                 ShowPointsInLegend="true"
-                                 Template="{StaticResource PieTemplate}"
-                                 ShowHintLabels="true"
-                                 HintLineTemplate="{StaticResource HintLineTemplate}"
-                                 HintLabelTemplate="{StaticResource HintLabelTemplate}"
-                                 HintLineLength="30">
-						   <xctk:Series.DataPoints>
-						       <xctk:DataPoint Y="-3" Label="{StaticResource Name1}" />
-							   <xctk:DataPoint Y="-2" Label="{StaticResource Name2}" />
-							   <xctk:DataPoint Y="-1" Label="{StaticResource Name3}" />
-							   <xctk:DataPoint Y="1" Label="{StaticResource Name4}"/>
-							   <xctk:DataPoint Y="1" Label="{StaticResource Name5}"/>
-							   <xctk:DataPoint Y="2" Label="{StaticResource Name6}"/>
-							   <xctk:DataPoint Y="5" Label="{StaticResource Name7}"/>
-					       </xctk:Series.DataPoints>
-					       <xctk:Series.Layout>
-						       <xctk:PieLayout/>
-					       </xctk:Series.Layout>
-				       </xctk:Series>
-			       </xctk:Area.Series>
-            </xctk:Area>
-        </xctk:Chart.Areas>
-     </xctk:Chart>
-    </Grid>
-<!--##END-->
-    
-<!--##INCLUDE_OPEN_SOURCE
+
+
+
+
+
+
+
+
     <Image Source="..\OpenSourceImages\ChartStylingPieSeries.png" Width="600" Height="400"/>
-##END-->
 </local:DemoView>

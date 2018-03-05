@@ -62,7 +62,6 @@ namespace Xceed.Wpf.DataGrid
       {
         value = new ReadOnlyObservableHashList();
         this.InternalAdd( key, value );
-        m_dataGridCollectionViewBase.ForceRefreshDistinctValuesForFieldName( key );
       }
 
       Debug.Assert( value != null );

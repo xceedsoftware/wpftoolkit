@@ -22,8 +22,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Windows.Controls.Primitives;
-using System.Linq;
-using System.Collections.Generic;
 using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit
@@ -186,6 +184,23 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //DisplayColorAndName
+
+    #region DisplayColorTooltip
+
+    public static readonly DependencyProperty DisplayColorTooltipProperty = DependencyProperty.Register( "DisplayColorTooltip", typeof( bool ), typeof( ColorPicker ), new UIPropertyMetadata( true ) );
+    public bool DisplayColorTooltip
+    {
+      get
+      {
+        return ( bool )GetValue( DisplayColorTooltipProperty );
+      }
+      set
+      {
+        SetValue( DisplayColorTooltipProperty, value );
+      }
+    }
+
+    #endregion //DisplayColorTooltip
 
     #region ColorMode
 
@@ -581,7 +596,7 @@ namespace Xceed.Wpf.Toolkit
     {
       base.OnMouseUp( e );
 
-      // Close ColorPicker on MouseUp to prevent action of mouseUp on controls behind the ColorPicker.
+      // Close ColorPicker on MouseUp to prevent action of MouseUp on controls behind the ColorPicker.
       if( _selectionChanged )
       {
         CloseColorPicker( true );
@@ -589,7 +604,8 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    #endregion //Base Class Overrides
+
+#endregion //Base Class Overrides
 
     #region Event Handlers
 

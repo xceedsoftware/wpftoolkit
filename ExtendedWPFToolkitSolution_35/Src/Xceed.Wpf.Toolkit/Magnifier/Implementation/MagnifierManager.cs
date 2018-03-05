@@ -59,6 +59,10 @@ namespace Xceed.Wpf.Toolkit
 
     private void Element_MouseLeave( object sender, MouseEventArgs e )
     {
+      var magnifier = MagnifierManager.GetMagnifier( _element ) as Magnifier;
+      if( ( magnifier != null ) && magnifier.IsFrozen )
+        return;
+
       HideAdorner();
     }
 
@@ -94,16 +98,16 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-#endregion //Event Handlers
+    #endregion //Event Handlers
 
-#region Methods
+    #region Methods
 
     private void AttachToMagnifier( UIElement element, Magnifier magnifier )
     {
       _element = element;
-      _element.MouseEnter += Element_MouseEnter;
-      _element.MouseLeave += Element_MouseLeave;
-      _element.MouseWheel += Element_MouseWheel;
+      _element.MouseEnter += this.Element_MouseEnter;
+      _element.MouseLeave += this.Element_MouseLeave;
+      _element.MouseWheel += this.Element_MouseWheel;
 
       magnifier.Target = _element;
 

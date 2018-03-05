@@ -234,6 +234,9 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+
+
+
     #endregion
 
     #region Constructors
@@ -529,6 +532,9 @@ namespace Xceed.Wpf.Toolkit
 
         if( list.IsFixedSize )
         {
+          if( sourceList.Count > list.Count )
+            throw new IndexOutOfRangeException("Exceeding array size.");
+
           for( int i = 0; i < sourceList.Count; ++i )
             list[ i ] = sourceList[ i ];
         }
@@ -573,7 +579,11 @@ namespace Xceed.Wpf.Toolkit
         var constructor = ItemsSourceType.GetConstructor( Type.EmptyTypes );
         if( constructor != null )
         {
-          collection = (IEnumerable)constructor.Invoke( null );
+          collection = ( IEnumerable )constructor.Invoke( null );
+        }
+        else if( ItemsSourceType.IsArray )
+        {
+          collection = Array.CreateInstance( ItemsSourceType.GetElementType(), Items.Count );
         }
       }
 

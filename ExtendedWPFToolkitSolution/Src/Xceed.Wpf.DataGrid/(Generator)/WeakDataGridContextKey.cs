@@ -15,28 +15,26 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 
 namespace Xceed.Wpf.DataGrid
 {
-  internal class WeakDataGridContextKey
+  internal sealed class WeakDataGridContextKey
   {
-    public WeakDataGridContextKey( DataGridContext dataGridContext )
+    internal WeakDataGridContextKey( DataGridContext dataGridContext )
     {
-      DataGridContext parentDataGridContext = dataGridContext.ParentDataGridContext;
-      int level = 0;
+      var parentDataGridContext = dataGridContext.ParentDataGridContext;
+      var level = 0;
+
       while( parentDataGridContext != null )
       {
         level++;
         parentDataGridContext = parentDataGridContext.ParentDataGridContext;
       }
 
-      System.Diagnostics.Debug.Assert( ( ( level == 0 ) || ( dataGridContext.SourceDetailConfiguration != null ) ),
-        "A child dataGridContext must have a SourceDetailConfiguration." );
+      Debug.Assert( ( ( level == 0 ) || ( dataGridContext.SourceDetailConfiguration != null ) ), "A child dataGridContext must have a SourceDetailConfiguration." );
 
-      m_sourceDetailConfigurationRelationName = ( dataGridContext.SourceDetailConfiguration != null ) ?
-        dataGridContext.SourceDetailConfiguration.RelationName : string.Empty;
+      m_sourceDetailConfigurationRelationName = ( dataGridContext.SourceDetailConfiguration != null ) ? dataGridContext.SourceDetailConfiguration.RelationName : string.Empty;
 
       if( level > 0 )
       {
@@ -45,13 +43,13 @@ namespace Xceed.Wpf.DataGrid
         // Build the tree of master items.
         m_weakItemsTree = new WeakReference[ level ];
 
-        DataGridContext tempDataGridContext = dataGridContext;
+        var tempDataGridContext = dataGridContext;
         for( int i = level - 1; i >= 0; i-- )
         {
           // Ensure to get a reference to the System.Data.DataRow when doing a 
           // save/restore of a System.Data.DataRowView since the view is recreated
           // for every detail views
-          object parentItem = ItemsSourceHelper.TryGetDataRowFromDataItem( tempDataGridContext.ParentItem );
+          var parentItem = ItemsSourceHelper.TryGetDataRowFromDataItem( tempDataGridContext.ParentItem );
 
           m_weakItemsTree[ i ] = new WeakReference( parentItem );
 
@@ -59,67 +57,33 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      this.Initialize();
+      m_hashCode = WeakDataGridContextKey.CalculateHashCode( m_sourceDetailConfigurationRelationName, m_weakItemsTree );
     }
-
-    private void Initialize()
-    {
-      m_cachedHash = 0;
-
-      if( !string.IsNullOrEmpty( m_sourceDetailConfigurationRelationName ) )
-        m_cachedHash = m_sourceDetailConfigurationRelationName.GetHashCode();
-
-      if( m_weakItemsTree != null )
-      {
-        // We use this hashing algorithm in order to get a different hashCode
-        // when the same values are in a different order in the object array.
-        int weakItemsTreeLength = m_weakItemsTree.Length;
-        for( int i = 0; i < weakItemsTreeLength; i++ )
-        {
-          object item = m_weakItemsTree[ i ].Target;
-
-          System.Diagnostics.Debug.Assert( item != null, "Item should still be referenced by the Child DataGridContext at this point!." );
-
-          m_cachedHash ^= item.GetHashCode();
-          m_cachedHash += ( m_cachedHash << 10 );
-          m_cachedHash ^= ( m_cachedHash >> 6 );
-        }
-      }
-    }
-
-    private int m_cachedHash;
 
     public override int GetHashCode()
     {
-      return m_cachedHash;
+      return m_hashCode;
     }
-
-    private WeakReference[] m_weakItemsTree;
-    private string m_sourceDetailConfigurationRelationName;
 
     public override bool Equals( object obj )
     {
-      WeakDataGridContextKey weakDataGridContextKey = obj as WeakDataGridContextKey;
-
-      if( weakDataGridContextKey == null )
+      var target = obj as WeakDataGridContextKey;
+      if( ( target == null ) || ( m_hashCode != target.m_hashCode ) )
         return false;
 
-      if( m_cachedHash != weakDataGridContextKey.m_cachedHash )
+      if( m_sourceDetailConfigurationRelationName != target.m_sourceDetailConfigurationRelationName )
         return false;
 
-      if( m_sourceDetailConfigurationRelationName != weakDataGridContextKey.m_sourceDetailConfigurationRelationName )
-        return false;
-
-      int dataGridContextStatusKeyLength = ( weakDataGridContextKey.m_weakItemsTree == null ) ? 0 : weakDataGridContextKey.m_weakItemsTree.Length;
-      int myLength = ( m_weakItemsTree == null ) ? 0 : m_weakItemsTree.Length;
+      var dataGridContextStatusKeyLength = ( target.m_weakItemsTree == null ) ? 0 : target.m_weakItemsTree.Length;
+      var myLength = ( m_weakItemsTree == null ) ? 0 : m_weakItemsTree.Length;
 
       if( myLength != dataGridContextStatusKeyLength )
         return false;
 
-      for( int i = 0; i < dataGridContextStatusKeyLength; i++ )
+      for( var i = 0; i < dataGridContextStatusKeyLength; i++ )
       {
-        object sourceItem = m_weakItemsTree[ i ].Target;
-        object targetItem = weakDataGridContextKey.m_weakItemsTree[ i ].Target;
+        var sourceItem = m_weakItemsTree[ i ].Target;
+        var targetItem = target.m_weakItemsTree[ i ].Target;
 
         if( !object.Equals( sourceItem, targetItem ) )
           return false;
@@ -127,6 +91,34 @@ namespace Xceed.Wpf.DataGrid
 
       return true;
     }
-  }
 
+    private static int CalculateHashCode( string relationName, WeakReference[] items )
+    {
+      var hashCode = ( !string.IsNullOrEmpty( relationName ) ) ? relationName.GetHashCode() : 0;
+
+      if( items != null )
+      {
+        // We use this hashing algorithm in order to get a different hashCode
+        // when the same values are in a different order in the object array.
+        for( var i = 0; i < items.Length; i++ )
+        {
+          var item = items[ i ].Target;
+          Debug.Assert( item != null, "Item should still be referenced by the Child DataGridContext at this point!." );
+
+          if( item == null )
+            continue;
+
+          hashCode ^= item.GetHashCode();
+          hashCode += ( hashCode << 10 );
+          hashCode ^= ( hashCode >> 6 );
+        }
+      }
+
+      return hashCode;
+    }
+
+    private readonly WeakReference[] m_weakItemsTree;
+    private readonly string m_sourceDetailConfigurationRelationName;
+    private readonly int m_hashCode;
+  }
 }

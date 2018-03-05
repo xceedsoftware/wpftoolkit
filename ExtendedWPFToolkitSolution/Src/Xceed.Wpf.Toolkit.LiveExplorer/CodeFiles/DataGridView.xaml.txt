@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -33,12 +33,12 @@
             </Hyperlink>
         </Paragraph>
     </local:DemoView.Description>
-   
+
    <local:DemoView.Resources>
       <xcdg:ImageConverter x:Key="imageConverter" />
       <!-- Converter used to return a BitmapImage from a Country name -->
       <conv:FlagPathConverter x:Key="flagPathConverter" />
-      
+
       <!-- DataTemplate to display an Employee object -->
       <DataTemplate x:Key="employeeDataTemplate">
          <Grid MaxHeight="30"
@@ -59,13 +59,13 @@
             </StackPanel>
          </Grid>
       </DataTemplate>
-      
+
        <!-- DataTemplate to display the $ in Freight column -->
       <DataTemplate x:Key="freightDataTemplate">
          <TextBlock Text="{Binding StringFormat=\{0:C\}}"
                     VerticalAlignment="Center" />
       </DataTemplate>
-      
+
        <!-- DataTemplate to display a Country -->
       <DataTemplate x:Key="countryDataTemplate">
          <StackPanel Orientation="Horizontal"
@@ -82,9 +82,9 @@
                        VerticalAlignment="Center" />
          </StackPanel>
       </DataTemplate>
-           
+
    </local:DemoView.Resources>
-   
+
     <Grid>
         <Grid.Resources>
             <xcdg:DataGridCollectionViewSource x:Key="cvsOrders" 
@@ -109,38 +109,38 @@
                              Width="100"
                              IsMainColumn="True">
                 </xcdg:Column>
-               
+
                 <xcdg:Column FieldName="Employee"
                              Title="Employee"
                              Width="160"
                              CellContentTemplate="{StaticResource employeeDataTemplate}" 
                              GroupValueTemplate="{StaticResource employeeDataTemplate}"/>
-               
+
                 <xcdg:Column FieldName="Customer.CompanyName"
                              Title="Customer"
                              Width="185"/>
-               
+
                 <xcdg:Column FieldName="OrderDate"
                              Title="Order Date"
                              Width="120" />
-               
+
                 <xcdg:Column FieldName="Shipper.CompanyName"
                              Title="Ship Via" />
-               
+
                 <xcdg:Column FieldName="Freight"
                              Width="100"
                              CellContentTemplate="{StaticResource freightDataTemplate}"
                              GroupValueTemplate="{StaticResource freightDataTemplate}"/>
-               
+
                 <xcdg:Column FieldName="ShipCity"
                              Title="City"
                              Width="80" />
-               
+
                 <xcdg:Column FieldName="ShipCountry"
                              Title="Country"
                              CellContentTemplate="{StaticResource countryDataTemplate}"
                              GroupValueTemplate="{StaticResource countryDataTemplate}"/>
-               
+
                 <xcdg:Column FieldName="ShipAddress"
                              Title="Address"
                              Width="200" />
@@ -148,7 +148,7 @@
                 <xcdg:Column FieldName="ShipPostalCode"
                              Title="Postal Code"
                              Width="120" />
-               
+
                 <xcdg:Column FieldName="RequiredDate"
                              Title="Required Date"
                              Width="140" />
@@ -156,7 +156,7 @@
                 <xcdg:Column FieldName="ShippedDate"
                              Title="Shipped Date"
                              Width="140" />               
-               
+
                 <xcdg:Column FieldName="ShipName"
                               Visible="False" />
 

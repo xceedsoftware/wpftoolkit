@@ -14,12 +14,13 @@
 
   ***********************************************************************************/
 
+using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -60,6 +61,8 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    #region ItemCount Property
+
     public int ItemCount
     {
       get
@@ -91,6 +94,10 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    #endregion
+
+    #region InternalCustomItemContainerGenerator Property
+
     private CustomItemContainerGenerator InternalCustomItemContainerGenerator
     {
       get
@@ -103,7 +110,7 @@ namespace Xceed.Wpf.DataGrid
 
         CustomItemContainerGenerator retval = null;
         ItemsControl control1 = ItemsControl.GetItemsOwner( this );
-        if((control1 != null) && (control1.IsGrouping == false ))
+        if( ( control1 != null ) && ( control1.IsGrouping == false ) )
         {
           retval = m_customGenerator;
         }
@@ -111,6 +118,8 @@ namespace Xceed.Wpf.DataGrid
         return retval;
       }
     }
+
+    #endregion
 
     #region ItemIndex Attached Property
 
@@ -129,82 +138,13 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion ItemIndex Attached Property
 
-    private void InitializeDataGridVirtualizingPanel()
-    {
-      DataGridControl dataGridControl = ItemsControl.GetItemsOwner( this ) as DataGridControl;
-
-      if( dataGridControl != null )
-      {
-        //Retrieve the Grouping Custom Generator
-        m_customGenerator = dataGridControl.CustomItemContainerGenerator;
-
-        //Remove all items from the generator, this is to ensure that the panel starts "fresh" with items.
-        if( this.InternalChildren.Count > 0 )
-        {
-          this.RemoveInternalChildRange( 0, this.InternalChildren.Count );
-        }
-        ((IItemContainerGenerator)m_customGenerator).RemoveAll();
-
-        m_customGenerator.ItemsChanged += OnCustomGeneratorItemsChanged;
-
-        m_initializedCustomGenerator = true;
-      }
-    }
-
-    private void OnCustomGeneratorItemsChanged( object sender, CustomGeneratorChangedEventArgs e )
-    {
-
-      switch( e.Action )
-      {
-        //In case of a Reset, nothing to do since the Panel base class has cleared the internal children already!
-        case NotifyCollectionChangedAction.Reset:
-          if ( this.InternalChildren.Count > 0 )
-          {
-            this.RemoveInternalChildRange( 0, this.InternalChildren.Count );
-          }
-          else
-          {
-            this.InvalidateMeasure();
-          }
-
-          break;
-
-        //If there was a removal (collapsing)
-        //or if there was a Move (edition of a Sorted field)
-        case NotifyCollectionChangedAction.Move:
-        case NotifyCollectionChangedAction.Remove:
-          //remove the concerned range
-          int index = e.OldPosition.Index;
-          if(e.OldPosition.Offset != 0)
-          {
-            index++;
-          }
-
-          this.RemoveInternalChildRange( index, e.ItemUICount );
-          break;
-
-        //if some items were added (expansion)
-        case NotifyCollectionChangedAction.Add:
-          //invalidate layout so that the items will be inserted in place!
-          this.InvalidateMeasure();
-          break;
-
-        case NotifyCollectionChangedAction.Replace:
-          Debug.Fail("NotifyCollectionChangedAction.Replace");
-          break;
-
-        default:
-          break;
-      }
-    }
-
     protected sealed override void OnItemsChanged( object sender, ItemsChangedEventArgs args )
     {
       //I don't want anybody to override this since we might be hooked to the CustomItemContainerGenerator
       base.OnItemsChanged( sender, args );
 
       //Ok, I only want to process this if i'm NOT hooked to the CustomItemContainerGenerator
-      if(this.InternalCustomItemContainerGenerator == null)
+      if( this.InternalCustomItemContainerGenerator == null )
       {
         switch( args.Action )
         {
@@ -231,7 +171,7 @@ namespace Xceed.Wpf.DataGrid
             break;
 
           case NotifyCollectionChangedAction.Replace:
-            Debug.Fail("NotifyCollectionChangedAction.Replace");
+            Debug.Fail( "NotifyCollectionChangedAction.Replace" );
             break;
 
           default:
@@ -251,7 +191,124 @@ namespace Xceed.Wpf.DataGrid
       base.OnClearChildren();
     }
 
-    private static void OnParentDataGridControlChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+    private void InitializeDataGridVirtualizingPanel()
+    {
+      DataGridControl dataGridControl = ItemsControl.GetItemsOwner( this ) as DataGridControl;
+
+      if( dataGridControl != null )
+      {
+        //Retrieve the Grouping Custom Generator
+        m_customGenerator = dataGridControl.CustomItemContainerGenerator;
+
+        //Remove all items from the generator, this is to ensure that the panel starts "fresh" with items.
+        if( this.InternalChildren.Count > 0 )
+        {
+          this.RemoveInternalChildRange( 0, this.InternalChildren.Count );
+        }
+        ( ( IItemContainerGenerator )m_customGenerator ).RemoveAll();
+
+        m_customGenerator.ItemsChanged += OnCustomGeneratorItemsChanged;
+
+        m_initializedCustomGenerator = true;
+      }
+    }
+
+    private void OnCustomGeneratorItemsChanged( object sender, CustomGeneratorChangedEventArgs e )
+    {
+
+      switch( e.Action )
+      {
+        //In case of a Reset, nothing to do since the Panel base class has cleared the internal children already!
+        case NotifyCollectionChangedAction.Reset:
+          {
+            if( this.InternalChildren.Count > 0 )
+            {
+              this.RemoveInternalChildRange( 0, this.InternalChildren.Count );
+            }
+            else
+            {
+              this.InvalidateMeasure();
+            }
+          }
+          break;
+
+        //If there was a removal (collapsing)
+        //or if there was a Move (edition of a Sorted field)
+        case NotifyCollectionChangedAction.Move:
+        case NotifyCollectionChangedAction.Remove:
+          {
+            var containers = new HashSet<DependencyObject>( e.Containers ?? new DependencyObject[ 0 ] );
+
+            if( containers.Count > 0 )
+            {
+              var children = this.InternalChildren;
+              var from = -1;
+              var removeCount = 0;
+              var i = 0;
+
+              while( i < children.Count )
+              {
+                var container = children[ i ];
+
+                if( containers.Contains( container ) )
+                {
+                  containers.Remove( container );
+
+                  if( from < 0 )
+                  {
+                    from = i;
+                  }
+
+                  removeCount++;
+                  i++;
+                }
+                else if( removeCount > 0 )
+                {
+                  Debug.Assert( from >= 0 );
+                  this.RemoveInternalChildRange( from, removeCount );
+
+                  from = -1;
+                  removeCount = 0;
+                }
+                else
+                {
+                  i++;
+                }
+              }
+
+              if( removeCount > 0 )
+              {
+                Debug.Assert( from >= 0 );
+                this.RemoveInternalChildRange( from, removeCount );
+              }
+            }
+            else
+            {
+              this.InvalidateMeasure();
+            }
+          }
+          break;
+
+        //if some items were added (expansion)
+        case NotifyCollectionChangedAction.Add:
+          {
+            //invalidate layout so that the items will be inserted in place!
+            this.InvalidateMeasure();
+          }
+          break;
+
+        case NotifyCollectionChangedAction.Replace:
+          {
+            Debug.Fail( "NotifyCollectionChangedAction.Replace" );
+          }
+          break;
+
+        default:
+          break;
+      }
+    }
+
+    private static void OnParentDataGridControlChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
       DataGridVirtualizingPanel panel = ( DataGridVirtualizingPanel )sender;
 

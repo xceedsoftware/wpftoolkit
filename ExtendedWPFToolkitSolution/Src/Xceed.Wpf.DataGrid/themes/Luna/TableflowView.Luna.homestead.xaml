@@ -647,16 +647,6 @@
                     Value="18,0,0,0" />
          </MultiDataTrigger>
 
-         <!-- Trigger related to the filteringToggleButton-->
-         <Trigger SourceName="toggleButton"
-                  Property="IsMouseOver"
-                  Value="True">
-
-            <Setter TargetName="toggleButton"
-                    Property="Opacity"
-                    Value="1" />
-         </Trigger>
-
          <Trigger Property="IsMouseOver"
                   Value="True">
 
@@ -800,12 +790,6 @@
             <Setter TargetName="PART_ColumnResizerThumbLeft"
                     Property="IsEnabled"
                     Value="False" />
-         </DataTrigger>
-
-         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.Visible}"
-                      Value="False">
-            <Setter Property="Visibility"
-                    Value="Collapsed" />
          </DataTrigger>
 
       </ControlTemplate.Triggers>
@@ -1150,7 +1134,7 @@
             <local:HierarchicalGroupLevelIndicatorPane DockPanel.Dock="Left" />
             <local:GroupLevelIndicatorPane DockPanel.Dock="Left"
                                            Indented="False"
-                                           local:GroupLevelIndicatorPane.GroupLevel="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:GroupLevelIndicatorPane.GroupLevel), Converter={StaticResource groupHeaderControlGroupLevelConverter}, ConverterParameter=-1}" />
+                                           local:GroupLevelIndicatorPane.GroupLevel="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:GroupLevelIndicatorPane.GroupLevel), Converter={StaticResource intAdditionConverter}, ConverterParameter=-1}" />
 
             <Grid>
                <Border BorderThickness="0,1,0,1">
@@ -1481,6 +1465,10 @@
    <Style x:Key="tableflowViewLunaHomesteadDataRowStyle"
           TargetType="local:DataRow"
           BasedOn="{StaticResource tableflowViewLunaHomesteadRowStyle}">
+
+      <Setter Property="Template"
+              Value="{StaticResource tableflowViewDataRowTemplate}" />
+
    </Style>
 
    <!--**************************
@@ -1591,6 +1579,9 @@
            while preserving the background drawn by the underlying Row. -->
       <Setter Property="Background"
               Value="Transparent" />
+
+      <Setter Property="ToolTip"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.Description}" />
 
       <!-- In TableflowView, each Cell has the same width as its ParentColum's ActualWidth -->
       <Setter Property="Width"
@@ -2212,4 +2203,5 @@
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, ThemeType=views:LunaHomesteadTheme, TargetElementType=local:GroupNavigationControlItem}"
           TargetType="local:GroupNavigationControlItem"
           BasedOn="{StaticResource tableflowViewLunaHomesteadGroupNavigationControlItemStyle}" />
+
 </ResourceDictionary>

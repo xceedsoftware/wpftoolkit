@@ -92,9 +92,9 @@ namespace Xceed.Wpf.Toolkit
       _pickerBrush.EndPoint = new Point( 0.5, 1 );
       _pickerBrush.ColorInterpolationMode = ColorInterpolationMode.SRgbLinearInterpolation;
 
-      List<Color> colorsList = ColorUtilities.GenerateHsvSpectrum();
+      var colorsList = ColorUtilities.GenerateHsvSpectrum();
 
-      double stopIncrement = ( double )1 / colorsList.Count;
+      double stopIncrement = ( double )1 / (colorsList.Count - 1);
 
       int i;
       for( i = 0; i < colorsList.Count; i++ )

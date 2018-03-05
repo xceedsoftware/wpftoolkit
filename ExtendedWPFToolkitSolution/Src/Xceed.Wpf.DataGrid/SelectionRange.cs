@@ -15,9 +15,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
 
 namespace Xceed.Wpf.DataGrid
@@ -30,11 +27,11 @@ namespace Xceed.Wpf.DataGrid
 
     public SelectionRange( int startIndex, int endIndex )
     {
-      if( startIndex < 0 )  
-        throw new ArgumentOutOfRangeException( "startIndex", "startIndex must be equal to or greater than zero." );
+      if( ( startIndex < 0 ) || ( startIndex >= int.MaxValue ) )
+        throw new ArgumentOutOfRangeException( "startIndex", "startIndex must be equal to or greater than zero and lower than int.MaxValue." );
 
-      if( endIndex < 0 )  
-        throw new ArgumentOutOfRangeException( "endIndex", "endIndex must be equal to or greater than zero." );
+      if( ( endIndex < 0 ) || ( endIndex >= int.MaxValue ) )
+        throw new ArgumentOutOfRangeException( "endIndex", "endIndex must be equal to or greater than zero and lower than int.MaxValue." );
 
       m_startIndex = startIndex;
       m_endIndex = endIndex;
@@ -43,14 +40,14 @@ namespace Xceed.Wpf.DataGrid
     public SelectionRange( int index )
     {
       // Only place where we accept index = -1
-      if( index < -1 )  
-        throw new ArgumentOutOfRangeException( "index", "index must be equal to or greater than -1." );
+      if( ( index < -1 ) || ( index >= int.MaxValue ) )
+        throw new ArgumentOutOfRangeException( "index", "index must be equal to or greater than -1 and lower than int.MaxValue." );
 
       m_startIndex = index;
       m_endIndex = index;
     }
 
-    #endregion CONSTRUCTORS
+    #endregion
 
     #region StartIndex Property
 
@@ -62,8 +59,8 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
-        if( value < 0 )  
-          throw new ArgumentOutOfRangeException( "StartIndex", "StartIndex must be equal to or greater than zero." );
+        if( ( value < 0 ) || ( value >= int.MaxValue ) )
+          throw new ArgumentOutOfRangeException( "StartIndex", "StartIndex must be equal to or greater than zero and lower than int.MaxValue." );
 
         m_startIndex = value;
       }
@@ -71,7 +68,7 @@ namespace Xceed.Wpf.DataGrid
 
     private int m_startIndex;
 
-    #endregion StartIndex Property
+    #endregion
 
     #region EndIndex Property
 
@@ -83,8 +80,8 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
-        if( value < 0 )  
-          throw new ArgumentOutOfRangeException( "EndIndex", "EndIndex must be equal to or greater than zero." );
+        if( ( value < 0 ) || ( value >= int.MaxValue ) )
+          throw new ArgumentOutOfRangeException( "EndIndex", "EndIndex must be equal to or greater than zero and lower than int.MaxValue." );
 
         m_endIndex = value;
       }
@@ -92,7 +89,7 @@ namespace Xceed.Wpf.DataGrid
 
     private int m_endIndex;
 
-    #endregion EndIndex Property
+    #endregion
 
     #region Length Property
 
@@ -107,7 +104,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion Length Property
+    #endregion
 
     #region IsEmpty Property
 
@@ -119,9 +116,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion IsEmpty Property
-
-    #region PUBLIC METHODS
+    #endregion
 
     public static bool operator >( SelectionRange range1, SelectionRange range2 )
     {
@@ -229,9 +224,7 @@ namespace Xceed.Wpf.DataGrid
       if( rangeToExclude.IsEmpty )
         return new SelectionRange[] { this };
 
-      SelectionRange rangeIntersection = 
-        rangeIntersection = this.Intersect( rangeToExclude );
-
+      var rangeIntersection = this.Intersect( rangeToExclude );
       if( rangeIntersection.IsEmpty )
         return new SelectionRange[] { this };
 
@@ -241,7 +234,7 @@ namespace Xceed.Wpf.DataGrid
 
         if( rangeIntersection.EndIndex > m_endIndex )
         {
-          SelectionRange newRange = this;
+          var newRange = this;
           newRange.StartIndex = rangeIntersection.EndIndex - 1;
 
           if( rangeIntersection.StartIndex < m_startIndex )
@@ -261,7 +254,7 @@ namespace Xceed.Wpf.DataGrid
         {
           if( rangeIntersection.StartIndex < m_startIndex )
           {
-            SelectionRange newRange = this;
+            var newRange = this;
             newRange.EndIndex = rangeIntersection.StartIndex + 1;
             return new SelectionRange[] { newRange };
           }
@@ -308,7 +301,7 @@ namespace Xceed.Wpf.DataGrid
       if( !( obj is SelectionRange ) )
         return false;
 
-      SelectionRange selectionRange = ( SelectionRange )obj;
+      var selectionRange = ( SelectionRange )obj;
 
       return ( selectionRange.m_startIndex == m_startIndex )
         && ( selectionRange.m_endIndex == m_endIndex );
@@ -342,12 +335,6 @@ namespace Xceed.Wpf.DataGrid
         return itemIndex - m_startIndex;
       }
     }
-
-    #endregion PUBLIC METHODS
-
-    #region INTERNAL METHODS
-
-    #endregion INTERNAL METHODS
 
     #region IComparable<SelectionRange> Members
 

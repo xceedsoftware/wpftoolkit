@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -26,57 +26,17 @@
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
             <Run>The DataPoint objects of a chart's series can be set by binding with the Series.DataPointsSource property. From there, a DataPointBinding can be set on the X, Y, or Label property of a DataPoint.</Run>
-       <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xced Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->
         </Paragraph>
     </local:DemoView.Description>
-    
-<!--##EXCLUDE_OPEN_SOURCE-->
-    <local:DemoView.Resources>
-        <sample:Persons x:Key="Persons"/>
-        <CollectionViewSource x:Key="PersonCollection" Source="{Binding Source={StaticResource Persons}, Path=PersonList}" />
-    </local:DemoView.Resources>
-    
-   <Grid Margin="10">
-        <xctk:Chart MinHeight="300" ShowLegend="False">
-            <xctk:Chart.Areas>
-                <xctk:Area>
-                    <xctk:Area.XAxis>
-						<xctk:Axis Title="Persons" GraduationMode="Manual" LabelsType="Labels"/>
-					</xctk:Area.XAxis>
-                     <xctk:Area.YAxis>
-						<xctk:Axis Title="Skill Level" />
-					</xctk:Area.YAxis>
-                    <xctk:Area.Series>
-                        <xctk:Series DataPointsSource="{Binding Source={StaticResource PersonCollection}}">
-                            <xctk:Series.DataPointBindings>
-								<xctk:BindingInfo PropertyName="Y">
-									<xctk:BindingInfo.Binding>
-										<Binding Path="Skill"/>
-									</xctk:BindingInfo.Binding>
-								</xctk:BindingInfo>
-								<xctk:BindingInfo PropertyName="Label">
-									<xctk:BindingInfo.Binding>
-										<Binding Path="Name"/>
-									</xctk:BindingInfo.Binding>
-								</xctk:BindingInfo>
-							</xctk:Series.DataPointBindings>
-                        </xctk:Series>
-                    </xctk:Area.Series>
-                </xctk:Area>
-            </xctk:Chart.Areas>
-        </xctk:Chart>
 
-    </Grid>
- <!--##END-->
-    
-<!--##INCLUDE_OPEN_SOURCE
+
+
+
     <Image Source="..\OpenSourceImages\ChartSeriesDataPointsBinding.png" Width="600" Height="400"/>
-##END-->
 </local:DemoView>

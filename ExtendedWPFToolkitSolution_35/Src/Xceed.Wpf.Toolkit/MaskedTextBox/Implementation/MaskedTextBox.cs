@@ -168,8 +168,6 @@ namespace Xceed.Wpf.Toolkit
         new FrameworkPropertyMetadata(
         null,
         new CoerceValueCallback( MaskedTextBox.TextCoerceValueCallback ) ) );
-
-      AutomationProperties.AutomationIdProperty.OverrideMetadata( typeof( MaskedTextBox ), new UIPropertyMetadata( "MaskedTextBox" ) );
     }
 
     public MaskedTextBox()

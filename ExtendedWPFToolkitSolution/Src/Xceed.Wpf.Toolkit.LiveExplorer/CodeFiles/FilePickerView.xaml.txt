@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -26,7 +26,6 @@
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
          <Run>The FilePicker is a control that can be used to select one or more files in a browsing window.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -34,189 +33,26 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
-       ##END-->
       </Paragraph>
    </local:DemoView.Description>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-      <x:Array x:Key="FilterStrings"
-               Type="sys:String">
-         <sys:String>All files |*.*</sys:String>
-         <sys:String>Text Files |*.txt</sys:String>
-         <sys:String>Office Files |*.docx;*.xlsx;*.pptx</sys:String>
-         <sys:String>Image files |*.jpg;*.jpeg</sys:String>
-      </x:Array>
-
-      <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
-
-      <Style TargetType="TextBlock">
-         <Style.Triggers>
-            <Trigger Property="IsEnabled"
-                     Value="False">
-               <Setter Property="Foreground"
-                       Value="Gray" />
-            </Trigger>
-         </Style.Triggers>
-      </Style>
-   </local:DemoView.Resources>
-
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
 
 
-      <GroupBox Header="Features"
-                Grid.Row="0"
-                Margin="5">
-         <Grid Margin="5">
-            <Grid.RowDefinitions>
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="*" />
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
 
-            <!-- 1st Column -->
-            <TextBlock Text="Filter: "
-                       VerticalAlignment="Center" />
-            <ComboBox Grid.Column="1"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Center"
-                      Margin="5"
-                      Width="187"
-                      ToolTip="Gets/Sets the type of files to show when Dialog is opened."
-                      ItemsSource="{StaticResource FilterStrings}"
-                      SelectedItem="{Binding Filter, ElementName=_filePicker}" />            
 
-            <TextBlock Text="Use Full Path: "
-                       Grid.Row="1"
-                       VerticalAlignment="Center" />
-            <CheckBox Grid.Column="1"
-                      Grid.Row="1"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Center"
-                      Margin="5"
-                      ToolTip="Gets/Sets if the full path should be used for SelectedFile and SelectedFiles."
-                      IsChecked="{Binding UseFullPath, ElementName=_filePicker}" />
-            
-            <TextBlock Text="Multi Select: "
-                       Grid.Row="2"
-                       VerticalAlignment="Center" />
-            <CheckBox Grid.Column="1"
-                      Grid.Row="2"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Center"
-                      Margin="5"
-                      ToolTip="Gets/Sets if the browsing window permits to do multi-selection of files."
-                      IsChecked="{Binding MultiSelect, ElementName=_filePicker}" />
 
-            <TextBlock Text="Selected File: "
-                       Grid.Row="3"
-                       VerticalAlignment="Center"
-                       IsEnabled="{Binding MultiSelect, ElementName=_filePicker, Converter={StaticResource InverseBoolConverter}}"/>
-            <TextBox Grid.Column="1"
-                     Grid.Row="3"
-                     HorizontalAlignment="Stretch"
-                     VerticalAlignment="Center"
-                     Margin="5"
-                     ToolTip="Gets/Sets the file that is selected when MultiSelect is false."
-                     Text="{Binding SelectedFile, ElementName=_filePicker}"
-                     IsEnabled="{Binding MultiSelect, ElementName=_filePicker, Converter={StaticResource InverseBoolConverter}}"/>
 
-            <TextBlock Text="Selected Files: "
-                       Grid.Row="4"
-                       VerticalAlignment="Center"
-                       IsEnabled="{Binding MultiSelect, ElementName=_filePicker}"/>
-            <xctk:PrimitiveTypeCollectionControl x:Name="_primitiveTypeCollectionControl"
-                                                 Grid.Column="1"
-                                                 Grid.Row="4"
-                                                 HorizontalAlignment="Stretch"
-                                                 VerticalAlignment="Center"
-                                                 Margin="5"
-                                                 ToolTip="Gets/Sets the files that are selected when MultiSelect is true."
-                                                 Content="Selected Files"
-                                                 ItemsSource="{Binding SelectedFiles, ElementName=_filePicker}"
-                                                 ItemType="{x:Type sys:String}"
-                                                 IsEnabled="{Binding MultiSelect, ElementName=_filePicker}"/>
 
-            <!-- 2nd Column -->
-            <TextBlock Text="Watermark: "
-                       Grid.Column="2"
-                       VerticalAlignment="Center" />
-            <TextBox Grid.Column="3"
-                     HorizontalAlignment="Stretch"
-                     VerticalAlignment="Center"
-                     Margin="5"
-                     ToolTip="Gets/Sets the watermark when there are no file selected."
-                     Text="{Binding Watermark, ElementName=_filePicker}" />
-            
-            <TextBlock Text="Title: "
-                       Grid.Row="1"
-                       Grid.Column="2"
-                       VerticalAlignment="Center" />
-            <TextBox Grid.Row="1"
-                     Grid.Column="3"
-                     HorizontalAlignment="Stretch"
-                     VerticalAlignment="Center"
-                     Margin="5"
-                     ToolTip="Gets/Sets the tile of the window browser."
-                     Text="{Binding Title, ElementName=_filePicker}" />
 
-            <TextBlock Text="Initial Directory: "
-                       Grid.Row="2"
-                       Grid.Column="2"
-                       VerticalAlignment="Center" />
-            <TextBox Grid.Row="2"
-                     Grid.Column="3"
-                     HorizontalAlignment="Stretch"
-                     VerticalAlignment="Center"
-                     Margin="5"
-                     ToolTip="Gets/Sets the current directory of the window browser."
-                     Text="{Binding InitialDirectory, ElementName=_filePicker}" />
 
-            <TextBlock Text="Browse Content: "
-                       Grid.Row="3"
-                       Grid.Column="2"
-                       VerticalAlignment="Center" />
-            <TextBox Grid.Row="3"
-                     Grid.Column="3"
-                     HorizontalAlignment="Stretch"
-                     VerticalAlignment="Center"
-                     Margin="5"
-                     ToolTip="Gets/Sets the content of the Browse Button."
-                     Text="{Binding BrowseContent, ElementName=_filePicker, UpdateSourceTrigger=PropertyChanged}" />            
-         </Grid>
-      </GroupBox>
 
-      <StackPanel Grid.Row="1"
-                  Margin="10">
-         <TextBlock Text="Usage:"
-                    Style="{StaticResource Header}" />
-        
-         <xctk:FilePicker x:Name="_filePicker"
-                          Filter="All files |*.*" 
-                          Title="The FilePicker"
-                          UseFullPath="True" 
-                          MultiSelect="False"
-                          InitialDirectory="C:\"
-                          BrowseContent=". . ."
-                          Watermark="Choose your file(s)..."/>
-      </StackPanel>
-   </Grid>
 
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
+
+
+
+
+
+
     <Image Source="..\OpenSourceImages\FilePicker.png" Width="600" Height="400"/>
-   ##END-->
 </local:DemoView>

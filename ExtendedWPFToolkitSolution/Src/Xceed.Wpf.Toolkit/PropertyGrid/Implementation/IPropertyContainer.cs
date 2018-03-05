@@ -52,5 +52,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     FilterInfo FilterInfo { get; }
 
     bool? IsPropertyVisible( PropertyDescriptor pd );
+
   }
 }

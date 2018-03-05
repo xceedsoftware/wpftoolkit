@@ -339,7 +339,7 @@ namespace Xceed.Wpf.DataGrid
              : UIViewBase.DefaultGroupDraggedOutsideCursor;
           }
 
-          m_dragSourceManager.ProcessMouseLeftButtonDown( e );
+          m_dragSourceManager.DragStart( e );
         }
 
         e.Handled = true;
@@ -353,7 +353,9 @@ namespace Xceed.Wpf.DataGrid
       if( ( this.IsMouseCaptured ) && ( e.LeftButton == MouseButtonState.Pressed ) )
       {
         if( m_dragSourceManager != null )
-          m_dragSourceManager.ProcessMouseMove( e );
+        {
+          m_dragSourceManager.DragMove( e );
+        }
       }
 
       base.OnMouseMove( e );
@@ -365,10 +367,14 @@ namespace Xceed.Wpf.DataGrid
       bool isPressed = this.IsPressed;
 
       if( m_dragSourceManager != null )
-        m_dragSourceManager.ProcessMouseLeftButtonUp( e );
+      {
+        m_dragSourceManager.Drop( e );
+      }
 
       if( isMouseCaptured )
       {
+        this.ReleaseMouseCapture();
+
         bool click = isPressed;
 
         if( click )
@@ -423,22 +429,24 @@ namespace Xceed.Wpf.DataGrid
     protected override void OnLostMouseCapture( MouseEventArgs e )
     {
       if( m_dragSourceManager != null )
-        m_dragSourceManager.ProcessLostMouseCapture( e );
+      {
+        m_dragSourceManager.DragCancel( e );
+      }
 
       base.OnLostMouseCapture( e );
     }
 
-    internal void ShowFarDropMark( Point mousePosition )
+    internal void ShowFarDropMark( RelativePoint mousePosition )
     {
       this.ShowDropMark( mousePosition, DropMarkAlignment.Far, true );
     }
 
-    private void ShowDropMark( Point mousePosition )
+    private void ShowDropMark( RelativePoint mousePosition )
     {
       this.ShowDropMark( mousePosition, DropMarkAlignment.Far, false );
     }
 
-    private void ShowDropMark( Point mousePosition, DropMarkAlignment defaultAlignment, bool forceDefaultAlignment )
+    private void ShowDropMark( RelativePoint mousePosition, DropMarkAlignment defaultAlignment, bool forceDefaultAlignment )
     {
       if( m_dropMarkAdorner == null )
       {
@@ -475,7 +483,7 @@ namespace Xceed.Wpf.DataGrid
 
       if( forceDefaultAlignment )
       {
-        m_dropMarkAdorner.ForceAlignment( defaultAlignment );
+        m_dropMarkAdorner.Alignment = defaultAlignment;
       }
       else
       {
@@ -619,7 +627,7 @@ namespace Xceed.Wpf.DataGrid
 
     #region IDropTarget Members
 
-    bool IDropTarget.CanDropElement( UIElement draggedElement )
+    bool IDropTarget.CanDropElement( UIElement draggedElement, RelativePoint mousePosition )
     {
       bool canDrop = true;
 
@@ -703,7 +711,7 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
-    void IDropTarget.DragOver( UIElement draggedElement, Point mousePosition )
+    void IDropTarget.DragOver( UIElement draggedElement, RelativePoint mousePosition )
     {
       ColumnManagerCell cell = draggedElement as ColumnManagerCell;
 
@@ -855,7 +863,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    void IDropTarget.Drop( UIElement draggedElement )
+    void IDropTarget.Drop( UIElement draggedElement, RelativePoint mousePosition )
     {
       ColumnManagerCell draggedColumnManagerCell = draggedElement as ColumnManagerCell;
 

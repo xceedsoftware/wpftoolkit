@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -21,12 +21,10 @@
                         xmlns:sys="clr-namespace:System;assembly=mscorlib"
                         xmlns:winConv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Converters"
                         Title="MaterialSlider">
-   <local:DemoView.Description>
-      <!-- TODODOC-->
-      <Paragraph FontSize="14"
-                 FontFamily="Segoe">
-         <Run>A Slider with customizable and animated thumb and bubble that is using the Material Brushes.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
+  <local:DemoView.Description>
+    <Paragraph FontSize="14"
+               FontFamily="Segoe">
+      <Run>A Slider with customizable and animated thumb and bubble that is using the Material Brushes.</Run>
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -34,310 +32,31 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
-       ##END-->
-      </Paragraph>
-   </local:DemoView.Description>
+    </Paragraph>
+  </local:DemoView.Description>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-      <ResourceDictionary>
-         <ResourceDictionary.MergedDictionaries>
-            <ResourceDictionary Source="../Resources/CommonResources.xaml" />
-         </ResourceDictionary.MergedDictionaries>
 
-         <winConv:IntToBoolConverter x:Key="IntToBoolConverter" />
-         <xctk:InverseBoolConverter x:Key="InverseBoolConverter" />
 
-         <ObjectDataProvider x:Key="SliderEnumData"
-                             MethodName="GetValues"
-                             ObjectType="{x:Type sys:Enum}">
-            <ObjectDataProvider.MethodParameters>
-               <x:Type TypeName="xctk:MaterialSliderModeEnum" />
-            </ObjectDataProvider.MethodParameters>
-         </ObjectDataProvider>
 
-         <ObjectDataProvider x:Key="SliderBubbleLocationEnumData"
-                             MethodName="GetValues"
-                             ObjectType="{x:Type sys:Enum}">
-            <ObjectDataProvider.MethodParameters>
-               <x:Type TypeName="xctk:MaterialSliderBubbleLocationEnum" />
-            </ObjectDataProvider.MethodParameters>
-         </ObjectDataProvider>
 
-         <ObjectDataProvider x:Key="SliderOrientationEnumData"
-                             MethodName="GetValues"
-                             ObjectType="{x:Type sys:Enum}">
-            <ObjectDataProvider.MethodParameters>
-               <x:Type TypeName="Orientation" />
-            </ObjectDataProvider.MethodParameters>
-         </ObjectDataProvider>
 
-         <DataTemplate x:Key="MaterialSliderBubbleTemplate1">
-            <Border Background="Black"
-                    Padding="7">
-               <TextBlock Text="{Binding ., StringFormat=N1}"
-                          FontSize="12"
-                          Foreground="White"
-                          HorizontalAlignment="Center" />
-            </Border>
-         </DataTemplate>
 
-         <DataTemplate x:Key="MaterialSliderBubbleTemplate2">
-            <Grid>
-               <Ellipse Fill="Red"
-                        Width="60"
-                        Height="60"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center" />
-               <TextBlock Text="{Binding ., StringFormat=N2}"
-                          FontSize="20"
-                          Foreground="Yellow"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center" />
-            </Grid>
-         </DataTemplate>
 
-         <Style x:Key="MaterialSliderThumbStyle1"
-                TargetType="{x:Type Thumb}">
-            <Setter Property="VerticalAlignment"
-                    Value="Center" />
-            <Setter Property="Width"
-                    Value="10" />
-            <Setter Property="Height"
-                    Value="10" />
-            <Setter Property="Template">
-               <Setter.Value>
-                  <ControlTemplate TargetType="{x:Type Thumb}">
-                     <Grid>
-                        <Border x:Name="border"
-                                Width="{TemplateBinding Width}"
-                                Height="{TemplateBinding Height}"
-                                HorizontalAlignment="Center"
-                                BorderBrush="Orange"
-                                BorderThickness="2"
-                                Background="Black" />
-                     </Grid>
-                     <ControlTemplate.Triggers>
-                        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource TemplatedParent}}"
-                                     Value="True">
-                           <Setter Property="BorderBrush"
-                                   Value="Green"
-                                   TargetName="border" />
-                        </DataTrigger>
-                     </ControlTemplate.Triggers>
-                  </ControlTemplate>
-               </Setter.Value>
-            </Setter>
-         </Style>
 
-         <Style x:Key="MaterialSliderThumbStyle2"
-                TargetType="{x:Type Thumb}">
-            <Setter Property="Template">
-               <Setter.Value>
-                  <ControlTemplate TargetType="{x:Type Thumb}">
-                     <Grid>
-                        <Image Source="..\Resources\PencilTool16.png"
-                               Stretch="None" />
-                     </Grid>
-                  </ControlTemplate>
-               </Setter.Value>
-            </Setter>
-         </Style>
-      </ResourceDictionary>
-   </local:DemoView.Resources>
-   
-   <Grid>
 
-      <StackPanel Margin="10">
 
-         <GroupBox Header="Features"
-                   Margin="0,5,0,5">
-            <Grid Margin="5">
-               <Grid.RowDefinitions>
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="Auto" />
-               </Grid.RowDefinitions>
-               <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="100" />
-               </Grid.ColumnDefinitions>
 
-               <!-- First Column-->
-               <TextBlock Grid.Column="0"
-                          Grid.Row="0"
-                          Text="Mode: "
-                          VerticalAlignment="Center" />
-               <ComboBox x:Name="modeComboBox"
-                         Grid.Column="1"
-                         Grid.Row="0"
-                         ItemsSource="{Binding Source={StaticResource SliderEnumData}}"
-                         SelectedItem="{Binding Mode, ElementName=materialSlider}"
-                         Width="100"
-                         VerticalAlignment="Center"
-                         Margin="5" />
 
-               <TextBlock x:Name="bubbleTemplateTextBlock"
-                          Grid.Column="0"
-                          Grid.Row="1"
-                          Text="Bubble Template: "
-                          VerticalAlignment="Center"
-                          IsEnabled="{Binding SelectedIndex, ElementName=modeComboBox, Converter={StaticResource IntToBoolConverter}}"
-                          Style="{StaticResource DisableGrayText}" />
-               <ComboBox Grid.Column="1"
-                         Grid.Row="1"
-                         SelectedValue="{Binding BubbleTemplate, ElementName=materialSlider}"
-                         SelectedValuePath="Tag"
-                         VerticalAlignment="Center"
-                         Margin="5"
-                         IsEnabled="{Binding SelectedIndex, ElementName=modeComboBox, Converter={StaticResource IntToBoolConverter}}"
-                         Style="{StaticResource DisableGrayComboBox}">
-                  <ComboBoxItem Content="Default"
-                                Tag="{x:Null}" />
-                  <ComboBoxItem Content="Template 1"
-                                Tag="{StaticResource MaterialSliderBubbleTemplate1}" />
-                  <ComboBoxItem Content="Template 2"
-                                Tag="{StaticResource MaterialSliderBubbleTemplate2}" />
-               </ComboBox>
 
-               <TextBlock Grid.Column="0"
-                          Grid.Row="2"
-                          Text="Bubble Location: "
-                          VerticalAlignment="Center"
-                          IsEnabled="{Binding SelectedIndex, ElementName=modeComboBox, Converter={StaticResource IntToBoolConverter}}"
-                          Style="{StaticResource DisableGrayText}" />
-               <ComboBox Grid.Column="1"
-                         Grid.Row="2"
-                         ItemsSource="{Binding Source={StaticResource SliderBubbleLocationEnumData}}"
-                         SelectedItem="{Binding BubbleLocation, ElementName=materialSlider}"
-                         VerticalAlignment="Center"
-                         Margin="5"
-                         IsEnabled="{Binding SelectedIndex, ElementName=modeComboBox, Converter={StaticResource IntToBoolConverter}}"
-                         Style="{StaticResource DisableGrayComboBox}"
-                         ToolTip="The location of the Slider's bubble. If its orientation is Vertical : Over will be on the left and under will be on the right of the slider."/>
 
-               <!-- Second Column -->
-               <TextBlock Grid.Column="2"
-                          Grid.Row="0"
-                          Text="Thumb Style: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0" />
-               <ComboBox Grid.Column="3"
-                         Grid.Row="0"
-                         SelectedValue="{Binding ThumbStyle, ElementName=materialSlider}"
-                         SelectedValuePath="Tag"
-                         VerticalAlignment="Center"
-                         HorizontalAlignment="Left"
-                         Width="70"
-                         Margin="5">
-                  <ComboBoxItem Content="Default"
-                                Tag="{x:Null}" />
-                  <ComboBoxItem Content="Style 1"
-                                Tag="{StaticResource MaterialSliderThumbStyle1}" />
-                  <ComboBoxItem Content="Style 2"
-                                Tag="{StaticResource MaterialSliderThumbStyle2}" />
-               </ComboBox>
 
-               <TextBlock Grid.Column="2"
-                          Grid.Row="1"
-                          Text="Thumb Resize Scale Factor: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0"
-                          IsEnabled="{Binding IsEnabled, ElementName=bubbleTemplateTextBlock, Converter={StaticResource InverseBoolConverter}}"
-                          Style="{StaticResource DisableGrayText}" />
-               <xctk:DoubleUpDown Grid.Column="3"
-                                  Grid.Row="1"
-                                  Value="{Binding ThumbResizeScaleFactor, ElementName=materialSlider}"
-                                  Minimum="0.6"
-                                  Maximum="4"
-                                  Increment="0.1"
-                                  FormatString="N1"
-                                  VerticalAlignment="Center"
-                                  Margin="5"
-                                  IsEnabled="{Binding IsEnabled, ElementName=bubbleTemplateTextBlock, Converter={StaticResource InverseBoolConverter}}" />
 
-               <!--Third Column-->
-               <TextBlock Grid.Column="4"
-                          Grid.Row="0"
-                          Text="Show Ticks: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0" />
-               <CheckBox Grid.Column="5"
-                         Grid.Row="0"
-                         IsChecked="{Binding ShowTicks, ElementName=materialSlider}"
-                         VerticalAlignment="Center"
-                         Margin="5" />
-               
-               <TextBlock Grid.Column="4"
-                          Grid.Row="1"
-                          Text="Orientation: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0" />
-               <ComboBox Grid.Column="5"
-                         Grid.Row="1"
-                         ItemsSource="{Binding Source={StaticResource SliderOrientationEnumData}}"
-                         SelectedItem="{Binding Orientation, ElementName=materialSlider}"
-                         VerticalAlignment="Center"
-                         Width="90"
-                         Margin="5" />
 
-               <TextBlock Grid.Column="4"
-                          Grid.Row="2"
-                          Text="Material Accent Brush: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0" />
-               <ComboBox Grid.Column="5"
-                         Grid.Row="2"
-                         ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                         SelectedItem="{Binding MaterialAccentBrush, ElementName=materialSlider}"
-                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                         VerticalAlignment="Center"
-                         Margin="5" />
-            </Grid>
-         </GroupBox>
 
-         <StackPanel>
-            <TextBlock Text="Usage:"
-                       Style="{StaticResource Header}" />
 
-            <xctk:MaterialSlider x:Name="materialSlider"
-                                 Maximum="10"
-                                 Minimum="0"
-                                 Value="2"
-                                 Margin="20"
-                                 ShowTicks="True"
-                                 Mode="WithBubble"
-                                 BubbleTemplate="{x:Null}"
-                                 ThumbStyle="{x:Null}"
-                                 Orientation="Horizontal">
-               <xctk:MaterialSlider.Resources>
-                  <Style TargetType="xctk:MaterialSlider">
-                     <Style.Triggers>
-                        <Trigger Property="Orientation"
-                                 Value="Horizontal">
-                           <Setter Property="Width"
-                                   Value="500" />
-                        </Trigger>
-                        <Trigger Property="Orientation"
-                                 Value="Vertical">
-                           <Setter Property="Height"
-                                   Value="300" />
-                        </Trigger>
-                     </Style.Triggers>
-                  </Style>
-               </xctk:MaterialSlider.Resources>
-            </xctk:MaterialSlider>
-         </StackPanel>
-      </StackPanel>
 
-   </Grid>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
+
+
     <Image Source="..\OpenSourceImages\MaterialSlider.png" Width="600" Height="400"/>
-   ##END-->
 </local:MaterialDemoView>

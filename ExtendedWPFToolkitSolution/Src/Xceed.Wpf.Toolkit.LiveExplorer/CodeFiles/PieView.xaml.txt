@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -25,7 +25,7 @@
             The Pie shape is a WPF shape that represents a portion of an ellipse.  It is in the same shape as a slice of pie (hence the name).  More precisely, the Pie shape is represented as either a full ellipse (Slice = 1.0), nothing (Slice = 0.0), or an arc of an ellipse joined to its center by two line segments.
         </Paragraph>
     </local:DemoView.Description>
-    
+
    <local:DemoView.Resources>
       <xctk:ColorToSolidColorBrushConverter x:Key="colorConverter" />
    </local:DemoView.Resources>

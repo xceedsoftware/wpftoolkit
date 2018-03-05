@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -26,7 +26,6 @@
         <Paragraph FontSize="14"
                  FontFamily="Segoe">
          <Run>The TokenizedTextBox lets you display a series of values as tokens. If an ItemsSource is specified, an AutoComplete popup will appear with a filtered list of valid values during edit.</Run>
-            <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
@@ -34,294 +33,42 @@
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-          ##END-->
       </Paragraph>
     </local:DemoView.Description>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
 
-        <GroupBox Header="Features"
-                  Margin="5">
 
-            <GroupBox.Resources>
-                <Style TargetType="TextBlock">
-                    <Setter Property="Width" Value="150" />
-                    <Setter Property="Margin" Value="0,5,0,5" />
-                </Style>
-                <Style x:Key="SubHeader" TargetType="TextBlock">
-                    <Setter Property="Margin" Value="0,10,0,0" />
-                    <Setter Property="Foreground" Value="Orange" />
-                    <Setter Property="TextElement.FontWeight" Value="Bold" />
-                </Style>
-            </GroupBox.Resources>
 
-         <Grid Margin="5,0,0,5">
 
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="4*" />
-               <ColumnDefinition Width="6*" />
-            </Grid.ColumnDefinitions>
 
-            <Grid.RowDefinitions>
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
 
-            <StackPanel Grid.Column="0">
 
-               <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="Is Valid:" />
-                  <TextBlock Width="80"
-                             Margin="0,5,0,0"
-                             ToolTip="False if there is some invalid values or text segments within the TokenizedTextBox that are&#x0a;not yet resolved to a valid item and added to the TokenizedTextBox.SelectedItems collection.&#x0a;&#x0a;In this sample this value is linked to the Default TokenizedTextBox only."
-                             Text="{Binding IsValid, ElementName=defaultTokenizedTextBox}">
-                  </TextBlock>
-               </StackPanel>
 
-               <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="Allow Invalid Values:" />
-                  <CheckBox x:Name="chkAllowInvalidValues"
-                            Width="80"
-                            Margin="0,5,0,0"
-                            IsChecked="{Binding AllowInvalidValues, ElementName=defaultTokenizedTextBox}" />
-               </StackPanel>
 
-               <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="Allow Duplicate Values:" />
-                  <CheckBox x:Name="chkAllowDuplicateValues"
-                            Width="80"
-                            Margin="0,5,0,0"
-                            IsChecked="{Binding AllowDuplicateValues, ElementName=defaultTokenizedTextBox}" />
-               </StackPanel>
 
-               <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="Token Delimiter:" />
-                  <TextBox Width="15"
-                           Margin="0,5,0,0"
-                           MaxLength="1"
-                           Text="{Binding TokenDelimiter, ElementName=defaultTokenizedTextBox, UpdateSourceTrigger=PropertyChanged}" />
-               </StackPanel>
 
-            </StackPanel>
 
-            <StackPanel x:Name="panel1"
-                        Grid.Column="1">
 
-               <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="TokenDisplayMemberPath:" />
-                  <TextBox x:Name="txtValueMemberPath"
-                           Width="200"
-                           Margin="0,5,0,0"
-                           IsEnabled="False"
-                           Text="{Binding TokenDisplayMemberPath, ElementName=defaultTokenizedTextBox}" />
-               </StackPanel>
 
-               <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="DisplayMemberPath:" />
-                  <TextBox x:Name="txtDisplayMemberPath"
-                           Width="200"
-                           Margin="0,5,0,0"
-                           IsEnabled="False"
-                           Text="{Binding DisplayMemberPath, ElementName=defaultTokenizedTextBox}" />
-               </StackPanel>
 
-               <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="SearchMemberPaths:" />
-                  <TextBox x:Name="txtSearchMemberPath"
-                           Width="200"
-                           Margin="0,5,0,0"
-                           IsEnabled="False"
-                           Text="{Binding SearchMemberPaths, ElementName=defaultTokenizedTextBox}" />
-               </StackPanel>
 
-            </StackPanel>
 
-            <StackPanel x:Name="panel2"
-                        Grid.Column="1"
-                        Visibility="Collapsed">
 
-               <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="ValueMemberPath:" />
-                  <TextBox x:Name="txtHiddenValueMemberPath"
-                           Width="200"
-                           Margin="0,5,0,0"
-                           IsEnabled="False"
-                           Text="" />
-               </StackPanel>
 
-               <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="DisplayMemberPath:" />
-                  <TextBox x:Name="txtHiddenDisplayMemberPath"
-                           Width="200"
-                           Margin="0,5,0,0"
-                           IsEnabled="False"
-                           Text="" />
-               </StackPanel>
 
-               <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="SearchMemberPaths:" />
-                  <TextBox x:Name="txtHiddenSearchMemberPath"
-                           Width="200"
-                           Margin="0,5,0,0"
-                           IsEnabled="False"
-                           Text="" />
-               </StackPanel>
 
-            </StackPanel>
 
-            <StackPanel Grid.Row="1"
-                        Grid.ColumnSpan="2">
 
-               <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="Text:" />
-                  <TextBox x:Name="txtValue"
-                           Width="477"
-                           Margin="0,5,0,0"
-                           Text="{Binding Text, ElementName=defaultTokenizedTextBox}" />
-               </StackPanel>
 
-            </StackPanel>
-            <DockPanel Grid.Row="2"
-                       Grid.ColumnSpan="2"
-                       HorizontalAlignment="Stretch">
-               <TextBlock Text="SelectedItems:"
-                          DockPanel.Dock="Left" />
-               <Border BorderBrush="Gray"
-                       BorderThickness="1"
-                       Margin="5,5,0,0"
-                       Height="60"
-                       Width="477"
-                       SnapsToDevicePixels="True">
-                  <ScrollViewer>
-                     <ItemsControl ItemsSource="{Binding SelectedItems, ElementName=defaultTokenizedTextBox}"
-                                   HorizontalAlignment="Stretch">
-                        <ItemsControl.ItemsPanel>
-                           <ItemsPanelTemplate>
-                              <WrapPanel />
-                           </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                           <DataTemplate>
-                              <Border BorderThickness="1"
-                                      BorderBrush="Gray"
-                                      SnapsToDevicePixels="True"
-                                      Margin="3">
-                                 <StackPanel Orientation="Horizontal"
-                                             Margin="3">
-                                    <TextBlock Text="{Binding FirstName, FallbackValue=(String}"
-                                               Margin="0,0,5,0" />
-                                    <TextBlock Text="{Binding LastName, FallbackValue=Value)}" />
-                                 </StackPanel>
-                              </Border>
-                           </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                     </ItemsControl>
-                  </ScrollViewer>
-               </Border>
-            </DockPanel>
-         </Grid>
-        </GroupBox>
 
-        <StackPanel x:Name="_samplePanel" 
-                    Grid.Row="1" 
-                    Margin="10">
 
-            <TextBlock Text="Default:" 
-                       Margin="10"
-                       Style="{StaticResource Header}" />
 
-            <xctk:TokenizedTextBox x:Name="defaultTokenizedTextBox" 
-                                   Margin="10" 
-                                   Width="500"
-                                   HorizontalAlignment="Left"
-                                   AllowInvalidValues="False"
-                                   TokenDelimiter=";"
-                                   TokenDisplayMemberPath="FirstName"
-                                   DisplayMemberPath="LastName"
-                                   SearchMemberPaths="FirstName,LastName"
-                                   ItemsSource="{Binding Path=EmployeeList}" />
 
-            <TextBlock Text="Customized:" 
-                       Margin="10"
-                       Style="{StaticResource Header}" />
 
-         <xctk:TokenizedTextBox x:Name="customTokenizedTextBox"
-                                Margin="10"
-                                Width="500"
-                                HorizontalAlignment="Left"
-                                TokenDisplayMemberPath="{Binding TokenDisplayMemberPath, ElementName=defaultTokenizedTextBox}"
-                                AllowDuplicateValues="{Binding AllowDuplicateValues, ElementName=defaultTokenizedTextBox}"
-                                TokenDelimiter="{Binding TokenDelimiter, ElementName=defaultTokenizedTextBox}"
-                                SearchMemberPaths="{Binding SearchMemberPaths, ElementName=defaultTokenizedTextBox}"
-                                ItemsSource="{Binding Path=EmployeeList}">
 
-            
-            <xctk:TokenizedTextBox.ItemTemplate>
-               <DataTemplate>
-                  <StackPanel Orientation="Horizontal"
-                              ToolTip="This item's Italic font style was set using the ItemTemplate property">
-                     <TextBlock Text="{Binding FirstName}" FontStyle="Italic"/>
-                     <TextBlock Text="{Binding LastName}" FontStyle="Italic"
-                                Margin="5,0,0,0"/>
-                  </StackPanel>
-               </DataTemplate>
-            </xctk:TokenizedTextBox.ItemTemplate>
-            <xctk:TokenizedTextBox.TokenItemTemplate>
-               <DataTemplate>
-                  <StackPanel Orientation="Horizontal"
-                              ToolTip="This item's Bold font style was set using the TokenItemTemplate property">
-                     <TextBlock Text="{Binding FirstName}"
-                                FontWeight="Bold" />
-                     <TextBlock Text="{Binding LastName}"
-                                FontWeight="Bold"
-                                Margin="5,0,0,0" />
-                  </StackPanel>
-               </DataTemplate>
-            </xctk:TokenizedTextBox.TokenItemTemplate>
-            <xctk:TokenizedTextBox.TokenItemContainerStyle>
-               <Style TargetType="{x:Type xctk:TokenItem}">
-                  <Setter Property="Template">
-                     <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type xctk:TokenItem}">
-                           <DockPanel>
-                              <Button DockPanel.Dock="Right"
-                                      Margin="2,0,0,0"
-                                      Padding="0"
-                                      BorderThickness="1"
-                                      BorderBrush="Gray"
-                                      KeyboardNavigation.IsTabStop="False"
-                                      Click="OnDeleteToken"
-                                      ToolTip="This button was added using the TokenItemContainerStyle property">
-                                 <Grid>
-                                    <Path Stroke="Red"
-                                          StrokeThickness="2"
-                                          Data="M 1,1 L 10,10" />
-                                    <Path Stroke="Red"
-                                          StrokeThickness="2"
-                                          Data="M 1,10 L 10,1" />
-                                 </Grid>
-                              </Button>
-                              <ContentPresenter />
-                           </DockPanel>
-                        </ControlTemplate>
-                     </Setter.Value>
-                  </Setter>
-               </Style>
-            </xctk:TokenizedTextBox.TokenItemContainerStyle>            
-            
-         </xctk:TokenizedTextBox>
 
-      </StackPanel>
-    </Grid>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
+
+
     <Image Source="..\OpenSourceImages\TokenizedTextBox.png" Width="600" Height="400"/>
-   ##END-->
 </local:DemoView>

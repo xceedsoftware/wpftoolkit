@@ -496,16 +496,6 @@
 
       <ControlTemplate.Triggers>
 
-         <!-- Trigger related to the filteringToggleButton-->
-         <Trigger SourceName="toggleButton"
-                  Property="IsMouseOver"
-                  Value="True">
-
-            <Setter TargetName="toggleButton"
-                    Property="Opacity"
-                    Value="1" />
-         </Trigger>
-
          <Trigger Property="IsMouseOver"
                   Value="True">
 
@@ -646,12 +636,6 @@
             <Setter TargetName="PART_ColumnResizerThumbLeft"
                     Property="IsEnabled"
                     Value="False" />
-         </DataTrigger>
-
-         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.Visible}"
-                      Value="False">
-            <Setter Property="Visibility"
-                    Value="Collapsed" />
          </DataTrigger>
 
       </ControlTemplate.Triggers>
@@ -1224,6 +1208,10 @@
    <Style x:Key="tableViewZuneNormalColorDataRowStyle"
           TargetType="local:DataRow"
           BasedOn="{StaticResource tableViewZuneNormalColorRowStyle}">
+
+      <Setter Property="Template"
+              Value="{StaticResource tableViewDataRowTemplate}" />
+
    </Style>
 
    <!--**************************
@@ -1334,6 +1322,9 @@
            while preserving the background drawn by the underlying Row. -->
       <Setter Property="Background"
               Value="Transparent" />
+
+      <Setter Property="ToolTip"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.Description}" />
 
       <!-- In TableView, each Cell has the same width as its ParentColum's ActualWidth -->
       <Setter Property="Width"

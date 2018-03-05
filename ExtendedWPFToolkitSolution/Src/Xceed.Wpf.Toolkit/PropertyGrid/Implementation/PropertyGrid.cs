@@ -279,7 +279,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     #region IsVirtualizing
 
     public static readonly DependencyProperty IsVirtualizingProperty = DependencyProperty.Register( "IsVirtualizing", typeof( bool ), typeof( PropertyGrid )
-      , new UIPropertyMetadata( false ) );
+      , new UIPropertyMetadata( false, OnIsVirtualizingChanged ) );
     public bool IsVirtualizing
     {
       get
@@ -290,6 +290,18 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         SetValue( IsVirtualizingProperty, value );
       }
+    }
+
+    private static void OnIsVirtualizingChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var propertyGrid = o as PropertyGrid;
+      if( propertyGrid != null )
+        propertyGrid.OnIsVirtualizingChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+    }
+
+    protected virtual void OnIsVirtualizingChanged( bool oldValue, bool newValue )
+    {
+      this.UpdateContainerHelper();
     }
 
     #endregion //IsVirtualizing
@@ -693,6 +705,23 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //ShowAdvancedOptions
 
+    #region ShowHorizontalScrollBar
+
+    public static readonly DependencyProperty ShowHorizontalScrollBarProperty = DependencyProperty.Register( "ShowHorizontalScrollBar", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( false ) );
+    public bool ShowHorizontalScrollBar
+    {
+      get
+      {
+        return ( bool )GetValue( ShowHorizontalScrollBarProperty );
+      }
+      set
+      {
+        SetValue( ShowHorizontalScrollBarProperty, value );
+      }
+    }
+
+    #endregion //ShowHorizontalScrollBar
+
     #region ShowPreview
 
     public static readonly DependencyProperty ShowPreviewProperty = DependencyProperty.Register( "ShowPreview", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( false ) );
@@ -867,7 +896,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
-    #endregion //Base Class Overrides
+
+#endregion //Base Class Overrides
 
     #region Event Handlers
 
@@ -916,8 +946,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       var modifiedPropertyItem = e.OriginalSource as PropertyItem;
       if( modifiedPropertyItem != null )
       {
+        // Need to refresh the PropertyGrid Properties.
         if( modifiedPropertyItem.WillRefreshPropertyGrid )
+        {
+          // Refresh the PropertyGrid...this will set the initial Categories states.
           this.UpdateContainerHelper();
+        }
 
         var parentPropertyItem = modifiedPropertyItem.ParentNode as PropertyItem;
         if( ( parentPropertyItem != null ) && parentPropertyItem.IsExpandable )
@@ -1215,6 +1249,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion
 
+
+
+
+
+
     #region PreparePropertyItemEvent Attached Routed Event
 
     /// <summary>
@@ -1396,6 +1435,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return null;
     }
 
+
+
+
     #endregion
 
 
@@ -1452,17 +1494,47 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
   }
   #endregion
 
+  #region IsPropertyArgs class
+
+  public class PropertyArgs : RoutedEventArgs
+  {
+    #region Constructors
+
+    public PropertyArgs( PropertyDescriptor pd )
+    {
+      this.PropertyDescriptor = pd;
+    }
+
+    #endregion
+
+    #region Properties
+
+    #region PropertyDescriptor Property
+
+    public PropertyDescriptor PropertyDescriptor
+    {
+      get;
+      private set;
+    }
+
+    #endregion
+
+    #endregion
+  }
+
+  #endregion
+
   #region isPropertyBrowsableEvent Handler/Args
 
   public delegate void IsPropertyBrowsableHandler( object sender, IsPropertyBrowsableArgs e );
 
-  public class IsPropertyBrowsableArgs : RoutedEventArgs
+  public class IsPropertyBrowsableArgs : PropertyArgs
   {
     #region Constructors
 
     public IsPropertyBrowsableArgs( PropertyDescriptor pd )
+      : base( pd )
     {
-      this.PropertyDescriptor = pd;
     }
 
     #endregion
@@ -1479,19 +1551,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion
 
-    #region PropertyDescriptor Property
-
-    public PropertyDescriptor PropertyDescriptor
-    {
-      get;
-      private set;
-    }
-
-    #endregion
-
     #endregion
   }
 
   #endregion
+
+
+
+
+
+
+
+
+
+
+
 
 }

@@ -183,6 +183,47 @@
    <SolidColorBrush x:Key="repeatButtonBorderDefaultBackgrounBrush"
                     Color="Transparent" />
 
+   <!--These Brushes are the basic light and dark borders for the controls-->
+   <LinearGradientBrush x:Key="basicWhiteBorderBrush"
+                        EndPoint="1.11,1.10"
+                        StartPoint="-0.03,-0.04">
+      <GradientStop Color="White" />
+      <GradientStop Offset="1"
+                    Color="White" />
+      <GradientStop Offset="0.5" />
+   </LinearGradientBrush>
+
+   <LinearGradientBrush x:Key="basicBlackBorderBrush"
+                        EndPoint="1.18,1.16"
+                        StartPoint="-0.21,-0.19">
+      <GradientStop Color="Black"
+                    Offset="1" />
+      <GradientStop Color="#00000000"
+                    Offset="0.47" />
+      <GradientStop Color="Black" />
+   </LinearGradientBrush>
+
+   <!-- Used for DatePicker-->
+   <LinearGradientBrush x:Key="SelectedDatePickerItemBorderBrush"
+                        EndPoint="0.5,1"
+                        StartPoint="0.5,0">
+      <GradientStop Color="White"
+                    Offset="0.509" />
+      <GradientStop Color="#7FFFFFFF"
+                    Offset="1" />
+      <GradientStop Offset="0"
+                    Color="#7FFFFFFF" />
+   </LinearGradientBrush>
+
+   <LinearGradientBrush x:Key="SelectedDatePickerItemBackground"
+                        EndPoint="0.5,1"
+                        StartPoint="0.5,0">
+      <GradientStop Color="#FFA8F5FB"
+                    Offset="0.703" />
+      <GradientStop Color="White"
+                    Offset="0.293" />
+   </LinearGradientBrush>
+
    <DataTemplate x:Key="leafGlyph">
       <Viewbox RenderTransformOrigin="0.5,0.5">
          <Viewbox.LayoutTransform>
@@ -476,7 +517,7 @@
                              Property="Background"
                              Value="{StaticResource checkBoxBorderPressedBackgroundBrush}" />
                   </Trigger>
-                     <Trigger Property="IsChecked"
+                  <Trigger Property="IsChecked"
                            Value="true">
                      <Setter TargetName="CheckMark"
                              Property="Visibility"
@@ -1599,6 +1640,9 @@
 
    </Style>
 
+   <Style TargetType="{x:Type ScrollViewer}"
+          BasedOn="{StaticResource ScrollViewerWindows7}" />
+
    <Style x:Key="windows7ComboBoxStyle"
           TargetType="{x:Type ComboBox}">
 
@@ -1684,8 +1728,8 @@
 
                            <!-- The StackPanel is used to display the children by setting IsItemsHost to be True -->
                            <StackPanel IsItemsHost="True"
-                                       KeyboardNavigation.DirectionalNavigation="Contained" 
-                                       TextElement.Foreground="White"/>
+                                       KeyboardNavigation.DirectionalNavigation="Contained"
+                                       TextElement.Foreground="White" />
 
                         </ScrollViewer>
 
@@ -1887,11 +1931,12 @@
       </Setter>
 
       <Style.Triggers>
-         <Trigger Property="IsVisible" Value="True">
+         <Trigger Property="IsVisible"
+                  Value="True">
             <Setter Property="HorizontalContentAlignment"
-                    Value="{Binding Path=HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                    Value="{Binding Path=HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
             <Setter Property="VerticalContentAlignment"
-                    Value="{Binding Path=VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                    Value="{Binding Path=VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
          </Trigger>
       </Style.Triggers>
    </Style>
@@ -1944,7 +1989,8 @@
           TargetType="{x:Type RepeatButton}">
       <Setter Property="Template">
          <Setter.Value>
-            <ControlTemplate TargetType="{x:Type RepeatButton}"><Border Background="Transparent">
+            <ControlTemplate TargetType="{x:Type RepeatButton}">
+               <Border Background="Transparent">
                   <ContentPresenter x:Name="glyphZone">
                      <ContentPresenter.Content>
                         <Canvas x:Name="leftArrowCanvas"

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -21,11 +21,10 @@
                         xmlns:sys="clr-namespace:System;assembly=mscorlib"
                         xmlns:winConv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Converters"
                         Title="MaterialSlider">
-   <local:DemoView.Description>
-      <!-- TODODOC-->
-      <Paragraph FontSize="14"
-                 FontFamily="Segoe">
-         <Run>A Slider with customizable and animated thumb and bubble that is using the Material Brushes.</Run>
+  <local:DemoView.Description>
+    <Paragraph FontSize="14"
+               FontFamily="Segoe">
+      <Run>A Slider with customizable and animated thumb and bubble that is using the Material Brushes.</Run>
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -33,8 +32,8 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
-      </Paragraph>
-   </local:DemoView.Description>
+    </Paragraph>
+  </local:DemoView.Description>
 
 
 

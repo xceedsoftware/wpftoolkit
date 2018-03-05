@@ -23,8 +23,6 @@ namespace Xceed.Wpf.DataGrid
 {
   internal class DetailConfigurationCollection : ObservableCollection<DetailConfiguration>, IWeakEventListener
   {
-    #region CONSTRUCTORS
-
     internal DetailConfigurationCollection( DataGridControl dataGridControl, DetailConfiguration parentDetailConfiguration )
       : base()
     {
@@ -32,7 +30,38 @@ namespace Xceed.Wpf.DataGrid
       this.ParentDetailConfiguration = parentDetailConfiguration;
     }
 
-    #endregion CONSTRUCTORS
+    #region DataGridControl Property
+
+    internal DataGridControl DataGridControl
+    {
+      get
+      {
+        return m_dataGridControl;
+      }
+      set
+      {
+        if( m_dataGridControl == value )
+          return;
+
+        m_dataGridControl = value;
+
+        this.OnPropertyChanged( new PropertyChangedEventArgs( "DataGridControl" ) );
+      }
+    }
+
+    private DataGridControl m_dataGridControl;
+
+    #endregion
+
+    #region ParentDetailConfiguration Property
+
+    internal DetailConfiguration ParentDetailConfiguration
+    {
+      get;
+      set;
+    }
+
+    #endregion
 
     public DetailConfiguration this[ string relationName ]
     {
@@ -108,6 +137,11 @@ namespace Xceed.Wpf.DataGrid
 
     bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
+      return this.OnReceiveWeakEvent( managerType, sender, e );
+    }
+
+    protected virtual bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
       if( managerType == typeof( DetailVisibilityChangedEventManager ) )
       {
         if( this.DetailVisibilityChanged != null )
@@ -118,39 +152,6 @@ namespace Xceed.Wpf.DataGrid
         return true;
       }
       return false;
-    }
-
-    #endregion
-
-    #region DataGridControl Property
-
-    internal DataGridControl DataGridControl
-    {
-      get
-      {
-        return m_dataGridControl;
-      }
-      set
-      {
-        if( m_dataGridControl == value )
-          return;
-
-        m_dataGridControl = value;
-
-        this.OnPropertyChanged( new PropertyChangedEventArgs( "DataGridControl" ) );
-      }
-    }
-
-    private DataGridControl m_dataGridControl;
-
-    #endregion
-
-    #region ParentDetailConfiguration Property
-
-    internal DetailConfiguration ParentDetailConfiguration
-    {
-      get;
-      set;
     }
 
     #endregion

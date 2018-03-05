@@ -24,7 +24,6 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Xceed.Wpf.Toolkit.Primitives;
-using System.Diagnostics;
 using Xceed.Wpf.Toolkit.Core;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 
@@ -530,6 +529,9 @@ namespace Xceed.Wpf.Toolkit
         _windowControl.IsBlockMouseInputsPanelActive = this.IsBlockMouseInputsPanelActive;
       }
     }
+
+
+
 
     #endregion //Base Class Overrides
 

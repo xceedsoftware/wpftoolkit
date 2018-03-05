@@ -15,8 +15,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -28,15 +26,15 @@ namespace Xceed.Wpf.DataGrid
     static HierarchicalGroupLevelIndicatorPane()
     {
       // This DefaultStyleKey will only be used in design-time.
-      DefaultStyleKeyProperty.OverrideMetadata( typeof( HierarchicalGroupLevelIndicatorPane ), new FrameworkPropertyMetadata( new Markup.ThemeKey( typeof( Views.TableView ), typeof( HierarchicalGroupLevelIndicatorPane ) ) ) );
+      FrameworkElement.DefaultStyleKeyProperty.OverrideMetadata( typeof( HierarchicalGroupLevelIndicatorPane ), new FrameworkPropertyMetadata( new Markup.ThemeKey( typeof( Views.TableView ), typeof( HierarchicalGroupLevelIndicatorPane ) ) ) );
 
-      FocusableProperty.OverrideMetadata( typeof( HierarchicalGroupLevelIndicatorPane ), new FrameworkPropertyMetadata( false ) );
+      UIElement.FocusableProperty.OverrideMetadata( typeof( HierarchicalGroupLevelIndicatorPane ), new FrameworkPropertyMetadata( false ) );
 
       DataGridControl.ParentDataGridControlPropertyKey.OverrideMetadata( typeof( HierarchicalGroupLevelIndicatorPane ), new FrameworkPropertyMetadata( new PropertyChangedCallback( OnParentDataGridControlChanged ) ) );
-      DataGridControl.DataGridContextPropertyKey.OverrideMetadata( typeof( HierarchicalGroupLevelIndicatorPane ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.Inherits, new PropertyChangedCallback( OnDataGridContextChanged ) ) );
+      DataGridControl.DataGridContextPropertyKey.OverrideMetadata( typeof( HierarchicalGroupLevelIndicatorPane ), new FrameworkPropertyMetadata( new PropertyChangedCallback( OnDataGridContextChanged ) ) );
     }
 
-    #region GroupLevelIndicatorPaneHost Read-Only Property
+    #region GroupLevelIndicatorPaneHost Private Property
 
     private Panel GroupLevelIndicatorPaneHost
     {
@@ -45,7 +43,7 @@ namespace Xceed.Wpf.DataGrid
         //if there is no local storage for the host panel, try to retrieve and store the value
         if( m_storedGroupLevelIndicatorPaneHost == null )
         {
-          m_storedGroupLevelIndicatorPaneHost = this.RetrieveGroupLevelIndicatorPaneHostPanel();
+          m_storedGroupLevelIndicatorPaneHost = this.GetTemplateChild( "PART_GroupLevelIndicatorHost" ) as Panel;
         }
 
         return m_storedGroupLevelIndicatorPaneHost;
@@ -54,7 +52,7 @@ namespace Xceed.Wpf.DataGrid
 
     private Panel m_storedGroupLevelIndicatorPaneHost = null;
 
-    #endregion GroupLevelIndicatorPaneHost Read-Only Property
+    #endregion
 
     #region GroupLevelIndicatorPaneNeedsRefresh Private Property
 
@@ -62,18 +60,18 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        Panel panel = this.GroupLevelIndicatorPaneHost;
+        var panel = this.GroupLevelIndicatorPaneHost;
         if( panel == null )
           return false;
 
-        DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
+        var dataGridContext = DataGridControl.GetDataGridContext( this );
         if( dataGridContext == null )
           return false;
 
         //skip the "current" DataGridContext
         dataGridContext = dataGridContext.ParentDataGridContext;
 
-        int expectedIndicatorsCount = 0;
+        var expectedIndicatorsCount = 0;
         for( ; dataGridContext != null; dataGridContext = dataGridContext.ParentDataGridContext )
         {
           //a group indicator and a detail indicator should exist per level
@@ -96,107 +94,106 @@ namespace Xceed.Wpf.DataGrid
 
     internal virtual void PrepareDefaultStyleKey( Xceed.Wpf.DataGrid.Views.ViewBase view )
     {
-      this.DefaultStyleKey = view.GetDefaultStyleKey( typeof( HierarchicalGroupLevelIndicatorPane ) );
+      var newThemeKey = view.GetDefaultStyleKey( typeof( HierarchicalGroupLevelIndicatorPane ) );
+      if( object.Equals( this.DefaultStyleKey, newThemeKey ) )
+        return;
+
+      this.DefaultStyleKey = newThemeKey;
     }
 
     protected override Size MeasureOverride( Size availableSize )
     {
-      Panel panel = this.GroupLevelIndicatorPaneHost;
+      var panel = this.GroupLevelIndicatorPaneHost;
+      if( panel == null )
+        return base.MeasureOverride( availableSize );
 
-      if( panel != null )
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
+      if( ( dataGridContext == null ) || !this.GroupLevelIndicatorPaneNeedsRefresh )
+        return base.MeasureOverride( availableSize );
+
+      //clear all the panel's children!
+      panel.Children.Clear();
+
+      var previousContext = dataGridContext;
+      var runningDataGridContext = dataGridContext.ParentDataGridContext;
+
+      while( runningDataGridContext != null )
       {
-        DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
+        //create a GroupLevelIndicator to create indentation between the GLIPs
+        FrameworkElement newGroupMargin = new DetailIndicator();
+        newGroupMargin.DataContext = dataGridContext;
 
-        if( dataGridContext != null )
+        object bindingSource = dataGridContext.GetDefaultDetailConfigurationForContext();
+        if( bindingSource == null )
         {
-          if( this.GroupLevelIndicatorPaneNeedsRefresh )
-          {
-            //clear all the panel's children!
-            panel.Children.Clear();
+          bindingSource = dataGridContext.SourceDetailConfiguration;
+        }
 
-            DataGridContext previousContext = dataGridContext;
-            DataGridContext runningDataGridContext = dataGridContext.ParentDataGridContext;
+        //Bind the GroupLevelIndicator`s style to the running DataGridContext`s GroupLevelIndicatorStyle.
+        var groupLevelIndicatorStyleBinding = new Binding();
+        groupLevelIndicatorStyleBinding.Path = new PropertyPath( DetailConfiguration.DetailIndicatorStyleProperty );
+        groupLevelIndicatorStyleBinding.Source = bindingSource;
+        newGroupMargin.SetBinding( StyleProperty, groupLevelIndicatorStyleBinding );
 
-            while( runningDataGridContext != null )
-            {
-              //create a GroupLevelIndicator to create indentation between the GLIPs
-              FrameworkElement newGroupMargin = null;
-              newGroupMargin = new DetailIndicator();
-              newGroupMargin.DataContext = dataGridContext;
+        //insert the Spacer GroupLevelIndicator in the panel
+        panel.Children.Insert( 0, newGroupMargin );
 
-              object bindingSource = dataGridContext.GetDefaultDetailConfigurationForContext();
-              if( bindingSource == null )
-                bindingSource = dataGridContext.SourceDetailConfiguration;
+        if( !runningDataGridContext.AreDetailsFlatten )
+        {
+          //then create the GLIP for the running DataGridContext
+          var newSubGLIP = new GroupLevelIndicatorPane();
+          DataGridControl.SetDataGridContext( newSubGLIP, runningDataGridContext );
+          newSubGLIP.SetIsLeaf( false );
+          GroupLevelIndicatorPane.SetGroupLevel( newSubGLIP, -1 );
 
-              //Bind the GroupLevelIndicator`s style to the running DataGridContext`s GroupLevelIndicatorStyle.
-              Binding groupLevelIndicatorStyleBinding = new Binding();
-              groupLevelIndicatorStyleBinding.Path = new PropertyPath( DetailConfiguration.DetailIndicatorStyleProperty );
-              groupLevelIndicatorStyleBinding.Source = bindingSource;
-              newGroupMargin.SetBinding( StyleProperty, groupLevelIndicatorStyleBinding );
+          //and insert it in the panel.
+          panel.Children.Insert( 0, newSubGLIP );
+        }
 
-              //insert the Spacer GroupLevelIndicator in the panel
-              panel.Children.Insert( 0, newGroupMargin );
-
-              if( !runningDataGridContext.AreDetailsFlatten )
-              {
-                //then create the GLIP for the running DataGridContext
-                GroupLevelIndicatorPane newSubGLIP = new GroupLevelIndicatorPane();
-                DataGridControl.SetDataGridContext( newSubGLIP, runningDataGridContext );
-                newSubGLIP.SetIsLeaf( false );
-                GroupLevelIndicatorPane.SetGroupLevel( newSubGLIP, -1 );
-
-                //and insert it in the panel.
-                panel.Children.Insert( 0, newSubGLIP );
-              }
-
-              previousContext = runningDataGridContext;
-              runningDataGridContext = runningDataGridContext.ParentDataGridContext;
-            } //end of the loop to cycle through the parent contexts.
-          } // end if GroupLevelIndicatorPaneNeedsRefresh
-        } // end if dataGridContext != null
-      } //end if panel is not null
+        previousContext = runningDataGridContext;
+        runningDataGridContext = runningDataGridContext.ParentDataGridContext;
+      }
 
       return base.MeasureOverride( availableSize );
     }
 
     private static void OnParentDataGridControlChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      HierarchicalGroupLevelIndicatorPane self = ( HierarchicalGroupLevelIndicatorPane )sender;
-      DataGridControl grid = e.OldValue as DataGridControl;
+      var self = sender as HierarchicalGroupLevelIndicatorPane;
+      if( self == null )
+        return;
 
-      //unsubsribe from the old DataGridControl (the GLIP was disconnected)
-      if( grid != null )
+      var dataGridControl = e.OldValue as DataGridControl;
+      if( dataGridControl != null )
       {
-        DetailsChangedEventManager.RemoveListener( grid, self );
+        DetailsChangedEventManager.RemoveListener( dataGridControl, self );
       }
 
-      grid = e.NewValue as DataGridControl;
+      dataGridControl = e.NewValue as DataGridControl;
 
       //register to the parent grid control's Items Collection GroupDescriptions Changed event
-      if( grid != null )
+      if( dataGridControl != null )
       {
-        self.PrepareDefaultStyleKey( grid.GetView() );
+        self.PrepareDefaultStyleKey( dataGridControl.GetView() );
 
-        DetailsChangedEventManager.AddListener( grid, self );
+        DetailsChangedEventManager.AddListener( dataGridControl, self );
         self.InvalidateMeasure();
       }
     }
 
     private static void OnDataGridContextChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      HierarchicalGroupLevelIndicatorPane self = ( HierarchicalGroupLevelIndicatorPane )sender;
-      Panel panel = self.GroupLevelIndicatorPaneHost;
+      var self = sender as HierarchicalGroupLevelIndicatorPane;
+      if( self == null )
+        return;
 
+      var panel = self.GroupLevelIndicatorPaneHost;
       if( panel != null )
       {
         panel.Children.Clear();
       }
-    }
 
-    private Panel RetrieveGroupLevelIndicatorPaneHostPanel()
-    {
-      //get the template part
-      return this.GetTemplateChild( "PART_GroupLevelIndicatorHost" ) as Panel;
+      self.InvalidateMeasure();
     }
 
     #region IWeakEventListener Members

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -27,12 +27,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
-#if !OPEN_SOURCE
-using Xceed.Wpf.Themes.Metro;
-using System.Diagnostics;
-using Xceed.Wpf.Themes.Office2007;
-using Xceed.Wpf.Themes.Windows10;
-#endif
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
 {
@@ -41,13 +35,8 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
   /// </summary>
   public partial class ThemingAvalonDockView : DemoView
   {
-#if !OPEN_SOURCE
-    #region Members
 
-    private Brush _accentBrush = new SolidColorBrush( System.Windows.Media.Color.FromRgb( 255, 152, 29 ) );
 
-    #endregion
-#endif
 
     #region constructors
 
@@ -65,18 +54,10 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
     {
       AvalonDockComboBoxItem comboBoxItem = sender as AvalonDockComboBoxItem;
 
-#if OPEN_SOURCE
       if( comboBoxItem != null )
       {
         this.SetOpenSourceImage( comboBoxItem );
       }
-#else
-      this.SetInternalControlsTheme( comboBoxItem );
-      if( _accentColorPanel != null )
-      {
-        _accentColorPanel.Visibility = Visibility.Hidden;
-      }
-#endif
     }
 
     private void AvalonDockControlsThemes_Initialized( object sender, EventArgs e )
@@ -87,68 +68,24 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
     private void MetroComboBoxItem_Selected( object sender, RoutedEventArgs e )
     {
       AvalonDockComboBoxItem comboBoxItem = sender as AvalonDockComboBoxItem;
-#if OPEN_SOURCE
       if( comboBoxItem != null )
       {
         this.SetOpenSourceImage( comboBoxItem );
       }
-#else
-      this.SetInternalControlsTheme( comboBoxItem );
-      if( comboBoxItem != null )
-      {
-        comboBoxItem.Tag = this.GetAvalonDockMetroTheme( ( comboBoxItem.ThemeEnum == AvalonDockThemesEnum.MetroDark )
-                                                      ? new Xceed.Wpf.AvalonDock.Themes.MetroAccent.AvalonDockMetroDarkThemeResourceDictionary() as MetroThemeResourceDictionaryBase
-                                                      : new Xceed.Wpf.AvalonDock.Themes.MetroAccent.AvalonDockMetroLightThemeResourceDictionary() as MetroThemeResourceDictionaryBase );
-    }
-#endif
     }
 
-#if !OPEN_SOURCE
 
-    private void RadioButton_Checked( object sender, RoutedEventArgs e )
-    {
-      RadioButton button = sender as RadioButton;
-      if( button == null )
-        return;
 
-      _accentBrush = button.Background;
-      if( _accentBrush == null )
-        return;
 
-      AvalonDockComboBoxItem comboBoxItem = _themeCombo.SelectedItem as AvalonDockComboBoxItem;
 
-      if( comboBoxItem != null )
-      {
-        this.SetInternalControlsTheme( comboBoxItem );
 
-        if( comboBoxItem.ThemeEnum == AvalonDockThemesEnum.MetroDark )
-        {
-          metroDarkComboBoxItem.Tag = this.GetAvalonDockMetroTheme( new Xceed.Wpf.AvalonDock.Themes.MetroAccent.AvalonDockMetroDarkThemeResourceDictionary() );
-        }
-        else if( comboBoxItem.ThemeEnum == AvalonDockThemesEnum.MetroLight )
-        {
-          metroLightComboBoxItem.Tag = this.GetAvalonDockMetroTheme( new Xceed.Wpf.AvalonDock.Themes.MetroAccent.AvalonDockMetroLightThemeResourceDictionary() );
-        }
-      }
-    }
 
-    private Xceed.Wpf.AvalonDock.Themes.MetroAccentTheme GetAvalonDockMetroTheme( MetroThemeResourceDictionaryBase metroThemeResourceDictionary )
-    {
-      if( _accentColorPanel != null )
-      {
-        _accentColorPanel.Visibility = Visibility.Visible;
-      }
-      metroThemeResourceDictionary.AccentBrush = _accentBrush;
-      return new Xceed.Wpf.AvalonDock.Themes.MetroAccentTheme( metroThemeResourceDictionary );
-    }
 
-#endif
 
     #endregion
 
     #region private Methods
 
-#if OPEN_SOURCE
 
      private void SetOpenSourceImage( AvalonDockComboBoxItem comboBoxItem )
     {
@@ -204,86 +141,10 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
       }
     }
 
-#else
 
-    private void SetInternalControlsTheme( AvalonDockComboBoxItem comboBoxItem )
-    {
-      if( ( comboBoxItem == null ) || ( SampleBorder == null ) )
-        return;
 
-      SampleBorder.Resources.MergedDictionaries.Clear();
 
-      if( comboBoxItem != null )
-      {
-        switch( comboBoxItem.ThemeEnum )
-        {
-          case AvalonDockThemesEnum.Generic:
-          case AvalonDockThemesEnum.Aero:
-          case AvalonDockThemesEnum.VS2010:
-          case AvalonDockThemesEnum.Metro:
-            break;
-          case AvalonDockThemesEnum.Office2007Black:
-            Office2007BlackResourceDictionary office2007Black = new Xceed.Wpf.Themes.Office2007.Office2007BlackResourceDictionary();
-            if( !string.IsNullOrEmpty( Xceed.Wpf.Toolkit.Licenser.LicenseKey ) )
-            {
-              office2007Black.LicenseKey = Xceed.Wpf.Toolkit.Licenser.LicenseKey;
-            }
-            SampleBorder.Resources.MergedDictionaries.Add( office2007Black );
-            SampleBorder.Resources.MergedDictionaries.Add( new Xceed.Wpf.Toolkit.Themes.Office2007.Office2007BlackResourceDictionary() );
-            break;
-          case AvalonDockThemesEnum.Office2007Blue:
-            Office2007BlueResourceDictionary office2007Blue = new Xceed.Wpf.Themes.Office2007.Office2007BlueResourceDictionary();
-            if( !string.IsNullOrEmpty( Xceed.Wpf.Toolkit.Licenser.LicenseKey ) )
-            {
-              office2007Blue.LicenseKey = Xceed.Wpf.Toolkit.Licenser.LicenseKey;
-            }
-            SampleBorder.Resources.MergedDictionaries.Add( office2007Blue );
-            SampleBorder.Resources.MergedDictionaries.Add( new Xceed.Wpf.Toolkit.Themes.Office2007.Office2007BlueResourceDictionary() );
-            break;
-          case AvalonDockThemesEnum.Office2007Silver:
-            Office2007SilverResourceDictionary office2007Silver = new Xceed.Wpf.Themes.Office2007.Office2007SilverResourceDictionary();
-            if( !string.IsNullOrEmpty( Xceed.Wpf.Toolkit.Licenser.LicenseKey ) )
-            {
-              office2007Silver.LicenseKey = Xceed.Wpf.Toolkit.Licenser.LicenseKey;
-            }
-            SampleBorder.Resources.MergedDictionaries.Add( office2007Silver );
-            SampleBorder.Resources.MergedDictionaries.Add( new Xceed.Wpf.Toolkit.Themes.Office2007.Office2007SilverResourceDictionary() );
-            break;
-          case AvalonDockThemesEnum.Windows10:
-            Windows10ResourceDictionary windows10 = new Xceed.Wpf.Themes.Windows10.Windows10ResourceDictionary();
-            if( !string.IsNullOrEmpty( Xceed.Wpf.Toolkit.Licenser.LicenseKey ) )
-            {
-              windows10.LicenseKey = Xceed.Wpf.Toolkit.Licenser.LicenseKey;
-            }
-            SampleBorder.Resources.MergedDictionaries.Add( windows10 );
-            SampleBorder.Resources.MergedDictionaries.Add( new Xceed.Wpf.Toolkit.Themes.Windows10.Windows10ResourceDictionary() );
-            break;
-          case AvalonDockThemesEnum.MetroDark:
-            MetroDarkThemeResourceDictionary darkTheme = new Xceed.Wpf.Themes.Metro.MetroDarkThemeResourceDictionary( _accentBrush );
-            if( !string.IsNullOrEmpty( Xceed.Wpf.Toolkit.Licenser.LicenseKey ) )
-            {
-              darkTheme.LicenseKey = Xceed.Wpf.Toolkit.Licenser.LicenseKey;
-            }
-            SampleBorder.Resources.MergedDictionaries.Add( darkTheme );
-            SampleBorder.Resources.MergedDictionaries.Add( new Xceed.Wpf.Toolkit.Themes.Metro.ToolkitMetroDarkThemeResourceDictionary( _accentBrush ) );
-            break;
-          case AvalonDockThemesEnum.MetroLight:
-            MetroLightThemeResourceDictionary lightTheme = new Xceed.Wpf.Themes.Metro.MetroLightThemeResourceDictionary( _accentBrush );
-            if( !string.IsNullOrEmpty( Xceed.Wpf.Toolkit.Licenser.LicenseKey ) )
-            {
-              lightTheme.LicenseKey = Xceed.Wpf.Toolkit.Licenser.LicenseKey;
-            }
-            SampleBorder.Resources.MergedDictionaries.Add( lightTheme );
-            SampleBorder.Resources.MergedDictionaries.Add( new Xceed.Wpf.Toolkit.Themes.Metro.ToolkitMetroLightThemeResourceDictionary( _accentBrush ) );
-            break;
-          default:
-            Debug.Assert( false, "Unknown theme" );
-            break;
-        }
-      }
-    }
 
-#endif
 
     #endregion
   }

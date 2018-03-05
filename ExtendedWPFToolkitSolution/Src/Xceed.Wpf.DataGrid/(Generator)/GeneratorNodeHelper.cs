@@ -15,224 +15,130 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Data;
 
 namespace Xceed.Wpf.DataGrid
 {
-  internal class GeneratorNodeHelper
+  internal sealed class GeneratorNodeHelper
   {
-    public GeneratorNodeHelper( GeneratorNode initialPointer, int index, int sourceDataIndex )
+    internal GeneratorNodeHelper( GeneratorNode startNode, int index, int sourceDataIndex )
     {
-      if( initialPointer == null )
-        throw new ArgumentNullException( "initialPointer" );
+      if( startNode == null )
+        throw new ArgumentNullException( "startNode" );
 
-      m_currentNode = initialPointer;
-      m_index = index;
-      m_sourceDataIndex = sourceDataIndex;
+      m_state = new State( startNode, index, sourceDataIndex );
     }
 
-    //-------------
-    // Properties
-
-    public GeneratorNode CurrentNode
+    internal GeneratorNode CurrentNode
     {
       get
       {
-        return m_currentNode;
+        return m_state.Node;
       }
     }
 
-    public int Index
+    internal int Index
     {
       get
       {
-        return m_index;
+        return m_state.Index;
       }
     }
 
-    public int SourceDataIndex
+    internal int SourceDataIndex
     {
       get
       {
-        return m_sourceDataIndex;
+        return m_state.DataIndex;
       }
     }
 
-    //-------------
-    // Methods
-
-    public bool MoveToNext()
+    internal bool MoveToNext()
     {
-      if( m_currentNode.Next != null )
-      {
-        GroupGeneratorNode groupNode = m_currentNode as GroupGeneratorNode;
+      var success = GeneratorNodeHelper.MoveToNext( ref m_state );
 
-        if( groupNode != null )
-        {
-          m_sourceDataIndex += groupNode.TotalLeafCount;
-        }
+      this.EnsureState();
 
-        m_index += m_currentNode.ItemCount;
-        m_currentNode = m_currentNode.Next;
-        return true;
-      }
-
-      return false;
+      return success;
     }
 
-    public bool MoveToNextBy( int count )
+    internal bool MoveToNextBy( int count )
     {
-      GeneratorNode originalNode = m_currentNode;
-      int originalIndex = m_index;
-      int originalSourceDataIndex = m_sourceDataIndex;
+      var success = GeneratorNodeHelper.MoveToNext( ref m_state, count );
 
-      for( int i = 0; i < count; i++ )
-      {
-        //if we are not capable of moving forward to the item specified, problem.... throw.
-        if( !this.MoveToNext() )
-        {
-          m_currentNode = originalNode;
-          m_index = originalIndex;
-          m_sourceDataIndex = originalSourceDataIndex;
-          return false;
-        }
-      }
+      this.EnsureState();
+
+      return success;
+    }
+
+    internal bool MoveToPrevious()
+    {
+      var success = GeneratorNodeHelper.MoveToPrevious( ref m_state );
+
+      this.EnsureState();
+
+      return success;
+    }
+
+    internal bool MoveToFirst()
+    {
+      GeneratorNodeHelper.MoveToFirst( ref m_state );
+
+      this.EnsureState();
 
       return true;
     }
 
-    //internal use only
-    public bool MoveToPrevious()
+    internal bool MoveToEnd()
     {
-      if( m_currentNode.Previous != null )
-      {
-        m_currentNode = m_currentNode.Previous;
-        GroupGeneratorNode groupNode = m_currentNode as GroupGeneratorNode;
-
-        if( groupNode != null )
-        {
-          m_sourceDataIndex -= groupNode.TotalLeafCount;
-        }
-
-        m_index -= m_currentNode.ItemCount;
-        return true;
-      }
-
-      return false;
-    }
-
-    public bool MoveToFirst()
-    {
-      //this function stays at the same level and moves to the first node
-      while( this.MoveToPrevious() )
+      // We call MoveToNext instead of MoveToEnd because MoveToEnd includes the indexes of the last node.
+      while( GeneratorNodeHelper.MoveToNext( ref m_state ) )
       {
       }
+
+      this.EnsureState();
 
       return true;
     }
 
-    public bool MoveToEnd()
+    internal bool MoveToChild( bool skipItemLessGroupNodes )
     {
-      //this function stays at the same level and moves to the end
-      while( this.MoveToNext() )
-      {
-      }
+      var success = GeneratorNodeHelper.MoveToChild( ref m_state, skipItemLessGroupNodes );
 
-      return true;
+      this.EnsureState();
+
+      return success;
     }
 
-    public bool MoveToChild()
+    internal bool MoveToParent()
     {
-      return this.MoveToChild( true );
+      var success = GeneratorNodeHelper.MoveToParent( ref m_state );
+
+      this.EnsureState();
+
+      return success;
     }
 
-    public bool MoveToChild( bool skipItemLessGroupNodes )
-    {
-      GroupGeneratorNode groupNode = m_currentNode as GroupGeneratorNode;
-
-      if( ( groupNode == null ) || ( groupNode.Child == null ) )
-        return false;
-
-      if( ( skipItemLessGroupNodes ) && ( !( groupNode.ItemCount > 0 ) ) )
-        return false;
-
-      m_currentNode = groupNode.Child;
-      return true;
-    }
-
-    public bool MoveToParent()
-    {
-      GeneratorNode originalNode = m_currentNode;
-      int originalIndex = m_index;
-      int originalSourceDataIndex = m_sourceDataIndex;
-
-      //move until we arrive at the first of the linked list.
-      while( this.MoveToPrevious() )
-      {
-      }
-
-      //if the first does not have a parent, then... error.
-      if( m_currentNode.Parent != null )
-      {
-        m_currentNode = m_currentNode.Parent;
-        return true;
-      }
-
-      //if there was an error, revert to the original node;
-      m_currentNode = originalNode;
-      m_index = originalIndex;
-      m_sourceDataIndex = originalSourceDataIndex;
-      return false;
-    }
-
-    public bool MoveToFollowing()
-    {
-      bool retval = false;
-      GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( m_currentNode, m_index, m_sourceDataIndex );
-
-      while( !retval )
-      {
-        retval = nodeHelper.MoveToNext();
-
-        if( !retval )
-        {
-          if( !nodeHelper.MoveToParent() )
-          {
-            //cannot move to parent and could not move to next, this is the end of the chain.
-            break;
-          }
-        }
-      }
-
-      if( retval )
-      {
-        m_currentNode = nodeHelper.CurrentNode;
-        m_index = nodeHelper.Index;
-        m_sourceDataIndex = nodeHelper.SourceDataIndex;
-      }
-
-      return retval;
-    }
-
-    public bool InsertAfter( GeneratorNode insert )
+    internal bool InsertAfter( GeneratorNode insert )
     {
       if( insert == null )
         throw new DataGridInternalException( "GeneratorNode is null." );
 
-      int insertionCount;
-      int chainLength;
-      GeneratorNode insertLast = GeneratorNodeHelper.EvaluateChain( insert, out insertionCount, out chainLength );
+      var insertionCount = default( int );
+      var chainLength = default( int );
+      var insertLast = GeneratorNodeHelper.EvaluateChain( insert, out insertionCount, out chainLength );
 
-      if( m_currentNode.Next != null )
+      var nextNode = m_state.Node.Next;
+      if( nextNode != null )
       {
-        m_currentNode.Next.Previous = insertLast;
+        nextNode.Previous = insertLast;
       }
 
-      insertLast.Next = m_currentNode.Next;
-      insert.Previous = m_currentNode;
-      m_currentNode.Next = insert;
+      insertLast.Next = nextNode;
+      insert.Previous = m_state.Node;
+      m_state.Node.Next = insert;
 
       // Move the current node to the last node inserted
       if( !this.MoveToNextBy( chainLength ) )
@@ -241,527 +147,362 @@ namespace Xceed.Wpf.DataGrid
       return true;
     }
 
-    public bool InsertBefore( GeneratorNode insert )
+    internal bool InsertBefore( GeneratorNode insert )
     {
       if( insert == null )
         throw new DataGridInternalException( "GeneratorNode is null" );
 
-      int insertionCount;
-      int chainLength;
-      GeneratorNode insertLast = GeneratorNodeHelper.EvaluateChain( insert, out insertionCount, out chainLength );
-      GeneratorNode previous = m_currentNode.Previous;
+      var insertionCount = default( int );
+      var chainLength = default( int );
+      var insertLast = GeneratorNodeHelper.EvaluateChain( insert, out insertionCount, out chainLength );
 
-      if( previous != null )
+      var previousNode = m_state.Node.Previous;
+      if( previousNode != null )
       {
-        previous.Next = insert;
+        previousNode.Next = insert;
       }
 
-      insert.Previous = previous;
-      m_currentNode.Previous = insertLast;
-      insertLast.Next = m_currentNode;
+      insert.Previous = previousNode;
+      m_state.Node.Previous = insertLast;
+      insertLast.Next = m_state.Node;
 
-      GroupGeneratorNode parentGroup = insert.Parent as GroupGeneratorNode;
-
+      var parentGroup = insert.Parent as GroupGeneratorNode;
       if( parentGroup != null )
       {
-        if( parentGroup.Child == m_currentNode )
+        if( parentGroup.Child == m_state.Node )
         {
           parentGroup.Child = insert;
         }
       }
 
       // Move the current to the first item inserted.
-      // No need to change m_index, m_sourceDataIndex since they will still be with the correct value.
-      m_currentNode = insert;
+      // No need to update the indexes since they will still be with the correct value.
+      m_state.Node = insert;
+
+      this.EnsureState();
+
       return true;
     }
 
-    public static GeneratorNode EvaluateChain( GeneratorNode chainStart, out int totalChildCount, out int chainLength )
+    internal int FindItem( object item )
     {
-      //if we insert a chain of nodes, this GeneratorNodeHelper will help us
-      GeneratorNodeHelper newHelper = new GeneratorNodeHelper( chainStart, 0, 0 );
+      var current = m_state;
 
-      //first determine the total number of childs from this "node"
-      totalChildCount = 0;
-      chainLength = 0;
-
-      do
+      while( true )
       {
-        totalChildCount += newHelper.CurrentNode.ItemCount;
-        chainLength++;
-      }
-      while( newHelper.MoveToNext() );
-
-      //then, since we moved at the end of the "chain"
-      return newHelper.CurrentNode;
-    }
-
-    //FindItem skips over itemless nodes.
-    public int FindItem( object item )
-    {
-      //finding items can only be done in "forward" direction
-      int retval = -1;
-
-      GeneratorNode originalNode = m_currentNode;
-      int originalIndex = m_index;
-      int originalSourceDataIndex = m_sourceDataIndex;
-
-      while( retval == -1 )
-      {
-        ItemsGeneratorNode itemsNode = m_currentNode as ItemsGeneratorNode;
-
+        var itemsNode = current.Node as ItemsGeneratorNode;
         if( itemsNode != null )
         {
-          int tmpIndex = itemsNode.Items.IndexOf( item );
-          if( tmpIndex > -1 )
+          var index = itemsNode.Items.IndexOf( item );
+          if( index >= 0 )
           {
-            tmpIndex += itemsNode.CountDetailsBeforeDataIndex( tmpIndex );
-            //item is directly from this items node... then return the appropriate index!
-            retval = m_index + tmpIndex;
-            break;
+            index += itemsNode.CountDetailsBeforeDataIndex( index );
+
+            // Item is directly from this items node... then return the appropriate index!
+            m_state = current;
+
+            this.EnsureState();
+
+            return index + current.Index;
           }
-          else
-          {
-            //if the item is from a detail, then I don't want to "use" it!!!
-            retval = -1;
-            //but continue looping.... to find occurances of this item somewhere else in the tree
-          }
+
+          // If the item is from a detail, then I don't want to "use" it!!!
+          // but continue looping.... to find occurances of this item somewhere else in the tree.
         }
         else
         {
-          CollectionGeneratorNode collectionNode = m_currentNode as CollectionGeneratorNode;
-
+          var collectionNode = current.Node as CollectionGeneratorNode;
           if( collectionNode != null )
           {
-            int tmpIndex = collectionNode.IndexOf( item );
-
-            if( tmpIndex != -1 )
+            var index = collectionNode.IndexOf( item );
+            if( index >= 0 )
             {
-              retval = m_index + tmpIndex;
-              break;
+              m_state = current;
+
+              this.EnsureState();
+
+              return index + current.Index;
             }
           }
         }
 
-        //if we reach this point, it's because the item we are looking
-        //for is not in this node... Try to access the child
-        if( this.MoveToChild() )
-          continue;
-
-        //if we reach this point, it's because we have no child...
-        if( this.MoveToNext() )
-          continue;
-
-        //final try, try "advancing" to the next item.
-        if( this.MoveToFollowing() )
-          continue;
-
-        //up to this, we are in an endpoint, we failed.
-        break;
+        // If we reach this point, it's because the item we are looking
+        // for is not in this node... Try to access the child
+        if( !GeneratorNodeHelper.MoveToChild( ref current ) )
+        {
+          // Try "advancing" to the next item.
+          if( !GeneratorNodeHelper.MoveToFollowing( ref current ) )
+            break;
+        }
       }
 
-      if( retval == -1 )
-      {
-        m_currentNode = originalNode;
-        m_index = originalIndex;
-        m_sourceDataIndex = originalSourceDataIndex;
-      }
-
-      return retval;
+      return -1;
     }
 
-    public object FindIndex( int index )
+    internal object FindIndex( int index )
     {
-      //WARNING: this method only searches forward
+      var current = m_state;
 
-      GeneratorNode originalNode = m_currentNode;
-      int originalIndex = m_index;
-      int originalSourceDataIndex = m_sourceDataIndex;
-
-      do
+      while( true )
       {
-        if( index < ( m_index + m_currentNode.ItemCount ) )
+        if( index < current.Index + current.Node.ItemCount )
         {
-          CollectionGeneratorNode itemsNode = m_currentNode as CollectionGeneratorNode;
-
+          var itemsNode = current.Node as CollectionGeneratorNode;
           if( itemsNode != null )
           {
-            return itemsNode.GetAt( index - m_index );
+            m_state = current;
+
+            this.EnsureState();
+
+            return itemsNode.GetAt( index - current.Index );
           }
-          else // not an Items Node, then try to move to child...
-          {
-            //if it fails, then quit loop with failure
-            if( !this.MoveToChild() )
-            {
-              break;
-            }
-          }
+
+          if( !GeneratorNodeHelper.MoveToChild( ref current ) )
+            break;
         }
         else
         {
-          //if we reach this point, it's because the item we are looking
-          //for is not in this node... Try to access the child
-
-          //No need to check for childs, since the condition above would catch it (childs part of ItemCount).
-
-          if( this.MoveToNext() )
-            continue;
-
-          //final try, try "advancing" to the next item.
-          if( this.MoveToFollowing() )
-            continue;
-
-          //up to this, we are in an endpoint, we failed.
-          break;
+          // If we reach this point, it's because the item we are looking for is not in this node... Try to access the child.
+          // No need to check for childs, since the condition above would catch it (childs part of ItemCount).
+          if( !GeneratorNodeHelper.MoveToFollowing( ref current ) )
+            break;
         }
       }
-      while( true );
 
-      m_currentNode = originalNode;
-      m_index = originalIndex;
-      m_sourceDataIndex = originalSourceDataIndex;
       return null;
     }
 
-    public bool ReverseCalculateIndex()
+    internal bool FindNode( GeneratorNode node )
     {
-      // index need to be 0, as I will use the value from the index once I backtracked all the way to the root.
-      GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( this.CurrentNode, 0, 0 );
+      if( node == null )
+        throw new ArgumentNullException( "node" );
 
-      while( ( nodeHelper.CurrentNode.Previous != null ) || ( nodeHelper.CurrentNode.Parent != null ) )
-      {
-        if( !nodeHelper.MoveToPrevious() )
-        {
-          nodeHelper.MoveToParent();
-        }
-      }
+      var success = GeneratorNodeHelper.FindNode( ref m_state, node );
 
-      m_index = Math.Abs( nodeHelper.Index );
-      m_sourceDataIndex = Math.Abs( nodeHelper.SourceDataIndex );
-      return true;
+      this.EnsureState();
+
+      return success;
     }
 
-    public bool FindNodeForIndex( int index )
+    internal bool FindNodeForIndex( int index )
     {
-      GeneratorNode originalNode = m_currentNode;
-      int originalIndex = m_index;
-      int originalSourceDataIndex = m_sourceDataIndex;
+      var success = GeneratorNodeHelper.FindNodeForIndex( ref m_state, index );
 
-      //The algo is a single drill-down... for optimized performance..
-      //It first tries to go Horizontally in the tree and then drills-down it can.
+      this.EnsureState();
 
-      do
-      {
-        int itemCount = m_currentNode.ItemCount;
-
-        //verify if the current node contains ( directly or its children ) the required index
-        if( index < ( m_index + itemCount ) )
-        {
-          //a Group node is the only node that can Have Children is by definition empty... let's dig deeper.
-          //If we try to dig deeper and fail... 
-          if( !this.MoveToChild() )
-          {
-            //if we cannot travel deeper, then this node is the closest we get...
-            return true;
-          }
-        }
-        else if( ( index == m_index ) && ( itemCount != 0 ) )
-        {
-          return true;
-        }
-        else
-        {
-          //Move to the NextNode in the list... 
-          if( !this.MoveToNext() )
-            break;
-        }
-      }
-      while( true );
-
-      m_currentNode = originalNode;
-      m_index = originalIndex;
-      m_sourceDataIndex = originalSourceDataIndex;
-      return false;
-    }
-
-    public bool MoveForward()
-    {
-      bool recurseGroup = true;
-      GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( m_currentNode, m_index, m_sourceDataIndex );
-
-      do
-      {
-        GroupGeneratorNode groupNode = nodeHelper.CurrentNode as GroupGeneratorNode;
-
-        if( ( groupNode == null ) && ( nodeHelper.CurrentNode != m_currentNode ) && ( nodeHelper.CurrentNode.ItemCount != 0 ) )
-        {
-          m_currentNode = nodeHelper.CurrentNode;
-          m_index = nodeHelper.Index;
-          m_sourceDataIndex = nodeHelper.SourceDataIndex;
-          return true;
-        }
-
-        if( ( recurseGroup ) && ( nodeHelper.MoveToChild() ) )
-          continue;
-
-        recurseGroup = true;
-
-        if( nodeHelper.MoveToNext() )
-          continue;
-
-        if( nodeHelper.MoveToParent() )
-        {
-          recurseGroup = false;
-          continue;
-        }
-
-        break;
-      }
-      while( true );
-
-      return false;
-    }
-
-    public bool MoveBackward()
-    {
-      bool recurseGroup = true;
-      GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( m_currentNode, m_index, m_sourceDataIndex );
-
-      do
-      {
-        GroupGeneratorNode groupNode = nodeHelper.CurrentNode as GroupGeneratorNode;
-
-        if( ( groupNode == null ) && ( nodeHelper.CurrentNode != m_currentNode ) && ( nodeHelper.CurrentNode.ItemCount != 0 ) )
-        {
-          m_currentNode = nodeHelper.CurrentNode;
-          m_index = nodeHelper.Index;
-          m_sourceDataIndex = nodeHelper.SourceDataIndex;
-          return true;
-        }
-
-        if( ( recurseGroup ) && ( nodeHelper.MoveToChild() ) )
-        {
-          nodeHelper.MoveToEnd();
-          continue;
-        }
-
-        recurseGroup = true;
-
-        if( nodeHelper.MoveToPrevious() )
-          continue;
-
-
-        if( nodeHelper.MoveToParent() )
-        {
-          recurseGroup = false;
-          continue;
-        }
-
-        break;
-      }
-      while( true );
-
-      return false;
+      return success;
     }
 
     //Note: this function will not check for the presence of the item in the details for Items nodes.
-    public bool AbsoluteFindItem( object item )
+    internal bool AbsoluteFindItem( object item )
     {
-      //this method will search through nodes, even those collapsed for the item 
-      //finding items can only be done in "forward" direction
-      GeneratorNode originalNode = m_currentNode;
-      int originalIndex = m_index;
-      int originalSourceDataIndex = m_sourceDataIndex;
+      // This method will search through nodes, even those collapsed for the item.
+      var current = m_state;
 
-      do
+      while( true )
       {
-        CollectionGeneratorNode itemsNode = m_currentNode as CollectionGeneratorNode;
+        var itemsNode = current.Node as CollectionGeneratorNode;
+        if( ( itemsNode != null ) && itemsNode.Items.Contains( item ) )
+          break;
 
-        if( itemsNode != null )
+        // If we reach this point, it's because the item we are looking
+        // for is not in this node... Try to access the child
+        if( !GeneratorNodeHelper.MoveToChild( ref current, false ) )
         {
-          if( itemsNode.Items.Contains( item ) )
-            return true;
+          // Try "advancing" to the next item.
+          if( !GeneratorNodeHelper.MoveToFollowing( ref current ) )
+            return false;
         }
+      }
 
-        //if we reach this point, it's because the item we are looking
-        //for is not in this node... Try to access the child
-        if( this.MoveToChild() )
-          continue;
+      m_state = current;
 
-        //if we reach this point, it's because we have no child...
-        if( this.MoveToNext() )
-          continue;
+      this.EnsureState();
 
-        //final try, try "advancing" to the next item.
-        if( this.MoveToFollowing() )
-          continue;
-
-        //up to this, we are in an endpoint, we failed.
-        break;
-      } while( true );
-
-      m_currentNode = originalNode;
-      m_index = originalIndex;
-      m_sourceDataIndex = originalSourceDataIndex;
-      return false;
+      return true;
     }
 
     //Note: this function will not check for the presence of the group in the details for Items nodes.
-    public bool FindGroup( CollectionViewGroup group )
+    internal bool FindGroup( CollectionViewGroup group )
     {
       if( group == null )
         return false;
 
-      GeneratorNode originalNode = m_currentNode;
-      int originalIndex = m_index;
-      int originalSourceDataIndex = m_sourceDataIndex;
+      var current = m_state;
 
-      do
+      while( true )
       {
-        GroupGeneratorNode groupNode = m_currentNode as GroupGeneratorNode;
+        var groupNode = current.Node as GroupGeneratorNode;
         if( groupNode != null )
         {
           if( groupNode.CollectionViewGroup == group )
-            return true;
+            break;
 
           if( !groupNode.CollectionViewGroup.IsBottomLevel )
           {
-            if( !this.MoveToChild( false ) )
-            {
-              break;
-            }
+            if( !GeneratorNodeHelper.MoveToChild( ref current, false ) )
+              return false;
           }
           else
           {
-            if( !this.MoveToFollowing() )
-            {
-              break;
-            }
+            if( !GeneratorNodeHelper.MoveToFollowing( ref current ) )
+              return false;
           }
         }
         else
         {
-          //There can be nothing under a non-GroupGeneratorNode, try to move Next node in the list.
-          if( !this.MoveToFollowing() )
-          {
-            break;
-          }
+          // There is nothing under a non GroupGeneratorNode, try to move Next node in the list.
+          if( !GeneratorNodeHelper.MoveToFollowing( ref current ) )
+            return false;
         }
-      } while( true );
+      }
 
-      m_currentNode = originalNode;
-      m_index = originalIndex;
-      m_sourceDataIndex = originalSourceDataIndex;
-      return false;
+      m_state = current;
+
+      this.EnsureState();
+
+      return true;
     }
 
-    //This method cannot be used for groups.
-    //This method will search for items independently of the Expanded/Collpased status of GroupGeneratorNodes
-    public bool Contains( object item )
+    internal void ReverseCalculateIndex()
     {
-      bool skipCollectionGeneratorNodeCheck = false;
+      m_state = GeneratorNodeHelper.FindNodeLocation( m_state.Node );
 
-      do
+      this.EnsureState();
+    }
+
+    internal bool MoveForward()
+    {
+      var startNode = m_state.Node;
+
+      while( true )
       {
-        HeadersFootersGeneratorNode headersFootersNode = m_currentNode as HeadersFootersGeneratorNode;
+        if( !( m_state.Node is GroupGeneratorNode ) && ( m_state.Node != startNode ) && ( m_state.Node.ItemCount != 0 ) )
+          break;
+
+        if( !GeneratorNodeHelper.MoveToChild( ref m_state ) )
+        {
+          if( !GeneratorNodeHelper.MoveToFollowing( ref m_state ) )
+            return false;
+        }
+      }
+
+      this.EnsureState();
+
+      return true;
+    }
+
+    internal bool MoveBackward()
+    {
+      var startNode = m_state.Node;
+
+      while( true )
+      {
+        if( !( m_state.Node is GroupGeneratorNode ) && ( m_state.Node != startNode ) && ( m_state.Node.ItemCount != 0 ) )
+          break;
+
+        if( !GeneratorNodeHelper.MoveToChild( ref m_state ) )
+        {
+          if( !GeneratorNodeHelper.MoveToPreceding( ref m_state ) )
+            return false;
+        }
+        else
+        {
+          GeneratorNodeHelper.MoveToEnd( ref m_state );
+        }
+      }
+
+      this.EnsureState();
+
+      return true;
+    }
+
+    // This method cannot be used for groups.
+    // This method will search for items independently of the Expanded/Collapsed status of GroupGeneratorNodes.
+    internal bool Contains( object item )
+    {
+      var current = m_state;
+      var found = false;
+      var skipCollectionGeneratorNodeCheck = false;
+
+      while( true )
+      {
         skipCollectionGeneratorNodeCheck = false;
 
-        //If the node is a HeadersFootersGeneratorNode, do some specific handling.
-        if( headersFootersNode != null )
+        var headersFootersNode = current.Node as HeadersFootersGeneratorNode;
+        if( ( headersFootersNode != null ) && ( item is GroupHeaderFooterItem ) )
         {
-          //If the item passed to the function is a GroupHeaderFooterItem, then its because we are looking for a GroupHeader/Footer       
-          if( item.GetType() == typeof( GroupHeaderFooterItem ) )
+          var groupHeaderFooterItem = ( GroupHeaderFooterItem )item;
+          var parentGroup = headersFootersNode.Parent as GroupGeneratorNode;
+
+          if( ( parentGroup != null ) && ( parentGroup.CollectionViewGroup == groupHeaderFooterItem.Group ) && headersFootersNode.Items.Contains( groupHeaderFooterItem.Template ) )
           {
-            GroupHeaderFooterItem groupHeaderFooterItem = ( GroupHeaderFooterItem )item;
-
-            //Determine the parent node/collectionViewGroup
-            GroupGeneratorNode parentGroup = headersFootersNode.Parent as GroupGeneratorNode;
-
-            if( parentGroup != null )
-            {
-              if( groupHeaderFooterItem.Group == parentGroup.CollectionViewGroup )
-              {
-                if( headersFootersNode.Items.Contains( groupHeaderFooterItem.Template ) )
-                  return true;
-              }
-            }
-            //If there is no parent node, then its because the current HeadersFootersGeneratorNode is not a GroupHeaders/Footers node (FixedHeaders/Fotoers or Headers/Footers).
-
-            skipCollectionGeneratorNodeCheck = true; //force skip CollectionGeneratorNode verification, this is to limit amount of job done by loop body.
+            found = true;
+            break;
           }
 
-          //If the item passed is not a GroupHeaderFooterItem, not need to do specific processing, reverting to "Common" algo.
+          // If there is no parent node, then its because the current HeadersFootersGeneratorNode is not a GroupHeaders/Footers node (FixedHeaders/Footers or Headers/Footers).
+          skipCollectionGeneratorNodeCheck = true; // force skip CollectionGeneratorNode verification, this is to limit amount of job done by loop body.
         }
 
         if( !skipCollectionGeneratorNodeCheck )
         {
-          CollectionGeneratorNode collectionNode = m_currentNode as CollectionGeneratorNode;
-
+          var collectionNode = current.Node as CollectionGeneratorNode;
           if( collectionNode != null )
           {
             // When dealing with a DataView, the DataView's IList's Contains implementation will return false 
             // for a dataRowView which is in edition and was modified even though it is really part of the collection.
             // Therefore, we must use a for loop of Object.Equals method calls.
-            System.Data.DataRowView dataRowViewItem = item as System.Data.DataRowView;
-
+            var dataRowViewItem = item as System.Data.DataRowView;
             if( dataRowViewItem != null )
             {
-              IList items = collectionNode.Items;
-              int itemsCount = items.Count;
-
-              System.Data.DataRow itemDataRow = dataRowViewItem.Row;
+              var items = collectionNode.Items;
+              var itemsCount = items.Count;
+              var itemDataRow = dataRowViewItem.Row;
 
               for( int i = 0; i < itemsCount; i++ )
               {
-                System.Data.DataRowView currentDataRowView = items[ i ] as System.Data.DataRowView;
-
+                var currentDataRowView = items[ i ] as System.Data.DataRowView;
                 if( ( currentDataRowView != null ) && ( itemDataRow == currentDataRowView.Row ) )
-                  return true;
+                {
+                  found = true;
+                  break;
+                }
               }
+
+              if( found )
+                break;
             }
             else
             {
-              //Since the GetAt() methods can be overriden to compensate for the Expand/Collapse status of Groups
+              // Since the GetAt() methods can be overriden to compensate for the Expand/Collapse status of Groups
               // AND the details features, accessing the collection directly prevent pre-processing of the content of the collection node.
               if( collectionNode.Items.Contains( item ) )
               {
-                //if the item is from a detail, then I don't want to "use" it!!!
-                return true;
+                found = true;
+                break;
               }
             }
           }
         }
 
-        //if we reach this point, it's because the item we are looking
-        //for is not in this node... Try to access the child
-        //Note: Since I want to search independently of the Expand/Collapse status,
-        //pass false to the method to systematically visit childs.
-        if( this.MoveToChild( false ) )
+        if( GeneratorNodeHelper.MoveToChild( ref current, false ) )
           continue;
 
-        //if we reach this point, it's because we have no child...
-        if( this.MoveToNext() )
+        if( GeneratorNodeHelper.MoveToFollowing( ref current ) )
           continue;
 
-        //final try, try "advancing" to the next item.
-        if( this.MoveToFollowing() )
-          continue;
-
-        //up to this, we are in an endpoint, we failed.
         break;
-      } while( true );
+      }
 
-      return false;
+      m_state = current;
+
+      this.EnsureState();
+
+      return found;
     }
 
-    //-------------
-    // Data Members
-
-    private GeneratorNode m_currentNode; // = null
-    private int m_index;
-    private int m_sourceDataIndex;
-
-    public void ProcessVisit(
+    internal void ProcessVisit(
       DataGridContext sourceContext,
       int minIndex,
       int maxIndex,
@@ -773,14 +514,11 @@ namespace Xceed.Wpf.DataGrid
       visitWasStopped = false;
 
       // This is used only for DataGridContextVisitorType.ItemsBlock
-      int startSourceDataItemIndex = -1;
-      int endSourceDataItemIndex = -1;
+      var startSourceDataItemIndex = -1;
+      var endSourceDataItemIndex = -1;
 
       if( minIndex < 0 )
-      {
-        DataGridException.ThrowSystemException( "The minimum index must be greater than or equal to zero.",
-                                                typeof( ArgumentException ), sourceContext.DataGridControl.Name, "minIndex" );
-      }
+        throw DataGridException.Create<ArgumentException>( "The minimum index must be greater than or equal to zero.", sourceContext.DataGridControl, "minIndex" );
 
       if( ( visitorType & DataGridContextVisitorType.DataGridContext ) == DataGridContextVisitorType.DataGridContext )
       {
@@ -792,43 +530,42 @@ namespace Xceed.Wpf.DataGrid
 
       //Take a shortcut, if the visit is made only for contexts, and there is no child contexts
       //return right away.
-      bool containsDetails = false;
+      var containsDetails = false;
 
-      foreach( DataGridContext childContext in sourceContext.GetChildContexts() )
+      foreach( var childContext in sourceContext.GetChildContextsCore() )
       {
         containsDetails = true;
         break;
       }
 
-      bool processed = false;
+      var processed = false;
+      var current = m_state;
 
-      do
+      while( true )
       {
-        //resets the flag that indicates if the node was already processed
         processed = false;
 
-        int itemCount = this.CurrentNode.ItemCount;
+        var itemCount = current.Node.ItemCount;
 
         //If the whole current node is below the minIndex, jump over it.
-        if( ( this.Index + ( itemCount - 1 ) ) < minIndex )
+        if( ( current.Index + ( itemCount - 1 ) ) < minIndex )
         {
           processed = true;
         }
 
         //when the index to visit exceeds the range defined, exit the loop.
-        if( this.Index > maxIndex )
+        if( current.Index > maxIndex )
           break;
 
-        int minForNode = Math.Max( 0, minIndex - this.Index ); // this will give the base offset within the node where to start the visitating!
-        int maxForNode = Math.Min( itemCount - 1, maxIndex - this.Index ); //this will five the max offset within this node to visit (protected against overlfow )
+        var minForNode = Math.Max( 0, minIndex - current.Index ); // this will give the base offset within the node where to start the visitating!
+        var maxForNode = Math.Min( itemCount - 1, maxIndex - current.Index ); //this will five the max offset within this node to visit (protected against overlfow )
 
         if( !processed )
         {
-          HeadersFootersGeneratorNode headersNode = this.CurrentNode as HeadersFootersGeneratorNode;
-
+          var headersNode = current.Node as HeadersFootersGeneratorNode;
           if( headersNode != null )
           {
-            bool isHeaderFooter = ( headersNode.Parent == null );
+            var isHeaderFooter = ( headersNode.Parent == null );
 
             //If the node is a Headers or Footers node AND the visitorType does not contain HeadersFooters
             if( ( isHeaderFooter ) && ( ( visitorType & DataGridContextVisitorType.HeadersFooters ) == DataGridContextVisitorType.HeadersFooters ) )
@@ -846,8 +583,7 @@ namespace Xceed.Wpf.DataGrid
 
         if( !processed )
         {
-          ItemsGeneratorNode itemsNode = this.CurrentNode as ItemsGeneratorNode;
-
+          var itemsNode = current.Node as ItemsGeneratorNode;
           if( itemsNode != null )
           {
             if( ( visitorType & DataGridContextVisitorType.ItemsBlock ) == DataGridContextVisitorType.ItemsBlock )
@@ -855,7 +591,7 @@ namespace Xceed.Wpf.DataGrid
               GeneratorNodeHelper.ProcessItemsNodeBlockVisit(
                 itemsNode, sourceContext,
                 minForNode, maxForNode,
-                visitor, visitorType, visitDetails, containsDetails, m_sourceDataIndex,
+                visitor, visitorType, visitDetails, containsDetails, current.DataIndex,
                 ref startSourceDataItemIndex, ref endSourceDataItemIndex, ref visitWasStopped );
             }
             else if( ( ( visitDetails ) && ( containsDetails ) )
@@ -864,7 +600,7 @@ namespace Xceed.Wpf.DataGrid
               GeneratorNodeHelper.ProcessItemsNodeVisit(
                 itemsNode, sourceContext,
                 minForNode, maxForNode,
-                visitor, visitorType, visitDetails, m_sourceDataIndex, ref visitWasStopped );
+                visitor, visitorType, visitDetails, current.DataIndex, ref visitWasStopped );
             }
 
             processed = true;
@@ -873,8 +609,7 @@ namespace Xceed.Wpf.DataGrid
 
         if( !processed )
         {
-          GroupGeneratorNode groupNode = this.CurrentNode as GroupGeneratorNode;
-
+          var groupNode = current.Node as GroupGeneratorNode;
           if( groupNode != null )
           {
             if( ( visitorType & DataGridContextVisitorType.Groups ) == DataGridContextVisitorType.Groups )
@@ -894,31 +629,61 @@ namespace Xceed.Wpf.DataGrid
         }
 
         if( !processed )
-          throw new DataGridInternalException( "Unable to process the visit.", sourceContext.DataGridControl );
+          throw DataGridException.Create<DataGridInternalException>( "Unable to process the visit.", sourceContext.DataGridControl );
 
         if( visitWasStopped )
           break;
 
-        if( this.MoveToChild() )
+        if( GeneratorNodeHelper.MoveToChild( ref current ) )
           continue;
 
-        if( this.MoveToFollowing() )
+        if( GeneratorNodeHelper.MoveToFollowing( ref current ) )
           continue;
 
         break;
       }
-      while( true ); //loop is controled by continue and break statements.
-
 
       if( ( visitorType & DataGridContextVisitorType.ItemsBlock ) == DataGridContextVisitorType.ItemsBlock )
       {
         if( startSourceDataItemIndex != -1 )
         {
-          bool stopVisit = false;
+          var stopVisit = false;
           visitor.Visit( sourceContext, startSourceDataItemIndex, endSourceDataItemIndex, ref stopVisit );
           visitWasStopped = visitWasStopped || stopVisit;
         }
       }
+
+      m_state = current;
+
+      this.EnsureState();
+    }
+
+    internal static GeneratorNode EvaluateChain( GeneratorNode startNode, out int totalChildCount, out int chainLength )
+    {
+      if( startNode == null )
+        throw new ArgumentNullException( "startNode" );
+
+      var current = new State( startNode, 0, 0 );
+
+      totalChildCount = startNode.ItemCount;
+      chainLength = 1;
+
+      while( true )
+      {
+        if( !GeneratorNodeHelper.MoveToNext( ref current ) )
+          break;
+
+        totalChildCount += current.Node.ItemCount;
+        chainLength++;
+      }
+
+      return current.Node;
+    }
+
+    private void EnsureState()
+    {
+      if( m_state.Node == null )
+        throw new DataGridInternalException();
     }
 
     private static void ProcessItemsNodeBlockVisit(
@@ -1030,7 +795,7 @@ namespace Xceed.Wpf.DataGrid
       int sourceDataItemIndex,
       ref bool stopVisit )
     {
-      int runningIndex = minIndex;
+      var runningIndex = minIndex;
       sourceDataItemIndex += minIndex;
 
       int masterIndex;
@@ -1039,19 +804,18 @@ namespace Xceed.Wpf.DataGrid
 
       while( runningIndex <= maxIndex )
       {
-        DetailGeneratorNode detailNode = itemsNode.GetDetailNodeForIndex( runningIndex, out masterIndex, out detailStartIndex, out detailNodeIndex );
+        var detailNode = itemsNode.GetDetailNodeForIndex( runningIndex, out masterIndex, out detailStartIndex, out detailNodeIndex );
 
         if( detailNode != null )
         {
-          int detailEndIndex = Math.Min( detailNode.ItemCount - 1, detailStartIndex + ( maxIndex - runningIndex ) );
+          var detailEndIndex = Math.Min( detailNode.ItemCount - 1, detailStartIndex + ( maxIndex - runningIndex ) );
           sourceDataItemIndex -= detailStartIndex;
 
           if( visitDetails )
           {
             bool visitWasStopped;
 
-            ( ( IDataGridContextVisitable )detailNode.DetailGenerator ).AcceptVisitor(
-              detailStartIndex, detailEndIndex, visitor, visitorType, visitDetails, out visitWasStopped );
+            ( ( IDataGridContextVisitable )detailNode.DetailGenerator ).AcceptVisitor( detailStartIndex, detailEndIndex, visitor, visitorType, visitDetails, out visitWasStopped );
 
             stopVisit = stopVisit || visitWasStopped;
 
@@ -1083,9 +847,9 @@ namespace Xceed.Wpf.DataGrid
     {
       for( int i = minIndex; i <= maxIndex; i++ )
       {
-        object template = headersNode.GetAt( i );
+        var template = headersNode.GetAt( i );
 
-        GroupGeneratorNode groupNode = headersNode.Parent as GroupGeneratorNode;
+        var groupNode = headersNode.Parent as GroupGeneratorNode;
         if( groupNode != null )
         {
           visitor.Visit( sourceContext, ( GroupHeaderFooterItem )template, ref stopVisit );
@@ -1100,5 +864,289 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private static bool MoveToNext( ref State state )
+    {
+      return GeneratorNodeHelper.MoveToNext( ref state, 1 );
+    }
+
+    private static bool MoveToNext( ref State state, int count )
+    {
+      if( count <= 0 )
+        return true;
+
+      var node = state.Node;
+      var index = state.Index;
+      var dataIndex = state.DataIndex;
+
+      for( int i = 0; i < count; i++ )
+      {
+        var nextNode = node.Next;
+        if( nextNode == null )
+          return false;
+
+        var groupNode = node as GroupGeneratorNode;
+        if( groupNode != null )
+        {
+          dataIndex += groupNode.TotalLeafCount;
+        }
+
+        index += node.ItemCount;
+        node = nextNode;
+      }
+
+      state.Node = node;
+      state.Index = index;
+      state.DataIndex = dataIndex;
+
+      return true;
+    }
+
+    private static bool MoveToPrevious( ref State state )
+    {
+      var node = state.Node.Previous;
+      if( node == null )
+        return false;
+
+      state.Node = node;
+      state.Index -= node.ItemCount;
+
+      var groupNode = node as GroupGeneratorNode;
+      if( groupNode != null )
+      {
+        state.DataIndex -= groupNode.TotalLeafCount;
+      }
+
+      return true;
+    }
+
+    private static void MoveToFirst( ref State state )
+    {
+      var node = state.Node.Previous;
+      if( node == null )
+        return;
+
+      var index = state.Index;
+      var dataIndex = state.DataIndex;
+
+      while( true )
+      {
+        var groupNode = node as GroupGeneratorNode;
+        if( groupNode != null )
+        {
+          dataIndex -= groupNode.TotalLeafCount;
+        }
+
+        index -= node.ItemCount;
+
+        var target = node.Previous;
+        if( target == null )
+          break;
+
+        node = target;
+      }
+
+      state.Node = node;
+      state.Index = index;
+      state.DataIndex = dataIndex;
+    }
+
+    private static void MoveToEnd( ref State state )
+    {
+      var node = state.Node;
+      if( node.Next == null )
+        return;
+
+      var index = state.Index;
+      var dataIndex = state.DataIndex;
+
+      while( true )
+      {
+        var groupNode = node as GroupGeneratorNode;
+        if( groupNode != null )
+        {
+          dataIndex += groupNode.TotalLeafCount;
+        }
+
+        index += node.ItemCount;
+
+        var target = node.Next;
+        if( target == null )
+          break;
+
+        node = target;
+      }
+
+      state.Node = node;
+      state.Index = index;
+      state.DataIndex = dataIndex;
+    }
+
+    private static bool MoveToChild( ref State state )
+    {
+      return GeneratorNodeHelper.MoveToChild( ref state, true );
+    }
+
+    private static bool MoveToChild( ref State state, bool skipItemLessGroupNodes )
+    {
+      var groupNode = state.Node as GroupGeneratorNode;
+      if( ( groupNode == null ) || ( groupNode.Child == null ) )
+        return false;
+
+      if( ( skipItemLessGroupNodes ) && ( groupNode.ItemCount <= 0 ) )
+        return false;
+
+      state.Node = groupNode.Child;
+
+      return true;
+    }
+
+    private static bool MoveToParent( ref State state )
+    {
+      if( state.Node.Level == 0 )
+        return false;
+
+      GeneratorNodeHelper.MoveToFirst( ref state );
+
+      state.Node = state.Node.Parent;
+      Debug.Assert( state.Node != null );
+
+      return true;
+    }
+
+    private static bool MoveToFollowing( ref State state )
+    {
+      while( !GeneratorNodeHelper.MoveToNext( ref state ) )
+      {
+        if( !GeneratorNodeHelper.MoveToParent( ref state ) )
+          return false;
+      }
+
+      return true;
+    }
+
+    private static bool MoveToPreceding( ref State state )
+    {
+      while( !GeneratorNodeHelper.MoveToPrevious( ref state ) )
+      {
+        if( !GeneratorNodeHelper.MoveToParent( ref state ) )
+          return false;
+      }
+
+      return true;
+    }
+
+    private static State FindNodeLocation( GeneratorNode node )
+    {
+      var state = new State( node, 0, 0 );
+
+      while( true )
+      {
+        GeneratorNodeHelper.MoveToFirst( ref state );
+
+        if( !GeneratorNodeHelper.MoveToParent( ref state ) )
+          break;
+      }
+
+      Debug.Assert( state.Index <= 0 );
+      Debug.Assert( state.DataIndex <= 0 );
+
+      return new State( node, -state.Index, -state.DataIndex );
+    }
+
+    private static bool FindNode( ref State state, GeneratorNode node )
+    {
+      if( state.Node == node )
+        return true;
+
+      var from = state;
+      var fromLevel = state.Node.Level;
+      var to = new State( node, 0, 0 );
+      var toLevel = node.Level;
+
+      while( from.Node != to.Node )
+      {
+        if( fromLevel > toLevel )
+        {
+          if( !GeneratorNodeHelper.MoveToParent( ref from ) )
+            return false;
+
+          fromLevel = from.Node.Level;
+        }
+        else
+        {
+          if( !GeneratorNodeHelper.MoveToPrevious( ref to ) )
+          {
+            if( !GeneratorNodeHelper.MoveToParent( ref to ) )
+              return false;
+
+            toLevel = to.Node.Level;
+          }
+        }
+      }
+
+      state.Node = node;
+      state.Index = from.Index - to.Index;
+      state.DataIndex = from.DataIndex - to.DataIndex;
+
+      return true;
+    }
+
+    private static bool FindNodeForIndex( ref State state, int index )
+    {
+      var current = state;
+
+      // The algo is a single drill-down... for optimized performance..
+      // It first tries to go horizontally in the tree and then drills-down if it can.
+      while( true )
+      {
+        var itemCount = current.Node.ItemCount;
+
+        // Verify if the current node contains ( directly or its children ) the required index
+        if( index < current.Index + itemCount )
+        {
+          // A Group node is the only node that can have children is by definition empty... let's dig deeper.
+          // If we cannot travel deeper, then this node is the closest we get.
+          if( !GeneratorNodeHelper.MoveToChild( ref current ) )
+            break;
+        }
+        else if( ( index == current.Index ) && ( itemCount != 0 ) )
+        {
+          break;
+        }
+        else
+        {
+          if( !GeneratorNodeHelper.MoveToNext( ref current ) )
+            return false;
+        }
+      }
+
+      state.Node = current.Node;
+      state.Index = current.Index;
+      state.DataIndex = current.DataIndex;
+
+      return true;
+    }
+
+    private State m_state;
+
+    #region State Private Struct
+
+    private struct State
+    {
+      internal State( GeneratorNode node, int index, int dataIndex )
+      {
+        Debug.Assert( node != null );
+
+        this.Node = node;
+        this.Index = index;
+        this.DataIndex = dataIndex;
+      }
+
+      internal GeneratorNode Node;
+      internal int Index;
+      internal int DataIndex;
+    }
+
+    #endregion
   }
 }

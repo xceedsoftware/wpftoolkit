@@ -15,12 +15,12 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Xceed.Wpf.DataGrid
 {
+  [DebuggerDisplay( "Name = {Name}" )]
   public class DataGridUnboundItemProperty : DataGridItemPropertyBase
   {
     public DataGridUnboundItemProperty()
@@ -35,7 +35,7 @@ namespace Xceed.Wpf.DataGrid
       if( dataType == null )
         throw new ArgumentNullException( "dataType" );
 
-      this.Initialize( name, null, dataType, null, null, null );
+      this.Initialize( name, null, dataType, null, null, null, null );
     }
 
     public DataGridUnboundItemProperty( string name, Type dataType, bool isReadOnly )
@@ -46,7 +46,7 @@ namespace Xceed.Wpf.DataGrid
       if( dataType == null )
         throw new ArgumentNullException( "dataType" );
 
-      this.Initialize( name, null, dataType, isReadOnly, null, null );
+      this.Initialize( name, null, dataType, isReadOnly, null, null, null );
     }
 
     public DataGridUnboundItemProperty( string name, Type dataType, bool isReadOnly, bool overrideReadOnlyForInsertion )
@@ -57,24 +57,15 @@ namespace Xceed.Wpf.DataGrid
       if( dataType == null )
         throw new ArgumentNullException( "dataType" );
 
-      this.Initialize( name, null, dataType, isReadOnly, overrideReadOnlyForInsertion, null );
+      this.Initialize( name, null, dataType, isReadOnly, overrideReadOnlyForInsertion, null, null );
     }
 
+    [Browsable( false )]
+    [EditorBrowsable( EditorBrowsableState.Never )]
+    [Obsolete( "This constructor is obsolete and should no longer be used.", true )]
     protected DataGridUnboundItemProperty( DataGridUnboundItemProperty template )
-      : base( template )
     {
-      this.QueryValue += template.QueryValue;
-      this.CommittingValue += template.CommittingValue;
-    }
-
-    public override object Clone()
-    {
-      Type type = this.GetType();
-
-      if( type == typeof( DataGridUnboundItemProperty ) )
-        return new DataGridUnboundItemProperty( this );
-
-      return base.Clone();
+      throw new NotSupportedException();
     }
 
     public event EventHandler<DataGridItemPropertyQueryValueEventArgs> QueryValue;
@@ -82,21 +73,23 @@ namespace Xceed.Wpf.DataGrid
 
     protected override object GetValueCore( object component )
     {
-      if( this.QueryValue != null )
-      {
-        DataGridItemPropertyQueryValueEventArgs gettingValueEventArgs = new DataGridItemPropertyQueryValueEventArgs( component );
-        this.QueryValue( this, gettingValueEventArgs );
-        return gettingValueEventArgs.Value;
-      }
+      var handler = this.QueryValue;
+      if( handler == null )
+        return null;
 
-      return null;
+      var e = new DataGridItemPropertyQueryValueEventArgs( component );
+
+      handler.Invoke( this, e );
+
+      return e.Value;
     }
 
     protected override void SetValueCore( object component, object value )
     {
-      if( this.CommittingValue != null )
+      var handler = this.CommittingValue;
+      if( handler != null )
       {
-        this.CommittingValue( this, new DataGridItemPropertyCommittingValueEventArgs( component, value ) );
+        handler.Invoke( this, new DataGridItemPropertyCommittingValueEventArgs( component, value ) );
       }
 
       base.SetValueCore( component, value );
@@ -104,20 +97,20 @@ namespace Xceed.Wpf.DataGrid
 
     internal void Refresh( object component )
     {
-      PropertyDescriptorFromItemPropertyBase propertyDescriptor = this.GetPropertyDescriptorForBinding();
-
+      var propertyDescriptor = this.GetPropertyDescriptorForBinding();
       if( propertyDescriptor == null )
         return;
 
       propertyDescriptor.RaiseValueChanged( component );
     }
 
-    internal override void SetUnspecifiedPropertiesValues( DataGridItemPropertyCollection itemPropertyCollection )
+    internal override void SetUnspecifiedPropertiesValues(
+      PropertyDescription description,
+      Type itemType,
+      bool defaultItemPropertiesCreated )
     {
       if( this.DataType == null )
-      {
         throw new InvalidOperationException( "An attempt was made to add an item without specifying its data type." );
-      }
 
       if( string.IsNullOrEmpty( this.Title ) )
       {

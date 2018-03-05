@@ -15,47 +15,37 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using Xceed.Wpf.DataGrid.Stats;
-using System.Data;
 using System.Collections;
-using System.Diagnostics;
-using System.Windows;
-using System.Windows.Data;
-using Xceed.Utils.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Windows;
+using Xceed.Utils.Collections;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal abstract class DataGridDetailDescription : DependencyObject, IWeakEventListener
   {
-    #region Constructor
-
     protected DataGridDetailDescription()
     {
-      m_detailDescriptions = new DataGridDetailDescriptionCollection();
-      m_detailDescriptions.CollectionChanged += this.OnDetailDescriptionsCollectionChanged;
-
       m_itemProperties = new DataGridItemPropertyCollection();
-      m_itemProperties.CollectionChanged += this.OnItemPropertiesCollectionChanged;
+      m_detailDescriptions = new DataGridDetailDescriptionCollection();
+      m_defaultPropertyDescriptions = new PropertyDescriptionRouteDictionary();
 
       m_groupDescriptions = new GroupDescriptionCollection();
-      m_sortDescriptions = new DataGridSortDescriptionCollection();
-      m_statFunctions = new StatFunctionCollection();
-      m_autoFilterValues = new ReadOnlyDictionary<string, IList>();
-      m_autoFilteredItems = new ObservableCollection<DataGridItemPropertyBase>();
-      m_registeredFieldNamesToAutoFilterValues = new Dictionary<string, INotifyCollectionChanged>();
-      m_registeredAutoFilterValuesToFieldNames = new Dictionary<INotifyCollectionChanged, string>();
+      m_sortDescriptions = new DataGridSortDescriptionCollection();    
 
       this.AutoCreateDetailDescriptions = true;
       this.AutoCreateItemProperties = true;
       this.DefaultCalculateDistinctValues = true;
-    }
 
-    #endregion
+      CollectionChangedEventManager.AddListener( m_itemProperties, this );
+      InitializeItemPropertyEventManager.AddListener( m_itemProperties, this );
+      CollectionChangedEventManager.AddListener( m_detailDescriptions, this );
+    }
 
     #region RelationName Public Property
 
@@ -74,6 +64,8 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private string m_relationName;
+
     #endregion
 
     #region Title Public Property
@@ -90,6 +82,8 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private object m_title;
+
     #endregion
 
     #region TitleTemplate Public Property
@@ -105,6 +99,8 @@ namespace Xceed.Wpf.DataGrid
         m_titleTemplate = value;
       }
     }
+
+    private DataTemplate m_titleTemplate;
 
     #endregion
 
@@ -156,34 +152,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region AutoFilterValues Public Property
-
-    internal IDictionary<string, IList> AutoFilterValues
-    {
-      get
-      {
-        return m_autoFilterValues;
-      }
-    }
-
-    #endregion
-
-    #region AutoFilterMode Public Property
-
-    internal AutoFilterMode AutoFilterMode
-    {
-      get
-      {
-        return m_autoFilterMode;
-      }
-      set
-      {
-        m_autoFilterMode = value;
-      }
-    }
-
-    #endregion
-
     #region DistinctValuesConstraint Public Property
 
     public DistinctValuesConstraint DistinctValuesConstraint
@@ -198,25 +166,11 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion
-
-    #region FilterCriteriaMode Public Property
-
-    public FilterCriteriaMode FilterCriteriaMode
-    {
-      get
-      {
-        return m_filterCriteriaMode;
-      }
-      set
-      {
-        m_filterCriteriaMode = value;
-      }
-    }
+    private DistinctValuesConstraint m_distinctValuesConstraint = DistinctValuesConstraint.All;
 
     #endregion
 
-    #region ItemProperty Public Property
+    #region ItemProperties Public Property
 
     public DataGridItemPropertyCollection ItemProperties
     {
@@ -225,6 +179,8 @@ namespace Xceed.Wpf.DataGrid
         return m_itemProperties;
       }
     }
+
+    private readonly DataGridItemPropertyCollection m_itemProperties;
 
     #endregion
 
@@ -244,7 +200,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region DetailDesctiptions Public Property
+    #region DetailDescriptions Public Property
 
     public DataGridDetailDescriptionCollection DetailDescriptions
     {
@@ -254,17 +210,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion
-
-    #region StatFunctions Public Property
-
-    internal StatFunctionCollection StatFunctions
-    {
-      get
-      {
-        return m_statFunctions;
-      }
-    }
+    private readonly DataGridDetailDescriptionCollection m_detailDescriptions;
 
     #endregion
 
@@ -278,6 +224,8 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private readonly GroupDescriptionCollection m_groupDescriptions;
+
     #endregion
 
     #region SortDescriptions Public Propertiy
@@ -289,6 +237,8 @@ namespace Xceed.Wpf.DataGrid
         return m_sortDescriptions;
       }
     }
+
+    private readonly DataGridSortDescriptionCollection m_sortDescriptions;
 
     #endregion
 
@@ -324,15 +274,49 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region AutoFilteredItems Internal Property
+    #region DefaultItemPropertiesInitialized Internal Property
 
-    internal ObservableCollection<DataGridItemPropertyBase> AutoFilteredItems
+    internal bool DefaultItemPropertiesInitialized
     {
       get
       {
-        return m_autoFilteredItems;
+        return m_flags[ ( int )DataGridDetailDescriptionFlags.DefaultItemPropertiesInitialized ];
+      }
+      set
+      {
+        m_flags[ ( int )DataGridDetailDescriptionFlags.DefaultItemPropertiesInitialized ] = value;
       }
     }
+
+    #endregion
+
+    #region DefaultPropertyDescriptionsCreated Internal Property
+
+    internal bool DefaultPropertyDescriptionsCreated
+    {
+      get
+      {
+        return m_flags[ ( int )DataGridDetailDescriptionFlags.DefaultPropertyDescriptionsCreated ];
+      }
+      set
+      {
+        m_flags[ ( int )DataGridDetailDescriptionFlags.DefaultPropertyDescriptionsCreated ] = value;
+      }
+    }
+
+    #endregion
+
+    #region DefaultPropertyDescriptions Internal Property
+
+    internal PropertyDescriptionRouteDictionary DefaultPropertyDescriptions
+    {
+      get
+      {
+        return m_defaultPropertyDescriptions;
+      }
+    }
+
+    private readonly PropertyDescriptionRouteDictionary m_defaultPropertyDescriptions;
 
     #endregion
 
@@ -384,6 +368,27 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
+    #region ItemType Internal Property
+
+    internal Type ItemType
+    {
+      get
+      {
+        return m_itemType;
+      }
+      set
+      {
+        if( value == m_itemType )
+          return;
+
+        m_itemType = value;
+      }
+    }
+
+    private Type m_itemType; //null
+
+    #endregion
+
     #region DataGridSortDescriptions Internal Property
 
     internal DataGridSortDescriptionCollection DataGridSortDescriptions
@@ -396,23 +401,11 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region AutoFilterValuesChanged Internal Property
-
-    internal Action<AutoFilterValuesChangedEventArgs> DetailDescriptionAutoFilterValuesChanged;
-
-    #endregion
-
-    #region Protected Methods
-
     protected internal virtual void Initialize( DataGridCollectionViewBase parentCollectionView )
     {
     }
 
     protected internal abstract IEnumerable GetDetailsForParentItem( DataGridCollectionViewBase parentCollectionView, object parentItem );
-
-    #endregion
-
-    #region Internal Methods
 
     internal void Seal()
     {
@@ -427,212 +420,88 @@ namespace Xceed.Wpf.DataGrid
       this.Initialize( parentCollectionView );
     }
 
-    internal virtual void OnDetailDescriptionsCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
+    private void OnItemPropertiesCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
-      // Set the AutoFilterValuesChanged event for each
-      // newly added DataGridDetailDescription added to 
-      // collection
-      int newItemsCount = ( e.NewItems != null )
-       ? e.NewItems.Count
-       : 0;
+      var removedItems = default( IEnumerable<DataGridItemPropertyBase> );
 
-      int oldItemsCount = ( e.OldItems != null )
-      ? e.OldItems.Count
-      : 0;
-
-      for( int i = 0; i < oldItemsCount; i++ )
-      {
-        DataGridDetailDescription description = e.OldItems[ i ] as DataGridDetailDescription;
-
-        if( description == null )
-          continue;
-
-        description.UnregisterAllAutoFilterValuesChangedEvent();
-      }
-
-      for( int i = 0; i < newItemsCount; i++ )
-      {
-        DataGridDetailDescription description = e.NewItems[ i ] as DataGridDetailDescription;
-
-        if( description == null )
-          continue;
-
-        description.DetailDescriptionAutoFilterValuesChanged = this.RaiseDetailDescriptionAutoFilterValuesChangedEvent;
-      }
-    }
-
-    internal virtual void OnItemPropertiesCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
-    {
       switch( e.Action )
       {
         case NotifyCollectionChangedAction.Replace:
-          Debug.Assert( false, "The replace of an ItemProperty is not supported." );
+          removedItems = e.OldItems.Cast<DataGridItemPropertyBase>();
           break;
+
         case NotifyCollectionChangedAction.Remove:
-
-          int oldItemsCount = ( e.OldItems != null )
-            ? e.OldItems.Count
-            : 0;
-
-          for( int i = 0; i < oldItemsCount; i++ )
-          {
-            DataGridItemPropertyBase dataGridItemProperty = e.OldItems[ i ] as DataGridItemPropertyBase;
-            Debug.Assert( dataGridItemProperty != null );
-
-            this.UnregisterAutoFilterValuesChangedEvent( dataGridItemProperty.Name );
-          }
+          removedItems = e.OldItems.Cast<DataGridItemPropertyBase>();
           break;
+
         case NotifyCollectionChangedAction.Reset:
-
-          this.UnregisterAllAutoFilterValuesChangedEvent();
-          break;
+          throw new NotSupportedException();
       }
     }
 
-    internal void RegisterAutoFilterValuesChangedEvent( string fieldName, INotifyCollectionChanged autoFilterValues )
-    {
-      if( this.DetailDescriptionAutoFilterValuesChanged == null )
-        return;
-
-      if( m_registeredFieldNamesToAutoFilterValues.ContainsKey( fieldName ) )
-        return;
-
-      m_registeredFieldNamesToAutoFilterValues.Add( fieldName, autoFilterValues );
-      m_registeredAutoFilterValuesToFieldNames.Add( autoFilterValues, fieldName );
-
-      CollectionChangedEventManager.AddListener( autoFilterValues, this );
-    }
-
-    internal void UnregisterAllAutoFilterValuesChangedEvent()
-    {
-      foreach( INotifyCollectionChanged autoFilterValues in m_registeredAutoFilterValuesToFieldNames.Keys )
-        CollectionChangedEventManager.RemoveListener( autoFilterValues, this );
-
-      m_registeredAutoFilterValuesToFieldNames.Clear();
-      m_registeredFieldNamesToAutoFilterValues.Clear();
-      this.DetailDescriptionAutoFilterValuesChanged = null;
-    }
-
-
-    #endregion
-
-    #region Private Methods
-
-    private void UnregisterAutoFilterValuesChangedEvent( string fieldName )
-    {
-      if( string.IsNullOrEmpty( fieldName ) )
-        return;
-
-      INotifyCollectionChanged collectionChanged = null;
-
-      if( !m_registeredFieldNamesToAutoFilterValues.TryGetValue( fieldName, out collectionChanged ) )
-        return;
-
-      CollectionChangedEventManager.RemoveListener( collectionChanged, this );
-
-      m_registeredFieldNamesToAutoFilterValues.Remove( fieldName );
-      m_registeredAutoFilterValuesToFieldNames.Remove( collectionChanged );
-    }
-
-    private void RaiseDetailDescriptionAutoFilterValuesChangedEvent( AutoFilterValuesChangedEventArgs e )
-    {
-      // Forward this change notification to the root CollectionView
-      // or CollectionViewSource
-      if( this.DetailDescriptionAutoFilterValuesChanged != null )
-        this.DetailDescriptionAutoFilterValuesChanged( e );
-    }
-
-    private void OnAutoFilterValuesCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
-    {
-      if( this.AutoFilterMode == AutoFilterMode.None )
-        return;
-
-      ObservableHashList hashList = sender as ObservableHashList;
-
-      if( hashList == null )
-        return;
-
-      string fieldName = m_registeredAutoFilterValuesToFieldNames[ hashList ];
-
-      if( string.IsNullOrEmpty( fieldName ) )
-        return;
-
-      DataGridItemPropertyBase itemProperty = this.ItemProperties[ fieldName ];
-
-      if( itemProperty == null )
-        return;
-
-      this.DetailDescriptionAutoFilterValuesChanged( new AutoFilterValuesChangedEventArgs( this, itemProperty, hashList, e ) );
-    }
-
-    #endregion
-
-    #region Private Fields
-
-    private string m_relationName;
-    private object m_title;
-    private DataTemplate m_titleTemplate;
-    private DataGridItemPropertyCollection m_itemProperties;
-    private DataGridDetailDescriptionCollection m_detailDescriptions;
-    private DistinctValuesConstraint m_distinctValuesConstraint = DistinctValuesConstraint.All;
-    private StatFunctionCollection m_statFunctions;
-    private GroupDescriptionCollection m_groupDescriptions;
-    private DataGridSortDescriptionCollection m_sortDescriptions;
-    private ReadOnlyDictionary<string, IList> m_autoFilterValues;
-    private ObservableCollection<DataGridItemPropertyBase> m_autoFilteredItems;
-    private AutoFilterMode m_autoFilterMode = AutoFilterMode.None;
-    private FilterCriteriaMode m_filterCriteriaMode = FilterCriteriaMode.And;
-    private BitVector32 m_flags = new BitVector32();
-    private Dictionary<string, INotifyCollectionChanged> m_registeredFieldNamesToAutoFilterValues;
-    private Dictionary<INotifyCollectionChanged, string> m_registeredAutoFilterValuesToFieldNames;
-
-    #endregion
-
-    #region DataGridDetailDescriptionFlags Private Classes
-
-    [Flags]
-    private enum DataGridDetailDescriptionFlags
-    {
-      IsSealed = 1,
-      DefaultCalculateDistinctValues = 2,
-      IsInitialized = 4,
-      AutoCreateItemProperties = 8,
-      AutoCreateDetailDescriptions = 16,
-      AutoCreateForeignKeyDescriptions = 32,
-      IsAutoCreated = 64,
-      AutoCreateItemPropertiesCompleted = 128,
-      AutoCreateDetailDescriptionsCompleted = 256,
-    }
-
-    #endregion
-
     #region IWeakEventListener Members
 
-    public bool ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
       return this.OnReceiveWeakEvent( managerType, sender, e );
     }
 
     protected virtual bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
-      if( ( managerType == null )
-          || ( sender == null )
-          || ( e == null ) )
+      if( ( managerType == null ) || ( sender == null ) || ( e == null ) )
         return false;
 
       if( managerType == typeof( CollectionChangedEventManager ) )
       {
-        NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs =
-          e as NotifyCollectionChangedEventArgs;
+        var eventArgs = ( NotifyCollectionChangedEventArgs )e;
 
-        this.OnAutoFilterValuesCollectionChanged( sender, notifyCollectionChangedEventArgs );
+        if( m_itemProperties == sender )
+        {
+          this.OnItemPropertiesCollectionChanged( sender, eventArgs );
+        }
+        else if( m_detailDescriptions == sender )
+        {
+        }
+      }
+      else if( managerType == typeof( InitializeItemPropertyEventManager ) )
+      {
+        var eventArgs = ( InitializeItemPropertyEventArgs )e;
 
-        return true;
+        if( m_itemProperties == sender )
+        {
+          var itemProperty = eventArgs.ItemProperty;
+          var itemPropertyRoute = DataGridItemPropertyRoute.Create( itemProperty );
+
+          ItemsSourceHelper.SetPropertyDescriptionsFromItemProperty( m_defaultPropertyDescriptions, null, null, m_itemType, itemPropertyRoute );
+          ItemsSourceHelper.InitializePropertyDescriptions( m_defaultPropertyDescriptions, itemPropertyRoute, m_itemType, this.DefaultPropertyDescriptionsCreated );
+        }
+      }
+      else
+      {
+        return false;
       }
 
-      return false;
+      return true;
     }
 
     #endregion
+
+    private BitVector32 m_flags = new BitVector32();
+
+    [Flags]
+    private enum DataGridDetailDescriptionFlags
+    {
+      IsSealed = 1 << 0,
+      DefaultCalculateDistinctValues = 1 << 1,
+      IsInitialized = 1 << 2,
+      AutoCreateItemProperties = 1 << 3,
+      AutoCreateDetailDescriptions = 1 << 4,
+      AutoCreateForeignKeyDescriptions = 1 << 5,
+      IsAutoCreated = 1 << 6,
+      AutoCreateItemPropertiesCompleted = 1 << 7,
+      AutoCreateDetailDescriptionsCompleted = 1 << 8,
+      DefaultItemPropertiesInitialized = 1 << 9,
+      DefaultPropertyDescriptionsCreated = 1 << 10,
+    }
   }
 }

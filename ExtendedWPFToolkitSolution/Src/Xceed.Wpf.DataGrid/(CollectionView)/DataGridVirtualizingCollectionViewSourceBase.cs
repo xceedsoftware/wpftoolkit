@@ -15,12 +15,7 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
 using System.Windows;
-using System.Globalization;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -80,7 +75,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion MaxRealizedItemCount
 
-
     #region PreemptivePageQueryRatio
 
     public static readonly DependencyProperty PreemptivePageQueryRatioProperty = DependencyProperty.Register(
@@ -90,8 +84,14 @@ namespace Xceed.Wpf.DataGrid
 
     public double PreemptivePageQueryRatio
     {
-      get { return ( double )GetValue( DataGridVirtualizingCollectionViewSourceBase.PreemptivePageQueryRatioProperty ); }
-      set { this.SetValue( DataGridVirtualizingCollectionViewSourceBase.PreemptivePageQueryRatioProperty, value ); }
+      get
+      {
+        return ( double )GetValue( DataGridVirtualizingCollectionViewSourceBase.PreemptivePageQueryRatioProperty );
+      }
+      set
+      {
+        this.SetValue( DataGridVirtualizingCollectionViewSourceBase.PreemptivePageQueryRatioProperty, value );
+      }
     }
 
     #endregion PreemptivePageQueryRatio
@@ -105,8 +105,14 @@ namespace Xceed.Wpf.DataGrid
 
     public CommitMode CommitMode
     {
-      get { return ( CommitMode )GetValue( DataGridVirtualizingCollectionViewSourceBase.CommitModeProperty ); }
-      set { this.SetValue( DataGridVirtualizingCollectionViewSourceBase.CommitModeProperty, value ); }
+      get
+      {
+        return ( CommitMode )GetValue( DataGridVirtualizingCollectionViewSourceBase.CommitModeProperty );
+      }
+      set
+      {
+        this.SetValue( DataGridVirtualizingCollectionViewSourceBase.CommitModeProperty, value );
+      }
     }
 
     #endregion CommitMode
@@ -123,7 +129,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion DATA VIRTUALIZATION EVENTS
 
-
     #region INTERNAL PROPERTIES
 
     internal bool IsInitialized
@@ -135,7 +140,6 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion INTERNAL PROPERTIES
-
 
     #region INTERNAL METHODS
 
@@ -151,12 +155,10 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion INTERNAL METHODS
 
-
     #region PRIVATE FIELDS
 
     private bool m_isInitialized;
 
     #endregion PRIVATE FIELDS
-
   }
 }

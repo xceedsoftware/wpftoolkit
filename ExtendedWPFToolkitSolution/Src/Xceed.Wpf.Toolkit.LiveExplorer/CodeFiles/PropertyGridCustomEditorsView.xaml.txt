@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -27,7 +27,7 @@
             This example demonstrates the various methods of assigning custom editors to the properties. You can supply your own editor DataTemplate based on a Type, a property name, or both. To supply your own editor for a property, you must create an EditorDefinition for the PropertyGrid.
         </Paragraph>
     </local:DemoView.Description>
-    
+
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
@@ -56,7 +56,7 @@
                         <TextBox Background="Green"  Text="{Binding Value}" />
                         <!-- 
                         When using SelectedObject[s] bind to the "Value" property 
-                        
+
                         When using PropertiesSource or Properties to specify your items,
                         your DataContext will be the item itself, so bind directly to the 
                         property of your underlying item, hence, probably the same path as 

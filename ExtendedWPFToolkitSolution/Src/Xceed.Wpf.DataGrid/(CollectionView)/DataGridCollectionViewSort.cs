@@ -14,20 +14,15 @@
 
   ***********************************************************************************/
 
-using System;
-using System.ComponentModel;
 using System.Collections.Generic;
-using System.Text;
-
+using System.ComponentModel;
 using Xceed.Utils.Collections;
-using System.Collections;
-using Xceed.Utils.Data;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal class DataGridCollectionViewSort : IndexWeakHeapSort
   {
-    public DataGridCollectionViewSort( int[] dataIndexArray, SortDescriptionInfo[] sortDescriptionInfos )
+    public DataGridCollectionViewSort( int[] dataIndexArray, IList<SortDescriptionInfo> sortDescriptionInfos )
       : base( dataIndexArray )
     {
       m_sortDescriptionInfos = sortDescriptionInfos;
@@ -35,41 +30,25 @@ namespace Xceed.Wpf.DataGrid
 
     public override int Compare( int xDataIndex, int yDataIndex )
     {
-      ListSortDirection lastSortDirection = ListSortDirection.Ascending;
+      var lastSortDirection = ListSortDirection.Ascending;
 
       if( m_sortDescriptionInfos != null )
       {
-        int result = 0;
-        int count = m_sortDescriptionInfos.Length;
-
-        for( int i = 0; i < count; i++ )
+        foreach( var sortDescriptionInfo in m_sortDescriptionInfos )
         {
-          SortDescriptionInfo sortDescriptionInfo = m_sortDescriptionInfos[ i ];
-
           lastSortDirection = sortDescriptionInfo.SortDirection;
 
           if( sortDescriptionInfo.Property == null )
             continue;
 
-          IComparer sortComparer = sortDescriptionInfo.SortComparer;
-          DataStore dataStore = sortDescriptionInfo.DataStore;
+          var sortComparer = sortDescriptionInfo.SortComparer;
+          var dataStore = sortDescriptionInfo.DataStore;
+          var compare = ( sortComparer != null )
+                          ? sortComparer.Compare( dataStore.GetData( xDataIndex ), dataStore.GetData( yDataIndex ) )
+                          : dataStore.Compare( xDataIndex, yDataIndex );
 
-          if( sortComparer != null )
-          {
-            result = sortComparer.Compare( dataStore.GetData( xDataIndex ), dataStore.GetData( yDataIndex ) );
-          }
-          else
-          {
-            result = dataStore.Compare( xDataIndex, yDataIndex );
-          }
-
-          if( result != 0 )
-          {
-            if( lastSortDirection == ListSortDirection.Descending )
-              result = -result;
-
-            return result;
-          }
+          if( compare != 0 )
+            return ( lastSortDirection == ListSortDirection.Descending ) ? -compare : compare;
         }
       }
 
@@ -79,6 +58,6 @@ namespace Xceed.Wpf.DataGrid
       return xDataIndex - yDataIndex;
     }
 
-    private SortDescriptionInfo[] m_sortDescriptionInfos;
+    private readonly IList<SortDescriptionInfo> m_sortDescriptionInfos;
   }
 }

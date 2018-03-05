@@ -120,10 +120,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private PropertyItem CreatePropertyItem( PropertyDescriptor property, PropertyDefinition propertyDef )
     {
-      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property,
-                                                                                  SelectedObject, 
-                                                                                  this.PropertyContainer.IsCategorized
-                                                                                 );
+      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property, SelectedObject, this.PropertyContainer );                                                                                 
       definition.InitProperties();
 
       this.InitializeDescriptorDefinition( definition, propertyDef );
@@ -131,6 +128,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       Debug.Assert( SelectedObject != null );
       propertyItem.Instance = SelectedObject;
       propertyItem.CategoryOrder = this.GetCategoryOrder( definition.CategoryValue );
+
       propertyItem.WillRefreshPropertyGrid = this.GetWillRefreshPropertyGrid( property );
       return propertyItem;
     }
@@ -158,6 +156,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       return order;
     }
+
 
 
 

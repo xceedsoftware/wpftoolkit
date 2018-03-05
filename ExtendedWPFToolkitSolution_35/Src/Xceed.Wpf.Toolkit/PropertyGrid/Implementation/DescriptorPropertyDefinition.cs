@@ -49,12 +49,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region Constructor
 
-
-    internal DescriptorPropertyDefinition( PropertyDescriptor propertyDescriptor, object selectedObject, bool isPropertyGridCategorized )
-      : base( isPropertyGridCategorized )
+    internal DescriptorPropertyDefinition( PropertyDescriptor propertyDescriptor, object selectedObject, IPropertyContainer propertyContainer )
+       : base( propertyContainer.IsCategorized
+             )
     {
       this.Init( propertyDescriptor, selectedObject );
     }
+
     #endregion
 
     #region Custom Properties
@@ -120,8 +121,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected override bool ComputeCanResetValue()
     {
-      return PropertyDescriptor.CanResetValue( SelectedObject )
-        && !PropertyDescriptor.IsReadOnly;
+      if( !PropertyDescriptor.IsReadOnly )
+      {
+        var defaultValue = this.ComputeDefaultValueAttribute();
+        if( defaultValue != null )
+          return true;
+
+        return PropertyDescriptor.CanResetValue( SelectedObject );
+      }
+
+      return false;
     }
 
     protected override object ComputeAdvancedOptionsTooltip()
@@ -188,10 +197,22 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       var editorAttribute = GetAttribute<EditorAttribute>();
       if( editorAttribute != null )
       {
+        Type type = null;
 #if VS2008
-        var type = Type.GetType( editorAttribute.EditorTypeName );
+        type = Type.GetType( editorAttribute.EditorTypeName );
 #else
-        var type = Type.GetType( editorAttribute.EditorTypeName, ( name ) => { return AppDomain.CurrentDomain.GetAssemblies().Where( l => l.FullName == name.FullName ).FirstOrDefault(); }, null, true );
+        try
+        {
+          type = Type.GetType( editorAttribute.EditorTypeName, ( name ) =>
+          {
+            return AppDomain.CurrentDomain.GetAssemblies().Where( l => l.FullName == name.FullName ).FirstOrDefault();
+          }
+          , null, true );
+        }
+        catch( Exception )
+        {
+          type = Type.GetType( editorAttribute.EditorTypeName );
+        }       
 #endif
 
         // If the editor does not have any public parameterless constructor, forget it.

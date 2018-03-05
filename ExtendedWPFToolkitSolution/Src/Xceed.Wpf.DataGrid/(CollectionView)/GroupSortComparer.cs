@@ -54,25 +54,22 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      ListSortDirection sortDirection = ListSortDirection.Ascending;
+      var sortDirection = ListSortDirection.Ascending;
       int result;
 
       foreach( SortInfo sortInfo in m_sortInfos )
-      //for( int i = 0; i < sortInfoCount; i++ )
       {
-        string statResultPropertyName = sortInfo.StatResultPropertyName;
-        IComparer sortComparer = sortInfo.SortComparer;
+        var foreignKeyDescription = sortInfo.ForeignKeyDescription;
+        var sortComparer = sortInfo.SortComparer;
         sortDirection = sortInfo.SortDirection;
 
-        if( statResultPropertyName == null )
+        if( foreignKeyDescription != null )
         {
-          result = sortComparer.Compare( xGroup.Name, yGroup.Name );
+          result = sortComparer.Compare( foreignKeyDescription.GetDisplayValue( xGroup.Name ), foreignKeyDescription.GetDisplayValue( yGroup.Name ) );
         }
         else
         {
-          result = sortComparer.Compare(
-            xGroup.GetStatFunctionValue( statResultPropertyName ),
-            yGroup.GetStatFunctionValue( statResultPropertyName ) );
+          result = sortComparer.Compare( xGroup.Name, yGroup.Name );
         }
 
         if( result != 0 )
@@ -96,21 +93,37 @@ namespace Xceed.Wpf.DataGrid
 
     public class SortInfo
     {
-      public SortInfo( string statResultPropertyName, ListSortDirection sortDirection, IComparer sortComparer )
+      public SortInfo( ListSortDirection sortDirection, IComparer sortComparer )
       {
         if( sortComparer == null )
           throw new ArgumentNullException( "sortComparer" );
 
-        this.StatResultPropertyName = statResultPropertyName;
         this.SortDirection = sortDirection;
         this.SortComparer = sortComparer;
       }
 
-      public string StatResultPropertyName
+      public SortInfo( DataGridForeignKeyDescription foreignKeyDescription, ListSortDirection sortDirection, IComparer sortComparer )
+      {
+        if( sortComparer == null )
+          throw new ArgumentNullException( "sortComparer" );
+
+        this.ForeignKeyDescription = foreignKeyDescription;
+        this.SortDirection = sortDirection;
+        this.SortComparer = sortComparer;
+      }
+
+
+      #region ForeignKeyDescription Property
+
+      internal DataGridForeignKeyDescription ForeignKeyDescription
       {
         get;
         private set;
       }
+
+      #endregion
+
+      #region SortDirection Property
 
       public ListSortDirection SortDirection
       {
@@ -118,11 +131,17 @@ namespace Xceed.Wpf.DataGrid
         private set;
       }
 
+      #endregion
+
+      #region SortComparer Property
+
       public IComparer SortComparer
       {
         get;
         private set;
       }
+
+      #endregion
     }
   }
 }

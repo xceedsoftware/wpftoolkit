@@ -17,11 +17,70 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Xceed.Wpf.DataGrid"
-                    xmlns:cnv="clr-namespace:Xceed.Wpf.DataGrid.Converters"
+                    xmlns:conv="clr-namespace:Xceed.Wpf.DataGrid.Converters"
                     xmlns:views="clr-namespace:Xceed.Wpf.DataGrid.Views"
-                    xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase">
+                    xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+                    xmlns:mscorlib="clr-namespace:System;assembly=mscorlib">
 
-    <cnv:StringFormatMultiConverter x:Key="stringFormatMultiConverter" />
+   <conv:StringFormatMultiConverter x:Key="stringFormatMultiConverter" />
+   <conv:NullToBooleanConverter x:Key="nullToBooleanConverter" />
+   <conv:LevelToOpacityConverter x:Key="levelToOpacityConverter" />
+   <conv:IntAdditionConverter x:Key="intAdditionConverter" />
+   <conv:ThicknessConverter x:Key="thicknessConverter" />
+   <conv:EmptyStringToBooleanConverter x:Key="emptyStringToBooleanConverter" />
+   <conv:SourceDataConverter x:Key="sourceDataConverter" />
+
+   <!-- DownArrow -->
+   <Path x:Key="downArrow"
+         Data="M454.165,177.507L422.165,212.46 390.165,177.507 454.165,177.507z"
+         Stretch="Uniform"
+         Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}"
+         Width="16"
+         Height="24" />
+
+   <!-- UpArrow -->
+   <Path x:Key="upArrow"
+         Data="M167.5,212.46L199.5,177.507 231.5,212.46 167.5,212.46z"
+         Stretch="Uniform"
+         Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}"
+         Width="16"
+         Height="24" />
+
+   <!-- Visible icon -->
+   <Path x:Key="visibleIcon"
+         x:Shared="False"
+         Data="M10.666975,3.7209997C11.811488,3.7209999 12.74,4.6494002 12.74,5.7939548 12.74,6.9385099 11.811488,7.8670001 10.666975,7.8670001 9.5224209,7.8670001 8.5939999,6.9385099 8.5939999,5.7939548 8.5939999,4.6494002 9.5224209,3.7209999 10.666975,3.7209997z M10.6665,1.4661931C8.2771845,1.4661933 6.3384409,3.4050867 6.3384409,5.7944998 6.3384409,8.1851625 8.2771845,10.122937 10.6665,10.122937 13.055855,10.122937 14.994618,8.1851625 14.994618,5.7944998 14.994618,3.4050867 13.055855,1.4661933 10.6665,1.4661931z M10.6665,0C16.557089,-5.0623953E-08 21.333,5.7944998 21.333,5.7944998 21.333,5.7944998 16.557089,11.589 10.6665,11.589 4.7761602,11.589 0,5.7944998 0,5.7944998 0,5.7944998 4.7761602,-5.0623953E-08 10.6665,0z"
+         Stretch="Uniform"
+         Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}"
+         Width="16"
+         Height="16" />
+
+   <!-- Delete icon -->
+   <Path x:Key="deleteIcon"
+         x:Shared="False"
+         Data="M33.978,27.679999L33.978,58.098995 41.374,58.098995 41.374,27.679999z M14.841001,27.679999L14.841001,58.098995 22.237,58.098995 22.237,27.679999z M4.0320003,22.430001L52.183002,22.430001 52.183002,63.995998 4.0320003,63.995998z M15.974001,0L40.194999,0 40.194999,7.7200003 56.166999,7.7200003 56.166999,15.995 0,15.995 0,7.7200003 15.974001,7.7200003z"
+         Stretch="Uniform"
+         Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}"
+         Width="16"
+         Height="12" />
+
+   <!-- Insert Group icon -->
+   <Path x:Key="insertGroupIcon"
+         x:Shared="False"
+         Data="M19.833,0L32.501,0 32.501,19.833999 52.334,19.833999 52.334,32.500999 32.501,32.500999 32.501,52.333 19.833,52.333 19.833,32.500999 0,32.500999 0,19.833999 19.833,19.833999z"
+         Stretch="Uniform"
+         Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}"
+         Width="16"
+         Height="12" />
+
+   <!-- Rename Group icon -->
+   <Path x:Key="renameGroupIcon"
+         x:Shared="False"
+         Data="M0,44.439791L18.98951,54.569246 0.47998798,62.66881z M17.428029,12.359973L36.955557,23.568769 21.957478,49.686174 20.847757,46.346189 15.11851,45.756407 14.138656,42.166935 8.5292659,41.966761 6.9493899,38.037481 2.4399572,38.477377z M26.812517,0.0009765625C27.350616,-0.012230873,27.875986,0.10826397,28.348372,0.3782568L42.175028,8.3180408C43.85462,9.2780154,44.234529,11.777948,43.02482,13.89789L41.375219,16.767812 21.460039,5.3381228 23.10964,2.4582005C23.979116,0.941679,25.437378,0.034730911,26.812517,0.0009765625z"
+         Stretch="Uniform"
+         Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}"
+         Width="16"
+         Height="12" />
 
    <!-- Style applied to the Thumbs that are used to resize the columns and rows.
         The Thumb's template is an empty Grid with a Transparent background to
@@ -94,19 +153,21 @@
 
          <TextBlock Text=": "
                     VerticalAlignment="Center" />
-            <ContentPresenter ContentTemplate="{Binding RelativeSource={RelativeSource TemplatedParent},Path=DataContext.ValueTemplate}"
-                              ContentTemplateSelector="{Binding RelativeSource={RelativeSource TemplatedParent},Path=DataContext.ValueTemplateSelector}"
-                              VerticalAlignment="Center">
-                <ContentPresenter.Content>
-                   <MultiBinding Converter="{StaticResource stringFormatMultiConverter}">
-                        <Binding Path="Value" />
-                        <Binding Path="DataContext.ValueStringFormat" RelativeSource="{RelativeSource TemplatedParent}" />
-                        <Binding Path="DataContext.ValueStringFormatCulture" RelativeSource="{RelativeSource TemplatedParent}" />
-                   </MultiBinding>
-                </ContentPresenter.Content>
-            </ContentPresenter>
+         <ContentPresenter ContentTemplate="{Binding RelativeSource={RelativeSource TemplatedParent},Path=DataContext.ValueTemplate}"
+                           ContentTemplateSelector="{Binding RelativeSource={RelativeSource TemplatedParent},Path=DataContext.ValueTemplateSelector}"
+                           VerticalAlignment="Center">
+            <ContentPresenter.Content>
+               <MultiBinding Converter="{StaticResource stringFormatMultiConverter}">
+                  <Binding Path="Value" />
+                  <Binding Path="DataContext.ValueStringFormat"
+                           RelativeSource="{RelativeSource TemplatedParent}" />
+                  <Binding Path="DataContext.ValueStringFormatCulture"
+                           RelativeSource="{RelativeSource TemplatedParent}" />
+               </MultiBinding>
+            </ContentPresenter.Content>
+         </ContentPresenter>
 
-            <TextBlock Text=" ("
+         <TextBlock Text=" ("
                     VerticalAlignment="Center" />
          <TextBlock Text="{Binding ItemCount}"
                     VerticalAlignment="Center" />
@@ -135,23 +196,23 @@
          <DataTemplate x:Key="detailedGroupItemContentTemplate">
             <StackPanel Orientation="Horizontal"
                         VerticalAlignment="Center">
-                    <ContentControl ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplate}"
-                                    ContentTemplateSelector="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplateSelector}"
-                                    TextBlock.FontWeight="Bold"
-                                    VerticalAlignment="Center">
-                        <ContentControl.Content>
+               <ContentControl ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplate}"
+                               ContentTemplateSelector="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplateSelector}"
+                               TextBlock.FontWeight="Bold"
+                               VerticalAlignment="Center">
+                  <ContentControl.Content>
                      <MultiBinding Converter="{StaticResource stringFormatMultiConverter}">
-                                <Binding Path="(local:GroupNavigationControl.Group).Value"
-                                         RelativeSource="{RelativeSource Self}"/>
-                                <Binding Path="(local:GroupNavigationControl.Group).ValueStringFormat"
-                                         RelativeSource="{RelativeSource Self}" />
-                                <Binding Path="(local:GroupNavigationControl.Group).ValueStringFormatCulture"
-                                         RelativeSource="{RelativeSource Self}" />
-                           </MultiBinding>
-                        </ContentControl.Content>
-                    </ContentControl>
+                        <Binding Path="(local:GroupNavigationControl.Group).Value"
+                                 RelativeSource="{RelativeSource Self}" />
+                        <Binding Path="(local:GroupNavigationControl.Group).ValueStringFormat"
+                                 RelativeSource="{RelativeSource Self}" />
+                        <Binding Path="(local:GroupNavigationControl.Group).ValueStringFormatCulture"
+                                 RelativeSource="{RelativeSource Self}" />
+                     </MultiBinding>
+                  </ContentControl.Content>
+               </ContentControl>
 
-                    <TextBlock Text=" ("
+               <TextBlock Text=" ("
                           VerticalAlignment="Center" />
                <TextBlock Text="{Binding ItemCount}"
                           VerticalAlignment="Center" />
@@ -176,20 +237,20 @@
          </DataTemplate>
 
          <DataTemplate x:Key="groupItemContentTemplate">
-                <ContentControl ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplate}"
-                                ContentTemplateSelector="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplateSelector}">
-                    <ContentControl.Content>
+            <ContentControl ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplate}"
+                            ContentTemplateSelector="{Binding RelativeSource={RelativeSource Self}, Path=(local:GroupNavigationControl.Group).ValueTemplateSelector}">
+               <ContentControl.Content>
                   <MultiBinding Converter="{StaticResource stringFormatMultiConverter}">
-                            <Binding Path="(local:GroupNavigationControl.Group).Value" 
-                                     RelativeSource="{RelativeSource Self}" />
-                            <Binding Path="(local:GroupNavigationControl.Group).ValueStringFormat"
-                                     RelativeSource="{RelativeSource Self}" />
-                            <Binding Path="(local:GroupNavigationControl.Group).ValueStringFormatCulture"
-                                     RelativeSource="{RelativeSource Self}" />
-                        </MultiBinding>
-                    </ContentControl.Content>
-                </ContentControl>
-            </DataTemplate>
+                     <Binding Path="(local:GroupNavigationControl.Group).Value"
+                              RelativeSource="{RelativeSource Self}" />
+                     <Binding Path="(local:GroupNavigationControl.Group).ValueStringFormat"
+                              RelativeSource="{RelativeSource Self}" />
+                     <Binding Path="(local:GroupNavigationControl.Group).ValueStringFormatCulture"
+                              RelativeSource="{RelativeSource Self}" />
+                  </MultiBinding>
+               </ContentControl.Content>
+            </ContentControl>
+         </DataTemplate>
 
          <DataTemplate x:Key="parentGroupTemplate">
             <local:GroupNavigationControl Group="{Binding}"
@@ -225,7 +286,7 @@
                       ContentTemplate="{StaticResource defaultGroupTemplate}" />
 
       <DataTemplate.Triggers>
-         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).DataGridControl.View, Converter={x:Static cnv:TypeToBooleanConverter.Singleton}, ConverterParameter={x:Type views:TableflowView}}"
+         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).DataGridControl.View, Converter={x:Static conv:TypeToBooleanConverter.Singleton}, ConverterParameter={x:Type views:TableflowView}}"
                       Value="True">
             <Setter Property="ContentTemplate"
                     Value="{StaticResource stickyGroupTemplate}"
@@ -242,52 +303,12 @@
 
    </DataTemplate>
 
-   <!-- ValueConverter that is used to do DataTriggers on Content properties to check if they are null. -->
-   <cnv:NullToBooleanConverter x:Key="nullToBooleanConverter" />
-
-   <cnv:IntAdditionConverter x:Key="intAdditionConverter" />
-
-   <!-- ValueConverter that is used to map GridLineThickness properties (of type double)
-        to Thickness structures that we can set to BorderThickness properties in the templates. -->
-   <cnv:ThicknessConverter x:Key="thicknessConverter" />
-
-   <cnv:EmptyStringToBooleanConverter x:Key="emptyStringToBooleanConverter" />
-
-   <cnv:SourceDataConverter x:Key="sourceDataConverter" />
-
    <Thickness x:Key="cellPadding"
               Left="2"
               Top="2"
               Right="2"
               Bottom="2" />
 
-   <!--**************************
-   * Style: ListBoxItem Style (AutoFilter Options)
-   **************************-->
-   <Style x:Key="defaultAutoFilteringCheckBoxItemStyle"
-          TargetType="ListBoxItem">
-      <Setter Property="Template">
-         <Setter.Value>
-            <ControlTemplate TargetType="{x:Type ListBoxItem}">
-
-               <Border Background="{TemplateBinding Background}"
-                       BorderBrush="{TemplateBinding BorderBrush}"
-                       BorderThickness="{TemplateBinding BorderThickness}">
-
-                  <CheckBox Content="{TemplateBinding Content}"
-                            ContentTemplate="{TemplateBinding ContentTemplate}"
-                            ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
-                            Focusable="False"
-                            TextElement.Foreground="{TemplateBinding Foreground}"
-                            IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent},Path=IsSelected, Mode=TwoWay}"
-                            Margin="2,2,2,2"
-                            AutomationProperties.AutomationId="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource sourceDataConverter}}" />
-               </Border>
-
-            </ControlTemplate>
-         </Setter.Value>
-      </Setter>
-   </Style>
 
    <DataTemplate x:Key="connectionStateLoadingGlyph">
       <DataTemplate.Resources>

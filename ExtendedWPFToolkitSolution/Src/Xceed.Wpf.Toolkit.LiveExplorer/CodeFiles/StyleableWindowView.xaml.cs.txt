@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -47,80 +47,28 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
     private const string MessageBoxStyleKey = "messageBoxStyle";
     private const string WindowControlStyleKey = "windowControlStyle";
     private const string WindowButtonStyle = "FancyButtonStyle";
-#if OPEN_SOURCE
     private const string StyleableWindowMessage = "StyleableWindow is a standalone window that can be styled just like ChildWindow or MessageBox. This is a feature of the \"Plus\" version.";
-#else
-    private const string StyleableWindowNoStyleKey = "styleableWindowNoStyle";
-    private const string StyleableWindowStyleKey = "styleableWindowStyle";
-    private StyleableWindow _styleableWindow;
-#endif
 
     public StyleableWindowView()
     {
       InitializeComponent();
-#if !OPEN_SOURCE
-      this.Unloaded += new RoutedEventHandler( OnSampleUnloaded );
-#endif
       this.UpdateWindowsStyles(null,null);
     }
 
-#if !OPEN_SOURCE
-    private void OnSampleUnloaded( object sender, RoutedEventArgs e )
-    {
-      //# Be sure to close the window
-      if( _styleableWindow != null )
-      {
-        _styleableWindow.Close();
-      }
-    }
-#endif
 
     private void OnStyleableWindow_Click( object sender, RoutedEventArgs e )
     {
-#if OPEN_SOURCE
       var msgBox = new Xceed.Wpf.Toolkit.MessageBox();
       msgBox.DataContext = this.DataContext;
       msgBox.Text = StyleableWindowMessage;
       msgBox.Caption = StyledMsgBoxTitle;
       msgBox.Style = ( _enableStyleCheckBox.IsChecked.GetValueOrDefault() ) ? ( Style )this.Resources[ MessageBoxStyleKey ] : null;
       msgBox.ShowDialog();
-#else
-      if( _styleableWindow == null )
-      {
-        _styleableWindow = new StyleableWindow();
-        _styleableWindow.Width = 500;
-        _styleableWindow.Height = 300;
-        _styleableWindow.Title = StyleableWindowTitle;
-        _styleableWindow.DataContext = this.DataContext;
-        _styleableWindow.Left = Application.Current.MainWindow.Left + ( Application.Current.MainWindow.ActualWidth / 2 );
-        _styleableWindow.Top = Application.Current.MainWindow.Top + ( Application.Current.MainWindow.ActualHeight / 2 );
-        _styleableWindow.Closed += new EventHandler( OnStyleableWindowClosed );
-        _styleableWindow.Topmost = true;
 
-        _styleableWindow.Content = new TextBlock()
-        {
-          Text = StyleableWindowContent,
-          TextWrapping = TextWrapping.Wrap
-        };
 
-        _styleableWindow.Style = ( _enableStyleCheckBox.IsChecked.GetValueOrDefault() )
-          ? ( Style )this.Resources[ StyleableWindowStyleKey ]
-          : ( Style )this.Resources[ StyleableWindowNoStyleKey ];
 
-        _styleableWindow.Show();
-      }
-#endif
     }
 
-#if !OPEN_SOURCE
-    private void OnStyleableWindowClosed( object sender, EventArgs e )
-    {
-      _styleableWindow.Closed -= new EventHandler( OnStyleableWindowClosed );
-      _styleableWindow.Style = null;
-      _styleableWindow.DataContext = null;
-      _styleableWindow = null;
-    }
-#endif
     private void StandardMessageBoxButton_Click( object sender, RoutedEventArgs e )
     {
       System.Windows.MessageBox.Show( StandardMsgBoxMessage, StandardMsgBoxTitle );
@@ -150,15 +98,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
       {
         _childWindow.ClearValue( ChildWindow.StyleProperty );
       }
-      
-#if !OPEN_SOURCE
-      if( _styleableWindow != null )
-      {
-        _styleableWindow.Style = ( styled )
-          ? ( Style )this.Resources[ StyleableWindowStyleKey ]
-          : ( Style )this.Resources[ StyleableWindowNoStyleKey ];
-      }
-#endif
+
     }
   }
 

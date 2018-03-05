@@ -14,23 +14,21 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
+using Xceed.Wpf.DataGrid;
 
 namespace Xceed.Utils.Wpf.DragDrop
 {
   internal interface IDropTarget
   {
-    bool CanDropElement( UIElement draggedElement );
+    bool CanDropElement( UIElement draggedElement, RelativePoint mousePosition );
 
     void DragEnter( UIElement draggedElement );
 
-    void DragOver( UIElement draggedElement, Point mousePosition );
+    void DragOver( UIElement draggedElement, RelativePoint mousePosition );
 
     void DragLeave( UIElement draggedElement );
 
-    void Drop( UIElement draggedElement );
+    void Drop( UIElement draggedElement, RelativePoint mousePosition );
   }
 }

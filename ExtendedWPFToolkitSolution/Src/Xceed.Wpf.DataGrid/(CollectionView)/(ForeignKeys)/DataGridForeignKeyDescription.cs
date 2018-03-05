@@ -14,7 +14,9 @@
 
   ***********************************************************************************/
 
+using System;
 using System.Collections;
+using System.Data;
 using System.Windows;
 
 namespace Xceed.Wpf.DataGrid
@@ -23,6 +25,7 @@ namespace Xceed.Wpf.DataGrid
   {
     public DataGridForeignKeyDescription()
     {
+      this.SetForeignKeyConverter();
     }
 
     #region ForeignKeyConverter Property
@@ -122,5 +125,102 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion
+
+    protected virtual void SetForeignKeyConverter()
+    {
+      this.ForeignKeyConverter = new DataGridForeignKeyConverter();
+    }
+
+    internal Type GetDataType()
+    {
+      var itemsSource = this.ItemsSource;
+      if( itemsSource == null )
+        return null;
+
+      var displayMemberPath = this.DisplayMemberPath;
+      var foreignKeyConverter = this.ForeignKeyConverter;
+
+      if( string.IsNullOrWhiteSpace( displayMemberPath ) && ( foreignKeyConverter == null ) )
+        return null;
+
+      try
+      {
+        //Use the DisplayMemberPath or the ForeignKeyConverter to find the converted value data type, using a DataRowView or reflection.
+        if( ( itemsSource is DataView ) || ( itemsSource is DataTable ) )
+        {
+          foreach( object item in itemsSource )
+          {
+            var dataRowView = item as DataRowView;
+            if( dataRowView == null )
+              continue;
+
+            if( !string.IsNullOrWhiteSpace( displayMemberPath ) )
+            {
+              var dataColumn = dataRowView.Row.Table.Columns[ displayMemberPath ];
+              if( dataColumn != null )
+              {
+                return dataColumn.DataType;
+              }
+            }
+            else
+            {
+              var valuePath = this.ValuePath;
+              if( valuePath != null )
+              {
+                var key = dataRowView[ valuePath ];
+                var value = foreignKeyConverter.GetValueFromKey( key, this );
+                if( value != null )
+                {
+                  return value.GetType();
+                }
+              }
+            }
+          }
+        }
+        else
+        {
+          foreach( object item in itemsSource )
+          {
+            if( item == null )
+              continue;
+
+            if( !string.IsNullOrWhiteSpace( displayMemberPath ) )
+              return item.GetType().GetProperty( displayMemberPath ).PropertyType;
+
+            if( item is Enum )
+              return item.GetType();
+
+            var valuePath = this.ValuePath;
+            if( valuePath != null )
+            {
+              var key = item.GetType().GetProperty( valuePath ).GetValue( item, null );
+              var value = foreignKeyConverter.GetValueFromKey( key, this );
+              if( value != null )
+              {
+                return value.GetType();
+              }
+            }
+          }
+        }
+      }
+      catch
+      {
+        //Swallow the exception, no need to terminate the application, since the original value will be exported.
+      }
+
+      return null;
+    }
+
+    internal object GetDisplayValue( object fieldValue )
+    {
+      if( fieldValue == null )
+        return null;
+
+      var foreignKeyConverter = this.ForeignKeyConverter;
+      if( foreignKeyConverter != null )
+        return foreignKeyConverter.GetValueFromKey( fieldValue, this );
+
+      return fieldValue;
+    }
   }
 }

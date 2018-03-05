@@ -15,206 +15,297 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics;
+using Xceed.Utils.Wpf;
 
 namespace Xceed.Wpf.DataGrid
 {
   public class ObservableColumnCollection : ObservableCollection<ColumnBase>
   {
+    #region [] Property
+
     public ColumnBase this[ string fieldName ]
     {
       get
       {
-        ColumnBase column = null;
+        if( fieldName != null )
+        {
+          ColumnBase value;
+          if( m_fieldNameToColumn.TryGetValue( fieldName, out value ) )
+            return value;
+        }
 
-        m_fieldNameToColumns.TryGetValue( fieldName, out column );
-
-        return column;
+        return null;
       }
     }
 
-    #region ProcessingVisibleColumnsUpdate Property
+    #endregion
 
-    internal AutoResetFlag ProcessingVisibleColumnsUpdate
+    #region SyncRoot Private Property
+
+    private object SyncRoot
     {
       get
       {
-        return m_processingVisibleColumnsUpdate;
+        return ( ( ICollection )this ).SyncRoot;
       }
     }
 
-    private readonly AutoResetFlag m_processingVisibleColumnsUpdate = AutoResetFlagFactory.Create();
-
     #endregion
 
-    #region ProcessingCollectionChangedUpdate Property
-
-    internal bool ProcessingCollectionChangedUpdate
+    // This method has better performance than the one on the base class.
+    public new bool Contains( ColumnBase item )
     {
-      get;
-      set;
+      if( item == null )
+        return false;
+
+      return object.ReferenceEquals( item, this[ item.FieldName ] );
     }
 
-    #endregion
+    protected virtual void OnItemAdding( ColumnBase item )
+    {
+    }
+
+    protected virtual void OnItemAdded( ColumnBase item )
+    {
+    }
+
+    protected virtual void OnItemRemoving( ColumnBase item )
+    {
+    }
+
+    protected virtual void OnItemRemoved( ColumnBase item )
+    {
+    }
 
     protected override void RemoveItem( int index )
     {
-      ColumnBase column = this[ index ];
+      var item = this[ index ];
+      Debug.Assert( item != null );
 
-      if( column != null )
-      {
-        this.UnregisterColumnChangedEvent( column );
-
-        m_fieldNameToColumns.Remove( column.FieldName );
-      }
+      this.OnItemRemovingCore( item );
 
       base.RemoveItem( index );
+
+      this.OnItemRemovedCore( item );
     }
 
     protected override void InsertItem( int index, ColumnBase item )
     {
-      if( item != null )
-      {
-        if( ( item != null ) && ( string.IsNullOrEmpty( item.FieldName ) == true ) )
-          throw new ArgumentException( "A column must have a fieldname.", "item" );
+      if( item == null )
+        throw new ArgumentNullException( "item" );
 
-        if( m_fieldNameToColumns.ContainsKey( item.FieldName ) )
-          throw new DataGridException( "A column with same field name already exists in collection." );
+      var fieldName = item.FieldName;
+      if( string.IsNullOrEmpty( fieldName ) )
+        throw new ArgumentException( "A column must have a fieldname.", "item" );
 
-        m_fieldNameToColumns.Add( item.FieldName, item );
+      if( m_fieldNameToColumn.ContainsKey( fieldName ) )
+        throw new DataGridException( "A column with same field name already exists in collection." );
 
-        this.RegisterColumnChangedEvent( item );
-      }
+      this.OnItemAddingCore( item );
 
       base.InsertItem( index, item );
+
+      this.OnItemAddedCore( item );
     }
 
     protected override void ClearItems()
     {
-      foreach( ColumnBase column in this )
+      var items = new List<ColumnBase>( this );
+
+      foreach( var item in items )
       {
-        this.UnregisterColumnChangedEvent( column );
+        this.OnItemRemovingCore( item );
       }
 
-      m_fieldNameToColumns.Clear();
+      Debug.Assert( m_fieldNameToColumn.Count == 0 );
+      m_fieldNameToColumn.Clear();
 
       base.ClearItems();
+
+      foreach( var item in items )
+      {
+        this.OnItemRemovedCore( item );
+      }
     }
 
     protected override void SetItem( int index, ColumnBase item )
     {
-      if( ( item != null ) && ( string.IsNullOrEmpty( item.FieldName ) == true ) )
+      if( item == null )
+        throw new ArgumentNullException( "item" );
+
+      var fieldName = item.FieldName;
+      if( string.IsNullOrEmpty( fieldName ) )
         throw new ArgumentException( "A column must have a fieldname.", "item" );
 
-      if( m_fieldNameToColumns.ContainsKey( item.FieldName ) )
-        throw new DataGridException( "A column with same field name already exists in collection." );
+      var oldItem = this[ index ];
+      Debug.Assert( oldItem != null );
 
-      ColumnBase column = this[ index ];
-
-      if( ( column != null ) && ( column != item ) )
+      if( oldItem.FieldName != fieldName )
       {
-        this.UnregisterColumnChangedEvent( column );
-
-        m_fieldNameToColumns.Remove( column.FieldName );
+        if( m_fieldNameToColumn.ContainsKey( fieldName ) )
+          throw new DataGridException( "A column with same field name already exists in collection." );
       }
 
-      if( ( item != null ) && ( column != item ) )
-      {
-        m_fieldNameToColumns.Add( item.FieldName, item );
-
-        this.RegisterColumnChangedEvent( item );
-      }
+      this.OnItemRemovingCore( oldItem );
+      this.OnItemAddingCore( item );
 
       base.SetItem( index, item );
+
+      this.OnItemRemovedCore( oldItem );
+      this.OnItemAddedCore( item );
+    }
+
+    protected override void OnPropertyChanged( PropertyChangedEventArgs e )
+    {
+      lock( this.SyncRoot )
+      {
+        if( m_deferCount != 0 )
+        {
+          if( m_deferPropertyChangedEventArgs == null )
+          {
+            m_deferPropertyChangedEventArgs = e;
+          }
+          else if( !string.IsNullOrEmpty( m_deferPropertyChangedEventArgs.PropertyName ) && !object.Equals( m_deferPropertyChangedEventArgs.PropertyName, e.PropertyName ) )
+          {
+            m_deferPropertyChangedEventArgs = new PropertyChangedEventArgs( string.Empty );
+          }
+
+          return;
+        }
+      }
+
+      base.OnPropertyChanged( e );
     }
 
     protected override void OnCollectionChanged( NotifyCollectionChangedEventArgs e )
     {
-      if( ( m_columnAdditionMessagesDeferedCount > 0 ) && ( e.Action == NotifyCollectionChangedAction.Add ) && ( e.NewStartingIndex == ( this.Count - e.NewItems.Count ) ) )
+      lock( this.SyncRoot )
       {
-        if( m_deferedColumnAdditionMessageStartIndex == -1 )
+        if( m_deferCount != 0 )
         {
-          m_deferedColumnAdditionMessageStartIndex = e.NewStartingIndex;
-        }
-
-        foreach( object item in e.NewItems )
-        {
-          m_deferedColumns.Add( ( ColumnBase )item );
-        }
-      }
-      else
-      {
-        base.OnCollectionChanged( e );
-      }
-    }
-
-    internal IDisposable DeferColumnAdditionMessages()
-    {
-      return new DeferedColumnAdditionMessageDisposable( this );
-    }
-
-    internal event EventHandler ColumnVisibilityChanged;
-
-    private void RegisterColumnChangedEvent( ColumnBase column )
-    {
-      column.VisiblePositionChanged += new EventHandler( this.OnColumnVisibilityChanged );
-      column.VisibleChanged += new EventHandler( this.OnColumnVisibilityChanged );
-    }
-
-    private void UnregisterColumnChangedEvent( ColumnBase column )
-    {
-      column.VisiblePositionChanged -= new EventHandler( this.OnColumnVisibilityChanged );
-      column.VisibleChanged -= new EventHandler( this.OnColumnVisibilityChanged );
-    }
-
-    private void OnColumnVisibilityChanged( object sender, EventArgs e )
-    {
-      if( this.ColumnVisibilityChanged != null )
-      {
-        this.ColumnVisibilityChanged( this, new ColumnCollection.WrappedEventEventArgs( sender, e ) );
-      }
-    }
-
-    private int m_columnAdditionMessagesDeferedCount = 0;
-    private int m_deferedColumnAdditionMessageStartIndex = -1;
-    private List<ColumnBase> m_deferedColumns = new List<ColumnBase>();
-    private Dictionary<string, ColumnBase> m_fieldNameToColumns = new Dictionary<string, ColumnBase>(); // To optimize indexing speed for FieldName
-
-    private sealed class DeferedColumnAdditionMessageDisposable : IDisposable
-    {
-      internal DeferedColumnAdditionMessageDisposable( ObservableColumnCollection columns )
-      {
-        if( columns == null )
-          throw new ArgumentNullException( "columns" );
-
-        m_columns = columns;
-
-        m_columns.m_columnAdditionMessagesDeferedCount++;
-      }
-
-      #region IDisposable Members
-
-      public void Dispose()
-      {
-        m_columns.m_columnAdditionMessagesDeferedCount--;
-
-        if( m_columns.m_columnAdditionMessagesDeferedCount == 0 )
-        {
-          if( m_columns.m_deferedColumns.Count > 0 )
+          if( m_deferCollectionChangedEventArgs == null )
           {
-            m_columns.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Add, m_columns.m_deferedColumns, m_columns.m_deferedColumnAdditionMessageStartIndex ) );
+            m_deferCollectionChangedEventArgs = e;
+          }
+          else if( m_deferCollectionChangedEventArgs.Action != NotifyCollectionChangedAction.Reset )
+          {
+            m_deferCollectionChangedEventArgs = new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset );
           }
 
-          m_columns.m_deferedColumnAdditionMessageStartIndex = -1;
-          m_columns.m_deferedColumns.Clear();
+          return;
         }
       }
 
-      #endregion
-
-      private ObservableColumnCollection m_columns; // = null
+      base.OnCollectionChanged( e );
     }
+
+    internal IDisposable DeferNotifications()
+    {
+      return new DeferredDisposable( new DeferState( this ) );
+    }
+
+    private void OnItemAddingCore( ColumnBase item )
+    {
+      m_fieldNameToColumn.Add( item.FieldName, item );
+
+      this.OnItemAdding( item );
+    }
+
+    private void OnItemAddedCore( ColumnBase item )
+    {
+      this.OnItemAdded( item );
+    }
+
+    private void OnItemRemovingCore( ColumnBase item )
+    {
+      var fieldName = item.FieldName;
+
+      this.OnItemRemoving( item );
+
+      m_fieldNameToColumn.Remove( fieldName );
+    }
+
+    private void OnItemRemovedCore( ColumnBase item )
+    {
+      this.OnItemRemoved( item );
+    }
+
+    private int m_deferCount; //0
+    private PropertyChangedEventArgs m_deferPropertyChangedEventArgs; //null
+    private NotifyCollectionChangedEventArgs m_deferCollectionChangedEventArgs; //null
+
+    private readonly Dictionary<string, ColumnBase> m_fieldNameToColumn = new Dictionary<string, ColumnBase>();
+
+    #region DeferState Private Class
+
+    private sealed class DeferState : DeferredDisposableState
+    {
+      internal DeferState( ObservableColumnCollection target )
+      {
+        Debug.Assert( target != null );
+        m_target = target;
+      }
+
+      protected override object SyncRoot
+      {
+        get
+        {
+          return m_target.SyncRoot;
+        }
+      }
+
+      protected override bool IsDeferred
+      {
+        get
+        {
+          return ( m_target.m_deferCount != 0 );
+        }
+      }
+
+      protected override void Increment()
+      {
+        m_target.m_deferCount++;
+      }
+
+      protected override void Decrement()
+      {
+        m_target.m_deferCount--;
+      }
+
+      protected override void OnDeferEnding( bool disposing )
+      {
+        m_propertyChangedEventArgs = m_target.m_deferPropertyChangedEventArgs;
+        m_collectionChangedEventArgs = m_target.m_deferCollectionChangedEventArgs;
+        m_target.m_deferPropertyChangedEventArgs = null;
+        m_target.m_deferCollectionChangedEventArgs = null;
+
+        base.OnDeferEnding( disposing );
+      }
+
+      protected override void OnDeferEnded( bool disposing )
+      {
+        if( m_collectionChangedEventArgs != null )
+        {
+          m_target.OnCollectionChanged( m_collectionChangedEventArgs );
+        }
+
+        if( m_propertyChangedEventArgs != null )
+        {
+          m_target.OnPropertyChanged( m_propertyChangedEventArgs );
+        }
+      }
+
+      private readonly ObservableColumnCollection m_target;
+      private PropertyChangedEventArgs m_propertyChangedEventArgs;
+      private NotifyCollectionChangedEventArgs m_collectionChangedEventArgs;
+    }
+
+    #endregion
   }
 }

@@ -19,31 +19,43 @@
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit">
 
-    <Style TargetType="{x:Type local:CheckListBox}">
-       <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="KeyboardNavigation.TabNavigation" Value="Once" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:CheckListBox}">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                        <ScrollViewer Padding="{TemplateBinding Padding}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                        </ScrollViewer>
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+  <Style TargetType="{x:Type local:CheckListBox}">
+    <Setter Property="Background"
+            Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
+    <Setter Property="BorderBrush"
+            Value="{DynamicResource {x:Static themes:ResourceKeys.ControlNormalBorderKey}}" />
+    <Setter Property="BorderThickness"
+            Value="1" />
+    <Setter Property="KeyboardNavigation.TabNavigation"
+            Value="Once" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:CheckListBox}">
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}">
+            <ScrollViewer Padding="{TemplateBinding Padding}"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Auto">
+              <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+            </ScrollViewer>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
 
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
-            </Trigger>
-            <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver"
+               Value="True">
+        <Setter Property="BorderBrush"
+                Value="{DynamicResource {x:Static themes:ResourceKeys.ControlMouseOverBorderKey}}" />
+      </Trigger>
+      <Trigger Property="IsKeyboardFocusWithin"
+               Value="True">
+        <Setter Property="BorderBrush"
+                Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
 
 </ResourceDictionary>

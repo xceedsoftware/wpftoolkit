@@ -104,5 +104,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       this.RaiseClearPropertyItemEvent( ( PropertyItemBase )element, item );
       base.ClearContainerForItemOverride( element, item );
     }
+
   }
 }

@@ -14,10 +14,6 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -71,5 +67,12 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //Constructors
+
+    #region Base Class Overrides
+
+
+
+
+    #endregion
   }
 }

@@ -23,7 +23,6 @@
    <ResourceDictionary.MergedDictionaries>
       <!-- Style definitions for specific controls (things that are not grid elements) -->
 
-      <markup:DataGridThemeResourceDictionary Source="/themes/Controls/FixedColumnSplitter.generic.xaml"/>
       <markup:DataGridThemeResourceDictionary Source="/themes/Controls/TableViewScrollViewer.generic.xaml"/>
 
       <!-- For each specific systeme theme ResourceDictionary, we only need to include 
@@ -44,87 +43,83 @@
           TargetType="views:TableView"
           BasedOn="{StaticResource tableViewAero2NormalColorDefaultValues}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:DataGridControl}"
+   <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:DataGridControl}"
           TargetType="local:DataGridControl"
-          BasedOn="{StaticResource tableViewAero2NormalColorGridControlStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorGridControlStyle}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:RowSelectorPane}"
+   <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:RowSelectorPane}"
           TargetType="local:RowSelectorPane"
-          BasedOn="{StaticResource tableViewAero2NormalColorRowSelectorPaneStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorRowSelectorPaneStyle}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:RowSelector}"
+   <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:RowSelector}"
           TargetType="local:RowSelector"
           BasedOn="{StaticResource tableViewAero2NormalColorRowSelectorStyle}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:Row}"
+   <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:Row}"
           TargetType="local:Row"
-          BasedOn="{StaticResource tableViewAero2NormalColorRowStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorRowStyle}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:DataRow}"
+   <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:DataRow}"
           TargetType="local:DataRow"
-          BasedOn="{StaticResource tableViewAero2NormalColorDataRowStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorDataRowStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:ColumnManagerRow}"
           TargetType="local:ColumnManagerRow"
-          BasedOn="{StaticResource tableViewAero2NormalColorColumnManagerRowStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorColumnManagerRowStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:Cell}"
           TargetType="local:Cell"
-          BasedOn="{StaticResource tableViewAero2NormalColorCellStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorCellStyle}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:DataCell}"
+   <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:DataCell}"
           TargetType="local:DataCell"
-          BasedOn="{StaticResource tableViewAero2NormalColorDataCellStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorDataCellStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:ColumnManagerCell}"
           TargetType="local:ColumnManagerCell"
-          BasedOn="{StaticResource tableViewAero2NormalColorColumnManagerCellStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorColumnManagerCellStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:GroupByControl}"
           TargetType="local:GroupByControl"
-          BasedOn="{StaticResource tableViewAero2NormalColorGroupByControlStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorGroupByControlStyle}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:GroupByItem}"
+   <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:GroupByItem}"
           TargetType="local:GroupByItem"
-          BasedOn="{StaticResource tableViewAero2NormalColorGroupByItemStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorGroupByItemStyle}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:GroupHeaderControl}"
+   <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:GroupHeaderControl}"
           TargetType="local:GroupHeaderControl"
-          BasedOn="{StaticResource tableViewAero2NormalColorGroupHeaderControlStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorGroupHeaderControlStyle}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:GroupLevelIndicator}"
+   <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:GroupLevelIndicator}"
           TargetType="local:GroupLevelIndicator"
-          BasedOn="{StaticResource tableViewAero2NormalColorGroupLevelIndicatorStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorGroupLevelIndicatorStyle}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:DetailIndicator}"
+   <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:DetailIndicator}"
           TargetType="local:DetailIndicator"
-          BasedOn="{StaticResource tableViewAero2NormalColorDetailIndicatorStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorDetailIndicatorStyle}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:HierarchicalGroupLevelIndicatorPane}"
-          TargetType="local:HierarchicalGroupLevelIndicatorPane"
-          BasedOn="{StaticResource tableViewAero2NormalColorHierarchicalGroupLevelIndicatorPaneStyle}"/>
-
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:GroupLevelIndicatorPane}"
+   <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:GroupLevelIndicatorPane}"
           TargetType="local:GroupLevelIndicatorPane"
-          BasedOn="{StaticResource tableViewAero2NormalColorGroupLevelIndicatorPaneStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorGroupLevelIndicatorPaneStyle}" />
 
     <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:ScrollTip}"
           TargetType="local:ScrollTip"
-          BasedOn="{StaticResource tableViewAero2NormalColorScrollTipStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorScrollTipStyle}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:HierarchicalGroupByControlNode}"
+   <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:HierarchicalGroupByControlNode}"
           TargetType="local:HierarchicalGroupByControlNode"
-          BasedOn="{StaticResource tableViewAero2NormalColorHierarchicalGroupByControlNodeStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorHierarchicalGroupByControlNodeStyle}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:HierarchicalGroupByControl}"
+   <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:HierarchicalGroupByControl}"
           TargetType="local:HierarchicalGroupByControl"
-          BasedOn="{StaticResource tableViewAero2NormalColorHierarchicalGroupByControlStyle}"/>
+          BasedOn="{StaticResource tableViewAero2NormalColorHierarchicalGroupByControlStyle}" />
 
-    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:HierarchicalGroupByItem}"
-          TargetType="local:HierarchicalGroupByItem"
-          BasedOn="{StaticResource tableViewAero2NormalColorHierarchicalGroupByItemStyle}"/> -->
+  <Style x:Key="{markup:ThemeKey TargetViewType=views:TableView, TargetElementType=local:HierarchicalGroupByItem}"
+         TargetType="local:HierarchicalGroupByItem"
+         BasedOn="{StaticResource tableViewAero2NormalColorHierarchicalGroupByItemStyle}" />-->
 
-   <!-- Generic theme for TableflowView -->
+  <!-- Generic theme for TableflowView -->
 
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView}"
           TargetType="views:TableflowView"
@@ -211,15 +206,15 @@
           BasedOn="{StaticResource tableflowViewAero2NormalColorHierarchicalGroupByItemStyle}" />
 
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationButton}"
-          TargetType="{x:Type local:GroupNavigationButton}"
+          TargetType="local:GroupNavigationButton"
           BasedOn="{StaticResource tableflowViewAero2NormalColorGroupNavigationButtonStyle}" />
 
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationControl}"
-          TargetType="{x:Type local:GroupNavigationControl}"
+          TargetType="local:GroupNavigationControl"
           BasedOn="{StaticResource tableflowViewAero2NormalColorGroupNavigationControlStyle}" />
 
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationControlItem}"
-          TargetType="{x:Type local:GroupNavigationControlItem}"
+          TargetType="local:GroupNavigationControlItem"
           BasedOn="{StaticResource tableflowViewAero2NormalColorGroupNavigationControlItemStyle}" />
 
 </ResourceDictionary>

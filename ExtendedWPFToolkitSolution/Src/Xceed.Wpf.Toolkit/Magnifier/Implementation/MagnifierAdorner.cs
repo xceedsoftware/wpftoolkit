@@ -57,6 +57,9 @@ namespace Xceed.Wpf.Toolkit
       if( (_currentMousePosition == pt) && (_magnifier.ZoomFactor == _currentZoomFactor) )
         return;
 
+      if( _magnifier.IsFrozen )
+        return;
+
       _currentMousePosition = pt;
       _currentZoomFactor = _magnifier.ZoomFactor;
       UpdateViewBox();

@@ -19,31 +19,31 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Xceed.Wpf.DataGrid.Automation;
 using Xceed.Wpf.DataGrid.Utils;
-using System.Linq;
 
 namespace Xceed.Wpf.DataGrid
 {
-  public class Group : IGroupLevelDescription, INotifyPropertyChanged
+  public sealed class Group : IGroupLevelDescription, INotifyPropertyChanged, IWeakEventListener
   {
     #region Static Fields
 
-    private static readonly string IsExpandedPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.IsExpanded );
-    private static readonly string ItemCountPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ItemCount );
-    private static readonly string GroupByPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.GroupBy );
-    private static readonly string TitlePropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.Title );
-    private static readonly string TitleTemplatePropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.TitleTemplate );
-    private static readonly string TitleTemplateSelectorPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.TitleTemplateSelector );
-    private static readonly string ValueTemplatePropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ValueTemplate );
-    private static readonly string ValueTemplateSelectorPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ValueTemplateSelector );
-    private static readonly string ValueStringFormatPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ValueStringFormat );
-    private static readonly string ValueStringFormatCulturePropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ValueStringFormatCulture );
+    internal static readonly string IsExpandedPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.IsExpanded );
+    internal static readonly string ItemCountPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ItemCount );
+    internal static readonly string GroupByPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.GroupBy );
+    internal static readonly string TitlePropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.Title );
+    internal static readonly string TitleTemplatePropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.TitleTemplate );
+    internal static readonly string TitleTemplateSelectorPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.TitleTemplateSelector );
+    internal static readonly string ValueTemplatePropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ValueTemplate );
+    internal static readonly string ValueTemplateSelectorPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ValueTemplateSelector );
+    internal static readonly string ValueStringFormatPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ValueStringFormat );
+    internal static readonly string ValueStringFormatCulturePropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ValueStringFormatCulture );
 
     #endregion
 
@@ -630,11 +630,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    internal DataGridGroupAutomationPeer CreateAutomationPeer()
-    {
-      return new DataGridGroupAutomationPeer( this );
-    }
-
     internal void ClearGroup()
     {
       m_groupDescription = null;
@@ -701,6 +696,20 @@ namespace Xceed.Wpf.DataGrid
         return;
 
       handler.Invoke( this, new PropertyChangedEventArgs( propertyName ) );
+    }
+
+    #endregion
+
+    #region IWeakEventListener Members
+
+    bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      return this.OnReceiveWeakEvent( managerType, sender, e );
+    }
+
+    private bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      return false;
     }
 
     #endregion

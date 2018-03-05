@@ -18,6 +18,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
@@ -35,6 +37,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       set;
     }
 
+    protected override MaskedTextBox CreateEditor()
+    {
+      return new PropertyGridEditorMaskedTextBox();
+    }
+
     protected override void SetControlProperties( PropertyItem propertyItem )
     {
       Editor.BorderThickness = new System.Windows.Thickness( 0 );
@@ -45,6 +52,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     protected override void SetValueDependencyProperty()
     {
       this.ValueProperty = MaskedTextBox.ValueProperty;
+    }
+  }
+
+  public class PropertyGridEditorMaskedTextBox : MaskedTextBox
+  {
+    static PropertyGridEditorMaskedTextBox()
+    {
+      DefaultStyleKeyProperty.OverrideMetadata( typeof( PropertyGridEditorMaskedTextBox ), new FrameworkPropertyMetadata( typeof( PropertyGridEditorMaskedTextBox ) ) );
     }
   }
 }

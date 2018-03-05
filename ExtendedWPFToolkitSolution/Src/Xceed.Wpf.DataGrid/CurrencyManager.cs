@@ -16,19 +16,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Data;
-using System.ComponentModel;
 
 namespace Xceed.Wpf.DataGrid
 {
-  internal class CurrencyManager
+  internal sealed class CurrencyManager : IWeakEventListener
   {
-    #region CONSTRUCTORS
-
-    public CurrencyManager( DataGridContext dataGridContext, CollectionView collectionView )
+    internal CurrencyManager( DataGridContext dataGridContext, CollectionView collectionView )
     {
       if( dataGridContext == null )
         throw new ArgumentNullException( "dataGridContext" );
@@ -39,50 +37,12 @@ namespace Xceed.Wpf.DataGrid
       m_dataGridContext = dataGridContext;
       m_collectionView = collectionView;
 
-      System.Diagnostics.Debug.Assert( m_dataGridContext.CurrentItem == m_collectionView.CurrentItem );
+      Debug.Assert( m_dataGridContext.CurrentItem == m_collectionView.CurrentItem );
 
       this.RegisterListeners();
     }
 
-    #endregion CONSTRUCTORS
-
-    #region IsCurrentChanging Property
-
-    public bool IsCurrentChanging
-    {
-      get;
-      private set;
-    }
-
-    #endregion IsCurrentChanging Property
-
-    #region PUBLIC METHODS
-
-    public void CleanCurrencyManager()
-    {
-      this.UnregisterListeners();
-
-      m_dataGridContext = null;
-      m_collectionView = null;
-    }
-
-    #endregion PUBLIC METHODS
-
-    #region EVENT HANDLERS
-
-    private void OnDataGridContextCurrentItemChanged( object sender, EventArgs e )
-    {
-      this.ChangeCollectionViewCurrentItem();
-    }
-
-    private void OnCollectionViewCurrentChanged( object sender, EventArgs e )
-    {
-      this.ChangeDataGridContextCurrentItem();
-    }
-
-    #endregion EVENT HANDLERS
-
-    #region PRIVATE PROPERTIES
+    #region IsSetCurrentInProgress Private Property
 
     private bool IsSetCurrentInProgress
     {
@@ -92,6 +52,10 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    #endregion
+
+    #region ShouldSynchronizeCurrentItem Private Property
+
     private bool ShouldSynchronizeCurrentItem
     {
       get
@@ -100,34 +64,47 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    #endregion
+
+    #region ShouldSynchronizeSelectionWithCurrent Private Property
+
     private bool ShouldSynchronizeSelectionWithCurrent
     {
       get
       {
+        // #case 158670 
+        // When using DataGridVirtualizingCollectionViewBase, the synchronization between
+        // currentItem and Selection will only be done if currentItem is modified in code-behind.
+        var dgvcvb = m_collectionView.SourceCollection as DataGridVirtualizingCollectionViewBase;
+        if( ( dgvcvb != null ) && !dgvcvb.CanSynchronizeSelectionWithCurrent )
+          return false;
+
         return m_dataGridContext.DataGridControl.SynchronizeSelectionWithCurrent;
       }
     }
 
     #endregion
 
-    #region PRIVATE METHODS
+    internal void CleanManager()
+    {
+      this.UnregisterListeners();
+    }
 
     private void ChangeCollectionViewCurrentItem()
     {
-      if( ( this.IsCurrentChanging ) || ( !this.ShouldSynchronizeCurrentItem ) )
+      if( m_isCurrentChanging || !this.ShouldSynchronizeCurrentItem )
         return;
 
-      this.IsCurrentChanging = true;
+      m_isCurrentChanging = true;
 
       try
       {
-        // Synchronize the CurrentItem of the CollecitonView 
-        // with the one of the DataGridContext.
+        // Synchronize the CurrentItem of the CollecitonView with the one of the DataGridContext.
         m_collectionView.MoveCurrentToPosition( m_dataGridContext.CurrentItemIndex );
       }
       finally
       {
-        this.IsCurrentChanging = false;
+        m_isCurrentChanging = false;
       }
     }
 
@@ -137,10 +114,10 @@ namespace Xceed.Wpf.DataGrid
       if( this.IsSetCurrentInProgress )
         return;
 
-      if( ( this.IsCurrentChanging ) || ( !this.ShouldSynchronizeCurrentItem ) )
+      if( m_isCurrentChanging || !this.ShouldSynchronizeCurrentItem )
         return;
 
-      this.IsCurrentChanging = true;
+      m_isCurrentChanging = true;
 
       try
       {
@@ -157,12 +134,14 @@ namespace Xceed.Wpf.DataGrid
           AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged );
 
         if( m_collectionView.CurrentItem == null )
+        {
           this.ChangeCurrentDataGridContext();
+        }
       }
       catch( DataGridException )
       {
-        // When we deleted an item in edition that contain invalid data, we don't want a throw to go all the way up to the end user.
-        // We try to abort the edition in that case.
+        // When we deleted an item in edit that contain invalid data, we don't want a throw to go all the way up to the end user.
+        // We try to abort the edit in that case.
 
         if( ( m_dataGridContext.IsCurrent ) && ( m_dataGridContext.DataGridControl.IsBeingEdited ) && ( !m_dataGridContext.Items.Contains( m_dataGridContext.CurrentItem ) ) )
         {
@@ -179,97 +158,141 @@ namespace Xceed.Wpf.DataGrid
             AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged );
 
           if( m_collectionView.CurrentItem == null )
+          {
             this.ChangeCurrentDataGridContext();
+          }
         }
       }
       finally
       {
-        this.IsCurrentChanging = false;
+        m_isCurrentChanging = false;
       }
     }
 
     private void ChangeCurrentDataGridContext()
     {
-      if( ( m_dataGridContext.ParentDataGridContext == null )
-        || ( m_dataGridContext.ParentItem == null ) )
+      var parentDataGridContext = m_dataGridContext.ParentDataGridContext;
+      var parentItem = m_dataGridContext.ParentItem;
+
+      if( ( parentDataGridContext == null ) || ( parentItem == null ) )
         return;
 
-      List<DataGridContext> childContexts = this.GetParentItemChildContexts();
-      int currentContextIndex = childContexts.IndexOf( m_dataGridContext );
+      var childContexts = CurrencyManager.GetChildContexts( parentDataGridContext, parentItem ).ToList();
 
       if( childContexts.Count > 1 )
       {
-        if( currentContextIndex < ( childContexts.Count - 1 ) )
+        var currentContextIndex = childContexts.IndexOf( m_dataGridContext );
+        int lookForwardFrom;
+        int lookBackwardFrom;
+
+        if( currentContextIndex < 0 )
         {
-          // We are not the last context, we'll search for a
-          // non-empty context after us.
-          for( int i = currentContextIndex + 1; i < childContexts.Count; i++ )
-          {
-            DataGridContext childContext = childContexts[ i ];
-
-            if( childContext.Items.Count == 0 )
-              continue;
-
-            childContext.SetCurrentItemCore( childContext.Items.GetItemAt( 0 ), false, this.ShouldSynchronizeSelectionWithCurrent, AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged );
-            return;
-          }
+          lookForwardFrom = 0;
+          lookBackwardFrom = -1;
+        }
+        else
+        {
+          lookForwardFrom = currentContextIndex + 1;
+          lookBackwardFrom = currentContextIndex - 1;
         }
 
-        // No context have been found. We'll search for a 
-        // non-empty context before us.
-        for( int i = currentContextIndex - 1; i >= 0; i-- )
+        for( int i = lookForwardFrom; i < childContexts.Count; i++ )
         {
-          DataGridContext childContext = childContexts[ i ];
-
-          int count = childContext.Items.Count;
-
-          if( count == 0 )
+          var childContext = childContexts[ i ];
+          if( childContext.Items.Count <= 0 )
             continue;
 
-          childContext.SetCurrentItemCore( childContext.Items.GetItemAt( count - 1 ), false, this.ShouldSynchronizeSelectionWithCurrent, AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged );
+          childContext.SetCurrentItemCore( childContext.Items.GetItemAt( 0 ), false, this.ShouldSynchronizeSelectionWithCurrent, AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged );
+          return;
+        }
+
+        for( int i = lookBackwardFrom; i >= 0; i-- )
+        {
+          var childContext = childContexts[ i ];
+
+          var itemsCount = childContext.Items.Count;
+          if( itemsCount <= 0 )
+            continue;
+
+          childContext.SetCurrentItemCore( childContext.Items.GetItemAt( itemsCount - 1 ), false, this.ShouldSynchronizeSelectionWithCurrent, AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged );
           return;
         }
       }
 
       // No context after or before us have been found, we will set the CurrentItem to our ParentItem.
-      m_dataGridContext.ParentDataGridContext.SetCurrentItemCore( m_dataGridContext.ParentItem, false, this.ShouldSynchronizeSelectionWithCurrent, AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged );
-    }
-
-    private List<DataGridContext> GetParentItemChildContexts()
-    {
-      List<DataGridContext> childContexts = new List<DataGridContext>();
-
-      foreach( DetailConfiguration detailConfig in m_dataGridContext.ParentDataGridContext.DetailConfigurations )
-      {
-        childContexts.Add( m_dataGridContext.ParentDataGridContext.GetChildContext( m_dataGridContext.ParentItem, detailConfig ) );
-      }
-
-      return childContexts;
+      parentDataGridContext.SetCurrentItemCore( parentItem, false, this.ShouldSynchronizeSelectionWithCurrent, AutoScrollCurrentItemSourceTriggers.CollectionViewCurrentItemChanged );
     }
 
     private void RegisterListeners()
     {
       // We are not checking this.ShouldSynchronizeCurrentItem since it might return the wrong value if the grid
       // is still in the process of being instantiated.
-      m_dataGridContext.CurrentItemChanged += new EventHandler( this.OnDataGridContextCurrentItemChanged );
-      m_collectionView.CurrentChanged += new EventHandler( this.OnCollectionViewCurrentChanged );
+      CurrentItemChangedEventManager.AddListener( m_dataGridContext, this );
+      CurrentChangedEventManager.AddListener( m_collectionView, this );
     }
 
     private void UnregisterListeners()
     {
       // We are not checking this.ShouldSynchronizeCurrentItem since it might have returned the wrong value 
       // when RegisterListeners was called if the grid was still in the process of being instantiated.
-      m_dataGridContext.CurrentItemChanged -= new EventHandler( this.OnDataGridContextCurrentItemChanged );
-      m_collectionView.CurrentChanged -= new EventHandler( this.OnCollectionViewCurrentChanged );
+      CurrentItemChangedEventManager.RemoveListener( m_dataGridContext, this );
+      CurrentChangedEventManager.RemoveListener( m_collectionView, this );
     }
 
-    #endregion PRIVATE METHODS
+    private static IEnumerable<DataGridContext> GetChildContexts( DataGridContext dataGridContext, object item )
+    {
+      Debug.Assert( dataGridContext != null );
+      Debug.Assert( item != null );
 
-    #region PRIVATE FIELDS
+      return ( from detailConfig in dataGridContext.DetailConfigurations
+               let childContext = dataGridContext.GetChildContext( item, detailConfig )
+               where ( childContext != null )
+               select childContext );
+    }
 
-    private DataGridContext m_dataGridContext;
-    private CollectionView m_collectionView;
+    private void OnDataGridContextCurrentItemChanged( object sender, EventArgs e )
+    {
+      Debug.Assert( sender == m_dataGridContext );
 
-    #endregion PRIVATE FIELDS
+      this.ChangeCollectionViewCurrentItem();
+    }
+
+    private void OnCollectionViewCurrentChanged( object sender, EventArgs e )
+    {
+      Debug.Assert( sender == m_collectionView );
+
+      this.ChangeDataGridContextCurrentItem();
+    }
+
+    #region IWeakEventListener Members
+
+    bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      return this.OnReceiveWeakEvent( managerType, sender, e );
+    }
+
+    private bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      if( managerType == typeof( CurrentItemChangedEventManager ) )
+      {
+        this.OnDataGridContextCurrentItemChanged( sender, e );
+      }
+      else if( managerType == typeof( CurrentChangedEventManager ) )
+      {
+        this.OnCollectionViewCurrentChanged( sender, e );
+      }
+      else
+      {
+        return false;
+      }
+
+      return true;
+    }
+
+    #endregion
+
+    private readonly DataGridContext m_dataGridContext;
+    private readonly CollectionView m_collectionView;
+    private bool m_isCurrentChanging;
   }
 }

@@ -41,6 +41,7 @@ namespace Xceed.Wpf.Toolkit
       Button = GetTemplateChild( PART_ActionButton ) as Button;
     }
 
-    #endregion //Base Class Overrides
+
+  #endregion //Base Class Overrides
   }
 }

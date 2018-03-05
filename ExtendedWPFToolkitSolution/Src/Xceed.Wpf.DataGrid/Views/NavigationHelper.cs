@@ -78,18 +78,11 @@ namespace Xceed.Wpf.DataGrid.Views
       if( !dataGridContext.IsAFlattenDetail )
         return NavigationHelper.GetNextVisibleFocusableColumnIndex( dataGridContext, targetRow, columnIndex + 1 );
 
-      var columnMap = dataGridContext.ItemPropertyMap;
-      var masterColumnName = default( string );
-
-      if( !columnMap.TryGetColumnFieldName( targetColumn, out masterColumnName ) )
+      var masterColumn = default( ColumnBase );
+      if( !DataGridItemPropertyMapHelper.TryGetMasterColumn( dataGridContext, targetColumn, out masterColumn ) )
         return -1;
 
       var masterDataGridContext = dataGridContext.RootDataGridContext;
-      var masterColumn = masterDataGridContext.Columns[ masterColumnName ];
-
-      if( masterColumn == null )
-        return -1;
-
       var masterColumnIndex = masterDataGridContext.VisibleColumns.IndexOf( masterColumn );
       if( masterColumnIndex < 0 )
         return -1;
@@ -113,23 +106,27 @@ namespace Xceed.Wpf.DataGrid.Views
       if( !dataGridContext.IsAFlattenDetail )
         return NavigationHelper.GetPreviousVisibleFocusableColumnIndex( dataGridContext, targetRow, columnIndex - 1 );
 
-      var columnMap = dataGridContext.ItemPropertyMap;
-      var masterColumnName = default( string );
-
-      if( !columnMap.TryGetColumnFieldName( targetColumn, out masterColumnName ) )
+      var masterColumn = default( ColumnBase );
+      if( !DataGridItemPropertyMapHelper.TryGetMasterColumn( dataGridContext, targetColumn, out masterColumn ) )
         return -1;
 
       var masterDataGridContext = dataGridContext.RootDataGridContext;
-      var masterColumn = masterDataGridContext.Columns[ masterColumnName ];
-
-      if( masterColumn == null )
-        return -1;
-
       var masterColumnIndex = masterDataGridContext.VisibleColumns.IndexOf( masterColumn );
       if( masterColumnIndex < 0 )
         return -1;
 
       return NavigationHelper.GetPreviousVisibleFocusableDetailColumnIndexFromMasterColumnIndex( dataGridContext, targetRow, masterColumnIndex - 1 );
+    }
+
+    internal static int GetFirstVisibleFocusableInViewportColumnIndex( DataGridContext dataGridContext, Row targetRow )
+    {
+      if( dataGridContext == null )
+        return -1;
+
+      if( dataGridContext.IsAFlattenDetail )
+        return NavigationHelper.GetNextVisibleFocusableInViewportDetailColumnIndexFromMasterColumnIndex( dataGridContext, targetRow );
+
+      return NavigationHelper.GetNextVisibleFocusableInViewportColumnIndex( dataGridContext, targetRow );
     }
 
     internal static bool MoveFocusLeft( DataGridContext dataGridContext )
@@ -140,7 +137,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
       var leftToRight = ( dataGridControl.FlowDirection == FlowDirection.LeftToRight );
 
-      return NavigationHelper.MoveFocus( dataGridControl, dataGridContext, leftToRight );
+      return NavigationHelper.MoveFocus( dataGridControl, dataGridContext, leftToRight, false );
     }
 
     internal static bool MoveFocusRight( DataGridContext dataGridContext )
@@ -151,10 +148,10 @@ namespace Xceed.Wpf.DataGrid.Views
 
       var leftToRight = ( dataGridControl.FlowDirection == FlowDirection.LeftToRight );
 
-      return NavigationHelper.MoveFocus( dataGridControl, dataGridContext, !leftToRight );
+      return NavigationHelper.MoveFocus( dataGridControl, dataGridContext, !leftToRight, false );
     }
 
-    internal static bool MoveFocusToNextVisibleColumn( DataGridContext dataGridContext )
+    internal static bool MoveFocusToNextVisibleColumn( DataGridContext dataGridContext, bool cycle )
     {
       var dataGridControl = NavigationHelper.GetDataGridControl( dataGridContext );
       if( dataGridControl == null )
@@ -162,10 +159,10 @@ namespace Xceed.Wpf.DataGrid.Views
 
       Debug.Assert( dataGridControl.CurrentContext == dataGridContext );
 
-      return NavigationHelper.MoveFocusToNextVisibleColumn( dataGridContext, dataGridContext.CurrentRow, dataGridContext.CurrentColumn );
+      return NavigationHelper.MoveFocusToNextVisibleColumn( dataGridContext, dataGridContext.CurrentRow, dataGridContext.CurrentColumn, cycle );
     }
 
-    internal static bool MoveFocusToPreviousVisibleColumn( DataGridContext dataGridContext )
+    internal static bool MoveFocusToPreviousVisibleColumn( DataGridContext dataGridContext, bool cycle )
     {
       var dataGridControl = NavigationHelper.GetDataGridControl( dataGridContext );
       if( dataGridControl == null )
@@ -173,7 +170,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
       Debug.Assert( dataGridControl.CurrentContext == dataGridContext );
 
-      return NavigationHelper.MoveFocusToPreviousVisibleColumn( dataGridContext, dataGridContext.CurrentRow, dataGridContext.CurrentColumn );
+      return NavigationHelper.MoveFocusToPreviousVisibleColumn( dataGridContext, dataGridContext.CurrentRow, dataGridContext.CurrentColumn, cycle );
     }
 
     internal static bool MoveFocusToFirstVisibleColumn( DataGridContext dataGridContext )
@@ -232,11 +229,11 @@ namespace Xceed.Wpf.DataGrid.Views
       {
         if( ( device.Modifiers & ModifierKeys.Shift ) == ModifierKeys.Shift )
         {
-          handled = NavigationHelper.MoveFocusToPreviousVisibleColumn( dataGridContext );
+          handled = NavigationHelper.MoveFocusToPreviousVisibleColumn( dataGridContext, true );
         }
         else
         {
-          handled = NavigationHelper.MoveFocusToNextVisibleColumn( dataGridContext );
+          handled = NavigationHelper.MoveFocusToNextVisibleColumn( dataGridContext, true );
         }
       }
 
@@ -303,9 +300,6 @@ namespace Xceed.Wpf.DataGrid.Views
 
       var masterDataGridContext = dataGridContext.RootDataGridContext;
       var masterVisibleColumns = masterDataGridContext.VisibleColumns;
-
-      var detailColumns = dataGridContext.Columns;
-      var detailPropertyMap = dataGridContext.ItemPropertyMap;
       var cells = targetRow.Cells;
 
       for( int i = Math.Max( 0, startIndex ); i < masterVisibleColumns.Count; i++ )
@@ -313,19 +307,13 @@ namespace Xceed.Wpf.DataGrid.Views
         var masterColumn = masterVisibleColumns[ i ];
         Debug.Assert( masterColumn != null );
 
-        var detailColumnName = default( string );
-        if( detailPropertyMap.TryGetItemPropertyName( masterColumn, out detailColumnName ) )
-        {
-          var detailColumn = detailColumns[ detailColumnName ];
+        var detailColumn = default( ColumnBase );
+        if( !DataGridItemPropertyMapHelper.TryGetDetailColumn( dataGridContext, masterColumn, out detailColumn ) )
+          continue;
 
-          if( detailColumn != null )
-          {
-            var detailColumnIndex = detailVisibleColumns.IndexOf( detailColumn );
-
-            if( ( detailColumnIndex >= 0 ) && ( cells[ detailColumn ].GetCalculatedCanBeCurrent() ) )
-              return detailColumnIndex;
-          }
-        }
+        var detailColumnIndex = detailVisibleColumns.IndexOf( detailColumn );
+        if( ( detailColumnIndex >= 0 ) && ( cells[ detailColumn ].GetCalculatedCanBeCurrent() ) )
+          return detailColumnIndex;
       }
 
       return -1;
@@ -344,9 +332,6 @@ namespace Xceed.Wpf.DataGrid.Views
 
       var masterDataGridContext = dataGridContext.RootDataGridContext;
       var masterVisibleColumns = masterDataGridContext.VisibleColumns;
-
-      var detailColumns = dataGridContext.Columns;
-      var detailPropertyMap = dataGridContext.ItemPropertyMap;
       var cells = targetRow.Cells;
 
       for( int i = Math.Min( masterVisibleColumns.Count - 1, startIndex ); i >= 0; i-- )
@@ -354,19 +339,80 @@ namespace Xceed.Wpf.DataGrid.Views
         var masterColumn = masterVisibleColumns[ i ];
         Debug.Assert( masterColumn != null );
 
-        var detailColumnName = default( string );
-        if( detailPropertyMap.TryGetItemPropertyName( masterColumn, out detailColumnName ) )
-        {
-          var detailColumn = detailColumns[ detailColumnName ];
+        var detailColumn = default( ColumnBase );
+        if( !DataGridItemPropertyMapHelper.TryGetDetailColumn( dataGridContext, masterColumn, out detailColumn ) )
+          continue;
 
-          if( detailColumn != null )
-          {
-            var detailColumnIndex = detailVisibleColumns.IndexOf( detailColumn );
+        var detailColumnIndex = detailVisibleColumns.IndexOf( detailColumn );
+        if( ( detailColumnIndex >= 0 ) && ( cells[ detailColumn ].GetCalculatedCanBeCurrent() ) )
+          return detailColumnIndex;
+      }
 
-            if( ( detailColumnIndex >= 0 ) && ( cells[ detailColumn ].GetCalculatedCanBeCurrent() ) )
-              return detailColumnIndex;
-          }
-        }
+      return -1;
+    }
+
+    private static int GetNextVisibleFocusableInViewportColumnIndex( DataGridContext dataGridContext, Row targetRow )
+    {
+      if( ( dataGridContext == null ) || ( targetRow == null ) )
+        return -1;
+
+      var columns = dataGridContext.VisibleColumns;
+      if( ( columns == null ) || ( columns.Count <= 0 ) )
+        return -1;
+
+      var fixedCellPanel = targetRow.CellsHostPanel as FixedCellPanel;
+      if( fixedCellPanel == null )
+        return -1;
+
+      var cell = default( Cell );
+      var virtualizingCellCollection = fixedCellPanel.ParentRowCells;
+
+      foreach( var targetColumn in columns )
+      {
+        if( !virtualizingCellCollection.TryGetBindedCell( targetColumn, out cell ) )
+          continue;
+
+        if( cell.GetCalculatedCanBeCurrent() )
+          return columns.IndexOf( targetColumn );
+      }
+
+      return -1;
+    }
+
+    private static int GetNextVisibleFocusableInViewportDetailColumnIndexFromMasterColumnIndex( DataGridContext dataGridContext, Row targetRow )
+    {
+      if( ( dataGridContext == null ) || ( targetRow == null ) )
+        return -1;
+
+      Debug.Assert( dataGridContext.IsAFlattenDetail );
+
+      var detailVisibleColumns = dataGridContext.VisibleColumns;
+      if( ( detailVisibleColumns == null ) || ( detailVisibleColumns.Count <= 0 ) )
+        return -1;
+
+      var masterDataGridContext = dataGridContext.RootDataGridContext;
+      var masterVisibleColumns = masterDataGridContext.VisibleColumns;
+
+      var fixedCellPanel = targetRow.CellsHostPanel as FixedCellPanel;
+      if( fixedCellPanel == null )
+        return -1;
+
+      var cell = default( Cell );
+      var virtualizingCellCollection = fixedCellPanel.ParentRowCells;
+
+      foreach( var masterColumn in masterVisibleColumns )
+      {
+        Debug.Assert( masterColumn != null );
+
+        var detailColumn = default( ColumnBase );
+        if( !DataGridItemPropertyMapHelper.TryGetDetailColumn( dataGridContext, masterColumn, out detailColumn ) )
+          continue;
+
+        if( !virtualizingCellCollection.TryGetBindedCell( detailColumn, out cell ) )
+          continue;
+
+        if( cell.GetCalculatedCanBeCurrent() )
+          return detailVisibleColumns.IndexOf( detailColumn );
       }
 
       return -1;
@@ -389,10 +435,10 @@ namespace Xceed.Wpf.DataGrid.Views
       if( ( cell == null ) || ( cell.ParentColumn != dataGridControl.CurrentColumn ) )
         return false;
 
-      return object.Equals( cell.ParentRow.DataContext, dataGridControl.CurrentItemInEdition );
+      return object.Equals( cell.ParentRow.GetEditingDataContext(), dataGridControl.CurrentItemInEdition );
     }
 
-    private static bool MoveFocus( DataGridControl dataGridControl, DataGridContext dataGridContext, bool moveLeft )
+    private static bool MoveFocus( DataGridControl dataGridControl, DataGridContext dataGridContext, bool moveLeft, bool cycle )
     {
       Debug.Assert( dataGridControl != null );
       Debug.Assert( dataGridControl.CurrentContext == dataGridContext );
@@ -408,46 +454,60 @@ namespace Xceed.Wpf.DataGrid.Views
         || ( ( navigationBehavior == NavigationBehavior.RowOrCell ) && isFocusWithin && ( dataGridContext.CurrentColumn != null ) ) )
       {
         if( moveLeft )
-          return NavigationHelper.MoveFocusToPreviousVisibleColumn( dataGridContext, dataGridContext.CurrentRow, dataGridContext.CurrentColumn );
+          return NavigationHelper.MoveFocusToPreviousVisibleColumn( dataGridContext, dataGridContext.CurrentRow, dataGridContext.CurrentColumn, cycle );
 
-        return NavigationHelper.MoveFocusToNextVisibleColumn( dataGridContext, dataGridContext.CurrentRow, dataGridContext.CurrentColumn );
+        return NavigationHelper.MoveFocusToNextVisibleColumn( dataGridContext, dataGridContext.CurrentRow, dataGridContext.CurrentColumn, cycle );
       }
 
       return false;
     }
 
-    private static bool MoveFocusToNextVisibleColumn( DataGridContext dataGridContext, Row targetRow, ColumnBase targetColumn )
+    private static bool MoveFocusToNextVisibleColumn( DataGridContext dataGridContext, Row targetRow, ColumnBase targetColumn, bool cycle )
     {
       if( ( dataGridContext == null ) || ( targetRow == null ) )
         return false;
 
       var columnIndex = NavigationHelper.GetNextVisibleFocusableColumnIndex( dataGridContext, targetRow, targetColumn );
       if( columnIndex < 0 )
-        return NavigationHelper.MoveFocusToFirstVisibleColumn( dataGridContext, targetRow );
+      {
+        if( cycle )
+          return NavigationHelper.MoveFocusToFirstVisibleColumn( dataGridContext, targetRow );
 
-      var columns = dataGridContext.VisibleColumns;
-      Debug.Assert( columns != null );
+        return false;
+      }
+      else
+      {
+        var columns = dataGridContext.VisibleColumns;
+        Debug.Assert( columns != null );
 
-      NavigationHelper.SetCurrentColumnAndChangeSelection( dataGridContext, columns[ columnIndex ] );
+        NavigationHelper.SetCurrentColumnAndChangeSelection( dataGridContext, columns[ columnIndex ] );
 
-      return true;
+        return true;
+      }
     }
 
-    private static bool MoveFocusToPreviousVisibleColumn( DataGridContext dataGridContext, Row targetRow, ColumnBase targetColumn )
+    private static bool MoveFocusToPreviousVisibleColumn( DataGridContext dataGridContext, Row targetRow, ColumnBase targetColumn, bool cycle )
     {
       if( ( dataGridContext == null ) || ( targetRow == null ) )
         return false;
 
       var columnIndex = NavigationHelper.GetPreviousVisibleFocusableColumnIndex( dataGridContext, targetRow, targetColumn );
       if( columnIndex < 0 )
-        return NavigationHelper.MoveFocusToLastVisibleColumn( dataGridContext, targetRow );
+      {
+        if( cycle )
+          return NavigationHelper.MoveFocusToLastVisibleColumn( dataGridContext, targetRow );
 
-      var columns = dataGridContext.VisibleColumns;
-      Debug.Assert( columns != null );
+        return false;
+      }
+      else
+      {
+        var columns = dataGridContext.VisibleColumns;
+        Debug.Assert( columns != null );
 
-      NavigationHelper.SetCurrentColumnAndChangeSelection( dataGridContext, columns[ columnIndex ] );
+        NavigationHelper.SetCurrentColumnAndChangeSelection( dataGridContext, columns[ columnIndex ] );
 
-      return true;
+        return true;
+      }
     }
 
     private static bool MoveFocusToFirstVisibleColumn( DataGridContext dataGridContext, Row targetRow )

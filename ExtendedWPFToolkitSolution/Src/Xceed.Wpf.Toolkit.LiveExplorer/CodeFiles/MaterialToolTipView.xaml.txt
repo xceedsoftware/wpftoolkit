@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -21,11 +21,9 @@
                         xmlns:sys="clr-namespace:System;assembly=mscorlib"
                         Title="MaterialToolTip">
    <local:DemoView.Description>
-      <!-- TODODOC-->
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
-         <Run>A ToolTip with animations when opening. It is using the Material Brushes.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
+         <Run>A ToolTip with animations when opening. It uses the Material Brushes.</Run>
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -33,10 +31,9 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
-       ##END-->
       </Paragraph>
    </local:DemoView.Description>
-   
+
    <local:DemoView.Resources>
       <ResourceDictionary>
          <ResourceDictionary.MergedDictionaries>
@@ -45,70 +42,10 @@
       </ResourceDictionary>
    </local:DemoView.Resources>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <Grid>
-      <StackPanel Margin="10">
 
-         <GroupBox Header="Features"
-                   Margin="0,5,0,5">
-            <Grid Margin="5">
-               <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-               </Grid.ColumnDefinitions>
 
-               <!--First Column-->
-               <TextBlock Grid.Column="0"
-                          Grid.Row="0"
-                          Text="Material Accent Brush: "
-                          VerticalAlignment="Center" />
-               <ComboBox x:Name="materialAccentBrushComboBox"
-                         Grid.Column="1"
-                         Grid.Row="0"
-                         ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                         SelectedItem="{Binding MaterialAccentBrush, ElementName=materialButton}"
-                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                         Width="95"
-                         VerticalAlignment="Center"
-                         Margin="5" />
-            </Grid>
-         </GroupBox>
-         
-         <StackPanel>
-            <TextBlock Text="Usage:"
-                       Style="{StaticResource Header}" />
 
-            <xctk:MaterialButton x:Name="materialButton"
-                                 Content="MaterialButton using MaterialToolTip"
-                                 Margin="20"
-                                 Padding="5"
-                                 HorizontalAlignment="Center">
-               <xctk:MaterialButton.ToolTip>
-                  <xctk:MaterialToolTip Placement="Mouse"
-                                        DataContext="{Binding Path=PlacementTarget, RelativeSource={RelativeSource Self}}"
-                                        MaterialAccentBrush="{Binding MaterialAccentBrush}">
-                     <StackPanel Orientation="Horizontal">
-                        <ContentControl>
-                           <ContentControl.Content>
-                              <Path Data="M17.071346,6.6599999C17.78875,8.1508932 18.122005,9.9854851 17.917633,11.917816 17.780151,13.210711 17.415701,14.404805 16.885771,15.449L15.177,14.644304C15.617841,13.787608 15.9243,12.790113 16.036884,11.719817 16.208162,10.105325 15.913901,8.568861 15.306683,7.365747z M20.566984,5.2669997C21.512329,7.3320866 21.947803,9.7617378 21.678318,12.318976 21.49543,14.033849 21.006458,15.634024 20.297501,17.052L18.59,16.251213C19.210964,15.018133 19.637339,13.622355 19.796829,12.11588 20.034515,9.8762961 19.647739,7.7448602 18.813787,5.9662089z M13.335,0L13.335,21.334999 5.6516771,14.88951 0,14.88951 0,6.4454007 5.6543674,6.4454007z"
-                                    Stretch="Uniform"
-                                    Fill="{Binding MaterialAccentBrush}"
-                                    Width="15"
-                                    Height="15" />
-                           </ContentControl.Content>
-                        </ContentControl>
-                        <TextBlock Text="Press to increment volume."
-                                   Margin="5,0,0,0"/>
-                     </StackPanel>                    
-                  </xctk:MaterialToolTip>
-               </xctk:MaterialButton.ToolTip>
-            </xctk:MaterialButton>
-         </StackPanel>
-      </StackPanel>
-   </Grid>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
+
     <Image Source="..\OpenSourceImages\MaterialToolTip.png" Width="600" Height="400"/>
-   ##END-->
 </local:MaterialDemoView>

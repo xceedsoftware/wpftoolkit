@@ -17,13 +17,11 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Automation.Peers;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Xml;
-using Xceed.Wpf.DataGrid.Converters;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -69,6 +67,7 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion
+
 
     protected override void OnMouseEnter( MouseEventArgs e )
     {
@@ -118,16 +117,6 @@ namespace Xceed.Wpf.DataGrid
         //call the helper function to setup the Cell's binding.
         this.SetupDisplayMemberBinding( dataGridContext );
       }
-      else
-      {
-
-        BindingExpression binding = BindingOperations.GetBindingExpression( this, DataCell.ContentProperty );
-
-        if( binding != null )
-        {
-          binding.UpdateTarget();
-        }
-      }
     }
 
     protected internal override void PrepareContainer( DataGridContext dataGridContext, object item )
@@ -154,34 +143,32 @@ namespace Xceed.Wpf.DataGrid
     protected internal virtual void SetupDisplayMemberBinding( DataGridContext dataGridContext )
     {
       // Bind the cell content.
-      Column column = this.ParentColumn as Column;
+      var column = this.ParentColumn as Column;
 
       if( column != null )
       {
-        BindingBase displayMemberBinding = null;
-        object dataContext = this.ParentRow.DataContext;
+        var displayMemberBinding = default( BindingBase );
+        var dataItem = this.ParentRow.DataContext;
 
         // If the dataContext is our ParentRow, we do not create any binding
-        if( dataContext != this.ParentRow )
+        if( dataItem != this.ParentRow )
         {
           displayMemberBinding = column.GetDisplayMemberBinding();
 
           if( displayMemberBinding == null )
           {
-            if( ( dataGridContext == null ) || ( dataGridContext.ItemsSourceFieldDescriptors == null ) )
+            if( dataGridContext == null )
               throw new InvalidOperationException( "An attempt was made to create a DisplayMemberBinding before the DataGridContext has been initialized." );
 
             if( !DesignerProperties.GetIsInDesignMode( this ) )
             {
-              bool isDataGridUnboundItemProperty;
+              var propertyDescription = ItemsSourceHelper.CreateOrGetPropertyDescriptionFromColumn( dataGridContext, column, ( dataItem != null ) ? dataItem.GetType() : null );
+              ItemsSourceHelper.UpdateColumnFromPropertyDescription( column, dataGridContext.DataGridControl.DefaultCellEditors, dataGridContext.AutoCreateForeignKeyConfigurations, propertyDescription );
 
-              displayMemberBinding = ItemsSourceHelper.AutoCreateDisplayMemberBinding( column, dataGridContext, dataContext, out isDataGridUnboundItemProperty );
-
-              column.IsBoundToDataGridUnboundItemProperty = isDataGridUnboundItemProperty;
+              displayMemberBinding = column.GetDisplayMemberBinding();
             }
 
             column.IsBindingAutoCreated = true;
-            column.SetDisplayMemberBinding( displayMemberBinding );
           }
         }
 
@@ -191,9 +178,7 @@ namespace Xceed.Wpf.DataGrid
 
           BindingOperations.SetBinding( this, Cell.ContentProperty, displayMemberBinding );
 
-          XmlElement xmlElement =
-            this.GetValue( Cell.ContentProperty ) as XmlElement;
-
+          var xmlElement = this.GetValue( Cell.ContentProperty ) as XmlElement;
           if( xmlElement != null )
           {
 
@@ -204,10 +189,9 @@ namespace Xceed.Wpf.DataGrid
             //under any circumstances, a cell that is bound to XML cannot be recycled
             m_canBeRecycled = false;
 
-            BindingOperations.ClearBinding( this, Cell.ContentProperty );
-            this.ClearValue( Cell.ContentProperty );
+            this.ClearDisplayMemberBinding();
 
-            Binding xmlElementBinding = new Binding( "InnerXml" );
+            var xmlElementBinding = new Binding( "InnerXml" );
             xmlElementBinding.Source = xmlElement;
             xmlElementBinding.Mode = BindingMode.TwoWay;
             xmlElementBinding.UpdateSourceTrigger = UpdateSourceTrigger.Explicit;
@@ -215,12 +199,27 @@ namespace Xceed.Wpf.DataGrid
             BindingOperations.SetBinding( this, Cell.ContentProperty, xmlElementBinding );
           }
         }
+        else
+        {
+          this.ClearDisplayMemberBinding();
+        }
+      }
+      else
+      {
+        this.ClearDisplayMemberBinding();
       }
     }
 
     internal virtual void ClearDisplayMemberBinding()
     {
-      BindingOperations.ClearBinding( this, Cell.ContentProperty );
+      if( BindingOperations.IsDataBound( this, Cell.ContentProperty ) )
+      {
+        BindingOperations.ClearBinding( this, Cell.ContentProperty );
+      }
+      else
+      {
+        this.ClearValue( Cell.ContentProperty );
+      }
     }
 
     internal override void ContentCommitted()
@@ -239,9 +238,8 @@ namespace Xceed.Wpf.DataGrid
       if( column == null )
         return null;
 
-      // If a foreignKey CellContentTemplate was found by the configuration,
-      // it must be used even if a CellContentTemplate is defined because the 
-      // CellContentTemplate will be used by this template
+      // If a foreignKey CellContentTemplate was found by the configuration, it must be used even if a CellContentTemplate is defined
+      // because the CellContentTemplate will be used by this template
       var configuration = column.ForeignKeyConfiguration;
       if( configuration == null )
         return null;
@@ -251,8 +249,8 @@ namespace Xceed.Wpf.DataGrid
 
     internal override DataTemplate GetCellStringFormatDataTemplate( DataTemplate contentTemplate )
     {
+      // parentColumn is verified to be not null in the calling method
       var parentColumn = this.ParentColumn;
-      Debug.Assert( parentColumn != null );
 
       var format = parentColumn.CellContentStringFormat;
       Debug.Assert( !string.IsNullOrEmpty( format ) );

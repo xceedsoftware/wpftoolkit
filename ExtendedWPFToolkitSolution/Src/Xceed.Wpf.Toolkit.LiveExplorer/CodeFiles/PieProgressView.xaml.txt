@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -24,7 +24,7 @@
             The Pie control properties can be animated to create various effects and controls like this circular progress bar.
         </Paragraph>
     </local:DemoView.Description>
-   
+
    <local:DemoView.Resources>
       <ControlTemplate x:Key="PieProgressTemplate"
                        TargetType="{x:Type ProgressBar}">
@@ -69,7 +69,7 @@
          </DoubleAnimationUsingKeyFrames>
       </Storyboard>
    </local:DemoView.Resources>
-   
+
    <local:DemoView.Triggers>
       <EventTrigger RoutedEvent="ButtonBase.Click"
                     SourceName="SimulateProgressButton">

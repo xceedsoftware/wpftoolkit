@@ -15,29 +15,17 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.ComponentModel;
-using System.Windows.Data;
-using System.Globalization;
-using System.Diagnostics;
-using System.Collections;
-using System.Collections.Specialized;
-using System.Collections.ObjectModel;
-using System.Windows;
-using System.Xml;
 using System.Data;
-
-using Xceed.Wpf.DataGrid.Converters;
-using Xceed.Wpf.DataGrid.FilterCriteria;
+using System.Diagnostics;
+using System.Globalization;
+using System.Windows;
 
 namespace Xceed.Wpf.DataGrid
 {
+  [DebuggerDisplay( "Name = {Name}" )]
   public partial class DataGridItemProperty : DataGridItemPropertyBase
   {
-
-    #region CONSTRUCTORS
-
     public DataGridItemProperty()
     {
     }
@@ -63,6 +51,7 @@ namespace Xceed.Wpf.DataGrid
         valuePath,
         dataType,
         false,
+        null,
         null,
         null,
         null,
@@ -93,6 +82,7 @@ namespace Xceed.Wpf.DataGrid
         isReadOnly,
         null,
         null,
+        null,
         null );
     }
 
@@ -117,6 +107,7 @@ namespace Xceed.Wpf.DataGrid
         null,
         dataType,
         false,
+        null,
         null,
         null,
         null,
@@ -147,6 +138,7 @@ namespace Xceed.Wpf.DataGrid
         isReadOnly,
         overrideReadOnlyForInsertion,
         null,
+        null,
         null );
     }
 
@@ -169,6 +161,7 @@ namespace Xceed.Wpf.DataGrid
         null,
         null,
         null,
+        null,
         null );
     }
 
@@ -188,6 +181,7 @@ namespace Xceed.Wpf.DataGrid
         null,
         null,
         null,
+        null,
         null );
     }
 
@@ -201,6 +195,7 @@ namespace Xceed.Wpf.DataGrid
       bool isAutoCreated,
       Nullable<bool> isReadOnly,
       Nullable<bool> overrideReadOnlyForInsertion,
+      Nullable<bool> isDisplayable,
       Nullable<bool> isASubRelationship,
       DataGridForeignKeyDescription foreignKeyDescription )
     {
@@ -220,17 +215,17 @@ namespace Xceed.Wpf.DataGrid
         isAutoCreated,
         isReadOnly,
         overrideReadOnlyForInsertion,
+        isDisplayable,
         isASubRelationship,
         foreignKeyDescription );
     }
 
+    [Browsable( false )]
+    [EditorBrowsable( EditorBrowsableState.Never )]
+    [Obsolete( "This constructor is obsolete and should no longer be used.", true )]
     protected DataGridItemProperty( DataGridItemProperty template )
-      : base( template )
     {
-      // this.IsAutoCreated = false, after a clone, we consider the ItemProperty not AutoCreated.
-      m_propertyDescriptor = template.m_propertyDescriptor;
-      m_valueXPath = template.m_valueXPath;
-      m_valuePath = template.m_valuePath;
+      throw new NotSupportedException();
     }
 
     private void Initialize(
@@ -243,6 +238,7 @@ namespace Xceed.Wpf.DataGrid
       bool isAutoCreated,
       Nullable<bool> isReadOnly,
       Nullable<bool> overrideReadOnlyForInsertion,
+      Nullable<bool> isDisplayable,
       Nullable<bool> isASubRelationship,
       DataGridForeignKeyDescription foreignKeyDescription )
     {
@@ -259,7 +255,7 @@ namespace Xceed.Wpf.DataGrid
 
       if( m_propertyDescriptor != null )
       {
-        this.Browsable = m_propertyDescriptor.IsBrowsable;
+        this.IsBrowsable = m_propertyDescriptor.IsBrowsable;
 
         if( m_propertyDescriptor.IsReadOnly )
           isReadOnly = m_propertyDescriptor.IsReadOnly;
@@ -291,10 +287,8 @@ namespace Xceed.Wpf.DataGrid
 
       this.ForeignKeyDescription = foreignKeyDescription;
 
-      base.Initialize( name, title, dataType, isReadOnly, overrideReadOnlyForInsertion, isASubRelationship );
+      base.Initialize( name, title, dataType, isReadOnly, overrideReadOnlyForInsertion, isDisplayable, isASubRelationship );
     }
-
-    #endregion CONSTRUCTORS
 
     #region ValuePath Property
 
@@ -306,7 +300,7 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
-        if( this.Initialized )
+        if( this.IsSealed )
           throw new InvalidOperationException( "An attempt was made to change the ValuePath of a property already added to a containing collection." );
 
         this.SetValuePath( value );
@@ -322,7 +316,7 @@ namespace Xceed.Wpf.DataGrid
 
     private string m_valuePath;
 
-    #endregion ValuePath Property
+    #endregion
 
     #region ValueXPath Property
 
@@ -334,7 +328,7 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
-        if( this.Initialized )
+        if( this.IsSealed )
           throw new InvalidOperationException( "An attempt was made to change the ValueXPath of a property already added to a containing collection." );
 
         this.SetValueXPath( value );
@@ -350,7 +344,7 @@ namespace Xceed.Wpf.DataGrid
 
     private string m_valueXPath;
 
-    #endregion ValueXPath Property
+    #endregion
 
     #region PropertyDescriptor Property
 
@@ -362,7 +356,7 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
-        if( this.Initialized )
+        if( this.IsSealed )
           throw new InvalidOperationException( "An attempt was made to change the PropertyDescriptor of a property already added to a containing collection." );
 
         this.SetPropertyDescriptor( value );
@@ -374,7 +368,9 @@ namespace Xceed.Wpf.DataGrid
       m_propertyDescriptor = propertyDescriptor;
 
       if( ( m_propertyDescriptor != null ) && ( !this.IsReadOnly ) )
+      {
         this.SetIsReadOnly( propertyDescriptor.IsReadOnly );
+      }
 
       m_bindingPathValueExtractorForRead = null;
       m_bindingPathValueExtractorForWrite = null;
@@ -382,7 +378,7 @@ namespace Xceed.Wpf.DataGrid
 
     private PropertyDescriptor m_propertyDescriptor;
 
-    #endregion PropertyDescriptor Property
+    #endregion
 
     #region IsAutoCreated Property
 
@@ -392,23 +388,23 @@ namespace Xceed.Wpf.DataGrid
       private set;
     }
 
-    #endregion IsAutoCreated Property
+    #endregion
 
-    #region PUBLIC METHODS
+    #region FieldName Internal Property
 
-    public override object Clone()
+    internal override string FieldName
     {
-      Type type = this.GetType();
+      get
+      {
+        var descriptor = this.PropertyDescriptor;
+        if( descriptor != null )
+          return descriptor.Name;
 
-      if( type == typeof( DataGridItemProperty ) )
-        return new DataGridItemProperty( this );
-
-      return base.Clone();
+        return base.FieldName;
+      }
     }
 
-    #endregion PUBLIC METHODS
-
-    #region PROTECTED METHODS
+    #endregion
 
     protected override object GetValueCore( object component )
     {
@@ -422,20 +418,19 @@ namespace Xceed.Wpf.DataGrid
         }
         catch( DataException )
         {
-          // We have to return null if the datarow is deleted from the DataTable.
-          // When the System.Data.DataRow have RowState == detached, it can be because it has been deleted
-          // or it being inserted, nothing special found to differentiate that 2 state.  So doing a try catch.
+          // We have to return null if the datarow is deleted from the DataTable.  When the System.Data.DataRow has RowState == detached,
+          // it can be because it has been deleted or it being inserted, nothing special found to differentiate that 2 state.  So doing a try catch.
           value = null;
         }
 
         CultureInfo converterCulture = this.ConverterCulture;
 
         if( converterCulture == null )
+        {
           converterCulture = CultureInfo.InvariantCulture;
+        }
 
-        return this.GetBindingConverter( component ).Convert(
-          value, this.DataType,
-          this.ConverterParameter, converterCulture );
+        return this.GetBindingConverter( component ).Convert( value, this.DataType, this.ConverterParameter, converterCulture );
       }
 
       if( m_bindingPathValueExtractorForRead == null )
@@ -443,18 +438,19 @@ namespace Xceed.Wpf.DataGrid
         CultureInfo converterCulture = this.ConverterCulture;
 
         if( converterCulture == null )
+        {
           converterCulture = CultureInfo.InvariantCulture;
+        }
 
         PropertyPath propertyPath = null;
 
         if( !string.IsNullOrEmpty( this.ValuePath ) )
+        {
           propertyPath = new PropertyPath( this.ValuePath, BindingPathValueExtractor.EmptyObjectArray );
+        }
 
-        m_bindingPathValueExtractorForRead = new BindingPathValueExtractor(
-          this.ValueXPath, propertyPath, false,
-          this.DataType,
-          this.GetBindingConverter( component ),
-          this.ConverterParameter, converterCulture );
+        m_bindingPathValueExtractorForRead = new BindingPathValueExtractor( this.ValueXPath, propertyPath, false, this.DataType,
+                                                                            this.GetBindingConverter( component ), this.ConverterParameter, converterCulture );
       }
 
       return m_bindingPathValueExtractorForRead.GetValueFromItem( component );
@@ -467,13 +463,11 @@ namespace Xceed.Wpf.DataGrid
         CultureInfo converterCulture = this.ConverterCulture;
 
         if( converterCulture == null )
+        {
           converterCulture = CultureInfo.InvariantCulture;
+        }
 
-        object convertedValue = this.GetBindingConverter( component ).ConvertBack(
-          value,
-          m_propertyDescriptor.PropertyType,
-          this.ConverterParameter,
-          converterCulture );
+        object convertedValue = this.GetBindingConverter( component ).ConvertBack( value, m_propertyDescriptor.PropertyType, this.ConverterParameter, converterCulture );
 
         m_propertyDescriptor.SetValue( component, convertedValue );
       }
@@ -484,17 +478,19 @@ namespace Xceed.Wpf.DataGrid
           CultureInfo converterCulture = this.ConverterCulture;
 
           if( converterCulture == null )
+          {
             converterCulture = CultureInfo.InvariantCulture;
+          }
 
           PropertyPath propertyPath = null;
 
           if( !string.IsNullOrEmpty( this.ValuePath ) )
+          {
             propertyPath = new PropertyPath( this.ValuePath, BindingPathValueExtractor.EmptyObjectArray );
+          }
 
-          m_bindingPathValueExtractorForWrite = new BindingPathValueExtractor(
-            this.ValueXPath, propertyPath, true,
-            this.DataType,
-            this.GetBindingConverter( component ), this.ConverterParameter, converterCulture );
+          m_bindingPathValueExtractorForWrite = new BindingPathValueExtractor( this.ValueXPath, propertyPath, true, this.DataType,
+                                                                               this.GetBindingConverter( component ), this.ConverterParameter, converterCulture );
         }
 
         m_bindingPathValueExtractorForWrite.SetValueToItem( component, value );
@@ -503,40 +499,27 @@ namespace Xceed.Wpf.DataGrid
       base.SetValueCore( component, value );
     }
 
-    #endregion PROTECTED METHODS
-
-    #region INTERNAL METHODS
-
     internal override PropertyDescriptorFromItemPropertyBase GetPropertyDescriptorForBindingCore()
     {
       return new PropertyDescriptorFromItemProperty( this );
     }
 
-    internal override void SetUnspecifiedPropertiesValues( DataGridItemPropertyCollection itemPropertyCollection )
+    internal override void SetUnspecifiedPropertiesValues(
+      PropertyDescription description,
+      Type itemType,
+      bool defaultItemPropertiesCreated )
     {
-      // ContainingCollection.ItemType and ContainingCollection.DefaultItemProperties can be null at first when this is 
-      // the ItemProperties of a DetailGrid.
-      // the SetUnspecifiedPropertiesValues will be recall when both this.ItemType and this.DefaultItemProperties are affected.
+      var itemIsXceedDataRow = ( itemType != null ) ? typeof( DataRow ).IsAssignableFrom( itemType ) : false;
 
-      if( itemPropertyCollection == null )
-        return;
-
-      DataGridItemProperty defaultItemProperty = null;
-      bool itemIsXceedDataRow = ( itemPropertyCollection.ItemType != null ) ? typeof( DataRow ).IsAssignableFrom( itemPropertyCollection.ItemType ) : false;
-
-      if( ( string.IsNullOrEmpty( this.ValueXPath ) )
-        && ( string.IsNullOrEmpty( this.ValuePath ) )
-        && ( this.PropertyDescriptor == null ) )
+      if( ( this.PropertyDescriptor == null ) && string.IsNullOrEmpty( this.ValuePath ) && string.IsNullOrEmpty( this.ValueXPath ) )
       {
         if( itemIsXceedDataRow )
         {
-          this.PropertyDescriptor = new UnboundDataRowPropertyDescriptor( this.Name, this.DataType );
+          this.SetPropertyDescriptor( new UnboundDataRowPropertyDescriptor( this.Name, this.DataType ) );
         }
         else
         {
-          defaultItemProperty = itemPropertyCollection.FindDefaultItemProperty( this.Name ) as DataGridItemProperty;
-
-          if( defaultItemProperty == null )
+          if( description == null )
           {
             if( this.Name == "." )
             {
@@ -545,91 +528,71 @@ namespace Xceed.Wpf.DataGrid
               this.SetIsReadOnly( true );
               this.SetOverrideReadOnlyForInsertion( false );
             }
-            else if( itemPropertyCollection.DefaultItemProperties != null )
-            {
-              // I have to add this particular exception case to make sure that when the ItemProperty is "re-normalized" when the first DataGridCollectionView
-              // is created for it, then the ValuePath is still null or empty (allowing it to be re-normalized)
-              this.SetValuePath( this.Name );
-            }
           }
           else
           {
-            this.SetPropertyDescriptor( defaultItemProperty.PropertyDescriptor );
-            this.SetValuePath( defaultItemProperty.ValuePath );
-            this.SetValueXPath( defaultItemProperty.ValueXPath );
+            this.SetPropertyDescriptor( description.PropertyDescriptor );
+            this.SetValuePath( description.Path );
+            this.SetValueXPath( description.XPath );
           }
+        }
+
+        if( defaultItemPropertiesCreated && ( this.PropertyDescriptor == null ) && string.IsNullOrEmpty( this.ValuePath ) && string.IsNullOrEmpty( this.ValueXPath ) )
+        {
+          // I have to add this particular exception case to make sure that when the ItemProperty is "re-normalized" when the first DataGridCollectionView
+          // is created for it, then the ValuePath is still null or empty (allowing it to be re-normalized)
+          this.SetValuePath( this.Name );
         }
       }
 
       if( this.DataType == null )
       {
-        //only try to affect the DataType if the DefaultItemProperties were set. (will not be the case when XAML parsing DetailDescriptions)
-        if( itemPropertyCollection.DefaultItemProperties != null )
+        //only try to affect the DataType if the DefaultPropertyDescriptions were set. (will not be the case when XAML parsing DetailDescriptions)
+        if( defaultItemPropertiesCreated )
         {
-          if( defaultItemProperty == null )
-            defaultItemProperty = itemPropertyCollection.FindDefaultItemProperty( this.Name ) as DataGridItemProperty;
-
-          if( defaultItemProperty == null )
-          {
+          if( description == null )
             throw new InvalidOperationException( "An attempt was made to add an item (" + this.Name + ") without specifying its data type." );
-          }
 
-          this.SetDataType( defaultItemProperty.DataType );
+          this.SetDataType( description.DataType );
         }
       }
 
       if( string.IsNullOrEmpty( this.Title ) )
       {
-        if( itemIsXceedDataRow )
+        if( !itemIsXceedDataRow && ( description != null ) && !string.IsNullOrEmpty( description.DisplayName ) )
         {
-          this.Title = this.Name;
+          this.Title = description.DisplayName;
         }
         else
         {
-          if( defaultItemProperty == null )
-            defaultItemProperty = itemPropertyCollection.FindDefaultItemProperty( this.Name ) as DataGridItemProperty;
-
-          if( defaultItemProperty == null )
-          {
-            this.Title = this.Name;
-          }
-          else
-          {
-            this.Title = defaultItemProperty.Title;
-          }
+          this.Title = this.Name;
         }
       }
 
       if( !this.IsReadOnly )
       {
-        if( defaultItemProperty == null )
-          defaultItemProperty = itemPropertyCollection.FindDefaultItemProperty( this.Name ) as DataGridItemProperty;
-
-        if( defaultItemProperty != null )
+        if( description != null )
         {
-          this.SetIsReadOnly( defaultItemProperty.IsReadOnly );
+          this.SetIsReadOnly( description.IsReadOnly );
         }
       }
 
       if( this.OverrideReadOnlyForInsertion == null )
       {
         //only try to affect the DataType if the DefaultItemProperties were set. (will not be the case when XAML parsing DetailDescriptions)
-        if( itemPropertyCollection.DefaultItemProperties != null )
+        if( defaultItemPropertiesCreated )
         {
-          if( defaultItemProperty == null )
-            defaultItemProperty = itemPropertyCollection.FindDefaultItemProperty( this.Name ) as DataGridItemProperty;
-
-          this.SetOverrideReadOnlyForInsertion( ( defaultItemProperty != null ) && ( defaultItemProperty.OverrideReadOnlyForInsertion.HasValue )
-            ? defaultItemProperty.OverrideReadOnlyForInsertion.Value
-            : false );
+          this.SetOverrideReadOnlyForInsertion( ( description != null ) ? description.OverrideReadOnlyForInsertion : false );
         }
       }
 
       if( ( !string.IsNullOrEmpty( this.ValueXPath ) ) && ( string.IsNullOrEmpty( this.ValuePath ) ) )
+      {
         this.SetValuePath( "InnerText" );
+      }
 
-      bool foreignKeyDescriptionIsNull = ( this.ForeignKeyDescription == null );
-      bool foreignKeyDescriptionItemsSourceIsNull = false;
+      var foreignKeyDescriptionIsNull = ( this.ForeignKeyDescription == null );
+      var foreignKeyDescriptionItemsSourceIsNull = false;
 
       if( !foreignKeyDescriptionIsNull )
       {
@@ -639,33 +602,28 @@ namespace Xceed.Wpf.DataGrid
       // Update the ForeignKeyDescription if not set
       if( foreignKeyDescriptionIsNull || foreignKeyDescriptionItemsSourceIsNull )
       {
-        if( defaultItemProperty == null )
-          defaultItemProperty = itemPropertyCollection.FindDefaultItemProperty( this.Name ) as DataGridItemProperty;
-
-        if( ( defaultItemProperty != null ) && ( defaultItemProperty.ForeignKeyDescription != null ) )
+        if( ( description != null ) && ( description.ForeignKeyDescription != null ) )
         {
           if( foreignKeyDescriptionIsNull )
           {
-            this.SetForeignKeyDescription( defaultItemProperty.ForeignKeyDescription );
+            this.SetForeignKeyDescription( description.ForeignKeyDescription );
           }
           else
           {
             if( foreignKeyDescriptionItemsSourceIsNull )
             {
-              this.ForeignKeyDescription.ItemsSource = defaultItemProperty.ForeignKeyDescription.ItemsSource;
+              this.ForeignKeyDescription.ItemsSource = description.ForeignKeyDescription.ItemsSource;
             }
           }
         }
       }
     }
 
-    #endregion INTERNAL METHODS
-
-    #region PRIVATE FIELDS
+    #region Private Fields
 
     private BindingPathValueExtractor m_bindingPathValueExtractorForRead;
     private BindingPathValueExtractor m_bindingPathValueExtractorForWrite;
 
-    #endregion PRIVATE FIELDS
+    #endregion
   }
 }

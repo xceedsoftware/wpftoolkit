@@ -15,26 +15,36 @@
   ***********************************************************************************/
 
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Data;
-using Xceed.Wpf.DataGrid.Automation;
 
 namespace Xceed.Wpf.DataGrid
 {
   public struct GroupHeaderFooterItem
   {
-    #region CONSTRUCTORS
+    #region Static Fields
+
+    public static readonly GroupHeaderFooterItem Empty = new GroupHeaderFooterItem();
+
+    #endregion
 
     public GroupHeaderFooterItem( CollectionViewGroup collectionViewGroup, object template )
     {
       if( !( template is DataTemplate ) && !( template is GroupHeaderFooterItemTemplate ) )
         throw new ArgumentException( "A GroupHeaderFooterItem can only be created with a DataTemplate or VisibleWhenCollapsed objects.", "template" );
 
-      m_template = template;
-      m_weakGroup = new WeakReference( collectionViewGroup );
-    }
+      Debug.Assert( template != null );
 
-    #endregion CONSTRUCTORS
+      m_template = template;
+      m_group = new WeakReference( collectionViewGroup );
+
+      m_hashCode = template.GetHashCode();
+      if( collectionViewGroup != null )
+      {
+        m_hashCode ^= collectionViewGroup.GetHashCode();
+      }
+    }
 
     #region Template Property
 
@@ -46,9 +56,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private object m_template;
+    private readonly object m_template;
 
-    #endregion Template Property
+    #endregion
 
     #region Group Property
 
@@ -56,25 +66,22 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        if( m_weakGroup.IsAlive )
-          return m_weakGroup.Target as CollectionViewGroup;
-
-        if( m_weakGroup.Target != null )
-          m_weakGroup.Target = null;
+        if( m_group != null )
+          return m_group.Target as CollectionViewGroup;
 
         return null;
       }
     }
 
-    private WeakReference m_weakGroup;
+    private readonly WeakReference m_group;
 
-    #endregion Group Property
-
-    #region PUBLIC METHODS
+    #endregion
 
     public static bool Equals( GroupHeaderFooterItem item1, GroupHeaderFooterItem item2 )
     {
-      return ( ( item1.m_template == item2.m_template ) && ( item1.Group == item2.Group ) );
+      return ( item1.m_hashCode == item2.m_hashCode )
+          && ( item1.m_template == item2.m_template )
+          && ( item1.Group == item2.Group );
     }
 
     public static bool operator ==( GroupHeaderFooterItem item1, GroupHeaderFooterItem item2 )
@@ -89,7 +96,7 @@ namespace Xceed.Wpf.DataGrid
 
     public override bool Equals( object obj )
     {
-      if( ( obj == null ) || ( !( obj is GroupHeaderFooterItem ) ) )
+      if( ( obj == null ) || !( obj is GroupHeaderFooterItem ) )
         return false;
 
       return this.Equals( ( GroupHeaderFooterItem )obj );
@@ -102,21 +109,9 @@ namespace Xceed.Wpf.DataGrid
 
     public override int GetHashCode()
     {
-      int hashCode = 0;
-
-      if( m_template != null )
-        hashCode ^= m_template.GetHashCode();
-
-      CollectionViewGroup group = this.Group;
-
-      if( group != null )
-        hashCode ^= group.GetHashCode();
-
-      return hashCode;
+      return m_hashCode;
     }
 
-    #endregion PUBLIC METHODS
-
-    public static readonly GroupHeaderFooterItem Empty = new GroupHeaderFooterItem();
+    private readonly int m_hashCode;
   }
 }

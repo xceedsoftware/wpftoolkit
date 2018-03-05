@@ -31,17 +31,16 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using Xceed.Utils.Wpf;
-using Xceed.Wpf.DataGrid.Automation;
+using Xceed.Wpf.DataGrid.Utils;
 using Xceed.Wpf.DataGrid.ValidationRules;
 using Xceed.Wpf.DataGrid.Views;
-using Xceed.Wpf.Toolkit.Core;
 
 namespace Xceed.Wpf.DataGrid
 {
   [TemplatePart( Name = "PART_CellsHost", Type = typeof( Panel ) )]
   [TemplatePart( Name = "PART_RowFocusRoot", Type = typeof( FrameworkElement ) )]
   [ContentProperty( "Cells" )]
-  public abstract class Row : Control, IDataGridItemContainer
+  public abstract class Row : Control, IDataGridItemContainer, INotifyPropertyChanged, IWeakEventListener
   {
     // This validation rule is meant to be used as the rule in error set in a Row's ValidationError when
     // we want to flag a validation error even though no binding's ValidationRules or CellValidationRules are invalid.
@@ -68,8 +67,7 @@ namespace Xceed.Wpf.DataGrid
       DataGridControl.CellEditorDisplayConditionsProperty.OverrideMetadata( typeof( Row ),
         new FrameworkPropertyMetadata( new PropertyChangedCallback( OnCellEditorDisplayConditionsChanged ) ) );
 
-      // We do this last to ensure all the Static content of the row is done before using 
-      // any static readonly field of the cell.
+      // We do this last to ensure all the Static content of the row is done before using any static readonly field of the cell.
       Row.SelectionBackgroundProperty = Cell.SelectionBackgroundProperty.AddOwner( typeof( Row ) );
       Row.SelectionForegroundProperty = Cell.SelectionForegroundProperty.AddOwner( typeof( Row ) );
       Row.InactiveSelectionBackgroundProperty = Cell.InactiveSelectionBackgroundProperty.AddOwner( typeof( Row ) );
@@ -94,8 +92,7 @@ namespace Xceed.Wpf.DataGrid
                                               new ExecutedRoutedEventHandler( OnCancelEditExecuted ),
                                               new CanExecuteRoutedEventHandler( OnCancelEditCanExecute ) ) );
 
-      // Cache the CellsCollection and always return it in the 
-      // getter of the DependencyProperty's CLR accessor
+      // Cache the CellsCollection and always return it in the getter of the DependencyProperty's CLR accessor
       m_cellsCache = new VirtualizingCellCollection( this );
 
       // Set the Value of the DependencyProperty
@@ -134,7 +131,7 @@ namespace Xceed.Wpf.DataGrid
     public static readonly DependencyProperty CellsProperty;
 
     // Define it as Virtualizing to avoid casts
-    private VirtualizingCellCollection m_cellsCache; // = null;
+    private readonly VirtualizingCellCollection m_cellsCache; // = null;
 
     public CellCollection Cells
     {
@@ -221,11 +218,13 @@ namespace Xceed.Wpf.DataGrid
 
     #region HasValidationError Read-Only Property
 
-    internal static readonly DependencyPropertyKey HasValidationErrorPropertyKey =
-        DependencyProperty.RegisterReadOnly( "HasValidationError", typeof( bool ), typeof( Row ), new UIPropertyMetadata( false ) );
+    internal static readonly DependencyPropertyKey HasValidationErrorPropertyKey = DependencyProperty.RegisterReadOnly(
+      "HasValidationError",
+      typeof( bool ),
+      typeof( Row ),
+      new UIPropertyMetadata( false ) );
 
-    public static readonly DependencyProperty HasValidationErrorProperty =
-      HasValidationErrorPropertyKey.DependencyProperty;
+    public static readonly DependencyProperty HasValidationErrorProperty = HasValidationErrorPropertyKey.DependencyProperty;
 
     public bool HasValidationError
     {
@@ -254,11 +253,13 @@ namespace Xceed.Wpf.DataGrid
 
     #region IsValidationErrorRestrictive Read-Only Property
 
-    private static readonly DependencyPropertyKey IsValidationErrorRestrictivePropertyKey =
-        DependencyProperty.RegisterReadOnly( "IsValidationErrorRestrictive", typeof( bool ), typeof( Row ), new UIPropertyMetadata( false ) );
+    private static readonly DependencyPropertyKey IsValidationErrorRestrictivePropertyKey = DependencyProperty.RegisterReadOnly(
+      "IsValidationErrorRestrictive",
+      typeof( bool ),
+      typeof( Row ),
+      new UIPropertyMetadata( false ) );
 
-    public static readonly DependencyProperty IsValidationErrorRestrictiveProperty =
-      IsValidationErrorRestrictivePropertyKey.DependencyProperty;
+    public static readonly DependencyProperty IsValidationErrorRestrictiveProperty = IsValidationErrorRestrictivePropertyKey.DependencyProperty;
 
     public bool IsValidationErrorRestrictive
     {
@@ -478,10 +479,6 @@ namespace Xceed.Wpf.DataGrid
           this.ClearValue( Row.IsSelectedPropertyKey );
         }
 
-        DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-
-        if( dataGridContext != null )
-          dataGridContext.RaiseIsSelectedChangedAutomationEvent( this, value );
       }
     }
 
@@ -645,7 +642,8 @@ namespace Xceed.Wpf.DataGrid
 
     #region ValidationError Read-Only Property
 
-    public static readonly RoutedEvent ValidationErrorChangingEvent = EventManager.RegisterRoutedEvent( "ValidationErrorChanging", RoutingStrategy.Bubble, typeof( RowValidationErrorRoutedEventHandler ), typeof( Row ) );
+    public static readonly RoutedEvent ValidationErrorChangingEvent =
+           EventManager.RegisterRoutedEvent( "ValidationErrorChanging", RoutingStrategy.Bubble, typeof( RowValidationErrorRoutedEventHandler ), typeof( Row ) );
 
     public event RowValidationErrorRoutedEventHandler ValidationErrorChanging
     {
@@ -665,11 +663,11 @@ namespace Xceed.Wpf.DataGrid
       this.RaiseEvent( e );
     }
 
-    private static readonly DependencyPropertyKey ValidationErrorPropertyKey =
-        DependencyProperty.RegisterReadOnly( "ValidationError", typeof( RowValidationError ), typeof( Row ),
-        new PropertyMetadata( null,
-          new PropertyChangedCallback( Row.OnValidationErrorChanged ),
-          new CoerceValueCallback( Row.OnCoerceValidationError ) ) );
+    private static readonly DependencyPropertyKey ValidationErrorPropertyKey = DependencyProperty.RegisterReadOnly(
+      "ValidationError",
+      typeof( RowValidationError ),
+      typeof( Row ),
+      new PropertyMetadata( null, new PropertyChangedCallback( Row.OnValidationErrorChanged ), new CoerceValueCallback( Row.OnCoerceValidationError ) ) );
 
     public static readonly DependencyProperty ValidationErrorProperty = Row.ValidationErrorPropertyKey.DependencyProperty;
 
@@ -719,7 +717,9 @@ namespace Xceed.Wpf.DataGrid
             Debug.Assert( rowState != null );
 
             if( rowState != null )
+            {
               rowState.SetItemValidationError( e.NewValue as RowValidationError );
+            }
           }
         }
       }
@@ -753,6 +753,23 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion ValidationError Read-Only Property
 
+    #region CanBeRecycled Protected Property
+
+    protected virtual bool CanBeRecycled
+    {
+      get
+      {
+        if( this.IsKeyboardFocused
+          || this.IsKeyboardFocusWithin
+          || this.IsBeingEdited )
+          return false;
+
+        return true;
+      }
+    }
+
+    #endregion
+
     #region UnboundDataItemContext Property
 
     internal UnboundDataItem UnboundDataItemContext
@@ -765,40 +782,42 @@ namespace Xceed.Wpf.DataGrid
 
     internal void ClearUnboundDataItemContext()
     {
-      if( m_unboundDataItemNode != null )
-      {
-        UnboundDataItem.FreeUnboundDataItem( m_unboundDataItemNode );
-        m_unboundDataItemNode = null;
-      }
-
       m_unboundDataItem = null;
     }
 
     internal void UpdateUnboundDataItemContext()
     {
-      object dataItem = this.DataContext;
-
+      var dataItem = this.DataContext;
       if( dataItem == null )
       {
         this.ClearUnboundDataItemContext();
-        return;
       }
-
-      if( m_unboundDataItemNode != null )
+      else
       {
-        object oldDataItem = m_unboundDataItemNode.DataItem;
+        if( m_unboundDataItem != null )
+        {
+          if( object.Equals( m_unboundDataItem.DataItem, dataItem ) )
+            return;
+        }
 
-        if( ( m_unboundDataItemNode.IsAlive ) && ( object.Equals( oldDataItem, dataItem ) ) )
-          return;
-
-        UnboundDataItem.FreeUnboundDataItem( m_unboundDataItemNode );
+        m_unboundDataItem = UnboundDataItem.GetUnboundDataItem( dataItem );
       }
-
-      m_unboundDataItemNode = UnboundDataItem.GetUnboundDataItemNode( dataItem, out m_unboundDataItem );
     }
 
-    private UnboundDataItem.UnboundDataItemNode m_unboundDataItemNode;
     private UnboundDataItem m_unboundDataItem;
+
+    #endregion
+
+    #region VirtualizedCells Property
+
+    internal IEnumerable<Cell> VirtualizedCells
+    {
+      get
+      {
+        Debug.Assert( m_cellsCache != null );
+        return m_cellsCache.VirtualizedCells;
+      }
+    }
 
     #endregion
 
@@ -854,25 +873,16 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
+        if( value == this.IsContainerPrepared )
+          return;
+
         m_flags[ ( int )RowFlags.IsContainerPrepared ] = value;
+
+        this.OnPropertyChanged( Row.IsContainerPreparedPropertyName );
       }
     }
 
-    #endregion
-
-    #region IsInitializingInsertionRow Property
-
-    internal bool IsInitializingInsertionRow
-    {
-      get
-      {
-        return m_flags[ ( int )RowFlags.IsInitializingInsertionRow ];
-      }
-      set
-      {
-        m_flags[ ( int )RowFlags.IsInitializingInsertionRow ] = value;
-      }
-    }
+    internal static readonly string IsContainerPreparedPropertyName = PropertyHelper.GetPropertyName( ( Row r ) => r.IsContainerPrepared );
 
     #endregion
 
@@ -912,6 +922,18 @@ namespace Xceed.Wpf.DataGrid
       set
       {
         this.SetValue( Row.LevelCacheProperty, value );
+      }
+    }
+
+    #endregion
+
+    #region IsUnfocusable Property
+
+    internal virtual bool IsUnfocusable
+    {
+      get
+      {
+        return false;
       }
     }
 
@@ -989,64 +1011,72 @@ namespace Xceed.Wpf.DataGrid
     {
       base.OnApplyTemplate();
 
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
       if( dataGridContext == null )
         throw new DataGridInternalException( "DataGridContext is null for Row." );
 
-      DataGridControl gridControl = dataGridContext.DataGridControl;
-      if( gridControl == null )
+      var dataGridControl = dataGridContext.DataGridControl;
+      if( dataGridControl == null )
         throw new DataGridInternalException( "DataGridControl is null for Row." );
 
       m_rowFocusRoot = this.GetTemplateChild( "PART_RowFocusRoot" ) as FrameworkElement;
 
-      var oldCellsHostPanel = m_cellsHostPanel;
-      var oldVirtualizingCellsHost = oldCellsHostPanel as IVirtualizingCellsHost;
-
-      if( oldVirtualizingCellsHost != null )
+      if( m_cellsHostPanel != null )
       {
-        oldVirtualizingCellsHost.ClearCellsHost();
+        var oldVirtualizingCellsHost = m_cellsHostPanel as IVirtualizingCellsHost;
+        if( oldVirtualizingCellsHost != null )
+        {
+          oldVirtualizingCellsHost.ClearCellsHost();
+        }
+
+        m_cellsHostPanel.Children.Clear();
       }
 
       m_cellsHostPanel = this.GetTemplateChild( "PART_CellsHost" ) as Panel;
+
+      // The PART_CellsHost children are handled internally, it is not allowed to add child elements directly through the template, so clear it.
+      if( m_cellsHostPanel != null )
+      {
+        m_cellsHostPanel.Children.Clear();
+      }
 
       if( m_rowFocusRoot == null )
       {
         m_rowFocusRoot = m_cellsHostPanel;
       }
 
+      //Get templated cells, if any (cells added to the visual tree of the row, but not through .Cells).
       m_templateCells.Clear();
-
       this.GetTemplateCells( this, m_templateCells );
 
-      this.PreparePreviousTemplateCells();
-
-      this.SynchronizeCellsWithColumns( gridControl, m_templateCells, false );
-
-      if( oldCellsHostPanel != null )
+      //This will, among other things, process cells added to Row.Cells, in xaml for instance.
+      //This must be done AFTER getting template cells, for cells added to Row.Cells will be part of the VisualTree after this call, thus would became template cells.
+      var fixedCellPanel = m_cellsHostPanel as FixedCellPanel;
+      if( fixedCellPanel != null )
       {
-        oldCellsHostPanel.Children.Clear();
-      }
-
-      var virtualizingCellsHost = m_cellsHostPanel as IVirtualizingCellsHost;
-      if( virtualizingCellsHost != null )
-      {
-        this.PrepareCellsHost( dataGridContext );
+        fixedCellPanel.PrepareVirtualizationMode( dataGridContext );
       }
       else
       {
-        // Reset the flag
-        if( gridControl.ForceGeneratorReset == false )
-        {
-          gridControl.ForceGeneratorReset = true;
-        }
-
-        if( ( m_cellsHostPanel != null ) && ( m_cellsHostPanel != oldCellsHostPanel ) )
-        {
-          m_cellsHostPanel.Children.Clear();
-        }
-
-        this.PutCellsInVisualTree( m_templateCells );
+        m_cellsCache.MergeFreeCells();
       }
+
+      var virtualizingCellsHost = m_cellsHostPanel as IVirtualizingCellsHost;
+      var hasVirtualizingCellsHost = virtualizingCellsHost != null;
+
+      // Ensure that old template cells are cleared, and remove cells not mapped to any columns.
+      this.SynchronizeActualAndTemplateCells( dataGridContext, dataGridContext.Columns, ( hasVirtualizingCellsHost && ( m_templateCells.Count > 0 ) ) );
+
+      if( hasVirtualizingCellsHost )
+      {
+        this.PrepareVirtualizingCellsHost( dataGridContext, virtualizingCellsHost );
+      }
+      else
+      {
+        dataGridControl.ForceGeneratorReset = true;
+        this.PrepareNonVirtualizingCellsHost();
+      }
+
 
       this.UpdateNavigationBehavior();
       this.UpdateCellsFocusableStatus();
@@ -1091,7 +1121,7 @@ namespace Xceed.Wpf.DataGrid
         DependencyObject sourceElement = e.OriginalSource as DependencyObject;
 
         // Is not FixedColumnSplitter
-        if( !( sourceElement is Views.FixedColumnSplitter ) && ( !Row.IsPartOfFixedColumnSplitter( sourceElement ) ) )
+        if( !Row.IsPartOfFixedColumnSplitter( sourceElement ) )
         {
           bool focused = false;
 
@@ -1144,9 +1174,11 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    protected override AutomationPeer OnCreateAutomationPeer()
+
+    protected override void OnPropertyChanged( DependencyPropertyChangedEventArgs e )
     {
-      return new RowAutomationPeer( this );
+      base.OnPropertyChanged( e );
+      this.OnPropertyChanged( e.Property.Name );
     }
 
     protected override void OnVisualParentChanged( DependencyObject oldParent )
@@ -1191,40 +1223,39 @@ namespace Xceed.Wpf.DataGrid
 
       // We ensure to create the CurrentCell by fetching it from the CellsCollection
       // If there is a current column on the DataGridContext, try to restore the currency of the cell
-      if( ( this.IsCurrent ) && ( dataGridContext.CurrentColumn != null ) )
+      var currentColumn = dataGridContext.CurrentColumn;
+      if( ( this.IsCurrent ) && ( currentColumn != null ) )
       {
         //This will also trigger the creation of the Cell if it is virtualized.
-        Cell currentCell = m_cellsCache[ dataGridContext.CurrentColumn ];
+        Cell currentCell = m_cellsCache[ currentColumn ];
       }
 
       IVirtualizingCellsHost virtualizingCellsHost = this.CellsHostPanel as IVirtualizingCellsHost;
 
       if( virtualizingCellsHost != null )
       {
-        this.PrepareCellsHost( dataGridContext );
+        this.PrepareVirtualizingCellsHost( dataGridContext, virtualizingCellsHost );
+
+        // Template cells are not part of the VirtualzingCellsHost (thus not part of CreatedCells), so we must ensure they are prepared
+        if( m_templateCells != null )
+        {
+          foreach( Cell cell in m_templateCells.Values )
+          {
+            cell.PrepareContainer( dataGridContext, item );
+          }
+        }
       }
       else
       {
-        //re-Initialize all created cells for the new "assignation"
+        // When not having a VirtualizingCellHost, both template and "default" cells are contained within the VirtualizingCellCollection, so they will all be in CreatedCells.
         foreach( Cell cell in this.CreatedCells )
         {
-          // Call Cell.PrepareContainer for cells already created          
           cell.PrepareContainer( dataGridContext, item );
         }
       }
 
-      if( m_templateCells != null )
-      {
-        // We must ensure every template cells are prepared
-        foreach( Cell cell in m_templateCells.Values )
-        {
-          cell.PrepareContainer( dataGridContext, item );
-        }
-      }
-
-      // We must set isContainerPrepared because a verification is made in BeginEdit
-      // to ensure the container is prepared before entering in edition. The following
-      // RestoreEditionState will possibly trigger BeginEdit.
+      // We must set isContainerPrepared because a verification is made in BeginEdit to ensure the container is prepared before entering in edition.
+      // The following RestoreEditionState will possibly trigger BeginEdit.
       this.IsContainerPrepared = true;
 
       // Use the CurrentContext.InternalCurrentItem when restoring current item
@@ -1235,9 +1266,8 @@ namespace Xceed.Wpf.DataGrid
       if( ( currentItemInEdition != null ) && ( currentItemInEdition.Equals( item ) ) )
       {
         //PL: Should only occur when hitting a CollectionView reset while editing.
-        this.RestoreEditionState( gridControl.CurrentRowInEditionState, dataGridContext.CurrentColumn );
+        this.RestoreEditionState( gridControl.CurrentRowInEditionState, currentColumn );
       }
-
 
       this.UpdateMatchingDisplayConditions();
       this.UpdateNavigationBehavior();
@@ -1253,20 +1283,15 @@ namespace Xceed.Wpf.DataGrid
 
       try
       {
-        // If there were some validation errors, we want to clear every Cells to be sure 
-        // they will never reflect the error state on another data item if they are not 
-        // explicitly prepared
+        // If there were some validation errors, we want to clear every Cells to be sure they will
+        // never reflect the error state on another data item if they are not explicitly prepared
         this.ClearCellsHost();
 
-        // Clear every Cells before clearing the Row's values to allow the Cell
-        // to check some properties on there parent row when processing a Cell.ClearContainer
-        // Ensure every prepared Cells are cleared correctly
-        foreach( Cell cell in m_cellsCache.Cells )
+        // Clear every Cells before clearing the Row's values to allow the Cell to check some properties on their
+        // parent row when processing a Cell.ClearContainer, which ensures every prepared Cells are cleared correctly
+        foreach( Cell cell in this.CreatedCells )
         {
-          if( cell.IsContainerPrepared )
-          {
-            cell.ClearContainer();
-          }
+          cell.ClearContainer();
         }
 
         // Clear all the DP's that are either public or somehow inherited.
@@ -1296,6 +1321,101 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    protected virtual void PartialClearContainer()
+    {
+      this.IsClearingContainer = true;
+
+      try
+      {
+        this.ClearCellsHost();
+
+        // Clear every Cells before clearing the Row's values to allow the Cell to check some properties on their
+        // parent row when processing a Cell.ClearContainer, which ensures every prepared Cells are cleared correctly
+        foreach( Cell cell in this.CreatedCells )
+        {
+          cell.PartialClearContainer();
+        }
+
+        // We need to clear both the ValidationError and the HasValidationError property.
+        // The clearing of ValidationError will take care of the tooltip/cached local tooltip
+        // The clearing of HasValidationError will take care of updating the DataGridControl HasValidationError property.
+        this.ClearValue( Row.ValidationErrorPropertyKey );
+        this.ClearValue( Row.HasValidationErrorPropertyKey );
+
+        this.ClearValue( Row.IsBeingEditedPropertyKey );
+        this.ClearValue( Row.IsDirtyPropertyKey );
+        this.ClearValue( Row.IsCurrentPropertyKey );
+
+        //No need to clear the IsSelected property, it will be properly set by the CustomItemContainerGenerator when recycling the row.
+
+        this.ClearValue( DataGridControl.ContainerGroupConfigurationProperty );
+      }
+      finally
+      {
+        this.IsClearingContainer = false;
+      }
+    }
+
+    protected virtual void SynchronizeActualAndTemplateCells( DataGridContext dataGridContext, ColumnCollection columns, bool initializeTemplateCells )
+    {
+      var oldTemplateCellsToRemove = new List<Cell>();
+      var unmappedCellsToRemove = new Hashtable();
+
+      //cycle through all the currently created cells, and place them in the right collection for further processing
+      foreach( var cell in this.CreatedCells )
+      {
+        // When switching row templates, it is possible for a cell that was a template cell to be replaced by a regular cell,
+        // but still have a counterpart in the template cells.  As a result, both conditions need to be checked.
+        if( Row.GetIsTemplateCell( cell ) || m_templateCells.ContainsKey( cell.FieldName ) )
+        {
+          oldTemplateCellsToRemove.Add( cell );
+          continue;
+        }
+
+        unmappedCellsToRemove.Add( cell.FieldName, cell );
+      }
+
+      //First remove old templated cells, so they eventually get replaced by the newly discovered ones.
+      foreach( var oldTemplateCell in oldTemplateCellsToRemove )
+      {
+        oldTemplateCell.ClearContainer();
+        m_cellsCache.InternalRemove( oldTemplateCell );
+      }
+
+      if( initializeTemplateCells || ( unmappedCellsToRemove.Count > 0 ) )
+      {
+        Xceed.Wpf.DataGrid.Views.ViewBase view = dataGridContext.DataGridControl.GetView();
+        foreach( ColumnBase column in columns )
+        {
+          var fieldName = column.FieldName;
+
+          //This column is still in use, keep the corresponding cell.
+          unmappedCellsToRemove.Remove( fieldName );
+
+          // Case 161385 : the following is because template cells are not part of Row.Cells when dealing with an IVirtualizingCellPanel.
+          // If dealing with an IVirtualizingCellPanel, need to do further processing if there is a template cell associated to this column.
+          if( initializeTemplateCells )
+          {
+            Cell cell = null;
+            m_templateCells.TryGetValue( fieldName, out cell );
+
+            if( cell != null )
+            {
+              cell.Initialize( dataGridContext, this, column );
+              cell.PrepareDefaultStyleKey( view );
+            }
+          }
+        }
+      }
+
+      // Lastly, clear cells that are not mapped to any column.
+      foreach( Cell unmappedcell in unmappedCellsToRemove.Values )
+      {
+        unmappedcell.ClearContainer();
+        m_cellsCache.InternalRemove( unmappedcell );
+      }
+    }
+
     internal static Row FromContainer( DependencyObject container )
     {
       if( container == null )
@@ -1316,17 +1436,14 @@ namespace Xceed.Wpf.DataGrid
     {
       Debug.Assert( ( row != null ) && ( exception != null ) );
 
-      // This method will set a validation error on the row and throw back a DataGridValidationException so that 
-      // the row stays in edition.
+      // This method will set a validation error on the row and throw back a DataGridValidationException so that the row stays in edition.
 
       if( exception is TargetInvocationException )
+      {
         exception = exception.InnerException;
+      }
 
-      row.SetValidationError( new RowValidationError(
-      Row.CustomRowValidationExceptionValidationRule,
-      row,
-      exception.Message,
-      exception ) );
+      row.SetValidationError( new RowValidationError( Row.CustomRowValidationExceptionValidationRule, row, exception.Message, exception ) );
 
       // Throwing a DataGridValidationException will be caught by the grid and will make the cell stay in edition.
       throw new DataGridValidationException( "An error occurred while attempting to end the edit process.", exception );
@@ -1337,9 +1454,9 @@ namespace Xceed.Wpf.DataGrid
       return ( ( row.CellEditorDisplayConditions & condition ) == condition );
     }
 
-    internal void PrepareCellsHost()
+    internal virtual object GetEditingDataContext()
     {
-      this.PrepareCellsHost( DataGridControl.GetDataGridContext( this ) );
+      return this.DataContext;
     }
 
     internal void ClearCellsHost()
@@ -1357,27 +1474,6 @@ namespace Xceed.Wpf.DataGrid
       foreach( Cell cell in this.CreatedCells )
       {
         cell.UpdateContentBindingTarget();
-      }
-    }
-
-    internal void SynchronizeCellsWithColumns( DataGridControl parentGrid, Dictionary<string, Cell> templateCells, bool onlyIfParentGridHasChanged )
-    {
-      if( ( !onlyIfParentGridHasChanged ) || ( parentGrid != m_parentGridUsedForCellsGeneration ) )
-      {
-        if( templateCells == null )
-        {
-          // Create a list of manually specified Cells in the Template. These will be 
-          // ignored by the Cell adding process.
-          templateCells = m_templateCells;
-        }
-
-        DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-
-        if( dataGridContext == null )
-          return;
-
-        this.GenerateMissingAndRemoveUnusedCells( dataGridContext, dataGridContext.Columns, templateCells );
-        m_parentGridUsedForCellsGeneration = parentGrid;
       }
     }
 
@@ -1399,13 +1495,14 @@ namespace Xceed.Wpf.DataGrid
           rowHasValidationError = true;
 
           if( errorChangedCell.IsValidationErrorRestrictive )
+          {
             rowHasRestrictiveValidationError = true;
+          }
         }
 
         if( !rowHasRestrictiveValidationError )
         {
-          // Create a clone of the list to avoid concurrent access when iterating 
-          // and a Cell is added to CreatedCells because of ColumnVirtualization
+          // Create a clone of the list to avoid concurrent access when iterating and a Cell is added to CreatedCells because of ColumnVirtualization
           List<Cell> createdCells = new List<Cell>( this.CreatedCells );
 
           foreach( Cell cell in createdCells )
@@ -1432,9 +1529,7 @@ namespace Xceed.Wpf.DataGrid
 
       DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
 
-      DataGridControl gridControl = ( dataGridContext != null )
-        ? dataGridContext.DataGridControl
-        : null;
+      DataGridControl gridControl = ( dataGridContext != null ) ? dataGridContext.DataGridControl : null;
 
       if( gridControl != null )
       {
@@ -1464,76 +1559,92 @@ namespace Xceed.Wpf.DataGrid
       return ( ( this.EditTriggers & triggers ) == triggers );
     }
 
-    internal Cell ProvideCell( ColumnBase column )
+    internal Cell PrepareUnbindedCell( ColumnBase column, Cell cell )
     {
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-      bool isCurrentColumn = ( dataGridContext.CurrentColumn == column );
-      bool rowIsCurrent = this.IsCurrent;
+      if( column == null )
+        return cell;
 
-      Xceed.Wpf.DataGrid.Views.ViewBase view = dataGridContext.DataGridControl.GetView();
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
 
-      string fieldName = column.FieldName;
-      Cell cell = null;
+      if( dataGridContext == null )
+        return null;
 
-      if( fieldName != null )
-      {
-        // Get the Cell from either the explicitly positioned cells of the row template
-        // or from the already created cells.
-        m_templateCells.TryGetValue( fieldName, out cell );
-      }
-
-      // We get the IVirtualizingCellsHost to be able to modify the LogicalParent if required
-      IVirtualizingCellsHost virtualizingCellsHost = m_cellsHostPanel as IVirtualizingCellsHost;
-
+      //Generate a cell if it was not provided in xaml
       if( cell == null )
       {
         cell = this.CreateCell( column );
 
-        bool isNewDataContext;
-        Cell.AssignDataContext( cell, this.DataContext, this.UnboundDataItemContext, column, out isNewDataContext );
-
-        cell.Initialize( dataGridContext, this, column );
-
-        cell.PrepareDefaultStyleKey( view );
-
-        if( ( virtualizingCellsHost != null ) && ( virtualizingCellsHost.CanModifyLogicalParent ) )
-        {
-          virtualizingCellsHost.SetLogicalParent( cell );
-        }
-
-        //optimization so that lookup speed will be increased for the Cells
-        cell.SetValue( DataGridControl.DataGridContextPropertyKey, dataGridContext );
-
-        if( ( rowIsCurrent ) && ( isCurrentColumn ) )
-        {
-          cell.SetIsCurrent( true );
-        }
-
-        // We must update the Focusable status for the newly created cell since
-        // UpdateCellsFocusableStatus is only called in Row.OnApplyTemplate
-        this.UpdateCellFocusableStatus( cell );
-
-        // The cell was just created, we must prepare it manually the first time
-        // since it is added by the PART_CellsHost and not directly put in it
-        // by the Row. Further PrepareContainer will be done when Row.PrepareContainer
-        // is called since it will be contained in Row.CreatedCells
-        cell.PrepareContainer( dataGridContext, this.DataContext );
+        // Make sure to add the cell to the VisualTree right away, so the binding engine works correctly when initializing the cell.
+        this.AddToVisualTree( cell );
       }
-      else
-      {
-        if( virtualizingCellsHost == null )
-        {
-          cell.Initialize( dataGridContext, this, column );
-        }
-        else
-        {
-          Debug.Fail( "We do not want to return a template Cell since it already has a visual parent." );
-          // We do not want to return a template Cell since it already has a visual parent
-          cell = null;
-        }
-      }
+
+      cell.PrepareDefaultStyleKey( dataGridContext.DataGridControl.GetView() );
+      cell.Initialize( dataGridContext, this, column );
+      cell.PrepareContainer( dataGridContext, this.DataContext );
+
+      //This is like doing a Measure/Arrange pass, in the sens that first time scrolling will be faster because the cell is ready to be displayed.
+      cell.ApplyTemplate();
+
+      //This is an out of view cell, it needs to be treated as such.  However, no need to add the cell's fieldName to the FixedCellPanel.PermanentScrollingFieldNames,
+      //for FixedCellPanel.UpdateChildren() will take care of it in the next layout pass.
+      cell.Visibility = Visibility.Collapsed;
+      cell.RemoveContentBinding();
 
       return cell;
+    }
+
+    internal Cell ProvideCell( ColumnBase column )
+    {
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
+      Cell cell = null;
+
+      // First verify if there is a corresponding Cell that has been explicitly positioned in the row template.
+      var fieldName = column.FieldName;
+      if( fieldName != null )
+      {
+        m_templateCells.TryGetValue( fieldName, out cell );
+      }
+
+      // If no template cell provided, create one and set it up.
+      if( cell == null )
+      {
+        cell = this.CreateCell( column );
+
+        // Make sure to add the cell to the VisualTree right away, so the binding engine works correctly when initializing the cell.
+        this.AddToVisualTree( cell );
+      }
+
+      cell.PrepareDefaultStyleKey( dataGridContext.DataGridControl.GetView() );
+
+      //The rest of the preparation of the cell must be done by the caller.
+      return cell;
+    }
+
+    internal void AddToVisualTree( Cell cell )
+    {
+      var virtualizingCellsHost = m_cellsHostPanel as IVirtualizingCellsHost;
+      if( ( virtualizingCellsHost != null ) && ( virtualizingCellsHost.CanModifyLogicalParent ) )
+      {
+        virtualizingCellsHost.SetLogicalParent( cell );
+      }
+      else if( ( virtualizingCellsHost == null ) && ( m_cellsHostPanel != null ) )
+      {
+        m_cellsHostPanel.Children.Add( cell );
+      }
+    }
+
+    internal void RemoveFromVisualTree( Cell cell )
+    {
+      IVirtualizingCellsHost virtualizingCellsHost = m_cellsHostPanel as IVirtualizingCellsHost;
+
+      if( ( virtualizingCellsHost != null ) && ( virtualizingCellsHost.CanModifyLogicalParent ) )
+      {
+        virtualizingCellsHost.ClearLogicalParent( cell );
+      }
+      else if( ( virtualizingCellsHost == null ) && ( m_cellsHostPanel != null ) )
+      {
+        m_cellsHostPanel.Children.Remove( cell );
+      }
     }
 
     internal void RefreshCellsDisplayedTemplate()
@@ -1568,9 +1679,6 @@ namespace Xceed.Wpf.DataGrid
 
       while( parent != null )
       {
-        if( parent is Views.FixedColumnSplitter )
-          break;
-
         // It is not necessary to go further than the Row.
         if( parent is Row )
           break;
@@ -1578,48 +1686,27 @@ namespace Xceed.Wpf.DataGrid
         parent = TreeHelper.GetParent( parent );
       }
 
-      return ( parent is Views.FixedColumnSplitter );
+      return false;
     }
 
-    private static bool IsPartOfCell( DependencyObject element )
+    private static IDisposable DeferCollectionViewRefresh( DataGridContext dataGridContext )
     {
-      bool retval = false;
+      if( dataGridContext == null )
+        return null;
 
-      DependencyObject parent = element;
-
-      while( ( parent is Row ) == false )
-      {
-        parent = TreeHelper.GetParent( parent );
-
-        //if the parent is null, then the item "clicked" is floating... let's consider it as a cell, so that 
-        //no specific actions are taken
-        if( parent == null )
-        {
-          retval = true;
-          break;
-        }
-
-        if( parent is Cell )
-        {
-          retval = true;
-          break;
-        }
-      }
-
-      return retval;
+      return dataGridContext.Items.DeferRefresh();
     }
 
-    private void PrepareCellsHost( DataGridContext dataGridContext )
+    private void PrepareVirtualizingCellsHost( DataGridContext dataGridContext, IVirtualizingCellsHost virtualizingCellsHost )
     {
-      var cellsHost = m_cellsHostPanel as IVirtualizingCellsHost;
-      if( ( cellsHost == null ) || ( dataGridContext == null ) )
+      if( dataGridContext == null )
         return;
 
       // Ensure to register to the TableViewColumnVirtualizationManager
-      cellsHost.PrepareCellsHost( dataGridContext );
+      virtualizingCellsHost.PrepareCellsHost( dataGridContext );
 
       // We force an InvalidateMeasure on the CellsHost to be sure the visible Cells are the good ones
-      cellsHost.InvalidateCellsHostMeasure();
+      virtualizingCellsHost.InvalidateCellsHostMeasure();
     }
 
     private void UpdateMatchingDisplayConditions()
@@ -1769,10 +1856,9 @@ namespace Xceed.Wpf.DataGrid
 
     private void UpdateCellsFocusableStatus()
     {
-      //cycle through all cells and 
+      //cycle through cells in view or those that are permanent (binded cells).
       foreach( Cell cell in this.CreatedCells )
       {
-
         //force an update of the NavigationBehavior characteristics
         this.UpdateCellFocusableStatus( cell );
       }
@@ -1783,9 +1869,7 @@ namespace Xceed.Wpf.DataGrid
       if( cell == null )
         return;
 
-      bool cellFocusable = true;
-
-      ColumnBase parentColumn = cell.ParentColumn;
+      var cellFocusable = true;
 
       if( !this.IsBeingEdited )
       {
@@ -1829,7 +1913,9 @@ namespace Xceed.Wpf.DataGrid
         var currentRowInEditionCellState = parentColumn.CurrentRowInEditionCellState;
 
         if( currentRowInEditionCellState != null )
+        {
           cachedCellStates.Add( parentColumn, currentRowInEditionCellState.Clone() );
+        }
       }
 
       try
@@ -1858,52 +1944,37 @@ namespace Xceed.Wpf.DataGrid
           CellState cachedCellState;
 
           if( cachedCellStates.TryGetValue( parentColumn, out cachedCellState ) )
+          {
             parentColumn.CurrentRowInEditionCellState = cachedCellState;
+          }
 
           cell.RestoreEditionState( currentColumn );
         }
       }
     }
 
-    private void PutCellsInVisualTree( Dictionary<string, Cell> templateCells )
+    private void PrepareNonVirtualizingCellsHost()
     {
-      if( m_cellsCache == null )
-      {
-        Debug.Fail( "PutCellsInVisualTree was called on a Row that is not a DataGridControl's descendant or whose DataGridControl ancestor has a null VisibleColumns property." );
-        return;
-      }
-
-      if( m_cellsHostPanel == null )
-      {
-        Debug.Fail( "PutCellsInVisualTree was called on a Row that doesn't have a Panel identified as the CellsHost in its VisualTree." );
-        return;
-      }
-
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
       if( dataGridContext == null )
         return;
 
-      object dataItem = this.DataContext;
+      if( m_cellsHostPanel == null )
+        return;
 
-      // fill the cellsHostPanel in visible order.
-      foreach( ColumnBase column in this.GetColumnsByVisiblePosition( dataGridContext ) )
+      var cellsHostCollection = m_cellsHostPanel.Children;
+
+      // Fill the cellsHostPanel in visible order.
+      foreach( var column in this.GetColumnsByVisiblePosition( dataGridContext ) )
       {
-        Cell cell = m_cellsCache[ column ];
+        //Cells will be created (if non-existing, via Row.ProvideCell()), initialized, and prepared through this call, including template cells.
+        var cell = m_cellsCache[ column ];
 
-        if( cell == null )
+        // An existing cell may not be in the VisualTree anymore, since m_cellsHostPanel.Children was just cleared in calling method.
+        if( !cellsHostCollection.Contains( cell ) && ( ( cell.FieldName == null ) || !m_templateCells.ContainsKey( cell.FieldName ) ) )
         {
-          //This situation is now a proof that something is awfully wrong since the VirtualizingCellCollection will create a cell if none is present.
-          throw new DataGridInternalException( "No cell found or created for " + column.FieldName + " column.", dataGridContext.DataGridControl );
+          cellsHostCollection.Add( cell );
         }
-
-        // We don't add a cell specifically (manually) positioned in the row template.
-        if( cell.FieldName == null || !templateCells.ContainsKey( cell.FieldName ) )
-        {
-          m_cellsHostPanel.Children.Add( cell );
-        }
-
-        // When explicitly put in the PART_CellsHost, we must call Cell.PrepareContainer
-        cell.PrepareContainer( dataGridContext, dataItem );
       }
     }
 
@@ -1983,12 +2054,46 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    protected virtual void GenerateMissingAndRemoveUnusedCells( DataGridContext dataGridContext, ColumnCollection columns, Dictionary<string, Cell> templateCells )
+    private void RemovePreviousTemplateCells()
+    {
+      List<Cell> removeList = new List<Cell>();
+
+      //cycle through all the cells, and if any of them have the attached property identifying them as Fixed Template Cells, then clear their FieldName property
+      foreach( Cell cell in this.CreatedCells )
+      {
+        if( Row.GetIsTemplateCell( cell ) )
+        {
+          removeList.Add( cell );
+        }
+      }
+
+      foreach( Cell removedCell in removeList )
+      {
+        removedCell.ClearContainer();
+        m_cellsCache.InternalRemove( removedCell );
+      }
+    }
+
+    private void SynchronizeCellsWithColumns( DataGridControl parentGrid, Dictionary<string, Cell> templateCells, bool onlyIfParentGridHasChanged )
+    {
+      if( ( !onlyIfParentGridHasChanged ) || ( parentGrid != m_parentGridUsedForCellsGeneration ) )
+      {
+        var dataGridContext = DataGridControl.GetDataGridContext( this );
+
+        if( dataGridContext == null )
+          return;
+
+        this.GenerateMissingAndRemoveUnusedCells( dataGridContext, dataGridContext.Columns, templateCells );
+        m_parentGridUsedForCellsGeneration = parentGrid;
+      }
+    }
+
+    private void GenerateMissingAndRemoveUnusedCells( DataGridContext dataGridContext, ColumnCollection columns, Dictionary<string, Cell> templateCells )
     {
       Hashtable cellsDictionary = new Hashtable();
 
       //Take each and every cells already created and place them in a dictionary.
-      //This dictionary is gonna be used to manage cells that need to be removed at the end of the method's body.
+      //This dictionary will be used to manage cells that need to be removed at the end of the method's body.
       foreach( Cell cell in this.CreatedCells )
       {
         cellsDictionary.Add( cell.FieldName, cell );
@@ -2007,18 +2112,9 @@ namespace Xceed.Wpf.DataGrid
         //Try to get the Template Cell defined for this column
         templateCells.TryGetValue( fieldName, out cell );
 
-        //The cell has been found in the template cells.
+        //The cell has been found in the template cells, simply prepare it, no need to add it to the VirtualizingCellCollection
         if( cell != null )
         {
-          //A cell for this Column has been found in the Template cells, get rid of the corresponding Cell in the Cells collection (if any)
-          Cell oldCell;
-          if( m_cellsCache.TryGetCell( column, false, out oldCell ) )
-          {
-            //If an oldCell was present, clear it and remove it from the Cells collection
-            oldCell.ClearContainer();
-            m_cellsCache.InternalRemove( oldCell );
-          }
-
           cell.Initialize( dataGridContext, this, column );
 
           // Ensure to prepare a Cell if it is not prepared or virtualized
@@ -2026,9 +2122,6 @@ namespace Xceed.Wpf.DataGrid
           {
             cell.PrepareContainer( dataGridContext, this.DataContext );
           }
-
-          //then add the Template cell to the Cells collection.
-          m_cellsCache.InternalAdd( cell );
 
           //finally, if the Row is current and the column in question is current, set the Currency state on the template cell.
           if( ( rowIsCurrent ) && ( column == currentColumn ) )
@@ -2039,13 +2132,13 @@ namespace Xceed.Wpf.DataGrid
         //The cell is not part of the Template Cells... But it still needs some work to be done.
         else
         {
-          if( !m_cellsCache.TryGetCell( column, out cell ) )
+          if( !m_cellsCache.TryGetBindedCell( column, out cell ) )
           {
             cell = null;
           }
         }
 
-        //the Cell is a Template Cell OR is already present in the Row
+        //the cell is a template cell OR is already present in the Row
         if( cell != null )
         {
           //To ensure that the DefaultStyleKey is set appropriatly
@@ -2061,28 +2154,6 @@ namespace Xceed.Wpf.DataGrid
       {
         cell.ClearContainer();
         m_cellsCache.InternalRemove( cell );
-      }
-    }
-
-    private void PreparePreviousTemplateCells()
-    {
-      List<Cell> removeList = new List<Cell>();
-
-      //cycle through all the cells, and if any of them have the 
-      //attached property identifying them as Fixed Template Cells, 
-      // then clear their FieldName property
-      foreach( Cell cell in this.CreatedCells )
-      {
-        if( Row.GetIsTemplateCell( cell ) )
-        {
-          removeList.Add( cell );
-        }
-      }
-
-      foreach( Cell removedCell in removeList )
-      {
-        removedCell.ClearContainer();
-        m_cellsCache.InternalRemove( removedCell );
       }
     }
 
@@ -2254,7 +2325,7 @@ namespace Xceed.Wpf.DataGrid
         // This call will also validate that we're not starting a second row edition. It will also save the row state and update the columns' CurrentRowInEditionCellState.
         if( gridControl != null )
         {
-          gridControl.UpdateCurrentRowInEditionCellStates( this, this.DataContext );
+          gridControl.UpdateCurrentRowInEditionCellStates( this, this.GetEditingDataContext() );
         }
 
         this.SetIsBeingEdited( true );
@@ -2316,14 +2387,15 @@ namespace Xceed.Wpf.DataGrid
             currentCell = m_cellsCache[ dataGridContext.VisibleColumns[ firstEditableColumn ] ];
 
             if( currentCell != null )
+            {
               currentCell.BeginEdit();
+            }
           }
         }
       }
       catch( DataGridException )
       {
-        // We swallow exception if it occurs because of a validation error or Cell was read-only or
-        // any other GridException.
+        // We swallow exception if it occurs because of a validation error or Cell was read-only or any other GridException.
       }
     }
 
@@ -2376,7 +2448,7 @@ namespace Xceed.Wpf.DataGrid
       if( this.IsCancelingEdition )
         throw new InvalidOperationException( "An attempt was made to end the edit process while it is being canceled." );
 
-      CancelRoutedEventArgs e = new CancelRoutedEventArgs( Row.EditEndingEvent, this );
+      var e = new CancelRoutedEventArgs( Row.EditEndingEvent, this );
 
       try
       {
@@ -2387,8 +2459,7 @@ namespace Xceed.Wpf.DataGrid
       }
       catch( Exception exception )
       {
-        // This method will set a validation error on the row and throw back a DataGridValidationException so that 
-        // the row stays in edition.
+        // This method will set a validation error on the row and throw back a DataGridValidationException so that  the row stays in edition.
         Row.SetRowValidationErrorOnException( this, exception );
       }
 
@@ -2396,17 +2467,15 @@ namespace Xceed.Wpf.DataGrid
 
       try
       {
-        DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-
+        var dataGridContext = DataGridControl.GetDataGridContext( this );
         if( dataGridContext == null )
         {
           Debug.Fail( "DataGridContext cannot be null." );
           return;
         }
 
-        IDisposable deferRefresh = ( ( this is DataRow )
-          && ( dataGridContext.ItemsSourceCollection is DataGridCollectionViewBase ) )
-          ? DataRow.DeferCollectionViewRefresh( dataGridContext ) : null;
+        var dataGridCollectionViewBase = dataGridContext.ItemsSourceCollection as DataGridCollectionViewBase;
+        var deferRefresh = ( ( dataGridCollectionViewBase != null ) ) ? Row.DeferCollectionViewRefresh( dataGridContext ) : null;
 
         try
         {
@@ -2417,11 +2486,9 @@ namespace Xceed.Wpf.DataGrid
         {
           if( deferRefresh != null )
           {
-            // If there is a validation error, The Dispose of the deferRefresh
-            // may clear (local value) the current error. Be sure to keep it in order
-            // to restore it if needed.
-            object hasValidationError = this.ReadLocalValue( Row.HasValidationErrorProperty );
-            object validationError = this.ReadLocalValue( Row.ValidationErrorProperty );
+            // If there is a validation error, deferRefresh.Dispose() may clear the current error. Be sure to keep it in order to restore it if needed.
+            var hasValidationError = this.ReadLocalValue( Row.HasValidationErrorProperty );
+            var validationError = this.ReadLocalValue( Row.ValidationErrorProperty );
 
             deferRefresh.Dispose();
 
@@ -2430,6 +2497,7 @@ namespace Xceed.Wpf.DataGrid
               // This will use the PropertyKey.
               this.SetHasValidationError( ( bool )hasValidationError );
             }
+
             if( validationError != DependencyProperty.UnsetValue )
             {
               this.SetValidationError( ( RowValidationError )validationError );
@@ -2439,9 +2507,8 @@ namespace Xceed.Wpf.DataGrid
 
         this.PreEditEnded();
 
-        // Item validation has passed if we reached this far.  
-        // Since it is the Row's HasValidationError which drives the error styles, setting 
-        // the ItemValidationError to null will not get in the way of the row's cells validation.
+        // Item validation has passed if we reached this far. Since it is the Row's HasValidationError which drives the error styles,
+        // setting the ItemValidationError to null will not get in the way of the row's cells validation.
         this.SetValidationError( null );
 
       }
@@ -2465,7 +2532,6 @@ namespace Xceed.Wpf.DataGrid
       foreach( Cell cell in this.CreatedCells )
       {
         cell.SetIsDirty( false );
-        cell.SetIsDirtyFromInitializingInsertionRow( false );
       }
 
       this.SetIsDirty( false );
@@ -2497,18 +2563,19 @@ namespace Xceed.Wpf.DataGrid
     {
       bool hasRestrictiveError = false;
 
-      // Create a clone of the list to avoid concurrent access when iterating 
-      // and a Cell is added to CreatedCells because of ColumnVirtualization
-      List<Cell> createdCells = new List<Cell>();
+      // Create a clone of the list to avoid concurrent access when iterating and a Cell is added to CreatedCells because of ColumnVirtualization
+      var createdCells = new List<Cell>();
 
       Cell editCell = null;
 
-      foreach( Cell cell in this.CreatedCells )
+      foreach( var cell in this.CreatedCells )
       {
         createdCells.Add( cell );
 
         if( cell.IsBeingEdited )
+        {
           editCell = cell;
+        }
       }
 
       if( editCell != null )
@@ -2529,20 +2596,18 @@ namespace Xceed.Wpf.DataGrid
         if( cell == editCell )
           continue;
 
-        Nullable<DataGridUpdateSourceTrigger> contentBindingUpdateSourceTrigger = cell.GetContentBindingUpdateSourceTrigger();
-
-        bool updateContentBindingSource = ( contentBindingUpdateSourceTrigger == DataGridUpdateSourceTrigger.RowEndingEdit );
-
-        bool cascadeValidate = updateContentBindingSource;
-
+        var contentBindingUpdateSourceTrigger = cell.GetContentBindingUpdateSourceTrigger();
+        var updateContentBindingSource = ( contentBindingUpdateSourceTrigger == DataGridUpdateSourceTrigger.RowEndingEdit );
+        var cascadeValidate = updateContentBindingSource;
         Exception exception;
         CellValidationRule ruleInError;
 
-        ValidationResult result =
-          cell.ValidateAndSetAllErrors( true, true, updateContentBindingSource, cascadeValidate, out exception, out ruleInError );
+        var result = cell.ValidateAndSetAllErrors( true, true, updateContentBindingSource, cascadeValidate, out exception, out ruleInError );
 
         if( ( !result.IsValid ) && ( Cell.GetIsRuleInErrorRestrictive( ruleInError ) ) )
+        {
           hasRestrictiveError = true;
+        }
       }
 
       // Throwing a DataGridValidationException will be caught by the grid and will make the cell stay in edition.
@@ -2615,9 +2680,8 @@ namespace Xceed.Wpf.DataGrid
 
         if( dataGridContext != null )
         {
-          deferRefresh = ( ( this is DataRow )
-            && ( dataGridContext.ItemsSourceCollection is DataGridCollectionViewBase ) )
-            ? DataRow.DeferCollectionViewRefresh( dataGridContext ) : null;
+          deferRefresh = ( ( this is DataRow )  || ( dataGridContext.ItemsSourceCollection is DataGridCollectionViewBase ) )
+                         ? DataRow.DeferCollectionViewRefresh( dataGridContext ) : null;
         }
 
         try
@@ -2635,9 +2699,8 @@ namespace Xceed.Wpf.DataGrid
 
         this.PreEditCanceled();
 
-        // A row cannot have an ItemValidationError when not being edited.
-        // Since it is the Row's HasValidationError which drives the error styles, setting 
-        // the ItemValidationError to null will not get in the way of the row's cells validation.
+        // A row cannot have an ItemValidationError when not being edited. Since it is the Row's HasValidationError which drives the error styles,
+        // setting the ItemValidationError to null will not get in the way of the row's cells validation.
         this.SetValidationError( null );
 
       }
@@ -2683,16 +2746,18 @@ namespace Xceed.Wpf.DataGrid
     protected virtual void CancelEditCore()
     {
       // Restore the Cell.Content
-      foreach( Cell cell in this.CreatedCells )
+      foreach( var cell in this.CreatedCells )
       {
         if( cell.IsBeingEdited )
+        {
           cell.CancelEdit();
+        }
 
         cell.RevertEditedValue();
       }
 
 #if DEBUG
-      foreach( Cell cell in this.CreatedCells )
+      foreach( var cell in this.CreatedCells )
       {
         Debug.Assert( Cell.GetIsValidationErrorRestrictive( cell.ValidationError ) == false );
       }
@@ -2854,8 +2919,34 @@ namespace Xceed.Wpf.DataGrid
 
     #region IDataGridItemContainer Members
 
+    bool IDataGridItemContainer.CanBeRecycled
+    {
+      get
+      {
+        return this.CanBeRecycled;
+      }
+    }
+
+    bool IDataGridItemContainer.IsRecyclingCandidate
+    {
+      get
+      {
+        return m_isRecyclingCandidate;
+      }
+      set
+      {
+        m_isRecyclingCandidate = value;
+      }
+    }
+
     void IDataGridItemContainer.PrepareContainer( DataGridContext dataGridContext, object item )
     {
+      if( m_isRecyclingCandidate )
+      {
+        this.IsContainerPrepared = false;
+        m_isRecyclingCandidate = false;
+      }
+
       if( this.IsContainerPrepared )
         Debug.Fail( "A Row can't be prepared twice, it must be cleaned before PrepareContainer is called again" );
 
@@ -2864,17 +2955,96 @@ namespace Xceed.Wpf.DataGrid
 
     void IDataGridItemContainer.ClearContainer()
     {
+      if( m_isRecyclingCandidate )
+      {
+        this.PartialClearContainer();
+        return;
+      }
+
+      this.ClearContainer();
+    }
+
+    void IDataGridItemContainer.CleanRecyclingCandidate()
+    {
       this.ClearContainer();
     }
 
     #endregion
 
-    #region Private Fields
+    #region INotifyPropertyChanged Members
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged( string propertyName )
+    {
+      var handler = this.PropertyChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, new PropertyChangedEventArgs( propertyName ) );
+    }
+
+    #endregion
+
+    #region IWeakEventListener Members
+
+    bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      return this.OnReceiveWeakEvent( managerType, sender, e );
+    }
+
+    protected virtual bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      return false;
+    }
+
+    #endregion
 
     private DataGridControl m_parentGridUsedForCellsGeneration; // = null
     private Panel m_cellsHostPanel; // = null
     private Dictionary<string, Cell> m_templateCells = new Dictionary<string, Cell>();
+    private List<RegionPresenterConfig> m_oldRegionPresenterConfigs; // = null
     private BitVector32 m_flags = new BitVector32();
+    private bool m_isRecyclingCandidate;
+
+    #region RegionPresenterConfig Private Class
+
+    private sealed class RegionPresenterConfig
+    {
+      public Nullable<bool> ReadOnly
+      {
+        get;
+        set;
+      }
+
+      public Nullable<bool> ShowCellTitles
+      {
+        get;
+        set;
+      }
+
+      public Nullable<Stretch> ImageStretch
+      {
+        get;
+        set;
+      }
+
+      public Nullable<StretchDirection> ImageStretchDirection
+      {
+        get;
+        set;
+      }
+
+      public List<string> FieldNameList
+      {
+        get
+        {
+          return m_fieldNameList;
+        }
+      }
+
+      private List<string> m_fieldNameList = new List<string>();
+    }
 
     #endregion
 
@@ -2890,7 +3060,6 @@ namespace Xceed.Wpf.DataGrid
       IsBeingEditedCache = 16,
       IsClearingContainer = 32,
       IsContainerPrepared = 64,
-      IsInitializingInsertionRow = 128,
     }
 
     #endregion

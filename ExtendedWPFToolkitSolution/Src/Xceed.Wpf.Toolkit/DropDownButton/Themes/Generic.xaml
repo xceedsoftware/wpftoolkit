@@ -22,151 +22,153 @@
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-   <ResourceDictionary.MergedDictionaries>
-      <ResourceDictionary Source="..\..\Themes\Generic\Glyphs.xaml" />
-   </ResourceDictionary.MergedDictionaries>
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="..\..\Themes\Generic\Glyphs.xaml" />
+  </ResourceDictionary.MergedDictionaries>
 
-   <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+  <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
 
-   <LinearGradientBrush x:Key="PopupDarkBorderBrush"
-                        EndPoint="0.5,1"
-                        StartPoint="0.5,0">
-      <GradientStop Color="#FFA3AEB9"
-                    Offset="0" />
-      <GradientStop Color="#FF8399A9"
-                    Offset="0.375" />
-      <GradientStop Color="#FF718597"
-                    Offset="0.375" />
-      <GradientStop Color="#FF617584"
-                    Offset="1" />
-   </LinearGradientBrush>
+  <LinearGradientBrush x:Key="PopupDarkBorderBrush"
+                       EndPoint="0.5,1"
+                       StartPoint="0.5,0">
+    <GradientStop Color="#FFA3AEB9"
+                  Offset="0" />
+    <GradientStop Color="#FF8399A9"
+                  Offset="0.375" />
+    <GradientStop Color="#FF718597"
+                  Offset="0.375" />
+    <GradientStop Color="#FF617584"
+                  Offset="1" />
+  </LinearGradientBrush>
 
-   <LinearGradientBrush x:Key="PopupBackgroundBrush"
-                        StartPoint="0,0"
-                        EndPoint="0,1">
-      <LinearGradientBrush.GradientStops>
-         <GradientStopCollection>
-            <GradientStop Offset="0"
-                          Color="#FFffffff" />
-            <GradientStop Offset="1"
-                          Color="#FFE8EBED" />
-         </GradientStopCollection>
-      </LinearGradientBrush.GradientStops>
-   </LinearGradientBrush>
+  <LinearGradientBrush x:Key="PopupBackgroundBrush"
+                       StartPoint="0,0"
+                       EndPoint="0,1">
+    <LinearGradientBrush.GradientStops>
+      <GradientStopCollection>
+        <GradientStop Offset="0"
+                      Color="#FFffffff" />
+        <GradientStop Offset="1"
+                      Color="#FFE8EBED" />
+      </GradientStopCollection>
+    </LinearGradientBrush.GradientStops>
+  </LinearGradientBrush>
 
-   <Style TargetType="{x:Type local:DropDownButton}">
-      <Setter Property="BorderThickness"
-              Value="1" />
-      <Setter Property="IsTabStop"
-              Value="False" />
-      <Setter Property="HorizontalContentAlignment"
-              Value="Center" />
-      <Setter Property="VerticalContentAlignment"
-              Value="Center" />
-      <Setter Property="Background"
-              Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalBackgroundKey}}" />
-      <Setter Property="BorderBrush"
-              Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalOuterBorderKey}}" />
-      <Setter Property="Padding"
-              Value="3" />
-      <Setter Property="Template">
-         <Setter.Value>
-            <ControlTemplate TargetType="{x:Type local:DropDownButton}">
-               <Grid x:Name="MainGrid"
-                     SnapsToDevicePixels="True">
-                  <ToggleButton x:Name="PART_DropDownButton"
-                                Grid.Column="1"
-                                IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                                IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}">
-                     <ToggleButton.Template>
-                        <ControlTemplate TargetType="ToggleButton">
-                           <ContentPresenter />
-                        </ControlTemplate>
-                     </ToggleButton.Template>
-                     <Grid>
-                        <chrome:ButtonChrome x:Name="ToggleButtonChrome"
-                                             Background="{TemplateBinding Background}"
-                                             Foreground="{TemplateBinding Foreground}"
-                                             BorderThickness="{TemplateBinding BorderThickness}"
-                                             BorderBrush="{TemplateBinding BorderBrush}"
-                                             CornerRadius="2.75"
-                                             RenderChecked="{TemplateBinding IsOpen}"
-                                             RenderEnabled="{TemplateBinding IsEnabled}"
-                                             RenderMouseOver="{Binding IsMouseOver, ElementName=PART_DropDownButton}"
-                                             RenderPressed="{Binding IsPressed, ElementName=PART_DropDownButton}">
-                           <Grid>
-                              <Grid.ColumnDefinitions>
-                                 <ColumnDefinition Width="*" />
-                                 <ColumnDefinition Width="Auto" />
-                              </Grid.ColumnDefinitions>
-                              <ContentPresenter Margin="{TemplateBinding Padding}"
-                                                Content="{TemplateBinding Content}"
-                                                ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                RecognizesAccessKey="true" />
-                              <Grid x:Name="arrowGlyph"
-                                    IsHitTestVisible="False"
-                                    Margin="4,3,4,3"
-                                    Grid.Column="1">
-                                 <Path x:Name="Arrow"
-                                       Width="9"
-                                       Height="5"
-                                       Data="{StaticResource DownArrowGeometry}"
-                                       Fill="#FF000000" 
-                                       Margin="0,1,0,0"/>
-                              </Grid>
-                           </Grid>
-                        </chrome:ButtonChrome>
-                     </Grid>
-                  </ToggleButton>
+  <Style TargetType="{x:Type local:DropDownButton}">
+    <Setter Property="BorderThickness"
+            Value="1" />
+    <Setter Property="IsTabStop"
+            Value="False" />
+    <Setter Property="HorizontalContentAlignment"
+            Value="Center" />
+    <Setter Property="VerticalContentAlignment"
+            Value="Center" />
+    <Setter Property="Background"
+            Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalBackgroundKey}}" />
+    <Setter Property="BorderBrush"
+            Value="{DynamicResource {x:Static themes:ResourceKeys.ButtonNormalOuterBorderKey}}" />
+    <Setter Property="DropDownContentBackground"
+            Value="{StaticResource PopupBackgroundBrush}" />
+    <Setter Property="Padding"
+            Value="3" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:DropDownButton}">
+          <Grid x:Name="MainGrid"
+                SnapsToDevicePixels="True">
+            <ToggleButton x:Name="PART_DropDownButton"
+                          Grid.Column="1"
+                          IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                          IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}">
+              <ToggleButton.Template>
+                <ControlTemplate TargetType="ToggleButton">
+                  <ContentPresenter />
+                </ControlTemplate>
+              </ToggleButton.Template>
+              <Grid>
+                <chrome:ButtonChrome x:Name="ToggleButtonChrome"
+                                     Background="{TemplateBinding Background}"
+                                     Foreground="{TemplateBinding Foreground}"
+                                     BorderThickness="{TemplateBinding BorderThickness}"
+                                     BorderBrush="{TemplateBinding BorderBrush}"
+                                     CornerRadius="2.75"
+                                     RenderChecked="{TemplateBinding IsOpen}"
+                                     RenderEnabled="{TemplateBinding IsEnabled}"
+                                     RenderMouseOver="{Binding IsMouseOver, ElementName=PART_DropDownButton}"
+                                     RenderPressed="{Binding IsPressed, ElementName=PART_DropDownButton}">
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="*" />
+                      <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ContentPresenter Margin="{TemplateBinding Padding}"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      RecognizesAccessKey="true" />
+                    <Grid x:Name="arrowGlyph"
+                          IsHitTestVisible="False"
+                          Margin="4,3,4,3"
+                          Grid.Column="1">
+                      <Path x:Name="Arrow"
+                            Width="9"
+                            Height="5"
+                            Data="{StaticResource DownArrowGeometry}"
+                            Fill="#FF000000"
+                            Margin="0,1,0,0" />
+                    </Grid>
+                  </Grid>
+                </chrome:ButtonChrome>
+              </Grid>
+            </ToggleButton>
 
-                  <Popup x:Name="PART_Popup"
-                         HorizontalOffset="1"
-                         VerticalOffset="1"
-                         AllowsTransparency="True"
-                         StaysOpen="False"
-                         Placement="{TemplateBinding DropDownPosition}"
-                         Focusable="False"
-                         IsOpen="{Binding IsChecked, ElementName=PART_DropDownButton}"
-                         ToolTip="{x:Static sys:String.Empty}">
-                     <Popup.Resources>
-                        <Style TargetType="ToolTip">
-                           <Style.Triggers>
-                              <Trigger Property="Content"
-                                                Value="{x:Static sys:String.Empty}">
-                                 <Setter Property="Visibility"
-                                                  Value="Collapsed" />
-                              </Trigger>
-                           </Style.Triggers>
-                        </Style>
-                     </Popup.Resources>
-                     <Border BorderThickness="1"
-                             Background="{StaticResource PopupBackgroundBrush}"
-                             BorderBrush="{StaticResource PopupDarkBorderBrush}"
-                             MaxHeight="{TemplateBinding MaxDropDownHeight}">
-                        <ScrollViewer x:Name="DropDownScrollViewer"
-                                      VerticalScrollBarVisibility="Auto">
-                           <ContentPresenter x:Name="PART_ContentPresenter"
-                                             Content="{TemplateBinding DropDownContent}" />
-                        </ScrollViewer>
-                     </Border>
-                  </Popup>
+            <Popup x:Name="PART_Popup"
+                   HorizontalOffset="1"
+                   VerticalOffset="1"
+                   AllowsTransparency="True"
+                   StaysOpen="False"
+                   Placement="{TemplateBinding DropDownPosition}"
+                   Focusable="False"
+                   IsOpen="{Binding IsChecked, ElementName=PART_DropDownButton}"
+                   ToolTip="{x:Static sys:String.Empty}">
+              <Popup.Resources>
+                <Style TargetType="ToolTip">
+                  <Style.Triggers>
+                    <Trigger Property="Content"
+                             Value="{x:Static sys:String.Empty}">
+                      <Setter Property="Visibility"
+                              Value="Collapsed" />
+                    </Trigger>
+                  </Style.Triggers>
+                </Style>
+              </Popup.Resources>
+              <Border BorderThickness="1"
+                      Background="{TemplateBinding DropDownContentBackground}"
+                      BorderBrush="{StaticResource PopupDarkBorderBrush}"
+                      MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                <ScrollViewer x:Name="DropDownScrollViewer"
+                              VerticalScrollBarVisibility="Auto">
+                  <ContentPresenter x:Name="PART_ContentPresenter"
+                                    Content="{TemplateBinding DropDownContent}" />
+                </ScrollViewer>
+              </Border>
+            </Popup>
 
-               </Grid>
-               <ControlTemplate.Triggers>
-                  <Trigger Property="IsEnabled"
-                           Value="False">
-                     <Setter Property="Fill"
-                             TargetName="Arrow"
-                             Value="#AFAFAF" />
-                     <Setter Property="Foreground"
-                             Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                  </Trigger>
-               </ControlTemplate.Triggers>
-            </ControlTemplate>
-         </Setter.Value>
-      </Setter>
-   </Style>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsEnabled"
+                     Value="False">
+              <Setter Property="Fill"
+                      TargetName="Arrow"
+                      Value="#AFAFAF" />
+              <Setter Property="Foreground"
+                      Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 
 </ResourceDictionary>

@@ -744,7 +744,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         #region CanClose
 
-        private bool _canClose = true;
+        internal bool _canClose = true;
         public bool CanClose
         {
             get { return _canClose; }

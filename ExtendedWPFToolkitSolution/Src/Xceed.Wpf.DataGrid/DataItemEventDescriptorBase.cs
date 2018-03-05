@@ -21,8 +21,6 @@ namespace Xceed.Wpf.DataGrid
 {
   internal abstract class DataItemEventDescriptorBase : EventDescriptor
   {
-    #region Constructor
-
     protected DataItemEventDescriptorBase( DataItemTypeDescriptor owner, EventDescriptor parent )
       : base( parent )
     {
@@ -31,8 +29,6 @@ namespace Xceed.Wpf.DataGrid
 
       m_owner = owner;
     }
-
-    #endregion
 
     #region IsMulticast Property
 

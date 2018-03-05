@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -24,9 +24,7 @@ using Xceed.Wpf.Toolkit;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Diagnostics;
-#if OPEN_SOURCE
 using System.Windows.Media.Imaging;
-#endif
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Panels.Views
 {
@@ -37,9 +35,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Panels.Views
   {
     #region Members
 
-#if !OPEN_SOURCE
-    private DependencyObject _textBlockIdentifier;
-#endif
 
     #endregion
 
@@ -52,7 +47,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Panels.Views
 
     private void OnLayoutComboSelectionChanged( object sender, RoutedEventArgs e )
     {
-#if OPEN_SOURCE
       ComboBox comboBox = sender as ComboBox;
       bool isPlusPanel = (comboBox.SelectedIndex >= 2);
 
@@ -130,524 +124,64 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Panels.Views
         if( _openSourceScreenShotDesc != null )
           _openSourceScreenShotDesc.Text = desc;
       }
-#endif
     }
 
     private void OnSwitchPanelLayoutChanged( object sender, RoutedEventArgs e )
     {
-#if !OPEN_SOURCE
-      SwitchPanel switchPanel = sender as SwitchPanel;
-      if( switchPanel.ActiveLayout is Xceed.Wpf.Toolkit.Panels.Canvas )
-      {
-        InitCanvasPanel( switchPanel );
-      }
-      else if( switchPanel.ActiveLayout is Xceed.Wpf.Toolkit.Panels.DockPanel )
-      {
-        InitDockPanel( switchPanel );
-      }
-      else if( switchPanel.ActiveLayout is Xceed.Wpf.Toolkit.Panels.Grid )
-      {
-        InitGridPanel( switchPanel );
-      }
-      else if( switchPanel.ActiveLayout is Xceed.Wpf.Toolkit.Panels.StackedStackPanel )
-      {
-        InitStackedStackPanel( switchPanel );
-      }
-      else if( switchPanel.ActiveLayout is Xceed.Wpf.Toolkit.Panels.RelativeCanvas )
-      {
-        InitRelativeCanvasPanel( switchPanel );
-      }
-      else if( switchPanel.ActiveLayout is Xceed.Wpf.Toolkit.Panels.RadialCanvas )
-      {
-        InitRadialCanvasPanel( switchPanel );
-      }
-      else if( switchPanel.ActiveLayout is Xceed.Wpf.Toolkit.Panels.CameraPanel )
-      {
-        InitCameraPanel( switchPanel );
-      }
-      else if( switchPanel.ActiveLayout is Xceed.Wpf.Toolkit.Panels.AnimatedTimelinePanel )
-      {
-        InitAnimatedTimelinePanel( switchPanel );
-      }
-#endif
     }
 
-#if !OPEN_SOURCE
 
-    private void OnCanvasMoveItemComboBoxChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox combo = sender as ComboBox;
-      if( ( combo == null ) || !( combo.SelectedItem is Coordinates ) )
-      {
-        throw new InvalidDataException( "ComboBox should contain a coordinate." );
-      }
-      Coordinates coordinate = combo.SelectedItem as Coordinates;
-      SetItemPositionOnCanvas( _textBlockIdentifier, coordinate.X, coordinate.Y );
-    }
 
-    private void OnDockComboBoxChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox combo = sender as ComboBox;
-      if( ( combo != null) && (combo.SelectedItem is Dock) )
-        SetItemPositionOnDockPanel( _textBlockIdentifier, (Dock)combo.SelectedItem );
-    }
 
-    private void OnGridComboBoxChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox combo = sender as ComboBox;
-      if( ( combo == null ) || !( combo.SelectedItem is Coordinates ) )
-      {
-        throw new InvalidDataException( "ComboBox should contain a coordinate." );
-      }
-      Coordinates coordinate = combo.SelectedItem as Coordinates;
-      SetItemPositionOnGrid( _textBlockIdentifier, (int)coordinate.X, (int)coordinate.Y );
-    }
 
-    private void OnStackedStackComboBoxChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox combo = sender as ComboBox;
-      if( ( combo != null ) && ( combo.SelectedItem is int ) )
-        SetItemPositionOnStackedStackPanel( _textBlockIdentifier, (int)combo.SelectedItem );
-    }
 
-    private void OnStackedStackPanelStackLengthChanged( object sender, EventArgs e )
-    {
-      DoubleUpDown doubleUpDown = sender as DoubleUpDown;
-      if( doubleUpDown.Value.HasValue )
-      {
-        _stackedStackPanel.DefaultStackLength = double.IsNaN( doubleUpDown.Value.Value )
-                                                ? StackLength.Auto
-                                                : new StackLength( doubleUpDown.Value.Value );
-      }
-    }
 
-    private void OnRelativeLeftTopComboBoxChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox combo = sender as ComboBox;
-      if( ( combo == null ) || !( combo.SelectedItem is Coordinates ) )
-      {
-        throw new InvalidDataException( "ComboBox should contain a coordinate." );
-      }
-      Coordinates coordinate = combo.SelectedItem as Coordinates;
 
-      SetItemPositionOnRelativeCanvas( _textBlockIdentifier, coordinate.X, coordinate.Y, null, null, null );
-    }
 
-    private void OnRelativeWidthHeightComboBoxChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox combo = sender as ComboBox;
-      if( ( combo == null ) || !( combo.SelectedItem is Coordinates ) )
-      {
-        throw new InvalidDataException( "ComboBox should contain a coordinate." );
-      }
-      Coordinates coordinate = combo.SelectedItem as Coordinates;
 
-      SetItemPositionOnRelativeCanvas( _textBlockIdentifier, null, null, coordinate.X, coordinate.Y, null );
-    }
 
-    private void OnRelativePinPointComboBoxChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox combo = sender as ComboBox;
-      if( ( combo == null ) || !( combo.SelectedItem is Coordinates ) )
-      {
-        throw new InvalidDataException( "ComboBox should contain a coordinate." );
-      }
-      Coordinates coordinate = combo.SelectedItem as Coordinates;
-      Point pinPoint = new Point( coordinate.X, coordinate.Y );
-      SetItemPositionOnRelativeCanvas( _textBlockIdentifier, null, null, null, null, pinPoint );
-    }
 
-    private void OnRadialCanvasCenterComboBoxChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox combo = sender as ComboBox;
-      if( ( combo == null ) || !( combo.SelectedItem is Coordinates ) )
-      {
-        throw new InvalidDataException( "ComboBox should contain a coordinate." );
-      }
-      Coordinates coordinate = combo.SelectedItem as Coordinates;
-      _radialCanvas.Center = new Point( coordinate.X, coordinate.Y );
-    }
 
-    private void OnRadialCanvasAngleComboBoxChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox combo = sender as ComboBox;
-      if( ( combo != null ) && ( combo.SelectedItem is int ) )
-      {
-        if( _textBlockIdentifier != null )
-          Xceed.Wpf.Toolkit.Panels.RadialCanvas.SetAngle( _textBlockIdentifier, ( int )combo.SelectedItem );
-      }
-    }
 
-    private void OnRadialCanvasRadiusComboBoxChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox combo = sender as ComboBox;
-      if( ( combo != null ) && ( combo.SelectedItem is int ) )
-      {
-        if( _textBlockIdentifier != null )
-          Xceed.Wpf.Toolkit.Panels.RadialCanvas.SetRadius( _textBlockIdentifier, ( int )combo.SelectedItem );
-      }
-    }
 
-    private void OnRadialCanvasPinPointComboBoxChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox combo = sender as ComboBox;
-      if( ( combo == null ) || !( combo.SelectedItem is Coordinates ) )
-      {
-        throw new InvalidDataException( "ComboBox should contain a coordinate." );
-      }
-      Coordinates coordinate = combo.SelectedItem as Coordinates;
-      Point pinPoint = new Point( coordinate.X, coordinate.Y );
-      SetItemPositionOnRadialCanvas( _textBlockIdentifier, null, null, pinPoint );
-    }
 
-    private void OnAnimatedTimelineUnitTimeSpanChanged( object sender, EventArgs e )
-    {
-      IntegerUpDown integerUpDown = sender as IntegerUpDown;
-      if( integerUpDown.Value.HasValue )
-      {
-        _animatedTimeLinePanel.UnitTimeSpan = (integerUpDown.Value.Value == 0)
-                                              ? System.TimeSpan.Zero
-                                              : new System.TimeSpan( integerUpDown.Value.Value, 0, 0, 0 );
-      }
-    }
 
-    private void OnAnimatedTimelineDatesChanged( object sender, SelectionChangedEventArgs e )
-    {
-      ComboBox combo = sender as ComboBox;
-      if( ( combo != null ) && ( combo.SelectedItem is string ) )
-      {
-        string selectionContent = ( string )combo.SelectedItem;
-        string[] dateContent = selectionContent.Split( new string[]{ "to" }, StringSplitOptions.RemoveEmptyEntries );
-        if( dateContent.Length != 2 )
-          throw new InvalidDataException( "ComboBox should contain 2 date strings." );
 
-        if( ( _textBlockIdentifier != null ) && ( _textBlockIdentifier is TextBlock ) )
-        {
-          TextBlock textBlock = _textBlockIdentifier as TextBlock;
-          ResetItemContent( textBlock );
-          AddToItemContent( textBlock,  dateContent[ 0 ], dateContent[ 1 ] );
-        }
-        SetItemPositionOnAnimatedTimelinePanel( _textBlockIdentifier, System.DateTime.Parse( dateContent[ 0 ] ), System.DateTime.Parse( dateContent[ 1 ] ) );
-      }
-    }
 
-    private void OnAnimatedTimelinePanelDeactivated( object sender, RoutedEventArgs e )
-    {
-      AnimationPanel animationPanel = sender as AnimationPanel;
-      if( animationPanel != null )
-      {
-        ResetItemContent( "_item1" );
-        ResetItemContent( "_item2" );
-        ResetItemContent( "_item3" );
-        ResetItemContent( "_item4" );
-        ResetItemContent( "_item5" );
-        ResetItemContent( "_item6" );
-        ResetItemContent( "_item7" );
-        ResetItemContent( "_item8" );
-      }
-    }
 
-#endif //!OPEN_SOURCE
 
     #endregion 
 
     #region Methods (Private)
 
-    #if !OPEN_SOURCE
 
-    private void InitCanvasPanel( SwitchPanel switchPanel )
-    {
-      if( ( switchPanel != null ) && ( switchPanel.ActiveLayout != null ) )
-      {
-        _textBlockIdentifier = switchPanel.ActiveLayout.FindName( "_item8" ) as DependencyObject;
-        SetItemPositionOnCanvas( switchPanel, "_item1", 0, 200 );
-        SetItemPositionOnCanvas( switchPanel, "_item2", 150, 0 );
-        SetItemPositionOnCanvas( switchPanel, "_item3", 180, 180 );
-        SetItemPositionOnCanvas( switchPanel, "_item4", 12, 50 );
-        SetItemPositionOnCanvas( switchPanel, "_item5", 400, 30 );
-        SetItemPositionOnCanvas( switchPanel, "_item6", 500, 200 );
-        SetItemPositionOnCanvas( switchPanel, "_item7", 260, 50 );
-        SetItemPositionOnCanvas( switchPanel, "_item8", 600, 0 );
-      }
-    }
 
-    private void InitDockPanel( SwitchPanel switchPanel )
-    {
-      if( ( switchPanel != null ) && ( switchPanel.ActiveLayout != null ) )
-        _textBlockIdentifier = switchPanel.ActiveLayout.FindName( "_item2" ) as DependencyObject;
-    }
 
-    private void InitGridPanel( SwitchPanel switchPanel )
-    {
-      if( ( switchPanel != null ) && ( switchPanel.ActiveLayout != null ) )
-      {
-        _textBlockIdentifier = switchPanel.ActiveLayout.FindName( "_item4" ) as DependencyObject;
-        SetItemPositionOnGrid( switchPanel, "_item1", 1, 2 );
-        SetItemPositionOnGrid( switchPanel, "_item2", 3, 0 );
-        SetItemPositionOnGrid( switchPanel, "_item3", 2, 1 );
-        SetItemPositionOnGrid( switchPanel, "_item4", 3, 2 );
-        SetItemPositionOnGrid( switchPanel, "_item5", 3, 1 );
-        SetItemPositionOnGrid( switchPanel, "_item6", 2, 0 );
-        SetItemPositionOnGrid( switchPanel, "_item7", 0, 0 );
-        SetItemPositionOnGrid( switchPanel, "_item8", 1, 1 );
-      }
-    }
 
-    private void InitStackedStackPanel( SwitchPanel switchPanel )
-    {
-      if( ( switchPanel != null ) && ( switchPanel.ActiveLayout != null ) )
-      {
-        _textBlockIdentifier = switchPanel.ActiveLayout.FindName( "_item5" ) as DependencyObject;
-        SetItemPositionOnStackedStackPanel( switchPanel, "_item1", 1 );
-        SetItemPositionOnStackedStackPanel( switchPanel, "_item2", 3 );
-        SetItemPositionOnStackedStackPanel( switchPanel, "_item3", 2 );
-        SetItemPositionOnStackedStackPanel( switchPanel, "_item4", 3 );
-        SetItemPositionOnStackedStackPanel( switchPanel, "_item5", 2 );
-        SetItemPositionOnStackedStackPanel( switchPanel, "_item6", 2 );
-        SetItemPositionOnStackedStackPanel( switchPanel, "_item7", 0 );
-        SetItemPositionOnStackedStackPanel( switchPanel, "_item8", 1 );
-      }
-    }
 
-    private void InitRelativeCanvasPanel( SwitchPanel switchPanel )
-    {
-      if( ( switchPanel != null ) && ( switchPanel.ActiveLayout != null ) )
-      {
-        _textBlockIdentifier = switchPanel.ActiveLayout.FindName( "_item6" ) as DependencyObject;
-        SetItemPositionOnRelativeCanvas( switchPanel, "_item1", 0.3, 0.1 );
-        SetItemPositionOnRelativeCanvas( switchPanel, "_item2", 0.55, 0 );
-        SetItemPositionOnRelativeCanvas( switchPanel, "_item3", 0.6, 0.75 );
-        SetItemPositionOnRelativeCanvas( switchPanel, "_item4", 0.05, 0.2 );
-        SetItemPositionOnRelativeCanvas( switchPanel, "_item5", 0.45, 0.9 );
-        SetItemPositionOnRelativeCanvas( switchPanel, "_item6", 0.2, 0.7 );
-        SetItemPositionOnRelativeCanvas( switchPanel, "_item7", 0.5, 0.4 );
-        SetItemPositionOnRelativeCanvas( switchPanel, "_item8", 0.85, 0.8 );
-      }
-    }
 
-    private void InitRadialCanvasPanel( SwitchPanel switchPanel )
-    {
-      if( ( switchPanel != null ) && ( switchPanel.ActiveLayout != null ) )
-      {
-        _textBlockIdentifier = switchPanel.ActiveLayout.FindName( "_item7" ) as DependencyObject;
-        SetItemPositionOnRadialCanvas( switchPanel, "_item1", 278, 0 );
-        SetItemPositionOnRadialCanvas( switchPanel, "_item2", 100, 145 );
-        SetItemPositionOnRadialCanvas( switchPanel, "_item3", 125, 270 );
-        SetItemPositionOnRadialCanvas( switchPanel, "_item4", 200, 335 );
-        SetItemPositionOnRadialCanvas( switchPanel, "_item5", 200, 30 );
-        SetItemPositionOnRadialCanvas( switchPanel, "_item6", 25, 0 );
-        SetItemPositionOnRadialCanvas( switchPanel, "_item7", 175, 200 );
-        SetItemPositionOnRadialCanvas( switchPanel, "_item8", 300, 175 );
-      }
-    }
 
-    private void InitCameraPanel( SwitchPanel switchPanel )
-    {
-      if( ( switchPanel != null ) && ( switchPanel.ActiveLayout != null ) )
-      {
-        _textBlockIdentifier = switchPanel.ActiveLayout.FindName( "_item3" ) as DependencyObject;
-        SetItemPositionOnCameraPanel( switchPanel, "_item1", 50, 100, 100 );
-        SetItemPositionOnCameraPanel( switchPanel, "_item2", 400, 175, 25 );
-        SetItemPositionOnCameraPanel( switchPanel, "_item3", 250, 300, 200 );
-        SetItemPositionOnCameraPanel( switchPanel, "_item4", 75, 0, 50 );
-        SetItemPositionOnCameraPanel( switchPanel, "_item5", 500, 150, 2 );
-        SetItemPositionOnCameraPanel( switchPanel, "_item6", 25, 300, 90 );
-        SetItemPositionOnCameraPanel( switchPanel, "_item7", 0, 200, 300 );
-        SetItemPositionOnCameraPanel( switchPanel, "_item8", 450, 250, 100 );
-      }
-    }
 
-    private void InitAnimatedTimelinePanel( SwitchPanel switchPanel )
-    {
-      if( ( switchPanel != null ) && ( switchPanel.ActiveLayout != null ) )
-      {
-        _textBlockIdentifier = switchPanel.ActiveLayout.FindName( "_item2" ) as DependencyObject;
-        SetItemPositionOnAnimatedTimelinePanel( switchPanel, "_item1", new System.DateTime( 2012, 1, 1 ), new System.DateTime( 2012, 1, 1 ) );
-        SetItemPositionOnAnimatedTimelinePanel( switchPanel, "_item2", new System.DateTime( 2012, 1, 3 ), new System.DateTime( 2012, 1, 3 ) );
-        SetItemPositionOnAnimatedTimelinePanel( switchPanel, "_item3", new System.DateTime( 2012, 1, 1 ), new System.DateTime( 2012, 1, 4 ) );
-        SetItemPositionOnAnimatedTimelinePanel( switchPanel, "_item4", new System.DateTime( 2012, 1, 4 ), new System.DateTime( 2012, 1, 4 ) );
-        SetItemPositionOnAnimatedTimelinePanel( switchPanel, "_item5", new System.DateTime( 2012, 1, 1 ), new System.DateTime( 2012, 1, 1 ) );
-        SetItemPositionOnAnimatedTimelinePanel( switchPanel, "_item6", new System.DateTime( 2012, 1, 7 ), new System.DateTime( 2012, 1, 7 ) );
-        SetItemPositionOnAnimatedTimelinePanel( switchPanel, "_item7", new System.DateTime( 2012, 1, 5 ), new System.DateTime( 2012, 1, 7 ) );
-        SetItemPositionOnAnimatedTimelinePanel( switchPanel, "_item8", new System.DateTime( 2012, 1, 6 ), new System.DateTime( 2012, 1, 6 ) );
-      }
-    }
 
-    private void SetItemPositionOnCanvas( SwitchPanel switchPanel, string itemName, double left, double top )
-    {
-      if( switchPanel != null )
-      {
-        object item = switchPanel.ActiveLayout.FindName( itemName ) as object;
-        SetItemPositionOnCanvas( ( DependencyObject )item, left, top );
-      }
-    }
-    
-    private void SetItemPositionOnCanvas( DependencyObject item, double left, double top )
-    {
-      if( item != null )
-      {
-        Xceed.Wpf.Toolkit.Panels.Canvas.SetLeft( item, left );
-        Xceed.Wpf.Toolkit.Panels.Canvas.SetTop( item, top );
-      }
-    }
 
-    private void SetItemPositionOnDockPanel( DependencyObject item, Dock dock )
-    {
-      if( item != null )
-        Xceed.Wpf.Toolkit.Panels.DockPanel.SetDock( item, dock );
-    }
 
-    private void SetItemPositionOnGrid( SwitchPanel switchPanel, string itemName, int row, int column )
-    {
-      if( switchPanel != null )
-      {
-        object item = switchPanel.ActiveLayout.FindName( itemName ) as object;
-        SetItemPositionOnGrid( ( DependencyObject )item, row, column );
-      }
-    }
 
-    private void SetItemPositionOnGrid( DependencyObject item, int row, int column )
-    {
-      if( item != null )
-      {
-        Xceed.Wpf.Toolkit.Panels.Grid.SetRow( item, row );
-        Xceed.Wpf.Toolkit.Panels.Grid.SetColumn( item, column );
-      }
-    }
 
-    private void SetItemPositionOnStackedStackPanel( SwitchPanel switchPanel, string itemName, int stacked )
-    {
-      if( switchPanel != null )
-      {
-        object item = switchPanel.ActiveLayout.FindName( itemName ) as object;
-        SetItemPositionOnStackedStackPanel( ( DependencyObject )item, stacked );
-      }
-    }
 
-    private void SetItemPositionOnStackedStackPanel( DependencyObject item, int stacked )
-    {
-      if( item != null )
-        Xceed.Wpf.Toolkit.Panels.StackedStackPanel.SetStack( item, stacked );
-    }
 
-    private void SetItemPositionOnRelativeCanvas( SwitchPanel switchPanel, string itemName, double left, double top )
-    {
-      if( switchPanel != null )
-      {
-        object item = switchPanel.ActiveLayout.FindName( itemName ) as object;
-        SetItemPositionOnRelativeCanvas( ( DependencyObject )item, left, top, null, null, null );
-      }
-    }
 
-    private void SetItemPositionOnRelativeCanvas( DependencyObject item, double? left, double? top, double? width, double? height, Point? pinPoint )
-    {
-      if( item != null )
-      {
-        if( left.HasValue )
-          Xceed.Wpf.Toolkit.Panels.RelativeCanvas.SetLeft( item, left.Value );
-        if( top.HasValue )
-          Xceed.Wpf.Toolkit.Panels.RelativeCanvas.SetTop( item, top.Value );
-        if( width.HasValue )
-          Xceed.Wpf.Toolkit.Panels.RelativeCanvas.SetRelativeWidth( item, width.Value );
-        if( height.HasValue )
-          Xceed.Wpf.Toolkit.Panels.RelativeCanvas.SetRelativeHeight( item, height.Value );
-        if( pinPoint.HasValue )
-          Xceed.Wpf.Toolkit.Panels.RelativeCanvas.SetPinPoint( item, pinPoint.Value );
-      }
-    }
 
-    private void SetItemPositionOnRadialCanvas( SwitchPanel switchPanel, string itemName, int radius, int angle )
-    {
-      if( switchPanel != null )
-      {
-        object item = switchPanel.ActiveLayout.FindName( itemName ) as object;
-        SetItemPositionOnRadialCanvas( ( DependencyObject )item, radius, angle, null );
-      }
-    }
 
-    private void SetItemPositionOnRadialCanvas( DependencyObject item, int? radius, int? angle, Point? pinPoint )
-    {
-      if( item != null )
-      {
-        if( radius.HasValue )
-          Xceed.Wpf.Toolkit.Panels.RadialCanvas.SetRadius( item, radius.Value );
-        if( angle.HasValue )
-          Xceed.Wpf.Toolkit.Panels.RadialCanvas.SetAngle( item, angle.Value );
-        if( pinPoint.HasValue )
-          Xceed.Wpf.Toolkit.Panels.RadialCanvas.SetPinPoint( item, pinPoint.Value );
-      }
-    }
 
-    private void SetItemPositionOnCameraPanel( SwitchPanel switchPanel, string itemName, double left, double top, int depth )
-    {
-      if( switchPanel != null )
-      {
-        object item = switchPanel.ActiveLayout.FindName( itemName ) as object;
-        SetItemPositionOnCameraPanel( ( DependencyObject )item, left, top,  depth );
-      }
-    }
 
-    private void SetItemPositionOnCameraPanel( DependencyObject item, double left, double top, int depth )
-    {
-      if( item != null )
-      {
-        Xceed.Wpf.Toolkit.Panels.CameraPanel.SetLeft( item, left );
-        Xceed.Wpf.Toolkit.Panels.CameraPanel.SetTop( item, top );
-        Xceed.Wpf.Toolkit.Panels.CameraPanel.SetDepth( item, depth );
-      }
-    }
 
-    private void SetItemPositionOnAnimatedTimelinePanel( SwitchPanel switchPanel, string itemName, System.DateTime date, System.DateTime dateEnd )
-    {
-      if( switchPanel != null )
-      {
-        object item = switchPanel.ActiveLayout.FindName( itemName ) as object;
-        AddToItemContent( item, date.ToShortDateString(), dateEnd.ToShortDateString() );
-        SetItemPositionOnAnimatedTimelinePanel( ( DependencyObject )item, date, dateEnd );
-      }
-    }
 
-    private void SetItemPositionOnAnimatedTimelinePanel( DependencyObject item, System.DateTime date, System.DateTime dateEnd )
-    {
-      if( item != null )
-      {
-        Xceed.Wpf.Toolkit.Panels.AnimatedTimelinePanel.SetDate( item, date );
-        Xceed.Wpf.Toolkit.Panels.AnimatedTimelinePanel.SetDateEnd( item, dateEnd );
-      }
-    }
 
-    private void AddToItemContent( object o, string date1, string date2 )
-    {
-      if( o is TextBlock )
-      {
-        string addedString = "\n" + date1 + "\nto " + date2;
-        ( ( TextBlock )o ).Text += addedString;
-      }
-    }
 
-    private void ResetItemContent( object o )
-    {
-      if( o is TextBlock )
-      {
-        TextBlock textBlock = ( TextBlock )o;
-        //# Only keep the first line
-        int endIndex = textBlock.Text.IndexOf( '\n' );
-        if( endIndex > 0 )
-          textBlock.Text = textBlock.Text.Substring( 0, endIndex );
-      }
-    }
 
-    private void ResetItemContent( string itemName )
-    {
-      if( ( _switchPanel != null ) && ( _switchPanel.ActiveLayout != null ) )
-      {
-        object textBlock = _switchPanel.ActiveLayout.FindName( itemName );
-        ResetItemContent( textBlock );
-      }
-    }
 
-#endif //!OPEN_SOURCE
-    
+
+
     #endregion
 
   }

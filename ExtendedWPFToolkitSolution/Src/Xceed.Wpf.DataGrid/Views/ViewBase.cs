@@ -45,8 +45,6 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion Static Members
 
-    #region Constructors
-
     static ViewBase()
     {
       ViewBase.FixedHeadersProperty = ViewBase.FixedHeadersPropertyKey.DependencyProperty;
@@ -68,8 +66,6 @@ namespace Xceed.Wpf.DataGrid.Views
         this.DefaultStyleKey = newDefaultStyleKey;
       }
     }
-
-    #endregion Constructors
 
     #region Theme Property
 

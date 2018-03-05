@@ -23,37 +23,27 @@ using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
 {
-  internal class DropMarkAdorner : Adorner
+  internal sealed class DropMarkAdorner : Adorner
   {
     // A null value for the pen parameter means that the adorner will not show any visual cue.
-    public DropMarkAdorner( UIElement adornedElement, Pen pen, DropMarkOrientation orientation )
+    internal DropMarkAdorner( UIElement adornedElement, Pen pen, DropMarkOrientation orientation )
       : base( adornedElement )
     {
       Debug.Assert( orientation != DropMarkOrientation.Default, "A DropMarkAdorner without a specific orientation should virtually never happen. The only known way to do this would be to have a grid element not hosted in a DataGridControl. The DropMarkAdorner should react well to this nonetheless." );
       m_pen = pen;
       m_orientation = orientation;
+      m_render = ( pen != null );
 
       this.IsHitTestVisible = false;
     }
 
-    public DropMarkAlignment Alignment
-    {
-      get
-      {
-        return m_alignment;
-      }
-    }
-
-    // This Property does not use the Alignment paradigm. It allows to manually set the position of the drop mark.
     #region HorizontalPosition Property
 
     public static readonly DependencyProperty HorizontalPositionProperty = DependencyProperty.Register(
       "HorizontalPosition",
       typeof( double ),
       typeof( DropMarkAdorner ),
-      new FrameworkPropertyMetadata(
-        0d,
-        new PropertyChangedCallback( DropMarkAdorner.OnHorizontalPositionChanged ) ) );
+      new FrameworkPropertyMetadata( 0d, new PropertyChangedCallback( DropMarkAdorner.OnHorizontalPositionChanged ) ) );
 
     public double HorizontalPosition
     {
@@ -69,164 +59,140 @@ namespace Xceed.Wpf.DataGrid
 
     private static void OnHorizontalPositionChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      DropMarkAdorner adorner = sender as DropMarkAdorner;
-
-      if( adorner == null )
+      var self = sender as DropMarkAdorner;
+      if( self == null )
         return;
 
-      adorner.UpdatePosition();
+      self.Update();
     }
 
     #endregion
 
-    public void ForceAlignment( DropMarkAlignment alignment )
+    #region Alignment Property
+
+    internal DropMarkAlignment Alignment
     {
-      m_alignment = alignment;
-    }
-
-    public void UpdateAlignment( Point mousePosition )
-    {
-      DropMarkAlignment alignment = DropMarkAlignment.Near;
-
-      if( m_orientation == DropMarkOrientation.Horizontal )
+      get
       {
-        // A horizontal drop mark is either displayed at the top or at the bottom of the AdornedElement.
-        Rect hitTestRect = new Rect( 0d, 0d, this.AdornedElement.RenderSize.Width, this.AdornedElement.RenderSize.Height / 2 );
-
-        if( hitTestRect.Contains( mousePosition ) )
-        {
-          alignment = DropMarkAlignment.Near;
-        }
-        else
-        {
-          alignment = DropMarkAlignment.Far;
-        }
+        return m_alignment;
       }
-      else
+      set
       {
-        // A vertical drop mark is either displayed at the left or at the right of the AdornedElement.
-        Rect hitTestRect = new Rect( 0d, 0d, this.AdornedElement.RenderSize.Width / 2, this.AdornedElement.RenderSize.Height );
+        if( value == m_alignment )
+          return;
 
-        if( hitTestRect.Contains( mousePosition ) )
-        {
-          alignment = DropMarkAlignment.Near;
-        }
-        else
-        {
-          alignment = DropMarkAlignment.Far;
-        }
-      }
+        m_alignment = value;
 
-      if( alignment != m_alignment )
-      {
-        m_alignment = alignment;
-        this.UpdatePosition();
-      }
-    }
-
-    protected override Size MeasureOverride( Size constraint )
-    {
-      this.AdornedElement.Measure( constraint );
-
-      Size size = Size.Empty;
-
-      if( m_pen != null )
-      {
-        switch( m_orientation )
-        {
-          case DropMarkOrientation.Default:
-          case DropMarkOrientation.Vertical:
-            size = new Size( m_pen.Thickness, this.AdornedElement.RenderSize.Height );
-            break;
-          case DropMarkOrientation.Horizontal:
-            size = new Size( this.AdornedElement.RenderSize.Width, m_pen.Thickness );
-            break;
-        }
-      }
-
-      return size;
-    }
-
-    public override GeneralTransform GetDesiredTransform( GeneralTransform transform )
-    {
-      double offsetX = this.HorizontalPosition;
-      double offsetY = 0d;
-
-      if( m_pen != null )
-      {
-        switch( m_orientation )
-        {
-          case DropMarkOrientation.Default:
-          case DropMarkOrientation.Vertical:
-            offsetX -= m_pen.Thickness / 2;
-            break;
-          case DropMarkOrientation.Horizontal:
-            offsetY -= m_pen.Thickness / 2;
-            break;
-        }
-
-        if( m_alignment == DropMarkAlignment.Far )
-        {
-          if( m_orientation == DropMarkOrientation.Vertical )
-          {
-            // A "far" vertical drop mark is displayed at the right
-            offsetX += this.AdornedElement.RenderSize.Width;
-          }
-          else
-          {
-            // A "far" horizontal drop mark is displayed at the bottom
-            offsetY += this.AdornedElement.RenderSize.Height;
-          }
-        }
-      }
-
-      GeneralTransformGroup transformGroup = new GeneralTransformGroup();
-
-      transformGroup.Children.Add( base.GetDesiredTransform( transform ) );
-      transformGroup.Children.Add( new TranslateTransform( offsetX, offsetY ) );
-
-      return transformGroup;
-    }
-
-    protected override void OnRender( DrawingContext drawingContext )
-    {
-      if( m_pen != null )
-      {
-        Size renderSize = this.RenderSize;
-        Point startPoint = new Point();
-        Point endPoint = new Point();
-
-        switch( m_orientation )
-        {
-          case DropMarkOrientation.Default:
-          case DropMarkOrientation.Vertical:
-            startPoint = new Point( renderSize.Width / 2, 0d );
-            endPoint = new Point( startPoint.X, renderSize.Height );
-            break;
-          case DropMarkOrientation.Horizontal:
-            startPoint = new Point( 0d, renderSize.Height / 2 );
-            endPoint = new Point( renderSize.Width, startPoint.Y );
-            break;
-        }
-
-        drawingContext.DrawLine( m_pen, startPoint, endPoint );
-      }
-
-      base.OnRender( drawingContext );
-    }
-
-    private void UpdatePosition()
-    {
-      AdornerLayer adornerLayer = this.Parent as AdornerLayer;
-
-      if( adornerLayer != null )
-      {
-        adornerLayer.Update( this.AdornedElement );
+        this.Update();
       }
     }
 
     private DropMarkAlignment m_alignment = DropMarkAlignment.ExplicitPosition;
-    private Pen m_pen;
-    private DropMarkOrientation m_orientation;
+
+    #endregion
+
+    #region AdornerLayout Private Property
+
+    private AdornerLayer AdornerLayer
+    {
+      get
+      {
+        return ( this.Parent as AdornerLayer );
+      }
+    }
+
+    #endregion
+
+    protected override void OnRender( DrawingContext drawingContext )
+    {
+      base.OnRender( drawingContext );
+
+      if( !m_render || ( m_pen == null ) )
+        return;
+
+      var renderSize = this.AdornedElement.RenderSize;
+
+      Point startPoint = new Point( this.HorizontalPosition, 0d );
+      Point endPoint;
+
+      switch( m_orientation )
+      {
+        case DropMarkOrientation.Default:
+        case DropMarkOrientation.Vertical:
+          {
+            if( m_alignment == DropMarkAlignment.Far )
+            {
+              startPoint.X += renderSize.Width;
+            }
+
+            endPoint = new Point( startPoint.X, renderSize.Height );
+          }
+          break;
+        case DropMarkOrientation.Horizontal:
+          {
+            if( m_alignment == DropMarkAlignment.Far )
+            {
+              startPoint.Y += renderSize.Height;
+            }
+
+            endPoint = new Point( renderSize.Width, startPoint.Y );
+          }
+          break;
+        default:
+          return;
+      }
+
+      drawingContext.DrawLine( m_pen, startPoint, endPoint );
+    }
+
+    internal void UpdateAlignment( RelativePoint mousePosition )
+    {
+      var relativePosition = mousePosition.GetPoint( this.AdornedElement );
+      var elementSize = this.AdornedElement.RenderSize;
+
+      if( m_orientation == DropMarkOrientation.Horizontal )
+      {
+        this.Alignment = ( relativePosition.Y < elementSize.Height / 2d ) ? DropMarkAlignment.Near : DropMarkAlignment.Far;
+      }
+      else
+      {
+        this.Alignment = ( relativePosition.X < elementSize.Width / 2d ) ? DropMarkAlignment.Near : DropMarkAlignment.Far;
+      }
+    }
+
+    private void Update()
+    {
+      if( !m_render )
+        return;
+
+      if( !this.InvalidateAdornerLayer() )
+        return;
+
+      m_render = false;
+      this.LayoutUpdated += new EventHandler( this.OnLayoutUpdated );
+    }
+
+    private bool InvalidateAdornerLayer()
+    {
+      var adornerLayer = this.AdornerLayer;
+      if( adornerLayer == null )
+        return false;
+
+      adornerLayer.Update( this.AdornedElement );
+      return true;
+    }
+
+    private void OnLayoutUpdated( object sender, EventArgs e )
+    {
+      m_render = true;
+
+      this.LayoutUpdated -= new EventHandler( this.OnLayoutUpdated );
+      this.InvalidateVisual();
+      this.InvalidateAdornerLayer();
+    }
+
+    private readonly DropMarkOrientation m_orientation;
+    private readonly Pen m_pen;
+    private bool m_render;
   }
 }

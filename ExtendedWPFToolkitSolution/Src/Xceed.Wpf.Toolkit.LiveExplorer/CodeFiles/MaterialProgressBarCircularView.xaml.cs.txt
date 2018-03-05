@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -33,45 +33,18 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.MaterialControls.Views
     {
       InitializeComponent();
 
-#if !OPEN_SOURCE
-      this.Loaded += this.MaterialProgressBarCircularView_Loaded;
-#endif
     }
 
     #endregion
 
-#if !OPEN_SOURCE
 
-    #region Private Methods
 
-    private void AnimateDeterminateProgressBar()
-    {
-      var storyboard = new Storyboard();
 
-      // Animate Determinate Circular ProgressBar
-      DoubleAnimation valueAnim = new DoubleAnimation( materialDeterminateProgressBarCircular.Minimum, materialDeterminateProgressBarCircular.Maximum, System.TimeSpan.FromMilliseconds( 4000 ) );
-      Storyboard.SetTarget( valueAnim, materialDeterminateProgressBarCircular );
-      Storyboard.SetTargetProperty( valueAnim, new PropertyPath( MaterialProgressBarCircular.ValueProperty ) );
-      storyboard.Children.Add( valueAnim );
 
-      storyboard.Begin( this );
-    }
 
-    #endregion
 
-    #region Event Handlers
 
-    private void MaterialProgressBarCircularView_Loaded( object sender, RoutedEventArgs e )
-    {
-      this.AnimateDeterminateProgressBar();
-    }
 
-    private void ResetButton_Click( object sender, RoutedEventArgs e )
-    {
-      this.AnimateDeterminateProgressBar();
-    }
 
-    #endregion
-#endif
   }
 }

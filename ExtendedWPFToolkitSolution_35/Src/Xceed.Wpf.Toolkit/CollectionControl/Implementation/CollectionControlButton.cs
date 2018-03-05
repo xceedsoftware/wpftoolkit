@@ -19,6 +19,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -64,7 +65,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (IEnumerable)GetValue( ItemsSourceProperty );
+        return ( IEnumerable )GetValue( ItemsSourceProperty );
       }
       set
       {
@@ -110,12 +111,18 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion
 
+    #region Base Class Overrides
+
+
+    #endregion
+
     #region Methods
 
     private void CollectionControlButton_Click( object sender, RoutedEventArgs e )
     {
       var collectionControlDialog = new CollectionControlDialog();
-      collectionControlDialog.ItemsSource = this.ItemsSource;
+      var binding = new Binding( "ItemsSource" ) { Source = this, Mode = BindingMode.TwoWay };
+      BindingOperations.SetBinding( collectionControlDialog, CollectionControlDialog.ItemsSourceProperty, binding );
       collectionControlDialog.NewItemTypes = this.NewItemTypes;
       collectionControlDialog.ItemsSourceType = this.ItemsSourceType;
       collectionControlDialog.IsReadOnly = this.IsReadOnly;

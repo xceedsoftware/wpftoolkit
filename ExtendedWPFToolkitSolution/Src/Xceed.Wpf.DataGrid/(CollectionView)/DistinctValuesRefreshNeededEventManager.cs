@@ -74,14 +74,10 @@ namespace Xceed.Wpf.DataGrid
 
     protected override void StartListening( object source )
     {
-      var target = ( DataGridCollectionViewBase )source;
-      target.DistinctValuesRefreshNeeded += new EventHandler( this.DeliverEvent );
     }
 
     protected override void StopListening( object source )
     {
-      var target = ( DataGridCollectionViewBase )source;
-      target.DistinctValuesRefreshNeeded -= new EventHandler( this.DeliverEvent );
     }
   }
 }

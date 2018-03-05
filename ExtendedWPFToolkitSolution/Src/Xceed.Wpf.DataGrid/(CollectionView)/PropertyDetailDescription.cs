@@ -15,10 +15,8 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.ComponentModel;
 using System.Collections;
+using System.ComponentModel;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -37,6 +35,8 @@ namespace Xceed.Wpf.DataGrid
 
       this.PropertyDescriptor = relation;
     }
+
+    #region PropertyDescriptor Property
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly" )]
     public PropertyDescriptor PropertyDescriptor
@@ -60,6 +60,10 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private PropertyDescriptor m_propertyDescriptor;
+
+    #endregion
+
     protected internal override void Initialize( DataGridCollectionViewBase parentCollectionView )
     {
       base.Initialize( parentCollectionView );
@@ -72,56 +76,31 @@ namespace Xceed.Wpf.DataGrid
       if( String.IsNullOrEmpty( relationName ) == true )
         throw new InvalidOperationException( "An attempt was made to initialize a PropertyDetailDescription whose Name property has not been set." );
 
-      foreach( DataGridDetailDescription detailDescription in parentCollectionView.DetailDescriptions.DefaultDetailDescriptions )
+      var enumeration = parentCollectionView as IEnumerable;
+      if( enumeration != null )
       {
-        PropertyDetailDescription propertyDetailDescription = detailDescription as PropertyDetailDescription;
-        if( propertyDetailDescription != null )
+        // Try to get it from the first item in the DataGridCollectionView
+        var firstItem = ItemsSourceHelper.GetFirstItemByEnumerable( enumeration );
+        if( firstItem != null )
         {
-          if( propertyDetailDescription.RelationName == relationName )
+          var propertyDescriptor = this.GetPropertyDescriptorFromFirstItem( firstItem );
+          if( propertyDescriptor != null )
           {
-            this.PropertyDescriptor = propertyDetailDescription.PropertyDescriptor;
+            this.PropertyDescriptor = propertyDescriptor;
             return;
           }
         }
       }
 
-      // The DetailDescription for RelationName was not found in DefaultDetailDescription
-      // and may not have the PropertyDetailDescriptionAttribute
-      if( this.PropertyDescriptor == null )
+      // If the list is empty, check if the SourceCollection is ITypedList
+      var typedList = parentCollectionView.SourceCollection as ITypedList;
+      if( typedList != null )
       {
-        PropertyDescriptor relationDescriptor = null;
-
-        IEnumerable enumeration = parentCollectionView as IEnumerable;
-
-        if( enumeration != null )
+        var propertyDescriptor = this.GetPropertyDescriptorFromITypedList( typedList );
+        if( propertyDescriptor != null )
         {
-          // Try to get it from the first item in the DataGridCollectionView
-          object firstItem = ItemsSourceHelper.GetFirstItemByEnumerable( enumeration );
-
-          if( firstItem != null )
-          {
-            relationDescriptor = this.GetPropertyDescriptorFromFirstItem( firstItem );
-
-            if( relationDescriptor != null )
-            {
-              this.PropertyDescriptor = relationDescriptor;
-              return;
-            }
-          }
-        }
-
-        // If the list is empty, check if the SourceCollection is ITypedList
-        ITypedList iTypedList = parentCollectionView.SourceCollection as ITypedList;
-
-        if( iTypedList != null )
-        {
-          relationDescriptor = this.GetPropertyDescriptorFromITypedList( iTypedList );
-
-          if( relationDescriptor != null )
-          {
-            this.PropertyDescriptor = relationDescriptor;
-            return;
-          }
+          this.PropertyDescriptor = propertyDescriptor;
+          return;
         }
       }
 
@@ -133,9 +112,7 @@ namespace Xceed.Wpf.DataGrid
       if( string.IsNullOrEmpty( this.RelationName ) || ( typedList == null ) )
         return null;
 
-      PropertyDescriptorCollection properties;
-
-      properties = typedList.GetItemProperties( null );
+      var properties = typedList.GetItemProperties( null );
       if( ( properties != null ) && ( properties.Count > 0 ) )
         return properties[ this.RelationName ];
 
@@ -167,7 +144,7 @@ namespace Xceed.Wpf.DataGrid
       if( string.IsNullOrEmpty( this.RelationName ) || ( firstItem == null ) )
         return null;
 
-      var descriptor = ItemsSourceHelper.GetCustomTypeDescriptor( firstItem, firstItem.GetType() );
+      var descriptor = ItemsSourceHelper.GetCustomTypeDescriptorFromItem( firstItem, firstItem.GetType() );
       if( descriptor == null )
         return null;
 
@@ -185,16 +162,14 @@ namespace Xceed.Wpf.DataGrid
 
       this.Seal();
 
-      object value = this.PropertyDescriptor.GetValue( parentItem );
-
+      var value = this.PropertyDescriptor.GetValue( parentItem );
       if( value == null )
         return null;
 
-      IEnumerable enumeration = value as IEnumerable;
-
+      var enumeration = value as IEnumerable;
       if( enumeration == null )
       {
-        IListSource listSource = value as IListSource;
+        var listSource = value as IListSource;
         if( listSource != null )
         {
           enumeration = listSource.GetList();
@@ -203,7 +178,5 @@ namespace Xceed.Wpf.DataGrid
 
       return enumeration;
     }
-
-    private PropertyDescriptor m_propertyDescriptor;
   }
 }

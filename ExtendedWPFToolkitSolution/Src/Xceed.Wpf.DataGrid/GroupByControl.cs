@@ -318,95 +318,43 @@ namespace Xceed.Wpf.DataGrid
         panel.RegisterParentDataGridContext( dataGridContext );
     }
 
-    private void ShowFarDropMark()
-    {
-      if( m_dropMarkAdorner == null )
-      {
-        DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-
-        DataGridControl grid = ( dataGridContext != null )
-          ? dataGridContext.DataGridControl
-          : null;
-
-        Pen pen = Xceed.Wpf.DataGrid.Views.UIViewBase.GetDropMarkPen( this );
-
-        if( ( pen == null ) && ( grid != null ) )
-        {
-          UIViewBase uiViewBase = grid.GetView() as UIViewBase;
-          pen = uiViewBase.DefaultDropMarkPen;
-        }
-
-        DropMarkOrientation orientation = UIViewBase.GetDropMarkOrientation( this );
-
-        if( ( orientation == DropMarkOrientation.Default ) && ( grid != null ) )
-        {
-          UIViewBase uiViewBase = grid.GetView() as UIViewBase;
-
-          orientation = uiViewBase.DefaultDropMarkOrientation;
-        }
-
-        m_dropMarkAdorner = new DropMarkAdorner( this, pen, orientation );
-
-        AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer( this );
-
-        if( adornerLayer != null )
-          adornerLayer.Add( m_dropMarkAdorner );
-      }
-
-      // We Only want the drop mark to be displayed at the end of the HierarchicalGroupByControlNode
-      m_dropMarkAdorner.ForceAlignment( DropMarkAlignment.Far );
-    }
-
-    private void HideDropMark()
-    {
-      if( m_dropMarkAdorner != null )
-      {
-        AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer( this );
-
-        if( adornerLayer != null )
-          adornerLayer.Remove( m_dropMarkAdorner );
-
-        m_dropMarkAdorner = null;
-      }
-    }
-
     #region IDropTarget Members
 
-
-    bool IDropTarget.CanDropElement( UIElement draggedElement )
+    bool IDropTarget.CanDropElement( UIElement draggedElement, RelativePoint mousePosition )
     {
-      bool isAlreadyGroupedBy = false;
-
-      ColumnManagerCell cell = draggedElement as ColumnManagerCell;
+      var isAlreadyGroupedBy = false;
+      var cell = draggedElement as ColumnManagerCell;
 
       if( cell != null )
       {
         isAlreadyGroupedBy = GroupingHelper.IsAlreadyGroupedBy( cell );
-        ColumnBase parentColumn = cell.ParentColumn;
 
+        var parentColumn = cell.ParentColumn;
         if( ( parentColumn == null ) || ( !parentColumn.AllowGroup ) )
           return false;
       }
 
-      DataGridContext sourceDetailContext = DataGridControl.GetDataGridContext( this );
+      var sourceDetailContext = DataGridControl.GetDataGridContext( this );
       Debug.Assert( sourceDetailContext != null );
-      DetailConfiguration sourceDetailConfig = ( sourceDetailContext != null ) ? sourceDetailContext.SourceDetailConfiguration : null;
+      var sourceDetailConfig = ( sourceDetailContext != null ) ? sourceDetailContext.SourceDetailConfiguration : null;
 
-      DataGridContext draggedDetailContext = DataGridControl.GetDataGridContext( draggedElement );
-      Debug.Assert( draggedDetailContext != null );
-      DetailConfiguration draggedDetailConfig = ( draggedDetailContext != null ) ? draggedDetailContext.SourceDetailConfiguration : null;
+      var draggedElementContext = DataGridControl.GetDataGridContext( draggedElement );
+      Debug.Assert( draggedElementContext != null );
+      var draggedDetailConfig = ( draggedElementContext != null ) ? draggedElementContext.SourceDetailConfiguration : null;
 
 
-      bool canDrop = ( sourceDetailConfig == draggedDetailConfig ) &&
-        ( sourceDetailContext != null ) &&
-        ( draggedDetailContext != null ) &&
-        ( sourceDetailContext.GroupLevelDescriptions == draggedDetailContext.GroupLevelDescriptions ) &&
-        ( this.IsGroupingModificationAllowed ) &&
-        ( ( draggedElement is ColumnManagerCell ) || ( draggedElement is GroupByItem ) ) &&
-        ( !isAlreadyGroupedBy );
+      var canDrop = ( sourceDetailConfig == draggedDetailConfig ) &&
+                    ( sourceDetailContext != null ) &&
+                    ( draggedElementContext != null ) &&
+                    ( sourceDetailContext.GroupLevelDescriptions == draggedElementContext.GroupLevelDescriptions ) &&
+                    ( this.IsGroupingModificationAllowed ) &&
+                    ( ( draggedElement is ColumnManagerCell ) || ( draggedElement is GroupByItem ) ) &&
+                    ( !isAlreadyGroupedBy );
 
       if( canDrop && ( cell != null ) )
-        canDrop = GroupingHelper.ValidateMaxGroupDescriptions( draggedDetailContext );
+      {
+        canDrop = GroupingHelper.ValidateMaxGroupDescriptions( draggedElementContext );
+      }
 
       return canDrop;
     }
@@ -415,94 +363,65 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
-    void IDropTarget.DragOver( UIElement draggedElement, Point mousePosition )
+    void IDropTarget.DragOver( UIElement draggedElement, RelativePoint mousePosition )
     {
-      ColumnManagerCell cell = draggedElement as ColumnManagerCell;
-
+      var cell = draggedElement as ColumnManagerCell;
       if( cell == null )
         return;
 
-      DataGridContext draggedDetailContext = DataGridControl.GetDataGridContext( draggedElement );
+      var draggedElementContext = DataGridControl.GetDataGridContext( draggedElement );
+      var lastIndex = draggedElementContext.GroupLevelDescriptions.Count - 1;
+      if( lastIndex < 0 )
+        return;
 
-      int lastIndex = draggedDetailContext.GroupLevelDescriptions.Count - 1;
-      if( lastIndex > -1 )
-      {
-        GroupByItem groupByItem = this.ItemContainerGenerator.ContainerFromIndex( lastIndex ) as GroupByItem;
+      var groupByItem = this.ItemContainerGenerator.ContainerFromIndex( lastIndex ) as GroupByItem;
+      if( groupByItem == null )
+        throw new DataGridInternalException( "groupByItem is null." );
 
-        Debug.Assert( groupByItem != null );
-        if( groupByItem == null )
-          throw new DataGridInternalException( "groupByItem is null." );
-
-        groupByItem.ShowDropMark( mousePosition );
-      }
+      groupByItem.ShowDropMark( mousePosition );
     }
 
     void IDropTarget.DragLeave( UIElement draggedElement )
     {
-      ColumnManagerCell cell = draggedElement as ColumnManagerCell;
-
+      var cell = draggedElement as ColumnManagerCell;
       if( cell == null )
         return;
 
-      DataGridContext draggedDetailContext = DataGridControl.GetDataGridContext( draggedElement );
+      var draggedElementContext = DataGridControl.GetDataGridContext( draggedElement );
+      var lastIndex = draggedElementContext.GroupLevelDescriptions.Count - 1;
+      if( lastIndex < 0 )
+        return;
 
-      int lastIndex = draggedDetailContext.GroupLevelDescriptions.Count - 1;
-      if( lastIndex > -1 )
-      {
-        GroupByItem groupByItem = this.ItemContainerGenerator.ContainerFromIndex( lastIndex ) as GroupByItem;
+      var groupByItem = this.ItemContainerGenerator.ContainerFromIndex( lastIndex ) as GroupByItem;
+      if( groupByItem == null )
+        throw new DataGridInternalException( "groupByItem is null." );
 
-        Debug.Assert( groupByItem != null );
-        if( groupByItem == null )
-          throw new DataGridInternalException( "groupByItem is null." );
-
-        groupByItem.HideDropMark();
-      }
-      else
-      {
-        this.HideDropMark();
-      }
+      groupByItem.HideDropMark();
     }
 
-    void IDropTarget.Drop( UIElement draggedElement )
+    void IDropTarget.Drop( UIElement draggedElement, RelativePoint mousePosition )
     {
-      ColumnManagerCell cell = draggedElement as ColumnManagerCell;
-
+      var cell = draggedElement as ColumnManagerCell;
       if( cell == null )
         return;
 
-      DataGridContext draggedDetailContext = DataGridControl.GetDataGridContext( draggedElement );
+      var draggedElementContext = DataGridControl.GetDataGridContext( draggedElement );
+      var lastIndex = draggedElementContext.GroupLevelDescriptions.Count - 1;
 
-      int lastIndex = draggedDetailContext.GroupLevelDescriptions.Count - 1;
-      if( lastIndex > -1 )
+      if( lastIndex >= 0 )
       {
-        GroupByItem groupByItem = this.ItemContainerGenerator.ContainerFromIndex( lastIndex ) as GroupByItem;
-
-        Debug.Assert( groupByItem != null );
+        var groupByItem = this.ItemContainerGenerator.ContainerFromIndex( lastIndex ) as GroupByItem;
         if( groupByItem == null )
           throw new DataGridInternalException( "groupByItem is null." );
 
         groupByItem.HideDropMark();
       }
-      else
-      {
-        this.HideDropMark();
-      }
 
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
+      var dataGridControl = ( dataGridContext != null ) ? dataGridContext.DataGridControl : null;
 
-      DataGridControl parentGrid = ( dataGridContext != null )
-        ? dataGridContext.DataGridControl
-        : null;
-
-      GroupingHelper.AppendNewGroupFromColumnManagerCell( cell, parentGrid );
-
+      GroupingHelper.AppendNewGroupFromColumnManagerCell( cell, dataGridControl );
     }
-
-    #endregion
-
-    #region PRIVATE FIELDS
-
-    private DropMarkAdorner m_dropMarkAdorner;
 
     #endregion
   }

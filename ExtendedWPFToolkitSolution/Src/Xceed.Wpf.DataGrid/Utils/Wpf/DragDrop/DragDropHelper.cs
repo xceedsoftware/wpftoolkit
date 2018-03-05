@@ -16,18 +16,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
+using Xceed.Wpf.DataGrid;
 
 namespace Xceed.Utils.Wpf.DragDrop
 {
-  internal class DragDropHelper
+  internal static class DragDropHelper
   {
-    public static bool IsMouseMoveDrag( Point initialPosition, Point currentPosition )
+    internal static bool IsMouseMoveDrag( Point initialPosition, Point currentPosition )
     {
-      Rect dragRect = new Rect(
+      var dragRect = new Rect(
         initialPosition.X - SystemParameters.MinimumHorizontalDragDistance,
         initialPosition.Y - SystemParameters.MinimumVerticalDragDistance,
         SystemParameters.MinimumHorizontalDragDistance * 2,
@@ -36,48 +35,46 @@ namespace Xceed.Utils.Wpf.DragDrop
       return !dragRect.Contains( currentPosition );
     }
 
-    public static IDropTarget GetDropTargetAtPoint(
+    internal static IEnumerable<DropTargetInfo> GetDropTargetAtPoint(
       UIElement draggedElement,
-      UIElement dragContainer,
-      MouseEventArgs e,
-      out Nullable<Point> dropTargetPosition,
-      out IDropTarget lastFoundDropTarget )
+      UIElement container,
+      MouseEventArgs e )
     {
-      dropTargetPosition = null;
-      lastFoundDropTarget = null;
+      return DragDropHelper.GetDropTargetAtPoint( draggedElement, container, e.GetPosition );
+    }
 
-      if( dragContainer == null )
-        return null;
+    internal static IEnumerable<DropTargetInfo> GetDropTargetAtPoint(
+      UIElement draggedElement,
+      UIElement container,
+      Func<IInputElement, Point> getPosition )
+    {
+      if( container == null )
+        yield break;
 
-      IDropTarget dropTarget = null;
+      var mousePosition = new RelativePoint( container, getPosition.Invoke( container ) );
+      var hitTest = container.InputHitTest( mousePosition.GetPoint( container ) );
+      if( hitTest == null )
+        yield break;
 
-      Point pointToDragContainer = e.GetPosition( dragContainer );
+      var parent = hitTest as DependencyObject;
 
-      IInputElement hitTest = dragContainer.InputHitTest( pointToDragContainer );
-
-      if( hitTest != null )
+      while( parent != null )
       {
-        DependencyObject parent = hitTest as DependencyObject;
-
-        while( parent != null )
+        var dropTarget = parent as IDropTarget;
+        if( dropTarget != null )
         {
-          dropTarget = parent as IDropTarget;
-          if( dropTarget != null )
+          var element = parent as UIElement;
+          if( element != null )
           {
-            lastFoundDropTarget = dropTarget;
+            var dropTargetPosition = mousePosition.TranslateTo( element );
+            var canDrop = dropTarget.CanDropElement( draggedElement, dropTargetPosition );
 
-            if( dropTarget.CanDropElement( draggedElement ) )
-            {
-              dropTargetPosition = pointToDragContainer;
-              break;
-            }
+            yield return new DropTargetInfo( dropTarget, dropTargetPosition, canDrop );
           }
-          dropTarget = null;
-          parent = Xceed.Utils.Wpf.TreeHelper.GetParent( parent );
         }
-      }
 
-      return dropTarget;
+        parent = Xceed.Utils.Wpf.TreeHelper.GetParent( parent );
+      }
     }
   }
 }

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -22,11 +22,9 @@
                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
                 Title="MaterialFrame">
    <local:DemoView.Description>
-      <!-- TODODOC-->
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
          <Run>A ContentControl with a fully customizable shadow that can be modified through Shadow properties or with a Z property that enables predefined shadows.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -34,174 +32,16 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
-       ##END-->
       </Paragraph>
    </local:DemoView.Description>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-      <conv:EqualsMinusOneConverter x:Key="EqualsMinusOneConverter" />
-      <xctk:CornerRadiusToDoubleConverter x:Key="CornerRadiusToDoubleConverter" />
-   </local:DemoView.Resources>   
 
-   <Grid>
-      <StackPanel Margin="10">
 
-         <GroupBox Header="Features"
-                   Margin="0,5,0,5">
-            <Grid Margin="5">
-               <Grid.RowDefinitions>
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="Auto" />
-               </Grid.RowDefinitions>
-               <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-               </Grid.ColumnDefinitions>
 
-               <!-- First Column-->
-               <TextBlock Grid.Column="0"
-                          Text="Z: "
-                          VerticalAlignment="Center" />
-               <xctk:IntegerUpDown Grid.Column="1"
-                                   Value="{Binding Z, ElementName=materialFrame}"
-                                   Minimum="-1"
-                                   Maximum="7"
-                                   VerticalAlignment="Center"
-                                   Margin="5"
-                                   ToolTip="When the Z property is greater than 0, the shadow effects will be built using the default shadows."/>
-               <TextBlock Grid.Column="0"
-                          Grid.Row="1"
-                          Text="CornerRadius: "
-                          VerticalAlignment="Center" />
-               <xctk:DoubleUpDown Grid.Column="1"
-                                  Grid.Row="1"
-                                  Value="{Binding CornerRadius, ElementName=materialFrame, Converter={StaticResource CornerRadiusToDoubleConverter}}"
-                                  Minimum="0"
-                                  Maximum="30"
-                                  VerticalAlignment="Center"
-                                  Margin="5"/>
 
-               <!-- Second Column-->
-               <TextBlock Grid.Column="2"
-                          Grid.Row="0"
-                          Text="Shadow Direction: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0"
-                          IsEnabled="{Binding Z, ElementName=materialFrame, Converter={StaticResource EqualsMinusOneConverter}}"
-                          Style="{StaticResource DisableGrayText}"/>
-               <xctk:DoubleUpDown Grid.Column="3"
-                                  Grid.Row="0"
-                                  Value="{Binding ShadowDirection, ElementName=materialFrame}"
-                                  Minimum="0"
-                                  Maximum="360"
-                                  Increment="5"
-                                  VerticalAlignment="Center"
-                                  Margin="5"
-                                  ToolTip="The Z property should equal -1 in order to build the shadow from MaterialFrame Shadow properties."
-                                  IsEnabled="{Binding Z, ElementName=materialFrame, Converter={StaticResource EqualsMinusOneConverter}}"/>
-               <TextBlock Grid.Column="2"
-                          Grid.Row="1"
-                          Text="Shadow Depth: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0"
-                          IsEnabled="{Binding Z, ElementName=materialFrame, Converter={StaticResource EqualsMinusOneConverter}}"
-                          Style="{StaticResource DisableGrayText}"/>
-               <xctk:DoubleUpDown Grid.Column="3"
-                                  Grid.Row="1"
-                                  Value="{Binding ShadowDepth, ElementName=materialFrame}"
-                                  Minimum="0"
-                                  Maximum="40"
-                                  VerticalAlignment="Center"
-                                  Margin="5"
-                                  ToolTip="The Z property should equal -1 in order to build the shadow from MaterialFrame Shadow properties."
-                                  IsEnabled="{Binding Z, ElementName=materialFrame, Converter={StaticResource EqualsMinusOneConverter}}"/>
-               <!--Third Column-->
-               <TextBlock Grid.Column="4"
-                          Grid.Row="0"
-                          Text="Shadow Blur Radius: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0"
-                          IsEnabled="{Binding Z, ElementName=materialFrame, Converter={StaticResource EqualsMinusOneConverter}}"
-                          Style="{StaticResource DisableGrayText}"/>
-               <xctk:DoubleUpDown Grid.Column="5"
-                                  Grid.Row="0"
-                                  Value="{Binding ShadowBlurRadius, ElementName=materialFrame}"
-                                  Minimum="0"
-                                  Maximum="100"
-                                  VerticalAlignment="Center"
-                                  Margin="5"
-                                  ToolTip="The Z property should equal -1 in order to build the shadow from MaterialFrame Shadow properties."
-                                  IsEnabled="{Binding Z, ElementName=materialFrame, Converter={StaticResource EqualsMinusOneConverter}}"/>
-               <TextBlock Grid.Column="4"
-                          Grid.Row="1"
-                          Text="Shadow Opacity: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0"
-                          IsEnabled="{Binding Z, ElementName=materialFrame, Converter={StaticResource EqualsMinusOneConverter}}"
-                          Style="{StaticResource DisableGrayText}"/>
-               <xctk:DoubleUpDown Grid.Column="5"
-                                  Grid.Row="1"
-                                  Value="{Binding ShadowOpacity, ElementName=materialFrame}"
-                                  Minimum="0"
-                                  Maximum="1"
-                                  Increment="0.1"
-                                  FormatString="N1"
-                                  VerticalAlignment="Center"
-                                  Margin="5"
-                                  ToolTip="The Z property should equal -1 in order to build the shadow from MaterialFrame Shadow properties."
-                                  IsEnabled="{Binding Z, ElementName=materialFrame, Converter={StaticResource EqualsMinusOneConverter}}"/>
 
-               <!--Fourth Column-->
-               <TextBlock Grid.Column="6"
-                          Grid.Row="0"
-                          Text="Shadow Color: "
-                          VerticalAlignment="Center"
-                          Margin="10,0,0,0"
-                          IsEnabled="{Binding Z, ElementName=materialFrame, Converter={StaticResource EqualsMinusOneConverter}}"
-                          Style="{StaticResource DisableGrayText}" />
-               <xctk:ColorPicker Grid.Column="7"
-                                 Grid.Row="0"
-                                 SelectedColor="{Binding ShadowColor, ElementName=materialFrame}"
-                                 VerticalAlignment="Center"
-                                 Width="90"
-                                 Margin="5"
-                                 ToolTip="The Z property should equal -1 in order to build the shadow from MaterialFrame Shadow properties."
-                                 IsEnabled="{Binding Z, ElementName=materialFrame, Converter={StaticResource EqualsMinusOneConverter}}"/>
-            </Grid>
-         </GroupBox>
 
-         <StackPanel>
-            <TextBlock Text="Usage:"
-                       Style="{StaticResource Header}" />
 
-            <xctk:MaterialFrame x:Name="materialFrame"
-                                Margin="20"
-                                HorizontalAlignment="Center"
-                                HorizontalContentAlignment="Center"
-                                VerticalContentAlignment="Center"
-                                Width="400"
-                                Height="300"
-                                Z="2"
-                                ShadowDirection="315"
-                                ShadowDepth="10"
-                                ShadowBlurRadius="20"
-                                ShadowOpacity="0.7"
-                                ShadowColor="Blue">
-               <TextBlock Text="This is a MaterialFrame"/>
-            </xctk:MaterialFrame>
-         </StackPanel>
-      </StackPanel>
-   </Grid>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
     <Image Source="..\OpenSourceImages\MaterialFrame.png" Width="600" Height="400"/>
-   ##END-->
 </local:DemoView>

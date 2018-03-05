@@ -14,21 +14,10 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-
 namespace Xceed.Wpf.DataGrid
 {
   internal class DataGridVirtualizingCollectionViewGroupRoot : DataGridVirtualizingCollectionViewGroup
   {
-    #region CONSTRUCTORS
-
     internal DataGridVirtualizingCollectionViewGroupRoot( DataGridVirtualizingCollectionView collectionView, bool isBottomLevel )
       : base( null, -1, 0, null, -1, isBottomLevel )
     {
@@ -36,9 +25,10 @@ namespace Xceed.Wpf.DataGrid
       m_virtualPageManager = new DataGridPageManager( collectionView );
     }
 
-    #endregion CONSTRUCTORS
-
-    #region INTERNAL METHODS
+    protected override DataGridVirtualizingCollectionViewBase GetCollectionView()
+    {
+      return m_parentCollectionView;
+    }
 
     internal override int GetGlobalIndexOf( object item )
     {
@@ -57,23 +47,8 @@ namespace Xceed.Wpf.DataGrid
       base.DisposeCore();
     }
 
-    #endregion
-
-    #region PROTECTED METHODS
-
-    protected override DataGridVirtualizingCollectionViewBase GetCollectionView()
-    {
-      return m_parentCollectionView;
-    }
-
-    #endregion PROTECTED METHODS
-
-    #region PRIVATE FILEDS
-
     private DataGridVirtualizingCollectionView m_parentCollectionView;
     private DataGridPageManager m_virtualPageManager;
-
-    #endregion PRIVATE FIELDS
   }
 
 }

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -21,11 +21,9 @@
                         xmlns:sys="clr-namespace:System;assembly=mscorlib"
                         Title="MaterialToast">
    <local:DemoView.Description>
-      <!-- TODODOC-->
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
-         <Run>A ContentControl that can be customized to display a content in any corner of any window or FrameworkElement. It is using the Material Brushes.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
+         <Run>A ContentControl that can be customized to display a content in any corner of any window or FrameworkElement. It uses the Material Brushes.</Run>
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -33,296 +31,26 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
-       ##END-->
       </Paragraph>
    </local:DemoView.Description>
 
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-      <ResourceDictionary>
-         <ResourceDictionary.MergedDictionaries>
-            <ResourceDictionary Source="../Resources/CommonResources.xaml" />
-         </ResourceDictionary.MergedDictionaries>
 
-         <ObjectDataProvider x:Key="ToastLocationEnumData"
-                             MethodName="GetValues"
-                             ObjectType="{x:Type sys:Enum}">
-            <ObjectDataProvider.MethodParameters>
-               <x:Type TypeName="xctk:MaterialToastLocationEnum" />
-            </ObjectDataProvider.MethodParameters>
-         </ObjectDataProvider>
 
-         <ObjectDataProvider x:Key="ToastSlidingDirectionEnumData"
-                             MethodName="GetValues"
-                             ObjectType="{x:Type sys:Enum}">
-            <ObjectDataProvider.MethodParameters>
-               <x:Type TypeName="Orientation" />
-            </ObjectDataProvider.MethodParameters>
-         </ObjectDataProvider>
 
-         <Style x:Key="MaterialToastCloseButtonStyle1"
-                TargetType="{x:Type Button}">
-            <Setter Property="Margin"
-                    Value="2" />
-            <Setter Property="Content"
-                    Value="OK" />
-            <Setter Property="Foreground"
-                    Value="Yellow" />
-            <Setter Property="Background"
-                    Value="Transparent" />
-            <Setter Property="BorderBrush"
-                    Value="Transparent" />
-            <Setter Property="Template">
-               <Setter.Value>
-                  <ControlTemplate TargetType="{x:Type Button}">
-                     <Border Background="{TemplateBinding Background}"
-                             BorderBrush="{TemplateBinding BorderBrush}"
-                             BorderThickness="{TemplateBinding BorderThickness}">
-                        <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center" />
-                     </Border>
-                  </ControlTemplate>
-               </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-               <Trigger Property="IsMouseOver"
-                        Value="True">
-                  <Setter Property="Background"
-                          Value="Green" />
-               </Trigger>
-            </Style.Triggers>
-         </Style>
-      </ResourceDictionary>
 
-   </local:DemoView.Resources>
-   
-   <Grid>
-      <StackPanel Margin="10">         
 
-         <GroupBox Header="Features"
-                   Margin="0,5,0,5">
-            <Grid Margin="5">
-               <Grid.RowDefinitions>
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="Auto" />
-               </Grid.RowDefinitions>
-               <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-               </Grid.ColumnDefinitions>
 
-               <!--First Column-->
-               <TextBlock Grid.Column="0"
-                          Text="Owner: "
-                          VerticalAlignment="Center" />
-               <ComboBox x:Name="toastOwnerComboBox"
-                         Grid.Column="1"
-                         SelectedIndex="0"
-                         Width="125"
-                         Margin="5"
-                         VerticalContentAlignment="Center"
-                         HorizontalAlignment="Left">
-                  <ComboBoxItem Content="LightBlue Border"
-                                Tag="{Binding ElementName=lightBlueBorder}" />
-                  <ComboBoxItem Content="LightGreen Border"
-                                Tag="{Binding ElementName=greenBlueBorder}" />
-                  <ComboBoxItem Content="Sample Window"
-                                Tag="{x:Null}" />
-               </ComboBox>
 
-               <TextBlock Grid.Column="0"
-                          Grid.Row="1"
-                          Text="Location: "
-                          VerticalAlignment="Center" />
-               <ComboBox x:Name="toastLocationComboBox"
-                         Grid.Column="1"
-                         Grid.Row="1"
-                         ItemsSource="{Binding Source={StaticResource ToastLocationEnumData}}"
-                         SelectedIndex="0"
-                         Margin="5"
-                         VerticalContentAlignment="Center" />
 
-               <TextBlock Grid.Column="0"
-                          Grid.Row="2"
-                          Text="Sliding Direction: "
-                          VerticalAlignment="Center" />
-               <ComboBox x:Name="toastSlidingDirectionComboBox"
-                         Grid.Column="1"
-                         Grid.Row="2"
-                         ItemsSource="{Binding Source={StaticResource ToastSlidingDirectionEnumData}}"
-                         Tag="{Binding SelectedItem, ElementName=toastLocationComboBox}"
-                         Margin="5"
-                         VerticalContentAlignment="Center">
-                  <ComboBox.Style>
-                     <Style TargetType="{x:Type ComboBox}">
-                        <Setter Property="SelectedIndex"
-                                Value="1" />
-                        <Setter Property="IsEnabled"
-                                Value="True" />
-                        <Style.Triggers>
-                           <DataTrigger Binding="{Binding Path=Tag, RelativeSource={RelativeSource Self}}"
-                                        Value="{x:Static xctk:MaterialToastLocationEnum.Right}">
-                              <Setter Property="SelectedIndex"
-                                      Value="0" />
-                              <Setter Property="IsEnabled"
-                                      Value="False" />
-                           </DataTrigger>
-                           <DataTrigger Binding="{Binding Path=Tag, RelativeSource={RelativeSource Self}}"
-                                        Value="{x:Static xctk:MaterialToastLocationEnum.Left}">
-                              <Setter Property="SelectedIndex"
-                                      Value="0" />
-                              <Setter Property="IsEnabled"
-                                      Value="False" />
-                           </DataTrigger>
-                           <DataTrigger Binding="{Binding Path=Tag, RelativeSource={RelativeSource Self}}"
-                                        Value="{x:Static xctk:MaterialToastLocationEnum.Top}">
-                              <Setter Property="SelectedIndex"
-                                      Value="1" />
-                              <Setter Property="IsEnabled"
-                                      Value="False" />
-                           </DataTrigger>
-                           <DataTrigger Binding="{Binding Path=Tag, RelativeSource={RelativeSource Self}}"
-                                        Value="{x:Static xctk:MaterialToastLocationEnum.Bottom}">
-                              <Setter Property="SelectedIndex"
-                                      Value="1" />
-                              <Setter Property="IsEnabled"
-                                      Value="False" />
-                           </DataTrigger>
-                        </Style.Triggers>
-                     </Style>
-                  </ComboBox.Style>
-               </ComboBox>
 
-               <TextBlock Grid.Column="0"
-                          Grid.Row="3"
-                          Text="Corner Radius: "
-                          VerticalAlignment="Center" />
-               <xctk:IntegerUpDown x:Name="toastCornerRadiusIntegerUpDown"
-                                   Grid.Column="1"
-                                   Grid.Row="3"
-                                   Value="2"
-                                   Minimum="0"
-                                   Maximum="30"
-                                   Increment="1"
-                                   Margin="5"
-                                   VerticalContentAlignment="Center" />
 
-               <!-- Second Column -->
-               <TextBlock Grid.Column="2"
-                          Text="Display Time: "
-                          VerticalAlignment="Center"
-                          Margin="7,0,0,0" />
-               <xctk:IntegerUpDown x:Name="toastDisplayTimeIntegerUpDown"
-                                   Grid.Column="3"
-                                   Value="3000"
-                                   Minimum="0"
-                                   Maximum="10000"
-                                   Increment="500"
-                                   Margin="5"
-                                   VerticalContentAlignment="Center"
-                                   ToolTip="Duration in milliseconds for displaying a toast after it's completely popped in and before it starts popping out. 0 will keep the toast popped in." />
-               <TextBlock Grid.Column="2"
-                          Grid.Row="1"
-                          Text="Hide On Click: "
-                          VerticalAlignment="Center"
-                          Margin="7,0,0,0" />
-               <CheckBox x:Name="toastHideOnclickCheckBox"
-                         Grid.Column="3"
-                         Grid.Row="1"
-                         IsChecked="False"
-                         Margin="5"
-                         VerticalContentAlignment="Center"
-                         ToolTip="When true, clicking anywhere on a toast will close it." />
-               <TextBlock Grid.Column="2"
-                          Grid.Row="2"
-                          Text="Material Accent Brush: "
-                          VerticalAlignment="Center"
-                          Margin="7,0,0,0"/>
-               <ComboBox x:Name="toastMaterialAccentBrushComboBox"
-                         Grid.Column="3"
-                         Grid.Row="2"
-                         ItemsSource="{Binding MaterialBrushes, RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                         SelectedItem="{Binding MaterialBrushes[6], RelativeSource={RelativeSource AncestorType={x:Type local:MaterialDemoView}}}"
-                         Width="95"
-                         ItemTemplate="{StaticResource ColorItemTemplate}"
-                         Margin="5"/>               
 
-               <!-- Third Column-->
-               <TextBlock Grid.Column="4"
-                          Grid.Row="0"
-                          Text="Is Close Button Visible: "
-                          VerticalAlignment="Center"
-                          Margin="7,0,0,0" />
-               <CheckBox x:Name="toastIsCloseButtonVisibleCheckBox"
-                         Grid.Column="5"
-                         Grid.Row="0"
-                         IsChecked="False"
-                         Margin="5"
-                         VerticalContentAlignment="Center" />
 
-               <TextBlock Grid.Column="4"
-                          Grid.Row="1"
-                          Text="Close Button Style: "
-                          VerticalAlignment="Center"
-                          Margin="7,0,0,0"
-                          IsEnabled="{Binding IsChecked, ElementName=toastIsCloseButtonVisibleCheckBox}"
-                          Style="{StaticResource DisableGrayText}" />
-               <ComboBox x:Name="toastClosebuttonStyleComboBox"
-                         Grid.Column="5"
-                         Grid.Row="1"
-                         Width="85"
-                         Margin="5"
-                         SelectedIndex="0"
-                         HorizontalAlignment="Left"
-                         VerticalContentAlignment="Center"
-                         IsEnabled="{Binding IsChecked, ElementName=toastIsCloseButtonVisibleCheckBox}"
-                         Style="{StaticResource DisableGrayComboBox}">
-                  <ComboBoxItem Content="Default"
-                                Tag="{x:Null}" />
-                  <ComboBoxItem Content="OK Button"
-                                Tag="{StaticResource MaterialToastCloseButtonStyle1}" />
-               </ComboBox>
 
-               <Button Grid.Row="2"
-                       Grid.Column="4"
-                       Grid.ColumnSpan="2"
-                       Content="Pop Toast!"
-                       Margin="7,0,0,0"
-                       Padding="5"
-                       Click="ToastButton_Click" />
-            </Grid>
-         </GroupBox>
 
-         <StackPanel>
-            <TextBlock Text="Usage:"
-                       Style="{StaticResource Header}" />
 
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center">
 
-               <Border x:Name="lightBlueBorder"
-                       Background="LightBlue"
-                       Width="300"
-                       Height="280"
-                       Margin="20" />
-               <Border x:Name="greenBlueBorder"
-                       Background="LightGreen"
-                       Width="300"
-                       Height="280"
-                       Margin="20" />
-            </StackPanel>
-         </StackPanel>
-      </StackPanel>
-   </Grid>
-   <!--##END-->
 
-   <!--##INCLUDE_OPEN_SOURCE
+
     <Image Source="..\OpenSourceImages\MaterialToast.png" Width="600" Height="400"/>
-   ##END-->
 </local:MaterialDemoView>

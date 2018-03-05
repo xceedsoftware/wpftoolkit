@@ -18,10 +18,8 @@ using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Xceed.Wpf.Toolkit.Primitives;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Windows.Controls;
-using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Controls.Primitives;
 
@@ -213,6 +211,7 @@ namespace Xceed.Wpf.Toolkit
       if( _popup != null )
         _popup.Opened += Popup_Opened;
     }
+
 
     #endregion //Base Class Overrides
 

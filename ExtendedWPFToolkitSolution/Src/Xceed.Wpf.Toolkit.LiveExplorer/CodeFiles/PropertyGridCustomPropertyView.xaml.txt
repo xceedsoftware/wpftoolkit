@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -22,10 +22,10 @@
                 xmlns:s="clr-namespace:System;assembly=mscorlib"
                 VerticalScrollBarVisibility="Disabled"
                 Title="Custom Properties">
-    <local:DemoView.Description>
-        <Paragraph FontSize="14" FontFamily="Segoe">
-         Using the CustomPropertyItems class, you can flexibly modify the display of each of your properties.
-         <!--##INCLUDE_OPEN_SOURCE
+  <local:DemoView.Description>
+    <Paragraph FontSize="14"
+               FontFamily="Segoe">
+      Using the CustomPropertyItems class, you can flexibly modify the display of each of your properties.
             <LineBreak />
            <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
@@ -33,25 +33,19 @@
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->           
-      </Paragraph>
-    </local:DemoView.Description>
-    
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-      <StackPanel Grid.Row="0" Margin="10">
-         <TextBlock Text="This sample adds 'CustomPropertyItem' to the 'Properties' collection and directly controls the display of each item."
-                    TextWrapping="Wrap"/>
-         <!--##EXCLUDE_OPEN_SOURCE-->
-         <TextBlock Text="(Click the XAML and Code tabs to see details.)" 
-                    FontStyle="Italic"
-                    Margin="0,10,0,0"/>
-         <!--##END-->
-      </StackPanel>
-      <!--##INCLUDE_OPEN_SOURCE
+    </Paragraph>
+  </local:DemoView.Description>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+    <StackPanel Grid.Row="0"
+                Margin="10">
+      <TextBlock Text="This sample adds 'CustomPropertyItem' to the 'Properties' collection and directly controls the display of each item."
+                 TextWrapping="Wrap" />
+    </StackPanel>
       <ScrollViewer Grid.Row="1" 
                     VerticalScrollBarVisibility="Auto"
                     HorizontalScrollBarVisibility="Auto">
@@ -60,57 +54,10 @@
             <local:XamlBox CodeSource="/Samples/PropertyGrid/OpenSourceImages/CustomProperty.xaml.txt" />
          </StackPanel>
       </ScrollViewer>      
-      ##END-->
-<!--##EXCLUDE_OPEN_SOURCE-->
-      <!-- 
-      No assignement of either PropertyNameBinding or PropertyValueBinding. CustomProperties
-      will each have all the values directly set.
-      -->
-      <xctk:PropertyGrid x:Name="_propertyGrid" Grid.Row="1" Width="350" MaxHeight="280">
-         <xctk:PropertyGrid.EditorDefinitions>
-            <xctk:EditorTextDefinition TargetProperties="firstName,lastName" 
-                                       FontWeight="Bold" 
-                                       FontStyle="Italic"/>
-         </xctk:PropertyGrid.EditorDefinitions>
-         <xctk:PropertyGrid.Properties>
-            <!--Use CustomPropertyItem to control each of their characteristics. -->
-            <!--Here we specify a DefinitionKey to assign a specific CUSTOM editor. -->
-            <xctk:CustomPropertyItem DisplayName="First Name" Value="Nancy" Category="Name"
-                                     DefinitionKey="firstName" />
-            <xctk:CustomPropertyItem DisplayName="Last Name" Value="Davolio" Category="Name"
-                                     DefinitionKey="lastName"/>
 
-            <!-- Here we specify a DefinitionKey to assign a specific DEFAULT editor. -->
-            <!-- Since the XAML parser will parse "29" as a string, the TypeConverter defined
-            on Int32 struct will automatically make the conversion. -->
-            <xctk:CustomPropertyItem DisplayName="Age" Value="29" Category="Other"
-                                     DefinitionKey="{x:Type s:Int32}" />
-            
-            <!-- For thoses values where no TypeConverter supporting strings is defined, you must
-            use property element syntax to define the value. -->
-            <xctk:CustomPropertyItem DisplayName="Coordinates" Category="Other" 
-                                     Description="Location on the state map">
-               <xctk:CustomPropertyItem.Value>
-                  <v:Coords X="12" Y="15"/>
-               </xctk:CustomPropertyItem.Value>
-            </xctk:CustomPropertyItem>
 
-            <!--Here we define a specific editor directly. No value -->
-            <xctk:CustomPropertyItem DisplayName="Picture" Category="Other">
-               <xctk:CustomPropertyItem.Editor>
-                  <Image Source="/Samples/PropertyGrid/Resources/woman.png" 
-                         Stretch="None"
-                         HorizontalAlignment="Left"/>
-               </xctk:CustomPropertyItem.Editor>
-            </xctk:CustomPropertyItem>
-            
-         </xctk:PropertyGrid.Properties>
-         
-         <!-- You must specify that the grouping is based on the value of "Category" property. -->
-         <xctk:PropertyGrid.CategoryGroupDescription>
-            <PropertyGroupDescription PropertyName="Category"/>
-         </xctk:PropertyGrid.CategoryGroupDescription>
-      </xctk:PropertyGrid>
-<!--##END-->      
-   </Grid>      
+
+
+
+  </Grid>
 </local:DemoView>

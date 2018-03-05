@@ -14,15 +14,10 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Diagnostics;
-using System.Windows.Threading;
 using System.Windows.Data;
+using System.Windows.Documents;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -30,6 +25,13 @@ namespace Xceed.Wpf.DataGrid
   {
     static CellContentPresenter()
     {
+      CellContentPresenter.MinHeightProperty.OverrideMetadata( typeof( CellContentPresenter ), new FrameworkPropertyMetadata( null, new CoerceValueCallback( CellContentPresenter.CoerceMinHeight ) ) );
+      TextElement.FontFamilyProperty.OverrideMetadata( typeof( CellContentPresenter ), new FrameworkPropertyMetadata( new PropertyChangedCallback( CellContentPresenter.InvalidateMinHeight ) ) );
+      TextElement.FontSizeProperty.OverrideMetadata( typeof( CellContentPresenter ), new FrameworkPropertyMetadata( new PropertyChangedCallback( CellContentPresenter.InvalidateMinHeight ) ) );
+      TextElement.FontStretchProperty.OverrideMetadata( typeof( CellContentPresenter ), new FrameworkPropertyMetadata( new PropertyChangedCallback( CellContentPresenter.InvalidateMinHeight ) ) );
+      TextElement.FontStyleProperty.OverrideMetadata( typeof( CellContentPresenter ), new FrameworkPropertyMetadata( new PropertyChangedCallback( CellContentPresenter.InvalidateMinHeight ) ) );
+      TextElement.FontWeightProperty.OverrideMetadata( typeof( CellContentPresenter ), new FrameworkPropertyMetadata( new PropertyChangedCallback( CellContentPresenter.InvalidateMinHeight ) ) );
+
       m_sContentBinding = new Binding();
       m_sContentBinding.RelativeSource = RelativeSource.TemplatedParent;
       m_sContentBinding.Mode = BindingMode.OneWay;
@@ -59,12 +61,15 @@ namespace Xceed.Wpf.DataGrid
       m_sTextBlockStyle = new Style( typeof( TextBlock ) );
       m_sTextBlockStyle.Setters.Add( new Setter( TextBlock.TextTrimmingProperty, trimmingBinding ) );
       m_sTextBlockStyle.Setters.Add( new Setter( TextBlock.TextWrappingProperty, wrappingBinding ) );
+      m_sTextBlockStyle.Seal();
     }
 
     public CellContentPresenter()
     {
       this.Resources.Add( typeof( TextBlock ), m_sTextBlockStyle );
       this.DataContext = null;
+
+      this.SetCurrentValue( CellContentPresenter.MinHeightProperty, 0d );
     }
 
     public override void EndInit()
@@ -75,11 +80,26 @@ namespace Xceed.Wpf.DataGrid
       BindingOperations.SetBinding( this, CellContentPresenter.ContentTemplateProperty, m_sContentTemplateBinding );
     }
 
+    private static object CoerceMinHeight( DependencyObject sender, object value )
+    {
+      var self = sender as CellContentPresenter;
+      if( self == null )
+        return value;
+
+      return self.CoerceMinHeight( new Thickness(), value );
+    }
+
+    private static void InvalidateMinHeight( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    {
+      var self = sender as CellContentPresenter;
+      if( self == null )
+        return;
+
+      self.CoerceValue( CellContentPresenter.MinHeightProperty );
+    }
+
     private static Binding m_sContentTemplateBinding;
     private static Binding m_sContentBinding;
-
     private static Style m_sTextBlockStyle;
   }
-
-
 }

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -31,13 +31,13 @@
    <local:DemoView.Resources>
       <conv:DimensionsConverter x:Key="DimensionsConverter" />
    </local:DemoView.Resources>
-   
+
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
          <RowDefinition Height="*" />
       </Grid.RowDefinitions>
-      
+
       <TextBlock Text="The solution to this problem is to create a custom editor and provide an IValueConverter to handle the proper conversion of the Struct values." TextWrapping="Wrap" />
       <xctk:PropertyGrid x:Name="_propertyGrid" Grid.Row="1" Width="450" MaxHeight="250" Margin="10">
          <xctk:PropertyGrid.EditorDefinitions>

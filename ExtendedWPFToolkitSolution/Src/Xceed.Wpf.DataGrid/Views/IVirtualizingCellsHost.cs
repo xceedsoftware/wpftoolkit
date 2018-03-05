@@ -27,6 +27,8 @@ namespace Xceed.Wpf.DataGrid.Views
       get;
     }
 
+    void ClearLogicalParent( Cell cell );
+
     void SetLogicalParent( Cell cell );
 
     void PrepareCellsHost( DataGridContext dataGridContext );

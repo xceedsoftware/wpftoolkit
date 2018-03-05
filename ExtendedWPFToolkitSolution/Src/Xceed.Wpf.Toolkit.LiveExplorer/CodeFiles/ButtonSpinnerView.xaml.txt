@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -25,9 +25,9 @@
             The ButtonSpinner control allows you to add button spinners to any element and then respond to the Spin event to manipulate that element. The Spin event lets the developer know which direction the buttons are spinning; SpinDirection.Increase indicates an increment, SpinDirection.Decrease indicates a decrement.
         </Paragraph>
     </local:DemoView.Description>
-    
+
    <local:DemoView.Resources>
-       
+
       <x:Array x:Key="names" Type="s:String">
          <s:String>John Smith</s:String>
          <s:String>Janel Leverling</s:String>
@@ -40,7 +40,7 @@
          <s:String>Naomi Suyama</s:String>
       </x:Array>       
    </local:DemoView.Resources>
-    
+
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2016 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -29,7 +29,6 @@
          <LineBreak />
          <LineBreak />
          <Run>Supports implicit styles, so the entire listbox can be styled in minutes with a couple of lines of code. Also supports explicit styles and Expression Blend.</Run>
-         <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <LineBreak />
             <Run>The listBox items can be animated, dragged-and-dropped, filtered, grouped, selected in various ways, and sorted. Plus, all of the ListBox components can be styled or themed. In addition, different ways of presenting the listBox items are available, such as horizontal or vertical scrolling and following specific or circle paths.</Run>
@@ -38,1009 +37,105 @@
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Toolkit Plus for WPF.
             </Hyperlink>
-        ##END-->         
       </Paragraph>
    </local:DemoView.Description>
 
-   <!--##INCLUDE_OPEN_SOURCE
     <Image Source="..\OpenSourceImages\ListBox.png" Width="600" Height="400"/>
-##END-->   
-   <!--##EXCLUDE_OPEN_SOURCE-->
-   <local:DemoView.Resources>
-       <ResourceDictionary>
-         <ResourceDictionary.MergedDictionaries>
-            <ResourceDictionary Source="../ItemTemplates/ItemTemplates.xaml" />
-         </ResourceDictionary.MergedDictionaries>
-          
-           <LinearGradientBrush x:Key="WpfThemeListBoxDefaultBorderBrush"
-                        EndPoint="0.5,1"
-                        StartPoint="0.5,0">
-            <GradientStop Color="#FFA3AEB9"
-                          Offset="0" />
-            <GradientStop Color="#FF8399A9"
-                          Offset="0.375" />
-            <GradientStop Color="#FF718597"
-                          Offset="0.375" />
-            <GradientStop Color="#FF617584"
-                          Offset="1" />
-         </LinearGradientBrush>
-          
-           <LinearGradientBrush x:Key="WpfThemeToolPaneBackgroundBrush"
-                              StartPoint="0.5,0"
-                              EndPoint="0.5,1">
-            <GradientStop Offset="0"
-                          Color="#FFE2E2E2" />
-            <GradientStop Offset="1"
-                          Color="White" />
-         </LinearGradientBrush>
-          
-           <LinearGradientBrush x:Key="WpfThemeListBoxGroupHearderItemBackgroundBrush"
-                              EndPoint="0.5,1"
-                              StartPoint="0.5,0">
-            <GradientStop Color="#EBEDEF"
-                          Offset="1" />
-
-            <GradientStop Color="#FBFBFB"
-                          Offset="0" />
-         </LinearGradientBrush>
-          
-           <LinearGradientBrush x:Key="WpfThemeGroupNavigationControlButtonDefaultBorderBrush"
-                              EndPoint="0.5,1"
-                              StartPoint="0.5,0">
-            <GradientStop Color="#FFCFD0D0"
-                          Offset="0" />
-
-            <GradientStop Color="#FFC9CACA"
-                          Offset="1" />
-         </LinearGradientBrush>
-          
-           <LinearGradientBrush x:Key="WpfThemeGroupNavigationControlButtonDefaultBackgroundBrush"
-                              StartPoint="0.5,0"
-                              EndPoint="0.5,1">
-            <GradientStop Color="#FFFBFBFB"
-                          Offset="0" />
-
-            <GradientStop Color="#FFD6DBDF"
-                          Offset="1" />
-         </LinearGradientBrush>
-          
-           <LinearGradientBrush x:Key="WpfThemeGroupNavigationControlButtonPressedBackgroundBrush"
-                              StartPoint="0.5,0"
-                              EndPoint="0.5,1.04">
-            <GradientStop Color="#FFe1ecf6"
-                          Offset="0" />
-
-            <GradientStop Color="#FFd5e5f2"
-                          Offset="0.3" />
-
-            <GradientStop Color="#FFaecee8"
-                          Offset="0.5" />
-
-            <GradientStop Color="#FF75abd8"
-                          Offset="1" />
-         </LinearGradientBrush>
-          
-           <Style TargetType="ScrollViewer" x:Key="WpfThemeScrollViewerStyle">
-            <Setter Property="HorizontalContentAlignment"
-                    Value="Left" />
-
-            <Setter Property="VerticalContentAlignment"
-                    Value="Top" />
-
-            <Setter Property="VerticalScrollBarVisibility"
-                    Value="Visible" />
-
-            <Setter Property="BorderBrush"
-                    Value="Transparent" />
-
-            <Setter Property="BorderThickness"
-                    Value="0" />
-
-            <Setter Property="Background"
-                    Value="Transparent" />
-         </Style>
-          
-           <Style x:Key="WpfThemeLicensingStateRichTextBoxStyle" TargetType="RichTextBox">
-            <Setter Property="HorizontalAlignment"
-                    Value="Left" />
-            <Setter Property="FontSize"
-                    Value="13.333" />
-            <Setter Property="Foreground"
-                    Value="White" />
-            <Setter Property="VerticalAlignment"
-                    Value="Top" />
-            <Setter Property="IsReadOnly"
-                    Value="True" />
-            <Setter Property="IsTabStop"
-                    Value="False" />
-            <Setter Property="CaretBrush"
-                    Value="Transparent" />
-
-            <Setter Property="Template">
-               <Setter.Value>
-                  <ControlTemplate TargetType="RichTextBox">
-                     <ScrollViewer x:Name="PART_ContentHost"
-                                   BorderThickness="0"
-                                   BorderBrush="Transparent"
-                                   Background="Transparent"/>
-                  </ControlTemplate>
-               </Setter.Value>
-            </Setter>
-         </Style>
-          
-           <Style x:Key="WpfThemeNavigationButtonStyle"
-                TargetType="Button">
-            <Setter Property="Foreground"
-                    Value="#6B6A6B" />
-
-            <Setter Property="Height"
-                    Value="21" />
-
-            <Setter Property="Width"
-                    Value="29" />
-
-            <Setter Property="Template">
-               <Setter.Value>
-                  <ControlTemplate TargetType="Button">
-                     <Grid x:Name="grid">
-                        <VisualStateManager.VisualStateGroups>
-                           <VisualStateGroup x:Name="CommonStates">
-                              <VisualStateGroup.Transitions>
-                                 <VisualTransition GeneratedDuration="00:00:00.200" />
-
-                                 <VisualTransition From="MouseOver"
-                                                   To="Pressed" />
-                              </VisualStateGroup.Transitions>
-
-                              <VisualState x:Name="Normal" />
-
-                              <VisualState x:Name="MouseOver">
-                                 <Storyboard>
-                                    <DoubleAnimation Duration="00:00:00.000"
-                                                     To="1"
-                                                     Storyboard.TargetProperty="(UIElement.Opacity)"
-                                                     Storyboard.TargetName="Over" />
-                                 </Storyboard>
-                              </VisualState>
-
-                              <VisualState x:Name="Pressed">
-                                 <Storyboard>
-                                    <DoubleAnimation Duration="00:00:00.000"
-                                                     To="1"
-                                                     Storyboard.TargetProperty="(UIElement.Opacity)"
-                                                     Storyboard.TargetName="Pressed1" />
-                                 </Storyboard>
-                              </VisualState>
-
-                              <VisualState x:Name="Disabled">
-                                 <Storyboard>
-                                    <DoubleAnimation Duration="00:00:00.000"
-                                                     To="0.5"
-                                                     Storyboard.TargetProperty="(UIElement.Opacity)"
-                                                     Storyboard.TargetName="grid" />
-                                 </Storyboard>
-                              </VisualState>
-                           </VisualStateGroup>
-
-                           <VisualStateGroup x:Name="FocusStates">
-                              <VisualState x:Name="Focused" />
-
-                              <VisualState x:Name="Unfocused" />
-                           </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-
-                        <Border x:Name="Background"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                BorderBrush="{StaticResource WpfThemeGroupNavigationControlButtonDefaultBorderBrush}"
-                                Background="{StaticResource WpfThemeGroupNavigationControlButtonDefaultBackgroundBrush}" />
-
-                        <Border x:Name="Over"
-                                Opacity="0"
-                                BorderThickness="1">
-                           <Border.Background>
-                              <LinearGradientBrush StartPoint="0.5,0"
-                                                   EndPoint="0.5,1">
-                                 <GradientStop Color="#FFfbfcfd"
-                                               Offset="0" />
-
-                                 <GradientStop Color="#FFeef4f9"
-                                               Offset="0.36" />
-
-                                 <GradientStop Color="#FFa4c7e5"
-                                               Offset="1" />
-                              </LinearGradientBrush>
-                           </Border.Background>
-                        </Border>
-
-                        <Border x:Name="Pressed1"
-                                Opacity="0"
-                                BorderThickness="1"
-                                Background="{StaticResource WpfThemeGroupNavigationControlButtonPressedBackgroundBrush}" />
-
-                        <ContentPresenter x:Name="contentPresenter"
-                                          Margin="{TemplateBinding Padding}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}"
-                                          Content="{TemplateBinding Content}"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center" />
-                     </Grid>
-                  </ControlTemplate>
-               </Setter.Value>
-            </Setter>
-         </Style>
-          
-           <DataTemplate x:Key="WpfThemeDataNavigationIcon">
-            <Grid HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  Margin="0">
-               <Grid.Effect>
-                  <DropShadowEffect BlurRadius="2"
-                                    ShadowDepth="1"
-                                    Color="White" />
-               </Grid.Effect>
-               <Grid.RowDefinitions>
-                  <RowDefinition Height="4" />
-                  <RowDefinition Height="3" />
-                  <RowDefinition Height="4" />
-               </Grid.RowDefinitions>
-               <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="5" />
-                  <ColumnDefinition Width="7" />
-                  <ColumnDefinition Width="5" />
-               </Grid.ColumnDefinitions>
-               <Rectangle StrokeThickness="0"
-                          Fill="#FFC1CBD7"
-                          Width="5"
-                          Height="3"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center"
-                          Margin="0,0,0,1" />
-               <Rectangle StrokeThickness="0"
-                          Fill="#FFC1CBD7"
-                          Width="5"
-                          Height="3"
-                          Grid.Column="1"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center"
-                          Margin="1,0,1,1" />
-               <Rectangle StrokeThickness="0"
-                          Fill="#FFC1CBD7"
-                          Width="5"
-                          Height="3"
-                          Margin="0,0,0,1"
-                          Grid.Column="2"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center" />
-               <Rectangle StrokeThickness="0"
-                          Fill="#FFB1BDCD"
-                          Width="5"
-                          Height="3"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center"
-                          Grid.Row="1" />
-               <Rectangle StrokeThickness="0"
-                          Fill="#FFB1BDCD"
-                          Width="5"
-                          Height="3"
-                          Grid.Row="1"
-                          Grid.Column="1"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center"
-                          Margin="1,0" />
-               <Rectangle StrokeThickness="0"
-                          Fill="#FF1A69D6"
-                          Width="5"
-                          Height="3"
-                          Grid.Row="1"
-                          Grid.Column="2"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center"
-                          Margin="0" />
-               <Rectangle StrokeThickness="0"
-                          Fill="#FFA4B2C5"
-                          Width="5"
-                          Height="3"
-                          Grid.Row="2"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center"
-                          Margin="0,1,0,0" />
-               <Rectangle StrokeThickness="0"
-                          Fill="#FFA4B2C5"
-                          Width="5"
-                          Height="3"
-                          Grid.Row="2"
-                          Grid.Column="1"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center"
-                          Margin="1,1,1,0" />
-               <Rectangle StrokeThickness="0"
-                          Fill="#FFA4B2C5"
-                          Width="5"
-                          Height="3"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center"
-                          Grid.Row="2"
-                          Grid.Column="2"
-                          Margin="0,1,0,0" />
-            </Grid>
-         </DataTemplate>
-          
-          <!-- Custom ListBox Style -->
-         <Style TargetType="xclb:ListBox">
-
-            <Setter Property="BorderThickness"
-                    Value="1" />
-
-            <Setter Property="BorderBrush"
-                    Value="{StaticResource WpfThemeListBoxDefaultBorderBrush}" />
-
-            <Setter Property="Background"
-                    Value="White" />
-
-            <Setter Property="Foreground"
-                    Value="Black" />
-
-            <Setter Property="Padding"
-                    Value="1" />
-
-            <Setter Property="IsTabStop"
-                    Value="False" />
-
-            <Setter Property="Template">
-               <Setter.Value>
-                  <ControlTemplate TargetType="xclb:ListBox">
-                     <Border BorderBrush="{TemplateBinding BorderBrush}"
-                             BorderThickness="{TemplateBinding BorderThickness}"
-                             Background="{TemplateBinding Background}">
-                        <VisualStateManager.VisualStateGroups>
-                           <VisualStateGroup x:Name="CommonStates">
-                              <VisualState x:Name="Normal" />
-                              <VisualState x:Name="Disabled" />
-                           </VisualStateGroup>
-
-                           <VisualStateGroup x:Name="ResquestStatus">
-
-                              <VisualState x:Name="NoPendingRequests" />
-
-                              <VisualState x:Name="RequestsPending">
-                                 <Storyboard>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="loadingIndicator"
-                                                                   Storyboard.TargetProperty="RequestsPending">
-                                       <DiscreteObjectKeyFrame KeyTime="00:00:00.0">
-                                          <DiscreteObjectKeyFrame.Value>
-                                             <sys:Boolean>
-                                                True
-                                             </sys:Boolean>
-                                          </DiscreteObjectKeyFrame.Value>
-                                       </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                 </Storyboard>
-                              </VisualState>
-
-                              <VisualStateGroup.Transitions>
-                                 <VisualTransition From="RequestsPending"
-                                                   To="NoPendingRequests">
-                                    <Storyboard>
-                                       <ObjectAnimationUsingKeyFrames Storyboard.TargetName="loadingIndicator"
-                                                                      Storyboard.TargetProperty="RequestsPending">
-                                          <DiscreteObjectKeyFrame KeyTime="00:00:00.0">
-                                             <DiscreteObjectKeyFrame.Value>
-                                                <sys:Boolean>
-                                                   False
-                                                </sys:Boolean>
-                                             </DiscreteObjectKeyFrame.Value>
-                                          </DiscreteObjectKeyFrame>
-                                       </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                 </VisualTransition>
-                              </VisualStateGroup.Transitions>
-                           </VisualStateGroup>
-
-                           <VisualStateGroup x:Name="LicensingStates">
-                              <VisualState x:Name="Licensed" />
-
-                              <VisualState x:Name="NotLicensed">
-                                 <Storyboard>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="licensingMessage"
-                                                                   Storyboard.TargetProperty="Visibility"
-                                                                   Duration="00:00:0.0">
-                                       <DiscreteObjectKeyFrame KeyTime="00:00:0.0">
-                                          <DiscreteObjectKeyFrame.Value>
-                                             <Visibility>Visible</Visibility>
-                                          </DiscreteObjectKeyFrame.Value>
-                                       </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                 </Storyboard>
-                              </VisualState>
-                           </VisualStateGroup>
-
-                           <VisualStateGroup x:Name="DataNavigationPaneStates">
-                              <VisualState x:Name="DataNavigationPaneHidden">
-                                 <Storyboard>
-                                    <DoubleAnimation Storyboard.TargetName="DataNavPane"
-                                                     Storyboard.TargetProperty="Opacity"
-                                                     To="0"
-                                                     Duration="00:00:00.150" />
-
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DataNavPane"
-                                                                   Storyboard.TargetProperty="Visibility"
-                                                                   Duration="00:00:0.0">
-                                       <DiscreteObjectKeyFrame KeyTime="00:00:0.150">
-                                          <DiscreteObjectKeyFrame.Value>
-                                             <Visibility>Collapsed</Visibility>
-                                          </DiscreteObjectKeyFrame.Value>
-                                       </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                 </Storyboard>
-                              </VisualState>
-
-
-                              <VisualState x:Name="DataNavigationPaneVisible">
-                                 <Storyboard>
-                                    <DoubleAnimation Storyboard.TargetName="DataNavPane"
-                                                     Storyboard.TargetProperty="Opacity"
-                                                     From="0"
-                                                     To="1"
-                                                     Duration="00:00:00.150" />
-
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DataNavPane"
-                                                                   Storyboard.TargetProperty="Visibility"
-                                                                   Duration="00:00:0.0">
-                                       <DiscreteObjectKeyFrame KeyTime="00:00:0.0">
-                                          <DiscreteObjectKeyFrame.Value>
-                                             <Visibility>Visible</Visibility>
-                                          </DiscreteObjectKeyFrame.Value>
-                                       </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                 </Storyboard>
-                              </VisualState>
-                           </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-
-                        <Grid>
-                           <Grid.ColumnDefinitions>
-                              <ColumnDefinition />
-                              <ColumnDefinition Width="Auto" />
-                           </Grid.ColumnDefinitions>
-                           <Grid.RowDefinitions>
-                              <RowDefinition Height="Auto" />
-                              <RowDefinition />
-                           </Grid.RowDefinitions>
-                           <Grid Grid.Column="0"
-                                 Grid.ColumnSpan="2"
-                                 Grid.Row="0"
-                                 Height="50"
-                                 Background="{StaticResource WpfThemeToolPaneBackgroundBrush}"
-                                 Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ToolPaneVisibility}">
-                              <Border Opacity="1">
-                                 <Border.Background>
-                                    <LinearGradientBrush StartPoint="320,0"
-                                                         EndPoint="353.127,51.434"
-                                                         SpreadMethod="Repeat"
-                                                         MappingMode="Absolute">
-                                       <GradientStop Color="#FF637FA5"
-                                                     Offset="0.5" />
-                                       <GradientStop Offset="0.5"
-                                                     Color="#FF596E89" />
-                                       <GradientStop Offset="1"
-                                                     Color="#FF596E89" />
-                                       <GradientStop Color="#FF617CA1" />
-                                    </LinearGradientBrush>
-                                 </Border.Background>
-                              </Border>
-
-                              <xclb:FilterControl x:Name="FilterControl"
-                                                  HorizontalAlignment="Left"
-                                                  Margin="10,0,0,0"
-                                                  Height="28"
-                                                  Width="225"
-                                                  DataSourceFilterExpression="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=FilterExpression, Mode=TwoWay}"
-                                                  xclb:SearchTextBox.FilteredFieldNames="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(xclb:SearchTextBox.FilteredFieldNames)}"
-                                                  xclb:SearchTextBox.TooComplexText="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(xclb:SearchTextBox.TooComplexText)}"
-                                                  xclb:SearchTextBox.IsCaseSensitive="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(xclb:SearchTextBox.IsCaseSensitive)}"/>
-                              
-                              <Rectangle Height="1"
-                                         VerticalAlignment="Bottom"
-                                         Fill="#FF8399A9" />
-                           </Grid>
-
-                           <ScrollViewer x:Name="ScrollViewer"
-                                         IsTabStop="False"
-                                         Grid.Column="0"
-                                         Grid.Row="1"
-                                         HorizontalScrollBarVisibility="{TemplateBinding HorizontalScrollBarVisibility}"
-                                         VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}"
-                                         Padding="{TemplateBinding Padding}"
-                                         Style="{StaticResource WpfThemeScrollViewerStyle}">
-                              <xclb:ItemsPresenter />
-                           </ScrollViewer>
-
-                           <xclb:LoadingIndicator x:Name="loadingIndicator"
-                                                  Grid.Column="0"
-                                                  Grid.Row="1" />
-
-                           <Grid x:Name="licensingMessage"
-                                 Grid.RowSpan="3"
-                                 Grid.ColumnSpan="2"
-                                 Visibility="Collapsed"
-                                 Background="#80FFFFFF">
-                              <Grid HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Width="250">
-                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="0.27*" />
-                                    <RowDefinition Height="1" />
-                                    <RowDefinition Height="0.69*" />
-                                 </Grid.RowDefinitions>
-                                 <Border CornerRadius="6"
-                                         Grid.RowSpan="3">
-                                    <Border.Background>
-                                       <LinearGradientBrush EndPoint="0.5,1"
-                                                            StartPoint="0.5,0">
-                                          <GradientStop Color="#FFCA4800"
-                                                        Offset="1" />
-                                          <GradientStop Color="#FFFF9B09" />
-                                       </LinearGradientBrush>
-                                    </Border.Background>
-                                 </Border>
-                                 <Border BorderBrush="#66000000"
-                                         BorderThickness="1"
-                                         CornerRadius="6"
-                                         Grid.RowSpan="3" />
-                                 <Border BorderBrush="#33FFFFFF"
-                                         BorderThickness="1"
-                                         CornerRadius="5"
-                                         Margin="1"
-                                         Grid.RowSpan="3" />
-                                 <Border Opacity="0.08"
-                                         CornerRadius="6"
-                                         Grid.RowSpan="3">
-                                    <Border.Background>
-                                       <LinearGradientBrush StartPoint="-0.015,0.1"
-                                                            EndPoint="9.187,9.236"
-                                                            SpreadMethod="Repeat"
-                                                            MappingMode="Absolute">
-                                          <GradientStop Offset="0"
-                                                        Color="Transparent" />
-                                          <GradientStop Color="Transparent"
-                                                        Offset="0.5" />
-                                          <GradientStop Offset="0.5"
-                                                        Color="White" />
-                                          <GradientStop Offset="1"
-                                                        Color="White" />
-                                       </LinearGradientBrush>
-                                    </Border.Background>
-                                 </Border>
-                                 <Border Background="#66000000"
-                                         Grid.Row="1"
-                                         Margin="10,0" />
-                                 <TextBlock HorizontalAlignment="Left"
-                                            Margin="10,6,0,0"
-                                            TextWrapping="Wrap"
-                                            Text="Invalid License / Trial Expired"
-                                            VerticalAlignment="Bottom"
-                                            Foreground="White"
-                                            FontSize="16" />
-                                 <RichTextBox x:Name="LicensingMessageRichTextBox"
-                                              Style="{StaticResource WpfThemeLicensingStateRichTextBoxStyle}"
-                                              Margin="10,6,0,10"
-                                              Grid.Row="2" />
-                              </Grid>
-                           </Grid>
-
-                           <Grid x:Name="DataNavPane"
-                                 Visibility="Collapsed"
-                                 Grid.Row="1"
-                                 Grid.RowSpan="2">
-
-                              <Grid.RowDefinitions>
-                                 <RowDefinition Height="32" />
-                                 <RowDefinition />
-                              </Grid.RowDefinitions>
-                              <Border Background="{StaticResource WpfThemeListBoxGroupHearderItemBackgroundBrush}"
-                                      Grid.RowSpan="2" />
-
-                              <xclb:DataNavigationControl x:Name="DataNavControl"
-                                                          DataNavigationHost="{Binding RelativeSource={RelativeSource TemplatedParent}}"
-                                                          Grid.Row="1" />
-
-                              <Button x:Name="HidePaneButton"
-                                      Grid.Row="0"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Top"
-                                      Padding="5"
-                                      Margin="5"
-                                      Style="{StaticResource WpfThemeNavigationButtonStyle}"
-                                      Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=HideDataNavigationPaneCommand}">
-                                 <Path Height="9.33"
-                                       Width="9.33"
-                                       Stretch="Fill"
-                                       Data="M 7.333343505859375,-0.6666641235351562 C7.333343505859375,-0.6666641235351562 4,2.6650009155273438 4,2.6650009155273438 4,2.6650009155273438 0.666656494140625,-0.6666641235351562 0.666656494140625,-0.6666641235351562 0.666656494140625,-0.6666641235351562 -0.666656494140625,0.6666641235351562 -0.666656494140625,0.6666641235351562 -0.666656494140625,0.6666641235351562 2.665008544921875,4 2.665008544921875,4 2.665008544921875,4 -0.666656494140625,7.333335876464844 -0.666656494140625,7.333335876464844 -0.666656494140625,7.333335876464844 0.666656494140625,8.666664123535156 0.666656494140625,8.666664123535156 0.666656494140625,8.666664123535156 4,5.334999084472656 4,5.334999084472656 4,5.334999084472656 7.333343505859375,8.666664123535156 7.333343505859375,8.666664123535156 7.333343505859375,8.666664123535156 8.666656494140625,7.333335876464844 8.666656494140625,7.333335876464844 8.666656494140625,7.333335876464844 5.334991455078125,4 5.334991455078125,4 5.334991455078125,4 8.666656494140625,0.6666641235351562 8.666656494140625,0.6666641235351562 8.666656494140625,0.6666641235351562 7.333343505859375,-0.6666641235351562 7.333343505859375,-0.6666641235351562 z"
-                                       Fill="#A6A6A6" />
-                              </Button>
-                           </Grid>
-                        </Grid>
-                     </Border>
-                  </ControlTemplate>
-               </Setter.Value>
-            </Setter>
-         </Style>
-          
-          <!-- Custom GroupHeader Style -->
-         <Style TargetType="xclb:ListBoxGroupHeader">
-            <Setter Property="Background"
-                    Value="{StaticResource WpfThemeListBoxGroupHearderItemBackgroundBrush}" />
-
-            <Setter Property="BorderThickness"
-                    Value="1" />
-
-            <Setter Property="BorderBrush"
-                    Value="#C9CACA" />
-
-            <Setter Property="Foreground"
-                    Value="#7691B4" />
-
-            <Setter Property="Padding"
-                    Value="5,0,0,0" />
-
-            <Setter Property="MinHeight"
-                    Value="34" />
-
-            <Setter Property="HorizontalContentAlignment"
-                    Value="Stretch" />
-
-            <Setter Property="VerticalContentAlignment"
-                    Value="Center" />
-
-            <Setter Property="Template">
-               <Setter.Value>
-                  <ControlTemplate TargetType="xclb:ListBoxGroupHeader">
-                     <Grid>
-                        <VisualStateManager.VisualStateGroups>
-                           <VisualStateGroup x:Name="CommonStates">
-                              <VisualState x:Name="Disabled">
-                                 <Storyboard>
-                                    <DoubleAnimation Storyboard.TargetName="contentPresenter"
-                                                     Storyboard.TargetProperty="Opacity"
-                                                     Duration="0"
-                                                     To=".55" />
-                                 </Storyboard>
-                              </VisualState>
-                              <VisualState x:Name="Normal" />
-                              <VisualState x:Name="MouseOver" />
-                           </VisualStateGroup>
-
-                           <VisualStateGroup x:Name="FocusStates">
-                              <VisualState x:Name="Unfocused" />
-                              <VisualState x:Name="Focused" />
-                           </VisualStateGroup>
-
-                           <VisualStateGroup x:Name="SelectionStates">
-                              <VisualState x:Name="Unselected" />
-                              <VisualState x:Name="SelectedUnfocused" />
-                              <VisualState x:Name="Selected" />
-                           </VisualStateGroup>
-
-                           <VisualStateGroup x:Name="LoadingStates">
-                              <VisualState x:Name="Loaded">
-                                 <Storyboard>
-                                    <DoubleAnimation Storyboard.TargetName="contentPresenter"
-                                                     Storyboard.TargetProperty="Opacity"
-                                                     Duration="00:00:00.0"
-                                                     To="1" />
-                                 </Storyboard>
-                              </VisualState>
-                              <VisualState x:Name="Loading">
-                                 <Storyboard>
-                                    <DoubleAnimation Storyboard.TargetName="contentPresenter"
-                                                     Storyboard.TargetProperty="Opacity"
-                                                     Duration="0"
-                                                     To="0" />
-                                 </Storyboard>
-                              </VisualState>
-                           </VisualStateGroup>
-
-                           <VisualStateGroup x:Name="LayoutModeStates">
-                              <VisualState x:Name="Vertical" />
-                              <VisualState x:Name="Horizontal">
-                                 <Storyboard>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalLayoutGrid"
-                                                                   Storyboard.TargetProperty="Visibility"
-                                                                   Duration="00:00:0.0">
-                                       <DiscreteObjectKeyFrame KeyTime="00:00:0.0">
-                                          <DiscreteObjectKeyFrame.Value>
-                                             <Visibility>Visible</Visibility>
-                                          </DiscreteObjectKeyFrame.Value>
-                                       </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalLayoutGrid"
-                                                                   Storyboard.TargetProperty="Visibility"
-                                                                   Duration="00:00:0.0">
-                                       <DiscreteObjectKeyFrame KeyTime="00:00:0.0">
-                                          <DiscreteObjectKeyFrame.Value>
-                                             <Visibility>Collapsed</Visibility>
-                                          </DiscreteObjectKeyFrame.Value>
-                                       </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                 </Storyboard>
-                              </VisualState>
-                              <VisualState x:Name="Floating">
-                                 <Storyboard>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalLayoutGrid"
-                                                                   Storyboard.TargetProperty="Visibility"
-                                                                   Duration="00:00:0.0">
-                                       <DiscreteObjectKeyFrame KeyTime="00:00:0.0">
-                                          <DiscreteObjectKeyFrame.Value>
-                                             <Visibility>Visible</Visibility>
-                                          </DiscreteObjectKeyFrame.Value>
-                                       </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalLayoutGrid"
-                                                                   Storyboard.TargetProperty="Visibility"
-                                                                   Duration="00:00:0.0">
-                                       <DiscreteObjectKeyFrame KeyTime="00:00:0.0">
-                                          <DiscreteObjectKeyFrame.Value>
-                                             <Visibility>Collapsed</Visibility>
-                                          </DiscreteObjectKeyFrame.Value>
-                                       </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                 </Storyboard>
-                              </VisualState>
-                           </VisualStateGroup>
-
-                        </VisualStateManager.VisualStateGroups>
-                        <Grid x:Name="VerticalLayoutGrid"
-                              Visibility="Visible">
-                           <Border x:Name="rootBorder"
-                                   BorderBrush="{TemplateBinding BorderBrush}"
-                                   BorderThickness="{TemplateBinding BorderThickness}"
-                                   Background="{TemplateBinding Background}">
-                              <Grid>
-                                 <Border Opacity="1">
-                                    <Border.Background>
-                                       <LinearGradientBrush StartPoint="355,0"
-                                                            EndPoint="388.127,51.434"
-                                                            SpreadMethod="Repeat"
-                                                            MappingMode="Absolute">
-                                          <GradientStop Color="#FFCCD8E9"
-                                                        Offset="0.5" />
-                                          <GradientStop Offset="0.5"
-                                                        Color="#FFB8CCE5" />
-                                          <GradientStop Offset="1"
-                                                        Color="#FFB8CCE5" />
-                                          <GradientStop Color="#FFCCD8E9" />
-                                       </LinearGradientBrush>
-                                    </Border.Background>
-                                 </Border>
-
-                                 <xclb:HierarchicalGroupValueControl x:Name="contentPresenter"
-                                                                     Margin="{TemplateBinding Padding}"
-                                                                     HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                                     GroupValueDataTemplates="{TemplateBinding GroupValueDataTemplates}"
-                                                                     ItemsSource="{Binding Path=FieldNameValuePairs}"
-                                                                     xclb:ListBoxContainer.LayoutMode="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(xclb:ListBoxContainer.LayoutMode)}">
-                                    <xclb:HierarchicalGroupValueControl.ItemsPanel>
-                                       <ItemsPanelTemplate>
-                                          <StackPanel Orientation="Horizontal"></StackPanel>
-                                       </ItemsPanelTemplate>
-                                    </xclb:HierarchicalGroupValueControl.ItemsPanel>
-                                 </xclb:HierarchicalGroupValueControl>
-                              </Grid>
-                           </Border>
-                           <StackPanel Orientation="Horizontal"
-                                       HorizontalAlignment="Right"
-                                       Margin="0,0,5,0">
-
-                              <Button Style="{StaticResource WpfThemeNavigationButtonStyle}"
-                                      ContentTemplate="{StaticResource WpfThemeDataNavigationIcon}"
-                                      Margin="0,5,10,5"
-                                      Padding="5"
-                                      Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ParentListBox.ShowDataNavigationPaneCommand}" />
-
-                              <Button x:Name="PreviousButton"
-                                      BorderThickness="1"
-                                      IsTabStop="False"
-                                      Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=NavigateToPreviousGroupCommand}"
-                                      Style="{StaticResource WpfThemeNavigationButtonStyle}"
-                                      Margin="0,5,3,5"
-                                      Padding="5">
-                                 <Path Margin="3,1"
-                                       RenderTransformOrigin="0.5,0.5"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       Height="7"
-                                       Width="14"
-                                       Stretch="Fill"
-                                       Opacity="1"
-                                       Data="M 7,0 C7,0 0,7 0,7 0,7 14,7 14,7 14,7 7,0 7,0 z"
-                                       UseLayoutRounding="False">
-                                    <Path.Effect>
-                                       <DropShadowEffect BlurRadius="2"
-                                                         ShadowDepth="1"
-                                                         Color="White" />
-                                    </Path.Effect>
-                                    <Path.Fill>
-                                       <LinearGradientBrush EndPoint="0.5,1"
-                                                            StartPoint="0.5,0">
-                                          <GradientStop Color="#FF9EADC1"
-                                                        Offset="1" />
-                                          <GradientStop Color="#FFC6CFDA" />
-                                       </LinearGradientBrush>
-                                    </Path.Fill>
-                                 </Path>
-                              </Button>
-
-                              <Button x:Name="NextButton"
-                                      IsTabStop="False"
-                                      Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=NavigateToNextGroupCommand}"
-                                      Style="{StaticResource WpfThemeNavigationButtonStyle}"
-                                      Margin="0,5,0,5"
-                                      Padding="5">
-                                 <Path Margin="3,1"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       Height="7"
-                                       Width="14"
-                                       Stretch="Fill"
-                                       Opacity="1"
-                                       Data="M 7,7 C7,7 14,0 14,0 14,0 0,0 0,0 0,0 7,7 7,7 z"
-                                       UseLayoutRounding="False">
-                                    <Path.Effect>
-                                       <DropShadowEffect BlurRadius="2"
-                                                         ShadowDepth="1"
-                                                         Color="White" />
-                                    </Path.Effect>
-                                    <Path.Fill>
-                                       <LinearGradientBrush EndPoint="0.5,1"
-                                                            StartPoint="0.5,0">
-                                          <GradientStop Color="#FF9EADC1"
-                                                        Offset="1" />
-                                          <GradientStop Color="#FFC6CFDA" />
-                                       </LinearGradientBrush>
-                                    </Path.Fill>
-                                 </Path>
-                              </Button>
-                           </StackPanel>
-
-                        </Grid>
-
-                        <Grid x:Name="HorizontalLayoutGrid"
-                              Visibility="Collapsed">
-                           <Grid.ColumnDefinitions>
-                              <ColumnDefinition Width="*" />
-                              <ColumnDefinition Width="40" />
-                              <ColumnDefinition Width="*" />
-                           </Grid.ColumnDefinitions>
-                           <Grid.RowDefinitions>
-                              <RowDefinition Height="*" />
-                              <RowDefinition Height="Auto" />
-                           </Grid.RowDefinitions>
-
-                           <Border x:Name="HorizontalRootBorder"
-                                   Grid.RowSpan="2"
-                                   Grid.ColumnSpan="3"
-                                   BorderBrush="{TemplateBinding BorderBrush}"
-                                   BorderThickness="{TemplateBinding BorderThickness}"
-                                   Background="{TemplateBinding Background}" />
-
-                           <Button x:Name="HorizontalPreviousButton"
-                                   Grid.Row="1"
-                                   Grid.Column="0"
-                                   BorderThickness="1,1,0,1"
-                                   IsTabStop="False"
-                                   Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=NavigateToPreviousGroupCommand}"
-                                   Style="{StaticResource WpfThemeNavigationButtonStyle}"
-                                   Padding="5">
-                              <Path Margin="6"
-                                    RenderTransformOrigin="0.5,0.5"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Height="15"
-                                    Width="7"
-                                    Stretch="Fill"
-                                    Opacity="1"
-                                    Data="M 306,597 C306,597 313,590 313,590 313,590 313,605 313,605 313,605 306,597 306,597 z"
-                                    UseLayoutRounding="False">
-                                 <Path.Effect>
-                                    <DropShadowEffect BlurRadius="2"
-                                                      ShadowDepth="1"
-                                                      Color="White" />
-                                 </Path.Effect>
-                                 <Path.Fill>
-                                    <LinearGradientBrush EndPoint="0.5,1"
-                                                         StartPoint="0.5,0">
-                                       <GradientStop Color="#FF9EADC1"
-                                                     Offset="1" />
-                                       <GradientStop Color="#FFC6CFDA" />
-                                    </LinearGradientBrush>
-                                 </Path.Fill>
-                              </Path>
-                           </Button>
-
-                           <Button x:Name="HorizontalNextButton"
-                                   Grid.Row="1"
-                                   Grid.Column="2"
-                                   IsTabStop="False"
-                                   Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=NavigateToNextGroupCommand}"
-                                   Style="{StaticResource WpfThemeNavigationButtonStyle}"
-                                   Padding="5">
-                              <Path Margin="6"
-                                    RenderTransformOrigin="0.5,0.5"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Height="15"
-                                    Width="7"
-                                    Stretch="Fill"
-                                    Opacity="1"
-                                    Data="M 401,598 C401,598 394,605 394,605 394,605 394,590 394,590 394,590 401,598 401,598 z"
-                                    UseLayoutRounding="False">
-                                 <Path.Effect>
-                                    <DropShadowEffect BlurRadius="2"
-                                                      ShadowDepth="1"
-                                                      Color="White" />
-                                 </Path.Effect>
-                                 <Path.Fill>
-                                    <LinearGradientBrush EndPoint="0.5,1"
-                                                         StartPoint="0.5,0">
-                                       <GradientStop Color="#FF9EADC1"
-                                                     Offset="1" />
-                                       <GradientStop Color="#FFC6CFDA" />
-                                    </LinearGradientBrush>
-                                 </Path.Fill>
-                              </Path>
-                           </Button>
-
-                           <Button Style="{StaticResource WpfThemeNavigationButtonStyle}"
-                                   Grid.Row="1"
-                                   Grid.Column="1"
-                                   ContentTemplate="{StaticResource WpfThemeDataNavigationIcon}"
-                                   Padding="5"
-                                   Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ParentListBox.ShowDataNavigationPaneCommand}" />
-
-                           <xclb:HierarchicalGroupValueControl x:Name="HorizontalContentPresenter"
-                                                               Grid.Row="0"
-                                                               Grid.Column="0"
-                                                               Grid.ColumnSpan="3"
-                                                               Margin="{TemplateBinding Padding}"
-                                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                               GroupValueDataTemplates="{TemplateBinding GroupValueDataTemplates}"
-                                                               ItemsSource="{Binding Path=FieldNameValuePairs}"
-                                                               xclb:ListBoxContainer.LayoutMode="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(xclb:ListBoxContainer.LayoutMode)}">
-                              <xclb:HierarchicalGroupValueControl.ItemsPanel>
-                                 <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Vertical"></StackPanel>
-                                 </ItemsPanelTemplate>
-                              </xclb:HierarchicalGroupValueControl.ItemsPanel>
-                           </xclb:HierarchicalGroupValueControl>
-
-                        </Grid>
-                     </Grid>
-                  </ControlTemplate>
-               </Setter.Value>
-            </Setter>
-         </Style>
-          
-          <xclb:FieldNameList x:Key="filteredFieldNameList">
-            <sys:String>ShipName</sys:String>
-         </xclb:FieldNameList>
-
-         <PropertyGroupDescription x:Key="shipCountryGroupDescription"
-                                   PropertyName="ShipCountry"/>
-
-         <PropertyGroupDescription x:Key="shipCityGroupDescription"
-                                   PropertyName="ShipCity" />
-      </ResourceDictionary>
-   </local:DemoView.Resources>
-
-   <Grid>
-      <xclb:ListBox x:Name="_listBox"
-                    ItemsSource="{Binding}" 
-                    ItemTemplate="{StaticResource orderListBoxItemTemplate}"
-                    xclb:SearchTextBox.FilteredFieldNames="{StaticResource filteredFieldNameList}"
-                    xclb:SearchTextBox.IsCaseSensitive="False">
-      </xclb:ListBox>
-   </Grid >
-   <!--##END-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </local:DemoView>

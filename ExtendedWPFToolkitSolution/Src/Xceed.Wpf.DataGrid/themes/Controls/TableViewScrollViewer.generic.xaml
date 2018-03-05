@@ -14,6 +14,18 @@
 
   **********************************************************************************-->
 
+<!-- =======================================================================
+  Xceed DataGrid for WPF - CUSTOMIZATION CODE - Default Styles and Templates
+  Copyright (c) 2007-2017 Xceed Software Inc.
+
+  [TableViewScrollViewer.generic.xaml]
+
+  This file is part of the Xceed DataGrid for WPF product. The use and
+  distribution of this Customization Code is subject to the terms
+  and conditions refering to "Customization Code" that are specified in
+  the XCEED SOFTWARE LICENSE AGREEMENT accompanying this product.
+======================================================================= -->
+
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Xceed.Wpf.DataGrid"

@@ -14,46 +14,39 @@
 
   ***********************************************************************************/
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
 using System.Collections.ObjectModel;
-using System.Collections;
-using System.Windows.Data;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Windows.Documents;
-using System.Collections.Specialized;
 using System.Windows;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal class DataGridVirtualizingCollectionViewGroup : DataGridVirtualizingCollectionViewGroupBase, IWeakEventListener
   {
-    #region STATIC MEMBERS
-
     private static List<DataGridGroupInfo> EmptyDataGridInfoList = new List<DataGridGroupInfo>( 0 );
 
-    #endregion STATIC MEMBERS
-
-
-    #region CONSTRUCTORS
-
-    internal DataGridVirtualizingCollectionViewGroup(
-      object name,
-      int initialItemsCount,
-      int startGlobalIndex,
-      DataGridVirtualizingCollectionViewGroup parent,
-      int level,
-      bool isBottomLevel )
+    internal DataGridVirtualizingCollectionViewGroup( object name, int initialItemsCount, int startGlobalIndex, DataGridVirtualizingCollectionViewGroup parent, int level, bool isBottomLevel )
       : base( name, initialItemsCount, startGlobalIndex, parent, level, isBottomLevel )
     {
     }
 
-    #endregion CONSTRUCTORS
+    #region GroupPath Property
 
-    #region DATA VIRTUALIZATION
+    internal List<DataGridGroupInfo> GroupPath
+    {
+      get
+      {
+        if( m_groupPath == null )
+        {
+          m_groupPath = this.BuildGroupPath();
+        }
+
+        return m_groupPath;
+      }
+    }
+
+    #endregion
 
     internal override int QueryItemCount()
     {
@@ -79,35 +72,13 @@ namespace Xceed.Wpf.DataGrid
         object subGroupName = subGroupInfos[ i ].Name;
         int subGroupItemCount = subGroupInfos[ i ].ItemCount;
 
-        subCollectionViewGroupList.Add(
-          new DataGridVirtualizingCollectionViewGroup( subGroupName, subGroupItemCount, runningCount, this, nextLevel, nextLevelIsBottom ) );
+        subCollectionViewGroupList.Add( new DataGridVirtualizingCollectionViewGroup( subGroupName, subGroupItemCount, runningCount, this, nextLevel, nextLevelIsBottom ) );
 
         runningCount += subGroupItemCount;
       }
 
       return subCollectionViewGroupList;
     }
-
-    #endregion DATA VIRTUALIZATION
-
-
-    #region INTERNAL PROPERTIES
-
-    internal List<DataGridGroupInfo> GroupPath
-    {
-      get
-      {
-        if( m_groupPath == null )
-          m_groupPath = this.BuildGroupPath();
-
-        return m_groupPath;
-      }
-    }
-
-    #endregion INTERNAL PROPERTIES
-
-
-    #region PRIVATE METHODS
 
     private List<DataGridGroupInfo> BuildGroupPath()
     {
@@ -129,17 +100,13 @@ namespace Xceed.Wpf.DataGrid
       Debug.Assert( groupDescriptions.Count > level );
 
       if( groupDescriptions.Count > level )
+      {
         groupPath.Add( new DataGridGroupInfo( groupDescriptions[ level ], this ) );
+      }
 
       return groupPath;
     }
 
-    #endregion PRIVATE METHODS
-
-    #region PRIVATE FIELDS
-
     private List<DataGridGroupInfo> m_groupPath;
-
-    #endregion PRIVATE FIELDS
   }
 }

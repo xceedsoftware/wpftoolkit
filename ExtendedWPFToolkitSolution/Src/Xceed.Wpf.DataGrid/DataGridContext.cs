@@ -31,8 +31,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
 using Xceed.Utils.Collections;
-using Xceed.Wpf.DataGrid.Automation;
-using Xceed.Wpf.DataGrid.Utils;
 using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
@@ -89,9 +87,23 @@ namespace Xceed.Wpf.DataGrid
       }
 
       //If the detailConfiguration is null then we are in the master...
-      if( detailConfiguration == null )
+      if( m_detailConfig == null )
       {
-        this.CreateStandaloneCollections();
+        var columns = new ColumnCollection( dataGridControl, null );
+
+        m_columnManager = new ColumnHierarchyManager( columns );
+        m_itemsSourcePropertyDescriptions = dataGridControl.ItemsSourcePropertyDescriptions;
+        m_itemPropertyMap = dataGridControl.ItemPropertyMap;
+        m_groupLevelDescriptions = new GroupLevelDescriptionCollection();
+
+        //in this particular case, I need to create a SortDescriptionsSyncContext to ensure I will be able to synchronize access to the sort descriptions collection.
+        m_sortDescriptionsSyncContext = new SortDescriptionsSyncContext();
+
+        //Register to the Columns Collection's CollectionChanged event to manage the Removal of the CurrentColumn.
+        CollectionChangedEventManager.AddListener( m_columnManager.Columns, this );
+
+        // Register to the VisibleColumnsChanged to update, if need be, the columns desired width when column stretching is active and there's a column reordering.
+        CollectionChangedEventManager.AddListener( m_columnManager.VisibleColumns, this );
 
         CollectionChangedEventManager.AddListener( m_items.SortDescriptions, this );
         CollectionChangedEventManager.AddListener( m_items.GroupDescriptions, this );
@@ -101,17 +113,23 @@ namespace Xceed.Wpf.DataGrid
         MaxGroupLevelsChangedEventManager.AddListener( m_dataGridControl, this );
         MaxSortLevelsChangedEventManager.AddListener( m_dataGridControl, this );
         ItemsSourceChangeCompletedEventManager.AddListener( m_dataGridControl, this );
+
+        this.HookToItemPropertiesChanged();
       }
       //Detail DataGridContext
       else
       {
+        m_detailConfig.AddDataGridContext( this );
+
+        m_columnManager = m_detailConfig.ColumnManager;
+        m_itemsSourcePropertyDescriptions = m_detailConfig.ItemsSourcePropertyDescriptions;
+        m_itemPropertyMap = m_detailConfig.ItemPropertyMap;
+
         //only listen to the detail grid config current column changed if the detail grid config is synchronized.
         CurrentColumnChangedEventManager.AddListener( m_detailConfig, this );
 
         GroupConfigurationSelectorChangedEventManager.AddListener( m_detailConfig, this );
         AllowDetailToggleChangedEventManager.AddListener( m_detailConfig, this );
-
-        VisibilityChangingEventManager.AddListener( m_detailConfig.Columns, this );
 
         // Register to the VisibleColumnsChanged to update, if need be, the columns desired width
         // when column stretching is active and there's a column reordering.
@@ -120,19 +138,20 @@ namespace Xceed.Wpf.DataGrid
         MaxGroupLevelsChangedEventManager.AddListener( m_detailConfig, this );
         MaxSortLevelsChangedEventManager.AddListener( m_detailConfig, this );
 
-        m_detailConfig.RequestingDelayBringIntoViewAndFocusCurrent += this.OnDetailConfigRequestingDelayBringIntoViewAndFocusCurrent;
         m_detailConfig.DetailConfigurations.DataGridControl = dataGridControl;
       }
 
-      CollectionChangedEventManager.AddListener( this.DetailConfigurations, this );
-      VisibleColumnsUpdatedEventManager.AddListener( this.Columns, this );
-      VisibleColumnsUpdatingEventManager.AddListener( this.Columns, this );
+      Debug.Assert( m_columnManager != null );
+      Debug.Assert( m_itemsSourcePropertyDescriptions != null );
+      Debug.Assert( m_itemPropertyMap != null );
+
+      ColumnsLayoutChangingEventManager.AddListener( m_columnManager, this );
+      ColumnsLayoutChangedEventManager.AddListener( m_columnManager, this );
+      DetailVisibilityChangedEventManager.AddListener( this.DetailConfigurations, this );
       RealizedContainersRequestedEventManager.AddListener( this.Columns, this );
       DistinctValuesRequestedEventManager.AddListener( this.Columns, this );
 
-      DetailVisibilityChangedEventManager.AddListener( this.DetailConfigurations, this );
-
-      this.SetupViewProperties( true );
+      this.SetupViewProperties();
       this.InitializeViewProperties();
 
       ViewChangedEventManager.AddListener( m_dataGridControl, this );
@@ -151,8 +170,6 @@ namespace Xceed.Wpf.DataGrid
         this.DetailLevel++;
         tempDataGridContext = tempDataGridContext.ParentDataGridContext;
       }
-
-      this.HookToItemPropertiesChanged();
     }
 
     private void Items_CollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
@@ -179,36 +196,25 @@ namespace Xceed.Wpf.DataGrid
         m_dataGridControl.CoerceValue( DataGridControl.SelectedItemProperty );
       }
 
-      if( this.Peer != null )
-      {
-        m_dataGridControl.QueueDataGridContextPeerChlidrenRefresh( this );
-      }
-
       m_dataGridControl.SelectionChangerManager.UpdateSelectionAfterSourceCollectionChanged( this, e );
+
     }
 
     internal void CleanDataGridContext()
     {
-      if( m_currencyManager != null )
-      {
-        m_currencyManager.CleanCurrencyManager();
-        m_currencyManager = null;
-      }
+      m_currencyManager.CleanManager();
 
       if( m_items != null )
       {
         CollectionChangedEventManager.RemoveListener( m_items, this );
 
-        DataGridCollectionViewBase dataGridCollectionViewBase = this.ItemsSourceCollection as DataGridCollectionViewBase;
-
+        var dataGridCollectionViewBase = this.ItemsSourceCollection as DataGridCollectionViewBase;
         if( dataGridCollectionViewBase != null )
         {
-          dataGridCollectionViewBase.UnregisterChangedEvents();
-          dataGridCollectionViewBase.RemoveSourceChangedListenersForDetail();
+          dataGridCollectionViewBase.Dispose();
         }
       }
 
-      //For non-master DataGridContext
       if( m_detailConfig == null )
       {
         GroupConfigurationSelectorChangedEventManager.RemoveListener( m_dataGridControl, this );
@@ -219,6 +225,8 @@ namespace Xceed.Wpf.DataGrid
 
         CollectionChangedEventManager.RemoveListener( m_items.SortDescriptions, this );
         CollectionChangedEventManager.RemoveListener( m_items.GroupDescriptions, this );
+
+        this.UnhookToItemPropertiesChanged( m_dataGridControlItemsSource as DataGridCollectionViewBase );
       }
       else
       {
@@ -229,24 +237,21 @@ namespace Xceed.Wpf.DataGrid
         MaxGroupLevelsChangedEventManager.RemoveListener( m_detailConfig, this );
         MaxSortLevelsChangedEventManager.RemoveListener( m_detailConfig, this );
 
-        m_detailConfig.RequestingDelayBringIntoViewAndFocusCurrent -= OnDetailConfigRequestingDelayBringIntoViewAndFocusCurrent;
+        m_detailConfig.RemoveDataGridContext( this );
       }
 
       this.ClearSizeStates();
 
+      ColumnsLayoutChangingEventManager.RemoveListener( m_columnManager, this );
+      ColumnsLayoutChangedEventManager.RemoveListener( m_columnManager, this );
       CollectionChangedEventManager.RemoveListener( this.DetailConfigurations, this );
-
       DetailVisibilityChangedEventManager.RemoveListener( this.DetailConfigurations, this );
-
-      VisibleColumnsUpdatedEventManager.RemoveListener( this.Columns, this );
-      VisibleColumnsUpdatingEventManager.RemoveListener( this.Columns, this );
       RealizedContainersRequestedEventManager.RemoveListener( this.Columns, this );
       DistinctValuesRequestedEventManager.RemoveListener( this.Columns, this );
 
       ViewChangedEventManager.RemoveListener( m_dataGridControl, this );
-      this.UnhookToItemPropertiesChanged( m_dataGridControlItemsSource as DataGridCollectionViewBase );
 
-      ColumnVirtualizationManager columnVirtualizationManager = this.ColumnVirtualizationManager;
+      var columnVirtualizationManager = this.ColumnVirtualizationManager;
       if( columnVirtualizationManager != null )
       {
         columnVirtualizationManager.CleanManager();
@@ -280,8 +285,6 @@ namespace Xceed.Wpf.DataGrid
 
     #region ParentItem Read-Only Property
 
-    private object m_parentItem;
-
     public object ParentItem
     {
       get
@@ -290,7 +293,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion ParentItem Read-Only Property
+    private readonly object m_parentItem;
+
+    #endregion
 
     #region AllowDetailToggle Property
 
@@ -300,15 +305,11 @@ namespace Xceed.Wpf.DataGrid
       {
         if( m_detailConfig != null )
         {
-          DefaultDetailConfiguration defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
+          var defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
           if( defaultDetailConfig != null )
-          {
             return defaultDetailConfig.AllowDetailToggle;
-          }
-          else
-          {
-            return m_detailConfig.AllowDetailToggle;
-          }
+
+          return m_detailConfig.AllowDetailToggle;
         }
 
         return m_dataGridControl.AllowDetailToggle;
@@ -323,13 +324,11 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        DataGridCollectionViewBase dataGridCollectionViewBase =
-                  this.ItemsSourceCollection as DataGridCollectionViewBase;
-
+        var dataGridCollectionViewBase = this.ItemsSourceCollection as DataGridCollectionViewBase;
         if( dataGridCollectionViewBase == null )
           return null;
 
-        return dataGridCollectionViewBase.DistinctValues;
+        return null;
       }
     }
 
@@ -341,15 +340,9 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        if( m_detailConfig != null )
-          return m_detailConfig.Columns;
-
-        return m_columns;
+        return m_columnManager.Columns;
       }
     }
-
-    private ColumnCollection m_columns; // = null, this variable will store the ColumnCollection only when
-    //the DataGridContext is used "desynchronized".
 
     #endregion
 
@@ -363,9 +356,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private CollectionView m_items;
+    private readonly CollectionView m_items;
 
-    #endregion Items Property
+    #endregion
 
     #region OriginalItems Property
 
@@ -465,7 +458,7 @@ namespace Xceed.Wpf.DataGrid
       this.SetCurrent( this.Items.GetItemAt( index ), null, index, this.CurrentColumn, false, isCancelable, synchronizeSelectionWithCurrent, trigger );
     }
 
-    private void SetCurrentItemHelper( object dataItem, int sourceDataItemIndex )
+    private void SetCurrentItem( object dataItem, int sourceDataItemIndex )
     {
       // This is called only for DataItem
       if( ( m_currentItem == dataItem ) && ( m_currentItemIndex == sourceDataItemIndex ) )
@@ -480,14 +473,17 @@ namespace Xceed.Wpf.DataGrid
 
     private void OnCurrentItemChanged()
     {
-      if( this.CurrentItemChanged != null )
-        this.CurrentItemChanged( this, EventArgs.Empty );
+      var handler = this.CurrentItemChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, EventArgs.Empty );
     }
 
     private object m_currentItem; // = null
     private int m_currentItemIndex = -1;
 
-    #endregion CurrentItem
+    #endregion
 
     #region DefaultGroupConfiguration Read-Only Property
 
@@ -497,15 +493,11 @@ namespace Xceed.Wpf.DataGrid
       {
         if( m_detailConfig != null )
         {
-          DefaultDetailConfiguration defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
+          var defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
           if( defaultDetailConfig != null )
-          {
             return defaultDetailConfig.DefaultGroupConfiguration;
-          }
-          else
-          {
-            return m_detailConfig.DefaultGroupConfiguration;
-          }
+
+          return m_detailConfig.DefaultGroupConfiguration;
         }
 
         return m_dataGridControl.DefaultGroupConfiguration;
@@ -521,11 +513,9 @@ namespace Xceed.Wpf.DataGrid
       get
       {
         if( m_detailConfig != null )
-        {
           return m_detailConfig.DetailConfigurations;
-        }
 
-        return m_dataGridControl.DetailConfigurations;
+        return null;
       }
     }
 
@@ -539,18 +529,14 @@ namespace Xceed.Wpf.DataGrid
       {
         if( m_detailConfig != null )
         {
-          DefaultDetailConfiguration defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
+          var defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
           if( defaultDetailConfig != null )
-          {
             return defaultDetailConfig.Footers;
-          }
-          else
-          {
-            return m_detailConfig.Footers;
-          }
+
+          return m_detailConfig.Footers;
         }
 
-        Xceed.Wpf.DataGrid.Views.ViewBase view = m_dataGridControl.GetView( false );
+        var view = m_dataGridControl.GetView();
         if( view == null )
           return new ObservableCollection<DataTemplate>();
 
@@ -573,8 +559,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private GroupLevelDescriptionCollection m_groupLevelDescriptions; // = null, this variable will store the GroupLevelDescriptions only when
-    //the DataGridContext is used "desynchronized".
+    private readonly GroupLevelDescriptionCollection m_groupLevelDescriptions; //null
 
     #endregion
 
@@ -586,29 +571,29 @@ namespace Xceed.Wpf.DataGrid
       {
         if( m_detailConfig != null )
         {
-          DefaultDetailConfiguration defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
+          var defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
           if( defaultDetailConfig != null )
-          {
             return defaultDetailConfig.GroupConfigurationSelector;
-          }
 
           return m_detailConfig.GroupConfigurationSelector;
         }
+
         return m_dataGridControl.GroupConfigurationSelector;
       }
     }
 
     private void OnGroupConfigurationSelectorChanged()
     {
-      if( this.GroupConfigurationSelectorChanged != null )
-      {
-        this.GroupConfigurationSelectorChanged( this, EventArgs.Empty );
-      }
+      var handler = this.GroupConfigurationSelectorChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, EventArgs.Empty );
     }
 
     internal event EventHandler GroupConfigurationSelectorChanged;
 
-    #endregion GroupConfigurationSelector Property
+    #endregion
 
     #region HasDetails Read-Only Property
 
@@ -616,17 +601,6 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        bool isDataGridCollectionView = ( this.ItemsSourceCollection is DataGridCollectionView );
-
-        if( !isDataGridCollectionView )
-          return false;
-
-        foreach( DetailConfiguration detailConfig in this.DetailConfigurations )
-        {
-          if( detailConfig.Visible )
-            return true;
-        }
-
         return false;
       }
     }
@@ -641,18 +615,14 @@ namespace Xceed.Wpf.DataGrid
       {
         if( m_detailConfig != null )
         {
-          DefaultDetailConfiguration defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
+          var defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
           if( defaultDetailConfig != null )
-          {
             return defaultDetailConfig.Headers;
-          }
-          else
-          {
-            return m_detailConfig.Headers;
-          }
+
+          return m_detailConfig.Headers;
         }
 
-        Xceed.Wpf.DataGrid.Views.ViewBase view = m_dataGridControl.GetView( false );
+        var view = m_dataGridControl.GetView();
         if( view == null )
           return new ObservableCollection<DataTemplate>();
 
@@ -668,25 +638,13 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return IsCurrentCache;
-      }
-    }
-
-    internal void SetIsCurrentHelper( bool value )
-    {
-      IsCurrentCache = value;
-    }
-
-    private bool IsCurrentCache
-    {
-      get
-      {
         return m_flags[ ( int )DataGridContextFlags.IsCurrent ];
       }
-      set
-      {
-        m_flags[ ( int )DataGridContextFlags.IsCurrent ] = value;
-      }
+    }
+
+    internal void SetIsCurrent( bool value )
+    {
+      m_flags[ ( int )DataGridContextFlags.IsCurrent ] = value;
     }
 
     #endregion
@@ -699,16 +657,13 @@ namespace Xceed.Wpf.DataGrid
       {
         if( m_detailConfig != null )
         {
-          DefaultDetailConfiguration defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
+          var defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
           if( defaultDetailConfig != null )
-          {
             return defaultDetailConfig.ItemContainerStyle;
-          }
-          else
-          {
-            return m_detailConfig.ItemContainerStyle;
-          }
+
+          return m_detailConfig.ItemContainerStyle;
         }
+
         return m_dataGridControl.ItemContainerStyle;
       }
     }
@@ -723,15 +678,11 @@ namespace Xceed.Wpf.DataGrid
       {
         if( m_detailConfig != null )
         {
-          DefaultDetailConfiguration defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
+          var defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
           if( defaultDetailConfig != null )
-          {
             return defaultDetailConfig.ItemContainerStyleSelector;
-          }
-          else
-          {
-            return m_detailConfig.ItemContainerStyleSelector;
-          }
+
+          return m_detailConfig.ItemContainerStyleSelector;
         }
 
         return m_dataGridControl.ItemContainerStyleSelector;
@@ -764,9 +715,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private SelectionItemCollection m_selectedItems;
+    private readonly SelectionItemCollection m_selectedItems;
 
-    #endregion SelectedItems Read-Only Property
+    #endregion
 
     #region SelectedItemRanges Read-Only Property
 
@@ -778,9 +729,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private SelectionItemRangeCollection m_selectedItemsRanges;
+    private readonly SelectionItemRangeCollection m_selectedItemsRanges;
 
-    #endregion SelectedItemRanges Read-Only Property
+    #endregion
 
     #region SelectedCellRanges Read-Only Property
 
@@ -792,9 +743,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private SelectionCellRangeCollection m_selectedCellRanges;
+    private readonly SelectionCellRangeCollection m_selectedCellRanges;
 
-    #endregion SelectedCellRanges Read-Only Property
+    #endregion
 
     #region SourceDetailConfiguration Read-Only Property
 
@@ -808,7 +759,7 @@ namespace Xceed.Wpf.DataGrid
 
     private readonly DetailConfiguration m_detailConfig;
 
-    #endregion SourceDetailConfiguration Read-Only Property
+    #endregion
 
     #region VisibleColumns Read-Only Property
 
@@ -816,15 +767,9 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        if( m_detailConfig != null )
-          return m_detailConfig.VisibleColumns;
-
-        return m_visibleColumns;
+        return m_columnManager.VisibleColumns;
       }
     }
-
-    private ReadOnlyColumnCollection m_visibleColumns; // = null, this variable will store the VisibleColumns only when
-    //the DataGridContext is used "desynchronized".
 
     #endregion
 
@@ -835,9 +780,7 @@ namespace Xceed.Wpf.DataGrid
       get
       {
         if( m_detailConfig != null )
-        {
           return m_detailConfig.AutoCreateForeignKeyConfigurations;
-        }
 
         return m_dataGridControl.AutoCreateForeignKeyConfigurations;
       }
@@ -853,22 +796,18 @@ namespace Xceed.Wpf.DataGrid
       {
         if( m_detailConfig != null )
         {
-          DefaultDetailConfiguration defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
+          var defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
           if( defaultDetailConfig != null )
-          {
             return defaultDetailConfig.MaxSortLevels;
-          }
-          else
-          {
-            return m_detailConfig.MaxSortLevels;
-          }
+
+          return m_detailConfig.MaxSortLevels;
         }
 
         return m_dataGridControl.MaxSortLevels;
       }
     }
 
-    #endregion MaxSortLevels Property
+    #endregion
 
     #region MaxGroupLevels Property
 
@@ -878,22 +817,18 @@ namespace Xceed.Wpf.DataGrid
       {
         if( m_detailConfig != null )
         {
-          DefaultDetailConfiguration defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
+          var defaultDetailConfig = this.GetDefaultDetailConfigurationForContext();
           if( defaultDetailConfig != null )
-          {
             return defaultDetailConfig.MaxGroupLevels;
-          }
-          else
-          {
-            return m_detailConfig.MaxGroupLevels;
-          }
+
+          return m_detailConfig.MaxGroupLevels;
         }
 
         return m_dataGridControl.MaxGroupLevels;
       }
     }
 
-    #endregion MaxGroupLevels Property
+    #endregion
 
     //--------- INTERNAL PROPERTIES ---------
 
@@ -919,9 +854,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private SelectedItemsStorage m_selectedItemsStore;
+    private readonly SelectedItemsStorage m_selectedItemsStore;
 
-    #endregion SelectedItemsStore Read-Only Property
+    #endregion
 
     #region SelectedItemsStore Read-Only Property
 
@@ -933,9 +868,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private SelectedCellsStorage m_selectedCellsStore;
+    private readonly SelectedCellsStorage m_selectedCellsStore;
 
-    #endregion SelectedItemsStore Read-Only Property
+    #endregion
 
     #region ColumnsByVisiblePosition Read-Only Property
 
@@ -943,15 +878,9 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        if( m_detailConfig != null )
-          return m_detailConfig.ColumnsByVisiblePosition;
-
-        return m_columnsByVisiblePosition;
+        return m_columnManager.ColumnsByVisiblePosition;
       }
     }
-
-    private HashedLinkedList<ColumnBase> m_columnsByVisiblePosition;// = null, this variable will store the ColumnsByVisiblePosition only when
-    //the DataGridContext is used "desynchronized".
 
     #endregion
 
@@ -962,7 +891,9 @@ namespace Xceed.Wpf.DataGrid
       get
       {
         if( m_columnStretchingManager == null )
+        {
           m_columnStretchingManager = new ColumnStretchingManager( this );
+        }
 
         return m_columnStretchingManager;
       }
@@ -978,8 +909,7 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        Row currentRow = this.CurrentRow;
-
+        var currentRow = this.CurrentRow;
         if( currentRow == null )
           return null;
 
@@ -987,7 +917,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion CurrentCell Property
+    #endregion
 
     #region CurrentRow Read-Only Property
 
@@ -1002,11 +932,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion CurrentRow Property
+    #endregion
 
     #region CustomItemContainerGenerator Read-Only Property
-
-    private CustomItemContainerGenerator m_generator;
 
     internal CustomItemContainerGenerator CustomItemContainerGenerator
     {
@@ -1027,6 +955,8 @@ namespace Xceed.Wpf.DataGrid
       m_generator = generator;
     }
 
+    private CustomItemContainerGenerator m_generator;
+
     #endregion
 
     #region InternalCurrentItem Read-Only Property
@@ -1039,105 +969,40 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    internal void SetInternalCurrentItemHelper( object value )
+    private void SetInternalCurrentItem( object value )
     {
       m_internalCurrentItem = value;
     }
 
-    private object m_internalCurrentItem; // = null
+    private object m_internalCurrentItem; //null
 
     #endregion
 
-    #region InternalCurrentItemNamesTree Read-Only Property
+    #region ItemsSourcePropertyDescriptions Property
 
-    internal object[] InternalCurrentItemNamesTree
+    internal PropertyDescriptionRouteDictionary ItemsSourcePropertyDescriptions
     {
       get
       {
-        return m_internalCurrentItemNamesTree;
+        return m_itemsSourcePropertyDescriptions;
       }
     }
 
-    private void SetInternalCurrentItemNamesTree( object[] namesTree )
-    {
-      m_internalCurrentItemNamesTree = namesTree;
-    }
-
-    private object[] m_internalCurrentItemNamesTree;
-
-    #endregion
-
-    #region ItemsSourceFieldDescriptors Property
-
-    internal Dictionary<string, ItemsSourceHelper.FieldDescriptor> ItemsSourceFieldDescriptors
-    {
-      get
-      {
-        if( m_detailConfig != null )
-        {
-          Dictionary<string, ItemsSourceHelper.FieldDescriptor> itemsSourceFieldDescriptors = m_detailConfig.ItemsSourceFieldDescriptors;
-
-          if( itemsSourceFieldDescriptors == null )
-          {
-            if( this.AreDetailsFlatten )
-            {
-              var rootDataGridContext = this.RootDataGridContext;
-              Debug.Assert( ( rootDataGridContext != null ) && ( this != rootDataGridContext ) );
-
-              itemsSourceFieldDescriptors = ItemsSourceHelper.GetFields( rootDataGridContext.ItemsSourceFieldDescriptors, this.ItemPropertyMap, m_items, null );
-            }
-            else
-            {
-              itemsSourceFieldDescriptors = ItemsSourceHelper.GetFields( m_items, null );
-            }
-
-            m_detailConfig.ItemsSourceFieldDescriptors = itemsSourceFieldDescriptors;
-          }
-
-          return itemsSourceFieldDescriptors;
-        }
-
-        //we are nescessarily in the master context in this case ( m_detailConfig == null ).
-        if( m_itemsSourceFieldDescriptors == null )
-          m_itemsSourceFieldDescriptors = ItemsSourceHelper.GetFields( m_dataGridControl.ItemsSource, null );
-
-        return m_itemsSourceFieldDescriptors;
-      }
-      set
-      {
-        if( m_detailConfig != null )
-        {
-          m_detailConfig.ItemsSourceFieldDescriptors = value;
-          return;
-        }
-
-        m_itemsSourceFieldDescriptors = value;
-      }
-    }
-
-    private Dictionary<string, ItemsSourceHelper.FieldDescriptor> m_itemsSourceFieldDescriptors;
+    private readonly PropertyDescriptionRouteDictionary m_itemsSourcePropertyDescriptions;
 
     #endregion
 
     #region ItemPropertyMap Internal Property
 
-    internal FieldNameMap ItemPropertyMap
+    internal DataGridItemPropertyMap ItemPropertyMap
     {
       get
       {
-        if( m_detailConfig != null )
-          return m_detailConfig.ItemPropertyMap;
-
-        if( m_itemPropertyMap == null )
-        {
-          m_itemPropertyMap = new FieldNameMap();
-        }
-
         return m_itemPropertyMap;
       }
     }
 
-    private FieldNameMap m_itemPropertyMap; //null
+    private readonly DataGridItemPropertyMap m_itemPropertyMap;
 
     #endregion
 
@@ -1210,9 +1075,7 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        DataGridCollectionViewBase dataGridCollectionViewBase =
-          this.ItemsSourceCollection as DataGridCollectionViewBase;
-
+        var dataGridCollectionViewBase = this.ItemsSourceCollection as DataGridCollectionViewBase;
         if( dataGridCollectionViewBase != null )
           return dataGridCollectionViewBase.DataGridSortDescriptions.SyncContext;
 
@@ -1221,7 +1084,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private SortDescriptionsSyncContext m_sortDescriptionsSyncContext; // = null
+    private readonly SortDescriptionsSyncContext m_sortDescriptionsSyncContext; //null
 
     #endregion
 
@@ -1232,13 +1095,12 @@ namespace Xceed.Wpf.DataGrid
       get
       {
         if( m_detailConfig != null )
-        {
           return m_detailConfig.DefaultDetailConfiguration;
-        }
 
         return m_dataGridControl.DefaultDetailConfiguration;
       }
     }
+
     #endregion
 
     #region ColumnVirtualizationManager Property
@@ -1247,8 +1109,7 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        ColumnVirtualizationManager columnVirtualizationManager = ColumnVirtualizationManager.GetColumnVirtualizationManager( this );
-
+        var columnVirtualizationManager = this.GetColumnVirtualizationManagerOrNull();
         if( columnVirtualizationManager == null )
         {
           columnVirtualizationManager = this.DataGridControl.GetView().CreateColumnVirtualizationManager( this );
@@ -1268,6 +1129,21 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
+    #region ColumnManagerRowConfiguration Read-Only Internal Property
+
+    internal ColumnManagerRowConfiguration ColumnManagerRowConfiguration
+    {
+      get
+      {
+        if( m_detailConfig != null )
+          return m_detailConfig.ColumnManagerRowConfiguration;
+
+        return this.DataGridControl.ColumnManagerRowConfiguration;
+      }
+    }
+
+    #endregion
+
     #region FixedHeaderFooterViewPortSize Property
 
     internal Size FixedHeaderFooterViewPortSize
@@ -1278,47 +1154,16 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
-        if( Size.Equals( m_fixedHeaderFooterViewPortSize, value ) == false )
-        {
-          m_fixedHeaderFooterViewPortSize = value;
-          this.NotifyPropertyChanged( "FixedHeaderFooterViewPortSize" );
-        }
+        if( Size.Equals( value, m_fixedHeaderFooterViewPortSize ) )
+          return;
+
+        m_fixedHeaderFooterViewPortSize = value;
+
+        this.OnPropertyChanged( "FixedHeaderFooterViewPortSize" );
       }
     }
 
     private Size m_fixedHeaderFooterViewPortSize = new Size();
-
-    #endregion
-
-    #region RecyclingManager Read-Only property
-
-    internal RecyclingManager RecyclingManager
-    {
-      get
-      {
-        RecyclingManager retval = null;
-
-        //If the DataGridContext belongs to a detail, then use the DetailConfiguration's RecyclingManager
-        DetailConfiguration sourceDetailConfiguration = this.SourceDetailConfiguration;
-        if( sourceDetailConfiguration != null )
-        {
-          retval = sourceDetailConfiguration.RecyclingManager;
-        }
-        else
-        {
-          //If the DataGridContext is from the Master context, then use and/or create the RecyclingManager
-          if( m_recyclingManager == null )
-          {
-            m_recyclingManager = new RecyclingManager();
-          }
-          retval = m_recyclingManager;
-        }
-
-        //RecyclingManager should never be null
-        Debug.Assert( retval != null );
-        return retval;
-      }
-    }
 
     #endregion
 
@@ -1345,8 +1190,7 @@ namespace Xceed.Wpf.DataGrid
         return dataGridContext.DataGridControl.IsDeleteCommandEnabled;
       }
 
-      DefaultDetailConfiguration defaultDetailConfig = dataGridContext.GetDefaultDetailConfigurationForContext();
-
+      var defaultDetailConfig = dataGridContext.GetDefaultDetailConfigurationForContext();
       if( defaultDetailConfig != null )
       {
         if( defaultDetailConfig.ReadLocalValue( DefaultDetailConfiguration.IsDeleteCommandEnabledProperty ) != DependencyProperty.UnsetValue )
@@ -1361,7 +1205,7 @@ namespace Xceed.Wpf.DataGrid
       return this.FindIsDeletedCommandEnabledAmbient( dataGridContext.ParentDataGridContext );
     }
 
-    #endregion IsDeleteCommandEnabled Property
+    #endregion
 
     #region SelectionChanged Event
 
@@ -1380,20 +1224,6 @@ namespace Xceed.Wpf.DataGrid
       if( ( selectionInfo.RemovedItems.Count == 0 ) && ( selectionInfo.AddedItems.Count == 0 ) )
         return;
 
-      if( ( AutomationPeer.ListenerExists( AutomationEvents.SelectionPatternOnInvalidated )
-        || AutomationPeer.ListenerExists( AutomationEvents.SelectionItemPatternOnElementSelected ) )
-        || ( AutomationPeer.ListenerExists( AutomationEvents.SelectionItemPatternOnElementAddedToSelection )
-          || AutomationPeer.ListenerExists( AutomationEvents.SelectionItemPatternOnElementRemovedFromSelection ) ) )
-      {
-        DataGridContextAutomationPeer peer = this.Peer;
-
-        if( peer != null )
-        {
-          peer.RaiseSelectionEvents(
-            ( IList<object> )selectionInfo.RemovedItems,
-            ( IList<object> )selectionInfo.AddedItems );
-        }
-      }
     }
 
     #endregion
@@ -1510,35 +1340,35 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region ItemsProperties/Column Auto update
+    #region ColumnManager Internal Property
 
-    private void HookToItemPropertiesChanged()
+    internal ColumnHierarchyManager ColumnManager
     {
-      DataGridCollectionViewBase itemsSourceCollection = this.ItemsSourceCollection as DataGridCollectionViewBase;
-
-      if( itemsSourceCollection != null )
+      get
       {
-        ItemPropertiesChangedEventManager.AddListener( itemsSourceCollection.ItemProperties, this );
+        return m_columnManager;
       }
     }
 
-    private void UnhookToItemPropertiesChanged( DataGridCollectionViewBase itemsSourceCollection )
+    private readonly ColumnHierarchyManager m_columnManager;
+
+    #endregion
+
+    #region CanIncreaseColumnWidth Property
+
+    internal bool CanIncreaseColumnWidth
     {
-      if( itemsSourceCollection != null )
+      get
       {
-        ItemPropertiesChangedEventManager.RemoveListener( itemsSourceCollection.ItemProperties, this );
+        return m_canIncreaseColumnWidth;
+      }
+      set
+      {
+        m_canIncreaseColumnWidth = value;
       }
     }
 
-    #endregion ItemsProperties/Column Auto update
-
-    #region IsSettingFixedColumnCount Property
-
-    internal bool IsSettingFixedColumnCount
-    {
-      get;
-      set;
-    }
+    private bool m_canIncreaseColumnWidth = true;
 
     #endregion
 
@@ -1567,11 +1397,9 @@ namespace Xceed.Wpf.DataGrid
         }
 
         var oldPosition = SelectionRangePoint.TryCreateFromCurrent( this );
-        var newPosition = new SelectionRangePoint( this, item, dataRowIndex, newCurrentColumn.VisiblePosition );
+        var newPosition = SelectionRangePoint.TryCreateRangePoint( this, item, dataRowIndex, newCurrentColumn.VisiblePosition );
 
-        m_dataGridControl.SelectionChangerManager.UpdateSelection(
-          oldPosition,newPosition, true, rowIsBeingEdited,
-          SelectionManager.UpdateSelectionSource.Navigation );
+        m_dataGridControl.SelectionChangerManager.UpdateSelection( oldPosition, newPosition, true, rowIsBeingEdited, SelectionManager.UpdateSelectionSource.Navigation );
       }
     }
 
@@ -1615,57 +1443,42 @@ namespace Xceed.Wpf.DataGrid
 
     public bool IsGroupExpanded( CollectionViewGroup group )
     {
-      return this.CustomItemContainerGenerator.IsGroupExpanded( group );
+      return ( this.CustomItemContainerGenerator.IsGroupExpanded( group ) == true );
     }
 
-    internal bool IsGroupExpandedCore( CollectionViewGroup group, bool recurseDetails )
+    internal bool? IsGroupExpanded( CollectionViewGroup group, bool recurseDetails )
     {
-      return this.CustomItemContainerGenerator.IsGroupExpandedCore( group, recurseDetails );
+      return this.CustomItemContainerGenerator.IsGroupExpanded( group, recurseDetails );
     }
 
-    public void ToggleGroupExpansion( CollectionViewGroup group )
+    public bool ToggleGroupExpansion( CollectionViewGroup group )
     {
-      this.CustomItemContainerGenerator.ToggleGroupExpansion( group );
+      return this.CustomItemContainerGenerator.ToggleGroupExpansion( group );
     }
 
-    public void ExpandGroup( CollectionViewGroup group )
+    public bool ExpandGroup( CollectionViewGroup group )
     {
-      this.CustomItemContainerGenerator.ExpandGroup( group );
+      return this.CustomItemContainerGenerator.ExpandGroup( group );
     }
 
-    internal bool ExpandGroupCore( CollectionViewGroup group, bool recurseDetails )
+    internal bool ExpandGroup( CollectionViewGroup group, bool recurseDetails )
     {
-      return this.CustomItemContainerGenerator.ExpandGroupCore( group, recurseDetails );
+      return this.CustomItemContainerGenerator.ExpandGroup( group, recurseDetails );
     }
 
-    public void CollapseGroup( CollectionViewGroup group )
+    public bool CollapseGroup( CollectionViewGroup group )
     {
-      this.CustomItemContainerGenerator.CollapseGroup( group );
+      return this.CustomItemContainerGenerator.CollapseGroup( group );
     }
 
-    internal bool CollapseGroupCore( CollectionViewGroup group, bool recurseDetails )
+    internal bool CollapseGroup( CollectionViewGroup group, bool recurseDetails )
     {
-      return this.CustomItemContainerGenerator.CollapseGroupCore( group, recurseDetails );
+      return this.CustomItemContainerGenerator.CollapseGroup( group, recurseDetails );
     }
 
-    internal bool AreDetailsExpanded( object dataItem )
+    public bool AreDetailsExpanded( object dataItem )
     {
       return this.CustomItemContainerGenerator.AreDetailsExpanded( dataItem );
-    }
-
-    internal void CollapseDetails( object dataItem )
-    {
-      this.CustomItemContainerGenerator.CollapseDetails( dataItem );
-    }
-
-    internal void ExpandDetails( object dataItem )
-    {
-      this.CustomItemContainerGenerator.ExpandDetails( dataItem );
-    }
-
-    internal void ToggleDetailExpansion( object dataItem )
-    {
-      this.CustomItemContainerGenerator.ToggleDetails( dataItem );
     }
 
     public Group GetGroupFromCollectionViewGroup( CollectionViewGroup collectionViewGroup )
@@ -1683,7 +1496,7 @@ namespace Xceed.Wpf.DataGrid
       if( item == null )
         return null;
 
-      DependencyObject container = null;
+      var container = default( DependencyObject );
 
       if( ( m_detailConfig == null ) && ( item is DataTemplate ) )
       {
@@ -1693,7 +1506,9 @@ namespace Xceed.Wpf.DataGrid
       }
 
       if( container == null )
+      {
         container = this.CustomItemContainerGenerator.ContainerFromItem( item );
+      }
 
       return container;
     }
@@ -1743,7 +1558,7 @@ namespace Xceed.Wpf.DataGrid
       //For the master level, before interrogating the Generator, I need to check for the items presence in the Fixed regions.
       if( ( m_detailConfig == null ) && ( dataTemplate != null ) )
       {
-        Xceed.Wpf.DataGrid.Views.ViewBase view = m_dataGridControl.GetView();
+        Views.ViewBase view = m_dataGridControl.GetView();
 
         //Fixed header cannot have a Parent Group.
         if( view.FixedHeaders.Contains( dataTemplate ) == true )
@@ -1752,7 +1567,6 @@ namespace Xceed.Wpf.DataGrid
         //Fixed header cannot have a Parent Group.
         if( view.FixedFooters.Contains( dataTemplate ) == true )
           return null;
-
       }
 
       if( this.CustomItemContainerGenerator.IsInUse == true )
@@ -1798,39 +1612,49 @@ namespace Xceed.Wpf.DataGrid
       if( column == null )
         throw new ArgumentNullException( "column" );
 
-      string xPath = null;
-      PropertyPath propertyPath = null;
+      var xPath = default( string );
+      var propertyPath = default( PropertyPath );
 
       // Disable warning for DisplayMemberBinding when internaly used
 #pragma warning disable 618
-
-      Binding displayMemberBinding = column.DisplayMemberBinding as Binding;
-
+      var displayMemberBinding = column.DisplayMemberBinding as Binding;
 #pragma warning restore 618
 
       if( displayMemberBinding == null )
       {
-        bool isBoundToDataGridUnboundItemProperty;
-
-        displayMemberBinding = ItemsSourceHelper.AutoCreateDisplayMemberBinding(
-          column, this, dataItem, out isBoundToDataGridUnboundItemProperty );
+        displayMemberBinding = ItemsSourceHelper.CreateDefaultBinding(
+                                 ItemsSourceHelper.CreateOrGetPropertyDescriptionFromColumn( this, column, dataItem.GetType() ) );
       }
 
-      if( displayMemberBinding != null )
-      {
-        xPath = displayMemberBinding.XPath;
-        propertyPath = displayMemberBinding.Path;
-      }
-      else
-      {
+      if( displayMemberBinding == null )
         throw new DataGridInternalException( "DisplayMemberBinding is null.", m_dataGridControl );
-      }
 
-      IValueConverter converter = new Xceed.Wpf.DataGrid.Converters.SourceDataConverter( ItemsSourceHelper.IsItemSupportingDBNull( dataItem ), CultureInfo.InvariantCulture );
+      xPath = displayMemberBinding.XPath;
+      propertyPath = displayMemberBinding.Path;
 
-      BindingPathValueExtractor extractorForRead = new BindingPathValueExtractor( xPath, propertyPath, false, typeof( object ), converter, null, CultureInfo.InvariantCulture );
+      var converter = new Xceed.Wpf.DataGrid.Converters.SourceDataConverter( ItemsSourceHelper.IsItemSupportingDBNull( dataItem ), CultureInfo.InvariantCulture );
 
-      return extractorForRead;
+      return new BindingPathValueExtractor( xPath, propertyPath, false, typeof( object ), converter, null, CultureInfo.InvariantCulture );
+    }
+
+    public IDisposable DeferColumnsUpdate()
+    {
+      return ColumnHierarchyManagerHelper.DeferColumnsUpdate( this );
+    }
+
+    public bool MoveColumnBefore( ColumnBase current, ColumnBase next )
+    {
+      return ColumnHierarchyManagerHelper.MoveColumnBefore( this, current, next );
+    }
+
+    public bool MoveColumnAfter( ColumnBase current, ColumnBase previous )
+    {
+      return ColumnHierarchyManagerHelper.MoveColumnAfter( this, current, previous );
+    }
+
+    public bool MoveColumnUnder( ColumnBase current, ColumnBase parent )
+    {
+      return ColumnHierarchyManagerHelper.MoveColumnUnder( this, current, parent );
     }
 
     //---------- INTERNAL METHODS -----------
@@ -1838,22 +1662,6 @@ namespace Xceed.Wpf.DataGrid
     internal IDisposable DeferRestoreState()
     {
       return new DeferRestoreStateDisposable( this );
-    }
-
-    internal void SetAssociatedAutomationPeer()
-    {
-      DataGridContextAutomationPeer parentAutomationPeer = m_parentDataGridContext.Peer;
-
-      if( parentAutomationPeer == null )
-        return;
-
-      DataGridContextAutomationPeer automationPeer = parentAutomationPeer.GetDetailPeer( m_parentItem, m_detailConfig );
-
-      if( automationPeer != null )
-      {
-        this.Peer = automationPeer;
-        automationPeer.DataGridContext = this;
-      }
     }
 
     internal void UpdatePublicSelectionProperties()
@@ -1900,42 +1708,96 @@ namespace Xceed.Wpf.DataGrid
 
     internal void GetFirstSelectedItemFromStore( bool checkCellsStore, out int selectedItemIndex, out object selectedItem, out int selectedColumnIndex )
     {
-      SelectionRangeWithItems newSelectedRangeWithItems = ( m_selectedItemsStore.Count == 0 ) ?
-        SelectionRangeWithItems.Empty : m_selectedItemsStore[ 0 ];
+      var newSelectedRangeWithItems = ( m_selectedItemsStore.Count == 0 ) ? SelectionRangeWithItems.Empty : m_selectedItemsStore[ 0 ];
 
-      if( newSelectedRangeWithItems.IsEmpty )
+      try
       {
-        if( checkCellsStore )
+        if( newSelectedRangeWithItems.IsEmpty )
         {
-          SelectionCellRangeWithItems newSelectionCellRangeWithItems = ( m_selectedCellsStore.Count == 0 ) ?
-            SelectionCellRangeWithItems.Empty : m_selectedCellsStore[ 0 ];
+          if( checkCellsStore )
+          {
+            var newSelectionCellRangeWithItems = ( m_selectedCellsStore.Count == 0 ) ? SelectionCellRangeWithItems.Empty : m_selectedCellsStore[ 0 ];
 
-          if( newSelectionCellRangeWithItems.ItemRange.IsEmpty )
+            if( newSelectionCellRangeWithItems.ItemRange.IsEmpty )
+            {
+              selectedColumnIndex = -1;
+              selectedItemIndex = -1;
+              selectedItem = null;
+            }
+            else
+            {
+              selectedColumnIndex = newSelectionCellRangeWithItems.ColumnRange.StartIndex;
+              selectedItemIndex = newSelectionCellRangeWithItems.ItemRange.StartIndex;
+              selectedItem = newSelectionCellRangeWithItems.ItemRangeWithItems.GetItem( this, 0 );
+            }
+          }
+          else
           {
             selectedColumnIndex = -1;
             selectedItemIndex = -1;
             selectedItem = null;
           }
-          else
-          {
-            selectedColumnIndex = newSelectionCellRangeWithItems.ColumnRange.StartIndex;
-            selectedItemIndex = newSelectionCellRangeWithItems.ItemRange.StartIndex;
-            selectedItem = newSelectionCellRangeWithItems.ItemRangeWithItems.GetItem( this, 0 );
-          }
         }
         else
         {
           selectedColumnIndex = -1;
-          selectedItemIndex = -1;
-          selectedItem = null;
+          selectedItemIndex = newSelectedRangeWithItems.Range.StartIndex;
+          selectedItem = newSelectedRangeWithItems.GetItem( this, 0 );
         }
       }
-      else
+      catch( ArgumentOutOfRangeException )
       {
         selectedColumnIndex = -1;
-        selectedItemIndex = newSelectedRangeWithItems.Range.StartIndex;
-        selectedItem = newSelectedRangeWithItems.GetItem( this, 0 );
+        selectedItemIndex = -1;
+        selectedItem = null;
       }
+    }
+
+    internal ColumnBase GetMatchingColumn( DataGridContext sourceContext, ColumnBase sourceColumn )
+    {
+      if( ( sourceContext == null ) || ( sourceColumn == null ) )
+        return null;
+
+      if( sourceContext == this )
+        return sourceColumn;
+
+      var collectionView = sourceContext.ItemsSourceCollection as DataGridCollectionViewBase;
+      if( collectionView == null )
+        return null;
+
+      var sourceItemProperty = ItemsSourceHelper.GetItemPropertyFromProperty( collectionView.ItemProperties, sourceColumn.FieldName );
+      if( sourceItemProperty == null )
+        return null;
+
+      var masterContext = sourceContext.RootDataGridContext;
+      var masterItemProperty = sourceItemProperty;
+
+      if( masterContext != sourceContext )
+      {
+        if( !sourceContext.ItemPropertyMap.TryGetMasterItemProperty( sourceItemProperty, out masterItemProperty ) )
+          return null;
+      }
+
+      Debug.Assert( masterItemProperty != null );
+      if( masterItemProperty == null )
+        return null;
+
+      var currentItemProperty = masterItemProperty;
+      if( masterContext != this )
+      {
+        if( !this.ItemPropertyMap.TryGetDetailItemProperty( masterItemProperty, out currentItemProperty ) )
+          return null;
+      }
+
+      Debug.Assert( currentItemProperty != null );
+      if( currentItemProperty == null )
+        return null;
+
+      var columnName = PropertyRouteParser.Parse( currentItemProperty );
+      if( string.IsNullOrEmpty( columnName ) )
+        return null;
+
+      return this.Columns[ columnName ];
     }
 
     internal ColumnBase GetDefaultImageColumn()
@@ -1945,61 +1807,71 @@ namespace Xceed.Wpf.DataGrid
         if( this.Items.Count > 0 )
         {
           this.DefaultImageColumnDetermined = true;
-          ItemsSourceHelper.FieldDescriptor fieldDescriptor;
-          object dataItem = this.Items.GetItemAt( 0 );
 
-          foreach( ColumnBase visibleColumn in this.VisibleColumns )
+          var dataItem = this.Items.GetItemAt( 0 );
+
+          foreach( var column in this.VisibleColumns )
           {
-            if( this.ItemsSourceFieldDescriptors.TryGetValue( visibleColumn.FieldName, out fieldDescriptor ) )
+            var key = PropertyRouteParser.Parse( column.FieldName );
+            if( key == null )
+              continue;
+
+            var propertyDescriptionRoute = default( PropertyDescriptionRoute );
+            if( !m_itemsSourcePropertyDescriptions.TryGetValue( key, out propertyDescriptionRoute ) )
+              continue;
+
+            var propertyDescription = propertyDescriptionRoute.Current;
+            var dataType = propertyDescription.DataType;
+
+            if( typeof( ImageSource ).IsAssignableFrom( dataType ) )
             {
-              if( typeof( ImageSource ).IsAssignableFrom( fieldDescriptor.DataType ) )
-              {
-                m_defaultImageColumn = visibleColumn;
-                break;
-              }
-              else if( ( typeof( byte[] ).IsAssignableFrom( fieldDescriptor.DataType ) ) ||
-                       ( typeof( System.Drawing.Image ).IsAssignableFrom( fieldDescriptor.DataType ) ) )
-              {
-                Xceed.Wpf.DataGrid.Converters.ImageConverter converter = new Xceed.Wpf.DataGrid.Converters.ImageConverter();
-                object convertedValue = null;
-                object rawValue = null;
+              m_defaultImageColumn = column;
+              break;
+            }
+            else if( ( typeof( byte[] ).IsAssignableFrom( dataType ) ) ||
+                     ( typeof( System.Drawing.Image ).IsAssignableFrom( dataType ) ) )
+            {
+              var converter = new Xceed.Wpf.DataGrid.Converters.ImageConverter();
+              var convertedValue = default( object );
+              var rawValue = default( object );
 
-                try
+              try
+              {
+                if( propertyDescription.PropertyDescriptor == null )
                 {
-                  if( fieldDescriptor.PropertyDescriptor == null )
+                  var dataRow = dataItem as System.Data.DataRow;
+                  if( dataRow == null )
                   {
-                    System.Data.DataRow dataRow = dataItem as System.Data.DataRow;
-
-                    if( dataRow == null )
+                    var dataRowView = dataItem as System.Data.DataRowView;
+                    if( dataRowView != null )
                     {
-                      System.Data.DataRowView dataRowView = dataItem as System.Data.DataRowView;
-
-                      if( dataRowView != null )
-                        rawValue = dataRowView[ fieldDescriptor.Name ];
-                    }
-                    else
-                    {
-                      rawValue = dataRow[ fieldDescriptor.Name ];
+                      rawValue = dataRowView[ propertyDescription.Name ];
                     }
                   }
                   else
                   {
-                    rawValue = fieldDescriptor.PropertyDescriptor.GetValue( dataItem );
+                    rawValue = dataRow[ propertyDescription.Name ];
                   }
-
-                  if( rawValue != null )
-                    convertedValue = converter.Convert( rawValue, typeof( ImageSource ), null, System.Globalization.CultureInfo.CurrentCulture );
                 }
-                catch( NotSupportedException )
+                else
                 {
-                  //suppress the exception, the byte[] is not an image. convertedValue will remain null
+                  rawValue = propertyDescription.PropertyDescriptor.GetValue( dataItem );
                 }
 
-                if( convertedValue != null )
+                if( rawValue != null )
                 {
-                  m_defaultImageColumn = visibleColumn;
-                  break;
+                  convertedValue = converter.Convert( rawValue, typeof( ImageSource ), null, CultureInfo.CurrentCulture );
                 }
+              }
+              catch( NotSupportedException )
+              {
+                //suppress the exception, the byte[] is not an image. convertedValue will remain null
+              }
+
+              if( convertedValue != null )
+              {
+                m_defaultImageColumn = column;
+                break;
               }
             }
           }
@@ -2093,57 +1965,6 @@ namespace Xceed.Wpf.DataGrid
       return this.CustomItemContainerGenerator.GetGroupFromItem( dataItem );
     }
 
-    internal static void HandleColumnsCollectionChanged(
-      NotifyCollectionChangedEventArgs e,
-      ColumnCollection columns,
-      ReadOnlyColumnCollection visibleColumns,
-      HashedLinkedList<ColumnBase> columnsByVisiblePosition )
-    {
-      if( columns == null )
-        throw new ArgumentNullException( "columns" );
-
-      if( visibleColumns == null )
-        throw new ArgumentNullException( "visibleColumns" );
-
-      if( columnsByVisiblePosition == null )
-        throw new ArgumentNullException( "columnsByVisiblePosition" );
-
-      bool needGeneratorHardReset = false;
-
-      if( e.OldItems != null )
-      {
-        if( ( e.Action == NotifyCollectionChangedAction.Remove )
-          || ( e.Action == NotifyCollectionChangedAction.Replace )
-          || ( e.Action == NotifyCollectionChangedAction.Reset ) )
-        {
-          if( e.OldItems.Count > 0 )
-            needGeneratorHardReset = true;
-        }
-      }
-
-      DataGridContext.UpdateVisibleColumns( columns, visibleColumns, columnsByVisiblePosition, e.NewItems, null );
-
-      // When a column is removed, we need to clear the Generator from every container to avoid problem
-      // when a Column with the same field name is removed thant reinserted with 2 different instances
-      if( needGeneratorHardReset )
-      {
-        DataGridControl dataGridControl = columns.DataGridControl;
-        if( dataGridControl != null )
-        {
-          if( dataGridControl.CustomItemContainerGenerator != null )
-          {
-            dataGridControl.CustomItemContainerGenerator.RemoveAllAndNotify();
-          }
-
-          // We only reset the fixed region if the column is part of the master context 
-          if( ( dataGridControl.DataGridContext != null ) && ( dataGridControl.DataGridContext.SourceDetailConfiguration == null ) )
-          {
-            dataGridControl.ResetFixedRegions();
-          }
-        }
-      }
-    }
-
     internal IDisposable SetQueueBringIntoViewRestrictions( AutoScrollCurrentItemSourceTriggers trigger )
     {
       return m_dataGridControl.SetQueueBringIntoViewRestrictions( trigger );
@@ -2161,9 +1982,7 @@ namespace Xceed.Wpf.DataGrid
 
     internal void NotifyItemsSourceChanged()
     {
-      this.NotifyPropertyChanged( "HasDetails" );
-
-      m_dataGridControl.QueueDataGridContextPeerChlidrenRefresh( this );
+      this.OnPropertyChanged( "HasDetails" );
     }
 
     internal void DelayBringIntoViewAndFocusCurrent( AutoScrollCurrentItemSourceTriggers trigger )
@@ -2203,42 +2022,37 @@ namespace Xceed.Wpf.DataGrid
         //set the flag that indicates that we are already processing a SetCurrent
         m_dataGridControl.IsSetCurrentInProgress = true;
 
-        DataGridContext oldCurrentContext = m_dataGridControl.CurrentContext;
-        DataGridContext newCurrentContext = this;
+        var oldCurrentContext = m_dataGridControl.CurrentContext;
+        var newCurrentContext = this;
 
         //store the previous public current item, so I can detect a change and lift the PropertyChanged for this properties
-        object oldCurrentItem = oldCurrentContext.InternalCurrentItem;
-        object oldPublicCurrentItem = oldCurrentContext.CurrentItem;
-        ColumnBase oldCurrentColumn = oldCurrentContext.CurrentColumn;
-        Row oldCurrentRow = oldCurrentContext.CurrentRow;
+        var oldCurrentItem = oldCurrentContext.InternalCurrentItem;
+        var oldPublicCurrentItem = oldCurrentContext.CurrentItem;
+        var oldCurrentColumn = oldCurrentContext.CurrentColumn;
+        var oldCurrentRow = oldCurrentContext.CurrentRow;
 
-        //if item is not realized or if the item passed is not a Data Item (header, footer or group), then the 
-        //old current cell will be null
-        Cell oldCurrentCell = ( oldCurrentRow == null )
-          ? null : oldCurrentRow.Cells[ oldCurrentColumn ];
+        //if item is not realized or if the item passed is not a Data Item (header, footer or group), then the old current cell will be null
+        var oldCurrentCell = ( oldCurrentRow == null ) ? null : oldCurrentRow.Cells[ oldCurrentColumn ];
 
-        Row newCurrentRow = ( containerRow != null )
-          ? containerRow : Row.FromContainer( this.GetContainerFromItem( item ) );
+        var newCurrentRow = ( containerRow != null ) ? containerRow : Row.FromContainer( this.GetContainerFromItem( item ) );
+        var newCurrentCell = default( Cell );
 
         //verify that set Current is not called on a column that cannot be current
         if( newCurrentRow != null )
         {
-          if( ( column != null )
-            && ( ( ( column.ReadOnly )
-            && ( !newCurrentRow.Cells[ column ].GetCalculatedCanBeCurrent() ) ) ) )
+          newCurrentCell = newCurrentRow.Cells[ column ];
+          if( ( column != null ) && column.ReadOnly && ( newCurrentCell != null ) && !newCurrentCell.GetCalculatedCanBeCurrent() )
             throw new DataGridException( "SetCurrent cannot be invoked if the column cannot be current.", m_dataGridControl );
         }
 
-        //if item is not realized or if the item passed is not a Data Item (header, footer or group), then the 
-        //new current cell will be null
-        Cell newCurrentCell = ( newCurrentRow == null ) ? null : newCurrentRow.Cells[ column ];
-        bool currentCellChanged = ( newCurrentCell != oldCurrentCell );
+        var currentCellChanged = ( newCurrentCell != oldCurrentCell );
 
-        if( ( ( item != oldCurrentItem ) || ( oldCurrentContext != newCurrentContext ) )
-          && ( oldCurrentRow != null ) )
+        if( ( ( item != oldCurrentItem ) || ( oldCurrentContext != newCurrentContext ) ) && ( oldCurrentRow != null ) )
         {
           if( Row.IsCellEditorDisplayConditionsSet( oldCurrentRow, CellEditorDisplayConditions.RowIsCurrent ) )
+          {
             oldCurrentRow.RemoveDisplayEditorMatchingCondition( CellEditorDisplayConditions.RowIsCurrent );
+          }
 
           oldCurrentRow.SetIsCurrent( false );
 
@@ -2251,29 +2065,31 @@ namespace Xceed.Wpf.DataGrid
           {
             //restore the Cell and the Row's IsCurrent Flag
             if( oldCurrentCell != null )
+            {
               oldCurrentCell.SetIsCurrent( true );
+            }
 
             oldCurrentRow.SetIsCurrent( true );
             throw;
           }
         }
 
-        // For this if, the assumption is that current item hasn't changed, but current column does... (previous if will have 
-        // caught the case where current item changed ).
+        //For this if, the assumption is that current item hasn't changed, but current column has... (previous if will have caught the case where current item changed).
 
         //if the currentCell has changed and the old current cell still exists.
         if( ( currentCellChanged ) && ( oldCurrentCell != null ) )
         {
           //clear the CellIsCurrent editor display conditions
           if( Cell.IsCellEditorDisplayConditionsSet( oldCurrentCell, CellEditorDisplayConditions.CellIsCurrent ) )
+          {
             oldCurrentCell.RemoveDisplayEditorMatchingCondition( CellEditorDisplayConditions.CellIsCurrent );
+          }
 
           oldCurrentCell.SetIsCurrent( false );
 
           try
           {
-            //cancel any ongoing editing on the cell. (this has no effect if row or cell is not being edited.
-            //this line can throw but no action is to be done.
+            //cancel any ongoing editing on the cell. (this has no effect if row or cell is not being edited. This line can throw but no action is to be done.
             oldCurrentCell.EndEdit();
           }
           catch( DataGridException )
@@ -2283,10 +2099,9 @@ namespace Xceed.Wpf.DataGrid
           }
         }
 
-        if( ( item != oldCurrentItem )
-          || ( oldCurrentContext != newCurrentContext ) )
+        if( ( item != oldCurrentItem ) || ( oldCurrentContext != newCurrentContext ) )
         {
-          DataGridCurrentChangingEventArgs currentChangingEventArgs = new DataGridCurrentChangingEventArgs( oldCurrentContext, oldCurrentItem, newCurrentContext, item, isCancelable );
+          var currentChangingEventArgs = new DataGridCurrentChangingEventArgs( oldCurrentContext, oldCurrentItem, newCurrentContext, item, isCancelable );
           m_dataGridControl.RaiseCurrentChanging( currentChangingEventArgs );
 
           if( isCancelable && currentChangingEventArgs.Cancel )
@@ -2295,7 +2110,9 @@ namespace Xceed.Wpf.DataGrid
             if( oldCurrentRow != null )
             {
               if( oldCurrentCell != null )
+              {
                 oldCurrentCell.SetIsCurrent( true );
+              }
 
               oldCurrentRow.SetIsCurrent( true );
             }
@@ -2307,12 +2124,11 @@ namespace Xceed.Wpf.DataGrid
         //If they are different, clean the previously current DataGridContext
         if( oldCurrentContext != newCurrentContext )
         {
-          oldCurrentContext.SetCurrentItemHelper( null, -1 );
-          oldCurrentContext.SetInternalCurrentItemHelper( null );
-          oldCurrentContext.SetInternalCurrentItemNamesTree( null );
+          oldCurrentContext.SetCurrentItem( null, -1 );
+          oldCurrentContext.SetInternalCurrentItem( null );
           //preserve current column on the old DataGridContext
 
-          oldCurrentContext.SetIsCurrentHelper( false );
+          oldCurrentContext.SetIsCurrent( false );
         }
 
         if( !sourceDataItemIndex.HasValue )
@@ -2321,35 +2137,24 @@ namespace Xceed.Wpf.DataGrid
         }
 
         // All the stuff that can throw is done
-        newCurrentContext.SetInternalCurrentItemHelper( item );
-        newCurrentContext.SetIsCurrentHelper( true );
-
-        if( ( item != null ) && ( item.GetType() == typeof( GroupHeaderFooterItem ) ) )
-        {
-          GroupHeaderFooterItem groupHeaderItem = ( GroupHeaderFooterItem )item;
-          newCurrentContext.SetInternalCurrentItemNamesTree( newCurrentContext.CustomItemContainerGenerator.GetNamesTreeFromGroup( groupHeaderItem.Group ) );
-        }
-        else
-        {
-          newCurrentContext.SetInternalCurrentItemNamesTree( null );
-        }
+        newCurrentContext.SetInternalCurrentItem( item );
+        newCurrentContext.SetIsCurrent( true );
 
         // change the CurrentRow and CurentColumn
         if( ( item != null ) && ( sourceDataItemIndex.Value != -1 ) )
         {
-          newCurrentContext.SetCurrentItemHelper( item, sourceDataItemIndex.Value );
+          newCurrentContext.SetCurrentItem( item, sourceDataItemIndex.Value );
         }
         else
         {
-          newCurrentContext.SetCurrentItemHelper( null, -1 );
+          newCurrentContext.SetCurrentItem( null, -1 );
         }
 
         newCurrentContext.SetCurrentColumnHelper( column );
         m_dataGridControl.SetCurrentDataGridContextHelper( this );
 
         // We must refetch the container for the current item in case EndEdit triggers a reset on the 
-        // CustomItemContainerGenerator and remap this item to a container other than the one previously
-        // fetched
+        // CustomItemContainerGenerator and remap this item to a container other than the one previously fetched
         newCurrentRow = Row.FromContainer( newCurrentContext.GetContainerFromItem( item ) );
         newCurrentCell = ( newCurrentRow == null ) ? null : newCurrentRow.Cells[ column ];
 
@@ -2362,7 +2167,9 @@ namespace Xceed.Wpf.DataGrid
 
           //update the RowIsCurrent display condition
           if( Row.IsCellEditorDisplayConditionsSet( newCurrentRow, CellEditorDisplayConditions.RowIsCurrent ) )
+          {
             newCurrentRow.SetDisplayEditorMatchingCondition( CellEditorDisplayConditions.RowIsCurrent );
+          }
 
           //Update the IsCurrent flag
           newCurrentRow.SetIsCurrent( true );
@@ -2370,15 +2177,13 @@ namespace Xceed.Wpf.DataGrid
           //if the current row changed, make sure to check the appropriate edition triggers.
           if( currentRowChanged == true )
           {
-            //if enterEditTriggers tells to enter edition mode AND no current cell is going to be set on the new current row
-            if( ( newCurrentRow.IsEditTriggerSet( EditTriggers.RowIsCurrent ) )
-              && ( newCurrentCell == null ) )
+            //if EditTriggers tells to enter editing mode AND no current cell is set on the new current row
+            if( ( newCurrentRow.IsEditTriggerSet( EditTriggers.RowIsCurrent ) ) && ( newCurrentCell == null ) )
             {
               //To prevent re-entrancy of the SetCurrent fonction (since Row.BeginEdit will call Cell.BeginEdit which will call SetCurrent if not current already)
               if( this.VisibleColumns.Count > 0 )
               {
-                int firstFocusableColumn = NavigationHelper.GetFirstVisibleFocusableColumnIndex( this, newCurrentRow );
-
+                var firstFocusableColumn = NavigationHelper.GetFirstVisibleFocusableColumnIndex( this, newCurrentRow );
                 if( firstFocusableColumn < 0 )
                   throw new DataGridException( "Trying to edit while no cell is focusable. ", m_dataGridControl );
 
@@ -2395,7 +2200,9 @@ namespace Xceed.Wpf.DataGrid
         {
           //update the CellIsCurrent display condition
           if( Cell.IsCellEditorDisplayConditionsSet( newCurrentCell, CellEditorDisplayConditions.CellIsCurrent ) )
+          {
             newCurrentCell.SetDisplayEditorMatchingCondition( CellEditorDisplayConditions.CellIsCurrent );
+          }
 
           newCurrentCell.SetIsCurrent( true );
 
@@ -2436,14 +2243,21 @@ namespace Xceed.Wpf.DataGrid
           {
             if( m_dataGridControl.IsBringIntoViewAllowed( trigger ) )
             {
-              if( newCurrentCell != null )
+              if( !m_dataGridControl.IsBringIntoViewDelayed )
               {
-                newCurrentCell.BringIntoView();
+                if( newCurrentCell != null )
+                {
+                  newCurrentCell.BringIntoView();
+                }
+                else
+                {
+                  // Ensure the item is visible visible
+                  newCurrentRow.BringIntoView();
+                }
               }
               else
               {
-                // Ensure the item is visible visible
-                newCurrentRow.BringIntoView();
+                m_dataGridControl.DelayBringIntoViewAndFocusCurrent( trigger );
               }
             }
 
@@ -2494,20 +2308,23 @@ namespace Xceed.Wpf.DataGrid
           }
           finally
           {
-            m_dataGridControl.SelectionChangerManager.End( false, false, false );
+            m_dataGridControl.SelectionChangerManager.End( false, false );
           }
         }
 
         if( this.CurrentItem != oldPublicCurrentItem )
-          this.NotifyPropertyChanged( "CurrentItem" );
+        {
+          this.OnPropertyChanged( "CurrentItem" );
+        }
 
         if( column != oldCurrentColumn )
-          this.NotifyPropertyChanged( "CurrentColumn" );
-
-        if( ( item != oldCurrentItem )
-          || ( oldCurrentContext != newCurrentContext ) )
         {
-          DataGridCurrentChangedEventArgs currentChangedEventArgs = new DataGridCurrentChangedEventArgs( oldCurrentContext, oldCurrentItem, newCurrentContext, item );
+          this.OnPropertyChanged( "CurrentColumn" );
+        }
+
+        if( ( item != oldCurrentItem ) || ( oldCurrentContext != newCurrentContext ) )
+        {
+          var currentChangedEventArgs = new DataGridCurrentChangedEventArgs( oldCurrentContext, oldCurrentItem, newCurrentContext, item );
           m_dataGridControl.RaiseCurrentChanged( currentChangedEventArgs );
         }
       }
@@ -2594,148 +2411,6 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    internal static void UpdateVisibleColumns(
-      ColumnCollection columns,
-      ReadOnlyColumnCollection visibleColumns,
-      HashedLinkedList<ColumnBase> columnsByVisiblePosition,
-      IList triggeringColumns,
-      ColumnVisiblePositionChangedEventArgs visiblePositionChangedArgs )
-    {
-      if( columns == null )
-        throw new ArgumentNullException( "columns" );
-
-      if( visibleColumns == null )
-        throw new ArgumentNullException( "visibleColumns" );
-
-      if( columnsByVisiblePosition == null )
-        throw new ArgumentNullException( "columnsByVisiblePosition" );
-
-      if( columns.ProcessingVisibleColumnsUpdate.IsSet )
-        return;
-
-      if( columns.IsDeferVisibleColumnsUpdate )
-        return;
-
-      using( columns.ProcessingVisibleColumnsUpdate.Set() )
-      {
-        columns.NotifyVisibleColumnsUpdating();
-
-        columnsByVisiblePosition.Clear();
-
-        int columnCount = columns.Count;
-        ColumnBase currentColumn;
-
-        // Add the Columns which are not part of the triggering columns collection.
-        for( int currentIndex = 0; currentIndex < columnCount; currentIndex++ )
-        {
-          currentColumn = columns[ currentIndex ];
-
-          if( ( triggeringColumns == null ) || ( !triggeringColumns.Contains( currentColumn ) ) )
-          {
-            DataGridContext.InsertColumnByVisiblePosition( columnsByVisiblePosition, currentColumn );
-          }
-        }
-
-        // Add the Columns which are part of the triggering columns collection
-        // (their VisiblePosition have priority over the existing ones).
-        if( triggeringColumns != null )
-        {
-          if( visiblePositionChangedArgs == null )
-          {
-            // From a ColumnCollection change
-            foreach( ColumnBase column in triggeringColumns )
-            {
-              DataGridContext.InsertColumnByVisiblePosition( columnsByVisiblePosition, column );
-            }
-          }
-          else
-          {
-            // From a Column.VisiblePosition change
-            ColumnBase column = visiblePositionChangedArgs.TriggeringColumn;
-
-            LinkedListNode<ColumnBase> oldPositionNode = null;
-            LinkedListNode<ColumnBase> listNode = columnsByVisiblePosition.First;
-
-            while( listNode != null )
-            {
-              if( listNode.Value.VisiblePosition >= column.VisiblePosition )
-              {
-                oldPositionNode = listNode;
-                break;
-              }
-              listNode = listNode.Next;
-            }
-
-            // If there were already some columns, the desired. If oldPositionNode is null, it means 
-            // there were no column  at the desired VisiblePosition. We must add it at the end of the 
-            // list since the new column VisiblePosition is greater than the actual columns VisiblePosition
-            if( oldPositionNode != null )
-            {
-              if( visiblePositionChangedArgs.PositionDelta > 0 )
-              {
-                columnsByVisiblePosition.AddAfter( oldPositionNode, column );
-              }
-              else if( visiblePositionChangedArgs.PositionDelta < 0 )
-              {
-                columnsByVisiblePosition.AddBefore( oldPositionNode, column );
-              }
-            }
-            else
-            {
-              columnsByVisiblePosition.AddLast( column );
-            }
-          }
-        }
-
-        var dataGridControl = columns.DataGridControl;
-        var mainColumn = columns.MainColumn;
-        if( ( dataGridControl != null ) && ( mainColumn != null ) && ( dataGridControl.AreDetailsFlatten ) )
-        {
-          var firstNode = columnsByVisiblePosition.First;
-          if( ( firstNode == null ) || ( firstNode.Value != mainColumn ) )
-          {
-            columnsByVisiblePosition.Remove( mainColumn );
-            columnsByVisiblePosition.AddFirst( mainColumn );
-          }
-        }
-
-        // Fill the VisibleColumns collection and 
-        // update all the columns' VisiblePosition, IsFirstVisible, and IsLastVisible properties.
-        visibleColumns.InternalClear();
-
-        int i = 0;
-        LinkedListNode<ColumnBase> columnNode = columnsByVisiblePosition.First;
-
-        // While is used to be sure Columns are returned in ascendant order
-        while( columnNode != null )
-        {
-          currentColumn = columnNode.Value;
-
-          using( currentColumn.InhibitVisiblePositionChanging() )
-          {
-            currentColumn.VisiblePosition = i++;
-            currentColumn.ClearIsFirstVisible();
-            currentColumn.ClearIsLastVisible();
-
-            if( currentColumn.Visible )
-            {
-              visibleColumns.InternalAdd( currentColumn );
-            }
-          }
-
-          columnNode = columnNode.Next;
-        }
-
-        if( visibleColumns.Count > 0 )
-        {
-          visibleColumns[ 0 ].SetIsFirstVisible( true );
-          visibleColumns[ visibleColumns.Count - 1 ].SetIsLastVisible( true );
-        }
-
-        columns.DispatchNotifyVisibleColumnsUpdated();
-      }
-    }
-
     internal static DataGridContext SafeGetDataGridContextForDataGridCollectionView(
       DataGridContext rootDataGridContext,
       DataGridCollectionViewBase targetDataGridCollectionViewBase )
@@ -2799,7 +2474,7 @@ namespace Xceed.Wpf.DataGrid
       }
       finally
       {
-        selectionManager.End( false, false, false );
+        selectionManager.End( false, false );
       }
     }
 
@@ -2867,6 +2542,8 @@ namespace Xceed.Wpf.DataGrid
 
       return false;
     }
+
+
 
     //---------- PRIVATE METHODS ----------
 
@@ -3122,15 +2799,16 @@ namespace Xceed.Wpf.DataGrid
     {
       Debug.Assert( this.Columns[ args.AutoFilterColumnFieldName ] != null );
 
-      ReadOnlyObservableHashList readOnlyObservableHashList = null;
-
-      if( this.DistinctValues == null )
+      var distinctValues = this.DistinctValues;
+      if( distinctValues == null )
         return;
 
+      var readOnlyObservableHashList = default( ReadOnlyObservableHashList );
+
       // We force the creation of DistinctValues for this field in every DataGridCollectionView
-      if( this.DistinctValues.TryGetValue( args.AutoFilterColumnFieldName, out readOnlyObservableHashList ) )
+      if( distinctValues.TryGetValue( args.AutoFilterColumnFieldName, out readOnlyObservableHashList ) )
       {
-        foreach( object item in readOnlyObservableHashList )
+        foreach( var item in readOnlyObservableHashList )
         {
           args.DistinctValues.Add( item );
         }
@@ -3244,31 +2922,11 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private void CreateStandaloneCollections()
-    {
-      m_columns = new ColumnCollection( this.DataGridControl, null );
-      VisibilityChangingEventManager.AddListener( m_columns, this );
-      VisibilityChangedEventManager.AddListener( m_columns, this );
-
-      m_visibleColumns = new ReadOnlyColumnCollection();
-      m_columnsByVisiblePosition = new HashedLinkedList<ColumnBase>();
-      m_groupLevelDescriptions = new GroupLevelDescriptionCollection();
-
-      //in this particular case, I need to create a SortDescriptionsSyncContext to ensure I will be able to synchronize access to the sort descriptions collection.
-      m_sortDescriptionsSyncContext = new SortDescriptionsSyncContext();
-
-      //Register to the Columns Collection's CollectionChanged event to manage the Removal of the CurrentColumn.
-      CollectionChangedEventManager.AddListener( m_columns, this );
-
-      // Register to the VisibleColumnsChanged to update, if need be, the columns desired width when column stretching is active and there's a column reordering.
-      CollectionChangedEventManager.AddListener( m_visibleColumns, this );
-    }
-
     private void HandleMasterColumnsCollectionChanged( NotifyCollectionChangedEventArgs e )
     {
-      bool removeCurrentColumn = false;
-      bool needGeneratorHardReset = false;
-      ColumnBase currentColumn = this.CurrentColumn;
+      var removeCurrentColumn = false;
+      var needGeneratorHardReset = false;
+      var currentColumn = this.CurrentColumn;
 
       //If( e.Action == Add ), there is nothing to do.
 
@@ -3297,26 +2955,29 @@ namespace Xceed.Wpf.DataGrid
           needGeneratorHardReset = true;
         }
       }
+      //Nothing to do because the way to change the visible position of a column is through its VisiblePosition property.
       else if( e.Action == NotifyCollectionChangedAction.Move )
       {
-        //Nothing to do because the way to change the visible position of a column is through its VisiblePosition property.
         return;
       }
 
-      ColumnBase closestColumn = null;
+      var closestColumn = default( ColumnBase );
 
+      //Select the current column's closest visible column while its possible
       if( removeCurrentColumn )
       {
         closestColumn = DataGridContext.GetClosestColumn( currentColumn, this.ColumnsByVisiblePosition );
       }
 
-      // When a column is removed, we need to clear the Generator from every container to avoid problem
-      // when a Column with the same field name is removed thant reinserted with 2 different instances
+      // When a column is removed, we need to clear the Generator from every container to avoid problems
+      // if the column is added again, but using a different instance (i.e. a new column with the same fieldname).
       if( needGeneratorHardReset )
       {
         // We only reset the fixed region if the column is part of the master context 
         if( this.SourceDetailConfiguration == null )
+        {
           this.DataGridControl.ResetFixedRegions();
+        }
 
         this.DataGridControl.CustomItemContainerGenerator.RemoveAllAndNotify();
       }
@@ -3329,10 +2990,10 @@ namespace Xceed.Wpf.DataGrid
         this.UpdateColumnSortCommand.Execute();
       }
 
-      DataGridContext.HandleColumnsCollectionChanged( e, this.Columns, this.VisibleColumns as ReadOnlyColumnCollection, this.ColumnsByVisiblePosition );
-
       if( removeCurrentColumn )
       {
+        // Now that the columns collections have been updated, it is time to set the new current column if necessary.
+        // The new current column that was identified earlier may have been removed from the visible columns after the collections update.
         if( ( closestColumn != null ) && !this.Columns.Contains( closestColumn ) )
         {
           closestColumn = null;
@@ -3341,14 +3002,10 @@ namespace Xceed.Wpf.DataGrid
         this.SetCurrentColumnCore( closestColumn, false, m_dataGridControl.SynchronizeSelectionWithCurrent, AutoScrollCurrentItemSourceTriggers.ColumnsCollectionChanged );
       }
 
-      if( m_columns != null )
-      {
-        ForeignKeyConfiguration.UpdateColumnsForeignKeyConfigurations(
-          m_columns.FieldNameToColumnDictionary,
-          this.ItemsSourceCollection,
-          this.ItemsSourceFieldDescriptors,
-          this.AutoCreateForeignKeyConfigurations );
-      }
+      ForeignKeyConfiguration.UpdateColumnsForeignKeyConfigurations( this.Columns,
+                                                                     this.ItemsSourceCollection,
+                                                                     m_itemsSourcePropertyDescriptions,
+                                                                     this.AutoCreateForeignKeyConfigurations );
     }
 
     internal static ColumnBase GetClosestColumn( ColumnBase reference, HashedLinkedList<ColumnBase> columnsByVisiblePosition )
@@ -3375,11 +3032,11 @@ namespace Xceed.Wpf.DataGrid
       return newColumn;
     }
 
-    private void SetupViewProperties( bool initialization = false )
+    private void SetupViewProperties()
     {
       this.ClearViewPropertyBindings();
 
-      Views.ViewBase view = m_dataGridControl.GetView( !initialization );
+      Views.ViewBase view = m_dataGridControl.GetView();
       if( view == null )
         return;
 
@@ -3401,13 +3058,157 @@ namespace Xceed.Wpf.DataGrid
         //Note: we place the shared and non-shared properties in the same pool (makes no differences beyond this point ).
         m_viewProperties.Add( viewProperty );
 
-        this.NotifyPropertyChanged( dependencyProperty.Name );
+        this.OnPropertyChanged( dependencyProperty.Name );
       }
     }
 
     private void InitializeViewProperties()
     {
-      TableflowView.SetFixedColumnSplitterTranslation( this, new TranslateTransform() );
+      if( !this.IsAFlattenDetail )
+      {
+        TableflowView.SetFixedColumnSplitterTranslation( this, new TranslateTransform() );
+      }
+    }
+
+    private void HookToItemPropertiesChanged()
+    {
+      var collectionView = this.ItemsSourceCollection as DataGridCollectionViewBase;
+      if( collectionView == null )
+        return;
+
+      this.RegisterItemProperties( collectionView.ItemProperties );
+    }
+
+    private void UnhookToItemPropertiesChanged( DataGridCollectionViewBase collectionView )
+    {
+      if( collectionView == null )
+        return;
+
+      this.UnregisterItemProperties( collectionView.ItemProperties );
+    }
+
+    private void UpdateColumns()
+    {
+      Debug.Assert( m_detailConfig == null );
+
+      ItemsSourceHelper.ResetPropertyDescriptions( m_itemsSourcePropertyDescriptions, m_itemPropertyMap, m_dataGridControl, m_dataGridControlItemsSource );
+
+      if( m_dataGridControl.AutoCreateColumns )
+      {
+        ItemsSourceHelper.UpdateColumnsFromPropertyDescriptions( m_columnManager, m_dataGridControl.DefaultCellEditors, m_itemsSourcePropertyDescriptions, this.AutoCreateForeignKeyConfigurations );
+      }
+    }
+
+    private void RegisterItemProperties( DataGridItemPropertyCollection itemProperties )
+    {
+      if( itemProperties == null )
+        return;
+
+      CollectionChangedEventManager.AddListener( itemProperties, this );
+
+      foreach( var itemProperty in itemProperties )
+      {
+        this.RegisterItemProperty( itemProperty );
+      }
+    }
+
+    private void UnregisterItemProperties( DataGridItemPropertyCollection itemProperties )
+    {
+      if( itemProperties == null )
+        return;
+
+      foreach( var itemProperty in itemProperties )
+      {
+        this.UnregisterItemProperty( itemProperty );
+      }
+
+      CollectionChangedEventManager.RemoveListener( itemProperties, this );
+    }
+
+    private void RegisterItemProperty( DataGridItemPropertyBase itemProperty )
+    {
+      if( itemProperty == null )
+        return;
+
+      PropertyChangedEventManager.AddListener( itemProperty, this, DataGridItemPropertyBase.ItemPropertiesInternalPropertyName );
+      this.RegisterItemProperties( itemProperty.ItemPropertiesInternal );
+    }
+
+    private void UnregisterItemProperty( DataGridItemPropertyBase itemProperty )
+    {
+      if( itemProperty == null )
+        return;
+
+      this.UnregisterItemProperties( itemProperty.ItemPropertiesInternal );
+      PropertyChangedEventManager.RemoveListener( itemProperty, this, DataGridItemPropertyBase.ItemPropertiesInternalPropertyName );
+    }
+
+    private void OnItemPropertiesCollectionChanged( DataGridItemPropertyCollection collection, NotifyCollectionChangedEventArgs e )
+    {
+      Debug.Assert( m_detailConfig == null );
+
+      var rootCollection = ItemsSourceHelper.GetRootCollection( collection );
+      if( rootCollection == null )
+        return;
+
+      if( rootCollection == ( ( DataGridCollectionViewBase )m_dataGridControlItemsSource ).ItemProperties )
+      {
+        if( e.Action == NotifyCollectionChangedAction.Reset )
+          throw new NotSupportedException();
+
+        if( e.Action == NotifyCollectionChangedAction.Move )
+          return;
+
+        if( e.OldItems != null )
+        {
+          foreach( DataGridItemPropertyBase itemProperty in e.OldItems )
+          {
+            this.UnregisterItemProperty( itemProperty );
+          }
+        }
+
+        if( e.NewItems != null )
+        {
+          foreach( DataGridItemPropertyBase itemProperty in e.NewItems )
+          {
+            this.RegisterItemProperty( itemProperty );
+          }
+        }
+
+        this.UpdateColumns();
+      }
+      else
+      {
+        Debug.Fail( "The collection is not linked to the collection view's item properties." );
+        this.UnregisterItemProperties( collection );
+      }
+    }
+
+    private void OnItemPropertyPropertyChanged( DataGridItemPropertyBase itemProperty, PropertyChangedEventArgs e )
+    {
+      Debug.Assert( m_detailConfig == null );
+
+      var rootCollection = ItemsSourceHelper.GetRootCollection( itemProperty );
+      if( rootCollection == null )
+        return;
+
+      if( rootCollection != ( ( DataGridCollectionViewBase )m_dataGridControlItemsSource ).ItemProperties )
+      {
+        Debug.Fail( "The collection is not linked to the detail configuration's item properties." );
+        this.UnregisterItemProperty( itemProperty );
+        return;
+      }
+
+      if( string.IsNullOrEmpty( e.PropertyName ) || ( e.PropertyName == DataGridItemPropertyBase.ItemPropertiesInternalPropertyName ) )
+      {
+        var itemProperties = itemProperty.ItemPropertiesInternal;
+        if( itemProperties != null )
+        {
+          this.UnregisterItemProperties( itemProperties );
+          this.RegisterItemProperties( itemProperties );
+          this.UpdateColumns();
+        }
+      }
     }
 
     private void OnDetailConfigRequestingDelayBringIntoViewAndFocusCurrent( object sender, RequestingDelayBringIntoViewAndFocusCurrentEventArgs e )
@@ -3465,14 +3266,7 @@ namespace Xceed.Wpf.DataGrid
     protected override void OnPropertyChanged( DependencyPropertyChangedEventArgs e )
     {
       base.OnPropertyChanged( e );
-
-      if( ( m_viewProperties != null ) && ( m_viewProperties.Count > 0 ) )
-      {
-        if( m_viewProperties.Contains( new Views.ViewBase.ViewPropertyStruct( e.Property ) ) == true )
-        {
-          this.NotifyPropertyChanged( e.Property.Name );
-        }
-      }
+      this.OnPropertyChanged( e.Property.Name );
     }
 
     //---------- INTERFACES ----------
@@ -3481,10 +3275,13 @@ namespace Xceed.Wpf.DataGrid
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    private void NotifyPropertyChanged( string propertyName )
+    private void OnPropertyChanged( string propertyName )
     {
-      if( this.PropertyChanged != null )
-        this.PropertyChanged( this, new PropertyChangedEventArgs( propertyName ) );
+      var handler = this.PropertyChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, new PropertyChangedEventArgs( propertyName ) );
     }
 
     #endregion
@@ -3493,84 +3290,78 @@ namespace Xceed.Wpf.DataGrid
 
     bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
+      return this.OnReceiveWeakEvent( managerType, sender, e );
+    }
+
+    private bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
       if( managerType == typeof( CollectionChangedEventManager ) )
       {
+        var eventArgs = ( NotifyCollectionChangedEventArgs )e;
+
         if( sender == m_items )
         {
-          var args = ( ( NotifyCollectionChangedEventArgs )e ).GetRangeActionOrSelf();
+          var args = eventArgs.GetRangeActionOrSelf();
 
           this.Items_CollectionChanged( sender, args );
-          return true;
         }
         if( sender == this.DetailConfigurations )
         {
-          this.NotifyPropertyChanged( "HasDetails" );
-          return true;
+          this.OnPropertyChanged( "HasDetails" );
         }
-        else if( sender == m_columns )
+        else if( sender == m_columnManager.Columns )
         {
           //Master Level columns collection changed
-          this.HandleMasterColumnsCollectionChanged( ( NotifyCollectionChangedEventArgs )e );
-          return true;
+          this.HandleMasterColumnsCollectionChanged( eventArgs );
         }
         else if( sender == this.VisibleColumns )
         {
-          ColumnStretchMode mode = ColumnStretchMode.None;
+          var mode = ColumnStretchMode.None;
 
           if( this.GetViewPropertyValue<ColumnStretchMode>( "ColumnStretchMode", ref mode ) )
           {
             if( ( mode == ColumnStretchMode.First ) || ( mode == ColumnStretchMode.Last ) )
             {
-              NotifyCollectionChangedEventArgs notifyArgs = ( NotifyCollectionChangedEventArgs )e;
-
-              if( notifyArgs.NewItems != null )
+              if( eventArgs.NewItems != null )
               {
-                foreach( ColumnBase column in notifyArgs.NewItems )
+                foreach( ColumnBase column in eventArgs.NewItems )
                 {
                   column.ClearValue( ColumnBase.DesiredWidthProperty );
                 }
               }
             }
           }
-
-          return true;
         }
         else if( sender == m_items.SortDescriptions )
         {
-          this.OnSortDescriptionsChanged( sender, ( NotifyCollectionChangedEventArgs )e );
-          return true;
+          this.OnSortDescriptionsChanged( sender, eventArgs );
         }
         else if( sender == m_items.GroupDescriptions )
         {
-          this.OnGroupDescriptionsChanged( sender, ( NotifyCollectionChangedEventArgs )e );
-          return true;
+          this.OnGroupDescriptionsChanged( sender, eventArgs );
+        }
+        else if( sender is DataGridItemPropertyCollection )
+        {
+          this.OnItemPropertiesCollectionChanged( ( DataGridItemPropertyCollection )sender, eventArgs );
         }
       }
-      else if( managerType == typeof( VisibilityChangingEventManager ) )
+      else if( managerType == typeof( PropertyChangedEventManager ) )
+      {
+        var eventArgs = ( PropertyChangedEventArgs )e;
+
+        if( sender is DataGridItemPropertyBase )
+        {
+          this.OnItemPropertyPropertyChanged( ( DataGridItemPropertyBase )sender, eventArgs );
+        }
+      }
+      else if( managerType == typeof( ColumnsLayoutChangingEventManager ) )
       {
         DataGridContext.UnselectAllCells( this );
-
-        return true;
       }
-      else if( managerType == typeof( VisibilityChangedEventManager ) )
-      {
-        var wrappedEventArgs = ( ColumnCollection.WrappedEventEventArgs )e;
-
-        DataGridContext.UpdateVisibleColumns( this.Columns, this.VisibleColumns as ReadOnlyColumnCollection, this.ColumnsByVisiblePosition,
-          new object[] { wrappedEventArgs.WrappedSender }, wrappedEventArgs.WrappedEventArgs as ColumnVisiblePositionChangedEventArgs );
-
-        return true;
-      }
-      else if( managerType == typeof( VisibleColumnsUpdatingEventManager ) )
-      {
-        DataGridContext.UnselectAllCells( this );
-
-        return true;
-      }
-      else if( managerType == typeof( VisibleColumnsUpdatedEventManager ) )
+      else if( managerType == typeof( ColumnsLayoutChangedEventManager ) )
       {
         // Only force a reset if at least one Row has not used an IVirtualizingCellsHost as PART_CellsHost
-        if( this.DataGridControl.ForceGeneratorReset == true )
+        if( m_dataGridControl.ForceGeneratorReset )
         {
           //forces the collection view to refresh (therefore, regenerates all the items ).
           this.CustomItemContainerGenerator.RemoveAllAndNotify();
@@ -3583,18 +3374,17 @@ namespace Xceed.Wpf.DataGrid
         }
 
         this.DefaultImageColumnDetermined = false;
-        return true;
       }
       else if( managerType == typeof( PreBatchCollectionChangedEventManager ) )
       {
         Debug.Assert( m_deferSelectionChangedOnItemsCollectionChanged == null );
 
-        if( m_deferSelectionChangedOnItemsCollectionChanged == null )
+        // When using DataGridVirtualizingCollectionViewBase, we should keep the "Replace" action
+        // in order to call UpdateSelectionAfterSourceCollectionChanged with a Replace instead of a Reset.
+        if( m_deferSelectionChangedOnItemsCollectionChanged == null && !( sender is DataGridVirtualizingCollectionViewBase ) )
         {
           m_deferSelectionChangedOnItemsCollectionChanged = new DeferSelectionChangedOnItemsCollectionChangedDisposable( this );
         }
-
-        return true;
       }
       else if( managerType == typeof( PostBatchCollectionChangedEventManager ) )
       {
@@ -3604,77 +3394,51 @@ namespace Xceed.Wpf.DataGrid
           m_deferSelectionChangedOnItemsCollectionChanged = null;
           disposable.Dispose();
         }
-
-        return true;
       }
       else if( managerType == typeof( RealizedContainersRequestedEventManager ) )
       {
-        RealizedContainersRequestedEventArgs eventArgs = ( RealizedContainersRequestedEventArgs )e;
+        var eventArgs = ( RealizedContainersRequestedEventArgs )e;
         this.GetRealizedItems( eventArgs.RealizedContainers );
-        return true;
       }
       else if( managerType == typeof( DistinctValuesRequestedEventManager ) )
       {
-        DistinctValuesRequestedEventArgs eventArgs = ( DistinctValuesRequestedEventArgs )e;
+        var eventArgs = ( DistinctValuesRequestedEventArgs )e;
         this.MergeDistinctValues( eventArgs );
-        return true;
       }
       else if( managerType == typeof( AllowDetailToggleChangedEventManager ) )
       {
-        this.NotifyPropertyChanged( "AllowDetailToggle" );
-        return true;
+        this.OnPropertyChanged( "AllowDetailToggle" );
       }
       else if( managerType == typeof( ViewChangedEventManager ) )
       {
         this.SetupViewProperties();
         this.InitializeViewProperties();
-        return true;
       }
       else if( managerType == typeof( CurrentColumnChangedEventManager ) )
       {
-        this.NotifyPropertyChanged( "CurrentColumn" );
-        return true;
+        this.OnPropertyChanged( "CurrentColumn" );
       }
       else if( managerType == typeof( GroupConfigurationSelectorChangedEventManager ) )
       {
         this.OnGroupConfigurationSelectorChanged();
-        return true;
       }
       else if( managerType == typeof( DetailVisibilityChangedEventManager ) )
       {
-        this.NotifyPropertyChanged( "HasDetails" );
-        return true;
+        this.OnPropertyChanged( "HasDetails" );
       }
       else if( managerType == typeof( MaxGroupLevelsChangedEventManager ) )
       {
-        this.NotifyPropertyChanged( "MaxGroupLevels" );
-        return true;
+        this.OnPropertyChanged( "MaxGroupLevels" );
       }
       else if( managerType == typeof( MaxSortLevelsChangedEventManager ) )
       {
-        this.NotifyPropertyChanged( "MaxSortLevels" );
-        return true;
-      }
-      else if( managerType == typeof( ItemPropertiesChangedEventManager ) )
-      {
-        this.ItemsSourceFieldDescriptors = null;
-        bool autoCreateColumns = ( m_detailConfig == null ) ? m_dataGridControl.AutoCreateColumns : m_detailConfig.AutoCreateColumns;
-
-        if( autoCreateColumns )
-        {
-          ItemsSourceHelper.UpdateColumnsOnItemsPropertiesChanged(
-            this.DataGridControl, this.Columns, this.AutoCreateForeignKeyConfigurations,
-            ( NotifyCollectionChangedEventArgs )e, ( DataGridItemPropertyCollection )sender );
-        }
-
-        return true;
+        this.OnPropertyChanged( "MaxSortLevels" );
       }
       else if( managerType == typeof( ItemsSourceChangeCompletedEventManager ) )
       {
         var dataGridCollectionViewBase = m_dataGridControlItemsSource as DataGridCollectionViewBase;
 
-        // GenerateColumnsFromItemsSourceFields is already done in DataGridControl.ProcessDelayedItemsSourceChanged
-        // no need to do it here.
+        // GenerateColumnsFromItemsSourceFields is already done in DataGridControl.ProcessDelayedItemsSourceChanged no need to do it here.
         this.UnhookToItemPropertiesChanged( dataGridCollectionViewBase );
 
         if( dataGridCollectionViewBase != null )
@@ -3705,11 +3469,13 @@ namespace Xceed.Wpf.DataGrid
             collectionView.PrepareRootContextForDeferRefresh( this );
           }
         }
-
-        return true;
+      }
+      else
+      {
+        return false;
       }
 
-      return false;
+      return true;
     }
 
     #endregion
@@ -3717,14 +3483,13 @@ namespace Xceed.Wpf.DataGrid
     #region Private Fields
 
     private BitVector32 m_flags = new BitVector32();
-    private CurrencyManager m_currencyManager;
-    private List<Views.ViewBase.ViewPropertyStruct> m_viewProperties = new List<Views.ViewBase.ViewPropertyStruct>();
-    PropertyDescriptorCollection m_viewPropertiesDescriptors; // = null
+    private readonly CurrencyManager m_currencyManager;
+    private readonly ICollection<Views.ViewBase.ViewPropertyStruct> m_viewProperties = new List<Views.ViewBase.ViewPropertyStruct>();
+    private PropertyDescriptorCollection m_viewPropertiesDescriptors; // = null
     private DefaultDetailConfiguration m_defaultDetailConfiguration; // = null
-    private RecyclingManager m_recyclingManager; // = null
     private ColumnBase m_defaultImageColumn; // = null
     private int m_deferRestoreStateCount; // = 0;
-    private Dictionary<object, ContainerSizeState> m_sizeStateDictionary = new Dictionary<object, ContainerSizeState>();
+    private readonly Dictionary<object, ContainerSizeState> m_sizeStateDictionary = new Dictionary<object, ContainerSizeState>();
     private IEnumerable m_dataGridControlItemsSource;
     private DeferSelectionChangedOnItemsCollectionChangedDisposable m_deferSelectionChangedOnItemsCollectionChanged; // = null
 
@@ -3808,20 +3573,20 @@ namespace Xceed.Wpf.DataGrid
         // We only cache the full property list.
         if( m_viewPropertiesDescriptors == null )
         {
-          Xceed.Wpf.DataGrid.Views.ViewBase view = this.DataGridControl.GetView();
+          var view = m_dataGridControl.GetView();
           Debug.Assert( view != null );
 
           if( view == null )
             return PropertyDescriptorCollection.Empty;
 
-          ViewBindingPropertyDescriptor[] properties = new ViewBindingPropertyDescriptor[ m_viewProperties.Count ];
-          for( int i = 0; i < m_viewProperties.Count; i++ )
+          var properties = new ViewBindingPropertyDescriptor[ m_viewProperties.Count ];
+          var defaultDetailConfiguration = this.GetDefaultDetailConfigurationForContext();
+          var index = 0;
+
+          foreach( var property in m_viewProperties )
           {
-            properties[ i ] = new ViewBindingPropertyDescriptor( m_detailConfig,
-                                                                  this.GetDefaultDetailConfigurationForContext(),
-                                                                  m_dataGridControl.GetView(),
-                                                                  m_viewProperties[ i ].DependencyProperty,
-                                                                  m_viewProperties[ i ].ViewPropertyMode );
+            properties[ index ] = new ViewBindingPropertyDescriptor( m_detailConfig, defaultDetailConfiguration, view, property.DependencyProperty, property.ViewPropertyMode );
+            index++;
           }
 
           m_viewPropertiesDescriptors = new PropertyDescriptorCollection( properties );
@@ -3844,57 +3609,6 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion
-
-    #region Automation
-
-    private static readonly DependencyPropertyKey AutomationPeerPropertyKey =
-      DependencyProperty.RegisterReadOnly( "AutomationPeer", typeof( DataGridContextAutomationPeer ), typeof( DataGridContext ),
-        new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.NotDataBindable ) );
-
-    private static readonly DependencyProperty AutomationPeerProperty = AutomationPeerPropertyKey.DependencyProperty;
-
-    internal DataGridContextAutomationPeer Peer
-    {
-      get
-      {
-        return this.GetValue( AutomationPeerProperty ) as DataGridContextAutomationPeer;
-      }
-      set
-      {
-        this.SetValue( AutomationPeerPropertyKey, value );
-      }
-    }
-
-    internal AutomationPeer PeerSource
-    {
-      get
-      {
-        if( m_parentItem == null )
-          return FrameworkElementAutomationPeer.CreatePeerForElement( m_dataGridControl );
-
-        return this.Peer;
-      }
-    }
-
-    internal void RaiseIsSelectedChangedAutomationEvent( DependencyObject container, bool isSelected )
-    {
-      DataGridContextAutomationPeer peer = this.Peer;
-
-      if( ( peer != null ) && ( peer.ItemPeers != null ) )
-      {
-        object item = this.GetItemFromContainer( container );
-
-        if( item != null )
-        {
-          Xceed.Wpf.DataGrid.Automation.DataGridItemAutomationPeer itemPeer = peer.ItemPeers[ item ] as Xceed.Wpf.DataGrid.Automation.DataGridItemAutomationPeer;
-
-          if( itemPeer != null )
-            itemPeer.RaiseAutomationIsSelectedChanged( isSelected );
-        }
-      }
-    }
-
-    #endregion Automation
 
     //---------- SUB CLASSES ----------
 
@@ -3920,8 +3634,8 @@ namespace Xceed.Wpf.DataGrid
 
       private void Dispose( bool disposing )
       {
-        var wr = m_dataGridContext;
-        if( Interlocked.CompareExchange<WeakReference>( ref m_dataGridContext, null, wr ) == null )
+        var wr = Interlocked.Exchange( ref m_dataGridContext, null );
+        if( wr == null )
           return;
 
         var dataGridContext = ( DataGridContext )wr.Target;
@@ -3966,10 +3680,7 @@ namespace Xceed.Wpf.DataGrid
 
         if( m_eventArgs != null )
         {
-          if( m_eventArgs.Action != NotifyCollectionChangedAction.Reset )
-          {
-            m_eventArgs = new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset );
-          }
+          m_eventArgs = NotifyBatchCollectionChangedEventArgs.Combine( m_eventArgs, e );
         }
         else
         {
@@ -3988,8 +3699,8 @@ namespace Xceed.Wpf.DataGrid
         if( !disposing )
           return;
 
-        var wr = m_dataGridContext;
-        if( Interlocked.CompareExchange<WeakReference>( ref m_dataGridContext, null, wr ) == null )
+        var wr = Interlocked.Exchange( ref m_dataGridContext, null );
+        if( wr == null )
           return;
 
         var eventArgs = m_eventArgs;
@@ -4003,11 +3714,6 @@ namespace Xceed.Wpf.DataGrid
         dataGridContext.UpdateSelectionAfterSourceCollectionChanged( eventArgs );
       }
 
-      ~DeferSelectionChangedOnItemsCollectionChangedDisposable()
-      {
-        this.Dispose( false );
-      }
-
       private WeakReference m_dataGridContext;
       private NotifyCollectionChangedEventArgs m_eventArgs; //null
     }
@@ -4018,7 +3724,7 @@ namespace Xceed.Wpf.DataGrid
 
     private class ViewBindingPropertyDescriptor : PropertyDescriptor
     {
-      public ViewBindingPropertyDescriptor( DetailConfiguration detailConfig, DefaultDetailConfiguration defaultDetailConfig, Xceed.Wpf.DataGrid.Views.ViewBase view, DependencyProperty dp, ViewPropertyMode viewPropertyMode )
+      public ViewBindingPropertyDescriptor( DetailConfiguration detailConfig, DefaultDetailConfiguration defaultDetailConfig, Views.ViewBase view, DependencyProperty dp, ViewPropertyMode viewPropertyMode )
         : base( dp.Name, null )
       {
         if( dp == null )
@@ -4081,7 +3787,7 @@ namespace Xceed.Wpf.DataGrid
 
       #region View Read-Only Property
 
-      public Xceed.Wpf.DataGrid.Views.ViewBase View
+      public Views.ViewBase View
       {
         get
         {
@@ -4089,7 +3795,7 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      private Xceed.Wpf.DataGrid.Views.ViewBase m_view;
+      private Views.ViewBase m_view;
 
       #endregion
 
@@ -4122,36 +3828,35 @@ namespace Xceed.Wpf.DataGrid
 
       public override object GetValue( object component )
       {
-        object retval = null;
-        DependencyObject dependencyObject = component as DependencyObject;
-        if( dependencyObject != null )
+        if( m_viewPropertyMode == ViewPropertyMode.Routed )
         {
-          retval = dependencyObject.GetValue( m_dp );
+          var source = ( DependencyObject )m_defaultDetailConfig ?? m_detailConfig;
+
+          //If there is a DefaultDetailConfig, process it in precedence to the DetailConfig.
+          if( source != null )
+          {
+            var valueSource = DependencyPropertyHelper.GetValueSource( source, m_dp );
+
+            switch( valueSource.BaseValueSource )
+            {
+              // Pick the value on the view.
+              case BaseValueSource.Default:
+              case BaseValueSource.Inherited:
+              case BaseValueSource.Unknown:
+                return m_view.GetValue( m_dp );
+
+              // Pick the value on the source component itself.
+              default:
+                break;
+            }
+          }
         }
 
-        //If there isa a DefaultDetailConfig, process it in precedence to the DetailConfig
-        if( m_defaultDetailConfig != null )
-        {
-          //AND there is NO local value set on it.
-          object localValue = m_defaultDetailConfig.ReadLocalValue( m_dp );
-          if( ( localValue == DependencyProperty.UnsetValue ) && ( this.ViewPropertyMode == ViewPropertyMode.Routed ) )
-          {
-            //then use the View's Value.
-            retval = m_view.GetValue( m_dp );
-          }
-        }
-        //If there isa a DetailConfig
-        else if( m_detailConfig != null )
-        {
-          //AND there is NO local value set on it.
-          object localValue = m_detailConfig.ReadLocalValue( m_dp );
-          if( ( localValue == DependencyProperty.UnsetValue ) && ( this.ViewPropertyMode == ViewPropertyMode.Routed ) )
-          {
-            //then use the View's Value.
-            retval = m_view.GetValue( m_dp );
-          }
-        }
-        return retval;
+        var dependencyObject = component as DependencyObject;
+        if( dependencyObject != null )
+          return dependencyObject.GetValue( m_dp );
+
+        return null;
       }
 
       public override bool IsReadOnly
@@ -4177,13 +3882,11 @@ namespace Xceed.Wpf.DataGrid
 
       public override void SetValue( object component, object value )
       {
-        DependencyObject dependencyObject = component as DependencyObject;
-        if( dependencyObject != null )
-        {
-          dependencyObject.SetValue( m_dp, value );
-          return;
-        }
-        throw new ArgumentException( "SetValue was called for an object which is not a DependencyObject.", component.ToString() );
+        var dependencyObject = component as DependencyObject;
+        if( dependencyObject == null )
+          throw new ArgumentException( "SetValue was called for an object which is not a DependencyObject.", component.ToString() );
+
+        dependencyObject.SetValue( m_dp, value );
       }
 
       public override bool ShouldSerializeValue( object component )
@@ -4542,16 +4245,22 @@ namespace Xceed.Wpf.DataGrid
       protected override string GetColumnName( ColumnBase column )
       {
         var dataGridContext = this.DataGridContext;
-        if( dataGridContext == null )
+        if( ( dataGridContext == null ) || ( column == null ) )
           return null;
 
-        var fieldNameMap = dataGridContext.ItemPropertyMap;
-        string fieldName;
+        var itemPropertyMap = dataGridContext.ItemPropertyMap;
+        if( ( itemPropertyMap != null ) && itemPropertyMap.IsMapping )
+        {
+          string fieldName;
+          if( DataGridItemPropertyMapHelper.TryGetDetailColumnName( itemPropertyMap, column.FieldName, out fieldName ) )
+            return fieldName;
+        }
+        else
+        {
+          return column.FieldName;
+        }
 
-        if( !fieldNameMap.TryGetItemPropertyName( column, out fieldName ) )
-          return null;
-
-        return fieldName;
+        return null;
       }
 
       protected override GroupDescription GetGroupDescription( ColumnBase column )

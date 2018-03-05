@@ -120,26 +120,26 @@ namespace Xceed.Wpf.DataGrid
 
     private void InitSortDirection()
     {
-      DataGridContext gridContext = DataGridControl.GetDataGridContext( this );
-      GroupLevelDescription groupInfo = this.Content as GroupLevelDescription;
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
+      if( dataGridContext == null )
+        return;
 
-      Debug.Assert( ( gridContext != null ) && ( groupInfo != null ) || ( DesignerProperties.GetIsInDesignMode( this ) ) );
-      if( ( gridContext != null ) && ( groupInfo != null ) )
-      {
-        ColumnBase column = gridContext.Columns[ groupInfo.FieldName ];
+      var groupInfo = this.Content as GroupLevelDescription;
+      if( groupInfo == null )
+        return;
 
-        if( column != null )
-        {
-          Binding sortBinding = new Binding();
-          sortBinding.Path = new PropertyPath( ColumnBase.SortDirectionProperty );
-          sortBinding.Mode = BindingMode.OneWay;
-          sortBinding.NotifyOnSourceUpdated = true;
-          sortBinding.Source = column;
-          sortBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+      var column = dataGridContext.Columns[ groupInfo.FieldName ];
+      if( column == null )
+        return;
 
-          BindingOperations.SetBinding( this, GroupByItem.SortDirectionInternalProperty, sortBinding );
-        }
-      }
+      var sortBinding = new Binding();
+      sortBinding.Path = new PropertyPath( ColumnBase.SortDirectionProperty );
+      sortBinding.Mode = BindingMode.OneWay;
+      sortBinding.NotifyOnSourceUpdated = true;
+      sortBinding.Source = column;
+      sortBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+
+      BindingOperations.SetBinding( this, GroupByItem.SortDirectionInternalProperty, sortBinding );
     }
 
     private GroupByControl GetParentGroupByControl()
@@ -278,7 +278,7 @@ namespace Xceed.Wpf.DataGrid
              : UIViewBase.DefaultGroupDraggedOutsideCursor;
           }
 
-          m_dragSourceManager.ProcessMouseLeftButtonDown( e );
+          m_dragSourceManager.DragStart( e );
         }
 
         e.Handled = true;
@@ -292,7 +292,9 @@ namespace Xceed.Wpf.DataGrid
       if( ( this.IsMouseCaptured ) && ( e.LeftButton == MouseButtonState.Pressed ) )
       {
         if( m_dragSourceManager != null )
-          m_dragSourceManager.ProcessMouseMove( e );
+        {
+          m_dragSourceManager.DragMove( e );
+        }
       }
 
       base.OnMouseMove( e );
@@ -304,10 +306,14 @@ namespace Xceed.Wpf.DataGrid
       bool isPressed = this.IsPressed;
 
       if( m_dragSourceManager != null )
-        m_dragSourceManager.ProcessMouseLeftButtonUp( e );
+      {
+        m_dragSourceManager.Drop( e );
+      }
 
       if( isMouseCaptured )
       {
+        this.ReleaseMouseCapture();
+
         bool click = isPressed;
 
         if( click )
@@ -351,44 +357,48 @@ namespace Xceed.Wpf.DataGrid
     protected override void OnLostMouseCapture( MouseEventArgs e )
     {
       if( m_dragSourceManager != null )
-        m_dragSourceManager.ProcessLostMouseCapture( e );
+      {
+        m_dragSourceManager.DragCancel( e );
+      }
 
       base.OnLostMouseCapture( e );
     }
 
-    internal void ShowDropMark( Point mousePosition )
+    internal void ShowDropMark( RelativePoint mousePosition )
     {
       if( m_dropMarkAdorner == null )
       {
-        DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
+        var dataGridContext = DataGridControl.GetDataGridContext( this );
+        var dataGridControl = ( dataGridContext != null ) ? dataGridContext.DataGridControl : null;
+        var pen = UIViewBase.GetDropMarkPen( this );
 
-        DataGridControl grid = ( dataGridContext != null )
-          ? dataGridContext.DataGridControl
-          : null;
-
-        Pen pen = UIViewBase.GetDropMarkPen( this );
-
-        if( ( pen == null ) && ( grid != null ) )
+        if( ( pen == null ) && ( dataGridControl != null ) )
         {
-          UIViewBase uiViewBase = grid.GetView() as UIViewBase;
-          pen = uiViewBase.DefaultDropMarkPen;
+          var uiViewBase = dataGridControl.GetView() as UIViewBase;
+          if( uiViewBase != null )
+          {
+            pen = uiViewBase.DefaultDropMarkPen;
+          }
         }
 
-        DropMarkOrientation orientation = UIViewBase.GetDropMarkOrientation( this );
+        var orientation = UIViewBase.GetDropMarkOrientation( this );
 
-        if( ( orientation == DropMarkOrientation.Default ) && ( grid != null ) )
+        if( ( orientation == DropMarkOrientation.Default ) && ( dataGridControl != null ) )
         {
-          UIViewBase uiViewBase = grid.GetView() as UIViewBase;
-
-          orientation = uiViewBase.DefaultDropMarkOrientation;
+          var uiViewBase = dataGridControl.GetView() as UIViewBase;
+          if( uiViewBase != null )
+          {
+            orientation = uiViewBase.DefaultDropMarkOrientation;
+          }
         }
 
         m_dropMarkAdorner = new DropMarkAdorner( this, pen, orientation );
 
-        AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer( this );
-
+        var adornerLayer = AdornerLayer.GetAdornerLayer( this );
         if( adornerLayer != null )
+        {
           adornerLayer.Add( m_dropMarkAdorner );
+        }
       }
 
       m_dropMarkAdorner.UpdateAlignment( mousePosition );
@@ -396,62 +406,65 @@ namespace Xceed.Wpf.DataGrid
 
     internal void HideDropMark()
     {
-      if( m_dropMarkAdorner != null )
+      if( m_dropMarkAdorner == null )
+        return;
+
+      var adornerLayer = AdornerLayer.GetAdornerLayer( this );
+      if( adornerLayer != null )
       {
-        AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer( this );
-
-        if( adornerLayer != null )
-          adornerLayer.Remove( m_dropMarkAdorner );
-
-        m_dropMarkAdorner = null;
+        adornerLayer.Remove( m_dropMarkAdorner );
       }
+
+      m_dropMarkAdorner = null;
     }
 
     #endregion Drag & Drop Manager
 
     #region IDropTarget Members
 
-    bool IDropTarget.CanDropElement( UIElement draggedElement )
+    bool IDropTarget.CanDropElement( UIElement draggedElement, RelativePoint mousePosition )
     {
-      bool allowGroupingModification = true;
-      GroupByControl parentGBC = this.GetParentGroupByControl();
+      var allowGroupingModification = true;
+      var parentGBC = this.GetParentGroupByControl();
 
       if( parentGBC != null )
+      {
         allowGroupingModification = parentGBC.IsGroupingModificationAllowed;
+      }
 
       // We don't accept any ColumnManagerCell from Details
-      DataGridContext context = DataGridControl.GetDataGridContext( draggedElement );
-
-      ColumnManagerCell cell = draggedElement as ColumnManagerCell;
-
-      bool isAlreadyGroupedBy = false;
+      var context = DataGridControl.GetDataGridContext( draggedElement );
+      var cell = draggedElement as ColumnManagerCell;
+      var isAlreadyGroupedBy = false;
 
       if( cell != null )
       {
         isAlreadyGroupedBy = GroupingHelper.IsAlreadyGroupedBy( cell );
-        ColumnBase parentColumn = cell.ParentColumn;
 
+        var parentColumn = cell.ParentColumn;
         if( ( parentColumn == null ) || ( !parentColumn.AllowGroup ) )
           return false;
       }
 
-      DataGridContext sourceDetailContext = DataGridControl.GetDataGridContext( this );
+      var sourceDetailContext = DataGridControl.GetDataGridContext( this );
       Debug.Assert( sourceDetailContext != null );
-      DetailConfiguration sourceDetailConfig = ( sourceDetailContext != null ) ? sourceDetailContext.SourceDetailConfiguration : null;
+      var sourceDetailConfig = ( sourceDetailContext != null ) ? sourceDetailContext.SourceDetailConfiguration : null;
 
-      DataGridContext draggedDetailContext = DataGridControl.GetDataGridContext( draggedElement );
+      var draggedDetailContext = DataGridControl.GetDataGridContext( draggedElement );
       Debug.Assert( draggedDetailContext != null );
-      DetailConfiguration draggedDetailConfig = ( draggedDetailContext != null ) ? draggedDetailContext.SourceDetailConfiguration : null;
+      var draggedDetailConfig = ( draggedDetailContext != null ) ? draggedDetailContext.SourceDetailConfiguration : null;
 
 
-      bool canDrop = ( sourceDetailConfig == draggedDetailConfig ) &&
-        ( allowGroupingModification ) &&
-        ( ( draggedElement is ColumnManagerCell ) || ( draggedElement is GroupByItem ) ) &&
-        ( draggedElement != this ) &&
-        ( isAlreadyGroupedBy == false );
+      var canDrop = ( sourceDetailConfig == draggedDetailConfig ) &&
+                    ( allowGroupingModification ) &&
+                    ( ( draggedElement is ColumnManagerCell ) || ( draggedElement is GroupByItem ) ) &&
+                    ( draggedElement != this ) &&
+                    ( isAlreadyGroupedBy == false );
 
       if( canDrop && ( cell != null ) )
+      {
         canDrop = GroupingHelper.ValidateMaxGroupDescriptions( draggedDetailContext );
+      }
 
       return canDrop;
     }
@@ -460,7 +473,7 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
-    void IDropTarget.DragOver( UIElement draggedElement, Point mousePosition )
+    void IDropTarget.DragOver( UIElement draggedElement, RelativePoint mousePosition )
     {
       this.ShowDropMark( mousePosition );
     }
@@ -470,44 +483,39 @@ namespace Xceed.Wpf.DataGrid
       this.HideDropMark();
     }
 
-    void IDropTarget.Drop( UIElement draggedElement )
+    void IDropTarget.Drop( UIElement draggedElement, RelativePoint mousePosition )
     {
-      if( m_dropMarkAdorner != null )
+      if( m_dropMarkAdorner == null )
+        return;
+
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
+      if( dataGridContext == null )
+        return;
+
+      var draggedOverGroupLevelDescription = this.Content as GroupLevelDescription;
+      if( draggedOverGroupLevelDescription == null )
+        return;
+
+      var alignment = m_dropMarkAdorner.Alignment;
+
+      this.HideDropMark();
+
+      var draggedCell = draggedElement as ColumnManagerCell;
+      if( draggedCell != null )
       {
-        DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
+        GroupingHelper.AddNewGroupFromColumnManagerCell( draggedCell, draggedOverGroupLevelDescription, alignment, dataGridContext.DataGridControl );
+      }
+      else
+      {
+        var draggedGroupBy = draggedElement as GroupByItem;
 
-        Debug.Assert( dataGridContext != null );
-        if( dataGridContext != null )
+        Debug.Assert( draggedGroupBy != null );
+
+        if( draggedGroupBy != null )
         {
-          GroupLevelDescription draggedOverGroupLevelDescription = this.Content as GroupLevelDescription;
+          var draggedGroupLevelDescription = draggedGroupBy.Content as GroupLevelDescription;
 
-          Debug.Assert( draggedOverGroupLevelDescription != null );
-          if( draggedOverGroupLevelDescription != null )
-          {
-            DropMarkAlignment alignment = m_dropMarkAdorner.Alignment;
-
-            this.HideDropMark();
-
-            ColumnManagerCell draggedCell = draggedElement as ColumnManagerCell;
-
-            if( draggedCell != null )
-            {
-              GroupingHelper.AddNewGroupFromColumnManagerCell( draggedCell, draggedOverGroupLevelDescription, alignment, dataGridContext.DataGridControl );
-            }
-            else
-            {
-              GroupByItem draggedGroupBy = draggedElement as GroupByItem;
-
-              Debug.Assert( draggedGroupBy != null );
-
-              if( draggedGroupBy != null )
-              {
-                GroupLevelDescription draggedGroupLevelDescription = draggedGroupBy.Content as GroupLevelDescription;
-
-                GroupingHelper.MoveGroupDescription( dataGridContext.Columns, dataGridContext.Items.GroupDescriptions, draggedOverGroupLevelDescription, alignment, draggedGroupLevelDescription, dataGridContext.DataGridControl );
-              }
-            }
-          }
+          GroupingHelper.MoveGroupDescription( dataGridContext.Columns, dataGridContext.Items.GroupDescriptions, draggedOverGroupLevelDescription, alignment, draggedGroupLevelDescription, dataGridContext.DataGridControl );
         }
       }
     }

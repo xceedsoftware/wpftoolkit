@@ -15,10 +15,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -27,7 +23,7 @@ namespace Xceed.Wpf.DataGrid
     internal class PropertyDescriptorFromItemPropertyBase : EmptyDataItemSafePropertyDescriptor
     {
       public PropertyDescriptorFromItemPropertyBase( DataGridItemPropertyBase dataGridItemProperty )
-        : base( dataGridItemProperty.Name )
+        : base( dataGridItemProperty.FieldName )
       {
         m_dataGridItemProperty = new WeakReference( dataGridItemProperty );
         m_propertyType = dataGridItemProperty.DataType;

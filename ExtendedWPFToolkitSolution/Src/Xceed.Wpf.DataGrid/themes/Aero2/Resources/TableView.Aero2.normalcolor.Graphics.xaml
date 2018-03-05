@@ -25,7 +25,7 @@
       <markup:DataGridThemeResourceDictionary Source="../../Common/Graphics.xaml" />
 
       <!-- Needs Windows8 Resources -->
-      <markup:DataGridThemeResourceDictionary Source="Aero2.NormalColor.Resources.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="Aero2.normalColor.Resources.xaml" />
 
    </ResourceDictionary.MergedDictionaries>
 

@@ -41,7 +41,7 @@
       </Border>
    </DataTemplate>
 
-   <!-- Glyph that is displayed in the group headers to expand the group. -->
+  <!-- Glyph that is displayed in the group headers to expand the group. -->
    <DataTemplate x:Key="expandGroupGlyph">
       <Canvas Width="9"
               Height="9">

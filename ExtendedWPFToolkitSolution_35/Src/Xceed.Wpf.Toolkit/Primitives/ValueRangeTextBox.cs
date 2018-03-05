@@ -51,8 +51,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
       ValueRangeTextBox.AcceptsTabProperty.OverrideMetadata( typeof( ValueRangeTextBox ),
         new FrameworkPropertyMetadata(
         false, null, new CoerceValueCallback( ValueRangeTextBox.AcceptsTabCoerceValueCallback ) ) );
-
-      AutomationProperties.AutomationIdProperty.OverrideMetadata( typeof( ValueRangeTextBox ), new UIPropertyMetadata( "ValueRangeTextBox" ) );
     }
 
     public ValueRangeTextBox()

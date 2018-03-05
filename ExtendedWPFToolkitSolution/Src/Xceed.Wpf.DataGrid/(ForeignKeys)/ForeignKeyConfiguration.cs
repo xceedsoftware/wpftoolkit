@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
@@ -24,7 +23,6 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Xceed.Utils.Collections;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -538,7 +536,7 @@ namespace Xceed.Wpf.DataGrid
         {
           foreach( object item in itemsSource )
           {
-            DataRowView dataRowView = item as DataRowView;
+            var dataRowView = item as DataRowView;
             if( dataRowView != null )
             {
               var value = dataRowView[ valuePath ];
@@ -567,76 +565,97 @@ namespace Xceed.Wpf.DataGrid
       return fieldValue;
     }
 
-    internal static void UpdateColumnsForeignKeyConfigurations( Dictionary<string, ColumnBase> columns, IEnumerable itemsSourceCollection,
-                                                                Dictionary<string, ItemsSourceHelper.FieldDescriptor> fieldDescriptors, bool autoCreateForeignKeyConfigurations )
+    internal static void UpdateColumnsForeignKeyConfigurations(
+      ObservableColumnCollection columns,
+      IEnumerable itemsSourceCollection,
+      PropertyDescriptionRouteDictionary propertyDescriptions,
+      bool autoCreateForeignKeyConfigurations )
     {
-      DataGridCollectionViewBase collectionViewBase = itemsSourceCollection as DataGridCollectionViewBase;
-
+      var collectionViewBase = itemsSourceCollection as DataGridCollectionViewBase;
       if( collectionViewBase != null )
       {
         ForeignKeyConfiguration.UpdateColumnsForeignKeyConfigurationsFromDataGridCollectionView( columns, collectionViewBase.ItemProperties, autoCreateForeignKeyConfigurations );
       }
       else
       {
-        ForeignKeyConfiguration.UpdateColumnsForeignKeyConfigurationsFromFieldDescriptors( columns, fieldDescriptors, autoCreateForeignKeyConfigurations );
+        ForeignKeyConfiguration.UpdateColumnsForeignKeyConfigurationsFromPropertyDescriptions( columns, propertyDescriptions, autoCreateForeignKeyConfigurations );
       }
     }
 
     // If a DataGridCollectionViewBase is used, get the ItemProperties it defines to be able to retreive DataGridForeignKeyDescription for each of them
     // to get the auto-detected ForeignKey ItemsSource (if any).
     // If a DataGridCollectionViewBase is not used, the ItemsSource must be manually specified on each Column in order to correctly display/edit the Data
-    internal static void UpdateColumnsForeignKeyConfigurationsFromDataGridCollectionView( Dictionary<string, ColumnBase> columns, DataGridItemPropertyCollection itemProperties,
-                                                                                          bool autoCreateForeignKeyConfigurations )
+    internal static void UpdateColumnsForeignKeyConfigurationsFromDataGridCollectionView(
+      ObservableColumnCollection columns,
+      DataGridItemPropertyCollection itemProperties,
+      bool autoCreateForeignKeyConfigurations )
     {
       if( itemProperties == null )
         return;
 
-      foreach( DataGridItemPropertyBase itemProperty in itemProperties )
+      foreach( var itemProperty in itemProperties )
       {
-        DataGridForeignKeyDescription description = itemProperty.ForeignKeyDescription;
+        var description = itemProperty.ForeignKeyDescription;
+        if( description != null )
+        {
+          var columnName = PropertyRouteParser.Parse( itemProperty );
+          var column = ( columnName != null ) ? columns[ columnName ] as Column : null;
 
-        if( description == null )
-          continue;
+          if( column != null )
+          {
+            ForeignKeyConfiguration.SynchronizeForeignKeyConfigurationFromForeignKeyDescription( column, description, autoCreateForeignKeyConfigurations );
+          }
+        }
 
-        ColumnBase column;
-        columns.TryGetValue( itemProperty.Name, out column );
-
-        ForeignKeyConfiguration.SynchronizeForeignKeyConfigurationFromForeignKeyDescription( column as Column, description, autoCreateForeignKeyConfigurations );
+        if( itemProperty.ItemPropertiesInternal != null )
+        {
+          ForeignKeyConfiguration.UpdateColumnsForeignKeyConfigurationsFromDataGridCollectionView(
+            columns,
+            itemProperty.ItemPropertiesInternal,
+            autoCreateForeignKeyConfigurations );
+        }
       }
     }
 
-    private static void UpdateColumnsForeignKeyConfigurationsFromFieldDescriptors( Dictionary<string, ColumnBase> columns,
-                                                                                   Dictionary<string, ItemsSourceHelper.FieldDescriptor> fieldDescriptors,
-                                                                                   bool autoCreateForeignKeyConfigurations )
+    private static void UpdateColumnsForeignKeyConfigurationsFromPropertyDescriptions(
+      ObservableColumnCollection columns,
+      PropertyDescriptionRouteDictionary propertyDescriptions,
+      bool autoCreateForeignKeyConfigurations )
     {
-      if( columns == null )
+      if( ( columns == null ) || ( propertyDescriptions == null ) )
         return;
 
-      if( fieldDescriptors == null )
-        return;
-
-      foreach( ItemsSourceHelper.FieldDescriptor fieldDescriptor in fieldDescriptors.Values )
+      foreach( var column in columns )
       {
-        DataGridForeignKeyDescription description = fieldDescriptor.ForeignKeyDescription;
-
-        if( description == null )
+        var targetColumn = column as Column;
+        if( targetColumn == null )
           continue;
 
-        ColumnBase column;
-        columns.TryGetValue( fieldDescriptor.Name, out column );
+        var key = PropertyRouteParser.Parse( targetColumn.FieldName );
+        if( key == null )
+          continue;
 
-        ForeignKeyConfiguration.SynchronizeForeignKeyConfigurationFromForeignKeyDescription( column as Column, description, autoCreateForeignKeyConfigurations );
+        var propertyDescription = propertyDescriptions[ key ];
+        if( propertyDescription == null )
+          continue;
+
+        var foreignKeyDescription = propertyDescription.Current.ForeignKeyDescription;
+        if( foreignKeyDescription == null )
+          continue;
+
+        ForeignKeyConfiguration.SynchronizeForeignKeyConfigurationFromForeignKeyDescription( targetColumn, foreignKeyDescription, autoCreateForeignKeyConfigurations );
       }
     }
 
-    internal static void SynchronizeForeignKeyConfigurationFromForeignKeyDescription( Column column, DataGridForeignKeyDescription description,
-                                                                                      bool autoCreateForeignKeyConfigurations )
+    internal static void SynchronizeForeignKeyConfigurationFromForeignKeyDescription(
+      Column column,
+      DataGridForeignKeyDescription description,
+      bool autoCreateForeignKeyConfigurations )
     {
       if( ( description == null ) || ( column == null ) )
         return;
 
-      ForeignKeyConfiguration configuration = column.ForeignKeyConfiguration;
-
+      var configuration = column.ForeignKeyConfiguration;
       if( configuration == null )
       {
         if( !autoCreateForeignKeyConfigurations )
@@ -678,13 +697,21 @@ namespace Xceed.Wpf.DataGrid
 
     bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
+      return this.OnReceiveWeakEvent( managerType, sender, e );
+    }
+
+    protected virtual bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
       if( ( managerType == typeof( CollectionChangedEventManager ) ) || ( managerType == typeof( ListChangedEventManager ) ) )
       {
         this.OnNotifiyCollectionChanged();
-        return true;
+      }
+      else
+      {
+        return false;
       }
 
-      return false;
+      return true;
     }
 
     #endregion

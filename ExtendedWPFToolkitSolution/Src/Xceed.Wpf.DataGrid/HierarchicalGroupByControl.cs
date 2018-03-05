@@ -493,7 +493,7 @@ namespace Xceed.Wpf.DataGrid
     #region IDropTarget Members
 
 
-    bool IDropTarget.CanDropElement( UIElement draggedElement )
+    bool IDropTarget.CanDropElement( UIElement draggedElement, RelativePoint mousePosition )
     {
       bool canDrop = this.AllowGroupingModification;
 
@@ -559,7 +559,7 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
-    void IDropTarget.DragOver( UIElement draggedElement, Point mousePosition )
+    void IDropTarget.DragOver( UIElement draggedElement, RelativePoint mousePosition )
     {
       ColumnManagerCell cell = draggedElement as ColumnManagerCell;
 
@@ -615,7 +615,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    void IDropTarget.Drop( UIElement draggedElement )
+    void IDropTarget.Drop( UIElement draggedElement, RelativePoint mousePosition )
     {
       ColumnManagerCell cell = draggedElement as ColumnManagerCell;
 
@@ -646,18 +646,20 @@ namespace Xceed.Wpf.DataGrid
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    private void OnNotifyPropertyChanged( string propertyName )
+    private void OnPropertyChanged( string propertyName )
     {
-      if( this.PropertyChanged != null )
-        this.PropertyChanged( this, new PropertyChangedEventArgs( propertyName ) );
+      var handler = this.PropertyChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, new PropertyChangedEventArgs( propertyName ) );
     }
 
     internal void UpdateHasGroups()
     {
-      this.OnNotifyPropertyChanged( "HasGroups" );
+      this.OnPropertyChanged( "HasGroups" );
     }
 
     #endregion
-
   }
 }

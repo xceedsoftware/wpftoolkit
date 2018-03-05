@@ -59,10 +59,9 @@ namespace Xceed.Wpf.DataGrid
 
       private void Dispose( bool disposing )
       {
-        var target = m_target;
-
         // The disposed method has already been called at least once.
-        if( Interlocked.CompareExchange<IAutoResetFlag>( ref m_target, null, target ) == null )
+        var target = Interlocked.Exchange( ref m_target, null );
+        if( target == null )
           return;
 
         Debug.Assert( m_target == null );
