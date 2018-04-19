@@ -476,6 +476,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     internal void InternalClose()
     {
+      if( _internalCloseFlag )
+      {
+        return;
+      }
       _internalCloseFlag = true;
       Close();
     }
