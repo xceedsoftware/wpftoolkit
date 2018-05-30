@@ -102,7 +102,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <tr>
 <td><a href="../../wiki/Charts">Charts</a></td>
 <td><a href="../../wiki/ChildWindow-Plus">ChildWindow Plus</a></td>
-<td>ExtendedTabControl</td>
+<td><a href="../../wiki/ExtendedTabControl">ExtendedTabControl</a></td>
 <td><a href="../../wiki/FilePicker-Plus">FilePicker Plus</a></td>
 </tr>
 <tr>
