@@ -126,6 +126,7 @@ namespace Xceed.Wpf.Toolkit
       collectionControlDialog.NewItemTypes = this.NewItemTypes;
       collectionControlDialog.ItemsSourceType = this.ItemsSourceType;
       collectionControlDialog.IsReadOnly = this.IsReadOnly;
+	  collectionControlDialog.Owner = Window.GetWindow(this);
       collectionControlDialog.ShowDialog();
     }
 

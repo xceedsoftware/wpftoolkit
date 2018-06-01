@@ -227,6 +227,9 @@ namespace Xceed.Wpf.Toolkit
       Debug.Assert( result != null );
       if( result != null )
       {
+        if (result is ICollection
+          && ((ICollection)result).Count == 0)
+          return result;
         var properties = sourceType.GetProperties();
 
         foreach( var propertyInfo in properties )
