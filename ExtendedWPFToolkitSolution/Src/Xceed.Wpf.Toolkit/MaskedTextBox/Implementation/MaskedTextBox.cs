@@ -252,6 +252,8 @@ namespace Xceed.Wpf.Toolkit
         SetValue( AllowPromptAsInputProperty, value );
       }
     }
+    
+    public bool DisplayPromptCharactersOnReadOnly { get;set; }
 
     private static void AllowPromptAsInputPropertyChangedCallback( object sender, DependencyPropertyChangedEventArgs e )
     {
@@ -1915,7 +1917,7 @@ namespace Xceed.Wpf.Toolkit
       //System.Diagnostics.Debug.Assert( provider.EditPositionCount > 0 );
 
 
-      bool includePrompt = ( this.IsReadOnly ) ? false : ( !this.HidePromptOnLeave || this.IsFocused );
+      bool includePrompt = ( this.IsReadOnly && !this.DisplayPromptCharactersOnReadOnly ) ? false : ( !this.HidePromptOnLeave || this.IsFocused );
 
       string displayString = provider.ToString( false, includePrompt, true, 0, m_maskedTextProvider.Length );
 
