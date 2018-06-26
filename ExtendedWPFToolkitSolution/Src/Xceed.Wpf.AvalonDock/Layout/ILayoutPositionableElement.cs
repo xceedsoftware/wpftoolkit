@@ -42,6 +42,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
         bool AllowDuplicateContent { get; set; }
 
         bool IsVisible { get; }
+        bool ForceFixedDockSize { get; }
     }
 
 
