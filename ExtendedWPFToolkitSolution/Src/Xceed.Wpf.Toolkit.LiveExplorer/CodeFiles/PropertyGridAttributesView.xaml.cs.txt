@@ -76,6 +76,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     [Category( "Information" )]
     [Description( "This property uses the [Editor(..)] attribute to provide a custom editor using the 'LastNameUserControlEditor' user control." )]
     [Editor( typeof( LastNameUserControlEditor ), typeof( LastNameUserControlEditor ) )]
+    [DefaultValue("Friend")]
     public string LastName
     {
       get{ return _lastName; }

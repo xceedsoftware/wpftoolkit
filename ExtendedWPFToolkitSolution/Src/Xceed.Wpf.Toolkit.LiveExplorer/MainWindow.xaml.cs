@@ -99,6 +99,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
     {
       if( treeViewItem != null )
       {
+        treeViewItem.IsExpanded = true;
         Type type = treeViewItem.SampleType;
         if( type != null )
         {

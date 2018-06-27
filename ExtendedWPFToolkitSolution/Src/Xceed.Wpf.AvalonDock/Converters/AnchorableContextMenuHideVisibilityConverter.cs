@@ -28,8 +28,8 @@ namespace Xceed.Wpf.AvalonDock.Converters
     {
       if( ( values.Count() == 2 )
         && ( values[ 0 ] != DependencyProperty.UnsetValue )
-        && ( values[ 1 ] != DependencyProperty.UnsetValue ) 
-        && ( values[ 1 ] is bool ))
+        && ( values[ 1 ] != DependencyProperty.UnsetValue )
+        && ( values[ 1 ] is bool ) )
       {
         var canClose = ( bool )values[ 1 ];
 

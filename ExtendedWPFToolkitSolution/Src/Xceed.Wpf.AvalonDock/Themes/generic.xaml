@@ -856,17 +856,17 @@
                             <Grid.ColumnDefinitions>
                               <ColumnDefinition Width="*" />
                               <ColumnDefinition Width="Auto" />
+                              <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <Border Grid.ColumnSpan="2"
+                            <Border Grid.ColumnSpan="3"
                                     Background="Transparent" />
                             <ContentPresenter Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
                                               ContentTemplate="{Binding DocumentHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
                                               ContentTemplateSelector="{Binding DocumentHeaderTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}" />
-                            <!-- Close button should be moved out to the container style -->
+
                             <Button x:Name="DocumentCloseButton"
                                     Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                    Grid.Column="1"
-                                    Margin="5,0,0,0"
+                                    Grid.Column="2"
                                     Visibility="Hidden"
                                     Command="{Binding Path=LayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                     ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}">
@@ -877,18 +877,24 @@
                         </Border>
                       </avalonDockControls:DropDownControlArea>
                       <ControlTemplate.Triggers>
-                        <DataTrigger Binding="{Binding Path=IsSelected}"
-                                     Value="true">
+                        <MultiDataTrigger>
+                          <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Path=IsSelected}"
+                                       Value="True" />
+                          </MultiDataTrigger.Conditions>
                           <Setter Property="Visibility"
                                   Value="Visible"
                                   TargetName="DocumentCloseButton" />
-                        </DataTrigger>
-                        <Trigger Property="IsMouseOver"
-                                 Value="True">
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                          <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource TemplatedParent}}"
+                                       Value="True" />
+                          </MultiDataTrigger.Conditions>
                           <Setter Property="Visibility"
                                   Value="Visible"
                                   TargetName="DocumentCloseButton" />
-                        </Trigger>
+                        </MultiDataTrigger>
                         <DataTrigger Binding="{Binding Path=CanClose}"
                                      Value="false">
                           <Setter Property="Visibility"
@@ -1023,7 +1029,7 @@
                                       CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                       ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
                                       Grid.Column="2">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinMaximize.png" >
+                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinMaximize.png">
                                 </Image>
                               </Button>
 
@@ -1035,7 +1041,7 @@
                                       CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                       ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
                                       Grid.Column="2">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinRestore.png" >
+                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinRestore.png">
                                 </Image>
                               </Button>
 
@@ -1046,7 +1052,7 @@
                                       ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
                                       Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                                       Grid.Column="3">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinClose.png" >
+                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinClose.png">
                                 </Image>
                               </Button>
                             </Grid>
@@ -1131,7 +1137,7 @@
                                                                  DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
                                                                  DropDownContextMenuDataContext="{Binding Path=SingleContentLayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
                                                                  ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_CxMenu_Hint}">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinMenu.png" >
+                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinMenu.png">
                                 </Image>
                               </avalonDockControls:DropDownButton>
 
@@ -1143,7 +1149,7 @@
                                       CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                       ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
                                       Grid.Column="2">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinMaximize.png" >
+                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinMaximize.png">
                                 </Image>
                               </Button>
 
@@ -1155,7 +1161,7 @@
                                       CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                       ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
                                       Grid.Column="2">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinRestore.png" >
+                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinRestore.png">
                                 </Image>
                               </Button>
 
@@ -1167,7 +1173,7 @@
                                       ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}"
                                       Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                                       Grid.Column="3">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinClose.png" >
+                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinClose.png">
                                 </Image>
                               </Button>
                             </Grid>
@@ -1253,19 +1259,21 @@
                                   <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
                                 <Image Source="{Binding SelectedDocument.LayoutElement.IconSource, Converter={StaticResource NullToDoNothingConverter}}"
-                                       Stretch="None" >
+                                       Stretch="None">
                                 </Image>
-                                <TextBlock Text="{Binding SelectedDocument.LayoutElement.Title}"
+                                <TextBlock x:Name="selectedElementTitle"
+                                           Text="{Binding SelectedDocument.LayoutElement.Title}"
                                            TextTrimming="CharacterEllipsis"
                                            Grid.Column="1"
                                            VerticalAlignment="Center"
                                            FontWeight="Bold"
-                                           Margin="4,0,0,0" >
+                                           Margin="4,0,0,0">
                                 </TextBlock>
                               </Grid>
-                              <TextBlock Text="{Binding SelectedDocument.LayoutElement.Description}"
+                              <TextBlock x:Name="selectedElementDescription"
+                                         Text="{Binding SelectedDocument.LayoutElement.Description}"
                                          TextTrimming="CharacterEllipsis"
-                                         VerticalAlignment="Center" >
+                                         VerticalAlignment="Center">
                               </TextBlock>
                             </Grid>
 
@@ -1281,9 +1289,10 @@
                                 </Grid.RowDefinitions>
                                 <TextBlock Text="Active Tool Windows"
                                            FontWeight="Bold"
-                                           Margin="0,3,0,4" >
+                                           Margin="0,3,0,4">
                                 </TextBlock>
-                                <ListBox Grid.Row="1"
+                                <ListBox x:Name="PART_AnchorableListBox"
+                                         Grid.Row="1"
                                          ItemsSource="{Binding Anchorables}"
                                          SelectedItem="{Binding SelectedAnchorable, Mode=TwoWay}"
                                          Background="Transparent"
@@ -1335,7 +1344,8 @@
                                            FontWeight="Bold"
                                            Margin="0,3,0,4">
                                 </TextBlock>
-                                <ListBox Grid.Row="1"
+                                <ListBox x:Name="PART_DocumentListBox"
+                                         Grid.Row="1"
                                          ItemsSource="{Binding Documents}"
                                          SelectedItem="{Binding SelectedDocument, Mode=TwoWay}"
                                          Background="Transparent"
@@ -1392,6 +1402,17 @@
                           </Grid>
                         </Border>
                       </Grid>
+                      <ControlTemplate.Triggers>
+                        <Trigger Property="SelectedDocument"
+                                 Value="{x:Null}">
+                          <Setter Property="Text"
+                                  Value="{Binding SelectedAnchorable.LayoutElement.Title}"
+                                  TargetName="selectedElementTitle" />
+                          <Setter Property="Text"
+                                  Value="{x:Null}"
+                                  TargetName="selectedElementDescription" />
+                        </Trigger>
+                      </ControlTemplate.Triggers>
                     </ControlTemplate>
                   </Setter.Value>
                 </Setter>

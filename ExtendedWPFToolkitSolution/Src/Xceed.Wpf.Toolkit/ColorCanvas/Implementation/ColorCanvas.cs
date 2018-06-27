@@ -325,6 +325,10 @@ namespace Xceed.Wpf.Toolkit
       DefaultStyleKeyProperty.OverrideMetadata( typeof( ColorCanvas ), new FrameworkPropertyMetadata( typeof( ColorCanvas ) ) );
     }
 
+    public ColorCanvas()
+    {
+    }
+
     #endregion //Constructors
 
     #region Base Class Overrides

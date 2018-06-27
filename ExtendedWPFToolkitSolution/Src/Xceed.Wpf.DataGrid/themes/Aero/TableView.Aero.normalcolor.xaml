@@ -43,6 +43,7 @@
 
    <conv:GreaterThanZeroConverter x:Key="greaterThanZeroConverter" />
    <conv:NullToBooleanConverter x:Key="nullToBooleanConverter" />
+   <conv:TypeToBooleanConverter x:Key="typeToBooleanConverter" />
    <conv:ThicknessConverter x:Key="thicknessConverter" />
    <conv:ThicknessConverter x:Key="inverseThicknessConverter"
                             InverseValue="True" />

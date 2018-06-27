@@ -14,17 +14,11 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Xceed.Wpf.AvalonDock.Layout;
-using System.Reflection;
-using System.Diagnostics;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
@@ -38,6 +32,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #endregion
 
+    #region Constructors
+
     static LayoutAnchorableTabItem()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( LayoutAnchorableTabItem ), new FrameworkPropertyMetadata( typeof( LayoutAnchorableTabItem ) ) );
@@ -47,17 +43,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
     }
 
+    #endregion
 
+    #region Properties
 
     #region Model
 
     /// <summary>
     /// Model Dependency Property
     /// </summary>
-    public static readonly DependencyProperty ModelProperty =
-        DependencyProperty.Register( "Model", typeof( LayoutContent ), typeof( LayoutAnchorableTabItem ),
-            new FrameworkPropertyMetadata( (LayoutContent)null,
-                new PropertyChangedCallback( OnModelChanged ) ) );
+    public static readonly DependencyProperty ModelProperty = DependencyProperty.Register( "Model", typeof( LayoutContent ), typeof( LayoutAnchorableTabItem ),
+            new FrameworkPropertyMetadata( ( LayoutContent )null, new PropertyChangedCallback( OnModelChanged ) ) );
 
     /// <summary>
     /// Gets or sets the Model property.  This dependency property 
@@ -67,7 +63,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       get
       {
-        return (LayoutContent)GetValue( ModelProperty );
+        return ( LayoutContent )GetValue( ModelProperty );
       }
       set
       {
@@ -80,7 +76,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// </summary>
     private static void OnModelChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
-      ( (LayoutAnchorableTabItem)d ).OnModelChanged( e );
+      ( ( LayoutAnchorableTabItem )d ).OnModelChanged( e );
     }
 
     /// <summary>
@@ -102,12 +98,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// LayoutItem Read-Only Dependency Property
     /// </summary>
-    private static readonly DependencyPropertyKey LayoutItemPropertyKey
-        = DependencyProperty.RegisterReadOnly( "LayoutItem", typeof( LayoutItem ), typeof( LayoutAnchorableTabItem ),
-            new FrameworkPropertyMetadata( (LayoutItem)null ) );
+    private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly( "LayoutItem", typeof( LayoutItem ), typeof( LayoutAnchorableTabItem ),
+            new FrameworkPropertyMetadata( ( LayoutItem )null ) );
 
-    public static readonly DependencyProperty LayoutItemProperty
-        = LayoutItemPropertyKey.DependencyProperty;
+    public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
     /// <summary>
     /// Gets the LayoutItem property.  This dependency property 
@@ -117,7 +111,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       get
       {
-        return (LayoutItem)GetValue( LayoutItemProperty );
+        return ( LayoutItem )GetValue( LayoutItemProperty );
       }
     }
 
@@ -133,6 +127,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #endregion
 
+    #endregion
+
+    #region Overrides
     protected override void OnMouseLeftButtonDown( System.Windows.Input.MouseButtonEventArgs e )
     {
       base.OnMouseLeftButtonDown( e );
@@ -184,17 +181,16 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       base.OnMouseEnter( e );
 
-      if( _draggingItem != null &&
-          _draggingItem != this &&
+      if( _draggingItem != this &&
           e.LeftButton == MouseButtonState.Pressed )
       {
         var model = Model;
         var container = model.Parent as ILayoutContainer;
         var containerPane = model.Parent as ILayoutPane;
 
-        if( ( containerPane is LayoutAnchorablePane ) && !( (LayoutAnchorablePane)containerPane ).CanRepositionItems )
+        if( ( containerPane is LayoutAnchorablePane ) && !( ( LayoutAnchorablePane )containerPane ).CanRepositionItems )
           return;
-        if( ( containerPane.Parent != null ) && ( containerPane.Parent is LayoutAnchorablePaneGroup ) && !( (LayoutAnchorablePaneGroup)containerPane.Parent ).CanRepositionItems )
+        if( ( containerPane.Parent != null ) && ( containerPane.Parent is LayoutAnchorablePaneGroup ) && !( ( LayoutAnchorablePaneGroup )containerPane.Parent ).CanRepositionItems )
           return;
 
         var childrenList = container.Children.ToList();
@@ -207,6 +203,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
       base.OnPreviewGotKeyboardFocus( e );
 
     }
+
+    #endregion
+
+    #region Internal Methods
 
     internal static bool IsDraggingItem()
     {
@@ -221,10 +221,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       _draggingItem = null;
     }
-
     internal static void CancelMouseLeave()
     {
       _cancelMouseLeave = true;
     }
-  }
+
+  #endregion
+}
 }

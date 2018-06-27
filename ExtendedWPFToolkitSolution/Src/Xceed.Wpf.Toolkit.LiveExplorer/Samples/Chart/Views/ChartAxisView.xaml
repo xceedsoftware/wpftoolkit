@@ -22,17 +22,18 @@
                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
                 x:Name="_demo"
                 Title="Chart Axis">
-    <local:DemoView.Description>
-        <Paragraph FontSize="14" FontFamily="Segoe">
-            <Run>The chart's Axis class represents the x- and y-axis of an area (Area class) in a chart. They can be individually configured with many properties.</Run>
+  <local:DemoView.Description>
+    <Paragraph FontSize="14"
+               FontFamily="Segoe">
+      <Run>The chart's Axis class represents the x- and y-axis of an area (Area class) in a chart. They can be individually configured with many properties.</Run>
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        </Paragraph>
-    </local:DemoView.Description>
+    </Paragraph>
+  </local:DemoView.Description>
 
 
 

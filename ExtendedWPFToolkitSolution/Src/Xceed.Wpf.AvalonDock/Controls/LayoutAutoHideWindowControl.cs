@@ -29,6 +29,28 @@ namespace Xceed.Wpf.AvalonDock.Controls
 {
   public class LayoutAutoHideWindowControl : HwndHost, ILayoutControl
   {
+    #region Members
+
+    internal LayoutAnchorableControl _internalHost = null;
+
+    private LayoutAnchorControl _anchor;
+    private LayoutAnchorable _model;
+    private HwndSource _internalHwndSource = null;
+    private IntPtr parentWindowHandle;
+    private bool _internalHost_ContentRendered = false;
+    private ContentPresenter _internalHostPresenter = new ContentPresenter();
+    private Grid _internalGrid = null;
+    private AnchorSide _side;
+    private LayoutGridResizerControl _resizer = null;
+    private DockingManager _manager;
+    private Border _resizerGhost = null;
+    private Window _resizerWindowHost = null;
+    private Vector _initialStartPoint;
+
+    #endregion
+
+    #region Constructors
+
     static LayoutAutoHideWindowControl()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( LayoutAutoHideWindowControl ), new FrameworkPropertyMetadata( typeof( LayoutAutoHideWindowControl ) ) );
@@ -40,6 +62,170 @@ namespace Xceed.Wpf.AvalonDock.Controls
     internal LayoutAutoHideWindowControl()
     {
     }
+
+    #endregion
+
+    #region Properties
+
+    #region AnchorableStyle
+
+    /// <summary>
+    /// AnchorableStyle Dependency Property
+    /// </summary>
+    public static readonly DependencyProperty AnchorableStyleProperty = DependencyProperty.Register( "AnchorableStyle", typeof( Style ), typeof( LayoutAutoHideWindowControl ),
+            new FrameworkPropertyMetadata( ( Style )null ) );
+
+    /// <summary>
+    /// Gets or sets the AnchorableStyle property. This dependency property 
+    /// indicates the style to apply to the LayoutAnchorableControl hosted in this auto hide window.
+    /// </summary>
+    public Style AnchorableStyle
+    {
+      get
+      {
+        return ( Style )GetValue( AnchorableStyleProperty );
+      }
+      set
+      {
+        SetValue( AnchorableStyleProperty, value );
+      }
+    }
+
+    #endregion
+
+    #region Background
+
+    /// <summary>
+    /// Background Dependency Property
+    /// </summary>
+    public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register( "Background", typeof( Brush ), typeof( LayoutAutoHideWindowControl ),
+            new FrameworkPropertyMetadata( ( Brush )null ) );
+
+    /// <summary>
+    /// Gets or sets the Background property.  This dependency property 
+    /// indicates background of the autohide childwindow.
+    /// </summary>
+    public Brush Background
+    {
+      get
+      {
+        return ( Brush )GetValue( BackgroundProperty );
+      }
+      set
+      {
+        SetValue( BackgroundProperty, value );
+      }
+    }
+
+    #endregion
+
+    #region Model
+
+    public ILayoutElement Model
+    {
+      get
+      {
+        return _model;
+      }
+    }
+
+    #endregion
+
+    #region Resizer
+
+    internal bool IsResizing
+    {
+      get;
+      private set;
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Overrides
+
+    protected override System.Runtime.InteropServices.HandleRef BuildWindowCore( System.Runtime.InteropServices.HandleRef hwndParent )
+    {
+      parentWindowHandle = hwndParent.Handle;
+      _internalHwndSource = new HwndSource( new HwndSourceParameters()
+      {
+        ParentWindow = hwndParent.Handle,
+        WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_VISIBLE | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
+        Width = 0,
+        Height = 0,
+      } );
+
+      _internalHost_ContentRendered = false;
+      _internalHwndSource.ContentRendered += _internalHwndSource_ContentRendered;
+      _internalHwndSource.RootVisual = _internalHostPresenter;
+      AddLogicalChild( _internalHostPresenter );
+      Win32Helper.BringWindowToTop( _internalHwndSource.Handle );
+      return new HandleRef( this, _internalHwndSource.Handle );
+    }
+
+    protected override IntPtr WndProc( IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled )
+    {
+      if( msg == Win32Helper.WM_WINDOWPOSCHANGING )
+      {
+        if( _internalHost_ContentRendered )
+          Win32Helper.SetWindowPos( _internalHwndSource.Handle, Win32Helper.HWND_TOP, 0, 0, 0, 0, Win32Helper.SetWindowPosFlags.IgnoreMove | Win32Helper.SetWindowPosFlags.IgnoreResize );
+      }
+      return base.WndProc( hwnd, msg, wParam, lParam, ref handled );
+    }
+
+    protected override void DestroyWindowCore( System.Runtime.InteropServices.HandleRef hwnd )
+    {
+      if( _internalHwndSource != null )
+      {
+        _internalHwndSource.ContentRendered -= _internalHwndSource_ContentRendered;
+        _internalHwndSource.Dispose();
+        _internalHwndSource = null;
+      }
+    }
+
+    public override void OnApplyTemplate()
+    {
+      base.OnApplyTemplate();
+    }
+
+    protected override bool HasFocusWithinCore()
+    {
+      return false;
+    }
+
+    protected override System.Collections.IEnumerator LogicalChildren
+    {
+      get
+      {
+        if( _internalHostPresenter == null )
+          return new UIElement[] { }.GetEnumerator();
+        return new UIElement[] { _internalHostPresenter }.GetEnumerator();
+      }
+    }
+
+    protected override Size MeasureOverride( Size constraint )
+    {
+      if( _internalHostPresenter == null )
+        return base.MeasureOverride( constraint );
+
+      _internalHostPresenter.Measure( constraint );
+      //return base.MeasureOverride(constraint);
+      return _internalHostPresenter.DesiredSize;
+    }
+
+    protected override Size ArrangeOverride( Size finalSize )
+    {
+      if( _internalHostPresenter == null )
+        return base.ArrangeOverride( finalSize );
+
+      _internalHostPresenter.Arrange( new Rect( finalSize ) );
+      return base.ArrangeOverride( finalSize );// new Size(_internalHostPresenter.ActualWidth, _internalHostPresenter.ActualHeight);
+    }
+
+    #endregion
+
+    #region Internal Methods
 
     internal void Show( LayoutAnchorControl anchor )
     {
@@ -73,82 +259,45 @@ namespace Xceed.Wpf.AvalonDock.Controls
       Visibility = System.Windows.Visibility.Hidden;
     }
 
-    LayoutAnchorControl _anchor;
-
-    LayoutAnchorable _model;
-
-    public ILayoutElement Model
+    internal bool IsWin32MouseOver
     {
       get
       {
-        return _model;
+        var ptMouse = new Win32Helper.Win32Point();
+        if( !Win32Helper.GetCursorPos( ref ptMouse ) )
+          return false;
+
+        Point location = this.PointToScreenDPI( new Point() );
+
+        Rect rectWindow = this.GetScreenArea();
+        if( rectWindow.Contains( new Point( ptMouse.X, ptMouse.Y ) ) )
+          return true;
+
+        var manager = Model.Root.Manager;
+        var anchor = manager.FindVisualChildren<LayoutAnchorControl>().Where( c => c.Model == Model ).FirstOrDefault();
+
+        if( anchor == null )
+          return false;
+
+        location = anchor.PointToScreenDPI( new Point() );
+
+        if( anchor.IsMouseOver )
+          return true;
+
+        return false;
       }
     }
 
-    HwndSource _internalHwndSource = null;
-    IntPtr parentWindowHandle;
-    protected override System.Runtime.InteropServices.HandleRef BuildWindowCore( System.Runtime.InteropServices.HandleRef hwndParent )
-    {
-      parentWindowHandle = hwndParent.Handle;
-      _internalHwndSource = new HwndSource( new HwndSourceParameters()
-      {
-        ParentWindow = hwndParent.Handle,
-        WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_VISIBLE | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
-        Width = 0,
-        Height = 0,
-      } );
+    #endregion
 
-      _internalHost_ContentRendered = false;
-      _internalHwndSource.ContentRendered += _internalHwndSource_ContentRendered;
-      _internalHwndSource.RootVisual = _internalHostPresenter;
-      AddLogicalChild( _internalHostPresenter );
-      Win32Helper.BringWindowToTop( _internalHwndSource.Handle );
-      return new HandleRef( this, _internalHwndSource.Handle );
-    }
+    #region Private Methods
 
-    private bool _internalHost_ContentRendered = false;
-
-    void _internalHwndSource_ContentRendered( object sender, EventArgs e )
+    private void _internalHwndSource_ContentRendered( object sender, EventArgs e )
     {
       _internalHost_ContentRendered = true;
     }
 
-
-    protected override IntPtr WndProc( IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled )
-    {
-      if( msg == Win32Helper.WM_WINDOWPOSCHANGING )
-      {
-        if( _internalHost_ContentRendered )
-          Win32Helper.SetWindowPos( _internalHwndSource.Handle, Win32Helper.HWND_TOP, 0, 0, 0, 0, Win32Helper.SetWindowPosFlags.IgnoreMove | Win32Helper.SetWindowPosFlags.IgnoreResize );
-      }
-      return base.WndProc( hwnd, msg, wParam, lParam, ref handled );
-    }
-
-    protected override void DestroyWindowCore( System.Runtime.InteropServices.HandleRef hwnd )
-    {
-      if( _internalHwndSource != null )
-      {
-        _internalHwndSource.ContentRendered -= _internalHwndSource_ContentRendered;
-        _internalHwndSource.Dispose();
-        _internalHwndSource = null;
-      }
-    }
-
-    public override void OnApplyTemplate()
-    {
-      base.OnApplyTemplate();
-
-
-    }
-
-    ContentPresenter _internalHostPresenter = new ContentPresenter();
-    Grid _internalGrid = null;
-    internal LayoutAnchorableControl _internalHost = null;
-    AnchorSide _side;
-    LayoutGridResizerControl _resizer = null;
-    DockingManager _manager;
-
-    void _model_PropertyChanged( object sender, System.ComponentModel.PropertyChangedEventArgs e )
+    private void _model_PropertyChanged( object sender, System.ComponentModel.PropertyChangedEventArgs e )
     {
       if( e.PropertyName == "IsAutoHidden" )
       {
@@ -159,7 +308,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    void CreateInternalGrid()
+    private void CreateInternalGrid()
     {
       _internalGrid = new Grid() { FlowDirection = System.Windows.FlowDirection.LeftToRight };
       _internalGrid.SetBinding( Grid.BackgroundProperty, new Binding( "Background" ) { Source = this } );
@@ -248,7 +397,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       _internalHostPresenter.Content = _internalGrid;
     }
 
-    void RemoveInternalGrid()
+    private void RemoveInternalGrid()
     {
       _resizer.DragStarted -= new System.Windows.Controls.Primitives.DragStartedEventHandler( OnResizerDragStarted );
       _resizer.DragDelta -= new System.Windows.Controls.Primitives.DragDeltaEventHandler( OnResizerDragDelta );
@@ -257,19 +406,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       _internalHostPresenter.Content = null;
     }
 
-
-    protected override bool HasFocusWithinCore()
-    {
-      return false;
-    }
-
-    #region Resizer
-
-    Border _resizerGhost = null;
-    Window _resizerWindowHost = null;
-    Vector _initialStartPoint;
-
-    void ShowResizerOverlayWindow( LayoutGridResizerControl splitter )
+    private void ShowResizerOverlayWindow( LayoutGridResizerControl splitter )
     {
       _resizerGhost = new Border()
       {
@@ -346,7 +483,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       _resizerWindowHost.Show();
     }
 
-    void HideResizerOverlayWindow()
+    private void HideResizerOverlayWindow()
     {
       if( _resizerWindowHost != null )
       {
@@ -355,13 +492,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    internal bool IsResizing
-    {
-      get;
-      private set;
-    }
-
-    void OnResizerDragCompleted( object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e )
+    private void OnResizerDragCompleted( object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e )
     {
       LayoutGridResizerControl splitter = sender as LayoutGridResizerControl;
       var rootVisual = this.FindVisualTreeRoot() as Visual;
@@ -419,7 +550,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       InvalidateMeasure();
     }
 
-    void OnResizerDragDelta( object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e )
+    private void OnResizerDragDelta( object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e )
     {
       LayoutGridResizerControl splitter = sender as LayoutGridResizerControl;
       var rootVisual = this.FindVisualTreeRoot() as Visual;
@@ -440,126 +571,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    void OnResizerDragStarted( object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e )
+    private void OnResizerDragStarted( object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e )
     {
       var resizer = sender as LayoutGridResizerControl;
       ShowResizerOverlayWindow( resizer );
       IsResizing = true;
     }
-    #endregion
-
-    protected override System.Collections.IEnumerator LogicalChildren
-    {
-      get
-      {
-        if( _internalHostPresenter == null )
-          return new UIElement[] { }.GetEnumerator();
-        return new UIElement[] { _internalHostPresenter }.GetEnumerator();
-      }
-    }
-
-    protected override Size MeasureOverride( Size constraint )
-    {
-      if( _internalHostPresenter == null )
-        return base.MeasureOverride( constraint );
-
-      _internalHostPresenter.Measure( constraint );
-      //return base.MeasureOverride(constraint);
-      return _internalHostPresenter.DesiredSize;
-    }
-
-    protected override Size ArrangeOverride( Size finalSize )
-    {
-      if( _internalHostPresenter == null )
-        return base.ArrangeOverride( finalSize );
-
-      _internalHostPresenter.Arrange( new Rect( finalSize ) );
-      return base.ArrangeOverride( finalSize );// new Size(_internalHostPresenter.ActualWidth, _internalHostPresenter.ActualHeight);
-    }
-
-    #region Background
-
-    /// <summary>
-    /// Background Dependency Property
-    /// </summary>
-    public static readonly DependencyProperty BackgroundProperty =
-        DependencyProperty.Register( "Background", typeof( Brush ), typeof( LayoutAutoHideWindowControl ),
-            new FrameworkPropertyMetadata( ( Brush )null ) );
-
-    /// <summary>
-    /// Gets or sets the Background property.  This dependency property 
-    /// indicates background of the autohide childwindow.
-    /// </summary>
-    public Brush Background
-    {
-      get
-      {
-        return ( Brush )GetValue( BackgroundProperty );
-      }
-      set
-      {
-        SetValue( BackgroundProperty, value );
-      }
-    }
 
     #endregion
-
-    internal bool IsWin32MouseOver
-    {
-      get
-      {
-        var ptMouse = new Win32Helper.Win32Point();
-        if( !Win32Helper.GetCursorPos( ref ptMouse ) )
-          return false;
-
-        Point location = this.PointToScreenDPI( new Point() );
-
-        Rect rectWindow = this.GetScreenArea();
-        if( rectWindow.Contains( new Point( ptMouse.X, ptMouse.Y ) ) )
-          return true;
-
-        var manager = Model.Root.Manager;
-        var anchor = manager.FindVisualChildren<LayoutAnchorControl>().Where( c => c.Model == Model ).FirstOrDefault();
-
-        if( anchor == null )
-          return false;
-
-        location = anchor.PointToScreenDPI( new Point() );
-
-        if( anchor.IsMouseOver )
-          return true;
-
-        return false;
-      }
-    }
-
-    #region AnchorableStyle
-
-    /// <summary>
-    /// AnchorableStyle Dependency Property
-    /// </summary>
-    public static readonly DependencyProperty AnchorableStyleProperty =
-        DependencyProperty.Register( "AnchorableStyle", typeof( Style ), typeof( LayoutAutoHideWindowControl ),
-            new FrameworkPropertyMetadata( ( Style )null ) );
-
-    /// <summary>
-    /// Gets or sets the AnchorableStyle property. This dependency property 
-    /// indicates the style to apply to the LayoutAnchorableControl hosted in this auto hide window.
-    /// </summary>
-    public Style AnchorableStyle
-    {
-      get
-      {
-        return ( Style )GetValue( AnchorableStyleProperty );
-      }
-      set
-      {
-        SetValue( AnchorableStyleProperty, value );
-      }
-    }
-
-    #endregion
-
-
   }
 }

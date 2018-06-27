@@ -48,9 +48,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       get { return "Style Setter"; }
     }
 
-    public static string AdvancedProperties
+    public static string Default
     {
-      get { return "Advanced Properties"; }
+      get { return "Default"; }
     }
   }
 }

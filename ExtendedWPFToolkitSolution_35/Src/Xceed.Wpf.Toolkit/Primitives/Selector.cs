@@ -41,6 +41,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     private int _ignoreSelectedMemberPathValuesChanged;
     private IList _selectedItems;
     private IList _removedItems = new ObservableCollection<object>();
+    private object[] _internalSelectedItems;
 
     private ValueChangeHelper _selectedMemberPathValuesHelper;
     private ValueChangeHelper _valueMemberPathValuesHelper;
@@ -134,10 +135,10 @@ namespace Xceed.Wpf.Toolkit.Primitives
         return;
 
       _ignoreSelectedItemsCollectionChanged++;
-      SelectedItems.Clear();
+      this.SelectedItems.Clear();
       if( newValue != null )
       {
-        SelectedItems.Add( newValue );
+        this.SelectedItems.Add( newValue );
       }
       this.UpdateFromSelectedItems();
       _ignoreSelectedItemsCollectionChanged--;
@@ -170,6 +171,40 @@ namespace Xceed.Wpf.Toolkit.Primitives
         {
           CollectionChangedEventManager.AddListener( newCollection, this );
         }
+
+        var newValue = value;
+        var oldValue = _selectedItems;
+        if( oldValue != null )
+        {
+          foreach( var item in oldValue )
+          {
+            if( ( ( newValue != null ) && !newValue.Contains( item ) ) || ( newValue == null ) )
+            {
+              this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, false ) );
+
+              if( Command != null )
+              {
+                this.Command.Execute( item );
+              }
+            }
+          }
+        }
+        if( newValue != null )
+        {
+          foreach( var item in newValue )
+          {
+            this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, true ) );
+
+            if( ( ( oldValue != null ) && !oldValue.Contains( item ) ) || ( oldValue == null ) )
+            {
+              if( Command != null )
+              {
+                this.Command.Execute( item );
+              }
+            }
+          }
+        }
+
 
         _selectedItems = value;
       }
@@ -370,6 +405,13 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
       this.UpdateSelectedMemberPathValuesBindings();
       this.UpdateValueMemberPathValuesBindings();
+    }
+
+    protected override void OnItemsChanged( NotifyCollectionChangedEventArgs e )
+    {
+      base.OnItemsChanged( e );
+
+      this.RemoveUnavailableSelectedItems();
     }
 
     // When a DataTemplate includes a CheckComboBox, some bindings are
@@ -581,6 +623,46 @@ namespace Xceed.Wpf.Toolkit.Primitives
     /// <param name="e"></param>
     protected virtual void OnSelectedItemsCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
+      if( e.Action == NotifyCollectionChangedAction.Reset )
+      {
+        if( _internalSelectedItems != null )
+        {
+          foreach( var item in _internalSelectedItems )
+          {
+            this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, false ) );
+
+            if( Command != null )
+            {
+              this.Command.Execute( item );
+            }
+          }
+        }
+      }
+      if( e.OldItems != null )
+      {
+        foreach( var item in e.OldItems )
+        {
+          this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, false ) );
+
+          if( Command != null )
+          {
+            this.Command.Execute( item );
+          }
+        }
+      }
+      if( e.NewItems != null )
+      {
+        foreach( var item in e.NewItems )
+        {
+          this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, true ) );
+
+          if( Command != null )
+          {
+            this.Command.Execute( item );
+          }
+        }
+      }
+
       if( _ignoreSelectedItemsCollectionChanged > 0 )
         return;
 
@@ -608,9 +690,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
         if( !SelectedItems.Contains( item ) )
           SelectedItems.Add( item );
       }
-
-      OnItemSelectionChanged(
-        new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, !unselected ) );
     }
 
     /// <summary>
@@ -669,9 +748,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
         return;
 
       RaiseEvent( args );
-
-      if( Command != null )
-        Command.Execute( args.Item );
     }
 
     /// <summary>
@@ -784,6 +860,9 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
       UpdateSelectedItem();
       UpdateSelectedValue();
+
+      _internalSelectedItems = new object[ this.SelectedItems.Count ];
+      this.SelectedItems.CopyTo( _internalSelectedItems, 0 );
     }
 
     /// <summary>

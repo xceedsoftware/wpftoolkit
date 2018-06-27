@@ -35,6 +35,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       return new PropertyGridEditorCollectionControl();
     }
 
+    protected override void SetControlProperties( PropertyItem propertyItem )
+    {
+
+      var propertyGrid = propertyItem.ParentElement as PropertyGrid;
+      if( propertyGrid != null )
+      {
+        // Use the PropertyGrid.EditorDefinitions for the CollectionControl's propertyGrid.
+        this.Editor.EditorDefinitions = propertyGrid.EditorDefinitions;
+      }
+    }
 
     protected override void ResolveValueBinding( PropertyItem propertyItem )
     {

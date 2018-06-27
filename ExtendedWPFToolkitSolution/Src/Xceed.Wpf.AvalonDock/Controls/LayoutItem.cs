@@ -15,14 +15,11 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using Xceed.Wpf.AvalonDock.Layout;
 using System.Windows.Input;
 using Xceed.Wpf.AvalonDock.Commands;
-using System.ComponentModel;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Controls;
@@ -31,6 +28,26 @@ namespace Xceed.Wpf.AvalonDock.Controls
 {
   public abstract class LayoutItem : FrameworkElement
   {
+    #region Members
+
+    private ICommand _defaultCloseCommand;
+    private ICommand _defaultFloatCommand;
+    private ICommand _defaultDockAsDocumentCommand;
+    private ICommand _defaultCloseAllButThisCommand;
+    private ICommand _defaultCloseAllCommand;
+    private ICommand _defaultActivateCommand;
+    private ICommand _defaultNewVerticalTabGroupCommand;
+    private ICommand _defaultNewHorizontalTabGroupCommand;
+    private ICommand _defaultMoveToNextTabGroupCommand;
+    private ICommand _defaultMoveToPreviousTabGroupCommand;
+    private ContentPresenter _view = null;
+    private ReentrantFlag _isSelectedReentrantFlag = new ReentrantFlag();
+    private ReentrantFlag _isActiveReentrantFlag = new ReentrantFlag();
+
+    #endregion
+
+    #region Constructors
+
     static LayoutItem()
     {
       ToolTipProperty.OverrideMetadata( typeof( LayoutItem ), new FrameworkPropertyMetadata( null, ( s, e ) => OnToolTipChanged( s, e ) ) );
@@ -40,55 +57,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     internal LayoutItem()
     {
-
     }
 
-    internal virtual void Attach( LayoutContent model )
-    {
-      LayoutElement = model;
-      Model = model.Content;
+    #endregion
 
-      InitDefaultCommands();
+    #region Properties
 
-      LayoutElement.IsSelectedChanged += new EventHandler( LayoutElement_IsSelectedChanged );
-      LayoutElement.IsActiveChanged += new EventHandler( LayoutElement_IsActiveChanged );
-
-      DataContext = this;
-    }
-
-
-
-    void LayoutElement_IsActiveChanged( object sender, EventArgs e )
-    {
-      if( _isActiveReentrantFlag.CanEnter )
-      {
-        using( _isActiveReentrantFlag.Enter() )
-        {
-          var bnd = BindingOperations.GetBinding( this, IsActiveProperty );
-          IsActive = LayoutElement.IsActive;
-          var bnd2 = BindingOperations.GetBinding( this, IsActiveProperty );
-        }
-      }
-    }
-
-    void LayoutElement_IsSelectedChanged( object sender, EventArgs e )
-    {
-      if( _isSelectedReentrantFlag.CanEnter )
-      {
-        using( _isSelectedReentrantFlag.Enter() )
-        {
-          IsSelected = LayoutElement.IsSelected;
-        }
-      }
-    }
-
-    internal virtual void Detach()
-    {
-      LayoutElement.IsSelectedChanged -= new EventHandler( LayoutElement_IsSelectedChanged );
-      LayoutElement.IsActiveChanged -= new EventHandler( LayoutElement_IsActiveChanged );
-      LayoutElement = null;
-      Model = null;
-    }
+    #region LayoutElement
 
     public LayoutContent LayoutElement
     {
@@ -96,106 +71,20 @@ namespace Xceed.Wpf.AvalonDock.Controls
       private set;
     }
 
+    #endregion
+
+    #region Model
+
     public object Model
     {
       get;
       private set;
     }
 
-    ICommand _defaultCloseCommand;
-    ICommand _defaultFloatCommand;
-    ICommand _defaultDockAsDocumentCommand;
-    ICommand _defaultCloseAllButThisCommand;
-    ICommand _defaultCloseAllCommand;
-    ICommand _defaultActivateCommand;
-    ICommand _defaultNewVerticalTabGroupCommand;
-    ICommand _defaultNewHorizontalTabGroupCommand;
-    ICommand _defaultMoveToNextTabGroupCommand;
-    ICommand _defaultMoveToPreviousTabGroupCommand;
+    #endregion
 
-    protected virtual void InitDefaultCommands()
-    {
-      _defaultCloseCommand = new RelayCommand( ( p ) => ExecuteCloseCommand( p ), ( p ) => CanExecuteCloseCommand( p ) );
-      _defaultFloatCommand = new RelayCommand( ( p ) => ExecuteFloatCommand( p ), ( p ) => CanExecuteFloatCommand( p ) );
-      _defaultDockAsDocumentCommand = new RelayCommand( ( p ) => ExecuteDockAsDocumentCommand( p ), ( p ) => CanExecuteDockAsDocumentCommand( p ) );
-      _defaultCloseAllButThisCommand = new RelayCommand( ( p ) => ExecuteCloseAllButThisCommand( p ), ( p ) => CanExecuteCloseAllButThisCommand( p ) );
-      _defaultCloseAllCommand = new RelayCommand( ( p ) => ExecuteCloseAllCommand( p ), ( p ) => CanExecuteCloseAllCommand( p ) );
-      _defaultActivateCommand = new RelayCommand( ( p ) => ExecuteActivateCommand( p ), ( p ) => CanExecuteActivateCommand( p ) );
-      _defaultNewVerticalTabGroupCommand = new RelayCommand( ( p ) => ExecuteNewVerticalTabGroupCommand( p ), ( p ) => CanExecuteNewVerticalTabGroupCommand( p ) );
-      _defaultNewHorizontalTabGroupCommand = new RelayCommand( ( p ) => ExecuteNewHorizontalTabGroupCommand( p ), ( p ) => CanExecuteNewHorizontalTabGroupCommand( p ) );
-      _defaultMoveToNextTabGroupCommand = new RelayCommand( ( p ) => ExecuteMoveToNextTabGroupCommand( p ), ( p ) => CanExecuteMoveToNextTabGroupCommand( p ) );
-      _defaultMoveToPreviousTabGroupCommand = new RelayCommand( ( p ) => ExecuteMoveToPreviousTabGroupCommand( p ), ( p ) => CanExecuteMoveToPreviousTabGroupCommand( p ) );
-    }
+    #region View
 
-    protected virtual void ClearDefaultBindings()
-    {
-      if( CloseCommand == _defaultCloseCommand )
-        BindingOperations.ClearBinding( this, CloseCommandProperty );
-      if( FloatCommand == _defaultFloatCommand )
-        BindingOperations.ClearBinding( this, FloatCommandProperty );
-      if( DockAsDocumentCommand == _defaultDockAsDocumentCommand )
-        BindingOperations.ClearBinding( this, DockAsDocumentCommandProperty );
-      if( CloseAllButThisCommand == _defaultCloseAllButThisCommand )
-        BindingOperations.ClearBinding( this, CloseAllButThisCommandProperty );
-      if( CloseAllCommand == _defaultCloseAllCommand )
-        BindingOperations.ClearBinding( this, CloseAllCommandProperty );
-      if( ActivateCommand == _defaultActivateCommand )
-        BindingOperations.ClearBinding( this, ActivateCommandProperty );
-      if( NewVerticalTabGroupCommand == _defaultNewVerticalTabGroupCommand )
-        BindingOperations.ClearBinding( this, NewVerticalTabGroupCommandProperty );
-      if( NewHorizontalTabGroupCommand == _defaultNewHorizontalTabGroupCommand )
-        BindingOperations.ClearBinding( this, NewHorizontalTabGroupCommandProperty );
-      if( MoveToNextTabGroupCommand == _defaultMoveToNextTabGroupCommand )
-        BindingOperations.ClearBinding( this, MoveToNextTabGroupCommandProperty );
-      if( MoveToPreviousTabGroupCommand == _defaultMoveToPreviousTabGroupCommand )
-        BindingOperations.ClearBinding( this, MoveToPreviousTabGroupCommandProperty );
-    }
-
-    protected virtual void SetDefaultBindings()
-    {
-      if( CloseCommand == null )
-        CloseCommand = _defaultCloseCommand;
-      if( FloatCommand == null )
-        FloatCommand = _defaultFloatCommand;
-      if( DockAsDocumentCommand == null )
-        DockAsDocumentCommand = _defaultDockAsDocumentCommand;
-      if( CloseAllButThisCommand == null )
-        CloseAllButThisCommand = _defaultCloseAllButThisCommand;
-      if( CloseAllCommand == null )
-        CloseAllCommand = _defaultCloseAllCommand;
-      if( ActivateCommand == null )
-        ActivateCommand = _defaultActivateCommand;
-      if( NewVerticalTabGroupCommand == null )
-        NewVerticalTabGroupCommand = _defaultNewVerticalTabGroupCommand;
-      if( NewHorizontalTabGroupCommand == null )
-        NewHorizontalTabGroupCommand = _defaultNewHorizontalTabGroupCommand;
-      if( MoveToNextTabGroupCommand == null )
-        MoveToNextTabGroupCommand = _defaultMoveToNextTabGroupCommand;
-      if( MoveToPreviousTabGroupCommand == null )
-        MoveToPreviousTabGroupCommand = _defaultMoveToPreviousTabGroupCommand;
-
-
-      IsSelected = LayoutElement.IsSelected;
-      IsActive = LayoutElement.IsActive;
-      CanClose = LayoutElement.CanClose;
-    }
-
-    internal void _ClearDefaultBindings()
-    {
-      ClearDefaultBindings();
-    }
-
-    internal void _SetDefaultBindings()
-    {
-      SetDefaultBindings();
-    }
-
-    internal bool IsViewExists()
-    {
-      return ( _view != null );
-    }
-
-    ContentPresenter _view = null;
     public ContentPresenter View
     {
       get
@@ -220,16 +109,15 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
+    #endregion
 
     #region Title
 
     /// <summary>
     /// Title Dependency Property
     /// </summary>
-    public static readonly DependencyProperty TitleProperty =
-        DependencyProperty.Register( "Title", typeof( string ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( ( string )null,
-                new PropertyChangedCallback( OnTitleChanged ) ) );
+    public static readonly DependencyProperty TitleProperty = DependencyProperty.Register( "Title", typeof( string ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( ( string )null, new PropertyChangedCallback( OnTitleChanged ) ) );
 
     /// <summary>
     /// Gets or sets the Title property.  This dependency property 
@@ -266,28 +154,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #endregion
 
-    #region ToolTip
-    private static void OnToolTipChanged( DependencyObject s, DependencyPropertyChangedEventArgs e )
-    {
-      ( ( LayoutItem )s ).OnToolTipChanged();
-    }
-
-    private void OnToolTipChanged()
-    {
-      if( LayoutElement != null )
-        LayoutElement.ToolTip = ToolTip;
-    }
-    #endregion
-
     #region IconSource
 
     /// <summary>
     /// IconSource Dependency Property
     /// </summary>
-    public static readonly DependencyProperty IconSourceProperty =
-        DependencyProperty.Register( "IconSource", typeof( ImageSource ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( ( ImageSource )null,
-                new PropertyChangedCallback( OnIconSourceChanged ) ) );
+    public static readonly DependencyProperty IconSourceProperty = DependencyProperty.Register( "IconSource", typeof( ImageSource ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( ( ImageSource )null, new PropertyChangedCallback( OnIconSourceChanged ) ) );
 
     /// <summary>
     /// Gets or sets the IconSource property.  This dependency property 
@@ -324,31 +197,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #endregion
 
-    #region Visibility
-
-    private static void OnVisibilityChanged( DependencyObject s, DependencyPropertyChangedEventArgs e )
-    {
-      ( ( LayoutItem )s ).OnVisibilityChanged();
-    }
-
-    protected virtual void OnVisibilityChanged()
-    {
-      if( LayoutElement != null &&
-          Visibility == System.Windows.Visibility.Collapsed )
-        LayoutElement.Close();
-    }
-
-    #endregion
-
     #region ContentId
 
     /// <summary>
     /// ContentId Dependency Property
     /// </summary>
-    public static readonly DependencyProperty ContentIdProperty =
-        DependencyProperty.Register( "ContentId", typeof( string ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( ( string )null,
-                new PropertyChangedCallback( OnContentIdChanged ) ) );
+    public static readonly DependencyProperty ContentIdProperty = DependencyProperty.Register( "ContentId", typeof( string ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( ( string )null, new PropertyChangedCallback( OnContentIdChanged ) ) );
 
     /// <summary>
     /// Gets or sets the ContentId property.  This dependency property 
@@ -387,15 +242,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region IsSelected
 
-    ReentrantFlag _isSelectedReentrantFlag = new ReentrantFlag();
-
     /// <summary>
     /// IsSelected Dependency Property
     /// </summary>
-    public static readonly DependencyProperty IsSelectedProperty =
-        DependencyProperty.Register( "IsSelected", typeof( bool ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( ( bool )false,
-                new PropertyChangedCallback( OnIsSelectedChanged ) ) );
+    public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register( "IsSelected", typeof( bool ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( ( bool )false, new PropertyChangedCallback( OnIsSelectedChanged ) ) );
 
     /// <summary>
     /// Gets or sets the IsSelected property.  This dependency property 
@@ -438,17 +289,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #endregion
 
-    #region IsActive
-
-    ReentrantFlag _isActiveReentrantFlag = new ReentrantFlag();
+    #region IsActive  
 
     /// <summary>
     /// IsActive Dependency Property
     /// </summary>
-    public static readonly DependencyProperty IsActiveProperty =
-        DependencyProperty.Register( "IsActive", typeof( bool ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( ( bool )false,
-                new PropertyChangedCallback( OnIsActiveChanged ) ) );
+    public static readonly DependencyProperty IsActiveProperty = DependencyProperty.Register( "IsActive", typeof( bool ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( ( bool )false, new PropertyChangedCallback( OnIsActiveChanged ) ) );
 
     /// <summary>
     /// Gets or sets the IsActive property.  This dependency property 
@@ -496,10 +343,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// CanClose Dependency Property
     /// </summary>
-    public static readonly DependencyProperty CanCloseProperty =
-        DependencyProperty.Register( "CanClose", typeof( bool ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( ( bool )true,
-                new PropertyChangedCallback( OnCanCloseChanged ) ) );
+    public static readonly DependencyProperty CanCloseProperty = DependencyProperty.Register( "CanClose", typeof( bool ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( ( bool )true, new PropertyChangedCallback( OnCanCloseChanged ) ) );
 
     /// <summary>
     /// Gets or sets the CanClose property.  This dependency property 
@@ -541,10 +386,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// CanFloat Dependency Property
     /// </summary>
-    public static readonly DependencyProperty CanFloatProperty =
-        DependencyProperty.Register( "CanFloat", typeof( bool ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( ( bool )true,
-                new PropertyChangedCallback( OnCanFloatChanged ) ) );
+    public static readonly DependencyProperty CanFloatProperty = DependencyProperty.Register( "CanFloat", typeof( bool ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( ( bool )true, new PropertyChangedCallback( OnCanFloatChanged ) ) );
 
     /// <summary>
     /// Gets or sets the CanFloat property.  This dependency property 
@@ -586,11 +429,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// CloseCommand Dependency Property
     /// </summary>
-    public static readonly DependencyProperty CloseCommandProperty =
-        DependencyProperty.Register( "CloseCommand", typeof( ICommand ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( null,
-                new PropertyChangedCallback( OnCloseCommandChanged ),
-                new CoerceValueCallback( CoerceCloseCommandValue ) ) );
+    public static readonly DependencyProperty CloseCommandProperty = DependencyProperty.Register( "CloseCommand", typeof( ICommand ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( null, new PropertyChangedCallback( OnCloseCommandChanged ), new CoerceValueCallback( CoerceCloseCommandValue ) ) );
 
     /// <summary>
     /// Gets or sets the CloseCommand property.  This dependency property 
@@ -650,11 +490,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// FloatCommand Dependency Property
     /// </summary>
-    public static readonly DependencyProperty FloatCommandProperty =
-        DependencyProperty.Register( "FloatCommand", typeof( ICommand ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( null,
-                new PropertyChangedCallback( OnFloatCommandChanged ),
-                new CoerceValueCallback( CoerceFloatCommandValue ) ) );
+    public static readonly DependencyProperty FloatCommandProperty = DependencyProperty.Register( "FloatCommand", typeof( ICommand ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( null, new PropertyChangedCallback( OnFloatCommandChanged ), new CoerceValueCallback( CoerceFloatCommandValue ) ) );
 
     /// <summary>
     /// Gets or sets the FloatCommand property.  This dependency property 
@@ -713,16 +550,20 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #endregion
 
+
+
+
+
+
+
+
     #region DockAsDocumentCommand
 
     /// <summary>
     /// DockAsDocumentCommand Dependency Property
     /// </summary>
-    public static readonly DependencyProperty DockAsDocumentCommandProperty =
-        DependencyProperty.Register( "DockAsDocumentCommand", typeof( ICommand ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( null,
-                new PropertyChangedCallback( OnDockAsDocumentCommandChanged ),
-                new CoerceValueCallback( CoerceDockAsDocumentCommandValue ) ) );
+    public static readonly DependencyProperty DockAsDocumentCommandProperty = DependencyProperty.Register( "DockAsDocumentCommand", typeof( ICommand ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( null, new PropertyChangedCallback( OnDockAsDocumentCommandChanged ), new CoerceValueCallback( CoerceDockAsDocumentCommandValue ) ) );
 
     /// <summary>
     /// Gets or sets the DockAsDocumentCommand property.  This dependency property 
@@ -781,11 +622,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// CloseAllButThisCommand Dependency Property
     /// </summary>
-    public static readonly DependencyProperty CloseAllButThisCommandProperty =
-        DependencyProperty.Register( "CloseAllButThisCommand", typeof( ICommand ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( null,
-                new PropertyChangedCallback( OnCloseAllButThisCommandChanged ),
-                new CoerceValueCallback( CoerceCloseAllButThisCommandValue ) ) );
+    public static readonly DependencyProperty CloseAllButThisCommandProperty = DependencyProperty.Register( "CloseAllButThisCommand", typeof( ICommand ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( null, new PropertyChangedCallback( OnCloseAllButThisCommandChanged ), new CoerceValueCallback( CoerceCloseAllButThisCommandValue ) ) );
 
     /// <summary>
     /// Gets or sets the CloseAllButThisCommand property.  This dependency property 
@@ -850,11 +688,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// CloseAllCommand Dependency Property
     /// </summary>
-    public static readonly DependencyProperty CloseAllCommandProperty =
-        DependencyProperty.Register( "CloseAllCommand", typeof( ICommand ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( null,
-                new PropertyChangedCallback( OnCloseAllCommandChanged ),
-                new CoerceValueCallback( CoerceCloseAllCommandValue ) ) );
+    public static readonly DependencyProperty CloseAllCommandProperty = DependencyProperty.Register( "CloseAllCommand", typeof( ICommand ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( null, new PropertyChangedCallback( OnCloseAllCommandChanged ), new CoerceValueCallback( CoerceCloseAllCommandValue ) ) );
 
     /// <summary>
     /// Gets or sets the CloseAllCommand property.  This dependency property 
@@ -919,11 +754,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// ActivateCommand Dependency Property
     /// </summary>
-    public static readonly DependencyProperty ActivateCommandProperty =
-        DependencyProperty.Register( "ActivateCommand", typeof( ICommand ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( null,
-                new PropertyChangedCallback( OnActivateCommandChanged ),
-                new CoerceValueCallback( CoerceActivateCommandValue ) ) );
+    public static readonly DependencyProperty ActivateCommandProperty = DependencyProperty.Register( "ActivateCommand", typeof( ICommand ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( null, new PropertyChangedCallback( OnActivateCommandChanged ), new CoerceValueCallback( CoerceActivateCommandValue ) ) );
 
     /// <summary>
     /// Gets or sets the ActivateCommand property.  This dependency property 
@@ -981,10 +813,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// NewVerticalTabGroupCommand Dependency Property
     /// </summary>
-    public static readonly DependencyProperty NewVerticalTabGroupCommandProperty =
-        DependencyProperty.Register( "NewVerticalTabGroupCommand", typeof( ICommand ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( ( ICommand )null,
-                new PropertyChangedCallback( OnNewVerticalTabGroupCommandChanged ) ) );
+    public static readonly DependencyProperty NewVerticalTabGroupCommandProperty = DependencyProperty.Register( "NewVerticalTabGroupCommand", typeof( ICommand ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( ( ICommand )null, new PropertyChangedCallback( OnNewVerticalTabGroupCommandChanged ) ) );
 
     /// <summary>
     /// Gets or sets the NewVerticalTabGroupCommand property.  This dependency property 
@@ -1057,10 +887,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// NewHorizontalTabGroupCommand Dependency Property
     /// </summary>
-    public static readonly DependencyProperty NewHorizontalTabGroupCommandProperty =
-        DependencyProperty.Register( "NewHorizontalTabGroupCommand", typeof( ICommand ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( ( ICommand )null,
-                new PropertyChangedCallback( OnNewHorizontalTabGroupCommandChanged ) ) );
+    public static readonly DependencyProperty NewHorizontalTabGroupCommandProperty = DependencyProperty.Register( "NewHorizontalTabGroupCommand", typeof( ICommand ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( ( ICommand )null, new PropertyChangedCallback( OnNewHorizontalTabGroupCommandChanged ) ) );
 
     /// <summary>
     /// Gets or sets the NewHorizontalTabGroupCommand property.  This dependency property 
@@ -1134,10 +962,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// MoveToNextTabGroupCommand Dependency Property
     /// </summary>
-    public static readonly DependencyProperty MoveToNextTabGroupCommandProperty =
-        DependencyProperty.Register( "MoveToNextTabGroupCommand", typeof( ICommand ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( ( ICommand )null,
-                new PropertyChangedCallback( OnMoveToNextTabGroupCommandChanged ) ) );
+    public static readonly DependencyProperty MoveToNextTabGroupCommandProperty = DependencyProperty.Register( "MoveToNextTabGroupCommand", typeof( ICommand ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( ( ICommand )null, new PropertyChangedCallback( OnMoveToNextTabGroupCommandChanged ) ) );
 
     /// <summary>
     /// Gets or sets the MoveToNextTabGroupCommand property.  This dependency property 
@@ -1203,10 +1029,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// MoveToPreviousTabGroupCommand Dependency Property
     /// </summary>
-    public static readonly DependencyProperty MoveToPreviousTabGroupCommandProperty =
-        DependencyProperty.Register( "MoveToPreviousTabGroupCommand", typeof( ICommand ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( ( ICommand )null,
-                new PropertyChangedCallback( OnMoveToPreviousTabGroupCommandChanged ) ) );
+    public static readonly DependencyProperty MoveToPreviousTabGroupCommandProperty = DependencyProperty.Register( "MoveToPreviousTabGroupCommand", typeof( ICommand ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( ( ICommand )null, new PropertyChangedCallback( OnMoveToPreviousTabGroupCommandChanged ) ) );
 
     /// <summary>
     /// Gets or sets the MoveToPreviousTabGroupCommand property.  This dependency property 
@@ -1265,7 +1089,164 @@ namespace Xceed.Wpf.AvalonDock.Controls
     }
     #endregion
 
+    #endregion
+
+    #region Internal Methods
+
+    protected virtual void InitDefaultCommands()
+    {
+      _defaultCloseCommand = new RelayCommand( ( p ) => ExecuteCloseCommand( p ), ( p ) => CanExecuteCloseCommand( p ) );
+      _defaultFloatCommand = new RelayCommand( ( p ) => ExecuteFloatCommand( p ), ( p ) => CanExecuteFloatCommand( p ) );
+      _defaultDockAsDocumentCommand = new RelayCommand( ( p ) => ExecuteDockAsDocumentCommand( p ), ( p ) => CanExecuteDockAsDocumentCommand( p ) );
+      _defaultCloseAllButThisCommand = new RelayCommand( ( p ) => ExecuteCloseAllButThisCommand( p ), ( p ) => CanExecuteCloseAllButThisCommand( p ) );
+      _defaultCloseAllCommand = new RelayCommand( ( p ) => ExecuteCloseAllCommand( p ), ( p ) => CanExecuteCloseAllCommand( p ) );
+      _defaultActivateCommand = new RelayCommand( ( p ) => ExecuteActivateCommand( p ), ( p ) => CanExecuteActivateCommand( p ) );
+      _defaultNewVerticalTabGroupCommand = new RelayCommand( ( p ) => ExecuteNewVerticalTabGroupCommand( p ), ( p ) => CanExecuteNewVerticalTabGroupCommand( p ) );
+      _defaultNewHorizontalTabGroupCommand = new RelayCommand( ( p ) => ExecuteNewHorizontalTabGroupCommand( p ), ( p ) => CanExecuteNewHorizontalTabGroupCommand( p ) );
+      _defaultMoveToNextTabGroupCommand = new RelayCommand( ( p ) => ExecuteMoveToNextTabGroupCommand( p ), ( p ) => CanExecuteMoveToNextTabGroupCommand( p ) );
+      _defaultMoveToPreviousTabGroupCommand = new RelayCommand( ( p ) => ExecuteMoveToPreviousTabGroupCommand( p ), ( p ) => CanExecuteMoveToPreviousTabGroupCommand( p ) );
+    }
+
+    protected virtual void ClearDefaultBindings()
+    {
+      if( CloseCommand == _defaultCloseCommand )
+        BindingOperations.ClearBinding( this, CloseCommandProperty );
+      if( FloatCommand == _defaultFloatCommand )
+        BindingOperations.ClearBinding( this, FloatCommandProperty );
+      if( DockAsDocumentCommand == _defaultDockAsDocumentCommand )
+        BindingOperations.ClearBinding( this, DockAsDocumentCommandProperty );
+      if( CloseAllButThisCommand == _defaultCloseAllButThisCommand )
+        BindingOperations.ClearBinding( this, CloseAllButThisCommandProperty );
+      if( CloseAllCommand == _defaultCloseAllCommand )
+        BindingOperations.ClearBinding( this, CloseAllCommandProperty );
+      if( ActivateCommand == _defaultActivateCommand )
+        BindingOperations.ClearBinding( this, ActivateCommandProperty );
+      if( NewVerticalTabGroupCommand == _defaultNewVerticalTabGroupCommand )
+        BindingOperations.ClearBinding( this, NewVerticalTabGroupCommandProperty );
+      if( NewHorizontalTabGroupCommand == _defaultNewHorizontalTabGroupCommand )
+        BindingOperations.ClearBinding( this, NewHorizontalTabGroupCommandProperty );
+      if( MoveToNextTabGroupCommand == _defaultMoveToNextTabGroupCommand )
+        BindingOperations.ClearBinding( this, MoveToNextTabGroupCommandProperty );
+      if( MoveToPreviousTabGroupCommand == _defaultMoveToPreviousTabGroupCommand )
+        BindingOperations.ClearBinding( this, MoveToPreviousTabGroupCommandProperty );
+    }
+
+    protected virtual void SetDefaultBindings()
+    {
+      if( CloseCommand == null )
+        CloseCommand = _defaultCloseCommand;
+      if( FloatCommand == null )
+        FloatCommand = _defaultFloatCommand;
+      if( DockAsDocumentCommand == null )
+        DockAsDocumentCommand = _defaultDockAsDocumentCommand;
+      if( CloseAllButThisCommand == null )
+        CloseAllButThisCommand = _defaultCloseAllButThisCommand;
+      if( CloseAllCommand == null )
+        CloseAllCommand = _defaultCloseAllCommand;
+      if( ActivateCommand == null )
+        ActivateCommand = _defaultActivateCommand;
+      if( NewVerticalTabGroupCommand == null )
+        NewVerticalTabGroupCommand = _defaultNewVerticalTabGroupCommand;
+      if( NewHorizontalTabGroupCommand == null )
+        NewHorizontalTabGroupCommand = _defaultNewHorizontalTabGroupCommand;
+      if( MoveToNextTabGroupCommand == null )
+        MoveToNextTabGroupCommand = _defaultMoveToNextTabGroupCommand;
+      if( MoveToPreviousTabGroupCommand == null )
+        MoveToPreviousTabGroupCommand = _defaultMoveToPreviousTabGroupCommand;
 
 
+      IsSelected = LayoutElement.IsSelected;
+      IsActive = LayoutElement.IsActive;
+      CanClose = LayoutElement.CanClose;
+    }
+
+    protected virtual void OnVisibilityChanged()
+    {
+      if( LayoutElement != null &&
+          Visibility == System.Windows.Visibility.Collapsed )
+        LayoutElement.Close();
+    }
+
+    internal virtual void Attach( LayoutContent model )
+    {
+      LayoutElement = model;
+      Model = model.Content;
+
+      InitDefaultCommands();
+
+      LayoutElement.IsSelectedChanged += new EventHandler( LayoutElement_IsSelectedChanged );
+      LayoutElement.IsActiveChanged += new EventHandler( LayoutElement_IsActiveChanged );
+
+      DataContext = this;
+    }
+
+    internal virtual void Detach()
+    {
+      LayoutElement.IsSelectedChanged -= new EventHandler( LayoutElement_IsSelectedChanged );
+      LayoutElement.IsActiveChanged -= new EventHandler( LayoutElement_IsActiveChanged );
+      LayoutElement = null;
+      Model = null;
+    }
+
+    internal void _ClearDefaultBindings()
+    {
+      ClearDefaultBindings();
+    }
+
+    internal void _SetDefaultBindings()
+    {
+      SetDefaultBindings();
+    }
+
+    internal bool IsViewExists()
+    {
+      return ( _view != null );
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void LayoutElement_IsActiveChanged( object sender, EventArgs e )
+    {
+      if( _isActiveReentrantFlag.CanEnter )
+      {
+        using( _isActiveReentrantFlag.Enter() )
+        {
+          var bnd = BindingOperations.GetBinding( this, IsActiveProperty );
+          IsActive = LayoutElement.IsActive;
+          var bnd2 = BindingOperations.GetBinding( this, IsActiveProperty );
+        }
+      }
+    }
+
+    private void LayoutElement_IsSelectedChanged( object sender, EventArgs e )
+    {
+      if( _isSelectedReentrantFlag.CanEnter )
+      {
+        using( _isSelectedReentrantFlag.Enter() )
+        {
+          IsSelected = LayoutElement.IsSelected;
+        }
+      }
+    }
+
+    private static void OnToolTipChanged( DependencyObject s, DependencyPropertyChangedEventArgs e )
+    {
+      ( ( LayoutItem )s ).OnToolTipChanged();
+    }
+
+    private void OnToolTipChanged()
+    {
+      if( LayoutElement != null )
+        LayoutElement.ToolTip = ToolTip;
+    }
+
+    private static void OnVisibilityChanged( DependencyObject s, DependencyPropertyChangedEventArgs e )
+    {
+      ( ( LayoutItem )s ).OnVisibilityChanged();
+    }
+
+    #endregion
   }
 }

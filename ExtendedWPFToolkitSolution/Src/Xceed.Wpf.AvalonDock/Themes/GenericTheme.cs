@@ -15,9 +15,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Xceed.Wpf.AvalonDock.Themes
 {
@@ -25,9 +22,7 @@ namespace Xceed.Wpf.AvalonDock.Themes
   {
     public override Uri GetResourceUri()
     {
-      return new Uri(
-          "/Xceed.Wpf.AvalonDock;component/Themes/generic.xaml",
-          UriKind.Relative );
+      return new Uri( "/Xceed.Wpf.AvalonDock;component/Themes/generic.xaml", UriKind.Relative );
     }
   }
 }

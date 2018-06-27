@@ -33,7 +33,8 @@
                                ItemsSourceType="{Binding ItemsSourceType, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Mode=TwoWay}"
                                NewItemTypes="{Binding NewItemTypes, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                               IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
+                               IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                               EditorDefinitions="{Binding EditorDefinitions, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
 
       <StackPanel Orientation="Horizontal"
                   Grid.Row="1"

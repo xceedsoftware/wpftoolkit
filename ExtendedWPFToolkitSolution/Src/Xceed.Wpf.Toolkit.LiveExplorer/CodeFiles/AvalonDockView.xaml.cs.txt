@@ -14,11 +14,9 @@
 
   ************************************************************************************/
 
-using System;
-using System.Windows.Controls;
-using Xceed.Wpf.Toolkit;
-using System.Windows.Media;
 using System.Windows;
+using Xceed.Wpf.AvalonDock.Layout.Serialization;
+using System.IO;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.AvalonDock.Views
 {
@@ -30,6 +28,24 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.AvalonDock.Views
     public AvalonDockView()
     {
       InitializeComponent();
+    }
+
+    private void SaveButton_Click( object sender, RoutedEventArgs e )
+    {
+      using( var writer = new StreamWriter( "AvalonDockSavedFile.txt" ) )
+      {
+        var layoutSerializer = new XmlLayoutSerializer( _dockingManager );
+        layoutSerializer.Serialize( writer );
+      }
+    }
+
+    private void LoadButton_Click( object sender, RoutedEventArgs e )
+    {
+      using( var reader = new StreamReader( "AvalonDockSavedFile.txt" ) )
+      {
+        var layoutSerializer = new XmlLayoutSerializer( _dockingManager );
+        layoutSerializer.Deserialize( reader );
+      }
     }
   }
 }

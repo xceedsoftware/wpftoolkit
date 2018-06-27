@@ -15,6 +15,8 @@
   ***********************************************************************************/
 
 using System;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit.Core.Converters
@@ -25,12 +27,21 @@ namespace Xceed.Wpf.Toolkit.Core.Converters
     {
       if( value != null )
       {
-        string valueString = value.ToString();
-        if( string.IsNullOrEmpty( valueString )
-         || ( valueString == value.GetType().UnderlyingSystemType.ToString() ) )
+        if( value is Type )
         {
-          return value.GetType().Name;
+          var displayNameAttribute = ( ( Type )value ).GetCustomAttributes( false ).OfType<DisplayNameAttribute>().FirstOrDefault();
+          return ( displayNameAttribute != null ) ? displayNameAttribute.DisplayName : ( ( Type )value ).Name;
         }
+
+        var type = value.GetType();
+        var valueString = value.ToString();
+        if( string.IsNullOrEmpty( valueString )
+         || ( valueString == type.UnderlyingSystemType.ToString() ) )
+        {
+          var displayNameAttribute = type.GetCustomAttributes( false ).OfType<DisplayNameAttribute>().FirstOrDefault();
+          return ( displayNameAttribute != null ) ? displayNameAttribute.DisplayName : type.Name;
+        }
+
         return value; 
       }
       return null;

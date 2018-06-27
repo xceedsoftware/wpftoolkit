@@ -48,6 +48,7 @@
   <pgconv:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
   <pgconv:IsDefaultCategoryConverter x:Key="IsDefaultCategoryConverter" />
   <pgconv:SelectedObjectConverter x:Key="objectConverter" />
+  <pgconv:PropertyItemEditorConverter x:Key="PropertyItemEditorConverter" />
 
   <x:Static x:Key="EmptyString"
             Member="sys:String.Empty" />
@@ -914,11 +915,11 @@
     </Setter>
   </Style>
 
-  <ContextMenu x:Key="{ComponentResourceKey 
-                  TypeInTargetAssembly={x:Type pg:PropertyGrid}, 
-                  ResourceId=SelectedObjectAdvancedOptionsMenu}">
+  <ContextMenu x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type pg:PropertyGrid}, ResourceId=SelectedObjectAdvancedOptionsMenu}">
     <MenuItem Header="Reset Value"
-              Command="commands:PropertyItemCommands.ResetValue" />
+              Command="commands:PropertyItemCommands.ResetValue"
+              CommandParameter="{Binding}"
+              CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"/>
   </ContextMenu>
 
   <pg:CategoryGroupStyleSelector x:Key="categoryGroupStyleSelector"
@@ -1024,11 +1025,17 @@
                   <ToolTip Visibility="Collapsed" />
                 </Border.ToolTip >
                 <ContentControl x:Name="PART_ValueContainer"
-                                Content="{TemplateBinding Editor}"
                                 Focusable="False"
                                 IsTabStop="False"
-                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}, Converter={StaticResource InverseBoolConverter}}">
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                  <ContentControl.Content>
+                    <MultiBinding Converter="{StaticResource PropertyItemEditorConverter}">
+                      <Binding Path="Editor"
+                               RelativeSource="{RelativeSource TemplatedParent}" />
+                      <Binding Path="IsReadOnly"
+                               RelativeSource="{RelativeSource AncestorType={x:Type pg:PropertyGrid}}" />
+                    </MultiBinding>
+                  </ContentControl.Content>
                 </ContentControl>
               </Border>
 
@@ -1155,7 +1162,7 @@
                       Value="../Images/Style11.png" />
             </DataTrigger>
             <DataTrigger Binding="{Binding ElementName=_optionsImage, Path=ToolTip}"
-                         Value="{x:Static pg:StringConstants.AdvancedProperties}">
+                         Value="{x:Static pg:StringConstants.Default}">
               <Setter TargetName="_optionsImage"
                       Property="Source"
                       Value="../Images/AdvancedProperties11.png" />

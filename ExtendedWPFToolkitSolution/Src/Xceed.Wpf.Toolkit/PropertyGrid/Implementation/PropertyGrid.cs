@@ -49,7 +49,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private int _initializationCount;
     private ContainerHelperBase _containerHelper;
     private PropertyDefinitionCollection _propertyDefinitions;
-    private EditorDefinitionCollection _editorDefinitions;    
     private WeakEventListener<NotifyCollectionChangedEventArgs> _propertyDefinitionsListener;
     private WeakEventListener<NotifyCollectionChangedEventArgs> _editorDefinitionsListener;
 
@@ -127,21 +126,25 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region EditorDefinitions
 
+    public static readonly DependencyProperty EditorDefinitionsProperty = DependencyProperty.Register( "EditorDefinitions", typeof( EditorDefinitionCollection ), typeof( PropertyGrid )
+      , new UIPropertyMetadata( null, OnEditorDefinitionsChanged ) );
     public EditorDefinitionCollection EditorDefinitions
     {
       get
       {
-        return _editorDefinitions;
+        return ( EditorDefinitionCollection )GetValue( EditorDefinitionsProperty );
       }
       set
       {
-        if( _editorDefinitions != value )
-        {
-          EditorDefinitionCollection oldValue = _editorDefinitions;
-          _editorDefinitions = value;
-          this.OnEditorDefinitionsChanged( oldValue, value );
-        }
+        SetValue( EditorDefinitionsProperty, value );
       }
+    }
+
+    private static void OnEditorDefinitionsChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      PropertyGrid propertyGrid = o as PropertyGrid;
+      if( propertyGrid != null )
+        propertyGrid.OnEditorDefinitionsChanged( ( EditorDefinitionCollection )e.OldValue, ( EditorDefinitionCollection )e.NewValue );
     }
 
     protected virtual void OnEditorDefinitionsChanged( EditorDefinitionCollection oldValue, EditorDefinitionCollection newValue )
@@ -275,6 +278,24 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
     #endregion //IsMiscCategoryLabelHidden
+
+    #region IsScrollingToTopAfterRefresh
+
+    public static readonly DependencyProperty IsScrollingToTopAfterRefreshProperty = DependencyProperty.Register( "IsScrollingToTopAfterRefresh", typeof( bool ), typeof( PropertyGrid )
+      , new UIPropertyMetadata( true ) );
+    public bool IsScrollingToTopAfterRefresh
+    {
+      get
+      {
+        return ( bool )GetValue( IsScrollingToTopAfterRefreshProperty );
+      }
+      set
+      {
+        SetValue( IsScrollingToTopAfterRefreshProperty, value );
+      }
+    }
+
+    #endregion //IsScrollingToTopAfterRefresh
 
     #region IsVirtualizing
 
@@ -821,7 +842,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       _propertyDefinitionsListener = new WeakEventListener<NotifyCollectionChangedEventArgs>( this.OnPropertyDefinitionsCollectionChanged );
       _editorDefinitionsListener = new WeakEventListener<NotifyCollectionChangedEventArgs>( this.OnEditorDefinitionsCollectionChanged);     
       UpdateContainerHelper();
-      EditorDefinitions = new EditorDefinitionCollection();
+#if VS2008
+        EditorDefinitions = new EditorDefinitionCollection();
+#else
+      this.SetCurrentValue( PropertyGrid.EditorDefinitionsProperty, new EditorDefinitionCollection() );
+#endif
+
       PropertyDefinitions = new PropertyDefinitionCollection();      
       this.PropertyValueChanged += this.PropertyGrid_PropertyValueChanged;
 
@@ -937,7 +963,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private void DragThumb_DragDelta( object sender, DragDeltaEventArgs e )
     {
-      NameColumnWidth = Math.Max( 0, NameColumnWidth + e.HorizontalChange );
+      NameColumnWidth = Math.Min( Math.Max( this.ActualWidth * 0.1, NameColumnWidth + e.HorizontalChange ), this.ActualWidth * 0.9 );
     }
 
 
@@ -1129,7 +1155,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         _containerHelper.ChildrenItemsControl = childrenItemsControl;
       }
 
-      this.ScrollToTop();
+      if( this.IsScrollingToTopAfterRefresh )
+      {
+        this.ScrollToTop();
+      }
 
       // Since the template will bind on this property and this property
       // will be different when the property parent is updated.

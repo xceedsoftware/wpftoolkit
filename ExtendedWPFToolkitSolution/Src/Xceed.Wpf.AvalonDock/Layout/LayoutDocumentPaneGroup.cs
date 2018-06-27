@@ -15,65 +15,73 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-    [ContentProperty("Children")]
-    [Serializable]
-    public class LayoutDocumentPaneGroup : LayoutPositionableGroup<ILayoutDocumentPane>, ILayoutDocumentPane, ILayoutOrientableGroup
+  [ContentProperty( "Children" )]
+  [Serializable]
+  public class LayoutDocumentPaneGroup : LayoutPositionableGroup<ILayoutDocumentPane>, ILayoutDocumentPane, ILayoutOrientableGroup
+  {
+    #region Constructors
+
+    public LayoutDocumentPaneGroup()
     {
-        public LayoutDocumentPaneGroup()
+    }
+
+    public LayoutDocumentPaneGroup( LayoutDocumentPane documentPane )
+    {
+      Children.Add( documentPane );
+    }
+
+    #endregion
+
+    #region Properties
+
+    #region Orientation
+
+    private Orientation _orientation;
+    public Orientation Orientation
+    {
+      get
+      {
+        return _orientation;
+      }
+      set
+      {
+        if( _orientation != value )
         {
+          RaisePropertyChanging( "Orientation" );
+          _orientation = value;
+          RaisePropertyChanged( "Orientation" );
         }
+      }
+    }
 
-        public LayoutDocumentPaneGroup(LayoutDocumentPane documentPane)
-        {
-            Children.Add(documentPane);
-        }
+    #endregion
 
-        #region Orientation
+    #endregion
 
-        private Orientation _orientation;
-        public Orientation Orientation
-        {
-            get { return _orientation; }
-            set
-            {
-                if (_orientation != value)
-                {
-                    RaisePropertyChanging("Orientation");
-                    _orientation = value;
-                    RaisePropertyChanged("Orientation");
-                }
-            }
-        }
+    #region Overrides
 
-        #endregion
+    protected override bool GetVisibility()
+    {
+      return true;
+    }
 
-        protected override bool GetVisibility()
-        {
-            return true;
-        }
+    public override void WriteXml( System.Xml.XmlWriter writer )
+    {
+      writer.WriteAttributeString( "Orientation", Orientation.ToString() );
+      base.WriteXml( writer );
+    }
 
-        public override void WriteXml(System.Xml.XmlWriter writer)
-        {
-            writer.WriteAttributeString("Orientation", Orientation.ToString());
-            base.WriteXml(writer);
-        }
-
-        public override void ReadXml(System.Xml.XmlReader reader)
-        {
-            if (reader.MoveToAttribute("Orientation"))
-                Orientation = (Orientation)Enum.Parse(typeof(Orientation), reader.Value, true);
-            base.ReadXml(reader);
-        }
+    public override void ReadXml( System.Xml.XmlReader reader )
+    {
+      if( reader.MoveToAttribute( "Orientation" ) )
+        Orientation = ( Orientation )Enum.Parse( typeof( Orientation ), reader.Value, true );
+      base.ReadXml( reader );
+    }
 
 #if TRACE
         public override void ConsoleDump(int tab)
@@ -85,5 +93,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
               child.ConsoleDump(tab + 1);
         }
 #endif
-    }
+
+    #endregion
+  }
 }

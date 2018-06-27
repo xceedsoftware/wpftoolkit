@@ -77,6 +77,11 @@ namespace Xceed.Wpf.DataGrid
 
     #region INTERNAL METHODS
 
+    internal override IQueryable CreateUnsortedFilteredQueryable()
+    {
+      return m_queryableSource;
+    }
+
     internal override int GetGlobalIndexOf( object item )
     {
       return m_virtualPageManager.GetGlobalIndexOf( item );

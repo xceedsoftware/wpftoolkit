@@ -245,7 +245,9 @@ namespace Xceed.Wpf.DataGrid.Markup
       sb.Append( assemblyName ?? string.Empty );
 
       sb.Append( SharedThemeResourceDictionary.UriAssemblyInfoSeparator );
+      sb.Append( assemblyVersion ?? string.Empty );
       sb.Append( SharedThemeResourceDictionary.UriAssemblyInfoSeparator );
+      sb.Append( assemblyPublicKeyToken ?? string.Empty );
 
       sb.Append( SharedThemeResourceDictionary.UriComponent );
 

@@ -17,18 +17,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.PropertyGrid.Commands;
 using System.Windows.Media;
-using System.Collections;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Windows.Markup.Primitives;
 using System.Windows.Data;
-using System.Windows.Media.Imaging;
 #if !VS2008
 using System.ComponentModel.DataAnnotations;
 #endif
@@ -127,6 +124,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected virtual void ResetValue()
     {
+      var binding = BindingOperations.GetBindingExpressionBase( this, DescriptorPropertyDefinition.ValueProperty );
+      if( binding != null )
+      {
+        binding.UpdateTarget();
+      }
     }
 
     protected abstract BindingBase CreateValueBinding();
@@ -158,7 +160,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     internal void UpdateAdvanceOptionsForItem( MarkupObject markupObject, DependencyObject dependencyObject, DependencyPropertyDescriptor dpDescriptor,
                                                 out object tooltip )
     {
-      tooltip = StringConstants.AdvancedProperties;
+      tooltip = StringConstants.Default;
 
       bool isResource = false;
       bool isDynamicResource = false;
@@ -177,7 +179,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
       else
       {
-        if( (dependencyObject != null) && (dpDescriptor != null) )
+        if( ( dependencyObject != null ) && ( dpDescriptor != null ) )
         {
           if( BindingOperations.GetBindingExpressionBase( dependencyObject, dpDescriptor.DependencyProperty ) != null )
           {
@@ -206,6 +208,40 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
               case BaseValueSource.Local:
                 tooltip = StringConstants.Local;
                 break;
+            }
+          }
+        }
+        else
+        {
+          // When the Value is diferent from the DefaultValue, use the local icon.
+          if( markupProperty != null && !markupProperty.Value.Equals( this.DefaultValue ) )
+          {
+            if( this.DefaultValue != null )
+            {
+              if( !markupProperty.Value.Equals( this.DefaultValue ) )
+              {
+                tooltip = StringConstants.Local;
+              }
+            }
+            else
+            {
+              if( markupProperty.PropertyType.IsValueType )
+              {
+                var defaultValue = Activator.CreateInstance( markupProperty.PropertyType );
+                // When the Value is diferent from the DefaultValue, use the local icon.
+                if( !markupProperty.Value.Equals( defaultValue ) )
+                {
+                  tooltip = StringConstants.Local;
+                }
+              }
+              else
+              {
+                // When the Value is diferent from the DefaultValue, use the local icon.
+                if( !(markupProperty.Value is System.Windows.Markup.NullExtension) )
+                {
+                  tooltip = StringConstants.Local;
+                }
+              }
             }
           }
         }
@@ -346,15 +382,34 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region Private Methods
 
-    private void ExecuteResetValueCommand( object sender, ExecutedRoutedEventArgs e )
+    private static void ExecuteResetValueCommand( object sender, ExecutedRoutedEventArgs e )
     {
-      if( ComputeCanResetValue() )
-        ResetValue();
+      var affectedPropertyItem = e.Parameter as PropertyItem;
+      if( affectedPropertyItem == null )
+      {
+        affectedPropertyItem = sender as PropertyItem;
+      }
+
+      if( ( affectedPropertyItem != null ) && ( affectedPropertyItem.DescriptorDefinition != null ) )
+      {
+        if( affectedPropertyItem.DescriptorDefinition.ComputeCanResetValue() )
+        {
+          affectedPropertyItem.DescriptorDefinition.ResetValue();
+        }
+      }
     }
 
-    private void CanExecuteResetValueCommand( object sender, CanExecuteRoutedEventArgs e )
+    private static void CanExecuteResetValueCommand( object sender, CanExecuteRoutedEventArgs e )
     {
-      e.CanExecute = ComputeCanResetValue();
+      var affectedPropertyItem = e.Parameter as PropertyItem;
+      if( affectedPropertyItem == null )
+      {
+        affectedPropertyItem = sender as PropertyItem;
+      }
+
+      e.CanExecute = ( (affectedPropertyItem != null) && ( affectedPropertyItem.DescriptorDefinition != null) ) 
+                      ? affectedPropertyItem.DescriptorDefinition.ComputeCanResetValue()
+                      : false;
     }
 
     private string ComputeDisplayName()

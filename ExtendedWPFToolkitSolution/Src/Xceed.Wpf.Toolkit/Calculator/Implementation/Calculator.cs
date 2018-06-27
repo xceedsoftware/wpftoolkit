@@ -245,6 +245,7 @@ namespace Xceed.Wpf.Toolkit
 
     public Calculator()
     {
+
       CommandBindings.Add( new CommandBinding( CalculatorCommands.CalculatorButtonClick, ExecuteCalculatorButtonClick ) );
       AddHandler( MouseDownEvent, new MouseButtonEventHandler( Calculator_OnMouseDown ), true );
     }

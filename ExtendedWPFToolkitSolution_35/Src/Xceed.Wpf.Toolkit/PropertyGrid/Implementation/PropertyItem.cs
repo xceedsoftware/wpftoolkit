@@ -28,6 +28,7 @@ using System.Collections;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Linq.Expressions;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -51,6 +52,52 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
     #endregion //IsReadOnly
+
+    #region IsInValid
+
+    /// <summary>
+    /// Identifies the IsInvalid dependency property
+    /// </summary>
+    public static readonly DependencyProperty IsInvalidProperty =
+        DependencyProperty.Register( "IsInvalid", typeof( bool ), typeof( PropertyItem ), new UIPropertyMetadata( false, OnIsInvalidChanged ) );
+
+    public bool IsInvalid
+    {
+      get
+      {
+        return ( bool )GetValue( IsInvalidProperty );
+      }
+      internal set
+      {
+        SetValue( IsInvalidProperty, value );
+      }
+    }
+
+    private static void OnIsInvalidChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var propertyItem = o as PropertyItem;
+      if( propertyItem != null )
+        propertyItem.OnIsInvalidChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+    }
+
+    protected virtual void OnIsInvalidChanged( bool oldValue, bool newValue )
+    {
+      var be = this.GetBindingExpression( PropertyItem.ValueProperty );
+
+      if( newValue )
+      {
+        var validationError = new ValidationError( new InvalidValueValidationRule(), be );
+        validationError.ErrorContent = "Value could not be converted.";
+        Validation.MarkInvalid( be, validationError );
+      }
+      else
+      {
+        Validation.ClearInvalid( be );
+      }
+    }
+
+
+    #endregion // IsInvalid
 
     #region PropertyDescriptor
 
@@ -152,7 +199,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         this.SetCurrentValue( PropertyItem.ValueProperty, this.DescriptorDefinition.DefaultValue );
 #endif
       }
-      this.SetValueFontWeight();
     }
 
     #endregion
@@ -205,21 +251,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       this.Loaded += this.PropertyItem_Loaded;
     }
 
-    private void SetValueFontWeight()
-    {
-      if( this.ValueContainer == null )
-        return;
-
-      // If Value equals the Default Value => set it Bold
-       this.ValueContainer.FontWeight = ( ( this.DescriptorDefinition != null )
-                                          && ( this.DescriptorDefinition.DefaultValue != null )
-                                          && ( this.Value != null )
-                                          && ( this.Value.Equals( this.DescriptorDefinition.DefaultValue ) )
-                                          && !(this.Editor is ComboBox) )   
-                                        ? FontWeights.Bold 
-                                        : FontWeights.Normal;
-    }
-
     private void GenerateExpandedPropertyItems()
     {
       if( this.IsExpanded )
@@ -241,8 +272,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private void PropertyItem_Loaded( object sender, RoutedEventArgs e )
     {
       this.GenerateExpandedPropertyItems();
-
-      this.SetValueFontWeight();
     }
 
     #endregion
@@ -256,5 +285,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
     #endregion //Constructors
+
+    private class InvalidValueValidationRule : ValidationRule
+    {
+      public override ValidationResult Validate( object value, CultureInfo cultureInfo )
+      {
+        // Will always return an error.
+        return new ValidationResult( false, null );
+      }
+    }
   }
 }

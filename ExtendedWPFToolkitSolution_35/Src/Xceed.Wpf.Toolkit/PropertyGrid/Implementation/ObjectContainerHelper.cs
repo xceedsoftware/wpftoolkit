@@ -59,7 +59,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         try
         {
-          List<PropertyDescriptor> descriptors = new List<PropertyDescriptor>();
+          var descriptors = new List<PropertyDescriptor>();
           {
             descriptors = ObjectContainerHelperBase.GetPropertyDescriptors( SelectedObject, this.PropertyContainer.HideInheritedProperties );
           }

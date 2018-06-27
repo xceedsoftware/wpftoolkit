@@ -17,8 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
 using System.Windows.Markup;
 
 namespace Xceed.Wpf.AvalonDock.Layout
@@ -27,21 +25,19 @@ namespace Xceed.Wpf.AvalonDock.Layout
   [Serializable]
   public class LayoutDocumentPane : LayoutPositionableGroup<LayoutContent>, ILayoutDocumentPane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable
   {
+    #region Constructors
+
     public LayoutDocumentPane()
     {
     }
     public LayoutDocumentPane( LayoutContent firstChild )
     {
-      Children.Add( firstChild );
+      this.Children.Add( firstChild );
     }
 
-    protected override bool GetVisibility()
-    {
-      if( Parent is LayoutDocumentPaneGroup )
-        return ChildrenCount > 0;
+    #endregion
 
-      return true;
-    }
+    #region Properties
 
     #region ShowHeader
 
@@ -99,6 +95,46 @@ namespace Xceed.Wpf.AvalonDock.Layout
       }
     }
 
+    #endregion
+
+    #region SelectedContent
+
+    public LayoutContent SelectedContent
+    {
+      get
+      {
+        return _selectedIndex == -1 ? null : Children[ _selectedIndex ];
+      }
+    }
+
+    #endregion
+
+    #region ChildrenSorted
+
+    public IEnumerable<LayoutContent> ChildrenSorted
+    {
+      get
+      {
+        var listSorted = this.Children.ToList();
+        listSorted.Sort();
+        return listSorted;
+      }
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Overrides
+
+    protected override bool GetVisibility()
+    {
+      if( this.Parent is LayoutDocumentPaneGroup )
+        return ( this.ChildrenCount > 0 ) && this.Children.Any( c => ( c is LayoutDocument && ( ( LayoutDocument )c ).IsVisible ) || ( c is LayoutAnchorable ) );
+
+      return true;
+    }
+
     protected override void ChildMoved( int oldIndex, int newIndex )
     {
       if( _selectedIndex == oldIndex )
@@ -112,29 +148,20 @@ namespace Xceed.Wpf.AvalonDock.Layout
       base.ChildMoved( oldIndex, newIndex );
     }
 
-    public LayoutContent SelectedContent
-    {
-      get
-      {
-        return _selectedIndex == -1 ? null : Children[ _selectedIndex ];
-      }
-    }
-    #endregion
-
     protected override void OnChildrenCollectionChanged()
     {
-      if( SelectedContentIndex >= ChildrenCount )
-        SelectedContentIndex = Children.Count - 1;
-      if( SelectedContentIndex == -1 && ChildrenCount > 0 )
+      if( this.SelectedContentIndex >= this.ChildrenCount )
+        this.SelectedContentIndex = this.Children.Count - 1;
+      if( this.SelectedContentIndex == -1 && this.ChildrenCount > 0 )
       {
-        if( Root == null )
+        if( this.Root == null )
         {
-          SetNextSelectedIndex();
+          this.SetNextSelectedIndex();
         }
         else
         {
-          var childrenToSelect = Children.OrderByDescending( c => c.LastActivationTimeStamp.GetValueOrDefault() ).First();
-          SelectedContentIndex = Children.IndexOf( childrenToSelect );
+          var childrenToSelect = this.Children.OrderByDescending( c => c.LastActivationTimeStamp.GetValueOrDefault() ).First();
+          this.SelectedContentIndex = this.Children.IndexOf( childrenToSelect );
           childrenToSelect.IsActive = true;
         }
       }
@@ -144,58 +171,10 @@ namespace Xceed.Wpf.AvalonDock.Layout
       RaisePropertyChanged( "ChildrenSorted" );
     }
 
-    public int IndexOf( LayoutContent content )
-    {
-      return Children.IndexOf( content );
-    }
-
     protected override void OnIsVisibleChanged()
     {
-      UpdateParentVisibility();
+      this.UpdateParentVisibility();
       base.OnIsVisibleChanged();
-    }
-
-    internal void SetNextSelectedIndex()
-    {
-      SelectedContentIndex = -1;
-      for( int i = 0; i < this.Children.Count; ++i )
-      {
-        if( Children[ i ].IsEnabled )
-        {
-          SelectedContentIndex = i;
-          return;
-        }
-      }
-    }
-
-    void UpdateParentVisibility()
-    {
-      var parentPane = Parent as ILayoutElementWithVisibility;
-      if( parentPane != null )
-        parentPane.ComputeVisibility();
-    }
-
-    public IEnumerable<LayoutContent> ChildrenSorted
-    {
-      get
-      {
-        var listSorted = Children.ToList();
-        listSorted.Sort();
-        return listSorted;
-      }
-    }
-
-    string _id;
-    string ILayoutPaneSerializable.Id
-    {
-      get
-      {
-        return _id;
-      }
-      set
-      {
-        _id = value;
-      }
     }
 
     public override void WriteXml( System.Xml.XmlWriter writer )
@@ -231,5 +210,60 @@ namespace Xceed.Wpf.AvalonDock.Layout
         }
 #endif
 
+    #endregion
+
+    #region Public Methods
+
+    public int IndexOf( LayoutContent content )
+    {
+      return Children.IndexOf( content );
+    }
+
+    #endregion
+
+    #region Internal Methods
+
+    internal void SetNextSelectedIndex()
+    {
+      this.SelectedContentIndex = -1;
+      for( int i = 0; i < this.Children.Count; ++i )
+      {
+        if( this.Children[ i ].IsEnabled )
+        {
+          this.SelectedContentIndex = i;
+          return;
+        }
+      }
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void UpdateParentVisibility()
+    {
+      var parentPane = this.Parent as ILayoutElementWithVisibility;
+      if( parentPane != null )
+        parentPane.ComputeVisibility();
+    }
+
+    #endregion
+
+    #region ILayoutPaneSerializable Interface
+
+    string _id;
+    string ILayoutPaneSerializable.Id
+    {
+      get
+      {
+        return _id;
+      }
+      set
+      {
+        _id = value;
+      }
+    }
+
+    #endregion
   }
 }

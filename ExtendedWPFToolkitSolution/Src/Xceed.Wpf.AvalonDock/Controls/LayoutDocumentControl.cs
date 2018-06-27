@@ -24,21 +24,25 @@ namespace Xceed.Wpf.AvalonDock.Controls
 {
   public class LayoutDocumentControl : Control
   {
+    #region Constructors
+
     static LayoutDocumentControl()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( LayoutDocumentControl ), new FrameworkPropertyMetadata( typeof( LayoutDocumentControl ) ) );
       FocusableProperty.OverrideMetadata( typeof( LayoutDocumentControl ), new FrameworkPropertyMetadata( true ) );
     }
 
+    #endregion
+
+    #region Properties
+
     #region Model
 
     /// <summary>
     /// Model Dependency Property
     /// </summary>
-    public static readonly DependencyProperty ModelProperty = DependencyProperty.Register( "Model",
-                                                                                          typeof( LayoutContent ),
-                                                                                          typeof( LayoutDocumentControl ),
-                                                                                          new FrameworkPropertyMetadata( null, OnModelChanged ) );
+    public static readonly DependencyProperty ModelProperty = DependencyProperty.Register( "Model", typeof( LayoutContent ), typeof( LayoutDocumentControl ),
+      new FrameworkPropertyMetadata( null, OnModelChanged ) );
 
     /// <summary>
     /// Gets or sets the Model property.  This dependency property 
@@ -110,11 +114,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// LayoutItem Read-Only Dependency Property
     /// </summary>
-    private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly( "LayoutItem",
-                                                                                                              typeof( LayoutItem ),
-                                                                                                              typeof( LayoutDocumentControl ),
-                                                                                                              new FrameworkPropertyMetadata(
-                                                                                                                  ( LayoutItem )null ) );
+    private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly( "LayoutItem", typeof( LayoutItem ), typeof( LayoutDocumentControl ),
+      new FrameworkPropertyMetadata(( LayoutItem )null ) );
 
     public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
@@ -142,6 +143,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #endregion
 
+    #endregion
+
+    #region Overrides
+
     protected override void OnPreviewGotKeyboardFocus( KeyboardFocusChangedEventArgs e )
     {
       this.SetIsActive();
@@ -161,6 +166,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
     }
 
 
+    #endregion
+
+    #region Private Methods
+
     private void SetIsActive()
     {
       if( this.Model != null )
@@ -168,5 +177,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         this.Model.IsActive = true;
       }
     }
+
+    #endregion
   }
 }

@@ -1161,8 +1161,9 @@
                 <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="*" />
                   <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Border Grid.ColumnSpan="2"
+                <Border Grid.ColumnSpan="3"
                         Background="Transparent" />
                 <ContentPresenter Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
                                   ContentTemplate="{Binding DocumentHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
@@ -1172,8 +1173,7 @@
                         Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
-                        Grid.Column="1"
-                        Margin="5,0,0,0"
+                        Grid.Column="2"
                         Padding="-1"
                         Visibility="Hidden"
                         Command="{Binding Path=LayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
@@ -1186,24 +1186,30 @@
             </Border>
           </avalonDockControls:DropDownControlArea>
           <ControlTemplate.Triggers>
-            <DataTrigger Binding="{Binding Path=IsSelected}"
-                         Value="true">
+            <MultiDataTrigger>
+              <MultiDataTrigger.Conditions>
+                <Condition Binding="{Binding Path=IsSelected}"
+                           Value="True" />
+              </MultiDataTrigger.Conditions>
               <Setter Property="Visibility"
                       Value="Visible"
                       TargetName="DocumentCloseButton" />
-            </DataTrigger>
+            </MultiDataTrigger>
             <DataTrigger Binding="{Binding Path=IsActive}"
                          Value="true">
               <Setter Property="Visibility"
                       Value="Visible"
                       TargetName="DocumentCloseButton" />
             </DataTrigger>
-            <Trigger Property="IsMouseOver"
-                     Value="True">
+            <MultiDataTrigger>
+              <MultiDataTrigger.Conditions>
+                <Condition Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource TemplatedParent}}"
+                           Value="True" />
+              </MultiDataTrigger.Conditions>
               <Setter Property="Visibility"
                       Value="Visible"
                       TargetName="DocumentCloseButton" />
-            </Trigger>
+            </MultiDataTrigger>
             <DataTrigger Binding="{Binding Path=CanClose}"
                          Value="false">
               <Setter Property="Visibility"
@@ -1847,7 +1853,8 @@
                            Stretch="None"
                            Visibility="{Binding SelectedDocument.LayoutElement.IconSource, Converter={StaticResource BoolToVisibilityConverter} }" >
                     </Image>
-                    <TextBlock Text="{Binding SelectedDocument.LayoutElement.Title}"
+                    <TextBlock x:Name="selectedElementTitle"
+                               Text="{Binding SelectedDocument.LayoutElement.Title}"
                                TextTrimming="CharacterEllipsis"
                                Grid.Column="1"
                                VerticalAlignment="Center"
@@ -1855,7 +1862,8 @@
                                Margin="4,0,0,0" >
                     </TextBlock>
                   </Grid>
-                  <TextBlock Text="{Binding SelectedDocument.LayoutElement.Description}"
+                  <TextBlock x:Name="selectedElementDescription"
+                             Text="{Binding SelectedDocument.LayoutElement.Description}"
                              TextTrimming="CharacterEllipsis"
                              VerticalAlignment="Center" >
                   </TextBlock>
@@ -1880,7 +1888,8 @@
                                  FontWeight="Bold"
                                  Margin="0,3,0,4" >
                       </TextBlock>
-                      <ListBox Grid.Row="1"
+                      <ListBox x:Name="PART_AnchorableListBox"
+                               Grid.Row="1"
                                ItemsSource="{Binding Anchorables}"
                                SelectedItem="{Binding SelectedAnchorable, Mode=TwoWay}"
                                ItemContainerStyle="{StaticResource AvalonDock_ThemeAero_NavigatorWindowListBoxItemStyle}"
@@ -1917,7 +1926,8 @@
                                  FontWeight="Bold"
                                  Margin="0,3,0,4" >
                       </TextBlock>
-                      <ListBox Grid.Row="1"
+                      <ListBox x:Name="PART_DocumentListBox"
+                               Grid.Row="1"
                                ItemsSource="{Binding Documents}"
                                SelectedItem="{Binding SelectedDocument, Mode=TwoWay}"
                                ItemContainerStyle="{StaticResource AvalonDock_ThemeAero_NavigatorWindowListBoxItemStyle}"
@@ -1961,6 +1971,17 @@
               </Grid>
             </Border>
           </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="SelectedDocument"
+                     Value="{x:Null}">
+              <Setter Property="Text"
+                      Value="{Binding SelectedAnchorable.LayoutElement.Title}"
+                      TargetName="selectedElementTitle" />
+              <Setter Property="Text"
+                      Value="{x:Null}"
+                      TargetName="selectedElementDescription" />
+            </Trigger>
+          </ControlTemplate.Triggers>
         </ControlTemplate>
       </Setter.Value>
     </Setter>

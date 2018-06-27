@@ -22,11 +22,12 @@ using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Windows.Controls;
 using System.Collections.Generic;
 using System.Windows.Controls.Primitives;
+using Xceed.Wpf.Toolkit.Primitives;
 
 namespace Xceed.Wpf.Toolkit
 {
   [TemplatePart( Name = PART_Popup, Type = typeof( Popup ) )]
-  public class CheckComboBox : Xceed.Wpf.Toolkit.Primitives.Selector
+  public class CheckComboBox : SelectAllSelector
   {
     private const string PART_Popup = "PART_Popup";
 
@@ -48,6 +49,7 @@ namespace Xceed.Wpf.Toolkit
 
     public CheckComboBox()
     {
+
       Keyboard.AddKeyDownHandler( this, OnKeyDown );
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );
       _displayMemberPathValuesChangeHelper = new ValueChangeHelper( this.OnDisplayMemberPathValuesChanged );
@@ -136,14 +138,16 @@ namespace Xceed.Wpf.Toolkit
       {
         _initialValue.Clear();
         foreach( object o in SelectedItems )
+        {
           _initialValue.Add( o );
+        }
+        base.RaiseEvent( new RoutedEventArgs( CheckComboBox.OpenedEvent, this ) );
       }
       else
       {
         _initialValue.Clear();
+        base.RaiseEvent( new RoutedEventArgs( CheckComboBox.ClosedEvent, this ) );
       }
-
-      // TODO: Add your property changed side-effects. Descendants can override as well.
     }
 
     #endregion //IsDropDownOpen
@@ -266,6 +270,40 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //Event Handlers
+
+    #region Closed Event
+
+    public static readonly RoutedEvent ClosedEvent = EventManager.RegisterRoutedEvent( "Closed", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( CheckComboBox ) );
+    public event RoutedEventHandler Closed
+    {
+      add
+      {
+        AddHandler( ClosedEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( ClosedEvent, value );
+      }
+    }
+
+    #endregion //Closed Event
+
+    #region Opened Event
+
+    public static readonly RoutedEvent OpenedEvent = EventManager.RegisterRoutedEvent( "Opened", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( CheckComboBox ) );
+    public event RoutedEventHandler Opened
+    {
+      add
+      {
+        AddHandler( OpenedEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( OpenedEvent, value );
+      }
+    }
+
+    #endregion //Opened Event
 
     #region Methods
 

@@ -14,15 +14,13 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-    public interface ILayoutControl
+  public interface ILayoutControl
+  {
+    ILayoutElement Model
     {
-        ILayoutElement Model { get;  }
+      get;
     }
+  }
 }

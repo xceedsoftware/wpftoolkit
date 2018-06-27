@@ -25,6 +25,7 @@ using System.Xml.Serialization;
 using Standard;
 using System.Xml;
 using System.Xml.Schema;
+using System.Windows.Controls;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
@@ -32,6 +33,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
   [Serializable]
   public class LayoutRoot : LayoutElement, ILayoutContainer, ILayoutRoot, IXmlSerializable
   {
+    #region Constructors
+
     public LayoutRoot()
     {
       RightSide = new LayoutAnchorSide();
@@ -41,6 +44,9 @@ namespace Xceed.Wpf.AvalonDock.Layout
       RootPanel = new LayoutPanel( new LayoutDocumentPane() );
     }
 
+    #endregion
+
+    #region Properties
 
     #region RootPanel
 
@@ -170,6 +176,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
     #endregion
 
     #region FloatingWindows
+
     ObservableCollection<LayoutFloatingWindow> _floatingWindows = null;
 
     public ObservableCollection<LayoutFloatingWindow> FloatingWindows
@@ -186,25 +193,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
       }
     }
 
-    void _floatingWindows_CollectionChanged( object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e )
-    {
-      if( e.OldItems != null && ( e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove ||
-          e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace ) )
-      {
-        foreach( LayoutFloatingWindow element in e.OldItems )
-        {
-          if( element.Parent == this )
-            element.Parent = null;
-        }
-      }
-
-      if( e.NewItems != null && ( e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add ||
-          e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace ) )
-      {
-        foreach( LayoutFloatingWindow element in e.NewItems )
-          element.Parent = this;
-      }
-    }
     #endregion
 
     #region HiddenAnchorables
@@ -225,46 +213,10 @@ namespace Xceed.Wpf.AvalonDock.Layout
       }
     }
 
-    void _hiddenAnchorables_CollectionChanged( object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e )
-    {
-      if( e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove ||
-          e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace )
-      {
-        if( e.OldItems != null )
-        {
-          foreach( LayoutAnchorable element in e.OldItems )
-          {
-            if( element.Parent == this )
-              element.Parent = null;
-          }
-        }
-      }
-
-      if( e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add ||
-          e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace )
-      {
-        if( e.NewItems != null )
-        {
-          foreach( LayoutAnchorable element in e.NewItems )
-          {
-            if( element.Parent != this )
-            {
-              if( element.Parent != null )
-                element.Parent.RemoveChild( element );
-              element.Parent = this;
-            }
-
-          }
-        }
-      }
-
-
-
-    }
-
     #endregion
 
     #region Children
+
     public IEnumerable<ILayoutElement> Children
     {
       get
@@ -291,50 +243,10 @@ namespace Xceed.Wpf.AvalonDock.Layout
         }
       }
     }
-    public void RemoveChild( ILayoutElement element )
-    {
-      if( element == RootPanel )
-        RootPanel = null;
-      else if( _floatingWindows != null && _floatingWindows.Contains( element ) )
-        _floatingWindows.Remove( element as LayoutFloatingWindow );
-      else if( _hiddenAnchorables != null && _hiddenAnchorables.Contains( element ) )
-        _hiddenAnchorables.Remove( element as LayoutAnchorable );
-      else if( element == TopSide )
-        TopSide = null;
-      else if( element == RightSide )
-        RightSide = null;
-      else if( element == BottomSide )
-        BottomSide = null;
-      else if( element == LeftSide )
-        LeftSide = null;
 
-    }
+    #endregion
 
-    public void ReplaceChild( ILayoutElement oldElement, ILayoutElement newElement )
-    {
-      if( oldElement == RootPanel )
-        RootPanel = ( LayoutPanel )newElement;
-      else if( _floatingWindows != null && _floatingWindows.Contains( oldElement ) )
-      {
-        int index = _floatingWindows.IndexOf( oldElement as LayoutFloatingWindow );
-        _floatingWindows.Remove( oldElement as LayoutFloatingWindow );
-        _floatingWindows.Insert( index, newElement as LayoutFloatingWindow );
-      }
-      else if( _hiddenAnchorables != null && _hiddenAnchorables.Contains( oldElement ) )
-      {
-        int index = _hiddenAnchorables.IndexOf( oldElement as LayoutAnchorable );
-        _hiddenAnchorables.Remove( oldElement as LayoutAnchorable );
-        _hiddenAnchorables.Insert( index, newElement as LayoutAnchorable );
-      }
-      else if( oldElement == TopSide )
-        TopSide = ( LayoutAnchorSide )newElement;
-      else if( oldElement == RightSide )
-        RightSide = ( LayoutAnchorSide )newElement;
-      else if( oldElement == BottomSide )
-        BottomSide = ( LayoutAnchorSide )newElement;
-      else if( oldElement == LeftSide )
-        LeftSide = ( LayoutAnchorSide )newElement;
-    }
+    #region ChildrenCount
 
     public int ChildrenCount
     {
@@ -345,6 +257,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
             ( _hiddenAnchorables != null ? _hiddenAnchorables.Count : 0 );
       }
     }
+
     #endregion
 
     #region ActiveContent
@@ -370,35 +283,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
       }
     }
 
-    void InternalSetActiveContent( LayoutContent currentValue, LayoutContent newActiveContent )
-    {
-      RaisePropertyChanging( "ActiveContent" );
-      if( currentValue != null )
-        currentValue.IsActive = false;
-      _activeContent = new WeakReference( newActiveContent );
-      currentValue = ActiveContent;
-      if( currentValue != null )
-        currentValue.IsActive = true;
-      RaisePropertyChanged( "ActiveContent" );
-      _activeContentSet = currentValue != null;
-      if( currentValue != null )
-      {
-        if( currentValue.Parent is LayoutDocumentPane || currentValue is LayoutDocument )
-          LastFocusedDocument = currentValue;
-      }
-      else
-        LastFocusedDocument = null;
-    }
 
-    void UpdateActiveContentProperty()
-    {
-      var activeContent = ActiveContent;
-      if( _activeContentSet && ( activeContent == null || activeContent.Root != this ) )
-      {
-        _activeContentSet = false;
-        InternalSetActiveContent( activeContent, null );
-      }
-    }
     #endregion
 
     #region LastFocusedDocument
@@ -461,7 +346,80 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     #endregion
 
-    #region CollectGarbage
+    #endregion
+
+    #region Overrides
+
+#if TRACE
+        public override void ConsoleDump(int tab)
+        {
+          System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
+          System.Diagnostics.Trace.WriteLine( "RootPanel()" );
+
+          RootPanel.ConsoleDump(tab + 1);
+
+          System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
+          System.Diagnostics.Trace.WriteLine( "FloatingWindows()" );
+
+          foreach (LayoutFloatingWindow fw in FloatingWindows)
+              fw.ConsoleDump(tab + 1);
+
+          System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
+          System.Diagnostics.Trace.WriteLine( "Hidden()" );
+
+          foreach (LayoutAnchorable hidden in Hidden)
+              hidden.ConsoleDump(tab + 1);
+        }
+#endif
+
+    #endregion
+
+    #region Public Methods
+
+    public void RemoveChild( ILayoutElement element )
+    {
+      if( element == RootPanel )
+        RootPanel = null;
+      else if( _floatingWindows != null && _floatingWindows.Contains( element ) )
+        _floatingWindows.Remove( element as LayoutFloatingWindow );
+      else if( _hiddenAnchorables != null && _hiddenAnchorables.Contains( element ) )
+        _hiddenAnchorables.Remove( element as LayoutAnchorable );
+      else if( element == TopSide )
+        TopSide = null;
+      else if( element == RightSide )
+        RightSide = null;
+      else if( element == BottomSide )
+        BottomSide = null;
+      else if( element == LeftSide )
+        LeftSide = null;
+
+    }
+
+    public void ReplaceChild( ILayoutElement oldElement, ILayoutElement newElement )
+    {
+      if( oldElement == RootPanel )
+        RootPanel = ( LayoutPanel )newElement;
+      else if( _floatingWindows != null && _floatingWindows.Contains( oldElement ) )
+      {
+        int index = _floatingWindows.IndexOf( oldElement as LayoutFloatingWindow );
+        _floatingWindows.Remove( oldElement as LayoutFloatingWindow );
+        _floatingWindows.Insert( index, newElement as LayoutFloatingWindow );
+      }
+      else if( _hiddenAnchorables != null && _hiddenAnchorables.Contains( oldElement ) )
+      {
+        int index = _hiddenAnchorables.IndexOf( oldElement as LayoutAnchorable );
+        _hiddenAnchorables.Remove( oldElement as LayoutAnchorable );
+        _hiddenAnchorables.Insert( index, newElement as LayoutAnchorable );
+      }
+      else if( oldElement == TopSide )
+        TopSide = ( LayoutAnchorSide )newElement;
+      else if( oldElement == RightSide )
+        RightSide = ( LayoutAnchorSide )newElement;
+      else if( oldElement == BottomSide )
+        BottomSide = ( LayoutAnchorSide )newElement;
+      else if( oldElement == LeftSide )
+        LeftSide = ( LayoutAnchorSide )newElement;
+    }
 
     /// <summary>
     /// Removes any empty container not directly referenced by other layout items
@@ -654,40 +612,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
 #endif
     }
 
-    #endregion
-
-    public event EventHandler Updated;
-
-    internal void FireLayoutUpdated()
-    {
-      if( Updated != null )
-        Updated( this, EventArgs.Empty );
-    }
-
-    #region LayoutElement Added/Removed events
-
-    internal void OnLayoutElementAdded( LayoutElement element )
-    {
-      if( ElementAdded != null )
-        ElementAdded( this, new LayoutElementEventArgs( element ) );
-    }
-
-    public event EventHandler<LayoutElementEventArgs> ElementAdded;
-
-    internal void OnLayoutElementRemoved( LayoutElement element )
-    {
-      if( element.Descendents().OfType<LayoutContent>().Any( c => c == LastFocusedDocument ) )
-        LastFocusedDocument = null;
-      if( element.Descendents().OfType<LayoutContent>().Any( c => c == ActiveContent ) )
-        ActiveContent = null;
-      if( ElementRemoved != null )
-        ElementRemoved( this, new LayoutElementEventArgs( element ) );
-    }
-
-    public event EventHandler<LayoutElementEventArgs> ElementRemoved;
-
-    #endregion
-
     public XmlSchema GetSchema()
     {
       return null;
@@ -702,50 +626,239 @@ namespace Xceed.Wpf.AvalonDock.Layout
         return;
       }
 
-      var layoutPanelElements = ReadRootPanel( reader );
+      Orientation orientation;
+      var layoutPanelElements = this.ReadRootPanel( reader, out orientation );
       if( layoutPanelElements != null )
       {
-        RootPanel = new LayoutPanel();
+        this.RootPanel = new LayoutPanel() { Orientation = orientation };
         //Add all children to RootPanel
         for( int i = 0; i < layoutPanelElements.Count; ++i )
         {
-          RootPanel.Children.Add( layoutPanelElements[ i ] );
+          this.RootPanel.Children.Add( layoutPanelElements[ i ] );
         }
       }
 
-      TopSide = new LayoutAnchorSide();
-      if( ReadElement( reader ) != null )
+      this.TopSide = new LayoutAnchorSide();
+      if( this.ReadElement( reader ) != null )
       {
-        FillLayoutAnchorSide( reader, TopSide );
+        this.FillLayoutAnchorSide( reader, TopSide );
       }
-      RightSide = new LayoutAnchorSide();
-      if( ReadElement( reader ) != null )
+      this.RightSide = new LayoutAnchorSide();
+      if( this.ReadElement( reader ) != null )
       {
-        FillLayoutAnchorSide( reader, RightSide );
+        this.FillLayoutAnchorSide( reader, RightSide );
       }
-      LeftSide = new LayoutAnchorSide();
-      if( ReadElement( reader ) != null )
+      this.LeftSide = new LayoutAnchorSide();
+      if( this.ReadElement( reader ) != null )
       {
-        FillLayoutAnchorSide( reader, LeftSide );
+        this.FillLayoutAnchorSide( reader, LeftSide );
       }
-      BottomSide = new LayoutAnchorSide();
-      if( ReadElement( reader ) != null )
+      this.BottomSide = new LayoutAnchorSide();
+      if( this.ReadElement( reader ) != null )
       {
-        FillLayoutAnchorSide( reader, BottomSide );
+        this.FillLayoutAnchorSide( reader, BottomSide );
       }
 
-      FloatingWindows.Clear();
-      var floatingWindows = ReadElementList( reader );
+      this.FloatingWindows.Clear();
+      var floatingWindows = this.ReadElementList( reader, true );
       foreach( var floatingWindow in floatingWindows )
       {
-        FloatingWindows.Add( ( LayoutFloatingWindow )floatingWindow );
+        this.FloatingWindows.Add( ( LayoutFloatingWindow )floatingWindow );
       }
 
-      Hidden.Clear();
-      var hidden = ReadElementList( reader );
+      this.Hidden.Clear();
+      var hidden = this.ReadElementList( reader, false );
       foreach( var hiddenObject in hidden )
       {
-        Hidden.Add( ( LayoutAnchorable )hiddenObject );
+        this.Hidden.Add( ( LayoutAnchorable )hiddenObject );
+      }
+    }
+
+    public void WriteXml( XmlWriter writer )
+    {
+      writer.WriteStartElement( "RootPanel" );
+      if( this.RootPanel != null )
+      {
+        this.RootPanel.WriteXml( writer );
+      }
+      writer.WriteEndElement();
+
+      writer.WriteStartElement( "TopSide" );
+      if( this.TopSide != null )
+      {
+        this.TopSide.WriteXml( writer );
+      }
+      writer.WriteEndElement();
+
+      writer.WriteStartElement( "RightSide" );
+      if( this.RightSide != null )
+      {
+        this.RightSide.WriteXml( writer );
+      }
+      writer.WriteEndElement();
+
+      writer.WriteStartElement( "LeftSide" );
+      if( this.LeftSide != null )
+      {
+        this.LeftSide.WriteXml( writer );
+      }
+      writer.WriteEndElement();
+
+      writer.WriteStartElement( "BottomSide" );
+      if( this.BottomSide != null )
+      {
+        this.BottomSide.WriteXml( writer );
+      }
+      writer.WriteEndElement();
+
+      // Write all floating windows (can be LayoutDocumentFloatingWindow or LayoutAnchorableFloatingWindow).
+      // To prevent "can not create instance of abstract type", the type is retrieved with GetType().Name
+      writer.WriteStartElement( "FloatingWindows" );
+      foreach( var layoutFloatingWindow in FloatingWindows )
+      {
+        writer.WriteStartElement( layoutFloatingWindow.GetType().Name );
+        layoutFloatingWindow.WriteXml( writer );
+        writer.WriteEndElement();
+      }
+      writer.WriteEndElement();
+
+      writer.WriteStartElement( "Hidden" );
+      foreach( var layoutAnchorable in Hidden )
+      {
+        writer.WriteStartElement( layoutAnchorable.GetType().Name );
+        layoutAnchorable.WriteXml( writer );
+        writer.WriteEndElement();
+      }
+      writer.WriteEndElement();
+    }
+
+    #endregion
+
+    #region Internal Methods
+
+    internal static Type FindType( string name )
+    {
+      foreach( var assembly in AppDomain.CurrentDomain.GetAssemblies() )
+      {
+        foreach( var type in assembly.GetTypes() )
+        {
+          if( type.Name.Equals( name ) )
+            return type;
+        }
+      }
+      return null;
+    }
+
+    internal void FireLayoutUpdated()
+    {
+      if( Updated != null )
+        Updated( this, EventArgs.Empty );
+    }
+
+    internal void OnLayoutElementAdded( LayoutElement element )
+    {
+      if( ElementAdded != null )
+        ElementAdded( this, new LayoutElementEventArgs( element ) );
+    }
+
+    internal void OnLayoutElementRemoved( LayoutElement element )
+    {
+      if( element.Descendents().OfType<LayoutContent>().Any( c => c == LastFocusedDocument ) )
+        LastFocusedDocument = null;
+      if( element.Descendents().OfType<LayoutContent>().Any( c => c == ActiveContent ) )
+        ActiveContent = null;
+      if( ElementRemoved != null )
+        ElementRemoved( this, new LayoutElementEventArgs( element ) );
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void _floatingWindows_CollectionChanged( object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e )
+    {
+      if( e.OldItems != null && ( e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove ||
+          e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace ) )
+      {
+        foreach( LayoutFloatingWindow element in e.OldItems )
+        {
+          if( element.Parent == this )
+            element.Parent = null;
+        }
+      }
+
+      if( e.NewItems != null && ( e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add ||
+          e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace ) )
+      {
+        foreach( LayoutFloatingWindow element in e.NewItems )
+          element.Parent = this;
+      }
+    }
+
+    private void _hiddenAnchorables_CollectionChanged( object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e )
+    {
+      if( e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove ||
+          e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace )
+      {
+        if( e.OldItems != null )
+        {
+          foreach( LayoutAnchorable element in e.OldItems )
+          {
+            if( element.Parent == this )
+              element.Parent = null;
+          }
+        }
+      }
+
+      if( e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add ||
+          e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace )
+      {
+        if( e.NewItems != null )
+        {
+          foreach( LayoutAnchorable element in e.NewItems )
+          {
+            if( element.Parent != this )
+            {
+              if( element.Parent != null )
+                element.Parent.RemoveChild( element );
+              element.Parent = this;
+            }
+
+          }
+        }
+      }
+
+
+
+    }
+
+    private void InternalSetActiveContent( LayoutContent currentValue, LayoutContent newActiveContent )
+    {
+      RaisePropertyChanging( "ActiveContent" );
+      if( currentValue != null )
+        currentValue.IsActive = false;
+      _activeContent = new WeakReference( newActiveContent );
+      currentValue = ActiveContent;
+      if( currentValue != null )
+        currentValue.IsActive = true;
+      RaisePropertyChanged( "ActiveContent" );
+      _activeContentSet = currentValue != null;
+      if( currentValue != null )
+      {
+        if( currentValue.Parent is LayoutDocumentPane || currentValue is LayoutDocument )
+          LastFocusedDocument = currentValue;
+      }
+      else
+        LastFocusedDocument = null;
+    }
+
+    private void UpdateActiveContentProperty()
+    {
+      var activeContent = ActiveContent;
+      if( _activeContentSet && ( activeContent == null || activeContent.Root != this ) )
+      {
+        _activeContentSet = false;
+        InternalSetActiveContent( activeContent, null );
       }
     }
 
@@ -774,8 +887,9 @@ namespace Xceed.Wpf.AvalonDock.Layout
       }
     }
 
-    private List<ILayoutPanelElement> ReadRootPanel( XmlReader reader )
+    private List<ILayoutPanelElement> ReadRootPanel( XmlReader reader, out Orientation orientation )
     {
+      orientation = Orientation.Horizontal;
       var result = new List<ILayoutPanelElement>();
 
       var startElementName = reader.LocalName;
@@ -792,6 +906,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
       if( reader.LocalName.Equals( "RootPanel" ) )
       {
+        orientation = (reader.GetAttribute( "Orientation" ) == "Vertical") ? Orientation.Vertical : Orientation.Horizontal;
         reader.Read();
 
         while( true )
@@ -814,9 +929,14 @@ namespace Xceed.Wpf.AvalonDock.Layout
       return result;
     }
 
-    private List<object> ReadElementList( XmlReader reader )
+    private List<object> ReadElementList( XmlReader reader, bool isFloatingWindow )
     {
       var resultList = new List<object>();
+
+      while( reader.NodeType == XmlNodeType.Whitespace )
+      {
+        reader.Read();
+      }
 
       if( reader.IsEmptyElement )
       {
@@ -838,13 +958,24 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
       while( true )
       {
-        var result = ReadElement( reader ) as LayoutFloatingWindow;
-        if( result == null )
+        if( isFloatingWindow )
         {
-          break;
+          var result = this.ReadElement( reader ) as LayoutFloatingWindow;
+          if( result == null )
+          {
+            break;
+          }
+          resultList.Add( result );
         }
-
-        resultList.Add( result );
+        else
+        {
+          var result = this.ReadElement( reader ) as LayoutAnchorable;
+          if( result == null )
+          {
+            break;
+          }
+          resultList.Add( result );
+        }
       }
 
       reader.ReadEndElement();
@@ -854,14 +985,14 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     private object ReadElement( XmlReader reader )
     {
-      if( reader.NodeType == XmlNodeType.EndElement )
-      {
-        return null;
-      }
-
       while( reader.NodeType == XmlNodeType.Whitespace )
       {
         reader.Read();
+      }
+
+      if( reader.NodeType == XmlNodeType.EndElement )
+      {
+        return null;
       }
 
       XmlSerializer serializer;
@@ -920,97 +1051,14 @@ namespace Xceed.Wpf.AvalonDock.Layout
       return serializer.Deserialize( reader );
     }
 
-    public void WriteXml( XmlWriter writer )
-    {
-      writer.WriteStartElement( "RootPanel" );
-      if( RootPanel != null )
-      {
-        RootPanel.WriteXml( writer );
-      }
-      writer.WriteEndElement();
+    #endregion
 
-      writer.WriteStartElement( "TopSide" );
-      if( TopSide != null )
-      {
-        TopSide.WriteXml( writer );
-      }
-      writer.WriteEndElement();
+    #region Events
 
-      writer.WriteStartElement( "RightSide" );
-      if( RightSide != null )
-      {
-        RightSide.WriteXml( writer );
-      }
-      writer.WriteEndElement();
+    public event EventHandler Updated;
+    public event EventHandler<LayoutElementEventArgs> ElementAdded;
+    public event EventHandler<LayoutElementEventArgs> ElementRemoved;
 
-      writer.WriteStartElement( "LeftSide" );
-      if( LeftSide != null )
-      {
-        LeftSide.WriteXml( writer );
-      }
-      writer.WriteEndElement();
-
-      writer.WriteStartElement( "BottomSide" );
-      if( BottomSide != null )
-      {
-        BottomSide.WriteXml( writer );
-      }
-      writer.WriteEndElement();
-
-      // Write all floating windows (can be LayoutDocumentFloatingWindow or LayoutAnchorableFloatingWindow).
-      // To prevent "can not create instance of abstract type", the type is retrieved with GetType().Name
-      writer.WriteStartElement( "FloatingWindows" );
-      foreach( var layoutFloatingWindow in FloatingWindows )
-      {
-        writer.WriteStartElement( layoutFloatingWindow.GetType().Name );
-        layoutFloatingWindow.WriteXml( writer );
-        writer.WriteEndElement();
-      }
-      writer.WriteEndElement();
-
-      writer.WriteStartElement( "Hidden" );
-      foreach( var layoutAnchorable in Hidden )
-      {
-        layoutAnchorable.WriteXml( writer );
-      }
-      writer.WriteEndElement();
-    }
-
-    internal static Type FindType( string name )
-    {
-      foreach( var assembly in AppDomain.CurrentDomain.GetAssemblies() )
-      {
-        foreach( var type in assembly.GetTypes() )
-        {
-          if( type.Name.Equals( name ) )
-            return type;
-        }
-      }
-      return null;
-    }
-
-#if TRACE
-        public override void ConsoleDump(int tab)
-        {
-          System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
-          System.Diagnostics.Trace.WriteLine( "RootPanel()" );
-
-          RootPanel.ConsoleDump(tab + 1);
-
-          System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
-          System.Diagnostics.Trace.WriteLine( "FloatingWindows()" );
-
-          foreach (LayoutFloatingWindow fw in FloatingWindows)
-              fw.ConsoleDump(tab + 1);
-
-          System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
-          System.Diagnostics.Trace.WriteLine( "Hidden()" );
-
-          foreach (LayoutAnchorable hidden in Hidden)
-              hidden.ConsoleDump(tab + 1);
-        }
-#endif
-
-
+    #endregion
   }
 }

@@ -29,6 +29,10 @@ namespace Xceed.Wpf.Toolkit
       DefaultStyleKeyProperty.OverrideMetadata( typeof( IconButton ), new FrameworkPropertyMetadata( typeof( IconButton ) ) );
     }
 
+    public IconButton()
+    {
+    }
+
     #endregion //Constructors
 
     #region Properties

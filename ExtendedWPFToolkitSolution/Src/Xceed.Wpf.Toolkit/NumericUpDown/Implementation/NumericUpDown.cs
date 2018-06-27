@@ -145,6 +145,23 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion
 
+    #region MaxLength
+
+    public static readonly DependencyProperty MaxLengthProperty = DependencyProperty.Register( "MaxLength", typeof( int ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( 0 ) );
+    public int MaxLength
+    {
+      get
+      {
+        return ( int )GetValue( MaxLengthProperty );
+      }
+      set
+      {
+        SetValue( MaxLengthProperty, value );
+      }
+    }
+
+    #endregion //MaxLength
+
     #endregion //Properties
 
     #region Overrides

@@ -543,6 +543,7 @@ namespace Xceed.Wpf.Toolkit
 
     public ColorPicker()
     {
+
 #if VS2008
         this.RecentColors = new ObservableCollection<ColorItem>();
 #else

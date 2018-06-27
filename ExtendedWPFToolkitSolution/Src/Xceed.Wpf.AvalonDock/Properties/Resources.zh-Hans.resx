@@ -141,6 +141,9 @@
   <data name="Anchorable_Hide" xml:space="preserve">
     <value>隐藏</value>
   </data>
+  <data name="Document_BtnPinned_Hint" xml:space="preserve">
+    <value>切換引腳狀態</value>
+  </data>
   <data name="Document_Close" xml:space="preserve">
     <value>关闭</value>
   </data>

@@ -141,6 +141,9 @@
   <data name="Anchorable_Hide" xml:space="preserve">
     <value>Esconder</value>
   </data>
+  <data name="Document_BtnPinned_Hint" xml:space="preserve">
+    <value>Activar el estado del pin</value>
+  </data>
   <data name="Document_Close" xml:space="preserve">
     <value>Cerrar</value>
   </data>

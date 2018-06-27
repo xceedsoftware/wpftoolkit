@@ -22,6 +22,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
 {
   public class LayoutAnchorableControl : Control
   {
+    #region Constructors
+
     static LayoutAnchorableControl()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( LayoutAnchorableControl ), new FrameworkPropertyMetadata( typeof( LayoutAnchorableControl ) ) );
@@ -33,16 +35,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
       //SetBinding(FlowDirectionProperty, new Binding("Model.Root.Manager.FlowDirection") { Source = this });
     }
 
+    #endregion
+
+    #region Properties
 
     #region Model
 
     /// <summary>
     /// Model Dependency Property
     /// </summary>
-    public static readonly DependencyProperty ModelProperty =
-        DependencyProperty.Register( "Model", typeof( LayoutAnchorable ), typeof( LayoutAnchorableControl ),
-            new FrameworkPropertyMetadata( ( LayoutAnchorable )null,
-                new PropertyChangedCallback( OnModelChanged ) ) );
+    public static readonly DependencyProperty ModelProperty =  DependencyProperty.Register( "Model", typeof( LayoutAnchorable ), typeof( LayoutAnchorableControl ),
+            new FrameworkPropertyMetadata( ( LayoutAnchorable )null, new PropertyChangedCallback( OnModelChanged ) ) );
 
     /// <summary>
     /// Gets or sets the Model property.  This dependency property 
@@ -112,12 +115,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// LayoutItem Read-Only Dependency Property
     /// </summary>
-    private static readonly DependencyPropertyKey LayoutItemPropertyKey
-        = DependencyProperty.RegisterReadOnly( "LayoutItem", typeof( LayoutItem ), typeof( LayoutAnchorableControl ),
+    private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly( "LayoutItem", typeof( LayoutItem ), typeof( LayoutAnchorableControl ),
             new FrameworkPropertyMetadata( ( LayoutItem )null ) );
 
-    public static readonly DependencyProperty LayoutItemProperty
-        = LayoutItemPropertyKey.DependencyProperty;
+    public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
     /// <summary>
     /// Gets the LayoutItem property.  This dependency property 
@@ -143,6 +144,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #endregion
 
+    #endregion
+
+    #region Overrides
 
     protected override void OnGotKeyboardFocus( System.Windows.Input.KeyboardFocusChangedEventArgs e )
     {
@@ -153,5 +157,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
     }
 
 
+    #endregion
   }
 }

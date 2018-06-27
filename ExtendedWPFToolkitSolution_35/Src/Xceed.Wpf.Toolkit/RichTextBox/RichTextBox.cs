@@ -39,7 +39,6 @@ namespace Xceed.Wpf.Toolkit
     public RichTextBox( System.Windows.Documents.FlowDocument document )
       : base( document )
     {
-
     }
 
     #endregion //Constructors

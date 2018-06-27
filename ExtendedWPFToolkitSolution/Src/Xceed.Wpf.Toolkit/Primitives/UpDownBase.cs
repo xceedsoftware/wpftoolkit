@@ -457,6 +457,7 @@ UpDownBase<T> ), new UIPropertyMetadata( true ) );
 
     internal UpDownBase()
     {
+
       this.AddHandler( Mouse.PreviewMouseDownOutsideCapturedElementEvent, new RoutedEventHandler( this.HandleClickOutsideOfControlWithMouseCapture ),
 
 true );

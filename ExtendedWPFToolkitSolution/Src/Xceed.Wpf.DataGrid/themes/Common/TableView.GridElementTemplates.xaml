@@ -243,8 +243,11 @@
 
       <!-- A basic Row Template requires at least a Panel named "PART_CellsHost" to which the Row's cells will be added.
            This Panel is usually placed inside a Border who is responsible for painting the gridlines. -->
+    <ControlTemplate.Resources>
+      <conv:TypeToBooleanConverter x:Key="typeToBooleanConverter" />
+    </ControlTemplate.Resources>
 
-      <!-- This Grid is used to layout the GroupLevelIndicatorPane placeholder and the CellsHost panel. -->
+    <!-- This Grid is used to layout the GroupLevelIndicatorPane placeholder and the CellsHost panel. -->
       <Grid x:Name="rootGrid">
          <Grid.ColumnDefinitions>
             <!-- HierarchicalGroupLevelIndicatorPane -->

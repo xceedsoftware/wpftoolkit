@@ -24,6 +24,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
 {
   public class LayoutAnchorablePaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
   {
+    #region Members
+
+    private LayoutAnchorablePane _model;
+
+    #endregion
+
+    #region Constructors
+
     static LayoutAnchorablePaneControl()
     {
       FocusableProperty.OverrideMetadata( typeof( LayoutAnchorablePaneControl ), new FrameworkPropertyMetadata( false ) );
@@ -42,14 +50,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
       this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
     }
 
-    void OnLayoutUpdated( object sender, EventArgs e )
-    {
-      var modelWithAtcualSize = _model as ILayoutPositionableElementWithActualSize;
-      modelWithAtcualSize.ActualWidth = ActualWidth;
-      modelWithAtcualSize.ActualHeight = ActualHeight;
-    }
+    #endregion
 
-    LayoutAnchorablePane _model;
+    #region Properties
 
     public ILayoutElement Model
     {
@@ -58,6 +61,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
         return _model;
       }
     }
+
+    #endregion
+
+    #region Overrides
 
     protected override void OnGotKeyboardFocus( System.Windows.Input.KeyboardFocusChangedEventArgs e )
     {
@@ -89,5 +96,18 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
+
+    #endregion
+
+    #region Private Methods
+
+    private void OnLayoutUpdated( object sender, EventArgs e )
+    {
+      var modelWithAtcualSize = _model as ILayoutPositionableElementWithActualSize;
+      modelWithAtcualSize.ActualWidth = ActualWidth;
+      modelWithAtcualSize.ActualHeight = ActualHeight;
+    }
+
+    #endregion
   }
 }

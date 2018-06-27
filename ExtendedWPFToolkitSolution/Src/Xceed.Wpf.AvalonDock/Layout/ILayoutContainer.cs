@@ -14,18 +14,32 @@
 
   ***********************************************************************************/
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-    public interface ILayoutContainer : ILayoutElement
+  public interface ILayoutContainer : ILayoutElement
+  {
+    #region Properties
+
+    IEnumerable<ILayoutElement> Children
     {
-        IEnumerable<ILayoutElement> Children { get; }
-        void RemoveChild(ILayoutElement element);
-        void ReplaceChild(ILayoutElement oldElement, ILayoutElement newElement);
-        int ChildrenCount { get; }
+      get;
     }
+
+    int ChildrenCount
+    {
+      get;
+    }
+
+    #endregion
+
+    #region Methods
+
+    void RemoveChild( ILayoutElement element );
+
+    void ReplaceChild( ILayoutElement oldElement, ILayoutElement newElement );
+
+    #endregion    
+  }
 }

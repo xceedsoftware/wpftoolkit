@@ -23,6 +23,9 @@ namespace Xceed.Wpf.Toolkit
 {
   public class AutoSelectTextBox : TextBox
   {
+    public AutoSelectTextBox()
+    {
+    }
 
     #region AutoSelectBehavior PROPERTY
 

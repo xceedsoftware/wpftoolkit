@@ -181,7 +181,7 @@ namespace Xceed.Wpf.Toolkit
     {
       if( _calculator != null )
       {
-        if( IsValid( _calculator.Value ) )
+        if( this.IsBetweenMinMax( _calculator.Value ) )
         {
           if( this.UpdateValueOnEnterKey )
           {

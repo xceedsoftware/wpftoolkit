@@ -124,8 +124,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( !PropertyDescriptor.IsReadOnly )
       {
         var defaultValue = this.ComputeDefaultValueAttribute();
-        if( defaultValue != null )
-          return true;
+        if( defaultValue != null)
+          return !defaultValue.Equals( this.Value ); // can Reset if different from defaultValue.
 
         return PropertyDescriptor.CanResetValue( SelectedObject );
       }
@@ -189,7 +189,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected override void ResetValue()
     {
-      PropertyDescriptor.ResetValue( SelectedObject );
+      this.PropertyDescriptor.ResetValue( this.SelectedObject );
+      base.ResetValue();
     }
 
     internal override ITypeEditor CreateAttributeEditor()

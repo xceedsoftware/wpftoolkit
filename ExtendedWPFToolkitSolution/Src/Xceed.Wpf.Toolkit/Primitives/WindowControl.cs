@@ -66,6 +66,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     public WindowControl()
     {
+
     }
 
     #endregion //Constructors

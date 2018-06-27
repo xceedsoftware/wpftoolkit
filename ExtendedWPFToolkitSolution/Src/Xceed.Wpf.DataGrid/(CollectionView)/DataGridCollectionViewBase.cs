@@ -1786,6 +1786,11 @@ namespace Xceed.Wpf.DataGrid
       {
         CollectionChangedEventManager.RemoveListener( collectionChanged, this );
       }
+      var bindingList = source as IBindingList;
+      if( ( bindingList != null ) && bindingList.SupportsChangeNotification )
+      {
+        ListChangedEventManager.RemoveListener( bindingList, this );
+      }
     }
 
     private void RegisterItemProperties( DataGridItemPropertyCollection itemProperties )

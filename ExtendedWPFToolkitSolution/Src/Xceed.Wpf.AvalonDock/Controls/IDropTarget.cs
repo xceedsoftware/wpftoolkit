@@ -14,28 +14,35 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Media;
 using Xceed.Wpf.AvalonDock.Layout;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-    internal interface IDropTarget
+  internal interface IDropTarget
+  {
+    #region Properties
+
+    DropTargetType Type
     {
-        Geometry GetPreviewPath(OverlayWindow overlayWindow, LayoutFloatingWindow floatingWindow);
-
-        bool HitTest(Point dragPoint);
-
-        DropTargetType Type { get; }
-
-        void Drop(LayoutFloatingWindow floatingWindow);
-
-        void DragEnter();
-
-        void DragLeave();
+      get;
     }
+
+    #endregion
+
+    #region Methods
+
+    Geometry GetPreviewPath( OverlayWindow overlayWindow, LayoutFloatingWindow floatingWindow );
+
+    bool HitTest( Point dragPoint );
+
+    void Drop( LayoutFloatingWindow floatingWindow );
+
+    void DragEnter();
+
+    void DragLeave();
+
+    #endregion
+  }
 }

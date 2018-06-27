@@ -14,26 +14,22 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
 using Xceed.Wpf.AvalonDock.Layout;
 
 namespace Xceed.Wpf.AvalonDock
 {
-    public class DocumentClosingEventArgs : CancelEventArgs
+  public class DocumentClosingEventArgs : CancelEventArgs
+  {
+    public DocumentClosingEventArgs( LayoutDocument document )
     {
-        public DocumentClosingEventArgs(LayoutDocument document)
-        {
-            Document = document;
-        }
-
-        public LayoutDocument Document
-        {
-            get;
-            private set;
-        }
+      Document = document;
     }
+
+    public LayoutDocument Document
+    {
+      get;
+      private set;
+    }
+  }
 }

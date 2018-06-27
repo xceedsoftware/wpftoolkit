@@ -190,7 +190,6 @@ namespace Xceed.Wpf.Toolkit
 
     public PrimitiveTypeCollectionControl()
     {
-
     }
 
     #endregion //Constructors

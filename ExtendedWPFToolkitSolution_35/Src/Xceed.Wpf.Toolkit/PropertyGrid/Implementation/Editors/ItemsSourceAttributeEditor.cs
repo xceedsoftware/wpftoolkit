@@ -48,6 +48,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     {
       Editor.DisplayMemberPath = "DisplayName";
       Editor.SelectedValuePath = "Value";
+      if( propertyItem != null )
+      {
+        Editor.IsEnabled = !propertyItem.IsReadOnly;
+      }
     }
 
     private void SetItemsSource()

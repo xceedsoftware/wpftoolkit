@@ -17,7 +17,10 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
+                    xmlns:prim="clr-namespace:Xceed.Wpf.Toolkit.Primitives"
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit">
+
+  <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 
   <Style TargetType="{x:Type local:CheckListBox}">
     <Setter Property="Background"
@@ -37,7 +40,12 @@
             <ScrollViewer Padding="{TemplateBinding Padding}"
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Auto">
-              <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+              <StackPanel>
+                <prim:SelectAllSelectorItem x:Name="PART_SelectAllSelectorItem"
+                                            Content="{TemplateBinding SelectAllContent}"
+                                            Visibility="{Binding IsSelectAllActive, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+              </StackPanel>
             </ScrollViewer>
           </Border>
         </ControlTemplate>

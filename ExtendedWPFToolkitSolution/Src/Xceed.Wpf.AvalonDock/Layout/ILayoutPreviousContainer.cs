@@ -14,17 +14,18 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-    interface ILayoutPreviousContainer
+  interface ILayoutPreviousContainer
+  {
+    ILayoutContainer PreviousContainer
     {
-        ILayoutContainer PreviousContainer { get; set; }
-
-        string PreviousContainerId { get; set; }
+      get; set;
     }
+
+    string PreviousContainerId
+    {
+      get; set;
+    }
+  }
 }

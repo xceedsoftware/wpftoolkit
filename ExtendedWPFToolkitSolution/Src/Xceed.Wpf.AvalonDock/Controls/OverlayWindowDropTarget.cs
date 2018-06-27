@@ -14,42 +14,51 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Controls;
 using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-    public class OverlayWindowDropTarget : IOverlayWindowDropTarget
+  public class OverlayWindowDropTarget : IOverlayWindowDropTarget
+  {
+    #region Members
+
+    private IOverlayWindowArea _overlayArea;
+    private Rect _screenDetectionArea;
+    private OverlayWindowDropTargetType _type;
+
+    #endregion
+
+    #region Constructors
+
+    internal OverlayWindowDropTarget( IOverlayWindowArea overlayArea, OverlayWindowDropTargetType targetType, FrameworkElement element )
     {
-        internal OverlayWindowDropTarget(IOverlayWindowArea overlayArea, OverlayWindowDropTargetType targetType, FrameworkElement element)
-        {
-            _overlayArea = overlayArea;
-            _type = targetType;
-            _screenDetectionArea = new Rect(element.TransformToDeviceDPI(new Point()), element.TransformActualSizeToAncestor());
-        }
+      _overlayArea = overlayArea;
+      _type = targetType;
+      _screenDetectionArea = new Rect( element.TransformToDeviceDPI( new Point() ), element.TransformActualSizeToAncestor() );
+    }
 
-        IOverlayWindowArea _overlayArea;
+    #endregion
 
-        Rect _screenDetectionArea;
-        Rect IOverlayWindowDropTarget.ScreenDetectionArea
-        {
-            get
-            {
-                return _screenDetectionArea;
-            }
 
-        }
+    #region IOverlayWindowDropTarget
 
-        OverlayWindowDropTargetType _type;
-        OverlayWindowDropTargetType IOverlayWindowDropTarget.Type
-        {
-            get { return _type; }
-        }
-
+    Rect IOverlayWindowDropTarget.ScreenDetectionArea
+    {
+      get
+      {
+        return _screenDetectionArea;
+      }
 
     }
+
+    OverlayWindowDropTargetType IOverlayWindowDropTarget.Type
+    {
+      get
+      {
+        return _type;
+      }
+    }
+
+    #endregion
+  }
 }

@@ -71,6 +71,10 @@ namespace Xceed.Wpf.Toolkit
       DefaultStyleKeyProperty.OverrideMetadata( typeof( RichTextBoxFormatBar ), new FrameworkPropertyMetadata( typeof( RichTextBoxFormatBar ) ) );
     }
 
+    public RichTextBoxFormatBar()
+    {
+    }
+
     #endregion //Constructors
 
     #region Base Class Overrides

@@ -15,79 +15,87 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Globalization;
+using System.Linq;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-    [Serializable]
-    public class LayoutDocument : LayoutContent
+  [Serializable]
+  public class LayoutDocument : LayoutContent
+  {
+    #region Properties
+
+    #region IsVisible
+
+    public bool IsVisible
     {
-        public bool IsVisible
+      get
+      {
+        return _isVisible;
+      }
+      internal set
+      {
+        _isVisible = value;
+      }
+    }
+
+    private bool _isVisible = true;
+
+    #endregion
+
+    #region Description
+
+    private string _description = null;
+    public string Description
+    {
+      get
+      {
+        return _description;
+      }
+      set
+      {
+        if( _description != value )
         {
-            get { return true; }
+          _description = value;
+          RaisePropertyChanged( "Description" );
         }
+      }
+    }
 
-        #region Description
+    #endregion
 
-        private string _description = null;
-        public string Description
-        {
-            get { return _description; }
-            set
-            {
-                if (_description != value)
-                {
-                    _description = value;
-                    RaisePropertyChanged("Description");
-                }
-            }
-        }
+    #endregion
 
-        #endregion
+    #region Overrides
 
-        public override void WriteXml(System.Xml.XmlWriter writer)
-        {
-            base.WriteXml(writer);
+    public override void WriteXml( System.Xml.XmlWriter writer )
+    {
+      base.WriteXml( writer );
 
-            if (!string.IsNullOrWhiteSpace(Description))
-                writer.WriteAttributeString("Description", Description);
+      if( !string.IsNullOrWhiteSpace( this.Description ) )
+        writer.WriteAttributeString( "Description", this.Description );
+    }
 
-        }
+    public override void ReadXml( System.Xml.XmlReader reader )
+    {
+      if( reader.MoveToAttribute( "Description" ) )
+        this.Description = reader.Value;
 
-        public override void ReadXml(System.Xml.XmlReader reader)
-        {
-            if (reader.MoveToAttribute("Description"))
-                Description = reader.Value;
+      base.ReadXml( reader );
+    }
 
-            base.ReadXml(reader);
-        }
-
-        public override void Close()
-        {
-          if( ( this.Root != null ) && ( this.Root.Manager != null ) )
-          {
-            var dockingManager = this.Root.Manager;
-            dockingManager._ExecuteCloseCommand( this );
-          }
-          else
-          {
-            this.CloseDocument();
-          }
-        }
-
-        internal bool CloseDocument()
-        {
-          if( this.TestCanClose() )
-          {
-            this.CloseInternal();
-            return true;
-          }
-
-          return false;
-        }
+    public override void Close()
+    {
+      if( ( this.Root != null ) && ( this.Root.Manager != null ) )
+      {
+        var dockingManager = this.Root.Manager;
+        dockingManager._ExecuteCloseCommand( this );
+      }
+      else
+      {
+        this.CloseDocument();
+      }
+    }
 
 #if TRACE
         public override void ConsoleDump(int tab)
@@ -97,45 +105,61 @@ namespace Xceed.Wpf.AvalonDock.Layout
         }
 #endif
 
+    protected override void InternalDock()
+    {
+      var root = Root as LayoutRoot;
+      LayoutDocumentPane documentPane = null;
+      if( root.LastFocusedDocument != null &&
+          root.LastFocusedDocument != this )
+      {
+        documentPane = root.LastFocusedDocument.Parent as LayoutDocumentPane;
+      }
 
-        protected override void InternalDock()
-        {
-            var root = Root as LayoutRoot;
-            LayoutDocumentPane documentPane = null;
-            if (root.LastFocusedDocument != null &&
-                root.LastFocusedDocument != this)
-            {
-                documentPane = root.LastFocusedDocument.Parent as LayoutDocumentPane;
-            }
-
-            if (documentPane == null)
-            {
-                documentPane = root.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
-            }
-
-
-            bool added = false;
-            if (root.Manager.LayoutUpdateStrategy != null)
-            {
-                added = root.Manager.LayoutUpdateStrategy.BeforeInsertDocument(root, this, documentPane);
-            }
-
-            if (!added)
-            {
-                if (documentPane == null)
-                    throw new InvalidOperationException("Layout must contains at least one LayoutDocumentPane in order to host documents");
-
-                documentPane.Children.Add(this);
-                added = true;
-            }
-
-            if (root.Manager.LayoutUpdateStrategy != null)
-            {
-                root.Manager.LayoutUpdateStrategy.AfterInsertDocument(root, this);
-            }
+      if( documentPane == null )
+      {
+        documentPane = root.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
+      }
 
 
-            base.InternalDock();
-        }
+      bool added = false;
+      if( root.Manager.LayoutUpdateStrategy != null )
+      {
+        added = root.Manager.LayoutUpdateStrategy.BeforeInsertDocument( root, this, documentPane );
+      }
+
+      if( !added )
+      {
+        if( documentPane == null )
+          throw new InvalidOperationException( "Layout must contains at least one LayoutDocumentPane in order to host documents" );
+
+        documentPane.Children.Add( this );
+        added = true;
+      }
+
+      if( root.Manager.LayoutUpdateStrategy != null )
+      {
+        root.Manager.LayoutUpdateStrategy.AfterInsertDocument( root, this );
+      }
+
+
+      base.InternalDock();
     }
+
+    #endregion
+
+    #region Internal Methods
+
+    internal bool CloseDocument()
+    {
+      if( this.TestCanClose() )
+      {
+        this.CloseInternal();
+        return true;
+      }
+
+      return false;
+    }
+
+    #endregion
+  }
 }

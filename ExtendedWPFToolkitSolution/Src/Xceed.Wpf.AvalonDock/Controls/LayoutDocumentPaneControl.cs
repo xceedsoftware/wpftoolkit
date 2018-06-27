@@ -25,11 +25,19 @@ namespace Xceed.Wpf.AvalonDock.Controls
 {
   public class LayoutDocumentPaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
   {
+    #region Members
+
+    private List<object> _logicalChildren = new List<object>();
+    private LayoutDocumentPane _model;
+
+    #endregion
+
+    #region Constructors
+
     static LayoutDocumentPaneControl()
     {
       FocusableProperty.OverrideMetadata( typeof( LayoutDocumentPaneControl ), new FrameworkPropertyMetadata( false ) );
     }
-
 
     internal LayoutDocumentPaneControl( LayoutDocumentPane model )
     {
@@ -43,22 +51,21 @@ namespace Xceed.Wpf.AvalonDock.Controls
       this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
     }
 
-    void OnLayoutUpdated( object sender, EventArgs e )
+    #endregion
+
+    #region Properties
+
+    public ILayoutElement Model
     {
-      var modelWithAtcualSize = _model as ILayoutPositionableElementWithActualSize;
-      modelWithAtcualSize.ActualWidth = ActualWidth;
-      modelWithAtcualSize.ActualHeight = ActualHeight;
+      get
+      {
+        return _model;
+      }
     }
 
-    protected override void OnSelectionChanged( SelectionChangedEventArgs e )
-    {
-      base.OnSelectionChanged( e );
+    #endregion
 
-      if( _model.SelectedContent != null )
-        _model.SelectedContent.IsActive = true;
-    }
-
-    List<object> _logicalChildren = new List<object>();
+    #region Overrides
 
     protected override System.Collections.IEnumerator LogicalChildren
     {
@@ -68,14 +75,12 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    LayoutDocumentPane _model;
-
-    public ILayoutElement Model
+    protected override void OnSelectionChanged( SelectionChangedEventArgs e )
     {
-      get
-      {
-        return _model;
-      }
+      base.OnSelectionChanged( e );
+
+      if( _model.SelectedContent != null )
+        _model.SelectedContent.IsActive = true;
     }
 
     protected override void OnMouseLeftButtonDown( System.Windows.Input.MouseButtonEventArgs e )
@@ -95,5 +100,18 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     }
 
+
+    #endregion
+
+    #region Private Methods
+
+    private void OnLayoutUpdated( object sender, EventArgs e )
+    {
+      var modelWithAtcualSize = _model as ILayoutPositionableElementWithActualSize;
+      modelWithAtcualSize.ActualWidth = ActualWidth;
+      modelWithAtcualSize.ActualHeight = ActualHeight;
+    }
+
+    #endregion
   }
 }

@@ -15,15 +15,14 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Themes
 {
   public abstract class DictionaryTheme : Theme
   {
+    #region Constructors
+
     public DictionaryTheme()
     {
     }
@@ -33,15 +32,25 @@ namespace Xceed.Wpf.AvalonDock.Themes
       this.ThemeResourceDictionary = themeResourceDictionary;
     }
 
+    #endregion
+
+    #region Properties
+
     public ResourceDictionary ThemeResourceDictionary
     {
       get;
       private set;
     }
 
+    #endregion
+
+    #region Overrides
+
     public override Uri GetResourceUri()
     {
       return null;
     }
+
+    #endregion
   }
 }

@@ -15,20 +15,23 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
 using Xceed.Wpf.AvalonDock.Layout;
 using System.Windows;
 using System.Windows.Controls.Primitives;
-using System.Windows.Media;
 using Microsoft.Windows.Shell;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
   public class LayoutDocumentFloatingWindowControl : LayoutFloatingWindowControl
   {
+    #region Members
+
+    private LayoutDocumentFloatingWindow _model;
+
+    #endregion
+
+    #region Constructors
+
     static LayoutDocumentFloatingWindowControl()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( LayoutDocumentFloatingWindowControl ), new FrameworkPropertyMetadata( typeof( LayoutDocumentFloatingWindowControl ) ) );
@@ -41,22 +44,27 @@ namespace Xceed.Wpf.AvalonDock.Controls
       UpdateThemeResources();
     }
 
+    #endregion
 
-    LayoutDocumentFloatingWindow _model;
-
-    public override ILayoutElement Model
-    {
-      get
-      {
-        return _model;
-      }
-    }
+    #region Properties
 
     public LayoutItem RootDocumentLayoutItem
     {
       get
       {
         return _model.Root.Manager.GetLayoutItemFromModel( _model.RootDocument );
+      }
+    }
+
+    #endregion
+
+    #region Overrides
+
+    public override ILayoutElement Model
+    {
+      get
+      {
+        return _model;
       }
     }
 
@@ -75,14 +83,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
         Content = manager.CreateUIElementForModel( _model.RootDocument );
 
         _model.RootDocumentChanged += new EventHandler( _model_RootDocumentChanged );
-      }
-    }
-
-    void _model_RootDocumentChanged( object sender, EventArgs e )
-    {
-      if( _model.RootDocument == null )
-      {
-        InternalClose();
       }
     }
 
@@ -114,22 +114,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       return base.FilterMessage( hwnd, msg, wParam, lParam, ref handled );
     }
 
-    bool OpenContextMenu()
-    {
-      var ctxMenu = _model.Root.Manager.DocumentContextMenu;
-      if( ctxMenu != null && RootDocumentLayoutItem != null )
-      {
-        ctxMenu.PlacementTarget = null;
-        ctxMenu.Placement = PlacementMode.MousePoint;
-        ctxMenu.DataContext = RootDocumentLayoutItem;
-        ctxMenu.IsOpen = true;
-        return true;
-      }
-
-      return false;
-    }
-
-
     protected override void OnClosed( EventArgs e )
     {
       var root = Model.Root;
@@ -146,5 +130,33 @@ namespace Xceed.Wpf.AvalonDock.Controls
       _model.RootDocumentChanged -= new EventHandler( _model_RootDocumentChanged );
     }
 
+    #endregion
+
+    #region Private Methods
+
+    private void _model_RootDocumentChanged( object sender, EventArgs e )
+    {
+      if( _model.RootDocument == null )
+      {
+        InternalClose();
+      }
+    }
+
+    private bool OpenContextMenu()
+    {
+      var ctxMenu = _model.Root.Manager.DocumentContextMenu;
+      if( ctxMenu != null && RootDocumentLayoutItem != null )
+      {
+        ctxMenu.PlacementTarget = null;
+        ctxMenu.Placement = PlacementMode.MousePoint;
+        ctxMenu.DataContext = RootDocumentLayoutItem;
+        ctxMenu.IsOpen = true;
+        return true;
+      }
+
+      return false;
+    }
+
+    #endregion
   }
 }

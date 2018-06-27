@@ -86,7 +86,8 @@
                                     TabIndex="{TemplateBinding TabIndex}"
                                     VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                     Watermark="{Binding Watermark, RelativeSource={RelativeSource TemplatedParent}}"
-                                    WatermarkTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}}">
+                                    WatermarkTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                    MaxLength="{Binding MaxLength, RelativeSource={RelativeSource TemplatedParent}}">
             </local:WatermarkTextBox>
           </local:ButtonSpinner>
 

@@ -14,49 +14,78 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-    internal interface ILayoutPositionableElement : ILayoutElement, ILayoutElementForFloatingWindow
+  internal interface ILayoutPositionableElement : ILayoutElement, ILayoutElementForFloatingWindow
+  {
+    GridLength DockWidth
     {
-        GridLength DockWidth
-        {
-            get;
-            set;
-        }
-
-        GridLength DockHeight
-        {
-            get;
-            set;
-        }
-
-        double DockMinWidth { get; set; }
-        double DockMinHeight { get; set; }
-
-        bool AllowDuplicateContent { get; set; }
-
-        bool IsVisible { get; }
+      get;
+      set;
     }
 
-
-    internal interface ILayoutPositionableElementWithActualSize
+    GridLength DockHeight
     {
-        double ActualWidth { get; set; }
-        double ActualHeight { get; set; }
+      get;
+      set;
     }
 
-    internal interface ILayoutElementForFloatingWindow
+    double DockMinWidth
     {
-        double FloatingWidth { get; set; }
-        double FloatingHeight { get; set; }
-        double FloatingLeft { get; set; }
-        double FloatingTop { get; set; }
-        bool IsMaximized { get; set; }
+      get; set;
     }
+    double DockMinHeight
+    {
+      get; set;
+    }
+
+    bool AllowDuplicateContent
+    {
+      get; set;
+    }
+
+    bool IsVisible
+    {
+      get;
+    }
+  }
+
+
+  internal interface ILayoutPositionableElementWithActualSize
+  {
+    double ActualWidth
+    {
+      get; set;
+    }
+    double ActualHeight
+    {
+      get; set;
+    }
+  }
+
+  internal interface ILayoutElementForFloatingWindow
+  {
+    double FloatingWidth
+    {
+      get; set;
+    }
+    double FloatingHeight
+    {
+      get; set;
+    }
+    double FloatingLeft
+    {
+      get; set;
+    }
+    double FloatingTop
+    {
+      get; set;
+    }
+    bool IsMaximized
+    {
+      get; set;
+    }
+  }
 }

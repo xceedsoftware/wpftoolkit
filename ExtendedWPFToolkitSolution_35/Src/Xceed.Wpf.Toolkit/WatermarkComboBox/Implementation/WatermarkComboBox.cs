@@ -66,6 +66,10 @@ namespace Xceed.Wpf.Toolkit
       DefaultStyleKeyProperty.OverrideMetadata( typeof( WatermarkComboBox ), new FrameworkPropertyMetadata( typeof( WatermarkComboBox ) ) );
     }
 
+    public WatermarkComboBox()
+    {
+    }
+
     #endregion //Constructors
 
     #region Base Class Overrides

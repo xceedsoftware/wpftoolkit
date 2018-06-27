@@ -83,14 +83,13 @@
                   <RowDefinition Height="Auto" />
                   <RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock Margin="0,0,0,5"
-                           Text="Select type:" >
-                </TextBlock>
+                <ContentControl Margin="0,0,0,5"
+                                Content="{TemplateBinding TypeSelectionLabel}">
+                </ContentControl>
                 <ComboBox x:Name="PART_NewItemTypesComboBox"
                           Grid.Row="1"
                           Margin="0,0,0,3"
-                          HorizontalAlignment="Stretch"
-                          DisplayMemberPath="Name">
+                          HorizontalAlignment="Stretch">
                   <ComboBox.ItemsSource>
                     <MultiBinding Converter="{StaticResource NewItemTypesComboBoxConverter}">
                       <Binding RelativeSource="{RelativeSource TemplatedParent}"
@@ -99,6 +98,11 @@
                                Path="NewItemTypes" />
                     </MultiBinding>
                   </ComboBox.ItemsSource>
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding Converter={StaticResource ObjectTypeToNameConverter}}" />
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
                 </ComboBox>
                 <Button Margin="3,0,0,3"
                         Grid.Row="1"
@@ -143,6 +147,17 @@
                            Source="./../Images/Delete16.png" >
                     </Image>
                   </Button>
+                  <Button Margin="0,7,0,0"
+                          Style="{StaticResource CollectionControlButtonStyle}"
+                          Command="Copy"
+                          CommandParameter="{Binding SelectedItem, ElementName=PART_ListBox}">
+                    <Image Stretch="None"
+                           Height="16"
+                           Width="16"
+                           Margin="1"
+                           Source="./../Images/Duplicate.png">
+                    </Image>
+                  </Button>
                 </StackPanel>
               </Grid>
               <Grid Column="1"
@@ -151,9 +166,9 @@
                   <RowDefinition Height="Auto" />
                   <RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Column="1"
-                           Text="Properties:" >
-                </TextBlock>
+                <ContentControl Grid.Column="1"
+                                Content="{TemplateBinding PropertiesLabel}">
+                </ContentControl>
                 <pg:PropertyGrid x:Name="PART_PropertyGrid"
                                  Grid.Row="1"
                                  Grid.Column="1"
@@ -161,7 +176,8 @@
                                  HorizontalAlignment="Stretch"
                                  VerticalAlignment="Stretch"
                                  SelectedObject="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}"
-                                 IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}" />
+                                 IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}"
+                                 EditorDefinitions="{Binding EditorDefinitions, RelativeSource={RelativeSource TemplatedParent}}"/>
               </Grid>
             </Grid>
           </Border>

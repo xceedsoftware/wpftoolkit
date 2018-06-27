@@ -14,64 +14,78 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-    public enum DropAreaType
+  public enum DropAreaType
+  {
+    DockingManager,
+    DocumentPane,
+    DocumentPaneGroup,
+    AnchorablePane,
+  }
+
+
+  public interface IDropArea
+  {
+    Rect DetectionRect
     {
-        DockingManager,
+      get;
+    }
+    DropAreaType Type
+    {
+      get;
+    }
+  }
 
-        DocumentPane,
+  public class DropArea<T> : IDropArea where T : FrameworkElement
+  {
+    #region Members
 
-        DocumentPaneGroup,
+    private Rect _detectionRect;
+    private DropAreaType _type;
+    private T _element;
 
-        AnchorablePane,
+    #endregion
 
+    #region Constructors
+
+    internal DropArea( T areaElement, DropAreaType type )
+    {
+      _element = areaElement;
+      _detectionRect = areaElement.GetScreenArea();
+      _type = type;
     }
 
+    #endregion
 
-    public interface IDropArea
+    #region Properties
+
+    public Rect DetectionRect
     {
-        Rect DetectionRect { get; }
-        DropAreaType Type { get; }
+      get
+      {
+        return _detectionRect;
+      }
+    }   
+
+    public DropAreaType Type
+    {
+      get
+      {
+        return _type;
+      }
     }
 
-    public class DropArea<T> : IDropArea where T : FrameworkElement
+    public T AreaElement
     {
-        internal DropArea(T areaElement, DropAreaType type)
-        {
-            _element = areaElement;
-            _detectionRect = areaElement.GetScreenArea();
-            _type = type;
-        }
-
-        Rect _detectionRect;
-
-        public Rect DetectionRect
-        {
-            get { return _detectionRect; }
-        }
-
-        DropAreaType _type;
-
-        public DropAreaType Type
-        {
-            get { return _type; }
-        }
-
-        T _element;
-        public T AreaElement
-        {
-            get
-            {
-                return _element;
-            }
-        }
-
+      get
+      {
+        return _element;
+      }
     }
+
+    #endregion
+  }
 }

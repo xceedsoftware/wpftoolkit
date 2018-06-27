@@ -24,12 +24,20 @@ namespace Xceed.Wpf.AvalonDock.Controls
 {
   public class LayoutAnchorControl : Control, ILayoutControl
   {
+    #region Members
+
+    private LayoutAnchorable _model;
+    private DispatcherTimer _openUpTimer = null;
+
+    #endregion
+
+    #region Constructors
+
     static LayoutAnchorControl()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( LayoutAnchorControl ), new FrameworkPropertyMetadata( typeof( LayoutAnchorControl ) ) );
       Control.IsHitTestVisibleProperty.AddOwner( typeof( LayoutAnchorControl ), new FrameworkPropertyMetadata( true ) );
     }
-
 
     internal LayoutAnchorControl( LayoutAnchorable model )
     {
@@ -40,7 +48,61 @@ namespace Xceed.Wpf.AvalonDock.Controls
       SetSide( _model.FindParent<LayoutAnchorSide>().Side );
     }
 
-    void _model_IsSelectedChanged( object sender, EventArgs e )
+    #endregion
+
+    #region Properties
+
+    #region Model
+
+    public ILayoutElement Model
+    {
+      get
+      {
+        return _model;
+      }
+    }
+
+    #endregion
+
+    #region Side
+
+    /// <summary>
+    /// Side Read-Only Dependency Property
+    /// </summary>
+    private static readonly DependencyPropertyKey SidePropertyKey = DependencyProperty.RegisterReadOnly( "Side", typeof( AnchorSide ), typeof( LayoutAnchorControl ),
+            new FrameworkPropertyMetadata( ( AnchorSide )AnchorSide.Left ) );
+
+    public static readonly DependencyProperty SideProperty = SidePropertyKey.DependencyProperty;
+
+    /// <summary>
+    /// Gets the Side property.  This dependency property 
+    /// indicates the anchor side of the control.
+    /// </summary>
+    public AnchorSide Side
+    {
+      get
+      {
+        return ( AnchorSide )GetValue( SideProperty );
+      }
+    }
+
+    /// <summary>
+    /// Provides a secure method for setting the Side property.  
+    /// This dependency property indicates the anchor side of the control.
+    /// </summary>
+    /// <param name="value">The new value for the property.</param>
+    protected void SetSide( AnchorSide value )
+    {
+      SetValue( SidePropertyKey, value );
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Private Methods
+
+    private void _model_IsSelectedChanged( object sender, EventArgs e )
     {
       if( !_model.IsAutoHidden )
         _model.IsSelectedChanged -= new EventHandler( _model_IsSelectedChanged );
@@ -51,7 +113,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    void _model_IsActiveChanged( object sender, EventArgs e )
+    private void _model_IsActiveChanged( object sender, EventArgs e )
     {
       if( !_model.IsAutoHidden )
         _model.IsActiveChanged -= new EventHandler( _model_IsActiveChanged );
@@ -59,15 +121,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
         _model.Root.Manager.ShowAutoHideWindow( this );
     }
 
-    LayoutAnchorable _model;
-
-    public ILayoutElement Model
+    private void _openUpTimer_Tick( object sender, EventArgs e )
     {
-      get
-      {
-        return _model;
-      }
+      _openUpTimer.Tick -= new EventHandler( _openUpTimer_Tick );
+      _openUpTimer.Stop();
+      _openUpTimer = null;
+      _model.Root.Manager.ShowAutoHideWindow( this );
     }
+
+    #endregion
+
+    #region Overrides
 
     //protected override void OnVisualParentChanged(DependencyObject oldParent)
     //{
@@ -110,9 +174,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-
-    DispatcherTimer _openUpTimer = null;
-
     protected override void OnMouseEnter( System.Windows.Input.MouseEventArgs e )
     {
       base.OnMouseEnter( e );
@@ -124,14 +185,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
         _openUpTimer.Tick += new EventHandler( _openUpTimer_Tick );
         _openUpTimer.Start();
       }
-    }
-
-    void _openUpTimer_Tick( object sender, EventArgs e )
-    {
-      _openUpTimer.Tick -= new EventHandler( _openUpTimer_Tick );
-      _openUpTimer.Stop();
-      _openUpTimer = null;
-      _model.Root.Manager.ShowAutoHideWindow( this );
     }
 
     protected override void OnMouseLeave( System.Windows.Input.MouseEventArgs e )
@@ -146,41 +199,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
     }
 
 
-    #region Side
-
-    /// <summary>
-    /// Side Read-Only Dependency Property
-    /// </summary>
-    private static readonly DependencyPropertyKey SidePropertyKey
-        = DependencyProperty.RegisterReadOnly( "Side", typeof( AnchorSide ), typeof( LayoutAnchorControl ),
-            new FrameworkPropertyMetadata( ( AnchorSide )AnchorSide.Left ) );
-
-    public static readonly DependencyProperty SideProperty
-        = SidePropertyKey.DependencyProperty;
-
-    /// <summary>
-    /// Gets the Side property.  This dependency property 
-    /// indicates the anchor side of the control.
-    /// </summary>
-    public AnchorSide Side
-    {
-      get
-      {
-        return ( AnchorSide )GetValue( SideProperty );
-      }
-    }
-
-    /// <summary>
-    /// Provides a secure method for setting the Side property.  
-    /// This dependency property indicates the anchor side of the control.
-    /// </summary>
-    /// <param name="value">The new value for the property.</param>
-    protected void SetSide( AnchorSide value )
-    {
-      SetValue( SidePropertyKey, value );
-    }
-
     #endregion
-
   }
 }

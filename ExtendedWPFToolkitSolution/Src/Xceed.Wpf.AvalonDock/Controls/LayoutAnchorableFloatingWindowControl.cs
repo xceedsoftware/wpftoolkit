@@ -17,17 +17,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Runtime.InteropServices;
-using System.Windows.Interop;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
 using System.Windows.Input;
 using Xceed.Wpf.AvalonDock.Layout;
 using Xceed.Wpf.AvalonDock.Converters;
-using System.Diagnostics;
 using System.Windows.Controls.Primitives;
 using Xceed.Wpf.AvalonDock.Commands;
 using Microsoft.Windows.Shell;
@@ -36,11 +30,20 @@ namespace Xceed.Wpf.AvalonDock.Controls
 {
   public class LayoutAnchorableFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
   {
+    #region Members
+
+    private LayoutAnchorableFloatingWindow _model;
+    private OverlayWindow _overlayWindow = null;
+    private List<IDropArea> _dropAreas = null;
+
+    #endregion
+
+    #region Constructors
+
     static LayoutAnchorableFloatingWindowControl()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( LayoutAnchorableFloatingWindowControl ), new FrameworkPropertyMetadata( typeof( LayoutAnchorableFloatingWindowControl ) ) );
     }
-
 
     internal LayoutAnchorableFloatingWindowControl( LayoutAnchorableFloatingWindow model )
         : base( model )
@@ -51,33 +54,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
       UpdateThemeResources();
     }
 
-    internal override void UpdateThemeResources( Xceed.Wpf.AvalonDock.Themes.Theme oldTheme = null )
-    {
-      base.UpdateThemeResources( oldTheme );
+    #endregion
 
-      if( _overlayWindow != null )
-        _overlayWindow.UpdateThemeResources( oldTheme );
-    }
-
-    LayoutAnchorableFloatingWindow _model;
-
-    public override ILayoutElement Model
-    {
-      get
-      {
-        return _model;
-      }
-    }
+    #region Properties
 
     #region SingleContentLayoutItem
 
     /// <summary>
     /// SingleContentLayoutItem Dependency Property
     /// </summary>
-    public static readonly DependencyProperty SingleContentLayoutItemProperty =
-        DependencyProperty.Register( "SingleContentLayoutItem", typeof( LayoutItem ), typeof( LayoutAnchorableFloatingWindowControl ),
-            new FrameworkPropertyMetadata( ( LayoutItem )null,
-                new PropertyChangedCallback( OnSingleContentLayoutItemChanged ) ) );
+    public static readonly DependencyProperty SingleContentLayoutItemProperty = DependencyProperty.Register( "SingleContentLayoutItem", typeof( LayoutItem ), typeof( LayoutAnchorableFloatingWindowControl ),
+            new FrameworkPropertyMetadata( ( LayoutItem )null, new PropertyChangedCallback( OnSingleContentLayoutItemChanged ) ) );
 
     /// <summary>
     /// Gets or sets the SingleContentLayoutItem property.  This dependency property 
@@ -112,7 +99,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #endregion
 
+    #endregion
 
+    #region Overrides
+
+    public override ILayoutElement Model
+    {
+      get
+      {
+        return _model;
+      }
+    }
 
     protected override void OnInitialized( EventArgs e )
     {
@@ -137,89 +134,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       SetBinding( SingleContentLayoutItemProperty, new Binding( "Model.SinglePane.SelectedContent" ) { Source = this, Converter = new LayoutItemFromLayoutModelConverter() } );
 
       _model.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler( _model_PropertyChanged );
-    }
-
-
-    void _model_PropertyChanged( object sender, System.ComponentModel.PropertyChangedEventArgs e )
-    {
-      if( e.PropertyName == "RootPanel" &&
-          _model.RootPanel == null )
-      {
-        InternalClose();
-      }
-    }
-
-
-    bool IOverlayWindowHost.HitTest( Point dragPoint )
-    {
-      Rect detectionRect = new Rect( this.PointToScreenDPIWithoutFlowDirection( new Point() ), this.TransformActualSizeToAncestor() );
-      return detectionRect.Contains( dragPoint );
-    }
-
-    DockingManager IOverlayWindowHost.Manager
-    {
-      get
-      {
-        return _model.Root.Manager;
-      }
-    }
-
-    OverlayWindow _overlayWindow = null;
-    void CreateOverlayWindow()
-    {
-      if( _overlayWindow == null )
-        _overlayWindow = new OverlayWindow( this );
-      Rect rectWindow = new Rect( this.PointToScreenDPIWithoutFlowDirection( new Point() ), this.TransformActualSizeToAncestor() );
-      _overlayWindow.Left = rectWindow.Left;
-      _overlayWindow.Top = rectWindow.Top;
-      _overlayWindow.Width = rectWindow.Width;
-      _overlayWindow.Height = rectWindow.Height;
-    }
-
-    IOverlayWindow IOverlayWindowHost.ShowOverlayWindow( LayoutFloatingWindowControl draggingWindow )
-    {
-      CreateOverlayWindow();
-      _overlayWindow.Owner = draggingWindow;
-      _overlayWindow.EnableDropTargets();
-      _overlayWindow.Show();
-
-      return _overlayWindow;
-    }
-
-    void IOverlayWindowHost.HideOverlayWindow()
-    {
-      _dropAreas = null;
-      _overlayWindow.Owner = null;
-      _overlayWindow.HideDropTargets();
-    }
-
-    List<IDropArea> _dropAreas = null;
-    IEnumerable<IDropArea> IOverlayWindowHost.GetDropAreas( LayoutFloatingWindowControl draggingWindow )
-    {
-      if( _dropAreas != null )
-        return _dropAreas;
-
-      _dropAreas = new List<IDropArea>();
-
-      if( draggingWindow.Model is LayoutDocumentFloatingWindow )
-        return _dropAreas;
-
-      var rootVisual = ( Content as FloatingWindowContentHost ).RootVisual;
-
-      foreach( var areaHost in rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>() )
-      {
-        _dropAreas.Add( new DropArea<LayoutAnchorablePaneControl>(
-            areaHost,
-            DropAreaType.AnchorablePane ) );
-      }
-      foreach( var areaHost in rootVisual.FindVisualChildren<LayoutDocumentPaneControl>() )
-      {
-        _dropAreas.Add( new DropArea<LayoutDocumentPaneControl>(
-            areaHost,
-            DropAreaType.DocumentPane ) );
-      }
-
-      return _dropAreas;
     }
 
     protected override void OnClosed( EventArgs e )
@@ -283,7 +197,41 @@ namespace Xceed.Wpf.AvalonDock.Controls
       return base.FilterMessage( hwnd, msg, wParam, lParam, ref handled );
     }
 
-    bool OpenContextMenu()
+    internal override void UpdateThemeResources( Xceed.Wpf.AvalonDock.Themes.Theme oldTheme = null )
+    {
+      base.UpdateThemeResources( oldTheme );
+
+      if( _overlayWindow != null )
+      {
+        _overlayWindow.UpdateThemeResources( oldTheme );
+      }
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void _model_PropertyChanged( object sender, System.ComponentModel.PropertyChangedEventArgs e )
+    {
+      if( e.PropertyName == "RootPanel" &&
+          _model.RootPanel == null )
+      {
+        InternalClose();
+      }
+    }
+
+    private void CreateOverlayWindow()
+    {
+      if( _overlayWindow == null )
+        _overlayWindow = new OverlayWindow( this );
+      Rect rectWindow = new Rect( this.PointToScreenDPIWithoutFlowDirection( new Point() ), this.TransformActualSizeToAncestor() );
+      _overlayWindow.Left = rectWindow.Left;
+      _overlayWindow.Top = rectWindow.Top;
+      _overlayWindow.Width = rectWindow.Width;
+      _overlayWindow.Height = rectWindow.Height;
+    }
+
+    private bool OpenContextMenu()
     {
       var ctxMenu = _model.Root.Manager.AnchorableContextMenu;
       if( ctxMenu != null && SingleContentLayoutItem != null )
@@ -298,7 +246,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       return false;
     }
 
-    bool IsContextMenuOpen()
+    private bool IsContextMenuOpen()
     {
       var ctxMenu = _model.Root.Manager.AnchorableContextMenu;
       if( ctxMenu != null && SingleContentLayoutItem != null )
@@ -309,7 +257,12 @@ namespace Xceed.Wpf.AvalonDock.Controls
       return false;
     }
 
+    #endregion
+
+    #region Commands
+
     #region HideWindowCommand
+
     public ICommand HideWindowCommand
     {
       get;
@@ -417,6 +370,72 @@ namespace Xceed.Wpf.AvalonDock.Controls
         anchorableLayoutItem.CloseCommand.Execute( parameter );
       }
     }
+
+    #endregion
+
+    #endregion
+
+    #region IOverlayWindowHost
+
+    bool IOverlayWindowHost.HitTest( Point dragPoint )
+    {
+      Rect detectionRect = new Rect( this.PointToScreenDPIWithoutFlowDirection( new Point() ), this.TransformActualSizeToAncestor() );
+      return detectionRect.Contains( dragPoint );
+    }
+
+    DockingManager IOverlayWindowHost.Manager
+    {
+      get
+      {
+        return _model.Root.Manager;
+      }
+    }
+
+    IOverlayWindow IOverlayWindowHost.ShowOverlayWindow( LayoutFloatingWindowControl draggingWindow )
+    {
+      CreateOverlayWindow();
+      _overlayWindow.Owner = draggingWindow;
+      _overlayWindow.EnableDropTargets();
+      _overlayWindow.Show();
+
+      return _overlayWindow;
+    }
+
+    void IOverlayWindowHost.HideOverlayWindow()
+    {
+      _dropAreas = null;
+      _overlayWindow.Owner = null;
+      _overlayWindow.HideDropTargets();
+    }
+
+    IEnumerable<IDropArea> IOverlayWindowHost.GetDropAreas( LayoutFloatingWindowControl draggingWindow )
+    {
+      if( _dropAreas != null )
+        return _dropAreas;
+
+      _dropAreas = new List<IDropArea>();
+
+      if( draggingWindow.Model is LayoutDocumentFloatingWindow )
+        return _dropAreas;
+
+      var rootVisual = ( Content as FloatingWindowContentHost ).RootVisual;
+
+      foreach( var areaHost in rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>() )
+      {
+        _dropAreas.Add( new DropArea<LayoutAnchorablePaneControl>(
+            areaHost,
+            DropAreaType.AnchorablePane ) );
+      }
+      foreach( var areaHost in rootVisual.FindVisualChildren<LayoutDocumentPaneControl>() )
+      {
+        _dropAreas.Add( new DropArea<LayoutDocumentPaneControl>(
+            areaHost,
+            DropAreaType.DocumentPane ) );
+      }
+
+      return _dropAreas;
+    }
+
     #endregion
   }
 }
