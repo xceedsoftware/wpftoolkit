@@ -181,7 +181,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       base.OnMouseEnter( e );
 
-      if( _draggingItem != this &&
+      if( _draggingItem != null && 
+          _draggingItem != this &&
           e.LeftButton == MouseButtonState.Pressed )
       {
         var model = Model;
