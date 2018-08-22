@@ -92,7 +92,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <td><a href="../../wiki/Zoombox">Zoombox</a></td>
 </tr>
 <tr>
-<td><a href="">Windows 8 Theme</a></td>
+<td><a href="../../wiki/Themes-Usage-Instructions">Windows 8 Theme</a></td>
 </tr>
 </table>
 
@@ -130,10 +130,10 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <td><a href="../../wiki/WindowControl-Plus">WindowControl Plus</a></td>
 </tr>
 <tr>
-<td><a href="">Windows 10 theme</a></td>
-<td><a href="">Metro theme</a></td>
-<td><a href="">Office theme</a></td>
-<td><a href="">1+ release ahead</a></td>
+<td><a href="../../wiki/Themes-Usage-Instructions">Windows 10 theme</a></td>
+<td><a href="../..wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">Metro theme</a></td>
+<td><a href="../..wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">Office theme</a></td>
+<td><a href="../..wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">1 or more release ahead</a></td>
 </tr>
 </table>
 
@@ -142,9 +142,9 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <table>
 <tr>
 <td><a href="../../wiki/Advanced-DataGrid">Advanced DataGrid</a></td>
-<td><a href="">3D Views for WPF</a></td>
-<td><a href="">More themes</a></td>
-<td><a href="">All base WPF controls themed</a></td>
+<td><a href="../..wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">3D Views for WPF</a></td>
+<td><a href="../..wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">More themes</a></td>
+<td><a href="../..wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">All base WPF controls themed</a></td>
 </tr>
 </table>
 
