@@ -131,9 +131,9 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 </tr>
 <tr>
 <td><a href="../../wiki/Themes-Usage-Instructions">Windows 10 theme</a></td>
-<td><a href="../..wiki/Xceed-Toolkit-Plus-for-WPF">Metro theme</a></td>
-<td><a href="../..wiki/Xceed-Toolkit-Plus-for-WPF">Office theme</a></td>
-<td><a href="../..wiki/Xceed-Toolkit-Plus-for-WPF">1 or more release ahead</a></td>
+<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">Metro theme</a></td>
+<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">Office theme</a></td>
+<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">1 or more release ahead</a></td>
 </tr>
 </table>
 
@@ -142,9 +142,9 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <table>
 <tr>
 <td><a href="../../wiki/Advanced-DataGrid">Advanced DataGrid</a></td>
-<td><a href="../..wiki/Xceed-Toolkit-Plus-for-WPF">3D Views for WPF</a></td>
-<td><a href="../..wiki/Xceed-Toolkit-Plus-for-WPF">More themes</a></td>
-<td><a href="../..wiki/Xceed-Toolkit-Plus-for-WPF">All base WPF controls themed</a></td>
+<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">3D Views for WPF</a></td>
+<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">More themes</a></td>
+<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">All base WPF controls themed</a></td>
 </tr>
 </table>
 
