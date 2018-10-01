@@ -434,6 +434,11 @@ namespace Xceed.Wpf.Toolkit
             this.Value = newDate;
           }
         }
+        // Update _timePicker Value for correct time choise
+        if (newDate != null)
+        {
+            _timePicker.UpdateValueProperty(newDate.Value);
+        }
       }
     }
 
