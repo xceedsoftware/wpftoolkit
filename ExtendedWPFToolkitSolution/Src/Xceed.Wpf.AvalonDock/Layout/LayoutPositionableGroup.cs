@@ -50,7 +50,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
       }
       set
       {
-        if( DockWidth != value )
+        if( DockWidth != value && value.Value > 0 )
         {
           RaisePropertyChanging( "DockWidth" );
           _dockWidth = value;
@@ -74,7 +74,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
       }
       set
       {
-        if( DockHeight != value )
+        if( DockHeight != value && value.Value > 0 )
         {
           RaisePropertyChanging( "DockHeight" );
           _dockHeight = value;
