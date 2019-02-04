@@ -106,7 +106,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <td><a href="../../wiki/FilePicker">FilePicker</a></td>
 </tr>
 <tr>
-<td><a href="../../wiki/Material-Design-controls">19 Material Design controls</a></td>
+<td><a href="../../wiki/Material-Design-controls">21 Material Design controls</a></td>
 <td><a href="../../wiki/MessageBox-Plus">MessageBox Plus</a></td>
 <td><a href="../../wiki/MultiCalendar">MultiCalendar</a></td>
 <td><a href="../../wiki/MultiColumnComboBox">MultiColumnComboBox</a></td>
