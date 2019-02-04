@@ -74,7 +74,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <td><a href="../../wiki/SplitButton">SplitButton</a></td>
 </tr>
 <tr>
-<td><a href="../../wiki/SwitchPanel">SwitchPanel</a></td>
+<td><a href="../../wiki/SwitchPanel">2 SwitchPanels</a></td>
 <td><a href="../../wiki/TimelinePanel">TimelinePanel</a></td>
 <td><a href="../../wiki/TimePicker">TimePicker</a></td>
 <td><a href="../../wiki/TimeSpanUpDown">TimeSpanUpDown</a></td>
@@ -103,10 +103,10 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <td><a href="../../wiki/Charts">Charts</a></td>
 <td><a href="../../wiki/ChildWindow-Plus">ChildWindow Plus</a></td>
 <td><a href="../../wiki/ExtendedTabControl">ExtendedTabControl</a></td>
-<td><a href="../../wiki/FilePicker-Plus">FilePicker Plus</a></td>
+<td><a href="../../wiki/FilePicker">FilePicker</a></td>
 </tr>
 <tr>
-<td><a href="../../wiki/Material-Design-controls">Material Design controls</a></td>
+<td><a href="../../wiki/Material-Design-controls">19 Material Design controls</a></td>
 <td><a href="../../wiki/MessageBox-Plus">MessageBox Plus</a></td>
 <td><a href="../../wiki/MultiCalendar">MultiCalendar</a></td>
 <td><a href="../../wiki/MultiColumnComboBox">MultiColumnComboBox</a></td>
@@ -120,20 +120,20 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <tr>
 <td><a href="../../wiki/SlideShow">SlideShow</a></td>
 <td><a href="../../wiki/StyleableWindow">StyleableWindow</a></td>
-<td><a href="../../wiki/SwitchPanel-Plus">SwitchPanel Plus</a></td>
+<td><a href="../../wiki/SwitchPanel-Plus">12 new SwitchPanels</a></td>
 <td><a href="../../wiki/ToggleSwitch">ToggleSwitch</a></td>
 </tr>
 <tr>
 <td><a href="../../wiki/TokenizedTextBox">TokenizedTextBox</a></td>
 <td><a href="../../wiki/Ultimate-ListBox">Ultimate ListBox</a></td>
-<td><a href="../../wiki/WatermarkPasswordBox">WatermarkPasswordBox</a></td>
 <td><a href="../../wiki/WindowControl-Plus">WindowControl Plus</a></td>
+<td><a href="../../wiki/Themes-Usage-Instructions">Windows 10 theme</a></td>
 </tr>
 <tr>
-<td><a href="../../wiki/Themes-Usage-Instructions">Windows 10 theme</a></td>
-<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">Metro theme</a></td>
-<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">Office theme</a></td>
-<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">1 or more release ahead</a></td>
+<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">2 Metro themes</a></td>
+<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">3 Office themes</a></td>
+<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">2+ releases ahead</a></td>
+<td></td>
 </tr>
 </table>
 
@@ -142,6 +142,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <table>
 <tr>
 <td><a href="../../wiki/Advanced-DataGrid">Advanced DataGrid</a></td>
+<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">10 new DataGrid editors</a></td>
 <td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">3D Views for WPF</a></td>
 <td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">More themes</a></td>
 <td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">All base WPF controls themed</a></td>
