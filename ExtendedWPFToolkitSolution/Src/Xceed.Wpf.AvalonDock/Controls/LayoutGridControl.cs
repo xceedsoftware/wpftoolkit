@@ -416,7 +416,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         else
         {
           var width = ( prevChildModel.DockWidth.IsAuto ) ? prevChildActualSize.Width : prevChildModel.DockWidth.Value;
-          prevChildModel.DockWidth = new GridLength( width + delta, GridUnitType.Pixel );
+          var resizedWidth = width + delta;
+          prevChildModel.DockWidth = new GridLength( double.IsNaN(resizedWidth) ? width : resizedWidth, GridUnitType.Pixel );
         }
 
         if( nextChildModel.DockWidth.IsStar )
@@ -426,7 +427,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         else
         {
           var width = ( nextChildModel.DockWidth.IsAuto ) ? nextChildActualSize.Width : nextChildModel.DockWidth.Value;
-          nextChildModel.DockWidth = new GridLength( width - delta, GridUnitType.Pixel );
+          var resizedWidth = width - delta;
+          nextChildModel.DockWidth = new GridLength( double.IsNaN(resizedWidth) ? width : resizedWidth, GridUnitType.Pixel );
         }
       }
       else
@@ -438,7 +440,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         else
         {
           var height = ( prevChildModel.DockHeight.IsAuto ) ? prevChildActualSize.Height : prevChildModel.DockHeight.Value;
-          prevChildModel.DockHeight = new GridLength( height + delta, GridUnitType.Pixel );
+          var resizedHeight = height + delta;
+          prevChildModel.DockHeight = new GridLength( double.IsNaN(resizedHeight) ? height : resizedHeight, GridUnitType.Pixel );
         }
 
         if( nextChildModel.DockHeight.IsStar )
@@ -448,7 +451,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         else
         {
           var height = ( nextChildModel.DockHeight.IsAuto ) ? nextChildActualSize.Height : nextChildModel.DockHeight.Value;
-          nextChildModel.DockHeight = new GridLength( height - delta, GridUnitType.Pixel );
+          var resizedHeight = height - delta;
+          nextChildModel.DockHeight = new GridLength( double.IsNaN(resizedHeight) ? height : resizedHeight, GridUnitType.Pixel );
         }
       }
 
