@@ -40,58 +40,55 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <tr>
 <td><a href="../../wiki/ColorCanvas">ColorCanvas</a></td>
 <td><a href="../../wiki/ColorPicker">ColorPicker</a></td>
-<td><a href="../../wiki/DataGrid">DataGrid</a></td>
 <td><a href="../../wiki/DateTimePicker">DateTimePicker</a></td>
+<td><a href="../../wiki/DateTimeUpDown">DateTimeUpDown</a></td>
 </tr>
 <tr>
-<td><a href="../../wiki/DateTimeUpDown">DateTimeUpDown</a></td>
 <td><a href="../../wiki/DecimalUpDown">DecimalUpDown</a></td>
 <td><a href="../../wiki/DoubleUpDown">DoubleUpDown</a></td>
 <td><a href="../../wiki/DropDownButton">DropDownButton</a></td>
+<td><a href="../../wiki/IconButton">IconButton</a></td>
 </tr>
 <tr>
-<td><a href="../../wiki/IconButton">IconButton</a></td>
 <td><a href="../../wiki/IntegerUpDown">IntegerUpDown</a></td>
 <td><a href="../../wiki/LongUpDown">LongUpDown</a></td>
 <td><a href="../../wiki/Magnifier">Magnifier</a></td>
+<td><a href="../../wiki/MaskedTextBox">MaskedTextBox</a></td>
 </tr>
 <tr>
-<td><a href="../../wiki/MaskedTextBox">MaskedTextBox</a></td>
 <td><a href="../../wiki/MessageBox">MessageBox</a></td>
 <td><a href="../../wiki/MultiLineTextEditor">MultiLineTextEditor</a></td>
 <td><a href="../../wiki/PieChart">PieChart</a></td>
+<td><a href="../../wiki/PrimitiveTypeCollectionEditor">PrimitiveTypeCollEditor</a></td>
 </tr>
 <tr>
-<td><a href="../../wiki/PrimitiveTypeCollectionEditor">PrimitiveTypeCollEditor</a></td>
 <td><a href="../../wiki/PropertyGrid">PropertyGrid</a></td>
 <td><a href="../../wiki/RangeSlider">RangeSlider</a></td>
 <td><a href="../../wiki/RichTextBox">RichTextBox</a></td>
+<td><a href="../../wiki/RichTextBoxFormatBar">RichTextBoxFormatBar</a></td>
 </tr>
 <tr>
-<td><a href="../../wiki/RichTextBoxFormatBar">RichTextBoxFormatBar</a></td>
 <td><a href="../../wiki/ShortUpDown">ShortUpDown</a></td>
 <td><a href="../../wiki/SingleUpDown">SingleUpDown</a></td>
 <td><a href="../../wiki/SplitButton">SplitButton</a></td>
+<td><a href="../../wiki/SwitchPanel">2 SwitchPanels</a></td>
 </tr>
 <tr>
-<td><a href="../../wiki/SwitchPanel">2 SwitchPanels</a></td>
 <td><a href="../../wiki/TimelinePanel">TimelinePanel</a></td>
 <td><a href="../../wiki/TimePicker">TimePicker</a></td>
 <td><a href="../../wiki/TimeSpanUpDown">TimeSpanUpDown</a></td>
+<td><a href="../../wiki/ValueRangeTextBox">ValueRangeTextBox</a></td>
 </tr>
 <tr>
-<td><a href="../../wiki/ValueRangeTextBox">ValueRangeTextBox</a></td>
 <td><a href="../../wiki/WatermarkPasswordBox">WatermarkPasswordBox</a></td>
 <td><a href="../../wiki/WatermarkTextBox">WatermarkTextBox</a></td>
 <td><a href="../../wiki/WatermarkComboBox">WatermarkComboBox</a></td>
+<td><a href="../../wiki/WindowContainer">WindowContainer</a></td>
 </tr>
 <tr>
-<td><a href="../../wiki/WindowContainer">WindowContainer</a></td>
 <td><a href="../../wiki/WindowControl">WindowControl</a></td>
 <td><a href="../../wiki/Wizard">Wizard</a></td>
 <td><a href="../../wiki/Zoombox">Zoombox</a></td>
-</tr>
-<tr>
 <td><a href="../../wiki/Themes-Usage-Instructions">Windows 8 Theme</a></td>
 </tr>
 </table>
@@ -103,37 +100,37 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 <td><a href="../../wiki/Charts">Charts</a></td>
 <td><a href="../../wiki/ChildWindow-Plus">ChildWindow Plus</a></td>
 <td><a href="../../wiki/ExtendedTabControl">ExtendedTabControl</a></td>
-<td><a href="../../wiki/FilePicker">FilePicker</a></td>
+<td><a href="../../wiki/DataGrid">DataGrid</a></td>
 </tr>
 <tr>
+<td><a href="../../wiki/FilePicker">FilePicker</a></td>
 <td><a href="../../wiki/Material-Design-controls">21 Material Design controls</a></td>
 <td><a href="../../wiki/MessageBox-Plus">MessageBox Plus</a></td>
 <td><a href="../../wiki/MultiCalendar">MultiCalendar</a></td>
-<td><a href="../../wiki/MultiColumnComboBox">MultiColumnComboBox</a></td>
 </tr>
 <tr>
+<td><a href="../../wiki/MultiColumnComboBox">MultiColumnComboBox</a></td>
 <td><a href="../../wiki/PileFlowPanel">PileFlowPanel</a></td>
 <td><a href="../../wiki/PropertyGrid-Plus">PropertyGrid Plus</a></td>
 <td><a href="../../wiki/RadialGauge">RadialGauge</a></td>
-<td><a href="../../wiki/Rating">Rating</a></td>
 </tr>
 <tr>
+<td><a href="../../wiki/Rating">Rating</a></td>
 <td><a href="../../wiki/SlideShow">SlideShow</a></td>
 <td><a href="../../wiki/StyleableWindow">StyleableWindow</a></td>
 <td><a href="../../wiki/SwitchPanel-Plus">12 new SwitchPanels</a></td>
-<td><a href="../../wiki/ToggleSwitch">ToggleSwitch</a></td>
 </tr>
 <tr>
+<td><a href="../../wiki/ToggleSwitch">ToggleSwitch</a></td>
 <td><a href="../../wiki/TokenizedTextBox">TokenizedTextBox</a></td>
 <td><a href="../../wiki/Ultimate-ListBox">Ultimate ListBox</a></td>
 <td><a href="../../wiki/WindowControl-Plus">WindowControl Plus</a></td>
-<td><a href="../../wiki/Themes-Usage-Instructions">Windows 10 theme</a></td>
 </tr>
 <tr>
+<td><a href="../../wiki/Themes-Usage-Instructions">Windows 10 theme</a></td>
 <td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">2 Metro themes</a></td>
 <td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">3 Office themes</a></td>
 <td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">2+ releases ahead</a></td>
-<td></td>
 </tr>
 </table>
 
