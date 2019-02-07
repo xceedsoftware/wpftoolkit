@@ -29,6 +29,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+using System.Windows.Controls;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -239,12 +240,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected abstract string GetDefaultPropertyName();
 
-    protected abstract IEnumerable<PropertyItem> GenerateSubPropertiesCore();
+    protected abstract void GenerateSubPropertiesCore( Action<IEnumerable<PropertyItem>> updatePropertyItemsCallback );
 
     private void RegenerateProperties()
     {
-      IEnumerable<PropertyItem> subProperties = this.GenerateSubPropertiesCore();
+      this.GenerateSubPropertiesCore( this.UpdatePropertyItemsCallback );
+    }
 
+    private void UpdatePropertyItemsCallback( IEnumerable<PropertyItem> subProperties )
+    {
       foreach( var propertyItem in subProperties )
       {
         this.InitializePropertyItem( propertyItem );

@@ -25,6 +25,27 @@ namespace Xceed.Wpf.AvalonDock.Layout
   {
     #region Properties
 
+    #region CanMove
+
+    internal bool _canMove = true;
+    public bool CanMove
+    {
+      get
+      {
+        return _canMove;
+      }
+      set
+      {
+        if( _canMove != value )
+        {
+          _canMove = value;
+          RaisePropertyChanged( "CanMove" );
+        }
+      }
+    }
+
+    #endregion
+
     #region IsVisible
 
     public bool IsVisible
@@ -74,12 +95,16 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
       if( !string.IsNullOrWhiteSpace( this.Description ) )
         writer.WriteAttributeString( "Description", this.Description );
+      if( !CanMove )
+        writer.WriteAttributeString( "CanMove", CanMove.ToString() );
     }
 
     public override void ReadXml( System.Xml.XmlReader reader )
     {
       if( reader.MoveToAttribute( "Description" ) )
         this.Description = reader.Value;
+      if( reader.MoveToAttribute( "CanMove" ) )
+        CanMove = bool.Parse( reader.Value );
 
       base.ReadXml( reader );
     }

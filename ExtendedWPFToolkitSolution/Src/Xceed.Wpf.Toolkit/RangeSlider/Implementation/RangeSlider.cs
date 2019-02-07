@@ -121,7 +121,8 @@ namespace Xceed.Wpf.Toolkit
     /// Get/Set the Brush for the Range between Higher and Maximum values. (Brush)
     /// </summary>
 
-    public static readonly DependencyProperty HigherRangeBackgroundProperty = DependencyProperty.Register( "HigherRangeBackground", typeof( Brush ), typeof( RangeSlider ) );
+    public static readonly DependencyProperty HigherRangeBackgroundProperty = DependencyProperty.Register( "HigherRangeBackground", typeof( Brush ), typeof( RangeSlider )
+      , new FrameworkPropertyMetadata( Brushes.Transparent ) );
 
     public Brush HigherRangeBackground
     {
@@ -304,7 +305,8 @@ namespace Xceed.Wpf.Toolkit
     /// Get/Set the Brush for the Range between Minimum and Lower values. (Brush)
     /// </summary>
 
-    public static readonly DependencyProperty LowerRangeBackgroundProperty = DependencyProperty.Register( "LowerRangeBackground", typeof( Brush ), typeof( RangeSlider ) );
+    public static readonly DependencyProperty LowerRangeBackgroundProperty = DependencyProperty.Register( "LowerRangeBackground", typeof( Brush ), typeof( RangeSlider )
+      , new FrameworkPropertyMetadata( Brushes.Transparent ) );
 
     public Brush LowerRangeBackground
     {
@@ -552,7 +554,8 @@ namespace Xceed.Wpf.Toolkit
     /// Get/Set the Brush for the Range between Lower and Higher values [active state]. (Brush)
     /// </summary>
 
-    public static readonly DependencyProperty RangeBackgroundProperty = DependencyProperty.Register( "RangeBackground", typeof( Brush ), typeof( RangeSlider ) );
+    public static readonly DependencyProperty RangeBackgroundProperty = DependencyProperty.Register( "RangeBackground", typeof( Brush ), typeof( RangeSlider )
+      , new FrameworkPropertyMetadata( Brushes.Transparent ) );
 
     public Brush RangeBackground
     {

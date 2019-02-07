@@ -35,6 +35,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
     private double _autohideMinHeight = 100.0;
     private bool _canHide = true;
     private bool _canAutoHide = true;
+    private bool _canDockAsTabbedDocument = true;
     private bool _canCloseValueBeforeInternalSet;
 
     #endregion
@@ -175,6 +176,26 @@ namespace Xceed.Wpf.AvalonDock.Layout
         {
           _canAutoHide = value;
           RaisePropertyChanged( "CanAutoHide" );
+        }
+      }
+    }
+
+    #endregion
+
+    #region CanDockAsTabbedDocument
+
+    public bool CanDockAsTabbedDocument
+    {
+      get
+      {
+        return _canDockAsTabbedDocument;
+      }
+      set
+      {
+        if( _canDockAsTabbedDocument != value )
+        {
+          _canDockAsTabbedDocument = value;
+          RaisePropertyChanged( "CanDockAsTabbedDocument" );
         }
       }
     }
@@ -326,6 +347,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
         AutoHideMinWidth = double.Parse( reader.Value, CultureInfo.InvariantCulture );
       if( reader.MoveToAttribute( "AutoHideMinHeight" ) )
         AutoHideMinHeight = double.Parse( reader.Value, CultureInfo.InvariantCulture );
+      if( reader.MoveToAttribute( "CanDockAsTabbedDocument" ) )
+        CanDockAsTabbedDocument = bool.Parse( reader.Value );
 
       base.ReadXml( reader );
     }
@@ -344,7 +367,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
         writer.WriteAttributeString( "AutoHideMinWidth", AutoHideMinWidth.ToString( CultureInfo.InvariantCulture ) );
       if( AutoHideMinHeight != 25.0 )
         writer.WriteAttributeString( "AutoHideMinHeight", AutoHideMinHeight.ToString( CultureInfo.InvariantCulture ) );
-
+      if( !CanDockAsTabbedDocument )
+        writer.WriteAttributeString( "CanDockAsTabbedDocument", CanDockAsTabbedDocument.ToString( CultureInfo.InvariantCulture ) );
 
       base.WriteXml( writer );
     }

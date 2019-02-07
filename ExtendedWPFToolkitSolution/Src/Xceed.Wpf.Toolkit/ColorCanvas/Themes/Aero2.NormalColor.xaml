@@ -77,7 +77,8 @@
 
   <ControlTemplate x:Key="VerticalSlideThumbTemplate"
                    TargetType="{x:Type Thumb}">
-    <Canvas SnapsToDevicePixels="true">
+    <Canvas SnapsToDevicePixels="true"
+            Background="Transparent">
       <Path x:Name="LeftArrow"
             Stretch="Fill"
             StrokeLineJoin="Round"
@@ -89,11 +90,7 @@
             Height="8">
         <Path.RenderTransform>
           <TransformGroup>
-            <ScaleTransform />
-            <SkewTransform />
-            <RotateTransform />
-            <TranslateTransform Y="6"
-                                X="-3" />
+            <TranslateTransform Y="6" />
           </TransformGroup>
         </Path.RenderTransform>
       </Path>
@@ -108,11 +105,9 @@
             Height="8">
         <Path.RenderTransform>
           <TransformGroup>
-            <ScaleTransform />
-            <SkewTransform />
             <RotateTransform Angle="-180" />
             <TranslateTransform Y="6"
-                                X="8" />
+                                X="9" />
           </TransformGroup>
         </Path.RenderTransform>
       </Path>
@@ -128,7 +123,7 @@
     <Setter Property="Height"
             Value="12" />
     <Setter Property="Width"
-            Value="11" />
+            Value="15" />
     <Setter Property="Foreground"
             Value="Gray" />
     <Setter Property="Template"
@@ -178,6 +173,8 @@
             Value="DarkGray" />
     <Setter Property="BorderThickness"
             Value="1" />
+    <Setter Property="SmallChange"
+            Value="10" />
     <Setter Property="Orientation"
             Value="Vertical" />
     <Setter Property="Background"

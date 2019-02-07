@@ -16,6 +16,8 @@
 
 using System;
 using System.Globalization;
+using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
@@ -38,8 +40,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
       var editorIsReadOnlyPropertyInfo = editorType.GetProperty( "IsReadOnly" );
       if( editorIsReadOnlyPropertyInfo != null )
       {
-        // Set Editor.IsReadOnly to PropertyGrid.IsReadOnly.
-        editorIsReadOnlyPropertyInfo.SetValue( editor, isReadOnly, null );
+        if( !this.IsPropertySetLocally( editor, TextBoxBase.IsReadOnlyProperty )  )
+        {
+          // Set Editor.IsReadOnly to PropertyGrid.IsReadOnly.
+          editorIsReadOnlyPropertyInfo.SetValue( editor, isReadOnly, null );
+        }
       }
       // No Editor.IsReadOnly property, set the Editor.IsEnabled property.
       else
@@ -47,8 +52,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
         var editorIsEnabledPropertyInfo = editorType.GetProperty( "IsEnabled" );
         if( editorIsEnabledPropertyInfo != null )
         {
-          // Set Editor.IsEnabled to !PropertyGrid.IsReadOnly.
-          editorIsEnabledPropertyInfo.SetValue( editor, !isReadOnly, null );
+          if( !this.IsPropertySetLocally( editor, UIElement.IsEnabledProperty ) )
+          {
+            // Set Editor.IsEnabled to !PropertyGrid.IsReadOnly.
+            editorIsEnabledPropertyInfo.SetValue( editor, !isReadOnly, null );
+          }
         }
       }
 
@@ -58,6 +66,22 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
     public object[] ConvertBack( object value, Type[] targetTypes, object parameter, CultureInfo culture )
     {
       throw new NotImplementedException();
+    }
+
+    private bool IsPropertySetLocally( object editor, DependencyProperty dp )
+    {
+      if( dp == null )
+        return false;
+
+      var editorObject = editor as DependencyObject;
+      if( editorObject == null )
+        return false;
+
+      var valueSource = DependencyPropertyHelper.GetValueSource( editorObject, dp );
+      if( valueSource == null )
+        return false;
+
+      return ( valueSource.BaseValueSource == BaseValueSource.Local );
     }
   }
 }

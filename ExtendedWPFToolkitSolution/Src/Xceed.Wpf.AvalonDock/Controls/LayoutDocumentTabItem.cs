@@ -143,6 +143,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       Model.IsActive = true;
 
+      var layoutDocument = Model as LayoutDocument;
+      if( ( layoutDocument != null ) && !layoutDocument.CanMove )
+        return;
+
       if( e.ClickCount == 1 )
       {
         _mouseDownPoint = e.GetPosition( this );
