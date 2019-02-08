@@ -59,6 +59,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         internal void UpdateThemeResources(Theme oldTheme = null)
         {
+            if (Application.Current != null)
+                return;
+
             if (oldTheme != null)
             {
                 var resourceDictionaryToRemove =

@@ -51,6 +51,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         internal override void UpdateThemeResources( Xceed.Wpf.AvalonDock.Themes.Theme oldTheme = null )
         {
+            if (Application.Current != null)
+                return;
+
             base.UpdateThemeResources(oldTheme);
 
             if (_overlayWindow != null)
@@ -141,6 +144,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         bool IOverlayWindowHost.HitTest(Point dragPoint)
         {
+            if (!this.IsVisible) return false;
             Rect detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
             return detectionRect.Contains(dragPoint);
         }
@@ -175,8 +179,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
         void IOverlayWindowHost.HideOverlayWindow()
         {
             _dropAreas = null;
+            if (_overlayWindow != null)
+            {
             _overlayWindow.Owner = null;
             _overlayWindow.HideDropTargets();
+            }
         }
 
         List<IDropArea> _dropAreas = null;
@@ -345,7 +352,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
             foreach (var anchorable in this.Model.Descendents().OfType<LayoutAnchorable>().ToArray())
             {
                 var anchorableLayoutItem = manager.GetLayoutItemFromModel(anchorable) as LayoutAnchorableItem;
-                anchorableLayoutItem.HideCommand.Execute(parameter);
+                anchorableLayoutItem.CloseCommand.Execute(parameter);
             }
         }
         #endregion

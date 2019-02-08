@@ -28,6 +28,7 @@ using System.Windows.Media;
 using Xceed.Wpf.AvalonDock.Layout;
 using System.Diagnostics;
 using System.Windows.Threading;
+using System.ComponentModel;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
@@ -119,12 +120,23 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
+			// Make sure that autohide windows always display on top of other Controls
+			// (even Win32 control which WPF cannot normally overlay!)
             if (msg == Win32Helper.WM_WINDOWPOSCHANGING)
             {
-                if (_internalHost_ContentRendered)
-                    Win32Helper.SetWindowPos(_internalHwndSource.Handle, Win32Helper.HWND_TOP, 0, 0, 0, 0, Win32Helper.SetWindowPosFlags.IgnoreMove | Win32Helper.SetWindowPosFlags.IgnoreResize);
+				// APD Fix - Stop a recursive call to WndProc when the window has been destroyed
+				// It was making a call to SetWindowPos which could cause a stack overflow.
+				if (_internalHost_ContentRendered)
+				{
+					Win32Helper.WINDOWPOS mwp = (Win32Helper.WINDOWPOS)Marshal.PtrToStructure(lParam, typeof(Win32Helper.WINDOWPOS));
+
+					mwp.hwndInsertAfter = Win32Helper.HWND_TOP;
+					mwp.flags = mwp.flags & ~(int)Win32Helper.SetWindowPosFlags.IgnoreZOrder;
+
+					Marshal.StructureToPtr(mwp, lParam, true);
+				}
             }
-            return base.WndProc(hwnd, msg, wParam, lParam, ref handled);
+			return base.WndProc(hwnd, msg, wParam, lParam, ref handled);
         }
 
         protected override void DestroyWindowCore(System.Runtime.InteropServices.HandleRef hwnd)
@@ -478,23 +490,23 @@ namespace Xceed.Wpf.AvalonDock.Controls
             return base.ArrangeOverride(finalSize);// new Size(_internalHostPresenter.ActualWidth, _internalHostPresenter.ActualHeight);
         }
 
-        WeakReference _lastFocusedElement = null;
-        protected override void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
-        {
-            base.OnGotKeyboardFocus(e);
-            if (!e.Handled && _internalHostPresenter != null)
-            {
-                if (e.NewFocus == _internalHostPresenter)
-                {
-                    var elementToFocus = _lastFocusedElement.GetValueOrDefault<IInputElement>();
-                    if (elementToFocus != null)
-                        Keyboard.Focus(elementToFocus);
-                    e.Handled = true;
-                }
-                else
-                    _lastFocusedElement = new WeakReference(e.NewFocus);
-            }
-        }
+		WeakReference _lastFocusedElement = null;
+		protected override void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
+		{
+			base.OnGotKeyboardFocus(e);
+			if (!e.Handled && _internalHostPresenter != null)
+			{
+				if (e.NewFocus == _internalHostPresenter)
+				{
+					var elementToFocus = _lastFocusedElement.GetValueOrDefault<IInputElement>();
+					if (elementToFocus != null)
+						Keyboard.Focus(elementToFocus);
+					e.Handled = true;
+				}
+				else
+					_lastFocusedElement = new WeakReference(e.NewFocus);
+			}
+		}
 
         #region Background
 

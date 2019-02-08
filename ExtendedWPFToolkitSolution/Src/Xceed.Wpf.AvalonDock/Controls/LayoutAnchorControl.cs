@@ -105,13 +105,30 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
             if (!e.Handled)
             {
-                _model.Root.Manager.ShowAutoHideWindow(this);
-                _model.IsActive = true;
+				if (_model.Root.Manager.AutoHideWindow.Visibility != Visibility.Visible)
+				{
+                _model.Root.Manager.ShowAutoHideWindow(this);    
+					_model.IsActive = true;
+					_manuallyOpened = true;
+				}
+				else
+				{
+					if (!_inGracePeriod)
+					{
+						_model.Root.Manager.HideAutoHideWindow(this);
+					}
+				}
             }
         }
 
 
         DispatcherTimer _openUpTimer = null;
+
+		DispatcherTimer _clickGracePeriodTimer = null;
+
+		bool _inGracePeriod = false;
+
+		bool _manuallyOpened = false;
 
         protected override void OnMouseEnter(System.Windows.Input.MouseEventArgs e)
         {
@@ -132,6 +149,30 @@ namespace Xceed.Wpf.AvalonDock.Controls
             _openUpTimer.Stop();
             _openUpTimer = null;
             _model.Root.Manager.ShowAutoHideWindow(this);
+
+			if (!_manuallyOpened)
+			{
+				_clickGracePeriodTimer = new DispatcherTimer(DispatcherPriority.ApplicationIdle);
+				_clickGracePeriodTimer.Interval = TimeSpan.FromMilliseconds(1000);
+				_inGracePeriod = true;
+				_clickGracePeriodTimer.Tick += new EventHandler(_clickGracePeriodTimer_Tick);
+				_clickGracePeriodTimer.Start();
+			}
+
+			_manuallyOpened = false;
+        }
+
+		void _clickGracePeriodTimer_Tick(object sender, EventArgs e)
+		{
+			StopGraceTimer();
+		}
+
+		void StopGraceTimer()
+		{
+			_clickGracePeriodTimer.Tick -= new EventHandler(_clickGracePeriodTimer_Tick);
+			_clickGracePeriodTimer.Stop();
+			_clickGracePeriodTimer = null;
+			_inGracePeriod = false;
         }
 
         protected override void OnMouseLeave(System.Windows.Input.MouseEventArgs e)

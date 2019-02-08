@@ -87,8 +87,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         {
             var focusedElement = e.NewFocus as Visual;
             if (focusedElement != null &&
-                !(focusedElement is LayoutAnchorableTabItem || focusedElement is LayoutDocumentTabItem) &&
-                !(focusedElement is ICommandSource))//Avoid tracking focus for elements like this
+                !(focusedElement is LayoutAnchorableTabItem || focusedElement is LayoutDocumentTabItem))
             {
                 var parentAnchorable = focusedElement.FindVisualAncestor<LayoutAnchorableControl>();
                 if (parentAnchorable != null)

@@ -134,5 +134,34 @@ namespace Xceed.Wpf.AvalonDock.Layout.Serialization
             Manager.SuspendDocumentsSourceBinding = false;
             Manager.SuspendAnchorablesSourceBinding = false;
         }
+
+		#region Virtual Serialize and Deserialize methods
+
+		public virtual void Serialize(System.Xml.XmlWriter writer)
+		{
     }
+		public virtual void Serialize(System.IO.TextWriter writer)
+		{
+		}
+		public virtual void Serialize(System.IO.Stream stream)
+		{
+		}
+		public virtual void Serialize(string filepath)
+		{
+		}
+		public virtual void Deserialize(System.IO.Stream stream)
+		{
+		}
+		public virtual void Deserialize(System.IO.TextReader reader)
+		{
+		}
+		public virtual void Deserialize(System.Xml.XmlReader reader)
+		{
+		}
+		public virtual void Deserialize(string filepath)
+		{
+		}
+		
+		#endregion
+	}
 }

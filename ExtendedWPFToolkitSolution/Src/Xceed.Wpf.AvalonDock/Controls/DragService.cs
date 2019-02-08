@@ -53,6 +53,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         public void UpdateMouseLocation(Point dragPosition)
         {
+            if (!_floatingWindow.Model.Root.ActiveContent.CanDock) return;
+
             var floatingWindowModel = _floatingWindow.Model as LayoutFloatingWindow;
 
             var newHost = _overlayWindowHosts.FirstOrDefault(oh => oh.HitTest(dragPosition));
@@ -89,8 +91,19 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 }
             }
 
-            if (_currentHost == null)
-                return;
+			if (_currentHost == null)
+			{
+				Debug.WriteLine("Zero Dock Areas");
+				
+				if(_manager.Parent is DockingManager)
+				{
+					_manager = _manager.Parent as DockingManager;
+					GetOverlayWindowHosts();
+					UpdateMouseLocation(dragPosition);
+				}
+
+				return;
+			}
 
             if (_currentDropTarget != null &&
                 !_currentDropTarget.HitTest(dragPosition))
@@ -175,7 +188,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         {
             var floatingWindowModel = _floatingWindow.Model as LayoutFloatingWindow;
 
-            _currentWindowAreas.ForEach(a => _currentWindow.DragLeave(a));
+            if(_currentWindow != null)
+                _currentWindowAreas.ForEach(a => _currentWindow.DragLeave(a));
 
             if (_currentDropTarget != null)
                 _currentWindow.DragLeave(_currentDropTarget);

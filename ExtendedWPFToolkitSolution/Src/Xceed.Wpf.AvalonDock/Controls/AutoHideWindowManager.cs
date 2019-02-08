@@ -38,10 +38,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         public void ShowAutoHideWindow(LayoutAnchorControl anchor)
         {
+          if(_currentAutohiddenAnchor.GetValueOrDefault<LayoutAnchorControl>() != anchor)
+          {
             StopCloseTimer();
             _currentAutohiddenAnchor = new WeakReference(anchor);
             _manager.AutoHideWindow.Show(anchor);
             StartCloseTimer();
+          }
         }
 
         public void HideAutoWindow(LayoutAnchorControl anchor = null)
@@ -81,6 +84,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         {
             _closeTimer.Stop();
             _manager.AutoHideWindow.Hide();
+            _currentAutohiddenAnchor = null;
         }
     }
 }

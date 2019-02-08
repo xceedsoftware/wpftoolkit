@@ -523,6 +523,31 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         #endregion
 
+        #region CanDock
+
+        public static readonly DependencyProperty CanDockProperty =
+            DependencyProperty.Register("CanDock", typeof(bool), typeof(LayoutItem),
+                new FrameworkPropertyMetadata(true,
+                new PropertyChangedCallback(OnCanDockChanged)));
+
+        public bool CanDock
+        {
+            get { return (bool)GetValue(CanDockProperty); }
+            set { SetValue(CanDockProperty, value); }
+        }
+
+        private static void OnCanDockChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((LayoutItem)d).OnCanDockChanged(e);
+        }
+
+        protected virtual void OnCanDockChanged(DependencyPropertyChangedEventArgs e)
+        {
+            LayoutElement.CanDock = (bool)e.NewValue;
+        }
+
+        #endregion
+
         #region CloseCommand
 
         /// <summary>
@@ -570,10 +595,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
         private bool CanExecuteCloseCommand(object parameter)
         {
 #if DEBUG
-          if( LayoutElement != null )
-            System.Diagnostics.Trace.WriteLine( string.Format( "CanExecuteCloseCommand({0}) = {1}", LayoutElement.Title, LayoutElement.CanClose ) );
+			if( LayoutElement != null )
+				System.Diagnostics.Trace.WriteLine( string.Format( "CanExecuteCloseCommand({0}) = {1}", LayoutElement.Title, LayoutElement.CanClose ) );
 #endif
-            return LayoutElement != null && LayoutElement.CanClose;
+			return LayoutElement != null && LayoutElement.CanClose;
         }
 
         private void ExecuteCloseCommand(object parameter)
@@ -694,7 +719,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         private bool CanExecuteDockAsDocumentCommand(object parameter)
         {
-            return LayoutElement != null && LayoutElement.FindParent<LayoutDocumentPane>() == null;
+            return LayoutElement != null && LayoutElement.CanDock && LayoutElement.FindParent<LayoutDocumentPane>() == null;
         }
 
         private void ExecuteDockAsDocumentCommand(object parameter)

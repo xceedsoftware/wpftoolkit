@@ -267,7 +267,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         {
             if (LayoutElement == null)
                 return false;
-            return LayoutElement.FindParent<LayoutAnchorableFloatingWindow>() != null;
+
+            return LayoutElement.CanDock && LayoutElement.FindParent<LayoutAnchorableFloatingWindow>() != null;
         }
 
         private void ExecuteDockCommand(object parameter)

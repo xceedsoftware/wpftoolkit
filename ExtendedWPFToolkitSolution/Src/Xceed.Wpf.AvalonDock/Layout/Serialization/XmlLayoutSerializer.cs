@@ -31,29 +31,29 @@ namespace Xceed.Wpf.AvalonDock.Layout.Serialization
 
         }
 
-        public void Serialize(System.Xml.XmlWriter writer)
+        public override void Serialize(System.Xml.XmlWriter writer)
         {
             var serializer = new XmlSerializer(typeof(LayoutRoot));
             serializer.Serialize(writer, Manager.Layout);
         }
-        public void Serialize(System.IO.TextWriter writer)
+        public override void Serialize(System.IO.TextWriter writer)
         {
             var serializer = new XmlSerializer(typeof(LayoutRoot));
             serializer.Serialize(writer, Manager.Layout);
         }
-        public void Serialize(System.IO.Stream stream)
+        public override void Serialize(System.IO.Stream stream)
         {
             var serializer = new XmlSerializer(typeof(LayoutRoot));
             serializer.Serialize(stream, Manager.Layout);
         }
 
-        public void Serialize(string filepath)
+        public override void Serialize(string filepath)
         {
             using (var stream = new StreamWriter(filepath))
                 Serialize(stream);
         }
 
-        public void Deserialize(System.IO.Stream stream)
+        public override void Deserialize(System.IO.Stream stream)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace Xceed.Wpf.AvalonDock.Layout.Serialization
             }
         }
 
-        public void Deserialize(System.IO.TextReader reader)
+        public override void Deserialize(System.IO.TextReader reader)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace Xceed.Wpf.AvalonDock.Layout.Serialization
             }
         }
 
-        public void Deserialize(System.Xml.XmlReader reader)
+        public override void Deserialize(System.Xml.XmlReader reader)
         {
             try
             {
@@ -101,7 +101,7 @@ namespace Xceed.Wpf.AvalonDock.Layout.Serialization
             }
         }
 
-        public void Deserialize(string filepath)
+        public override void Deserialize(string filepath)
         {
             using (var stream = new StreamReader(filepath))
                 Deserialize(stream);
