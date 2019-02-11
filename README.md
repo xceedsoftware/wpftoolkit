@@ -14,7 +14,7 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 
 **July 11, 2017:** The project's new home is Github. All issues from Codeplex are now located here.
 
-<a href="#"><img src="https://user-images.githubusercontent.com/21266763/27752265-1db3056c-5dae-11e7-8ef4-9728f01494e7.png" width="172"/></a>
+<a href=""><img src="https://user-images.githubusercontent.com/21266763/27752265-1db3056c-5dae-11e7-8ef4-9728f01494e7.png" width="172"/></a>
 
 ## Controls included
 
