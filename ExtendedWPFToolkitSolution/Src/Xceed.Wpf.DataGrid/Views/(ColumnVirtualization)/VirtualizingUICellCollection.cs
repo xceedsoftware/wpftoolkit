@@ -50,14 +50,16 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       if( fixedPanel == null )
         throw new ArgumentNullException( "fixedPanel" );
+
       if( scrollingPanel == null )
         throw new ArgumentNullException( "scrollingPanel" );
+
       if( parentFixedCellPanel == null )
         throw new ArgumentNullException( "parentFixedCellPanel" );
 
       m_fixedPanel = fixedPanel;
       m_scrollingPanel = scrollingPanel;
-      m_parentFixedCellPanel = parentFixedCellPanel;
+      m_parentVirtualizingCellsHost = parentFixedCellPanel as IVirtualizingCellsHost;
     }
 
     public override int Capacity
@@ -185,6 +187,7 @@ namespace Xceed.Wpf.DataGrid.Views
         {
           return m_fixedPanel.Children[ index ];
         }
+
         return m_scrollingPanel.Children[ index - fixedCount ];
       }
       set
@@ -193,12 +196,20 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
+    public void ClearCellLogicalParent( UIElement targetElement )
+    {
+      if( ( m_parentVirtualizingCellsHost != null ) && ( m_parentVirtualizingCellsHost.CanModifyLogicalParent == false ) )
+      {
+        this.ClearLogicalParent( targetElement );
+      }
+    }
+
     public void SetCellLogicalParent( UIElement targetElement )
     {
-      IVirtualizingCellsHost virtualizingCellsHost = m_parentFixedCellPanel as IVirtualizingCellsHost;
-
-      if( ( virtualizingCellsHost != null ) && ( virtualizingCellsHost.CanModifyLogicalParent == false ) )
+      if( ( m_parentVirtualizingCellsHost != null ) && ( m_parentVirtualizingCellsHost.CanModifyLogicalParent == false ) )
+      {
         this.SetLogicalParent( targetElement );
+      }
     }
 
     private void IncrementVersion()
@@ -211,7 +222,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private Panel m_fixedPanel;
     private Panel m_scrollingPanel;
-    private FixedCellPanel m_parentFixedCellPanel;
+    private IVirtualizingCellsHost m_parentVirtualizingCellsHost;
     private int m_version;
 
     private class CombinedEnumerator : IEnumerator
@@ -232,15 +243,11 @@ namespace Xceed.Wpf.DataGrid.Views
         {
           //Enumerator not started.
           if( m_fixedEnumerator == null )
-          {
             throw new InvalidOperationException();
-          }
 
           //If enumerating through fixed panel
           if( m_fixed == true )
-          {
             return m_fixedEnumerator.Current;
-          }
 
           //otherwise, use the scrolling enumerator
           return m_scrollingEnumerator.Current;

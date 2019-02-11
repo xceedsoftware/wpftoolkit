@@ -17,43 +17,40 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Media;
-using Xceed.Wpf.DataGrid.Print;
-using Xceed.Utils.Math;
-using System.Windows.Threading;
 using System.Windows.Input;
-using System.Collections.Specialized;
-using System.Windows.Controls.Primitives;
-using System.Windows.Media.Animation;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
-  public class FixedCellPanel : Panel, IPrintInfo, IVirtualizingCellsHost, IWeakEventListener
+  public class FixedCellPanel : Panel, IVirtualizingCellsHost, IWeakEventListener
   {
-    #region Static Fields
+    private static readonly TimeSpan MaxProcessDurationTime = TimeSpan.FromMilliseconds( 25d );
 
-    private static readonly Point EmptyPoint = new Point();
-    private static readonly Rect PositiveInfinityRect = new Rect( new Size( Double.PositiveInfinity, Double.PositiveInfinity ) );
-
-    #endregion Static Fields
-
-    #region Constructors
+    static FixedCellPanel()
+    {
+      FixedCellPanel.MinHeightProperty.OverrideMetadata( typeof( FixedCellPanel ), new FrameworkPropertyMetadata( null, new CoerceValueCallback( FixedCellPanel.CoerceMinHeight ) ) );
+      TextElement.FontFamilyProperty.OverrideMetadata( typeof( FixedCellPanel ), new FrameworkPropertyMetadata( new PropertyChangedCallback( FixedCellPanel.InvalidateMinHeight ) ) );
+      TextElement.FontSizeProperty.OverrideMetadata( typeof( FixedCellPanel ), new FrameworkPropertyMetadata( new PropertyChangedCallback( FixedCellPanel.InvalidateMinHeight ) ) );
+      TextElement.FontStretchProperty.OverrideMetadata( typeof( FixedCellPanel ), new FrameworkPropertyMetadata( new PropertyChangedCallback( FixedCellPanel.InvalidateMinHeight ) ) );
+      TextElement.FontStyleProperty.OverrideMetadata( typeof( FixedCellPanel ), new FrameworkPropertyMetadata( new PropertyChangedCallback( FixedCellPanel.InvalidateMinHeight ) ) );
+      TextElement.FontWeightProperty.OverrideMetadata( typeof( FixedCellPanel ), new FrameworkPropertyMetadata( new PropertyChangedCallback( FixedCellPanel.InvalidateMinHeight ) ) );
+    }
 
     public FixedCellPanel()
     {
-      // None of the Visual children of the FixedCellPanel will scroll. The needed scrolling
-      // as demanded by the parent ScrollViewer will be manually transferred to the 
-      // content (m_scrollingPanel) of the ScrollingCellsDecorator below.
+      // None of the Visual children of the FixedCellPanel will scroll. The needed scrolling as demanded by the parent ScrollViewer
+      // will be manually transferred to the  content (m_scrollingPanel) of the ScrollingCellsDecorator below.
 
       m_fixedPanel = new FixedCellSubPanel( this );
-
-      m_splitter = new FixedColumnSplitter();
 
       m_scrollingPanel = new VirtualizingFixedCellSubPanel( this );
 
@@ -61,17 +58,18 @@ namespace Xceed.Wpf.DataGrid.Views
       m_scrollingCellsDecorator.Child = m_scrollingPanel;
 
       this.AddVisualChild( m_fixedPanel );
-      this.AddVisualChild( m_splitter );
+      this.AddVisualChild( null );
       this.AddVisualChild( m_scrollingCellsDecorator );
 
       // Used to get the correct item depending of the ZIndex
       m_visualChildren.Add( m_fixedPanel );
-      m_visualChildren.Add( m_splitter );
+      m_visualChildren.Add( null );
       m_visualChildren.Add( m_scrollingCellsDecorator );
 
-    }
+      this.SetCurrentValue( FixedCellPanel.MinHeightProperty, 0d );
 
-    #endregion Constructors
+      this.LayoutUpdated += new EventHandler( FixedCellPanelLayoutUpdated );
+    }
 
     #region ColumnStretchMinWidth Property
 
@@ -79,16 +77,15 @@ namespace Xceed.Wpf.DataGrid.Views
       "ColumnStretchMinWidth",
       typeof( double ),
       typeof( FixedCellPanel ),
-      new UIPropertyMetadata( 50d, new PropertyChangedCallback( FixedCellPanel.ColumnStretchMinWidthChanged ) ),
-      new ValidateValueCallback( TableView.ValidateColumnStretchMinWidthCallback ) );
-
-    private double m_columnStretchMinWidth = 50d;
+      new UIPropertyMetadata( 50d,
+        new PropertyChangedCallback( FixedCellPanel.ColumnStretchMinWidthChanged ) ),
+        new ValidateValueCallback( TableView.ValidateColumnStretchMinWidthCallback ) );
 
     public double ColumnStretchMinWidth
     {
       get
       {
-        return m_columnStretchMinWidth;
+        return ( double )this.GetValue( FixedCellPanel.ColumnStretchMinWidthProperty );
       }
       set
       {
@@ -98,20 +95,21 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private static void ColumnStretchMinWidthChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      FixedCellPanel panel = sender as FixedCellPanel;
-
+      var panel = sender as FixedCellPanel;
       if( panel == null )
         return;
 
-      if( e.NewValue != null )
-        panel.m_columnStretchMinWidth = ( double )e.NewValue;
+      //Do not process merged headers.  Their width is determined by their child columns.
+      if( panel.ParentRow.LevelCache != -1 )
+        return;
 
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( panel );
+      var dataGridContext = DataGridControl.GetDataGridContext( panel );
+      if( dataGridContext == null )
+        return;
 
-      if( ( dataGridContext != null ) && ( dataGridContext.VisibleColumns.Count > 0 ) )
+      if( ( dataGridContext.VisibleColumns.Count > 0 ) && !dataGridContext.IsAFlattenDetail )
       {
-        // When ColumnStretchMinWidth changes trigger an update by clearing all 
-        // DesiredWidth values.
+        // When ColumnStretchMinWidth changes trigger an update by clearing all DesiredWidth values.
         foreach( ColumnBase column in dataGridContext.VisibleColumns )
         {
           column.ClearValue( Column.DesiredWidthProperty );
@@ -119,7 +117,7 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion ColumnStretchMinWidth Property
+    #endregion
 
     #region ColumnStretchMode Property
 
@@ -127,15 +125,13 @@ namespace Xceed.Wpf.DataGrid.Views
       "ColumnStretchMode",
       typeof( ColumnStretchMode ),
       typeof( FixedCellPanel ),
-      new UIPropertyMetadata( ColumnStretchMode.None, new PropertyChangedCallback( FixedCellPanel.ColumnStretchModeChanged ) ) );
-
-    private ColumnStretchMode m_columnStretchMode = ColumnStretchMode.None;
+      new UIPropertyMetadata( ColumnStretchMode.None ) );
 
     public ColumnStretchMode ColumnStretchMode
     {
       get
       {
-        return m_columnStretchMode;
+        return ( ColumnStretchMode )this.GetValue( FixedCellPanel.ColumnStretchModeProperty );
       }
       set
       {
@@ -143,29 +139,53 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    private static void ColumnStretchModeChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
-    {
-      FixedCellPanel panel = sender as FixedCellPanel;
+    #endregion
 
-      if( panel == null )
-        return;
+    #region DataGridContext Property
 
-      if( e.NewValue != null )
-        panel.m_columnStretchMode = ( ColumnStretchMode )e.NewValue;
-    }
-
-    #endregion ColumnStretchMode Property
-
-    #region DataGridContext Internal Property
-
-    // DataGridContext is set when IVirtualizingCellsHost.PrepareCellsHost is called and cleared when
-    // IVirtualizingCellsHost.ClearContainer is called. We always use the DataGridContext passed
-    // and assert the old one is never referenced
+    // DataGridContext is set when IVirtualizingCellsHost.PrepareCellsHost is called and cleared when IVirtualizingCellsHost.ClearContainer is called.
+    // We always use the DataGridContext passed and assert the old one is never referenced
     internal DataGridContext DataGridContext
     {
       get
       {
         return m_dataGridContext;
+      }
+    }
+
+    #endregion
+
+    #region Columns Internal Property
+
+    internal ColumnCollection Columns
+    {
+      get
+      {
+        return m_dataGridContext.Columns;
+      }
+    }
+
+    #endregion
+
+    #region ColumnsByVisiblePosition Property
+
+    internal HashedLinkedList<ColumnBase> ColumnsByVisiblePosition
+    {
+      get
+      {
+        return m_dataGridContext.ColumnsByVisiblePosition;
+      }
+    }
+
+    #endregion
+
+    #region VisibleColumns Property
+
+    private ReadOnlyObservableCollection<ColumnBase> VisibleColumns
+    {
+      get
+      {
+        return m_dataGridContext.VisibleColumns;
       }
     }
 
@@ -177,16 +197,16 @@ namespace Xceed.Wpf.DataGrid.Views
       "FixedCellCount",
       typeof( int ),
       typeof( FixedCellPanel ),
-      new UIPropertyMetadata( 0, new PropertyChangedCallback( FixedCellPanel.FixedCellCountChanged ) ),
-      new ValidateValueCallback( FixedCellPanel.ValidateFixedCellCountCallback ) );
-
-    private int m_fixedCellCount; // = 0;
+      new UIPropertyMetadata(
+        0,
+        new PropertyChangedCallback( FixedCellPanel.FixedCellCountChanged ) ),
+        new ValidateValueCallback( FixedCellPanel.ValidateFixedCellCountCallback ) );
 
     public int FixedCellCount
     {
       get
       {
-        return m_fixedCellCount;
+        return ( int )this.GetValue( FixedCellPanel.FixedCellCountProperty );
       }
       set
       {
@@ -197,12 +217,8 @@ namespace Xceed.Wpf.DataGrid.Views
     private static void FixedCellCountChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
       FixedCellPanel panel = sender as FixedCellPanel;
-
       if( panel == null )
         return;
-
-      if( e.NewValue != null )
-        panel.m_fixedCellCount = ( int )e.NewValue;
 
       // Invalidate the measure to force a layout pass
       panel.InvalidateMeasure();
@@ -213,7 +229,7 @@ namespace Xceed.Wpf.DataGrid.Views
       return ( ( int )value >= 0 );
     }
 
-    #endregion FixedCellCount Property
+    #endregion
 
     #region FixedPanel Property
 
@@ -229,26 +245,17 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region FixedColumnDropMarkPen Property
 
-    public static readonly DependencyProperty FixedColumnDropMarkPenProperty =
-        DependencyProperty.Register( "FixedColumnDropMarkPen", typeof( Pen ), typeof( FixedCellPanel ), new PropertyMetadata( new PropertyChangedCallback( FixedCellPanel.OnFixedColumnDropMarkPenChanged ) ) );
-
-    private Pen m_fixedColumnDropMarkPen;
-
-    private static void OnFixedColumnDropMarkPenChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
-    {
-      FixedCellPanel panel = o as FixedCellPanel;
-
-      if( panel == null )
-        return;
-
-      panel.m_fixedColumnDropMarkPen = e.NewValue as Pen;
-    }
+    public static readonly DependencyProperty FixedColumnDropMarkPenProperty = DependencyProperty.Register(
+      "FixedColumnDropMarkPen",
+      typeof( Pen ),
+      typeof( FixedCellPanel ),
+      new PropertyMetadata( null ) );
 
     public Pen FixedColumnDropMarkPen
     {
       get
       {
-        return m_fixedColumnDropMarkPen;
+        return ( Pen )this.GetValue( FixedCellPanel.FixedColumnDropMarkPenProperty );
       }
       set
       {
@@ -256,7 +263,7 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion FixedColumnDropMarkPen Property
+    #endregion
 
     #region ParentRow Property
 
@@ -266,8 +273,7 @@ namespace Xceed.Wpf.DataGrid.Views
       {
         if( m_parentRow == null )
         {
-          Debug.Assert( this.DataGridContext != null );
-          m_parentRow = Row.FindFromChild( this.DataGridContext, this );
+          m_parentRow = Row.FindFromChild( m_dataGridContext, this );
         }
 
         return m_parentRow;
@@ -330,81 +336,20 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion
 
-    #region CellsHostPrepared Private Property
+    #region ColumnVirtualizationManager Internal Property
 
-    private bool CellsHostPrepared
+    internal TableViewColumnVirtualizationManagerBase ColumnVirtualizationManager
     {
       get
       {
-        return m_flags[ ( int )FixedCellPanelFlags.CellsHostPrepared ];
-      }
-      set
-      {
-        m_flags[ ( int )FixedCellPanelFlags.CellsHostPrepared ] = value;
-      }
-    }
+        if( m_dataGridContext == null )
+          return null;
 
-    #endregion
+        var columnVirtualizationManager = m_dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManagerBase;
+        if( columnVirtualizationManager == null )
+          throw new DataGridInternalException( "Invalid ColumnVirtualizationManager for FixedCellPanel", m_dataGridContext.DataGridControl );
 
-    #region NeedToClearAllCreatedCells Private Property
-
-    private bool NeedToClearAllCreatedCells
-    {
-      get
-      {
-        return m_flags[ ( int )FixedCellPanelFlags.NeedToClearAllCreatedCells ];
-      }
-      set
-      {
-        m_flags[ ( int )FixedCellPanelFlags.NeedToClearAllCreatedCells ] = value;
-      }
-    }
-
-    #endregion
-
-    #region ZOrderDirty Private Property
-
-    private bool ZOrderDirty
-    {
-      get
-      {
-        return m_flags[ ( int )FixedCellPanelFlags.ZOrderDirty ];
-      }
-      set
-      {
-        m_flags[ ( int )FixedCellPanelFlags.ZOrderDirty ] = value;
-      }
-    }
-
-    #endregion
-
-    #region SplitterDragCanceled Private Property
-
-    private bool SplitterDragCanceled
-    {
-      get
-      {
-        return m_flags[ ( int )FixedCellPanelFlags.SplitterDragCanceled ];
-      }
-      set
-      {
-        m_flags[ ( int )FixedCellPanelFlags.SplitterDragCanceled ] = value;
-      }
-    }
-
-    #endregion
-
-    #region SplitterDragCompleted Private Property
-
-    private bool SplitterDragCompleted
-    {
-      get
-      {
-        return m_flags[ ( int )FixedCellPanelFlags.SplitterDragCompleted ];
-      }
-      set
-      {
-        m_flags[ ( int )FixedCellPanelFlags.SplitterDragCompleted ] = value;
+        return columnVirtualizationManager;
       }
     }
 
@@ -416,7 +361,7 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       get
       {
-        return s_visualChildrenCount;
+        return c_visualChildrenCount;
       }
     }
 
@@ -440,11 +385,29 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       get
       {
-        VirtualizingCellCollection cellCollection = this.ParentRowCells;
-        if( cellCollection == null )
+        var parentRowCells = this.ParentRowCells;
+        if( parentRowCells == null )
           return new Cell[ 0 ];
 
-        return cellCollection.BindedCells;
+        TableViewColumnVirtualizationManagerBase columnVirtualizationManager = this.ColumnVirtualizationManager;
+        if( columnVirtualizationManager == null )
+          return new Cell[ 0 ];
+
+        List<Cell> cells = new List<Cell>();
+        Cell cell;
+
+        var fieldNames = columnVirtualizationManager.GetFixedFieldNames( m_parentRow.LevelCache )
+                           .Concat( columnVirtualizationManager.GetScrollingFieldNames( m_parentRow.LevelCache ) );
+
+        foreach( string fieldName in fieldNames )
+        {
+          if( parentRowCells.TryGetCreatedCell( fieldName, out cell ) )
+          {
+            cells.Add( cell );
+          }
+        }
+
+        return cells;
       }
     }
 
@@ -462,46 +425,28 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private void AddPermanentScrollingFieldNames( string fieldName )
     {
-      if( string.IsNullOrEmpty( fieldName ) )
+      if( string.IsNullOrEmpty( fieldName ) || m_permanentScrollingFieldNames.Contains( fieldName ) )
         return;
 
-      if( !m_permanentScrollingFieldNames.Contains( fieldName ) )
-      {
-        m_permanentScrollingFieldNames.Add( fieldName );
-      }
+      m_permanentScrollingFieldNames.Add( fieldName );
     }
 
     private bool AddPermanentScrollingFieldNamesIfOutOfViewColumn( string fieldName )
     {
-      bool retVal = false;
+      if( string.IsNullOrEmpty( fieldName ) || m_permanentScrollingFieldNames.Contains( fieldName ) )
+        return false;
 
-      if( string.IsNullOrEmpty( fieldName ) )
-        return retVal;
-
-      if( this.DataGridContext == null )
+      var columnVirtualizationManager = this.ColumnVirtualizationManager;
+      if( columnVirtualizationManager != null )
       {
-        if( !m_permanentScrollingFieldNames.Contains( fieldName ) )
-        {
-          m_permanentScrollingFieldNames.Add( fieldName );
-          retVal = true;
-        }
-
-        return retVal;
+        if( columnVirtualizationManager.GetFixedFieldNames( m_parentRow.LevelCache ).Contains( fieldName )
+          || columnVirtualizationManager.GetScrollingFieldNames( m_parentRow.LevelCache ).Contains( fieldName ) )
+          return false;
       }
 
-      TableViewColumnVirtualizationManager columnVirtualizationManager = this.DataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
+      m_permanentScrollingFieldNames.Add( fieldName );
 
-      if( columnVirtualizationManager == null )
-        throw new DataGridInternalException();
-
-      if( !m_permanentScrollingFieldNames.Contains( fieldName ) && !columnVirtualizationManager.FixedFieldNames.Contains( fieldName )
-        && !columnVirtualizationManager.ScrollingFieldNames.Contains( fieldName ) )
-      {
-        m_permanentScrollingFieldNames.Add( fieldName );
-        retVal = true;
-      }
-
-      return retVal;
+      return true;
     }
 
     private void ClearPermanentScrollingFieldNames()
@@ -510,29 +455,29 @@ namespace Xceed.Wpf.DataGrid.Views
       m_permanentScrollingFieldNames.TrimExcess();
     }
 
-    private readonly HashSet<string> m_permanentScrollingFieldNames = new HashSet<string>();
+    private readonly List<string> m_permanentScrollingFieldNames = new List<string>( 0 );
 
     #endregion
 
     protected override Visual GetVisualChild( int index )
     {
-      if( this.ZOrderDirty )
+      if( m_zOrderDirty )
+      {
         this.RecomputeZOrder();
+      }
 
-      int correctedIndex = ( m_zIndexMapping == null )
-      ? index
-      : m_zIndexMapping[ index ];
+      var correctedIndex = ( m_zIndexMapping == null ) ? index : m_zIndexMapping[ index ];
 
       switch( correctedIndex )
       {
         case 0:
           return m_fixedPanel;
         case 1:
-          return m_splitter;
+          return null;
         case 2:
           return m_scrollingCellsDecorator;
         default:
-          throw new ArgumentOutOfRangeException( "index" );
+          throw DataGridException.Create<IndexOutOfRangeException>( "Invalid visual child index.", ( m_dataGridContext != null ? m_dataGridContext.DataGridControl : null ) );
       }
     }
 
@@ -543,22 +488,14 @@ namespace Xceed.Wpf.DataGrid.Views
 
     protected override Size MeasureOverride( Size availableSize )
     {
-      DataGridContext dataGridContext = this.DataGridContext;
-
       // DataGridContext can be null when the parent Row is not prepared
-      if( dataGridContext == null )
+      if( m_dataGridContext == null )
         return this.DesiredSize;
-
-      TableViewColumnVirtualizationManager columnVirtualizationManager =
-        dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
-
-      if( columnVirtualizationManager == null )
-        throw new DataGridInternalException();
 
       this.ApplyFixedTranform();
 
-      // If a change occured and did not triggered an UpdateMeasureRequiredEvent by the
-      // columnVirtualizationManager, we ensure the Row contains the necessary Cells
+      // If a change occured and did not triggered an UpdateMeasureRequiredEvent by the columnVirtualizationManager, we ensure the Row contains the necessary Cells
+      var columnVirtualizationManager = this.ColumnVirtualizationManager;
       if( m_lastColumnVirtualizationManagerVersion != columnVirtualizationManager.Version )
       {
         this.UpdateChildren();
@@ -567,33 +504,34 @@ namespace Xceed.Wpf.DataGrid.Views
       double tempDesiredHeight = 0;
       m_desiredSize.Width = 0;
 
-      // Measure the Splitter
-      m_splitter.Measure( availableSize );
-
-      // Measure the Panels (visual children) around the cells (logical children).
-      // Logical children will not be measured again during this process.
+      // Measure the Panels (visual children) around the cells (logical children).  Logical children will not be measured again during this process.
       m_fixedPanel.Measure( availableSize );
 
       if( m_fixedPanel.DesiredSize.Height > tempDesiredHeight )
+      {
         tempDesiredHeight = m_fixedPanel.DesiredSize.Height;
+      }
 
-      // Set the desired size for m_scrollingPanel which will be passed to the 
-      // Decorated that will allow the first cell to be clipped
-      m_desiredSize.Width += columnVirtualizationManager.VisibleColumnsTotalWidth;
+      // Set the desired size for m_scrollingPanel which will be passed to the Decorated that will allow the first cell to be clipped
+      m_desiredSize.Width += columnVirtualizationManager.VisibleColumnsWidth;
 
       m_scrollingCellsDecorator.Measure( availableSize );
 
       if( m_scrollingCellsDecorator.DesiredSize.Height > tempDesiredHeight )
+      {
         tempDesiredHeight = m_scrollingCellsDecorator.DesiredSize.Height;
+      }
 
       m_desiredSize.Height = tempDesiredHeight;
 
-      if( !double.IsPositiveInfinity( availableSize.Width ) )
+      if( !double.IsPositiveInfinity( availableSize.Width ) && !m_dataGridContext.IsAFlattenDetail )
       {
-        dataGridContext.ColumnStretchingManager.CalculateColumnStretchWidths(
-          availableSize.Width,
-          this.ColumnStretchMode,
-          this.ColumnStretchMinWidth );
+        m_dataGridContext.ColumnStretchingManager.CalculateColumnStretchWidths( availableSize.Width, this.ColumnStretchMode,
+                                                                                this.ColumnStretchMinWidth, m_dataGridContext.CanIncreaseColumnWidth );
+
+        // Since a panel can make a column change its width, and since this will invalidate every panel that has already been measured, only a decreasing value
+        // is allowd to be set from one panel to another, so the layout pass does not fall into an infinite loop of increasing and decreasing values.
+        m_dataGridContext.CanIncreaseColumnWidth = false;
       }
 
       // Adjust TabIndex of fixed cell and scrolling cell for the tab navigation to be ok
@@ -605,13 +543,11 @@ namespace Xceed.Wpf.DataGrid.Views
     protected override Size ArrangeOverride( Size finalSize )
     {
       // DataGridContext can be null when the parent Row is not prepared
-      if( this.DataGridContext == null )
+      if( m_dataGridContext == null )
         return this.DesiredSize;
 
-      // Very simple horizontally Arrange implementation
-      // We use m_visualChildren instead of GetVisualChild(index)
-      // to ensure the sub panels are always arranged in the 
-      // correct visible order
+      // Very simple horizontally Arrange implementation.  We use m_visualChildren instead of GetVisualChild(index)
+      // to ensure the sub panels are always arranged in the  correct visible order
       int childrenCount = m_visualChildren.Count;
       Rect finalRect = new Rect( finalSize );
       double offset = 0d;
@@ -636,13 +572,13 @@ namespace Xceed.Wpf.DataGrid.Views
     }
 
     // Returns the visible index of a column by its visible position
-    internal static int CalculateVisibleIndex( int visiblePosition, DataGridContext dataGridContext )
+    internal static int CalculateVisibleIndex( int visiblePosition, HashedLinkedList<ColumnBase> columnsByVisiblePosition )
     {
-      if( dataGridContext == null )
+      if( columnsByVisiblePosition == null )
         return -1;
 
       int visibleIndex = 0;
-      LinkedListNode<ColumnBase> tempNode = dataGridContext.ColumnsByVisiblePosition.First;
+      LinkedListNode<ColumnBase> tempNode = columnsByVisiblePosition.First;
 
       for( int i = 0; i < visiblePosition; i++ )
       {
@@ -650,7 +586,9 @@ namespace Xceed.Wpf.DataGrid.Views
           break;
 
         if( tempNode.Value.Visible )
+        {
           visibleIndex++;
+        }
 
         tempNode = tempNode.Next;
       }
@@ -660,9 +598,8 @@ namespace Xceed.Wpf.DataGrid.Views
 
     internal double GetFixedWidth()
     {
-      double offset = VisualTreeHelper.GetOffset( m_scrollingCellsDecorator ).X;
-
-      DependencyObject parent = VisualTreeHelper.GetParent( this );
+      var offset = VisualTreeHelper.GetOffset( m_scrollingCellsDecorator ).X;
+      var parent = VisualTreeHelper.GetParent( this );
 
       while( parent != null )
       {
@@ -681,7 +618,9 @@ namespace Xceed.Wpf.DataGrid.Views
     internal ScrollViewer GetParentScrollViewer()
     {
       if( m_parentScrollViewer == null )
+      {
         m_parentScrollViewer = TableViewScrollViewer.GetParentScrollViewer( this );
+      }
 
       return m_parentScrollViewer;
     }
@@ -693,16 +632,16 @@ namespace Xceed.Wpf.DataGrid.Views
       if( cell == null )
         return retVal;
 
-      // We do not want any template cells to be added/removed to/from visual tree
+      // We do not want any template cells to be added to/removed from visual tree
       Debug.Assert( !Row.GetIsTemplateCell( cell ), "We should never insert template cells" );
 
       ColumnBase parentColumn = cell.ParentColumn;
       Debug.Assert( parentColumn != null, "The cell doesn't have a parent column" );
 
-      CellCollection cellCollection = this.ParentRowCells;
-      Debug.Assert( cellCollection != null );
+      CellCollection parentRowCells = this.ParentRowCells;
+      Debug.Assert( parentRowCells != null );
 
-      Cell targetCell = cellCollection[ parentColumn ];
+      Cell targetCell = parentRowCells[ parentColumn ];
       Debug.Assert( targetCell == cell, "The forced cell is inappropriate" );
 
       retVal = this.MoveCellToScrollingPanel( cell );
@@ -713,44 +652,34 @@ namespace Xceed.Wpf.DataGrid.Views
       return retVal;
     }
 
-    private bool CanReleaseCell( Cell cell )
+    internal void PrepareVirtualizationMode( DataGridContext dataGridContext )
     {
-      DataGridContext dataGridContext = this.DataGridContext;
-
-
-      //We must never recycle a cell for one of the following reason:
-      //  1. Its edit template is currently displayed.  (The typed content must be kept).
-      //  2. Is the current cell.
-      //  3. Is a templated cell.
-      //  4. Is part of a dragged column.
-      return ( cell != null )
-          && ( dataGridContext != null )
-          && ( cell.CanBeRecycled )
-          && ( !cell.HasCellEditorError )
-          && ( cell != dataGridContext.CurrentCell )
-          && ( !Row.GetIsTemplateCell( cell ) )
-          && ( !TableflowView.GetIsBeingDraggedAnimated( cell.ParentColumn ) )
-          && ( !( bool )cell.GetValue( ColumnManagerCell.IsBeingDraggedProperty ) );
-    }
-
-    private static void ClearCellVisualState( Cell cell )
-    {
-      if( cell == null )
+      var columnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManagerBase;
+      if( columnVirtualizationManager == null )
         return;
 
-      ContextMenu contextMenu = cell.ContextMenu;
+      var parentRowCells = this.ParentRowCells;
+      m_virtualizationMode = columnVirtualizationManager.VirtualizationMode;
+      parentRowCells.VirtualizationMode = m_virtualizationMode;
 
-      // Ensure to close the ContextMenu if it is open and the Cell
-      // is virtualized to avoid problems with ContextMenus
-      // defined as static resources that won't be able to reopen
-      // again if the Close private method is called after the 
-      // PlacementTarget is removed from the VisualTree
-      if( ( contextMenu != null ) && ( contextMenu.IsOpen ) )
-      {
-        contextMenu.IsOpen = false;
-      }
+      //Cells provided through Row.Cells (in xaml for instance) must be merged now.
+      parentRowCells.MergeFreeCells();
 
-      cell.ClearContainerVisualState();
+      //Check if the mode is virutalizing without cell recycling
+      if( m_virtualizationMode != ColumnVirtualizationMode.Virtualizing )
+        return;
+
+      //In this mode, cells for all visible columns are automatically generated (speeds up first time horizontal scrolling).
+      m_generateMissingCellsDispatcherOperation = this.Dispatcher.BeginInvoke( new Action<int>( this.GenerateMissingCells ), DispatcherPriority.Input, 0 );
+    }
+
+    private void FixedCellPanelLayoutUpdated( object sender, EventArgs e )
+    {
+      if( m_dataGridContext == null )
+        return;
+
+      // Once the layout pass is done, the flag must be reset so the width of columns can be resized.
+      m_dataGridContext.CanIncreaseColumnWidth = true;
     }
 
     private void MoveCellToFixedPanel( Cell movingCell )
@@ -770,7 +699,7 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    private bool MoveCellToScrollingPanel( Cell movingCell, bool release = false )
+    private bool MoveCellToScrollingPanel( Cell movingCell )
     {
       bool retVal = false;
 
@@ -789,70 +718,306 @@ namespace Xceed.Wpf.DataGrid.Views
         retVal = true;
       }
 
-      if( release )
-      {
-        FixedCellPanel.ClearCellVisualState( movingCell );
-        retVal = true;
-      }
-
       return retVal;
     }
 
-    private void RemoveLeakingCells( ICollection<Cell> collection )
+    private void RemoveCellFromFixedOrScrollingPanel( Cell cell )
     {
-      this.RemoveLeakingCells( collection, m_fixedPanel.Children );
-      this.RemoveLeakingCells( collection, m_scrollingPanel.Children );
-    }
-
-    private void RemoveLeakingCells( ICollection<Cell> aliveCells, UIElementCollection collection )
-    {
-      if( ( aliveCells == null ) || ( collection == null ) )
+      if( cell == null )
         return;
 
-      //Remove the inaccessible cells from the elements collection.
-      for( int i = collection.Count - 1; i >= 0; i-- )
-      {
-        Cell cell = collection[ i ] as Cell;
+      m_fixedPanel.Children.Remove( cell );
+      m_scrollingPanel.Children.Remove( cell );
+    }
 
-        if( ( cell != null ) && ( !aliveCells.Contains( cell ) ) )
+    private IEnumerable<ColumnHierarchyManager.ILocation> GetPreviousLocationsOf( ColumnHierarchyManager.ILocation location )
+    {
+      if( location == null )
+        yield break;
+
+      var previousLocation = location.GetPreviousSiblingOrCousin();
+      while( previousLocation != null )
+      {
+        yield return previousLocation;
+        previousLocation = previousLocation.GetPreviousSiblingOrCousin();
+      }
+    }
+
+    private IEnumerable<ColumnHierarchyManager.ILocation> GetNextLocationsOf( ColumnHierarchyManager.ILocation location )
+    {
+      if( location == null )
+        yield break;
+
+      var nextLocation = location.GetNextSiblingOrCousin();
+      while( nextLocation != null )
+      {
+        yield return nextLocation;
+        nextLocation = nextLocation.GetNextSiblingOrCousin();
+      }
+    }
+
+    private IEnumerable<ColumnHierarchyManager.IColumnLocation> GetColumnLocations( IEnumerable<ColumnHierarchyManager.ILocation> locations )
+    {
+      if( locations == null )
+        return Enumerable.Empty<ColumnHierarchyManager.IColumnLocation>();
+
+      return ( from location in locations
+               let columnLocation = location as ColumnHierarchyManager.IColumnLocation
+               where ( columnLocation != null )
+               select columnLocation );
+    }
+
+    private bool IsDropMarkAtDropTarget( DropTarget dropTarget )
+    {
+      if( ( dropTarget == null ) || ( m_dataGridContext == null ) )
+        return false;
+
+      var columnManager = m_dataGridContext.ColumnManager;
+      var levelMarkers = columnManager.GetLevelMarkersFor( dropTarget.Columns );
+      if( levelMarkers == null )
+        return false;
+
+      var splitterLocation = levelMarkers.Splitter;
+      Debug.Assert( splitterLocation != null );
+      if( splitterLocation == null )
+        return false;
+
+      // The drop mark location should not be adjusted when the only thing that is between the splitter and
+      // the target location are hidden columns.
+      if( dropTarget.Type != DropTargetType.Column )
+      {
+        var locations = ( dropTarget.Before ) ? this.GetNextLocationsOf( splitterLocation ) : this.GetPreviousLocationsOf( splitterLocation );
+
+        return this.GetColumnLocations( locations ).All( columnLocation => !columnLocation.Column.Visible );
+      }
+      else
+      {
+        Debug.Assert( dropTarget.Column != null );
+
+        foreach( var columnLocation in this.GetColumnLocations( this.GetPreviousLocationsOf( splitterLocation ) ) )
         {
-          collection.RemoveAt( i );
+          var column = columnLocation.Column;
+          if( column == dropTarget.Column )
+          {
+            if( dropTarget.Before )
+              return !column.Visible;
+
+            return true;
+          }
+
+          if( column.Visible )
+            break;
+        }
+
+        foreach( var columnLocation in this.GetColumnLocations( this.GetNextLocationsOf( splitterLocation ) ) )
+        {
+          var column = columnLocation.Column;
+          if( column == dropTarget.Column )
+          {
+            if( !dropTarget.Before )
+              return !column.Visible;
+
+            return true;
+          }
+
+          if( column.Visible )
+            break;
         }
       }
+
+      return false;
+    }
+
+    private bool ShowDropMark()
+    {
+      if( ( m_dragDropState == null ) || ( m_dataGridContext == null ) )
+        return false;
+
+      var scrollViewer = TableViewScrollViewer.GetParentTableViewScrollViewer( this );
+      if( scrollViewer == null )
+        return false;
+
+      var parentRowCells = this.ParentRowCells;
+      if( parentRowCells == null )
+        return false;
+
+      var dropTarget = m_dragDropState.DropTarget;
+      var targetCell = default( Cell );
+      var showDropMarkBeforeTargetCell = ( dropTarget != null ) ? dropTarget.Before : false;
+
+      if( ( dropTarget != null ) && !this.IsDropMarkAtDropTarget( dropTarget ) )
+      {
+        var dropTargetLocation = default( ColumnHierarchyManager.ILocation );
+
+        if( dropTarget.Type == DropTargetType.Column )
+        {
+          Debug.Assert( dropTarget.Column != null );
+          dropTargetLocation = m_dataGridContext.ColumnManager.GetColumnLocationFor( dropTarget.Column );
+        }
+        else
+        {
+          var levelMarkers = m_dataGridContext.ColumnManager.GetLevelMarkersFor( dropTarget.Columns );
+          if( levelMarkers == null )
+            return false;
+
+          switch( dropTarget.Type )
+          {
+            case DropTargetType.Start:
+              dropTargetLocation = levelMarkers.Start;
+              break;
+
+            case DropTargetType.Orphan:
+              dropTargetLocation = levelMarkers.Orphan;
+              break;
+
+            default:
+              throw new NotImplementedException();
+          }
+        }
+
+        if( dropTargetLocation == null )
+          return false;
+
+        // Since the drop target may be a hidden column, we must look for the first visible column
+        // next to it since the calculation requires a cell.
+        {
+          var columnLocation = dropTargetLocation as ColumnHierarchyManager.IColumnLocation;
+          if( ( columnLocation != null ) && columnLocation.Column.Visible )
+          {
+            if( !parentRowCells.TryGetBindedCell( columnLocation.Column, false, out targetCell ) )
+              return false;
+          }
+        }
+
+        if( targetCell == null )
+        {
+          foreach( var columnLocation in this.GetColumnLocations( this.GetPreviousLocationsOf( dropTargetLocation ) ) )
+          {
+            if( !columnLocation.Column.Visible )
+              continue;
+
+            if( !parentRowCells.TryGetBindedCell( columnLocation.Column, false, out targetCell ) )
+              continue;
+
+            showDropMarkBeforeTargetCell = false;
+            break;
+          }
+        }
+
+        if( targetCell == null )
+        {
+          foreach( var columnLocation in this.GetColumnLocations( this.GetNextLocationsOf( dropTargetLocation ) ) )
+          {
+            if( !columnLocation.Column.Visible )
+              continue;
+
+            if( !parentRowCells.TryGetBindedCell( columnLocation.Column, false, out targetCell ) )
+              continue;
+
+            showDropMarkBeforeTargetCell = true;
+            break;
+          }
+        }
+      }
+
+      double dropMarkOffset = 0;
+
+      if( targetCell != null )
+      {
+        if( showDropMarkBeforeTargetCell )
+        {
+          dropMarkOffset = targetCell.TranslatePoint( new Point(), scrollViewer ).X;
+        }
+        else
+        {
+          dropMarkOffset = targetCell.TranslatePoint( new Point( targetCell.ActualWidth, 0d ), scrollViewer ).X;
+        }
+      }
+      else
+      {
+        return false;
+      }
+
+      var adorner = m_dragDropState.DropMarkAdorner;
+      if( adorner == null )
+      {
+        // FixedCellPanel can only be used in a Horizontal manner. We can afford to plug this vertical handling of drop mark.
+        var pen = this.FixedColumnDropMarkPen;
+        if( pen == null )
+        {
+          var dropMarkWidth = 1d;
+
+          pen = new Pen( Brushes.Gray, dropMarkWidth );
+        }
+
+        adorner = new DropMarkAdorner( scrollViewer, pen, DropMarkOrientation.Vertical );
+        adorner.HorizontalPosition = dropMarkOffset;
+
+        var adornerLayer = AdornerLayer.GetAdornerLayer( scrollViewer );
+        if( adornerLayer != null )
+        {
+          adornerLayer.Add( adorner );
+        }
+
+        m_dragDropState.DropMarkAdorner = adorner;
+      }
+      else
+      {
+        adorner.HorizontalPosition = dropMarkOffset;
+      }
+
+      return true;
+    }
+
+    private void HideDropMark()
+    {
+      if( m_dragDropState == null )
+        return;
+
+      var adorner = m_dragDropState.DropMarkAdorner;
+      if( adorner == null )
+        return;
+
+      var adornerLayer = AdornerLayer.GetAdornerLayer( adorner.AdornedElement );
+      if( adornerLayer != null )
+      {
+        adornerLayer.Remove( adorner );
+      }
+
+      m_dragDropState.DropMarkAdorner = null;
     }
 
     private void UpdateChildren()
     {
+      // If the parent Row is not prepared, do not update children.
+      // And contrary to this.UpdateChildren( UpdateMeasureTriggeredAction action ), m_dataGridContext can be null here, since it is from a dispatched call.
+      if( m_dataGridContext == null )
+        return;
+
       this.UpdateChildren( UpdateMeasureTriggeredAction.Unspecified );
     }
 
     private void UpdateChildren( UpdateMeasureTriggeredAction action )
     {
+      Debug.Assert( m_dataGridContext != null, "Should not be called when a container is not prepared" );
+
+      // If the parent Row is not prepared, do not update children
+      if( m_dataGridContext == null )
+        return;
+
       Row parentRow = this.ParentRow;
 
       // A CurrentItemChanged was received for a non current Row
       if( ( action == UpdateMeasureTriggeredAction.CurrentItemChanged ) && ( parentRow != null ) && ( !parentRow.IsCurrent ) )
         return;
 
-      DataGridContext dataGridContext = this.DataGridContext;
-
-      Debug.Assert( dataGridContext != null, "Should not be called when a container is not prepared" );
-
-      // If the parent Row is not prepared, do not update children
-      if( dataGridContext == null )
-        return;
-
-      TableViewColumnVirtualizationManager columnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
-
-      if( columnVirtualizationManager == null )
-        throw new DataGridInternalException();
-
       bool currentItemChangedOnCurrentRow = ( action == UpdateMeasureTriggeredAction.CurrentItemChanged ) && ( parentRow != null ) && ( parentRow.IsCurrent );
+      var columnVirtualizationManager = this.ColumnVirtualizationManager;
 
       if( ( m_lastColumnVirtualizationManagerVersion != columnVirtualizationManager.Version ) || ( currentItemChangedOnCurrentRow )
             || ( m_virtualizingCellCollectionChangedDispatcherOperation != null ) )
       {
-        this.UpdateChildren( dataGridContext, columnVirtualizationManager, this.ParentRowCells );
+        this.UpdateChildren( columnVirtualizationManager );
 
         m_lastColumnVirtualizationManagerVersion = columnVirtualizationManager.Version;
 
@@ -862,100 +1027,149 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    private void UpdateChildren( DataGridContext dataGridContext, TableViewColumnVirtualizationManager columnVirtualizationManager, VirtualizingCellCollection parentRowCells )
+    private void UpdateChildren( TableViewColumnVirtualizationManagerBase columnVirtualizationManager )
     {
+      var parentRowCells = this.ParentRowCells;
+
       //Prevent reentrance
-      if( m_parentRowCells.AlreadyUpdating )
+      if( ( parentRowCells == null ) || parentRowCells.IsUpdating )
         return;
 
-      m_parentRowCells.AlreadyUpdating = true;
+      using( parentRowCells.SetIsUpdating() )
+      {
+        //If in virtualizing mode but not recycling cells.
+        if( m_virtualizationMode == ColumnVirtualizationMode.Virtualizing )
+        {
+          //Retrieve the cells that aren't needed anymore.
+          var cellsToCollapse = this.GetCellsToCollapse( columnVirtualizationManager, parentRowCells );
 
-      if( dataGridContext == null )
-        throw new DataGridInternalException( "DataGridContext is null for FixedCellPanel" );
+          //Simply hide these cells for now.
+          foreach( var cell in cellsToCollapse )
+          {
+            if( cell.CanBeCollapsed )
+            {
+              cell.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+              this.AddPermanentScrollingFieldNames( cell.FieldName );
+            }
+          }
 
-      if( columnVirtualizationManager == null )
-        throw new DataGridInternalException( "ColumnVirtualizationManager is null for FixedCellPanel" );
+          //And do the actual processing after scrolling has stopped.
+          if( m_processUnusedCellsDispatcherOperation == null )
+          {
+            m_processUnusedCellsDispatcherOperation = this.Dispatcher.BeginInvoke( new Action<TableViewColumnVirtualizationManagerBase>( this.ProcessCollapsedCells ),
+                                                                                   DispatcherPriority.Background, columnVirtualizationManager );
+          }
+        }
+        else
+        {
+          //If recycling cells, we need to process them now, in order to minimize cells' creation.
+          this.ProcessCollapsedCells( columnVirtualizationManager );
+        }
 
-      if( parentRowCells == null )
+        var fixedFieldNames = columnVirtualizationManager.GetFixedFieldNames( m_parentRow.LevelCache ).ToList();
+        var scrollingFieldNames = columnVirtualizationManager.GetScrollingFieldNames( m_parentRow.LevelCache ).ToList();
+
+        //Add the missing cells to the fixed region.
+        foreach( string fieldName in fixedFieldNames )
+        {
+          var cell = this.GetCell( fieldName, parentRowCells );
+
+          //Make sure the cell is in the appropriate panel.
+          this.MoveCellToFixedPanel( cell );
+
+        }
+
+        //Add the missing cells to the scrolling region.
+        foreach( string fieldName in scrollingFieldNames )
+        {
+          var cell = this.GetCell( fieldName, parentRowCells );
+
+          //Make sure the cell is in the appropriate panel.
+          this.MoveCellToScrollingPanel( cell );
+        }
+
+        m_fixedPanel.InvalidateMeasure();
+        m_scrollingCellsDecorator.InvalidateMeasure();
+        m_scrollingPanel.InvalidateMeasure();
+      }
+    }
+
+    private void ProcessCollapsedCells( TableViewColumnVirtualizationManagerBase columnVirtualizationManager )
+    {
+      m_processUnusedCellsDispatcherOperation = null;
+
+      if( m_dataGridContext == null )
         return;
 
       this.ClearPermanentScrollingFieldNames();
 
-      List<string> currentFieldsName = new List<string>();
-      currentFieldsName.AddRange( columnVirtualizationManager.FixedFieldNames );
-      currentFieldsName.AddRange( columnVirtualizationManager.ScrollingFieldNames );
+      //Retrieve the cells that aren't needed anymore.
+      var collapsedCells = this.GetCellsToCollapse( columnVirtualizationManager, m_parentRowCells );
 
-      HashSet<Cell> unusedCells = new HashSet<Cell>( parentRowCells.BindedCells );
-
-      //Idenfity the binded cells that aren't needed anymore.
-      foreach( string fieldName in currentFieldsName )
+      foreach( Cell cell in collapsedCells )
       {
-        ColumnBase column = dataGridContext.Columns[ fieldName ];
-        Cell cell;
+        var isCollapsible = cell.CanBeCollapsed;
 
-        if( parentRowCells.TryGetCell( column, out cell ) )
+        if( isCollapsible && cell.CanBeRecycled )
         {
-          //Certain non recyclable cells like StatCells need their content binding to be updated when they become (or stay) in view.
-          cell.AddContentBinding();
-          unusedCells.Remove( cell );
+          // Ensure to close the ContextMenu if it is open and the Cell is virtualized to avoid problems with ContextMenus defined as static resources
+          // that won't be able to reopen again if the Close private method is called after the PlacementTarget is removed from the VisualTree
+          var contextMenu = cell.ContextMenu;
+          if( ( contextMenu != null ) && ( contextMenu.IsOpen ) )
+          {
+            contextMenu.IsOpen = false;
+          }
+
+          cell.ClearContainer();
+          m_parentRowCells.Release( cell );
         }
-      }
-      currentFieldsName.Clear();
-      currentFieldsName.TrimExcess();
-
-      //Release the unused binded cells now in order to minimize the number of cell's creation.
-      foreach( Cell cell in unusedCells )
-      {
-        bool release = this.CanReleaseCell( cell );
-
-        //We move the unused cell into the scrolling panel since there is more chance it will be reused there in the future.
-        this.MoveCellToScrollingPanel( cell, release );
-
-        if( release )
-        {
-          parentRowCells.Release( cell );
-        }
-        //Since the cell cannot be released, it will not be collapsed. We must keep the field name in order to let the scrolling sub-panel measure and arrange the cell out of view.
         else
         {
           //Certain non recyclable cells like StatCells needs their content binding to be removed when they become out of view.
           cell.RemoveContentBinding();
-          this.AddPermanentScrollingFieldNames( cell.FieldName );
+
+          //If in virtualizing mode but not recycling cells, release the cell so it will be collapsed, so no need to measure and arrange it.
+          if( isCollapsible && m_virtualizationMode == ColumnVirtualizationMode.Virtualizing )
+          {
+            m_parentRowCells.Release( cell );
+          }
+          else
+          {
+            //Since the cell cannot be released, it will not be collapsed. We must keep its fieldname
+            //in order to let the scrolling sub-panel measure and arrange the cell out of view.
+            this.AddPermanentScrollingFieldNames( cell.FieldName );
+          }
         }
       }
-      unusedCells.Clear();
-      unusedCells.TrimExcess();
+    }
 
-      //Add the missing cells to the fixed region.
-      foreach( string fieldName in columnVirtualizationManager.FixedFieldNames )
+    private List<Cell> GetCellsToCollapse( TableViewColumnVirtualizationManagerBase columnVirtualizationManager, VirtualizingCellCollection parentRowCells )
+    {
+      return ( from cell in parentRowCells.BindedCells
+               where !columnVirtualizationManager.GetScrollingFieldNames( m_parentRow.LevelCache ).Contains( cell.FieldName )
+                 && !columnVirtualizationManager.GetFixedFieldNames( m_parentRow.LevelCache ).Contains( cell.FieldName )
+               select cell ).ToList();
+    }
+
+    private Cell GetCell( string fieldName, VirtualizingCellCollection parentRowCells )
+    {
+      //The cell is created if it is missing.
+      var cell = parentRowCells[ fieldName ];
+
+      //Certain non recyclable cells like StatCells need their content binding to be updated when they become (or stay) in view.
+      cell.AddContentBinding( m_dataGridContext, m_parentRow, this.Columns[ fieldName ] );
+
+      //Only when in Virtualizing mode can the cell still be collapsed at this point, since parentRowCells[ fieldName ] will have uncollapsed it in other modes.
+      if( m_virtualizationMode == ColumnVirtualizationMode.Virtualizing )
       {
-        //The cell is created if it is missing.
-        Cell cell = parentRowCells[ fieldName ];
-
-        //Make sure the cell is in the appropriate panel.
-        this.MoveCellToFixedPanel( cell );
+        //The current local value must be cleared instead of setting a new local value to give a chance for a style to set a value.
+        cell.ClearValue( Cell.VisibilityProperty );
       }
 
-      //Add the missing cells to the scrolling region.
-      foreach( string fieldName in columnVirtualizationManager.ScrollingFieldNames )
-      {
-        //The cell is created if it is missing.
-        Cell cell = parentRowCells[ fieldName ];
-
-        //Make sure the cell is in the appropriate panel.
-        this.MoveCellToScrollingPanel( cell );
-      }
-
-      if( m_clearUnusedCellsDispatcherOperation == null )
-      {
-        m_clearUnusedCellsDispatcherOperation = this.Dispatcher.BeginInvoke( new Action( this.ClearUnusedCells ), DispatcherPriority.ApplicationIdle );
-      }
-
-      m_fixedPanel.InvalidateMeasure();
-      m_scrollingCellsDecorator.InvalidateMeasure();
-      m_scrollingPanel.InvalidateMeasure();
-
-      m_parentRowCells.AlreadyUpdating = false;
+      return cell;
     }
 
     private void ApplyFixedTranform()
@@ -978,75 +1192,227 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    private void AdjustCellTabIndex( TableViewColumnVirtualizationManager columnVirtualizationManager )
+    private void AdjustCellTabIndex( TableViewColumnVirtualizationManagerBase columnVirtualizationManager )
     {
-      // The order of the children in the panel is not guaranteed to be good.  We do not
-      // reorder children because we will have to remove and add them at a different location.
-      // Doing that will cause more calculations to occur, so we only change the TabIndex.
-      VirtualizingCellCollection collection = this.ParentRowCells;
-      if( collection == null )
-        return;
-
-      HashSet<string> bindedFields = new HashSet<string>();
-      foreach( Cell cell in collection.BindedCells )
-      {
-        bindedFields.Add( cell.FieldName );
-        this.AdjustCellTabIndex( columnVirtualizationManager, cell );
-      }
-
-      List<string> targetFields = new List<string>();
-      targetFields.AddRange( columnVirtualizationManager.FixedFieldNames );
-      targetFields.AddRange( columnVirtualizationManager.ScrollingFieldNames );
-      targetFields.AddRange( m_permanentScrollingFieldNames );
-
-      foreach( string fieldName in targetFields )
-      {
-        if( bindedFields.Contains( fieldName ) )
-          continue;
-
-        Cell cell = collection[ fieldName ];
-        Debug.Assert( cell != null );
-
-        this.AdjustCellTabIndex( columnVirtualizationManager, cell );
-      }
-    }
-
-    private void AdjustCellTabIndex( TableViewColumnVirtualizationManager columnVirtualizationManager, Cell targetCell )
-    {
-      int tabIndex;
-      if( columnVirtualizationManager.FieldNameToPosition.TryGetValue( targetCell.FieldName, out tabIndex ) )
-      {
-        if( tabIndex != KeyboardNavigation.GetTabIndex( targetCell ) )
-        {
-          KeyboardNavigation.SetTabIndex( targetCell, tabIndex );
-        }
-      }
-      else
-      {
-        targetCell.ClearValue( Cell.TabIndexProperty );
-      }
-    }
-
-    private void ClearUnusedCells()
-    {
-      if( ( m_clearUnusedCellsDispatcherOperation == null ) || ( m_clearUnusedCellsDispatcherOperation.Status == DispatcherOperationStatus.Aborted ) )
-        return;
-
-      m_clearUnusedCellsDispatcherOperation = null;
-
-      DataGridContext dataGridContext = this.DataGridContext;
-      if( dataGridContext == null )
-        return;
-
-      VirtualizingCellCollection parentRowCells = this.ParentRowCells;
+      // The order of the children in the panel is not guaranteed to be good.  We do not reorder children because we will have to remove
+      // and add them at a different location.  Doing that will cause more calculations to occur, so we only change the TabIndex.
+      var parentRowCells = this.ParentRowCells;
       if( parentRowCells == null )
         return;
 
-      //Remove the recycling bins that aren't used anymore.
-      parentRowCells.ClearUnusedRecycleBins( dataGridContext.Columns );
+      var fieldNameToPositionMapping = columnVirtualizationManager.GetFieldNameToPosition( m_parentRow.LevelCache );
+      var fieldNames = columnVirtualizationManager.GetFixedFieldNames( m_parentRow.LevelCache )
+                         .Concat( columnVirtualizationManager.GetScrollingFieldNames( m_parentRow.LevelCache ) )
+                         .Concat( m_permanentScrollingFieldNames );
 
-      //Remove the inaccessible cells from the panels.
-      this.RemoveLeakingCells( parentRowCells.Cells );
+      foreach( var fieldName in fieldNames )
+      {
+        Cell cell = parentRowCells.GetCell( fieldName, false );
+        Debug.Assert( cell != null );
+
+        int tabIndex;
+        if( fieldNameToPositionMapping.TryGetValue( fieldName, out tabIndex ) )
+        {
+          KeyboardNavigation.SetTabIndex( cell, tabIndex );
+        }
+        else
+        {
+          cell.ClearValue( Cell.TabIndexProperty );
+        }
+      }
+    }
+
+    private void GenerateMissingCells( int index )
+    {
+      m_generateMissingCellsDispatcherOperation = null;
+
+      if( m_dataGridContext == null )
+      {
+        // The row is being recycled without having been prepared properly.  By setting these properties,
+        // it will be correctly prepare when used again (through IVirtualizingCellsHost.PrepareCellsHost()).
+        m_virtualizationModeChanged = true;
+        m_virtualizingCellCollectionUpdateRequired = true;
+        return;
+      }
+
+      DateTime startTime = DateTime.UtcNow;
+
+      //Generate cells only for visible columns
+      var columns = this.VisibleColumns;
+      var parentRowCells = this.ParentRowCells;
+      var count = columns.Count;
+      var actualIndex = count;
+
+      for( int i = index; i < count; i++ )
+      {
+        var column = columns[ i ];
+
+        if( parentRowCells.HasVirtualizedCell( column.FieldName ) )
+          continue;
+
+        var cell = parentRowCells.AddVirtualizedCell( column );
+
+        //Though the cell has been newly prepared to provide better first time scrolling, it needs to be cleared like any other out of view cell.
+        //For non releasable cells (like StatCell), it's been properly processed in Row.PrepareUnbindedCell(), in the previous call.
+        if( cell.CanBeRecycled )
+        {
+          cell.ClearContainer();
+        }
+
+        if( DateTime.UtcNow.Subtract( startTime ) > FixedCellPanel.MaxProcessDurationTime )
+        {
+          actualIndex = i + 1;
+          break;
+        }
+      }
+
+      if( actualIndex == count )
+        return;
+
+      //If there is still cells to generate, dispatch again.
+      m_generateMissingCellsDispatcherOperation = this.Dispatcher.BeginInvoke( new Action<int>( this.GenerateMissingCells ), DispatcherPriority.Input, actualIndex );
+    }
+
+    private void GenerateOrRemoveCell( ColumnBase column )
+    {
+      Debug.Assert( column != null );
+
+      var parentRowCells = this.ParentRowCells;
+
+      switch( m_virtualizationMode )
+      {
+        case ColumnVirtualizationMode.None:
+          {
+            if( !column.Visible )
+            {
+              Cell cell;
+              if( parentRowCells.TryGetBindedCell( column, false, out cell ) )
+              {
+                //Only remove cells that can be generated without any unique configuration (e.g. no custom template, no ResultPropertyName, etc..)
+                if( cell.CanBeRecycled )
+                {
+                  parentRowCells.InternalRemove( cell );
+                }
+              }
+            }
+            break;
+          }
+
+        case ColumnVirtualizationMode.Recycling:
+          {
+            if( !column.Visible && ( m_synchronizeRecyclingBinsDispatcherOperation == null ) )
+            {
+              m_synchronizeRecyclingBinsDispatcherOperation = this.Dispatcher.BeginInvoke( DispatcherPriority.Background,
+                                                                                           new Action( this.SynchronizeRecyclingBinsWithRecyclingGroups ) );
+            }
+            break;
+          }
+
+        case ColumnVirtualizationMode.Virtualizing:
+          {
+            if( column.Visible )
+            {
+              if( !parentRowCells.HasVirtualizedCell( column.FieldName ) )
+              {
+                parentRowCells.AddVirtualizedCell( column );
+              }
+              break;
+            }
+
+            parentRowCells.RemoveVirtualizedCell( column );
+            break;
+          }
+      }
+    }
+
+    private void UpdateVirtualizationMode()
+    {
+      var columnVirtualizationManager = this.ColumnVirtualizationManager;
+      if( columnVirtualizationManager == null )
+        return;
+
+      var parentRowCells = this.ParentRowCells;
+      m_virtualizationMode = columnVirtualizationManager.VirtualizationMode;
+      parentRowCells.VirtualizationMode = m_virtualizationMode;
+
+      switch( m_virtualizationMode )
+      {
+        case ColumnVirtualizationMode.None:
+          {
+            //Not virtualizing
+            parentRowCells.BindRecycledCells( this.Columns );
+            parentRowCells.BindVirtualizedCells();
+            break;
+          }
+
+        case ColumnVirtualizationMode.Recycling:
+          {
+            //Virtualizing and recycling
+            parentRowCells.ClearOutOfViewBindedCells( this.GetCellsToCollapse( columnVirtualizationManager, parentRowCells ) );
+            parentRowCells.ClearVirtualizedCells();
+            break;
+          }
+
+        case ColumnVirtualizationMode.Virtualizing:
+          {
+            //Virtualizing with no recycling
+            this.ProcessCollapsedCells( columnVirtualizationManager );
+            parentRowCells.VirtualizeRecycledCells();
+            if( m_generateMissingCellsDispatcherOperation == null )
+            {
+              this.GenerateMissingCells( 0 );
+            }
+            break;
+          }
+      }
+    }
+
+    private void SynchronizeRecyclingBinsWithRecyclingGroups()
+    {
+      m_synchronizeRecyclingBinsDispatcherOperation = null;
+
+      if( m_dataGridContext == null )
+        return;
+
+      m_parentRowCells.SynchronizeRecyclingBinsWithRecyclingGroups( this.VisibleColumns );
+    }
+
+    private FrameworkElement GetPreparedContainer( Cell cell )
+    {
+      if( cell == null )
+        return null;
+
+      var parentRow = cell.ParentRow;
+      if( parentRow == null )
+        return null;
+
+      // Use the DataGridControl.Container attached property to assert a container is always returned even if the container is in FixedHeaders or FixedFooters.
+      var container = DataGridControl.GetContainer( parentRow );
+      if( container == null )
+        return null;
+
+      if( !DataGridControl.GetIsContainerPrepared( container ) )
+        return null;
+
+      return container;
+    }
+
+    private static object CoerceMinHeight( DependencyObject sender, object value )
+    {
+      var self = sender as FixedCellPanel;
+      if( self == null )
+        return value;
+
+      return self.CoerceMinHeight( new Thickness(), value );
+    }
+
+    private static void InvalidateMinHeight( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    {
+      var self = sender as FixedCellPanel;
+      if( self == null )
+        return;
+
+      self.CoerceValue( FixedCellPanel.MinHeightProperty );
     }
 
     #region ZOrder Management
@@ -1054,12 +1420,12 @@ namespace Xceed.Wpf.DataGrid.Views
     private void RecomputeZOrder()
     {
       ZOrderHelper.ComputeZOrder( m_visualChildren, ref m_zIndexMapping );
-      this.ZOrderDirty = false;
+      m_zOrderDirty = false;
     }
 
     private void InvalidateZOrder()
     {
-      this.ZOrderDirty = true;
+      m_zOrderDirty = true;
     }
 
     internal bool ChangeCellZOrder( Cell cell, int zIndex )
@@ -1068,8 +1434,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
       UIElement panelToChangeZOrder = null;
 
-      // Ensure the ZOrder is also considered
-      // by the panel containing the Cell
+      // Ensure the ZOrder is also considered by the panel containing the Cell
       if( m_fixedPanel.Children.Contains( cell ) )
       {
         panelToChangeZOrder = m_fixedPanel;
@@ -1100,7 +1465,6 @@ namespace Xceed.Wpf.DataGrid.Views
         }
       }
 
-
       Panel.SetZIndex( cell, zIndex );
 
       return zOrderChanged;
@@ -1114,36 +1478,6 @@ namespace Xceed.Wpf.DataGrid.Views
       this.InvalidateZOrder();
     }
 
-    #endregion ZOrder Management
-
-    #region IPrintInfo Members
-
-    double IPrintInfo.GetPageRightOffset( double horizontalOffset, double viewportWidth )
-    {
-      double nonScrollingWidth = ( ( FixedCellPanel )this ).GetFixedWidth();
-
-      IPrintInfo printInfo = m_scrollingPanel as IPrintInfo;
-
-      return printInfo.GetPageRightOffset( horizontalOffset, viewportWidth - nonScrollingWidth );
-    }
-
-    void IPrintInfo.UpdateElementVisibility( double horizontalOffset, double viewportWidth, object state )
-    {
-      double nonScrollingWidth = ( ( FixedCellPanel )this ).GetFixedWidth();
-
-      IPrintInfo printInfo = m_scrollingPanel as IPrintInfo;
-      double compensationOffset = TableView.GetCompensationOffset( this );
-
-      printInfo.UpdateElementVisibility( horizontalOffset - compensationOffset, viewportWidth - nonScrollingWidth, state );
-    }
-
-    object IPrintInfo.CreateElementVisibilityState()
-    {
-      IPrintInfo printInfo = m_scrollingPanel as IPrintInfo;
-
-      return printInfo.CreateElementVisibilityState();
-    }
-
     #endregion
 
     #region IVirtualizingCellsHost Members
@@ -1154,6 +1488,19 @@ namespace Xceed.Wpf.DataGrid.Views
       {
         return true;
       }
+    }
+
+    void IVirtualizingCellsHost.ClearLogicalParent( Cell cell )
+    {
+      Debug.Assert( cell != null );
+
+      VirtualizingUICellCollection cellCollection = this.Children as VirtualizingUICellCollection;
+
+      Debug.Assert( cellCollection != null );
+
+      cellCollection.ClearCellLogicalParent( cell );
+
+      this.RemoveCellFromFixedOrScrollingPanel( cell );
     }
 
     void IVirtualizingCellsHost.SetLogicalParent( Cell cell )
@@ -1171,78 +1518,100 @@ namespace Xceed.Wpf.DataGrid.Views
 
     void IVirtualizingCellsHost.PrepareCellsHost( DataGridContext dataGridContext )
     {
-      // This method is called in Row.PrepareContainer and Row.OnApplyTemplate, which is also 
-      // called in Row.PrepareContainer but only if the template was not previously applied, so 
-      // it is possible that this panel is already prepared. In that case, we only ignore this preparation.
-      if( this.CellsHostPrepared )
+      // This method is called in Row.PrepareContainer and Row.OnApplyTemplate, which is also called in Row.PrepareContainer but only if the template
+      // was not previously applied, so it is possible that this panel is already prepared. In that case, we only ignore this preparation.
+      if( m_cellsHostPrepared )
         return;
-
-      Debug.Assert( ( this.DataGridContext == null ) || ( dataGridContext == this.DataGridContext ),
-        "DataGridContext must be null otherwise this indicates that the FixedCellPanel was not cleaned properly before it is prepared again." );
-
-      m_dataGridContext = dataGridContext;
 
       if( dataGridContext != null )
       {
-        object dataItem = this.ParentRow.DataContext;
+        m_dataGridContext = dataGridContext;
 
-        // We will clear every created Cells when ClearContainer will be called
-        // since some Cells may have been virtualized or prepared, but still
-        // have some invalid states from previous data item when the data item 
-        // is the current item in edition when the container is prepared
-        this.NeedToClearAllCreatedCells = ( dataGridContext.DataGridControl.CurrentItemInEdition == dataItem );
+        object dataItem = this.ParentRow.DataContext;
 
         foreach( Cell cell in this.CellsInView )
         {
           cell.PrepareContainer( dataGridContext, dataItem );
         }
 
-        TableViewColumnVirtualizationManager columnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
+        var columnVirtualizationManager = this.ColumnVirtualizationManager;
 
-        if( columnVirtualizationManager != null )
+        //If the manager has changed, make sure to stop listening to it.
+        if( columnVirtualizationManager != m_previousColumnVirtualizationManager )
         {
-          UpdateMeasureRequiredEventManager.AddListener( columnVirtualizationManager, this );
+          VirtualizingCellCollectionUpdateRequiredEventManager.RemoveListener( m_previousColumnVirtualizationManager, this );
+          VirtualizingCellCollectionUpdateRequiredEventManager.AddListener( columnVirtualizationManager, this );
         }
 
-        VirtualizingCellCollection parentRowCells = this.ParentRowCells;
+        UpdateMeasureRequiredEventManager.AddListener( columnVirtualizationManager, this );
+        m_previousColumnVirtualizationManager = columnVirtualizationManager;
 
+        var parentRowCells = this.ParentRowCells;
         if( parentRowCells != null )
         {
           VirtualizingCellCollectionChangedEventManager.AddListener( parentRowCells, this );
         }
 
-        this.CellsHostPrepared = true;
+        //When pulling a row from the recycling pool, need to make sure it is in the correct virtualization mode and its VirtualzingCellCollection is update to date.
+        if( m_virtualizingCellCollectionUpdateRequired )
+        {
+          m_virtualizingCellCollectionUpdateRequired = false;
+
+          if( m_virtualizationModeChanged )
+          {
+            m_virtualizationModeChanged = false;
+            this.UpdateVirtualizationMode();
+          }
+
+          if( m_visibleColumnsChanged )
+          {
+            m_visibleColumnsChanged = false;
+            var columns = this.Columns;
+            foreach( WeakReference weakRef in m_changedVisibleColumns )
+            {
+              var column = weakRef.Target as ColumnBase;
+
+              if( ( column == null ) || !columns.Contains( column ) )
+                continue;
+
+              this.GenerateOrRemoveCell( column );
+            }
+            m_changedVisibleColumns.Clear();
+            m_changedVisibleColumns.TrimExcess();
+          }
+
+          if( m_visibleColumnsAdded )
+          {
+            m_visibleColumnsAdded = false;
+            this.GenerateMissingCells( 0 );
+          }
+        }
+
+        m_cellsHostPrepared = true;
       }
     }
 
     void IVirtualizingCellsHost.ClearCellsHost()
     {
-      if( m_dataGridContext != null )
+      if( !m_cellsHostPrepared )
+        return;
+
+      var parentRowCells = this.ParentRowCells;
+      if( parentRowCells != null )
       {
-        TableViewColumnVirtualizationManager columnVirtualizationManager = m_dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
-
-        if( columnVirtualizationManager != null )
-        {
-          UpdateMeasureRequiredEventManager.RemoveListener( columnVirtualizationManager, this );
-          this.CellsHostPrepared = false;
-        }
-
-        VirtualizingCellCollection parentRowCells = this.ParentRowCells;
-
-        if( parentRowCells != null )
-        {
-          VirtualizingCellCollectionChangedEventManager.RemoveListener( parentRowCells, this );
-        }
+        VirtualizingCellCollectionChangedEventManager.RemoveListener( parentRowCells, this );
       }
 
-      Debug.Assert( !this.CellsHostPrepared, "Should always be unregistered from DataGridContext.ColumnVirtualizationManager" );
+      //Make sure to stop listening from the same manager it started to listen from.
+      UpdateMeasureRequiredEventManager.RemoveListener( m_previousColumnVirtualizationManager, this );
 
       m_dataGridContext = null;
+      m_cellsHostPrepared = false;
     }
 
     void IVirtualizingCellsHost.InvalidateCellsHostMeasure()
     {
-      if( this.DataGridContext == null )
+      if( m_dataGridContext == null )
         return;
 
       this.InvalidateMeasure();
@@ -1251,124 +1620,129 @@ namespace Xceed.Wpf.DataGrid.Views
       m_scrollingPanel.InvalidateMeasure();
     }
 
-    bool IVirtualizingCellsHost.BringIntoView( Cell cell )
+    bool IVirtualizingCellsHost.BringIntoView( Cell cell, RequestBringIntoViewEventArgs e )
     {
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
+      // This cell doesn't seem to be in the grid.  We return true to handle the event that triggered the BringIntoView.
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
       if( dataGridContext == null )
+        return true;
+
+      // If the container is not in use, we return true to handle the event that triggered the BringIntoView.
+      var container = this.GetPreparedContainer( cell );
+      if( container == null )
+        return true;
+
+      // The ScrollViewer can handle the bring into view if the grid isn't virtualized.
+      var scrollViewer = this.ParentScrollViewer;
+      if( ( scrollViewer == null ) || !scrollViewer.CanContentScroll )
         return false;
 
-      TableViewColumnVirtualizationManager columnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
-      if( columnVirtualizationManager == null )
-        return false;
+      // This cell seems to be dead.  We return true to handle the event that triggered the BringIntoView.
+      var row = cell.ParentRow;
+      var column = cell.ParentColumn;
+      if( ( row == null ) || ( column == null ) )
+        return true;
 
-      Rect cellRect = new Rect();
-      cellRect.Width = cell.ParentColumn.Width;
-      cellRect.Height = cell.ActualHeight;
+      var columnVirtualizationManager = this.ColumnVirtualizationManager;
 
-      string targetFieldName = cell.FieldName;
-      DataGridItemsHost itemsHost = dataGridContext.DataGridControl.ItemsHost as DataGridItemsHost;
+      // Fixed cells are always visible.
+      if( columnVirtualizationManager.GetFixedFieldNames( row.LevelCache ).Contains( column ) )
+        return this.BringIntoViewFixedCell( container );
 
-      IScrollInfo scrollInfo = itemsHost as IScrollInfo;
-      Debug.Assert( scrollInfo != null );
+      return this.BringIntoViewScrollingCell( cell, container, e );
+    }
 
-      // Fixed Cells are always visible
-      if( !columnVirtualizationManager.FixedFieldNames.Contains( targetFieldName ) )
+    private bool BringIntoViewFixedCell( FrameworkElement container )
+    {
+      Debug.Assert( container != null );
+
+      // We always want the horizontal offset to change if Tab, Home, Left or Right is pressed.
+      if( Keyboard.IsKeyDown( Key.Tab ) || Keyboard.IsKeyDown( Key.Home ) || Keyboard.IsKeyDown( Key.Left ) || Keyboard.IsKeyDown( Key.Right ) )
       {
-        // The Cell must be measured/arranged for the BringIntoView to correctly reacts
-        bool isCellLayouted = !this.ForceScrollingCellToLayout( cell );
-
-        // Use the DataGridControl.Container attached property to assert a container is always returned even if the container is in FixedHeaders or FixedFooters
-        FrameworkElement container = DataGridControl.GetContainer( cell.ParentRow );
-
-        // Ensure to call UpdateLayout to be sure the offset returned are the correct ones.
-        if( ( !isCellLayouted ) && ( container != null ) )
-        {
-          container.UpdateLayout();
-        }
-
-        double containerToCellsHostWidth = this.TranslatePoint( FixedCellPanel.EmptyPoint, container ).X;
-        double viewportWidth = scrollInfo.ViewportWidth;
-        double fixedColumnWidth = columnVirtualizationManager.FixedColumnsWidth;
-
-        Point cellToScrollingCellsDecorator = cell.TranslatePoint( FixedCellPanel.EmptyPoint, this.ScrollingCellsDecorator );
-
-        // If the Cell's left edge is not fully visible, but displays its full content in the Viewport because its width is still
-        // greater than the Viewport, let the ScrollViewer process any events that would have requested a BringIntoView
-        if( ( cellRect.Width - Math.Abs( cellToScrollingCellsDecorator.X ) ) >= ( viewportWidth - fixedColumnWidth ) )
-        {
-          // The cell can't be more into view horizontally, but ensure to bring into view the container vertically.
-          if( container != null )
-          {
-            container.BringIntoView();
-          }
-          return true;
-        }
-
-        double scrollViewerDesiredOffset = 0;
-
-        if( cellToScrollingCellsDecorator.X < 0 )
-        {
-          scrollViewerDesiredOffset = cellToScrollingCellsDecorator.X;
-        }
-        else
-        {
-          // The Cell's left edge is visible in the Viewport
-          double cellRightEdgeOffset = ( cellToScrollingCellsDecorator.X + cellRect.Width );
-
-          // Verify if the Cell's right edge is visible in the ViewPort
-          Point cellToItemsHost = cell.TranslatePoint( new Point( cellRect.Width, 0 ), itemsHost );
-
-          double rightSideOutOfViewOffset = ( cellToItemsHost.X - viewportWidth );
-
-          // If the right edge is out of Viewport, ensure to bring into view the out of view part
-          if( rightSideOutOfViewOffset > 0 )
-          {
-            // Ensure to bring into view the right edge, but we don't want to scroll to far and hide the left edge. 
-            double avoidHiddingLeftEdgeCorrectedOffset = Math.Max( 0, ( rightSideOutOfViewOffset - cellToScrollingCellsDecorator.X ) );
-
-            // The desired offset of the rectangle is the left edge of the Cell and since we specified the width, IScrollInfo.MakeVisible
-            // will ensure to scroll horizontally so this rectangle is fully visible
-            scrollViewerDesiredOffset = cellToItemsHost.X - cellRect.Width - avoidHiddingLeftEdgeCorrectedOffset;
-          }
-          else
-          {
-            // No need to precise a Rect to bring into view since the Cell is already fully visible. Only call BringIntoView on the container
-            // to be sure it will be fully visible vertically.
-            if( container != null )
-            {
-              container.BringIntoView();
-            }
-            return true;
-          }
-        }
-
-        // We computed the desired offset according to the ScrollViewer.Content ( ItemsHost in the DataGridControl)
-        // translate it to a point accoring to the FixedCellPanel to ensure to bring this point into view
-        cellRect.X = itemsHost.TranslatePoint( new Point( scrollViewerDesiredOffset, 0 ), this ).X;
+        container.BringIntoView( new Rect( 0d, 0d, 0d, 0d ) );
       }
       else
       {
-        // We must consider the actual position of the Cell according to the FixedCellPanel in order to be sure we don't force
-        // an horizontal change. The fixed Cells are always visible so there is no need for horizontal change.
-        double desiredOffset = -1;
-
-        // We always want the horizontal offset to change if Tab, Home, Left or Right is pressed.
-        if( Keyboard.IsKeyDown( Key.Tab ) || Keyboard.IsKeyDown( Key.Home ) || Keyboard.IsKeyDown( Key.Left ) || Keyboard.IsKeyDown( Key.Right ) )
-        {
-          // Fixed Cells are not computed as part of the scrollable offset. Ensure to specify a rectangle that will force the horizontal offset to be 0.
-          desiredOffset = -scrollInfo.HorizontalOffset;
-        }
-        else
-        {
-          desiredOffset = columnVirtualizationManager.FieldNameToOffset[ targetFieldName ];
-        }
-
-        // The Point returned by TranslatePoint will be according to the current layout, meaning the HorizontalOffset
-        // will be included. So there won't be any horizontal scrolling when bringing a fixed Cell into view.
-        cellRect.X = itemsHost.TranslatePoint( new Point( desiredOffset, 0 ), this ).X;
+        // Ensure to bring the container into view vertically.
+        container.BringIntoView();
       }
 
-      this.BringIntoView( cellRect );
+      return true;
+    }
+
+    private bool BringIntoViewScrollingCell( Cell cell, FrameworkElement container, RequestBringIntoViewEventArgs e )
+    {
+      Debug.Assert( cell != null );
+      Debug.Assert( container != null );
+
+      // The cell must be measured/arranged for the BringIntoView to correctly reacts
+      if( this.ForceScrollingCellToLayout( cell ) )
+      {
+        container.UpdateLayout();
+      }
+
+      var fixedWidth = this.GetFixedWidth();
+      var viewportWidth = this.ParentScrollViewer.ViewportWidth;
+
+      //If fixed cells fill the entire viewport, then there is no scrolling cell that can be brought in to view, simply return.
+      if( fixedWidth >= viewportWidth )
+        return true;
+
+      var scrollingPanel = this.ScrollingCellsDecorator;
+      var scrollingArea = new Rect( scrollingPanel.TranslatePoint( new Point(), this ), new Size( viewportWidth - fixedWidth, scrollingPanel.ActualHeight ) );
+      var cellArea = new Rect( cell.TranslatePoint( new Point(), this ), new Size( cell.ParentColumn.ActualWidth, cell.ActualHeight ) );
+
+      // The cell is larger than the scrolling area.
+      if( cellArea.Width > scrollingArea.Width )
+      {
+        var targetObject = e.TargetObject as UIElement;
+        var targetRect = e.TargetRect;
+
+        // Try to narrow the area within the cell that we clearly want to bring into view.
+        if( ( targetObject != null ) && ( targetObject != cell || !targetRect.IsEmpty ) )
+        {
+          Debug.Assert( targetObject.IsDescendantOf( cell ) );
+
+          if( targetRect.IsEmpty )
+          {
+            targetRect = new Rect( new Point( 0d, 0d ), targetObject.RenderSize );
+          }
+
+          if( targetRect.Width <= scrollingArea.Width )
+          {
+            var offset = targetObject.TranslatePoint( new Point(), cell );
+            var location = cellArea.Location;
+            location.Offset( offset.X, offset.Y );
+
+            cellArea.Location = location;
+            cellArea.Size = targetRect.Size;
+          }
+        }
+      }
+
+      if( ( cellArea.Left <= scrollingArea.Left ) && ( cellArea.Right >= scrollingArea.Right ) )
+      {
+        // Ensure to bring the container into view vertically.
+        container.BringIntoView();
+      }
+      else if( cellArea.Left < scrollingArea.Left )
+      {
+        // The ScrollViewer's extent width includes the fixed section.  We must offset the target area or the cell
+        // will come into view under the fixed panel.
+        cellArea.X -= fixedWidth;
+
+        this.BringIntoView( cellArea );
+      }
+      else if( cellArea.Right > scrollingArea.Right )
+      {
+        this.BringIntoView( cellArea );
+      }
+      // The cell is fully visible.
+      else
+      {
+        // Ensure to bring the container into view vertically.
+        container.BringIntoView();
+      }
 
       return true;
     }
@@ -1384,12 +1758,10 @@ namespace Xceed.Wpf.DataGrid.Views
 
     protected virtual bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
-      bool handled = false;
-
       if( managerType == typeof( UpdateMeasureRequiredEventManager ) )
       {
-        UpdateMeasureTriggeredAction action = UpdateMeasureTriggeredAction.Unspecified;
-        UpdateMeasureRequiredEventArgs eventArgs = e as UpdateMeasureRequiredEventArgs;
+        var action = UpdateMeasureTriggeredAction.Unspecified;
+        var eventArgs = e as UpdateMeasureRequiredEventArgs;
 
         if( eventArgs != null )
         {
@@ -1397,15 +1769,77 @@ namespace Xceed.Wpf.DataGrid.Views
         }
 
         this.UpdateChildren( action );
+      }
+      else if( managerType == typeof( VirtualizingCellCollectionUpdateRequiredEventManager ) )
+      {
+        var eventArgs = e as VirtualizingCellCollectionUpdateRequiredEventArgs;
 
-        handled = true;
+        switch( eventArgs.TriggeredAction )
+        {
+          case VirtualizingCellCollectionUpdateTriggeredAction.VirtualizationModeChanged:
+            {
+              if( !m_cellsHostPrepared )
+              {
+                m_virtualizationModeChanged = true;
+                m_virtualizingCellCollectionUpdateRequired = true;
+                break;
+              }
+
+              this.UpdateVirtualizationMode();
+              break;
+            }
+
+          case VirtualizingCellCollectionUpdateTriggeredAction.VisibleColumnsChanged:
+            {
+              var columns = eventArgs.Columns;
+              if( ( columns == null ) || ( columns.Count <= 0 ) )
+                break;
+
+              if( !m_cellsHostPrepared )
+              {
+                foreach( var column in columns )
+                {
+                  m_changedVisibleColumns.Add( new WeakReference( column ) );
+                }
+
+                m_visibleColumnsChanged = true;
+                m_virtualizingCellCollectionUpdateRequired = true;
+                break;
+              }
+
+              //A column was added or removed from VisibleColumns.
+              foreach( var column in columns )
+              {
+                this.GenerateOrRemoveCell( column );
+              }
+              break;
+            }
+
+          //This action will be triggered only when in Virtualizing mode, so no need to check it.
+          //No need to handle Remove, Replace, Reset, since every row will be flushed and recreated, and rows present in recycle bins will simply be flushed.
+          case VirtualizingCellCollectionUpdateTriggeredAction.VisibleColumnsAdded:
+            {
+              if( !m_cellsHostPrepared )
+              {
+                m_visibleColumnsAdded = true;
+                m_virtualizingCellCollectionUpdateRequired = true;
+                break;
+              }
+
+              if( m_generateMissingCellsDispatcherOperation == null )
+              {
+                this.GenerateMissingCells( 0 );
+              }
+              break;
+            }
+        }
       }
       else if( managerType == typeof( VirtualizingCellCollectionChangedEventManager ) )
       {
         //Changes to the Cells collection (i.e. VirtualizingCellCollection) can come directly from the Row.Cells property, without the FixedCellPanel knowing about it.
         //So it needs to be informed if this is the case, since it is the FixedCellPanel responsablility to correctly manage and recycle cells.
         //However, if changes to Cells come from the FixedCellPanel itself, of course there is nothing to do.
-        if( !m_parentRowCells.AlreadyUpdating )
+        if( !m_parentRowCells.IsUpdating )
         {
           //Update cells as rarely as possible, so performance is not affected by this (for instance when Row.Cells is updated in a loop, do it once at the end).
           if( m_virtualizingCellCollectionChangedDispatcherOperation == null )
@@ -1413,46 +1847,161 @@ namespace Xceed.Wpf.DataGrid.Views
             m_virtualizingCellCollectionChangedDispatcherOperation = this.Dispatcher.BeginInvoke( DispatcherPriority.Render, new Action( this.UpdateChildren ) );
           }
         }
-        handled = true;
+      }
+      else
+      {
+        return false;
       }
 
-      return handled;
+      return true;
     }
 
     #endregion
 
     private int m_lastColumnVirtualizationManagerVersion = -1;
-    private BitVector32 m_flags = new BitVector32();
     private Row m_parentRow; // = null;
     private ScrollViewer m_parentScrollViewer; // = null;
+    private bool m_cellsHostPrepared; //false
+    private bool m_zOrderDirty; //false
 
     private Size m_desiredSize = new Size();
     private VirtualizingCellCollection m_parentRowCells; // = null;
 
+    private DragDropState m_dragDropState = null;
+
     // The immediate visual children of this panel.
     private FixedCellSubPanel m_fixedPanel;
-    private FixedColumnSplitter m_splitter;
     private ScrollingCellsDecorator m_scrollingCellsDecorator;
     private VirtualizingFixedCellSubPanel m_scrollingPanel;
 
     private int[] m_zIndexMapping; // = null;
 
-    private const int s_visualChildrenCount = 3;
+    private const int c_visualChildrenCount = 3;
     private readonly IList<UIElement> m_visualChildren = new List<UIElement>();
 
     private DataGridContext m_dataGridContext; // = null;
+    private TableViewColumnVirtualizationManagerBase m_previousColumnVirtualizationManager; // = null;
 
-    private DispatcherOperation m_clearUnusedCellsDispatcherOperation; // = null;
-    private object m_virtualizingCellCollectionChangedDispatcherOperation;
+    private DispatcherOperation m_processUnusedCellsDispatcherOperation; // = null;
+    private DispatcherOperation m_virtualizingCellCollectionChangedDispatcherOperation;
+    private DispatcherOperation m_generateMissingCellsDispatcherOperation;
+    private DispatcherOperation m_synchronizeRecyclingBinsDispatcherOperation;
+    private ColumnVirtualizationMode m_virtualizationMode;
+    private List<WeakReference> m_changedVisibleColumns = new List<WeakReference>();
+    private bool m_virtualizingCellCollectionUpdateRequired;
+    private bool m_virtualizationModeChanged;
+    private bool m_visibleColumnsChanged;
+    private bool m_visibleColumnsAdded;
 
-    private enum FixedCellPanelFlags
+    #region DragDropState Private Class
+
+    private sealed class DragDropState
     {
-      CellsHostPrepared = 1,
-      HasDataItem = 2,
-      NeedToClearAllCreatedCells = 4,
-      ZOrderDirty = 8,
-      SplitterDragCanceled = 16,
-      SplitterDragCompleted = 32,
+      internal DragDropState( double splitterOffset )
+      {
+        m_initialSplitterOffset = splitterOffset;
+      }
+
+      internal double InitialSplitterOffset
+      {
+        get
+        {
+          return m_initialSplitterOffset;
+        }
+      }
+
+      internal DropMarkAdorner DropMarkAdorner
+      {
+        get;
+        set;
+      }
+
+      internal DropTarget DropTarget
+      {
+        get;
+        set;
+      }
+
+      private readonly double m_initialSplitterOffset;
     }
+
+    #endregion
+
+    #region DropTarget Private Class
+
+    private sealed class DropTarget
+    {
+      internal DropTarget( DropTargetType type, ColumnCollection columns )
+      {
+        if( ( type != DropTargetType.Start ) && ( type != DropTargetType.Orphan ) )
+          throw new ArgumentException( "The drop target must be a Start or Orphan target type.", "type" );
+
+        m_type = type;
+        m_column = default( ColumnBase );
+        m_before = ( type == DropTargetType.Orphan );
+        m_columns = columns;
+      }
+
+      internal DropTarget( ColumnBase column, bool before, ColumnCollection columns )
+      {
+        if( column == null )
+          throw new ArgumentNullException( "column" );
+
+        m_type = DropTargetType.Column;
+        m_column = column;
+        m_before = before;
+        m_columns = columns;
+      }
+
+      internal DropTargetType Type
+      {
+        get
+        {
+          return m_type;
+        }
+      }
+
+      internal ColumnBase Column
+      {
+        get
+        {
+          return m_column;
+        }
+      }
+
+      internal bool Before
+      {
+        get
+        {
+          return m_before;
+        }
+      }
+
+      internal ColumnCollection Columns
+      {
+        get
+        {
+          return m_columns;
+        }
+      }
+
+      private readonly DropTargetType m_type;
+      private readonly ColumnBase m_column;
+      private readonly ColumnCollection m_columns;
+      private readonly bool m_before;
+    }
+
+    #endregion
+
+    #region DropTargetType Private Enum
+
+    private enum DropTargetType
+    {
+      Column = 0,
+      Start,
+      Orphan
+    }
+
+    #endregion
   }
 }

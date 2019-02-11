@@ -1,14 +1,14 @@
 ﻿<!--*************************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -20,8 +20,28 @@
    <Style x:Key="Header" TargetType="TextBlock">
       <Setter Property="FontSize" Value="18" />
         <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="Foreground" Value="#FFEFAC27" />
+      <Setter Property="Foreground"
+              Value="#FFC72035" />
       <Setter Property="Margin" Value="0,5" />
+   </Style>
+
+    <Style x:Key="DisableGrayText" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+               <Setter Property="Foreground" Value="Gray" />
+            </Trigger>
+      </Style.Triggers>
+    </Style>
+
+   <Style x:Key="DisableGrayComboBox"
+          TargetType="ComboBox">
+      <Style.Triggers>
+         <Trigger Property="IsEnabled"
+                  Value="False">
+            <Setter Property="Foreground"
+                    Value="Gray" />
+         </Trigger>
+      </Style.Triggers>
    </Style>
 
 </ResourceDictionary>

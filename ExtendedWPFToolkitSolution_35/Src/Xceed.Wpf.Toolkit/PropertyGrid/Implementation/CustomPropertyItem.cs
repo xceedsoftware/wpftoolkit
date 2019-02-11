@@ -32,8 +32,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
   /// </summary>
   public class CustomPropertyItem : PropertyItemBase
   {
+    #region Constructors
 
     internal CustomPropertyItem() { }
+
+    internal CustomPropertyItem( bool isPropertyGridCategorized, bool isSortedAlphabetically )
+    {
+      _isPropertyGridCategorized = isPropertyGridCategorized;
+      _isSortedAlphabetically = isSortedAlphabetically;
+    }
+
+
+    #endregion
+
+    #region Properties
 
     #region Category
 
@@ -47,6 +59,52 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
     #endregion //Category
+
+    #region CategoryOrder
+
+    public int CategoryOrder
+    {
+      get
+      {
+        return _categoryOrder;
+      }
+      set
+      {
+        if( _categoryOrder != value )
+        {
+          _categoryOrder = value;
+          // Notify the parent helper since this property may affect ordering.
+          this.RaisePropertyChanged( () => this.CategoryOrder );
+        }
+      }
+    }
+
+    private int _categoryOrder;
+
+    #endregion //CategoryOrder
+
+
+
+
+
+    #region PropertyOrder
+
+    public static readonly DependencyProperty PropertyOrderProperty =
+        DependencyProperty.Register( "PropertyOrder", typeof( int ), typeof( CustomPropertyItem ), new UIPropertyMetadata( 0 ) );
+
+    public int PropertyOrder
+    {
+      get
+      {
+        return ( int )GetValue( PropertyOrderProperty );
+      }
+      set
+      {
+        SetValue( PropertyOrderProperty, value );
+      }
+    }
+
+    #endregion //PropertyOrder
 
     #region Value
 
@@ -95,5 +153,30 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
     #endregion //Value
+
+    #endregion
+
+    #region Overrides
+
+    protected override Type GetPropertyItemType()
+    {
+      return this.Value.GetType();
+    }
+
+    protected override void OnEditorChanged( FrameworkElement oldValue, FrameworkElement newValue )
+    {
+      if( oldValue != null )
+      {
+        oldValue.DataContext = null;
+      }
+
+      //case 166547 : Do not overwrite a custom Editor's DataContext set by the user.
+      if( ( newValue != null ) && ( newValue.DataContext == null ) )
+      {
+        newValue.DataContext = this;
+      }
+    }
+
+    #endregion
   }
 }

@@ -15,25 +15,19 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Collections;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Data;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Diagnostics;
-using System.ComponentModel;
-using System.Collections;
-using System.Globalization;
-using System.Collections.Specialized;
-using System.Data;
 
 namespace Xceed.Wpf.DataGrid
 {
-  public class ForeignKeyConfiguration : DependencyObject
+  public class ForeignKeyConfiguration : DependencyObject, IWeakEventListener
   {
-    #region Constructors
-
     static ForeignKeyConfiguration()
     {
       ForeignKeyConfiguration.DefaultDistinctValueItemContentTemplateProperty = ForeignKeyConfiguration.DefaultDistinctValueItemContentTemplatePropertyKey.DependencyProperty;
@@ -45,14 +39,11 @@ namespace Xceed.Wpf.DataGrid
 
     public ForeignKeyConfiguration()
     {
-      this.SetDefaultDistinctValueItemContentTemplate( Column.GenericContentTemplateSelector.ForeignKeyDistinctValueItemContentTemplate );
-      this.SetDefaultCellContentTemplate( Column.GenericContentTemplateSelector.ForeignKeyCellContentTemplate );
-      this.SetDefaultGroupValueTemplate( Column.GenericContentTemplateSelector.ForeignKeyGroupValueTemplate );
-      this.SetDefaultScrollTipContentTemplate( Column.GenericContentTemplateSelector.ForeignKeyScrollTipContentTemplate );
+      this.SetDefaultCellContentTemplate( GenericContentTemplateSelector.ForeignKeyCellContentTemplate );
+      this.SetDefaultGroupValueTemplate( GenericContentTemplateSelector.ForeignKeyGroupValueTemplate );
+      this.SetDefaultScrollTipContentTemplate( GenericContentTemplateSelector.ForeignKeyScrollTipContentTemplate );
       this.SetDefaultCellEditor( DefaultCellEditorSelector.ForeignKeyCellEditor );
     }
-
-    #endregion
 
     #region ValuePath Property
 
@@ -60,31 +51,17 @@ namespace Xceed.Wpf.DataGrid
       "ValuePath",
       typeof( string ),
       typeof( ForeignKeyConfiguration ),
-      new FrameworkPropertyMetadata(
-        null,
-        new PropertyChangedCallback( ForeignKeyConfiguration.OnSelectedValuePathChanged ) ) );
+      new FrameworkPropertyMetadata( null ) );
 
     public string ValuePath
     {
       get
       {
-        return m_ValuePath;
+        return ( string )this.GetValue( ForeignKeyConfiguration.ValuePathProperty );
       }
       set
       {
         this.SetValue( ForeignKeyConfiguration.ValuePathProperty, value );
-      }
-    }
-
-    private string m_ValuePath; // = null;
-
-    private static void OnSelectedValuePathChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
-    {
-      ForeignKeyConfiguration foreignKeyConfiguration = sender as ForeignKeyConfiguration;
-
-      if( foreignKeyConfiguration != null )
-      {
-        foreignKeyConfiguration.m_ValuePath = e.NewValue as string;
       }
     }
 
@@ -96,31 +73,17 @@ namespace Xceed.Wpf.DataGrid
       "DisplayMemberPath",
       typeof( string ),
       typeof( ForeignKeyConfiguration ),
-      new FrameworkPropertyMetadata(
-        null,
-        new PropertyChangedCallback( ForeignKeyConfiguration.OnDisplayMemberPathChanged ) ) );
+      new FrameworkPropertyMetadata( null ) );
 
     public string DisplayMemberPath
     {
       get
       {
-        return m_displayMemberPath;
+        return ( string )this.GetValue( ForeignKeyConfiguration.DisplayMemberPathProperty );
       }
       set
       {
         this.SetValue( ForeignKeyConfiguration.DisplayMemberPathProperty, value );
-      }
-    }
-
-    private string m_displayMemberPath; // = null;
-
-    private static void OnDisplayMemberPathChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
-    {
-      ForeignKeyConfiguration foreignKeyConfiguration = sender as ForeignKeyConfiguration;
-
-      if( foreignKeyConfiguration != null )
-      {
-        foreignKeyConfiguration.m_displayMemberPath = e.NewValue as string;
       }
     }
 
@@ -132,30 +95,18 @@ namespace Xceed.Wpf.DataGrid
       "ItemContainerStyle",
       typeof( Style ),
       typeof( ForeignKeyConfiguration ),
-      new FrameworkPropertyMetadata(
-        null,
-        new PropertyChangedCallback( ForeignKeyConfiguration.OnItemContainerStyleChanged ) ) );
+      new FrameworkPropertyMetadata( null ) );
 
     public Style ItemContainerStyle
     {
       get
       {
-        return m_itemContainerStyle;
+        return ( Style )this.GetValue( ForeignKeyConfiguration.ItemContainerStyleProperty );
       }
       set
       {
         this.SetValue( ForeignKeyConfiguration.ItemContainerStyleProperty, value );
       }
-    }
-
-    private Style m_itemContainerStyle; // = null;
-
-    private static void OnItemContainerStyleChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
-    {
-      ForeignKeyConfiguration foreignKeyConfiguration = sender as ForeignKeyConfiguration;
-
-      if( foreignKeyConfiguration != null )
-        foreignKeyConfiguration.m_itemContainerStyle = e.NewValue as Style;
     }
 
     #endregion
@@ -166,31 +117,17 @@ namespace Xceed.Wpf.DataGrid
       "ItemContainerStyleSelector",
       typeof( StyleSelector ),
       typeof( ForeignKeyConfiguration ),
-      new FrameworkPropertyMetadata(
-        null,
-        new PropertyChangedCallback( ForeignKeyConfiguration.OnItemContainerStyleSelectorChanged ) ) );
+      new FrameworkPropertyMetadata( null ) );
 
     public StyleSelector ItemContainerStyleSelector
     {
       get
       {
-        return m_itemContainerStyleSelector;
+        return ( StyleSelector )this.GetValue( ForeignKeyConfiguration.ItemContainerStyleSelectorProperty );
       }
       set
       {
         this.SetValue( ForeignKeyConfiguration.ItemContainerStyleSelectorProperty, value );
-      }
-    }
-
-    private StyleSelector m_itemContainerStyleSelector; // = null;
-
-    private static void OnItemContainerStyleSelectorChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
-    {
-      ForeignKeyConfiguration foreignKeyConfiguration = sender as ForeignKeyConfiguration;
-
-      if( foreignKeyConfiguration != null )
-      {
-        foreignKeyConfiguration.m_itemContainerStyleSelector = e.NewValue as StyleSelector;
       }
     }
 
@@ -220,8 +157,7 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return m_itemsSource;
-
+        return ( IEnumerable )this.GetValue( ForeignKeyConfiguration.ItemsSourceProperty );
       }
       set
       {
@@ -229,17 +165,64 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private IEnumerable m_itemsSource;
-
     private static void OnItemsSourceChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      ForeignKeyConfiguration foreignConfiguration = sender as ForeignKeyConfiguration;
-
+      var foreignConfiguration = sender as ForeignKeyConfiguration;
       if( foreignConfiguration != null )
       {
-        foreignConfiguration.m_itemsSource = e.NewValue as IEnumerable;
+        foreignConfiguration.OnItemsSourceChanged( ( IEnumerable )e.OldValue, ( IEnumerable )e.NewValue );
       }
     }
+
+    private void OnItemsSourceChanged( IEnumerable oldItemsSource, IEnumerable newItemsSource )
+    {
+      //Unsubscribe from the old list changed event, if any.
+      if( oldItemsSource != null )
+      {
+        var oldNotifyCollectionChanged = oldItemsSource as INotifyCollectionChanged;
+        if( oldNotifyCollectionChanged != null )
+        {
+          CollectionChangedEventManager.RemoveListener( oldNotifyCollectionChanged, this );
+        }
+        else
+        {
+          var oldBindingList = oldItemsSource as IBindingList;
+          if( oldBindingList != null && oldBindingList.SupportsChangeNotification )
+          {
+            ListChangedEventManager.RemoveListener( oldBindingList, this );
+          }
+        }
+      }
+
+      //Subscribe from to the new list changed event, if any.
+      if( newItemsSource != null )
+      {
+        var newNotifyCollectionChanged = newItemsSource as INotifyCollectionChanged;
+        if( newNotifyCollectionChanged != null )
+        {
+          CollectionChangedEventManager.AddListener( newNotifyCollectionChanged, this );
+        }
+        else
+        {
+          var newBindingList = newItemsSource as IBindingList;
+          if( newBindingList != null && newBindingList.SupportsChangeNotification )
+          {
+            ListChangedEventManager.AddListener( newBindingList, this );
+          }
+        }
+      }
+    }
+
+    private void OnNotifiyCollectionChanged()
+    {
+      var handler = this.NotifiyCollectionChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, EventArgs.Empty );
+    }
+
+    internal event EventHandler NotifiyCollectionChanged;
 
     #endregion
 
@@ -261,6 +244,126 @@ namespace Xceed.Wpf.DataGrid
       {
         this.SetValue( ForeignKeyConfiguration.ForeignKeyConverterProperty, value );
       }
+    }
+
+    #endregion
+
+    #region ForeignKeyValueConverter Property
+
+    public static readonly DependencyProperty ForeignKeyValueConverterProperty = DependencyProperty.Register(
+      "ForeignKeyValueConverter",
+      typeof( IValueConverter ),
+      typeof( ForeignKeyConfiguration ),
+      new FrameworkPropertyMetadata( null ) );
+
+    public IValueConverter ForeignKeyValueConverter
+    {
+      get
+      {
+        return ( IValueConverter )this.GetValue( ForeignKeyConfiguration.ForeignKeyValueConverterProperty );
+      }
+      set
+      {
+        this.SetValue( ForeignKeyConfiguration.ForeignKeyValueConverterProperty, value );
+      }
+    }
+
+    #endregion
+
+    #region ForeignKeyValueConverterParameter Property
+
+    public static readonly DependencyProperty ForeignKeyValueConverterParameterProperty = DependencyProperty.Register(
+      "ForeignKeyValueConverterParameter",
+      typeof( object ),
+      typeof( ForeignKeyConfiguration ),
+      new FrameworkPropertyMetadata( null ) );
+
+    public object ForeignKeyValueConverterParameter
+    {
+      get
+      {
+        return ( object )this.GetValue( ForeignKeyConfiguration.ForeignKeyValueConverterParameterProperty );
+      }
+      set
+      {
+        this.SetValue( ForeignKeyConfiguration.ForeignKeyValueConverterParameterProperty, value );
+      }
+    }
+
+    #endregion
+
+    #region ForeignKeyValueConverterCulture Property
+
+    public static readonly DependencyProperty ForeignKeyValueConverterCultureProperty = DependencyProperty.Register(
+      "ForeignKeyValueConverterCulture",
+      typeof( CultureInfo ),
+      typeof( ForeignKeyConfiguration ),
+      new FrameworkPropertyMetadata( null ) );
+
+    public CultureInfo ForeignKeyValueConverterCulture
+    {
+      get
+      {
+        return ( CultureInfo )this.GetValue( ForeignKeyConfiguration.ForeignKeyValueConverterCultureProperty );
+      }
+      set
+      {
+        this.SetValue( ForeignKeyConfiguration.ForeignKeyValueConverterCultureProperty, value );
+      }
+    }
+
+    #endregion
+
+    #region UseDefaultFilterCriterion Property
+
+    public static readonly DependencyProperty UseDefaultFilterCriterionProperty = DependencyProperty.Register(
+      "UseDefaultFilterCriterion",
+      typeof( bool ),
+      typeof( ForeignKeyConfiguration ),
+      new FrameworkPropertyMetadata( true ) );
+
+    public bool UseDefaultFilterCriterion
+    {
+      get
+      {
+        return ( bool )this.GetValue( ForeignKeyConfiguration.UseDefaultFilterCriterionProperty );
+      }
+      set
+      {
+        this.SetValue( ForeignKeyConfiguration.UseDefaultFilterCriterionProperty, value );
+      }
+    }
+
+    #endregion
+
+    #region UseDisplayedValueWhenExporting Property
+
+    public static readonly DependencyProperty UseDisplayedValueWhenExportingProperty = DependencyProperty.Register(
+      "UseDisplayedValueWhenExporting",
+      typeof( bool ),
+      typeof( ForeignKeyConfiguration ),
+      new FrameworkPropertyMetadata( true ) );
+
+    public bool UseDisplayedValueWhenExporting
+    {
+      get
+      {
+        return ( bool )this.GetValue( ForeignKeyConfiguration.UseDisplayedValueWhenExportingProperty );
+      }
+      set
+      {
+        this.SetValue( ForeignKeyConfiguration.UseDisplayedValueWhenExportingProperty, value );
+      }
+    }
+
+    #endregion
+
+    #region ValuePathDataType Property
+
+    internal Type ValuePathDataType
+    {
+      get;
+      set;
     }
 
     #endregion
@@ -396,7 +499,6 @@ namespace Xceed.Wpf.DataGrid
 
     internal static readonly DependencyProperty DefaultCellEditorProperty;
 
-
     internal CellEditor DefaultCellEditor
     {
       get
@@ -417,88 +519,131 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region Static Methods
+    internal object GetDisplayMemberValue( object fieldValue )
+    {
+      try
+      {
+        var valuePath = this.ValuePath;
+        var displayMemberPath = this.DisplayMemberPath;
+
+        if( ( valuePath == null ) || ( displayMemberPath == null ) )
+          return fieldValue;
+
+        var itemsSource = this.ItemsSource;
+
+        //Convert the value from the ValuePath value to the DisplayMemberPath value, using a DataRowView or reflection.
+        if( ( itemsSource is DataView ) || ( itemsSource is DataTable ) )
+        {
+          foreach( object item in itemsSource )
+          {
+            var dataRowView = item as DataRowView;
+            if( dataRowView != null )
+            {
+              var value = dataRowView[ valuePath ];
+
+              if( fieldValue.Equals( value ) )
+                return dataRowView[ displayMemberPath ];
+            }
+          }
+        }
+        else
+        {
+          foreach( object item in itemsSource )
+          {
+            var value = item.GetType().GetProperty( valuePath ).GetValue( item, null );
+
+            if( fieldValue.Equals( value ) )
+              return item.GetType().GetProperty( displayMemberPath ).GetValue( item, null );
+          }
+        }
+      }
+      catch
+      {
+        //Swallow the exception, no need to terminate the application, since the original value will be exported.
+      }
+
+      return fieldValue;
+    }
 
     internal static void UpdateColumnsForeignKeyConfigurations(
-      Dictionary<string,ColumnBase> columns,
+      ObservableColumnCollection columns,
       IEnumerable itemsSourceCollection,
-      Dictionary<string, ItemsSourceHelper.FieldDescriptor> fieldDescriptors,
+      PropertyDescriptionRouteDictionary propertyDescriptions,
       bool autoCreateForeignKeyConfigurations )
     {
-      DataGridCollectionViewBase collectionViewBase =
-        itemsSourceCollection as DataGridCollectionViewBase;
-
+      var collectionViewBase = itemsSourceCollection as DataGridCollectionViewBase;
       if( collectionViewBase != null )
       {
-        ForeignKeyConfiguration.UpdateColumnsForeignKeyConfigurationsFromDataGridCollectionView(
-          columns,
-          collectionViewBase.ItemProperties,
-          autoCreateForeignKeyConfigurations );
+        ForeignKeyConfiguration.UpdateColumnsForeignKeyConfigurationsFromDataGridCollectionView( columns, collectionViewBase.ItemProperties, autoCreateForeignKeyConfigurations );
       }
       else
       {
-        ForeignKeyConfiguration.UpdateColumnsForeignKeyConfigurationsFromFieldDescriptors(
-          columns,
-          fieldDescriptors,
-          autoCreateForeignKeyConfigurations );
+        ForeignKeyConfiguration.UpdateColumnsForeignKeyConfigurationsFromPropertyDescriptions( columns, propertyDescriptions, autoCreateForeignKeyConfigurations );
       }
     }
 
-    // If a DataGridCollectionViewBase is used, get the ItemProperties it defines
-    // to be able to retreive DataGridForeignKeyDescription for each of them
+    // If a DataGridCollectionViewBase is used, get the ItemProperties it defines to be able to retreive DataGridForeignKeyDescription for each of them
     // to get the auto-detected ForeignKey ItemsSource (if any).
-    // If a DataGridCollectionViewBase is not used, the ItemsSource must be 
-    // manually specified on each Column in order to correctly display/edit the Data
+    // If a DataGridCollectionViewBase is not used, the ItemsSource must be manually specified on each Column in order to correctly display/edit the Data
     internal static void UpdateColumnsForeignKeyConfigurationsFromDataGridCollectionView(
-      Dictionary<string,ColumnBase> columns,
+      ObservableColumnCollection columns,
       DataGridItemPropertyCollection itemProperties,
       bool autoCreateForeignKeyConfigurations )
     {
       if( itemProperties == null )
         return;
 
-      foreach( DataGridItemPropertyBase itemProperty in itemProperties )
+      foreach( var itemProperty in itemProperties )
       {
-        DataGridForeignKeyDescription description = itemProperty.ForeignKeyDescription;
+        var description = itemProperty.ForeignKeyDescription;
+        if( description != null )
+        {
+          var columnName = PropertyRouteParser.Parse( itemProperty );
+          var column = ( columnName != null ) ? columns[ columnName ] as Column : null;
 
-        if( description == null )
-          continue;
+          if( column != null )
+          {
+            ForeignKeyConfiguration.SynchronizeForeignKeyConfigurationFromForeignKeyDescription( column, description, autoCreateForeignKeyConfigurations );
+          }
+        }
 
-        ColumnBase column;
-        columns.TryGetValue( itemProperty.Name, out column );
-
-        ForeignKeyConfiguration.SynchronizeForeignKeyConfigurationFromForeignKeyDescription(
-          column as Column,
-          description,
-          autoCreateForeignKeyConfigurations );
+        if( itemProperty.ItemPropertiesInternal != null )
+        {
+          ForeignKeyConfiguration.UpdateColumnsForeignKeyConfigurationsFromDataGridCollectionView(
+            columns,
+            itemProperty.ItemPropertiesInternal,
+            autoCreateForeignKeyConfigurations );
+        }
       }
     }
 
-    private static void UpdateColumnsForeignKeyConfigurationsFromFieldDescriptors(
-      Dictionary<string, ColumnBase> columns,
-      Dictionary<string, ItemsSourceHelper.FieldDescriptor> fieldDescriptors,
+    private static void UpdateColumnsForeignKeyConfigurationsFromPropertyDescriptions(
+      ObservableColumnCollection columns,
+      PropertyDescriptionRouteDictionary propertyDescriptions,
       bool autoCreateForeignKeyConfigurations )
     {
-      if( columns == null )
+      if( ( columns == null ) || ( propertyDescriptions == null ) )
         return;
 
-      if( fieldDescriptors == null )
-        return;
-
-      foreach( ItemsSourceHelper.FieldDescriptor fieldDescriptor in fieldDescriptors.Values )
+      foreach( var column in columns )
       {
-        DataGridForeignKeyDescription description = fieldDescriptor.ForeignKeyDescription;
-
-        if( description == null )
+        var targetColumn = column as Column;
+        if( targetColumn == null )
           continue;
 
-        ColumnBase column;
-        columns.TryGetValue( fieldDescriptor.Name, out column );
+        var key = PropertyRouteParser.Parse( targetColumn.FieldName );
+        if( key == null )
+          continue;
 
-        ForeignKeyConfiguration.SynchronizeForeignKeyConfigurationFromForeignKeyDescription(
-          column as Column,
-          description,
-          autoCreateForeignKeyConfigurations );
+        var propertyDescription = propertyDescriptions[ key ];
+        if( propertyDescription == null )
+          continue;
+
+        var foreignKeyDescription = propertyDescription.Current.ForeignKeyDescription;
+        if( foreignKeyDescription == null )
+          continue;
+
+        ForeignKeyConfiguration.SynchronizeForeignKeyConfigurationFromForeignKeyDescription( targetColumn, foreignKeyDescription, autoCreateForeignKeyConfigurations );
       }
     }
 
@@ -510,8 +655,7 @@ namespace Xceed.Wpf.DataGrid
       if( ( description == null ) || ( column == null ) )
         return;
 
-      ForeignKeyConfiguration configuration = column.ForeignKeyConfiguration;
-
+      var configuration = column.ForeignKeyConfiguration;
       if( configuration == null )
       {
         if( !autoCreateForeignKeyConfigurations )
@@ -522,21 +666,22 @@ namespace Xceed.Wpf.DataGrid
         column.ForeignKeyConfiguration = configuration;
       }
 
-      // ValuePath will be affected to the FieldName when the 
-      // configuration is auto-created to be able to modify 
-      // local source using foreign key value
+      // ValuePath will be affected to the FieldName when the configuration is auto-created to be able to modify local source using foreign key value
       if( configuration.IsAutoCreated )
       {
         if( string.IsNullOrEmpty( configuration.ValuePath ) )
         {
           configuration.ValuePath = description.ValuePath;
         }
+
+        if( string.IsNullOrEmpty( configuration.DisplayMemberPath ) )
+        {
+          configuration.DisplayMemberPath = description.DisplayMemberPath;
+        }
       }
 
-      // Affect the ItemsSource on the configuration if it is not
-      // already set
-      if( ( configuration.ItemsSource == null )
-        && ( description.ItemsSource != null ) )
+      // Affect the ItemsSource on the configuration if it is not already set
+      if( ( configuration.ItemsSource == null ) && ( description.ItemsSource != null ) )
       {
         configuration.ItemsSource = description.ItemsSource;
       }
@@ -546,6 +691,27 @@ namespace Xceed.Wpf.DataGrid
       {
         configuration.ForeignKeyConverter = description.ForeignKeyConverter;
       }
+    }
+
+    #region IWeakEventListener Members
+
+    bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      return this.OnReceiveWeakEvent( managerType, sender, e );
+    }
+
+    protected virtual bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      if( ( managerType == typeof( CollectionChangedEventManager ) ) || ( managerType == typeof( ListChangedEventManager ) ) )
+      {
+        this.OnNotifiyCollectionChanged();
+      }
+      else
+      {
+        return false;
+      }
+
+      return true;
     }
 
     #endregion

@@ -62,7 +62,7 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       m_columnStretchingDisabled = true;
 
-      foreach( Column column in m_dataGridContext.Columns )
+      foreach( ColumnBase column in m_dataGridContext.Columns )
       {
         if( column.ReadLocalValue( ColumnBase.DesiredWidthProperty ) != DependencyProperty.UnsetValue )
         {
@@ -73,7 +73,7 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    public void CalculateColumnStretchWidths( double widthToDistribute, ColumnStretchMode columnStretchMode, double columnStretchMinWidth )
+    public void CalculateColumnStretchWidths( double widthToDistribute, ColumnStretchMode columnStretchMode, double columnStretchMinWidth, bool canIncreaseColumnWidth )
     {
       if( m_columnStretchingDisabled )
         return;
@@ -175,11 +175,11 @@ namespace Xceed.Wpf.DataGrid.Views
           }
         }
 
-        this.CalculateColumnDesiredWidth( widthToDistribute, excludedColumns );
+        this.CalculateColumnDesiredWidth( widthToDistribute, excludedColumns, canIncreaseColumnWidth );
       }
     }
 
-    private void CalculateColumnDesiredWidth( double widthToDistribute, List<WorkingColumnWidth> excludedColumns )
+    private void CalculateColumnDesiredWidth( double widthToDistribute, List<WorkingColumnWidth> excludedColumns, bool canIncreaseColumnWidth )
     {
       double starToDistribute = 0d;
 
@@ -238,6 +238,9 @@ namespace Xceed.Wpf.DataGrid.Views
       {
         if( columnWidth.OverriddenWidth >= 0d )
         {
+          if( !canIncreaseColumnWidth && ( columnWidth.Column.DesiredWidth < columnWidth.DesiredWidth ) )
+            continue;
+
           // Assign the desired calculated Width. Column.ActualWidth will be in charge of
           // applying the MinWidth and MaxWidth. This ultimate responsability has to be 
           // kept in Column to make MinWidth and MaxWidth modifications having an impact.
@@ -248,7 +251,12 @@ namespace Xceed.Wpf.DataGrid.Views
         }
         else
         {
-          columnWidth.Column.DesiredWidth = ( unitWidth * columnWidth.StarValue );
+          var desiredWidth = unitWidth * columnWidth.StarValue;
+
+          if( !canIncreaseColumnWidth && ( columnWidth.Column.DesiredWidth < desiredWidth ) )
+            continue;
+
+          columnWidth.Column.DesiredWidth = desiredWidth;
         }
       }
     }

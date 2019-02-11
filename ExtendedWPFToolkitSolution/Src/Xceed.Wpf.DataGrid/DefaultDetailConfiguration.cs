@@ -26,8 +26,6 @@ namespace Xceed.Wpf.DataGrid
 {
   public class DefaultDetailConfiguration : DependencyObject
   {
-    #region Constructors
-
     static DefaultDetailConfiguration()
     {
       HeadersProperty = HeadersPropertyKey.DependencyProperty;
@@ -38,9 +36,7 @@ namespace Xceed.Wpf.DataGrid
     {
       this.SetHeaders( new ObservableCollection<DataTemplate>() );
       this.SetFooters( new ObservableCollection<DataTemplate>() );
-    } 
-
-    #endregion
+    }
 
     #region AllowDetailToggle Property
 
@@ -50,11 +46,11 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return (bool)this.GetValue(DefaultDetailConfiguration.AllowDetailToggleProperty);
+        return ( bool )this.GetValue( DefaultDetailConfiguration.AllowDetailToggleProperty );
       }
       set
       {
-        this.SetValue(DefaultDetailConfiguration.AllowDetailToggleProperty, value);
+        this.SetValue( DefaultDetailConfiguration.AllowDetailToggleProperty, value );
       }
     }
 
@@ -68,11 +64,11 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return (GroupConfiguration)this.GetValue(DefaultDetailConfiguration.DefaultGroupConfigurationProperty);
+        return ( GroupConfiguration )this.GetValue( DefaultDetailConfiguration.DefaultGroupConfigurationProperty );
       }
       set
       {
-        this.SetValue(DefaultDetailConfiguration.DefaultGroupConfigurationProperty, value);
+        this.SetValue( DefaultDetailConfiguration.DefaultGroupConfigurationProperty, value );
       }
     }
 
@@ -86,11 +82,11 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return (GroupConfigurationSelector)this.GetValue(DefaultDetailConfiguration.GroupConfigurationSelectorProperty);
+        return ( GroupConfigurationSelector )this.GetValue( DefaultDetailConfiguration.GroupConfigurationSelectorProperty );
       }
       set
       {
-        this.SetValue(DefaultDetailConfiguration.GroupConfigurationSelectorProperty, value);
+        this.SetValue( DefaultDetailConfiguration.GroupConfigurationSelectorProperty, value );
       }
     }
 
@@ -98,17 +94,17 @@ namespace Xceed.Wpf.DataGrid
 
     #region ItemContainerStyle Property
 
-    public static readonly DependencyProperty ItemContainerStyleProperty = DataGridControl.ItemContainerStyleProperty.AddOwner( typeof( DefaultDetailConfiguration ) ) ;
+    public static readonly DependencyProperty ItemContainerStyleProperty = DataGridControl.ItemContainerStyleProperty.AddOwner( typeof( DefaultDetailConfiguration ) );
 
     public Style ItemContainerStyle
     {
       get
       {
-        return (Style)this.GetValue(DefaultDetailConfiguration.ItemContainerStyleProperty);
+        return ( Style )this.GetValue( DefaultDetailConfiguration.ItemContainerStyleProperty );
       }
       set
       {
-        this.SetValue(DefaultDetailConfiguration.ItemContainerStyleProperty, value);
+        this.SetValue( DefaultDetailConfiguration.ItemContainerStyleProperty, value );
       }
     }
 
@@ -116,17 +112,17 @@ namespace Xceed.Wpf.DataGrid
 
     #region ItemContainerStyleSelector Property
 
-    public static readonly DependencyProperty ItemContainerStyleSelectorProperty = DataGridControl.ItemContainerStyleSelectorProperty.AddOwner( typeof(DefaultDetailConfiguration ) );
+    public static readonly DependencyProperty ItemContainerStyleSelectorProperty = DataGridControl.ItemContainerStyleSelectorProperty.AddOwner( typeof( DefaultDetailConfiguration ) );
 
     public StyleSelector ItemContainerStyleSelector
     {
       get
       {
-        return (StyleSelector)this.GetValue(DefaultDetailConfiguration.ItemContainerStyleSelectorProperty);
+        return ( StyleSelector )this.GetValue( DefaultDetailConfiguration.ItemContainerStyleSelectorProperty );
       }
       set
       {
-        this.SetValue(DefaultDetailConfiguration.ItemContainerStyleSelectorProperty, value);
+        this.SetValue( DefaultDetailConfiguration.ItemContainerStyleSelectorProperty, value );
       }
     }
 
@@ -140,11 +136,11 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return (Style)this.GetValue(DefaultDetailConfiguration.DetailIndicatorStyleProperty);
+        return ( Style )this.GetValue( DefaultDetailConfiguration.DetailIndicatorStyleProperty );
       }
       set
       {
-        this.SetValue(DefaultDetailConfiguration.DetailIndicatorStyleProperty, value);
+        this.SetValue( DefaultDetailConfiguration.DetailIndicatorStyleProperty, value );
       }
     }
 
@@ -153,7 +149,7 @@ namespace Xceed.Wpf.DataGrid
     #region Headers Property
 
     private static readonly DependencyPropertyKey HeadersPropertyKey =
-        DependencyProperty.RegisterReadOnly("Headers", typeof(ObservableCollection<DataTemplate>), typeof(DefaultDetailConfiguration), new FrameworkPropertyMetadata(null));
+        DependencyProperty.RegisterReadOnly( "Headers", typeof( ObservableCollection<DataTemplate> ), typeof( DefaultDetailConfiguration ), new FrameworkPropertyMetadata( null ) );
 
     public static readonly DependencyProperty HeadersProperty;
 
@@ -161,13 +157,13 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return (ObservableCollection<DataTemplate>)this.GetValue(DefaultDetailConfiguration.HeadersProperty);
+        return ( ObservableCollection<DataTemplate> )this.GetValue( DefaultDetailConfiguration.HeadersProperty );
       }
     }
 
-    private void SetHeaders(ObservableCollection<DataTemplate> headers)
+    private void SetHeaders( ObservableCollection<DataTemplate> headers )
     {
-      this.SetValue(DefaultDetailConfiguration.HeadersPropertyKey, headers);
+      this.SetValue( DefaultDetailConfiguration.HeadersPropertyKey, headers );
     }
 
     #endregion Headers Property
@@ -175,7 +171,7 @@ namespace Xceed.Wpf.DataGrid
     #region Footers Property
 
     private static readonly DependencyPropertyKey FootersPropertyKey =
-        DependencyProperty.RegisterReadOnly("Footers", typeof(ObservableCollection<DataTemplate>), typeof(DefaultDetailConfiguration), new FrameworkPropertyMetadata(null));
+        DependencyProperty.RegisterReadOnly( "Footers", typeof( ObservableCollection<DataTemplate> ), typeof( DefaultDetailConfiguration ), new FrameworkPropertyMetadata( null ) );
 
     public static readonly DependencyProperty FootersProperty;
 
@@ -183,13 +179,13 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return (ObservableCollection<DataTemplate>)this.GetValue(DefaultDetailConfiguration.FootersProperty);
+        return ( ObservableCollection<DataTemplate> )this.GetValue( DefaultDetailConfiguration.FootersProperty );
       }
     }
 
-    private void SetFooters(ObservableCollection<DataTemplate> footers)
+    private void SetFooters( ObservableCollection<DataTemplate> footers )
     {
-      this.SetValue(DefaultDetailConfiguration.FootersPropertyKey, footers);
+      this.SetValue( DefaultDetailConfiguration.FootersPropertyKey, footers );
     }
 
     #endregion Footers Property
@@ -232,17 +228,17 @@ namespace Xceed.Wpf.DataGrid
 
     #region UseDefaultHeadersFooters Property
 
-    public static readonly DependencyProperty UseDefaultHeadersFootersProperty = DetailConfiguration.UseDefaultHeadersFootersProperty.AddOwner(typeof(DefaultDetailConfiguration));
+    public static readonly DependencyProperty UseDefaultHeadersFootersProperty = DetailConfiguration.UseDefaultHeadersFootersProperty.AddOwner( typeof( DefaultDetailConfiguration ) );
 
     public bool UseDefaultHeadersFooters
     {
       get
       {
-        return (bool)this.GetValue(DefaultDetailConfiguration.UseDefaultHeadersFootersProperty);
+        return ( bool )this.GetValue( DefaultDetailConfiguration.UseDefaultHeadersFootersProperty );
       }
       set
       {
-        this.SetValue(DefaultDetailConfiguration.UseDefaultHeadersFootersProperty, value);
+        this.SetValue( DefaultDetailConfiguration.UseDefaultHeadersFootersProperty, value );
       }
     }
 
@@ -250,8 +246,8 @@ namespace Xceed.Wpf.DataGrid
 
     #region IsDeleteCommandEnabled Property
 
-    public static readonly DependencyProperty IsDeleteCommandEnabledProperty = DetailConfiguration.IsDeleteCommandEnabledProperty.AddOwner( 
-      typeof( DefaultDetailConfiguration ), 
+    public static readonly DependencyProperty IsDeleteCommandEnabledProperty = DetailConfiguration.IsDeleteCommandEnabledProperty.AddOwner(
+      typeof( DefaultDetailConfiguration ),
       new FrameworkPropertyMetadata( false, new PropertyChangedCallback( DefaultDetailConfiguration.OnIsDeleteCommandEnabledChanged ) ) );
 
     public bool IsDeleteCommandEnabled
@@ -273,25 +269,14 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion IsDeleteCommandEnabled Property
 
-    #region Internal Methods
-
     internal void AddDefaultHeadersFooters()
     {
       if( m_defaultHeadersFootersAdded )
         return;
 
       m_defaultHeadersFootersAdded = true;
+    }
 
-      DetailConfiguration.AddDefaultHeadersFooters( this.Headers, this.Footers );
-    } 
-
-    #endregion
-
-    #region Private Fields
-
-    private bool m_defaultHeadersFootersAdded = false; 
-
-    #endregion
-
+    private bool m_defaultHeadersFootersAdded = false;
   }
 }

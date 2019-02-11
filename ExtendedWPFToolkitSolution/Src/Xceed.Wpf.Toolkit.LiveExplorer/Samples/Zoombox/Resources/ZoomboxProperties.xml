@@ -62,6 +62,7 @@ For more information, see the ViewStackMode property.</EffectiveViewStackMode>
 The default value is true.</IsAnimated>
 <IsDraggingContent>Gets a Boolean value that specifies whether the content is currently being panned via a drag operation.</IsDraggingContent>
 <IsSelectingRegion>Gets a Boolean value that specifies whether a zoom region is currently being selected.</IsSelectingRegion>
+<IsUsingScrollBars>Gets/Sets a Boolean value that specifies whether the zoombox's scrollbars are enabled to move the content of the zoombox.</IsUsingScrollBars>
 <MaxScale>Gets or sets a Double value representing the maximum scale factor (or zoom level) that can be applied to the content.</MaxScale>
 <MinScale>Gets or sets a Double value representing the minimum scale factor (or zoom level) that can be applied to the content.</MinScale>
 <NavigateOnPreview>Gets or sets a Boolean value that specifies whether the Zoombox responds to tunneled mouse events (PreviewMouseDown) to navigate through the view stack. If false, navigation occurs in response to bubbled mouse events (MouseDown).

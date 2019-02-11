@@ -33,17 +33,25 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       ValueProperty = System.Windows.Controls.ComboBox.SelectedValueProperty;
     }
 
+    protected override System.Windows.Controls.ComboBox CreateEditor()
+    {
+      return new PropertyGridEditorComboBox();
+    }
+
     protected override void ResolveValueBinding( PropertyItem propertyItem )
     {
       SetItemsSource();
       base.ResolveValueBinding( propertyItem );
     }
 
-    protected override void SetControlProperties()
+    protected override void SetControlProperties( PropertyItem propertyItem )
     {
       Editor.DisplayMemberPath = "DisplayName";
       Editor.SelectedValuePath = "Value";
-      Editor.Style = PropertyGridUtilities.ComboBoxStyle;
+      if( propertyItem != null )
+      {
+        Editor.IsEnabled = !propertyItem.IsReadOnly;
+      }
     }
 
     private void SetItemsSource()

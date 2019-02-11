@@ -14,15 +14,14 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-    interface ILayoutPaneSerializable
+  interface ILayoutPaneSerializable
+  {
+    string Id
     {
-        string Id { get; set; }
+      get; set;
     }
+  }
 }

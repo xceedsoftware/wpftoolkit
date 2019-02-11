@@ -28,7 +28,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     protected override IEnumerable CreateItemsSource( PropertyItem propertyItem )
     {
       if( propertyItem.PropertyType == typeof( FontFamily ) )
-        return FontUtilities.Families;
+        return FontUtilities.Families.OrderBy( x => x.Source);
       else if( propertyItem.PropertyType == typeof( FontWeight ) )
         return FontUtilities.Weights;
       else if( propertyItem.PropertyType == typeof( FontStyle ) )

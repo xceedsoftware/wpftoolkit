@@ -15,9 +15,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using Xceed.Wpf.AvalonDock.Layout;
@@ -25,49 +22,143 @@ using System.Windows.Threading;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-    public class LayoutAnchorControl : Control, ILayoutControl
+  public class LayoutAnchorControl : Control, ILayoutControl
+  {
+    #region Members
+
+    private LayoutAnchorable _model;
+    private DispatcherTimer _openUpTimer = null;
+    private DispatcherTimer _clickGracePeriodTimer = null;
+    private bool _inGracePeriod = false;
+    private bool _manuallyOpened = false;
+
+    #endregion
+
+    #region Constructors
+
+    static LayoutAnchorControl()
     {
-        static LayoutAnchorControl()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutAnchorControl), new FrameworkPropertyMetadata(typeof(LayoutAnchorControl)));
-            Control.IsHitTestVisibleProperty.AddOwner(typeof(LayoutAnchorControl), new FrameworkPropertyMetadata(true)); 
-        }
+      DefaultStyleKeyProperty.OverrideMetadata( typeof( LayoutAnchorControl ), new FrameworkPropertyMetadata( typeof( LayoutAnchorControl ) ) );
+      Control.IsHitTestVisibleProperty.AddOwner( typeof( LayoutAnchorControl ), new FrameworkPropertyMetadata( true ) );
+    }
 
+    internal LayoutAnchorControl( LayoutAnchorable model )
+    {
+      _model = model;
+      _model.IsActiveChanged += new EventHandler( _model_IsActiveChanged );
+      _model.IsSelectedChanged += new EventHandler( _model_IsSelectedChanged );
 
-        internal LayoutAnchorControl(LayoutAnchorable model)
-        {
-            _model = model;
-            _model.IsActiveChanged += new EventHandler(_model_IsActiveChanged);
-            _model.IsSelectedChanged += new EventHandler(_model_IsSelectedChanged);
+      SetSide( _model.FindParent<LayoutAnchorSide>().Side );
+    }
 
-            SetSide(_model.FindParent<LayoutAnchorSide>().Side);
-        }
+    #endregion
 
-        void _model_IsSelectedChanged(object sender, EventArgs e)
-        {
-            if (!_model.IsAutoHidden)
-                _model.IsSelectedChanged -= new EventHandler(_model_IsSelectedChanged);
-            else if (_model.IsSelected)
+    #region Properties
+
+    #region Model
+
+    public ILayoutElement Model
+    {
+      get
+      {
+        return _model;
+      }
+    }
+
+    #endregion
+
+    #region Side
+
+    /// <summary>
+    /// Side Read-Only Dependency Property
+    /// </summary>
+    private static readonly DependencyPropertyKey SidePropertyKey = DependencyProperty.RegisterReadOnly( "Side", typeof( AnchorSide ), typeof( LayoutAnchorControl ),
+            new FrameworkPropertyMetadata( ( AnchorSide )AnchorSide.Left ) );
+
+    public static readonly DependencyProperty SideProperty = SidePropertyKey.DependencyProperty;
+
+    /// <summary>
+    /// Gets the Side property.  This dependency property 
+    /// indicates the anchor side of the control.
+    /// </summary>
+    public AnchorSide Side
+    {
+      get
+      {
+        return ( AnchorSide )GetValue( SideProperty );
+      }
+    }
+
+    /// <summary>
+    /// Provides a secure method for setting the Side property.  
+    /// This dependency property indicates the anchor side of the control.
+    /// </summary>
+    /// <param name="value">The new value for the property.</param>
+    protected void SetSide( AnchorSide value )
+    {
+      SetValue( SidePropertyKey, value );
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Private Methods
+
+    private void _model_IsSelectedChanged( object sender, EventArgs e )
+    {
+      if( !_model.IsAutoHidden )
+        _model.IsSelectedChanged -= new EventHandler( _model_IsSelectedChanged );
+      else if( _model.IsSelected )
+      {
+        _model.Root.Manager.ShowAutoHideWindow( this );
+        _model.IsSelected = false;
+      }
+    }
+
+    private void _model_IsActiveChanged( object sender, EventArgs e )
+    {
+      if( !_model.IsAutoHidden )
+        _model.IsActiveChanged -= new EventHandler( _model_IsActiveChanged );
+      else if( _model.IsActive )
+        _model.Root.Manager.ShowAutoHideWindow( this );
+    }
+
+    private void _openUpTimer_Tick( object sender, EventArgs e )
+    {
+      _openUpTimer.Tick -= new EventHandler( _openUpTimer_Tick );
+      _openUpTimer.Stop();
+      _openUpTimer = null;
+      _model.Root.Manager.ShowAutoHideWindow( this );
+
+            if (!_manuallyOpened)
             {
-                _model.Root.Manager.ShowAutoHideWindow(this);
-                _model.IsSelected = false;
+                _clickGracePeriodTimer = new DispatcherTimer(DispatcherPriority.ApplicationIdle);
+                _clickGracePeriodTimer.Interval = TimeSpan.FromMilliseconds(1000);
+                _inGracePeriod = true;
+                _clickGracePeriodTimer.Tick += new EventHandler(_clickGracePeriodTimer_Tick);
+                _clickGracePeriodTimer.Start();
             }
+
+            _manuallyOpened = false;
         }
 
-        void _model_IsActiveChanged(object sender, EventArgs e)
+        private void _clickGracePeriodTimer_Tick(object sender, EventArgs e)
         {
-            if (!_model.IsAutoHidden)
-                _model.IsActiveChanged -= new EventHandler(_model_IsActiveChanged);
-            else if (_model.IsActive)
-                _model.Root.Manager.ShowAutoHideWindow(this);
+            StopGraceTimer();
         }
 
-        LayoutAnchorable _model;
-
-        public ILayoutElement Model
+        private void StopGraceTimer()
         {
-            get { return _model; }
+            _clickGracePeriodTimer.Tick -= new EventHandler(_clickGracePeriodTimer_Tick);
+            _clickGracePeriodTimer.Stop();
+            _clickGracePeriodTimer = null;
+            _inGracePeriod = false;
         }
+
+        #endregion
+
+        #region Overrides
 
         //protected override void OnVisualParentChanged(DependencyObject oldParent)
         //{
@@ -98,41 +189,31 @@ namespace Xceed.Wpf.AvalonDock.Controls
         //    }
         //}
 
-
-        protected override void OnMouseDown(System.Windows.Input.MouseButtonEventArgs e)
-        {
-            base.OnMouseDown(e);
+        protected override void OnMouseDown( System.Windows.Input.MouseButtonEventArgs e )
+    {
+      base.OnMouseDown( e );
 
             if (!e.Handled)
             {
-				if (_model.Root.Manager.AutoHideWindow.Visibility != Visibility.Visible)
-				{
+                if (_model.Root.Manager.AutoHideWindow.Visibility != Visibility.Visible)
+                {
                 _model.Root.Manager.ShowAutoHideWindow(this);    
-					_model.IsActive = true;
-					_manuallyOpened = true;
-				}
-				else
-				{
-					if (!_inGracePeriod)
-					{
-						_model.Root.Manager.HideAutoHideWindow(this);
-					}
-				}
+                    _model.IsActive = true;
+                    _manuallyOpened = true;
+                }
+                else
+                {
+                    if (!_inGracePeriod)
+                    {
+                        _model.Root.Manager.HideAutoHideWindow(this);
+                    }
+                }
             }
         }
 
-
-        DispatcherTimer _openUpTimer = null;
-
-		DispatcherTimer _clickGracePeriodTimer = null;
-
-		bool _inGracePeriod = false;
-
-		bool _manuallyOpened = false;
-
-        protected override void OnMouseEnter(System.Windows.Input.MouseEventArgs e)
-        {
-            base.OnMouseEnter(e);
+    protected override void OnMouseEnter( System.Windows.Input.MouseEventArgs e )
+    {
+      base.OnMouseEnter( e );
 
             if (!e.Handled)
             {
@@ -143,83 +224,18 @@ namespace Xceed.Wpf.AvalonDock.Controls
             }
         }
 
-        void _openUpTimer_Tick(object sender, EventArgs e)
-        {
-            _openUpTimer.Tick -= new EventHandler(_openUpTimer_Tick);
-            _openUpTimer.Stop();
-            _openUpTimer = null;
-            _model.Root.Manager.ShowAutoHideWindow(this);
-
-			if (!_manuallyOpened)
-			{
-				_clickGracePeriodTimer = new DispatcherTimer(DispatcherPriority.ApplicationIdle);
-				_clickGracePeriodTimer.Interval = TimeSpan.FromMilliseconds(1000);
-				_inGracePeriod = true;
-				_clickGracePeriodTimer.Tick += new EventHandler(_clickGracePeriodTimer_Tick);
-				_clickGracePeriodTimer.Start();
-			}
-
-			_manuallyOpened = false;
-        }
-
-		void _clickGracePeriodTimer_Tick(object sender, EventArgs e)
-		{
-			StopGraceTimer();
-		}
-
-		void StopGraceTimer()
-		{
-			_clickGracePeriodTimer.Tick -= new EventHandler(_clickGracePeriodTimer_Tick);
-			_clickGracePeriodTimer.Stop();
-			_clickGracePeriodTimer = null;
-			_inGracePeriod = false;
-        }
-
-        protected override void OnMouseLeave(System.Windows.Input.MouseEventArgs e)
-        {
-            if (_openUpTimer != null)
-            {
-                _openUpTimer.Tick -= new EventHandler(_openUpTimer_Tick);
-                _openUpTimer.Stop();
-                _openUpTimer = null;
-            }
-            base.OnMouseLeave(e);
-        }
-
-
-        #region Side
-
-        /// <summary>
-        /// Side Read-Only Dependency Property
-        /// </summary>
-        private static readonly DependencyPropertyKey SidePropertyKey
-            = DependencyProperty.RegisterReadOnly("Side", typeof(AnchorSide), typeof(LayoutAnchorControl),
-                new FrameworkPropertyMetadata((AnchorSide)AnchorSide.Left));
-
-        public static readonly DependencyProperty SideProperty
-            = SidePropertyKey.DependencyProperty;
-
-        /// <summary>
-        /// Gets the Side property.  This dependency property 
-        /// indicates the anchor side of the control.
-        /// </summary>
-        public AnchorSide Side
-        {
-            get { return (AnchorSide)GetValue(SideProperty); }
-        }
-
-        /// <summary>
-        /// Provides a secure method for setting the Side property.  
-        /// This dependency property indicates the anchor side of the control.
-        /// </summary>
-        /// <param name="value">The new value for the property.</param>
-        protected void SetSide(AnchorSide value)
-        {
-            SetValue(SidePropertyKey, value);
-        }
-
-        #endregion
-
-
+    protected override void OnMouseLeave( System.Windows.Input.MouseEventArgs e )
+    {
+      if( _openUpTimer != null )
+      {
+        _openUpTimer.Tick -= new EventHandler( _openUpTimer_Tick );
+        _openUpTimer.Stop();
+        _openUpTimer = null;
+      }
+      base.OnMouseLeave( e );
     }
+
+
+    #endregion
+  }
 }

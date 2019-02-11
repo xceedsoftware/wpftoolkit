@@ -14,31 +14,29 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-    public class DocumentPaneControlOverlayArea : OverlayArea
+  public class DocumentPaneControlOverlayArea : OverlayArea
+  {
+    #region Members
+
+    private LayoutDocumentPaneControl _documentPaneControl;
+
+    #endregion
+
+    #region Constructors
+
+    internal DocumentPaneControlOverlayArea(
+        IOverlayWindow overlayWindow,
+        LayoutDocumentPaneControl documentPaneControl )
+        : base( overlayWindow )
     {
-
-
-        internal DocumentPaneControlOverlayArea(
-            IOverlayWindow overlayWindow,
-            LayoutDocumentPaneControl documentPaneControl)
-            : base(overlayWindow)
-        {
-            _documentPaneControl = documentPaneControl;
-            base.SetScreenDetectionArea(new Rect(
-                _documentPaneControl.PointToScreenDPI(new Point()),
-                _documentPaneControl.TransformActualSizeToAncestor()));
-        }
-
-        LayoutDocumentPaneControl _documentPaneControl;
-
-
+      _documentPaneControl = documentPaneControl;
+      base.SetScreenDetectionArea( new Rect(  _documentPaneControl.PointToScreenDPI( new Point() ),  _documentPaneControl.TransformActualSizeToAncestor() ) );
     }
+
+    #endregion
+  }
 }

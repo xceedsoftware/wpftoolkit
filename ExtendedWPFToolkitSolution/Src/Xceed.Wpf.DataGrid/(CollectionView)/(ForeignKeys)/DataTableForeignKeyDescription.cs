@@ -14,24 +14,15 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Data;
-using System.Collections;
 using System.Windows;
-using System.Diagnostics;
 
 namespace Xceed.Wpf.DataGrid
 {
   public class DataTableForeignKeyDescription : DataGridForeignKeyDescription
   {
-    #region CONSTRUCTORS
-
     public DataTableForeignKeyDescription()
     {
-      this.ForeignKeyConverter = new DataTableForeignKeyConverter();
     }
 
     internal DataTableForeignKeyDescription( ForeignKeyConstraint constraint )
@@ -39,8 +30,6 @@ namespace Xceed.Wpf.DataGrid
     {
       this.ForeignKeyConstraint = constraint;
     }
-
-    #endregion
 
     #region ForeignKeyConstraint Property
 
@@ -56,7 +45,7 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return m_foreignKeyConstraint;
+        return ( ForeignKeyConstraint )this.GetValue( DataTableForeignKeyDescription.ForeignKeyConstraintProperty );
       }
       set
       {
@@ -66,38 +55,39 @@ namespace Xceed.Wpf.DataGrid
 
     private static void OnForeignKeyConstraintChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      DataTableForeignKeyDescription foreignKeyDescription = sender as DataTableForeignKeyDescription;
-
+      var foreignKeyDescription = sender as DataTableForeignKeyDescription;
       if( foreignKeyDescription != null )
       {
-        foreignKeyDescription.m_foreignKeyConstraint = e.NewValue as ForeignKeyConstraint;
         foreignKeyDescription.UpdateValuePath();
         foreignKeyDescription.UpdateItemsSource();
       }
     }
 
-    private ForeignKeyConstraint m_foreignKeyConstraint;
-
     #endregion
 
-    #region PRIVATE METHODS
+    protected override void SetForeignKeyConverter()
+    {
+      this.ForeignKeyConverter = new DataTableForeignKeyConverter();
+    }
 
     private void UpdateValuePath()
     {
       // Affect the ValuePath if it was not explicitly set or bound
-      object valuePath = this.ReadLocalValue( ValuePathProperty );
+      var valuePath = this.ReadLocalValue( ValuePathProperty );
 
       if( string.IsNullOrEmpty( this.ValuePath )
         && ( ( valuePath == DependencyProperty.UnsetValue )
              || ( valuePath == null ) ) )
       {
+        var foreignKeyConstraint = this.ForeignKeyConstraint;
+
         // Affect the FieldName to the first RelatedColumn's name
         // if there is only one DataColumn in the RelatedColumns Collection
-        if( ( m_foreignKeyConstraint != null )
-          && ( m_foreignKeyConstraint.RelatedColumns != null )
-          && ( m_foreignKeyConstraint.RelatedColumns.Length == 1 ) )
+        if( ( foreignKeyConstraint != null )
+          && ( foreignKeyConstraint.RelatedColumns != null )
+          && ( foreignKeyConstraint.RelatedColumns.Length == 1 ) )
         {
-          string foreignFieldName = m_foreignKeyConstraint.RelatedColumns[ 0 ].ColumnName;
+          var foreignFieldName = foreignKeyConstraint.RelatedColumns[ 0 ].ColumnName;
 
           if( !string.IsNullOrEmpty( foreignFieldName ) )
           {
@@ -109,13 +99,15 @@ namespace Xceed.Wpf.DataGrid
 
     private void UpdateItemsSource()
     {
-      if( ( m_foreignKeyConstraint != null )
-        && ( m_foreignKeyConstraint.RelatedTable != null ) )
-      {
-        this.ItemsSource = m_foreignKeyConstraint.RelatedTable.DefaultView;
-      }
-    }
+      var foreignKeyConstraint = this.ForeignKeyConstraint;
+      if( foreignKeyConstraint == null )
+        return;
 
-    #endregion
+      var relatedTable = foreignKeyConstraint.RelatedTable;
+      if( relatedTable == null )
+        return;
+
+      this.ItemsSource = relatedTable.DefaultView;
+    }
   }
 }

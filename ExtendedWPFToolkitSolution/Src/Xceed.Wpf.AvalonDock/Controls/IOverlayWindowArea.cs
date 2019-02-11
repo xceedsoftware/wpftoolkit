@@ -14,16 +14,15 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-    internal interface IOverlayWindowArea
+  internal interface IOverlayWindowArea
+  {
+    Rect ScreenDetectionArea
     {
-        Rect ScreenDetectionArea { get; }
+      get;
     }
+  }
 }

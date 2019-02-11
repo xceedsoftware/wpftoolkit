@@ -30,6 +30,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
+
+
+
     ContainerHelperBase ContainerHelper { get; }
 
     Style PropertyContainerStyle { get; }
@@ -40,8 +43,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     bool IsCategorized { get; }
 
+    bool IsSortedAlphabetically { get; }
+
     bool AutoGenerateProperties { get; }
 
+    bool HideInheritedProperties { get; }
+
     FilterInfo FilterInfo { get; }
+
+    bool? IsPropertyVisible( PropertyDescriptor pd );
+
   }
 }

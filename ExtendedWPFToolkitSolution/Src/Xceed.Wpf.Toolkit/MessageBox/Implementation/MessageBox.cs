@@ -26,6 +26,8 @@ using System.Security;
 using Xceed.Wpf.Toolkit.Primitives;
 using System.Diagnostics;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using System.Windows.Interop;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -68,6 +70,7 @@ namespace Xceed.Wpf.Toolkit
     /// Tracks the owner of the MessageBox
     /// </summary>
     private Window _owner;
+    private IntPtr _ownerHandle;
 
     private WindowControl _windowControl;
 
@@ -84,6 +87,7 @@ namespace Xceed.Wpf.Toolkit
     {
       this.Visibility = Visibility.Collapsed;
       this.InitHandlers();
+      this.IsVisibleChanged += this.MessageBox_IsVisibleChanged;
     }
 
     #endregion //Constructors
@@ -346,6 +350,17 @@ namespace Xceed.Wpf.Toolkit
       SetDefaultResult();
     }
 
+    protected override void OnPreviewKeyDown( KeyEventArgs e )
+    {
+      base.OnPreviewKeyDown( e );
+
+      // Prevent MenuItem shortcuts while MessageBox is active.
+      if( Keyboard.IsKeyDown( Key.LeftAlt ) || Keyboard.IsKeyDown( Key.RightAlt ) )
+      {
+        e.Handled = true;
+      }
+    }
+
     protected override object OnCoerceCloseButtonVisibility( Visibility newValue )
     {
       if( newValue != Visibility.Visible )
@@ -369,11 +384,15 @@ namespace Xceed.Wpf.Toolkit
     }
 
 
+
+
     #endregion //Base Class Overrides
 
     #region Methods
 
     #region Public Static
+
+    #region Show with Window as Owner
 
 
     /// <summary>
@@ -435,7 +454,7 @@ namespace Xceed.Wpf.Toolkit
     /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
     public static MessageBoxResult Show( string messageText, string caption, MessageBoxButton button, Style messageBoxStyle )
     {
-      return ShowCore( null, messageText, caption, button, MessageBoxImage.None, MessageBoxResult.None, messageBoxStyle );
+      return ShowCore( null, IntPtr.Zero, messageText, caption, button, MessageBoxImage.None, MessageBoxResult.None, messageBoxStyle );
     }
 
 
@@ -446,7 +465,7 @@ namespace Xceed.Wpf.Toolkit
 
     public static MessageBoxResult Show( Window owner, string messageText, string caption, MessageBoxButton button, Style messageBoxStyle )
     {
-      return ShowCore( owner, messageText, caption, button, MessageBoxImage.None, MessageBoxResult.None, messageBoxStyle );
+      return ShowCore( owner, IntPtr.Zero, messageText, caption, button, MessageBoxImage.None, MessageBoxResult.None, messageBoxStyle );
     }
 
 
@@ -466,7 +485,7 @@ namespace Xceed.Wpf.Toolkit
     /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
     public static MessageBoxResult Show( string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, Style messageBoxStyle )
     {
-      return ShowCore( null, messageText, caption, button, icon, MessageBoxResult.None, messageBoxStyle );
+      return ShowCore( null, IntPtr.Zero, messageText, caption, button, icon, MessageBoxResult.None, messageBoxStyle );
     }
 
     public static MessageBoxResult Show( Window owner, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon )
@@ -476,7 +495,7 @@ namespace Xceed.Wpf.Toolkit
 
     public static MessageBoxResult Show( Window owner, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, Style messageBoxStyle )
     {
-      return ShowCore( owner, messageText, caption, button, icon, MessageBoxResult.None, messageBoxStyle );
+      return ShowCore( owner, IntPtr.Zero, messageText, caption, button, icon, MessageBoxResult.None, messageBoxStyle );
     }
 
 
@@ -496,7 +515,7 @@ namespace Xceed.Wpf.Toolkit
     /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
     public static MessageBoxResult Show( string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult, Style messageBoxStyle )
     {
-      return ShowCore( null, messageText, caption, button, icon, defaultResult, messageBoxStyle );
+      return ShowCore( null, IntPtr.Zero, messageText, caption, button, icon, defaultResult, messageBoxStyle );
     }
 
     public static MessageBoxResult Show( Window owner, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult )
@@ -507,8 +526,59 @@ namespace Xceed.Wpf.Toolkit
 
     public static MessageBoxResult Show( Window owner, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult, Style messageBoxStyle )
     {
-      return ShowCore( owner, messageText, caption, button, icon, defaultResult, messageBoxStyle );
+      return ShowCore( owner, IntPtr.Zero, messageText, caption, button, icon, defaultResult, messageBoxStyle );
     }
+
+    #endregion //Show with Window as Owner
+
+    #region Show with Window handle as Owner
+
+    public static MessageBoxResult Show( IntPtr ownerWindowHandle, string messageText )
+    {
+      return Show( ownerWindowHandle, messageText, string.Empty, MessageBoxButton.OK, ( Style )null );
+    }
+
+    public static MessageBoxResult Show( IntPtr ownerWindowHandle, string messageText, string caption )
+    {
+      return Show( ownerWindowHandle, messageText, caption, ( Style )null );
+    }
+
+    public static MessageBoxResult Show( IntPtr ownerWindowHandle, string messageText, string caption, Style messageBoxStyle )
+    {
+      return Show( ownerWindowHandle, messageText, caption, MessageBoxButton.OK, messageBoxStyle );
+    }
+
+    public static MessageBoxResult Show( IntPtr ownerWindowHandle, string messageText, string caption, MessageBoxButton button )
+    {
+      return Show( ownerWindowHandle, messageText, caption, button, ( Style )null );
+    }
+
+    public static MessageBoxResult Show( IntPtr ownerWindowHandle, string messageText, string caption, MessageBoxButton button, Style messageBoxStyle )
+    {
+      return ShowCore( null, ownerWindowHandle, messageText, caption, button, MessageBoxImage.None, MessageBoxResult.None, messageBoxStyle );
+    }
+
+    public static MessageBoxResult Show( IntPtr ownerWindowHandle, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon )
+    {
+      return Show( ownerWindowHandle, messageText, caption, button, icon, ( Style )null );
+    }
+
+    public static MessageBoxResult Show( IntPtr ownerWindowHandle, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, Style messageBoxStyle )
+    {
+      return ShowCore( null, ownerWindowHandle, messageText, caption, button, icon, MessageBoxResult.None, messageBoxStyle );
+    }
+
+    public static MessageBoxResult Show( IntPtr ownerWindowHandle, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult )
+    {
+      return Show( ownerWindowHandle, messageText, caption, button, icon, defaultResult, ( Style )null );
+    }
+
+    public static MessageBoxResult Show( IntPtr ownerWindowHandle, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult, Style messageBoxStyle )
+    {
+      return ShowCore( null, ownerWindowHandle, messageText, caption, button, icon, defaultResult, messageBoxStyle );
+    }
+
+    #endregion //Show with Window handle as Owner
 
     #endregion //Public Static
 
@@ -598,17 +668,21 @@ namespace Xceed.Wpf.Toolkit
     /// <summary>
     /// Initializes the MessageBox.
     /// </summary>
+    /// <param name="owner">The Window owner.</param>
+    /// <param name="ownerHandle">The Window Handle owner.</param>
     /// <param name="text">The text.</param>
     /// <param name="caption">The caption.</param>
     /// <param name="button">The button.</param>
     /// <param name="image">The image.</param>
-    protected void InitializeMessageBox( Window owner, string text, string caption, MessageBoxButton button, MessageBoxImage image, MessageBoxResult defaultResult )
+    /// <param name="defaultResult">The MessageBox result as default.</param>
+    protected void InitializeMessageBox( Window owner, IntPtr ownerHandle, string text, string caption, MessageBoxButton button, MessageBoxImage image, MessageBoxResult defaultResult )
     {
       Text = text;
       Caption = caption;
       _button = button;
       _defaultResult = defaultResult;
       _owner = owner;
+      _ownerHandle = ownerHandle;
       SetImageSource( image );
     }
 
@@ -727,7 +801,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void ShowMessageBoxCore( string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult )
     {
-      this.InitializeMessageBox( null, messageText, caption, button, icon, defaultResult );
+      this.InitializeMessageBox( null, IntPtr.Zero, messageText, caption, button, icon, defaultResult );
       this.ShowMessageBox();
     }
 
@@ -747,15 +821,20 @@ namespace Xceed.Wpf.Toolkit
     /// <param name="icon">The icon.</param>
     /// <param name="defaultResult">The default result.</param>
     /// <returns></returns>
-    private static MessageBoxResult ShowCore( Window owner, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult, Style messageBoxStyle )
+    private static MessageBoxResult ShowCore( Window owner, IntPtr ownerHandle, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult, Style messageBoxStyle )
     {
       if( System.Windows.Interop.BrowserInteropHelper.IsBrowserHosted )
       {
         throw new InvalidOperationException( "Static methods for MessageBoxes are not available in XBAP. Use the instance ShowMessageBox methods instead." );
       }
 
-      MessageBox msgBox = new MessageBox();
-      msgBox.InitializeMessageBox( owner, messageText, caption, button, icon, defaultResult );
+      if( (owner != null) && (ownerHandle != IntPtr.Zero) )
+      {
+        throw new NotSupportedException( "The owner of a MessageBox can't be both a Window and a WindowHandle." );
+      }
+
+      var msgBox = new MessageBox();
+      msgBox.InitializeMessageBox( owner, ownerHandle, messageText, caption, button, icon, defaultResult );
 
       // Setting the style to null will inhibit any implicit styles      
       if( messageBoxStyle != null )
@@ -767,13 +846,39 @@ namespace Xceed.Wpf.Toolkit
       return msgBox.MessageBoxResult;
     }
 
+    private delegate Window ComputeOwnerWindowCoreDelegate();
+
     /// <summary>
     /// Resolves the owner Window of the MessageBox.
     /// </summary>
     /// <returns>the owner Window</returns>
     private static Window ComputeOwnerWindow()
     {
+      Window result = null;
+
+      if( Application.Current != null )
+      {
+        if( Application.Current.Dispatcher.CheckAccess() )
+        {
+          result = ComputeOwnerWindowCore();
+        }
+        else
+        {
+          Application.Current.Dispatcher.BeginInvoke( new Action( () =>
+          {
+            result = ComputeOwnerWindowCore();
+          }
+          ) );
+        }
+      }     
+
+      return result;
+    }
+
+    private static Window ComputeOwnerWindowCore()
+    {
       Window owner = null;
+
       if( Application.Current != null )
       {
         foreach( Window w in Application.Current.Windows )
@@ -785,6 +890,7 @@ namespace Xceed.Wpf.Toolkit
           }
         }
       }
+
       return owner;
     }
 
@@ -825,7 +931,8 @@ namespace Xceed.Wpf.Toolkit
           }
       }
 
-      this.ImageSource = new BitmapImage( new Uri( String.Format("../Icons/{0}", iconName), UriKind.Relative ) );
+      // Use this syntax for other themes to get the icons
+      this.ImageSource = new BitmapImage( new Uri( String.Format( "/Xceed.Wpf.Toolkit;component/MessageBox/Icons/{0}", iconName ), UriKind.RelativeOrAbsolute ) );
     }
 
     /// <summary>
@@ -838,12 +945,20 @@ namespace Xceed.Wpf.Toolkit
       newWindow.AllowsTransparency = true;
       newWindow.Background = Brushes.Transparent;
       newWindow.Content = this;
-      newWindow.Owner = _owner ?? ComputeOwnerWindow();
 
-      if( newWindow.Owner != null )
+      if( _ownerHandle != IntPtr.Zero )
+      {
+        var windowHelper = new WindowInteropHelper( newWindow ) { Owner = _ownerHandle };
         newWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+      }
       else
-        newWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+      {
+        newWindow.Owner = _owner ?? ComputeOwnerWindow();
+        if( newWindow.Owner != null )
+          newWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+        else
+          newWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+      }
 
       newWindow.ShowInTaskbar = false;
       newWindow.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;
@@ -1002,6 +1117,24 @@ namespace Xceed.Wpf.Toolkit
     {
       this.Visibility = Visibility.Collapsed;
       this.OnClosed( EventArgs.Empty );
+    }
+
+    private void MessageBox_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )
+    {
+      if( (bool)e.NewValue )
+      {
+        Action action = () =>
+        {
+          //Focus first Focusable Child element of MessageBox to prevent Tab outside MessageBox.
+          var defaultButton = this.GetDefaultButtonFromDefaultResult();
+          if( defaultButton != null )
+          {
+            defaultButton.Focus();
+          }
+        };
+
+        Dispatcher.BeginInvoke( DispatcherPriority.ApplicationIdle, action );
+      }
     }
 
     #endregion //Event Handlers

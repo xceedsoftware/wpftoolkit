@@ -15,10 +15,9 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Collections;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -95,7 +94,7 @@ namespace Xceed.Wpf.DataGrid
     public bool MoveNext()
     {
       if( m_version != m_virtualList.PagingManager.Version )
-        throw new InvalidOperationException( "TODO: Collection was modified." );
+        throw new InvalidOperationException( "Collection was modified." );
 
       if( m_beforeStart )
         m_beforeStart = false;

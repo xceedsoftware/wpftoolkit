@@ -33,39 +33,5 @@ namespace Xceed.Wpf.DataGrid
       get;
       set;
     }
-
-    public event EventHandler<CustomDistinctValueItemFilterEventArgs> Filter
-    {
-      add
-      {
-        EventHandler<CustomDistinctValueItemFilterEventArgs> eventHandler = m_filter;
-
-        if( eventHandler != null )
-        {
-          throw new DataGridException( "A Filter event is already registered for this custom distinct value configuration." );
-        }
-        else
-        {
-          m_filter = value;
-        }
-      }
-      remove
-      {
-        // The event handler was not registered on this configuration, ignore it
-        if( ( value != null ) && ( value != m_filter ) )
-          return;
-
-        if( m_filter != null )
-          EventHandler<CustomDistinctValueItemFilterEventArgs>.Remove( m_filter, value );
-      }
-    }
-
-    private event EventHandler<CustomDistinctValueItemFilterEventArgs> m_filter;
-
-    internal void RaiseCustomDistinctValueItemSelectedEvent( CustomDistinctValueItemFilterEventArgs args )
-    {
-      if( m_filter != null )
-        m_filter( this, args );
-    }
   }
 }

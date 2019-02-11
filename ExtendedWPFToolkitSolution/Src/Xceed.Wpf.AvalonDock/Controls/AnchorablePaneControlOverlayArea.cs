@@ -14,30 +14,33 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
-using Xceed.Wpf.AvalonDock.Layout;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-    public class AnchorablePaneControlOverlayArea : OverlayArea
+  public class AnchorablePaneControlOverlayArea : OverlayArea
+  {
+    #region Members
+
+    private LayoutAnchorablePaneControl _anchorablePaneControl;
+
+    #endregion
+
+    #region constructors
+
+    internal AnchorablePaneControlOverlayArea(
+        IOverlayWindow overlayWindow,
+        LayoutAnchorablePaneControl anchorablePaneControl )
+        : base( overlayWindow )
     {
-        internal AnchorablePaneControlOverlayArea(
-            IOverlayWindow overlayWindow, 
-            LayoutAnchorablePaneControl anchorablePaneControl)
-            : base(overlayWindow)
-        {
 
-            _anchorablePaneControl = anchorablePaneControl;
-            base.SetScreenDetectionArea(new Rect(
-                _anchorablePaneControl.PointToScreenDPI(new Point()),
-                _anchorablePaneControl.TransformActualSizeToAncestor()));
+      _anchorablePaneControl = anchorablePaneControl;
+      base.SetScreenDetectionArea( new Rect(
+          _anchorablePaneControl.PointToScreenDPI( new Point() ),
+          _anchorablePaneControl.TransformActualSizeToAncestor() ) );
 
-        }
-
-        LayoutAnchorablePaneControl _anchorablePaneControl;
     }
+
+    #endregion
+  }
 }

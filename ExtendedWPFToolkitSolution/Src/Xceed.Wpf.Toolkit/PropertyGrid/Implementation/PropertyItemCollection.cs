@@ -25,6 +25,10 @@ using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using System.Linq;
 using System.Collections;
 using Xceed.Wpf.Toolkit.Core.Utilities;
+using System.Reflection;
+#if !VS2008
+using System.ComponentModel.DataAnnotations;
+#endif
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -77,7 +81,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public void Filter( string text )
     {
-      Predicate<object> filter = PropertyItemCollection.CreateFilter( text );
+      Predicate<object> filter = PropertyItemCollection.CreateFilter( text, this.Items, null );
       GetDefaultView().Filter = filter;
     }
 
@@ -107,8 +111,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
     }
 
-    internal void UpdateCategorization( GroupDescription groupDescription )
+    internal void UpdateCategorization( GroupDescription groupDescription, bool isPropertyGridCategorized, bool sortAlphabetically )
     {
+      // Compute Display Order relative to PropertyOrderAttributes on PropertyItem
+      // which could be different in Alphabetical or Categorized mode.
+      foreach( PropertyItem item in this.Items )
+      {
+        item.DescriptorDefinition.DisplayOrder = item.DescriptorDefinition.ComputeDisplayOrderInternal( isPropertyGridCategorized );
+        item.PropertyOrder = item.DescriptorDefinition.DisplayOrder;
+      }
+
       // Clear view values
       ICollectionView view = this.GetDefaultView();
       using( view.DeferRefresh() )
@@ -120,11 +132,18 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         if( groupDescription != null )
         {
           view.GroupDescriptions.Add( groupDescription );
-          SortBy( CategoryPropertyName, ListSortDirection.Ascending );
+          if( sortAlphabetically )
+          {
+            SortBy( CategoryOrderPropertyName, ListSortDirection.Ascending );
+            SortBy( CategoryPropertyName, ListSortDirection.Ascending );
+          }
         }
 
-        SortBy( PropertyOrderPropertyName, ListSortDirection.Ascending );
-        SortBy( DisplayNamePropertyName, ListSortDirection.Ascending );
+        if( sortAlphabetically )
+        {
+          SortBy( PropertyOrderPropertyName, ListSortDirection.Ascending );
+          SortBy( DisplayNamePropertyName, ListSortDirection.Ascending );
+        }
       }
     }
 
@@ -133,7 +152,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       GetDefaultView().Refresh();
     }
 
-    internal static Predicate<object> CreateFilter( string text )
+    internal static Predicate<object> CreateFilter( string text, IList<PropertyItem> PropertyItems, IPropertyContainer propertyContainer )
     {
       Predicate<object> filter = null;
 
@@ -144,7 +163,17 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           var property = item as PropertyItem;
           if( property.DisplayName != null )
           {
-            return property.DisplayName.ToLower().StartsWith( text.ToLower() );
+#if !VS2008
+            var displayAttribute = PropertyGridUtilities.GetAttribute<DisplayAttribute>( property.PropertyDescriptor );
+            if( displayAttribute != null )
+            {
+              var canBeFiltered = displayAttribute.GetAutoGenerateFilter();
+              if( canBeFiltered.HasValue && !canBeFiltered.Value )
+                return false;
+            }
+#endif
+            property.HighlightedText = property.DisplayName.ToLower().Contains( text.ToLower() ) ? text : null;
+            return (property.HighlightedText != null);
           }
 
           return false;
@@ -153,5 +182,30 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       return filter;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   }
 }

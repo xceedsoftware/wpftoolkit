@@ -15,14 +15,9 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Diagnostics;
-using System.Windows.Controls;
-using System.Windows;
-using Xceed.Utils.Math;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
@@ -51,8 +46,11 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region ColumnVirtualizationManager Property
 
-    private static readonly DependencyPropertyKey ColumnVirtualizationManagerPropertyKey =
-        DependencyProperty.RegisterAttachedReadOnly( "ColumnVirtualizationManager", typeof( ColumnVirtualizationManager ), typeof( ColumnVirtualizationManager ), new UIPropertyMetadata( null ) );
+    private static readonly DependencyPropertyKey ColumnVirtualizationManagerPropertyKey = DependencyProperty.RegisterAttachedReadOnly(
+      "ColumnVirtualizationManager",
+      typeof( ColumnVirtualizationManager ),
+      typeof( ColumnVirtualizationManager ),
+      new UIPropertyMetadata( null, new PropertyChangedCallback( ColumnVirtualizationManager.OnColumnVirtualizationManagerChanged ) ) );
 
     public static readonly DependencyProperty ColumnVirtualizationManagerProperty;
 
@@ -69,6 +67,23 @@ namespace Xceed.Wpf.DataGrid.Views
     internal static void ClearColumnVirtualizationManager( DependencyObject obj )
     {
       obj.ClearValue( ColumnVirtualizationManager.ColumnVirtualizationManagerPropertyKey );
+    }
+
+    private static void OnColumnVirtualizationManagerChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    {
+      var self = sender as ColumnVirtualizationManager;
+      if( self == null )
+        return;
+
+      var dataGridContext = self.DataGridContext;
+      if( dataGridContext == null )
+        return;
+
+      var column = dataGridContext.Columns.MainColumn;
+      if( column == null )
+        return;
+
+      column.RefreshDraggableStatus();
     }
 
     #endregion
@@ -95,6 +110,8 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
+    private DataGridContext m_dataGridContext; //null;
+
     #endregion
 
     #region Version Proptety
@@ -107,19 +124,18 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
+    private int m_version; //0;
+
     #endregion
 
-    public virtual void Update()
+    public void Update()
     {
-      if( this.NeedsUpdate == false )
+      if( !this.NeedsUpdate )
         return;
 
       this.PreUpdate();
-
       this.ResetInternalState();
-
       this.DoUpdate();
-
       this.PostUpdate();
     }
 
@@ -151,11 +167,12 @@ namespace Xceed.Wpf.DataGrid.Views
     // Called after attaching ColumnVirtualizationManager to DataGridContext
     protected virtual void Initialize()
     {
-      m_dataGridContext.PropertyChanged += new PropertyChangedEventHandler( this.DataGridContext_PropertyChanged );
+      PropertyChangedEventManager.AddListener( m_dataGridContext, this, string.Empty );
       ItemsSourceChangeCompletedEventManager.AddListener( m_dataGridContext.DataGridControl, this );
       ViewChangedEventManager.AddListener( m_dataGridContext.DataGridControl, this );
       ThemeChangedEventManager.AddListener( m_dataGridContext.DataGridControl, this );
-      VisibleColumnsUpdatedEventManager.AddListener( m_dataGridContext.Columns, this );
+      ColumnsLayoutChangingEventManager.AddListener( m_dataGridContext.ColumnManager, this );
+      ColumnsLayoutChangedEventManager.AddListener( m_dataGridContext.ColumnManager, this );
     }
 
     // Called before detaching ColumnVirtualizationManager from DataGridContext
@@ -163,16 +180,17 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       this.ResetInternalState();
 
-      m_dataGridContext.PropertyChanged -= new PropertyChangedEventHandler( this.DataGridContext_PropertyChanged );
+      PropertyChangedEventManager.RemoveListener( m_dataGridContext, this, string.Empty );
       ItemsSourceChangeCompletedEventManager.RemoveListener( m_dataGridContext.DataGridControl, this );
       ViewChangedEventManager.RemoveListener( m_dataGridContext.DataGridControl, this );
       ThemeChangedEventManager.RemoveListener( m_dataGridContext.DataGridControl, this );
-      VisibleColumnsUpdatedEventManager.RemoveListener( m_dataGridContext.Columns, this );
+      ColumnsLayoutChangingEventManager.RemoveListener( m_dataGridContext.ColumnManager, this );
+      ColumnsLayoutChangedEventManager.RemoveListener( m_dataGridContext.ColumnManager, this );
 
       m_dataGridContext = null;
     }
 
-    protected virtual void IncrementVersion( object parameters )
+    protected virtual void IncrementVersion( UpdateMeasureRequiredEventArgs e )
     {
       unchecked
       {
@@ -180,11 +198,11 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    protected virtual void DataGridContext_PropertyChanged( object sender, PropertyChangedEventArgs e )
+    protected virtual void OnDataGridContextPropertyChanged( PropertyChangedEventArgs e )
     {
-      Debug.Assert( string.IsNullOrEmpty( e.PropertyName ) == false );
+      Debug.Assert( !string.IsNullOrEmpty( e.PropertyName ) );
 
-      if( string.IsNullOrEmpty( e.PropertyName ) == true )
+      if( string.IsNullOrEmpty( e.PropertyName ) )
         return;
 
       switch( e.PropertyName )
@@ -195,61 +213,86 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    private int m_version; // = 0;
-    private int m_currentVersion; // = 0;
+    protected virtual void OnColumnsLayoutChanging()
+    {
+    }
 
-    private DataGridContext m_dataGridContext; // = null;
+    protected virtual void OnColumnsLayoutChanged()
+    {
+      this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.Unspecified ) );
+    }
+
+    protected virtual void OnDataGridControlViewChanged()
+    {
+      this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.Unspecified ) );
+    }
+
+    protected virtual void OnDataGridControlThemeChanged()
+    {
+      this.IncrementVersion( new UpdateMeasureRequiredEventArgs( UpdateMeasureTriggeredAction.Unspecified ) );
+    }
+
+    protected virtual void OnDataGridControlItemsSourceChanged()
+    {
+    }
+
+    private int m_currentVersion; //0;
 
     #region IWeakEventListener Members
 
     bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
-      return this.OnReceivedWeakEvent( managerType, sender, e );
+      return this.OnReceiveWeakEvent( managerType, sender, e );
     }
 
-    protected virtual bool OnReceivedWeakEvent( Type managerType, object sender, EventArgs e )
+    protected virtual bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
-      bool handled = false;
-      bool detachFromDataGridContext = false;
+      var detach = false;
 
-      if( managerType == typeof( VisibleColumnsUpdatedEventManager ) )
+      if( managerType == typeof( PropertyChangedEventManager ) )
       {
-        this.IncrementVersion( null );
-
-        handled = true;
+        if( sender == m_dataGridContext )
+        {
+          this.OnDataGridContextPropertyChanged( ( PropertyChangedEventArgs )e );
+        }
+      }
+      else if( managerType == typeof( ColumnsLayoutChangingEventManager ) )
+      {
+        this.OnColumnsLayoutChanging();
+      }
+      else if( managerType == typeof( ColumnsLayoutChangedEventManager ) )
+      {
+        this.OnColumnsLayoutChanged();
       }
       else if( managerType == typeof( ViewChangedEventManager ) )
       {
-        detachFromDataGridContext = true;
-        this.IncrementVersion( null );
-
-        handled = true;
+        this.OnDataGridControlViewChanged();
+        detach = true;
       }
       else if( managerType == typeof( ThemeChangedEventManager ) )
       {
-        detachFromDataGridContext = true;
-        this.IncrementVersion( null );
-
-        handled = true;
+        this.OnDataGridControlThemeChanged();
+        detach = true;
       }
       else if( managerType == typeof( ItemsSourceChangeCompletedEventManager ) )
       {
-        detachFromDataGridContext = true;
-        handled = true;
+        this.OnDataGridControlItemsSourceChanged();
+        detach = true;
       }
-
-      if( detachFromDataGridContext == true )
+      else
       {
-        if( m_dataGridContext != null )
-        {
-          // Detach the ColumnVirtualizationManager from the DataGridContext and detach from the DataGridContext
-          ColumnVirtualizationManager.SetColumnVirtualizationManager( m_dataGridContext, null );
-
-          this.Uninitialize();
-        }
+        return false;
       }
 
-      return handled;
+      if( detach && ( m_dataGridContext != null ) )
+      {
+        // Detach the ColumnVirtualizationManager from the DataGridContext and detach from the DataGridContext
+        ColumnVirtualizationManager.SetColumnVirtualizationManager( m_dataGridContext, null );
+
+        this.Uninitialize();
+      }
+
+      return true;
     }
 
     #endregion

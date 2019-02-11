@@ -20,28 +20,36 @@
                     xmlns:local="clr-namespace:Xceed.Wpf.DataGrid"
                     xmlns:conv="clr-namespace:Xceed.Wpf.DataGrid.Converters"
                     xmlns:markup="clr-namespace:Xceed.Wpf.DataGrid.Markup"
-                    xmlns:views="clr-namespace:Xceed.Wpf.DataGrid.Views"
-                    xmlns:utils="clr-namespace:Xceed.Utils.Wpf.Markup">
+                    xmlns:views="clr-namespace:Xceed.Wpf.DataGrid.Views">
 
    <ResourceDictionary.MergedDictionaries>
 
       <!-- Include the view independant, color-scheme independant, theme resources -->
-      <ResourceDictionary Source="Resources/Windows7.Resources.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="Resources/Windows7.Resources.xaml" />
 
       <!-- Include the view dependant, color-scheme independant, theme graphics -->
-      <ResourceDictionary Source="Resources/TableView.Windows7.Graphics.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="Resources/TableView.Windows7.Graphics.xaml" />
 
       <!-- Include the standard grid element templates -->
-      <ResourceDictionary Source="../Common/TableflowView.GridElementTemplates.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="../Common/TableflowView.GridElementTemplates.xaml" />
 
       <!-- Control Styles used in the Grid Control -->
-      <ResourceDictionary Source="Resources/Windows7.Controls.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="Resources/Windows7.Controls.xaml" />
 
    </ResourceDictionary.MergedDictionaries>
 
    <!-- =================================================================== -->
    <!-- Resources specific to this View/Theme/ColorScheme                   -->
    <!-- =================================================================== -->
+
+   <conv:GreaterThanZeroConverter x:Key="greaterThanZeroConverter" />
+   <conv:NullToBooleanConverter x:Key="nullToBooleanConverter" />
+   <conv:TypeToBooleanConverter x:Key="typeToBooleanConverter" />
+   <conv:ThicknessConverter x:Key="thicknessConverter" />
+   <conv:ThicknessConverter x:Key="inverseThicknessConverter"
+                            InverseValue="True" />
+   <conv:IntAdditionConverter x:Key="intAdditionConverter" />
+   <conv:SortingDirectionToBooleanConverter x:Key="sortingDirectionToBooleanConverter" />
 
    <Color x:Key="mainGradientColor">
       #C4DDFF
@@ -541,11 +549,11 @@
    <!--**************************
     * TEMPLATE: ColumnManagerCell 
     ************************** -->
+   <conv:IntAdditionConverter x:Key="IntAdditionConverter" />
+   <conv:SortingDirectionToBooleanConverter x:Key="SortingDirectionToBooleanConverter" />
+
    <ControlTemplate x:Key="tableflowViewWindows7ColumnManagerCellTemplate"
                     TargetType="local:ColumnManagerCell">
-      <ControlTemplate.Resources>
-         <conv:SortingDirectionToBooleanConverter x:Key="isSortedConverter" />
-      </ControlTemplate.Resources>
 
       <!-- We don't use the base Cell Template for the ColumnManagerCell because it need more elements
            to function properly: a Thumb named "PART_ColumnResizerThumb" that is used to resize the
@@ -639,7 +647,6 @@
                                    VerticalAlignment="Stretch"
                                    Margin="2,0,0,0"
                                    Opacity="0.5" />
-
                   </Grid>
 
                   <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -653,13 +660,15 @@
                      <!-- ContentPresenter that is used to display the sort glyph.
                         We explicitely set its Content property to Null to prevent the XAML parser
                         from implicitely setting it to its TemplatedParent's Content. -->
-                     <ContentPresenter x:Name="sortGlyphPresenter"
-                                       Content="{x:Null}"
-                                       ContentTemplate="{x:Null}"
-                                       TextElement.Foreground="#FFFFFFFF"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       Grid.Row="0" />
+                     <StackPanel Orientation="Horizontal"
+                                 Grid.Row="0"
+                                 VerticalAlignment="Center"
+                                 HorizontalAlignment="Center">
+                        <ContentPresenter x:Name="sortGlyphPresenter"
+                                          Content="{x:Null}"
+                                          ContentTemplate="{x:Null}"
+                                          TextElement.Foreground="#FFFFFFFF" />
+                     </StackPanel>
 
                      <!-- Same ContentPresenter as in the base Cell Template. -->
                      <local:CellContentPresenter VerticalAlignment="Center"
@@ -747,14 +756,6 @@
             <Setter TargetName="PART_ColumnResizerThumbLeft"
                     Property="IsEnabled"
                     Value="False" />
-         </DataTrigger>
-
-         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.Visible}"
-                      Value="False">
-
-            <Setter Property="Visibility"
-                    Value="Collapsed" />
-
          </DataTrigger>
 
          <!-- Trigger to set the background and pressed effect depending on state -->
@@ -898,20 +899,12 @@
    <ControlTemplate x:Key="tableflowViewWindows7RowTemplate"
                     TargetType="local:Row">
 
-      <!-- A basic Row Template requires at least a Panel named "PART_CellsHost" to which the Row's cells will be added.
-           This Panel is usually placed inside a Border who is responsible for painting the gridlines. -->
-      <ControlTemplate.Resources>
-         <conv:TypeToBooleanConverter x:Key="typeToBooleanConverter" />
-      </ControlTemplate.Resources>
-
-      <!-- This Grid is used to layout the GroupLevelIndicatorPane placeholder and the CellsHost panel. -->
       <Grid x:Name="rootGrid">
          <Grid.ColumnDefinitions>
             <!-- HierarchicalGroupLevelIndicatorPane -->
             <ColumnDefinition Width="Auto" />
             <!-- GroupLevelIndicatorPane -->
             <ColumnDefinition Width="Auto" />
-            <!-- MasterDetail ToggleButton -->
             <ColumnDefinition Width="Auto" />
 
             <!-- CellsHost panel -->
@@ -919,8 +912,8 @@
          </Grid.ColumnDefinitions>
 
          <!-- The border responsible for the visual outline of the row (gridlines and background)
-                       spans the GroupLevelIndicatorPane and CellsHost Panel. Those 2 elements are not children of
-                       the Border because we don't want the border to be displayed in the GroupLevelIndicatorPane. -->
+              spans the GroupLevelIndicatorPane and CellsHost Panel. Those 2 elements are not children of
+              the Border because we don't want the border to be displayed in the GroupLevelIndicatorPane. -->
          <Border x:Name="rootBorder"
                  Grid.Column="2"
                  Grid.ColumnSpan="2"
@@ -934,29 +927,22 @@
                                                     views:TableView.CanScrollHorizontally="False" />
 
          <!-- GroupLevelIndicatorPane is a placeholder for individual GroupLevelIndicator elements that are added
-                       whenever this Row is part of a group. -->
+              whenever this Row is part of a group. -->
          <local:GroupLevelIndicatorPane x:Name="groupLevelIndicatorPane"
                                         views:TableView.CanScrollHorizontally="False"
                                         Grid.Column="1" />
 
-         <!-- ToggleButton that is used to expand/collapse the group. -->
-         <Button x:Name="detailsToggle"
-                 Template="{StaticResource detailsExpanderButtonTemplate}"
-                 VerticalAlignment="Top"
-                 Grid.Column="2"
-                 Margin="2,4,2,0"
-                 Command="{x:Static local:DataGridCommands.ToggleDetailExpansion}"
-                 OverridesDefaultStyle="True"
-                 Focusable="False"
-                 Visibility="Collapsed"
-                 views:TableView.CanScrollHorizontally="False" />
-
-         <!-- This TextBlock is used to ensure that the DesiredSize for 
-         the Row will never fall below the Height of a String using the inherited font size and face-->
-         <TextBlock Text=""
-                    Visibility="Hidden"
-                    Grid.Column="3"
-                    Margin="{TemplateBinding BorderThickness}" />
+         <!-- Space reserved for alignment with data rows. -->
+         <ContentPresenter x:Name="detailsToggle"
+                           Grid.Column="2"
+                           Content="{x:Null}"
+                           ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).ExpandGroupGlyph}"
+                           VerticalAlignment="Top"
+                           Margin="2,4,2,0"
+                           OverridesDefaultStyle="True"
+                           Focusable="False"
+                           Visibility="Collapsed"
+                           views:TableView.CanScrollHorizontally="False" />
 
          <!-- The PART_CellsHost part designates the Panel to which this Row's Cells should be added.-->
          <views:FixedCellPanel x:Name="PART_CellsHost"
@@ -979,13 +965,108 @@
 
          <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}"
                           Value="True" />
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).DataGridControl.SelectionUnit}"
                           Value="Row" />
+            </MultiDataTrigger.Conditions>
 
+            <Setter TargetName="rootBorder"
+                    Property="Background">
+               <Setter.Value>
+                  <RadialGradientBrush Center="0.503,0.35"
+                                       GradientOrigin="1.009,0.295"
+                                       RadiusX="0.636"
+                                       RadiusY="2.375">
+                     <GradientStop Color="#FF04A2F7" />
+                     <GradientStop Color="#FF86E9F9"
+                                   Offset="1" />
+                     <GradientStop Color="#FF86E9F9"
+                                   Offset="0.5" />
+                  </RadialGradientBrush>
+               </Setter.Value>
+            </Setter>
+         </MultiDataTrigger>
+      </ControlTemplate.Triggers>
+
+   </ControlTemplate>
+
+   <!--**************************
+    * TEMPLATE: DataRow 
+    ************************** -->
+   <ControlTemplate x:Key="tableflowViewWindows7DataRowTemplate"
+                    TargetType="local:DataRow">
+
+      <Grid x:Name="rootGrid">
+         <Grid.ColumnDefinitions>
+            <!-- HierarchicalGroupLevelIndicatorPane -->
+            <ColumnDefinition Width="Auto" />
+            <!-- GroupLevelIndicatorPane -->
+            <ColumnDefinition Width="Auto" />
+            <!-- MasterDetail ToggleButton -->
+            <ColumnDefinition Width="Auto" />
+
+            <!-- CellsHost panel -->
+            <ColumnDefinition Width="*" />
+         </Grid.ColumnDefinitions>
+
+         <!-- The border responsible for the visual outline of the row (gridlines and background)
+              spans the GroupLevelIndicatorPane and CellsHost Panel. Those 2 elements are not children of
+              the Border because we don't want the border to be displayed in the GroupLevelIndicatorPane. -->
+         <Border x:Name="rootBorder"
+                 Grid.Column="2"
+                 Grid.ColumnSpan="2"
+                 views:TableView.CanScrollHorizontally="False"
+                 Background="{TemplateBinding Background}"
+                 BorderBrush="{TemplateBinding BorderBrush}"
+                 BorderThickness="{TemplateBinding BorderThickness}"
+                 Padding="{TemplateBinding Padding}" />
+
+         <local:HierarchicalGroupLevelIndicatorPane Grid.Column="0"
+                                                    views:TableView.CanScrollHorizontally="False" />
+
+         <!-- GroupLevelIndicatorPane is a placeholder for individual GroupLevelIndicator elements that are added
+              whenever this Row is part of a group. -->
+         <local:GroupLevelIndicatorPane x:Name="groupLevelIndicatorPane"
+                                        views:TableView.CanScrollHorizontally="False"
+                                        Grid.Column="1" />
+
+         <!-- ToggleButton that is used to expand/collapse the group. -->
+         <Button x:Name="detailsToggle"
+                 Grid.Column="2"
+                 Template="{StaticResource detailsExpanderButtonTemplate}"
+                 VerticalAlignment="Top"
+                 Margin="2,4,2,0"
+                 OverridesDefaultStyle="True"
+                 Focusable="False"
+                 Visibility="Collapsed"
+                 views:TableView.CanScrollHorizontally="False" />
+
+         <!-- The PART_CellsHost part designates the Panel to which this Row's Cells should be added.-->
+         <views:FixedCellPanel x:Name="PART_CellsHost"
+                               Grid.Column="3"
+                               ColumnStretchMinWidth="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).ColumnStretchMinWidth}"
+                               ColumnStretchMode="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).ColumnStretchMode}"
+                               FixedCellCount="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).FixedColumnCount, Mode=TwoWay}"
+                               FixedColumnDropMarkPen="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).FixedColumnDropMarkPen}"
+                               Margin="{TemplateBinding BorderThickness}" />
+      </Grid>
+
+      <ControlTemplate.Triggers>
+
+         <!-- When changing the appearance (e.g. background/foreground) of the Row to reflect specific
+              states (e.g. IsSelected), it is recommended to apply the changes directly to the template
+              elements because we want those modifications to be effective even when a value has been
+              explicitely set to these properties on the TemplatedParent. Also, when someone queries
+              the value of these properties on the TemplatedParent, we don't want to return the
+              intermediate, state-specific values. -->
+
+         <MultiDataTrigger>
+            <MultiDataTrigger.Conditions>
+               <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}"
+                          Value="True" />
+               <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).DataGridControl.SelectionUnit}"
+                          Value="Row" />
             </MultiDataTrigger.Conditions>
 
             <Setter TargetName="rootBorder"
@@ -1008,19 +1089,15 @@
          <!-- When the Row is Selected, we want to change its background/foreground to the appropriate brushes. -->
          <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=IsSelected}"
                           Value="True" />
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).DataGridControl.IsKeyboardFocusWithin}"
                           Value="True" />
-
             </MultiDataTrigger.Conditions>
 
             <Setter TargetName="rootBorder"
                     Property="Background"
                     Value="{Binding RelativeSource={RelativeSource TemplatedParent},Path=SelectionBackground}" />
-
             <Setter TargetName="rootGrid"
                     Property="TextElement.Foreground"
                     Value="{Binding RelativeSource={RelativeSource TemplatedParent},Path=SelectionForeground}" />
@@ -1031,22 +1108,17 @@
               the Row's background/foreground to the appropriate brushes. -->
          <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=IsSelected}"
                           Value="True" />
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).DataGridControl.IsKeyboardFocusWithin}"
                           Value="False" />
-
                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=(local:DataGridControl.DataGridContext).DataGridControl.HideSelection}"
                           Value="False" />
-
             </MultiDataTrigger.Conditions>
 
             <Setter TargetName="rootBorder"
                     Property="Background"
                     Value="{Binding RelativeSource={RelativeSource TemplatedParent},Path=InactiveSelectionBackground}" />
-
             <Setter TargetName="rootGrid"
                     Property="TextElement.Foreground"
                     Value="{Binding RelativeSource={RelativeSource TemplatedParent},Path=InactiveSelectionForeground}" />
@@ -1387,7 +1459,6 @@
    <!--**************************
     * TEMPLATE: GroupHeaderControl
     ************************** -->
-   <conv:IntAdditionConverter x:Key="groupHeaderControlGroupLevelConverter" />
    <ControlTemplate x:Key="tableflowViewWindows7GroupHeaderControlTemplate"
                     TargetType="local:GroupHeaderControl">
 
@@ -1401,7 +1472,7 @@
             <local:HierarchicalGroupLevelIndicatorPane DockPanel.Dock="Left" />
             <local:GroupLevelIndicatorPane DockPanel.Dock="Left"
                                            Indented="False"
-                                           local:GroupLevelIndicatorPane.GroupLevel="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:GroupLevelIndicatorPane.GroupLevel), Converter={StaticResource groupHeaderControlGroupLevelConverter}, ConverterParameter=-1}" />
+                                           local:GroupLevelIndicatorPane.GroupLevel="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:GroupLevelIndicatorPane.GroupLevel), Converter={StaticResource intAdditionConverter}, ConverterParameter=-1}" />
             <!-- Main Border for the GroupHeaderControl. It is Focusable to make the InputBindings work. -->
             <Border x:Name="mainBorder"
                     Background="{TemplateBinding Background}"
@@ -1500,7 +1571,7 @@
             <local:HierarchicalGroupLevelIndicatorPane DockPanel.Dock="Left" />
             <local:GroupLevelIndicatorPane DockPanel.Dock="Left"
                                            Indented="False"
-                                           local:GroupLevelIndicatorPane.GroupLevel="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:GroupLevelIndicatorPane.GroupLevel), Converter={StaticResource groupHeaderControlGroupLevelConverter}, ConverterParameter=-1}" />
+                                           local:GroupLevelIndicatorPane.GroupLevel="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:GroupLevelIndicatorPane.GroupLevel), Converter={StaticResource intAdditionConverter}, ConverterParameter=-1}" />
 
             <Grid>
                <Border BorderThickness="0,0,0,1"
@@ -1736,7 +1807,6 @@
 
    </ControlTemplate>
 
-
    <!--**************************
     * TEMPLATE: HierarchicalGroupByItem
     ************************** -->
@@ -1837,21 +1907,12 @@
 
    </ControlTemplate>
 
-
    <!--**************************
     * TEMPLATE: ColumnManagerRow 
     ************************** -->
    <ControlTemplate x:Key="tableflowViewWindows7ColumnManagerRowTemplate"
                     TargetType="local:ColumnManagerRow">
-      <!-- A basic Row Template requires at least a Panel named "PART_CellsHost" to which the Row's cells will be added.
-           This Panel is usually placed inside a Border who is responsible for painting the gridlines. -->
 
-      <ControlTemplate.Resources>
-         <conv:ThicknessConverter x:Key="thicknessConverter"
-                                  InverseValue="True" />
-      </ControlTemplate.Resources>
-
-      <!-- This Grid is used to layout the GroupLevelIndicatorPane placeholder and the CellsHost panel. -->
       <Grid x:Name="rootGrid">
          <Grid.ColumnDefinitions>
             <!-- HierarchicalGroupLevelIndicatorPane -->
@@ -1865,8 +1926,8 @@
          </Grid.ColumnDefinitions>
 
          <!-- The border responsible for the visual outline of the row (gridlines and background)
-                       spans the GroupLevelIndicatorPane and CellsHost Panel. Those 2 elements are not children of
-                       the Border because we don't want the border to be displayed in the GroupLevelIndicatorPane. -->
+              spans the GroupLevelIndicatorPane and CellsHost Panel. Those 2 elements are not children of
+              the Border because we don't want the border to be displayed in the GroupLevelIndicatorPane. -->
          <Border x:Name="rootBorder"
                  Grid.Column="1"
                  Grid.ColumnSpan="3"
@@ -1890,23 +1951,24 @@
                  views:TableView.CanScrollHorizontally="False" />
 
          <!-- GroupLevelIndicatorPane is a placeholder for individual GroupLevelIndicator elements that are added
-                       whenever this Row is part of a group. -->
+              whenever this Row is part of a group. -->
          <local:HierarchicalGroupLevelIndicatorPane views:TableView.CanScrollHorizontally="False"
                                                     Grid.Column="0" />
          <local:GroupLevelIndicatorPane x:Name="groupLevelIndicatorPane"
                                         views:TableView.CanScrollHorizontally="False"
                                         Grid.Column="1" />
 
-         <!-- Button that is used to expand/collapse the group. -->
-         <Button x:Name="detailsToggle"
-                 Template="{StaticResource detailsExpanderButtonTemplate}"
-                 Grid.Column="2"
-                 Margin="2,0,2,0"
-                 Command="{x:Static local:DataGridCommands.ToggleDetailExpansion}"
-                 OverridesDefaultStyle="True"
-                 Focusable="False"
-                 Visibility="Collapsed"
-                 views:TableView.CanScrollHorizontally="False" />
+         <!-- Space reserved for alignment with data rows. -->
+         <ContentPresenter x:Name="detailsToggle"
+                           Grid.Column="2"
+                           Content="{x:Null}"
+                           ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).ExpandGroupGlyph}"
+                           VerticalAlignment="Top"
+                           Margin="2,4,2,0"
+                           OverridesDefaultStyle="True"
+                           Focusable="False"
+                           Visibility="Collapsed"
+                           views:TableView.CanScrollHorizontally="False" />
 
          <!-- The PART_CellsHost part designates the Panel to which this Row's Cells should be added.-->
          <Decorator x:Name="indentationDecorator"
@@ -1949,10 +2011,6 @@
     ************************** -->
    <ControlTemplate x:Key="tableflowViewWindows7CellTemplate"
                     TargetType="local:Cell">
-
-      <ControlTemplate.Resources>
-         <conv:TypeToBooleanConverter x:Key="typeToBooleanConverter" />
-      </ControlTemplate.Resources>
 
       <Grid>
 
@@ -2097,18 +2155,6 @@
 
          </DataTrigger>
 
-         <!-- When the Cell's content is Null and the row is not being edited, we want to ensure that the row/cell
-              will preserve a minimum height based on the current font size for the row/cell. To do this, we override
-              the ContentPresenter's content binding and replace it with an empty string (""), the textbox generated 
-              this way will then size to the default text's height. When the trigger is not active anymore, default binding
-              is restored automatically. -->
-
-         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.Visible}"
-                      Value="False">
-            <Setter Property="Visibility"
-                    Value="Collapsed" />
-         </DataTrigger>
-
          <!-- When the Cell is Selected but the parent DataGridControl is not focused, we want to change
               the Cell's background to the appropriate brushes. -->
          <MultiDataTrigger>
@@ -2244,7 +2290,7 @@
 
       <!-- Include ControlTemplates of common controls -->
       <Style.Resources>
-         <ResourceDictionary Source="Resources/Windows7.Controls.xaml" />
+         <markup:DataGridThemeResourceDictionary Source="Resources/Windows7.Controls.xaml" />
       </Style.Resources>
 
       <Setter Property="BorderBrush"
@@ -2377,7 +2423,7 @@
       <!-- The Row is responsible for drawing the horizontal gridlines. It draws only its top gridline,
            assuming that the bottom gridline will be drawn by its following row/element -->
       <Setter Property="BorderThickness"
-              Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness,Converter={StaticResource thicknessConverter},ConverterParameter='Top'}" />
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness, Converter={StaticResource thicknessConverter}, ConverterParameter='Top'}" />
 
       <Setter Property="BorderBrush"
               Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HorizontalGridLineBrush}" />
@@ -2388,11 +2434,14 @@
       <Setter Property="Background"
               Value="Transparent" />
 
+      <Setter Property="Foreground"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentForeground}" />
+
       <Style.Triggers>
          <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(views:ViewBase.IsLastItem)}"
                       Value="True">
             <Setter Property="BorderThickness"
-                    Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness,Converter={StaticResource thicknessConverter},ConverterParameter='Top, Bottom'}" />
+                    Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).HorizontalGridLineThickness, Converter={StaticResource thicknessConverter}, ConverterParameter='Top, Bottom'}" />
          </DataTrigger>
 
          <!-- Enabled/Disabled Odd datarow style alternation -->
@@ -2418,6 +2467,10 @@
    <Style x:Key="tableflowViewWindows7DataRowStyle"
           TargetType="local:DataRow"
           BasedOn="{StaticResource tableflowViewWindows7RowStyle}">
+
+      <Setter Property="Template"
+              Value="{StaticResource tableflowViewWindows7DataRowTemplate}" />
+
    </Style>
 
    <!--**************************
@@ -2488,15 +2541,24 @@
       <Setter Property="Background"
               Value="Transparent" />
 
+      <Setter Property="Foreground"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentForeground}" />
+
       <!-- In TableflowView, each Cell has the same width as its ParentColum's ActualWidth -->
       <Setter Property="Width"
-              Value="{Binding RelativeSource={RelativeSource Self},Path=ParentColumn.ActualWidth}" />
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.ActualWidth}" />
 
       <Setter Property="Padding"
               Value="{StaticResource cellPadding}" />
 
+      <Setter Property="HorizontalContentAlignment"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.CellHorizontalContentAlignment, FallbackValue=Stretch}" />
+
+      <Setter Property="VerticalContentAlignment"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.CellVerticalContentAlignment, FallbackValue=Stretch}" />
+
       <Setter Property="BorderThickness"
-              Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).VerticalGridLineThickness,Converter={StaticResource thicknessConverter},ConverterParameter='Right'}" />
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).VerticalGridLineThickness, Converter={StaticResource thicknessConverter}, ConverterParameter='Right'}" />
 
       <Setter Property="BorderBrush"
               Value="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).VerticalGridLineBrush}" />
@@ -2524,6 +2586,9 @@
       <Setter Property="Background"
               Value="Transparent" />
 
+      <Setter Property="ToolTip"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.Description}" />
+
       <Setter Property="TextElement.Foreground"
               Value="White" />
 
@@ -2533,6 +2598,12 @@
 
       <Setter Property="Padding"
               Value="4,3,0,7" />
+
+      <Setter Property="HorizontalContentAlignment"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.CellHorizontalContentAlignment, FallbackValue=Stretch}" />
+
+      <Setter Property="VerticalContentAlignment"
+              Value="{Binding RelativeSource={RelativeSource Self}, Path=ParentColumn.CellVerticalContentAlignment, FallbackValue=Stretch}" />
 
       <Setter Property="Template"
               Value="{StaticResource tableflowViewWindows7ColumnManagerCellTemplate}" />
@@ -2612,6 +2683,18 @@
       <Setter Property="Foreground"
               Value="{StaticResource headerForegroundBrush}" />
 
+      <Setter Property="SelectionBackground"
+              Value="{StaticResource rowSelectionBackgroundBrush}" />
+
+      <Setter Property="SelectionForeground"
+              Value="Black" />
+
+      <Setter Property="InactiveSelectionBackground"
+              Value="{StaticResource rowInactiveSelectionBackgroundBrush}" />
+
+      <Setter Property="InactiveSelectionForeground"
+              Value="{DynamicResource {x:Static SystemColors.InactiveCaptionTextBrushKey}}" />
+
       <Setter Property="views:TableView.CanScrollHorizontally"
               Value="False" />
 
@@ -2658,6 +2741,7 @@
             <Setter Property="Template"
                     Value="{StaticResource tableflowViewWindows7GroupHeaderTopLevelStickyControlTemplate}" />
          </MultiDataTrigger>
+
       </Style.Triggers>
 
    </Style>
@@ -2744,7 +2828,7 @@
                   Value="-1">
 
             <!-- Stop the propagation of the value set by the default style trigger of
-                 the ColumnManagerRow . -->
+                 the ColumnManagerRow -->
             <Setter Property="local:GroupLevelIndicatorPane.ShowIndicators"
                     Value="True" />
 
@@ -3133,15 +3217,15 @@
           BasedOn="{StaticResource tableflowViewWindows7HierarchicalGroupByItemStyle}" />
 
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, ThemeType=views:Windows7Theme, TargetElementType=local:GroupNavigationButton}"
-          TargetType="{x:Type local:GroupNavigationButton}"
+          TargetType="local:GroupNavigationButton"
           BasedOn="{StaticResource tableflowViewWindows7GroupNavigationButtonStyle}" />
 
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, ThemeType=views:Windows7Theme, TargetElementType=local:GroupNavigationControl}"
-          TargetType="{x:Type local:GroupNavigationControl}"
+          TargetType="local:GroupNavigationControl"
           BasedOn="{StaticResource tableflowViewWindows7GroupNavigationControlStyle}" />
 
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, ThemeType=views:Windows7Theme, TargetElementType=local:GroupNavigationControlItem}"
-          TargetType="{x:Type local:GroupNavigationControlItem}"
+          TargetType="local:GroupNavigationControlItem"
           BasedOn="{StaticResource tableflowViewWindows7GroupNavigationControlItemStyle}" />
 
 </ResourceDictionary>

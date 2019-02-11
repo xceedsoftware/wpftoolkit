@@ -14,156 +14,149 @@
 
   ***********************************************************************************/
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Media3D;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-    public static class Extensions
+  public static class Extensions
+  {
+    #region Public Methods
+
+    public static IEnumerable<ILayoutElement> Descendents( this ILayoutElement element )
     {
-        public static IEnumerable<ILayoutElement> Descendents(this ILayoutElement element)
+      var container = element as ILayoutContainer;
+      if( container != null )
+      {
+        foreach( var childElement in container.Children )
         {
-            var container = element as ILayoutContainer;
-            if (container != null)
-            {
-                foreach (var childElement in container.Children)
-                {
-                    yield return childElement;
-                    foreach (var childChildElement in childElement.Descendents())
-                        yield return childChildElement;
-                }
-            }
+          yield return childElement;
+          foreach( var childChildElement in childElement.Descendents() )
+            yield return childChildElement;
         }
+      }
+    }
 
-        public static T FindParent<T>(this ILayoutElement element) //where T : ILayoutContainer
-        { 
-            var parent = element.Parent;
-            while (parent != null &&
-                !(parent is T))
-                parent = parent.Parent;
+    public static T FindParent<T>( this ILayoutElement element ) //where T : ILayoutContainer
+    {
+      var parent = element.Parent;
+      while( parent != null &&
+          !( parent is T ) )
+        parent = parent.Parent;
 
 
-            return (T)parent;
-        }
+      return ( T )parent;
+    }
 
-        public static ILayoutRoot GetRoot(this ILayoutElement element) //where T : ILayoutContainer
+    public static ILayoutRoot GetRoot( this ILayoutElement element ) //where T : ILayoutContainer
+    {
+      if( element is ILayoutRoot )
+        return element as ILayoutRoot;
+
+      var parent = element.Parent;
+      while( parent != null &&
+          !( parent is ILayoutRoot ) )
+        parent = parent.Parent;
+
+      return ( ILayoutRoot )parent;
+    }
+
+    public static bool ContainsChildOfType<T>( this ILayoutContainer element )
+    {
+      foreach( var childElement in element.Descendents() )
+        if( childElement is T )
+          return true;
+
+      return false;
+    }
+
+    public static bool ContainsChildOfType<T, S>( this ILayoutContainer container )
+    {
+      foreach( var childElement in container.Descendents() )
+        if( childElement is T || childElement is S )
+          return true;
+
+      return false;
+    }
+
+    public static bool IsOfType<T, S>( this ILayoutContainer container )
+    {
+      return container is T || container is S;
+    }
+
+    public static AnchorSide GetSide( this ILayoutElement element )
+    {
+      var parentContainer = element.Parent as ILayoutOrientableGroup;
+      if( parentContainer != null )
+      {
+        var layoutPanel = parentContainer as LayoutPanel;
+        if( layoutPanel == null )
         {
-            if (element is ILayoutRoot)
-                return element as ILayoutRoot;
-
-            var parent = element.Parent;
-            while (parent != null &&
-                !(parent is ILayoutRoot))
-                parent = parent.Parent;
-
-            return (ILayoutRoot)parent;
+          layoutPanel = parentContainer.FindParent<LayoutPanel>();
         }
 
-        public static bool ContainsChildOfType<T>(this ILayoutContainer element)
+        if( (layoutPanel != null) && ( layoutPanel.Children.Count > 0 ) )
         {
-            foreach (var childElement in element.Descendents())
-                if (childElement is T)
-                    return true;
-
-            return false;
+          if( layoutPanel.Orientation == System.Windows.Controls.Orientation.Horizontal )
+            return layoutPanel.Children[ 0 ].Descendents().Contains( element ) ? AnchorSide.Left : AnchorSide.Right;
+          return layoutPanel.Children[ 0 ].Descendents().Contains( element ) ? AnchorSide.Top : AnchorSide.Bottom;
         }
+      }
 
-        public static bool ContainsChildOfType<T, S>(this ILayoutContainer container)
+      Debug.Fail( "Unable to find the side for an element, possible layout problem!" );
+      return AnchorSide.Right;
+    }
+
+    #endregion
+
+    #region Internal Methods
+
+    internal static void KeepInsideNearestMonitor( this ILayoutElementForFloatingWindow paneInsideFloatingWindow )
+    {
+      Win32Helper.RECT r = new Win32Helper.RECT();
+      r.Left = ( int )paneInsideFloatingWindow.FloatingLeft;
+      r.Top = ( int )paneInsideFloatingWindow.FloatingTop;
+      r.Bottom = r.Top + ( int )paneInsideFloatingWindow.FloatingHeight;
+      r.Right = r.Left + ( int )paneInsideFloatingWindow.FloatingWidth;
+
+      uint MONITOR_DEFAULTTONEAREST = 0x00000002;
+      uint MONITOR_DEFAULTTONULL = 0x00000000;
+
+      System.IntPtr monitor = Win32Helper.MonitorFromRect( ref r, MONITOR_DEFAULTTONULL );
+      if( monitor == System.IntPtr.Zero )
+      {
+        System.IntPtr nearestmonitor = Win32Helper.MonitorFromRect( ref r, MONITOR_DEFAULTTONEAREST );
+        if( nearestmonitor != System.IntPtr.Zero )
         {
-            foreach (var childElement in container.Descendents())
-                if (childElement is T || childElement is S)
-                    return true;
+          Win32Helper.MonitorInfo monitorInfo = new Win32Helper.MonitorInfo();
+          monitorInfo.Size = Marshal.SizeOf( monitorInfo );
+          Win32Helper.GetMonitorInfo( nearestmonitor, monitorInfo );
 
-            return false;
+          if( paneInsideFloatingWindow.FloatingLeft < monitorInfo.Work.Left )
+          {
+            paneInsideFloatingWindow.FloatingLeft = monitorInfo.Work.Left + 10;
+          }
+
+          if( paneInsideFloatingWindow.FloatingLeft + paneInsideFloatingWindow.FloatingWidth > monitorInfo.Work.Right )
+          {
+            paneInsideFloatingWindow.FloatingLeft = monitorInfo.Work.Right - ( paneInsideFloatingWindow.FloatingWidth + 10 );
+          }
+
+          if( paneInsideFloatingWindow.FloatingTop < monitorInfo.Work.Top )
+          {
+            paneInsideFloatingWindow.FloatingTop = monitorInfo.Work.Top + 10;
+          }
+
+          if( paneInsideFloatingWindow.FloatingTop + paneInsideFloatingWindow.FloatingHeight > monitorInfo.Work.Bottom )
+          {
+            paneInsideFloatingWindow.FloatingTop = monitorInfo.Work.Bottom - ( paneInsideFloatingWindow.FloatingHeight + 10 );
+          }
         }
-
-        public static bool IsOfType<T, S>(this ILayoutContainer container)
-        {
-            return container is T || container is S;
-        }
-
-        public static AnchorSide GetSide(this ILayoutElement element)
-        {
-            var parentContainer = element.Parent as ILayoutOrientableGroup;
-            if (parentContainer != null)
-            {
-                if (!parentContainer.ContainsChildOfType<LayoutDocumentPaneGroup, LayoutDocumentPane>())
-                    return GetSide(parentContainer);
-
-                foreach (var childElement in parentContainer.Children)
-                {
-                    if (childElement == element ||
-                        childElement.Descendents().Contains(element))
-                        return parentContainer.Orientation == System.Windows.Controls.Orientation.Horizontal ?
-                            AnchorSide.Left : AnchorSide.Top;
-
-                    var childElementAsContainer = childElement as ILayoutContainer;
-                    if (childElementAsContainer != null &&
-                        (childElementAsContainer.IsOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() ||
-                        childElementAsContainer.ContainsChildOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>()))
-                    {
-                        return parentContainer.Orientation == System.Windows.Controls.Orientation.Horizontal ?
-                           AnchorSide.Right : AnchorSide.Bottom;
-                    }
-                }
-            }
-
-            Debug.Fail("Unable to find the side for an element, possible layout problem!");
-            return AnchorSide.Right;
-        }
-
-
-        internal static void KeepInsideNearestMonitor(this ILayoutElementForFloatingWindow paneInsideFloatingWindow)
-        {
-            Win32Helper.RECT r = new Win32Helper.RECT();
-            r.Left = (int)paneInsideFloatingWindow.FloatingLeft;
-            r.Top = (int)paneInsideFloatingWindow.FloatingTop;
-            r.Bottom = r.Top + (int)paneInsideFloatingWindow.FloatingHeight;
-            r.Right = r.Left + (int)paneInsideFloatingWindow.FloatingWidth;
-
-            uint MONITOR_DEFAULTTONEAREST = 0x00000002;
-            uint MONITOR_DEFAULTTONULL = 0x00000000;
-
-            System.IntPtr monitor = Win32Helper.MonitorFromRect(ref r, MONITOR_DEFAULTTONULL);
-            if (monitor == System.IntPtr.Zero)
-            {
-                System.IntPtr nearestmonitor = Win32Helper.MonitorFromRect(ref r, MONITOR_DEFAULTTONEAREST);
-                if (nearestmonitor != System.IntPtr.Zero)
-                {
-                    Win32Helper.MonitorInfo monitorInfo = new Win32Helper.MonitorInfo();
-                    monitorInfo.Size = Marshal.SizeOf(monitorInfo);
-                    Win32Helper.GetMonitorInfo(nearestmonitor, monitorInfo);
-
-                    if (paneInsideFloatingWindow.FloatingLeft < monitorInfo.Work.Left)
-                    {
-                        paneInsideFloatingWindow.FloatingLeft = monitorInfo.Work.Left + 10;
-                    }
-
-                    if (paneInsideFloatingWindow.FloatingLeft + paneInsideFloatingWindow.FloatingWidth > monitorInfo.Work.Right)
-                    {
-                        paneInsideFloatingWindow.FloatingLeft = monitorInfo.Work.Right - (paneInsideFloatingWindow.FloatingWidth + 10);
-                    }
-
-                    if (paneInsideFloatingWindow.FloatingTop < monitorInfo.Work.Top)
-                    {
-                        paneInsideFloatingWindow.FloatingTop = monitorInfo.Work.Top + 10;
-                    }
-
-                    if (paneInsideFloatingWindow.FloatingTop + paneInsideFloatingWindow.FloatingHeight > monitorInfo.Work.Bottom)
-                    {
-                        paneInsideFloatingWindow.FloatingTop = monitorInfo.Work.Bottom - (paneInsideFloatingWindow.FloatingHeight + 10);
-                    }
-                }
-            }
-
-        }
+      }
 
     }
+
+    #endregion
+  }
 }

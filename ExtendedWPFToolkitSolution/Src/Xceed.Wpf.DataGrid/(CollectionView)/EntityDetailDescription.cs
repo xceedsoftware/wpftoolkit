@@ -15,24 +15,16 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections;
-using System.Data.Objects;
+using System.ComponentModel;
 using System.Data.Objects.DataClasses;
 using System.Reflection;
-using System.Windows;
-using System.ComponentModel;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal class EntityDetailDescription : DataGridDetailDescription
   {
-    #region CONSTRUCTORS
-
     public EntityDetailDescription()
-      : base()
     {
     }
 
@@ -45,21 +37,20 @@ namespace Xceed.Wpf.DataGrid
       this.RelationName = propertyName;
     }
 
-    #endregion CONSTRUCTORS
-
     #region QueryDetails Event
 
     public event EventHandler<QueryEntityDetailsEventArgs> QueryDetails;
 
     protected virtual void OnQueryDetails( QueryEntityDetailsEventArgs e )
     {
-      if( this.QueryDetails != null )
-        this.QueryDetails( this, e );
+      var handler = this.QueryDetails;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, e );
     }
 
-    #endregion QueryDetails Event
-
-    #region DataGridDetailDescription Overrides
+    #endregion
 
     protected internal override IEnumerable GetDetailsForParentItem( DataGridCollectionViewBase parentCollectionView, object parentItem )
     {
@@ -94,8 +85,8 @@ namespace Xceed.Wpf.DataGrid
           {
             // Make sure that the details are loaded 
             // except if the user already handled it.
-            if( !relatedEnd.IsLoaded 
-              && !args.Handled 
+            if( !relatedEnd.IsLoaded
+              && !args.Handled
               && entityObjectLoadable )
             {
               relatedEnd.Load();
@@ -112,7 +103,5 @@ namespace Xceed.Wpf.DataGrid
 
       return null;
     }
-
-    #endregion DataGridDetailDescription Overrides
   }
 }

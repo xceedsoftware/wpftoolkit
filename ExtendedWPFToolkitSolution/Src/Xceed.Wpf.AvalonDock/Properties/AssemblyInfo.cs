@@ -25,12 +25,12 @@ using System;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Xceed Extended WPF Toolkit - AvalonDock" )]
+[assembly: AssemblyTitle( "Xceed Toolkit for WPF - AvalonDock" )]
 [assembly: AssemblyDescription( "This assembly implements the Xceed.Wpf.AvalonDock namespace, a docking layout system for the Windows Presentation Framework." )]
 
 [assembly: AssemblyCompany( "Xceed Software Inc." )]
-[assembly: AssemblyProduct( "Xceed Extended WPF Toolkit - AvalonDock" )]
-[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2013" )]
+[assembly: AssemblyProduct( "Xceed Toolkit for WPF - AvalonDock" )]
+[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2017" )]
 [assembly: AssemblyCulture( "" )]
 
 
@@ -52,7 +52,7 @@ using System;
 
 
 [assembly: ThemeInfo(
-    ResourceDictionaryLocation.SourceAssembly, //where theme specific resource dictionaries are located
+    ResourceDictionaryLocation.None, //where theme specific resource dictionaries are located
     //(used if a resource is not found in the page, 
     // or application resource dictionaries)
     ResourceDictionaryLocation.SourceAssembly //where the generic resource dictionary is located

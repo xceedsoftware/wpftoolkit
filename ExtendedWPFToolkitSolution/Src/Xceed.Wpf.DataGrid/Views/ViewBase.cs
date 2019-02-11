@@ -15,15 +15,14 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
-using System.Windows.Media;
-using Xceed.Wpf.DataGrid.Markup;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Windows;
+using Xceed.Wpf.DataGrid.Markup;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
@@ -33,19 +32,18 @@ namespace Xceed.Wpf.DataGrid.Views
 
     internal static object GetDefaultStyleKey( Type viewType, Type elementType )
     {
-      return ViewBase.GetDefaultStyleKey( viewType, null, elementType );
+      return new ThemeKey( viewType, null, elementType );
     }
 
     private static object GetDefaultStyleKey( Type viewType, Theme theme, Type elementType )
     {
-      Type themeType = ( theme == null ) ? null : theme.GetType();
+      if( theme == null )
+        return ViewBase.GetDefaultStyleKey( viewType, elementType );
 
-      return new ThemeKey( viewType, themeType, elementType );
+      return theme.GetDefaultStyleKey( viewType, elementType );
     }
 
     #endregion Static Members
-
-    #region Constructors
 
     static ViewBase()
     {
@@ -68,8 +66,6 @@ namespace Xceed.Wpf.DataGrid.Views
         this.DefaultStyleKey = newDefaultStyleKey;
       }
     }
-
-    #endregion Constructors
 
     #region Theme Property
 
@@ -99,8 +95,11 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private void OnThemeChanged( DependencyPropertyChangedEventArgs e )
     {
-      if( this.ThemeChanged != null )
-        this.ThemeChanged( this, e );
+      var handler = this.ThemeChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, e );
     }
 
     private static void ThemeChangedCallback( DependencyObject sender, DependencyPropertyChangedEventArgs e )
@@ -269,7 +268,7 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion DescendingSortGlyph Property
+    #endregion SortOrderGlyph Property
 
     #region ExpandGroupGlyph Property
 
@@ -340,8 +339,8 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #region IsLastItem Attached Property
 
-    public static readonly DependencyProperty IsLastItemProperty = DependencyProperty.RegisterAttached( 
-      "IsLastItem", typeof( bool ), typeof( ViewBase ), 
+    public static readonly DependencyProperty IsLastItemProperty = DependencyProperty.RegisterAttached(
+      "IsLastItem", typeof( bool ), typeof( ViewBase ),
       new FrameworkPropertyMetadata( false, FrameworkPropertyMetadataOptions.Inherits ) );
 
     public static bool GetIsLastItem( DependencyObject obj )
@@ -362,33 +361,19 @@ namespace Xceed.Wpf.DataGrid.Views
       "PreserveContainerSize",
       typeof( bool ),
       typeof( ViewBase ),
-      new FrameworkPropertyMetadata(
-        true,
-        new PropertyChangedCallback( ViewBase.OnPreserveContainerSizeChanged ) ) );
+      new FrameworkPropertyMetadata( true ) );
 
     internal bool PreserveContainerSize
     {
       get
       {
-        return m_preserveContainerSize;
+        return ( bool )this.GetValue( ViewBase.PreserveContainerSizeProperty );
       }
       set
       {
         this.SetValue( ViewBase.PreserveContainerSizeProperty, value );
       }
     }
-
-    private static void OnPreserveContainerSizeChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
-    {
-      ViewBase uiViewBase = sender as ViewBase;
-
-      if( uiViewBase == null )
-        return;
-
-      uiViewBase.m_preserveContainerSize = ( bool )e.NewValue;
-    }
-
-    private bool m_preserveContainerSize = true;
 
     #endregion
 
@@ -408,7 +393,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     protected virtual void AddDefaultHeadersFooters()
     {
-    } 
+    }
 
     #endregion
 
@@ -435,98 +420,134 @@ namespace Xceed.Wpf.DataGrid.Views
       return ViewBase.GetDefaultStyleKey( this.ViewTypeForThemeKey, this.Theme, elementType );
     }
 
-    internal IEnumerable<DependencyProperty> GetViewProperties()
+    internal IEnumerable<ViewPropertyStruct> GetViewProperties()
     {
       //This will ensure that the GetViewPropertiesCore will be called only once by instance of view (optimization to avoir re-doing it all the time ).
       if( m_viewProperties == null )
       {
-        List<DependencyProperty> viewProperties = new List<DependencyProperty>();
-
-        this.GetViewPropertiesCore( viewProperties, ViewPropertyMode.ViewOnly );
-
-        m_viewProperties = viewProperties;
+        m_viewProperties = this.GetViewPropertiesCore( ViewPropertyMode.ViewOnly ).ToArray();
       }
 
       return m_viewProperties;
     }
 
-    internal IEnumerable<DependencyProperty> GetSharedProperties()
+    internal IEnumerable<ViewPropertyStruct> GetSharedProperties()
     {
       //This will ensure that the GetViewPropertiesCore will be called only once by instance of view (optimization to avoir re-doing it all the time ).
       if( m_sharedProperties == null )
       {
-        List<DependencyProperty> sharedProperties = new List<DependencyProperty>();
-
-        this.GetViewPropertiesCore( sharedProperties, ViewPropertyMode.Routed );
-
-        m_sharedProperties = sharedProperties;
+        m_sharedProperties = this.GetViewPropertiesCore( ViewPropertyMode.Routed ).ToArray();
       }
 
       return m_sharedProperties;
     }
 
-    internal IEnumerable<DependencyProperty> GetSharedNoFallbackProperties()
+    internal IEnumerable<ViewPropertyStruct> GetSharedNoFallbackProperties()
     {
       //This will ensure that the GetViewPropertiesCore will be called only once by instance of view (optimization to avoir re-doing it all the time ).
       if( m_sharedNoFallbackProperties == null )
       {
-        List<DependencyProperty> sharedNoFallbackProperties = new List<DependencyProperty>();
-
-        this.GetViewPropertiesCore( sharedNoFallbackProperties, ViewPropertyMode.RoutedNoFallback );
-
-        m_sharedNoFallbackProperties = sharedNoFallbackProperties;
+        m_sharedNoFallbackProperties = this.GetViewPropertiesCore( ViewPropertyMode.RoutedNoFallback ).ToArray();
       }
 
       return m_sharedNoFallbackProperties;
-    } 
+    }
 
     #endregion
 
     #region Private Methods
 
-    private void GetViewPropertiesCore( List<DependencyProperty> viewProperties, ViewPropertyMode viewPropertyMode )
+    private static ViewPropertyAttribute GetViewPropertyAttribute( MemberInfo memberInfo )
     {
-      FieldInfo[] fields = this.GetType().GetFields( BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy );
+      if( memberInfo == null )
+        return null;
 
+      var attributes = memberInfo.GetCustomAttributes( typeof( ViewPropertyAttribute ), true );
+      if( ( attributes == null ) || ( attributes.GetLength( 0 ) != 1 ) )
+        return null;
+
+      return ( ViewPropertyAttribute )attributes[ 0 ];
+    }
+
+    private IEnumerable<ViewPropertyStruct> GetViewPropertiesCore( ViewPropertyMode viewPropertyMode )
+    {
+      var fields = this.GetType().GetFields( BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy );
       foreach( FieldInfo field in fields )
       {
-        //filter out any public static field that is not a DependencyProperty ( no examples )
-        if( field.FieldType == typeof( DependencyProperty ) )
-        {
-          object[] viewPropertyAttributes = field.GetCustomAttributes( typeof( ViewPropertyAttribute ), true );
+        //Filter out any public static field that is not a DependencyProperty ( no examples )
+        if( field.FieldType != typeof( DependencyProperty ) )
+          continue;
 
-          //If there is no attribute set on the DP field.
-          if( viewPropertyAttributes.GetLength( 0 ) == 0 )
-          {
-            //Do nothing, the DP shall not be used as a ViewProperty
-          }
-          else if( viewPropertyAttributes.GetLength( 0 ) == 1 )
-          {
-            //The attribute has been set on the DP field.
-            ViewPropertyAttribute attrib = ( ViewPropertyAttribute )viewPropertyAttributes[ 0 ];
+        //Filter out all DependencyProperty that doesn't match the ViewPropertyMode.
+        var attribute = ViewBase.GetViewPropertyAttribute( field );
+        if( ( attribute == null ) || ( attribute.ViewPropertyMode != viewPropertyMode ) )
+          continue;
 
-            if( viewPropertyMode == attrib.ViewPropertyMode )
-            {
-              viewProperties.Add( ( DependencyProperty )field.GetValue( null ) ); // parameter is ignored for static fields.
-            }
-          }
-          else
-          {
-            //More than one ViewProperty attribute has been set on the same field.
-            throw new InvalidOperationException( "An attempt was made to the ViewProperty Attribute more than once on a single DependencyProperty field." );
-          }
-        } // end if: FieldType is DependencyProperty
-      } //end foreach: fields
-    } 
+        var dependencyProperty = ( DependencyProperty )field.GetValue( null ); // parameter is ignored for static fields.
+        Debug.Assert( dependencyProperty != null );
+
+        if( dependencyProperty.ReadOnly )
+          throw new InvalidOperationException( "An attempt was made to return a read-only property. Dependency properties returned by ViewBase.GetViewPropertiesCore() cannot be read-only." );
+
+        yield return new ViewPropertyStruct( dependencyProperty, attribute.ViewPropertyMode, attribute.FlattenDetailBindingMode );
+      }
+    }
 
     #endregion
 
     #region Private Fields
 
-    private IEnumerable<DependencyProperty> m_viewProperties; // = null
-    private IEnumerable<DependencyProperty> m_sharedProperties; // = null
-    private IEnumerable<DependencyProperty> m_sharedNoFallbackProperties; // = null
+    private IEnumerable<ViewPropertyStruct> m_viewProperties; // = null
+    private IEnumerable<ViewPropertyStruct> m_sharedProperties; // = null
+    private IEnumerable<ViewPropertyStruct> m_sharedNoFallbackProperties; // = null
     private bool m_defaultHeadersFootersAdded; // = false 
+
+    #endregion
+
+    #region ViewPropertyStruct Nested Type
+
+    internal struct ViewPropertyStruct
+    {
+      internal ViewPropertyStruct( DependencyProperty dependencyProperty )
+      {
+        if( dependencyProperty == null )
+          throw new ArgumentNullException( "dependencyProperty" );
+
+        this.DependencyProperty = dependencyProperty;
+        this.ViewPropertyMode = ViewPropertyMode.None;
+        this.FlattenDetailBindingMode = FlattenDetailBindingMode.Default;
+      }
+
+      internal ViewPropertyStruct(
+        DependencyProperty dependencyProperty,
+        ViewPropertyMode viewPropertyMode,
+        FlattenDetailBindingMode flattenDetailBindingMode )
+      {
+        if( dependencyProperty == null )
+          throw new ArgumentNullException( "dependencyProperty" );
+
+        this.DependencyProperty = dependencyProperty;
+        this.ViewPropertyMode = viewPropertyMode;
+        this.FlattenDetailBindingMode = flattenDetailBindingMode;
+      }
+
+      internal readonly DependencyProperty DependencyProperty;
+      internal readonly ViewPropertyMode ViewPropertyMode;
+      internal readonly FlattenDetailBindingMode FlattenDetailBindingMode;
+
+      public override bool Equals( object obj )
+      {
+        if( !( obj is ViewPropertyStruct ) )
+          return false;
+
+        return ( this.DependencyProperty == ( ( ViewPropertyStruct )obj ).DependencyProperty );
+      }
+
+      public override int GetHashCode()
+      {
+        return this.DependencyProperty.GetHashCode();
+      }
+    }
 
     #endregion
   }

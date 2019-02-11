@@ -23,9 +23,10 @@ namespace Xceed.Wpf.DataGrid
 {
   internal class RangeSelectionVisitor : IDataGridContextVisitor
   {
-    public RangeSelectionVisitor( SelectionRange[] selectedColumns )
+    public RangeSelectionVisitor( SelectionRange[] selectedColumns, bool unselect )
     {
       m_selectedColumns = selectedColumns;
+      m_unselect = unselect;
     }
 
     #region IDataGridContextVisitor Members
@@ -56,21 +57,31 @@ namespace Xceed.Wpf.DataGrid
           if( intersectionSelectionRange.IsEmpty )
             continue;
 
-          Debug.WriteLine( "Selection : Adding cell : (" + startSourceDataItemIndex.ToString() + " - " + endSourceDataItemIndex.ToString() + ") - ("
-             + intersectionSelectionRange.StartIndex.ToString() + " - " + intersectionSelectionRange.EndIndex.ToString() + ")" );
 
-          selectionChangerManager.SelectCells(
-            sourceContext,
-            new SelectionCellRangeWithItems( new SelectionRange( startSourceDataItemIndex, endSourceDataItemIndex ), null, intersectionSelectionRange ) );
+          var cellRange = new SelectionCellRangeWithItems( new SelectionRange( startSourceDataItemIndex, endSourceDataItemIndex ), null, intersectionSelectionRange );
+
+          if( m_unselect )
+          {
+            selectionChangerManager.UnselectCells( sourceContext, cellRange );
+          }
+          else
+          {
+            selectionChangerManager.SelectCells( sourceContext, cellRange );
+          }
         }
       }
       else
       {
-        Debug.WriteLine( "Selection : Adding item : " + startSourceDataItemIndex.ToString() + " - " + endSourceDataItemIndex.ToString() );
+        var itemRange = new SelectionRangeWithItems( new SelectionRange( startSourceDataItemIndex, endSourceDataItemIndex ), null );
 
-        selectionChangerManager.SelectItems(
-          sourceContext,
-          new SelectionRangeWithItems( new SelectionRange( startSourceDataItemIndex, endSourceDataItemIndex ), null ) );
+        if( m_unselect )
+        {
+          selectionChangerManager.UnselectItems( sourceContext, itemRange );
+        }
+        else
+        {
+          selectionChangerManager.SelectItems( sourceContext, itemRange );
+        }
       }
     }
 
@@ -97,5 +108,6 @@ namespace Xceed.Wpf.DataGrid
     #endregion
 
     private SelectionRange[] m_selectedColumns;
+    private bool m_unselect;
   }
 }

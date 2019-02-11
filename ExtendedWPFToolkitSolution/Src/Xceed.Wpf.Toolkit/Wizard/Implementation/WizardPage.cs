@@ -18,6 +18,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System;
+using System.Windows.Input;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -301,6 +302,24 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //Constructors
+
+    #region Overrides
+
+    protected override void OnPropertyChanged( DependencyPropertyChangedEventArgs e )
+    {
+      base.OnPropertyChanged( e );
+
+      if( ( e.Property.Name == "CanSelectNextPage" ) || ( e.Property.Name == "CanHelp" ) || ( e.Property.Name == "CanFinish" )
+        || ( e.Property.Name == "CanCancel" ) || ( e.Property.Name == "CanSelectPreviousPage" ) )
+      {
+        CommandManager.InvalidateRequerySuggested();
+      }
+    }
+
+
+
+
+    #endregion
 
     #region Events
 

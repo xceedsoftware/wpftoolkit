@@ -18,14 +18,12 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Xceed.Wpf.DataGrid"
                     xmlns:markup="clr-namespace:Xceed.Wpf.DataGrid.Markup"
-                    xmlns:views="clr-namespace:Xceed.Wpf.DataGrid.Views"
-                    xmlns:print="clr-namespace:Xceed.Wpf.DataGrid.Print">
+                    xmlns:views="clr-namespace:Xceed.Wpf.DataGrid.Views">
 
    <ResourceDictionary.MergedDictionaries>
       <!-- Style definitions for specific controls (things that are not grid elements) -->
 
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Controls/FixedColumnSplitter.generic.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Controls/TableViewScrollViewer.generic.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Controls/TableViewScrollViewer.generic.xaml" />
 
       <!-- For each specific systeme theme ResourceDictionary, we only need to include 
            the xaml associated to the theme (to make the "BasedOn" work). However, here 
@@ -34,35 +32,38 @@
            specific ResourceDictionary, WPF looks in the generic.xaml ResourceDictionary. 
            That way, we don't have to maintain this list in all the xaml files. -->
 
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Aero/TableflowView.Aero.normalcolor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Aero/TableView.Aero.normalcolor.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Aero/TableflowView.Aero.normalcolor.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Aero/TableView.Aero.normalcolor.xaml" />
 
 
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Classic/TableflowView.Classic.systemcolor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Classic/TableView.Classic.systemcolor.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Classic/TableflowView.Classic.systemcolor.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Classic/TableView.Classic.systemcolor.xaml" />
 
 
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Luna/TableflowView.Luna.normalcolor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Luna/TableView.Luna.normalcolor.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Luna/TableflowView.Luna.normalcolor.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Luna/TableView.Luna.normalcolor.xaml" />
 
 
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Luna/TableflowView.Luna.homestead.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Luna/TableView.Luna.homestead.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Luna/TableflowView.Luna.homestead.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Luna/TableView.Luna.homestead.xaml" />
 
 
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Luna/TableflowView.Luna.metallic.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Luna/TableView.Luna.metallic.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Luna/TableflowView.Luna.metallic.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Luna/TableView.Luna.metallic.xaml" />
 
 
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Royale/TableflowView.Royale.normalcolor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Royale/TableView.Royale.normalcolor.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Royale/TableflowView.Royale.normalcolor.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Royale/TableView.Royale.normalcolor.xaml" />
 
 
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Zune/TableflowView.Zune.normalcolor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Zune/TableView.Zune.normalcolor.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Zune/TableflowView.Zune.normalcolor.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Zune/TableView.Zune.normalcolor.xaml" />
 
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Windows7/TableflowView.Windows7.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.DataGrid;;;component\themes/Windows7/TableView.Windows7.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Windows7/TableflowView.Windows7.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Windows7/TableView.Windows7.xaml" />
+
+      <markup:DataGridThemeResourceDictionary Source="/themes/Aero2/TableflowView.Aero2.normalcolor.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/Aero2/TableView.Aero2.normalcolor.xaml" />
 
    </ResourceDictionary.MergedDictionaries>
 
@@ -260,15 +261,15 @@
           BasedOn="{StaticResource tableflowViewLunaNormalColorHierarchicalGroupByItemStyle}" />
 
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationButton}"
-          TargetType="{x:Type local:GroupNavigationButton}"
+          TargetType="local:GroupNavigationButton"
           BasedOn="{StaticResource tableflowViewLunaNormalColorGroupNavigationButtonStyle}" />
 
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationControl}"
-          TargetType="{x:Type local:GroupNavigationControl}"
+          TargetType="local:GroupNavigationControl"
           BasedOn="{StaticResource tableflowViewLunaNormalColorGroupNavigationControlStyle}" />
 
    <Style x:Key="{markup:ThemeKey TargetViewType=views:TableflowView, TargetElementType=local:GroupNavigationControlItem}"
-          TargetType="{x:Type local:GroupNavigationControlItem}"
+          TargetType="local:GroupNavigationControlItem"
           BasedOn="{StaticResource tableflowViewLunaNormalColorGroupNavigationControlItemStyle}" />
 
 </ResourceDictionary>

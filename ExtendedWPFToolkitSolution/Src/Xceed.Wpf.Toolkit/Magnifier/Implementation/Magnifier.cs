@@ -63,6 +63,34 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //FrameType
 
+    #region IsUsingZoomOnMouseWheel
+
+    public static readonly DependencyProperty IsUsingZoomOnMouseWheelProperty = DependencyProperty.Register( "IsUsingZoomOnMouseWheel", typeof( bool )
+      , typeof( Magnifier ), new UIPropertyMetadata( true ) );
+    public bool IsUsingZoomOnMouseWheel
+    {
+      get
+      {
+        return (bool)GetValue( IsUsingZoomOnMouseWheelProperty );
+      }
+      set
+      {
+        SetValue( IsUsingZoomOnMouseWheelProperty, value );
+      }
+    }
+
+    #endregion //IsUsingZoomOnMouseWheel
+
+    #region IsFrozen
+
+    public bool IsFrozen
+    {
+      get;
+      private set;
+    }
+
+    #endregion
+
     #region Radius
 
     public static readonly DependencyProperty RadiusProperty = DependencyProperty.Register( "Radius", typeof( double ), typeof( Magnifier ), new FrameworkPropertyMetadata( ( Magnifier.DEFAULT_SIZE / 2 ), new PropertyChangedCallback( OnRadiusPropertyChanged ) ) );
@@ -158,6 +186,40 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //ZoomFactor
 
+    #region ZoomFactorOnMouseWheel
+
+    public static readonly DependencyProperty ZoomFactorOnMouseWheelProperty = DependencyProperty.Register( "ZoomFactorOnMouseWheel", typeof( double )
+      , typeof( Magnifier ), new FrameworkPropertyMetadata( 0.1d, OnZoomFactorOnMouseWheelPropertyChanged ), OnZoomFactorOnMouseWheelValidationCallback );
+    public double ZoomFactorOnMouseWheel
+    {
+      get
+      {
+        return (double)GetValue( ZoomFactorOnMouseWheelProperty );
+      }
+      set
+      {
+        SetValue( ZoomFactorOnMouseWheelProperty, value );
+      }
+    }
+
+    private static bool OnZoomFactorOnMouseWheelValidationCallback( object baseValue )
+    {
+      double zoomFactorOnMouseWheel = (double)baseValue;
+      return (zoomFactorOnMouseWheel >= 0);
+    }
+
+    private static void OnZoomFactorOnMouseWheelPropertyChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      Magnifier m = (Magnifier)d;
+      m.OnZoomFactorOnMouseWheelChanged( e );
+    }
+
+    protected virtual void OnZoomFactorOnMouseWheelChanged( DependencyPropertyChangedEventArgs e )
+    {
+    }
+
+    #endregion //ZoomFactorOnMouseWheel
+
     #endregion //Properties
 
     #region Constructors
@@ -223,7 +285,16 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion // Base Class Overrides
 
-    #region Methods
+    #region Public Methods
+
+    public void Freeze( bool freeze )
+    {
+      this.IsFrozen = freeze;
+    }
+
+    #endregion
+
+    #region Private Methods
 
     private void UpdateViewBox()
     {

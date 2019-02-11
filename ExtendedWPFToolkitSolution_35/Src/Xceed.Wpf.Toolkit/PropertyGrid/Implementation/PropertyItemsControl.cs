@@ -15,11 +15,9 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Controls;
 using System.Windows;
+using System.ComponentModel;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -30,6 +28,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
   /// </summary>
   public class PropertyItemsControl : ItemsControl
   {
+    public PropertyItemsControl()
+    {
+      var propertyItemsControlProperties = TypeDescriptor.GetProperties( this, new Attribute[] { new PropertyFilterAttribute( PropertyFilterOptions.All ) } );
+      var prop1 = propertyItemsControlProperties.Find( "VirtualizingPanel.IsVirtualizingWhenGrouping", false );
+      if( prop1 != null )
+      {
+        prop1.SetValue( this, true );
+      }
+      var prop2 = propertyItemsControlProperties.Find( "VirtualizingPanel.CacheLengthUnit", false );
+      if( prop2 != null )
+      {
+        prop2.SetValue( this, Enum.ToObject( prop2.PropertyType, 1 ) );
+      }
+    }
 
     #region PreparePropertyItemEvent Attached Routed Event
 
@@ -92,5 +104,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       this.RaiseClearPropertyItemEvent( ( PropertyItemBase )element, item );
       base.ClearContainerForItemOverride( element, item );
     }
+
   }
 }

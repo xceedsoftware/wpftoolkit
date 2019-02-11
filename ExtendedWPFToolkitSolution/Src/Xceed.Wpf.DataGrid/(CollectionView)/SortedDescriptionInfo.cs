@@ -25,13 +25,13 @@ namespace Xceed.Wpf.DataGrid
 {
   internal class SortDescriptionInfo
   {
-    public SortDescriptionInfo(
-      DataGridItemPropertyBase property,
-      ListSortDirection direction )
+    public SortDescriptionInfo( DataGridItemPropertyBase property, ListSortDirection direction )
     {
       m_property = property;
       m_direction = direction;
     }
+
+    #region SortDirection Property
 
     public ListSortDirection SortDirection
     {
@@ -41,6 +41,10 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    #endregion
+
+    #region Property Property
+
     public DataGridItemPropertyBase Property
     {
       get
@@ -48,6 +52,10 @@ namespace Xceed.Wpf.DataGrid
         return m_property;
       }
     }
+
+    #endregion
+
+    #region DataStore Property
 
     public DataStore DataStore
     {
@@ -61,6 +69,10 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    #endregion
+
+    #region SortComparer Property
+
     public IComparer SortComparer
     {
       get
@@ -71,6 +83,8 @@ namespace Xceed.Wpf.DataGrid
         return m_property.SortComparer;
       }
     }
+
+    #endregion
 
     public bool IsReverseOf( SortDescriptionInfo sortDescriptionInfo )
     {

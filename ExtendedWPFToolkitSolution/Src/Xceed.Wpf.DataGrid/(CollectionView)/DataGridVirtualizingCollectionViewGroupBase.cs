@@ -16,21 +16,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Data;
-using System.Diagnostics;
-using System.Collections.Specialized;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal abstract class DataGridVirtualizingCollectionViewGroupBase : CollectionViewGroup, IWeakEventListener, IDisposable
   {
-    #region CONSTRUCTORS
-
     internal DataGridVirtualizingCollectionViewGroupBase(
       object name,
       int initialItemsCount,
@@ -47,25 +43,7 @@ namespace Xceed.Wpf.DataGrid
       m_startGlobalIndex = startGlobalIndex;
     }
 
-    #endregion CONSTRUCTORS
-
-
-    #region DO NOT USE THOSE
-
-    #region Items PROPERTY
-
-    [Obsolete( "The Items property is obsolete and has been replaced by the VirtualItems property. When referencing through a CollectionViewGroup, the CollectionViewGroupExtensions.GetItems extension method can be used.", true )]
-    public new ReadOnlyObservableCollection<object> Items
-    {
-      get
-      {
-        return base.Items;
-      }
-    }
-
-    #endregion Items PROPERTY
-
-    #region ItemCount PROPERTY
+    #region ItemCount (Obselete) Property
 
     [Obsolete( "The ItemCount property is obsolete and has been replaced by the VirtualItemCount property. When referencing through a CollectionViewGroup, the CollectionViewGroupExtensions.GetItemCount extension method can be used.", true )]
     public new int ItemCount
@@ -76,25 +54,22 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion ItemCount PROPERTY
+    #endregion
 
-    #endregion DO NOT USE THOSE
+    #region Items (Obselete) Property
 
-
-    #region IsBottomLevel PROPERTY
-
-    public override bool IsBottomLevel
+    [Obsolete( "The Items property is obsolete and has been replaced by the VirtualItems property. When referencing through a CollectionViewGroup, the CollectionViewGroupExtensions.GetItems extension method can be used.", true )]
+    public new ReadOnlyObservableCollection<object> Items
     {
       get
       {
-        return m_isBottomLevel;
+        return base.Items;
       }
     }
 
-    #endregion IsBottomLevel PROPERTY
+    #endregion
 
-
-    #region DATA VIRTUALIZATION
+    #region VirtualItemCount Property
 
     public int VirtualItemCount
     {
@@ -120,7 +95,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    internal abstract int QueryItemCount();
+    #endregion
+
+    #region VirtualItems Property
 
     public IList<object> VirtualItems
     {
@@ -130,14 +107,12 @@ namespace Xceed.Wpf.DataGrid
         {
           this.EnsureProtectedVirtualItems();
 
+          ObservableCollection<object> observableProtectedItems = m_protectedVirtualItems as ObservableCollection<object>;
 
-          ObservableCollection<object> obserableProtectedItems =
-            m_protectedVirtualItems as ObservableCollection<object>;
-
-          if( obserableProtectedItems != null )
+          if( observableProtectedItems != null )
           {
             Debug.Assert( !m_isBottomLevel );
-            m_virtualItems = new ReadOnlyObservableCollection<object>( obserableProtectedItems );
+            m_virtualItems = new ReadOnlyObservableCollection<object>( observableProtectedItems );
           }
           else
           {
@@ -148,6 +123,169 @@ namespace Xceed.Wpf.DataGrid
 
         return m_virtualItems;
       }
+    }
+
+    #endregion
+
+    #region IsBottomLevel Property
+
+    public override bool IsBottomLevel
+    {
+      get
+      {
+        return m_isBottomLevel;
+      }
+    }
+
+    #endregion
+
+    #region Parent Property
+
+    internal DataGridVirtualizingCollectionViewGroupBase Parent
+    {
+      get
+      {
+        return m_parent;
+      }
+    }
+
+    #endregion
+
+    #region Level Property
+
+    internal int Level
+    {
+      get
+      {
+        return m_level;
+      }
+    }
+
+    #endregion
+
+    #region StartGlobalIndex Property
+
+    internal int StartGlobalIndex
+    {
+      get
+      {
+        return m_startGlobalIndex;
+      }
+    }
+
+    #endregion
+
+    protected virtual DataGridVirtualizingCollectionViewBase GetCollectionView()
+    {
+      if( m_parent != null )
+        return m_parent.GetCollectionView();
+
+      return null;
+    }
+
+    internal abstract int QueryItemCount();
+
+    internal abstract ObservableCollection<object> QuerySubCollectionViewGroupList( GroupDescription subGroupBy, int nextLevel, bool nextLevelIsBottom );
+
+    internal virtual GroupDescription GetSubGroupBy()
+    {
+      CollectionView collectionView = this.GetCollectionView();
+
+      ObservableCollection<GroupDescription> groupDescriptions = collectionView.GroupDescriptions;
+
+      int groupDescriptionsCount = ( groupDescriptions == null ) ? 0 : groupDescriptions.Count;
+
+      if( groupDescriptionsCount == 0 )
+        return null;
+
+      DataGridVirtualizingCollectionViewGroupBase parentCollectionViewGroup = this.Parent;
+
+      int level = 0;
+      while( parentCollectionViewGroup != null )
+      {
+        level++;
+        parentCollectionViewGroup = parentCollectionViewGroup.Parent;
+      }
+
+      Debug.Assert( groupDescriptionsCount >= level );
+
+      return groupDescriptions[ level ];
+    }
+
+    internal virtual void OnProtectedVirtualItemsCreated( IList<object> protectedVirtualItems )
+    {
+    }
+
+    internal virtual void DisposeCore()
+    {
+      m_protectedVirtualItems = new List<object>();
+      m_virtualItems = m_protectedVirtualItems;
+      m_parent = null;
+    }
+
+    internal virtual int GetGlobalIndexOf( object item )
+    {
+      return m_parent.GetGlobalIndexOf( item );
+    }
+
+    internal virtual DataGridPageManagerBase GetVirtualPageManager()
+    {
+      return m_parent.GetVirtualPageManager();
+    }
+
+    internal object GetItemAtGlobalIndex( int globalIndex )
+    {
+      Func<int, DataGridVirtualizingCollectionViewGroupBase, object> getItemFunction = ( localIndex, cvg ) =>
+      {
+        return cvg.m_protectedVirtualItems[ localIndex ];
+      };
+
+      return this.OperateOnGlobalIndex( globalIndex, getItemFunction );
+    }
+
+    internal void LockGlobalIndex( int globalIndex )
+    {
+      Func<int, DataGridVirtualizingCollectionViewGroupBase, object> lockingAction = ( localIndex, cvg ) =>
+      {
+        VirtualList virtualItemList = cvg.VirtualItems as VirtualList;
+
+        if( virtualItemList != null )
+        {
+          virtualItemList.LockPageForLocalIndex( localIndex );
+        }
+
+        return null;
+      };
+
+      this.OperateOnGlobalIndex( globalIndex, lockingAction );
+    }
+
+    internal void UnlockGlobalIndex( int globalIndex )
+    {
+      var collectionView = this.GetCollectionView();
+
+      if( collectionView != null )
+      {
+        var rootGroup = collectionView.RootGroup;
+
+        // This can happen when refreshing a CollectionView and the record count has changed in such a way that the global index to unlock is out of range of the new count.
+        if( ( rootGroup != null ) && ( ( globalIndex >= rootGroup.m_virtualItemCount ) ) )
+          return;
+      }
+
+      Func<int, DataGridVirtualizingCollectionViewGroupBase, object> unlockingAction = ( localIndex, cvg ) =>
+      {
+        VirtualList virtualItemList = cvg.VirtualItems as VirtualList;
+
+        if( virtualItemList != null )
+        {
+          virtualItemList.UnlockPageForLocalIndex( localIndex );
+        }
+
+        return null;
+      };
+
+      this.OperateOnGlobalIndex( globalIndex, unlockingAction );
     }
 
     private void EnsureProtectedVirtualItems()
@@ -199,9 +337,6 @@ namespace Xceed.Wpf.DataGrid
       return virtualItemList;
     }
 
-    internal abstract ObservableCollection<object> QuerySubCollectionViewGroupList( GroupDescription subGroupBy, int nextLevel, bool nextLevelIsBottom );
-
-
     private int GetSubLevelCount()
     {
       CollectionView collectionView = this.GetCollectionView();
@@ -223,81 +358,6 @@ namespace Xceed.Wpf.DataGrid
 
       return ( groupDescriptionsCount - level );
     }
-
-    internal virtual GroupDescription GetSubGroupBy()
-    {
-      CollectionView collectionView = this.GetCollectionView();
-
-      ObservableCollection<GroupDescription> groupDescriptions = collectionView.GroupDescriptions;
-
-      int groupDescriptionsCount = ( groupDescriptions == null ) ? 0 : groupDescriptions.Count;
-
-      if( groupDescriptionsCount == 0 )
-        return null;
-
-
-      DataGridVirtualizingCollectionViewGroupBase parentCollectionViewGroup = this.Parent;
-
-      int level = 0;
-      while( parentCollectionViewGroup != null )
-      {
-        level++;
-        parentCollectionViewGroup = parentCollectionViewGroup.Parent;
-      }
-
-      Debug.Assert( groupDescriptionsCount >= level );
-
-      return groupDescriptions[ level ];
-    }
-
-    internal virtual void OnProtectedVirtualItemsCreated( IList<object> protectedVirtualItems )
-    {
-    }
-
-    #endregion DATA VIRTUALIZATION
-
-
-    #region PROTECTED METHODS
-
-    protected virtual DataGridVirtualizingCollectionViewBase GetCollectionView()
-    {
-      if( m_parent != null )
-        return m_parent.GetCollectionView();
-
-      return null;
-    }
-
-    #endregion PROTECTED METHODS
-
-    #region INTERNAL PROPERTIES
-
-    internal DataGridVirtualizingCollectionViewGroupBase Parent
-    {
-      get
-      {
-        return m_parent;
-      }
-    }
-
-    internal int Level
-    {
-      get
-      {
-        return m_level;
-      }
-    }
-
-    internal int StartGlobalIndex
-    {
-      get
-      {
-        return m_startGlobalIndex;
-      }
-    }
-
-    #endregion INTERNAL PROPERTIES
-
-    #region INTERNAL METHODS
 
     private object OperateOnGlobalIndex( int index, Func<int, DataGridVirtualizingCollectionViewGroupBase, object> function )
     {
@@ -332,103 +392,7 @@ namespace Xceed.Wpf.DataGrid
       throw new ArgumentOutOfRangeException( "index" );
     }
 
-    internal object GetItemAtGlobalIndex( int globalIndex )
-    {
-      Func<int, DataGridVirtualizingCollectionViewGroupBase, object> getItemFunction = ( localIndex, cvg ) => 
-      {
-        return cvg.m_protectedVirtualItems[ localIndex ];
-      };
-
-      return this.OperateOnGlobalIndex( globalIndex, getItemFunction );
-    }
-
-    internal void LockGlobalIndex( int globalIndex )
-    {
-      Func<int,DataGridVirtualizingCollectionViewGroupBase,object> lockingAction = ( localIndex, cvg ) => 
-      {
-        VirtualList virtualItemList = cvg.VirtualItems as VirtualList;
-
-        if( virtualItemList != null )
-        {
-          virtualItemList.LockPageForLocalIndex( localIndex );
-        }
-
-        return null;
-      };
-
-      this.OperateOnGlobalIndex( globalIndex, lockingAction );
-    }
-
-    internal void UnlockGlobalIndex( int globalIndex )
-    {
-      var collectionView = this.GetCollectionView();
-
-      if( collectionView != null )
-      {
-        var rootGroup = collectionView.RootGroup;
-
-        if( ( rootGroup != null ) 
-          && ( ( globalIndex >= rootGroup.m_virtualItemCount ) ) )
-        {
-          // This can happen when refreshing a CollectionView and the record count has changed in such a way that the global index
-          // to unlock is out of range of the new count.
-          return;
-        }
-      }
-
-      Func<int, DataGridVirtualizingCollectionViewGroupBase, object> unlockingAction = ( localIndex, cvg ) => 
-      {
-        VirtualList virtualItemList = cvg.VirtualItems as VirtualList;
-
-        if( virtualItemList != null )
-        {
-          virtualItemList.UnlockPageForLocalIndex( localIndex );
-        }
-
-        return null;
-      };
-
-      this.OperateOnGlobalIndex( globalIndex, unlockingAction );
-    }
-
-    internal virtual void DisposeCore()
-    {
-      m_protectedVirtualItems = new List<object>();
-      m_virtualItems = m_protectedVirtualItems;
-      m_parent = null;
-    }
-
-    internal virtual int GetGlobalIndexOf( object item )
-    {
-      return m_parent.GetGlobalIndexOf( item );
-    }
-
-    internal virtual DataGridPageManagerBase GetVirtualPageManager()
-    {
-      return m_parent.GetVirtualPageManager();
-    }
-
-    #endregion INTERNAL METHODS
-
-    #region PRIVATE FIELDS
-
-    private bool m_isBottomLevel;
-    private int m_level;
-
-    private int m_startGlobalIndex;
-    private int m_virtualItemCount;
-
-    private IList<object> m_protectedVirtualItems;
-    private IList<object> m_virtualItems;
-
-    private DataGridVirtualizingCollectionViewGroupBase m_parent;
-
-    #endregion PRIVATE FIELDS
-
-
-    #region WEAK EVENT HANDLER
-
-    private void VirtualItemList_CollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
+    private void OnVirtualItemListCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
       DataGridVirtualizingCollectionViewBase collectionView = this.GetCollectionView();
 
@@ -440,21 +404,14 @@ namespace Xceed.Wpf.DataGrid
         {
           case NotifyCollectionChangedAction.Replace:
             {
-              deferredOperation = new DeferredOperation(
-                DeferredOperation.DeferredOperationAction.Replace, -1,
-                e.NewStartingIndex + m_startGlobalIndex,
-                e.NewItems,
-                e.OldStartingIndex + m_startGlobalIndex,
-                e.OldItems );
-
+              deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.Replace, -1, e.NewStartingIndex + m_startGlobalIndex,
+                                                         e.NewItems, e.OldStartingIndex + m_startGlobalIndex, e.OldItems );
               break;
             }
 
           case NotifyCollectionChangedAction.Reset:
             {
-              deferredOperation = new DeferredOperation(
-                DeferredOperation.DeferredOperationAction.Refresh, -1, null );
-
+              deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.Refresh, -1, null );
               break;
             }
 
@@ -463,19 +420,24 @@ namespace Xceed.Wpf.DataGrid
         }
 
         if( deferredOperation != null )
+        {
           collectionView.ExecuteOrQueueSourceItemOperation( deferredOperation );
+        }
       }
     }
-
-    #endregion WEAK EVENT HANDLER
 
     #region IWeakEventListener Members
 
     bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
+      return this.OnReceiveWeakEvent( managerType, sender, e );
+    }
+
+    protected virtual bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
       if( managerType == typeof( CollectionChangedEventManager ) )
       {
-        this.VirtualItemList_CollectionChanged( sender, ( NotifyCollectionChangedEventArgs )e );
+        this.OnVirtualItemListCollectionChanged( sender, ( NotifyCollectionChangedEventArgs )e );
         return true;
       }
 
@@ -483,7 +445,6 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion IWeakEventListener Members
-
 
     #region IDisposable Members
 
@@ -493,5 +454,16 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion
+
+    private bool m_isBottomLevel;
+    private int m_level;
+
+    private int m_startGlobalIndex;
+    private int m_virtualItemCount;
+
+    private IList<object> m_protectedVirtualItems;
+    private IList<object> m_virtualItems;
+
+    private DataGridVirtualizingCollectionViewGroupBase m_parent;
   }
 }

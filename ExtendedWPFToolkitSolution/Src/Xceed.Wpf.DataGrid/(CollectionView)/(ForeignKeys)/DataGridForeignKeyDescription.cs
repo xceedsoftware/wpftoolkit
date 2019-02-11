@@ -15,26 +15,18 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections;
-using System.Windows.Data;
-using System.Diagnostics;
+using System.Data;
 using System.Windows;
-using System.ComponentModel;
 
 namespace Xceed.Wpf.DataGrid
 {
   public class DataGridForeignKeyDescription : DependencyObject
   {
-    #region Constructors
-
     public DataGridForeignKeyDescription()
     {
+      this.SetForeignKeyConverter();
     }
-
-    #endregion
 
     #region ForeignKeyConverter Property
 
@@ -64,31 +56,17 @@ namespace Xceed.Wpf.DataGrid
       "ItemsSource",
       typeof( IEnumerable ),
       typeof( DataGridForeignKeyDescription ),
-      new FrameworkPropertyMetadata(
-        null,
-        new PropertyChangedCallback( DataGridForeignKeyDescription.OnItemsSourceChanged ) ) );
+      new FrameworkPropertyMetadata( null ) );
 
     public IEnumerable ItemsSource
     {
       get
       {
-        return m_itemsSource;
+        return ( IEnumerable )this.GetValue( DataGridForeignKeyDescription.ItemsSourceProperty );
       }
       set
       {
         this.SetValue( DataGridForeignKeyDescription.ItemsSourceProperty, value );
-      }
-    }
-
-    private IEnumerable m_itemsSource; // = null;
-
-    private static void OnItemsSourceChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
-    {
-      DataGridForeignKeyDescription foreignKeyDescription = sender as DataGridForeignKeyDescription;
-
-      if( foreignKeyDescription != null )
-      {
-        foreignKeyDescription.m_itemsSource = e.NewValue as IEnumerable;
       }
     }
 
@@ -125,5 +103,124 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion
+
+    #region DisplayMemberPath Property
+
+    public static readonly DependencyProperty DisplayMemberPathProperty = DependencyProperty.Register(
+      "DisplayMemberPath",
+      typeof( string ),
+      typeof( DataGridForeignKeyDescription ),
+      new FrameworkPropertyMetadata( null ) );
+
+    public string DisplayMemberPath
+    {
+      get
+      {
+        return ( string )this.GetValue( DataGridForeignKeyDescription.DisplayMemberPathProperty );
+      }
+      set
+      {
+        this.SetValue( DataGridForeignKeyDescription.DisplayMemberPathProperty, value );
+      }
+    }
+
+    #endregion
+
+    protected virtual void SetForeignKeyConverter()
+    {
+      this.ForeignKeyConverter = new DataGridForeignKeyConverter();
+    }
+
+    internal Type GetDataType()
+    {
+      var itemsSource = this.ItemsSource;
+      if( itemsSource == null )
+        return null;
+
+      var displayMemberPath = this.DisplayMemberPath;
+      var foreignKeyConverter = this.ForeignKeyConverter;
+
+      if( string.IsNullOrWhiteSpace( displayMemberPath ) && ( foreignKeyConverter == null ) )
+        return null;
+
+      try
+      {
+        //Use the DisplayMemberPath or the ForeignKeyConverter to find the converted value data type, using a DataRowView or reflection.
+        if( ( itemsSource is DataView ) || ( itemsSource is DataTable ) )
+        {
+          foreach( object item in itemsSource )
+          {
+            var dataRowView = item as DataRowView;
+            if( dataRowView == null )
+              continue;
+
+            if( !string.IsNullOrWhiteSpace( displayMemberPath ) )
+            {
+              var dataColumn = dataRowView.Row.Table.Columns[ displayMemberPath ];
+              if( dataColumn != null )
+              {
+                return dataColumn.DataType;
+              }
+            }
+            else
+            {
+              var valuePath = this.ValuePath;
+              if( valuePath != null )
+              {
+                var key = dataRowView[ valuePath ];
+                var value = foreignKeyConverter.GetValueFromKey( key, this );
+                if( value != null )
+                {
+                  return value.GetType();
+                }
+              }
+            }
+          }
+        }
+        else
+        {
+          foreach( object item in itemsSource )
+          {
+            if( item == null )
+              continue;
+
+            if( !string.IsNullOrWhiteSpace( displayMemberPath ) )
+              return item.GetType().GetProperty( displayMemberPath ).PropertyType;
+
+            if( item is Enum )
+              return item.GetType();
+
+            var valuePath = this.ValuePath;
+            if( valuePath != null )
+            {
+              var key = item.GetType().GetProperty( valuePath ).GetValue( item, null );
+              var value = foreignKeyConverter.GetValueFromKey( key, this );
+              if( value != null )
+              {
+                return value.GetType();
+              }
+            }
+          }
+        }
+      }
+      catch
+      {
+        //Swallow the exception, no need to terminate the application, since the original value will be exported.
+      }
+
+      return null;
+    }
+
+    internal object GetDisplayValue( object fieldValue )
+    {
+      if( fieldValue == null )
+        return null;
+
+      var foreignKeyConverter = this.ForeignKeyConverter;
+      if( foreignKeyConverter != null )
+        return foreignKeyConverter.GetValueFromKey( fieldValue, this );
+
+      return fieldValue;
+    }
   }
 }

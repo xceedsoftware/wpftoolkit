@@ -15,20 +15,13 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Controls;
-using System.Windows;
-using System.Windows.Data;
-using System.Collections;
-using System.Windows.Controls.Primitives;
-using Xceed.Utils.Wpf;
-using System.Windows.Input;
-using System.Diagnostics;
-using System.ComponentModel;
-using Xceed.Wpf.DataGrid.Views;
 using System.Collections.Specialized;
-using System.Windows.Media;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
+using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -251,14 +244,14 @@ namespace Xceed.Wpf.DataGrid
 
       if( scrollTip.m_mainColumn != null )
       {
-        PropertyChangedEventManager.RemoveListener( scrollTip.m_mainColumn, scrollTip, "DisplayMemberBinding" );
+        PropertyChangedEventManager.RemoveListener( scrollTip.m_mainColumn, scrollTip, Column.DisplayMemberBindingPropertyName );
       }
 
       scrollTip.m_mainColumn = null;
 
       if( oldItemContext != null )
       {
-        PropertyChangedEventManager.RemoveListener( oldItemContext.Columns, scrollTip, "MainColumn" );
+        PropertyChangedEventManager.RemoveListener( oldItemContext.Columns, scrollTip, ColumnCollection.MainColumnPropertyName );
       }
 
       scrollTip.ClearValue( ScrollTip.ContentProperty );
@@ -269,10 +262,10 @@ namespace Xceed.Wpf.DataGrid
 
         if( scrollTip.m_mainColumn != null )
         {
-          PropertyChangedEventManager.AddListener( scrollTip.m_mainColumn, scrollTip, "DisplayMemberBinding" );
+          PropertyChangedEventManager.AddListener( scrollTip.m_mainColumn, scrollTip, Column.DisplayMemberBindingPropertyName );
         }
 
-        PropertyChangedEventManager.AddListener( newItemContext.Columns, scrollTip, "MainColumn" );
+        PropertyChangedEventManager.AddListener( newItemContext.Columns, scrollTip, ColumnCollection.MainColumnPropertyName );
       }
 
       if( !scrollTip.IsInParentGridChanged )
@@ -311,10 +304,6 @@ namespace Xceed.Wpf.DataGrid
           }
 
           scrollTip.m_mainColumn = null;
-          scrollTip.m_horizontalScrollBar = null;
-          scrollTip.m_horizontalScrollThumb = null;
-          scrollTip.m_verticalScrollBar = null;
-          scrollTip.m_verticalScrollThumb = null;
 
           scrollTip.UnregisterListeners( oldParentGridControl );
         }
@@ -341,64 +330,25 @@ namespace Xceed.Wpf.DataGrid
     private void RegisterListeners( DataGridControl parentGridControl )
     {
       if( parentGridControl.ScrollViewer != null )
+      {
         parentGridControl.ScrollViewer.ScrollChanged += new ScrollChangedEventHandler( this.OnScrollViewerScrollChanged );
-
-      m_verticalScrollBar = parentGridControl.ScrollViewer.Template.FindName( "PART_VerticalScrollBar", parentGridControl.ScrollViewer ) as ScrollBar;
-      m_horizontalScrollBar = parentGridControl.ScrollViewer.Template.FindName( "PART_HorizontalScrollBar", parentGridControl.ScrollViewer ) as ScrollBar;
-
-      if( m_verticalScrollBar != null )
-      {
-        if( parentGridControl.ScrollViewer != null )
-        {
-          // Assert the Template as been applied on the ScrollBar to get access to the ScrollThumb
-          if( m_verticalScrollBar.Track == null )
-            m_verticalScrollBar.ApplyTemplate();
-
-          Debug.Assert( m_verticalScrollBar.Track != null );
-
-          if( m_verticalScrollBar.Track != null )
-            m_verticalScrollThumb = m_verticalScrollBar.Track.Thumb;
-
-          if( m_verticalScrollThumb != null )
-          {
-            // Register to IsMouseCaptureChanged to know when this ScrollThumb is clicked to display the ScrollTip if required
-            m_verticalScrollThumb.IsMouseCapturedChanged += new DependencyPropertyChangedEventHandler( this.ScrollThumb_IsMouseCapturedChanged );
-          }
-        }
-      }
-
-      if( m_horizontalScrollBar != null )
-      {
-        if( parentGridControl.ScrollViewer != null )
-        {
-          // Assert the Template as been applied on the ScrollBar to get access to the ScrollThumb
-          if( m_horizontalScrollBar.Track == null )
-            m_horizontalScrollBar.ApplyTemplate();
-
-          Debug.Assert( m_horizontalScrollBar.Track != null );
-
-          if( m_horizontalScrollBar.Track != null )
-            m_horizontalScrollThumb = m_horizontalScrollBar.Track.Thumb;
-
-          if( m_horizontalScrollThumb != null )
-          {
-            // Register to IsMouseCaptureChanged to know when this ScrollThumb is clicked to display the ScrollTip if required
-            m_horizontalScrollThumb.IsMouseCapturedChanged += new DependencyPropertyChangedEventHandler( this.ScrollThumb_IsMouseCapturedChanged );
-          }
-        }
+        m_scrollViewerTemplateHelper = new ScrollViewerTemplateHelper( parentGridControl.ScrollViewer, this.DragScrollBegin, this.DragScrollEnd );
+        m_scrollViewerTemplateHelper.RefreshTemplate();
       }
     }
 
     private void UnregisterListeners( DataGridControl parentGridControl )
     {
-      if( ( parentGridControl != null ) && ( parentGridControl.ScrollViewer != null ) )
+      if( parentGridControl.ScrollViewer != null )
+      {
         parentGridControl.ScrollViewer.ScrollChanged -= new ScrollChangedEventHandler( this.OnScrollViewerScrollChanged );
+      }
 
-      if( m_verticalScrollThumb != null )
-        m_verticalScrollThumb.IsMouseCapturedChanged -= new DependencyPropertyChangedEventHandler( this.ScrollThumb_IsMouseCapturedChanged );
-
-      if( m_horizontalScrollThumb != null )
-        m_horizontalScrollThumb.IsMouseCapturedChanged -= new DependencyPropertyChangedEventHandler( this.ScrollThumb_IsMouseCapturedChanged );
+      if( m_scrollViewerTemplateHelper != null )
+      {
+        m_scrollViewerTemplateHelper.Dispose();
+        m_scrollViewerTemplateHelper = null;
+      }
     }
 
     private void RefreshDefaultScrollTipContentTemplate()
@@ -492,38 +442,10 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private void ScrollThumb_IsMouseCapturedChanged( object sender, DependencyPropertyChangedEventArgs e )
+    private void DragScrollBegin( Orientation orientation )
     {
-      Thumb scrollThumb = sender as Thumb;
-
-      if( scrollThumb == null )
-        return;
-
-      if( !scrollThumb.IsMouseCaptured )
-        return;
-
       if( !this.ShouldDisplayScrollTip )
         return;
-
-      ScrollBar scrollBar = scrollThumb.TemplatedParent as ScrollBar;
-
-      if( scrollBar == null )
-        return;
-
-      // Register to LostMouseCapture to be sure to hide the ScrollTip when the ScrollThumb lost the focus
-      if( scrollThumb == m_horizontalScrollThumb )
-      {
-        m_horizontalScrollThumb.LostMouseCapture += new MouseEventHandler( this.ScrollThumb_LostMouseCapture );
-      }
-      else if( scrollThumb == m_verticalScrollThumb )
-      {
-        m_verticalScrollThumb.LostMouseCapture += new MouseEventHandler( this.ScrollThumb_LostMouseCapture );
-      }
-      else
-      {
-        Debug.Fail( "Unknown thumb used for scrolling." );
-        return;
-      }
 
       DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
 
@@ -536,34 +458,19 @@ namespace Xceed.Wpf.DataGrid
       // Update items scrolling orientation and pixel scrolling
       m_itemsScrollingOrientation = ScrollViewerHelper.GetItemScrollingOrientation( dataGridContext.DataGridControl );
 
-      if( m_itemsScrollingOrientation == Orientation.Vertical )
-      {
-        if( scrollBar != m_verticalScrollBar )
-          return;
-      }
-      else
-      {
-        if( scrollBar != m_horizontalScrollBar )
-          return;
-      }
+      if( m_itemsScrollingOrientation != orientation )
+        return;
 
       this.Visibility = Visibility.Visible;
 
       this.IsPixelScrolling = ScrollViewerHelper.IsPixelScrolling( dataGridContext.DataGridControl, dataGridContext.DataGridControl.ItemsHost, dataGridContext.DataGridControl.ScrollViewer );
 
-      this.RefreshScrollTipContent( scrollBar );
+      this.RefreshScrollTipContent( m_scrollViewerTemplateHelper.GetScrollBar( orientation ) );
     }
 
-    private void ScrollThumb_LostMouseCapture( object sender, MouseEventArgs e )
+    private void DragScrollEnd( Orientation orientation )
     {
       this.Visibility = Visibility.Collapsed;
-
-      Thumb scrollBarThumb = sender as Thumb;
-
-      Debug.Assert( scrollBarThumb != null );
-
-      if( scrollBarThumb != null )
-        scrollBarThumb.LostMouseCapture -= new MouseEventHandler( this.ScrollThumb_LostMouseCapture );
     }
 
     private void OnScrollViewerScrollChanged( object sender, ScrollChangedEventArgs e )
@@ -579,11 +486,11 @@ namespace Xceed.Wpf.DataGrid
 
       if( e.VerticalChange == 0 )
       {
-        scrollBar = m_horizontalScrollBar;
+        scrollBar = m_scrollViewerTemplateHelper.HorizontalScrollBar;
       }
       else
       {
-        scrollBar = m_verticalScrollBar;
+        scrollBar = m_scrollViewerTemplateHelper.VerticalScrollBar;
       }
 
       if( scrollBar == null )
@@ -596,20 +503,18 @@ namespace Xceed.Wpf.DataGrid
     {
       const int MaxItemToVisit = 100;
 
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
       if( dataGridContext == null )
         return;
 
-      DataGridControl parentGridControl = dataGridContext.DataGridControl;
-
+      var parentGridControl = dataGridContext.DataGridControl;
       if( parentGridControl == null )
         return;
 
       if( scrollBar.Orientation != m_itemsScrollingOrientation )
         return;
 
-      double maxOffset = 0;
+      var maxOffset = 0d;
 
       if( scrollBar.Orientation == Orientation.Vertical )
       {
@@ -620,10 +525,11 @@ namespace Xceed.Wpf.DataGrid
         maxOffset = parentGridControl.ScrollViewer.ExtentWidth;
       }
 
-      double offset = scrollBar.Track.Value;
+      var offset = scrollBar.Track.Value;
 
-      int itemMaxOffset = 0;
-      int itemOffset = 0;
+      var itemMaxOffset = 0;
+      var itemOffset = 0;
+      var itemHiddenRatio = 0d;
 
       if( this.IsPixelScrolling )
       {
@@ -633,7 +539,9 @@ namespace Xceed.Wpf.DataGrid
 
         if( ( maxOffset > 0 ) && ( itemsCount > 0 ) )
         {
-          itemOffset = ( int )( offset / ( maxOffset / itemsCount ) );
+          var position = offset / ( maxOffset / itemsCount );
+          itemOffset = ( int )position;
+          itemHiddenRatio = position - itemOffset;
         }
         else
         {
@@ -644,25 +552,24 @@ namespace Xceed.Wpf.DataGrid
       {
         itemMaxOffset = ( int )maxOffset;
         itemOffset = ( int )offset;
+        itemHiddenRatio = offset - itemOffset;
       }
 
-      object newValue = null;
-      DataGridContext itemContext = null;
+      object newValue;
+      DataGridContext itemContext;
 
       // If data is grouped, we do not want to keep the next data item if a HeaderFooterItem
       // is the current item returned. So we increment the scroll up to the next item in order
       // to get the real item that will be visible when the user will release the mouse
-      ItemContextVisitor visitor = new ItemContextVisitor( parentGridControl.ItemsHost is TableflowViewItemsHost );
-      int endOffset = Math.Min( itemOffset + MaxItemToVisit, itemMaxOffset );
+      var visitor = new ItemContextVisitor( parentGridControl.ItemsHost as TableflowViewItemsHost, itemHiddenRatio );
+      var endOffset = Math.Min( itemOffset + MaxItemToVisit, itemMaxOffset );
       bool visitWasStopped;
       ( ( IDataGridContextVisitable )parentGridControl.DataGridContext ).AcceptVisitor( itemOffset, endOffset, visitor, DataGridContextVisitorType.Items, out visitWasStopped );
 
-      object tempValue = visitor.Item;
-
       if( visitor.VisitSuccessful )
       {
-        newValue = tempValue;
         itemContext = visitor.ParentDataGridContext;
+        newValue = visitor.Item;
       }
       else
       {
@@ -674,40 +581,11 @@ namespace Xceed.Wpf.DataGrid
 
       // The TippedItemDataGridContext PropertChanged callback will take care of refreshing the ScrollTip CellContentTemplate.
       if( itemContext != DataGridControl.GetDataGridContext( this ) )
-        DataGridControl.SetDataGridContext( this, itemContext );
-
-      if( this.Content != newValue )
-        this.Content = newValue;
-    }
-
-    internal static bool IsItemInView( UIElement item, UIElement itemsHost )
-    {
-      GeneralTransform childTransform = item.TransformToAncestor( itemsHost );
-      Rect rectangle = childTransform.TransformBounds( new Rect( new Point( 0, 0 ), item.RenderSize ) );
-
-      //Check if the elements Rect intersects with that of the scrollviewer's
-      Rect result = Rect.Intersect( new Rect( new Point( 0, 0 ), itemsHost.RenderSize ), rectangle );
-
-      //if result is Empty then the element is not in view
-      return ( result != Rect.Empty );
-    }
-
-    internal static bool IsDataItemHiddenBySticky( DataGridContext dataGridContext, object tempValue )
-    {
-      // We only want to do special handling for a TableflowItemsHost.
-      TableflowViewItemsHost itemsHost = dataGridContext.DataGridControl.ItemsHost as TableflowViewItemsHost;
-
-      if( itemsHost == null )
-        return false;
-
-      int index = dataGridContext.CustomItemContainerGenerator.FindIndexForItem( tempValue, dataGridContext );
-
-      if( index > -1 )
       {
-        return itemsHost.IsDataItemHiddenBySticky( index );
+        DataGridControl.SetDataGridContext( this, itemContext );
       }
 
-      return false;
+      this.Content = newValue;
     }
 
     #endregion
@@ -721,27 +599,24 @@ namespace Xceed.Wpf.DataGrid
 
     protected virtual bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
-      bool handled = false;
-
-      DataGridContext itemContext = DataGridControl.GetDataGridContext( this );
-
-      if( itemContext == null )
-        return handled;
+      var dataGridContext = DataGridControl.GetDataGridContext( this );
+      if( dataGridContext == null )
+        return true;
 
       if( managerType == typeof( PropertyChangedEventManager ) )
       {
-        if( itemContext.Columns == sender )
+        if( dataGridContext.Columns == sender )
         {
           if( m_mainColumn != null )
           {
-            PropertyChangedEventManager.RemoveListener( m_mainColumn, this, "DisplayMemberBinding" );
+            PropertyChangedEventManager.RemoveListener( m_mainColumn, this, Column.DisplayMemberBindingPropertyName );
           }
 
-          m_mainColumn = itemContext.Columns.MainColumn;
+          m_mainColumn = dataGridContext.Columns.MainColumn;
 
           if( m_mainColumn != null )
           {
-            PropertyChangedEventManager.AddListener( m_mainColumn, this, "DisplayMemberBinding" );
+            PropertyChangedEventManager.AddListener( m_mainColumn, this, Column.DisplayMemberBindingPropertyName );
           }
 
           // If a defaut template was created for the previous MainColumn
@@ -750,8 +625,6 @@ namespace Xceed.Wpf.DataGrid
           {
             this.RefreshDefaultScrollTipContentTemplate();
           }
-
-          handled = true;
         }
         else if( sender == m_mainColumn )
         {
@@ -761,12 +634,14 @@ namespace Xceed.Wpf.DataGrid
           {
             this.RefreshDefaultScrollTipContentTemplate();
           }
-
-          handled = true;
         }
       }
+      else
+      {
+        return false;
+      }
 
-      return handled;
+      return true;
     }
 
     #endregion
@@ -775,10 +650,7 @@ namespace Xceed.Wpf.DataGrid
 
     private ColumnBase m_mainColumn; // = null;
     private Orientation m_itemsScrollingOrientation = Orientation.Vertical;
-    private ScrollBar m_horizontalScrollBar; // = null;
-    private Thumb m_horizontalScrollThumb; // = null;
-    private ScrollBar m_verticalScrollBar; // = null;
-    private Thumb m_verticalScrollThumb; // = null;
+    private ScrollViewerTemplateHelper m_scrollViewerTemplateHelper;
 
     private BitVector32 m_flags = new BitVector32();
 

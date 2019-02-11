@@ -15,9 +15,7 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid.Markup
@@ -87,9 +85,9 @@ namespace Xceed.Wpf.DataGrid.Markup
           case "windows7theme":
             theme = s_windows7Theme;
             break;
-          case "windows8":
-          case "windows8theme":
-            theme = s_windows8Theme;
+          case "aero2.normalcolor":
+          case "aero2normalcolortheme":
+            theme = s_aero2NormalColorTheme;
             break;
         }
 
@@ -110,6 +108,6 @@ namespace Xceed.Wpf.DataGrid.Markup
     private static readonly Theme s_royaleNormalColorTheme = new RoyaleNormalColorTheme();
     private static readonly Theme s_zuneNormalColorTheme = new ZuneNormalColorTheme();
     private static readonly Theme s_windows7Theme = new Windows7Theme();
-    private static readonly Theme s_windows8Theme = new Windows8Theme();
+    private static readonly Theme s_aero2NormalColorTheme = new Windows8Theme();
   }
 }

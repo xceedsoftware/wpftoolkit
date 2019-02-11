@@ -21,7 +21,6 @@ using System.Collections.Specialized;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Media;
 using Xceed.Wpf.Toolkit.Media.Animation;
 using Xceed.Wpf.Toolkit.Core.Utilities;
@@ -1363,6 +1362,7 @@ namespace Xceed.Wpf.Toolkit.Panels
         _switchParent.OnVisualChildrenChangedInternal( visualAdded, visualRemoved );
       }
     }
+
 
     protected new void RemoveVisualChild( Visual child )
     {

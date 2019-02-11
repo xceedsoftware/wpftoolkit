@@ -14,16 +14,14 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.ComponentModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.ComponentModel;
 
 namespace Xceed.Wpf.DataGrid
 {
-  public class GroupLevelDescription : DependencyObject, INotifyPropertyChanged
+  public class GroupLevelDescription : DependencyObject, IGroupLevelDescription, INotifyPropertyChanged
   {
     #region CONSTRUCTORS
 
@@ -48,6 +46,8 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private readonly string m_fieldName;
+
     #endregion
 
     #region GroupDescription Property
@@ -60,12 +60,17 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    private readonly GroupDescription m_groupDescription;
+
     #endregion
 
     #region Title Property
 
-    internal static readonly DependencyProperty TitleProperty =
-        DependencyProperty.Register( "Title", typeof( object ), typeof( GroupLevelDescription ), new UIPropertyMetadata( null, new PropertyChangedCallback( GroupPropertiesChangedHandler ) ) );
+    internal static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
+      "Title",
+      typeof( object ),
+      typeof( GroupLevelDescription ),
+      new UIPropertyMetadata( null, new PropertyChangedCallback( GroupLevelDescription.OnPropertyChanged ) ) );
 
     public object Title
     {
@@ -84,8 +89,11 @@ namespace Xceed.Wpf.DataGrid
 
     #region TitleTemplate Property
 
-    internal static readonly DependencyProperty TitleTemplateProperty =
-        DependencyProperty.Register( "TitleTemplate", typeof( DataTemplate ), typeof( GroupLevelDescription ), new UIPropertyMetadata( null, new PropertyChangedCallback( GroupPropertiesChangedHandler ) ) );
+    internal static readonly DependencyProperty TitleTemplateProperty = DependencyProperty.Register(
+      "TitleTemplate",
+      typeof( DataTemplate ),
+      typeof( GroupLevelDescription ),
+      new UIPropertyMetadata( null, new PropertyChangedCallback( GroupLevelDescription.OnPropertyChanged ) ) );
 
     public DataTemplate TitleTemplate
     {
@@ -95,17 +103,15 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    internal void SetTitleTemplate( DataTemplate titleTemplate )
-    {
-      this.SetValue( GroupLevelDescription.TitleTemplateProperty, titleTemplate );
-    }
-
     #endregion TitleTemplate Property
 
     #region TitleTemplateSelector Property
 
-    internal static readonly DependencyProperty TitleTemplateSelectorProperty =
-        DependencyProperty.Register( "TitleTemplateSelector", typeof( DataTemplateSelector ), typeof( GroupLevelDescription ), new UIPropertyMetadata( null, new PropertyChangedCallback( GroupPropertiesChangedHandler ) ) );
+    internal static readonly DependencyProperty TitleTemplateSelectorProperty = DependencyProperty.Register(
+      "TitleTemplateSelector",
+      typeof( DataTemplateSelector ),
+      typeof( GroupLevelDescription ),
+      new UIPropertyMetadata( null, new PropertyChangedCallback( GroupLevelDescription.OnPropertyChanged ) ) );
 
     public DataTemplateSelector TitleTemplateSelector
     {
@@ -115,17 +121,51 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    internal void SetTitleTemplateSelector( DataTemplateSelector titleTemplateSelector )
+    #endregion TitleTemplateSelector Property
+
+    #region ValueStringFormat Property
+
+    internal static readonly DependencyProperty ValueStringFormatProperty = DependencyProperty.Register(
+      "ValueStringFormat",
+      typeof( string ),
+      typeof( GroupLevelDescription ),
+      new UIPropertyMetadata( null, new PropertyChangedCallback( GroupLevelDescription.OnPropertyChanged ) ) );
+
+    public string ValueStringFormat
     {
-      this.SetValue( GroupLevelDescription.TitleTemplateSelectorProperty, titleTemplateSelector );
+      get
+      {
+        return ( string )this.GetValue( GroupLevelDescription.ValueStringFormatProperty );
+      }
     }
 
-    #endregion TitleTemplateSelector Property
+    #endregion ValueStringFormat Property
+
+    #region ValueStringFormatCulture Property
+
+    internal static readonly DependencyProperty ValueStringFormatCultureProperty = DependencyProperty.Register(
+      "ValueStringFormatCulture",
+      typeof( CultureInfo ),
+      typeof( GroupLevelDescription ),
+      new UIPropertyMetadata( null, new PropertyChangedCallback( GroupLevelDescription.OnPropertyChanged ) ) );
+
+    public CultureInfo ValueStringFormatCulture
+    {
+      get
+      {
+        return ( CultureInfo )this.GetValue( GroupLevelDescription.ValueStringFormatCultureProperty );
+      }
+    }
+
+    #endregion ValueStringFormatCulture Property
 
     #region ValueTemplate Property
 
-    public static readonly DependencyProperty ValueTemplateProperty =
-        DependencyProperty.Register( "ValueTemplate", typeof( DataTemplate ), typeof( GroupLevelDescription ), new UIPropertyMetadata( null, new PropertyChangedCallback( GroupPropertiesChangedHandler ) ) );
+    internal static readonly DependencyProperty ValueTemplateProperty = DependencyProperty.Register(
+      "ValueTemplate",
+      typeof( DataTemplate ),
+      typeof( GroupLevelDescription ),
+      new UIPropertyMetadata( null, new PropertyChangedCallback( GroupLevelDescription.OnPropertyChanged ) ) );
 
     public DataTemplate ValueTemplate
     {
@@ -133,18 +173,17 @@ namespace Xceed.Wpf.DataGrid
       {
         return ( DataTemplate )this.GetValue( GroupLevelDescription.ValueTemplateProperty );
       }
-      set
-      {
-        this.SetValue( GroupLevelDescription.ValueTemplateProperty, value );
-      }
     }
 
     #endregion ValueTemplate Property
 
     #region ValueTemplateSelector Property
 
-    public static readonly DependencyProperty ValueTemplateSelectorProperty =
-        DependencyProperty.Register( "ValueTemplateSelector", typeof( DataTemplateSelector ), typeof( GroupLevelDescription ), new UIPropertyMetadata( null, new PropertyChangedCallback( GroupPropertiesChangedHandler ) ) );
+    internal static readonly DependencyProperty ValueTemplateSelectorProperty = DependencyProperty.Register(
+      "ValueTemplateSelector",
+      typeof( DataTemplateSelector ),
+      typeof( GroupLevelDescription ),
+      new UIPropertyMetadata( null, new PropertyChangedCallback( GroupLevelDescription.OnPropertyChanged ) ) );
 
     public DataTemplateSelector ValueTemplateSelector
     {
@@ -152,38 +191,23 @@ namespace Xceed.Wpf.DataGrid
       {
         return ( DataTemplateSelector )this.GetValue( GroupLevelDescription.ValueTemplateSelectorProperty );
       }
-      set
-      {
-        this.SetValue( GroupLevelDescription.ValueTemplateSelectorProperty, value );
-      }
     }
 
     #endregion ValueTemplateSelector Property
-
-    #region PRIVATE METHODS
-
-    private static void GroupPropertiesChangedHandler( DependencyObject sender, DependencyPropertyChangedEventArgs e )
-    {
-      GroupLevelDescription info = ( GroupLevelDescription )sender;
-
-      if( info.PropertyChanged != null )
-      {
-        info.PropertyChanged( info, new PropertyChangedEventArgs( e.Property.Name ) );
-      }
-    }
-
-    #endregion
 
     #region INotifyPropertyChanged Members
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    #endregion
+    private static void OnPropertyChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
+    {
+      var self = ( GroupLevelDescription )sender;
+      var handler = self.PropertyChanged;
+      if( handler == null )
+        return;
 
-    #region PRIVATE FIELDS
-
-    private string m_fieldName;
-    private GroupDescription m_groupDescription;
+      handler.Invoke( self, new PropertyChangedEventArgs( e.Property.Name ) );
+    }
 
     #endregion
   }

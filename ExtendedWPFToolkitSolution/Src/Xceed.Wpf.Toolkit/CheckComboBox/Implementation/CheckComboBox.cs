@@ -18,23 +18,23 @@ using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Xceed.Wpf.Toolkit.Primitives;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Windows.Controls;
-using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Controls.Primitives;
+using Xceed.Wpf.Toolkit.Primitives;
 
 namespace Xceed.Wpf.Toolkit
 {
   [TemplatePart( Name = PART_Popup, Type = typeof( Popup ) )]
-  public class CheckComboBox : Xceed.Wpf.Toolkit.Primitives.Selector
+  public class CheckComboBox : SelectAllSelector
   {
     private const string PART_Popup = "PART_Popup";
 
     #region Members
 
     private ValueChangeHelper _displayMemberPathValuesChangeHelper;
+    private bool _ignoreTextValueChanged;
     private Popup _popup;
     private List<object> _initialValue = new List<object>();
 
@@ -49,6 +49,7 @@ namespace Xceed.Wpf.Toolkit
 
     public CheckComboBox()
     {
+
       Keyboard.AddKeyDownHandler( this, OnKeyDown );
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );
       _displayMemberPathValuesChangeHelper = new ValueChangeHelper( this.OnDisplayMemberPathValuesChanged );
@@ -58,9 +59,28 @@ namespace Xceed.Wpf.Toolkit
 
     #region Properties
 
+    #region IsEditable
+
+    public static readonly DependencyProperty IsEditableProperty = DependencyProperty.Register( "IsEditable", typeof( bool ), typeof( CheckComboBox )
+      , new UIPropertyMetadata( false ) );
+    public bool IsEditable
+    {
+      get
+      {
+        return (bool)GetValue( IsEditableProperty );
+      }
+      set
+      {
+        SetValue( IsEditableProperty, value );
+      }
+    }
+
+    #endregion
+
     #region Text
 
-    public static readonly DependencyProperty TextProperty = DependencyProperty.Register( "Text", typeof( string ), typeof( CheckComboBox ), new UIPropertyMetadata( null ) );
+    public static readonly DependencyProperty TextProperty = DependencyProperty.Register( "Text", typeof( string ), typeof( CheckComboBox )
+      , new UIPropertyMetadata( null, OnTextChanged ) );
     public string Text
     {
       get
@@ -71,6 +91,21 @@ namespace Xceed.Wpf.Toolkit
       {
         SetValue( TextProperty, value );
       }
+    }
+
+    private static void OnTextChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var checkComboBox = o as CheckComboBox;
+      if( checkComboBox != null )
+        checkComboBox.OnTextChanged( (string)e.OldValue, (string)e.NewValue );
+    }
+
+    protected virtual void OnTextChanged( string oldValue, string newValue )
+    {
+      if( !this.IsInitialized || _ignoreTextValueChanged || !this.IsEditable )
+        return;
+
+      this.UpdateFromText();
     }
 
     #endregion
@@ -103,14 +138,16 @@ namespace Xceed.Wpf.Toolkit
       {
         _initialValue.Clear();
         foreach( object o in SelectedItems )
+        {
           _initialValue.Add( o );
+        }
+        base.RaiseEvent( new RoutedEventArgs( CheckComboBox.OpenedEvent, this ) );
       }
       else
       {
         _initialValue.Clear();
+        base.RaiseEvent( new RoutedEventArgs( CheckComboBox.ClosedEvent, this ) );
       }
-
-      // TODO: Add your property changed side-effects. Descendants can override as well.
     }
 
     #endregion //IsDropDownOpen
@@ -179,13 +216,14 @@ namespace Xceed.Wpf.Toolkit
         _popup.Opened += Popup_Opened;
     }
 
+
     #endregion //Base Class Overrides
 
     #region Event Handlers
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      CloseDropDown( false );
+      CloseDropDown( true );
     }
 
     private void OnKeyDown( object sender, KeyEventArgs e )
@@ -233,7 +271,61 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Event Handlers
 
+    #region Closed Event
+
+    public static readonly RoutedEvent ClosedEvent = EventManager.RegisterRoutedEvent( "Closed", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( CheckComboBox ) );
+    public event RoutedEventHandler Closed
+    {
+      add
+      {
+        AddHandler( ClosedEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( ClosedEvent, value );
+      }
+    }
+
+    #endregion //Closed Event
+
+    #region Opened Event
+
+    public static readonly RoutedEvent OpenedEvent = EventManager.RegisterRoutedEvent( "Opened", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( CheckComboBox ) );
+    public event RoutedEventHandler Opened
+    {
+      add
+      {
+        AddHandler( OpenedEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( OpenedEvent, value );
+      }
+    }
+
+    #endregion //Opened Event
+
     #region Methods
+
+    protected virtual void UpdateText()
+    {
+#if VS2008
+      string newValue = String.Join( Delimiter, SelectedItems.Cast<object>().Select( x => GetItemDisplayValue( x ).ToString() ).ToArray() ); 
+#else
+      string newValue = String.Join( Delimiter, SelectedItems.Cast<object>().Select( x => GetItemDisplayValue( x ) ) );
+#endif
+
+      if( String.IsNullOrEmpty( Text ) || !Text.Equals( newValue ) )
+      {
+        _ignoreTextValueChanged = true;
+#if VS2008
+        Text = newValue;
+#else
+        this.SetCurrentValue( CheckComboBox.TextProperty, newValue );
+#endif
+        _ignoreTextValueChanged = false;
+      }
+    }
 
     private void UpdateDisplayMemberPathValuesBindings()
     {
@@ -245,27 +337,53 @@ namespace Xceed.Wpf.Toolkit
       this.UpdateText();
     }
 
-    private void UpdateText()
+    /// <summary>
+    /// Updates the SelectedItems collection based on the content of
+    /// the Text property.
+    /// </summary>
+    private void UpdateFromText()
     {
-#if VS2008
-      string newValue = String.Join( Delimiter, SelectedItems.Cast<object>().Select( x => GetItemDisplayValue( x ).ToString() ).ToArray() ); 
-#else
-      string newValue = String.Join( Delimiter, SelectedItems.Cast<object>().Select( x => GetItemDisplayValue( x ) ) );
-#endif
+      List<string> selectedValues = null;
+      if( !String.IsNullOrEmpty( this.Text ) )
+      {
+        selectedValues = this.Text.Replace( " ", string.Empty ).Split( new string[] { Delimiter }, StringSplitOptions.RemoveEmptyEntries ).ToList();
+      }
 
-      if( String.IsNullOrEmpty( Text ) || !Text.Equals( newValue ) )
-        Text = newValue;
+      this.UpdateFromList( selectedValues, this.GetItemDisplayValue );
     }
 
     protected object GetItemDisplayValue( object item )
     {
-      if( !String.IsNullOrEmpty( DisplayMemberPath ) )
+      if( String.IsNullOrEmpty( this.DisplayMemberPath ) )
+        return item;
+
+      string[] nameParts = this.DisplayMemberPath.Split( '.' );
+      if( nameParts.Length == 1 )
       {
-        var property = item.GetType().GetProperty( DisplayMemberPath );
+        var property = item.GetType().GetProperty( this.DisplayMemberPath );
         if( property != null )
           return property.GetValue( item, null );
+        return item;
       }
 
+      for( int i = 0; i < nameParts.Count(); ++i )
+      {
+        var type = item.GetType();
+        var info = type.GetProperty( nameParts[ i ] );
+        if( info == null )
+        {
+          return item;
+        }
+
+        if( i == nameParts.Count() - 1 )
+        {
+          return info.GetValue( item, null );
+        }
+        else
+        {
+          item = info.GetValue( item, null );
+        }
+      }
       return item;
     }
 
@@ -279,6 +397,6 @@ namespace Xceed.Wpf.Toolkit
         Focus();
     }
 
-    #endregion //Methods
+#endregion //Methods
   }
 }

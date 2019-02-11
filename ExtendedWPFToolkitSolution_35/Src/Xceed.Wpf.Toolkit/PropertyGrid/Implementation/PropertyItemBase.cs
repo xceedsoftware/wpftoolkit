@@ -16,9 +16,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -26,7 +24,6 @@ using System.Windows.Media;
 using System.Windows.Data;
 using System.Collections;
 using Xceed.Wpf.Toolkit.Core.Utilities;
-using System.Reflection;
 using System.Linq.Expressions;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
@@ -40,6 +37,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private ContentControl _valueContainer;
     private ContainerHelperBase _containerHelper;
     private IPropertyContainer _parentNode;
+    internal bool _isPropertyGridCategorized;
+    internal bool _isSortedAlphabetically = true;
 
     #region Properties
 
@@ -117,7 +116,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private static void OnEditorChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
-      PropertyItem propertyItem = o as PropertyItem;
+      PropertyItemBase propertyItem = o as PropertyItemBase;
       if( propertyItem != null )
         propertyItem.OnEditorChanged( ( FrameworkElement )e.OldValue, ( FrameworkElement )e.NewValue );
     }
@@ -127,6 +126,24 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
     #endregion //Editor
+
+    #region HighlightedText
+
+    public static readonly DependencyProperty HighlightedTextProperty = DependencyProperty.Register( "HighlightedText", typeof( string ), typeof( PropertyItemBase ), new UIPropertyMetadata( null ) );
+
+    public string HighlightedText
+    {
+      get
+      {
+        return ( string )GetValue( HighlightedTextProperty );
+      }
+      set
+      {
+        SetValue( HighlightedTextProperty, value );
+      }
+    }
+
+    #endregion //HighlightedText
 
     #region IsExpanded
 
@@ -253,6 +270,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       get
       {
+        if( _containerHelper == null )
+        {
+          _containerHelper = new ObjectContainerHelper( this, null );
+        }
         return _containerHelper.Properties;
       }
     }
@@ -297,6 +318,25 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion
 
+    #region WillRefreshPropertyGrid
+
+    public static readonly DependencyProperty WillRefreshPropertyGridProperty =
+        DependencyProperty.Register( "WillRefreshPropertyGrid", typeof( bool ), typeof( PropertyItemBase ), new UIPropertyMetadata( false ) );
+
+    public bool WillRefreshPropertyGrid
+    {
+      get
+      {
+        return ( bool )GetValue( WillRefreshPropertyGridProperty );
+      }
+      set
+      {
+        SetValue( WillRefreshPropertyGridProperty, value );
+      }
+    }
+
+    #endregion //WillRefreshPropertyGrid
+
     #endregion //Properties
 
     #region Events
@@ -338,8 +378,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     internal PropertyItemBase()
     {
-      _containerHelper = new ObjectContainerHelper( this, null );
       this.GotFocus += new RoutedEventHandler( PropertyItemBase_GotFocus );
+      this.RequestBringIntoView += this.PropertyItemBase_RequestBringIntoView;
       AddHandler( PropertyItemsControl.PreparePropertyItemEvent, new PropertyItemEventHandler( OnPreparePropertyItemInternal ) );
       AddHandler( PropertyItemsControl.ClearPropertyItemEvent, new PropertyItemEventHandler( OnClearPropertyItemInternal ) );
     }
@@ -366,9 +406,24 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       args.Handled = true;
     }
 
+    private void PropertyItemBase_RequestBringIntoView( object sender, RequestBringIntoViewEventArgs e )
+    {
+      e.Handled = true;
+    }
+
     #endregion  //Event Handlers
 
     #region Methods
+
+    protected virtual Type GetPropertyItemType()
+    {
+      return null;
+    }
+
+    protected virtual string GetPropertyItemName()
+    {
+      return this.DisplayName;
+    }
 
     public override void OnApplyTemplate()
     {
@@ -389,6 +444,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       e.Handled = true;
     }
 
+
     private void PropertyItemBase_GotFocus( object sender, RoutedEventArgs e )
     { 
       IsSelected = true;
@@ -403,15 +459,52 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       // First check that the raised property is actually a real CLR property.
       // This could be something else like an Attached DP.
-      if( ReflectionHelper.IsPublicInstanceProperty( GetType(), e.Property.Name ) )
+      if( ReflectionHelper.IsPublicInstanceProperty( GetType(), e.Property.Name ) 
+        && this.IsLoaded 
+        && (_parentNode != null) 
+        && !_parentNode.ContainerHelper.IsCleaning)
       {
         this.RaisePropertyChanged( e.Property.Name );
       }
     }
 
+    private PropertyDefinitionCollection GetPropertItemPropertyDefinitions()
+    {
+      if( (this.ParentNode != null) && (this.ParentNode.PropertyDefinitions != null) )
+      {
+        var name = this.GetPropertyItemName();
+        foreach( var pd in this.ParentNode.PropertyDefinitions )
+        {
+          if( pd.TargetProperties.Contains( name ) )
+          {
+            // PropertyDefinitions contains a PropertyDefinition for this PropertyItem Name => return its PropertyDefinitions.
+            return pd.PropertyDefinitions;
+          }
+          else
+          {
+            var type = this.GetPropertyItemType();
+            if( type != null )
+            {
+              foreach( var targetProperty in pd.TargetProperties )
+              {
+                var targetPropertyType = targetProperty as Type;
+                // PropertyDefinitions contains a PropertyDefinition for this PropertyItem Type => return its PropertyDefinitions.
+                if( (targetPropertyType != null) && targetPropertyType.IsAssignableFrom( type ) )
+                  return pd.PropertyDefinitions;
+              }
+            }
+          }
+        }
+      }
+      return null;
+    }
+
     #endregion //Methods
 
     #region IPropertyContainer Members
+
+
+
 
 
 
@@ -422,12 +515,18 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     EditorDefinitionCollection IPropertyContainer.EditorDefinitions
     {
-      get { return ParentNode.EditorDefinitions; }
+      get
+      {
+        return (this.ParentNode != null) ? this.ParentNode.EditorDefinitions : null;
+      }
     }
 
     PropertyDefinitionCollection IPropertyContainer.PropertyDefinitions
     {
-      get { return null; }
+      get
+      {
+        return this.GetPropertItemPropertyDefinitions();
+      }
     }
 
     ContainerHelperBase IPropertyContainer.ContainerHelper 
@@ -440,12 +539,44 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     bool IPropertyContainer.IsCategorized 
     {
-      get { return false; }
+      get
+      {
+        return _isPropertyGridCategorized;
+      }
+    }
+
+    bool IPropertyContainer.IsSortedAlphabetically
+    {
+      get
+      {
+        return _isSortedAlphabetically;
+      }
     }
 
     bool IPropertyContainer.AutoGenerateProperties
     {
-      get { return true; }
+      get
+      {
+        if( this.ParentNode != null )
+        {
+          var propertyItemPropertyDefinitions = this.GetPropertItemPropertyDefinitions();
+          // No PropertyDefinitions specified : show all properties of this PropertyItem.
+          if( (propertyItemPropertyDefinitions == null) || (propertyItemPropertyDefinitions.Count == 0) )
+            return true;
+
+          // A PropertyDefinitions is specified : show only the properties of the PropertyDefinitions from this PropertyItem.
+          return this.ParentNode.AutoGenerateProperties;
+        }
+        return true;
+      }
+    }
+
+    bool IPropertyContainer.HideInheritedProperties
+    {
+      get
+      {
+        return false;
+      }
     }
 
     FilterInfo IPropertyContainer.FilterInfo
@@ -453,7 +584,19 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       get { return new FilterInfo(); }
     }
 
-    #endregion
+    bool? IPropertyContainer.IsPropertyVisible( PropertyDescriptor pd )
+    {
+      if( _parentNode != null )
+      {
+        return _parentNode.IsPropertyVisible( pd );
+      }
+
+      return null;
+    }
+
+
+
+#endregion
 
   }
 }

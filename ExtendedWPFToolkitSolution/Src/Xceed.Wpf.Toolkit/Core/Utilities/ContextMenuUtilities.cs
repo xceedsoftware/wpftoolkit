@@ -15,6 +15,8 @@
   ***********************************************************************************/
 
 using System.Windows;
+using System.Windows.Media;
+using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Xceed.Wpf.Toolkit.Core.Utilities
 {
@@ -32,19 +34,42 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
 
     public static void OpenOnMouseLeftButtonClickChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
-      var control = ( FrameworkElement )sender;
-      if( ( bool )e.NewValue )
+      var control = sender as FrameworkElement;
+      if( control != null )
       {
-        control.PreviewMouseLeftButtonDown += ( s, args ) =>
+        if( ( bool )e.NewValue )
         {
-          if( control.ContextMenu != null )
-          {
-            control.ContextMenu.PlacementTarget = control;
-            control.ContextMenu.IsOpen = true;
-          }
-        };
+          control.PreviewMouseLeftButtonDown += ContextMenuUtilities.Control_PreviewMouseLeftButtonDown;
+        }
+        else
+        {
+          control.PreviewMouseLeftButtonDown -= ContextMenuUtilities.Control_PreviewMouseLeftButtonDown;
+        }
       }
-      //TODO: remove handler when set to false
+    }
+
+    private static void Control_PreviewMouseLeftButtonDown( object sender, System.Windows.Input.MouseButtonEventArgs e )
+    {
+      var control = sender as FrameworkElement;
+      if( (control != null) && (control.ContextMenu != null) )
+      {
+        // Get PropertyItemBase parent
+        var parent = VisualTreeHelper.GetParent( control );
+        while( parent != null )
+        {
+          var propertyItemBase = parent as PropertyItemBase;
+          if( propertyItemBase != null )
+          {
+            // Set the ContextMenu.DataContext to the PropertyItem associated to the clicked image.
+            control.ContextMenu.DataContext = propertyItemBase;
+            break;
+          }
+          parent = VisualTreeHelper.GetParent( parent );
+        }
+
+        control.ContextMenu.PlacementTarget = control;
+        control.ContextMenu.IsOpen = true;
+      }
     }
   }
 }

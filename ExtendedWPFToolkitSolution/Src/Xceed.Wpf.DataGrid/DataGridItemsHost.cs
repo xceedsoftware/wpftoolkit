@@ -15,31 +15,27 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Controls;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Windows.Controls.Primitives;
 using System.Diagnostics;
+using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 using Xceed.Utils.Wpf;
 
 namespace Xceed.Wpf.DataGrid
 {
   public abstract class DataGridItemsHost : FrameworkElement, ICustomVirtualizingPanel
   {
-    #region Constructors
-
     static DataGridItemsHost()
     {
       DataGridControl.ParentDataGridControlPropertyKey.OverrideMetadata(
         typeof( DataGridItemsHost ),
         new FrameworkPropertyMetadata( new PropertyChangedCallback( OnParentDataGridControlChanged ) ) );
     }
-
-    #endregion
 
     #region ParentDataGridControl property
 
@@ -86,15 +82,14 @@ namespace Xceed.Wpf.DataGrid
 
       m_generator.ItemsChanged += this.HandleGeneratorItemsChanged;
       m_generator.ContainersRemoved += this.HandleGeneratorContainersRemoved;
+      m_generator.RecyclingCandidatesCleaned += this.HandleGeneratorRecyclingCandidatesCleaned;
 
       m_generatorInitialized = true;
     }
 
     #endregion
 
-    #region CachedRootDataGridContext internal property
-
-    private DataGridContext m_cachedRootDataGridContext;
+    #region CachedRootDataGridContext Internal property
 
     internal DataGridContext CachedRootDataGridContext
     {
@@ -109,6 +104,18 @@ namespace Xceed.Wpf.DataGrid
 
         return m_cachedRootDataGridContext;
       }
+    }
+
+    private DataGridContext m_cachedRootDataGridContext;
+
+    #endregion
+
+    #region DelayBringIntoView Internal Property
+
+    internal bool DelayBringIntoView
+    {
+      get;
+      private set;
     }
 
     #endregion
@@ -161,7 +168,6 @@ namespace Xceed.Wpf.DataGrid
       if( m_children == null )
         throw new InvalidOperationException( "An attempt was made to retrieve a visual child when none exists for this element." );
 
-      //TODO (case 117289): Insert ZIndex lookup table checkup here.
 
       if( ( index < 0 ) || ( index >= m_children.Count ) )
         throw new ArgumentOutOfRangeException( "index", index, "index must be greater than or equal to zero and less than or equal to the number of contained UI elements." );
@@ -172,7 +178,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region  PreviewKeyDown and KeyDown handling overrides
+    #region PreviewKeyDown and KeyDown handling overrides
 
     protected override void OnPreviewKeyDown( KeyEventArgs e )
     {
@@ -407,31 +413,49 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region Protected Methods
-
     protected virtual IList<UIElement> CreateChildCollection()
     {
       return new ItemsHostUIElementCollection( this );
     }
 
-    protected abstract void OnItemsAdded( GeneratorPosition position, int index, int itemCount );
+    [Obsolete( "This OnItemsAdded method is obsolete and is no longer called." )]
+    protected virtual void OnItemsAdded( GeneratorPosition position, int index, int itemCount )
+    {
+    }
 
-    protected abstract void OnItemsMoved( GeneratorPosition position, int index, GeneratorPosition oldPosition, int oldIndex, int itemCount, int itemUICount, IList<DependencyObject> affectedContainers );
+    [Obsolete( "This OnItemsRemoved method is obsolete and is no longer called." )]
+    protected virtual void OnItemsRemoved( GeneratorPosition position, int index, GeneratorPosition oldPosition, int oldIndex, int itemCount, int itemUICount, IList<DependencyObject> affectedContainers )
+    {
+    }
 
-    protected abstract void OnItemsReplaced( GeneratorPosition position, int index, GeneratorPosition oldPosition, int oldIndex, int itemCount, int itemUICount, IList<DependencyObject> affectedContainers );
+    [Obsolete( "The OnItemsMoved method is obsolete and is no longer called." )]
+    protected virtual void OnItemsMoved( GeneratorPosition position, int index, GeneratorPosition oldPosition, int oldIndex, int itemCount, int itemUICount, IList<DependencyObject> affectedContainers )
+    {
+    }
 
-    protected abstract void OnItemsRemoved( GeneratorPosition position, int index, GeneratorPosition oldPosition, int oldIndex, int itemCount, int itemUICount, IList<DependencyObject> affectedContainers );
+    [Obsolete( "The OnItemsReplaced method is obsolete and is no longer called." )]
+    protected virtual void OnItemsReplaced( GeneratorPosition position, int index, GeneratorPosition oldPosition, int oldIndex, int itemCount, int itemUICount, IList<DependencyObject> affectedContainers )
+    {
+    }
+
+    protected abstract void OnItemsAdded();
+
+    protected abstract void OnItemsRemoved( IList<DependencyObject> affectedContainers );
 
     protected abstract void OnItemsReset();
 
     protected abstract void OnContainersRemoved( IList<DependencyObject> removedContainers );
+
+    protected virtual void OnRecyclingCandidatesCleaned( IList<DependencyObject> recyclingCandidates )
+    {
+    }
 
     protected virtual void OnParentDataGridControlChanged( DataGridControl oldValue, DataGridControl newValue )
     {
       if( ( m_generator != null ) && ( newValue != null ) )
       {
         if( newValue.CustomItemContainerGenerator != m_generator )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "The custom generator is different on the parent DataGridControl.", newValue );
       }
 
       // We must ensure that the old ItemsHost clears the Content of the
@@ -445,7 +469,7 @@ namespace Xceed.Wpf.DataGrid
       // DataGridControl and when the System color scheme is changed.
       if( ( oldValue != null ) && ( newValue == null ) )
       {
-        oldValue.CustomItemContainerGenerator.CleanupGenerator( false );
+        oldValue.CustomItemContainerGenerator.CleanupGenerator();
       }
 
       if( newValue != null )
@@ -461,24 +485,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    protected void InvalidateAutomationPeerChildren()
-    {
-      DataGridContext dataGridContext = this.CachedRootDataGridContext;
 
-      if( ( dataGridContext == null ) || ( dataGridContext.Peer == null ) )
-        return;
-
-      DataGridControl dataGridControl = dataGridContext.DataGridControl;
-
-      if( dataGridControl == null )
-        return;
-
-      dataGridControl.QueueDataGridContextPeerChlidrenRefresh( dataGridContext );
-    }
-
-    #endregion
-
-    #region Internal Methods
 
     internal static bool ProcessMoveFocus( Key key )
     {
@@ -501,7 +508,7 @@ namespace Xceed.Wpf.DataGrid
           navDirection = FocusNavigationDirection.Up;
           break;
         default:
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "An invalid key was processed to move the focus." );
       }
 
       //2. Call MoveFocus() on the currently focused keyboard element, 
@@ -570,9 +577,86 @@ namespace Xceed.Wpf.DataGrid
       return null;
     }
 
-    #endregion
+    internal bool ValidateTabKeyHandleIsWithin( FrameworkElement originalSource, KeyboardDevice keyboardDevice )
+    {
+      DependencyObject predictedNextVisual = null;
 
-    #region Private Methods
+      //If the original source is not a control (e.g. the cells panel instead of a cell), columns will be used to move focus.
+      //In the case of a ListBox set with Cycle or Contained navigation mode, we must move in the other direction if on the first or last item,
+      //since PedictFocus will throw is we use FocusNavigationDirection.First/Last.
+      if( originalSource != null )
+      {
+        if( ( keyboardDevice.Modifiers & ModifierKeys.Shift ) == ModifierKeys.Shift )
+        {
+          predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Left );
+          if( predictedNextVisual == null )
+          {
+            predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Up );
+            if( predictedNextVisual == null )
+            {
+              KeyboardNavigationMode navigationMode = ( KeyboardNavigationMode )originalSource.GetValue( KeyboardNavigation.TabNavigationProperty );
+              if( navigationMode == KeyboardNavigationMode.Cycle || navigationMode == KeyboardNavigationMode.Contained )
+              {
+                predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Right );
+                if( predictedNextVisual == null )
+                {
+                  predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Down );
+                }
+              }
+            }
+          }
+        }
+        else
+        {
+          predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Right );
+          if( predictedNextVisual == null )
+          {
+            predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Down );
+            if( predictedNextVisual == null )
+            {
+              KeyboardNavigationMode navigationMode = ( KeyboardNavigationMode )originalSource.GetValue( KeyboardNavigation.TabNavigationProperty );
+              if( navigationMode == KeyboardNavigationMode.Cycle || navigationMode == KeyboardNavigationMode.Contained )
+              {
+                predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Left );
+                if( predictedNextVisual == null )
+                {
+                  predictedNextVisual = originalSource.PredictFocus( FocusNavigationDirection.Up );
+                }
+              }
+            }
+          }
+        }
+      }
+
+      if( predictedNextVisual != null )
+      {
+        Cell ownerCell = Cell.FindFromChild( predictedNextVisual );
+
+        if( ( ownerCell != null ) && ( ownerCell.ParentColumn == this.ParentDataGridControl.CurrentColumn ) )
+        {
+          if( object.Equals( ownerCell.ParentRow.GetEditingDataContext(), this.ParentDataGridControl.CurrentItemInEdition ) )
+            return true;
+        }
+      }
+
+      return false;
+    }
+
+    internal bool CanRecycleContainer( DependencyObject container )
+    {
+      if( container == null )
+        return false;
+
+      var target = container as IDataGridItemContainer;
+      if( target != null )
+        return target.CanBeRecycled;
+
+      var element = container as UIElement;
+      if( ( element != null ) && ( element.IsKeyboardFocused || element.IsKeyboardFocusWithin ) )
+        return false;
+
+      return true;
+    }
 
     private static void OnParentDataGridControlChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
@@ -593,9 +677,15 @@ namespace Xceed.Wpf.DataGrid
         // Clean up the previous generator that was used by the ItemsHost
         m_generator.ItemsChanged -= this.HandleGeneratorItemsChanged;
         m_generator.ContainersRemoved -= this.HandleGeneratorContainersRemoved;
+        m_generator.RecyclingCandidatesCleaned -= this.HandleGeneratorRecyclingCandidatesCleaned;
       }
       m_generatorInitialized = false;
       m_cachedRootDataGridContext = null;
+    }
+
+    private void HandleGeneratorRecyclingCandidatesCleaned( object sender, RecyclingCandidatesCleanedEventArgs e )
+    {
+      this.OnRecyclingCandidatesCleaned( e.RecyclingCandidates );
     }
 
     private void HandleGeneratorContainersRemoved( object sender, ContainersRemovedEventArgs e )
@@ -605,41 +695,27 @@ namespace Xceed.Wpf.DataGrid
 
     private void HandleGeneratorItemsChanged( object sender, CustomGeneratorChangedEventArgs e )
     {
+      // We set this flag to delay any bring into view until a layout pass occured if there is one.
+      // We don't want the bring into view to occur on a container that may move around during the layout pass.
+      this.DelayBringIntoView = true;
+
       switch( e.Action )
       {
         case NotifyCollectionChangedAction.Add:
-          {
-            this.OnItemsAdded( e.Position, e.Index, e.ItemCount );
-            break;
-          }
-        case NotifyCollectionChangedAction.Move:
-          {
-            this.OnItemsMoved( e.Position, e.Index, e.OldPosition, e.OldIndex, e.ItemCount, e.ItemUICount, e.RemovedContainers );
-            break;
-          }
-        case NotifyCollectionChangedAction.Remove:
-          {
-            this.OnItemsRemoved( e.Position, e.Index, e.OldPosition, e.OldIndex, e.ItemCount, e.ItemUICount, e.RemovedContainers );
-            break;
-          }
-        case NotifyCollectionChangedAction.Replace:
-          {
-            this.OnItemsReplaced( e.Position, e.Index, e.OldPosition, e.OldIndex, e.ItemCount, e.ItemUICount, e.RemovedContainers );
-            break;
-          }
-        case NotifyCollectionChangedAction.Reset:
-          {
-            this.OnItemsReset();
-            break;
-          }
-        default:
-          {
-            throw new System.ComponentModel.InvalidEnumArgumentException( "An unknown action was specified." );
-          }
-      }
-    }
+          this.OnItemsAdded();
+          break;
 
-    #endregion
+        case NotifyCollectionChangedAction.Remove:
+          this.OnItemsRemoved( e.Containers );
+          break;
+
+        default:
+          this.OnItemsReset();
+          break;
+      }
+
+      this.Dispatcher.BeginInvoke( new Action( () => this.DelayBringIntoView = false ), DispatcherPriority.Loaded );
+    }
 
     #region ICustomVirtualizingPanel Members
 

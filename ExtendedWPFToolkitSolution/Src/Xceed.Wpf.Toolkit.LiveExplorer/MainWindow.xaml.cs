@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -44,7 +44,11 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
     public MainWindow()
     {
       InitializeComponent();
+      this.Loaded += new RoutedEventHandler( this.MainWindow_Loaded );
+
+      VersionTextBlock.Text = "Version: " + Assembly.GetExecutingAssembly().GetName().Version.ToString();
     }
+
 
     #region Properties
 
@@ -72,19 +76,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
 
     protected virtual void OnViewChanged( DemoView oldValue, DemoView newValue )
     {
-      if( _flowDocumentDesc != null )
-      {
-        _flowDocumentDesc.Blocks.Clear();
-        if( this.View.Description != null )
-        {
-          _flowDocumentDesc.Blocks.Add( this.View.Description );
-        }
-      }
-      if( _contentScrollViewer != null )
-      {
-      _contentScrollViewer.ScrollToHome();
-      }
-
+      this.InitView();
     }
 
     #endregion //View
@@ -92,6 +84,11 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
     #endregion //Properties
 
     #region Event Handler
+
+    void MainWindow_Loaded( object sender, RoutedEventArgs e )
+    {
+      this.InitView();
+    }
 
     private void OnTreeViewSelectionChanged( object sender, RoutedPropertyChangedEventArgs<Object> e )
     {
@@ -102,6 +99,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
     {
       if( treeViewItem != null )
       {
+        treeViewItem.IsExpanded = true;
         Type type = treeViewItem.SampleType;
         if( type != null )
         {
@@ -110,7 +108,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
           Assembly assembly = Assembly.Load( toolkitAssembly );
           Type sampleType = assembly.GetType( name );
 
-          this.View = (DemoView)Activator.CreateInstance( sampleType );
+          this.View = ( DemoView )Activator.CreateInstance( sampleType );
         }
       }
     }
@@ -128,6 +126,26 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
     }
 
     #endregion //EventHandler
+
+    #region Methods
+
+    private void InitView()
+    {
+      if( ( _flowDocumentDesc != null ) && ( this.View != null) )
+      {
+        _flowDocumentDesc.Blocks.Clear();
+        if( this.View.Description != null )
+        {
+          _flowDocumentDesc.Blocks.Add( this.View.Description );
+        }
+      }
+      if( _contentScrollViewer != null )
+      {
+        _contentScrollViewer.ScrollToHome();
+      }
+    }
+
+    #endregion
 
   }
 }

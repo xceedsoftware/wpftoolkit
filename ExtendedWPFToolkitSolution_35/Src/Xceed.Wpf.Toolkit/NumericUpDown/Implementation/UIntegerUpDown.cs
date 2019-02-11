@@ -25,11 +25,11 @@ namespace Xceed.Wpf.Toolkit
 
     static UIntegerUpDown()
     {
-      UpdateMetadataInternal( typeof( UIntegerUpDown ), ( uint )1, uint.MinValue, uint.MaxValue );
+      UpdateMetadata( typeof( UIntegerUpDown ), ( uint )1, uint.MinValue, uint.MaxValue );
     }
 
     public UIntegerUpDown()
-      : base( uint.Parse, Decimal.ToUInt32, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
+      : base( uint.TryParse, Decimal.ToUInt32, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
     {
     }
 

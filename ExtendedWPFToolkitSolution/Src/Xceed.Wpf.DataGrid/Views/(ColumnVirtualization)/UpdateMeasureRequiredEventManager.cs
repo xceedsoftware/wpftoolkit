@@ -15,9 +15,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace Xceed.Wpf.DataGrid.Views
@@ -40,26 +37,20 @@ namespace Xceed.Wpf.DataGrid.Views
 
     protected override void StartListening( object source )
     {
-      TableViewColumnVirtualizationManager columnVirtualizationManager = source as TableViewColumnVirtualizationManager;
-      if( columnVirtualizationManager != null )
-      {
-        columnVirtualizationManager.UpdateMeasureRequired += this.OnUpdateMeasureRequired;
-        return;
-      }
+      var columnVirtualizationManager = source as TableViewColumnVirtualizationManagerBase;
+      if( columnVirtualizationManager == null )
+        throw new InvalidOperationException( "An attempt was made to use a source other than a ColumnVirtualizationManager." );
 
-      throw new InvalidOperationException( "An attempt was made to use a source other than a ColumnVirtualizationManager." );
+      columnVirtualizationManager.UpdateMeasureRequired += this.OnUpdateMeasureRequired;
     }
 
     protected override void StopListening( object source )
     {
-      TableViewColumnVirtualizationManager columnVirtualizationManager = source as TableViewColumnVirtualizationManager;
-      if( columnVirtualizationManager != null )
-      {
-        columnVirtualizationManager.UpdateMeasureRequired -= this.OnUpdateMeasureRequired;
-        return;
-      }
+      var columnVirtualizationManager = source as TableViewColumnVirtualizationManagerBase;
+      if( columnVirtualizationManager == null )
+        throw new InvalidOperationException( "An attempt was made to use a source other than a ColumnVirtualizationManager." );
 
-      throw new InvalidOperationException( "An attempt was made to use a source other than a ColumnVirtualizationManager." );
+      columnVirtualizationManager.UpdateMeasureRequired -= this.OnUpdateMeasureRequired;
     }
 
     private static UpdateMeasureRequiredEventManager CurrentManager

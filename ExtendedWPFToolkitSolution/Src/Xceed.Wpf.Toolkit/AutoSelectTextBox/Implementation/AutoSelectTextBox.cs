@@ -17,16 +17,14 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows;
-using System.Windows.Automation;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
   public class AutoSelectTextBox : TextBox
   {
-    static AutoSelectTextBox()
+    public AutoSelectTextBox()
     {
-      AutomationProperties.AutomationIdProperty.OverrideMetadata( typeof( AutoSelectTextBox ), new UIPropertyMetadata( "AutoSelectTextBox" ) );
     }
 
     #region AutoSelectBehavior PROPERTY
@@ -123,7 +121,9 @@ namespace Xceed.Wpf.Toolkit
       {
         // If the focus was not in one of our child ( or popup ), we select all the text.
         if( !TreeHelper.IsDescendantOf( e.OldFocus as DependencyObject, this ) )
+        {
           this.SelectAll();
+        }
       }
     }
 
@@ -137,7 +137,7 @@ namespace Xceed.Wpf.Toolkit
       if( this.IsKeyboardFocusWithin == false )
       {
         this.Focus();
-        e.Handled = true;
+        e.Handled = true;  //prevent from removing the selection
       }
     }
 
@@ -162,6 +162,7 @@ namespace Xceed.Wpf.Toolkit
         }
       }
     }
+
 
     private bool CanMoveFocus( FocusNavigationDirection direction, bool reachedMax )
     {

@@ -15,22 +15,21 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
+using System.Windows.Data;
+using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
 {
-  internal class ItemContextVisitor : IDataGridContextVisitor
+  internal sealed class ItemContextVisitor : IDataGridContextVisitor
   {
-    public ItemContextVisitor( bool isTableFlowView )
+    internal ItemContextVisitor( TableflowViewItemsHost itemsHost, double firstItemHiddenRatio )
     {
-      m_isTableFlowView = isTableFlowView;
+      m_itemsHost = itemsHost;
+      m_firstItemHiddenRatio = firstItemHiddenRatio;
     }
 
     #region ParentDataGridContext
-
-    private DataGridContext m_parentDataGridContext;
 
     public DataGridContext ParentDataGridContext
     {
@@ -40,11 +39,11 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion ParentDataGridContext
+    private DataGridContext m_parentDataGridContext;
+
+    #endregion
 
     #region Item Property
-
-    private object m_item;
 
     public object Item
     {
@@ -54,7 +53,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion Item Property
+    private object m_item;
+
+    #endregion
 
     #region VisitSuccessful Property
 
@@ -84,39 +85,46 @@ namespace Xceed.Wpf.DataGrid
 
     public void Visit( DataGridContext sourceContext, int sourceDataItemIndex, object item, ref bool stopVisit )
     {
-      if( !m_isTableFlowView )
+      // In TableflowView, we must consider that sticky headers may hide the item.
+      if( m_itemsHost != null )
       {
-        m_item = item;
-        m_parentDataGridContext = sourceContext;
-        m_success = true;
-        stopVisit = true;
-        return;
+        if( m_isFirstItem )
+        {
+          m_isFirstItem = false;
+
+          // At least half the item is hidden.
+          if( m_firstItemHiddenRatio > 0.5d )
+            return;
+        }
+
+        var areHeadersSticky = TableflowView.GetAreHeadersSticky( sourceContext );
+        var areGroupHeadersSticky = TableflowView.GetAreGroupHeadersSticky( sourceContext );
+        var areParentRowsSticky = TableflowView.GetAreParentRowsSticky( sourceContext );
+
+        if( areHeadersSticky || areGroupHeadersSticky || areParentRowsSticky )
+        {
+          var stickyHeadersCount = sourceContext.CustomItemContainerGenerator.GetStickyHeaderCountForIndex( sourceDataItemIndex, areHeadersSticky, areGroupHeadersSticky, areParentRowsSticky );
+
+          if( stickyHeadersCount > m_stickyHeadersSkipped )
+          {
+            m_stickyHeadersSkipped++;
+            return;
+          }
+        }
       }
 
-      UIElement dataRow = sourceContext.CustomItemContainerGenerator.ContainerFromItem( item ) as UIElement;
-
-      if( dataRow != null )
-      {
-        if( !ScrollTip.IsItemInView( dataRow, sourceContext.DataGridControl.ItemsHost ) )
-        {
-          stopVisit = true;
-        }
-        else if( !ScrollTip.IsDataItemHiddenBySticky( sourceContext, item ) )
-        {
-          m_item = item;
-          m_parentDataGridContext = sourceContext;
-          m_success = true;
-          stopVisit = true;
-        }
-      }
+      m_item = item;
+      m_parentDataGridContext = sourceContext;
+      m_success = true;
+      stopVisit = true;
     }
 
-    public void Visit( DataGridContext sourceContext, System.Windows.Data.CollectionViewGroup group, object[] namesTree, int groupLevel, bool isExpanded, bool isComputedExpanded, ref bool stopVisit )
+    public void Visit( DataGridContext sourceContext, CollectionViewGroup group, object[] namesTree, int groupLevel, bool isExpanded, bool isComputedExpanded, ref bool stopVisit )
     {
       throw new NotSupportedException( "The ItemAndDataGridContextVisitor is only capable of handling data items." );
     }
 
-    public void Visit( DataGridContext sourceContext, System.Windows.DataTemplate headerFooter, ref bool stopVisit )
+    public void Visit( DataGridContext sourceContext, DataTemplate headerFooter, ref bool stopVisit )
     {
       throw new NotSupportedException( "The ItemAndDataGridContextVisitor is only capable of handling data items." );
     }
@@ -128,6 +136,9 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    private bool m_isTableFlowView;
+    private readonly TableflowViewItemsHost m_itemsHost;
+    private readonly double m_firstItemHiddenRatio;
+    private bool m_isFirstItem = true;
+    private int m_stickyHeadersSkipped; //0
   }
 }

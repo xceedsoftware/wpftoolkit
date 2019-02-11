@@ -29,7 +29,7 @@ namespace Xceed.Wpf.Toolkit
     }
 
     public ByteUpDown()
-      : base( Byte.Parse, Decimal.ToByte, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
+      : base( Byte.TryParse, Decimal.ToByte, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
     {
     }
 

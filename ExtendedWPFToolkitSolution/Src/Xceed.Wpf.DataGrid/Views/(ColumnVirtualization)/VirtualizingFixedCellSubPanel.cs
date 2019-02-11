@@ -16,13 +16,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using Xceed.Wpf.DataGrid.Print;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
-  internal class VirtualizingFixedCellSubPanel : FixedCellSubPanel, IPrintInfo
+  internal class VirtualizingFixedCellSubPanel : FixedCellSubPanel
   {
     public VirtualizingFixedCellSubPanel( FixedCellPanel parentPanel )
       : base( parentPanel )
@@ -32,34 +32,39 @@ namespace Xceed.Wpf.DataGrid.Views
     // Measure horizontally.
     protected override Size MeasureOverride( Size constraint )
     {
-      Size desiredSize = new Size();
+      // This can be null when the parent Row is not prepared yet.
+      var columnVirtualizationManager = this.ColumnVirtualizationManager;
+      if( columnVirtualizationManager == null )
+        return new Size();
 
-      DataGridContext dataGridContext = this.DataGridContext;
+      var parentRow = this.ParentPanel.ParentRow;
+      if( parentRow == null )
+        return new Size();
 
-      // DataGridContext can be null when a the parent Row was not prepared
-      if( dataGridContext == null )
-        return this.DesiredSize;
+      var desiredSize = new Size();
+      var columnToVisibleWidth = columnVirtualizationManager.GetFieldNameToWidth( parentRow.LevelCache );
 
-      TableViewColumnVirtualizationManager columnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
-      Dictionary<string, double> columnToVisibleWidth = columnVirtualizationManager.FieldNameToWidth;
-
-      foreach( Cell cell in this.GetCellsToLayout() )
+      //This using prevents a WeakEvent to be raised to execute UpdateChildren() in FixedCellPanel, as it is already up to date at this point.
+      using( this.ParentPanel.ParentRowCells.SetIsUpdating() )
       {
-        double width;
+        foreach( var cell in this.GetCellsToLayout() )
+        {
+          double width;
 
-        if( columnToVisibleWidth.TryGetValue( cell.FieldName, out width ) )
-        {
-          cell.Measure( new Size( width, constraint.Height ) );
-        }
-        else
-        {
-          // The cell will be hidden.
-          cell.Measure( Size.Empty );
-        }
+          if( columnToVisibleWidth.TryGetValue( cell.FieldName, out width ) )
+          {
+            cell.Measure( new Size( width, constraint.Height ) );
+          }
+          else
+          {
+            // The cell will be hidden.
+            cell.Measure( new Size() );
+          }
 
-        if( cell.DesiredSize.Height > desiredSize.Height )
-        {
-          desiredSize.Height = cell.DesiredSize.Height;
+          if( cell.DesiredSize.Height > desiredSize.Height )
+          {
+            desiredSize.Height = cell.DesiredSize.Height;
+          }
         }
       }
 
@@ -71,39 +76,37 @@ namespace Xceed.Wpf.DataGrid.Views
     // Arrange horizontally.
     protected override Size ArrangeOverride( Size arrangeSize )
     {
-      DataGridContext dataGridContext = this.DataGridContext;
+      // This can be null when the parent Row is not prepared yet.
+      var columnVirtualizationManager = this.ColumnVirtualizationManager;
+      if( columnVirtualizationManager == null )
+        return new Size();
 
-      // DataGridContext can be null when the parent Row was not prepared
-      if( dataGridContext == null )
-        return this.DesiredSize;
+      var parentRow = this.ParentPanel.ParentRow;
+      if( parentRow == null )
+        return new Size();
 
-      TableViewColumnVirtualizationManager columnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
-      Dictionary<string, double> columnToVisibleOffset = columnVirtualizationManager.FieldNameToOffset;
+      var dataGridContext = this.DataGridContext;
+      var scrollViewer = ( dataGridContext != null ) ? dataGridContext.DataGridControl.ScrollViewer : null;
 
-      ScrollViewer parentScrollViewer = dataGridContext.DataGridControl.ScrollViewer;
-      double horizontalOffset = parentScrollViewer.HorizontalOffset;
-      double fixedColumnVisibleWidth = columnVirtualizationManager.FixedColumnsWidth;
-      double firstColumnCompensationOffset = columnVirtualizationManager.FirstColumnCompensationOffset;
-      Rect finalRect = new Rect( arrangeSize );
+      var columnToVisibleOffset = columnVirtualizationManager.GetFieldNameToOffset( parentRow.LevelCache );
+      var horizontalOffset = ( scrollViewer != null ) ? scrollViewer.HorizontalOffset : 0d;
+      var fixedColumnsWidth = columnVirtualizationManager.FixedColumnsWidth;
+      var compensationOffset = columnVirtualizationManager.FirstColumnCompensationOffset;
+      var finalRect = new Rect( arrangeSize );
 
-      foreach( Cell cell in this.GetCellsToLayout() )
+      //This using prevents a WeakEvent to be raised to execute UpdateChildren() in FixedCellPanel, as it is already up to date at this point.
+      using( this.ParentPanel.ParentRowCells.SetIsUpdating() )
       {
-        // Calculate the offset of the Cell:
-        //    The original offset of the Column
-        //    - the horizontal offset of the ScrollViewer to scroll to the right
-        //    - the width of the fixed columns since we are in the Scrolling FixedCellSubPanel
-        //    + the compensation offset used in master detail to avoid scrolling when not required 
+        foreach( var cell in this.GetCellsToLayout() )
+        {
+          var offset = this.CalculateCellOffset( cell.ParentColumn, columnToVisibleOffset, horizontalOffset, fixedColumnsWidth, compensationOffset );
 
-        double cellOffset = columnToVisibleOffset[ cell.FieldName ]
-          - horizontalOffset
-          - fixedColumnVisibleWidth
-          + firstColumnCompensationOffset;
+          finalRect.X = offset.X;
+          finalRect.Width = cell.DesiredSize.Width;
+          finalRect.Height = Math.Max( arrangeSize.Height, cell.DesiredSize.Height );
 
-        finalRect.X = cellOffset;
-        finalRect.Width = cell.DesiredSize.Width;
-        finalRect.Height = Math.Max( arrangeSize.Height, cell.DesiredSize.Height );
-
-        cell.Arrange( finalRect );
+          cell.Arrange( finalRect );
+        }
       }
 
       return arrangeSize;
@@ -111,39 +114,92 @@ namespace Xceed.Wpf.DataGrid.Views
 
     protected override IEnumerable<string> GetVisibleFieldsName()
     {
-      DataGridContext dataGridContext = this.DataGridContext;
-      if( dataGridContext == null )
+      var columnVirtualizationManager = this.ColumnVirtualizationManager;
+      if( columnVirtualizationManager == null )
         return new string[ 0 ];
 
-      TableViewColumnVirtualizationManager columnVirtualizationManager =
-        dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
+      return columnVirtualizationManager.GetScrollingFieldNames( this.ParentPanel.ParentRow.LevelCache );
+    }
 
-      return columnVirtualizationManager.ScrollingFieldNames;
+    internal override Point CalculateCellOffset( ColumnBase column )
+    {
+      Debug.Assert( column != null );
+      var row = this.ParentPanel.ParentRow;
+
+      if( ( column != null ) && ( row != null ) )
+      {
+        var dataGridContext = this.DataGridContext;
+        var columnVirtualizationManager = this.ColumnVirtualizationManager;
+
+        if( ( dataGridContext != null ) && ( columnVirtualizationManager != null ) )
+        {
+          var columnToVisibleOffset = columnVirtualizationManager.GetFieldNameToOffset( row.LevelCache );
+          var scrollViewer = dataGridContext.DataGridControl.ScrollViewer;
+          var horizontalOffset = ( scrollViewer != null ) ? scrollViewer.HorizontalOffset : 0d;
+          var fixedColumnsWidth = columnVirtualizationManager.FixedColumnsWidth;
+          var compensationOffset = columnVirtualizationManager.FirstColumnCompensationOffset;
+
+          return this.CalculateCellOffset( column, columnToVisibleOffset, horizontalOffset, fixedColumnsWidth, compensationOffset );
+        }
+      }
+
+      return new Point();
+    }
+
+    private Point CalculateCellOffset( ColumnBase column, IColumnInfoCollection<double> columnsOffset, double horizontalOffset, double fixedColumnsWidth, double compensationOffset )
+    {
+      if( column == null )
+        return new Point();
+
+      Debug.Assert( columnsOffset != null );
+      Debug.Assert( columnsOffset.Contains( column ) );
+
+      var columnOffset = columnsOffset[ column ];
+
+      // Calculate the offset of the cell's parent column:
+      //    The original offset of the Column
+      //    - the horizontal offset of the ScrollViewer to scroll to the right
+      //    - the width of the fixed columns since we are in the Scrolling FixedCellSubPanel
+      //    + the compensation offset used in master detail to avoid scrolling when not required 
+      return new Point( columnOffset - horizontalOffset - fixedColumnsWidth + compensationOffset, 0d );
     }
 
     private IEnumerable<Cell> GetCellsToLayout()
     {
-      HashSet<Cell> layoutedCells = new HashSet<Cell>( this.GetVisibleCells() );
-      CellCollection collection = this.ParentPanel.ParentRowCells;
+      var visibleCells = this.GetVisibleCells();
 
-      if( collection != null )
+      // Check out if there are any out of view cells that needs to be layouted for different purpose.  In case of a BringIntoView, the cell
+      // must be layouted in order to find out the target location.  In case of a non recyclable cell, the cell must be arranged out of view.
+      var permanentScrollingFieldNames = this.ParentPanel.PermanentScrollingFieldNames;
+      if( !permanentScrollingFieldNames.Any() )
+        return visibleCells;
+
+      // Make sure we have access to the collection containing the additional cells to be layouted.
+      var parentRowCells = this.ParentPanel.ParentRowCells;
+      if( parentRowCells == null )
+        return visibleCells;
+
+      return this.GetCellsToLayout( visibleCells, permanentScrollingFieldNames, parentRowCells );
+    }
+
+    private IEnumerable<Cell> GetCellsToLayout( IEnumerable<Cell> visibleCells, IEnumerable<string> permanentScrollingFieldNames, VirtualizingCellCollection cellsCollection )
+    {
+      List<string> unhandledCells = permanentScrollingFieldNames.ToList();
+
+      foreach( var cell in visibleCells )
       {
-        // Retrieve the cells that aren't in view anymore but needs to be measured
-        // and arranged for different purpose.  In case of a BringIntoView, the cell
-        // must be layouted in order to find out the target location.  In case of a
-        // non recyclable cell, the cell must be arranged out of view.
-        foreach( string fieldName in this.ParentPanel.PermanentScrollingFieldNames )
-        {
-          Cell cell = collection[ fieldName ];
+        unhandledCells.Remove( cell.FieldName );
 
-          if( ( cell != null ) && ( !layoutedCells.Contains( cell ) ) )
-          {
-            layoutedCells.Add( cell );
-          }
-        }
+        yield return cell;
       }
 
-      return layoutedCells;
+      foreach( var fieldName in unhandledCells )
+      {
+        var cell = cellsCollection.GetCell( fieldName, false );
+        Debug.Assert( cell != null );
+
+        yield return cell;
+      }
     }
   }
 }

@@ -15,11 +15,10 @@
   ***********************************************************************************/
 
 using System.Collections.Specialized;
-using System.ComponentModel;
 
 namespace Xceed.Wpf.DataGrid
 {
-  public class NotifyCollectionChangedGeneratorNode : GeneratorNode, INotifyCollectionChanged
+  internal class NotifyCollectionChangedGeneratorNode : GeneratorNode, INotifyCollectionChanged
   {
     internal NotifyCollectionChangedGeneratorNode( GeneratorNode parent )
       : base( parent )
@@ -30,10 +29,11 @@ namespace Xceed.Wpf.DataGrid
 
     public void OnCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
-      if( this.CollectionChanged != null )
-      {
-        this.CollectionChanged( this, e );
-      }
+      var handler = this.CollectionChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, e );
     }
   }
 }

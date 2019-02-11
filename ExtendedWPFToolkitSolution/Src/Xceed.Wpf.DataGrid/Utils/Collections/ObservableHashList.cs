@@ -15,14 +15,13 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
-using Xceed.Wpf.DataGrid;
-using Xceed.Utils.Data;
-using System.Diagnostics;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Threading;
+using Xceed.Wpf.DataGrid;
 
 namespace Xceed.Utils.Collections
 {
@@ -34,64 +33,18 @@ namespace Xceed.Utils.Collections
   [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix" )]
   public sealed class ObservableHashList : IList, INotifyCollectionChanged, INotifyPropertyChanged
   {
-    #region INTERNAL CONSTRUCTOR
+    #region CONSTANTS
+
+    private const int UseHashSetThreshold = 10;
+    private const int UseListThreshold = 8;
+
+    #endregion
 
     internal ObservableHashList()
     {
     }
 
-    #endregion
-
     #region IList Members
-
-    public int Add( object value )
-    {
-      if( !m_hashSet.Add( value ) )
-      {
-        string strValue = ( value == null ) ? "null" : value.ToString();
-        throw new ArgumentException( "Item has already been added. (Key being added: '" + strValue + "')", "value" );
-      }
-
-      int index = m_list.Add( value );
-
-      this.OnPropertyChanged( "Item[]" );
-      this.OnPropertyChanged( "Count" );
-      this.FireCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Add, value, index ) );
-      return index;
-    }
-
-    public void Clear()
-    {
-      m_list.Clear();
-      m_hashSet.Clear();
-      this.OnPropertyChanged( "Item[]" );
-      this.OnPropertyChanged( "Count" );
-      this.FireCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
-    }
-
-    public bool Contains( object value )
-    {
-      return m_hashSet.Contains( value );
-    }
-
-    public int IndexOf( object value )
-    {
-      return m_list.IndexOf( value );
-    }
-
-    public void Insert( int index, object value )
-    {
-      if( !m_hashSet.Add( value ) )
-      {
-        string strValue = ( value == null ) ? "null" : value.ToString();
-        throw new ArgumentException( "Item has already been added. (Key being added: '" + strValue + "')", "value" );
-      }
-
-      m_list.Insert( index, value );
-      this.OnPropertyChanged( "Item[]" );
-      this.OnPropertyChanged( "Count" );
-      this.FireCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Add, value, index ) );
-    }
 
     public bool IsFixedSize
     {
@@ -109,63 +62,92 @@ namespace Xceed.Utils.Collections
       }
     }
 
-    public void Remove( object value )
-    {
-      int index = this.IndexOf( value );
-
-      if( index >= 0 )
-      {
-        m_hashSet.Remove( value );
-        m_list.RemoveAt( index );
-        this.OnPropertyChanged( "Item[]" );
-        this.OnPropertyChanged( "Count" );
-        this.FireCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Remove, value, index ) );
-      }
-    }
-
-    public void RemoveAt( int index )
-    {
-      if( ( index < 0 ) || ( index >= this.Count ) )
-        throw new ArgumentOutOfRangeException( "index" );
-
-      object value = m_list[ index ];
-      m_hashSet.Remove( value );
-      m_list.RemoveAt( index );
-      this.OnPropertyChanged( "Item[]" );
-      this.OnPropertyChanged( "Count" );
-      this.FireCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Remove, value, index ) );
-    }
-
     public object this[ int index ]
     {
       get
       {
-        return m_list[ index ];
+        return m_items[ index ];
       }
       set
       {
-        object oldValue = m_list[ index ];
-        m_list[ index ] = value;
-        this.OnPropertyChanged( "Item[]" );
-        this.OnPropertyChanged( "Count" );
-        this.FireCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Replace, value, oldValue, index ) );
+        var count = this.Count;
+        if( ( index < 0 ) || ( index > count ) )
+          throw new ArgumentOutOfRangeException( "index" );
+
+        if( index == count )
+        {
+          this.InsertCore( index, value );
+        }
+        else
+        {
+          this.ReplaceCore( index, value );
+        }
       }
+    }
+
+    public int Add( object value )
+    {
+      int index = this.Count;
+      this.InsertCore( index, value );
+
+      return index;
+    }
+
+    public void Clear()
+    {
+      if( this.Count == 0 )
+        return;
+
+      m_set = null;
+      m_items.Clear();
+
+      this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
+    }
+
+    public bool Contains( object value )
+    {
+      if( m_set != null )
+        return m_set.Contains( value );
+
+      return m_items.Contains( value );
+    }
+
+    public int IndexOf( object value )
+    {
+      if( ( m_set != null ) && !m_set.Contains( value ) )
+        return -1;
+
+      return m_items.IndexOf( value );
+    }
+
+    public void Insert( int index, object value )
+    {
+      this.InsertCore( index, value );
+    }
+
+    public void Remove( object value )
+    {
+      int index = this.IndexOf( value );
+      if( index < 0 )
+        return;
+
+      this.RemoveAtCore( index );
+    }
+
+    public void RemoveAt( int index )
+    {
+      this.RemoveAtCore( index );
     }
 
     #endregion
 
     #region ICollection Members
 
-    public void CopyTo( Array array, int index )
-    {
-      m_list.CopyTo( array, index );
-    }
-
     public int Count
     {
       get
       {
-        return m_list.Count;
+        return m_items.Count;
       }
     }
 
@@ -181,8 +163,13 @@ namespace Xceed.Utils.Collections
     {
       get
       {
-        return m_list.SyncRoot;
+        return ( ( ICollection )m_items ).SyncRoot;
       }
+    }
+
+    public void CopyTo( Array array, int index )
+    {
+      ( ( IList )m_items ).CopyTo( array, index );
     }
 
     #endregion
@@ -191,7 +178,7 @@ namespace Xceed.Utils.Collections
 
     public IEnumerator GetEnumerator()
     {
-      return m_list.GetEnumerator();
+      return m_items.GetEnumerator();
     }
 
     #endregion
@@ -200,18 +187,22 @@ namespace Xceed.Utils.Collections
 
     public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-    private void FireCollectionChanged( NotifyCollectionChangedEventArgs args )
+    private void OnCollectionChanged( NotifyCollectionChangedEventArgs e )
     {
-      if( m_deferOperationCount == 0 )
+      var handler = this.CollectionChanged;
+      if( handler == null )
+        return;
+
+      if( m_deferCount == 0 )
       {
-        if( this.CollectionChanged != null )
-        {
-          this.CollectionChanged( this, args );
-        }
+        this.OnPropertyChanged( "Item[]" );
+        this.OnPropertyChanged( "Count" );
+
+        handler.Invoke( this, e );
       }
       else
       {
-        m_operationsCount++;
+        m_hasDeferredNotifications = true;
       }
     }
 
@@ -223,25 +214,18 @@ namespace Xceed.Utils.Collections
 
     private void OnPropertyChanged( string propertyName )
     {
-      this.OnPropertyChanged( new PropertyChangedEventArgs( propertyName ) );
-    }
+      var handler = this.PropertyChanged;
+      if( handler == null )
+        return;
 
-    private void OnPropertyChanged( PropertyChangedEventArgs e )
-    {
-      if( m_deferOperationCount == 0 )
-      {
-        if( this.PropertyChanged != null )
-        {
-          this.PropertyChanged( this, e );
-        }
-      }
+      handler.Invoke( this, new PropertyChangedEventArgs( propertyName ) );
     }
 
     #endregion
 
     public IDisposable DeferINotifyCollectionChanged()
     {
-      return new ObservableHashList.DeferOperationNotifications( this );
+      return new DeferDisposable( this );
     }
 
     public void Sort()
@@ -251,85 +235,187 @@ namespace Xceed.Utils.Collections
 
     public void Sort( IComparer comparer )
     {
-      if( comparer == null )
-        comparer = ObjectComparer.Singleton;
+      var comparerWrapper = new ComparerWrapper( ( comparer != null ) ? comparer : ObjectComparer.Singleton );
+      m_items.Sort( comparerWrapper );
 
-      lock( this.SyncRoot )
-      {
-        m_list.Sort( comparer );
-        this.FireCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
-      }
+      this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
     }
 
-    private HashSet<object> m_hashSet = new HashSet<object>();
-    private ArrayList m_list = new ArrayList();
-    private int m_deferOperationCount;
-    private int m_operationsCount;
-
-    #region DeferOperationNotifications class
-
-    private class DeferOperationNotifications : IDisposable
+    private void InsertCore( int index, object value )
     {
-      public DeferOperationNotifications( ObservableHashList list )
+      var count = this.Count;
+      if( ( index < 0 ) || ( index > count ) )
+        throw new ArgumentOutOfRangeException( "index" );
+
+      this.EnsureNotIn( value );
+
+      if( ( m_set == null ) && ( count >= ObservableHashList.UseHashSetThreshold ) )
       {
-        m_innerList = list;
-        m_innerList.m_deferOperationCount++;
+        m_set = new HashSet<object>( m_items );
+      }
+
+      m_items.Insert( index, value );
+
+      if( m_set != null )
+      {
+        m_set.Add( value );
+      }
+
+      this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Add, value, index ) );
+    }
+
+    private void RemoveAtCore( int index )
+    {
+      var count = this.Count;
+      if( ( index < 0 ) || ( index >= count ) )
+        throw new ArgumentOutOfRangeException( "index" );
+
+      var value = m_items[ index ];
+
+      m_items.RemoveAt( index );
+
+      if( m_set != null )
+      {
+        if( count > ObservableHashList.UseListThreshold )
+        {
+          m_set.Remove( value );
+        }
+        else
+        {
+          m_set = null;
+        }
+      }
+
+      this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Remove, value, index ) );
+    }
+
+    private void ReplaceCore( int index, object value )
+    {
+      Debug.Assert( ( index >= 0 ) && ( index < this.Count ) );
+
+      if( m_items[ index ] == value )
+        return;
+
+      this.EnsureNotIn( value );
+
+      var oldValue = m_items[ index ];
+      m_items[ index ] = value;
+
+      if( m_set != null )
+      {
+        m_set.Remove( oldValue );
+        m_set.Add( value );
+      }
+
+      this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Replace, value, oldValue, index ) );
+    }
+
+    private void EnsureNotIn( object value )
+    {
+      if( this.Contains( value ) )
+        throw new ArgumentException( string.Format( "Item has already been added. (Key being added: '{0}')", "value", ( value == null ) ? "null" : value.ToString() ) );
+    }
+
+    #region Private Fields
+
+    private readonly List<object> m_items = new List<object>();
+    private HashSet<object> m_set; //null
+    private int m_deferCount;
+    private bool m_hasDeferredNotifications; //false
+
+    #endregion
+
+    #region DeferDisposable Private Class
+
+    private sealed class DeferDisposable : IDisposable
+    {
+      internal DeferDisposable( ObservableHashList owner )
+      {
+        Debug.Assert( owner != null );
+
+        m_owner = owner;
+        m_owner.m_deferCount++;
       }
 
       public void Dispose()
       {
-        if( m_innerList == null )
-          return;
-
-        m_innerList.m_deferOperationCount--;
-
-        if( ( m_innerList.m_deferOperationCount == 0 ) && ( m_innerList.m_operationsCount > 0 ) )
-        {
-          // We always force a Reset after any deferred operation
-          m_innerList.OnPropertyChanged( "Item[]" );
-          m_innerList.OnPropertyChanged( "Count" );
-          m_innerList.FireCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
-          m_innerList.m_operationsCount = 0;
-        }
-        m_innerList = null;
+        this.Dispose( true );
+        GC.SuppressFinalize( this );
       }
 
-      private ObservableHashList m_innerList; // = null;
+      private void Dispose( bool disposing )
+      {
+        var target = Interlocked.Exchange( ref m_owner, null );
+        if( target == null )
+          return;
+
+        target.m_deferCount--;
+        if( target.m_deferCount != 0 )
+          return;
+
+        if( target.m_hasDeferredNotifications )
+        {
+          target.m_hasDeferredNotifications = false;
+          target.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
+        }
+      }
+
+      ~DeferDisposable()
+      {
+        this.Dispose( false );
+      }
+
+      private ObservableHashList m_owner; // = null;
     }
 
     #endregion
 
-    #region Debugger helper classes
+    #region ComparerWrapper Private Class
 
-    internal class ObservableHashListDebugView
+    private sealed class ComparerWrapper : IComparer<object>
     {
-      private ObservableHashList m_hashList;
-
-      public ObservableHashListDebugView( ObservableHashList hashlist )
+      internal ComparerWrapper( IComparer comparer )
       {
-        if( hashlist == null )
-        {
-          throw new ArgumentNullException( "hashlist" );
-        }
-        m_hashList = hashlist;
+        Debug.Assert( comparer != null );
+
+        m_comparer = comparer;
+      }
+
+      public int Compare( object x, object y )
+      {
+        return m_comparer.Compare( x, y );
+      }
+
+      private readonly IComparer m_comparer;
+    }
+
+    #endregion
+
+    #region ObservableHashListDebugView Private Class
+
+    private sealed class ObservableHashListDebugView
+    {
+      internal ObservableHashListDebugView( ObservableHashList owner )
+      {
+        if( owner == null )
+          throw new ArgumentNullException( "list" );
+
+        m_owner = owner;
       }
 
       public object[] Values
       {
         get
         {
-          object[] values = new object[ m_hashList.m_hashSet.Count ];
+          var items = m_owner.m_items;
+          if( items == null )
+            return new object[ 0 ];
 
-          int i = 0;
-          foreach( object key in m_hashList.m_hashSet )
-          {
-            values[ i ] = key;
-            i++;
-          }
-
-          return values;
+          return items.ToArray();
         }
       }
+
+      private readonly ObservableHashList m_owner;
     }
 
     #endregion

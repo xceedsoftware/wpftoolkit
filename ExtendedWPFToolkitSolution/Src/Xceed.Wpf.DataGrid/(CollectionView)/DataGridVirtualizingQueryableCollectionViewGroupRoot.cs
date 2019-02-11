@@ -22,7 +22,6 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Collections;
 using System.Linq.Expressions;
-using Xceed.Wpf.DataGrid.FilterCriteria;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -80,161 +79,7 @@ namespace Xceed.Wpf.DataGrid
 
     internal override IQueryable CreateUnsortedFilteredQueryable()
     {
-      if( m_unsortedFilteredQueryableSource == null )
-      {
-        if( m_queryableSource != null )
-        {
-          ParameterExpression sharedParameterExpression = m_queryableSource.CreateParameterExpression();
-
-          Expression filterCriterionsExpression = this.GetFilterCriterionsExpression( m_queryableSource, sharedParameterExpression );
-          Expression autoFilterValuesExpression = this.GetAutoFilterValuesExpression( m_queryableSource, sharedParameterExpression );
-
-          Expression completeFilterExpression = null;
-
-          if( filterCriterionsExpression != null )
-            completeFilterExpression = filterCriterionsExpression;
-
-          if( autoFilterValuesExpression != null )
-          {
-            if( completeFilterExpression == null )
-            {
-              completeFilterExpression = autoFilterValuesExpression;
-            }
-            else
-            {
-              completeFilterExpression = Expression.And( completeFilterExpression, autoFilterValuesExpression );
-            }
-          }
-
-          // Apply the complete filter expression, or if null, set the root source.
-          if( completeFilterExpression == null )
-          {
-            m_unsortedFilteredQueryableSource = m_queryableSource;
-          }
-          else
-          {
-            m_unsortedFilteredQueryableSource = m_queryableSource.WhereFilter( sharedParameterExpression, completeFilterExpression );
-          }
-        }
-      }
-
-      return m_unsortedFilteredQueryableSource;
-    }
-
-    private Expression GetFilterCriterionsExpression( IQueryable queryable, ParameterExpression sharedParameterExpression )
-    {
-      if( queryable == null )
-        throw new ArgumentNullException( "queryable" );
-
-      FilterCriteriaMode filterCriteriaMode = m_parentCollectionView.FilterCriteriaMode;
-
-      if( filterCriteriaMode == FilterCriteriaMode.None )
-        return null;
-
-
-      DataGridItemPropertyCollection itemProperties = m_parentCollectionView.ItemProperties;
-      int itemPropertiesCount = itemProperties.Count;
-
-      Expression filterCriterionsExpression = null;
-
-      for( int i = 0; i < itemPropertiesCount; i++ )
-      {
-        DataGridItemPropertyBase itemProperty = itemProperties[ i ];
-        string itemPropertyName = itemProperty.Name;
-
-        FilterCriterion filterCriterion = itemProperty.FilterCriterion;
-
-        if( filterCriterion == null )
-          continue;
-
-        Expression propertyFilterCriterionExpression = filterCriterion.ToLinqExpression( queryable, sharedParameterExpression, itemPropertyName );
-
-        if( propertyFilterCriterionExpression == null )
-          continue;
-
-        if( filterCriterionsExpression == null )
-        {
-          filterCriterionsExpression = propertyFilterCriterionExpression;
-        }
-        else
-        {
-          Debug.Assert( ( filterCriteriaMode == FilterCriteriaMode.And ) || ( filterCriteriaMode == FilterCriteriaMode.Or ) );
-
-          // Merge this DataGridItemProperty FilterCriterionExpressions
-          if( filterCriteriaMode == FilterCriteriaMode.And )
-          {
-            filterCriterionsExpression = Expression.And( filterCriterionsExpression, propertyFilterCriterionExpression );
-          }
-          else
-          {
-            filterCriterionsExpression = Expression.Or( filterCriterionsExpression, propertyFilterCriterionExpression );
-          }
-        }
-
-        // Loop to next DataGridItemProperty.
-      }
-
-      return filterCriterionsExpression;
-    }
-
-    private Expression GetAutoFilterValuesExpression( IQueryable queryable, ParameterExpression sharedParameterExpression )
-    {
-      if( queryable == null )
-        throw new ArgumentNullException( "queryable" );
-
-      AutoFilterMode autoFilterMode = m_parentCollectionView.AutoFilterMode;
-
-      if( autoFilterMode == AutoFilterMode.None )
-        return null;
-
-      DataGridItemPropertyCollection itemProperties = m_parentCollectionView.ItemProperties;
-      int itemPropertiesCount = itemProperties.Count;
-
-      Expression autoFilterValuesExpression = null;
-
-      for( int i = 0; i < itemPropertiesCount; i++ )
-      {
-        DataGridItemPropertyBase itemProperty = itemProperties[ i ];
-        string itemPropertyName = itemProperty.Name;
-
-        IList itemPropertyAutoFilterValues;
-
-        if( m_parentCollectionView.AutoFilterValues.TryGetValue( itemPropertyName, out itemPropertyAutoFilterValues ) )
-        {
-          int itemPropertyAutoFilterValuesCount = itemPropertyAutoFilterValues.Count;
-
-          if( itemPropertyAutoFilterValuesCount == 0 )
-            continue;
-
-
-          object[] itemPropertyAutoFilterValuesArray = new object[ itemPropertyAutoFilterValuesCount ];
-          itemPropertyAutoFilterValues.CopyTo( itemPropertyAutoFilterValuesArray, 0 );
-
-          Expression itemPropertyAutoFilterExpression = queryable.CreateEqualExpression( sharedParameterExpression, itemPropertyName, itemPropertyAutoFilterValuesArray );
-
-          if( autoFilterValuesExpression == null )
-          {
-            autoFilterValuesExpression = itemPropertyAutoFilterExpression;
-          }
-          else
-          {
-            Debug.Assert( ( autoFilterMode == AutoFilterMode.And ) || ( autoFilterMode == AutoFilterMode.Or ) );
-
-            // Merge this DataGridItemProperty AutoFilterExpressions
-            if( autoFilterMode == AutoFilterMode.And )
-            {
-              autoFilterValuesExpression = Expression.And( autoFilterValuesExpression, itemPropertyAutoFilterExpression );
-            }
-            else
-            {
-              autoFilterValuesExpression = Expression.Or( autoFilterValuesExpression, itemPropertyAutoFilterExpression );
-            }
-          }
-        }
-        // Loop to next DataGridItemProperty.
-      }
-
-      return autoFilterValuesExpression;
+      return m_queryableSource;
     }
 
     internal override int GetGlobalIndexOf( object item )
@@ -280,7 +125,6 @@ namespace Xceed.Wpf.DataGrid
     {
       m_parentCollectionView = null;
       m_queryableSource = null;
-      m_unsortedFilteredQueryableSource = null;
       m_virtualPageManager = null;
       base.DisposeCore();
     }
@@ -292,7 +136,6 @@ namespace Xceed.Wpf.DataGrid
     private DataGridVirtualizingQueryableCollectionView m_parentCollectionView;
 
     private IQueryable m_queryableSource;
-    private IQueryable m_unsortedFilteredQueryableSource;
 
     private string[] m_primaryKeyPropertyNames;
 

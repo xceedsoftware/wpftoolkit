@@ -14,27 +14,29 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Xceed.Wpf.Toolkit.PropertyGrid.Converters;
-using System.Windows;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
-  public abstract class PropertyDefinitionBase : DependencyObject
+  public abstract class PropertyDefinitionBase : DefinitionBase
   {
-    private IList _targetProperties;
-    private bool _isLocked;
+    #region Constructors
 
     internal PropertyDefinitionBase()
     {
       _targetProperties = new List<object>();
+      this.PropertyDefinitions = new PropertyDefinitionCollection();
     }
+
+    #endregion
+
+    #region Properties
+
+    #region TargetProperties
 
     [TypeConverter(typeof(ListConverter))]
     public IList TargetProperties 
@@ -42,22 +44,44 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       get { return _targetProperties; }
       set 
       {
-        if( this.IsLocked )
-          throw new InvalidOperationException( @"Cannot modify TargetProperties once the definition has beed added to a collection." );
-
+        this.ThrowIfLocked( () => this.TargetProperties );
         _targetProperties = value; 
       }
     }
 
-    internal bool IsLocked
+    private IList _targetProperties;
+
+    #endregion
+
+    #region PropertyDefinitions
+
+    public PropertyDefinitionCollection PropertyDefinitions
     {
-      get{ return _isLocked; }
+      get
+      {
+        return _propertyDefinitions;
+      }
+      set
+      {
+        this.ThrowIfLocked( () => this.PropertyDefinitions );
+        _propertyDefinitions = value;
+      }
     }
 
-    internal virtual void Lock()
+    private PropertyDefinitionCollection _propertyDefinitions;
+
+    #endregion //PropertyDefinitions
+
+    #endregion
+
+    #region Overrides
+
+    internal override void Lock()
     {
       if( this.IsLocked )
         return;
+
+      base.Lock();
 
       // Just create a new copy of the properties target to ensure 
       // that the list doesn't ever get modified.
@@ -78,8 +102,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         }
       }
 
-      _targetProperties = new ReadOnlyCollection<object>( newList );
-      _isLocked = true;
+      //In Designer Mode, the Designer is broken if using a ReadOnlyCollection
+      _targetProperties = DesignerProperties.GetIsInDesignMode( this )
+                          ? new Collection<object>( newList )
+                          : new ReadOnlyCollection<object>( newList ) as IList;
     }
+
+    #endregion
   }
 }

@@ -22,14 +22,15 @@
  * ************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace Xceed.Wpf.DataGrid.Utils
 {
-  public sealed class WeakEventHandler<TEventArgs> 
+  [Obsolete( "This class is inefficient. You should derive from System.Windows.WeakEventManager instead." )]
+  [Browsable( false )]
+  [EditorBrowsable( EditorBrowsableState.Never )]
+  public sealed class WeakEventHandler<TEventArgs>
     where TEventArgs : class
   {
     #region Constructors

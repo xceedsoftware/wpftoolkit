@@ -15,167 +15,123 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections;
-using System.Collections.Specialized;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Xceed.Wpf.DataGrid.Views;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.ComponentModel;
-using System.Windows.Input;
 
 namespace Xceed.Wpf.DataGrid
 {
   public class RowSelectorPane : Panel
   {
-    private const double SafeOffScreenCoordinate = -1000000.0d;
-
-    private static readonly Rect RecycleReadyRect = new Rect( RowSelectorPane.SafeOffScreenCoordinate, RowSelectorPane.SafeOffScreenCoordinate, 0, 0 );
-    private static readonly Point OriginPoint = new Point( 0, 0 );
-
     static RowSelectorPane()
     {
       ClipToBoundsProperty.OverrideMetadata( typeof( RowSelectorPane ), new FrameworkPropertyMetadata( true ) );
-
       FocusableProperty.OverrideMetadata( typeof( RowSelectorPane ), new FrameworkPropertyMetadata( false ) );
 
       DataGridControl.ParentDataGridControlPropertyKey.OverrideMetadata( typeof( RowSelectorPane ), new FrameworkPropertyMetadata( new PropertyChangedCallback( RowSelectorPane.OnParentGridControlChanged ) ) );
     }
 
-    //------------------------------
-    // PROPERTIES
-    //------------------------------
+    #region Orientation Dependency Property
 
-    #region Orientation Property
+    // Using a DependencyProperty as the backing store for Orientation.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register(
+      "Orientation",
+      typeof( Orientation ),
+      typeof( RowSelectorPane ),
+      new UIPropertyMetadata( Orientation.Vertical ) );
 
     public Orientation Orientation
     {
       get
       {
-        return ( Orientation )GetValue( OrientationProperty );
+        return ( Orientation )this.GetValue( RowSelectorPane.OrientationProperty );
       }
       set
       {
-        SetValue( OrientationProperty, value );
+        this.SetValue( RowSelectorPane.OrientationProperty, value );
       }
     }
 
-    // Using a DependencyProperty as the backing store for Orientation.  This enables animation, styling, binding, etc...
-    public static readonly DependencyProperty OrientationProperty =
-        DependencyProperty.Register( "Orientation", typeof( Orientation ), typeof( RowSelectorPane ), new UIPropertyMetadata( Orientation.Vertical, new PropertyChangedCallback( OnOrientationChanged ) ) );
-
-
-    private static void OnOrientationChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
-    {
-
-    }
-
-    #endregion Orientation Property
-
-    internal void SetRowSelectorPosition( DependencyObject container, Rect containerRect, FrameworkElement referenceElement )
-    {
-      Debug.Assert( ( Visibility )this.GetValue( RowSelectorPane.VisibilityProperty ) == Visibility.Visible, "We should not be creating RowSelectors if we are not Visible." );
-
-      RowSelector rowSelector = null;
-
-      //Check if a RowSelector is already assigned to the container passed.
-      if( m_visibleSelectors.TryGetValue( container, out rowSelector ) == false )
-      {
-        //If no RowSelector exists for this container, try to recycle one.
-        if( m_recycleQueue.Count > 0 )
-        {
-          //get next recyclable RowSelector.
-          rowSelector = m_recycleQueue.Dequeue();
-        }
-        else
-        {
-          //Recycling pool empty, create a new RowSelector and place it in the visual tree right away.
-          rowSelector = new RowSelector();
-          this.InternalChildren.Add( rowSelector );
-        }
-
-        //Since there was no RowSelector for the container, map the container to this RowSelector
-        rowSelector.DataContext = container;
-        DataGridControl.SetContainer( rowSelector, container );
-        rowSelector.ReferenceElement = referenceElement;
-        m_visibleSelectors.Add( container, rowSelector );
-      }
-
-      //At this stage, it is not normal that no RowSelector instance is available.
-      Debug.Assert( rowSelector != null );
-
-      if( rowSelector == null )
-        throw new InvalidOperationException( "An attempt was made to set the position of a row selector that does not exist." );
-
-      rowSelector.ContainerRect = containerRect;
-
-      this.InvalidateMeasure();
-    }
-
-    internal void FreeRowSelector( DependencyObject container )
-    {
-      RowSelector rowSelector = null;
-
-      //Check if a RowSelector is already assigned to the container passed.
-      if( m_visibleSelectors.TryGetValue( container, out rowSelector ) == true )
-      {
-        //Remove from Visible list, add to pending cleanup list
-        m_visibleSelectors.Remove( container );
-        m_pendingCleanup.Add( rowSelector );
-
-        //clear data context (container) from the RowSelector.
-        rowSelector.DataContext = null;
-        DataGridControl.ClearContainer( rowSelector );
-
-        //Invalidate Measure since the list of VisibleSelector + PendingCleanup changed
-        this.InvalidateMeasure();
-      }
-      //If there are no RowSelector for container, then do nothing.
-    }
+    #endregion
 
     protected override Size MeasureOverride( Size availableSize )
     {
-      Size desiredSize = new Size( 0, 0 );
-
-      foreach( RowSelector rowSelector in m_visibleSelectors.Values )
+      foreach( UIElement child in this.InternalChildren )
       {
-        Size rowSelectorAvaillableSize = this.PrepareAvailableSizeForRowSelector( rowSelector, availableSize );
+        var decorator = child as RowSelectorDecorator;
+        if( decorator != null )
+        {
+          if( this.IsRowSelectorVisible( decorator ) )
+          {
+            decorator.Visibility = Visibility.Visible;
+            decorator.Measure( this.GetAvailableSize( decorator, availableSize ) );
+          }
+          else
+          {
+            decorator.Visibility = Visibility.Collapsed;
 
-        rowSelector.Measure( rowSelectorAvaillableSize );
+            if( !decorator.IsMeasureValid )
+            {
+              decorator.Measure( RowSelectorPane.EmptySize );
+            }
+          }
+        }
+        else
+        {
+          child.Measure( RowSelectorPane.EmptySize );
+        }
       }
 
-      return desiredSize;
+      return RowSelectorPane.EmptySize;
     }
 
     protected override Size ArrangeOverride( Size finalSize )
     {
-      foreach( RowSelector toClean in m_pendingCleanup )
+      foreach( UIElement child in this.InternalChildren )
       {
-        toClean.Arrange( RecycleReadyRect );
-        m_recycleQueue.Enqueue( toClean );
+        var decorator = child as RowSelectorDecorator;
+        if( decorator != null )
+        {
+          if( this.IsRowSelectorVisible( decorator ) )
+          {
+            var arrangeRect = this.GetArrangeRect( decorator, finalSize );
+            var rowSelector = decorator.RowSelector;
+            var referenceElement = ( rowSelector != null ) ? rowSelector.ReferenceElement : null;
+
+            decorator.Clip = this.GetClipRegion( decorator, arrangeRect, referenceElement );
+            decorator.Arrange( arrangeRect );
+          }
+          else if( !decorator.IsArrangeValid )
+          {
+            decorator.Arrange( RowSelectorPane.OutOfViewRect );
+          }
+        }
+        else
+        {
+          child.Arrange( RowSelectorPane.OutOfViewRect );
+        }
       }
 
-      m_pendingCleanup.Clear();
-
-      foreach( RowSelector visibleRowSelector in m_visibleSelectors.Values )
+      // The call to Mouse.Synchronize must not start dragging rows.
+      // Update the mouse status to make sure no container has invalid mouse over status.
+      // Only do this when the mouse is over the panel, to prevent unescessary update when scrolling with thumb.
+      if( this.IsMouseOver )
       {
-        Rect rowSelectorArrangeRect = this.PrepareArrangeRectForRowSelector( finalSize, visibleRowSelector );
+        var dataGridContext = DataGridControl.GetDataGridContext( this );
+        var dataGridControl = ( dataGridContext != null ) ? dataGridContext.DataGridControl : null;
 
-        visibleRowSelector.Clip = this.PrepareClipForRowSelector( visibleRowSelector, rowSelectorArrangeRect, visibleRowSelector.ReferenceElement );
-
-        visibleRowSelector.Arrange( rowSelectorArrangeRect );
-      }
-
-      //Case 117296: update the mouse status to make sure no container has invalid mouse over status. Only do this when the mouse is over the panel, to 
-      //prevent unescessary update when scrolling with thumb
-      if( this.IsMouseOver == true )
-      {
-        Mouse.Synchronize();
+        if( dataGridControl != null )
+        {
+          using( dataGridControl.InhibitDrag() )
+          {
+            Mouse.Synchronize();
+          }
+        }
       }
 
       return finalSize;
@@ -186,54 +142,80 @@ namespace Xceed.Wpf.DataGrid
       this.DefaultStyleKey = view.GetDefaultStyleKey( typeof( RowSelectorPane ) );
     }
 
-    private Rect PrepareArrangeRectForRowSelector( Size finalSize, RowSelector visibleRowSelector )
+    internal void SetRowSelectorPosition( DependencyObject container, Rect containerRect, FrameworkElement referenceElement )
     {
-      Rect returnRect;
+      Debug.Assert( ( Visibility )this.GetValue( RowSelectorPane.VisibilityProperty ) == Visibility.Visible, "We should not be creating RowSelectors if we are not Visible." );
 
-      FrameworkElement container = visibleRowSelector.DataContext as FrameworkElement;
+      // Try to re-use the RowSelector already assigned to the container.
+      if( this.TryReUseVisibleRowSelector( container, containerRect ) )
+        return;
+
+      var decorator = this.RecycleOrCreateRowSelector( container );
+      Debug.Assert( decorator != null, "An attempt was made to set the position of a row selector that does not exist." );
+
+      RowSelectorPane.PrepareRowSelector( decorator, container, containerRect, referenceElement );
+
+      m_visibleSelectors.Add( container, decorator );
+
+      this.InvalidateMeasure();
+    }
+
+    internal void FreeRowSelector( DependencyObject container )
+    {
+      RowSelectorDecorator decorator;
+      if( !m_visibleSelectors.TryGetValue( container, out decorator ) )
+        return;
+
+      m_visibleSelectors.Remove( container );
+      m_pendingCleanup.Add( decorator );
+
+      this.ScheduleUnusedRowSelectorsCleanUp();
+      this.InvalidateMeasure();
+    }
+
+    private Rect GetArrangeRect( RowSelectorDecorator decorator, Size finalSize )
+    {
+      var rowSelector = decorator.RowSelector;
+      if( rowSelector == null )
+        return RowSelectorPane.EmptyRect;
+
+      var container = rowSelector.DataContext as FrameworkElement;
       Debug.Assert( container != null );
 
-      GeneralTransform coordinatesTransform = container.TransformToVisual( this );
-      Point origin = coordinatesTransform.Transform( OriginPoint );
+      var coordinatesTransform = container.TransformToVisual( this );
+      var origin = coordinatesTransform.Transform( RowSelectorPane.OriginPoint );
 
       if( this.Orientation == Orientation.Vertical )
-      {
-        returnRect = new Rect( 0, origin.Y, finalSize.Width, container.ActualHeight );
-      }
-      else
-      {
-        returnRect = new Rect( origin.X, 0, container.ActualWidth, finalSize.Height );
-      }
+        return new Rect( 0, origin.Y, finalSize.Width, container.ActualHeight );
 
-      return returnRect;
+      return new Rect( origin.X, 0, container.ActualWidth, finalSize.Height );
     }
 
-    private Size PrepareAvailableSizeForRowSelector( RowSelector rowSelector, Size availableSize )
+    private Size GetAvailableSize( RowSelectorDecorator decorator, Size availableSize )
     {
-      Rect containerRect = rowSelector.ContainerRect;
-      Size returnSize;
+      var rowSelector = decorator.RowSelector;
+      if( rowSelector == null )
+        return RowSelectorPane.EmptySize;
+
+      var containerRect = rowSelector.ContainerRect;
 
       if( this.Orientation == Orientation.Vertical )
-      {
-        returnSize = new Size( availableSize.Width, containerRect.Height );
-      }
-      else
-      {
-        returnSize = new Size( containerRect.Width, availableSize.Height );
-      }
+        return new Size( availableSize.Width, containerRect.Height );
 
-      return returnSize;
+      return new Size( containerRect.Width, availableSize.Height );
     }
 
-    private Geometry PrepareClipForRowSelector( RowSelector rowSelector, Rect arrangeRect, FrameworkElement referenceElement )
+    private Geometry GetClipRegion( RowSelectorDecorator decorator, Rect arrangeRect, FrameworkElement referenceElement )
     {
       if( referenceElement == null )
         return null;
 
+      var rowSelector = decorator.RowSelector;
+      if( rowSelector == null )
+        return null;
+
       GeneralTransform referenceElementToRowSelectorPaneTransform = referenceElement.TransformToVisual( this );
-
       Rect referenceElementRegion = referenceElementToRowSelectorPaneTransform.TransformBounds( new Rect( 0, 0, referenceElement.ActualWidth, referenceElement.ActualHeight ) );
-
       RectangleGeometry clipRegion = null;
 
       if( this.Orientation == Orientation.Vertical )
@@ -254,7 +236,6 @@ namespace Xceed.Wpf.DataGrid
 
           double width = arrangeRect.Width;
           double height = Math.Max( 0, arrangeRect.Height - y - Math.Max( 0, arrangeRect.Bottom - referenceElementRegion.Bottom ) );
-
 
           clipRegion = new RectangleGeometry( new Rect( x, y, width, height ) );
         }
@@ -285,9 +266,139 @@ namespace Xceed.Wpf.DataGrid
       return clipRegion;
     }
 
-    //------------------------------
-    // DP CHANGED HANDLERS
-    //------------------------------
+    private bool IsRowSelectorVisible( RowSelectorDecorator decorator )
+    {
+      Debug.Assert( decorator != null );
+      if( decorator.RowSelector == null )
+        return false;
+
+      var container = DataGridControl.GetContainer( decorator );
+      if( container == null )
+        return false;
+
+      return m_visibleSelectors.ContainsKey( container );
+    }
+
+    private bool TryReUseVisibleRowSelector( DependencyObject container, Rect containerRect )
+    {
+      RowSelectorDecorator decorator;
+      if( !m_visibleSelectors.TryGetValue( container, out decorator ) )
+        return false;
+
+      var rowSelector = decorator.RowSelector;
+      if( rowSelector == null )
+      {
+        this.FreeRowSelector( container );
+        return false;
+      }
+
+      // Check if the cached position and size of the target container is up to date.
+      if( !Rect.Equals( rowSelector.ContainerRect, containerRect ) )
+      {
+        rowSelector.ContainerRect = containerRect;
+
+        this.InvalidateMeasure();
+      }
+
+      return true;
+    }
+
+    private RowSelectorDecorator RecycleOrCreateRowSelector( DependencyObject container )
+    {
+      RowSelectorDecorator decorator;
+
+      // Try to re-use a RowSelector that is schedule to be clean up.
+      if( m_pendingCleanup.Count > 0 )
+      {
+        int index = m_pendingCleanup.Count - 1;
+
+        for( int i = index; i >= 0; i-- )
+        {
+          decorator = m_pendingCleanup[ i ];
+          if( DataGridControl.GetContainer( decorator ) == container )
+          {
+            index = i;
+            break;
+          }
+        }
+
+        decorator = m_pendingCleanup[ index ];
+        m_pendingCleanup.RemoveAt( index );
+      }
+      // Try to recycle a RowSelector from the recycling pool.
+      else if( m_recyclingQueue.Count > 0 )
+      {
+        decorator = m_recyclingQueue.Dequeue();
+      }
+      else
+      {
+        decorator = new RowSelectorDecorator();
+
+        this.InternalChildren.Add( decorator );
+      }
+
+      return decorator;
+    }
+
+    private void ScheduleUnusedRowSelectorsCleanUp()
+    {
+      if( m_pendingCleanupOperation != null )
+        return;
+
+      m_pendingCleanupOperation = this.Dispatcher.BeginInvoke( DispatcherPriority.ApplicationIdle, new Action( this.CleanUpUnusedRowSelectors ) );
+    }
+
+    private void CleanUpUnusedRowSelectors()
+    {
+      m_pendingCleanupOperation = null;
+
+      for( int i = m_pendingCleanup.Count - 1; i >= 0; i-- )
+      {
+        var decorator = m_pendingCleanup[ i ];
+
+        RowSelectorPane.ClearRowSelector( decorator );
+
+        if( decorator.RowSelector != null )
+        {
+          m_recyclingQueue.Enqueue( decorator );
+        }
+        else
+        {
+          // The RowSelector has become useless, so we destroy it.
+          this.InternalChildren.Remove( decorator );
+        }
+      }
+
+      m_pendingCleanup.Clear();
+    }
+
+    private static void PrepareRowSelector( RowSelectorDecorator decorator, DependencyObject container, Rect containerRect, FrameworkElement referenceElement )
+    {
+      Debug.Assert( decorator != null );
+
+      DataGridControl.SetContainer( decorator, container );
+
+      var rowSelector = decorator.RowSelector;
+      if( rowSelector != null )
+      {
+        rowSelector.ReferenceElement = referenceElement;
+        rowSelector.ContainerRect = containerRect;
+      }
+    }
+
+    private static void ClearRowSelector( RowSelectorDecorator decorator )
+    {
+      Debug.Assert( decorator != null );
+
+      DataGridControl.ClearContainer( decorator );
+
+      var rowSelector = decorator.RowSelector;
+      if( rowSelector != null )
+      {
+        rowSelector.ReferenceElement = null;
+        rowSelector.ContainerRect = RowSelectorPane.EmptyRect;
+      }
+    }
 
     private static void OnParentGridControlChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
@@ -299,7 +410,7 @@ namespace Xceed.Wpf.DataGrid
       {
         // The RowSelectorPane must clear its internal state when the ParentGridControl changes
         rowSelectorPane.m_pendingCleanup.Clear();
-        rowSelectorPane.m_recycleQueue.Clear();
+        rowSelectorPane.m_recyclingQueue.Clear();
         rowSelectorPane.m_visibleSelectors.Clear();
         rowSelectorPane.InternalChildren.Clear();
       }
@@ -368,10 +479,45 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion Obsolete Members
 
+    #region CONSTANTS
 
-    private Queue<RowSelector> m_recycleQueue = new Queue<RowSelector>();
-    private List<RowSelector> m_pendingCleanup = new List<RowSelector>();
-    Dictionary<DependencyObject, RowSelector> m_visibleSelectors = new Dictionary<DependencyObject, RowSelector>();
+    private static readonly Point OriginPoint = new Point( 0d, 0d );
+    private static readonly Size EmptySize = new Size( 0d, 0d );
+    private static readonly Rect EmptyRect = new Rect( RowSelectorPane.OriginPoint, RowSelectorPane.EmptySize );
+    private static readonly Rect OutOfViewRect = new Rect( new Point( -999999d, -999999d ), RowSelectorPane.EmptySize );
 
+    #endregion
+
+    #region PRIVATE FIELDS
+
+    private readonly Queue<RowSelectorDecorator> m_recyclingQueue = new Queue<RowSelectorDecorator>();
+    private readonly List<RowSelectorDecorator> m_pendingCleanup = new List<RowSelectorDecorator>();
+    private readonly Dictionary<DependencyObject, RowSelectorDecorator> m_visibleSelectors = new Dictionary<DependencyObject, RowSelectorDecorator>();
+    private DispatcherOperation m_pendingCleanupOperation; //null
+
+    #endregion
+
+    #region RowSelectorDecorator Private Class
+
+    private sealed class RowSelectorDecorator : Decorator
+    {
+      internal RowSelectorDecorator()
+      {
+        this.Focusable = false;
+        this.OverridesDefaultStyle = true;
+
+        this.Child = new RowSelector();
+      }
+
+      internal RowSelector RowSelector
+      {
+        get
+        {
+          return this.Child as RowSelector;
+        }
+      }
+    }
+
+    #endregion
   }
 }

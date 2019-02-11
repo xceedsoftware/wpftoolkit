@@ -24,7 +24,6 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Xceed.Wpf.Toolkit.Primitives;
-using System.Diagnostics;
 using Xceed.Wpf.Toolkit.Core;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 
@@ -55,6 +54,7 @@ namespace Xceed.Wpf.Toolkit
     private Grid _windowRoot;  
     private WindowControl _windowControl;
     private bool _ignorePropertyChanged;
+    private bool _hasChildren;
     private bool _hasWindowContainer;  
 
     #endregion //Private Members
@@ -333,6 +333,8 @@ namespace Xceed.Wpf.Toolkit
 
       _modalLayer.Fill = OverlayBrush;
       _modalLayer.Opacity = OverlayOpacity;
+
+      this.IsVisibleChanged += this.ChildWindow_IsVisibleChanged;
     }
 
     #endregion //Constructors
@@ -365,7 +367,10 @@ namespace Xceed.Wpf.Toolkit
       this.UpdateBlockMouseInputsPanel();
 
       _windowRoot = this.GetTemplateChild( PART_WindowRoot ) as Grid;
-      _windowRoot.RenderTransform = _moveTransform;
+      if( _windowRoot != null )
+      {
+        _windowRoot.RenderTransform = _moveTransform;
+      }
       _hasWindowContainer = ( VisualTreeHelper.GetParent( this ) as WindowContainer ) != null;
 
       if( !_hasWindowContainer )
@@ -398,7 +403,7 @@ namespace Xceed.Wpf.Toolkit
 #if VS2008
       FocusVisualStyle = null;
 #else
-        Style focusStyle = _root.Resources[ "FocusVisualStyle" ] as Style;
+        Style focusStyle = ( _root != null ) ? _root.Resources[ "FocusVisualStyle" ] as Style : null;
         if( focusStyle != null )
         {
           Setter focusStyleDataContext = new Setter( Control.DataContextProperty, this );
@@ -406,7 +411,10 @@ namespace Xceed.Wpf.Toolkit
           FocusVisualStyle = focusStyle;
         }
 #endif
-        _root.Children.Add( _modalLayerPanel );
+        if( _root != null )
+        {
+          _root.Children.Add( _modalLayerPanel );
+        }
       }
     }
 
@@ -417,10 +425,46 @@ namespace Xceed.Wpf.Toolkit
       Action action = () =>
       {
         if( FocusedElement != null )
+        {
+          _hasChildren = true;
           FocusedElement.Focus();
+        }
+        else
+        {
+          //Focus first Focusable Child element of ChildWindow
+          var focusableChild = TreeHelper.FindChild<FrameworkElement>( this.Content as DependencyObject, x => x.Focusable );
+          if( focusableChild != null )
+          {
+            _hasChildren = true;
+            focusableChild.Focus();
+          }
+          else
+          {
+            _hasChildren = false;
+          }
+        }
       };
 
       Dispatcher.BeginInvoke( DispatcherPriority.ApplicationIdle, action );
+    }
+
+    protected override void OnPreviewKeyDown( KeyEventArgs e )
+    {
+      base.OnPreviewKeyDown( e );
+
+      if( this.IsModal )
+      {
+        // Prevent MenuItem shortcuts while ChildWindow is modal.
+        if( Keyboard.IsKeyDown( Key.LeftAlt ) || Keyboard.IsKeyDown( Key.RightAlt ) )
+        {
+          e.Handled = true;
+        }
+        // Prevent Tab when no children
+        else if( (e.Key == Key.Tab) && !_hasChildren )
+        {
+          e.Handled = true;
+        }
+      }
     }
 
     protected override void OnKeyDown( KeyEventArgs e )
@@ -485,6 +529,9 @@ namespace Xceed.Wpf.Toolkit
         _windowControl.IsBlockMouseInputsPanelActive = this.IsBlockMouseInputsPanelActive;
       }
     }
+
+
+
 
     #endregion //Base Class Overrides
 
@@ -611,6 +658,14 @@ namespace Xceed.Wpf.Toolkit
       Top = GetRestrictedTop();
     }
 
+    private void ChildWindow_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )
+    {
+      if( (bool)e.NewValue && this.IsModal )
+      {
+        this.Focus();
+      }
+    }
+
 
 
     #endregion //Event Handlers
@@ -627,7 +682,7 @@ namespace Xceed.Wpf.Toolkit
       if( Left < 0 )
         return 0;
 
-      if( _parentContainer != null )
+      if( ( _parentContainer != null ) && (_windowRoot != null) )
       {
         if( Left + _windowRoot.ActualWidth > _parentContainer.ActualWidth && _parentContainer.ActualWidth != 0 )
         {
@@ -645,7 +700,7 @@ namespace Xceed.Wpf.Toolkit
       if( Top < 0 )
         return 0;
 
-      if( _parentContainer != null )
+      if( ( _parentContainer != null ) && ( _windowRoot != null ) )
       {
         if( Top + _windowRoot.ActualHeight > _parentContainer.ActualHeight && _parentContainer.ActualHeight != 0 )
         {
@@ -735,8 +790,10 @@ namespace Xceed.Wpf.Toolkit
     [Obsolete( "This method is obsolete and should no longer be used. Use WindowContainer.CenterChild() instead." )]
     private void CenterChildWindow()
     {
-      if( _parentContainer != null )
+      if( ( _parentContainer != null ) && ( _windowRoot != null ) )
       {
+        _windowRoot.UpdateLayout();
+
         Left = ( _parentContainer.ActualWidth - _windowRoot.ActualWidth ) / 2.0;
         Top = ( _parentContainer.ActualHeight - _windowRoot.ActualHeight ) / 2.0;
       }

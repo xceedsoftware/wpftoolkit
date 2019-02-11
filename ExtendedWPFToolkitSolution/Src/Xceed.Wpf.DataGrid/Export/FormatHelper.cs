@@ -147,6 +147,85 @@ namespace Xceed.Wpf.DataGrid.Export
       return outputString;
     }
 
+    public static string FormatHtmlFieldData( Type dataType, object dataValue, HtmlFormatSettings formatSettings )
+    {
+      string outputString = null;
+
+      if( ( dataValue != null ) && ( !Convert.IsDBNull( dataValue ) ) && ( !( dataValue is Array ) ) )
+      {
+        if( dataType == null )
+          dataType = dataValue.GetType();
+
+        if( dataType == typeof( string ) )
+        {
+          outputString = ( string )dataValue;
+        }
+        else if( dataType == typeof( DateTime ) )
+        {
+          if( !string.IsNullOrEmpty( formatSettings.DateTimeFormat ) )
+          {
+            if( formatSettings.Culture == null )
+            {
+              outputString = ( ( DateTime )dataValue ).ToString( formatSettings.DateTimeFormat, CultureInfo.InvariantCulture );
+            }
+            else
+            {
+              outputString = ( ( DateTime )dataValue ).ToString( formatSettings.DateTimeFormat, formatSettings.Culture );
+            }
+          }
+        }
+        else if( ( dataType == typeof( double ) ) ||
+                 ( dataType == typeof( decimal ) ) ||
+                 ( dataType == typeof( float ) ) ||
+                 ( dataType == typeof( int ) ) ||
+                 ( dataType == typeof( double ) ) ||
+                 ( dataType == typeof( decimal ) ) ||
+                 ( dataType == typeof( float ) ) ||
+                 ( dataType == typeof( short ) ) ||
+                 ( dataType == typeof( Single ) ) ||
+                 ( dataType == typeof( UInt16 ) ) ||
+                 ( dataType == typeof( UInt32 ) ) ||
+                 ( dataType == typeof( UInt64 ) ) ||
+                 ( dataType == typeof( Int16 ) ) ||
+                 ( dataType == typeof( Int64 ) ) )
+        {
+          string format = formatSettings.NumericFormat;
+
+          if( ( ( dataType == typeof( double ) ) ||
+                ( dataType == typeof( decimal ) ) ||
+                ( dataType == typeof( float ) ) ) &&
+              ( !string.IsNullOrEmpty( formatSettings.FloatingPointFormat ) ) )
+            format = formatSettings.FloatingPointFormat;
+
+          if( !string.IsNullOrEmpty( format ) )
+          {
+            if( formatSettings.Culture == null )
+            {
+              outputString = string.Format( CultureInfo.InvariantCulture, "{0:" + format + "}", dataValue );
+            }
+            else
+            {
+              outputString = string.Format( formatSettings.Culture, "{0:" + format + "}", dataValue );
+            }
+          }
+        }
+
+        if( outputString == null )
+        {
+          if( formatSettings.Culture == null )
+          {
+            outputString = string.Format( CultureInfo.InvariantCulture, "{0}", dataValue );
+          }
+          else
+          {
+            outputString = string.Format( formatSettings.Culture, "{0}", dataValue );
+          }
+        }
+      }
+
+      return FormatHelper.FormatPlainTextAsHtml( outputString );
+    }
+
     public static void FormatHtmlData( StringBuilder htmlDataStringBuilder )
     {
       string htmlDataString = htmlDataStringBuilder.ToString();
@@ -201,7 +280,7 @@ namespace Xceed.Wpf.DataGrid.Export
             case '\r':
               break;
 
-            case ' ':
+            case '\u00A0':
               htmlStringBuilder.Append( "&nbsp;" );
               break;
 

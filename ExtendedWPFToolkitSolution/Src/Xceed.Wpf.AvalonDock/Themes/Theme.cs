@@ -15,22 +15,16 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Themes
 {
-    public abstract class Theme : DependencyObject
+  public abstract class Theme : DependencyObject
+  {
+    public Theme()
     {
-        public Theme()
-        {
-
-        }
-
-        public abstract Uri GetResourceUri();
-
-
     }
+
+    public abstract Uri GetResourceUri();
+  }
 }

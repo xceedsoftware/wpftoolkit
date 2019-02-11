@@ -63,6 +63,24 @@ namespace Xceed.Wpf.Toolkit
     /// </summary>
     public event EventHandler<SpinEventArgs> Spin;
 
+    #region Events
+
+    public static readonly RoutedEvent SpinnerSpinEvent = EventManager.RegisterRoutedEvent( "SpinnerSpin", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( Spinner ) );
+
+    public event RoutedEventHandler SpinnerSpin
+    {
+      add
+      {
+        AddHandler( SpinnerSpinEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( SpinnerSpinEvent, value );
+      }
+    }
+
+    #endregion
+
     /// <summary>
     /// Initializes a new instance of the Spinner class.
     /// </summary>

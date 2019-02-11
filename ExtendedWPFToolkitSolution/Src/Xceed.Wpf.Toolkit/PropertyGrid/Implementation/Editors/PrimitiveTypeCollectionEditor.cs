@@ -14,11 +14,13 @@
 
   ***********************************************************************************/
 
+using System.Windows;
+
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class PrimitiveTypeCollectionEditor : TypeEditor<PrimitiveTypeCollectionControl>
   {
-    protected override void SetControlProperties()
+    protected override void SetControlProperties( PropertyItem propertyItem )
     {
       Editor.BorderThickness = new System.Windows.Thickness( 0 );
       Editor.Content = "(Collection)";
@@ -29,11 +31,38 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       ValueProperty = PrimitiveTypeCollectionControl.ItemsSourceProperty;
     }
 
+    protected override PrimitiveTypeCollectionControl CreateEditor()
+    {
+      return new PropertyGridEditorPrimitiveTypeCollectionControl();
+    }
+
     protected override void ResolveValueBinding( PropertyItem propertyItem )
     {
-      Editor.ItemsSourceType = propertyItem.PropertyType;
-      Editor.ItemType = propertyItem.PropertyType.GetGenericArguments()[ 0 ];
+      var type = propertyItem.PropertyType;
+      Editor.ItemsSourceType = type;
+
+      if( type.BaseType == typeof( System.Array ) )
+      {
+        Editor.ItemType = type.GetElementType();
+      }
+      else
+      {
+        var typeArguments = type.GetGenericArguments();
+        if( typeArguments.Length > 0 )
+        {
+          Editor.ItemType = typeArguments[ 0 ];
+        }
+      }
+
       base.ResolveValueBinding( propertyItem );
+    }
+  }
+
+  public class PropertyGridEditorPrimitiveTypeCollectionControl : PrimitiveTypeCollectionControl
+  {
+    static PropertyGridEditorPrimitiveTypeCollectionControl()
+    {
+      DefaultStyleKeyProperty.OverrideMetadata( typeof( PropertyGridEditorPrimitiveTypeCollectionControl ), new FrameworkPropertyMetadata( typeof( PropertyGridEditorPrimitiveTypeCollectionControl ) ) );
     }
   }
 }

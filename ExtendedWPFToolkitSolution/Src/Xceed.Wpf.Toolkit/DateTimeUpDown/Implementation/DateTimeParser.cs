@@ -46,13 +46,59 @@ namespace Xceed.Wpf.Toolkit
     {
       Dictionary<string, string> dateParts = GetDateParts( currentDate, cultureInfo );
       string[] timeParts = new string[ 3 ] { currentDate.Hour.ToString(), currentDate.Minute.ToString(), currentDate.Second.ToString() };
+      string millisecondsPart = currentDate.Millisecond.ToString();
       string designator = "";
       string[] dateTimeSeparators = new string[] { ",", " ", "-", ".", "/", cultureInfo.DateTimeFormat.DateSeparator, cultureInfo.DateTimeFormat.TimeSeparator };
 
       UpdateSortableDateTimeString( ref dateTime, ref format, cultureInfo );
 
-      var dateTimeParts = dateTime.Split( dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries ).ToList();
-      var formats = format.Split( dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries ).ToList();
+      var dateTimeParts = new List<string>();
+      var formats = new List<string>();
+      var isContainingDateTimeSeparators = dateTimeSeparators.Any( s => dateTime.Contains( s ) );
+      if( isContainingDateTimeSeparators )
+      {
+        dateTimeParts = dateTime.Split( dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries ).ToList();
+        formats = format.Split( dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries ).ToList();
+      }
+      else
+      {
+        string currentformat = "";
+        string currentString = "";
+        var formatArray = format.ToCharArray();
+        for( int i = 0; i < formatArray.Count(); ++i )
+        {
+          var c = formatArray[ i ];
+          if( !currentformat.Contains( c ) )
+          {
+            if( !string.IsNullOrEmpty( currentformat ) )
+            {
+              formats.Add( currentformat );
+              dateTimeParts.Add( currentString );
+            }
+            currentformat = c.ToString();
+            currentString = (i < dateTime.Length) ? dateTime[ i ].ToString() : "";
+          }
+          else
+          {
+            currentformat = string.Concat( currentformat, c );
+            currentString = string.Concat( currentString, (i < dateTime.Length) ? dateTime[ i ] : '\0' );
+          }
+        }
+        if( !string.IsNullOrEmpty( currentformat ) )
+        {
+          formats.Add( currentformat );
+          dateTimeParts.Add( currentString );
+        }
+      }
+
+      //Auto-complete missing date parts
+      if( dateTimeParts.Count < formats.Count )
+      {
+        while( dateTimeParts.Count != formats.Count  )
+        {
+          dateTimeParts.Add( "0" );
+        }
+      }
 
       //something went wrong
       if( dateTimeParts.Count != formats.Count )
@@ -69,7 +115,7 @@ namespace Xceed.Wpf.Toolkit
             dateParts[ "Day" ] = dateTimeParts[ i ];
           else if( f.Contains( "y" ) )
           {
-            dateParts[ "Year" ] = dateTimeParts[ i ];
+            dateParts[ "Year" ] = dateTimeParts[ i ] != "0" ? dateTimeParts[ i ] : "0000";
 
             if( dateParts[ "Year" ].Length == 2 )
               dateParts[ "Year" ] = string.Format( "{0}{1}", currentDate.Year / 100, dateParts[ "Year" ] );
@@ -80,6 +126,8 @@ namespace Xceed.Wpf.Toolkit
             timeParts[ 1 ] = dateTimeParts[ i ];
           else if( f.Contains( "s" ) )
             timeParts[ 2 ] = dateTimeParts[ i ];
+          else if( f.Contains( "f" ) )
+            millisecondsPart = dateTimeParts[ i ];
           else if( f.Contains( "t" ) )
             designator = dateTimeParts[ i ];
         }
@@ -87,6 +135,7 @@ namespace Xceed.Wpf.Toolkit
 
       var date = string.Join( cultureInfo.DateTimeFormat.DateSeparator, dateParts.Select( x => x.Value ).ToArray() );
       var time = string.Join( cultureInfo.DateTimeFormat.TimeSeparator, timeParts );
+      time += "." + millisecondsPart; 
 
       return String.Format( "{0} {1} {2}", date, time, designator );
     }
@@ -108,7 +157,8 @@ namespace Xceed.Wpf.Toolkit
     private static Dictionary<string, string> GetDateParts( DateTime currentDate, CultureInfo cultureInfo )
     {
       Dictionary<string, string> dateParts = new Dictionary<string, string>();
-      var dateFormatParts = cultureInfo.DateTimeFormat.ShortDatePattern.Split( new string[] { cultureInfo.DateTimeFormat.DateSeparator }, StringSplitOptions.RemoveEmptyEntries ).ToList();
+      var dateTimeSeparators = new[] { ",", " ", "-", ".", "/", cultureInfo.DateTimeFormat.DateSeparator, cultureInfo.DateTimeFormat.TimeSeparator };
+      var dateFormatParts = cultureInfo.DateTimeFormat.ShortDatePattern.Split( dateTimeSeparators, StringSplitOptions.RemoveEmptyEntries ).ToList();
       dateFormatParts.ForEach( item =>
       {
         string key = string.Empty;
@@ -127,9 +177,12 @@ namespace Xceed.Wpf.Toolkit
         else if( item.Contains( "y" ) )
         {
           key = "Year";
-          value = currentDate.Year.ToString();
+          value = currentDate.Year.ToString("D4");
         }
-        dateParts.Add( key, value );
+        if( !dateParts.ContainsKey( key ) )
+        {
+          dateParts.Add( key, value );
+        }
       } );
       return dateParts;
     }

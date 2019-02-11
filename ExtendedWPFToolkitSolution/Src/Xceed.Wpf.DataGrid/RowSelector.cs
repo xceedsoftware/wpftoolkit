@@ -14,14 +14,13 @@
 
   ***********************************************************************************/
 
-using System.Windows.Controls;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Controls.Primitives;
 using System;
 using System.ComponentModel;
-using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Input;
 using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
@@ -34,11 +33,15 @@ namespace Xceed.Wpf.DataGrid
       RowSelector.IsPressedProperty = RowSelector.IsPressedPropertyKey.DependencyProperty;
       RowSelector.RowTypeProperty = RowSelector.RowTypePropertyKey.DependencyProperty;
 
-      FocusableProperty.OverrideMetadata( typeof( RowSelector ),
-        new FrameworkPropertyMetadata( false ) );
+      UIElement.FocusableProperty.OverrideMetadata( typeof( RowSelector ), new FrameworkPropertyMetadata( false ) );
 
       DataGridControl.ParentDataGridControlPropertyKey.OverrideMetadata( typeof( RowSelector ),
         new FrameworkPropertyMetadata( new PropertyChangedCallback( RowSelector.OnParentGridControlChanged ) ) );
+
+      m_sDataContextBinding = new Binding();
+      m_sDataContextBinding.RelativeSource = new RelativeSource( RelativeSourceMode.Self );
+      m_sDataContextBinding.Path = new PropertyPath( DataGridControl.ContainerProperty );
+      m_sDataContextBinding.Mode = BindingMode.OneWay;
 
       m_sItemIndexBinding = new Binding();
       m_sItemIndexBinding.Path = new PropertyPath( DataGridVirtualizingPanel.ItemIndexProperty );
@@ -68,17 +71,14 @@ namespace Xceed.Wpf.DataGrid
 
       m_sAllowResizeBinding = new Binding();
       m_sAllowResizeBinding.RelativeSource = new RelativeSource( RelativeSourceMode.Self );
-      m_sAllowResizeBinding.Path = new PropertyPath( "(0).(1)",
-        DataGridControl.DataGridContextProperty,
-        TableView.AllowRowResizeProperty );
+      m_sAllowResizeBinding.Path = new PropertyPath( "(0).(1)", DataGridControl.DataGridContextProperty, TableView.AllowRowResizeProperty );
 
       m_sAllowResizeBinding.Mode = BindingMode.OneWay;
     }
 
     internal RowSelector()
     {
-      this.DataContext = null;
-
+      BindingOperations.SetBinding( this, RowSelector.DataContextProperty, m_sDataContextBinding );
       BindingOperations.SetBinding( this, RowSelector.IsCurrentProperty, m_sIsCurrentBinding );
       BindingOperations.SetBinding( this, RowSelector.IsBeingEditedProperty, m_sIsBeingEditedBinding );
       BindingOperations.SetBinding( this, RowSelector.ItemIndexProperty, m_sItemIndexBinding );
@@ -154,7 +154,9 @@ namespace Xceed.Wpf.DataGrid
     private void NotifyPropertyChanged( string propertyName )
     {
       if( this.PropertyChanged != null )
+      {
         this.PropertyChanged( this, new PropertyChangedEventArgs( propertyName ) );
+      }
     }
 
     #endregion
@@ -194,7 +196,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private void SetIsPressed( bool value )
+    internal void SetIsPressed( bool value )
     {
       this.SetValue( RowSelector.IsPressedPropertyKey, value );
     }
@@ -203,7 +205,11 @@ namespace Xceed.Wpf.DataGrid
 
     #region IsCurrent
 
-    public static readonly DependencyProperty IsCurrentProperty = DependencyProperty.Register( "IsCurrent", typeof( bool ), typeof( RowSelector ), new FrameworkPropertyMetadata( false ) );
+    public static readonly DependencyProperty IsCurrentProperty = DependencyProperty.Register(
+      "IsCurrent",
+      typeof( bool ),
+      typeof( RowSelector ),
+      new FrameworkPropertyMetadata( false ) );
 
     public bool IsCurrent
     {
@@ -217,7 +223,11 @@ namespace Xceed.Wpf.DataGrid
 
     #region IsBeingEdited
 
-    public static readonly DependencyProperty IsBeingEditedProperty = DependencyProperty.Register( "IsBeingEdited", typeof( bool ), typeof( RowSelector ), new FrameworkPropertyMetadata( false ) );
+    public static readonly DependencyProperty IsBeingEditedProperty = DependencyProperty.Register(
+      "IsBeingEdited",
+      typeof( bool ),
+      typeof( RowSelector ),
+      new FrameworkPropertyMetadata( false ) );
 
     public bool IsBeingEdited
     {
@@ -245,7 +255,11 @@ namespace Xceed.Wpf.DataGrid
 
     #region HasValidationError
 
-    public static readonly DependencyProperty HasValidationErrorProperty = DependencyProperty.Register( "HasValidationError", typeof( bool ), typeof( RowSelector ), new FrameworkPropertyMetadata( false ) );
+    public static readonly DependencyProperty HasValidationErrorProperty = DependencyProperty.Register(
+      "HasValidationError",
+      typeof( bool ),
+      typeof( RowSelector ),
+      new FrameworkPropertyMetadata( false ) );
 
     public bool HasValidationError
     {
@@ -259,9 +273,11 @@ namespace Xceed.Wpf.DataGrid
 
     #region RowType
 
-    private static readonly DependencyPropertyKey RowTypePropertyKey
-        = DependencyProperty.RegisterReadOnly( "RowType", typeof( Type ), typeof( RowSelector ),
-            new FrameworkPropertyMetadata( null ) );
+    private static readonly DependencyPropertyKey RowTypePropertyKey = DependencyProperty.RegisterReadOnly(
+      "RowType",
+      typeof( Type ),
+      typeof( RowSelector ),
+      new FrameworkPropertyMetadata( null ) );
 
     public static readonly DependencyProperty RowTypeProperty;
 
@@ -282,9 +298,11 @@ namespace Xceed.Wpf.DataGrid
 
     #region ContainerRect
 
-    public static readonly DependencyProperty ContainerRectProperty =
-        DependencyProperty.Register( "ContainerRect", typeof( Rect ), typeof( RowSelector ),
-            new FrameworkPropertyMetadata( null ) );
+    public static readonly DependencyProperty ContainerRectProperty = DependencyProperty.Register(
+      "ContainerRect",
+      typeof( Rect ),
+      typeof( RowSelector ),
+      new FrameworkPropertyMetadata( null ) );
 
     public Rect ContainerRect
     {
@@ -302,9 +320,11 @@ namespace Xceed.Wpf.DataGrid
 
     #region Visible Attached Property
 
-    public static readonly DependencyProperty VisibleProperty =
-        DependencyProperty.RegisterAttached( "Visible", typeof( bool ), typeof( RowSelector ),
-            new FrameworkPropertyMetadata( true ) );
+    public static readonly DependencyProperty VisibleProperty = DependencyProperty.RegisterAttached(
+      "Visible",
+      typeof( bool ),
+      typeof( RowSelector ),
+      new FrameworkPropertyMetadata( true ) );
 
     public static bool GetVisible( DependencyObject d )
     {
@@ -320,9 +340,11 @@ namespace Xceed.Wpf.DataGrid
 
     #region RowSelectorStyle Attached Property
 
-    public static readonly DependencyProperty RowSelectorStyleProperty =
-        DependencyProperty.RegisterAttached( "RowSelectorStyle", typeof( Style ), typeof( RowSelector ),
-            new FrameworkPropertyMetadata( null, new PropertyChangedCallback( OnRowSelectorStyleChanged ) ) );
+    public static readonly DependencyProperty RowSelectorStyleProperty = DependencyProperty.RegisterAttached(
+      "RowSelectorStyle",
+      typeof( Style ),
+      typeof( RowSelector ),
+      new FrameworkPropertyMetadata( null, new PropertyChangedCallback( OnRowSelectorStyleChanged ) ) );
 
     public static Style GetRowSelectorStyle( DependencyObject obj )
     {
@@ -358,9 +380,11 @@ namespace Xceed.Wpf.DataGrid
 
     #region ReferenceElement Internal Property
 
-    internal static readonly DependencyProperty ReferenceElementProperty =
-        DependencyProperty.Register( "ReferenceElement", typeof( FrameworkElement ), typeof( RowSelector ),
-            new FrameworkPropertyMetadata( null ) );
+    internal static readonly DependencyProperty ReferenceElementProperty = DependencyProperty.Register(
+      "ReferenceElement",
+      typeof( FrameworkElement ),
+      typeof( RowSelector ),
+      new FrameworkPropertyMetadata( null ) );
 
     internal FrameworkElement ReferenceElement
     {
@@ -468,9 +492,7 @@ namespace Xceed.Wpf.DataGrid
         return;
 
       // Resets the row width or height depending on the orientation.
-      DependencyProperty property = ( this.Orientation == Orientation.Vertical )
-        ? FrameworkElement.HeightProperty
-        : FrameworkElement.WidthProperty;
+      DependencyProperty property = ( this.Orientation == Orientation.Vertical ) ? FrameworkElement.HeightProperty : FrameworkElement.WidthProperty;
 
       rowItem.ClearValue( property );
     }
@@ -497,9 +519,7 @@ namespace Xceed.Wpf.DataGrid
 
         if( e.Cursor == null )
         {
-          e.Cursor = ( this.Orientation == Orientation.Vertical )
-            ? TableView.DefaultRowSelectorResizeNorthSouthCursor
-            : TableView.DefaultRowSelectorResizeWestEastCursor;
+          e.Cursor = ( this.Orientation == Orientation.Vertical ) ? TableView.DefaultRowSelectorResizeNorthSouthCursor : TableView.DefaultRowSelectorResizeWestEastCursor;
         }
       }
 
@@ -616,7 +636,7 @@ namespace Xceed.Wpf.DataGrid
 
     protected override void OnMouseLeftButtonDown( MouseButtonEventArgs e )
     {
-      m_IsFromMouseButtonDown = true;
+      m_isFromMouseButtonDown = true;
 
       if( this.CaptureMouse() )
       {
@@ -647,7 +667,7 @@ namespace Xceed.Wpf.DataGrid
               {
                 try
                 {
-                  dataGridContext.SetCurrentColumnCore( null, false, false );
+                  dataGridContext.SetCurrentColumnCore( null, false, false, AutoScrollCurrentItemSourceTriggers.Navigation );
                 }
                 catch( DataGridException )
                 {
@@ -661,7 +681,7 @@ namespace Xceed.Wpf.DataGrid
 
       base.OnMouseLeftButtonDown( e );
 
-      m_IsFromMouseButtonDown = false;
+      m_isFromMouseButtonDown = false;
     }
 
     protected override void OnMouseMove( MouseEventArgs e )
@@ -686,7 +706,7 @@ namespace Xceed.Wpf.DataGrid
       if( dataGridContext != null )
       {
         //Do not start the drag operation until we have an actual mouse mouve.
-        if( doDrag && !m_IsFromMouseButtonDown )
+        if( doDrag && !m_isFromMouseButtonDown )
         {
           dataGridContext.DataGridControl.DoDrag( e );
         }
@@ -724,10 +744,11 @@ namespace Xceed.Wpf.DataGrid
       base.OnLostMouseCapture( e );
     }
 
-    private bool m_IsFromMouseButtonDown = false;
+    private bool m_isFromMouseButtonDown = false;
 
     #endregion Button Behavior Code
 
+    private static readonly Binding m_sDataContextBinding;
     private static readonly Binding m_sItemIndexBinding;
     private static readonly Binding m_sIsCurrentBinding;
     private static readonly Binding m_sIsBeingEditedBinding;

@@ -16,22 +16,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Windows.Data;
 using System.Diagnostics;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal class DataGridCollectionViewGroupRoot : DataGridCollectionViewGroup
   {
-    #region CONSTRUCTORS
-
-    public DataGridCollectionViewGroupRoot( DataGridCollectionView parentCollectionView )
-      : base( null, null, 0 )
+    internal DataGridCollectionViewGroupRoot( DataGridCollectionView parentCollectionView )
+      : base( 128 )
     {
-      if( parentCollectionView == null )
-        throw new ArgumentNullException( "parentCollectionView" );
-
       m_parentCollectionView = parentCollectionView;
     }
 
@@ -41,67 +34,44 @@ namespace Xceed.Wpf.DataGrid
       m_parentCollectionView = template.m_parentCollectionView;
     }
 
-    #endregion CONSTRUCTORS
-
-    #region PROTECTED METHODS
-
     protected override DataGridCollectionView GetCollectionView()
     {
       return m_parentCollectionView;
     }
 
-    #endregion PROTECTED METHODS
-
-    #region INTERNAL METHODS
-
-    internal void SortRootRawItems( SortDescriptionInfo[] sortDescriptionInfos, List<RawItem> globalRawItems )
+    internal void SortRootRawItems( IList<SortDescriptionInfo> sortDescriptionInfos, List<RawItem> globalRawItems )
     {
       Debug.Assert( this.IsBottomLevel );
-      List<RawItem> rawItems = this.RawItems;
 
-      if( rawItems == null )
-        return;
-
-      int itemCount = rawItems.Count;
-
+      var itemCount = m_sortedRawItems.Count;
       if( itemCount == 0 )
         return;
 
-      int[] indexes;
-
-      indexes = new int[ itemCount + 1 ];
+      var indexes = new int[ itemCount + 1 ];
 
       for( int i = 0; i < itemCount; i++ )
       {
-        indexes[ i ] = rawItems[ i ].Index;
+        indexes[ i ] = m_sortedRawItems[ i ].Index;
       }
 
       // "Weak heap sort" sort array[0..NUM_ELEMENTS-1] to array[1..NUM_ELEMENTS]
-      DataGridCollectionViewSort collectionViewSort =
-        new DataGridCollectionViewSort( indexes, sortDescriptionInfos );
+      var collectionViewSort = new DataGridCollectionViewSort( indexes, sortDescriptionInfos );
 
       collectionViewSort.Sort( itemCount );
-      int index = 0;
+      var index = 0;
 
       for( int i = 1; i <= itemCount; i++ )
       {
-        RawItem newRawItem = globalRawItems[ indexes[ i ] ];
+        var newRawItem = globalRawItems[ indexes[ i ] ];
         newRawItem.SetSortedIndex( index );
-        rawItems[ index ] = newRawItem;
+        m_sortedRawItems[ index ] = newRawItem;
         index++;
       }
     }
 
-    #endregion INTERNAL METHODS
-
-    #region RawItem management for BottomLevel
-
     internal override void InsertRawItem( int index, RawItem rawItem )
     {
       Debug.Assert( this.IsBottomLevel );
-
-      if( m_sortedRawItems == null )
-        m_sortedRawItems = new List<RawItem>( 128 );
 
       m_globalRawItemCount++;
       int count = m_sortedRawItems.Count;
@@ -119,11 +89,15 @@ namespace Xceed.Wpf.DataGrid
     internal override void RemoveRawItemAt( int index )
     {
       Debug.Assert( this.IsBottomLevel );
+      Debug.Assert( m_sortedRawItems.Count > 0 );
+
+      int count = m_sortedRawItems.Count;
+      if( count == 0 )
+        return;
 
       if( index != -1 )
       {
         m_globalRawItemCount--;
-        int count = m_sortedRawItems.Count;
 
         for( int i = index + 1; i < count; i++ )
         {
@@ -155,12 +129,6 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion RawItem management for BottomLevel
-
-    #region PRIVATE FILEDS
-
     private DataGridCollectionView m_parentCollectionView;
-
-    #endregion PRIVATE FIELDS
   }
 }

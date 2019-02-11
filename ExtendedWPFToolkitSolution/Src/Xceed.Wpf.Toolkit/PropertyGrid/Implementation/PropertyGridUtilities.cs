@@ -32,112 +32,12 @@ using System.Reflection;
 using System.Windows.Controls.Primitives;
 using Xceed.Wpf.Toolkit.PropertyGrid.Converters;
 using Xceed.Wpf.Toolkit.Primitives;
+using System.IO;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
   internal class PropertyGridUtilities
   {
-    #region DefaultNoBorderControlStyle Static Property
-    private static Style _noBorderControlStyle;
-    internal static Style NoBorderControlStyle
-    {
-      get
-      {
-        if( _noBorderControlStyle == null )
-        {
-          var style = new Style( typeof( Control ) );
-          var trigger = new MultiTrigger();
-          trigger.Conditions.Add( new Condition( Control.IsKeyboardFocusWithinProperty, false ) );
-          trigger.Conditions.Add( new Condition( Control.IsMouseOverProperty, false ) );
-          trigger.Setters.Add(
-            new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
-          style.Triggers.Add( trigger );
-
-          _noBorderControlStyle = style;
-        }
-
-        return _noBorderControlStyle;
-      }
-    }
-    #endregion
-
-    #region PropertyGridComboBoxStyle Static Property
-    private static Style _propertyGridComboBoxStyle;
-    internal static Style ComboBoxStyle
-    {
-      get
-      {
-        if( _propertyGridComboBoxStyle == null )
-        {
-          var style = new Style( typeof( Control ) );
-          var trigger = new MultiTrigger();
-          trigger.Conditions.Add( new Condition( Control.IsKeyboardFocusWithinProperty, false ) );
-          trigger.Conditions.Add( new Condition( Control.IsMouseOverProperty, false ) );
-          trigger.Setters.Add( new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
-          trigger.Setters.Add( new Setter( Control.BackgroundProperty, new SolidColorBrush( Colors.Transparent ) ) );
-          style.Triggers.Add( trigger );
-
-          _propertyGridComboBoxStyle = style;
-        }
-        return _propertyGridComboBoxStyle;
-      }
-    }
-    #endregion
-
-    #region ColorPickerStyle Static Property
-    private static Style _colorPickerStyle;
-    internal static Style ColorPickerStyle
-    {
-      get
-      {
-        if( _colorPickerStyle == null )
-        {
-          Style defaultColorPickerStyle = Application.Current.TryFindResource( typeof( ColorPicker ) ) as Style;
-          var style = new Style( typeof( ColorPicker ), defaultColorPickerStyle );
-          var trigger = new MultiTrigger();
-          trigger.Conditions.Add( new Condition( Control.IsKeyboardFocusWithinProperty, false ) );
-          trigger.Conditions.Add( new Condition( Control.IsMouseOverProperty, false ) );
-          trigger.Setters.Add( new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
-          trigger.Setters.Add( new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
-          trigger.Setters.Add( new Setter( ColorPicker.ShowDropDownButtonProperty, false ) );
-          style.Triggers.Add( trigger );
-
-          _colorPickerStyle = style;
-        }
-
-        return _colorPickerStyle;
-      }
-    }
-    #endregion
-
-    #region UpDownBaseStyle Static Getter
-    private static Dictionary<Type, Style> _upDownStyles;
-    internal static Style GetUpDownBaseStyle<T>()
-    {
-      if( _upDownStyles == null )
-      {
-        _upDownStyles = new Dictionary<Type, Style>();
-      }
-
-      Style style;
-      if( !_upDownStyles.TryGetValue( typeof( T ), out style ) )
-      {
-        style = new Style( typeof( UpDownBase<T> ) );
-        var trigger = new MultiTrigger();
-        trigger.Conditions.Add( new Condition( Control.IsKeyboardFocusWithinProperty, false ) );
-        trigger.Conditions.Add( new Condition( Control.IsMouseOverProperty, false ) );
-        trigger.Setters.Add(
-          new Setter( Control.BorderBrushProperty, new SolidColorBrush( Colors.Transparent ) ) );
-        trigger.Setters.Add(
-          new Setter( UpDownBase<T>.ShowButtonSpinnerProperty, false ) );
-        style.Triggers.Add( trigger );
-
-        _upDownStyles.Add( typeof( T ), style );
-      }
-      return style;
-    }
-    #endregion
-
     internal static T GetAttribute<T>( PropertyDescriptor property ) where T : Attribute
     {
       return property.Attributes.OfType<T>().FirstOrDefault();
@@ -146,11 +46,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
-    internal static ITypeEditor CreateDefaultEditor( Type propertyType, TypeConverter typeConverter )
+    internal static ITypeEditor CreateDefaultEditor( Type propertyType, TypeConverter typeConverter, PropertyItem propertyItem )
     {
       ITypeEditor editor = null;
 
-      if( propertyType == typeof( string )  )
+      var context = new EditorTypeDescriptorContext( null, propertyItem.Instance, propertyItem.PropertyDescriptor );
+      if( (typeConverter != null)
+        && typeConverter.GetStandardValuesSupported( context )
+        && typeConverter.GetStandardValuesExclusive( context )
+        && (propertyType != typeof( bool )) && (propertyType != typeof( bool? )) )  //Bool type always have a BooleanConverter with standardValues : True/False.
+      {
+        var items = typeConverter.GetStandardValues( context );
+        editor = new SourceComboBoxEditor( items, typeConverter );
+      }
+      else if( propertyType == typeof( string )  )
         editor = new TextBoxEditor();
       else if( propertyType == typeof( bool ) || propertyType == typeof( bool? ) )
         editor = new CheckBoxEditor();
@@ -169,23 +78,27 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       else if( propertyType == typeof( byte ) || propertyType == typeof( byte? ) )
         editor = new ByteUpDownEditor();
       else if( propertyType == typeof( sbyte ) || propertyType == typeof( sbyte? ) )
-        editor = new UpDownEditor<SByteUpDown,sbyte?>();
+        editor = new SByteUpDownEditor();
       else if( propertyType == typeof( uint ) || propertyType == typeof( uint? ) )
-        editor = new UpDownEditor<UIntegerUpDown, uint?>();
+        editor = new UIntegerUpDownEditor();
       else if( propertyType == typeof( ulong ) || propertyType == typeof( ulong? ) )
-        editor = new UpDownEditor<ULongUpDown, ulong?>();
+        editor = new ULongUpDownEditor();
       else if( propertyType == typeof( ushort ) || propertyType == typeof( ushort? ) )
-        editor = new UpDownEditor<UShortUpDown, ushort?>();
+        editor = new UShortUpDownEditor();
       else if( propertyType == typeof( DateTime ) || propertyType == typeof( DateTime? ) )
         editor = new DateTimeUpDownEditor();
-      else if( ( propertyType == typeof( Color ) ) )
+      else if( ( propertyType == typeof( Color ) ) || ( propertyType == typeof( Color? ) ) )
         editor = new ColorEditor();
       else if( propertyType.IsEnum )
         editor = new EnumComboBoxEditor();
-      else if( propertyType == typeof( TimeSpan ) )
-        editor = new TimeSpanEditor();
+      else if( propertyType == typeof( TimeSpan ) || propertyType == typeof( TimeSpan? ) )
+        editor = new TimeSpanUpDownEditor();
       else if( propertyType == typeof( FontFamily ) || propertyType == typeof( FontWeight ) || propertyType == typeof( FontStyle ) || propertyType == typeof( FontStretch ) )
         editor = new FontComboBoxEditor();
+      else if (propertyType == typeof(Guid) || propertyType == typeof(Guid?))
+        editor = new MaskedTextBoxEditor() { ValueDataType = propertyType, Mask = "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA" };
+      else if (propertyType == typeof(char) || propertyType == typeof(char?))
+        editor = new MaskedTextBoxEditor() { ValueDataType = propertyType, Mask = "&" };
       else if( propertyType == typeof( object ) )
         // If any type of object is possible in the property, default to the TextBoxEditor.
         // Useful in some case (e.g., Button.Content).
@@ -193,23 +106,34 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         editor = new TextBoxEditor();
       else
       {
-        Type listType = ListUtilities.GetListItemType( propertyType );
+        var listType = ListUtilities.GetListItemType( propertyType );
 
+        // A List of T
         if( listType != null )
         {
-          if( !listType.IsPrimitive && !listType.Equals( typeof( String ) ) )
+          if( !listType.IsPrimitive && !listType.Equals( typeof( String ) ) && !listType.IsEnum )
             editor = new Xceed.Wpf.Toolkit.PropertyGrid.Editors.CollectionEditor();
           else
             editor = new Xceed.Wpf.Toolkit.PropertyGrid.Editors.PrimitiveTypeCollectionEditor();
         }
         else
         {
-          // If the type is not supported, check if there is a converter that supports
-          // string conversion to the object type. Use TextBox in theses cases.
-          // Otherwise, return a TextBlock editor since no valid editor exists.
-          editor = ( typeConverter != null && typeConverter.CanConvertFrom( typeof( string ) ) )
-            ? ( ITypeEditor )new TextBoxEditor()
-            : ( ITypeEditor )new TextBlockEditor();
+          var dictionaryType = ListUtilities.GetDictionaryItemsType( propertyType );
+          var collectionType = ListUtilities.GetCollectionItemType( propertyType );
+          // A dictionary of T or a Collection of T or an ICollection
+          if( (dictionaryType != null) || (collectionType != null) || typeof( ICollection ).IsAssignableFrom( propertyType ) )
+          {
+            editor = new Xceed.Wpf.Toolkit.PropertyGrid.Editors.CollectionEditor();
+          }
+          else
+          {
+            // If the type is not supported, check if there is a converter that supports
+            // string conversion to the object type. Use TextBox in theses cases.
+            // Otherwise, return a TextBlock editor since no valid editor exists.
+            editor = (typeConverter != null && typeConverter.CanConvertFrom( typeof( string ) ))
+              ? (ITypeEditor)new TextBoxEditor()
+              : (ITypeEditor)new TextBlockEditor();
+          }
         }
       }
 
@@ -228,5 +152,59 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
+
+    #region Private class
+
+    private class EditorTypeDescriptorContext : ITypeDescriptorContext
+    {
+      IContainer _container;
+      object _instance;
+      PropertyDescriptor _propertyDescriptor;
+
+      internal EditorTypeDescriptorContext( IContainer container, object instance, PropertyDescriptor pd )
+      {
+        _container = container;
+        _instance = instance;
+        _propertyDescriptor = pd;
+      }
+
+      IContainer ITypeDescriptorContext.Container
+      {
+        get
+        {
+          return _container;
+        }
+      }
+      object ITypeDescriptorContext.Instance
+      {
+        get
+        {
+          return _instance;
+        }
+      }
+      PropertyDescriptor ITypeDescriptorContext.PropertyDescriptor
+      {
+        get
+        {
+          return _propertyDescriptor;
+        }
+      }
+
+      void ITypeDescriptorContext.OnComponentChanged()
+      {
+      }
+
+      bool ITypeDescriptorContext.OnComponentChanging()
+      {
+        return false;
+      }
+
+      object IServiceProvider.GetService( Type serviceType )
+      {
+        return null;
+      }
+    }
+
+    #endregion
   }
 }

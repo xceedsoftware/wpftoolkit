@@ -15,75 +15,54 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
-using System.Collections.ObjectModel;
 using System.Collections;
-using Xceed.Utils.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.ComponentModel;
-using System.Globalization;
 using System.Data;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
 using System.Windows;
-using System.Xml;
-using System.Reflection;
-using System.Data.Objects.DataClasses;
+using System.Windows.Data;
 using System.Windows.Threading;
+using Xceed.Utils.Collections;
+using Xceed.Wpf.DataGrid.Utils;
 
 namespace Xceed.Wpf.DataGrid
 {
   public abstract partial class DataGridCollectionViewBase : CollectionView, IEditableCollectionView, IWeakEventListener, IItemProperties
   {
-    #region STATIC MEMBERS
+    #region Static Fields
+
+    internal static readonly string GroupsPropertyName = PropertyHelper.GetPropertyName( ( DataGridCollectionViewBase c ) => c.Groups );
+    internal static readonly string RootGroupPropertyName = PropertyHelper.GetPropertyName( ( DataGridCollectionViewBase c ) => c.RootGroup );
+
+    #endregion
+
+    #region Static Members
 
     internal static string GetPropertyNameFromGroupDescription( GroupDescription groupDescription )
     {
-      PropertyGroupDescription propertyGroupDescription =
-        groupDescription as PropertyGroupDescription;
-
+      var propertyGroupDescription = groupDescription as PropertyGroupDescription;
       if( propertyGroupDescription != null )
         return propertyGroupDescription.PropertyName;
 
-      DataGridGroupDescription dataGridGroupDescription =
-        groupDescription as DataGridGroupDescription;
-
+      var dataGridGroupDescription = groupDescription as DataGridGroupDescription;
       if( dataGridGroupDescription != null )
         return dataGridGroupDescription.PropertyName;
 
       return null;
     }
 
-    private static List<DataGridItemPropertyBase> GetDataGridItemProperties( Dictionary<string, ItemsSourceHelper.FieldDescriptor> fieldDescriptors )
-    {
-      List<DataGridItemPropertyBase> itemProperties = new List<DataGridItemPropertyBase>( fieldDescriptors.Count );
+    #endregion
 
-      foreach( KeyValuePair<string, ItemsSourceHelper.FieldDescriptor> fieldDescriptorKeyValuePair in fieldDescriptors )
-      {
-        ItemsSourceHelper.FieldDescriptor fieldDescriptor = fieldDescriptorKeyValuePair.Value;
-
-        itemProperties.Add( new DataGridItemProperty(
-                              fieldDescriptor.Name,
-                              fieldDescriptor.PropertyDescriptor,
-                              fieldDescriptor.DisplayName,
-                              fieldDescriptor.BindingXPath,
-                              fieldDescriptor.BindingPath,
-                              fieldDescriptor.DataType,
-                              true,
-                              fieldDescriptor.ReadOnly,
-                              fieldDescriptor.OverrideReadOnlyForInsertion,
-                              fieldDescriptor.IsASubRelationship,
-                              fieldDescriptor.ForeignKeyDescription ) );
-      }
-
-      return itemProperties;
-    }
-
-    private static List<DataGridItemPropertyBase> EmptyDataGridItemPropertyList = new List<DataGridItemPropertyBase>();
-
-    #endregion STATIC MEMBERS
+//    static DataGridCollectionViewBase()
+//    {
+//      Licenser.VerifyLicenseSilently();
+//    }
 
     private DataGridCollectionViewBase()
       : base( new object[ 0 ] )
@@ -92,8 +71,6 @@ namespace Xceed.Wpf.DataGrid
       this.PreConstruct();
 
       m_distinctValues = new DistinctValuesDictionary( this );
-      m_autoFilterValues = new ReadOnlyDictionary<string, IList>();
-      m_autoFilteredDataGridItemProperties = new ObservableCollection<DataGridItemPropertyBase>();
 
       m_filteredItemProperties = new List<DataGridItemPropertyBase>();
       m_readOnlyFilteredItemProperties = new ReadOnlyCollection<DataGridItemPropertyBase>( m_filteredItemProperties );
@@ -113,11 +90,15 @@ namespace Xceed.Wpf.DataGrid
       bool autoCreateForeignKeyDescriptions )
       : this()
     {
+      m_desiredItemType = itemType;
+
+      m_itemProperties = new DataGridItemPropertyCollection();
+      m_detailDescriptions = new DataGridDetailDescriptionCollection();
+      m_defaultPropertyDescriptions = new PropertyDescriptionRouteDictionary();
+
       this.AutoCreateItemProperties = autoCreateItemProperties;
       this.AutoCreateDetailDescriptions = autoCreateDetailDescriptions;
       this.AutoCreateForeignKeyDescriptions = autoCreateForeignKeyDescriptions;
-
-      m_desiredItemType = itemType;
 
       if( itemType == null )
       {
@@ -127,58 +108,83 @@ namespace Xceed.Wpf.DataGrid
         }
         else if( modelSource != null )
         {
-          IQueryable queryable = modelSource as IQueryable;
-
+          var queryable = modelSource as IQueryable;
           if( queryable != null )
+          {
             itemType = queryable.ElementType;
+          }
         }
       }
       else
       {
-        Type listItemType = ItemsSourceHelper.GetItemTypeFromEnumeration( source );
-
-        if( listItemType == null )
-          listItemType = typeof( object );
-
+        var listItemType = ItemsSourceHelper.GetItemTypeFromEnumeration( source ) ?? typeof( object );
         if( !listItemType.IsAssignableFrom( itemType ) && !itemType.IsAssignableFrom( listItemType ) )
           throw new InvalidOperationException( "The itemType is not assignable to the type of the list." );
       }
 
-      this.SetSource( modelSource, source, itemType, true );
+      m_modelSource = modelSource;
+      m_itemType = itemType;
+      m_enumeration = source;
 
-      // This will create a new ItemProperties/DatatGridDetailDescriptions collection and pre-feed them with the 
-      // ItemProperties/DetailDescriptions detected on the source collection.
-      // For DataGridCollectionViews not supporting master/detail, the collection will be created but nothing will be inserted.
-      this.SetupDefaultDetailDescriptions();
-
-      this.SetupDefaultItemProperties();
       this.CreateDefaultCollections( null );
-      this.RegisterCollectionChanged();
+      this.RegisterChangedEvents();
+      this.SetupCurrent( true );
+      this.SetupDefaultPropertyDescriptions();
+      this.SetupDefaultDetailDescriptions();
+      this.PrepareItemProperties( m_itemProperties );
+
+      if( this.AutoCreateItemProperties )
+      {
+        ItemsSourceHelper.CreateAndAddItemPropertiesForPropertyDescriptions( m_itemProperties, m_defaultPropertyDescriptions.Values );
+        ItemsSourceHelper.AutoDetectSynonyms( this );
+      }
     }
 
     internal DataGridCollectionViewBase( IEnumerable collection, DataGridDetailDescription parentDetailDescription, DataGridCollectionViewBase rootDataGridCollectionViewBase )
       : this()
     {
-      if( !this.CanHaveDetails )
-        throw new InvalidOperationException( "An attempt was made to provide a detail description for a source that cannot have details." );
-
       if( parentDetailDescription == null )
         throw new ArgumentNullException( "parentDetailDescription" );
+
+      m_rootDataGridCollectionViewBase = rootDataGridCollectionViewBase;
+      m_parentDetailDescription = parentDetailDescription;
+      m_itemProperties = parentDetailDescription.ItemProperties;
+      m_detailDescriptions = parentDetailDescription.DetailDescriptions;
+      m_defaultPropertyDescriptions = parentDetailDescription.DefaultPropertyDescriptions;
+
+      m_distinctValuesConstraint = m_parentDetailDescription.DistinctValuesConstraint;
 
       this.AutoCreateDetailDescriptions = parentDetailDescription.AutoCreateDetailDescriptions;
       this.AutoCreateItemProperties = parentDetailDescription.AutoCreateItemProperties;
       this.AutoCreateForeignKeyDescriptions = parentDetailDescription.AutoCreateForeignKeyDescriptions;
 
-      m_parentDetailDescription = parentDetailDescription;
-      m_rootDataGridCollectionViewBase = rootDataGridCollectionViewBase;
+      if( parentDetailDescription.ItemType == null )
+      {
+        parentDetailDescription.ItemType = ItemsSourceHelper.GetItemTypeFromEnumeration( collection ) ?? typeof( object );
+      }
 
-      Type itemType;
-      itemType = ItemsSourceHelper.GetItemTypeFromEnumeration( collection );
+      m_modelSource = default( object );
+      m_itemType = parentDetailDescription.ItemType;
+      m_enumeration = collection;
 
-      if( itemType == null )
-        itemType = typeof( object );
+      this.CreateDefaultCollections( m_parentDetailDescription );
+      this.RegisterChangedEvents();
+      this.SetupCurrent( false );
+      this.SetupDefaultPropertyDescriptions();
+      this.SetupDefaultDetailDescriptions();
 
-      this.InitializeFromExternalDeclaration( collection, itemType );
+      // Creates the item properties if auto-creation is ON and no one already created them.
+      if( this.AutoCreateItemProperties && !m_parentDetailDescription.AutoCreateItemPropertiesCompleted )
+      {
+        ItemsSourceHelper.CreateAndAddItemPropertiesForPropertyDescriptions( m_itemProperties, m_defaultPropertyDescriptions.Values );
+        ItemsSourceHelper.AutoDetectSynonyms( this );
+
+        m_parentDetailDescription.AutoCreateItemPropertiesCompleted = true;
+      }
+
+      m_filteredItemProperties.Clear();
+
+      this.PrepareItemProperties( m_itemProperties );
 
       // This is required in the Master/Detail scheme of things!
       this.ForceRefresh( false, true, false );
@@ -188,7 +194,7 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
-    #region ParentCollectionViewSource Property
+    #region ParentCollectionViewSource Internal Property
 
     internal DataGridCollectionViewSourceBase ParentCollectionViewSourceBase
     {
@@ -207,9 +213,9 @@ namespace Xceed.Wpf.DataGrid
 
     private DataGridCollectionViewSourceBase m_parentCollectionViewSourceBase;
 
-    #endregion ParentCollectionViewSource Property
+    #endregion
 
-    #region NeedsRefresh Property
+    #region NeedsRefresh Public Property
 
     public override bool NeedsRefresh
     {
@@ -219,9 +225,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion NeedsRefresh Property
+    #endregion
 
-    #region Culture Property
+    #region Culture Public Property
 
     public override CultureInfo Culture
     {
@@ -239,17 +245,16 @@ namespace Xceed.Wpf.DataGrid
         // apply our properties to the DataGridCollectionView.
         // 
         // See CollectionViewSource.ApplyPropertiesToView in reflector for a better understanding.
-        if( ( this.InDeferRefresh )
-          && ( m_parentCollectionViewSourceBase != null ) )
+        if( ( this.InDeferRefresh ) && ( m_parentCollectionViewSourceBase != null ) )
         {
           m_parentCollectionViewSourceBase.ApplyExtraPropertiesToView( this );
         }
       }
     }
 
-    #endregion Culture Property
+    #endregion
 
-    #region AutoCreateItemProperties Property
+    #region AutoCreateItemProperties Public Property
 
     public bool AutoCreateItemProperties
     {
@@ -263,9 +268,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion AutoCreateItemProperties Property
+    #endregion
 
-    #region AutoCreateDetailDescriptions Property
+    #region AutoCreateDetailDescriptions Public Property
 
     internal bool AutoCreateDetailDescriptions
     {
@@ -279,9 +284,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion AutoCreateDetailDescriptions Property
+    #endregion
 
-    #region ParentDetailDescription Property
+    #region ParentDetailDescription Public Property
 
     internal DataGridDetailDescription ParentDetailDescription
     {
@@ -292,9 +297,9 @@ namespace Xceed.Wpf.DataGrid
     }
 
 
-    #endregion ParentDetailDescription Property
+    #endregion
 
-    #region AutoCreateForeignKeyDescriptions Property
+    #region AutoCreateForeignKeyDescriptions Public Property
 
     public bool AutoCreateForeignKeyDescriptions
     {
@@ -310,19 +315,26 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region SyncRoot Property
+    #region SyncRoot Internal Property
 
     internal virtual object SyncRoot
     {
       get
       {
-        return this;
+        if( m_syncRoot == null )
+        {
+          Interlocked.CompareExchange( ref m_syncRoot, new object(), null );
+        }
+
+        return m_syncRoot;
       }
     }
 
+    private object m_syncRoot; //null
+
     #endregion
 
-    #region DeferredOperationManager Property
+    #region DeferredOperationManager Internal Property
 
     internal DeferredOperationManager DeferredOperationManager
     {
@@ -334,19 +346,19 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region InDeferRefresh Property
+    #region InDeferRefresh Internal Property
 
     internal bool InDeferRefresh
     {
       get
       {
-        return m_deferRefreshCount > 0;
+        return ( m_deferRefreshCount > 0 );
       }
     }
 
     #endregion
 
-    #region Loaded Property
+    #region Loaded Internal Property
 
     internal bool Loaded
     {
@@ -362,7 +374,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region IsRefreshingDestinctValues Property
+    #region IsRefreshingDestinctValues Internal Property
 
     internal bool IsRefreshingDistinctValues
     {
@@ -378,7 +390,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region Refreshing Property
+    #region Refreshing Internal Property
 
     internal bool Refreshing
     {
@@ -394,7 +406,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region ModelSource Property
+    #region ModelSource Internal Property
 
     internal object ModelSource
     {
@@ -406,7 +418,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region ItemEditionIsManuallyHandled Property
+    #region ItemEditionIsManuallyHandled Private Property
 
     private bool ItemEditionIsManuallyHandled
     {
@@ -422,7 +434,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region CreatingNewItemIsManuallyHandled Property
+    #region CreatingNewItemIsManuallyHandled Private Property
 
     private bool CreatingNewItemIsManuallyHandled
     {
@@ -438,36 +450,71 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region ItemPropertiesCreated Property
-
-    private bool ItemPropertiesCreated
-    {
-      get
-      {
-        return m_flags[ ( int )DataGridCollectionViewBaseFlags.ItemPropertiesCreated ];
-      }
-      set
-      {
-        m_flags[ ( int )DataGridCollectionViewBaseFlags.ItemPropertiesCreated ] = value;
-      }
-    }
-
-    #endregion
-
-    #region ItemProperties Property
+    #region ItemProperties Public Property
 
     public DataGridItemPropertyCollection ItemProperties
     {
       get
       {
-        Debug.Assert( m_itemProperties != null );
         return m_itemProperties;
       }
     }
 
     #endregion
 
-    #region  CanCreateItemPropertiesFormModelSource Property
+    #region DefaultItemPropertiesInitialized Private Property
+
+    private bool DefaultItemPropertiesInitialized
+    {
+      get
+      {
+        if( m_parentDetailDescription != null )
+          return m_parentDetailDescription.DefaultItemPropertiesInitialized;
+
+        return m_flags[ ( int )DataGridCollectionViewBaseFlags.DefaultItemPropertiesInitialized ];
+      }
+      set
+      {
+        if( m_parentDetailDescription != null )
+        {
+          m_parentDetailDescription.DefaultItemPropertiesInitialized = value;
+        }
+        else
+        {
+          m_flags[ ( int )DataGridCollectionViewBaseFlags.DefaultItemPropertiesInitialized ] = value;
+        }
+      }
+    }
+
+    #endregion
+
+    #region DefaultPropertyDescriptionsCreated Private Property
+
+    private bool DefaultPropertyDescriptionsCreated
+    {
+      get
+      {
+        if( m_parentDetailDescription != null )
+          return m_parentDetailDescription.DefaultPropertyDescriptionsCreated;
+
+        return m_flags[ ( int )DataGridCollectionViewBaseFlags.DefaultPropertyDescriptionsCreated ];
+      }
+      set
+      {
+        if( m_parentDetailDescription != null )
+        {
+          m_parentDetailDescription.DefaultPropertyDescriptionsCreated = value;
+        }
+        else
+        {
+          m_flags[ ( int )DataGridCollectionViewBaseFlags.DefaultPropertyDescriptionsCreated ] = value;
+        }
+      }
+    }
+
+    #endregion
+
+    #region CanCreateItemPropertiesFormModelSource Private Property
 
     private bool CanCreateItemPropertiesFromModelSource
     {
@@ -479,6 +526,47 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
+    #region DetailDeferRefreshes Internal Property
+
+    internal List<List<IDisposable>> DetailDeferRefreshes
+    {
+      get
+      {
+        return m_detailDeferRefreshes;
+      }
+    }
+
+    private List<List<IDisposable>> m_detailDeferRefreshes;
+
+    #endregion
+
+    #region DataGridContext Internal Property
+
+    internal DataGridContext DataGridContext
+    {
+      get
+      {
+        if( m_dataGridContext == null )
+          return null;
+
+        return m_dataGridContext.Target as DataGridContext;
+      }
+      set
+      {
+        if( value == null )
+        {
+          m_dataGridContext = null;
+        }
+        else
+        {
+          m_dataGridContext = new WeakReference( value );
+        }
+      }
+    }
+
+    private WeakReference m_dataGridContext;
+
+    #endregion
 
     #region DataGridCollectionViewBase ABSTRACT MEMBERS
 
@@ -490,7 +578,7 @@ namespace Xceed.Wpf.DataGrid
     internal abstract DataGridCollectionViewBase CreateDetailDataGridCollectionViewBase(
       IEnumerable detailDataSource,
       DataGridDetailDescription parentDetailDescription,
-      DataGridCollectionViewBase rootDataGridCollectionViewBase );
+      DataGridCollectionViewBase parentDataGridCollectionViewBase );
 
     internal abstract void EnsurePosition( int globalSortedIndex );
 
@@ -501,86 +589,9 @@ namespace Xceed.Wpf.DataGrid
 
     internal abstract void ForceRefresh( bool sendResetNotification, bool initialLoad, bool setCurrentToFirstOnInitialLoad );
 
-    #endregion DataGridCollectionViewBase ABSTRACT MEMBERS
+    #endregion
 
     #region SOURCE
-
-    private void SetSource( object modelSource, IEnumerable source, Type itemType, bool setCurrentToFirst )
-    {
-      if( this.Loaded )
-        throw new InvalidOperationException( "An attempt was made to change the source when the collection view has already been loaded." );
-
-      m_modelSource = modelSource;
-      m_itemType = itemType;
-
-      this.SetSourceCore( source, setCurrentToFirst );
-    }
-
-    private void SetSourceCore( IEnumerable source, bool setCurrentToFirst )
-    {
-      Debug.Assert( !this.Loaded );
-
-      if( source == null )
-      {
-        m_enumeration = null;
-        m_notifyCollectionChanged = null;
-        m_dataTable = null;
-
-        this.SetCurrentItemAndPositionCore( null, -1, true, true );
-        return;
-      }
-
-      // Unsubscribe from old list event
-      if( m_notifyCollectionChanged != null )
-        CollectionChangedEventManager.RemoveListener( m_notifyCollectionChanged, this );
-
-      IBindingList oldBindingList = m_enumeration as IBindingList;
-
-      if( ( oldBindingList != null ) && ( oldBindingList.SupportsChangeNotification ) )
-        ListChangedEventManager.RemoveListener( oldBindingList, this );
-
-      m_enumeration = source;
-      m_notifyCollectionChanged = m_enumeration as INotifyCollectionChanged;
-
-      if( m_notifyCollectionChanged != null )
-        CollectionChangedEventManager.AddListener( m_notifyCollectionChanged, this );
-
-      if( m_notifyCollectionChanged == null )
-      {
-        IBindingList newBindingList = m_enumeration as IBindingList;
-
-        if( ( newBindingList != null ) && ( newBindingList.SupportsChangeNotification ) )
-          ListChangedEventManager.AddListener( newBindingList, this );
-      }
-
-      m_dataTable = m_enumeration as DataTable;
-
-      if( m_enumeration != null )
-      {
-        // Position to the first item
-        IEnumerator enumerator = m_enumeration.GetEnumerator();
-
-        if( enumerator.MoveNext() )
-        {
-          if( setCurrentToFirst )
-          {
-            this.SetCurrentItemAndPositionCore( enumerator.Current, 0, false, false );
-          }
-          else
-          {
-            this.SetCurrentItemAndPositionCore( null, -1, true, false );
-          }
-        }
-        else
-        {
-          this.SetCurrentItemAndPositionCore( null, -1, true, true );
-        }
-      }
-      else
-      {
-        this.SetCurrentItemAndPositionCore( null, -1, true, true );
-      }
-    }
 
     internal IEnumerable Enumeration
     {
@@ -590,29 +601,11 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    internal INotifyCollectionChanged NotifyCollectionChanged
-    {
-      get
-      {
-        return m_notifyCollectionChanged;
-      }
-    }
-
     public Type ItemType
     {
       get
       {
         return m_itemType;
-      }
-      private set
-      {
-        if( m_itemType == value )
-          return;
-
-        if( this.ItemPropertiesCreated )
-          throw new InvalidOperationException( "An attempt was made to modify the ItemType property after the DataGridItemProperty has been created." );
-
-        m_itemType = value;
       }
     }
 
@@ -628,15 +621,15 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return m_enumeration != null;
+        return ( m_enumeration != null );
       }
     }
 
-    #endregion SOURCE
+    #endregion
 
     #region SOURCE COLLECTION CHANGED HANDLERS
 
-    private void NotifyCollectionChanged_CollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
+    private void OnItemsSourceCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
       Debug.Assert( !( this is DataGridVirtualizingCollectionViewBase ),
         "The DataGridVirtualizingCollectionView is unbound and therefore should never receive a notification from a source." );
@@ -688,129 +681,119 @@ namespace Xceed.Wpf.DataGrid
         }
 
         if( deferredOperation != null )
+        {
           this.ExecuteOrQueueSourceItemOperation( deferredOperation );
+        }
       }
     }
 
-    private void BindingList_ListChanged( object sender, ListChangedEventArgs e )
+    private void OnItemsSourceListChanged( object sender, ListChangedEventArgs e )
     {
       Debug.Assert( !( this is DataGridVirtualizingCollectionViewBase ),
         "The DataGridVirtualizingCollectionView is unbound and therefore should never receive a notification from a source." );
 
-      IBindingList bindingList = ( IBindingList )m_enumeration;
-      int index = e.NewIndex;
-      IList items = null;
+      Action<PropertyDescriptor> propertyDescriptorHandler;
       ListChangedType listChangedType = e.ListChangedType;
 
-      //If we're within bounds
-      if( ( index > -1 ) && ( index < bindingList.Count ) )
+      switch( listChangedType )
       {
-        //Let's get the item
-        items = new object[] { bindingList[ index ] };
+        case ListChangedType.PropertyDescriptorAdded:
+          propertyDescriptorHandler = this.HandlePropertyDescriptorAdded;
+          break;
+
+        case ListChangedType.PropertyDescriptorChanged:
+          propertyDescriptorHandler = this.HandlePropertyDescriptorChanged;
+          break;
+
+        case ListChangedType.PropertyDescriptorDeleted:
+          propertyDescriptorHandler = this.HandlePropertyDescriptorDeleted;
+          break;
+
+        default:
+          propertyDescriptorHandler = null;
+          break;
+      }
+
+      if( propertyDescriptorHandler != null )
+      {
+        if( this.CheckAccess() )
+        {
+          propertyDescriptorHandler.Invoke( e.PropertyDescriptor );
+        }
+        else
+        {
+          this.Dispatcher.Invoke( new Action<PropertyDescriptor>( propertyDescriptorHandler ), e.PropertyDescriptor );
+        }
       }
       else
       {
-        //Let's reset the list because a change to the list has happenned (e.g. a delete) before we had a chance to process the current change.
-        listChangedType = ListChangedType.Reset;
-      }
+        IBindingList bindingList = ( IBindingList )m_enumeration;
+        int index = e.NewIndex;
+        IList items = null;
 
-      lock( m_deferredOperationManager )
-      {
-        if( m_deferredOperationManager.RefreshPending )
-          return;
-
-        DeferredOperation deferredOperation = null;
-
-        switch( listChangedType )
+        if( ( listChangedType != ListChangedType.Reset ) && ( listChangedType != ListChangedType.ItemDeleted ) )
         {
-          case ListChangedType.ItemAdded:
-            {
-              deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.Add, bindingList.Count, index, items );
-              break;
-            }
+          var indexInBound = ( index >= 0 ) && ( index < bindingList.Count );
 
-          case ListChangedType.ItemChanged:
-            {
-              DataGridCollectionView view = this as DataGridCollectionView;
-              if( view != null && view.UpdateChangedPropertyStatsOnly && e.PropertyDescriptor != null )
-              {
-                view.CalculateChangedPropertyStatsOnly = true;
-                foreach( Stats.StatFunction statFunc in view.StatFunctions )
-                {
-                  if( statFunc.SourcePropertyName.Contains( e.PropertyDescriptor.Name ) && !view.InvalidatedStatFunctions.Contains( statFunc ) )
-                  {
-                    view.InvalidatedStatFunctions.Add( statFunc );
-                  }
-                }
-              }
-
-              deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.Replace, -1, index, items, index, items );
-              break;
-            }
-
-          case ListChangedType.ItemDeleted:
-            {
-              deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.Remove, index, new object[ 1 ] );
-              break;
-            }
-
-          case ListChangedType.ItemMoved:
-            {
-              deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.Move, -1, index, items, e.OldIndex, items );
-              break;
-            }
-
-          case ListChangedType.Reset:
-            {
-              deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.Refresh, -1, null );
-              break;
-            }
-
-          case ListChangedType.PropertyDescriptorAdded:
-            {
-              if( this.CheckAccess() )
-              {
-                this.HandlePropertyDescriptorAdded( e.PropertyDescriptor );
-              }
-              else
-              {
-                this.Dispatcher.Invoke( new Action<PropertyDescriptor>( this.HandlePropertyDescriptorAdded ), e.PropertyDescriptor );
-              }
-              break;
-            }
-
-          case ListChangedType.PropertyDescriptorChanged:
-            {
-              if( this.CheckAccess() )
-              {
-                this.HandlePropertyDescriptorChanged( e.PropertyDescriptor );
-              }
-              else
-              {
-                this.Dispatcher.Invoke( new Action<PropertyDescriptor>( this.HandlePropertyDescriptorChanged ), e.PropertyDescriptor );
-              }
-              break;
-            }
-
-          case ListChangedType.PropertyDescriptorDeleted:
-            {
-              if( this.CheckAccess() )
-              {
-                this.HandlePropertyDescriptorDeleted( e.PropertyDescriptor );
-              }
-              else
-              {
-                this.Dispatcher.Invoke( new Action<PropertyDescriptor>( this.HandlePropertyDescriptorDeleted ), e.PropertyDescriptor );
-              }
-              break;
-            }
-
-          default:
-            throw new NotSupportedException( "This ListChangedType (" + listChangedType.ToString() + ") is not supported." );
+          //If we're within bounds
+          if( indexInBound )
+          {
+            //Let's get the item
+            items = new object[] { bindingList[ index ] };
+          }
+          else
+          {
+            //Let's reset the list because a change to the list has happenned (e.g. a delete) before we had a chance to process the current change.
+            listChangedType = ListChangedType.Reset;
+          }
         }
 
-        if( deferredOperation != null )
+        lock( m_deferredOperationManager )
         {
+          if( m_deferredOperationManager.RefreshPending )
+            return;
+
+          DeferredOperation deferredOperation;
+
+          switch( listChangedType )
+          {
+            case ListChangedType.ItemAdded:
+              {
+                deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.Add, bindingList.Count, index, items );
+                break;
+              }
+
+            case ListChangedType.ItemChanged:
+              {
+                var collectionView = this as DataGridCollectionView;
+                deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.Replace, -1, index, items, index, items );
+                break;
+              }
+
+            case ListChangedType.ItemDeleted:
+              {
+                deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.Remove, index, new object[ 1 ] );
+                break;
+              }
+
+            case ListChangedType.ItemMoved:
+              {
+                deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.Move, -1, index, items, e.OldIndex, items );
+                break;
+              }
+
+            case ListChangedType.Reset:
+              {
+                deferredOperation = new DeferredOperation( DeferredOperation.DeferredOperationAction.Refresh, -1, null );
+                break;
+              }
+
+            default:
+              throw new NotSupportedException( "This ListChangedType (" + listChangedType.ToString() + ") is not supported." );
+          }
+
+          Debug.Assert( deferredOperation != null );
+
           this.ExecuteOrQueueSourceItemOperation( deferredOperation );
         }
       }
@@ -818,84 +801,78 @@ namespace Xceed.Wpf.DataGrid
 
     private void HandlePropertyDescriptorAdded( PropertyDescriptor property )
     {
-      // setting m_defaultItemProperties, will force the collection view to reanalyse the source to get a new list of default ItemProperties.
-      m_defaultItemProperties = null;
+      this.ClearDefaultPropertyDescriptions();
+      this.SetupDefaultPropertyDescriptions();
 
-      if( this.AutoCreateItemProperties )
-      {
-        string name = property.Name;
+      if( !this.AutoCreateItemProperties )
+        return;
 
-        if( m_itemProperties[ name ] == null )
-        {
-          foreach( DataGridItemPropertyBase itemProperty in this.GetDefaultItemProperties() )
-          {
-            if( itemProperty.Name == name )
-            {
-              this.AddValidItemProperty( itemProperty );
-              break;
-            }
-          }
-        }
-      }
+      if( m_itemProperties[ property.Name ] != null )
+        return;
+
+      var propertyRoute = PropertyRouteParser.Parse( property.Name );
+      if( propertyRoute == null )
+        return;
+
+      ItemsSourceHelper.CreateAndAddItemPropertyForPropertyDescription( m_itemProperties, m_defaultPropertyDescriptions[ propertyRoute ] );
+      ItemsSourceHelper.AutoDetectSynonyms( this, DataGridItemPropertyRoute.Create( ItemsSourceHelper.GetItemPropertyFromProperty( m_itemProperties, propertyRoute ) ) );
     }
 
     private void HandlePropertyDescriptorChanged( PropertyDescriptor property )
     {
-      // setting m_defaultItemProperties, will force the collection view to reanalyse the source to get a new list of default ItemProperties.
-      m_defaultItemProperties = null;
+      this.ClearDefaultPropertyDescriptions();
+      this.SetupDefaultPropertyDescriptions();
 
-      if( this.AutoCreateItemProperties )
+      if( !this.AutoCreateItemProperties )
+        return;
+
+      if( property == null )
       {
-        if( property == null )
+        using( m_itemProperties.DeferCollectionChanged() )
         {
           for( int i = m_itemProperties.Count - 1; i >= 0; i-- )
           {
-            DataGridItemProperty oldItemProperty = m_itemProperties[ i ] as DataGridItemProperty;
-
+            var oldItemProperty = m_itemProperties[ i ] as DataGridItemProperty;
             if( ( oldItemProperty != null ) && ( oldItemProperty.IsAutoCreated ) )
             {
               m_itemProperties.RemoveAt( i );
             }
           }
-
-          foreach( DataGridItemPropertyBase itemProperty in this.GetDefaultItemProperties() )
-          {
-            this.AddValidItemProperty( itemProperty );
-          }
         }
-        else
+
+        ItemsSourceHelper.CreateAndAddItemPropertiesForPropertyDescriptions( m_itemProperties, m_defaultPropertyDescriptions.Values );
+        ItemsSourceHelper.AutoDetectSynonyms( this );
+      }
+      else
+      {
+        var oldItemProperty = m_itemProperties[ property.Name ] as DataGridItemProperty;
+
+        if( ( oldItemProperty != null ) && ( oldItemProperty.IsAutoCreated ) )
         {
-          string name = property.Name;
-          DataGridItemProperty oldItemProperty = m_itemProperties[ name ] as DataGridItemProperty;
+          // It is better to completely remove the item property and add a new one instead of changing is content.
+          m_itemProperties.Remove( oldItemProperty );
 
-          if( ( oldItemProperty != null ) && ( oldItemProperty.IsAutoCreated ) )
-          {
-            // It is better to completely remove the item property and add a new one instead of changing is content.
-            m_itemProperties.Remove( oldItemProperty );
-            List<DataGridItemPropertyBase> defaultItemProperties = this.GetDefaultItemProperties();
+          if( m_itemProperties[ property.Name ] != null )
+            return;
 
-            foreach( DataGridItemPropertyBase itemProperty in defaultItemProperties )
-            {
-              if( itemProperty.Name == name )
-              {
-                this.AddValidItemProperty( itemProperty );
-                break;
-              }
-            }
-          }
+          var propertyRoute = PropertyRouteParser.Parse( property.Name );
+          if( propertyRoute == null )
+            return;
+
+          ItemsSourceHelper.CreateAndAddItemPropertyForPropertyDescription( m_itemProperties, m_defaultPropertyDescriptions[ propertyRoute ] );
+          ItemsSourceHelper.AutoDetectSynonyms( this, DataGridItemPropertyRoute.Create( ItemsSourceHelper.GetItemPropertyFromProperty( m_itemProperties, propertyRoute ) ) );
         }
       }
     }
 
     private void HandlePropertyDescriptorDeleted( PropertyDescriptor property )
     {
-      // setting m_defaultItemProperties, will force the collection view to reanalyse the source to get a new list of default ItemProperties.
-      m_defaultItemProperties = null;
+      this.ClearDefaultPropertyDescriptions();
+      this.SetupDefaultPropertyDescriptions();
 
       if( this.AutoCreateItemProperties )
       {
-        string name = property.Name;
-        DataGridItemProperty oldItemProperty = m_itemProperties[ name ] as DataGridItemProperty;
+        var oldItemProperty = m_itemProperties[ property.Name ] as DataGridItemProperty;
 
         if( ( oldItemProperty != null ) && ( oldItemProperty.IsAutoCreated ) )
         {
@@ -904,186 +881,90 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion SOURCE COLLECTION CHANGED HANDLERS
+    #endregion
 
     #region CHILD COLLECTION CHANGED HANDLERS
 
-    private void ItemProperties_CollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
+    // This method is also called for sub properties.
+    private void OnItemPropertiesCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
-      // For detail DataGridCollectionView, this is usually called the first time the DetailDescription is used to generate a DataGridCollectionView.
+      var addedItems = default( IEnumerable<DataGridItemPropertyBase> );
+      var removedItems = default( IEnumerable<DataGridItemPropertyBase> );
 
       switch( e.Action )
       {
         case NotifyCollectionChangedAction.Add:
-
-          int newItemsCount = e.NewItems.Count;
-
-          for( int i = 0; i < newItemsCount; i++ )
-          {
-            DataGridItemPropertyBase dataGridItemProperty = e.NewItems[ i ] as DataGridItemPropertyBase;
-            Debug.Assert( dataGridItemProperty != null );
-
-            INotifyCollectionChanged collectionChanged = this.GetAutoFilterValues( dataGridItemProperty.Name ) as INotifyCollectionChanged;
-
-            if( collectionChanged != null )
-            {
-              collectionChanged.CollectionChanged += this.OnAutoFilterValuesChanged;
-            }
-
-            if( dataGridItemProperty.FilterCriterion != null )
-            {
-              this.AddFilteredItemProperty( dataGridItemProperty );
-            }
-          }
+          addedItems = e.NewItems.Cast<DataGridItemPropertyBase>();
           break;
 
         case NotifyCollectionChangedAction.Remove:
-
-          int oldItemsCount = e.OldItems.Count;
-
-          using( this.DeferRefresh() )
-          {
-            for( int i = 0; i < oldItemsCount; i++ )
-            {
-              DataGridItemPropertyBase dataGridItemProperty = e.OldItems[ i ] as DataGridItemPropertyBase;
-              Debug.Assert( dataGridItemProperty != null );
-
-              string fieldName = dataGridItemProperty.Name;
-
-              INotifyCollectionChanged collectionChanged = this.GetAutoFilterValues( fieldName ) as INotifyCollectionChanged;
-
-              if( collectionChanged != null )
-              {
-                collectionChanged.CollectionChanged -= this.OnAutoFilterValuesChanged;
-              }
-
-              IList autoFilterValues = collectionChanged as IList;
-
-              if( autoFilterValues != null )
-              {
-                autoFilterValues.Clear();
-              }
-
-              this.AutoFilteredDataGridItemProperties.Remove( dataGridItemProperty );
-
-              // Clear DistinctValues for this item
-              // NOTE: we use InternalTryGetValue instead of [ ] or TryGetValue to avoid creating the item inside the DistinctValuesDictionary
-              ReadOnlyObservableHashList readOnlyObservableHashList = null;
-
-              if( ( ( DistinctValuesDictionary )this.DistinctValues ).InternalTryGetValue( fieldName, out readOnlyObservableHashList ) )
-              {
-                IList distinctValues = readOnlyObservableHashList.InnerObservableHashList;
-
-                if( distinctValues != null )
-                {
-                  distinctValues.Clear();
-                }
-              }
-
-              if( dataGridItemProperty.FilterCriterion != null )
-              {
-                m_filteredItemProperties.Remove( dataGridItemProperty );
-              }
-            }
-          }
-
+          removedItems = e.OldItems.Cast<DataGridItemPropertyBase>();
           break;
 
         case NotifyCollectionChangedAction.Replace:
-          int replaceItemsCount = e.NewItems.Count;
-
-          for( int i = 0; i < replaceItemsCount; i++ )
-          {
-            // If necessary, remove the old ItemProperty and add the new one in the list
-            // of ItemProperties having their FilterCriterion set.
-            DataGridItemPropertyBase dataGridItemProperty = e.OldItems[ i ] as DataGridItemPropertyBase;
-            Debug.Assert( dataGridItemProperty != null );
-
-            if( dataGridItemProperty.FilterCriterion != null )
-            {
-              m_filteredItemProperties.Remove( dataGridItemProperty );
-            }
-
-            dataGridItemProperty = e.NewItems[ i ] as DataGridItemPropertyBase;
-            Debug.Assert( dataGridItemProperty != null );
-
-            if( dataGridItemProperty.FilterCriterion != null )
-            {
-              this.AddFilteredItemProperty( dataGridItemProperty );
-            }
-          }
+          addedItems = e.NewItems.Cast<DataGridItemPropertyBase>();
+          removedItems = e.OldItems.Cast<DataGridItemPropertyBase>();
           break;
 
         case NotifyCollectionChangedAction.Reset:
+          throw new NotSupportedException();
+      }
 
-          this.UnregisterAutoFilterCollectionChanged();
+      if( ( addedItems == null ) && ( removedItems == null ) )
+        return;
 
-          using( this.DeferRefresh() )
+      var deferRefresh = ( this.Loaded ) ? this.DeferRefresh() : null;
+
+      try
+      {
+        if( removedItems != null )
+        {
+          foreach( var itemProperty in removedItems )
           {
-            this.ResetDistinctValues();
-            this.ResetAutoFilterValues();
-            this.AutoFilteredDataGridItemProperties.Clear();
-            m_filteredItemProperties.Clear();
+            this.ClearItemProperty( itemProperty );
           }
+        }
 
-          break;
+        if( addedItems != null )
+        {
+          foreach( var itemProperty in addedItems )
+          {
+            this.PrepareItemProperty( itemProperty );
+          }
+        }
+      }
+      finally
+      {
+        lock( this.SyncRoot )
+        {
+          lock( this.DeferredOperationManager )
+          {
+            //This is required as the GroupSortStatResultPropertyName property affects this collection, and thus must be updated when there is a change to the ItemsProperties.
+            this.ClearGroupSortComparers();
+          }
+        }
+
+        if( deferRefresh != null )
+        {
+          deferRefresh.Dispose();
+        }
       }
     }
 
-    private void OnAutoFilterValuesChanged( object sender, NotifyCollectionChangedEventArgs e )
+    private void OnItemPropertyPropertyChanged( DataGridItemPropertyBase itemProperty, PropertyChangedEventArgs e )
     {
-      this.OnProxyAutoFilterValuesChanged( this, e );
+      if( itemProperty == null )
+        return;
 
-      IList autoFilterValues = sender as IList;
+      var propertyName = e.PropertyName;
 
-      Debug.Assert( autoFilterValues != null );
-      string fieldName = this.GetFieldNameFromAutoFitlerValues( autoFilterValues );
-      Debug.Assert( fieldName != null );
-      Debug.Assert( m_autoFilterValues != null );
-      Debug.Assert( m_autoFilterValues[ fieldName ] == autoFilterValues );
-
-      DataGridItemPropertyBase dataGridItemProperty = this.ItemProperties[ fieldName ];
-      Debug.Assert( dataGridItemProperty != null );
-
-      ObservableCollection<DataGridItemPropertyBase> autoFilteredItemProperties = this.AutoFilteredDataGridItemProperties;
-      Debug.Assert( autoFilteredItemProperties != null );
-
-      // If we are filtered
-      if( autoFilterValues.Count > 0 )
+      if( string.IsNullOrEmpty( propertyName ) || ( propertyName == DataGridItemPropertyBase.ItemPropertiesInternalPropertyName ) )
       {
-        // If this is a newly filtered DataGridItemProperty
-        if( !autoFilteredItemProperties.Contains( dataGridItemProperty ) )
+        var itemProperties = itemProperty.ItemPropertiesInternal;
+        if( itemProperties != null )
         {
-          autoFilteredItemProperties.Add( dataGridItemProperty );
-        }
-      }
-      else
-      {
-        // There is no more filter values for this DataGridItemProperty, 
-        // remove it from m_autoFilteredItems. 
-        if( dataGridItemProperty != null )
-        {
-          autoFilteredItemProperties.Remove( dataGridItemProperty );
-        }
-      }
-
-      if( this.AutoFilterMode != AutoFilterMode.None )
-      {
-        AutoFilterValuesChangedEventArgs autoFilterValuesChangedEventArgs = new AutoFilterValuesChangedEventArgs( m_parentDetailDescription, dataGridItemProperty, autoFilterValues, e );
-
-        this.RaiseAutoFilterValuesChangedEvent( autoFilterValuesChangedEventArgs );
-        m_excludedItemPropertyFromDistinctValueCalculation = dataGridItemProperty;
-
-        try
-        {
-          // The refresh may be defered, if it's the case, m_excludedItemPropertyFromDistinctValueCalculation will 
-          // not be considered.  This behavior is what we want since a defered refresh can mean aother operation
-          // altered the items of the source so we want to rebuild the distinct value.
-          this.Refresh();
-        }
-        finally
-        {
-          m_excludedItemPropertyFromDistinctValueCalculation = null;
+          this.ClearItemProperties( itemProperties );
+          this.PrepareItemProperties( itemProperties );
         }
       }
     }
@@ -1094,6 +975,8 @@ namespace Xceed.Wpf.DataGrid
       {
         lock( this.DeferredOperationManager )
         {
+          this.ClearGroupSortComparers();
+
           this.OnProxySortDescriptionsChanged( this, e );
 
           if( this.DataGridSortDescriptions.IsResortDefered )
@@ -1112,6 +995,8 @@ namespace Xceed.Wpf.DataGrid
       {
         lock( this.DeferredOperationManager )
         {
+          this.ClearGroupSortComparers();
+
           this.OnProxyGroupDescriptionsChanged( this, e );
 
           this.ExecuteOrQueueSourceItemOperation( new DeferredOperation( DeferredOperation.DeferredOperationAction.Regroup, -1, null ) );
@@ -1119,7 +1004,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion CHILD COLLECTION CHANGED HANDLERS
+    #endregion
 
     #region PROXY EVENTS
 
@@ -1131,28 +1016,14 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    internal event EventHandler ProxyApplyingFilterCriterias;
-
-    private void OnProxyApplyingFilterCriterias( object sender, EventArgs e )
-    {
-      if( m_rootDataGridCollectionViewBase.ProxyApplyingFilterCriterias != null )
-        m_rootDataGridCollectionViewBase.ProxyApplyingFilterCriterias( sender, e );
-    }
-
-    internal event NotifyCollectionChangedEventHandler ProxyAutoFilterValuesChanged;
-
-    private void OnProxyAutoFilterValuesChanged( object sender, NotifyCollectionChangedEventArgs e )
-    {
-      if( m_rootDataGridCollectionViewBase.ProxyAutoFilterValuesChanged != null )
-        m_rootDataGridCollectionViewBase.ProxyAutoFilterValuesChanged( sender, e );
-    }
-
     internal event EventHandler ProxyCollectionRefresh;
 
     internal void OnProxyCollectionRefresh()
     {
       if( m_rootDataGridCollectionViewBase.ProxyCollectionRefresh != null )
+      {
         m_rootDataGridCollectionViewBase.ProxyCollectionRefresh( this, EventArgs.Empty );
+      }
     }
 
     internal event NotifyCollectionChangedEventHandler ProxySortDescriptionsChanged;
@@ -1160,7 +1031,9 @@ namespace Xceed.Wpf.DataGrid
     internal void OnProxySortDescriptionsChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
       if( m_rootDataGridCollectionViewBase.ProxySortDescriptionsChanged != null )
+      {
         m_rootDataGridCollectionViewBase.ProxySortDescriptionsChanged( sender, e );
+      }
     }
 
     internal event NotifyCollectionChangedEventHandler ProxyGroupDescriptionsChanged;
@@ -1168,10 +1041,12 @@ namespace Xceed.Wpf.DataGrid
     internal void OnProxyGroupDescriptionsChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
       if( m_rootDataGridCollectionViewBase.ProxyGroupDescriptionsChanged != null )
+      {
         m_rootDataGridCollectionViewBase.ProxyGroupDescriptionsChanged( sender, e );
+      }
     }
 
-    #endregion PROXY EVENTS
+    #endregion
 
     #region EDIT PROCESS
 
@@ -1206,19 +1081,18 @@ namespace Xceed.Wpf.DataGrid
         throw new ArgumentNullException( "item" );
 
       endEditCalled = false;
-      IEditableObject editableObject = ItemsSourceHelper.GetEditableObject( item );
+      var editableObject = ItemsSourceHelper.GetEditableObject( item );
 
       // editableObject can be an Xceed datarow when directly inserted as Items in the DataGridControl.
       if( ( editableObject != null ) && ( !( editableObject is Xceed.Wpf.DataGrid.DataRow ) ) )
       {
         // Keep a copy of the values, because if EndEdit throw ( for a DataView ), we loose the old values.
-        DataGridItemPropertyCollection itemProperties = this.ItemProperties;
-        int count = itemProperties.Count;
-        object[] oldValueBeforeEndEdit = new object[ count ];
+        var itemProperties = this.ItemProperties;
+        var oldValueBeforeEndEdit = new Dictionary<DataGridItemPropertyBase, object>( itemProperties.Count );
 
-        for( int i = 0; i < count; i++ )
+        foreach( var itemProperty in itemProperties )
         {
-          oldValueBeforeEndEdit[ i ] = itemProperties[ i ].GetValue( item );
+          oldValueBeforeEndEdit[ itemProperty ] = ItemsSourceHelper.GetValueFromItemProperty( itemProperty, item );
         }
 
         try
@@ -1226,36 +1100,35 @@ namespace Xceed.Wpf.DataGrid
           editableObject.EndEdit();
           endEditCalled = true;
         }
-        catch
+        finally
         {
-          // Since the DataView of MS cancel the edition when EndEdit is throwing, we ensure to restart the edition mode.
-          editableObject.BeginEdit();
-
-          itemProperties.SuspendUnboundItemPropertyChanged( item );
-
-          try
+          if( !endEditCalled )
           {
-            // restore the oldvalues
-            for( int i = 0; i < count; i++ )
+            // Since the DataView of MS cancel the edition when EndEdit is throwing, we ensure to restart the editing mode.
+            editableObject.BeginEdit();
+
+            itemProperties.SuspendUnboundItemPropertyChanged( item );
+
+            try
             {
-              DataGridItemPropertyBase itemProperty = itemProperties[ i ];
+              // restore the oldvalues
+              foreach( var itemProperty in itemProperties )
+              {
+                var readOnly = ( ( item == m_currentAddItem ) && itemProperty.OverrideReadOnlyForInsertion.HasValue && itemProperty.OverrideReadOnlyForInsertion.Value )
+                                 ? false
+                                 : itemProperty.IsReadOnly;
 
-              bool readOnly = ( ( item == m_currentAddItem )
-                              && itemProperty.OverrideReadOnlyForInsertion.HasValue
-                              && itemProperty.OverrideReadOnlyForInsertion.Value )
-                ? false
-                : itemProperty.IsReadOnly;
-
-              if( !readOnly )
-                itemProperties[ i ].SetValue( item, oldValueBeforeEndEdit[ i ] );
+                if( !readOnly )
+                {
+                  ItemsSourceHelper.SetValueForItemProperty( itemProperty, item, oldValueBeforeEndEdit[ itemProperty ] );
+                }
+              }
+            }
+            finally
+            {
+              itemProperties.ResumeUnboundItemPropertyChanged( item );
             }
           }
-          finally
-          {
-            itemProperties.ResumeUnboundItemPropertyChanged( item );
-          }
-
-          throw;
         }
       }
     }
@@ -1319,10 +1192,14 @@ namespace Xceed.Wpf.DataGrid
     internal virtual void OnEditCanceled( DataGridItemEventArgs e )
     {
       if( this.EditCanceled != null )
+      {
         this.EditCanceled( this, e );
+      }
 
       if( m_parentCollectionViewSourceBase != null )
+      {
         m_parentCollectionViewSourceBase.OnEditCanceled( e );
+      }
     }
 
     public event EventHandler<DataGridItemCancelEventArgs> CommittingEdit;
@@ -1347,7 +1224,7 @@ namespace Xceed.Wpf.DataGrid
         m_parentCollectionViewSourceBase.OnEditCommitted( e );
     }
 
-    #endregion EDIT PROCESS
+    #endregion
 
     #region INSERTION PROCESS
 
@@ -1434,7 +1311,7 @@ namespace Xceed.Wpf.DataGrid
         m_parentCollectionViewSourceBase.OnNewItemCanceled( e );
     }
 
-    #endregion INSERTION PROCESS
+    #endregion
 
     #region DELETION PROCESS
 
@@ -1473,629 +1350,7 @@ namespace Xceed.Wpf.DataGrid
         m_parentCollectionViewSourceBase.OnItemRemoved( e );
     }
 
-    #endregion DELETION PROCESS
-
-    #region MASTER DETAIL
-
-    private static List<DataGridDetailDescription> EmptyDataGridDetailDescriptionList = new List<DataGridDetailDescription>();
-
-    internal virtual bool CanHaveDetails
-    {
-      get
-      {
-        return false;
-      }
-    }
-
-    private void DataGridDetailDescriptions_CollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
-    {
-      if( !this.CanHaveDetails )
-        throw new InvalidOperationException( "An attempt was made to modify the DetailDescriptions of a " + this.GetType().Name + ", which does not support master detail." );
-
-      // Set the AutoFilterValuesChanged event for each
-      // newly added DataGridDetailDescription added to 
-      // collection
-      int newItemsCount = ( e.NewItems != null )
-       ? e.NewItems.Count
-       : 0;
-
-      int oldItemsCount = ( e.OldItems != null )
-      ? e.OldItems.Count
-      : 0;
-
-      for( int i = 0; i < oldItemsCount; i++ )
-      {
-        DataGridDetailDescription description = e.OldItems[ i ] as DataGridDetailDescription;
-
-        if( description == null )
-          continue;
-
-        description.UnregisterAllAutoFilterValuesChangedEvent();
-      }
-
-      for( int i = 0; i < newItemsCount; i++ )
-      {
-        DataGridDetailDescription description = e.NewItems[ i ] as DataGridDetailDescription;
-
-        if( description == null )
-          continue;
-
-        description.DetailDescriptionAutoFilterValuesChanged = this.RaiseAutoFilterValuesChangedEvent;
-      }
-    }
-
-    internal DataGridDetailDescriptionCollection DetailDescriptions
-    {
-      get
-      {
-        Debug.Assert( m_dataGridDetailDescriptions != null );
-        return m_dataGridDetailDescriptions;
-      }
-    }
-
-    internal virtual List<DataGridDetailDescription> GetDefaultDetailDescriptions()
-    {
-      if( m_defaultDetailDescriptions == null )
-      {
-        if( this.CanCreateDetailDescriptions() )
-        {
-          m_defaultDetailDescriptions = this.CreateDetailDescriptions();
-
-          // Ensure to Affect the AutoCreateForeignKeyDescription for every 
-          // DataGridDetailDescription created
-          foreach( DataGridDetailDescription description in m_defaultDetailDescriptions )
-          {
-            if( description.IsAutoCreated )
-            {
-              description.AutoCreateForeignKeyDescriptions = this.AutoCreateForeignKeyDescriptions;
-            }
-          }
-        }
-        else
-        {
-          return DataGridCollectionViewBase.EmptyDataGridDetailDescriptionList;
-        }
-      }
-
-      return m_defaultDetailDescriptions;
-    }
-
-    internal virtual bool CanCreateDetailDescriptions()
-    {
-      return ( ( m_enumeration != null ) || ( m_itemType != typeof( object ) ) );
-    }
-
-    private List<DataGridDetailDescription> CreateDetailDescriptions()
-    {
-      //Source collection is a DataTable or a DataTable was detected by looking at the first item in the collection.
-      if( m_dataTable != null )
-        return this.CreateDetailDescriptionsForTable();
-
-      if( typeof( XmlNode ).IsAssignableFrom( m_itemType ) )
-        return new List<DataGridDetailDescription>();
-
-      //Unbound mode, we do not support Master/Detail in this scenario.
-      if( typeof( DataRow ).IsAssignableFrom( m_itemType ) )
-        return new List<DataGridDetailDescription>();
-
-      //we do not support Master/Details when Item is a Value type...
-      if( ItemsSourceHelper.IsValueType( m_itemType ) )
-        return new List<DataGridDetailDescription>();
-
-      //Check if the object is a Entity Framework Entity, before checking for IEnumerable (since Entity Framework does have IEnumerable
-      //properties, but require special handling )...
-      if( ItemsSourceHelper.IsEntityFramework( m_itemType ) )
-        return DataGridCollectionViewBase.CreateDetailDescriptionsForEntityFramework( m_itemType );
-
-      //If the first item maps to an object that implements IEnumerable, expand that as a Relation ( and only that )...
-      if( typeof( IEnumerable ).IsAssignableFrom( m_itemType ) )
-        return DataGridCollectionViewBase.CreateDetailDescriptionsForEnumerable();
-
-      if( typeof( IListSource ).IsAssignableFrom( m_itemType ) )
-        return DataGridCollectionViewBase.CreateDetailDescriptionsForListSource();
-
-      //If the Source collection implements ITypedList
-      ITypedList typedList = m_enumeration as ITypedList;
-
-      if( typedList != null )
-        return DataGridCollectionViewBase.GetDataGridDetailDescriptions( typedList.GetItemProperties( null ) );
-
-      TypeDescriptionProvider typeDescriptionProvider = TypeDescriptor.GetProvider( m_itemType );
-      object firstItem = ItemsSourceHelper.GetFirstItemByEnumerable( m_enumeration );
-      ICustomTypeDescriptor customTypeDescriptor = firstItem as ICustomTypeDescriptor;
-
-      if( customTypeDescriptor == null )
-        customTypeDescriptor = typeDescriptionProvider.GetTypeDescriptor( m_itemType, firstItem );
-
-      if( customTypeDescriptor != null )
-        return DataGridCollectionViewBase.GetDataGridDetailDescriptions( customTypeDescriptor.GetProperties() );
-
-      return DataGridCollectionViewBase.GetDataGridDetailDescriptions( TypeDescriptor.GetProperties( m_itemType ) );
-    }
-
-    private static List<DataGridDetailDescription> CreateDetailDescriptionsForEnumerable()
-    {
-      List<DataGridDetailDescription> newList = new List<DataGridDetailDescription>( 1 );
-      DataGridDetailDescription detailDesc = new EnumerableDetailDescription();
-      detailDesc.IsAutoCreated = true;
-
-      newList.Add( detailDesc );
-
-      return newList;
-    }
-
-    private static List<DataGridDetailDescription> CreateDetailDescriptionsForListSource()
-    {
-      List<DataGridDetailDescription> newList = new List<DataGridDetailDescription>( 1 );
-      ListSourceDetailDescription detailDesc = new ListSourceDetailDescription();
-      detailDesc.IsAutoCreated = true;
-
-      newList.Add( detailDesc );
-
-      return newList;
-    }
-
-    private List<DataGridDetailDescription> CreateDetailDescriptionsForTable()
-    {
-      List<DataGridDetailDescription> relations = new List<DataGridDetailDescription>( m_dataTable.ChildRelations.Count );
-      foreach( DataRelation relation in m_dataTable.ChildRelations )
-      {
-        DataRelationDetailDescription description = new DataRelationDetailDescription( relation );
-        description.IsAutoCreated = true;
-        relations.Add( description );
-      }
-
-      return relations;
-    }
-
-    private static List<DataGridDetailDescription> CreateDetailDescriptionsForEntityFramework( Type type )
-    {
-      List<DataGridDetailDescription> relations = new List<DataGridDetailDescription>();
-
-      // Gets all the public properties of the type.
-      PropertyInfo[] propertyInfos = type.GetProperties( BindingFlags.Instance | BindingFlags.Public );
-
-      // Loop throught the properties to build up the detail descriptions.
-      foreach( PropertyInfo propertyInfo in propertyInfos )
-      {
-        Type propertyType = propertyInfo.PropertyType;
-
-        // The property must be of type RelatedEnd and IEnumerable to continue.
-
-        if( ( propertyType.BaseType != null )
-          && ( propertyType.BaseType.FullName == "System.Data.Objects.DataClasses.RelatedEnd" )
-          && ( typeof( IEnumerable ).IsAssignableFrom( propertyInfo.PropertyType ) ) )
-        {
-          relations.Add( new EntityDetailDescription( propertyInfo.Name ) );
-        }
-      }
-
-      return relations;
-    }
-
-    private static List<DataGridDetailDescription> GetDataGridDetailDescriptions( PropertyDescriptorCollection properties )
-    {
-      Type enumrableType = typeof( IEnumerable );
-      Type listSourceType = typeof( IListSource );
-
-      List<DataGridDetailDescription> detailDescriptions = new List<DataGridDetailDescription>( properties.Count );
-
-      foreach( PropertyDescriptor property in properties )
-      {
-        // We only create details for properties that are browsable.
-        if( !property.IsBrowsable )
-          continue;
-
-        if( ItemsSourceHelper.IsASubRelationship( property.PropertyType ) )
-        {
-          PropertyDetailDescription description = new PropertyDetailDescription( property );
-          description.IsAutoCreated = true;
-          detailDescriptions.Add( description );
-        }
-      }
-
-      return detailDescriptions;
-    }
-
-    #endregion MASTER DETAIL
-
-    #region AUTO FILTERING
-
-    internal event EventHandler<AutoFilterValuesChangedEventArgs> AutoFilterValuesChanged;
-
-    public event EventHandler DistinctValuesRefreshNeeded;
-
-    internal AutoFilterMode AutoFilterMode
-    {
-      get
-      {
-        return m_autoFilterMode;
-      }
-      set
-      {
-        if( ( !this.CanAutoFilter ) && ( value != AutoFilterMode.None ) )
-          throw new NotSupportedException( "This collection view does not support automatic filtering." );
-
-        if( m_autoFilterMode != value )
-        {
-          m_autoFilterMode = value;
-
-          if( value == AutoFilterMode.None )
-            this.ResetDistinctValues();
-
-          if( this.Loaded )
-            this.Refresh();
-
-          this.OnPropertyChanged( new PropertyChangedEventArgs( "AutoFilterMode" ) );
-        }
-      }
-    }
-
-    public virtual DistinctValuesConstraint DistinctValuesConstraint
-    {
-      get
-      {
-        return m_distinctValuesConstraint;
-      }
-      set
-      {
-        if( value != m_distinctValuesConstraint )
-        {
-          using( this.DeferRefresh() )
-          {
-            m_distinctValuesConstraint = value;
-
-            this.RefreshDistinctValues( true );
-          }
-        }
-      }
-    }
-
-    public DistinctValuesUpdateMode DistinctValuesUpdateMode
-    {
-      get
-      {
-        return m_distinctValueUpdateMode;
-      }
-      set
-      {
-        m_distinctValueUpdateMode = value;
-      }
-    }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods" )]
-    public IDictionary<string, ReadOnlyObservableHashList> DistinctValues
-    {
-      get
-      {
-        return m_distinctValues;
-      }
-    }
-
-    internal IDictionary<string, IList> AutoFilterValues
-    {
-      get
-      {
-        return m_autoFilterValues;
-      }
-    }
-
-    public ICollection GetDistinctValues( string fieldName )
-    {
-      ReadOnlyObservableHashList distinctValues = null;
-
-      this.DistinctValues.TryGetValue( fieldName, out distinctValues );
-
-      return distinctValues;
-    }
-
-    internal ObservableCollection<DataGridItemPropertyBase> AutoFilteredDataGridItemProperties
-    {
-      get
-      {
-        return m_autoFilteredDataGridItemProperties;
-      }
-    }
-
-    internal static void RemoveUnusedDistinctValues( IComparer sortComparer, HashSet<object> currentValues, ObservableHashList cachedValues, object convertNullTo )
-    {
-      bool needsResort = false;
-      List<int> itemsToDelete = new List<int>();
-      int cachedValuesCount = cachedValues.Count;
-
-      // Find no more existing values
-      for( int i = 0; i < cachedValuesCount; i++ )
-      {
-        object cachedValue = cachedValues[ i ];
-
-        if( cachedValue == convertNullTo )
-        {
-          cachedValue = null;
-        }
-
-        if( currentValues.Remove( cachedValue ) )
-        {
-          // remaining items will only be newly added ones
-        }
-        else
-        {
-          // Item is not currently in column, will be deleted
-          itemsToDelete.Add( i );
-        }
-      }
-
-      // Remove unused items
-      int count = itemsToDelete.Count;
-
-      for( int i = count - 1; i >= 0; i-- )
-      {
-        cachedValues.RemoveAt( itemsToDelete[ i ] );
-      }
-
-      // Every item not removed from the current values are new values, we add them to columnDistinctValues
-      needsResort = ( currentValues.Count > 0 );
-
-      foreach( object key in currentValues )
-      {
-        if( key == null )
-        {
-          cachedValues.Add( convertNullTo );
-        }
-        else
-        {
-          cachedValues.Add( key );
-        }
-      }
-
-      if( needsResort )
-        cachedValues.Sort( sortComparer );
-    }
-
-    internal void RaiseAutoFilterValuesChangedEvent( AutoFilterValuesChangedEventArgs e )
-    {
-      // This will not be raised for Details since the ParentCollectionViewSourceBase
-      // is always null for a detail. The event will be raised by the 
-      // DataGridDetailDescription.AutoFilterValuesChanged internal Action
-      // to assert only 1 event is sent to the user event if there are more than
-      // 1 DataGridContext expanded.
-      if( this.AutoFilterValuesChanged != null )
-        this.AutoFilterValuesChanged( this, e );
-
-      if( m_parentCollectionViewSourceBase != null )
-        m_parentCollectionViewSourceBase.OnAutoFilterValuesChanged( e );
-    }
-
-    internal void RaiseDistinctValuesRefreshNeeded()
-    {
-      //The AutoFilterControl is the primary "user" of this events, it will use it to know when to update the DistinctValues when its DropDown gets open.
-      //However, users can subscribe to it, so they can update the DistinctValues when they use the AutoFilterControl outside the grid.
-      if( this.DistinctValuesRefreshNeeded != null )
-      {
-        this.DistinctValuesRefreshNeeded( this, EventArgs.Empty );
-      }
-
-      if( m_parentCollectionViewSourceBase != null )
-      {
-        m_parentCollectionViewSourceBase.RaiseDistinctValuesRefreshNeeded();
-      }
-    }
-
-    internal IList GetAutoFilterValues( string fieldName )
-    {
-      Debug.Assert( !string.IsNullOrEmpty( fieldName ), "fieldName can't be null" );
-
-      if( fieldName == null )
-        throw new ArgumentNullException( "dataGridItemProperty" );
-
-      IList autoFilterValues;
-
-      if( !m_autoFilterValues.TryGetValue( fieldName, out autoFilterValues ) )
-      {
-        ObservableHashList hashList = new ObservableHashList();
-        autoFilterValues = hashList;
-        m_autoFilterValues.InternalAdd( fieldName, hashList );
-
-        // Notify the DetailDescription that it must listen to 
-        // AutoFilterValues CollectionChanged for a specific
-        // field name and autoFilterValues in order to raise
-        // the AutoFilterValuesChanged properly
-        if( m_parentDetailDescription != null )
-          m_parentDetailDescription.RegisterAutoFilterValuesChangedEvent( fieldName, hashList );
-      }
-
-      return autoFilterValues;
-    }
-
-    internal void ForceRefreshDistinctValuesForFieldName( string fieldName, ObservableHashList columnDistinctValues )
-    {
-      if( this.AutoFilterMode == AutoFilterMode.None )
-        return;
-
-      // Avoid multiple refreshes caused by NotifyCollectionChanged events when adding or removing
-      // values from distinct values lists
-      if( this.IsRefreshingDistinctValues )
-        throw new InvalidOperationException( "An attempt was made to refresh the DataGridCollectionView while it is already in the process of refreshing." );
-
-      this.IsRefreshingDistinctValues = true;
-
-      DataGridItemPropertyBase dataGridItemProperty = this.ItemProperties[ fieldName ];
-
-      if( ( dataGridItemProperty == null ) || ( !dataGridItemProperty.CalculateDistinctValues ) )
-      {
-        this.IsRefreshingDistinctValues = false;
-        return;
-      }
-
-      this.RefreshDistinctValuesForField( dataGridItemProperty );
-
-      // Reset flags
-      this.IsRefreshingDistinctValues = false;
-    }
-
-    internal abstract void RefreshDistinctValuesForField( DataGridItemPropertyBase dataGridItemProperty );
-
-    internal void ForceRefreshDistinctValues( bool filteredItemsChanged )
-    {
-      if( this.AutoFilterMode == AutoFilterMode.None )
-        return;
-
-      // Avoid multiple refreshes caused by NotifyCollectionChanged events when adding or removing
-      // values from distinct values lists
-      if( this.IsRefreshingDistinctValues )
-        throw new InvalidOperationException( "An attempt was made to refresh the DataGridCollectionView while it is already in the process of refreshing." );
-
-      this.IsRefreshingDistinctValues = true;
-
-      int dataGridItemPropertiesCount = m_itemProperties.Count;
-
-      for( int propertyIndex = 0; propertyIndex < dataGridItemPropertiesCount; propertyIndex++ )
-      {
-        DataGridItemPropertyBase dataGridItemProperty = m_itemProperties[ propertyIndex ];
-
-        if( !dataGridItemProperty.CalculateDistinctValues )
-          continue;
-
-        if( dataGridItemProperty == m_excludedItemPropertyFromDistinctValueCalculation )
-          continue;
-
-        // No modifications to filtered items, do not calculated Distinct Values for this DataGridItemProperty
-        if( ( this.DistinctValuesConstraint == DistinctValuesConstraint.Filtered ) && ( !filteredItemsChanged ) )
-          continue;
-
-        this.RefreshDistinctValuesForField( dataGridItemProperty );
-      }
-
-      // Reset flags
-      this.IsRefreshingDistinctValues = false;
-    }
-
-    internal void RefreshDistinctValues( bool filteredItemsChanged )
-    {
-      Debug.Assert( !( this is DataGridVirtualizingCollectionViewBase ) );
-
-      this.EnsureThread();
-
-      lock( this.SyncRoot )
-      {
-        lock( m_deferredOperationManager )
-        {
-          this.ExecuteOrQueueSourceItemOperation(
-            new DeferredOperation(
-              DeferredOperation.DeferredOperationAction.RefreshDistincValues,
-              filteredItemsChanged ) );
-        }
-      }
-    }
-
-    private void ResetDistinctValues()
-    {
-      if( m_distinctValues == null )
-        return;
-
-      foreach( DataGridItemPropertyBase dataGridItemProperty in this.ItemProperties )
-      {
-        ReadOnlyObservableHashList readOnlyList = null;
-
-        // Not all field will be initialized
-        if( ( ( DistinctValuesDictionary )this.DistinctValues ).InternalTryGetValue( dataGridItemProperty.Name, out readOnlyList ) )
-        {
-          if( readOnlyList != null )
-          {
-            IList values = readOnlyList.InnerObservableHashList;
-
-            if( values != null )
-              values.Clear();
-          }
-        }
-      }
-    }
-
-    private void ResetAutoFilterValues()
-    {
-      if( m_autoFilterValues == null )
-        return;
-
-      foreach( IList values in m_autoFilterValues.Values )
-      {
-        if( values != null )
-          values.Clear();
-      }
-    }
-
-    private string GetFieldNameFromAutoFitlerValues( IList targetAutoFilterValues )
-    {
-      IDictionary<string, IList> autoFilterValues = this.AutoFilterValues;
-
-      foreach( string fieldName in autoFilterValues.Keys )
-      {
-        if( autoFilterValues[ fieldName ] == targetAutoFilterValues )
-          return fieldName;
-      }
-
-      return null;
-    }
-
-    #endregion AUTO FILTERING
-
-    #region FILTER CRITERION
-
-    public FilterCriteriaMode FilterCriteriaMode
-    {
-      get
-      {
-        return m_filterCriteriaMode;
-      }
-
-      set
-      {
-        if( value != m_filterCriteriaMode )
-        {
-          m_filterCriteriaMode = value;
-          this.ReapplyFilterCriterion();
-          this.OnPropertyChanged( new PropertyChangedEventArgs( "FilterCriteriaMode" ) );
-        }
-      }
-    }
-
-    internal ReadOnlyCollection<DataGridItemPropertyBase> FilteredCriterionItemProperties
-    {
-      get
-      {
-        return m_readOnlyFilteredItemProperties;
-      }
-    }
-
-    // We use the FilterCriterionChanged event instead of the generic PropertyChanged 
-    // event to be more efficient and be advised if any of the FilterCriterion hierarchy
-    // sub-property changes.
-    private void ItemProperties_FilterCriterionChanged( object sender, EventArgs e )
-    {
-      this.ReapplyFilterCriterion();
-    }
-
-    private void ReapplyFilterCriterion()
-    {
-      this.OnProxyApplyingFilterCriterias( this, EventArgs.Empty );
-
-      m_filteredItemProperties.Clear();
-
-      foreach( DataGridItemPropertyBase itemProperty in this.ItemProperties )
-      {
-        if( itemProperty.FilterCriterion != null )
-        {
-          this.AddFilteredItemProperty( itemProperty );
-        }
-      }
-
-      this.Refresh();
-    }
-
-    private void AddFilteredItemProperty( DataGridItemPropertyBase itemProperty )
-    {
-      m_filteredItemProperties.Add( itemProperty );
-    }
-
-    #endregion FILTER CRITERION
+    #endregion
 
     #region CURRENCY MANAGEMENT
 
@@ -2204,9 +1459,30 @@ namespace Xceed.Wpf.DataGrid
       m_flags[ ( int )DataGridCollectionViewBaseFlags.IsCurrentAfterLast ] = isCurrentAfterLast;
     }
 
-    #endregion CURRENCY MANAGEMENT
+    #endregion
 
     #region DEFERRED OPERATIONS HANDLING
+
+    internal event EventHandler PreBatchCollectionChanged;
+    internal event EventHandler PostBatchCollectionChanged;
+
+    internal void RaisePreBatchCollectionChanged()
+    {
+      var handler = this.PreBatchCollectionChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, EventArgs.Empty );
+    }
+
+    internal void RaisePostBatchCollectionChanged()
+    {
+      var handler = this.PostBatchCollectionChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, EventArgs.Empty );
+    }
 
     internal void EnsureThread()
     {
@@ -2241,13 +1517,12 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
+        if( this.InDeferRefresh || !this.CheckAccess() )
+          return true;
+
         lock( m_deferredOperationManager )
         {
-          return
-            ( !this.Loaded )
-            || ( m_deferRefreshCount != 0 )
-            || ( m_deferredOperationManager.HasPendingOperations )
-            || ( !this.CheckAccess() );
+          return ( !this.Loaded ) || ( m_deferredOperationManager.HasPendingOperations );
         }
       }
     }
@@ -2288,16 +1563,13 @@ namespace Xceed.Wpf.DataGrid
     {
       bool queueOperationForPendingAddNew = this.MustQueueOperationForPendingAddNew( deferredOperation.OldStartingIndex, deferredOperation.OldItems, deferredOperation.NewItems );
 
-      if( ( this.ShouldDeferOperation ) || ( queueOperationForPendingAddNew ) )
+      if( queueOperationForPendingAddNew )
       {
-        if( queueOperationForPendingAddNew )
-        {
-          this.AddDeferredOperationForAddNew( deferredOperation );
-        }
-        else
-        {
-          this.AddDeferredOperation( deferredOperation );
-        }
+        this.AddDeferredOperationForAddNew( deferredOperation );
+      }
+      else if( this.ShouldDeferOperation )
+      {
+        this.AddDeferredOperation( deferredOperation );
       }
       else
       {
@@ -2324,9 +1596,26 @@ namespace Xceed.Wpf.DataGrid
       m_deferredAddNewOperationManager.Add( deferredOperation );
     }
 
-    #endregion DEFERRED OPERATIONS HANDLING
+    #endregion
 
-    internal virtual void ProcessInvalidatedGroupStats( List<DataGridCollectionViewGroup> invalidatedGroups, bool ensurePosition )
+    protected override void OnCollectionChanged( NotifyCollectionChangedEventArgs args )
+    {
+
+      if( ( args != null )
+        && ( ( ( args.NewItems != null ) && ( args.NewItems.Count > 1 ) )
+          || ( ( args.OldItems != null ) && ( args.OldItems.Count > 1 ) ) ) )
+      {
+        args = new NotifyRangeCollectionChangedEventArgs( args );
+      }
+
+      base.OnCollectionChanged( args );
+    }
+
+    internal virtual void ProcessInvalidatedGroupStats( HashSet<DataGridCollectionViewGroup> invalidatedGroups, bool resortGroups )
+    {
+    }
+
+    internal virtual void ClearGroupSortComparers()
     {
     }
 
@@ -2337,33 +1626,10 @@ namespace Xceed.Wpf.DataGrid
 
     internal virtual void CreateDefaultCollections( DataGridDetailDescription parentDetailDescription )
     {
-      Debug.Assert( parentDetailDescription == null || this.CanHaveDetails );
+      Debug.Assert( parentDetailDescription == null );
 
-      m_sortDescriptions = ( parentDetailDescription == null ) ? new DataGridSortDescriptionCollection() :
-        parentDetailDescription.SortDescriptions as DataGridSortDescriptionCollection;
-
-      m_groupDescriptions = ( parentDetailDescription == null ) ? new GroupDescriptionCollection() :
-        parentDetailDescription.GroupDescriptions;
-    }
-
-    internal virtual void RegisterCollectionChanged()
-    {
-      ( ( INotifyCollectionChanged )m_sortDescriptions ).CollectionChanged +=
-        new NotifyCollectionChangedEventHandler( this.OnSortDescriptionsChanged );
-
-      ( ( INotifyCollectionChanged )m_groupDescriptions ).CollectionChanged +=
-        new NotifyCollectionChangedEventHandler( this.OnGroupDescriptionsChanged );
-    }
-
-    internal virtual void UnregisterChangedEvent()
-    {
-      ( ( INotifyCollectionChanged )m_sortDescriptions ).CollectionChanged -= this.OnSortDescriptionsChanged;
-      ( ( INotifyCollectionChanged )m_groupDescriptions ).CollectionChanged -= this.OnGroupDescriptionsChanged;
-
-      m_itemProperties.CollectionChanged -= this.ItemProperties_CollectionChanged;
-      m_itemProperties.FilterCriterionChanged -= this.ItemProperties_FilterCriterionChanged;
-
-      this.UnregisterAutoFilterCollectionChanged();
+      m_sortDescriptions = ( parentDetailDescription == null ) ? new DataGridSortDescriptionCollection() : parentDetailDescription.SortDescriptions as DataGridSortDescriptionCollection;
+      m_groupDescriptions = ( parentDetailDescription == null ) ? new GroupDescriptionCollection() : parentDetailDescription.GroupDescriptions;
     }
 
     internal bool IsSourceSupportingChangeNotification
@@ -2374,333 +1640,387 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    internal void PrepareRootContextForDeferRefresh( DataGridContext dataGridContext )
+    {
+      this.DataGridContext = dataGridContext;
+      m_detailDeferRefreshes = new List<List<IDisposable>>();
+    }
+
+    internal void Dispose()
+    {
+      if( this.ParentCollectionViewSourceBase != null )
+      {
+        this.ParentCollectionViewSourceBase = null;
+
+        this.ClearDefaultPropertyDescriptions();
+        this.ClearItemProperties();
+      }
+
+      this.ClearItemProperties( m_itemProperties );
+      this.UnregisterChangedEvents();
+    }
+
     private void SetupDefaultDetailDescriptions()
     {
-      if( this.CanHaveDetails )
-      {
-        List<DataGridDetailDescription> defaultDetailDescriptions = this.GetDefaultDetailDescriptions();
+      if( ( m_parentDetailDescription != null ) && m_parentDetailDescription.AutoCreateDetailDescriptionsCompleted )
+        return;
 
-        if( this.AutoCreateDetailDescriptions )
+      if( this.AutoCreateDetailDescriptions)
+      {
+        var defaultDetailDescriptions = ItemsSourceHelper.CreateDetailDescriptions( m_itemType, m_enumeration );
+        if( defaultDetailDescriptions != null )
         {
-          m_dataGridDetailDescriptions = new DataGridDetailDescriptionCollection( defaultDetailDescriptions );
-        }
-        else
-        {
-          m_dataGridDetailDescriptions = new DataGridDetailDescriptionCollection( new List<DataGridDetailDescription>() );
-        }
-
-        m_dataGridDetailDescriptions.DefaultDetailDescriptions = defaultDetailDescriptions;
-      }
-      else
-      {
-        // We still create the DetailDescriptions collection but will validate on any modification that the collection view does
-        // in fact support master/detail.
-        m_dataGridDetailDescriptions = new DataGridDetailDescriptionCollection( new List<DataGridDetailDescription>() );
-      }
-
-      CollectionChangedEventManager.AddListener( m_dataGridDetailDescriptions, this );
-    }
-
-    private void UnregisterAutoFilterCollectionChanged()
-    {
-      if( m_autoFilterValues != null )
-      {
-        foreach( INotifyCollectionChanged notifyCollectionChanged in m_autoFilterValues.Values )
-        {
-          notifyCollectionChanged.CollectionChanged -= this.OnAutoFilterValuesChanged;
-        }
-      }
-    }
-
-    private void InitializeFromExternalDeclaration( IEnumerable collection, Type itemType )
-    {
-      Debug.Assert( m_parentDetailDescription.ItemProperties != null );
-      Debug.Assert( m_parentDetailDescription.DetailDescriptions != null );
-      Debug.Assert( m_parentDetailDescription.StatFunctions != null );
-      Debug.Assert( m_parentDetailDescription.SortDescriptions != null );
-      Debug.Assert( m_parentDetailDescription.GroupDescriptions != null );
-      Debug.Assert( itemType != null );
-      Debug.Assert( m_parentDetailDescription.AutoFilterValues != null );
-      Debug.Assert( m_parentDetailDescription.AutoFilteredItems != null );
-
-      m_itemProperties = m_parentDetailDescription.ItemProperties;
-
-      //Ensure that the default item properties and the item type is set on the ItemProperties collection
-      if( m_itemProperties.ItemType == null )
-        m_itemProperties.ItemType = itemType;
-
-      m_dataGridDetailDescriptions = m_parentDetailDescription.DetailDescriptions;
-
-      this.CreateDefaultCollections( m_parentDetailDescription );
-
-      m_autoFilterMode = m_parentDetailDescription.AutoFilterMode;
-      m_autoFilterValues = m_parentDetailDescription.AutoFilterValues as ReadOnlyDictionary<string, IList>;
-      m_autoFilteredDataGridItemProperties = m_parentDetailDescription.AutoFilteredItems;
-      m_distinctValuesConstraint = m_parentDetailDescription.DistinctValuesConstraint;
-      m_filterCriteriaMode = m_parentDetailDescription.FilterCriteriaMode;
-
-      //Register to the change notifications for the Group/Sort descriptions collections
-      this.RegisterCollectionChanged();
-
-      // - then call the SetSource, with the source and the itemType...
-      this.SetSource( null, collection, itemType, false );
-
-
-      //cross-initialize the DefaultDetailDescriptions of the DataGridCollectionView and/or DataGridDetailDescriptionCollection
-      if( m_dataGridDetailDescriptions.DefaultDetailDescriptions != null )
-      {
-        m_defaultDetailDescriptions = new List<DataGridDetailDescription>( m_dataGridDetailDescriptions.DefaultDetailDescriptions );
-      }
-      else
-      {
-        m_dataGridDetailDescriptions.DefaultDetailDescriptions = new List<DataGridDetailDescription>( this.GetDefaultDetailDescriptions() );
-      }
-
-      //cross-initialize the DefaultItemProperties of the DataGridCollectionView and/or DataGridItemPropertyCollection
-      if( m_itemProperties.DefaultItemProperties != null )
-      {
-        m_defaultItemProperties = new List<DataGridItemPropertyBase>( m_itemProperties.DefaultItemProperties );
-      }
-      else
-      {
-        m_itemProperties.DefaultItemProperties = new List<DataGridItemPropertyBase>( this.GetDefaultItemProperties() );
-      }
-
-      // Creates the item properties if auto-creation is ON no one already created them.
-      if( ( this.AutoCreateItemProperties )
-        && ( !m_parentDetailDescription.AutoCreateItemPropertiesCompleted ) )
-      {
-        foreach( DataGridItemPropertyBase itemProperty in m_defaultItemProperties )
-        {
-          //  
-          if( !itemProperty.Browsable )
-            continue;
-
-          if( itemProperty.IsASubRelationship )
-            continue;
-
-          if( m_itemProperties[ itemProperty.Name ] == null )
+          foreach( var detailDescription in defaultDetailDescriptions )
           {
-            m_itemProperties.Add( itemProperty );
+            if( m_detailDescriptions[ detailDescription.RelationName ] != null )
+              continue;
+
+            if( detailDescription.IsAutoCreated )
+            {
+              // Propagate the AutoCreateForeignKeyDescriptions values to the auto created DataGridDetailDescription.
+              detailDescription.AutoCreateForeignKeyDescriptions = this.AutoCreateForeignKeyDescriptions;
+            }
+
+            m_detailDescriptions.Add( detailDescription );
           }
         }
-
-        m_parentDetailDescription.AutoCreateItemPropertiesCompleted = true;
       }
 
-      // List for ItemProperties changes to be able to refresh when AutoFilterValues changes
-      m_itemProperties.CollectionChanged += this.ItemProperties_CollectionChanged;
-      m_itemProperties.FilterCriterionChanged += this.ItemProperties_FilterCriterionChanged;
-
-      // Register CollectionChanged for AutoFiltering on every DataGridItemProperties 
-      // already in ItemProperties since they are already defined
-      foreach( DataGridItemPropertyBase dataGridItemProperty in m_itemProperties )
+      if( m_parentDetailDescription != null )
       {
-        INotifyCollectionChanged collectionChanged = this.GetAutoFilterValues( dataGridItemProperty.Name ) as INotifyCollectionChanged;
-
-        if( collectionChanged != null )
-          collectionChanged.CollectionChanged += new NotifyCollectionChangedEventHandler( this.OnAutoFilterValuesChanged );
-      }
-
-      // Creates the detail descriptions if auto-creation is ON no one already created them.
-      if( ( this.AutoCreateDetailDescriptions )
-        && ( !m_parentDetailDescription.AutoCreateDetailDescriptionsCompleted ) )
-      {
-        List<DataGridDetailDescription> defaultDetailDescriptions = this.GetDefaultDetailDescriptions();
-
-        foreach( DataGridDetailDescription detailDescription in defaultDetailDescriptions )
-        {
-          if( m_dataGridDetailDescriptions[ detailDescription.RelationName ] == null )
-            m_dataGridDetailDescriptions.Add( detailDescription );
-        }
-
         m_parentDetailDescription.AutoCreateDetailDescriptionsCompleted = true;
       }
+    }
 
-      m_filteredItemProperties.Clear();
+    private void SetupCurrent( bool setToFirstItem )
+    {
+      Debug.Assert( !this.Loaded );
 
-      foreach( DataGridItemPropertyBase itemProperty in m_itemProperties )
+      var enumerator = ( m_enumeration != null ) ? m_enumeration.GetEnumerator() : null;
+
+      try
       {
-        // Set default value for CalculateDistinctValues if not explicitly set
-        if( !itemProperty.IsCalculateDistinctValuesInitialized )
-          itemProperty.CalculateDistinctValues = m_parentDetailDescription.DefaultCalculateDistinctValues;
-
-        if( itemProperty.FilterCriterion != null )
+        if( ( enumerator != null ) && enumerator.MoveNext() )
         {
-          this.AddFilteredItemProperty( itemProperty );
-        }
-      }
-
-      // We must manually add AutoFilterDataGridItemProperties if some AutoFilterValues were specified a the DataGridDetailDescription
-      // since those are used to know in which order filter were applied. Normally, those DataGridItemProperties are
-      // added in OnAutoFilterValuesChanged because the
-      if( m_autoFilterValues != null )
-      {
-        foreach( string key in m_autoFilterValues.Keys )
-        {
-          IList autoFilterValues = m_autoFilterValues[ key ];
-
-          if( ( autoFilterValues != null ) && ( autoFilterValues.Count > 0 ) )
+          if( setToFirstItem )
           {
-            DataGridItemPropertyBase dataGridItemProperty = m_itemProperties[ key ];
-
-            if( dataGridItemProperty != null )
-            {
-              if( m_autoFilteredDataGridItemProperties.Contains( dataGridItemProperty ) == false )
-                m_autoFilteredDataGridItemProperties.Add( dataGridItemProperty );
-            }
+            this.SetCurrentItemAndPositionCore( enumerator.Current, 0, false, false );
           }
-        }
-      }
-    }
-
-    private void SetupDefaultItemProperties()
-    {
-      m_itemProperties = new DataGridItemPropertyCollection();
-      m_itemProperties.ItemType = m_itemType;
-
-      // Listen for ItemProperties changes to be able to refresh when AutoFilterValues changes
-      m_itemProperties.CollectionChanged += this.ItemProperties_CollectionChanged;
-      m_itemProperties.FilterCriterionChanged += this.ItemProperties_FilterCriterionChanged;
-
-      // Calling GetDefaultItemProperties will also cache the result in m_defaultItemProperties
-      // if able to detect properties
-      List<DataGridItemPropertyBase> defaultItemProperties = this.GetDefaultItemProperties();
-
-      if( this.AutoCreateItemProperties )
-      {
-        // Add new auto created item properties
-        foreach( DataGridItemPropertyBase defaultProperty in defaultItemProperties )
-        {
-          this.AddValidItemProperty( defaultProperty );
-        }
-      }
-
-      if( ( m_itemProperties.DefaultItemProperties == null ) && ( m_defaultItemProperties != null ) )
-        m_itemProperties.DefaultItemProperties = new List<DataGridItemPropertyBase>( m_defaultItemProperties );
-
-      //no need to cycle through the content of the ItemProperties collection to update them since
-      //they originate from the default anyway.
-    }
-
-    private void AddValidItemProperty( DataGridItemPropertyBase itemProperty )
-    {
-      if( !itemProperty.Browsable )
-        return;
-
-      if( itemProperty.IsASubRelationship )
-        return;
-
-      if( m_itemProperties[ itemProperty.Name ] != null )
-        return;
-
-      m_itemProperties.Add( itemProperty );
-    }
-
-    private List<DataGridItemPropertyBase> GetDefaultItemProperties()
-    {
-      if( m_defaultItemProperties == null )
-      {
-        if( this.CanCreateItemProperties() )
-        {
-          m_defaultItemProperties = this.CreateItemProperties();
+          else
+          {
+            this.SetCurrentItemAndPositionCore( null, -1, true, false );
+          }
         }
         else
         {
-          return DataGridCollectionViewBase.EmptyDataGridItemPropertyList;
+          this.SetCurrentItemAndPositionCore( null, -1, true, true );
         }
       }
-
-      return m_defaultItemProperties;
+      finally
+      {
+        var disposable = enumerator as IDisposable;
+        if( disposable != null )
+        {
+          disposable.Dispose();
+        }
+      }
     }
 
-    private List<DataGridItemPropertyBase> CreateItemProperties()
+    private void RegisterChangedEvents()
     {
-      List<DataGridItemPropertyBase> itemProperties = null;
+      this.RegisterSourceChanged( m_enumeration );
 
-      // That call will not always return existing property
-      // PropertyDescriptor, with an equivalent of a PropertyPath in is name, are also created for each sub index of a JaggedArray for example
-      this.ItemPropertiesCreated = true;
+      CollectionChangedEventManager.AddListener( m_sortDescriptions, this );
+      CollectionChangedEventManager.AddListener( m_groupDescriptions, this );
 
-      DataTable modelDataTable = ( m_dataTable != null ) ? m_dataTable : m_modelSource as DataTable;
+      ItemPropertyGroupSortStatNameChangedEventManager.AddListener( m_itemProperties, this );
 
-      if( modelDataTable != null )
+      if( m_parentDetailDescription == null )
       {
-        itemProperties = this.CreateItemPropertiesForTable();
+        InitializeItemPropertyEventManager.AddListener( m_itemProperties, this );
+        CollectionChangedEventManager.AddListener( m_detailDescriptions, this );
       }
-      else if( typeof( DataRow ).IsAssignableFrom( m_itemType ) )
-      {
-        itemProperties = new List<DataGridItemPropertyBase>();
-      }
+    }
 
+    private void UnregisterChangedEvents()
+    {
+      this.UnregisterSourceChanged( m_enumeration );
+
+      CollectionChangedEventManager.RemoveListener( m_sortDescriptions, this );
+      CollectionChangedEventManager.RemoveListener( m_groupDescriptions, this );
+
+      ItemPropertyGroupSortStatNameChangedEventManager.RemoveListener( m_itemProperties, this );
+
+      if( m_parentDetailDescription == null )
+      {
+        InitializeItemPropertyEventManager.RemoveListener( m_itemProperties, this );
+        CollectionChangedEventManager.RemoveListener( m_detailDescriptions, this );
+      }
+    }
+
+    private void RegisterSourceChanged( IEnumerable source )
+    {
+      if( source == null )
+        return;
+
+      var collectionChanged = source as INotifyCollectionChanged;
+      var bindingList = source as IBindingList;
+
+      if( collectionChanged != null )
+      {
+        CollectionChangedEventManager.AddListener( collectionChanged, this );
+      }
+      else if( ( bindingList != null ) && bindingList.SupportsChangeNotification )
+      {
+        ListChangedEventManager.AddListener( bindingList, this );
+      }
+    }
+
+    private void UnregisterSourceChanged( IEnumerable source )
+    {
+      if( source == null )
+        return;
+
+      var collectionChanged = source as INotifyCollectionChanged;
+      if( collectionChanged != null )
+      {
+        CollectionChangedEventManager.RemoveListener( collectionChanged, this );
+      }
+      var bindingList = source as IBindingList;
+      if( ( bindingList != null ) && bindingList.SupportsChangeNotification )
+      {
+        ListChangedEventManager.RemoveListener( bindingList, this );
+      }
+    }
+
+    private void RegisterItemProperties( DataGridItemPropertyCollection itemProperties )
+    {
       if( itemProperties == null )
-      {
-        Dictionary<string, ItemsSourceHelper.FieldDescriptor> fieldDescriptors = ItemsSourceHelper.GetFields( m_enumeration, m_itemType );
-        itemProperties = DataGridCollectionViewBase.GetDataGridItemProperties( fieldDescriptors );
-      }
+        return;
 
-      return itemProperties;
+      CollectionChangedEventManager.AddListener( itemProperties, this );
     }
 
-    private List<DataGridItemPropertyBase> CreateItemPropertiesForTable()
+    private void UnregisterItemProperties( DataGridItemPropertyCollection itemProperties )
     {
-      DataTable modelDataTable = ( m_dataTable != null ) ? m_dataTable : m_modelSource as DataTable;
+      if( itemProperties == null )
+        return;
 
-      Debug.Assert( modelDataTable != null,
-        "This method should not have been called in the first place if both m_dataTable and m_sourceSchema are null." );
+      CollectionChangedEventManager.RemoveListener( itemProperties, this );
+    }
 
+    private void RegisterItemProperty( DataGridItemPropertyBase itemProperty )
+    {
+      if( itemProperty == null )
+        return;
 
-      DataColumnCollection columns = modelDataTable.Columns;
-      int columnCount = columns.Count;
-      List<DataGridItemPropertyBase> properties = new List<DataGridItemPropertyBase>( columnCount );
+      PropertyChangedEventManager.AddListener( itemProperty, this, DataGridItemPropertyBase.ItemPropertiesInternalPropertyName );
+    }
 
-      for( int i = 0; i < columnCount; i++ )
+    private void UnregisterItemProperty( DataGridItemPropertyBase itemProperty )
+    {
+      if( itemProperty == null )
+        return;
+
+      PropertyChangedEventManager.RemoveListener( itemProperty, this, DataGridItemPropertyBase.ItemPropertiesInternalPropertyName );
+    }
+
+    private void PrepareItemProperties( DataGridItemPropertyCollection itemProperties )
+    {
+      if( itemProperties == null )
+        return;
+
+      foreach( var itemProperty in itemProperties )
       {
-        DataColumn column = columns[ i ];
-
-        DataGridItemProperty property = new DataGridItemProperty(
-          new DataRowColumnPropertyDescriptor( column ), true );
-
-        property.Title = column.Caption;
-        properties.Add( property );
+        this.PrepareItemProperty( itemProperty );
       }
 
-      return properties;
+      this.RegisterItemProperties( itemProperties );
+    }
+
+    private void ClearItemProperties( DataGridItemPropertyCollection itemProperties )
+    {
+      if( itemProperties == null )
+        return;
+
+      foreach( var itemProperty in itemProperties )
+      {
+        this.ClearItemProperty( itemProperty );
+      }
+
+      this.UnregisterItemProperties( itemProperties );
+    }
+
+    private void PrepareItemProperty( DataGridItemPropertyBase itemProperty )
+    {
+      if( itemProperty == null )
+        return;
+
+      // Set default value for CalculateDistinctValues if not explicitly set.
+      if( !itemProperty.IsCalculateDistinctValuesInitialized && ( m_parentDetailDescription != null ) )
+      {
+        itemProperty.CalculateDistinctValues = m_parentDetailDescription.DefaultCalculateDistinctValues;
+      }
+
+      var propertyPath = PropertyRouteParser.Parse( itemProperty );
+
+      this.RegisterItemProperty( itemProperty );
+      this.PrepareItemProperties( itemProperty.ItemPropertiesInternal );
+    }
+
+    private void ClearItemProperty( DataGridItemPropertyBase itemProperty )
+    {
+      if( itemProperty == null )
+        return;
+
+      this.ClearItemProperties( itemProperty.ItemPropertiesInternal );
+      this.UnregisterItemProperty( itemProperty );
+
+      var propertyPath = PropertyRouteParser.Parse( itemProperty );
+    }
+
+    private void SetupDefaultPropertyDescriptions()
+    {
+      if( this.DefaultPropertyDescriptionsCreated )
+        return;
+
+      var modelDataTable = ( m_enumeration as DataTable ) ?? ( m_modelSource as DataTable );
+
+      if( this.CanCreateItemProperties() )
+      {
+        this.DefaultItemPropertiesInitialized = false;
+        this.DefaultPropertyDescriptionsCreated = true;
+
+        ItemsSourceHelper.SetPropertyDescriptions( m_defaultPropertyDescriptions, modelDataTable, m_enumeration, m_itemType, true );
+      }
+
+      if( !this.DefaultItemPropertiesInitialized )
+      {
+        this.DefaultItemPropertiesInitialized = true;
+
+        // Initialize the item properties according to the default property descriptions.
+        foreach( var itemProperty in m_itemProperties )
+        {
+          var itemPropertyRoute = DataGridItemPropertyRoute.Create( itemProperty );
+
+          ItemsSourceHelper.SetPropertyDescriptionsFromItemProperty( m_defaultPropertyDescriptions, modelDataTable, m_enumeration, m_itemType, itemPropertyRoute );
+          ItemsSourceHelper.InitializePropertyDescriptions( m_defaultPropertyDescriptions, itemPropertyRoute, m_itemType, this.DefaultPropertyDescriptionsCreated );
+        }
+      }
+    }
+
+    private void ClearDefaultPropertyDescriptions()
+    {
+      this.DefaultItemPropertiesInitialized = false;
+      this.DefaultPropertyDescriptionsCreated = false;
+
+      m_defaultPropertyDescriptions.Clear();
+    }
+
+    private void ClearItemProperties()
+    {
+      m_itemProperties.Clear();
     }
 
     #region IWeakEventListener Members
 
     bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
     {
-      if( managerType == typeof( CollectionChangedEventManager ) )
-      {
-        if( sender is DataGridDetailDescriptionCollection )
-        {
-          this.DataGridDetailDescriptions_CollectionChanged( sender, ( NotifyCollectionChangedEventArgs )e );
-        }
-        else
-        {
-          this.NotifyCollectionChanged_CollectionChanged( sender, ( NotifyCollectionChangedEventArgs )e );
-        }
-
-        return true;
-      }
-
-      if( managerType == typeof( ListChangedEventManager ) )
-      {
-        this.BindingList_ListChanged( sender, ( ListChangedEventArgs )e );
-        return true;
-      }
-
-      return false;
+      return this.OnReceiveWeakEvent( managerType, sender, e );
     }
 
-    #endregion IWeakEventListener Members
+    protected virtual bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      if( managerType == typeof( CollectionChangedEventManager ) )
+      {
+        var eventArgs = ( NotifyCollectionChangedEventArgs )e;
 
-    #region ICollectionView MEMBERS
+        if( sender == this.SortDescriptions )
+        {
+          this.OnSortDescriptionsChanged( sender, eventArgs );
+        }
+        else if( sender == this.GroupDescriptions )
+        {
+          this.OnGroupDescriptionsChanged( sender, eventArgs );
+        }
+        else if( sender == this.Enumeration )
+        {
+          this.OnItemsSourceCollectionChanged( sender, eventArgs );
+        }
+        else if( sender is DataGridItemPropertyCollection )
+        {
+          this.OnItemPropertiesCollectionChanged( sender, eventArgs );
+        }
+      }
+      else if( managerType == typeof( PropertyChangedEventManager ) )
+      {
+        var eventArgs = ( PropertyChangedEventArgs )e;
+        var itemProperty = sender as DataGridItemPropertyBase;
+
+        if( itemProperty != null )
+        {
+          this.OnItemPropertyPropertyChanged( itemProperty, eventArgs );
+        }
+      }
+      else if( managerType == typeof( ListChangedEventManager ) )
+      {
+        if( sender == this.Enumeration )
+        {
+          this.OnItemsSourceListChanged( sender, ( ListChangedEventArgs )e );
+        }
+      }
+      else if( managerType == typeof( ItemPropertyGroupSortStatNameChangedEventManager ) )
+      {
+        if( sender == this.ItemProperties )
+        {
+          this.ClearGroupSortComparers();
+        }
+      }
+      else if( managerType == typeof( InitializeItemPropertyEventManager ) )
+      {
+        var eventArgs = ( InitializeItemPropertyEventArgs )e;
+
+        if( sender == this.ItemProperties )
+        {
+          var itemProperty = eventArgs.ItemProperty;
+          var itemPropertyRoute = DataGridItemPropertyRoute.Create( itemProperty );
+          var modelDataTable = ( m_enumeration as DataTable ) ?? ( m_modelSource as DataTable );
+
+          ItemsSourceHelper.SetPropertyDescriptionsFromItemProperty( m_defaultPropertyDescriptions, modelDataTable, m_enumeration, m_itemType, itemPropertyRoute );
+          ItemsSourceHelper.InitializePropertyDescriptions( m_defaultPropertyDescriptions, itemPropertyRoute, m_itemType, this.DefaultPropertyDescriptionsCreated );
+          ItemsSourceHelper.AutoDetectSynonyms( this, itemPropertyRoute );
+        }
+      }
+      else
+      {
+        return false;
+      }
+
+      return true;
+    }
+
+    #endregion
+
+    #region ICollectionView Members
 
     public override IDisposable DeferRefresh()
     {
+      this.EnsureThread();
+
+      var dataGridContext = this.DataGridContext;
+
+      if( dataGridContext != null )
+      {
+        //Make sure detail DataGridCollectionView's are also deferred.
+        List<IDisposable> detailDisposables = new List<IDisposable>();
+        foreach( DataGridContext detailContext in dataGridContext.GetChildContextsCore() )
+        {
+          detailDisposables.Add( detailContext.Items.DeferRefresh() );
+        }
+
+        m_detailDeferRefreshes.Add( detailDisposables );
+      }
+
       return new DataGridCollectionView.DeferRefreshHelper( this );
     }
 
@@ -2708,15 +2028,32 @@ namespace Xceed.Wpf.DataGrid
     {
       this.EnsureThread();
 
-      // We are not calling ShouldDeferOperation, we only want to defer operation if we are
-      // in defer refresh.
-      if( m_deferRefreshCount != 0 )
+      var dataGridContext = this.DataGridContext;
+
+      if( this.InDeferRefresh )
       {
-        this.AddDeferredOperation( new DeferredOperation(
-          DeferredOperation.DeferredOperationAction.Refresh, -1, null ) );
+        if( dataGridContext != null )
+        {
+          //Make sure to queue a Refresh on all detail DataGridCollectionView's.
+          foreach( DataGridContext detailContext in dataGridContext.GetChildContextsCore() )
+          {
+            detailContext.Items.Refresh();
+          }
+        }
+
+        this.AddDeferredOperation( new DeferredOperation( DeferredOperation.DeferredOperationAction.Refresh, -1, null ) );
       }
       else
       {
+        if( dataGridContext != null )
+        {
+          //Make sure all detail DataGridCollectionView's are refreshed.
+          foreach( DataGridContext detailContext in dataGridContext.GetChildContextsCore() )
+          {
+            detailContext.Items.Refresh();
+          }
+        }
+
         this.OnProxyCollectionRefresh();
         this.ForceRefresh( true, !this.Loaded, true );
       }
@@ -2803,14 +2140,6 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    internal virtual bool CanAutoFilter
-    {
-      get
-      {
-        return true;
-      }
-    }
-
     public override Predicate<object> Filter
     {
       get
@@ -2821,6 +2150,9 @@ namespace Xceed.Wpf.DataGrid
       {
         if( !this.CanFilter )
           throw new NotSupportedException();
+
+        if( ( value == null ) && ( value == m_filter ) )
+          return;
 
         m_filter = value;
         this.Refresh();
@@ -2835,7 +2167,7 @@ namespace Xceed.Wpf.DataGrid
       return true;
     }
 
-    #endregion ICollectionView MEMBERS
+    #endregion
 
     #region IEditableCollectionView
 
@@ -2884,9 +2216,7 @@ namespace Xceed.Wpf.DataGrid
           int newItemIndex;
           object newItem = ItemsSourceHelper.AddNewDataItem( this.Enumeration, null, out newItemIndex );
 
-          this.SetCurrentAddNew(
-            newItem,
-            newItemIndex );
+          this.SetCurrentAddNew( newItem, newItemIndex );
         }
 
         DataGridItemEventArgs initializingNewItemEventArgs = new DataGridItemEventArgs( this, m_currentAddItem );
@@ -2898,7 +2228,9 @@ namespace Xceed.Wpf.DataGrid
         this.QueueOperationForAddNew = false;
 
         if( m_currentAddItem != null )
+        {
           this.CancelNew();
+        }
 
         throw;
       }
@@ -2924,8 +2256,7 @@ namespace Xceed.Wpf.DataGrid
 
       try
       {
-        DataGridCommittingNewItemEventArgs committingNewItemEventArgs =
-          new DataGridCommittingNewItemEventArgs( this, m_currentAddItem, false );
+        DataGridCommittingNewItemEventArgs committingNewItemEventArgs = new DataGridCommittingNewItemEventArgs( this, m_currentAddItem, false );
 
         this.RootDataGridCollectionViewBase.OnCommittingNewItem( committingNewItemEventArgs );
 
@@ -2943,10 +2274,8 @@ namespace Xceed.Wpf.DataGrid
           int addItemPosition = m_currentAddItemPosition;
           ItemsSourceHelper.EndNewDataItem( this.Enumeration, null, m_currentAddItem, ref addItemPosition );
 
-          addOperationToNotifyIfNotAlreadyQueued = new DeferredOperation(
-            DeferredOperation.DeferredOperationAction.Add,
-            addItemPosition + 1, addItemPosition,
-            new object[] { m_currentAddItem } );
+          addOperationToNotifyIfNotAlreadyQueued = new DeferredOperation( DeferredOperation.DeferredOperationAction.Add, addItemPosition + 1,
+                                                                          addItemPosition, new object[] { m_currentAddItem } );
         }
         else
         {
@@ -2959,10 +2288,8 @@ namespace Xceed.Wpf.DataGrid
           if( committingNewItemEventArgs.Index >= committingNewItemEventArgs.NewCount )
             throw new InvalidOperationException( "The index at which the new item was inserted was greater than the new item count." );
 
-          addOperationToNotifyIfNotAlreadyQueued = new DeferredOperation(
-            DeferredOperation.DeferredOperationAction.Add,
-            committingNewItemEventArgs.NewCount, committingNewItemEventArgs.Index,
-            new object[] { m_currentAddItem } );
+          addOperationToNotifyIfNotAlreadyQueued = new DeferredOperation( DeferredOperation.DeferredOperationAction.Add, committingNewItemEventArgs.NewCount,
+                                                                          committingNewItemEventArgs.Index, new object[] { m_currentAddItem } );
         }
 
         this.SetCurrentAddNew( null, -1 );
@@ -2996,8 +2323,7 @@ namespace Xceed.Wpf.DataGrid
       {
         Debug.Assert( !this.IsSourceSupportingChangeNotification );
 
-        // No pending operation was in m_deferredAddNewOperationManager,
-        // so the list have not trigger notification for the new item added.
+        // No pending operation was in m_deferredAddNewOperationManager, so the list has not trigger notification for the new item added.
         // We will, in that case, raise the notification ourself.
         this.ExecuteOrQueueSourceItemOperation( addOperationToNotifyIfNotAlreadyQueued );
       }
@@ -3027,11 +2353,7 @@ namespace Xceed.Wpf.DataGrid
           if( !this.HasSource )
             throw new InvalidOperationException( "The CancelingNewItem event must be handled when not using an underlying data source." );
 
-          ItemsSourceHelper.CancelNewDataItem(
-            this.Enumeration,
-            null,
-            m_currentAddItem,
-            m_currentAddItemPosition );
+          ItemsSourceHelper.CancelNewDataItem( this.Enumeration, null, m_currentAddItem, m_currentAddItemPosition );
         }
 
         this.SetCurrentAddNew( null, -1 );
@@ -3078,7 +2400,7 @@ namespace Xceed.Wpf.DataGrid
 
       this.CommitEdit();
 
-      DataGridItemCancelEventArgs itemCancelEventArgs = new DataGridItemCancelEventArgs( this, item, false );
+      var itemCancelEventArgs = new DataGridItemCancelEventArgs( this, item, false );
       m_rootDataGridCollectionViewBase.OnBeginningEdit( itemCancelEventArgs );
 
       if( itemCancelEventArgs.Cancel )
@@ -3093,20 +2415,18 @@ namespace Xceed.Wpf.DataGrid
 
         if( !beginEditCalled )
         {
-          DataGridItemPropertyCollection itemProperties = this.ItemProperties;
-          int count = itemProperties.Count;
-          m_oldValuesBeforeEdition = new object[ count ];
+          var itemProperties = this.ItemProperties;
+          m_oldValuesBeforeEdition = new Dictionary<DataGridItemPropertyBase, object>( itemProperties.Count );
 
-          for( int i = 0; i < count; i++ )
+          foreach( var itemProperty in itemProperties )
           {
-            m_oldValuesBeforeEdition[ i ] = itemProperties[ i ].GetValue( item );
+            m_oldValuesBeforeEdition[ itemProperty ] = ItemsSourceHelper.GetValueFromItemProperty( itemProperty, item );
           }
         }
       }
 
       m_currentEditItem = item;
-      DataGridItemEventArgs itemEventArgs = new DataGridItemEventArgs( this, item );
-      m_rootDataGridCollectionViewBase.OnEditBegun( itemEventArgs );
+      m_rootDataGridCollectionViewBase.OnEditBegun( new DataGridItemEventArgs( this, item ) );
     }
 
     public virtual void CommitEdit()
@@ -3114,7 +2434,7 @@ namespace Xceed.Wpf.DataGrid
       if( m_currentEditItem == null )
         return;
 
-      DataGridItemCancelEventArgs itemCancelEventArgs = new DataGridItemCancelEventArgs( this, m_currentEditItem, false );
+      var itemCancelEventArgs = new DataGridItemCancelEventArgs( this, m_currentEditItem, false );
       m_rootDataGridCollectionViewBase.OnCommittingEdit( itemCancelEventArgs );
 
       if( itemCancelEventArgs.Cancel )
@@ -3130,20 +2450,13 @@ namespace Xceed.Wpf.DataGrid
         m_oldValuesBeforeEdition = null;
       }
 
-      DataGridItemEventArgs itemEventArgs = new DataGridItemEventArgs( this, m_currentEditItem );
-      int index = this.IndexOfSourceItem( m_currentEditItem );
-      Debug.Assert( index != -1 );
+      var itemEventArgs = new DataGridItemEventArgs( this, m_currentEditItem );
+      var index = this.IndexOfSourceItem( m_currentEditItem );
 
-      object[] items = new object[] { m_currentEditItem };
+      var items = new object[] { m_currentEditItem };
       m_currentEditItem = null;
 
-      // Only execute or queue a replace operation if the item is not already queued for a remove operation.
-      if( !this.DeferredOperationManager.ContainsItemForRemoveOperation( items[ 0 ] ) )
-      {
-        this.ExecuteOrQueueSourceItemOperation( new DeferredOperation(
-          DeferredOperation.DeferredOperationAction.Replace,
-          -1, index, items, index, items ) );
-      }
+      this.ExecuteOrQueueSourceItemOperation( new DeferredOperation( DeferredOperation.DeferredOperationAction.Replace, -1, index, items, index, items ) );
 
       m_rootDataGridCollectionViewBase.OnEditCommitted( itemEventArgs );
     }
@@ -3164,7 +2477,7 @@ namespace Xceed.Wpf.DataGrid
       if( m_currentEditItem == null )
         return;
 
-      DataGridItemHandledEventArgs itemHandleEventArgs = new DataGridItemHandledEventArgs( this, m_currentEditItem );
+      var itemHandleEventArgs = new DataGridItemHandledEventArgs( this, m_currentEditItem );
       m_rootDataGridCollectionViewBase.OnCancelingEdit( itemHandleEventArgs );
 
       if( itemHandleEventArgs.Handled != this.ItemEditionIsManuallyHandled )
@@ -3175,35 +2488,30 @@ namespace Xceed.Wpf.DataGrid
         bool cancelEditCalled;
         this.CancelEditInternal( m_currentEditItem, out cancelEditCalled );
 
-        DataGridItemPropertyCollection itemProperties = this.ItemProperties;
-        int count = itemProperties.Count;
+        var itemProperties = this.ItemProperties;
 
-        if( ( !cancelEditCalled ) && ( count > 0 ) )
+        if( ( !cancelEditCalled ) && ( itemProperties.Count > 0 ) )
         {
           itemProperties.SuspendUnboundItemPropertyChanged( m_currentEditItem );
 
           try
           {
-            for( int i = 0; i < count; i++ )
+            foreach( var itemProperty in itemProperties )
             {
-              DataGridItemPropertyBase itemProperty = itemProperties[ i ];
+              var readOnly = ( ( m_currentEditItem == m_currentAddItem ) && itemProperty.OverrideReadOnlyForInsertion.HasValue && itemProperty.OverrideReadOnlyForInsertion.Value )
+                               ? false
+                               : itemProperty.IsReadOnly;
 
-              bool readOnly = ( ( m_currentEditItem == m_currentAddItem )
-                              && itemProperty.OverrideReadOnlyForInsertion.HasValue
-                              && itemProperty.OverrideReadOnlyForInsertion.Value )
-                ? false
-                : itemProperty.IsReadOnly;
+              if( readOnly )
+                continue;
 
-              if( !readOnly )
+              try
               {
-                try
-                {
-                  itemProperty.SetValue( m_currentEditItem, m_oldValuesBeforeEdition[ i ] );
-                }
-                catch
-                {
-                  // Swallow any Exception, setting a property to is old value should not throw.
-                }
+                ItemsSourceHelper.SetValueForItemProperty( itemProperty, m_currentEditItem, m_oldValuesBeforeEdition[ itemProperty ] );
+              }
+              catch
+              {
+                // Swallow any Exception, setting a property to is old value should not throw.
               }
             }
           }
@@ -3214,7 +2522,7 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      DataGridItemEventArgs itemEventArgs = new DataGridItemEventArgs( this, m_currentEditItem );
+      var itemEventArgs = new DataGridItemEventArgs( this, m_currentEditItem );
       m_currentEditItem = null;
       m_rootDataGridCollectionViewBase.OnEditCanceled( itemEventArgs );
     }
@@ -3324,7 +2632,7 @@ namespace Xceed.Wpf.DataGrid
 
     private NewItemPlaceholderPosition m_newItemPlaceholderPosition = NewItemPlaceholderPosition.None;
 
-    #endregion IEditableCollectionView
+    #endregion
 
     #region IItemProperties Members
 
@@ -3343,22 +2651,8 @@ namespace Xceed.Wpf.DataGrid
 
     internal virtual List<ItemPropertyInfo> GetItemPropertyInfos()
     {
-      List<ItemPropertyInfo> itemPropertyInfos = new List<ItemPropertyInfo>();
-
-      int itemPropertyCount = m_itemProperties.Count;
-
-      for( int i = 0; i < itemPropertyCount; i++ )
-      {
-        DataGridItemPropertyBase dataGridItemPropertyBase = m_itemProperties[ i ];
-
-        itemPropertyInfos.Add(
-          new ItemPropertyInfo(
-            dataGridItemPropertyBase.Name,
-            dataGridItemPropertyBase.DataType,
-            dataGridItemPropertyBase.GetPropertyDescriptorForBinding() ) );
-      }
-
-      return itemPropertyInfos;
+      return ( from item in m_itemProperties
+               select new ItemPropertyInfo( item.Name, item.DataType, item.GetPropertyDescriptorForBinding() ) ).ToList();
     }
 
     #endregion
@@ -3370,43 +2664,37 @@ namespace Xceed.Wpf.DataGrid
 
     private int m_deferRefreshCount;
 
-    private DataGridCollectionViewBase m_rootDataGridCollectionViewBase;
+    private readonly DataGridCollectionViewBase m_rootDataGridCollectionViewBase;
 
     private Type m_itemType;
     private Type m_desiredItemType;
     private object m_modelSource;
     private IEnumerable m_enumeration;
-    private INotifyCollectionChanged m_notifyCollectionChanged;
-    private DataTable m_dataTable;
 
     private int m_currentPosition;
     private object m_currentItem;
     private int m_deferCurrencyEventCount;
 
     private object m_currentEditItem;
-    private object[] m_oldValuesBeforeEdition;
+    private Dictionary<DataGridItemPropertyBase, object> m_oldValuesBeforeEdition;
 
     private object m_currentAddItem;
     private int m_currentAddItemPosition = -1;
 
-    private AutoFilterMode m_autoFilterMode = AutoFilterMode.None;
     private DistinctValuesConstraint m_distinctValuesConstraint = DistinctValuesConstraint.All;
     private DistinctValuesUpdateMode m_distinctValueUpdateMode = DistinctValuesUpdateMode.Manual;
 
-    private FilterCriteriaMode m_filterCriteriaMode = FilterCriteriaMode.And;
     private List<DataGridItemPropertyBase> m_filteredItemProperties;
     private ReadOnlyCollection<DataGridItemPropertyBase> m_readOnlyFilteredItemProperties;
 
     private DataGridDetailDescription m_parentDetailDescription;
 
-    private DataGridItemPropertyCollection m_itemProperties;
-    private List<DataGridItemPropertyBase> m_defaultItemProperties;
-
-    private DataGridDetailDescriptionCollection m_dataGridDetailDescriptions;
-    private List<DataGridDetailDescription> m_defaultDetailDescriptions;
+    private readonly DataGridItemPropertyCollection m_itemProperties;
 
     private DataGridSortDescriptionCollection m_sortDescriptions;
     private ObservableCollection<GroupDescription> m_groupDescriptions;
+    private readonly DataGridDetailDescriptionCollection m_detailDescriptions;
+    private readonly PropertyDescriptionRouteDictionary m_defaultPropertyDescriptions;
 
     private CollectionViewGroup m_rootGroup;
 
@@ -3414,78 +2702,102 @@ namespace Xceed.Wpf.DataGrid
 
     // Containing a DataGridItemProperty key, ObservableCollection<object> values map
     private DistinctValuesDictionary m_distinctValues;
-    private ReadOnlyDictionary<string, IList> m_autoFilterValues;
-    private ObservableCollection<DataGridItemPropertyBase> m_autoFilteredDataGridItemProperties;
     private DataGridItemPropertyBase m_excludedItemPropertyFromDistinctValueCalculation;
 
     [Flags]
     private enum DataGridCollectionViewBaseFlags
     {
-      Loaded = 1,
-      ItemPropertiesCreated = 2,
-      Refreshing = 4,
-      QueueOperationForAddNew = 16,
-      IsRefreshingDistinctValues = 32,
-      IsCurrentAfterLast = 64,
-      IsCurrentBeforeFirst = 128,
-      CreatingNewItemIsManuallyHandled = 256,
-      ItemEditionIsManuallyHandled = 512,
-      AutoCreateItemProperties = 1024,
-      AutoCreateDetailDescriptions = 2048,
-      AutoCreateForeignKeyDescriptions = 4096,
+      Loaded = 1 << 0,
+      Refreshing = 1 << 1,
+      QueueOperationForAddNew = 1 << 2,
+      IsRefreshingDistinctValues = 1 << 3,
+      IsCurrentAfterLast = 1 << 4,
+      IsCurrentBeforeFirst = 1 << 5,
+      CreatingNewItemIsManuallyHandled = 1 << 6,
+      ItemEditionIsManuallyHandled = 1 << 7,
+      AutoCreateItemProperties = 1 << 8,
+      AutoCreateDetailDescriptions = 1 << 9,
+      AutoCreateForeignKeyDescriptions = 1 << 10,
+      DefaultItemPropertiesInitialized = 1 << 11,
+      DefaultPropertyDescriptionsCreated = 1 << 12,
     }
-
-    #region Private Class DeferRefreshHelper
 
     private sealed class DeferRefreshHelper : IDisposable
     {
       public DeferRefreshHelper( DataGridCollectionViewBase collectionView )
       {
         m_collectionView = collectionView;
-        collectionView.m_deferRefreshCount++;
+
+        Interlocked.Increment( ref collectionView.m_deferRefreshCount );
       }
 
-      public void Dispose()
+      void IDisposable.Dispose()
       {
-        if( m_collectionView == null )
+        this.Dispose( true );
+        GC.SuppressFinalize( this );
+      }
+
+      private void Dispose( bool disposing )
+      {
+        // Prevent this method from being invoked more than once by the same IDisposable.
+        var collectionView = Interlocked.Exchange( ref m_collectionView, null );
+        if( collectionView == null )
           return;
 
-        m_collectionView.m_deferRefreshCount--;
-
-        if( m_collectionView.CheckAccess() )
+        if( collectionView.CheckAccess() )
         {
-          this.ProcessDispose();
+          DeferRefreshHelper.ProcessDispose( collectionView );
         }
         else
         {
-          //In case Dispose is called from a different thread, make sure the refresh is not lost!
-          m_collectionView.Dispatcher.BeginInvoke( DispatcherPriority.Send, new Action( this.ProcessDispose ) );
+          //In case Dispose is called from a different thread, make sure the refresh is done on the UI thread.
+          collectionView.Dispatcher.BeginInvoke( new Action<DataGridCollectionViewBase>( DeferRefreshHelper.ProcessDispose ), DispatcherPriority.Send, collectionView );
         }
       }
 
-      private void ProcessDispose()
+      private static void ProcessDispose( DataGridCollectionViewBase collectionView )
       {
-        if( m_collectionView.Loaded )
+        //If there are detail DataGridCollectionView's being defered.
+        if( collectionView.m_detailDeferRefreshes != null && collectionView.m_detailDeferRefreshes.Count > 0 )
         {
-          m_collectionView.m_deferredOperationManager.Process();
+          //Dispose them.
+          foreach( IDisposable detailDisposable in collectionView.m_detailDeferRefreshes[ 0 ] )
+          {
+            if( detailDisposable != null )
+            {
+              detailDisposable.Dispose();
+            }
+          }
+
+          //Clear and remove the list that was just disposed of.
+          collectionView.m_detailDeferRefreshes[ 0 ].Clear();
+          collectionView.m_detailDeferRefreshes.RemoveAt( 0 );
+        }
+
+        //Only process the DeferRefresh when count is back to 0.
+        if( Interlocked.Decrement( ref collectionView.m_deferRefreshCount ) > 0 )
+          return;
+
+        if( collectionView.Loaded )
+        {
+          collectionView.m_deferredOperationManager.Process();
         }
         else
         {
-          // We call ForceRefresh when not yet "Loaded" because we want the Dispose here to
-          // triger the CollectionChanged( NotifyCollectionChangedAction.Reset )
-          // That is needed because of the way the ItemsControl, other than our grid, work.
-          m_collectionView.ForceRefresh( true, true, true );
+          // We call ForceRefresh when not yet "Loaded" because we want the Dispose here to triger the CollectionChanged( NotifyCollectionChangedAction.Reset )
+          // This is needed because of the way the ItemsControl works (other than our grid).
+          collectionView.ForceRefresh( true, true, true );
         }
+      }
 
-        m_collectionView = null;
+      ~DeferRefreshHelper()
+      {
+        //Make sure the defering process for the CollectionView stays in a valid state, by disposing of details and properly setting the count.
+        this.Dispose( false );
       }
 
       private DataGridCollectionViewBase m_collectionView;
     }
-
-    #endregion Private Class DeferRefreshHelper
-
-    #region Private Class DeferCurrencyEventHelper
 
     private sealed class DeferCurrencyEventHelper : IDisposable
     {
@@ -3494,60 +2806,96 @@ namespace Xceed.Wpf.DataGrid
         m_collectionView = collectionView;
         m_oldCurrentItem = m_collectionView.CurrentItem;
         m_oldCurrentPosition = m_collectionView.CurrentPosition;
-        m_oldIsCurrentAfterLast = m_collectionView.IsCurrentAfterLast;
         m_oldIsCurrentBeforeFirst = m_collectionView.IsCurrentBeforeFirst;
-        m_collectionView.m_deferCurrencyEventCount++;
+        m_oldIsCurrentAfterLast = m_collectionView.IsCurrentAfterLast;
+
+        Interlocked.Increment( ref m_collectionView.m_deferCurrencyEventCount );
       }
 
-      public void Dispose()
+      void IDisposable.Dispose()
       {
-        if( m_collectionView == null )
+        this.Dispose( true );
+        GC.SuppressFinalize( this );
+      }
+
+      private void Dispose( bool disposing )
+      {
+        // Prevent this method from being invoked more than once by the same IDisposable.
+        var collectionView = Interlocked.Exchange( ref m_collectionView, null );
+        if( collectionView == null )
           return;
 
-        m_collectionView.m_deferCurrencyEventCount--;
-
-        if( m_collectionView.m_deferCurrencyEventCount == 0 )
+        if( collectionView.CheckAccess() )
         {
-          bool itemChanged = false;
-
-          if( !object.Equals( m_oldCurrentItem, m_collectionView.CurrentItem ) )
-          {
-            itemChanged = true;
-            m_collectionView.OnPropertyChanged( new PropertyChangedEventArgs( "CurrentItem" ) );
-          }
-
-          if( m_oldCurrentPosition != m_collectionView.CurrentPosition )
-          {
-            itemChanged = true;
-            m_collectionView.OnPropertyChanged( new PropertyChangedEventArgs( "CurrentPosition" ) );
-          }
-
-          if( m_oldIsCurrentBeforeFirst != m_collectionView.IsCurrentBeforeFirst )
-          {
-            itemChanged = true;
-            m_collectionView.OnPropertyChanged( new PropertyChangedEventArgs( "IsCurrentBeforeFirst" ) );
-          }
-
-          if( m_oldIsCurrentAfterLast != m_collectionView.IsCurrentAfterLast )
-          {
-            itemChanged = true;
-            m_collectionView.OnPropertyChanged( new PropertyChangedEventArgs( "IsCurrentAfterLast" ) );
-          }
-
-          if( itemChanged )
-            m_collectionView.OnCurrentChanged();
+          DeferCurrencyEventHelper.ProcessDispose( collectionView, m_oldCurrentItem, m_oldCurrentPosition, m_oldIsCurrentBeforeFirst, m_oldIsCurrentAfterLast );
         }
-
-        m_collectionView = null;
+        else
+        {
+          // Make sure the calls to the collection view will be done on the collection view's thread.
+          collectionView.Dispatcher.BeginInvoke(
+            new Action<DataGridCollectionViewBase, object, int, bool, bool>( DeferCurrencyEventHelper.ProcessDispose ),
+            DispatcherPriority.Send,
+            collectionView,
+            m_oldCurrentItem,
+            m_oldCurrentPosition,
+            m_oldIsCurrentBeforeFirst,
+            m_oldIsCurrentAfterLast );
+        }
       }
 
-      private int m_oldCurrentPosition;
-      private object m_oldCurrentItem;
-      private bool m_oldIsCurrentAfterLast;
-      private bool m_oldIsCurrentBeforeFirst;
+      private static void ProcessDispose(
+        DataGridCollectionViewBase collectionView,
+        object oldCurrentItem,
+        int oldCurrentPosition,
+        bool oldIsCurrentBeforeFirst,
+        bool oldIsCurrentAfterLast )
+      {
+        if( Interlocked.Decrement( ref collectionView.m_deferCurrencyEventCount ) > 0 )
+          return;
+
+        bool itemChanged = false;
+
+        if( !object.Equals( oldCurrentItem, collectionView.CurrentItem ) )
+        {
+          itemChanged = true;
+          collectionView.OnPropertyChanged( new PropertyChangedEventArgs( "CurrentItem" ) );
+        }
+
+        if( oldCurrentPosition != collectionView.CurrentPosition )
+        {
+          itemChanged = true;
+          collectionView.OnPropertyChanged( new PropertyChangedEventArgs( "CurrentPosition" ) );
+        }
+
+        if( oldIsCurrentBeforeFirst != collectionView.IsCurrentBeforeFirst )
+        {
+          itemChanged = true;
+          collectionView.OnPropertyChanged( new PropertyChangedEventArgs( "IsCurrentBeforeFirst" ) );
+        }
+
+        if( oldIsCurrentAfterLast != collectionView.IsCurrentAfterLast )
+        {
+          itemChanged = true;
+          collectionView.OnPropertyChanged( new PropertyChangedEventArgs( "IsCurrentAfterLast" ) );
+        }
+
+        if( itemChanged )
+        {
+          collectionView.OnCurrentChanged();
+        }
+      }
+
+      ~DeferCurrencyEventHelper()
+      {
+        this.Dispose( false );
+      }
+
+      private readonly int m_oldCurrentPosition;
+      private readonly object m_oldCurrentItem;
+      private readonly bool m_oldIsCurrentAfterLast;
+      private readonly bool m_oldIsCurrentBeforeFirst;
+
       private DataGridCollectionViewBase m_collectionView;
     }
-
-    #endregion Private Class DeferCurrencyEventHelper
   }
 }

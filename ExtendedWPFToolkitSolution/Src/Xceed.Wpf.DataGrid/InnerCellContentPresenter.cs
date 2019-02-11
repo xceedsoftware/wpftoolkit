@@ -14,14 +14,8 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Diagnostics;
-using System.Windows.Threading;
 using System.Windows.Data;
 
 namespace Xceed.Wpf.DataGrid
@@ -49,6 +43,7 @@ namespace Xceed.Wpf.DataGrid
       m_sTextBlockStyle = new Style( typeof( TextBlock ) );
       m_sTextBlockStyle.Setters.Add( new Setter( TextBlock.TextTrimmingProperty, trimmingBinding ) );
       m_sTextBlockStyle.Setters.Add( new Setter( TextBlock.TextWrappingProperty, wrappingBinding ) );
+      m_sTextBlockStyle.Seal();
     }
 
     public InnerCellContentPresenter()

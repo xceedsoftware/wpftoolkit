@@ -14,12 +14,9 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Data;
+using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -106,7 +103,7 @@ namespace Xceed.Wpf.DataGrid
 
       DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
 
-      Xceed.Wpf.DataGrid.Views.UIViewBase uiViewBase = null;
+      UIViewBase uiViewBase = null;
 
       if( dataGridContext != null )
       {
@@ -114,7 +111,7 @@ namespace Xceed.Wpf.DataGrid
 
         if( dataGridControl != null )
         {
-          uiViewBase = dataGridControl.GetView() as Xceed.Wpf.DataGrid.Views.UIViewBase;
+          uiViewBase = dataGridControl.GetView() as UIViewBase;
         }
       }
 

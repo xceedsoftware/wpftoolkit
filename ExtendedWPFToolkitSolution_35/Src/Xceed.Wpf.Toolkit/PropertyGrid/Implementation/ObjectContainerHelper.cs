@@ -15,8 +15,12 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+#if !VS2008
+using System.ComponentModel.DataAnnotations;
+#endif
 using System.Diagnostics;
 using System.Linq;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
@@ -55,54 +59,58 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         try
         {
-          List<PropertyDescriptor> descriptors = ObjectContainerHelperBase.GetPropertyDescriptors( SelectedObject );
-          if( !PropertyContainer.AutoGenerateProperties )
+          var descriptors = new List<PropertyDescriptor>();
           {
-            List<PropertyDescriptor> specificProperties = new List<PropertyDescriptor>();
-            if( PropertyContainer.PropertyDefinitions != null )
+            descriptors = ObjectContainerHelperBase.GetPropertyDescriptors( SelectedObject, this.PropertyContainer.HideInheritedProperties );
+          }
+
+          foreach( var descriptor in descriptors )
+          {
+            var propertyDef = this.GetPropertyDefinition( descriptor );
+            bool isBrowsable = false;
+
+            var isPropertyBrowsable = this.PropertyContainer.IsPropertyVisible( descriptor );
+            if( isPropertyBrowsable.HasValue )
             {
-              foreach( PropertyDefinition pd in PropertyContainer.PropertyDefinitions )
+              isBrowsable = isPropertyBrowsable.Value;
+            }
+            else
+            {
+#if !VS2008
+              var displayAttribute = PropertyGridUtilities.GetAttribute<DisplayAttribute>( descriptor );
+              if( displayAttribute != null )
               {
-                foreach( object targetProperty in pd.TargetProperties )
-                {
-                  PropertyDescriptor descriptor = null;
-                  // If the target is a string, compare it with the property name.
-                  var propName = targetProperty as string;
-                  if( propName != null )
-                  {
-                    descriptor = descriptors.FirstOrDefault( d => d.Name == propName );
-                  }
+                var autoGenerateField = displayAttribute.GetAutoGenerateField();
+                isBrowsable = this.PropertyContainer.AutoGenerateProperties 
+                              && ((autoGenerateField.HasValue && autoGenerateField.Value) || !autoGenerateField.HasValue);
+              }
+              else
+#endif
+              {
+                isBrowsable = descriptor.IsBrowsable && this.PropertyContainer.AutoGenerateProperties;
+              }
 
-                  // If the target is a Type, compare it with the property type.
-                  var propType = targetProperty as Type;
-                  if( propType != null )
-                  {
-                    descriptor = descriptors.FirstOrDefault( d => d.PropertyType == propType );
-                  }
-
-                  if( descriptor != null )
-                  {
-                    specificProperties.Add( descriptor );
-                    descriptors.Remove( descriptor );
-                  }
-                }
+              if( propertyDef != null )
+              {
+                isBrowsable = propertyDef.IsBrowsable.GetValueOrDefault( isBrowsable );
               }
             }
 
-            descriptors = specificProperties;
-          }
-
-          foreach( PropertyDescriptor descriptor in descriptors )
-          {
-            if( descriptor.IsBrowsable )
+            if( isBrowsable )
             {
-              propertyItems.Add( CreatePropertyItem( descriptor ) );
+              var prop = this.CreatePropertyItem( descriptor, propertyDef );
+              if( prop != null )
+              {
+                propertyItems.Add( prop );
+              }
             }
           }
         }
-        catch( Exception )
+        catch( Exception e )
         {
           //TODO: handle this some how
+          Debug.WriteLine( "Property creation failed." );
+          Debug.WriteLine( e.StackTrace );
         }
       }
 
@@ -110,15 +118,46 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
 
-    private PropertyItem CreatePropertyItem( PropertyDescriptor property )
+    private PropertyItem CreatePropertyItem( PropertyDescriptor property, PropertyDefinition propertyDef )
     {
-      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property, SelectedObject );
+      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property, SelectedObject, this.PropertyContainer );                                                                                 
       definition.InitProperties();
+
+      this.InitializeDescriptorDefinition( definition, propertyDef );
       PropertyItem propertyItem = new PropertyItem( definition );
       Debug.Assert( SelectedObject != null );
       propertyItem.Instance = SelectedObject;
+      propertyItem.CategoryOrder = this.GetCategoryOrder( definition.CategoryValue );
+
+      propertyItem.WillRefreshPropertyGrid = this.GetWillRefreshPropertyGrid( property );
       return propertyItem;
     }
+
+    private int GetCategoryOrder( object categoryValue )
+    {
+      Debug.Assert( SelectedObject != null );
+
+      if( categoryValue == null )
+        return int.MaxValue;
+
+      int order = int.MaxValue;
+        object selectedObject = SelectedObject;
+        CategoryOrderAttribute[] orderAttributes = ( selectedObject != null )
+          ? ( CategoryOrderAttribute[] )selectedObject.GetType().GetCustomAttributes( typeof( CategoryOrderAttribute ), true )
+          : new CategoryOrderAttribute[ 0 ];
+
+        var orderAttribute = orderAttributes
+          .FirstOrDefault( ( a ) => object.Equals( a.CategoryValue, categoryValue ) );
+
+        if( orderAttribute != null )
+        {
+          order = orderAttribute.Order;
+        }
+
+      return order;
+    }
+
+
 
 
 

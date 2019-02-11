@@ -25,11 +25,11 @@ namespace Xceed.Wpf.Toolkit
 
     static ULongUpDown()
     {
-      UpdateMetadataInternal( typeof( ULongUpDown ), ( ulong )1, ulong.MinValue, ulong.MaxValue );
+      UpdateMetadata( typeof( ULongUpDown ), ( ulong )1, ulong.MinValue, ulong.MaxValue );
     }
 
     public ULongUpDown()
-      : base( ulong.Parse, Decimal.ToUInt64, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
+      : base( ulong.TryParse, Decimal.ToUInt64, ( v1, v2 ) => v1 < v2, ( v1, v2 ) => v1 > v2 )
     {
     }
 

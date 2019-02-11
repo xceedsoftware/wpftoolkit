@@ -25,10 +25,14 @@ using System.Windows.Input;
 using System.Windows.Markup.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+#if !VS2008
+using System.ComponentModel.DataAnnotations;
+#endif
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using Xceed.Wpf.Toolkit.PropertyGrid.Commands;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 using System.Reflection;
+using System.Globalization;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -36,27 +40,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
   {
     #region Members
 
-    private readonly object _selectedObject;
-    private readonly PropertyDescriptor _propertyDescriptor;
-    private readonly DependencyPropertyDescriptor _dpDescriptor;
-    private readonly MarkupObject _markupObject;
+    private object _selectedObject;
+    private PropertyDescriptor _propertyDescriptor;
+    private DependencyPropertyDescriptor _dpDescriptor;
+    private MarkupObject _markupObject;
 
     #endregion
 
     #region Constructor
 
-    internal DescriptorPropertyDefinition( PropertyDescriptor propertyDescriptor, object selectedObject )
+    internal DescriptorPropertyDefinition( PropertyDescriptor propertyDescriptor, object selectedObject, IPropertyContainer propertyContainer )
+       : base( propertyContainer.IsCategorized
+             )
     {
-      if( propertyDescriptor == null )
-        throw new ArgumentNullException( "propertyDescriptor" );
-
-      if( selectedObject == null )
-        throw new ArgumentNullException( "selectedObject" );
-
-      _propertyDescriptor = propertyDescriptor;
-      _selectedObject = selectedObject;
-      _dpDescriptor = DependencyPropertyDescriptor.FromProperty( propertyDescriptor );
-      _markupObject = MarkupWriter.GetMarkupObjectFor( SelectedObject );
+      this.Init( propertyDescriptor, selectedObject );
     }
 
     #endregion
@@ -83,15 +80,30 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region Override Methods
 
+    internal override ObjectContainerHelperBase CreateContainerHelper( IPropertyContainer parent )
+    {
+      return new ObjectContainerHelper( parent, this.Value );
+    }
+
+    internal override void OnValueChanged( object oldValue, object newValue )
+    {
+      base.OnValueChanged( oldValue, newValue );
+      this.RaiseContainerHelperInvalidated();
+    }
+
     protected override BindingBase CreateValueBinding()
     {
+      var selectedObject = this.SelectedObject;
+      var propertyName = this.PropertyDescriptor.Name;
+
       //Bind the value property with the source object.
-      var binding = new Binding( PropertyDescriptor.Name )
+      var binding = new Binding( propertyName )
       {
-        Source = SelectedObject,
+        Source = this.GetValueInstance( selectedObject ),
         Mode = PropertyDescriptor.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay,
         ValidatesOnDataErrors = true,
-        ValidatesOnExceptions = true
+        ValidatesOnExceptions = true,
+        ConverterCulture = CultureInfo.CurrentCulture 
       };
 
       return binding;
@@ -102,29 +114,41 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return PropertyDescriptor.IsReadOnly;
     }
 
-    internal override ITypeEditor CreateDefaultEditor()
+    internal override ITypeEditor CreateDefaultEditor( PropertyItem propertyItem )
     {
-      return PropertyGridUtilities.CreateDefaultEditor( PropertyDescriptor.PropertyType, PropertyDescriptor.Converter );
+      return PropertyGridUtilities.CreateDefaultEditor( PropertyDescriptor.PropertyType, PropertyDescriptor.Converter, propertyItem );
     }
 
     protected override bool ComputeCanResetValue()
     {
-      return PropertyDescriptor.CanResetValue( SelectedObject )
-        && !PropertyDescriptor.IsReadOnly;
+      if( !PropertyDescriptor.IsReadOnly )
+      {
+        var defaultValue = this.ComputeDefaultValueAttribute();
+        if( defaultValue != null)
+          return !defaultValue.Equals( this.Value ); // can Reset if different from defaultValue.
+
+        return PropertyDescriptor.CanResetValue( SelectedObject );
+      }
+
+      return false;
     }
 
-    protected override AdvancedOptionsValues ComputeAdvancedOptionsValues()
+    protected override object ComputeAdvancedOptionsTooltip()
     {
-      string imageName;
       object tooltip;
-      UpdateAdvanceOptionsForItem( _markupObject, SelectedObject as DependencyObject, _dpDescriptor, out imageName, out tooltip );
+      UpdateAdvanceOptionsForItem( _markupObject, SelectedObject as DependencyObject, _dpDescriptor, out tooltip );
 
-      return CreateAdvanceOptionValues( imageName, tooltip );
+      return tooltip;
     }
 
     protected override string ComputeCategory()
     {
-      return PropertyDescriptor.Category;
+#if VS2008
+        return PropertyDescriptor.Category;
+#else
+      var displayAttribute = PropertyGridUtilities.GetAttribute<DisplayAttribute>( PropertyDescriptor );
+      return ( (displayAttribute != null) && (displayAttribute.GetGroupName() != null) ) ? displayAttribute.GetGroupName() : PropertyDescriptor.Category;
+#endif
     }
 
     protected override string ComputeCategoryValue()
@@ -132,16 +156,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return PropertyDescriptor.Category;
     }
 
+    protected override bool ComputeExpandableAttribute()
+    {
+      return ( bool )this.ComputeExpandableAttributeForItem( PropertyDescriptor );
+    }
+
+    protected override object ComputeDefaultValueAttribute()
+    {
+      return this.ComputeDefaultValueAttributeForItem( PropertyDescriptor );
+    }
+
     protected override bool ComputeIsExpandable()
     {
-      bool isExpandable = false;
-      var attribute = GetAttribute<ExpandableObjectAttribute>();
-      if( attribute != null )
-      {
-        isExpandable = true;
-      }
-
-      return isExpandable;
+      return ( this.Value != null )
+        ;
     }
 
     protected override IList<Type> ComputeNewItemTypes()
@@ -153,14 +181,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return ( string )ComputeDescriptionForItem( PropertyDescriptor );
     }
 
-    protected override int ComputeDisplayOrder()
+    protected override int ComputeDisplayOrder( bool isPropertyGridCategorized )
     {
+      this.IsPropertyGridCategorized = isPropertyGridCategorized;
       return ( int )ComputeDisplayOrderForItem( PropertyDescriptor );
     }
 
     protected override void ResetValue()
     {
-      PropertyDescriptor.ResetValue( SelectedObject );
+      this.PropertyDescriptor.ResetValue( this.SelectedObject );
+      base.ResetValue();
     }
 
     internal override ITypeEditor CreateAttributeEditor()
@@ -168,7 +198,23 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       var editorAttribute = GetAttribute<EditorAttribute>();
       if( editorAttribute != null )
       {
-        Type type = Type.GetType( editorAttribute.EditorTypeName );
+        Type type = null;
+#if VS2008
+        type = Type.GetType( editorAttribute.EditorTypeName );
+#else
+        try
+        {
+          type = Type.GetType( editorAttribute.EditorTypeName, ( name ) =>
+          {
+            return AppDomain.CurrentDomain.GetAssemblies().Where( l => l.FullName == name.FullName ).FirstOrDefault();
+          }
+          , null, true );
+        }
+        catch( Exception )
+        {
+          type = Type.GetType( editorAttribute.EditorTypeName );
+        }       
+#endif
 
         // If the editor does not have any public parameterless constructor, forget it.
         if( typeof( ITypeEditor ).IsAssignableFrom( type )
@@ -195,6 +241,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private T GetAttribute<T>() where T : Attribute
     {
       return PropertyGridUtilities.GetAttribute<T>( PropertyDescriptor );
+    }
+
+    private void Init( PropertyDescriptor propertyDescriptor, object selectedObject )
+    {
+      if( propertyDescriptor == null )
+        throw new ArgumentNullException( "propertyDescriptor" );
+
+      if( selectedObject == null )
+        throw new ArgumentNullException( "selectedObject" );
+
+      _propertyDescriptor = propertyDescriptor;
+      _selectedObject = selectedObject;
+      _dpDescriptor = DependencyPropertyDescriptor.FromProperty( propertyDescriptor );
+      _markupObject = MarkupWriter.GetMarkupObjectFor( SelectedObject );
     }
 
     #endregion //Private Methods

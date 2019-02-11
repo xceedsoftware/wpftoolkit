@@ -21,7 +21,7 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
-        <ResourceDictionary Source="../../Core/Themes/Aero2/WindowControl.xaml" />
+        <ResourceDictionary Source="../../Primitives/Themes/Aero2/WindowControl.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <SolidColorBrush x:Key="BorderBrush" Color="Orange" />
@@ -72,7 +72,8 @@
                           Height="{TemplateBinding Height}">
 
                             <prim:WindowControl x:Name="PART_WindowControl" 
-                                            Caption="{TemplateBinding Caption}" 
+                                            Caption="{TemplateBinding Caption}"
+                                            CaptionFontSize="{TemplateBinding CaptionFontSize}"
                                             CaptionForeground="{TemplateBinding CaptionForeground}" 
                                             CaptionShadowBrush="{TemplateBinding CaptionShadowBrush}" 
                                             CaptionIcon="{TemplateBinding CaptionIcon}"
@@ -88,6 +89,7 @@
                                             CloseButtonStyle="{TemplateBinding CloseButtonStyle}" 
                                             WindowOpacity="{TemplateBinding WindowOpacity}" 
                                             Content="{TemplateBinding Content}"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}"
                                             WindowStyle="{TemplateBinding WindowStyle}"
                                             Width="{TemplateBinding Width}"
                                             Height="{TemplateBinding Height}">

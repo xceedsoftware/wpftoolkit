@@ -67,6 +67,7 @@ namespace Xceed.Wpf.Toolkit
       ChangeVisualState( false );
     }
 
+
     #endregion //Base Class Overrides
 
     #region Properties
@@ -145,6 +146,15 @@ namespace Xceed.Wpf.Toolkit
         // No longer visible
         _displayAfterTimer.Stop();
         IsContentVisible = false;
+
+        if( this.FocusAfterBusy != null )
+        {
+          this.FocusAfterBusy.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
+          {
+            this.FocusAfterBusy.Focus();
+          }
+          ) );
+        }
       }
 
       ChangeVisualState( true );
@@ -235,6 +245,34 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //Display After
+
+    #region FocusAfterBusy
+
+    /// <summary>
+    /// Identifies the FocusAfterBusy dependency property.
+    /// </summary>
+    public static readonly DependencyProperty FocusAfterBusyProperty = DependencyProperty.Register(
+        "FocusAfterBusy",
+        typeof( Control ),
+        typeof( BusyIndicator ),
+        new PropertyMetadata( null ) );
+
+    /// <summary>
+    /// Gets or sets a Control that should get the focus when the busy indicator disapears.
+    /// </summary>
+    public Control FocusAfterBusy
+    {
+      get
+      {
+        return ( Control )GetValue( FocusAfterBusyProperty );
+      }
+      set
+      {
+        SetValue( FocusAfterBusyProperty, value );
+      }
+    }
+
+    #endregion //FocusAfterBusy
 
     #region Overlay Style
 

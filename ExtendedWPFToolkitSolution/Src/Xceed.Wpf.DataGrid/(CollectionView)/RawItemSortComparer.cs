@@ -14,10 +14,7 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.ComponentModel;
 
 using Xceed.Utils.Data;
@@ -36,61 +33,60 @@ namespace Xceed.Wpf.DataGrid
     public int Compare( RawItem xRawItem, RawItem yRawItem )
     {
       if( xRawItem == null )
-      {
-        if( yRawItem == null )
-        {
-          return 0;
-        }
-        else
-        {
-          return -1;
-        }
-      }
-      else
-      {
-        if( yRawItem == null )
-        {
-          return 1;
-        }
-      }
+        return ( yRawItem == null ) ? 0 : -1;
 
-      ListSortDirection lastSortDirection = ListSortDirection.Ascending;
-      SortDescriptionCollection sortDescriptions = m_collectionView.SortDescriptions;
-      int sortDescriptionCount = sortDescriptions.Count;
+      if( yRawItem == null )
+        return 1;
+
+      var lastSortDirection = ListSortDirection.Ascending;
+      var sortDescriptions = m_collectionView.SortDescriptions;
+      var sortDescriptionCount = sortDescriptions.Count;
 
       if( sortDescriptionCount > 0 )
       {
-        int result;
-        DataGridItemPropertyCollection itemProperties = m_collectionView.ItemProperties;
+        var result = default( int );
+        var itemProperties = m_collectionView.ItemProperties;
 
         for( int i = 0; i < sortDescriptionCount; i++ )
         {
-          SortDescription sortDescription = sortDescriptions[ i ];
+          var sortDescription = sortDescriptions[ i ];
           lastSortDirection = sortDescription.Direction;
-          DataGridItemPropertyBase dataProperty = itemProperties[ sortDescription.PropertyName ];
 
-          if( dataProperty == null )
+          var itemProperty = ItemsSourceHelper.GetItemPropertyFromProperty( itemProperties, sortDescription.PropertyName );
+          if( itemProperty == null )
             continue;
 
-          ISupportInitialize supportInitialize = dataProperty as ISupportInitialize;
-          object xData = null;
-          object yData = null;
+          var supportInitialize = itemProperty as ISupportInitialize;
+          var xData = default( object );
+          var yData = default( object );
 
           if( supportInitialize != null )
+          {
             supportInitialize.BeginInit();
+          }
 
           try
           {
-            xData = dataProperty.GetValue( xRawItem.DataItem );
-            yData = dataProperty.GetValue( yRawItem.DataItem );
+            xData = ItemsSourceHelper.GetValueFromItemProperty( itemProperty, xRawItem.DataItem );
+            yData = ItemsSourceHelper.GetValueFromItemProperty( itemProperty, yRawItem.DataItem );
+
+            if( itemProperty.IsSortingOnForeignKeyDescription )
+            {
+              var foreignKeyDescription = itemProperty.ForeignKeyDescription;
+
+              xData = foreignKeyDescription.GetDisplayValue( xData );
+              yData = foreignKeyDescription.GetDisplayValue( yData );
+            }
           }
           finally
           {
             if( supportInitialize != null )
+            {
               supportInitialize.EndInit();
+            }
           }
 
-          IComparer sortComparer = dataProperty.SortComparer;
+          var sortComparer = itemProperty.SortComparer;
 
           if( sortComparer != null )
           {
@@ -104,7 +100,7 @@ namespace Xceed.Wpf.DataGrid
           if( result != 0 )
           {
             if( lastSortDirection == ListSortDirection.Descending )
-              result = - result;
+              return -result;
 
             return result;
           }

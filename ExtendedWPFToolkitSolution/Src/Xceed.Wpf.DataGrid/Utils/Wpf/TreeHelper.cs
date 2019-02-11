@@ -15,9 +15,12 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 
 namespace Xceed.Utils.Wpf
 {
@@ -42,7 +45,6 @@ namespace Xceed.Utils.Wpf
     {
       if( recurseIntoPopup )
       {
-        // Case 126732 : To correctly detect parent of a popup we must do that exception case
         Popup popup = element as Popup;
 
         if( ( popup != null ) && ( popup.PlacementTarget != null ) )
@@ -120,6 +122,22 @@ namespace Xceed.Utils.Wpf
     /// <example>Button button = TreeHelper.FindParent&lt;Button&gt;( this, foundChild => foundChild.Focusable );</example>
     public static T FindParent<T>( DependencyObject startingObject, bool checkStartingObject, Func<T, bool> additionalCheck ) where T : DependencyObject
     {
+      return TreeHelper.FindParent<T>( startingObject, checkStartingObject, additionalCheck, null );
+    }
+
+    /// <summary>
+    /// This will search for a parent of the specified type.
+    /// </summary>
+    /// <typeparam name="T">The type of the element to find</typeparam>
+    /// <param name="startingObject">The node where the search begins.</param>
+    /// <param name="checkStartingObject">Should the specified startingObject be checked first.</param>
+    /// <param name="additionalCheck">Provide a callback to check additional properties 
+    /// of the found elements. Can be left Null if no additional criteria are needed.</param>
+    /// <param name="scope">Should not search behond this parent. Scope value is excluded from the search</param>
+    /// <returns>Returns the found element. Null if nothing is found.</returns>
+    /// <example>Button button = TreeHelper.FindParent&lt;Button&gt;( this, foundChild => foundChild.Focusable );</example>
+    internal static T FindParent<T>( DependencyObject startingObject, bool checkStartingObject, Func<T, bool> additionalCheck, DependencyObject scope ) where T : DependencyObject
+    {
       T foundElement;
       DependencyObject parent = ( checkStartingObject ? startingObject : TreeHelper.GetParent( startingObject, true ) );
 
@@ -141,6 +159,10 @@ namespace Xceed.Utils.Wpf
         }
 
         parent = TreeHelper.GetParent( parent, true );
+
+        if( object.ReferenceEquals( parent, scope ) )
+          break;
+
       }
 
       return null;
@@ -164,42 +186,13 @@ namespace Xceed.Utils.Wpf
     /// </summary>
     /// <typeparam name="T">The type of the element to find</typeparam>
     /// <param name="parent">The root of the tree to search for. This element itself is not checked.</param>
-    /// <param name="additionalCheck">Provide a callback to check additional properties 
+    /// <param name="predicate">Provide a callback to check additional properties 
     /// of the found elements. Can be left Null if no additional criteria are needed.</param>
     /// <returns>Returns the found element. Null if nothing is found.</returns>
     /// <example>Button button = TreeHelper.FindChild&lt;Button&gt;( this, foundChild => foundChild.Focusable );</example>
-    public static T FindChild<T>( DependencyObject parent, Func<T, bool> additionalCheck ) where T : DependencyObject
+    public static T FindChild<T>( DependencyObject parent, Func<T, bool> predicate ) where T : DependencyObject
     {
-      int childrenCount = VisualTreeHelper.GetChildrenCount( parent );
-      T child;
-
-      for( int index = 0; index < childrenCount; index++ )
-      {
-        child = VisualTreeHelper.GetChild( parent, index ) as T;
-
-        if( child != null )
-        {
-          if( additionalCheck == null )
-          {
-            return child;
-          }
-          else
-          {
-            if( additionalCheck( child ) )
-              return child;
-          }
-        }
-      }
-
-      for( int index = 0; index < childrenCount; index++ )
-      {
-        child = TreeHelper.FindChild<T>( VisualTreeHelper.GetChild( parent, index ), additionalCheck );
-
-        if( child != null )
-          return child;
-      }
-
-      return null;
+      return TreeHelper.GetDescendants<T>( new BreadthFirstSearchTreeTraversalStrategy(), parent, predicate, null ).FirstOrDefault();
     }
 
     /// <summary>
@@ -230,6 +223,66 @@ namespace Xceed.Utils.Wpf
       }
 
       return false;
+    }
+
+    public static IEnumerable<T> GetDescendants<T>( ITreeTraversalStrategy strategy, DependencyObject root ) where T : DependencyObject
+    {
+      return TreeHelper.GetDescendants<T>( strategy, root, null, null );
+    }
+
+    public static IEnumerable<T> GetDescendants<T>( ITreeTraversalStrategy strategy, DependencyObject root, Func<T, bool> predicate ) where T : class
+    {
+      return TreeHelper.GetDescendants<T>( strategy, root, predicate, null );
+    }
+
+    public static IEnumerable<T> GetDescendants<T>(
+      ITreeTraversalStrategy strategy,
+      DependencyObject root,
+      Func<T, bool> predicate,
+      Func<DependencyObject, bool> expand ) where T : class
+    {
+      if( strategy == null )
+        throw new ArgumentNullException( "strategy" );
+
+      if( root == null )
+        yield break;
+
+      var traversal = strategy.Create();
+      Debug.Assert( traversal != null );
+
+      traversal.VisitNodes( TreeHelper.GetChildren( root ) );
+
+      while( traversal.MoveNext() )
+      {
+        var current = traversal.Current;
+        var descendant = current as T;
+
+        if( ( descendant != null ) && ( ( predicate == null ) || predicate.Invoke( descendant ) ) )
+        {
+          yield return descendant;
+        }
+
+        if( ( expand == null ) || expand.Invoke( current ) )
+        {
+          traversal.VisitNodes( TreeHelper.GetChildren( current ) );
+        }
+      }
+    }
+
+    private static IEnumerable<DependencyObject> GetChildren( DependencyObject parent )
+    {
+      if( parent == null )
+        yield break;
+
+      var childrenCount = VisualTreeHelper.GetChildrenCount( parent );
+      for( int i = 0; i < childrenCount; i++ )
+      {
+        var child = VisualTreeHelper.GetChild( parent, i );
+        if( child != null )
+        {
+          yield return child;
+        }
+      }
     }
   }
 }

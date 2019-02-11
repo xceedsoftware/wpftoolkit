@@ -15,26 +15,29 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Xceed.Wpf.DataGrid
 {
-  internal class SelectionCellRangeCollection : IList<SelectionCellRange>, IList
+  internal sealed class SelectionCellRangeCollection : IList<SelectionCellRange>, IList
   {
-    public SelectionCellRangeCollection( SelectedCellsStorage list )
+    internal SelectionCellRangeCollection( SelectedCellsStorage collection )
     {
-      m_list = list;
+      Debug.Assert( collection != null );
+
+      m_storage = collection;
     }
+
+    #region IList<> Members
 
     public SelectionCellRange this[ int index ]
     {
       get
       {
-        return m_list[ index ].CellRange;
+        return m_storage[ index ].CellRange;
       }
       set
       {
@@ -42,29 +45,73 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    public int Count
+    public int IndexOf( SelectionCellRange item )
     {
-      get
+      var count = m_storage.Count;
+
+      for( int i = 0; i < count; i++ )
       {
-        return m_list.Count;
+        if( m_storage[ i ].CellRange == item )
+          return i;
+      }
+
+      return -1;
+    }
+
+    public void Insert( int index, SelectionCellRange item )
+    {
+      if( ( index < 0 ) || ( index > m_storage.Count ) )
+        throw new ArgumentOutOfRangeException( "index", index, "index must be greater than or equal to zero and less than or equal to Count." );
+
+      var dataGridContext = m_storage.DataGridContext;
+      var dataGridControl = dataGridContext.DataGridControl;
+
+      if( dataGridControl.SelectionUnit == SelectionUnit.Row )
+        throw new InvalidOperationException( "Can't add cell range when SelectionUnit is Row." );
+
+      if( !( dataGridContext.ItemsSourceCollection is DataGridVirtualizingCollectionViewBase ) )
+      {
+        var minIndex = Math.Min( item.ItemRange.StartIndex, item.ItemRange.EndIndex );
+        var maxIndex = Math.Max( item.ItemRange.StartIndex, item.ItemRange.EndIndex );
+
+        if( ( minIndex < 0 ) || ( maxIndex >= dataGridContext.Items.Count ) )
+          throw new ArgumentException( "The selection range targets items outside of the data source.", "item" );
+      }
+
+      var selectionManager = dataGridControl.SelectionChangerManager;
+      selectionManager.Begin();
+
+      try
+      {
+        selectionManager.SelectCells( dataGridContext, new SelectionCellRangeWithItems( item.ItemRange, null, item.ColumnRange ) );
+      }
+      finally
+      {
+        selectionManager.End( true, true );
       }
     }
 
-    public bool IsReadOnly
+    public void RemoveAt( int index )
     {
-      get
+      if( ( index < 0 ) || ( index >= m_storage.Count ) )
+        throw new ArgumentOutOfRangeException( "index", index, "index must be greater than or equal to zero and less than Count." );
+
+      var dataGridContext = m_storage.DataGridContext;
+      var selectionManager = dataGridContext.DataGridControl.SelectionChangerManager;
+      selectionManager.Begin();
+
+      try
       {
-        return false;
+        var cellRange = this[ index ];
+        selectionManager.UnselectCells( dataGridContext, new SelectionCellRangeWithItems( cellRange.ItemRange, null, cellRange.ColumnRange ) );
+      }
+      finally
+      {
+        selectionManager.End( true, true );
       }
     }
 
-    public bool IsFixedSize
-    {
-      get
-      {
-        return false;
-      }
-    }
+    #endregion
 
     #region IList Members
 
@@ -80,10 +127,26 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    bool IList.IsReadOnly
+    {
+      get
+      {
+        return ( ( ICollection<SelectionCellRange> )this ).IsReadOnly;
+      }
+    }
+
+    bool IList.IsFixedSize
+    {
+      get
+      {
+        return false;
+      }
+    }
+
     int IList.Add( object item )
     {
       this.Add( ( SelectionCellRange )item );
-      return m_list.Count - 1;
+      return this.Count - 1;
     }
 
     void IList.Clear()
@@ -116,15 +179,104 @@ namespace Xceed.Wpf.DataGrid
       return this.IndexOf( ( SelectionCellRange )item );
     }
 
-    #endregion IList Members
+    #endregion
+
+    #region ICollection<> Members
+
+    public int Count
+    {
+      get
+      {
+        return m_storage.Count;
+      }
+    }
+
+    bool ICollection<SelectionCellRange>.IsReadOnly
+    {
+      get
+      {
+        return false;
+      }
+    }
+
+    public void Add( SelectionCellRange item )
+    {
+      this.Insert( m_storage.Count, item );
+    }
+
+    public void Clear()
+    {
+      var dataGridContext = m_storage.DataGridContext;
+      var selectionManager = dataGridContext.DataGridControl.SelectionChangerManager;
+      selectionManager.Begin();
+
+      try
+      {
+        selectionManager.UnselectAllCells( dataGridContext );
+      }
+      finally
+      {
+        selectionManager.End( true, true );
+      }
+    }
+
+    public bool Contains( SelectionCellRange item )
+    {
+      return ( this.IndexOf( item ) >= 0 );
+    }
+
+    public bool Remove( SelectionCellRange item )
+    {
+      var dataGridContext = m_storage.DataGridContext;
+      var dataGridControl = dataGridContext.DataGridControl;
+
+      if( dataGridControl.SelectionUnit == SelectionUnit.Row )
+        throw new InvalidOperationException( "Can't remove cell range when SelectionUnit is Row." );
+
+      if( !( dataGridContext.ItemsSourceCollection is DataGridVirtualizingCollectionViewBase ) )
+      {
+        var minIndex = Math.Min( item.ItemRange.StartIndex, item.ItemRange.EndIndex );
+        var maxIndex = Math.Max( item.ItemRange.StartIndex, item.ItemRange.EndIndex );
+
+        if( ( minIndex < 0 ) || ( maxIndex >= dataGridContext.Items.Count ) )
+          throw new ArgumentException( "The selection range targets items outside of the data source.", "item" );
+      }
+
+      var selectionManager = dataGridControl.SelectionChangerManager;
+      selectionManager.Begin();
+
+      try
+      {
+        return selectionManager.UnselectCells( dataGridContext, new SelectionCellRangeWithItems( item.ItemRange, null, item.ColumnRange ) );
+      }
+      finally
+      {
+        selectionManager.End( true, true );
+      }
+    }
+
+    public void CopyTo( SelectionCellRange[] array, int arrayIndex )
+    {
+      ( ( ICollection )this ).CopyTo( array, arrayIndex );
+    }
+
+    #endregion
 
     #region ICollection Members
+
+    int ICollection.Count
+    {
+      get
+      {
+        return this.Count;
+      }
+    }
 
     object ICollection.SyncRoot
     {
       get
       {
-        return m_list;
+        return m_storage;
       }
     }
 
@@ -138,141 +290,12 @@ namespace Xceed.Wpf.DataGrid
 
     void ICollection.CopyTo( Array array, int arrayIndex )
     {
-      int count = m_list.Count;
+      var count = m_storage.Count;
 
       for( int i = 0; i < count; i++ )
       {
-        array.SetValue( m_list[ i ].CellRange, arrayIndex );
+        array.SetValue( m_storage[ i ].CellRange, arrayIndex );
         arrayIndex++;
-      }
-    }
-
-    #endregion ICollection Members
-
-    #region IList<SelectionRange> Members
-
-    public int IndexOf( SelectionCellRange item )
-    {
-      int count = m_list.Count;
-
-      for( int i = 0; i < count; i++ )
-      {
-        if( m_list[ i ].CellRange == item )
-          return i;
-      }
-
-      return -1;
-    }
-
-    public void Insert( int index, SelectionCellRange item )
-    {
-      if( ( index < 0 ) || ( index > m_list.Count ) )
-        throw new ArgumentOutOfRangeException( "index", index, "index must be greater than or equal to zero and less than or equal to Count." );
-
-      DataGridContext dataGridContext = m_list.DataGridContext;
-      SelectionManager selectionManager = dataGridContext.DataGridControl.SelectionChangerManager;
-      selectionManager.Begin();
-
-      try
-      {
-        selectionManager.SelectCells( dataGridContext, new SelectionCellRangeWithItems( item.ItemRange, null, item.ColumnRange ) );
-      }
-      finally
-      {
-        selectionManager.End( false, true, true );
-      }
-    }
-
-    public void RemoveAt( int index )
-    {
-      if( ( index < 0 ) || ( index >= m_list.Count ) )
-        throw new ArgumentOutOfRangeException( "index", index, "index must be greater than or equal to zero and less than Count." );
-
-      DataGridContext dataGridContext = m_list.DataGridContext;
-      SelectionManager selectionManager = dataGridContext.DataGridControl.SelectionChangerManager;
-      selectionManager.Begin();
-
-      try
-      {
-        SelectionCellRange cellRange = this[ index ];
-        selectionManager.UnselectCells( dataGridContext, new SelectionCellRangeWithItems( cellRange.ItemRange, null, cellRange.ColumnRange ) );
-      }
-      finally
-      {
-        selectionManager.End( false, true, true );
-      }
-    }
-
-    #endregion
-
-    #region ICollection<SelectionRange> Members
-
-    public void Add( SelectionCellRange item )
-    {
-      DataGridContext dataGridContext = m_list.DataGridContext;
-      DataGridControl dataGridControl = dataGridContext.DataGridControl;
-
-      if( dataGridControl.SelectionUnit == SelectionUnit.Row )
-        throw new InvalidOperationException( "Can't add cell range when SelectionUnit is Row." );
-
-      SelectionManager selectionManager = dataGridControl.SelectionChangerManager;
-      selectionManager.Begin();
-
-      try
-      {
-        selectionManager.SelectCells( dataGridContext, new SelectionCellRangeWithItems( item.ItemRange, null, item.ColumnRange ) );
-      }
-      finally
-      {
-        selectionManager.End( false, true, true );
-      }
-    }
-
-    public void Clear()
-    {
-      DataGridContext dataGridContext = m_list.DataGridContext;
-      SelectionManager selectionManager = dataGridContext.DataGridControl.SelectionChangerManager;
-      selectionManager.Begin();
-
-      try
-      {
-        selectionManager.UnselectAllCells( dataGridContext );
-      }
-      finally
-      {
-        selectionManager.End( false, true, true );
-      }
-    }
-
-    public bool Contains( SelectionCellRange item )
-    {
-      return this.IndexOf( item ) != -1;
-    }
-
-    public void CopyTo( SelectionCellRange[] array, int arrayIndex )
-    {
-      int count = m_list.Count;
-
-      for( int i = 0; i < count; i++ )
-      {
-        array[ arrayIndex ] = m_list[ i ].CellRange;
-        arrayIndex++;
-      }
-    }
-
-    public bool Remove( SelectionCellRange item )
-    {
-      DataGridContext dataGridContext = m_list.DataGridContext;
-      SelectionManager selectionManager = dataGridContext.DataGridControl.SelectionChangerManager;
-      selectionManager.Begin();
-
-      try
-      {
-        return selectionManager.UnselectCells( dataGridContext, new SelectionCellRangeWithItems( item.ItemRange, null, item.ColumnRange ) );
-      }
-      finally
-      {
-        selectionManager.End( false, true, true );
       }
     }
 
@@ -282,11 +305,8 @@ namespace Xceed.Wpf.DataGrid
 
     public IEnumerator<SelectionCellRange> GetEnumerator()
     {
-      // We use a foreach to get the exception when the list is changed
-      foreach( SelectionCellRangeWithItems cellRangeWithItems in m_list )
-      {
-        yield return cellRangeWithItems.CellRange;
-      }
+      return ( from item in m_storage
+               select item.CellRange ).GetEnumerator();
     }
 
     #endregion
@@ -300,6 +320,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    private SelectedCellsStorage m_list;
+    private readonly SelectedCellsStorage m_storage;
   }
 }

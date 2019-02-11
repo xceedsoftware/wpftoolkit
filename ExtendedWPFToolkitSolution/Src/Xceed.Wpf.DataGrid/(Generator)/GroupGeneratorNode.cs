@@ -32,15 +32,11 @@ namespace Xceed.Wpf.DataGrid
       m_groupConfig = groupConfig;
     }
 
-    #region PUBLIC EVENTS
-
     public event EventHandler TotalLeafCountChanged;
     public event EventHandler IsExpandedChanged;
     public event EventHandler IsExpandedChanging;
 
-    #endregion PUBLIC EVENTS
-
-    #region PUBLIC PROPERTIES
+    #region CollectionViewGroup Property
 
     public CollectionViewGroup CollectionViewGroup
     {
@@ -49,6 +45,10 @@ namespace Xceed.Wpf.DataGrid
         return m_group;
       }
     }
+
+    #endregion
+
+    #region UIGroup Property
 
     public Group UIGroup
     {
@@ -62,6 +62,10 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    #endregion
+
+    #region GroupConfiguration Property
+
     public GroupConfiguration GroupConfiguration
     {
       get
@@ -70,6 +74,10 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    #endregion
+
+    #region TotalLeafCount Property
+
     public int TotalLeafCount
     {
       get
@@ -77,6 +85,10 @@ namespace Xceed.Wpf.DataGrid
         return m_leafCount;
       }
     }
+
+    #endregion
+
+    #region ItemCount Property
 
     internal override int ItemCount
     {
@@ -91,6 +103,10 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    #endregion
+
+    #region IsExpanded Property
+
     public bool IsExpanded
     {
       get
@@ -102,22 +118,58 @@ namespace Xceed.Wpf.DataGrid
         //if the expanded status changed
         if( m_isExpanded != value )
         {
-          if( this.IsExpandedChanging != null )
+          var dataGridContext = m_uiGroup.DataGridContext;
+          var groupExpansionChangingEventArgs = default( GroupExpansionChangingEventArgs );
+          if( value )
           {
-            this.IsExpandedChanging( this, EventArgs.Empty );
+            groupExpansionChangingEventArgs = new GroupExpansionChangingEventArgs( DataGridControl.GroupExpandingEvent, m_uiGroup, m_group, dataGridContext, true );
+            dataGridContext.DataGridControl.RaiseGroupExpanding( groupExpansionChangingEventArgs );
+          }
+          else
+          {
+            groupExpansionChangingEventArgs = new GroupExpansionChangingEventArgs( DataGridControl.GroupCollapsingEvent, m_uiGroup, m_group, dataGridContext, false );
+            dataGridContext.DataGridControl.RaiseGroupCollapsing( groupExpansionChangingEventArgs );
+          }
+
+          if( groupExpansionChangingEventArgs.Cancel )
+            return;
+
+          var handler = this.IsExpandedChanging;
+          if( handler != null )
+          {
+            handler.Invoke( this, EventArgs.Empty );
           }
 
           this.NotifyImmediateChildren( value );
 
           m_isExpanded = value;
 
-          if( this.IsExpandedChanged != null )
+          handler = this.IsExpandedChanged;
+          if( handler != null )
           {
-            this.IsExpandedChanged( this, EventArgs.Empty );
+            handler.Invoke( this, EventArgs.Empty );
+          }
+
+          if( m_isExpanded )
+          {
+            dataGridContext.DataGridControl.RaiseGroupExpanded( new GroupExpansionChangedEventArgs( DataGridControl.GroupExpandedEvent, m_uiGroup, m_group, dataGridContext, true ) );
+          }
+          else
+          {
+            dataGridContext.DataGridControl.RaiseGroupCollapsed( new GroupExpansionChangedEventArgs( DataGridControl.GroupCollapsedEvent, m_uiGroup, m_group, dataGridContext, false ) );
           }
         }
       }
     }
+
+    internal void SetIsExpandedAtInitialization( bool isExpanded )
+    {
+      m_isExpanded = isExpanded;
+    }
+
+    #endregion
+
+    #region NamesTree Property
 
     public object[] NamesTree
     {
@@ -127,9 +179,29 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion PUBLIC PROPERTIES
+    #endregion
 
-    #region PUBLIC METHODS
+    #region Child Property
+
+    public GeneratorNode Child
+    {
+      get;
+      set;
+    }
+
+    #endregion
+
+    #region IsComputedExpandedOverride Property
+
+    protected override bool IsComputedExpandedOverride
+    {
+      get
+      {
+        return this.IsExpanded;
+      }
+    }
+
+    #endregion
 
     public HeadersFootersGeneratorNode GetHeaderNode()
     {
@@ -151,6 +223,38 @@ namespace Xceed.Wpf.DataGrid
       } while( ( footerGeneratorNode == null ) && ( generatorNode != null ) );
 
       return footerGeneratorNode;
+    }
+
+    protected override int AdjustItemCountOverride( int delta )
+    {
+      delta = base.AdjustItemCountOverride( delta );
+
+      m_itemCount += delta;
+
+      GroupGeneratorNode parentGroup = this.Parent as GroupGeneratorNode;
+      if( ( parentGroup != null ) && ( parentGroup.IsExpanded == false ) )
+      {
+        return 0;
+      }
+
+      return delta;
+    }
+
+    protected override int AdjustLeafCountOverride( int delta )
+    {
+      delta = base.AdjustLeafCountOverride( delta );
+
+      if( delta != 0 )
+      {
+        m_leafCount += delta;
+
+        if( this.TotalLeafCountChanged != null )
+        {
+          this.TotalLeafCountChanged( this, EventArgs.Empty );
+        }
+      }
+
+      return delta;
     }
 
     internal override void NotifyExpansionStateChanged( bool isParentExpanded )
@@ -183,64 +287,6 @@ namespace Xceed.Wpf.DataGrid
       m_group = null;
     }
 
-    #endregion PUBLIC METHODS
-
-    #region PUBLIC FIELDS
-
-    public GeneratorNode Child;
-
-    #endregion PUBLIC FIELDS
-
-    #region PROTECTED PROPERTIES
-
-    protected override bool IsComputedExpandedOverride
-    {
-      get
-      {
-        return this.IsExpanded;
-      }
-    }
-
-    #endregion PROTECTED PROPERTIES
-
-    #region PROTECTED METHODS
-
-    protected override int AdjustItemCountOverride( int delta )
-    {
-      delta = base.AdjustItemCountOverride( delta );
-
-      m_itemCount += delta;
-
-      GroupGeneratorNode parentGroup = this.Parent as GroupGeneratorNode;
-      if( ( parentGroup != null ) && ( parentGroup.IsExpanded == false ) )
-      {
-        return 0;
-      }
-
-      return delta;
-    }
-
-    protected override int AdjustLeafCountOverride( int delta )
-    {
-      delta = base.AdjustLeafCountOverride( delta );
-
-      if( delta != 0 )
-      {
-        m_leafCount += delta;
-
-        if( this.TotalLeafCountChanged != null )
-        {
-          this.TotalLeafCountChanged( this, new EventArgs() );
-        }
-      }
-
-      return delta;
-    }
-
-    #endregion PROTECTED METHODS
-
-    #region INTERNAL METHODS
-
     internal void BuildNamesTree()
     {
       int level = this.Level;
@@ -257,10 +303,6 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion INTERNAL METHODS
-
-    #region PRIVATE METHODS
-
     private void NotifyImmediateChildren( bool value )
     {
       if( this.Child != null )
@@ -275,10 +317,6 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion PRIVATE METHODS
-
-    #region PRIVATE FIELDS
-
     private GroupConfiguration m_groupConfig;
     private bool m_isExpanded = true;
     private int m_leafCount; //this is the storage for the total number of "leaf" items that are child of this group. (no counting the groups, headers and footers)
@@ -286,7 +324,5 @@ namespace Xceed.Wpf.DataGrid
     private CollectionViewGroup m_group;
     private Group m_uiGroup;
     private object[] m_namesTree;
-
-    #endregion PRIVATE FIELDS
   }
 }

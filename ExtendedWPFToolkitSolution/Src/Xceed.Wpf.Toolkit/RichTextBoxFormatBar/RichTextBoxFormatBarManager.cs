@@ -79,18 +79,21 @@ namespace Xceed.Wpf.Toolkit
     {
       if( e.ChangedButton == MouseButton.Left && e.LeftButton == MouseButtonState.Released )
       {
-        TextRange selectedText = new TextRange( _richTextBox.Selection.Start, _richTextBox.Selection.End );
+        if( !_richTextBox.IsReadOnly )
+        {
+          TextRange selectedText = new TextRange( _richTextBox.Selection.Start, _richTextBox.Selection.End );
 #if !VS2008
-        if( selectedText.Text.Length > 0 && !String.IsNullOrWhiteSpace( selectedText.Text ) )
-          ShowAdorner();
+          if( selectedText.Text.Length > 0 && !String.IsNullOrWhiteSpace( selectedText.Text ) )
+            ShowAdorner();
 #else
-        if( selectedText.Text.Length > 0 && !String.IsNullOrEmpty( selectedText.Text ) )
-          ShowAdorner();
+          if( selectedText.Text.Length > 0 && !String.IsNullOrEmpty( selectedText.Text ) )
+            ShowAdorner();
 #endif
-        else
-          HideAdorner();
+          else
+            HideAdorner();
 
-        e.Handled = true;
+          e.Handled = true;
+        }
       }
       else
         HideAdorner();
@@ -100,9 +103,13 @@ namespace Xceed.Wpf.Toolkit
     {
       Point p = e.GetPosition( _adorner );
       double maxDist = 0d;
+      bool preventDisplayFadeOut = ( ( _adorner.Child != null ) && ( _adorner.Child is IRichTextBoxFormatBar ) ) ?
+                                  ( ( IRichTextBoxFormatBar )_adorner.Child ).PreventDisplayFadeOut :
+                                  false;
 
       //Mouse is inside FormatBar: Nothing to do.
-      if( ( p.X >= 0 ) && ( p.X <= _adorner.ActualWidth ) && ( p.Y >= 0 ) && ( p.Y <= _adorner.ActualHeight ) )
+      if( preventDisplayFadeOut ||
+        ( p.X >= 0 ) && ( p.X <= _adorner.ActualWidth ) && ( p.Y >= 0 ) && ( p.Y <= _adorner.ActualHeight ) )
       {
         return;
       }
@@ -126,12 +133,6 @@ namespace Xceed.Wpf.Toolkit
 
         _adorner.Opacity = 1d - ( Math.Min( maxDist, 100d ) / 100d );
       }
-    }
-
-    private void OnMouseLeaveParentWindow( object sender, MouseEventArgs e )
-    {
-      // Mouse is outside parent Window: Close it.
-      HideAdorner();
     }
 
     void RichTextBox_TextChanged( object sender, TextChangedEventArgs e )
@@ -176,12 +177,13 @@ namespace Xceed.Wpf.Toolkit
 
       VerifyAdornerLayer();
 
-      _toolbar.Update();
-
       Control adorningEditor = _toolbar as Control;
 
       if( _adorner.Child == null )
         _adorner.Child = adorningEditor;
+
+      adorningEditor.ApplyTemplate();
+      _toolbar.Update();
 
       _adorner.Visibility = Visibility.Visible;
 
@@ -191,7 +193,6 @@ namespace Xceed.Wpf.Toolkit
       if( _parentWindow != null )
       {
         Mouse.AddMouseMoveHandler( _parentWindow, OnPreviewMouseMoveParentWindow );
-        Mouse.AddMouseLeaveHandler( _parentWindow, OnMouseLeaveParentWindow );
       }
     }
 
@@ -203,19 +204,31 @@ namespace Xceed.Wpf.Toolkit
     {
       Point mousePosition = Mouse.GetPosition( _richTextBox );
 
-      double left = mousePosition.X;
-      double top = ( mousePosition.Y - 15 ) - adorningEditor.ActualHeight;
+      var left = mousePosition.X;
+      var top = mousePosition.Y;
 
-      //top
+      // Top boundary
       if( top < 0 )
       {
-        top = mousePosition.Y + 10;
+        top = 5d;
       }
 
-      //right boundary
-      if( left + adorningEditor.ActualWidth > _richTextBox.ActualWidth - 20 )
+      // Left boundary
+      if( left < 0 )
       {
-        left = left - ( adorningEditor.ActualWidth - ( _richTextBox.ActualWidth - left ) );
+        left = 5d;
+      }
+
+      // Right boundary
+      if( left + adorningEditor.ActualWidth > _richTextBox.ActualWidth - 10d )
+      {
+        left = _richTextBox.ActualWidth - adorningEditor.ActualWidth - 10d;
+      }
+
+      // Bottom boundary
+      if( top + adorningEditor.ActualHeight > _richTextBox.ActualHeight - 10d )
+      {
+        top = _richTextBox.ActualHeight - adorningEditor.ActualHeight - 10d;
       }
 
       _adorner.SetOffsets( left, top );
@@ -250,7 +263,6 @@ namespace Xceed.Wpf.Toolkit
         if( _parentWindow != null )
         {
           Mouse.RemoveMouseMoveHandler( _parentWindow, OnPreviewMouseMoveParentWindow );
-          Mouse.RemoveMouseLeaveHandler( _parentWindow, OnMouseLeaveParentWindow );
         }
       }
     }

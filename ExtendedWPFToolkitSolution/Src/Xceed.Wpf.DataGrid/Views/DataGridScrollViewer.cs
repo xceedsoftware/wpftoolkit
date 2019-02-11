@@ -16,27 +16,19 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Windows.Controls;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using Xceed.Utils.Wpf;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Windows.Data;
-using Xceed.Wpf.DataGrid.Converters;
-using Xceed.Utils.Math;
 using System.Windows.Threading;
-using System.Collections.ObjectModel;
+using Xceed.Wpf.DataGrid.Converters;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
   public class DataGridScrollViewer : ScrollViewer
   {
-    #region CONSTRUCTORS
-
     static DataGridScrollViewer()
     {
       DataGridControl.ParentDataGridControlPropertyKey.OverrideMetadata( typeof( DataGridScrollViewer ), new FrameworkPropertyMetadata( new PropertyChangedCallback( OnParentDataGridChanged ) ) );
@@ -46,14 +38,16 @@ namespace Xceed.Wpf.DataGrid.Views
     {
       this.Loaded += new RoutedEventHandler( OnLoaded );
       this.Unloaded += new RoutedEventHandler( OnUnloaded );
+      m_templateHelper = new ScrollViewerTemplateHelper( this, this.DragScrollBegin, this.DragScrollEnd );
     }
-
-    #endregion
 
     #region SynchronizedScrollViewerPosition Attached Property
 
-    public static readonly DependencyProperty SynchronizedScrollViewerPositionProperty =
-        DependencyProperty.RegisterAttached( "SynchronizedScrollViewerPosition", typeof( SynchronizedScrollViewerPosition ), typeof( TableViewScrollViewer ), new UIPropertyMetadata( SynchronizedScrollViewerPosition.None ) );
+    public static readonly DependencyProperty SynchronizedScrollViewerPositionProperty = DependencyProperty.RegisterAttached(
+      "SynchronizedScrollViewerPosition",
+      typeof( SynchronizedScrollViewerPosition ),
+      typeof( TableViewScrollViewer ),
+      new UIPropertyMetadata( SynchronizedScrollViewerPosition.None ) );
 
     public static SynchronizedScrollViewerPosition GetSynchronizedScrollViewerPosition( DependencyObject obj )
     {
@@ -67,7 +61,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion SynchronizedScrollViewerPosition Attached Property
 
-    #region INTERNAL PROPERTIES
+    #region SynchronizedScrollViewersWidth Property
 
     internal double SynchronizedScrollViewersWidth
     {
@@ -90,6 +84,10 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
+    #endregion
+
+    #region SynchronizedScrollViewersHeight Property
+
     internal double SynchronizedScrollViewersHeight
     {
       get
@@ -111,6 +109,10 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
+    #endregion
+
+    #region SynchronizedScrollViewers Property
+
     internal IEnumerable<SynchronizedScrollViewer> SynchronizedScrollViewers
     {
       get
@@ -119,8 +121,11 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    private static readonly DependencyProperty SynchronizedScrollViewerExtentProperty =
-        DependencyProperty.Register( "SynchronizedScrollViewerExtent", typeof( double ), typeof( DataGridScrollViewer ), new FrameworkPropertyMetadata( new PropertyChangedCallback( DataGridScrollViewer.OnSynchronizedScrollViewerExtentPropertyChanged ) ) );
+    private static readonly DependencyProperty SynchronizedScrollViewerExtentProperty = DependencyProperty.Register(
+      "SynchronizedScrollViewerExtent",
+      typeof( double ),
+      typeof( DataGridScrollViewer ),
+      new FrameworkPropertyMetadata( new PropertyChangedCallback( DataGridScrollViewer.OnSynchronizedScrollViewerExtentPropertyChanged ) ) );
 
     private static void OnSynchronizedScrollViewerExtentPropertyChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
@@ -147,27 +152,29 @@ namespace Xceed.Wpf.DataGrid.Views
 
     #endregion
 
-    #region PROTECTED PROPERTIES
+    #region HorizontalScrollBar Property
 
     protected internal ScrollBar HorizontalScrollBar
     {
       get
       {
-        return m_horizontalScrollBar;
-      }
-    }
-
-    protected internal ScrollBar VerticalScrollBar
-    {
-      get
-      {
-        return m_verticalScrollBar;
+        return m_templateHelper.HorizontalScrollBar;
       }
     }
 
     #endregion
 
-    #region PUBLIC METHODS
+    #region VerticalScrollBar Property
+
+    protected internal ScrollBar VerticalScrollBar
+    {
+      get
+      {
+        return m_templateHelper.VerticalScrollBar;
+      }
+    }
+
+    #endregion
 
     public override void OnApplyTemplate()
     {
@@ -179,62 +186,10 @@ namespace Xceed.Wpf.DataGrid.Views
       this.PopulateScrollViewerList( this, m_childScrollViewers );
       this.FindAllDeferableChildren( this, m_deferableChilds );
 
-      m_horizontalScrollBar = this.GetTemplateChild( "PART_HorizontalScrollBar" ) as ScrollBar;
-      m_verticalScrollBar = this.GetTemplateChild( "PART_VerticalScrollBar" ) as ScrollBar;
+      m_templateHelper.RefreshTemplate();
 
       this.UpdateChildScrollViewers();
-
-      DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
-
-      if( dataGridContext == null )
-        return;
-
-      if( m_verticalScrollBar != null )
-      {
-        if( dataGridContext.DataGridControl.ScrollViewer != null )
-        {
-          // Assert the Template as been applied on the ScrollBar to get access to the ScrollThumb
-          if( m_verticalScrollBar.Track == null )
-            m_verticalScrollBar.ApplyTemplate();
-
-          Debug.Assert( m_verticalScrollBar.Track != null );
-
-          if( m_verticalScrollBar.Track != null )
-            m_verticalScrollThumb = m_verticalScrollBar.Track.Thumb;
-
-          if( m_verticalScrollThumb != null )
-          {
-            // Register to IsMouseCaptureChanged to know when this ScrollThumb is clicked to display the ScrollTip if required
-            m_verticalScrollThumb.IsMouseCapturedChanged += new DependencyPropertyChangedEventHandler( this.ScrollThumb_IsMouseCapturedChanged );
-          }
-        }
-      }
-
-      if( m_horizontalScrollBar != null )
-      {
-        if( dataGridContext.DataGridControl.ScrollViewer != null )
-        {
-          // Assert the Template as been applied on the ScrollBar to get access to the ScrollThumb
-          if( m_horizontalScrollBar.Track == null )
-            m_horizontalScrollBar.ApplyTemplate();
-
-          Debug.Assert( m_horizontalScrollBar.Track != null );
-
-          if( m_horizontalScrollBar.Track != null )
-            m_horizontalScrollThumb = m_horizontalScrollBar.Track.Thumb;
-
-          if( m_horizontalScrollThumb != null )
-          {
-            // Register to IsMouseCaptureChanged to know when this ScrollThumb is clicked to display the ScrollTip if required
-            m_horizontalScrollThumb.IsMouseCapturedChanged += new DependencyPropertyChangedEventHandler( this.ScrollThumb_IsMouseCapturedChanged );
-          }
-        }
-      }
     }
-
-    #endregion
-
-    #region INTERNAL METHODS
 
     internal void HandlePageUpNavigation()
     {
@@ -330,187 +285,6 @@ namespace Xceed.Wpf.DataGrid.Views
         }
       }
     }
-
-    #region GetVisibleColumn
-
-
-    internal static int GetFirstVisibleFocusableColumnIndex( DataGridContext currentDataGridContext )
-    {
-      return DataGridScrollViewer.GetFirstVisibleFocusableColumnIndex( currentDataGridContext, null );
-    }
-
-    internal static int GetFirstVisibleFocusableColumnIndex( DataGridContext currentDataGridContext, Row newRow )
-    {
-      ReadOnlyColumnCollection visibleColumnsCollection = ( ReadOnlyColumnCollection )currentDataGridContext.VisibleColumns;
-
-      if( visibleColumnsCollection == null )
-        return -1;
-
-      int firstVisiblefocusableColumnIndex;
-      int visibleColumnsCount = visibleColumnsCollection.Count - 1;
-
-      Row currentRow = ( currentDataGridContext.CurrentRow != null ) ? currentDataGridContext.CurrentRow : newRow;
-
-      if( currentRow != null )
-      {
-        for( firstVisiblefocusableColumnIndex = 0; firstVisiblefocusableColumnIndex <= visibleColumnsCount; firstVisiblefocusableColumnIndex++ )
-        {
-          if( currentRow.Cells[ visibleColumnsCollection[ firstVisiblefocusableColumnIndex ] ].GetCalculatedCanBeCurrent() )
-          {
-            return firstVisiblefocusableColumnIndex;
-          }
-        }
-      }
-
-      return -1;
-    }
-
-    internal static int GetLastVisibleFocusableColumnIndex( DataGridContext currentDataGridContext )
-    {
-      ReadOnlyColumnCollection visibleColumnsCollection = ( ReadOnlyColumnCollection )currentDataGridContext.VisibleColumns;
-
-      if( visibleColumnsCollection == null )
-        return -1;
-
-      int lastVisiblefocusableColumnIndex;
-      int visibleColumnsCount = visibleColumnsCollection.Count - 1;
-
-      Row currentRow = currentDataGridContext.CurrentRow;
-
-      if( currentRow != null )
-      {
-        for( lastVisiblefocusableColumnIndex = visibleColumnsCount; lastVisiblefocusableColumnIndex >= 0; lastVisiblefocusableColumnIndex-- )
-        {
-          if( currentRow.Cells[ visibleColumnsCollection[ lastVisiblefocusableColumnIndex ] ].GetCalculatedCanBeCurrent() )
-          {
-            return lastVisiblefocusableColumnIndex;
-          }
-        }
-      }
-      return -1;
-    }
-
-    internal static int GetNextVisibleFocusableColumnIndex( DataGridContext currentDataGridContext )
-    {
-      ColumnBase currentColumn = currentDataGridContext.CurrentColumn;
-
-      return DataGridScrollViewer.GetNextVisibleFocusableColumnIndex( currentDataGridContext, currentColumn );
-    }
-
-    internal static int GetNextVisibleFocusableColumnIndex( DataGridContext currentDataGridContext, ColumnBase currentColumn )
-    {
-      ReadOnlyColumnCollection visibleColumnsCollection = ( ReadOnlyColumnCollection )currentDataGridContext.VisibleColumns;
-
-      if( visibleColumnsCollection == null )
-        return -1;
-
-      int visibleColumnsCollectionCount = visibleColumnsCollection.Count;
-
-      Row currentRow = currentDataGridContext.CurrentRow;
-
-      if( currentRow != null )
-      {
-        int currentColumnIndex = currentDataGridContext.VisibleColumns.IndexOf( currentColumn );
-        int NextVisibleFocusableColumnIndex;
-
-        for( NextVisibleFocusableColumnIndex = currentColumnIndex + 1; NextVisibleFocusableColumnIndex < visibleColumnsCollectionCount; NextVisibleFocusableColumnIndex++ )
-        {
-          if( currentRow.Cells[ visibleColumnsCollection[ NextVisibleFocusableColumnIndex ] ].GetCalculatedCanBeCurrent() )
-          {
-            return NextVisibleFocusableColumnIndex;
-          }
-        }
-      }
-
-      return -1;
-    }
-
-    internal static int GetPreviousVisibleFocusableColumnIndex( DataGridContext currentDataGridContext, ColumnBase currentColumn )
-    {
-      ReadOnlyColumnCollection visibleColumnsCollection = ( ReadOnlyColumnCollection )currentDataGridContext.VisibleColumns;
-      int visibleColumnsCollectionCount = visibleColumnsCollection.Count;
-
-      if( currentColumn != null )
-      {
-        Row currentRow = currentDataGridContext.CurrentRow;
-
-        int currentColumnIndex = currentDataGridContext.VisibleColumns.IndexOf( currentColumn );
-        int previousVisibleFocusableColumnIndex;
-
-        for( previousVisibleFocusableColumnIndex = currentColumnIndex - 1; previousVisibleFocusableColumnIndex >= 0; previousVisibleFocusableColumnIndex-- )
-        {
-          if( currentRow.Cells[ visibleColumnsCollection[ previousVisibleFocusableColumnIndex ] ].GetCalculatedCanBeCurrent() )
-          {
-            return previousVisibleFocusableColumnIndex;
-          }
-        }
-      }
-      return DataGridScrollViewer.GetLastVisibleFocusableColumnIndex( currentDataGridContext );
-    }
-
-    internal static int GetPreviousVisibleFocusableColumnIndex( DataGridContext currentDataGridContext )
-    {
-      ColumnBase currentColumn = currentDataGridContext.CurrentColumn;
-
-      return DataGridScrollViewer.GetPreviousVisibleFocusableColumnIndex( currentDataGridContext, currentColumn );
-    }
-
-    #endregion GetVisibleColumn
-
-    internal static void ProcessHomeKey( DataGridContext dataGridContext )
-    {
-      ReadOnlyColumnCollection visibleColumnsCollection = ( ReadOnlyColumnCollection )dataGridContext.VisibleColumns;
-
-      int visibleColumnsCount = visibleColumnsCollection.Count;
-
-      // Set the CurrentColumn only if there are VisibleColumns
-      if( visibleColumnsCount > 0 )
-      {
-        int firstVisiblefocusableColumnIndex = DataGridScrollViewer.GetFirstVisibleFocusableColumnIndex( dataGridContext );
-
-        if( firstVisiblefocusableColumnIndex >= 0 )
-        {
-          try
-          {
-            dataGridContext.SetCurrentColumnAndChangeSelection( visibleColumnsCollection[ firstVisiblefocusableColumnIndex ] );
-          }
-          catch( DataGridException )
-          {
-            // We swallow the exception if it occurs because of a validation error or Cell was read-only or
-            // any other GridException.
-          }
-        }
-      }
-    }
-
-    internal static void ProcessEndKey( DataGridContext dataGridContext )
-    {
-      ReadOnlyColumnCollection visibleColumnsCollection = ( ReadOnlyColumnCollection )dataGridContext.VisibleColumns;
-      int visibleColumnsCount = visibleColumnsCollection.Count;
-
-      // Set the CurrentColumn only if there are VisibleColumns
-      if( visibleColumnsCount > 0 )
-      {
-        int lastVisiblefocusableColumnIndex = DataGridScrollViewer.GetLastVisibleFocusableColumnIndex( dataGridContext );
-
-        if( lastVisiblefocusableColumnIndex >= 0 )
-        {
-          try
-          {
-            dataGridContext.SetCurrentColumnAndChangeSelection( visibleColumnsCollection[ lastVisiblefocusableColumnIndex ] );
-          }
-          catch( DataGridException )
-          {
-            // We swallow the exception if it occurs because of a validation error or Cell was read-only or
-            // any other GridException.
-          }
-        }
-      }
-    }
-
-    #endregion
-
-    #region PROTECTED METHODS
 
     protected override void OnKeyDown( KeyEventArgs e )
     {
@@ -825,24 +599,21 @@ namespace Xceed.Wpf.DataGrid.Views
 
       ColumnBase currentColumn = dataGridContext.CurrentColumn;
 
-      if( ( ( navigationBehavior == NavigationBehavior.CellOnly )
-        || ( navigationBehavior == NavigationBehavior.RowOrCell ) )
-        && ( currentColumn != null ) )
+      if( ( ( navigationBehavior == NavigationBehavior.CellOnly ) || ( navigationBehavior == NavigationBehavior.RowOrCell ) ) && ( currentColumn != null ) )
       {
-
         int oldCurrentIndex = currentColumn.Index;
 
-        DataGridScrollViewer.ProcessHomeKey( dataGridContext );
-        TableViewColumnVirtualizationManager columnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
+        NavigationHelper.MoveFocusToFirstVisibleColumn( dataGridContext );
+
+        var columnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManagerBase;
 
         //if the first focusable column is is within the viewport, scroll so 0d offset, otherwise, bringIntoView
-        bool isFixedColumn = ( columnVirtualizationManager == null ) ?
-          false : columnVirtualizationManager.FixedFieldNames.Contains( currentColumn.FieldName );
+        bool isFixedColumn = ( columnVirtualizationManager == null ) ? false : columnVirtualizationManager.GetFixedFieldNames().Contains( currentColumn.FieldName );
 
-        if( ( ( this.IsCellsOffsetNeedReset( dataGridContext ) )
-          && ( oldCurrentIndex == currentColumn.Index ) )
-          || ( isFixedColumn ) )
+        if( ( ( this.IsCellsOffsetNeedReset( dataGridContext ) ) && ( oldCurrentIndex == currentColumn.Index ) ) || ( isFixedColumn ) )
+        {
           this.Dispatcher.BeginInvoke( DispatcherPriority.Normal, new Action( this.ScrollToLeftEnd ) );
+        }
 
         if( ( e.KeyboardDevice.Modifiers & ModifierKeys.Control ) == ModifierKeys.Control )
         {
@@ -867,7 +638,9 @@ namespace Xceed.Wpf.DataGrid.Views
 
           //than handle new selection!
           if( navigationBehavior != NavigationBehavior.None )
+          {
             this.HandlePageUpNavigation();
+          }
         }
         else
         {
@@ -909,18 +682,17 @@ namespace Xceed.Wpf.DataGrid.Views
 
       ColumnBase CurrentColumn = dataGridContext.CurrentColumn;
 
-      if( ( ( navigationBehavior == NavigationBehavior.CellOnly )
-        || ( navigationBehavior == NavigationBehavior.RowOrCell ) )
-        && ( CurrentColumn != null ) )
+      if( ( ( navigationBehavior == NavigationBehavior.CellOnly ) || ( navigationBehavior == NavigationBehavior.RowOrCell ) ) && ( CurrentColumn != null ) )
       {
         int oldCurrentIndex = CurrentColumn.Index;
 
-        DataGridScrollViewer.ProcessEndKey( dataGridContext );
+        NavigationHelper.MoveFocusToLastVisibleColumn( dataGridContext );
 
         //if the last focusable column is is within the viewport, scroll to Extended offset, otherwise, bringIntoView
-
         if( ( this.IsCellsOffsetNeedReset( dataGridContext ) ) && ( oldCurrentIndex == CurrentColumn.Index ) )
+        {
           this.Dispatcher.BeginInvoke( DispatcherPriority.Normal, new Action( this.ScrollToRightEnd ) );
+        }
 
         if( ( e.KeyboardDevice.Modifiers & ModifierKeys.Control ) == ModifierKeys.Control )
         {
@@ -945,7 +717,9 @@ namespace Xceed.Wpf.DataGrid.Views
 
           // Than handle new selection!
           if( navigationBehavior != NavigationBehavior.None )
+          {
             this.HandlePageDownNavigation();
+          }
         }
         else
         {
@@ -965,15 +739,13 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private bool IsCellsOffsetNeedReset( DataGridContext dataGridContext )
     {
-      TableViewColumnVirtualizationManager columnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManager;
-
+      var columnVirtualizationManager = dataGridContext.ColumnVirtualizationManager as TableViewColumnVirtualizationManagerBase;
       if( columnVirtualizationManager == null )
         return false;
 
       Cell targetCell = dataGridContext.CurrentCell;
 
-      // if the targetCell is null, it means we are on a header or.. (a non focusable item)
-      // we want to scroll as the "no navigation" behavior
+      // if the targetCell is null, it means we are on a header or a non focusable item; thus we want to scroll as the "no navigation" behavior
       if( targetCell == null )
         return true;
 
@@ -982,6 +754,7 @@ namespace Xceed.Wpf.DataGrid.Views
 
       double viewportWidth = this.ViewportWidth;
       double fixedColumnWidth = columnVirtualizationManager.FixedColumnsWidth;
+      double fixedColumnSplitterWidth = 0;
       double cellsWidth = targetCell.ParentColumn.Width;
 
       Point cellToScrollingCellsDecorator = targetCell.TranslatePoint( new Point(), fixedCellPanel.ScrollingCellsDecorator );
@@ -992,20 +765,17 @@ namespace Xceed.Wpf.DataGrid.Views
       leftEdgeOutOfViewPort = ( cellToScrollingCellsDecorator.X < 0 ) ? true : false;
 
       // Verify if the Cell's right edge is visible in the ViewPort
-      Point cellToItemsHost = targetCell.TranslatePoint( new Point( cellsWidth, 0 ),
-        itemsHost );
+      Point cellToItemsHost = targetCell.TranslatePoint( new Point( cellsWidth, 0 ), itemsHost );
 
       // If the right edge is out of Viewport, ensure not to call the resetHorizontalOffset
       bool rightEdgeOutOfViewPort = ( ( cellToItemsHost.X - viewportWidth ) > 0 ) ? true : false;
 
       bool resetHorizontalOffset = false;
 
-      // if the cell is inside the viewPort or if one of the edges of the cell are outside the portView but the
-      // the viewPort is not wide enough to contain the cell
+      // if the cell is inside the viewPort or if one of the edges of the cell are outside the portView but the the viewPort is not wide enough to contain the cell
       if( ( ( !rightEdgeOutOfViewPort ) && ( !leftEdgeOutOfViewPort ) )
-        || ( ( ( rightEdgeOutOfViewPort )
-        || ( leftEdgeOutOfViewPort ) )
-        && ( ( cellsWidth - Math.Abs( cellToScrollingCellsDecorator.X ) ) >= ( viewportWidth - fixedColumnWidth ) ) ) )
+        || ( ( ( rightEdgeOutOfViewPort ) || ( leftEdgeOutOfViewPort ) )
+        && ( ( cellsWidth - Math.Abs( cellToScrollingCellsDecorator.X ) ) >= ( viewportWidth - fixedColumnWidth - fixedColumnSplitterWidth ) ) ) )
       {
         resetHorizontalOffset = true;
       }
@@ -1162,10 +932,6 @@ namespace Xceed.Wpf.DataGrid.Views
       return base.MeasureOverride( constraint );
     }
 
-    #endregion
-
-    #region PRIVATE METHODS
-
     private static void OnParentDataGridChanged( DependencyObject sender, DependencyPropertyChangedEventArgs e )
     {
       DataGridScrollViewer scrollViewer = sender as DataGridScrollViewer;
@@ -1197,39 +963,19 @@ namespace Xceed.Wpf.DataGrid.Views
       this.ClearScrollViewerList();
     }
 
-    private void ScrollThumb_IsMouseCapturedChanged( object sender, DependencyPropertyChangedEventArgs e )
+    private void DragScrollBegin( Orientation orientation )
     {
-      Thumb scrollThumb = sender as Thumb;
-
-      if( scrollThumb == null )
-        return;
-
-      if( scrollThumb.IsMouseCaptured == false )
-        return;
-
       DataGridContext dataGridContext = DataGridControl.GetDataGridContext( this );
 
       if( dataGridContext == null )
         return;
 
-      // Register to LostMouseCapture to be notified when to DeferScroll
-      if( scrollThumb == m_horizontalScrollThumb )
-      {
-        m_horizontalScrollThumb.LostMouseCapture += new MouseEventHandler( this.ScrollThumb_LostMouseCapture );
-      }
-      else if( scrollThumb == m_verticalScrollThumb )
-      {
-        m_verticalScrollThumb.LostMouseCapture += new MouseEventHandler( this.ScrollThumb_LostMouseCapture );
-      }
-      else
-      {
-        Debug.Fail( "Unknown thumb used for scrolling." );
-        return;
-      }
-
       DataGridControl parentGridControl = dataGridContext.DataGridControl;
 
-      if( ( parentGridControl != null ) && ( parentGridControl.ItemScrollingBehavior == ItemScrollingBehavior.Deferred ) )
+      if( parentGridControl == null || dataGridContext.DataGridControl.ScrollViewer == null )
+        return;
+
+      if( parentGridControl.ItemScrollingBehavior == ItemScrollingBehavior.Deferred )
       {
         IDeferableScrollInfoRefresh panel = this.ScrollInfo as IDeferableScrollInfoRefresh;
 
@@ -1246,21 +992,7 @@ namespace Xceed.Wpf.DataGrid.Views
             m_deferScrollInfoRefresh = null;
           }
 
-          ScrollBar scrollBar = scrollThumb.TemplatedParent as ScrollBar;
-
-          if( scrollBar == m_horizontalScrollBar )
-          {
-            m_deferScrollInfoRefresh = panel.DeferScrollInfoRefresh( Orientation.Horizontal );
-          }
-          else if( scrollBar == m_verticalScrollBar )
-          {
-            m_deferScrollInfoRefresh = panel.DeferScrollInfoRefresh( Orientation.Vertical );
-          }
-          else
-          {
-            Debug.Fail( "Unknown scroll bar used for DeferredScrolling." );
-            return;
-          }
+          m_deferScrollInfoRefresh = panel.DeferScrollInfoRefresh( orientation );
 
           if( m_deferScrollInfoRefresh != null )
           {
@@ -1273,15 +1005,8 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    private void ScrollThumb_LostMouseCapture( object sender, MouseEventArgs e )
+    private void DragScrollEnd( Orientation orientation )
     {
-      Thumb scrollBarThumb = sender as Thumb;
-
-      Debug.Assert( scrollBarThumb != null );
-
-      if( scrollBarThumb != null )
-        scrollBarThumb.LostMouseCapture -= new MouseEventHandler( this.ScrollThumb_LostMouseCapture );
-
       if( m_deferScrollInfoRefresh != null )
       {
         foreach( IDeferableScrollChanged deferable in m_deferableChilds )
@@ -1312,17 +1037,19 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private void PopulateScrollViewerListHelper( DependencyObject reference, List<SynchronizedScrollViewer> list, MultiBinding multiBinding )
     {
-      int childCount = VisualTreeHelper.GetChildrenCount( reference );
+      if( reference == null )
+        return;
+
+      var childCount = VisualTreeHelper.GetChildrenCount( reference );
 
       for( int i = 0; i < childCount; i++ )
       {
-        DependencyObject child = VisualTreeHelper.GetChild( reference, i );
-
-        SynchronizedScrollViewer synchronizedScrollViewer = child as SynchronizedScrollViewer;
+        var child = VisualTreeHelper.GetChild( reference, i );
+        var synchronizedScrollViewer = child as SynchronizedScrollViewer;
 
         if( synchronizedScrollViewer != null )
         {
-          string propertyName = String.Empty;
+          var propertyName = String.Empty;
 
           if( synchronizedScrollViewer.ScrollOrientation == ScrollOrientation.Horizontal )
           {
@@ -1333,7 +1060,7 @@ namespace Xceed.Wpf.DataGrid.Views
             propertyName = "ExtentHeight";
           }
 
-          Binding binding = new Binding();
+          var binding = new Binding();
           binding.Path = new PropertyPath( propertyName );
           binding.Mode = BindingMode.OneWay;
           binding.Source = synchronizedScrollViewer;
@@ -1351,13 +1078,15 @@ namespace Xceed.Wpf.DataGrid.Views
 
     private void FindAllDeferableChildren( DependencyObject reference, List<IDeferableScrollChanged> list )
     {
-      int childCount = VisualTreeHelper.GetChildrenCount( reference );
+      if( reference == null )
+        return;
+
+      var childCount = VisualTreeHelper.GetChildrenCount( reference );
 
       for( int i = 0; i < childCount; i++ )
       {
-        DependencyObject child = VisualTreeHelper.GetChild( reference, i );
-
-        IDeferableScrollChanged deferable = child as IDeferableScrollChanged;
+        var child = VisualTreeHelper.GetChild( reference, i );
+        var deferable = child as IDeferableScrollChanged;
 
         if( deferable != null )
         {
@@ -1431,23 +1160,12 @@ namespace Xceed.Wpf.DataGrid.Views
       }
     }
 
-    #endregion
-
-    #region PRIVATE FIELDS
-
     private List<SynchronizedScrollViewer> m_childScrollViewers = new List<SynchronizedScrollViewer>();
     private List<IDeferableScrollChanged> m_deferableChilds = new List<IDeferableScrollChanged>();
 
-    ScrollBar m_horizontalScrollBar; // = null
-    Thumb m_horizontalScrollThumb; // = null
-    ScrollBar m_verticalScrollBar; // = null
-    Thumb m_verticalScrollThumb; // = null
+    ScrollViewerTemplateHelper m_templateHelper;
     IDisposable m_deferScrollInfoRefresh; // = null 
     int m_measureVersion;
-
-    #endregion
-
-    #region INTERNAL INTERFACE IDeferableScrollChanged
 
     internal interface IDeferableScrollChanged
     {
@@ -1457,7 +1175,5 @@ namespace Xceed.Wpf.DataGrid.Views
         set;
       }
     }
-
-    #endregion
   }
 }

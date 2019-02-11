@@ -98,7 +98,7 @@ namespace Xceed.Wpf.Toolkit
     protected virtual void OnIsOpenChanged( bool oldValue, bool newValue )
     {
       if( newValue )
-        _initialValue = Value;
+        _initialValue = this.UpdateValueOnEnterKey ? this.ConvertTextToValue( this.TextBox.Text ) : this.Value;
     }
 
     #endregion //IsOpen
@@ -179,9 +179,19 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnCalculatorValueChanged( object sender, RoutedPropertyChangedEventArgs<object> e )
     {
-      if( IsValid( _calculator.Value ) )
+      if( _calculator != null )
       {
-        this.Value = _calculator.Value;
+        if( this.IsBetweenMinMax( _calculator.Value ) )
+        {
+          if( this.UpdateValueOnEnterKey )
+          {
+            this.TextBox.Text = ( _calculator.Value != null ) ? _calculator.Value.Value.ToString( this.FormatString, this.CultureInfo ) : null;
+          }
+          else
+          {
+            this.Value = _calculator.Value;
+          }
+        }
       }
     }
 
@@ -193,7 +203,8 @@ namespace Xceed.Wpf.Toolkit
     {
       if( _calculator != null )
       {
-        _calculator.InitializeToValue( this.Value );
+        var initValue = this.UpdateValueOnEnterKey ? this.ConvertTextToValue( this.TextBox.Text ) : this.Value;
+        _calculator.InitializeToValue( initValue );
         _calculator.Focus();
       }
     }
@@ -231,7 +242,16 @@ namespace Xceed.Wpf.Toolkit
         else if( e.Key == Key.Escape )
         {
           if( EnterClosesCalculator )
-            Value = _initialValue;
+          {
+            if( this.UpdateValueOnEnterKey )
+            {
+              this.TextBox.Text = (_initialValue != null) ? _initialValue.Value.ToString( this.FormatString, this.CultureInfo ) : null;
+            }
+            else
+            {
+              this.Value = _initialValue;
+            }
+          }
           CloseCalculatorUpDown( true );
           e.Handled = true;
         }
@@ -240,7 +260,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      CloseCalculatorUpDown( false );
+      CloseCalculatorUpDown( true );
     }
 
     #endregion //Event Handlers

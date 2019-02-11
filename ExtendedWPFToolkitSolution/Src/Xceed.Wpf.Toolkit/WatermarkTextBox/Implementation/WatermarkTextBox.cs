@@ -15,31 +15,31 @@
   ***********************************************************************************/
 
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace Xceed.Wpf.Toolkit
 {
-  public class WatermarkTextBox : TextBox
+#pragma warning disable 0618
+
+  public class WatermarkTextBox : AutoSelectTextBox
   {
     #region Properties
 
-    #region SelectAllOnGotFocus
+    #region KeepWatermarkOnGotFocus
 
-    public static readonly DependencyProperty SelectAllOnGotFocusProperty = DependencyProperty.Register( "SelectAllOnGotFocus", typeof( bool ), typeof( WatermarkTextBox ), new PropertyMetadata( false ) );
-    public bool SelectAllOnGotFocus
+    public static readonly DependencyProperty KeepWatermarkOnGotFocusProperty = DependencyProperty.Register( "KeepWatermarkOnGotFocus", typeof( bool ), typeof( WatermarkTextBox ), new UIPropertyMetadata( false ) );
+    public bool KeepWatermarkOnGotFocus
     {
       get
       {
-        return ( bool )GetValue( SelectAllOnGotFocusProperty );
+        return ( bool )GetValue( KeepWatermarkOnGotFocusProperty );
       }
       set
       {
-        SetValue( SelectAllOnGotFocusProperty, value );
+        SetValue( KeepWatermarkOnGotFocusProperty, value );
       }
     }
 
-    #endregion //SelectAllOnGotFocus
+    #endregion //KeepWatermarkOnGotFocus
 
     #region Watermark
 
@@ -84,29 +84,19 @@ namespace Xceed.Wpf.Toolkit
       DefaultStyleKeyProperty.OverrideMetadata( typeof( WatermarkTextBox ), new FrameworkPropertyMetadata( typeof( WatermarkTextBox ) ) );
     }
 
+    public WatermarkTextBox()
+    {
+    }
+
     #endregion //Constructors
 
     #region Base Class Overrides
 
-    protected override void OnGotFocus( RoutedEventArgs e )
-    {
-      base.OnGotFocus( e );
 
-       if( SelectAllOnGotFocus )
-        SelectAll();
-    }
 
-    protected override void OnPreviewMouseLeftButtonDown( MouseButtonEventArgs e )
-    {
-      if( !IsKeyboardFocused && SelectAllOnGotFocus )
-      {
-        e.Handled = true;
-        Focus();
-      }
 
-      base.OnPreviewMouseLeftButtonDown( e );
-    }
-
-    #endregion //Base Class Overrides
+    #endregion
   }
+
+#pragma warning restore 0618
 }

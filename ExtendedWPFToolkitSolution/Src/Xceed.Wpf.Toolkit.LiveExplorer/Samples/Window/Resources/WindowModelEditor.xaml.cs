@@ -1,14 +1,14 @@
 ﻿/***************************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -44,7 +44,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Resources
       ObservableCollection<ColorItem> alphaAvailableColors = new ObservableCollection<ColorItem>();
       foreach( ColorItem item in _titleShadowBrushColorPicker.AvailableColors )
       {
-        System.Windows.Media.Color color = System.Windows.Media.Color.FromArgb( ( byte )100, item.Color.R, item.Color.G, item.Color.B );
+        System.Windows.Media.Color color = System.Windows.Media.Color.FromArgb( ( byte )100, item.Color.Value.R, item.Color.Value.G, item.Color.Value.B );
         alphaAvailableColors.Add( new ColorItem( color, item.Name ) );
       }
       _titleShadowBrushColorPicker.AvailableColors = alphaAvailableColors;

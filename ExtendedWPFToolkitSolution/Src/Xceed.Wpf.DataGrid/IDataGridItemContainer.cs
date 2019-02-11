@@ -14,13 +14,24 @@
 
   ***********************************************************************************/
 
-using System;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal interface IDataGridItemContainer
   {
+    bool CanBeRecycled
+    {
+      get;
+    }
+
+    bool IsRecyclingCandidate
+    {
+      get;
+      set;
+    }
+
     void PrepareContainer( DataGridContext dataGridContext, object item );
     void ClearContainer();
+    void CleanRecyclingCandidate();
   }
 }

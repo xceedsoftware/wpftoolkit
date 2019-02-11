@@ -184,6 +184,14 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion
 
+    public List<DateElement> VisibleElements
+    {
+      get
+      {
+        return _visibleElements;
+      }
+    }
+
     #endregion //Properties
 
     #region Constructors
@@ -191,6 +199,10 @@ namespace Xceed.Wpf.Toolkit
     static TimelinePanel()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( TimelinePanel ), new FrameworkPropertyMetadata( typeof( TimelinePanel ) ) );
+    }
+
+    public TimelinePanel()
+    {
     }
 
     #endregion //Constructors
@@ -380,6 +392,7 @@ namespace Xceed.Wpf.Toolkit
 
       return renderSize;
     }
+
 
     #endregion //Base Class Overrides
 

@@ -15,119 +15,136 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.IO;
-using Xceed.Wpf.AvalonDock.Controls;
-using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Layout.Serialization
 {
-    public abstract class LayoutSerializer
+  public abstract class LayoutSerializer
+  {
+    #region Members
+
+    private DockingManager _manager;
+    private LayoutAnchorable[] _previousAnchorables = null;
+    private LayoutDocument[] _previousDocuments = null;
+
+    #endregion
+
+    #region Constructors
+
+    public LayoutSerializer( DockingManager manager )
     {
-        DockingManager _manager;
+      if( manager == null )
+        throw new ArgumentNullException( "manager" );
 
-        public LayoutSerializer(DockingManager manager)
+      _manager = manager;
+      _previousAnchorables = _manager.Layout.Descendents().OfType<LayoutAnchorable>().ToArray();
+      _previousDocuments = _manager.Layout.Descendents().OfType<LayoutDocument>().ToArray();
+    }
+
+    #endregion
+
+    #region Properties
+
+    public DockingManager Manager
+    {
+      get
+      {
+        return _manager;
+      }
+    }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler<LayoutSerializationCallbackEventArgs> LayoutSerializationCallback;
+
+    #endregion
+
+    #region Methods
+
+    protected virtual void FixupLayout( LayoutRoot layout )
+    {
+      //fix container panes
+      foreach( var lcToAttach in layout.Descendents().OfType<ILayoutPreviousContainer>().Where( lc => lc.PreviousContainerId != null ) )
+      {
+        var paneContainerToAttach = layout.Descendents().OfType<ILayoutPaneSerializable>().FirstOrDefault( lps => lps.Id == lcToAttach.PreviousContainerId );
+        if( paneContainerToAttach == null )
+          throw new ArgumentException( string.Format( "Unable to find a pane with id ='{0}'", lcToAttach.PreviousContainerId ) );
+
+        lcToAttach.PreviousContainer = paneContainerToAttach as ILayoutContainer;
+      }
+
+
+      //now fix the content of the layoutcontents
+      foreach( var lcToFix in layout.Descendents().OfType<LayoutAnchorable>().Where( lc => lc.Content == null ).ToArray() )
+      {
+        LayoutAnchorable previousAchorable = null;
+        if( lcToFix.ContentId != null )
         {
-            if (manager == null)
-                throw new ArgumentNullException("manager");
-
-            _manager = manager;
-            _previousAnchorables = _manager.Layout.Descendents().OfType<LayoutAnchorable>().ToArray();
-            _previousDocuments = _manager.Layout.Descendents().OfType<LayoutDocument>().ToArray();
+          //try find the content in replaced layout
+          previousAchorable = _previousAnchorables.FirstOrDefault( a => a.ContentId == lcToFix.ContentId );
         }
 
-        LayoutAnchorable[] _previousAnchorables = null;
-        LayoutDocument[] _previousDocuments = null;
-
-        public DockingManager Manager
+        if( LayoutSerializationCallback != null )
         {
-            get { return _manager; }
+          var args = new LayoutSerializationCallbackEventArgs( lcToFix, previousAchorable != null ? previousAchorable.Content : null );
+          LayoutSerializationCallback( this, args );
+          if( args.Cancel )
+            lcToFix.Close();
+          else if( args.Content != null )
+            lcToFix.Content = args.Content;
+          else if( args.Model.Content != null )
+            lcToFix.Hide( false );
+        }
+        else if( previousAchorable == null )
+          lcToFix.Hide( false );
+        else
+        {
+          lcToFix.Content = previousAchorable.Content;
+          lcToFix.IconSource = previousAchorable.IconSource;
+        }
+      }
+
+
+      foreach( var lcToFix in layout.Descendents().OfType<LayoutDocument>().Where( lc => lc.Content == null ).ToArray() )
+      {
+        LayoutDocument previousDocument = null;
+        if( lcToFix.ContentId != null )
+        {
+          //try find the content in replaced layout
+          previousDocument = _previousDocuments.FirstOrDefault( a => a.ContentId == lcToFix.ContentId );
         }
 
-        public event EventHandler<LayoutSerializationCallbackEventArgs> LayoutSerializationCallback;
-
-        protected virtual void FixupLayout(LayoutRoot layout)
+        if( LayoutSerializationCallback != null )
         {
-            //fix container panes
-            foreach (var lcToAttach in layout.Descendents().OfType<ILayoutPreviousContainer>().Where(lc => lc.PreviousContainerId != null))
-            {
-                var paneContainerToAttach = layout.Descendents().OfType<ILayoutPaneSerializable>().FirstOrDefault(lps => lps.Id == lcToAttach.PreviousContainerId);
-                if (paneContainerToAttach == null)
-                    throw new ArgumentException(string.Format("Unable to find a pane with id ='{0}'", lcToAttach.PreviousContainerId));
+          var args = new LayoutSerializationCallbackEventArgs( lcToFix, previousDocument != null ? previousDocument.Content : null );
+          LayoutSerializationCallback( this, args );
 
-                lcToAttach.PreviousContainer = paneContainerToAttach as ILayoutContainer;
-            }
-
-
-            //now fix the content of the layoutcontents
-            foreach (var lcToFix in layout.Descendents().OfType<LayoutAnchorable>().Where(lc => lc.Content == null).ToArray())
-            {
-                LayoutAnchorable previousAchorable = null;
-                if (lcToFix.ContentId != null)
-                { 
-                    //try find the content in replaced layout
-                    previousAchorable = _previousAnchorables.FirstOrDefault(a => a.ContentId == lcToFix.ContentId);
-                }
-
-                if (LayoutSerializationCallback != null)
-                {
-                    var args = new LayoutSerializationCallbackEventArgs(lcToFix, previousAchorable != null ? previousAchorable.Content : null);
-                    LayoutSerializationCallback(this, args);
-                    if (args.Cancel)
-                        lcToFix.Close();
-                    else if (args.Content != null)
-                        lcToFix.Content = args.Content;
-                    else if (args.Model.Content != null)
-                        lcToFix.Hide(false);
-                }
-                else if (previousAchorable == null)
-                    lcToFix.Hide(false);
-                else
-                {
-                    lcToFix.Content = previousAchorable.Content;
-                    lcToFix.IconSource = previousAchorable.IconSource;
-                }
-            }
-
-
-            foreach (var lcToFix in layout.Descendents().OfType<LayoutDocument>().Where(lc => lc.Content == null).ToArray())
-            {
-                LayoutDocument previousDocument = null;
-                if (lcToFix.ContentId != null)
-                {
-                    //try find the content in replaced layout
-                    previousDocument = _previousDocuments.FirstOrDefault(a => a.ContentId == lcToFix.ContentId);
-                }
-
-                if (LayoutSerializationCallback != null)
-                {
-                    var args = new LayoutSerializationCallbackEventArgs(lcToFix, previousDocument != null ? previousDocument.Content : null);
-                    LayoutSerializationCallback(this, args);
-
-                    if (args.Cancel)
-                        lcToFix.Close();
-                    else if (args.Content != null)
-                        lcToFix.Content = args.Content;
-                    else if (args.Model.Content != null)
-                        lcToFix.Close();
-                }
-                else if (previousDocument == null)
-                    lcToFix.Close();
-                else
-                    lcToFix.Content = previousDocument.Content;
-            }
-
-
-            layout.CollectGarbage();
+          if( args.Cancel )
+            lcToFix.Close();
+          else if( args.Content != null )
+            lcToFix.Content = args.Content;
+          else if( args.Model.Content != null )
+            lcToFix.Close();
         }
-
-        protected void StartDeserialization()
+        else if( previousDocument == null )
+          lcToFix.Close();
+        else
         {
-            Manager.SuspendDocumentsSourceBinding = true;
-            Manager.SuspendAnchorablesSourceBinding = true;
+          lcToFix.Content = previousDocument.Content;
+          lcToFix.IconSource = previousDocument.IconSource;
         }
+      }
+
+      layout.CollectGarbage();
+    }
+
+    protected void StartDeserialization()
+    {
+      Manager.SuspendDocumentsSourceBinding = true;
+      Manager.SuspendAnchorablesSourceBinding = true;
+    }
 
         protected void EndDeserialization()
         {
@@ -135,33 +152,6 @@ namespace Xceed.Wpf.AvalonDock.Layout.Serialization
             Manager.SuspendAnchorablesSourceBinding = false;
         }
 
-		#region Virtual Serialize and Deserialize methods
-
-		public virtual void Serialize(System.Xml.XmlWriter writer)
-		{
-    }
-		public virtual void Serialize(System.IO.TextWriter writer)
-		{
-		}
-		public virtual void Serialize(System.IO.Stream stream)
-		{
-		}
-		public virtual void Serialize(string filepath)
-		{
-		}
-		public virtual void Deserialize(System.IO.Stream stream)
-		{
-		}
-		public virtual void Deserialize(System.IO.TextReader reader)
-		{
-		}
-		public virtual void Deserialize(System.Xml.XmlReader reader)
-		{
-		}
-		public virtual void Deserialize(string filepath)
-		{
-		}
-		
 		#endregion
-	}
+  }
 }

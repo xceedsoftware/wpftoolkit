@@ -15,9 +15,7 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 using System.Windows;
 using Xceed.Wpf.DataGrid.Markup;
 
@@ -42,6 +40,16 @@ namespace Xceed.Wpf.DataGrid.Views
       }
 
       return false;
+    }
+
+    protected virtual ThemeKey CreateDefaultStyleKey( Type viewType, Type elementType )
+    {
+      return new ThemeKey( viewType, this.GetType(), elementType );
+    }
+
+    internal ThemeKey GetDefaultStyleKey( Type viewType, Type elementType )
+    {
+      return this.CreateDefaultStyleKey( viewType, elementType );
     }
   }
 
@@ -93,7 +101,8 @@ namespace Xceed.Wpf.DataGrid.Views
   {
   }
 
-  [TargetView(typeof(TableflowView))]
+  [TargetView( typeof( TableflowView ) )]
+  [TargetView( typeof( TableView ) )]
   public class Windows8Theme : Theme
   {
   }

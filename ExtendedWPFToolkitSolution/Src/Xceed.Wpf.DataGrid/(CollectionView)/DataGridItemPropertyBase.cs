@@ -15,51 +15,47 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
 using System.Collections;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using Xceed.Wpf.DataGrid.Converters;
+using System.Threading;
 using System.Windows.Data;
-using Xceed.Wpf.DataGrid.FilterCriteria;
+using Xceed.Wpf.DataGrid.Converters;
+using Xceed.Wpf.DataGrid.Utils;
 
 namespace Xceed.Wpf.DataGrid
 {
+  [DebuggerDisplay( "Name = {Name}" )]
   public abstract partial class DataGridItemPropertyBase : INotifyPropertyChanged, ICloneable
   {
+    #region Static Fields
 
-    #region CONSTRUCTORS
+    internal static readonly string CalculateDistinctValuesPropertyName = PropertyHelper.GetPropertyName( ( DataGridItemPropertyBase i ) => i.CalculateDistinctValues );
+    internal static readonly string ContainingCollectionPropertyName = PropertyHelper.GetPropertyName( ( DataGridItemPropertyBase i ) => i.ContainingCollection );
+    internal static readonly string ForeignKeyDescriptionPropertyName = PropertyHelper.GetPropertyName( ( DataGridItemPropertyBase i ) => i.ForeignKeyDescription );
+    internal static readonly string GroupSortStatResultPropertyNamePropertyName = PropertyHelper.GetPropertyName( ( DataGridItemPropertyBase i ) => i.GroupSortStatResultPropertyName );
+    internal static readonly string IsNameSealedPropertyName = PropertyHelper.GetPropertyName( ( DataGridItemPropertyBase i ) => i.IsNameSealed );
+    internal static readonly string IsSealedPropertyName = PropertyHelper.GetPropertyName( ( DataGridItemPropertyBase i ) => i.IsSealed );
+    internal static readonly string ItemPropertiesInternalPropertyName = PropertyHelper.GetPropertyName( ( DataGridItemPropertyBase i ) => i.ItemPropertiesInternal );
+    internal static readonly string MaxDistinctValuesPropertyName = PropertyHelper.GetPropertyName( ( DataGridItemPropertyBase i ) => i.MaxDistinctValues );
+    internal static readonly string SynonymPropertyName = PropertyHelper.GetPropertyName( ( DataGridItemPropertyBase i ) => i.Synonym );
+
+    #endregion
 
     protected DataGridItemPropertyBase()
     {
+      this.SetIsDisplayable( true );
+      this.IsBrowsable = true;
     }
 
+    [Browsable( false )]
+    [EditorBrowsable( EditorBrowsableState.Never )]
+    [Obsolete( "This constructor is obsolete and should no longer be used.", true )]
     protected DataGridItemPropertyBase( DataGridItemPropertyBase template )
+      : this()
     {
-      m_name = template.m_name;
-      m_dataType = template.m_dataType;
-      m_title = template.m_title;
-      m_readOnly = template.m_readOnly;
-      m_overrideReadOnlyForInsertion = template.m_overrideReadOnlyForInsertion;
-      m_isASubRelationship = template.m_isASubRelationship;
-      m_browsable = template.m_browsable;
-      m_calculateDistinctValues = template.m_calculateDistinctValues;
-      m_converter = template.m_converter;
-      m_converterCulture = template.m_converterCulture;
-      m_converterParameter = template.m_converterParameter;
-      this.FilterCriterion = template.m_filterCriterion;
-      m_foreignKeyDescription = template.m_foreignKeyDescription;
-      m_maxDistinctValues = template.m_maxDistinctValues;
-      m_sortComparer = template.m_sortComparer;
-      this.DistinctValuesEqualityComparer = template.DistinctValuesEqualityComparer;
-      this.DistinctValuesSortComparer = template.DistinctValuesSortComparer;
-
-      // FilterCriterionChanged is not cloned since only used after the clone occurs
-      this.PropertyChanged += template.PropertyChanged;
-      this.QueryDistinctValue += template.m_queryDistinctValue;
+      throw new NotSupportedException();
     }
 
     protected void Initialize(
@@ -68,6 +64,7 @@ namespace Xceed.Wpf.DataGrid
       Type dataType,
       Nullable<bool> isReadOnly,
       Nullable<bool> overrideReadOnlyForInsertion,
+      Nullable<bool> isDisplayable,
       Nullable<bool> isASubRelationship )
     {
       if( string.IsNullOrEmpty( name ) )
@@ -86,19 +83,22 @@ namespace Xceed.Wpf.DataGrid
 
       if( isReadOnly.HasValue )
       {
-        m_readOnly = isReadOnly.Value;
+        this.SetIsReadOnly( isReadOnly.Value );
       }
 
-      m_overrideReadOnlyForInsertion = overrideReadOnlyForInsertion;
+      this.SetOverrideReadOnlyForInsertion( overrideReadOnlyForInsertion );
       m_dataType = dataType;
+
+      if( isDisplayable.HasValue )
+      {
+        this.SetIsDisplayable( isDisplayable.Value );
+      }
 
       if( isASubRelationship != null )
       {
-        m_isASubRelationship = isASubRelationship;
+        this.SetIsASubRelationship( isASubRelationship );
       }
     }
-
-    #endregion CONSTRUCTORS
 
     #region Name Property
 
@@ -114,7 +114,7 @@ namespace Xceed.Wpf.DataGrid
         if( string.IsNullOrEmpty( value ) )
           throw new ArgumentException( "Name is null (Nothing in Visual Basic) or empty.", "Name" );
 
-        if( m_initialized )
+        if( this.IsNameSealed || this.IsSealed )
           throw new InvalidOperationException( "An attempt was made to change the name of a property already added to a containing collection." );
 
         m_name = value;
@@ -123,7 +123,7 @@ namespace Xceed.Wpf.DataGrid
 
     private string m_name;
 
-    #endregion Name Property
+    #endregion
 
     #region DataType Property
 
@@ -136,7 +136,7 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
-        if( m_initialized )
+        if( this.IsSealed )
           throw new InvalidOperationException( "An attempt was made to change the DataType of a property already added to a containing collection." );
 
         this.SetDataType( value );
@@ -153,7 +153,7 @@ namespace Xceed.Wpf.DataGrid
 
     private Type m_dataType;
 
-    #endregion DataType Property
+    #endregion
 
     #region IsReadOnly Property
 
@@ -161,11 +161,11 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return m_readOnly;
+        return m_flags[ DataGridItemPropertyBaseFlags.IsReadOnly ];
       }
       set
       {
-        if( m_initialized )
+        if( this.IsSealed )
           throw new InvalidOperationException( "An attempt was made to change the IsReadOnly property of a DataGridItemProperty already added to a containing collection." );
 
         this.SetIsReadOnly( value );
@@ -174,12 +174,10 @@ namespace Xceed.Wpf.DataGrid
 
     internal void SetIsReadOnly( bool isReadOnly )
     {
-      m_readOnly = isReadOnly;
+      m_flags[ DataGridItemPropertyBaseFlags.IsReadOnly ] = isReadOnly;
     }
 
-    private bool m_readOnly;
-
-    #endregion IsReadOnly Property
+    #endregion
 
     #region OverrideReadOnlyForInsertion Property
 
@@ -187,11 +185,14 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return m_overrideReadOnlyForInsertion;
+        if( !m_flags[ DataGridItemPropertyBaseFlags.IsOverrideReadOnlyForInsertionSet ] )
+          return null;
+
+        return m_flags[ DataGridItemPropertyBaseFlags.IsOverrideReadOnlyForInsertion ];
       }
       set
       {
-        if( m_initialized )
+        if( this.IsSealed )
           throw new InvalidOperationException( "An attempt was made to change the OverrideReadOnlyForInsertion property of a DataGridItemProperty already added to a containing collection." );
 
         this.SetOverrideReadOnlyForInsertion( value );
@@ -200,39 +201,19 @@ namespace Xceed.Wpf.DataGrid
 
     internal void SetOverrideReadOnlyForInsertion( Nullable<bool> overrideReadOnlyForInsertion )
     {
-      m_overrideReadOnlyForInsertion = overrideReadOnlyForInsertion;
-    }
-
-    private Nullable<bool> m_overrideReadOnlyForInsertion;
-
-    #endregion OverrideReadOnlyForInsertion Property
-
-    #region IsASubRelationship Property
-
-    internal bool IsASubRelationship
-    {
-      get
+      if( overrideReadOnlyForInsertion.HasValue )
       {
-        if( m_isASubRelationship == null )
-        {
-          if( m_dataType == null )
-            return false;
-
-          bool isASubRelationship = ItemsSourceHelper.IsASubRelationship( m_dataType );
-
-          if( m_initialized )
-            m_isASubRelationship = isASubRelationship;
-
-          return isASubRelationship;
-        }
-
-        return m_isASubRelationship.Value;
+        m_flags[ DataGridItemPropertyBaseFlags.IsOverrideReadOnlyForInsertion ] = overrideReadOnlyForInsertion.Value;
+        m_flags[ DataGridItemPropertyBaseFlags.IsOverrideReadOnlyForInsertionSet ] = true;
+      }
+      else
+      {
+        m_flags[ DataGridItemPropertyBaseFlags.IsOverrideReadOnlyForInsertionSet
+               | DataGridItemPropertyBaseFlags.IsOverrideReadOnlyForInsertion ] = false;
       }
     }
 
-    private Nullable<bool> m_isASubRelationship;
-
-    #endregion IsASubRelationship Property
+    #endregion
 
     #region Title Property
 
@@ -254,7 +235,43 @@ namespace Xceed.Wpf.DataGrid
 
     private string m_title;
 
-    #endregion Title Property
+    #endregion
+
+    #region Synonym Property
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly" )]
+    public string Synonym
+    {
+      get
+      {
+        return m_synonym;
+      }
+      set
+      {
+        if( this.IsSealed )
+          throw new InvalidOperationException( "An attempt was made to change the Synonym of a property already added to a containing collection." );
+
+        this.SetSynonym( value );
+      }
+    }
+
+    internal void SetSynonym( string value )
+    {
+      if( value == m_synonym )
+        return;
+
+      var wasSealed = this.IsSealed;
+      this.IsSealed = false;
+
+      m_synonym = value;
+
+      this.IsSealed = wasSealed;
+      this.OnPropertyChanged( DataGridItemPropertyBase.SynonymPropertyName );
+    }
+
+    private string m_synonym;
+
+    #endregion
 
     #region SortComparer Property
 
@@ -272,7 +289,7 @@ namespace Xceed.Wpf.DataGrid
 
     private IComparer m_sortComparer;
 
-    #endregion SortComparer Property
+    #endregion
 
     #region Converter Property
 
@@ -284,7 +301,7 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
-        if( m_initialized )
+        if( this.IsSealed )
           throw new InvalidOperationException( "An attempt was made to change the Converter property of a DataGridItemProperty already added to a containing collection." );
 
         m_converter = value;
@@ -293,7 +310,7 @@ namespace Xceed.Wpf.DataGrid
 
     internal IValueConverter GetBindingConverter( object sourceItem )
     {
-      if( !m_initialized )
+      if( !this.IsSealed )
         throw new InvalidOperationException( "An attempt was made to apply a binding to a DataGridItemProperty that has not be added to the ItemProperties collection." );
 
       if( m_bindingConverter == null )
@@ -304,9 +321,7 @@ namespace Xceed.Wpf.DataGrid
         }
         else
         {
-          m_bindingConverter = new SourceDataConverter(
-            ItemsSourceHelper.IsItemSupportingDBNull( sourceItem ),
-            CultureInfo.InvariantCulture );
+          m_bindingConverter = new SourceDataConverter( ItemsSourceHelper.IsItemSupportingDBNull( sourceItem ), CultureInfo.InvariantCulture );
         }
       }
 
@@ -316,7 +331,7 @@ namespace Xceed.Wpf.DataGrid
     private IValueConverter m_converter;
     private IValueConverter m_bindingConverter;
 
-    #endregion Converter Property
+    #endregion
 
     #region ConverterCulture Property
 
@@ -328,7 +343,7 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
-        if( m_initialized )
+        if( this.IsSealed )
           throw new InvalidOperationException( "An attempt was made to change the ConverterCulture property of a DataGridItemProperty already added to a containing collection." );
 
         m_converterCulture = value;
@@ -337,7 +352,7 @@ namespace Xceed.Wpf.DataGrid
 
     private CultureInfo m_converterCulture;
 
-    #endregion ConverterCulture Property
+    #endregion
 
     #region ConverterParameter Property
 
@@ -349,7 +364,7 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
-        if( m_initialized )
+        if( this.IsSealed )
           throw new InvalidOperationException( "An attempt was made to change the ConverterParameter property of a DataGridItemProperty already added to a containing collection." );
 
         m_converterParameter = value;
@@ -358,68 +373,7 @@ namespace Xceed.Wpf.DataGrid
 
     private object m_converterParameter;
 
-    #endregion ConverterParameter Property
-
-    #region FilterCriterion Property
-
-    public FilterCriterion FilterCriterion
-    {
-      get
-      {
-        return m_filterCriterion;
-      }
-
-      set
-      {
-        if( value != m_filterCriterion )
-        {
-          if( m_filterCriterion != null )
-            m_filterCriterion.PropertyChanged -= new PropertyChangedEventHandler( FilterCriterion_PropertyChanged );
-
-          m_filterCriterion = value;
-
-          this.RaiseFilterCriterionChanged();
-
-          if( m_filterCriterion != null )
-            m_filterCriterion.PropertyChanged += new PropertyChangedEventHandler( FilterCriterion_PropertyChanged );
-
-          this.OnPropertyChanged( "FilterCriterion" );
-        }
-      }
-    }
-
-    private void FilterCriterion_PropertyChanged( object sender, PropertyChangedEventArgs e )
-    {
-      this.RaiseFilterCriterionChanged();
-    }
-
-    private void RaiseFilterCriterionChanged()
-    {
-      if( this.FilterCriterionChanged != null )
-        this.FilterCriterionChanged( this, EventArgs.Empty );
-    }
-
-
-    // Triggered if the instance of FilterCriterion changes, if a property of the 
-    // FilterCriterion changes or if a property of one of the child FilterCriterion
-    // changes.
-    internal event EventHandler FilterCriterionChanged;
-
-    private FilterCriterion m_filterCriterion; // = null;
-
-    #endregion FilterCriterion Property
-
-    #region ValueChanged Event
-
-    private void OnValueChanged( ValueChangedEventArgs e )
-    {
-      if( this.ValueChanged != null )
-        this.ValueChanged( this, e );
-    }
-
-    internal event EventHandler<ValueChangedEventArgs> ValueChanged;
-
-    #endregion ComponentValueChanged Event
+    #endregion
 
     #region CalculateDistinctValues Property
 
@@ -428,20 +382,20 @@ namespace Xceed.Wpf.DataGrid
       get
       {
         // Always activate DistinctValues if not explicitly specified
-        if( !m_isCalculateDistinctValuesInitialized )
+        if( !this.IsCalculateDistinctValuesInitialized )
           return true;
 
-        return m_calculateDistinctValues;
+        return m_flags[ DataGridItemPropertyBaseFlags.CalculateDistinctValues ];
       }
       set
       {
-        if( m_calculateDistinctValues != value )
+        if( value != m_flags[ DataGridItemPropertyBaseFlags.CalculateDistinctValues ] )
         {
-          m_calculateDistinctValues = value;
-          this.OnPropertyChanged( "CalculateDistinctValues" );
+          m_flags[ DataGridItemPropertyBaseFlags.CalculateDistinctValues ] = value;
+          this.OnPropertyChanged( DataGridItemPropertyBase.CalculateDistinctValuesPropertyName );
         }
 
-        m_isCalculateDistinctValuesInitialized = true;
+        this.IsCalculateDistinctValuesInitialized = true;
       }
     }
 
@@ -449,18 +403,15 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return m_isCalculateDistinctValuesInitialized;
+        return m_flags[ DataGridItemPropertyBaseFlags.IsCalculateDistinctValuesInitialized ];
       }
       set
       {
-        m_isCalculateDistinctValuesInitialized = value;
+        m_flags[ DataGridItemPropertyBaseFlags.IsCalculateDistinctValuesInitialized ] = value;
       }
     }
 
-    private bool m_calculateDistinctValues; // = null; 
-    private bool m_isCalculateDistinctValuesInitialized;
-
-    #endregion CalculateDistinctValues Property
+    #endregion
 
     #region MaxDistinctValues Property
 
@@ -475,16 +426,16 @@ namespace Xceed.Wpf.DataGrid
         if( m_maxDistinctValues != value )
         {
           m_maxDistinctValues = value;
-          this.OnPropertyChanged( "MaxDistinctValues" );
+          this.OnPropertyChanged( DataGridItemPropertyBase.MaxDistinctValuesPropertyName );
         }
       }
     }
 
     private int m_maxDistinctValues = -1; // -1 ==> no maximum
 
-    #endregion MaxDistinctValues Property
+    #endregion
 
-    #region DistinctValuesSortComparer
+    #region DistinctValuesSortComparer Property
 
     public IComparer DistinctValuesSortComparer
     {
@@ -494,7 +445,7 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region DistinctValuesEqualityComparer
+    #region DistinctValuesEqualityComparer Property
 
     public IEqualityComparer DistinctValuesEqualityComparer
     {
@@ -504,45 +455,281 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region Initialized Property
+    #region ForeignKeyDescription Property
 
-    internal bool Initialized
+    public DataGridForeignKeyDescription ForeignKeyDescription
     {
       get
       {
-        return m_initialized;
+        return m_foreignKeyDescription;
       }
       set
       {
-        Debug.Assert( value );
-
-        m_initialized = value;
+        this.SetForeignKeyDescription( value );
       }
     }
 
-    private bool m_initialized;
+    internal void SetForeignKeyDescription( DataGridForeignKeyDescription description )
+    {
+      if( m_foreignKeyDescription != description )
+      {
+        m_foreignKeyDescription = description;
+        this.OnPropertyChanged( DataGridItemPropertyBase.ForeignKeyDescriptionPropertyName );
+      }
+    }
 
-    #endregion Initialized Property
+    private DataGridForeignKeyDescription m_foreignKeyDescription; // = null;
 
-    #region Browsable Property
+    #endregion
 
-    // That property only indicate for the DefaultProperties generated if
-    // the property should take place in the real property list by default.
-    internal bool Browsable
+    #region GroupSortStatResultPropertyName Property
+
+    public string GroupSortStatResultPropertyName
     {
       get
       {
-        return m_browsable;
+        return m_groupSortStatResultPropertyName;
       }
       set
       {
-        m_browsable = value;
+        if( value == m_groupSortStatResultPropertyName )
+          return;
+
+        m_groupSortStatResultPropertyName = value;
+
+        this.OnPropertyChanged( DataGridItemPropertyBase.GroupSortStatResultPropertyNamePropertyName );
       }
     }
 
-    private bool m_browsable = true;
+    private string m_groupSortStatResultPropertyName;
 
-    #endregion Browsable Property
+    #endregion
+
+    #region GroupSortStatResultComparer Property
+
+    public IComparer GroupSortStatResultComparer
+    {
+      get;
+      set;
+    }
+
+    #endregion
+
+    #region IsDisplayable Property
+
+    public bool IsDisplayable
+    {
+      get
+      {
+        return m_flags[ DataGridItemPropertyBaseFlags.IsDisplayable ];
+      }
+      set
+      {
+        if( this.IsSealed )
+          throw new InvalidOperationException( "An attempt was made to change the IsDisplayable property of a DataGridItemProperty already added to a containing collection." );
+
+        this.SetIsDisplayable( value );
+      }
+    }
+
+    internal void SetIsDisplayable( bool value )
+    {
+      m_flags[ DataGridItemPropertyBaseFlags.IsDisplayable ] = value;
+    }
+
+    #endregion
+
+    #region ItemProperties Property
+
+    public DataGridItemPropertyCollection ItemProperties
+    {
+      get
+      {
+        if( m_itemProperties == null )
+        {
+          Interlocked.CompareExchange( ref m_itemProperties, new DataGridItemPropertyCollection( this ), null );
+          Debug.Assert( m_itemProperties != null );
+
+          this.OnPropertyChanged( DataGridItemPropertyBase.ItemPropertiesInternalPropertyName );
+        }
+
+        return m_itemProperties;
+      }
+    }
+
+    internal DataGridItemPropertyCollection ItemPropertiesInternal
+    {
+      get
+      {
+        return m_itemProperties;
+      }
+    }
+
+    private DataGridItemPropertyCollection m_itemProperties;
+
+    #endregion
+
+    #region FieldName Internal Property
+
+    internal virtual string FieldName
+    {
+      get
+      {
+        return this.Name;
+      }
+    }
+
+    #endregion
+
+    #region IsNameSealed Internal Property
+
+    internal bool IsNameSealed
+    {
+      get
+      {
+        return m_flags[ DataGridItemPropertyBaseFlags.IsNameSealed ];
+      }
+      set
+      {
+        if( value == this.IsNameSealed )
+          return;
+
+        m_flags[ DataGridItemPropertyBaseFlags.IsNameSealed ] = value;
+
+        this.OnPropertyChanged( DataGridItemPropertyBase.IsNameSealedPropertyName );
+      }
+    }
+
+    #endregion
+
+    #region IsSealed Internal Property
+
+    internal bool IsSealed
+    {
+      get
+      {
+        return m_flags[ DataGridItemPropertyBaseFlags.IsSealed ];
+      }
+      set
+      {
+        if( value == this.IsSealed )
+          return;
+
+        m_flags[ DataGridItemPropertyBaseFlags.IsSealed ] = value;
+
+        this.OnPropertyChanged( DataGridItemPropertyBase.IsSealedPropertyName );
+      }
+    }
+
+    #endregion
+
+    #region IsBrowsable Internal Property
+
+    // That property only indicates for the DefaultProperties generated if the property should take place in the real property list by default.
+    internal bool IsBrowsable
+    {
+      get
+      {
+        return m_flags[ DataGridItemPropertyBaseFlags.IsBrowsable ];
+      }
+      set
+      {
+        m_flags[ DataGridItemPropertyBaseFlags.IsBrowsable ] = value;
+      }
+    }
+
+    #endregion
+
+    #region IsASubRelationship Internal Property
+
+    internal bool IsASubRelationship
+    {
+      get
+      {
+        if( m_flags[ DataGridItemPropertyBaseFlags.IsASubRelationshipSet ] )
+          return m_flags[ DataGridItemPropertyBaseFlags.IsASubRelationship ];
+
+        if( m_dataType == null )
+          return false;
+
+        bool isASubRelationship = ItemsSourceHelper.IsASubRelationship( m_dataType );
+
+        if( this.IsSealed )
+        {
+          m_flags[ DataGridItemPropertyBaseFlags.IsASubRelationship ] = isASubRelationship;
+          m_flags[ DataGridItemPropertyBaseFlags.IsASubRelationshipSet ] = true;
+        }
+
+        return isASubRelationship;
+      }
+    }
+
+    private void SetIsASubRelationship( Nullable<bool> isASubRelationship )
+    {
+      if( isASubRelationship.HasValue )
+      {
+        m_flags[ DataGridItemPropertyBaseFlags.IsASubRelationship ] = isASubRelationship.Value;
+        m_flags[ DataGridItemPropertyBaseFlags.IsASubRelationshipSet ] = true;
+      }
+      else
+      {
+        m_flags[ DataGridItemPropertyBaseFlags.IsASubRelationshipSet
+               | DataGridItemPropertyBaseFlags.IsASubRelationship ] = false;
+      }
+    }
+
+    #endregion
+
+    #region IsSortingOnForeignKeyDescription Internal Property
+
+    internal bool IsSortingOnForeignKeyDescription
+    {
+      get;
+      set;
+    }
+
+    #endregion
+
+    #region ContainingCollection Internal Property
+
+    internal DataGridItemPropertyCollection ContainingCollection
+    {
+      get
+      {
+        return m_containingCollection;
+      }
+      private set
+      {
+        if( value == m_containingCollection )
+          return;
+
+        if( ( value != null ) && ( m_containingCollection != null ) )
+          throw new InvalidOperationException( "The property is already assigned to a DataGridItemPropertyCollection." );
+
+        m_containingCollection = value;
+
+        this.OnPropertyChanged( DataGridItemPropertyBase.ContainingCollectionPropertyName );
+      }
+    }
+
+    private DataGridItemPropertyCollection m_containingCollection; //null
+
+    #endregion
+
+    #region ValueChanged Internal Event
+
+    internal event EventHandler<ValueChangedEventArgs> ValueChanged;
+
+    private void OnValueChanged( ValueChangedEventArgs e )
+    {
+      var handler = this.ValueChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, e );
+    }
+
+    #endregion
 
     #region DistinctValueSelector Event
 
@@ -574,134 +761,49 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region ForeignKeyDescription Property
-
-    public DataGridForeignKeyDescription ForeignKeyDescription
-    {
-      get
-      {
-        return m_foreignKeyDescription;
-      }
-      set
-      {
-        this.SetForeignKeyDescription( value );
-      }
-    }
-
-    internal void SetForeignKeyDescription( DataGridForeignKeyDescription description )
-    {
-      if( m_foreignKeyDescription != description )
-      {
-        m_foreignKeyDescription = description;
-        this.OnPropertyChanged( "ForeignKeyDescription" );
-      }
-    }
-
-    private DataGridForeignKeyDescription m_foreignKeyDescription; // = null;
-
-    #endregion ForeignKeyDescription Property
-
-    #region GroupSortStatResultPropertyName Property
-
-    public string GroupSortStatResultPropertyName
-    {
-      get
-      {
-        return m_groupSortStatResultPropertyName;
-      }
-      set
-      {
-        if( m_groupSortStatResultPropertyName != value )
-        {
-          m_groupSortStatResultPropertyName = value;
-        }
-      }
-    }
-
-    private string m_groupSortStatResultPropertyName;
-
-    #endregion GroupSortStatResultPropertyName Property
-
-    #region GroupSortStatResultComparer Property
-
-    public IComparer GroupSortStatResultComparer
-    {
-      get;
-      set;
-    }
-
-    #endregion GroupSortStatResultComparer Property
-
-    #region PUBLIC METHODS
-
     public object GetValue( object component )
     {
-      // Since EmptyDataItemSafePropertyDescriptor ensure
-      // to return null to avoid Binding exceptions when a 
-      // CollectionView other than the DataGridCollectionView
-      // is used, we must return null to avoid calling 
-      // GetValueCore using null as component
-      if( ( component == null )
-          || ( component is EmptyDataItem ) )
-        return null;
-
-      UnboundDataItem unboundDataItem = component as UnboundDataItem;
-
+      var unboundDataItem = component as UnboundDataItem;
       if( unboundDataItem != null )
+      {
         component = unboundDataItem.DataItem;
+      }
+
+      // Since EmptyDataItemSafePropertyDescriptor ensures to return null to avoid Binding exceptions when a CollectionView other
+      // than the DataGridCollectionView is used, we must return null to avoid calling GetValueCore using null as component.
+      if( ( component == null ) || ( component is EmptyDataItem ) )
+        return null;
 
       return this.GetValueCore( component );
     }
 
     public void SetValue( object component, object value )
     {
+      var unboundDataItem = component as UnboundDataItem;
+      if( unboundDataItem != null )
+      {
+        component = unboundDataItem.DataItem;
+      }
+
+      if( component == null )
+        throw new InvalidOperationException( "An attempt was made to set a value on a null data item." );
+
       if( component is EmptyDataItem )
         throw new InvalidOperationException( "An attempt was made to set a value on an empty data item." );
 
-      UnboundDataItem unboundDataItem = component as UnboundDataItem;
-
-      if( unboundDataItem != null )
-        component = unboundDataItem.DataItem;
-
-      bool isReadOnly = ( this.OverrideReadOnlyForInsertion.HasValue && this.OverrideReadOnlyForInsertion.Value )
-        ? false
-        : this.IsReadOnly;
-
-      if( isReadOnly )
+      if( this.IsReadOnly && !this.OverrideReadOnlyForInsertion.GetValueOrDefault( false ) )
         throw new InvalidOperationException( "An attempt was made to set a read-only property." );
 
       this.SetValueCore( component, value );
     }
 
+    [Browsable( false )]
+    [EditorBrowsable( EditorBrowsableState.Never )]
+    [Obsolete( "The ICloneable interface is no longer supported.", true )]
     public virtual object Clone()
     {
-      try
-      {
-        return Activator.CreateInstance( this.GetType(), this );
-      }
-      catch( Exception exception )
-      {
-        throw new NotImplementedException( "An attempt was made to Clone an instance of type " + this.GetType().ToString() + " that does not override the Clone() method.", exception );
-      }
+      throw new NotSupportedException();
     }
-
-#if DEBUG
-    public override string ToString()
-    {
-      if( this.Name != null )
-      {
-        return this.GetType() + ": " + this.Name;
-      }
-      else
-      {
-        return this.GetType().ToString();
-      }
-    }
-#endif
-
-    #endregion PUBLIC METHODS
-
-    #region PROTECTED METHODS
 
     protected abstract object GetValueCore( object component );
 
@@ -710,14 +812,12 @@ namespace Xceed.Wpf.DataGrid
       this.OnValueChanged( new ValueChangedEventArgs( component ) );
     }
 
-    #endregion PROTECTED METHODS
-
-    #region INTERNAL METHODS
-
     internal PropertyDescriptorFromItemPropertyBase GetPropertyDescriptorForBinding()
     {
       if( m_propertyDescriptorFromItemProperty == null )
+      {
         m_propertyDescriptorFromItemProperty = this.GetPropertyDescriptorForBindingCore();
+      }
 
       return m_propertyDescriptorFromItemProperty;
     }
@@ -727,11 +827,22 @@ namespace Xceed.Wpf.DataGrid
       return new PropertyDescriptorFromItemPropertyBase( this );
     }
 
-    internal virtual void SetUnspecifiedPropertiesValues( DataGridItemPropertyCollection itemPropertyCollection )
+    internal virtual void SetUnspecifiedPropertiesValues( PropertyDescription description, Type itemType, bool defaultItemPropertiesCreated )
     {
     }
 
-    #endregion INTERNAL METHODS
+    internal void AttachToContainingCollection( DataGridItemPropertyCollection collection )
+    {
+      if( collection == null )
+        throw new ArgumentNullException( "collection" );
+
+      this.ContainingCollection = collection;
+    }
+
+    internal void DetachFromContainingCollection()
+    {
+      this.ContainingCollection = null;
+    }
 
     #region INotifyPropertyChanged Members
 
@@ -739,17 +850,19 @@ namespace Xceed.Wpf.DataGrid
 
     private void OnPropertyChanged( string propertyName )
     {
-      if( this.PropertyChanged != null )
-        this.PropertyChanged( this, new PropertyChangedEventArgs( propertyName ) );
+      var handler = this.PropertyChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, new PropertyChangedEventArgs( propertyName ) );
     }
 
     #endregion
 
-    #region PRIVATE FIELDS
-
     private PropertyDescriptorFromItemPropertyBase m_propertyDescriptorFromItemProperty;
+    private BitFlags m_flags;
 
-    #endregion PRIVATE FIELDS
+    #region ValueChangedEventArgs Internal Class
 
     internal class ValueChangedEventArgs : EventArgs
     {
@@ -764,5 +877,79 @@ namespace Xceed.Wpf.DataGrid
         private set;
       }
     }
+
+    #endregion
+
+    #region BitFlags Private Struct
+
+    private struct BitFlags
+    {
+      internal bool this[ DataGridItemPropertyBaseFlags flag ]
+      {
+        get
+        {
+          return ( ( m_data & flag ) == flag );
+        }
+        set
+        {
+          this.CheckIfIsDefined( flag );
+
+          if( value )
+          {
+            m_data |= flag;
+          }
+          else
+          {
+            m_data &= ~flag;
+          }
+        }
+      }
+
+      [Conditional( "DEBUG" )]
+      private void CheckIfIsDefined( DataGridItemPropertyBaseFlags value )
+      {
+        if( Enum.IsDefined( typeof( DataGridItemPropertyBaseFlags ), value ) )
+          return;
+
+        int flags = Convert.ToInt32( value );
+        foreach( var flag in Enum.GetValues( typeof( DataGridItemPropertyBaseFlags ) ) )
+        {
+          int flagValue = Convert.ToInt32( flag );
+          if( ( flags & flagValue ) == flagValue )
+          {
+            flags &= ~flagValue;
+
+            if( flags == 0 )
+              break;
+          }
+        }
+
+        Debug.Assert( flags == 0 );
+      }
+
+      private DataGridItemPropertyBaseFlags m_data;
+    }
+
+    #endregion
+
+    #region DataGridItemPropertyBaseFlags Private Enum
+
+    [Flags]
+    private enum DataGridItemPropertyBaseFlags : ushort
+    {
+      IsReadOnly = 0x0001,
+      IsOverrideReadOnlyForInsertionSet = 0x0002,
+      IsOverrideReadOnlyForInsertion = 0x0004,
+      IsASubRelationshipSet = 0x0008,
+      IsASubRelationship = 0x0010,
+      CalculateDistinctValues = 0x0020,
+      IsCalculateDistinctValuesInitialized = 0x0040,
+      IsNameSealed = 0x0080,
+      IsSealed = 0x0100,
+      IsBrowsable = 0x0200,
+      IsDisplayable = 0x0400,
+    }
+
+    #endregion
   }
 }

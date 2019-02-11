@@ -15,9 +15,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
 
 namespace Xceed.Wpf.DataGrid
@@ -33,10 +30,19 @@ namespace Xceed.Wpf.DataGrid
 
     public SelectionRangeWithItems( SelectionRange range, object[] items )
     {
-      if( ( items != null ) && ( items.Length != range.Length ) && ( !range.IsEmpty ) ) 
+      if( ( items != null ) && ( items.Length != range.Length ) && ( !range.IsEmpty ) )
         throw new ArgumentException( "selectionRange and items must have the same length." );
 
-      m_items = items;
+      m_items = ( items != null ) ? new OptimizedItemsList( items ) : null;
+      m_range = range;
+    }
+
+    internal SelectionRangeWithItems( SelectionRange range, SharedList items )
+    {
+      if( ( items.Count != range.Length ) && ( !range.IsEmpty ) )
+        throw new ArgumentException( "selectionRange and items must have the same length." );
+
+      m_items = new OptimizedItemsList( items );
       m_range = range;
     }
 
@@ -52,7 +58,7 @@ namespace Xceed.Wpf.DataGrid
 
     private SelectionRange m_range;
 
-    #endregion SelectionRange Property
+    #endregion
 
     #region Items Property
 
@@ -60,13 +66,31 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return m_items;
+        if( m_items == null )
+          return null;
+
+        return m_items.ItemsArray;
       }
     }
 
-    private object[] m_items;
+    private OptimizedItemsList m_items;
 
-    #endregion Items Property
+    #endregion
+
+    #region ItemsList Property
+
+    internal SharedList? SharedList
+    {
+      get
+      {
+        if( m_items == null )
+          return null;
+
+        return m_items.SharedList;
+      }
+    }
+
+    #endregion
 
     #region Length Property
 
@@ -78,9 +102,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion Length Property
+    #endregion
 
-    #region PUBLIC PROPERTIES
+    #region IsEmpty Property
 
     public bool IsEmpty
     {
@@ -90,9 +114,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion PUBLIC PROPERTIES
-
-    #region PUBLIC METHODS
+    #endregion
 
     public static bool operator ==( SelectionRangeWithItems rangeWithItems1, SelectionRangeWithItems rangeWithItems2 )
     {
@@ -112,7 +134,7 @@ namespace Xceed.Wpf.DataGrid
 
     public bool IsItemsEqual( SelectionRange rangeIntersection, SelectionRangeWithItems rangeWithItemsToCompare )
     {
-      object[] itemsToCompare = rangeWithItemsToCompare.m_items;
+      OptimizedItemsList itemsToCompare = rangeWithItemsToCompare.m_items;
 
       if( ( m_items == null ) || ( itemsToCompare == null ) )
         return true;
@@ -135,7 +157,7 @@ namespace Xceed.Wpf.DataGrid
       }
 
       return true;
-    }    
+    }
 
     public object GetItem( DataGridContext dataGridContext, int offset )
     {
@@ -180,7 +202,7 @@ namespace Xceed.Wpf.DataGrid
       }
 
       object[] items = new object[ rangeIntersection.Length ];
-      Array.Copy( m_items, startOffset, items, 0, items.Length );
+      m_items.CopyItemsToArray( startOffset, items, 0, items.Length );
 
       if( reverseOrder )
       {
@@ -203,6 +225,88 @@ namespace Xceed.Wpf.DataGrid
       return ( ( SelectionRangeWithItems )obj ) == this;
     }
 
-    #endregion PUBLIC METHODS
+    #region OptimizedItemsList Private Class
+
+    // Performance optimization.
+    // This wrapper class allows to store items as an array (exclusive)OR as a SharedList.
+    // This allows a uniform API to access the items, whether they are stored as an Array or as a SharedList. 
+    //
+    // The SharedList allows us to be more efficient when we need to add items to the existing ones. 
+    // The Array allows the return of a value to the SelectionRangeWithItems.Items property more efficiently.
+    private class OptimizedItemsList
+    {
+      public OptimizedItemsList( SharedList list )
+      {
+        m_itemsArray = null;
+        m_itemsList = list;
+      }
+
+      public OptimizedItemsList( object[] items )
+      {
+        if( items == null )
+          throw new ArgumentNullException( "items" );
+
+        m_itemsArray = items;
+        m_itemsList = null;
+      }
+
+      public object this[ int index ]
+      {
+        get
+        {
+          if( m_itemsArray != null )
+          {
+            return m_itemsArray[ index ];
+          }
+          else
+          {
+            Debug.Assert( m_itemsList != null );
+            return m_itemsList.Value[ index ];
+          }
+        }
+      }
+
+      public SharedList? SharedList
+      {
+        get
+        {
+          return m_itemsList;
+        }
+      }
+
+      public object[] ItemsArray
+      {
+        get
+        {
+          //Convert the list to an array if needed.
+          if( m_itemsList != null )
+          {
+            Debug.Assert( m_itemsArray == null );
+            m_itemsArray = m_itemsList.Value.ToArray();
+            m_itemsList = null;
+          }
+
+          return m_itemsArray;
+        }
+      }
+
+      public void CopyItemsToArray( int index, object[] array, int arrayIndex, int length )
+      {
+        if( m_itemsArray != null )
+        {
+          Array.Copy( m_itemsArray, index, array, arrayIndex, length );
+        }
+        else
+        {
+          Debug.Assert( m_itemsList != null );
+          m_itemsList.Value.CopyTo( index, array, arrayIndex, length );
+        }
+      }
+
+      private object[] m_itemsArray;
+      private SharedList? m_itemsList;
+    }
+
+    #endregion
   }
 }

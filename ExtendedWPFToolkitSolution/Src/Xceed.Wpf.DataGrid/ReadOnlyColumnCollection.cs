@@ -15,24 +15,36 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using System.Collections.Specialized;
+using System.Diagnostics;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal class ReadOnlyColumnCollection : ReadOnlyObservableCollection<ColumnBase>
   {
-    public ReadOnlyColumnCollection()
-      : base( new ObservableCollection<ColumnBase>() )
+    internal ReadOnlyColumnCollection( ObservableColumnCollection collection )
+      : base( collection )
     {
     }
 
+    #region [] Property
+
+    internal ColumnBase this[ string fieldName ]
+    {
+      get
+      {
+        return ( ( ObservableColumnCollection )this.Items )[ fieldName ];
+      }
+    }
+
+    #endregion
+
     internal void RaiseItemChanged( ColumnBase column )
     {
-      this.OnCollectionChanged( 
-        new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Replace, column, column, this.IndexOf( column ) ) );
+      Debug.Assert( column != null );
+
+      this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Replace, column, column, this.IndexOf( column ) ) );
     }
 
     internal void InternalClear()
@@ -58,6 +70,11 @@ namespace Xceed.Wpf.DataGrid
     internal void InternalRemoveAt( int index )
     {
       this.Items.RemoveAt( index );
+    }
+
+    internal IDisposable DeferNotifications()
+    {
+      return ( ( ObservableColumnCollection )this.Items ).DeferNotifications();
     }
   }
 }

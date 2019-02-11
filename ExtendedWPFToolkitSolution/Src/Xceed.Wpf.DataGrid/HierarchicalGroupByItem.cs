@@ -15,22 +15,20 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using Xceed.Utils.Wpf.DragDrop;
-using System.Windows.Controls.Primitives;
-using System.ComponentModel;
-using System.Windows;
-using System.Windows.Input;
 using System.Collections.ObjectModel;
-using Xceed.Wpf.DataGrid.Views;
-using System.Windows.Resources;
-using System.Windows.Documents;
-using System.Windows.Data;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Security;
+using System.Windows;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using Xceed.Utils.Wpf;
+using Xceed.Utils.Wpf.DragDrop;
+using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -138,6 +136,8 @@ namespace Xceed.Wpf.DataGrid
         else
         {
           DataGridContext dataGridContext = this.ParentDataGridContext;
+          if( dataGridContext == null )
+            throw new DataGridInternalException( "The " + typeof( HierarchicalGroupByItem ).Name + "'s DataGridContext cannot be null." );
           groupLevelDescriptions = dataGridContext.GroupLevelDescriptions;
         }
 
@@ -167,6 +167,8 @@ namespace Xceed.Wpf.DataGrid
         else
         {
           DataGridContext dataGridContext = this.ParentDataGridContext;
+          if( dataGridContext == null )
+            throw new DataGridInternalException( "The " + typeof( HierarchicalGroupByItem ).Name + "'s DataGridContext cannot be null." );
           sortDescriptions = dataGridContext.Items.SortDescriptions;
         }
 
@@ -253,7 +255,7 @@ namespace Xceed.Wpf.DataGrid
       HierarchicalGroupByControlNode hierarchicalGroupByControlNode = HierarchicalGroupByItem.GetParentHierarchicalGroupByControlNode( this );
 
       if( hierarchicalGroupByControlNode == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "hierarchicalGroupByControlNode is null." );
 
       bool allowGroupingModification = hierarchicalGroupByControlNode.IsGroupingModificationAllowed;
 
@@ -337,7 +339,7 @@ namespace Xceed.Wpf.DataGrid
              : UIViewBase.DefaultGroupDraggedOutsideCursor;
           }
 
-          m_dragSourceManager.ProcessMouseLeftButtonDown( e );
+          m_dragSourceManager.DragStart( e );
         }
 
         e.Handled = true;
@@ -351,7 +353,9 @@ namespace Xceed.Wpf.DataGrid
       if( ( this.IsMouseCaptured ) && ( e.LeftButton == MouseButtonState.Pressed ) )
       {
         if( m_dragSourceManager != null )
-          m_dragSourceManager.ProcessMouseMove( e );
+        {
+          m_dragSourceManager.DragMove( e );
+        }
       }
 
       base.OnMouseMove( e );
@@ -363,10 +367,14 @@ namespace Xceed.Wpf.DataGrid
       bool isPressed = this.IsPressed;
 
       if( m_dragSourceManager != null )
-        m_dragSourceManager.ProcessMouseLeftButtonUp( e );
+      {
+        m_dragSourceManager.Drop( e );
+      }
 
       if( isMouseCaptured )
       {
+        this.ReleaseMouseCapture();
+
         bool click = isPressed;
 
         if( click )
@@ -379,16 +387,7 @@ namespace Xceed.Wpf.DataGrid
           // all the HierarchicalGroupByItem will share the same DataGridContext
           // which is the one of the level where the HierarchicalGroupByControl
           // is located
-          DataGridContext dataGridContext;
-
-          try
-          {
-            dataGridContext = this.ParentDataGridContext;
-          }
-          catch( DataGridInternalException )
-          {
-            dataGridContext = null;
-          }
+          DataGridContext dataGridContext = this.ParentDataGridContext;
 
           if( ( dataGridContext != null ) && ( dataGridContext.SourceDetailConfiguration == null ) )
           {
@@ -408,9 +407,14 @@ namespace Xceed.Wpf.DataGrid
 
               if( ( column != null ) && ( column.AllowSort ) )
               {
-                SortingHelper.ToggleColumnSort(
-                  dataGridContext, this.ParentSortDescriptions,
-                  columns, column, ( ( Keyboard.Modifiers & ModifierKeys.Shift ) != ModifierKeys.Shift ) );
+                bool shiftUnpressed = ( ( Keyboard.Modifiers & ModifierKeys.Shift ) != ModifierKeys.Shift );
+
+                var toggleColumnSort = new HierarchicalGroupByItemToggleColumnSortCommand( this );
+
+                if( toggleColumnSort.CanExecute( column, shiftUnpressed ) )
+                {
+                  toggleColumnSort.Execute( column, shiftUnpressed );
+                }
 
                 e.Handled = true;
               }
@@ -425,22 +429,24 @@ namespace Xceed.Wpf.DataGrid
     protected override void OnLostMouseCapture( MouseEventArgs e )
     {
       if( m_dragSourceManager != null )
-        m_dragSourceManager.ProcessLostMouseCapture( e );
+      {
+        m_dragSourceManager.DragCancel( e );
+      }
 
       base.OnLostMouseCapture( e );
     }
 
-    internal void ShowFarDropMark( Point mousePosition )
+    internal void ShowFarDropMark( RelativePoint mousePosition )
     {
       this.ShowDropMark( mousePosition, DropMarkAlignment.Far, true );
     }
 
-    private void ShowDropMark( Point mousePosition )
+    private void ShowDropMark( RelativePoint mousePosition )
     {
       this.ShowDropMark( mousePosition, DropMarkAlignment.Far, false );
     }
 
-    private void ShowDropMark( Point mousePosition, DropMarkAlignment defaultAlignment, bool forceDefaultAlignment )
+    private void ShowDropMark( RelativePoint mousePosition, DropMarkAlignment defaultAlignment, bool forceDefaultAlignment )
     {
       if( m_dropMarkAdorner == null )
       {
@@ -477,7 +483,7 @@ namespace Xceed.Wpf.DataGrid
 
       if( forceDefaultAlignment )
       {
-        m_dropMarkAdorner.ForceAlignment( defaultAlignment );
+        m_dropMarkAdorner.Alignment = defaultAlignment;
       }
       else
       {
@@ -592,9 +598,6 @@ namespace Xceed.Wpf.DataGrid
         if( hierarchicalGroupByControlNode != null )
           dataGridContext = hierarchicalGroupByControlNode.DataGridContext;
 
-        if( dataGridContext == null )
-          throw new DataGridInternalException( "The DataGridContext property must be set on a " + typeof( HierarchicalGroupByControlNode ) + "." );
-
         return dataGridContext;
       }
     }
@@ -624,7 +627,7 @@ namespace Xceed.Wpf.DataGrid
 
     #region IDropTarget Members
 
-    bool IDropTarget.CanDropElement( UIElement draggedElement )
+    bool IDropTarget.CanDropElement( UIElement draggedElement, RelativePoint mousePosition )
     {
       bool canDrop = true;
 
@@ -708,7 +711,7 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
-    void IDropTarget.DragOver( UIElement draggedElement, Point mousePosition )
+    void IDropTarget.DragOver( UIElement draggedElement, RelativePoint mousePosition )
     {
       ColumnManagerCell cell = draggedElement as ColumnManagerCell;
 
@@ -722,7 +725,7 @@ namespace Xceed.Wpf.DataGrid
           throw new DataGridInternalException( "A ColumnManagerCell must have a DataGridContext." );
 
         if( draggedOverHierarchicalGroupByControlNode == null )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "draggedOverHierarchicalGroupByControlNode is null." );
 
         if( draggedOverHierarchicalGroupByControlNode.GroupLevelDescriptions == draggedCellDataGridContext.GroupLevelDescriptions )
         {
@@ -757,10 +760,10 @@ namespace Xceed.Wpf.DataGrid
         HierarchicalGroupByControlNode draggedOverHierarchicalGroupByControlNode = HierarchicalGroupByItem.GetParentHierarchicalGroupByControlNode( this );
 
         if( draggedHierarchicalGroupByControlNode == null )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "draggedHierarchicalGroupByControlNode is null." );
 
         if( draggedOverHierarchicalGroupByControlNode == null )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "draggedOverHierarchicalGroupByControlNode is null." );
 
         if( draggedHierarchicalGroupByControlNode.GroupLevelDescriptions == draggedOverHierarchicalGroupByControlNode.GroupLevelDescriptions )
         {
@@ -831,10 +834,10 @@ namespace Xceed.Wpf.DataGrid
         HierarchicalGroupByControlNode draggedOverHierarchicalGroupByControlNode = HierarchicalGroupByItem.GetParentHierarchicalGroupByControlNode( this );
 
         if( draggedHierarchicalGroupByControlNode == null )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "draggedHierarchicalGroupByControlNode is null." );
 
         if( draggedOverHierarchicalGroupByControlNode == null )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "draggedOverHierarchicalGroupByControlNode is null." );
 
         if( draggedHierarchicalGroupByControlNode.GroupLevelDescriptions == draggedOverHierarchicalGroupByControlNode.GroupLevelDescriptions )
         {
@@ -860,7 +863,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    void IDropTarget.Drop( UIElement draggedElement )
+    void IDropTarget.Drop( UIElement draggedElement, RelativePoint mousePosition )
     {
       ColumnManagerCell draggedColumnManagerCell = draggedElement as ColumnManagerCell;
 
@@ -935,6 +938,210 @@ namespace Xceed.Wpf.DataGrid
     // Will remain null when no AdornerLayer is found.
     private DragSourceManager m_dragSourceManager;
     private DropMarkAdorner m_dropMarkAdorner;
+
+    #endregion
+
+    #region HierarchicalGroupByItemToggleColumnSortCommand Private Class
+
+    private sealed class HierarchicalGroupByItemToggleColumnSortCommand : ToggleColumnSortCommand
+    {
+      #region Constructor
+
+      internal HierarchicalGroupByItemToggleColumnSortCommand( HierarchicalGroupByItem target )
+        : base()
+      {
+        if( target == null )
+          throw new ArgumentNullException( "owner" );
+
+        m_target = new WeakReference( target );
+
+        if( target.ParentDataGridContext != null )
+        {
+          m_dataGridContext = new WeakReference( target.ParentDataGridContext );
+        }
+
+        DataGridContext groupByItemDataGridContext = DataGridControl.GetDataGridContext( target );
+        ToggleColumnSortCommand.ThrowIfNull( groupByItemDataGridContext, "groupByItemDataGridContext" );
+
+        DataGridControl dataGridControl = groupByItemDataGridContext.DataGridControl;
+        ToggleColumnSortCommand.ThrowIfNull( dataGridControl, "dataGridControl" );
+
+        m_dataGridControl = new WeakReference( dataGridControl );
+      }
+
+      #endregion
+
+      #region Properties
+
+      #region CanSort Protected Property
+
+      protected override bool CanSort
+      {
+        get
+        {
+          var datagrid = this.DataGridControl;
+          if( datagrid == null )
+            return false;
+
+          // When details are flatten, only the master may toggle a column.
+          if( this.DataGridControl.AreDetailsFlatten )
+            return false;
+
+          if( this.DataGridContext != null )
+          {
+            return this.DataGridContext.Items.CanSort;
+          }
+
+          return true;
+        }
+      }
+
+      #endregion
+
+      #region Columns Protected Property
+
+      protected override ColumnCollection Columns
+      {
+        get
+        {
+          var target = this.Target;
+          if( target == null )
+            return null;
+
+          return target.ParentColumns;
+        }
+      }
+
+      #endregion
+
+      #region DataGridContext Protected Property
+
+      protected override DataGridContext DataGridContext
+      {
+        get
+        {
+          return ( m_dataGridContext != null ) ? m_dataGridContext.Target as DataGridContext : null;
+        }
+      }
+
+      private readonly WeakReference m_dataGridContext;
+
+      #endregion   
+
+      #region DataGridControl Private Property
+
+      private DataGridControl DataGridControl
+      {
+        get
+        {
+          return ( m_dataGridControl != null ) ? m_dataGridControl.Target as DataGridControl : null;
+        }
+      }
+
+      private readonly WeakReference m_dataGridControl;
+
+      #endregion
+
+      #region MaxSortLevels Protected Property
+
+      protected override int MaxSortLevels
+      {
+        get
+        {
+          return -1;
+        }
+      }
+
+      #endregion
+
+      #region SortDescriptions Protected Property
+
+      protected override SortDescriptionCollection SortDescriptions
+      {
+        get
+        {
+          var target = this.Target;
+          if( target == null )
+            return null;
+
+          return target.ParentSortDescriptions;
+        }
+      }
+
+      #endregion
+
+      #region Target Private Property
+
+      private HierarchicalGroupByItem Target
+      {
+        get
+        {
+          return m_target.Target as HierarchicalGroupByItem;
+        }
+      }
+
+      private readonly WeakReference m_target;
+
+      #endregion
+
+      #endregion
+
+      #region Methods Override
+
+      protected override void ValidateToggleColumnSort()
+      {
+        Debug.Assert( !this.DataGridControl.AreDetailsFlatten, "A flatten detail should not be able to toggle the column sort direction." );
+      }
+
+      protected override SortDescriptionsSyncContext GetSortDescriptionsSyncContext()
+      {
+        var dataGridContext = this.DataGridContext;
+        if( dataGridContext != null )
+          return dataGridContext.SortDescriptionsSyncContext;
+
+        return this.DataGridControl.DataGridContext.SortDescriptionsSyncContext;
+      }
+
+      protected override void ValidateSynchronizationContext( SynchronizationContext synchronizationContext )
+      {
+        if( !synchronizationContext.Own )
+          throw new DataGridInternalException( "The column is already being processed.", this.DataGridControl );
+      }
+
+      protected override void DeferRestoreStateOnLevel( Disposer disposer )
+      {
+        var dataGridContext = this.DataGridContext;
+        if( dataGridContext != null )
+        {
+          ToggleColumnSortCommand.DeferRestoreStateOnLevel( disposer, dataGridContext );
+        }
+      }
+
+      protected override IDisposable DeferResortHelperItemsSourceCollection()
+      {
+        var dataGridContext = this.DataGridContext;
+
+        return ( dataGridContext != null )
+                ? this.DeferResortHelper( dataGridContext.ItemsSourceCollection, dataGridContext.Items )
+                : this.DeferResortHelper( this.DataGridControl.ItemsSource, this.DataGridControl.DataGridContext.Items );
+      }
+
+      protected override bool TryDeferResortSourceDetailConfiguration( out IDisposable defer )
+      {
+        var dataGridContext = this.DataGridContext;
+
+        return ( dataGridContext != null )
+                ? this.TryDeferResort( dataGridContext.SourceDetailConfiguration, out defer )
+                : this.TryDeferResort( this.DataGridControl.DataGridContext.SourceDetailConfiguration, out defer );
+      }
+
+      protected override IDisposable SetQueueBringIntoViewRestrictions( AutoScrollCurrentItemSourceTriggers triggers )
+      {
+        return this.DataGridControl.SetQueueBringIntoViewRestrictions( triggers );
+      }
+
+      #endregion
+    }
 
     #endregion
   }

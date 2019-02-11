@@ -94,11 +94,10 @@ namespace Xceed.Wpf.Toolkit
       if( ItemsSourceType == null )
         ItemsSourceType = newValue.GetType();
 
-      if( ItemType == null )
+      if( ItemType == null && newValue.GetType().ContainsGenericParameters )
         ItemType = newValue.GetType().GetGenericArguments()[ 0 ];
 
-      if( newValue.Count > 0 )
-        SetText( newValue );
+      SetText( newValue );
     }
 
     #endregion //ItemsSource
@@ -191,10 +190,14 @@ namespace Xceed.Wpf.Toolkit
 
     public PrimitiveTypeCollectionControl()
     {
-
     }
 
     #endregion //Constructors
+
+    #region Overrides
+
+
+#endregion
 
     #region Methods
 
@@ -204,13 +207,22 @@ namespace Xceed.Wpf.Toolkit
       if( list == null )
         return;
 
+      IList items = ComputeItems();
+
       //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
       list.Clear();
 
-      IList items = ComputeItems();
+      int counter = 0;
       foreach( var item in items )
       {
-        list.Add( item );
+        if( list is Array )
+        {
+           ( ( Array )list ).SetValue( item, counter++);
+        }
+        else
+        {
+          list.Add( item );
+        }
       };
 
       // if something went wrong during conversion we want to reload the text to show only valid entries
@@ -235,7 +247,14 @@ namespace Xceed.Wpf.Toolkit
           object value = null;
           try
           {
-            value = Convert.ChangeType( valueString, ItemType );
+            if( ItemType.IsEnum )
+            {
+              value = Enum.Parse( ItemType, valueString );
+            }
+            else
+            {
+              value = Convert.ChangeType( valueString, ItemType );
+            }
           }
           catch
           {
@@ -254,7 +273,12 @@ namespace Xceed.Wpf.Toolkit
     private IList ComputeItemsSource()
     {
       if( ItemsSource == null )
+      {
+        // Save current text since creating the ItemsSource will reset it
+        string currentText = this.Text;
         ItemsSource = CreateItemsSource();
+        this.Text = currentText;
+      }
 
       return ItemsSource;
     }

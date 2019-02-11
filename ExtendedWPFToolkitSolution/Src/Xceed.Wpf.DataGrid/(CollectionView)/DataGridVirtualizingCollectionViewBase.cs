@@ -15,20 +15,10 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
-using System.Globalization;
-using System.ComponentModel;
-using System.Collections.ObjectModel;
 using System.Collections;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Data;
-using Xceed.Utils.Collections;
-using Xceed.Utils.Data;
-using System.Windows.Threading;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -47,9 +37,10 @@ namespace Xceed.Wpf.DataGrid
     internal DataGridVirtualizingCollectionViewBase( object sourceModel, Type itemType, bool autoCreateItemProperties, int pageSize, int maxRealizedItemCount )
       : base( sourceModel, null, itemType, autoCreateItemProperties, false, false )
     {
-
       if( itemType == null )
+      {
         itemType = typeof( object );
+      }
 
       if( pageSize < 1 )
         throw new ArgumentOutOfRangeException( "pageSize", pageSize, "pageSize must be greater than zero." );
@@ -58,7 +49,9 @@ namespace Xceed.Wpf.DataGrid
         throw new ArgumentOutOfRangeException( "maxRealizedItemCount", maxRealizedItemCount, "maxRealizedItemCount must be greater than zero." );
 
       if( maxRealizedItemCount < pageSize )
+      {
         maxRealizedItemCount = pageSize;
+      }
 
       m_pageSize = pageSize;
       m_maxRealizedItemCount = maxRealizedItemCount;
@@ -68,12 +61,12 @@ namespace Xceed.Wpf.DataGrid
     internal override DataGridCollectionViewBase CreateDetailDataGridCollectionViewBase(
       IEnumerable detailDataSource,
       DataGridDetailDescription parentDetailDescription,
-      DataGridCollectionViewBase rootDataGridCollectionViewBase )
+      DataGridCollectionViewBase parentDataGridCollectionViewBase )
     {
       throw new NotImplementedException();
     }
 
-    #endregion CONSTRUCTORS
+    #endregion
 
     #region CollectionView Members
 
@@ -81,9 +74,7 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        bool canGroup = true;
-
-        return canGroup;
+        return true;
       }
     }
 
@@ -320,10 +311,6 @@ namespace Xceed.Wpf.DataGrid
 
     private void ResetDistinctValues()
     {
-      DistinctValuesDictionary distinctValues = this.DistinctValues as DistinctValuesDictionary;
-
-      if( distinctValues != null )
-        distinctValues.InternalClear();
     }
 
     #endregion
@@ -368,7 +355,9 @@ namespace Xceed.Wpf.DataGrid
           m_maxRealizedItemCount = value;
 
           if( value < this.PageSize )
+          {
             value = this.PageSize;
+          }
 
           // Cannot modify this PageManager property.  Must Refresh which will recreate the CollectionViewGroupRoot
           // and the DataGridVirtualPageManagerBase taking the new pageSize into account.
@@ -517,8 +506,7 @@ namespace Xceed.Wpf.DataGrid
       if( currentAddItem == null )
         return;
 
-      DataGridCommittingNewItemEventArgs committingNewItemEventArgs =
-        new DataGridCommittingNewItemEventArgs( this, currentAddItem, false );
+      DataGridCommittingNewItemEventArgs committingNewItemEventArgs = new DataGridCommittingNewItemEventArgs( this, currentAddItem, false );
 
       this.RootDataGridCollectionViewBase.OnCommittingNewItem( committingNewItemEventArgs );
 
@@ -533,6 +521,51 @@ namespace Xceed.Wpf.DataGrid
       this.SetCurrentAddNew( null, -1 );
 
       this.ExecuteOrQueueSourceItemOperation( new DeferredOperation( DeferredOperation.DeferredOperationAction.Refresh, -1, null ) );
+    }
+
+    public override bool MoveCurrentTo( object item )
+    {
+      m_canSynchronizeSelectionWithCurrent = true;
+      bool ret = base.MoveCurrentTo( item );
+      m_canSynchronizeSelectionWithCurrent = false;
+
+      return ret;
+    }
+
+    public override bool MoveCurrentToFirst()
+    {
+      m_canSynchronizeSelectionWithCurrent = true;
+      bool ret = base.MoveCurrentToFirst();
+      m_canSynchronizeSelectionWithCurrent = false;
+
+      return ret;
+    }
+
+    public override bool MoveCurrentToLast()
+    {
+      m_canSynchronizeSelectionWithCurrent = true;
+      bool ret = base.MoveCurrentToLast();
+      m_canSynchronizeSelectionWithCurrent = false;
+
+      return ret;
+    }
+
+    public override bool MoveCurrentToNext()
+    {
+      m_canSynchronizeSelectionWithCurrent = true;
+      bool ret = base.MoveCurrentToNext();
+      m_canSynchronizeSelectionWithCurrent = false;
+
+      return ret;
+    }
+
+    public override bool MoveCurrentToPrevious()
+    {
+      m_canSynchronizeSelectionWithCurrent = true;
+      bool ret = base.MoveCurrentToPrevious();
+      m_canSynchronizeSelectionWithCurrent = false;
+
+      return ret;
     }
 
     #endregion PUBLIC METHODS
@@ -683,16 +716,19 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
+    internal bool CanSynchronizeSelectionWithCurrent
+    {
+      get
+      {
+        return m_canSynchronizeSelectionWithCurrent;
+      }
+    }
+
     #endregion INTERNAL PROPERTIES
 
     #region INTERNAL METHODS
 
     internal abstract DataGridVirtualizingCollectionViewGroupBase CreateNewRootGroup();
-
-    internal override bool CanCreateDetailDescriptions()
-    {
-      return false;
-    }
 
     internal override void OnBeginningEdit( DataGridItemCancelEventArgs e )
     {
@@ -712,24 +748,24 @@ namespace Xceed.Wpf.DataGrid
 
     internal override void OnEditBegun( DataGridItemEventArgs e )
     {
-      object item = e.Item;
-
-      DataGridPageManagerBase pageManager = this.RootGroup.GetVirtualPageManager();
+      var item = e.Item;
+      var pageManager = this.RootGroup.GetVirtualPageManager();
 
       if( !pageManager.IsItemDirty( item ) )
       {
         // First time we enter edit on this item.
-        DataGridItemPropertyCollection itemProperties = this.ItemProperties;
-        int count = itemProperties.Count;
+        var itemProperties = this.ItemProperties;
+        var count = itemProperties.Count;
 
-        string[] propertyNames = new string[ count ];
-        object[] cachedValues = new object[ count ];
+        var propertyNames = new string[ count ];
+        var cachedValues = new object[ count ];
 
         for( int i = 0; i < count; i++ )
         {
-          DataGridItemPropertyBase itemProperty = itemProperties[ i ];
-          propertyNames[ i ] = itemProperty.Name;
-          cachedValues[ i ] = itemProperty.GetValue( item );
+          var itemProperty = itemProperties[ i ];
+
+          propertyNames[ i ] = PropertyRouteParser.Parse( itemProperty );
+          cachedValues[ i ] = ItemsSourceHelper.GetValueFromItemProperty( itemProperty, item );
         }
 
         // Cache the values of the never edited before row.  This will help the developer find the corresponding row
@@ -742,23 +778,22 @@ namespace Xceed.Wpf.DataGrid
 
     internal override void OnEditCommitted( DataGridItemEventArgs e )
     {
-      object item = e.Item;
-
-      DataGridPageManagerBase pageManager = this.RootGroup.GetVirtualPageManager();
+      var item = e.Item;
+      var pageManager = this.RootGroup.GetVirtualPageManager();
 
       // Compare cached values with current values.  If they are the same, we can clear the old values which in turn will
       // make the item non dirty.
-      bool clearIsDirty = true;
+      var clearIsDirty = true;
 
-      VirtualizedItemValueCollection cachedValues = pageManager.GetCachedValuesForItem( item );
+      var cachedValues = pageManager.GetCachedValuesForItem( item );
 
       Debug.Assert( cachedValues != null );
 
-      DataGridItemPropertyCollection itemProperties = this.ItemProperties;
+      var itemProperties = this.ItemProperties;
 
-      foreach( DataGridItemPropertyBase itemProperty in itemProperties )
+      foreach( var itemProperty in itemProperties )
       {
-        object currentValue = itemProperty.GetValue( item );
+        var currentValue = ItemsSourceHelper.GetValueFromItemProperty( itemProperty, item );
 
         if( !( object.Equals( currentValue, cachedValues[ itemProperty.Name ] ) ) )
         {
@@ -782,24 +817,24 @@ namespace Xceed.Wpf.DataGrid
 
     internal override void OnEditCanceled( DataGridItemEventArgs e )
     {
-      object item = e.Item;
-
-      DataGridPageManagerBase pageManager = this.RootGroup.GetVirtualPageManager();
+      var item = e.Item;
+      var pageManager = this.RootGroup.GetVirtualPageManager();
 
       // Compare cached values with current values.  If they are the same, we can clear the old values which in turn will
       // make the item non dirty.
-      bool clearIsDirty = true;
+      var clearIsDirty = true;
 
-      VirtualizedItemValueCollection cachedValues = pageManager.GetCachedValuesForItem( item );
+      var cachedValues = pageManager.GetCachedValuesForItem( item );
 
       Debug.Assert( cachedValues != null );
 
-      DataGridItemPropertyCollection itemProperties = this.ItemProperties;
-      foreach( DataGridItemPropertyBase itemProperty in itemProperties )
-      {
-        object currentValue = itemProperty.GetValue( item );
+      var itemProperties = this.ItemProperties;
 
-        if( !( object.Equals( currentValue, cachedValues[ itemProperty.Name ] ) ) )
+      foreach( var itemProperty in itemProperties )
+      {
+        var currentValue = ItemsSourceHelper.GetValueFromItemProperty( itemProperty, item );
+
+        if( !( object.Equals( currentValue, cachedValues[ PropertyRouteParser.Parse( itemProperty ) ] ) ) )
         {
           clearIsDirty = false;
           break;
@@ -807,7 +842,9 @@ namespace Xceed.Wpf.DataGrid
       }
 
       if( clearIsDirty )
+      {
         pageManager.ClearCachedValuesForItem( item );
+      }
 
       base.OnEditCanceled( e );
     }
@@ -845,6 +882,8 @@ namespace Xceed.Wpf.DataGrid
 
     private object m_connectionError;
     private DataGridConnectionState m_connectionState;
+
+    private bool m_canSynchronizeSelectionWithCurrent;
 
     #endregion PRIVATE FIELDS
 
@@ -925,7 +964,11 @@ namespace Xceed.Wpf.DataGrid
         }
 
         if( sendResetNotification )
+        {
           this.OnCollectionChanged( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
+        }
+
+        this.OnPropertyChanged( new PropertyChangedEventArgs( "Groups" ) );
       }
     }
 

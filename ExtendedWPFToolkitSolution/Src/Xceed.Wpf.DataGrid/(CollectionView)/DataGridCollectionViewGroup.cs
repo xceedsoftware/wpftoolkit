@@ -18,36 +18,46 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
-using System.Windows.Data;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Windows.Data;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal class DataGridCollectionViewGroup : CollectionViewGroup, ICustomTypeDescriptor
   {
-    public DataGridCollectionViewGroup( object name, DataGridCollectionViewGroup parent, int unsortedIndex )
+    protected DataGridCollectionViewGroup( int capacity )
+      : this( null, null, 0, capacity, 4 )
+    {
+    }
+
+    protected DataGridCollectionViewGroup( DataGridCollectionViewGroup template, DataGridCollectionViewGroup parent )
+      : this( template.Name, parent, template.m_unsortedIndex, template.m_sortedRawItems.Count, template.m_subGroups.Count )
+    {
+      m_nextSubGroupUnsortedIndex = template.m_nextSubGroupUnsortedIndex;
+      m_subGroupBy = template.m_subGroupBy;
+      m_groupByName = template.GroupByName;
+    }
+
+    private DataGridCollectionViewGroup( object name, DataGridCollectionViewGroup parent, int unsortedIndex )
+      : this( name, parent, unsortedIndex, 4, 4 )
+    {
+    }
+
+    private DataGridCollectionViewGroup( object name, DataGridCollectionViewGroup parent, int unsortedIndex, int rawCapacity, int groupCapacity )
       : base( name )
     {
       m_parent = parent;
       m_unsortedIndex = unsortedIndex;
-    }
-
-    internal DataGridCollectionViewGroup(
-      DataGridCollectionViewGroup template,
-      DataGridCollectionViewGroup parent )
-      : this( template.Name, parent, template.m_unsortedIndex )
-    {
-      m_nextSubGroupUnsortedIndex = template.m_nextSubGroupUnsortedIndex;
-      m_subGroupBy = template.m_subGroupBy;
-
-      if( template.m_groupsDictionary != null )
-        m_groupsDictionary = new Hashtable();
-
-      if( template.m_sortedRawItems != null )
-        m_sortedRawItems = new List<RawItem>( template.m_sortedRawItems.Count );
+      m_protectedItems = ObservableCollectionHelper.GetItems( base.ProtectedItems );
+      m_protectedItemsCollectionChanged = ObservableCollectionHelper.GetCollectionChanged( base.ProtectedItems );
+      m_optimizedItems = new OptimizedReadOnlyObservableCollection( this );
+      m_subGroups = new Dictionary<object, DataGridCollectionViewGroup>( groupCapacity );
+      m_sortedRawItems = new List<RawItem>( rawCapacity );
     }
 
     #region IsBottomLevel Property
@@ -56,40 +66,24 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        // return true if .Items contain DataItem
+        // returns true if .Items contain DataItem
         return ( m_subGroupBy == null );
       }
     }
 
-    #endregion IsBottomLevel Property
+    #endregion
 
     #region Items Property
 
-    public new ReadOnlyObservableCollection<object> Items
+    internal new ReadOnlyObservableCollection<object> Items
     {
       get
       {
-        // The optimized list is only able to handle Items. When we are not at the bottom level,
-        // this means that our Items collection return sub-groups.
-        if( this.IsBottomLevel )
-        {
-          if( m_optimizedItems == null )
-            m_optimizedItems = new OptimizedReadOnlyObservableCollection( this );
-
-          return m_optimizedItems;
-        }
-
-        // The group hierarchy can change over time. If, at this point, 
-        // we are not eligible to return the optimized list (we contains
-        // sub groups or our source item list is not a DataGridCollectionView),
-        // we must reset our cached list.
-        m_optimizedItems = null;
-
-        return base.Items;
+        return m_optimizedItems;
       }
     }
 
-    #endregion Items Property
+    #endregion
 
     #region ProtectedItems Property
 
@@ -101,7 +95,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion ProtectedItems Property
+    #endregion
 
     #region UnsortedIndex Property
 
@@ -113,7 +107,25 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion UnsortedIndex Property
+    #endregion
+
+    #region GroupByName Property
+
+    internal string GroupByName
+    {
+      get
+      {
+        return m_groupByName;
+      }
+      set
+      {
+        m_groupByName = value;
+      }
+    }
+
+    private string m_groupByName;
+
+    #endregion
 
     #region SubGroupBy Property
 
@@ -125,7 +137,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion SubGroupBy Property
+    #endregion
 
     #region Parent Property
 
@@ -137,7 +149,31 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion Parent Property
+    #endregion
+
+    #region GlobalRawItemCount Property
+
+    internal int GlobalRawItemCount
+    {
+      get
+      {
+        return m_globalRawItemCount;
+      }
+    }
+
+    #endregion
+
+    #region RawItems Property
+
+    internal List<RawItem> RawItems
+    {
+      get
+      {
+        return m_sortedRawItems;
+      }
+    }
+
+    #endregion
 
     protected virtual DataGridCollectionView GetCollectionView()
     {
@@ -147,34 +183,43 @@ namespace Xceed.Wpf.DataGrid
       return null;
     }
 
-    internal bool Contains( object dataItem )
+    internal bool Contains( object item )
     {
+      var group = item as DataGridCollectionViewGroup;
+      if( group != null )
+      {
+        //Must make sure the group the group is ref equals, because there can be groups with a null name at more than one level.
+        DataGridCollectionViewGroup foundGroup;
+        if( m_subGroups.TryGetValue( DataGridCollectionViewGroup.GetHashKeyFromName( group.Name ), out foundGroup ) )
+          return ( foundGroup == group );
+
+        return false;
+      }
+
       DataGridCollectionView collectionView = this.GetCollectionView();
       if( collectionView != null )
       {
-        RawItem rawItem = collectionView.GetFirstRawItemFromDataItem( dataItem );
+        RawItem rawItem = collectionView.GetFirstRawItemFromDataItem( item );
         if( rawItem != null )
-        {
           return ( rawItem.ParentGroup == this );
-        }
       }
 
       return false;
     }
 
-    internal int IndexOf( object dataItem )
+    internal int IndexOf( object item )
     {
+      if( item is DataGridCollectionViewGroup )
+        return this.ProtectedItems.IndexOf( item );
+
       DataGridCollectionView collectionView = this.GetCollectionView();
 
       if( collectionView != null )
       {
-        RawItem rawItem = collectionView.GetFirstRawItemFromDataItem( dataItem );
+        RawItem rawItem = collectionView.GetFirstRawItemFromDataItem( item );
 
-        if( ( rawItem != null )
-          && ( rawItem.ParentGroup == this ) )
-        {
+        if( ( rawItem != null ) && ( rawItem.ParentGroup == this ) )
           return rawItem.SortedIndex;
-        }
       }
 
       return -1;
@@ -182,26 +227,23 @@ namespace Xceed.Wpf.DataGrid
 
     internal int GetFirstRawItemGlobalSortedIndex()
     {
-      int index = 0;
-      DataGridCollectionViewGroup group = this;
-      DataGridCollectionViewGroup parent = group;
-
-      if( parent != null )
-        parent = parent.Parent;
+      var index = 0;
+      var group = this;
+      var parent = this.Parent;
+      var currentGroup = default( DataGridCollectionViewGroup );
 
       while( parent != null )
       {
-        ReadOnlyObservableCollection<object> subGroups = parent.Items;
-        int subGroupCount = subGroups.Count;
-        DataGridCollectionViewGroup currentGroup = null;
+        var items = parent.ProtectedItems;
+        var count = items.Count;
 
-        for( int i = 0; i < subGroupCount; i++ )
+        for( int i = 0; i < count; i++ )
         {
-          currentGroup = subGroups[ i ] as DataGridCollectionViewGroup;
-
-          if( currentGroup == group )
+          var value = items[ i ];
+          if( value == group )
             break;
 
+          currentGroup = value as DataGridCollectionViewGroup;
           index += currentGroup.GlobalRawItemCount;
         }
 
@@ -217,14 +259,10 @@ namespace Xceed.Wpf.DataGrid
       bool oldIsBottomLevel = this.IsBottomLevel;
       m_subGroupBy = groupBy;
 
-      if( m_subGroupBy != null )
-      {
-        if( m_groupsDictionary == null )
-          m_groupsDictionary = new Hashtable();
-      }
-
       if( oldIsBottomLevel != this.IsBottomLevel )
+      {
         this.OnPropertyChanged( new PropertyChangedEventArgs( "IsBottomLevel" ) );
+      }
     }
 
     internal DataGridCollectionViewGroup GetGroup(
@@ -232,7 +270,7 @@ namespace Xceed.Wpf.DataGrid
       int level,
       CultureInfo culture,
       ObservableCollection<GroupDescription> groupByList,
-      GroupSortComparer[] groupSortComparers )
+      List<GroupSortComparer> groupSortComparers )
     {
       // If sortComparers is null, we are in massive group creation, no order check.
 
@@ -240,23 +278,19 @@ namespace Xceed.Wpf.DataGrid
         throw new InvalidOperationException( "An attempt was made to get a group for which a GroupDescription has not been provided." );
 
       object groupName = m_subGroupBy.GroupNameFromItem( rawItem.DataItem, level, culture );
-      DataGridGroupDescription dataGridGroupDescription = m_subGroupBy as DataGridGroupDescription;
       DataGridCollectionViewGroup group;
 
-      if( dataGridGroupDescription != null )
+      if( ( m_subGroupBy is DataGridGroupDescription ) || ( m_subGroupBy is PropertyGroupDescription ) )
       {
-        group = m_groupsDictionary[ DataGridCollectionViewGroup.GetHashKeyFromName( groupName ) ]
-          as DataGridCollectionViewGroup;
+        m_subGroups.TryGetValue( DataGridCollectionViewGroup.GetHashKeyFromName( groupName ), out group );
       }
       else
       {
-        int itemCount = this.ItemCount;
+        //If dealing with an unknown GroupDescription type, use the standard method to retrieve a group, in case group retrival is handle differently.
         group = null;
 
-        for( int i = 0; i < itemCount; i++ )
+        foreach( var tempGroup in m_subGroups.Values )
         {
-          DataGridCollectionViewGroup tempGroup = this.ProtectedItems[ i ] as DataGridCollectionViewGroup;
-
           if( m_subGroupBy.NamesMatch( tempGroup.Name, groupName ) )
           {
             group = tempGroup;
@@ -267,32 +301,26 @@ namespace Xceed.Wpf.DataGrid
 
       if( group == null )
       {
-        group = this.CreateSubGroup(
-          groupName, level, groupByList, groupSortComparers );
+        group = this.CreateSubGroup( groupName, level, groupByList, groupSortComparers );
       }
 
       return group;
     }
 
     internal void SortItems(
-      SortDescriptionInfo[] sortDescriptionInfos,
-      GroupSortComparer[] groupSortComparers,
+      IList<SortDescriptionInfo> sortDescriptionInfos,
+      List<GroupSortComparer> groupSortComparers,
       int level,
       List<RawItem> globalRawItems,
       DataGridCollectionViewGroup newSortedGroup )
     {
-      int itemCount = this.ItemCount;
-
+      var itemCount = this.ProtectedItemCount;
       if( itemCount == 0 )
         return;
 
-      ObservableCollection<object> groupItems = this.ProtectedItems;
-
       if( this.IsBottomLevel )
       {
-        int[] indexes;
-
-        indexes = new int[ itemCount + 1 ];
+        var indexes = new int[ itemCount + 1 ];
 
         for( int i = 0; i < itemCount; i++ )
         {
@@ -300,11 +328,10 @@ namespace Xceed.Wpf.DataGrid
         }
 
         // "Weak heap sort" sort array[0..NUM_ELEMENTS-1] to array[1..NUM_ELEMENTS]
-        DataGridCollectionViewSort collectionViewSort =
-          new DataGridCollectionViewSort( indexes, sortDescriptionInfos );
+        var collectionViewSort = new DataGridCollectionViewSort( indexes, sortDescriptionInfos );
 
         collectionViewSort.Sort( itemCount );
-        int index = 0;
+        var index = 0;
 
         for( int i = 1; i <= itemCount; i++ )
         {
@@ -314,18 +341,18 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        int[] indexes;
-
-        indexes = new int[ itemCount + 1 ];
+        var indexes = new int[ itemCount + 1 ];
 
         for( int i = 0; i < itemCount; i++ )
         {
           indexes[ i ] = i;
         }
 
+        var subGroupsArray = new DataGridCollectionViewGroup[ itemCount ];
+        m_subGroups.Values.CopyTo( subGroupsArray, 0 );
+
         // "Weak heap sort" sort array[0..NUM_ELEMENTS-1] to array[1..NUM_ELEMENTS]
-        DataGridCollectionViewGroupSort collectionViewSort =
-          new DataGridCollectionViewGroupSort( indexes, groupSortComparers[ level ], this );
+        var collectionViewSort = new DataGridCollectionViewGroupSort( indexes, groupSortComparers[ level ], subGroupsArray );
 
         collectionViewSort.Sort( itemCount );
         int index = 0;
@@ -333,7 +360,7 @@ namespace Xceed.Wpf.DataGrid
 
         for( int i = 1; i <= itemCount; i++ )
         {
-          DataGridCollectionViewGroup oldGroup = ( DataGridCollectionViewGroup )groupItems[ indexes[ i ] ];
+          DataGridCollectionViewGroup oldGroup = subGroupsArray[ indexes[ i ] ];
           DataGridCollectionViewGroup newGroup = new DataGridCollectionViewGroup( oldGroup, newSortedGroup );
 
           // Sort sub items
@@ -345,62 +372,48 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    internal int BinarySearchGroup( DataGridCollectionViewGroup value, IComparer<DataGridCollectionViewGroup> comparer )
+    internal void SortGroups( List<GroupSortComparer> groupSortComparers, int level )
     {
-      if( comparer == null )
-        throw new ArgumentNullException( "comparer" );
+      int itemCount = this.ProtectedItemCount;
 
-      ObservableCollection<object> items = this.ProtectedItems;
+      if( itemCount == 0 )
+        return;
 
-      Debug.Assert( items.Count == this.ItemCount );
-
-      int low = 0;
-      int hi = ( items.Count ) - 1;
-
-      while( low <= hi )
+      int[] indexes;
+      indexes = new int[ itemCount + 1 ];
+      for( int i = 0; i < itemCount; i++ )
       {
-        int compareResult;
-        int median = ( low + ( ( hi - low ) >> 1 ) );
-
-        DataGridCollectionViewGroup medianGroup = items[ median ] as DataGridCollectionViewGroup;
-
-        // We exclude ourself from the research because we seek for a new valid position
-        if( medianGroup == value )
-        {
-          if( low == hi )
-            return low;
-
-          median++;
-          medianGroup = items[ median ] as DataGridCollectionViewGroup;
-        }
-
-        try
-        {
-          compareResult = comparer.Compare( medianGroup, value );
-        }
-        catch( Exception exception )
-        {
-          throw new InvalidOperationException( "IComparer has failed to compare the values.", exception );
-        }
-
-        if( compareResult == 0 )
-        {
-          return median;
-        }
-        if( compareResult < 0 )
-        {
-          low = median + 1;
-        }
-        else
-        {
-          hi = median - 1;
-        }
+        indexes[ i ] = i;
       }
 
-      return ~low;
+      DataGridCollectionViewGroup[] subGroupsArray = new DataGridCollectionViewGroup[ itemCount ];
+      m_subGroups.Values.CopyTo( subGroupsArray, 0 );
+
+      // "Weak heap sort" sort array[0..NUM_ELEMENTS-1] to array[1..NUM_ELEMENTS]
+      DataGridCollectionViewGroupSort collectionViewSort = new DataGridCollectionViewGroupSort( indexes, groupSortComparers[ level ], subGroupsArray );
+
+      collectionViewSort.Sort( itemCount );
+      level++;
+      m_protectedItems.Clear();
+
+      for( int i = 1; i <= itemCount; i++ )
+      {
+        DataGridCollectionViewGroup group = subGroupsArray[ indexes[ i ] ];
+
+        // Sort sub groups
+        if( !group.IsBottomLevel )
+        {
+          group.SortGroups( groupSortComparers, level );
+        }
+
+        m_protectedItems.Add( group );
+      }
+
+      this.ProtectedItemCount = m_protectedItems.Count;
+      m_protectedItemsCollectionChanged.Invoke( new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset ) );
     }
 
-    internal void CreateFixedGroupNames( int fixedGroupLevel, ObservableCollection<GroupDescription> groupByList, GroupSortComparer[] groupSortComparers )
+    internal void CreateFixedGroupNames( int fixedGroupLevel, ObservableCollection<GroupDescription> groupByList, List<GroupSortComparer> groupSortComparers )
     {
       GroupDescription groupDescription = this.SubGroupBy;
 
@@ -419,43 +432,6 @@ namespace Xceed.Wpf.DataGrid
     }
 
 
-    internal int GlobalRawItemCount
-    {
-      get
-      {
-        return m_globalRawItemCount;
-      }
-    }
-
-    internal List<RawItem> RawItems
-    {
-      get
-      {
-        return m_sortedRawItems;
-      }
-    }
-
-    internal void GetGlobalItems( List<object> items )
-    {
-      if( this.IsBottomLevel )
-      {
-        items.AddRange( this.ProtectedItems );
-        return;
-      }
-
-      int count = this.ItemCount;
-
-      for( int i = 0; i < count; i++ )
-      {
-        DataGridCollectionViewGroup subGroup = this.ProtectedItems[ i ] as DataGridCollectionViewGroup;
-
-        if( subGroup == null )
-          throw new InvalidOperationException( "Sub-groups cannot be null (Nothing in Visual Basic)." );
-
-        subGroup.GetGlobalItems( items );
-      }
-    }
-
     internal RawItem GetRawItemAtGlobalSortedIndex( int index )
     {
       if( this.IsBottomLevel )
@@ -464,19 +440,14 @@ namespace Xceed.Wpf.DataGrid
       }
       else
       {
-        int count = this.ItemCount;
-
-        for( int i = 0; i < count; i++ )
+        foreach( object value in this.ProtectedItems )
         {
-          DataGridCollectionViewGroup subGroups = this.ProtectedItems[ i ] as DataGridCollectionViewGroup;
+          DataGridCollectionViewGroup subGroup = value as DataGridCollectionViewGroup;
 
-          if( subGroups == null )
-            throw new InvalidOperationException( "Sub-groups cannot be null (Nothing in Visual Basic)." );
-
-          int subGroupCount = subGroups.GlobalRawItemCount;
+          int subGroupCount = subGroup.GlobalRawItemCount;
 
           if( index < subGroupCount )
-            return subGroups.GetRawItemAtGlobalSortedIndex( index );
+            return subGroup.GetRawItemAtGlobalSortedIndex( index );
 
           index -= subGroupCount;
         }
@@ -498,9 +469,6 @@ namespace Xceed.Wpf.DataGrid
     internal virtual void InsertRawItem( int index, RawItem rawItem )
     {
       Debug.Assert( this.IsBottomLevel );
-
-      if( m_sortedRawItems == null )
-        m_sortedRawItems = new List<RawItem>( 4 );
 
       m_globalRawItemCount++;
       DataGridCollectionViewGroup parent = m_parent;
@@ -526,21 +494,13 @@ namespace Xceed.Wpf.DataGrid
       this.ProtectedItems.Insert( index, rawItem.DataItem );
     }
 
-    internal void RemoveRawItem( RawItem rawItem )
-    {
-      if( !this.IsBottomLevel )
-        throw new InvalidOperationException( "An attempt was made to remove a data item from a group other than the bottom-level group." );
-
-      int index = this.RawItemIndexOf( rawItem );
-      this.RemoveRawItemAt( index );
-    }
-
     internal virtual void RemoveRawItemAt( int index )
     {
       Debug.Assert( this.IsBottomLevel );
-      Debug.Assert( m_sortedRawItems != null );
+      Debug.Assert( m_sortedRawItems.Count > 0 );
 
-      if( m_sortedRawItems == null )
+      int count = m_sortedRawItems.Count;
+      if( count == 0 )
         return;
 
       if( index != -1 )
@@ -553,8 +513,6 @@ namespace Xceed.Wpf.DataGrid
           parent.m_globalRawItemCount--;
           parent = parent.Parent;
         }
-
-        int count = m_sortedRawItems.Count;
 
         for( int i = index + 1; i < count; i++ )
         {
@@ -570,7 +528,9 @@ namespace Xceed.Wpf.DataGrid
         this.ProtectedItems.RemoveAt( index );
 
         if( ( this.ProtectedItemCount == 0 ) && ( m_parent != null ) )
+        {
           m_parent.RemoveGroup( this );
+        }
       }
     }
 
@@ -606,7 +566,7 @@ namespace Xceed.Wpf.DataGrid
       if( m_sortedRawItems == null )
         return -1; // ~0
 
-      Debug.Assert( ( m_sortedRawItems.Count == this.ItemCount ) || ( this is DataGridCollectionViewGroupRoot ) );
+      Debug.Assert( ( m_sortedRawItems.Count == this.ProtectedItemCount ) || ( this is DataGridCollectionViewGroupRoot ) );
 
       int low = 0;
       int hi = ( m_sortedRawItems.Count ) - 1;
@@ -654,65 +614,54 @@ namespace Xceed.Wpf.DataGrid
       return ~low;
     }
 
-
-    internal object GetStatFunctionValue( string propertyName )
+    private int BinarySearchGroup( DataGridCollectionViewGroup value, IComparer<DataGridCollectionViewGroup> comparer )
     {
-      DataGridCollectionView view = this.GetCollectionView();
+      if( comparer == null )
+        throw new ArgumentNullException( "comparer" );
 
-      Debug.Assert( view != null );
+      int low = 0;
+      int hi = ( this.ProtectedItemCount ) - 1;
+      int median;
+      int compareResult;
 
-      if( view == null )
-        return null;
-
-      Stats.StatFunction statFunction = view.StatFunctions[ propertyName ];
-
-      Debug.Assert( view != null );
-
-      if( statFunction == null )
-        return null;
-
-      return this.GetStatFunctionResult( statFunction, view ).Value;
-    }
-
-    internal Stats.StatResult GetStatFunctionResult( Stats.StatFunction statFunction, DataGridCollectionView view )
-    {
-      if( !m_statFunctionValues.ContainsKey( statFunction ) )
-        this.CalculateStatFunctionValue( statFunction, view );
-
-      return m_statFunctionValues[ statFunction ];
-    }
-
-    // This clears the value of all the previously calculated StatFunction Results for  this group.
-    internal void ClearStatFunctionsResult()
-    {
-      m_statFunctionValues.Clear();
-    }
-
-    internal void InvokeStatFunctionsPropertyChanged( DataGridCollectionView view )
-    {
-      if( view.CalculateChangedPropertyStatsOnly )
+      while( low <= hi )
       {
-        foreach( Stats.StatFunction statFunction in view.InvalidatedStatFunctions )
+        median = ( low + ( ( hi - low ) >> 1 ) );
+
+        DataGridCollectionViewGroup medianGroup = this.ProtectedItems[ median ] as DataGridCollectionViewGroup;
+
+        if( medianGroup == value )
         {
-          {
-            this.OnPropertyChanged( new PropertyChangedEventArgs( statFunction.ResultPropertyName ) );
-          }
+          if( low == hi )
+            return low;
+
+          return median;
+        }
+
+        try
+        {
+          compareResult = comparer.Compare( medianGroup, value );
+        }
+        catch( Exception exception )
+        {
+          throw new InvalidOperationException( "IComparer has failed to compare the values.", exception );
+        }
+
+        if( compareResult == 0 )
+        {
+          return median;
+        }
+        if( compareResult < 0 )
+        {
+          low = median + 1;
+        }
+        else
+        {
+          hi = median - 1;
         }
       }
-      else
-      {
-        foreach( PropertyDescriptor statFunctionPropertyDescriptor in view.GetStatFunctionProperties() )
-        {
-          this.OnPropertyChanged( new PropertyChangedEventArgs( statFunctionPropertyDescriptor.Name ) );
-        }
-      }
-    }
 
-    private void CalculateStatFunctionValue( Stats.StatFunction statFunction, DataGridCollectionView view )
-    {
-      m_statFunctionValues[ statFunction ] = new Stats.StatResult(
-        new InvalidOperationException( Log.NotToolkitStr( "Statistical functions" ) )
-        );
+      return ~low;
     }
 
     private static object GetHashKeyFromName( object groupName )
@@ -723,10 +672,17 @@ namespace Xceed.Wpf.DataGrid
       return groupName;
     }
 
-    private DataGridCollectionViewGroup CreateSubGroup( object groupName, int level, ObservableCollection<GroupDescription> groupByList, GroupSortComparer[] groupSortComparers )
+    private DataGridCollectionViewGroup CreateSubGroup( object groupName, int level, ObservableCollection<GroupDescription> groupByList,
+                                                        List<GroupSortComparer> groupSortComparers )
     {
       // If sortComparers is null, we are in massive group creation, no order check.
-      DataGridCollectionViewGroup group = new DataGridCollectionViewGroup( groupName, this, m_nextSubGroupUnsortedIndex );
+      var group = new DataGridCollectionViewGroup( groupName, this, m_nextSubGroupUnsortedIndex );
+
+      var dataGridGroupDescription = groupByList[ level ] as DataGridGroupDescription;
+      if( dataGridGroupDescription != null )
+      {
+        group.GroupByName = dataGridGroupDescription.PropertyName;
+      }
 
       unchecked
       {
@@ -745,7 +701,9 @@ namespace Xceed.Wpf.DataGrid
         index = this.BinarySearchGroup( group, groupSortComparers[ level ] );
 
         if( index < 0 )
+        {
           index = ~index;
+        }
       }
 
       level++;
@@ -764,7 +722,7 @@ namespace Xceed.Wpf.DataGrid
     {
       Debug.Assert( !this.IsBottomLevel );
 
-      m_groupsDictionary.Add( DataGridCollectionViewGroup.GetHashKeyFromName( group.Name ), group );
+      m_subGroups.Add( DataGridCollectionViewGroup.GetHashKeyFromName( group.Name ), group );
       this.ProtectedItemCount++;
       this.ProtectedItems.Insert( index, group );
     }
@@ -783,12 +741,15 @@ namespace Xceed.Wpf.DataGrid
       Debug.Assert( !this.IsBottomLevel );
       Debug.Assert( ( group.m_globalRawItemCount == 0 ) && ( group.ProtectedItemCount == 0 ) );
 
+      m_subGroups.Remove( DataGridCollectionViewGroup.GetHashKeyFromName( group.Name ) );
+
       this.ProtectedItemCount--;
-      m_groupsDictionary.Remove( DataGridCollectionViewGroup.GetHashKeyFromName( group.Name ) );
       this.ProtectedItems.Remove( group );
 
-      if( ( this.ProtectedItemCount == 0 ) && ( m_parent != null ) )
+      if( ( m_subGroups.Count == 0 ) && ( m_parent != null ) )
+      {
         m_parent.RemoveGroup( this );
+      }
     }
 
     #region ICustomTypeDescriptor Members
@@ -856,10 +817,8 @@ namespace Xceed.Wpf.DataGrid
             return TypeDescriptor.GetProperties( typeof( DataGridCollectionViewGroup ) );
 
           PropertyDescriptorCollection classProperties = TypeDescriptor.GetProperties( typeof( DataGridCollectionViewGroup ) );
-          PropertyDescriptorCollection statProperties = view.GetStatFunctionProperties();
-          PropertyDescriptor[] properties = new PropertyDescriptor[ classProperties.Count + statProperties.Count ];
+          PropertyDescriptor[] properties = new PropertyDescriptor[ classProperties.Count ];
           classProperties.CopyTo( properties, 0 );
-          statProperties.CopyTo( properties, classProperties.Count );
 
           m_classProperties = new PropertyDescriptorCollection( properties );
         }
@@ -870,12 +829,6 @@ namespace Xceed.Wpf.DataGrid
       {
         PropertyDescriptorCollection props = TypeDescriptor.GetProperties( this, attributes );
         DataGridCollectionView view = this.GetCollectionView();
-
-        if( view != null )
-        {
-          foreach( PropertyDescriptor property in view.GetStatFunctionProperties() )
-            props.Add( property );
-        }
 
         return props;
       }
@@ -893,20 +846,210 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
+    #region INotifyPropertyChanged Members
+
+    protected sealed override event PropertyChangedEventHandler PropertyChanged
+    {
+      add
+      {
+        this.PropertyChangedImpl += value;
+      }
+      remove
+      {
+        this.PropertyChangedImpl -= value;
+      }
+    }
+
+    protected override void OnPropertyChanged( PropertyChangedEventArgs e )
+    {
+      var handler = this.PropertyChangedImpl;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, e );
+    }
+
+    private bool HasPropertyChangedListeners
+    {
+      get
+      {
+        return ( this.PropertyChangedImpl != null );
+      }
+    }
+
+    private event PropertyChangedEventHandler PropertyChangedImpl;
+
+    #endregion
+
     private PropertyDescriptorCollection m_classProperties;
-    private Dictionary<Stats.StatFunction, Stats.StatResult> m_statFunctionValues = new Dictionary<Stats.StatFunction, Stats.StatResult>( s_statFunctionComparer );
 
     protected int m_globalRawItemCount;
-    protected List<RawItem> m_sortedRawItems;
+    protected readonly List<RawItem> m_sortedRawItems;
 
-    private Hashtable m_groupsDictionary;
+    private readonly OptimizedReadOnlyObservableCollection m_optimizedItems;
+    private readonly Dictionary<object, DataGridCollectionViewGroup> m_subGroups;
+    private readonly IList<object> m_protectedItems;
+    private readonly Action<NotifyCollectionChangedEventArgs> m_protectedItemsCollectionChanged;
+
     private GroupDescription m_subGroupBy;
-    private DataGridCollectionViewGroup m_parent;
-    private int m_unsortedIndex;
+    private readonly DataGridCollectionViewGroup m_parent;
+    private readonly int m_unsortedIndex;
     private int m_nextSubGroupUnsortedIndex;
 
-    private static Stats.StatFunctionComparer s_statFunctionComparer = new Stats.StatFunctionComparer();
+    #region OptimizedReadOnlyObservableCollection Private Class
 
-    private OptimizedReadOnlyObservableCollection m_optimizedItems;
+    // We re-implement IList and IList<object> to override the implementation of the 
+    // IndexOf and Contains methods to use our optimized way.
+    private sealed class OptimizedReadOnlyObservableCollection : ReadOnlyObservableCollection<object>, IList, IList<object>
+    {
+      internal OptimizedReadOnlyObservableCollection( DataGridCollectionViewGroup dataGridCollectionViewGroup )
+        : base( dataGridCollectionViewGroup.ProtectedItems )
+      {
+        if( dataGridCollectionViewGroup == null )
+          throw new ArgumentNullException( "dataGridCollectionViewGroup" );
+
+        m_dataGridCollectionViewGroup = dataGridCollectionViewGroup;
+      }
+
+      public new int IndexOf( object item )
+      {
+        // The DataGridCollectionViewGroup has been optimized to use the information
+        // stored on the RawItem associated with the data item instead of searching the item in the list.
+        return m_dataGridCollectionViewGroup.IndexOf( item );
+      }
+
+      public new bool Contains( object item )
+      {
+        // The DataGridCollectionViewGroup has been optimized to use the information
+        // stored on the RawItem associated with the data item instead of searching the item in the list.
+        return m_dataGridCollectionViewGroup.Contains( item );
+      }
+
+      private readonly DataGridCollectionViewGroup m_dataGridCollectionViewGroup;
+    }
+
+    #endregion
+
+    #region ObservableCollectionHelper Private Class
+
+    private static class ObservableCollectionHelper
+    {
+      private const string AssemblyName = "Xceed.Wpf.DataGrid.CollectionViewGroupExtractor";
+      private const string GetItemsMethodName = "GetItems";
+      private const string GetCollectionChangedMethodName = "GetCollectionChanged";
+
+      private static readonly Func<ObservableCollection<object>, IList<object>> s_getItems;
+      private static readonly Func<ObservableCollection<object>, Action<NotifyCollectionChangedEventArgs>> s_collectionChanged;
+
+      static ObservableCollectionHelper()
+      {
+        var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly( new AssemblyName( ObservableCollectionHelper.AssemblyName ), AssemblyBuilderAccess.RunAndCollect );
+        var moduleBuilder = assemblyBuilder.DefineDynamicModule( ObservableCollectionHelper.AssemblyName );
+
+        var typeBuilder = moduleBuilder.DefineType( "ObservableCollectionExtractor", TypeAttributes.Class | TypeAttributes.NotPublic | TypeAttributes.AutoLayout, typeof( ObservableCollection<object> ) );
+
+        ObservableCollectionHelper.DefineGetItemsMethod( typeBuilder );
+        ObservableCollectionHelper.DefineGetCollectionChangedMethod( typeBuilder );
+
+        var targetType = typeBuilder.CreateType();
+
+        s_getItems = ( Func<ObservableCollection<object>, IList<object>> )Delegate.CreateDelegate( typeof( Func<ObservableCollection<object>, IList<object>> ), targetType.GetMethod( ObservableCollectionHelper.GetItemsMethodName, BindingFlags.Public | BindingFlags.Static ) );
+        s_collectionChanged = ( Func<ObservableCollection<object>, Action<NotifyCollectionChangedEventArgs>> )Delegate.CreateDelegate( typeof( Func<ObservableCollection<object>, Action<NotifyCollectionChangedEventArgs>> ), targetType.GetMethod( ObservableCollectionHelper.GetCollectionChangedMethodName, BindingFlags.Public | BindingFlags.Static ) );
+      }
+
+      internal static IList<object> GetItems( ObservableCollection<object> source )
+      {
+        if( source == null )
+          throw new ArgumentNullException( "source" );
+
+        var storage = ( s_getItems != null ) ? s_getItems.Invoke( source ) : null;
+        if( storage == null )
+          throw new InvalidOperationException( "Unable to retrieve the ObservableCollection<>'s items storage." );
+
+        return storage;
+      }
+
+      internal static Action<NotifyCollectionChangedEventArgs> GetCollectionChanged( ObservableCollection<object> source )
+      {
+        if( source == null )
+          throw new ArgumentNullException( "source" );
+
+        var collectionChanged = ( s_collectionChanged != null ) ? s_collectionChanged.Invoke( source ) : null;
+        if( collectionChanged == null )
+          throw new InvalidOperationException( "Unable to retrieve the ObservableCollection<>'s collection change method." );
+
+        return collectionChanged;
+      }
+
+      private static void DefineGetItemsMethod( TypeBuilder typeBuilder )
+      {
+        var propertyInfo = typeof( ObservableCollection<object> ).GetProperty( "Items", BindingFlags.Instance | BindingFlags.NonPublic, null, typeof( IList<object> ), new Type[ 0 ], null );
+        if( ( propertyInfo == null ) || !propertyInfo.CanRead )
+          throw new InvalidOperationException( "Unable to retrieve the ObservableCollection<>.Items property." );
+
+        var methodInfo = propertyInfo.GetGetMethod( true );
+        if( ( methodInfo == null ) || !ObservableCollectionHelper.HasCallingConvention( methodInfo.CallingConvention, CallingConventions.HasThis ) )
+          throw new InvalidOperationException( "Unable to retrieve the ObservableCollection<>.Items property." );
+
+        var methodBuilder = typeBuilder.DefineMethod(
+                              ObservableCollectionHelper.GetItemsMethodName,
+                              MethodAttributes.Public | MethodAttributes.Static,
+                              CallingConventions.Standard,
+                              typeof( IList<object> ),
+                              new Type[] { typeof( ObservableCollection<object> ) } );
+
+        var body = methodBuilder.GetILGenerator();
+        // Load the reference to the ObservableCollection and put it on top of the stack.
+        body.Emit( OpCodes.Ldarg_0 );
+        // Invoke the property getter of the reference.  This operation pops the reference
+        // from the stack and pushes the result of the property getter.
+        body.Emit( OpCodes.Callvirt, methodInfo );
+        // Since the result of the propery getter will be retrieved by the method's caller,
+        // we may leave it on the stack and simply return.
+        body.Emit( OpCodes.Ret );
+      }
+
+      private static void DefineGetCollectionChangedMethod( TypeBuilder typeBuilder )
+      {
+        var methodInfo = typeof( ObservableCollection<object> ).GetMethod( "OnCollectionChanged", BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[] { typeof( NotifyCollectionChangedEventArgs ) }, null );
+        if( ( methodInfo == null ) || methodInfo.IsPrivate || !ObservableCollectionHelper.HasCallingConvention( methodInfo.CallingConvention, CallingConventions.HasThis ) )
+          throw new InvalidOperationException( "Unable to retrieve the ObservableCollection<>.OnCollectionChanged method." );
+
+        var constructorInfo = typeof( Action<NotifyCollectionChangedEventArgs> ).GetConstructor( new Type[] { typeof( object ), typeof( IntPtr ) } );
+        if( ( constructorInfo == null ) || constructorInfo.IsPrivate || !ObservableCollectionHelper.HasCallingConvention( constructorInfo.CallingConvention, CallingConventions.HasThis ) )
+          throw new InvalidOperationException( "Unable to retrieve the Action<>'s constructor." );
+
+        var methodBuilder = typeBuilder.DefineMethod(
+                              ObservableCollectionHelper.GetCollectionChangedMethodName,
+                              MethodAttributes.Public | MethodAttributes.Static,
+                              CallingConventions.Standard,
+                              typeof( Action<NotifyCollectionChangedEventArgs> ),
+                              new Type[] { typeof( ObservableCollection<object> ) } );
+
+        var body = methodBuilder.GetILGenerator();
+        // Load the reference to the ObservableCollection and put it on top of the stack.
+        body.Emit( OpCodes.Ldarg_0 );
+        // The last loaded reference will be consume in the call to "new Action<>".
+        // We must duplicate the value since it will be consume by the call that retrieve the
+        // target method's address.
+        body.Emit( OpCodes.Dup );
+        // This operation pops the top ObservableCollection's reference from the stack
+        // and pushes the ObservableCollection<>.OnCollectionChanged method's address.
+        body.Emit( OpCodes.Ldvirtftn, methodInfo );
+        // Create an Action<> delegate from the first ObservableCollection's reference we
+        // have put on the stack and the target method's address.
+        body.Emit( OpCodes.Newobj, constructorInfo );
+        // The resulting delegate should be on top of the stack.  We simply leave it there
+        // so it will be retrieved by the method's caller.
+        body.Emit( OpCodes.Ret );
+      }
+
+      private static bool HasCallingConvention( CallingConventions source, CallingConventions value )
+      {
+        return ( ( source & value ) == value );
+      }
+    }
+
+    #endregion
   }
 }

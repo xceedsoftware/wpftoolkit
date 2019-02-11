@@ -15,19 +15,14 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Threading;
-using System.Diagnostics;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Windows.Threading;
 
 namespace Xceed.Wpf.DataGrid
 {
   public class AsyncQueryInfo : IDisposable
   {
-    #region CONSTRUCTORS
-
     internal AsyncQueryInfo(
       Dispatcher dispatcher,
       Action<AsyncQueryInfo> beginQueryDelegate,
@@ -50,34 +45,6 @@ namespace Xceed.Wpf.DataGrid
       m_requestedItemCount = requestedItemCount;
     }
 
-    #endregion CONSTRUCTORS
-
-    #region BeginQueryDelegateInvoked Private Property
-
-    private bool BeginQueryDelegateInvoked
-    {
-      get
-      {
-        return m_flags[ ( int )AsyncQueryInfoFlags.BeginQueryDelegateInvoked ];
-      }
-      set
-      {
-        m_flags[ ( int )AsyncQueryInfoFlags.BeginQueryDelegateInvoked ] = value;
-      }
-    }
-
-    #endregion
-
-    #region EndQueryDelegateDispatcherOperation Private Property
-
-    private DispatcherOperation EndQueryDelegateDispatcherOperation
-    {
-      get;
-      set;
-    }
-
-    #endregion
-
     #region StartIndex Property
 
     public int StartIndex
@@ -88,7 +55,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion StartIndex Property
+    #endregion
 
     #region RequestedItemCount Property
 
@@ -100,23 +67,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion RequestedItemCount  Property
-
-    #region ShouldAbort Property
-
-    public bool ShouldAbort
-    {
-      get
-      {
-        return m_flags[ ( int )AsyncQueryInfoFlags.ShouldAbort ];
-      }
-      private set
-      {
-        m_flags[ ( int )AsyncQueryInfoFlags.ShouldAbort ] = value;
-      }
-    }
-
-    #endregion ShouldAbort Property
+    #endregion
 
     #region AsyncState Property
 
@@ -126,7 +77,7 @@ namespace Xceed.Wpf.DataGrid
       set;
     }
 
-    #endregion AsyncState Property
+    #endregion
 
     #region Error Property
 
@@ -146,18 +97,31 @@ namespace Xceed.Wpf.DataGrid
 
           if( m_queryErrorChangedDelegate != null )
           {
-            m_dispatcher.Invoke(
-              DispatcherPriority.Send,
-              m_queryErrorChangedDelegate,
-              this );
+            m_dispatcher.Invoke( DispatcherPriority.Send, m_queryErrorChangedDelegate, this );
           }
         }
       }
     }
 
-    #endregion Error Property
+    #endregion
 
-    #region IsDisposed Internal Property
+    #region ShouldAbort Property
+
+    public bool ShouldAbort
+    {
+      get
+      {
+        return m_flags[ ( int )AsyncQueryInfoFlags.ShouldAbort ];
+      }
+      private set
+      {
+        m_flags[ ( int )AsyncQueryInfoFlags.ShouldAbort ] = value;
+      }
+    }
+
+    #endregion
+
+    #region IsDisposed Property
 
     internal bool IsDisposed
     {
@@ -173,7 +137,21 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
-    #region PUBLIC METHODS
+    #region BeginQueryDelegateInvoked Property
+
+    private bool BeginQueryDelegateInvoked
+    {
+      get
+      {
+        return m_flags[ ( int )AsyncQueryInfoFlags.BeginQueryDelegateInvoked ];
+      }
+      set
+      {
+        m_flags[ ( int )AsyncQueryInfoFlags.BeginQueryDelegateInvoked ] = value;
+      }
+    }
+
+    #endregion
 
     public void EndQuery( object[] items )
     {
@@ -181,20 +159,14 @@ namespace Xceed.Wpf.DataGrid
       if( this.IsDisposed )
         return;
 
-      if( this.EndQueryDelegateDispatcherOperation != null )
+      if( m_endQueryDelegateDispatcherOperation != null )
         throw new InvalidOperationException( "An attempt was made to call EndQuery when it has already been called for this AsyncQueryInfo." );
 
       if( this.ShouldAbort )
         return;
 
-      this.EndQueryDelegateDispatcherOperation = 
-        m_dispatcher.BeginInvoke( DispatcherPriority.Background, m_endQueryDelegate,
-        this, new object[] { items } );
+      m_endQueryDelegateDispatcherOperation = m_dispatcher.BeginInvoke( DispatcherPriority.Background, m_endQueryDelegate, this, new object[] { items } );
     }
-
-    #endregion PUBLIC METHODS
-
-    #region INTERNAL METHODS
 
     internal void QueueQuery()
     {
@@ -203,19 +175,59 @@ namespace Xceed.Wpf.DataGrid
       this.ShouldAbort = false;
       this.BeginQueryDelegateInvoked = false;
 
-      var endQueryDelegateOperation = this.EndQueryDelegateDispatcherOperation;
-      if( endQueryDelegateOperation != null )
+      //Make sure to abort the EndQuery operation before queuing a new query.
+      if( m_endQueryDelegateDispatcherOperation != null )
       {
-        this.EndQueryDelegateDispatcherOperation.Abort();
-        this.EndQueryDelegateDispatcherOperation = null;
+        m_endQueryDelegateDispatcherOperation.Abort();
+        m_endQueryDelegateDispatcherOperation = null;
       }
 
 #if SILVERLIGHT
       m_dispatcher.BeginInvoke( new Action( this.BeginQuery ) );
 #else
-      m_beginQueryDispatcherOperation = m_dispatcher.BeginInvoke( DispatcherPriority.Background,
-        new Action( this.BeginQueryDispatcherCallback ) );
+      m_beginQueryDispatcherOperation = m_dispatcher.BeginInvoke( DispatcherPriority.Background, new Action( this.BeginQueryDispatcherCallback ) );
 #endif
+    }
+
+    internal void AbortQuery()
+    {
+      Debug.Assert( !this.IsDisposed );
+
+      // Make sure to abort the EndQuery operation before queuing an abort query.
+      if( m_endQueryDelegateDispatcherOperation != null )
+      {
+        m_endQueryDelegateDispatcherOperation.Abort();
+        m_endQueryDelegateDispatcherOperation = null;
+      }
+
+      if( this.ShouldAbort )
+      {
+        Debug.Assert( m_beginQueryDispatcherOperation == null );
+
+        m_builtInAbortDelegate( this );
+        return;
+      }
+
+      this.ShouldAbort = true;
+
+      // If the BeginQuery already had time to execute, then we know the user was notified of the query request.  Notify him to cancel the query as soon as possible.
+      if( this.BeginQueryDelegateInvoked )
+      {
+        Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "CALLING Abort Query! For page at starting index: " + m_startIndex.ToString() );
+
+        m_dispatcher.BeginInvoke( DispatcherPriority.Send, m_abortQueryDelegate, this );
+      }
+      else
+      {
+        // BeginQueryDispatcherCallback was dispatched but not executed yet, abort it and return
+        if( m_beginQueryDispatcherOperation != null )
+        {
+          m_beginQueryDispatcherOperation.Abort();
+          m_beginQueryDispatcherOperation = null;
+        }
+
+        m_builtInAbortDelegate( this );
+      }
     }
 
     private void BeginQueryDispatcherCallback()
@@ -227,6 +239,7 @@ namespace Xceed.Wpf.DataGrid
       if( this.ShouldAbort )
       {
         Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "BUILT-IN BeginQueryDispatcherCallback Aborted! (" + this.GetHashCode() + ") For page at starting index: " + m_startIndex.ToString() );
+
         m_builtInAbortDelegate( this );
         return;
       }
@@ -234,84 +247,6 @@ namespace Xceed.Wpf.DataGrid
       m_beginQueryDelegate( this );
       this.BeginQueryDelegateInvoked = true;
     }
-
-    internal void AbortQuery()
-    {
-      Debug.Assert( !this.IsDisposed );
-
-      // Already dispatcher on the UI Thread the method that will fill the page.  
-      // If it did have one, we would have invoked instead of BeginInvoked the endQuery delegate.
-      var endQueryDelegateOperation = this.EndQueryDelegateDispatcherOperation;
-      if( endQueryDelegateOperation != null )
-      {
-        this.EndQueryDelegateDispatcherOperation.Abort();
-        this.EndQueryDelegateDispatcherOperation = null;
-      }
-
-      if( this.ShouldAbort )
-      {
-        Debug.Assert( m_beginQueryDispatcherOperation == null );
-        m_builtInAbortDelegate( this );
-        return;
-      }
-
-      this.ShouldAbort = true;
-
-      // If the BeginQuery already had time to execute, then we know the user was notified of the query request.  
-      // Notify him to cancel the query as soon as possible.
-      if( this.BeginQueryDelegateInvoked )
-      {
-        Debug.WriteLineIf( VirtualPageManager.DebugDataVirtualization, "CALLING Abort Query! For page at starting index: " + m_startIndex.ToString() );
-        m_dispatcher.BeginInvoke( DispatcherPriority.Send, m_abortQueryDelegate, this );
-      }
-      else
-      {
-        // BeginQueryDispatcherCallback was dispatched
-        // but not executed yet, abort it and return
-        if( m_beginQueryDispatcherOperation != null )
-        {
-          m_beginQueryDispatcherOperation.Abort();
-          m_beginQueryDispatcherOperation = null;
-        }
-
-        m_builtInAbortDelegate( this );
-      }
-    }
-
-    #endregion INTERNAL METHODS
-
-    #region PRIVATE FIELDS
-
-    private int m_startIndex;
-    private int m_requestedItemCount;
-
-    private BitVector32 m_flags = new BitVector32();
-
-    private object m_error;
-
-    private Dispatcher m_dispatcher;
-
-    private DispatcherOperation m_beginQueryDispatcherOperation;
-    private Action<AsyncQueryInfo> m_builtInAbortDelegate;
-    private Action<AsyncQueryInfo> m_beginQueryDelegate;
-    private Action<AsyncQueryInfo> m_abortQueryDelegate;
-    private Action<AsyncQueryInfo, object[]> m_endQueryDelegate;
-    private Action<AsyncQueryInfo> m_queryErrorChangedDelegate;
-
-    #endregion PRIVATE FIELDS
-
-    #region AsyncQueryInfoFlags Private Enum
-
-    [Flags]
-    private enum AsyncQueryInfoFlags
-    {
-      ShouldAbort = 1,
-      EndQueryDelegateInvoked = 2,
-      BeginQueryDelegateInvoked = 4,
-      IsDisposed = 8,
-    }
-
-    #endregion
 
     #region IDisposable Members
 
@@ -332,5 +267,31 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion
+
+    private int m_startIndex;
+    private int m_requestedItemCount;
+
+    private BitVector32 m_flags = new BitVector32();
+
+    private object m_error;
+
+    private Dispatcher m_dispatcher;
+
+    private DispatcherOperation m_beginQueryDispatcherOperation;
+    private DispatcherOperation m_endQueryDelegateDispatcherOperation;
+    private Action<AsyncQueryInfo> m_builtInAbortDelegate;
+    private Action<AsyncQueryInfo> m_beginQueryDelegate;
+    private Action<AsyncQueryInfo> m_abortQueryDelegate;
+    private Action<AsyncQueryInfo, object[]> m_endQueryDelegate;
+    private Action<AsyncQueryInfo> m_queryErrorChangedDelegate;
+
+    [Flags]
+    private enum AsyncQueryInfoFlags
+    {
+      ShouldAbort = 1,
+      EndQueryDelegateInvoked = 2,
+      BeginQueryDelegateInvoked = 4,
+      IsDisposed = 8,
+    }
   }
 }

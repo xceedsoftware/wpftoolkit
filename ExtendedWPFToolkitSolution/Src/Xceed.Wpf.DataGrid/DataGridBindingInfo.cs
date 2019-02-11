@@ -31,8 +31,6 @@ namespace Xceed.Wpf.DataGrid
 {
   public class DataGridBindingInfo
   {
-    #region CONSTRUCTORS
-
     public DataGridBindingInfo()
     {
       m_binding = new Binding();
@@ -47,8 +45,6 @@ namespace Xceed.Wpf.DataGrid
       m_binding.NotifyOnTargetUpdated = true;
       m_binding.NotifyOnValidationError = true;
     }
-
-    #endregion CONSTRUCTORS
 
     #region BindsDirectlyToSource Property
 
@@ -152,6 +148,23 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion FallbackValue Property
 
+    #region IsAsync Property
+
+    public bool IsAsync
+    {
+      get
+      {
+        return m_binding.IsAsync;
+      }
+
+      set
+      {
+        m_binding.IsAsync = value;
+      }
+    }
+
+    #endregion IsAsync Property
+
     #region NotifyOnSourceUpdated Property
 
     public bool NotifyOnSourceUpdated
@@ -210,7 +223,6 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion ReadOnly Property
 
-
     #region UpdateSourceExceptionFilter Property
 
     public UpdateSourceExceptionFilterCallback UpdateSourceExceptionFilter
@@ -257,20 +269,11 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion Path Property
 
-
-    #region INTERNAL METHODS
-
     internal Binding GetBinding()
     {
       return m_binding;
     }
 
-    #endregion INTERNAL METHODS
-
-    #region PRIVATE FIELDS
-
     private Binding m_binding;
-
-    #endregion PRIVATE FIELDS
   }
 }

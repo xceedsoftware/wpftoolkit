@@ -37,7 +37,7 @@ namespace Xceed.Wpf.Toolkit.Core.Converters
       set
       {
         if( value < 0d || value > 1d )
-          throw new ArgumentException( "BlendedColorRatio must greater than or equal to 0 and lower than or equal to 1 " );
+          throw new ArgumentException( "BlendedColorRatio must be greater than or equal to 0 and lower than or equal to 1 " );
 
         _blendedColorRatio = value;
       }

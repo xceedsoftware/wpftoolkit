@@ -76,8 +76,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       set;
     }
 
+    internal bool IsCleaning
+    {
+      get;
+      private set;
+    }
+
     public virtual void ClearHelper()
     {
+      this.IsCleaning = true;
+
       var propChange = PropertyContainer as INotifyPropertyChanged;
       if( propChange != null )
       {
@@ -94,6 +102,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         ( ( IItemContainerGenerator )ChildrenItemsControl.ItemContainerGenerator ).RemoveAll();
       }
+      this.IsCleaning = false;
     }
 
     public virtual void PrepareChildrenPropertyItem( PropertyItemBase propertyItem, object item ) 
@@ -114,19 +123,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected FrameworkElement GenerateCustomEditingElement( Type definitionKey, PropertyItemBase propertyItem )
     {
-      FrameworkElement editor = null;
-
-      if( PropertyContainer.EditorDefinitions != null )
-      {
-        // If no editor for the current type, fall back on base type editor recursively.
-        while( editor == null && definitionKey != null )
-        {
-          editor = this.CreateCustomEditor( PropertyContainer.EditorDefinitions[ definitionKey ], propertyItem );
-          definitionKey = definitionKey.BaseType;
-        }
-      }
-
-      return editor;
+      return ( PropertyContainer.EditorDefinitions != null )
+        ? this.CreateCustomEditor( PropertyContainer.EditorDefinitions.GetRecursiveBaseTypes( definitionKey ), propertyItem )
+        : null;
     }
 
     protected FrameworkElement GenerateCustomEditingElement( object definitionKey, PropertyItemBase propertyItem )
@@ -159,6 +158,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         this.OnAutoGeneratePropertiesChanged();
       }
+      else if( propertyName == ReflectionHelper.GetPropertyOrFieldName( () => ps.HideInheritedProperties ) )
+      {
+        this.OnHideInheritedPropertiesChanged();
+      }
       else if(propertyName == ReflectionHelper.GetPropertyOrFieldName( () => ps.EditorDefinitions ))
       {
         this.OnEditorDefinitionsChanged();
@@ -175,9 +178,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected virtual void OnAutoGeneratePropertiesChanged() { }
 
+    protected virtual void OnHideInheritedPropertiesChanged() { }
+
     protected virtual void OnEditorDefinitionsChanged() { }
 
     protected virtual void OnPropertyDefinitionsChanged() { }
+
 
     public virtual void OnEndInit() { }
 
@@ -192,5 +198,41 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public abstract void UpdateValuesFromSource();
 
+    protected internal virtual void SetPropertiesExpansion( bool isExpanded )
+    {
+      foreach( var item in this.Properties )
+      {
+        var propertyItem = item as PropertyItemBase;
+        if( (propertyItem != null) && propertyItem.IsExpandable )
+        {
+          if( propertyItem.ContainerHelper != null )
+          {
+            propertyItem.ContainerHelper.SetPropertiesExpansion( isExpanded );
+          }
+          propertyItem.IsExpanded = isExpanded;
+        }
+      }
+    }
+
+    protected internal virtual void SetPropertiesExpansion( string propertyName, bool isExpanded )
+    {
+      foreach( var item in this.Properties )
+      {
+        var propertyItem = item as PropertyItemBase;
+        if( (propertyItem != null) && propertyItem.IsExpandable )
+        {
+          if( propertyItem.DisplayName == propertyName )
+          {
+            propertyItem.IsExpanded = isExpanded;
+            break;
+          }
+
+          if( propertyItem.ContainerHelper != null )
+          {
+            propertyItem.ContainerHelper.SetPropertiesExpansion( propertyName, isExpanded );
+          }
+        }
+      }
+    }
   }
 }

@@ -14,19 +14,28 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-    public interface ILayoutContentSelector
+  public interface ILayoutContentSelector
+  {
+    #region Properties
+
+    int SelectedContentIndex
     {
-        int SelectedContentIndex { get; set; }
-
-        int IndexOf(LayoutContent content);
-
-        LayoutContent SelectedContent { get; }
+      get; set;
     }
+
+    LayoutContent SelectedContent
+    {
+      get;
+    }
+
+    #endregion
+
+    #region Methods
+
+    int IndexOf( LayoutContent content );
+
+    #endregion
+  }
 }

@@ -47,6 +47,8 @@ namespace Xceed.Wpf.Toolkit
     static DropDownButton()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( DropDownButton ), new FrameworkPropertyMetadata( typeof( DropDownButton ) ) );
+
+      EventManager.RegisterClassHandler( typeof( DropDownButton ), AccessKeyManager.AccessKeyPressedEvent, new AccessKeyPressedEventHandler( OnAccessKeyPressed ) );
     }
 
     public DropDownButton()
@@ -107,6 +109,77 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //DropDownContent
 
+    #region DropDownContentBackground
+
+    public static readonly DependencyProperty DropDownContentBackgroundProperty = DependencyProperty.Register( "DropDownContentBackground", typeof( Brush ), typeof( DropDownButton ), new UIPropertyMetadata( null ) );
+    public Brush DropDownContentBackground
+    {
+      get
+      {
+        return ( Brush )GetValue( DropDownContentBackgroundProperty );
+      }
+      set
+      {
+        SetValue( DropDownContentBackgroundProperty, value );
+      }
+    }
+
+    #endregion //DropDownContentBackground
+
+    #region DropDownPosition
+
+    public static readonly DependencyProperty DropDownPositionProperty = DependencyProperty.Register( "DropDownPosition", typeof( PlacementMode )
+      , typeof( DropDownButton ), new UIPropertyMetadata( PlacementMode.Bottom ) );
+    public PlacementMode DropDownPosition
+    {
+      get
+      {
+        return (PlacementMode)GetValue( DropDownPositionProperty );
+      }
+      set
+      {
+        SetValue( DropDownPositionProperty, value );
+      }
+    }
+
+    #endregion
+
+    #region IsDefault
+
+    public static readonly DependencyProperty IsDefaultProperty = DependencyProperty.Register( "IsDefault", typeof( bool ), typeof( DropDownButton ), new UIPropertyMetadata( false, OnIsDefaultChanged ) );
+    public bool IsDefault
+    {
+      get
+      {
+        return ( bool )GetValue( IsDefaultProperty );
+      }
+      set
+      {
+        SetValue( IsDefaultProperty, value );
+      }
+    }
+
+    private static void OnIsDefaultChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var dropDownButton = o as DropDownButton;
+      if( dropDownButton != null )
+        dropDownButton.OnIsDefaultChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+    }
+
+    protected virtual void OnIsDefaultChanged( bool oldValue, bool newValue )
+    {
+      if( newValue )
+      {
+        AccessKeyManager.Register( "\r", this );
+      }
+      else
+      {
+        AccessKeyManager.Unregister( "\r", this );
+      }
+    }
+
+    #endregion //IsDefault
+
     #region IsOpen
 
     public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register( "IsOpen", typeof( bool ), typeof( DropDownButton ), new UIPropertyMetadata( false, OnIsOpenChanged ) );
@@ -139,6 +212,36 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //IsOpen
 
+    #region MaxDropDownHeight
+
+    public static readonly DependencyProperty MaxDropDownHeightProperty = DependencyProperty.Register( "MaxDropDownHeight", typeof( double )
+      , typeof( DropDownButton ), new UIPropertyMetadata( SystemParameters.PrimaryScreenHeight / 2.0, OnMaxDropDownHeightChanged ) );
+    public double MaxDropDownHeight
+    {
+      get
+      {
+        return (double)GetValue( MaxDropDownHeightProperty );
+      }
+      set
+      {
+        SetValue( MaxDropDownHeightProperty, value );
+      }
+    }
+
+    private static void OnMaxDropDownHeightChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var dropDownButton = o as DropDownButton;
+      if( dropDownButton != null )
+        dropDownButton.OnMaxDropDownHeightChanged( (double)e.OldValue, (double)e.NewValue );
+    }
+
+    protected virtual void OnMaxDropDownHeightChanged( double oldValue, double newValue )
+    {
+      // TODO: Add your property changed side-effects. Descendants can override as well.
+    }
+
+    #endregion
+
     #endregion //Properties
 
     #region Base Class Overrides
@@ -146,7 +249,7 @@ namespace Xceed.Wpf.Toolkit
     public override void OnApplyTemplate()
     {
       base.OnApplyTemplate();
-      Button = GetTemplateChild( PART_DropDownButton ) as ToggleButton;
+      this.Button = this.GetTemplateChild( PART_DropDownButton ) as ToggleButton;
 
       _contentPresenter = GetTemplateChild( PART_ContentPresenter ) as ContentPresenter;
 
@@ -157,6 +260,36 @@ namespace Xceed.Wpf.Toolkit
 
       if( _popup != null )
         _popup.Opened += Popup_Opened;
+    }
+
+    protected override void OnIsKeyboardFocusWithinChanged( DependencyPropertyChangedEventArgs e )
+    {
+      base.OnIsKeyboardFocusWithinChanged( e );
+      if( !( bool )e.NewValue )
+      {
+        this.CloseDropDown( false );
+      }
+    }
+
+    protected override void OnGotFocus( RoutedEventArgs e )
+    {
+      base.OnGotFocus( e );
+      if( this.Button != null )
+      {
+        this.Button.Focus();
+      }
+    }
+
+    protected override void OnAccessKey( AccessKeyEventArgs e )
+    {
+      if( e.IsMultiple )
+      {
+        base.OnAccessKey( e );
+      }
+      else
+      {
+        this.OnClick();
+      }
     }
 
     #endregion //Base Class Overrides
@@ -206,6 +339,14 @@ namespace Xceed.Wpf.Toolkit
 
     #region Event Handlers
 
+    private static void OnAccessKeyPressed( object sender, AccessKeyPressedEventArgs e )
+    {
+      if( !e.Handled && ( e.Scope == null ) && ( e.Target == null ) )
+      {
+        e.Target = sender as DropDownButton;
+      }
+    }
+
     private void OnKeyDown( object sender, KeyEventArgs e )
     {
       if( !IsOpen )
@@ -234,7 +375,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      CloseDropDown( false );
+      CloseDropDown( true );
     }
 
     private void DropDownButton_Click( object sender, RoutedEventArgs e )
@@ -281,11 +422,15 @@ namespace Xceed.Wpf.Toolkit
     private void CloseDropDown( bool isFocusOnButton )
     {
       if( IsOpen )
+      {
         IsOpen = false;
+      }
       ReleaseMouseCapture();
 
-      if( isFocusOnButton )
+      if( isFocusOnButton && (this.Button != null) )
+      {
         Button.Focus();
+      }
     }
 
     protected virtual void OnClick()

@@ -129,36 +129,24 @@ namespace Xceed.Wpf.DataGrid
         {
           for( int i = 0; i < m_itemsToExpand.Count; i++ )
           {
-            object dataItemToExpand = m_itemsToExpand[ i ].Target;
+            var dataItemToExpand = m_itemsToExpand[ i ].Target;
+            if( dataItemToExpand == null )
+              continue;
 
-            if( dataItemToExpand != null )
+            // Verify if we have a System.Data.DataView as ItemsSource to 
+            // ensure to restore the System.Data.DataRowView that represents
+            // the System.Data.DataRow saved previously
+            System.Data.DataView dataView = ItemsSourceHelper.TryGetDataViewFromDataGridContext( m_rootDataGridContext );
+
+            if( ( dataView != null ) && ( dataItemToExpand is System.Data.DataRow ) )
             {
-              try
+              foreach( System.Data.DataRowView dataRowView in dataView )
               {
-                // Verify if we have a System.Data.DataView as ItemsSource to 
-                // ensure to restore the System.Data.DataRowView that represents
-                // the System.Data.DataRow saved previously
-                System.Data.DataView dataView = 
-                  ItemsSourceHelper.TryGetDataViewFromDataGridContext( m_rootDataGridContext );
-
-                if( ( dataView != null ) 
-                    && ( dataItemToExpand is System.Data.DataRow ) )
+                if( dataRowView.Row == dataItemToExpand )
                 {
-                  foreach( System.Data.DataRowView dataRowView in dataView )
-                  {
-                    if( dataRowView.Row == dataItemToExpand )
-                    {
-                      dataItemToExpand = dataRowView;
-                      break;
-                    }
-                  }
+                  dataItemToExpand = dataRowView;
+                  break;
                 }
-
-                m_rootDataGridContext.ExpandDetails( dataItemToExpand );
-              }
-              catch
-              {
-                System.Diagnostics.Debug.Assert( false, "Item has moved in the source ?" );
               }
             }
           }
@@ -218,16 +206,16 @@ namespace Xceed.Wpf.DataGrid
       {
         if( wasExpanded )
         {
-          sourceContext.ExpandGroupCore( group, true );
+          sourceContext.ExpandGroup( group, true );
         }
         else
         {
-          sourceContext.CollapseGroupCore( group, true );
+          sourceContext.CollapseGroup( group, true );
         }
       }
       else if( m_stopAtFirstCollapsedGroup )
       {
-        sourceContext.CollapseGroupCore( group, true );
+        sourceContext.CollapseGroup( group, true );
       }
     }
 

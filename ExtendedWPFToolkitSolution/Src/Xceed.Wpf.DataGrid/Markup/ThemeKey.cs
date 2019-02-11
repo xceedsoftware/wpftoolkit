@@ -15,11 +15,11 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
-using System.Text;
 using System.Windows;
 using System.Windows.Markup;
+using System.Windows.Media;
 using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid.Markup
@@ -27,6 +27,7 @@ namespace Xceed.Wpf.DataGrid.Markup
   [MarkupExtensionReturnType( typeof( ThemeKey ) )]
   public class ThemeKey : ResourceKey
   {
+
     public ThemeKey()
     {
     }
@@ -66,8 +67,8 @@ namespace Xceed.Wpf.DataGrid.Markup
         if( value == null )
           throw new ArgumentNullException( "TargetViewType" );
 
-        if( !typeof( ViewBase ).IsAssignableFrom( value ) )
-          throw new ArgumentException( "The specified view type must derive from ViewBase.", "TargetViewType" );
+          if( !typeof( ViewBase ).IsAssignableFrom( value ) )
+            throw new ArgumentException( "The specified view type must derive from ViewBase.", "TargetViewType" );
 
         if( m_targetViewTypeInitialized )
           throw new InvalidOperationException( "An attempt was made to set the TargetViewType property when it has already been initialized." );
@@ -144,28 +145,43 @@ namespace Xceed.Wpf.DataGrid.Markup
 
     public override bool Equals( object obj )
     {
-      ThemeKey key = obj as ThemeKey;
+      if( object.ReferenceEquals( obj, this ) )
+        return true;
 
-      if( key == null )
+      var key = obj as ThemeKey;
+      if( object.ReferenceEquals( key, null ) )
         return false;
 
-      if( !( ( key.TargetViewType != null ) ? key.TargetViewType.Equals( this.TargetViewType ) : ( this.TargetViewType == null ) ) )
-        return false;
-
-      if( !( ( key.ThemeType != null ) ? key.ThemeType.Equals( this.ThemeType ) : ( this.ThemeType == null ) ) )
-        return false;
-
-      if( !( ( key.TargetElementType != null ) ? key.TargetElementType.Equals( this.TargetElementType ) : ( this.TargetElementType == null ) ) )
-        return false;
-
-      return true;
+      return ( object.Equals( key.TargetViewType, this.TargetViewType ) )
+          && ( object.Equals( key.ThemeType, this.ThemeType ) )
+          && ( object.Equals( key.TargetElementType, this.TargetElementType ) );
     }
 
     public override int GetHashCode()
     {
-      return ( ( ( this.TargetViewType != null ) ? this.TargetViewType.GetHashCode() : 0 )
-        ^ ( ( this.ThemeType != null ) ? this.ThemeType.GetHashCode() : 0 )
-        ^ ( ( this.TargetElementType != null ) ? this.TargetElementType.GetHashCode() : 0 ) );
+      var hashCode = 0;
+
+      var elementType = this.TargetElementType;
+      if( elementType != null )
+      {
+        hashCode += elementType.GetHashCode();
+      }
+
+      var viewType = this.TargetViewType;
+      if( viewType != null )
+      {
+        hashCode *= 11;
+        hashCode += viewType.GetHashCode();
+      }
+
+      var themeType = this.ThemeType;
+      if( themeType != null )
+      {
+        hashCode *= 17;
+        hashCode += themeType.GetHashCode();
+      }
+
+      return hashCode;
     }
   }
 }

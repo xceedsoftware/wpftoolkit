@@ -28,36 +28,14 @@ using System.Collections;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Linq.Expressions;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
   [TemplatePart( Name = "content", Type = typeof( ContentControl ) )]
   public class PropertyItem : CustomPropertyItem
   {
-    private int _categoryOrder;
-
     #region Properties
-
-    #region CategoryOrder
-
-    public int CategoryOrder
-    {
-      get
-      {
-        return _categoryOrder;
-      }
-      internal set
-      {
-        if( _categoryOrder != value )
-        {
-          _categoryOrder = value;
-          // Notify the parent helper since this property may affect ordering.
-          this.RaisePropertyChanged( () => this.CategoryOrder );
-        }
-      }
-    }
-
-    #endregion //CategoryOrder
 
     #region IsReadOnly
 
@@ -75,18 +53,51 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //IsReadOnly
 
-    #region PropertyOrder
+    #region IsInValid
 
-    public static readonly DependencyProperty PropertyOrderProperty =
-        DependencyProperty.Register( "PropertyOrder", typeof( int ), typeof( PropertyItem ), new UIPropertyMetadata( 0 ) );
+    /// <summary>
+    /// Identifies the IsInvalid dependency property
+    /// </summary>
+    public static readonly DependencyProperty IsInvalidProperty =
+        DependencyProperty.Register( "IsInvalid", typeof( bool ), typeof( PropertyItem ), new UIPropertyMetadata( false, OnIsInvalidChanged ) );
 
-    public int PropertyOrder
+    public bool IsInvalid
     {
-      get { return ( int )GetValue( PropertyOrderProperty ); }
-      set { SetValue( PropertyOrderProperty, value ); }
+      get
+      {
+        return ( bool )GetValue( IsInvalidProperty );
+      }
+      internal set
+      {
+        SetValue( IsInvalidProperty, value );
+      }
     }
 
-    #endregion //PropertyOrder
+    private static void OnIsInvalidChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var propertyItem = o as PropertyItem;
+      if( propertyItem != null )
+        propertyItem.OnIsInvalidChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+    }
+
+    protected virtual void OnIsInvalidChanged( bool oldValue, bool newValue )
+    {
+      var be = this.GetBindingExpression( PropertyItem.ValueProperty );
+
+      if( newValue )
+      {
+        var validationError = new ValidationError( new InvalidValueValidationRule(), be );
+        validationError.ErrorContent = "Value could not be converted.";
+        Validation.MarkInvalid( be, validationError );
+      }
+      else
+      {
+        Validation.ClearInvalid( be );
+      }
+    }
+
+
+    #endregion // IsInvalid
 
     #region PropertyDescriptor
 
@@ -97,6 +108,18 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
     #endregion //PropertyDescriptor
+
+    #region PropertyName
+
+    public string PropertyName
+    {
+      get
+      {
+        return (this.DescriptorDefinition != null) ? this.DescriptorDefinition.PropertyName : null;
+      }
+    }
+
+    #endregion
 
     #region PropertyType
 
@@ -120,7 +143,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       private set;
     }
 
-    #endregion DescriptorDefinition
+    #endregion DescriptorDefinition    
 
     #region Instance
 
@@ -134,11 +157,103 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //Properties
 
-    #region Methods
+    #region Overrides
+
+    protected override string GetPropertyItemName()
+    {
+      return this.PropertyName;
+    }
+
+    protected override Type GetPropertyItemType()
+    {
+      return this.PropertyType;
+    }
 
     protected override void OnIsExpandedChanged( bool oldValue, bool newValue )
     {
-      if( newValue )
+      if( newValue && this.IsLoaded )
+      {
+        this.GenerateExpandedPropertyItems();
+      }
+    }
+
+    protected override object OnCoerceValueChanged( object baseValue )
+    {
+      // Propagate error from DescriptorPropertyDefinitionBase to PropertyItem.Value
+      // to see the red error rectangle in the propertyGrid.
+      BindingExpression be = this.GetBindingExpression( PropertyItem.ValueProperty );
+      this.SetRedInvalidBorder( be );
+      return baseValue;
+    }
+
+    protected override void OnValueChanged( object oldValue, object newValue )
+    {
+      base.OnValueChanged( oldValue, newValue );
+
+      // A Default Value is defined and newValue is null => set the Default Value
+      if( ( newValue == null ) && ( this.DescriptorDefinition != null ) && ( this.DescriptorDefinition.DefaultValue != null ) )
+      {
+#if VS2008
+        this.Value = this.DescriptorDefinition.DefaultValue;
+#else
+        this.SetCurrentValue( PropertyItem.ValueProperty, this.DescriptorDefinition.DefaultValue );
+#endif
+      }
+    }
+
+    #endregion
+
+    #region Internal Methods
+
+    internal void SetRedInvalidBorder( BindingExpression be )
+    {
+      if( (be != null) && be.DataItem is DescriptorPropertyDefinitionBase )
+      {
+        DescriptorPropertyDefinitionBase descriptor = be.DataItem as DescriptorPropertyDefinitionBase;
+        if( Validation.GetHasError( descriptor ) )
+        {
+          ReadOnlyObservableCollection<ValidationError> errors = Validation.GetErrors( descriptor );
+          Validation.MarkInvalid( be, errors[ 0 ] );
+        }
+      }
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void OnDefinitionContainerHelperInvalidated( object sender, EventArgs e )
+    {
+      if( this.ContainerHelper != null )
+      {
+        this.ContainerHelper.ClearHelper();
+      }
+      var helper = this.DescriptorDefinition.CreateContainerHelper( this );
+      this.ContainerHelper = helper;
+      if( this.IsExpanded )
+      {
+        helper.GenerateProperties();
+      }
+    }
+
+    private void Init( DescriptorPropertyDefinitionBase definition )
+    {
+      if( definition == null )
+        throw new ArgumentNullException( "definition" );
+
+      if( this.ContainerHelper != null )
+      {
+        this.ContainerHelper.ClearHelper();
+      }
+      this.DescriptorDefinition = definition;
+      this.ContainerHelper = definition.CreateContainerHelper( this );
+      definition.ContainerHelperInvalidated += new EventHandler( OnDefinitionContainerHelperInvalidated );
+      this.Loaded += this.PropertyItem_Loaded;
+    }
+
+    private void GenerateExpandedPropertyItems()
+    {
+      if( this.IsExpanded )
       {
         // This withholds the generation of all PropertyItem instances (recursively)
         // until the PropertyItem is expanded.
@@ -150,43 +265,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
-    protected override void OnEditorChanged( FrameworkElement oldValue, FrameworkElement newValue )
+    #endregion
+
+    #region Event Handlers
+
+    private void PropertyItem_Loaded( object sender, RoutedEventArgs e )
     {
-      if( oldValue != null )
-        oldValue.DataContext = null;
-
-      if( newValue != null )
-        newValue.DataContext = this;
-    }
-
-    protected override object OnCoerceValueChanged( object baseValue )
-    {
-      // Propagate error from DescriptorPropertyDefinitionBase to PropertyItem.Value
-      // to see the red error rectangle in the propertyGrid.
-      BindingExpression be = GetBindingExpression( PropertyItem.ValueProperty );
-      if( ( be != null ) && be.DataItem is DescriptorPropertyDefinitionBase )
-      {
-        DescriptorPropertyDefinitionBase descriptor = be.DataItem as DescriptorPropertyDefinitionBase;
-        if( Validation.GetHasError( descriptor ) )
-        {
-          ReadOnlyObservableCollection<ValidationError> errors = Validation.GetErrors( descriptor );
-          Validation.MarkInvalid( be, errors[ 0 ] );
-        }
-      }
-      return baseValue;
-    }
-
-    protected override void OnValueChanged( object oldValue, object newValue )
-    {
-      base.OnValueChanged( oldValue, newValue );
-
-      // Update the ObjectContainerHelper this depends on 
-      var helper = new ObjectContainerHelper( this, newValue );
-      this.ContainerHelper = helper;
-      if( this.IsExpanded )
-      {
-        helper.GenerateProperties();
-      }
+      this.GenerateExpandedPropertyItems();
     }
 
     #endregion
@@ -194,14 +279,20 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     #region Constructors
 
     internal PropertyItem( DescriptorPropertyDefinitionBase definition )
-      : base()
+      : base( definition.IsPropertyGridCategorized, !definition.PropertyType.IsArray )
     {
-      if( definition == null )
-        throw new ArgumentNullException( "definition" );
-
-      this.DescriptorDefinition = definition;
+      this.Init( definition );
     }
 
     #endregion //Constructors
+
+    private class InvalidValueValidationRule : ValidationRule
+    {
+      public override ValidationResult Validate( object value, CultureInfo cultureInfo )
+      {
+        // Will always return an error.
+        return new ValidationResult( false, null );
+      }
+    }
   }
 }

@@ -15,21 +15,13 @@
   ***********************************************************************************/
 
 using System;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Text;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Xml;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using Xceed.Wpf.DataGrid.Views;
-using Xceed.Wpf.DataGrid.Markup;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Automation.Peers;
+using System.Windows.Data;
+using System.Windows.Input;
+using System.Xml;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -55,9 +47,12 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return ( m_canBeRecycled && base.CanBeRecycled );
+        return ( m_canBeRecycled )
+            && ( base.CanBeRecycled );
       }
     }
+
+    private bool m_canBeRecycled; //= false
 
     #endregion
 
@@ -73,13 +68,37 @@ namespace Xceed.Wpf.DataGrid
 
     #endregion
 
+
+    protected override void OnMouseEnter( MouseEventArgs e )
+    {
+      //If the current CellEditorDisplayConditions requires display when mouse is over the Cell 
+      if( Cell.IsCellEditorDisplayConditionsSet( this, CellEditorDisplayConditions.MouseOverCell ) )
+      {
+        //Display the editors for the Row
+        this.SetDisplayEditorMatchingCondition( CellEditorDisplayConditions.MouseOverCell );
+      }
+
+      base.OnMouseEnter( e );
+    }
+
+    protected override void OnMouseLeave( MouseEventArgs e )
+    {
+      //If the current CellEditorDisplayConditions requires display when mouse is over the Cell 
+      if( Cell.IsCellEditorDisplayConditionsSet( this, CellEditorDisplayConditions.MouseOverCell ) )
+      {
+        //Display the editors for the Row
+        this.RemoveDisplayEditorMatchingCondition( CellEditorDisplayConditions.MouseOverCell );
+      }
+
+      base.OnMouseLeave( e );
+    }
+
     protected override void InitializeCore( DataGridContext dataGridContext, Row parentRow, ColumnBase parentColumn )
     {
       ColumnBase oldParentColumn = this.ParentColumn;
 
       base.InitializeCore( dataGridContext, parentRow, parentColumn );
 
-      // This is a fix for Case 106982 (could not bind to XML datasources that contained namespaces).
       //
       // For an unknown reason, when a recycled DataCell was added back to the VisualTree (added
       // to the CellsHostPanel in its ParentRow), the binding would fail to update when the XPath
@@ -98,16 +117,6 @@ namespace Xceed.Wpf.DataGrid
         //call the helper function to setup the Cell's binding.
         this.SetupDisplayMemberBinding( dataGridContext );
       }
-      else
-      {
-
-        BindingExpression binding = BindingOperations.GetBindingExpression( this, DataCell.ContentProperty );
-
-        if( binding != null )
-        {
-          binding.UpdateTarget();
-        }
-      }
     }
 
     protected internal override void PrepareContainer( DataGridContext dataGridContext, object item )
@@ -122,12 +131,11 @@ namespace Xceed.Wpf.DataGrid
 
     protected internal override void PrepareDefaultStyleKey( Xceed.Wpf.DataGrid.Views.ViewBase view )
     {
-      object currentThemeKey = view.GetDefaultStyleKey( typeof( DataCell ) );
+      var newThemeKey = view.GetDefaultStyleKey( typeof( DataCell ) );
+      if( object.Equals( this.DefaultStyleKey, newThemeKey ) )
+        return;
 
-      if( currentThemeKey.Equals( this.DefaultStyleKey ) == false )
-      {
-        this.DefaultStyleKey = currentThemeKey;
-      }
+      this.DefaultStyleKey = newThemeKey;
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters" )]
@@ -135,46 +143,31 @@ namespace Xceed.Wpf.DataGrid
     protected internal virtual void SetupDisplayMemberBinding( DataGridContext dataGridContext )
     {
       // Bind the cell content.
-      Column column = this.ParentColumn as Column;
+      var column = this.ParentColumn as Column;
 
       if( column != null )
       {
-        BindingBase displayMemberBinding = null;
-        object dataContext = this.ParentRow.DataContext;
+        var displayMemberBinding = default( BindingBase );
+        var dataItem = this.ParentRow.DataContext;
 
         // If the dataContext is our ParentRow, we do not create any binding
-        if( dataContext != this.ParentRow )
+        if( dataItem != this.ParentRow )
         {
-
-          // Disable warning for DisplayMemberBinding when internaly used
-#pragma warning disable 618
-
-          displayMemberBinding = column.DisplayMemberBinding;
-
-#pragma warning restore 618
-
+          displayMemberBinding = column.GetDisplayMemberBinding();
 
           if( displayMemberBinding == null )
           {
-            if( ( dataGridContext == null ) || ( dataGridContext.ItemsSourceFieldDescriptors == null ) )
+            if( dataGridContext == null )
               throw new InvalidOperationException( "An attempt was made to create a DisplayMemberBinding before the DataGridContext has been initialized." );
 
             if( !DesignerProperties.GetIsInDesignMode( this ) )
             {
-              bool isDataGridUnboundItemProperty;
+              var propertyDescription = ItemsSourceHelper.CreateOrGetPropertyDescriptionFromColumn( dataGridContext, column, ( dataItem != null ) ? dataItem.GetType() : null );
+              ItemsSourceHelper.UpdateColumnFromPropertyDescription( column, dataGridContext.DataGridControl.DefaultCellEditors, dataGridContext.AutoCreateForeignKeyConfigurations, propertyDescription );
 
-              displayMemberBinding = ItemsSourceHelper.AutoCreateDisplayMemberBinding(
-                column, dataGridContext, dataContext, out isDataGridUnboundItemProperty );
-
-              column.IsBoundToDataGridUnboundItemProperty = isDataGridUnboundItemProperty;
+              displayMemberBinding = column.GetDisplayMemberBinding();
             }
 
-            // Disable warning for DisplayMemberBinding when internaly used
-#pragma warning disable 618
-            column.DisplayMemberBinding = displayMemberBinding;
-#pragma warning restore 618
-
-            //mark the Column's Binding as AutoCreated.
             column.IsBindingAutoCreated = true;
           }
         }
@@ -185,9 +178,7 @@ namespace Xceed.Wpf.DataGrid
 
           BindingOperations.SetBinding( this, Cell.ContentProperty, displayMemberBinding );
 
-          XmlElement xmlElement =
-            this.GetValue( Cell.ContentProperty ) as XmlElement;
-
+          var xmlElement = this.GetValue( Cell.ContentProperty ) as XmlElement;
           if( xmlElement != null )
           {
 
@@ -198,10 +189,9 @@ namespace Xceed.Wpf.DataGrid
             //under any circumstances, a cell that is bound to XML cannot be recycled
             m_canBeRecycled = false;
 
-            BindingOperations.ClearBinding( this, Cell.ContentProperty );
-            this.ClearValue( Cell.ContentProperty );
+            this.ClearDisplayMemberBinding();
 
-            Binding xmlElementBinding = new Binding( "InnerXml" );
+            var xmlElementBinding = new Binding( "InnerXml" );
             xmlElementBinding.Source = xmlElement;
             xmlElementBinding.Mode = BindingMode.TwoWay;
             xmlElementBinding.UpdateSourceTrigger = UpdateSourceTrigger.Explicit;
@@ -209,6 +199,26 @@ namespace Xceed.Wpf.DataGrid
             BindingOperations.SetBinding( this, Cell.ContentProperty, xmlElementBinding );
           }
         }
+        else
+        {
+          this.ClearDisplayMemberBinding();
+        }
+      }
+      else
+      {
+        this.ClearDisplayMemberBinding();
+      }
+    }
+
+    internal virtual void ClearDisplayMemberBinding()
+    {
+      if( BindingOperations.IsDataBound( this, Cell.ContentProperty ) )
+      {
+        BindingOperations.ClearBinding( this, Cell.ContentProperty );
+      }
+      else
+      {
+        this.ClearValue( Cell.ContentProperty );
       }
     }
 
@@ -220,6 +230,32 @@ namespace Xceed.Wpf.DataGrid
 
       if( ( dataGridContext != null ) && ( parentRow != null ) )
         parentRow.EnsurePosition( dataGridContext, this );
+    }
+
+    internal override DataTemplate GetForeignKeyDataTemplate()
+    {
+      var column = this.ParentColumn as Column;
+      if( column == null )
+        return null;
+
+      // If a foreignKey CellContentTemplate was found by the configuration, it must be used even if a CellContentTemplate is defined
+      // because the CellContentTemplate will be used by this template
+      var configuration = column.ForeignKeyConfiguration;
+      if( configuration == null )
+        return null;
+
+      return configuration.DefaultCellContentTemplate;
+    }
+
+    internal override DataTemplate GetCellStringFormatDataTemplate( DataTemplate contentTemplate )
+    {
+      // parentColumn is verified to be not null in the calling method
+      var parentColumn = this.ParentColumn;
+
+      var format = parentColumn.CellContentStringFormat;
+      Debug.Assert( !string.IsNullOrEmpty( format ) );
+
+      return StringFormatDataTemplate.Get( contentTemplate, format, parentColumn.GetCulture() );
     }
 
     private static bool VerifyDisplayMemberBinding( BindingBase binding )
@@ -242,7 +278,5 @@ namespace Xceed.Wpf.DataGrid
 
       return retval;
     }
-
-    private bool m_canBeRecycled; // = false
   }
 }

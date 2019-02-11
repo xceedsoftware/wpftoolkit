@@ -15,6 +15,8 @@
   ***********************************************************************************/
 
 using System;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit.Core.Converters
@@ -23,7 +25,26 @@ namespace Xceed.Wpf.Toolkit.Core.Converters
   {
     public object Convert( object value, Type targetType, object parameter, System.Globalization.CultureInfo culture )
     {
-      return value.GetType().Name;
+      if( value != null )
+      {
+        if( value is Type )
+        {
+          var displayNameAttribute = ( ( Type )value ).GetCustomAttributes( false ).OfType<DisplayNameAttribute>().FirstOrDefault();
+          return ( displayNameAttribute != null ) ? displayNameAttribute.DisplayName : ( ( Type )value ).Name;
+        }
+
+        var type = value.GetType();
+        var valueString = value.ToString();
+        if( string.IsNullOrEmpty( valueString )
+         || ( valueString == type.UnderlyingSystemType.ToString() ) )
+        {
+          var displayNameAttribute = type.GetCustomAttributes( false ).OfType<DisplayNameAttribute>().FirstOrDefault();
+          return ( displayNameAttribute != null ) ? displayNameAttribute.DisplayName : type.Name;
+        }
+
+        return value; 
+      }
+      return null;
     }
     public object ConvertBack( object value, Type targetType, object parameter, System.Globalization.CultureInfo culture )
     {

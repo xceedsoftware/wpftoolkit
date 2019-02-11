@@ -14,25 +14,35 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
 
 namespace Xceed.Wpf.AvalonDock.Layout.Serialization
 {
-    public class LayoutSerializationCallbackEventArgs : CancelEventArgs
+  public class LayoutSerializationCallbackEventArgs : CancelEventArgs
+  {
+    #region constructor
+
+    public LayoutSerializationCallbackEventArgs( LayoutContent model, object previousContent )
     {
-        public LayoutSerializationCallbackEventArgs(LayoutContent model, object previousContent)
-        {
-            Cancel = false;
-            Model = model;
-            Content = previousContent;
-        }
-
-        public LayoutContent Model { get; private set; }
-
-        public object Content { get; set; }
+      Cancel = false;
+      Model = model;
+      Content = previousContent;
     }
+
+    #endregion
+
+    #region Properties
+
+    public LayoutContent Model
+    {
+      get; private set;
+    }
+
+    public object Content
+    {
+      get; set;
+    }
+
+    #endregion
+  }
 }

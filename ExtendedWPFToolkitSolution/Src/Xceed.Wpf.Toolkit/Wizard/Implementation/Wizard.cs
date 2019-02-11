@@ -15,6 +15,7 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -226,7 +227,7 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    public static readonly DependencyProperty FinishButtonVisibilityProperty = DependencyProperty.Register( "FinishButtonVisibility", typeof( Visibility ), typeof( Wizard ), new UIPropertyMetadata( Visibility.Visible ) );
+    public static readonly DependencyProperty FinishButtonVisibilityProperty = DependencyProperty.Register( "FinishButtonVisibility", typeof( Visibility ), typeof( Wizard ), new UIPropertyMetadata( Visibility.Collapsed ) );
     public Visibility FinishButtonVisibility
     {
       get
@@ -331,6 +332,34 @@ namespace Xceed.Wpf.Toolkit
         CurrentPage = Items[ 0 ] as WizardPage;
     }
 
+    protected override void OnItemsChanged( NotifyCollectionChangedEventArgs e )
+    {
+      base.OnItemsChanged( e );
+
+      foreach( object o in this.Items )
+      {
+        if( !( o is WizardPage ) )
+          throw new NotSupportedException( "Wizard should only contain WizardPages." );
+      }
+
+      if( Items.Count > 0 && CurrentPage == null )
+        CurrentPage = Items[ 0 ] as WizardPage;
+    }
+
+    protected override void OnPropertyChanged( DependencyPropertyChangedEventArgs e )
+    {
+      base.OnPropertyChanged( e );
+
+      if( ( e.Property.Name == "CanSelectNextPage" ) || ( e.Property.Name == "CanHelp" ) || ( e.Property.Name == "CanFinish" )
+        || ( e.Property.Name == "CanCancel" ) || ( e.Property.Name == "CanSelectPreviousPage" ) )
+      {
+        CommandManager.InvalidateRequerySuggested();
+      }
+    }
+
+
+
+
     #endregion //Base Class Overrides
 
     #region Commands
@@ -356,7 +385,10 @@ namespace Xceed.Wpf.Toolkit
 
     private void ExecuteFinishWizard( object sender, ExecutedRoutedEventArgs e )
     {
-      RaiseRoutedEvent( Wizard.FinishEvent );
+      var eventArgs = new CancelRoutedEventArgs( Wizard.FinishEvent );
+      this.RaiseEvent( eventArgs );
+      if( eventArgs.Cancel )
+        return;
 
       if( FinishButtonClosesWindow )
         CloseParentWindow( true );
@@ -511,8 +543,8 @@ namespace Xceed.Wpf.Toolkit
 
     #region Finish Event
 
-    public static readonly RoutedEvent FinishEvent = EventManager.RegisterRoutedEvent( "Finish", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( Wizard ) );
-    public event RoutedEventHandler Finish
+    public static readonly RoutedEvent FinishEvent = EventManager.RegisterRoutedEvent( "Finish", RoutingStrategy.Bubble, typeof( CancelRoutedEventHandler ), typeof( Wizard ) );
+    public event CancelRoutedEventHandler Finish
     {
       add
       {

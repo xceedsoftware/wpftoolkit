@@ -15,26 +15,29 @@
   ***********************************************************************************/
 
 using System;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Collections;
 using System.ComponentModel;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Windows.Media;
-using Xceed.Wpf.DataGrid.ValidationRules;
-using System.Collections.Generic;
-using System.Windows.Controls.Primitives;
-using Xceed.Utils.Collections;
-using System.Collections.Specialized;
-using Xceed.Wpf.DataGrid.Converters;
+using System.Windows;
+using System.Windows.Data;
+using Xceed.Wpf.DataGrid.Utils;
 
 namespace Xceed.Wpf.DataGrid
 {
   [DebuggerDisplay( "FieldName = {FieldName}" )]
   public class Column : ColumnBase
   {
+    #region Static Fields
+
+    internal static readonly string AllowSortPropertyName = PropertyHelper.GetPropertyName( ( Column c ) => c.AllowSort );
+    internal static readonly string AllowGroupPropertyName = PropertyHelper.GetPropertyName( ( Column c ) => c.AllowGroup );
+#pragma warning disable 618
+    internal static readonly string DisplayMemberBindingPropertyName = PropertyHelper.GetPropertyName( ( Column c ) => c.DisplayMemberBinding );
+#pragma warning restore 618
+    internal static readonly string DisplayMemberBindingInfoPropertyName = PropertyHelper.GetPropertyName( ( Column c ) => c.DisplayMemberBindingInfo );
+
+    #endregion
+
     public Column()
     {
     }
@@ -43,12 +46,17 @@ namespace Xceed.Wpf.DataGrid
     public Column( string fieldName, object title, BindingBase displayMemberBinding )
       : base( fieldName, title )
     {
+      this.SetDisplayMemberBinding( displayMemberBinding );
+    }
+
+    internal static Column Create( string fieldName, object title, BindingBase displayMemberBinding )
+    {
       // Disable warning for DisplayMemberBinding when internaly used
 #pragma warning disable 618
-
-      this.DisplayMemberBinding = displayMemberBinding;
-
+      var column = new Column( fieldName, title, displayMemberBinding );
 #pragma warning restore 618
+
+      return column;
     }
 
     #region DisplayMemberBinding Property
@@ -67,12 +75,31 @@ namespace Xceed.Wpf.DataGrid
 
       set
       {
-        if( value != m_displayMemberBinding )
-        {
-          m_displayMemberBinding = value;
-          this.OnPropertyChanged( new PropertyChangedEventArgs( "DisplayMemberBinding" ) );
-        }
+        if( value == m_displayMemberBinding )
+          return;
+
+        m_displayMemberBinding = value;
+
+        this.OnPropertyChanged( new PropertyChangedEventArgs( Column.DisplayMemberBindingPropertyName ) );
       }
+    }
+
+    internal BindingBase GetDisplayMemberBinding()
+    {
+      // Disable warning for DisplayMemberBinding when internaly used
+#pragma warning disable 618
+      var value = this.DisplayMemberBinding;
+#pragma warning restore 618
+
+      return value;
+    }
+
+    internal void SetDisplayMemberBinding( BindingBase value )
+    {
+      // Disable warning for DisplayMemberBinding when internaly used
+#pragma warning disable 618
+      this.DisplayMemberBinding = value;
+#pragma warning restore 618
     }
 
     #endregion DisplayMemberBinding Property
@@ -93,10 +120,9 @@ namespace Xceed.Wpf.DataGrid
         if( value != m_displayMemberBindingInfo )
         {
           m_displayMemberBindingInfo = value;
-
           m_displayMemberBinding = m_displayMemberBindingInfo.GetBinding();
 
-          this.OnPropertyChanged( new PropertyChangedEventArgs( "DisplayMemberBindingInfo" ) );
+          this.OnPropertyChanged( new PropertyChangedEventArgs( Column.DisplayMemberBindingInfoPropertyName ) );
         }
       }
     }
@@ -117,7 +143,7 @@ namespace Xceed.Wpf.DataGrid
           return;
 
         m_allowSort = value;
-        this.OnPropertyChanged( new PropertyChangedEventArgs( "AllowSort" ) );
+        this.OnPropertyChanged( new PropertyChangedEventArgs( Column.AllowSortPropertyName ) );
       }
     }
 
@@ -139,7 +165,7 @@ namespace Xceed.Wpf.DataGrid
           return;
 
         m_allowGroup = value;
-        this.OnPropertyChanged( new PropertyChangedEventArgs( "AllowGroup" ) );
+        this.OnPropertyChanged( new PropertyChangedEventArgs( Column.AllowGroupPropertyName ) );
       }
     }
 
@@ -195,7 +221,9 @@ namespace Xceed.Wpf.DataGrid
       "ForeignKeyConfiguration",
       typeof( ForeignKeyConfiguration ),
       typeof( Column ),
-      new FrameworkPropertyMetadata( null, new PropertyChangedCallback( Column.OnForeignKeyConfigurationChanged ) ) );
+      new FrameworkPropertyMetadata(
+        null,
+        new PropertyChangedCallback( Column.OnForeignKeyConfigurationChanged ) ) );
 
     public ForeignKeyConfiguration ForeignKeyConfiguration
     {
@@ -228,10 +256,10 @@ namespace Xceed.Wpf.DataGrid
     private void RaiseForeignKeyConfigurationChanged()
     {
       var handler = this.ForeignKeyConfigurationChanged;
-      if( handler != null )
-      {
-        handler( this, EventArgs.Empty );
-      }
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, EventArgs.Empty );
     }
 
     #endregion
@@ -242,13 +270,15 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        return m_bindingAutoCreated;
+        return m_isBindingAutoCreated;
       }
       set
       {
-        m_bindingAutoCreated = value;
+        m_isBindingAutoCreated = value;
       }
     }
+
+    private bool m_isBindingAutoCreated; //false
 
     #endregion
 
@@ -256,9 +286,21 @@ namespace Xceed.Wpf.DataGrid
 
     internal bool IsBoundToDataGridUnboundItemProperty
     {
-      get;
-      set;
+      get
+      {
+        return m_isBoundToDataGridUnboundItemProperty;
+      }
+      set
+      {
+        if( value == m_isBoundToDataGridUnboundItemProperty )
+          return;
+
+        m_isBoundToDataGridUnboundItemProperty = value;
+        this.ResetDefaultCellRecyclingGroup();
+      }
     }
+
+    private bool m_isBoundToDataGridUnboundItemProperty; //false
 
     #endregion
 
@@ -274,6 +316,48 @@ namespace Xceed.Wpf.DataGrid
     }
 #endif
 
-    private bool m_bindingAutoCreated; // = false
+    internal override object CreateDefaultCellRecyclingGroup()
+    {
+      var key = base.CreateDefaultCellRecyclingGroup();
+
+      if( !this.IsBoundToDataGridUnboundItemProperty )
+        return key;
+
+      return new UnboundColumnCellRecyclingGroupKey( key );
+    }
+
+    #region UnboundColumnCellRecyclingGroupKey Private Nested Type
+
+    private sealed class UnboundColumnCellRecyclingGroupKey
+    {
+      internal UnboundColumnCellRecyclingGroupKey( object key )
+      {
+        m_key = key;
+      }
+
+      public override int GetHashCode()
+      {
+        if( m_key != null )
+          return m_key.GetHashCode();
+
+        return 0;
+      }
+
+      public override bool Equals( object obj )
+      {
+        UnboundColumnCellRecyclingGroupKey key = obj as UnboundColumnCellRecyclingGroupKey;
+        if( key == null )
+          return false;
+
+        if( key == this )
+          return true;
+
+        return object.Equals( key.m_key, m_key );
+      }
+
+      private readonly object m_key;
+    }
+
+    #endregion
   }
 }

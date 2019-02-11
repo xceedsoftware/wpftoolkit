@@ -93,6 +93,24 @@ namespace Xceed.Wpf.Toolkit
 
     #region Properties
 
+    #region CalculatorButtonPanelTemplate
+
+    public static readonly DependencyProperty CalculatorButtonPanelTemplateProperty = DependencyProperty.Register( "CalculatorButtonPanelTemplate"
+      , typeof( ControlTemplate ), typeof( Calculator ), new UIPropertyMetadata( null ) );
+    public ControlTemplate CalculatorButtonPanelTemplate
+    {
+      get
+      {
+        return (ControlTemplate)GetValue( CalculatorButtonPanelTemplateProperty );
+      }
+      set
+      {
+        SetValue( CalculatorButtonPanelTemplateProperty, value );
+      }
+    }
+
+    #endregion //CalculatorButtonPanelTemplate
+
     #region CalculatorButtonType
 
     public static readonly DependencyProperty CalculatorButtonTypeProperty = DependencyProperty.RegisterAttached( "CalculatorButtonType", typeof( CalculatorButtonType ), typeof( Calculator ), new UIPropertyMetadata( CalculatorButtonType.None, OnCalculatorButtonTypeChanged ) );
@@ -112,7 +130,10 @@ namespace Xceed.Wpf.Toolkit
     {
       Button button = o as Button;
       button.CommandParameter = newValue;
-      button.Content = CalculatorUtilities.GetCalculatorButtonContent( newValue );
+      if( button.Content == null )
+      {
+        button.Content = CalculatorUtilities.GetCalculatorButtonContent( newValue );
+      }
     }
 
     #endregion //CalculatorButtonType
@@ -224,6 +245,7 @@ namespace Xceed.Wpf.Toolkit
 
     public Calculator()
     {
+
       CommandBindings.Add( new CommandBinding( CalculatorCommands.CalculatorButtonClick, ExecuteCalculatorButtonClick ) );
       AddHandler( MouseDownEvent, new MouseButtonEventHandler( Calculator_OnMouseDown ), true );
     }
@@ -248,6 +270,9 @@ namespace Xceed.Wpf.Toolkit
         ProcessCalculatorButton( buttonType );
       }
     }
+
+
+
 
     #endregion //Base Class Overrides
 
@@ -415,6 +440,8 @@ namespace Xceed.Wpf.Toolkit
     {
       decimal currentValue = CalculatorUtilities.ParseDecimal( DisplayText );
 
+      _showNewNumber = true;
+
       switch( buttonType )
       {
         case Calculator.CalculatorButtonType.MAdd:
@@ -425,6 +452,7 @@ namespace Xceed.Wpf.Toolkit
           break;
         case Calculator.CalculatorButtonType.MR:
           DisplayText = Memory.ToString();
+          _showNewNumber = false;
           break;
         case Calculator.CalculatorButtonType.MS:
           Memory = currentValue;
@@ -435,8 +463,6 @@ namespace Xceed.Wpf.Toolkit
         default:
           break;
       }
-
-      _showNewNumber = true;
     }
 
     private void ProcessOperationKey( CalculatorButtonType buttonType )

@@ -15,16 +15,11 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
-using System.Collections;
-using System.Globalization;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Collections.Generic;
-using System.Diagnostics;
-using Xceed.Wpf.DataGrid.Stats;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -42,8 +37,6 @@ namespace Xceed.Wpf.DataGrid
     public DataGridCollectionViewSource()
       : base()
     {
-      m_statFunctions = new StatFunctionCollection();
-      m_statFunctions.CollectionChanged += new NotifyCollectionChangedEventHandler( this.ForwardedCollection_CollectionChanged );
     }
 
     #endregion CONSTRUCTORS
@@ -61,20 +54,6 @@ namespace Xceed.Wpf.DataGrid
     }
 
     #endregion CollectionViewType Property
-
-    #region StatFunctions Property
-
-    internal ObservableCollection<Stats.StatFunction> StatFunctions
-    {
-      get
-      {
-        return m_statFunctions;
-      }
-    }
-
-    private ObservableCollection<Stats.StatFunction> m_statFunctions;
-
-    #endregion StatFunctions Property
 
     #region UpdateChangedPropertyStatsOnly Property
 
@@ -110,19 +89,7 @@ namespace Xceed.Wpf.DataGrid
 
     internal override void ApplyExtraPropertiesToView( DataGridCollectionViewBase currentView )
     {
-      base.ApplyExtraPropertiesToView( currentView );
-
-      DataGridCollectionView dataGridCollectionView = currentView as DataGridCollectionView;
-
-      dataGridCollectionView.StatFunctions.Clear();
-      int count = m_statFunctions.Count;
-
-      for( int i = 0; i < count; i++ )
-      {
-        dataGridCollectionView.StatFunctions.Add( m_statFunctions[ i ] );
-      }
-
-      dataGridCollectionView.UpdateChangedPropertyStatsOnly = this.UpdateChangedPropertyStatsOnly;
+      base.ApplyExtraPropertiesToView( currentView );     
     }
 
     #endregion INTERNAL METHODS

@@ -14,19 +14,14 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using Xceed.Utils.Wpf.DragDrop;
-using System.Diagnostics;
-using System.Windows.Media;
 using System.Windows.Data;
-using Xceed.Utils.Wpf;
 using System.Windows.Documents;
-using Xceed.Wpf.DataGrid.Views;
-using System.ComponentModel;
+using System.Windows.Media;
+using Xceed.Utils.Wpf.DragDrop;
 
 namespace Xceed.Wpf.DataGrid
 {
@@ -302,7 +297,7 @@ namespace Xceed.Wpf.DataGrid
       Debug.Assert( groupLevelDescriptions != null );
 
       if( rootItem == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "rootItem is null." );
 
       foreach( object item in rootItem.Items )
       {
@@ -339,7 +334,7 @@ namespace Xceed.Wpf.DataGrid
       Debug.Assert( groupLevelDescription != null );
 
       if( rootItem == null )
-        throw new DataGridInternalException();
+        throw new DataGridInternalException( "rootItem is null." );
 
       foreach( object item in rootItem.Items )
       {
@@ -498,7 +493,7 @@ namespace Xceed.Wpf.DataGrid
     #region IDropTarget Members
 
 
-    bool IDropTarget.CanDropElement( UIElement draggedElement )
+    bool IDropTarget.CanDropElement( UIElement draggedElement, RelativePoint mousePosition )
     {
       bool canDrop = this.AllowGroupingModification;
 
@@ -564,7 +559,7 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
-    void IDropTarget.DragOver( UIElement draggedElement, Point mousePosition )
+    void IDropTarget.DragOver( UIElement draggedElement, RelativePoint mousePosition )
     {
       ColumnManagerCell cell = draggedElement as ColumnManagerCell;
 
@@ -620,7 +615,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    void IDropTarget.Drop( UIElement draggedElement )
+    void IDropTarget.Drop( UIElement draggedElement, RelativePoint mousePosition )
     {
       ColumnManagerCell cell = draggedElement as ColumnManagerCell;
 
@@ -651,18 +646,20 @@ namespace Xceed.Wpf.DataGrid
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    private void OnNotifyPropertyChanged( string propertyName )
+    private void OnPropertyChanged( string propertyName )
     {
-      if( this.PropertyChanged != null )
-        this.PropertyChanged( this, new PropertyChangedEventArgs( propertyName ) );
+      var handler = this.PropertyChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, new PropertyChangedEventArgs( propertyName ) );
     }
 
     internal void UpdateHasGroups()
     {
-      this.OnNotifyPropertyChanged( "HasGroups" );
+      this.OnPropertyChanged( "HasGroups" );
     }
 
     #endregion
-
   }
 }

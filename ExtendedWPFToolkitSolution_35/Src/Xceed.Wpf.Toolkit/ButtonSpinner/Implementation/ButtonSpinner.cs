@@ -21,6 +21,12 @@ using System.Windows.Markup;
 
 namespace Xceed.Wpf.Toolkit
 {
+  public enum Location
+  {
+    Left,
+    Right
+  }
+
   /// <summary>
   /// Represents a spinner control that includes two Buttons.
   /// </summary>
@@ -56,6 +62,23 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //AllowSpin
+
+    #region ButtonSpinnerLocation
+
+    public static readonly DependencyProperty ButtonSpinnerLocationProperty = DependencyProperty.Register( "ButtonSpinnerLocation", typeof( Location ), typeof( ButtonSpinner ), new UIPropertyMetadata( Location.Right ) );
+    public Location ButtonSpinnerLocation
+    {
+      get
+      {
+        return ( Location )GetValue( ButtonSpinnerLocationProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerLocationProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerLocation
 
     #region Content
 
@@ -174,6 +197,10 @@ namespace Xceed.Wpf.Toolkit
       DefaultStyleKeyProperty.OverrideMetadata( typeof( ButtonSpinner ), new FrameworkPropertyMetadata( typeof( ButtonSpinner ) ) );
     }
 
+    public ButtonSpinner()
+    {
+    }
+
     #endregion //Constructors
 
     #region Base Class Overrides
@@ -227,18 +254,30 @@ namespace Xceed.Wpf.Toolkit
           {
             if( this.AllowSpin )
             {
-              this.OnSpin( new SpinEventArgs( SpinDirection.Increase ) );
+              this.OnSpin( new SpinEventArgs( Spinner.SpinnerSpinEvent, SpinDirection.Increase ) );
+              e.Handled = true;
             }
-            e.Handled = true;
+
             break;
           }
         case Key.Down:
           {
             if( this.AllowSpin )
             {
-              this.OnSpin( new SpinEventArgs( SpinDirection.Decrease ) );
+              this.OnSpin( new SpinEventArgs( Spinner.SpinnerSpinEvent, SpinDirection.Decrease ) );
+              e.Handled = true;
             }
-            e.Handled = true;
+
+            break;
+          }
+          case Key.Enter:
+          {
+            //Do not Spin on enter Key when spinners have focus
+            if( ((this.IncreaseButton != null) && (this.IncreaseButton.IsFocused)) 
+              || (( this.DecreaseButton != null ) && this.DecreaseButton.IsFocused ))
+            {
+              e.Handled = true;
+            }
             break;
           }
       }
@@ -250,16 +289,12 @@ namespace Xceed.Wpf.Toolkit
 
       if( !e.Handled && this.AllowSpin )
       {
-        if( e.Delta < 0 )
+        if( e.Delta != 0 )
         {
-          this.OnSpin( new SpinEventArgs( SpinDirection.Decrease, true ) );
+          var spinnerEventArgs = new SpinEventArgs( Spinner.SpinnerSpinEvent, ( e.Delta < 0 ) ? SpinDirection.Decrease : SpinDirection.Increase, true );
+          this.OnSpin( spinnerEventArgs );
+          e.Handled = spinnerEventArgs.Handled;
         }
-        else if( 0 < e.Delta )
-        {
-          this.OnSpin( new SpinEventArgs( SpinDirection.Increase, true ) );
-        }
-
-        e.Handled = true;
       }
     }
 
@@ -272,6 +307,7 @@ namespace Xceed.Wpf.Toolkit
     {
       SetButtonUsage();
     }
+
 
     #endregion //Base Class Overrides
 
@@ -288,7 +324,7 @@ namespace Xceed.Wpf.Toolkit
       if( AllowSpin )
       {
         SpinDirection direction = sender == IncreaseButton ? SpinDirection.Increase : SpinDirection.Decrease;
-        OnSpin( new SpinEventArgs( direction ) );
+        OnSpin( new SpinEventArgs( Spinner.SpinnerSpinEvent, direction ) );
       }
     }
 

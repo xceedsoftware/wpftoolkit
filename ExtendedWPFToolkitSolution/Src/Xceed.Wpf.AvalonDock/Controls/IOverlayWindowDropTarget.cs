@@ -14,18 +14,20 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-    interface IOverlayWindowDropTarget
+  interface IOverlayWindowDropTarget
+  {
+    Rect ScreenDetectionArea
     {
-        Rect ScreenDetectionArea { get; }
-
-        OverlayWindowDropTargetType Type { get; }
+      get;
     }
+
+    OverlayWindowDropTargetType Type
+    {
+      get;
+    }
+  }
 }

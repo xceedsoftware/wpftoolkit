@@ -14,27 +14,30 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-    public class DockingManagerOverlayArea : OverlayArea
+  public class DockingManagerOverlayArea : OverlayArea
+  {
+    #region Members
+
+    private DockingManager _manager;
+
+    #endregion
+
+    #region Constructors
+
+    internal DockingManagerOverlayArea( IOverlayWindow overlayWindow, DockingManager manager )
+        : base( overlayWindow )
     {
-        internal DockingManagerOverlayArea(IOverlayWindow overlayWindow, DockingManager manager)
-            : base(overlayWindow)
-        {
-            _manager = manager;
+      _manager = manager;
 
-            base.SetScreenDetectionArea(new Rect(
-                _manager.PointToScreenDPI(new Point()),
-                _manager.TransformActualSizeToAncestor()));
-        }
-
-        DockingManager _manager;
-
+      base.SetScreenDetectionArea( new Rect(
+          _manager.PointToScreenDPI( new Point() ),
+          _manager.TransformActualSizeToAncestor() ) );
     }
+
+    #endregion
+  }
 }

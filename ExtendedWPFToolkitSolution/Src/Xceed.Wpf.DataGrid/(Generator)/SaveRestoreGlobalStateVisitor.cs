@@ -14,36 +14,34 @@
 
   ***********************************************************************************/
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Xceed.Wpf.DataGrid
 {
   internal class SaveRestoreGlobalStateVisitor : SaveRestoreStateVisitor
   {
-    #region CONSTRUCTORS
-
-    public SaveRestoreGlobalStateVisitor( bool stopAtFirstCollapsedGroup )
+    internal SaveRestoreGlobalStateVisitor( bool stopAtFirstCollapsedGroup )
     {
       m_stopAtFirstCollapsedGroup = stopAtFirstCollapsedGroup;
     }
 
-    #endregion CONSTRUCTORS
+    #region StopAtFirstCollapsedGroup Property
 
-    #region StopAtFirstCollapsedGroup PROPERTY
+    internal bool StopAtFirstCollapsedGroup
+    {
+      get
+      {
+        return m_stopAtFirstCollapsedGroup;
+      }
+      set
+      {
+        m_stopAtFirstCollapsedGroup = value;
+      }
+    }
 
     private bool m_stopAtFirstCollapsedGroup;
 
-    public bool StopAtFirstCollapsedGroup
-    {
-      get { return m_stopAtFirstCollapsedGroup; }
-      set { m_stopAtFirstCollapsedGroup = value; }
-    }
-
-    #endregion StopAtFirstCollapsedGroup PROPERTY
-
-    #region PROTECTED METHODS
+    #endregion
 
     protected override void InitializeCore()
     {
@@ -52,34 +50,27 @@ namespace Xceed.Wpf.DataGrid
 
     protected override void SaveStateCore( IDataGridContextVisitable dataGridContextVisitable )
     {
-      DataGridContext rootDataGridContext = SaveRestoreStateVisitor.GetDataGridContextFromVisitable( dataGridContextVisitable );
+      var dataGridContext = SaveRestoreStateVisitor.GetDataGridContextFromVisitable( dataGridContextVisitable );
 
-      this.RecursiveSaveDataGridContextsState( rootDataGridContext );
+      this.RecursiveSaveDataGridContextsState( dataGridContext );
     }
 
     protected override void RestoreStateCore( IDataGridContextVisitable dataGridContextVisitable )
     {
-      DataGridContext rootDataGridContext = SaveRestoreStateVisitor.GetDataGridContextFromVisitable( dataGridContextVisitable );
+      var dataGridContext = SaveRestoreStateVisitor.GetDataGridContextFromVisitable( dataGridContextVisitable );
 
-      this.RecursiveRestoreDataGridContextsState( rootDataGridContext );
+      this.RecursiveRestoreDataGridContextsState( dataGridContext );
     }
-
-    #endregion PROTECTED METHODS
-
-    #region PRIVATE METHODS
 
     private void RecursiveSaveDataGridContextsState( DataGridContext dataGridContext )
     {
-      SaveRestoreDataGridContextStateVisitor saveRestoreDataGridContextStateVisitor
-        = new SaveRestoreDataGridContextStateVisitor( true, int.MaxValue, m_stopAtFirstCollapsedGroup );
+      var saveRestoreDataGridContextStateVisitor = new SaveRestoreDataGridContextStateVisitor( true, int.MaxValue, m_stopAtFirstCollapsedGroup );
 
       saveRestoreDataGridContextStateVisitor.SaveState( dataGridContext as IDataGridContextVisitable );
 
       m_dataGridContextsStateDictionary.Add( new WeakDataGridContextKey( dataGridContext ), saveRestoreDataGridContextStateVisitor );
 
-      IEnumerable<DataGridContext> subDataGridContexts = dataGridContext.GetChildContexts();
-
-      foreach( DataGridContext subDataGridContext in subDataGridContexts )
+      foreach( var subDataGridContext in dataGridContext.GetChildContextsCore() )
       {
         this.RecursiveSaveDataGridContextsState( subDataGridContext );
       }
@@ -87,9 +78,8 @@ namespace Xceed.Wpf.DataGrid
 
     private void RecursiveRestoreDataGridContextsState( DataGridContext dataGridContext )
     {
-      WeakDataGridContextKey weakDataGridContextKey = new WeakDataGridContextKey( dataGridContext );
-
-      SaveRestoreDataGridContextStateVisitor saveRestoreDataGridContextStateVisitor;
+      var weakDataGridContextKey = new WeakDataGridContextKey( dataGridContext );
+      var saveRestoreDataGridContextStateVisitor = default( SaveRestoreDataGridContextStateVisitor );
 
       if( m_dataGridContextsStateDictionary.TryGetValue( weakDataGridContextKey, out saveRestoreDataGridContextStateVisitor ) )
       {
@@ -103,19 +93,12 @@ namespace Xceed.Wpf.DataGrid
         }
       }
 
-      IEnumerable<DataGridContext> subDataGridContexts = dataGridContext.GetChildContexts();
-      foreach( DataGridContext subDataGridContext in subDataGridContexts )
+      foreach( var subDataGridContext in dataGridContext.GetChildContextsCore() )
       {
         this.RecursiveRestoreDataGridContextsState( subDataGridContext );
       }
     }
 
-    #endregion PRIVATE METHODS
-
-    #region PRIVATE FIELDS
-
-    Dictionary<WeakDataGridContextKey, SaveRestoreDataGridContextStateVisitor> m_dataGridContextsStateDictionary;
-
-    #endregion PRIVATE FIELDS
+    private Dictionary<WeakDataGridContextKey, SaveRestoreDataGridContextStateVisitor> m_dataGridContextsStateDictionary;
   }
 }

@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2017 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -170,17 +170,31 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
     private void SetCSharpText( string viewName, string moduleName )
     {
       //now we need to append the file extension
-      string fileName = String.Format( "{0}.xaml", viewName );
-      string filePath = this.GetFilePath( moduleName, fileName );
-      this.XamlText = ReadFileText( filePath );
+      Uri uri = new Uri( string.Format( "/CodeFiles/{0}.xaml.txt", viewName ), UriKind.Relative );
+      try
+      {
+        var streamInfo = Application.GetResourceStream( uri );
+        using( StreamReader sr = new StreamReader( streamInfo.Stream ) )
+        {
+          this.XamlText = sr.ReadToEnd();
+        }
+      }
+      catch { }
     }
 
     private void SetXamlText( string viewName, string moduleName )
     {
       //now we need to append the file extension
-      string fileName = String.Format( "{0}.xaml.cs", viewName );
-      string filePath = this.GetFilePath( moduleName, fileName );
-      this.CSharpText = ReadFileText( filePath );
+      Uri uri = new Uri( string.Format( "/CodeFiles/{0}.xaml.cs.txt", viewName ), UriKind.Relative );
+      try
+      {
+        var streamInfo = Application.GetResourceStream( uri );
+        using( StreamReader sr = new StreamReader( streamInfo.Stream ) )
+        {
+          this.CSharpText = sr.ReadToEnd();
+        }
+      }
+      catch { }
     }
 
     private string GetFilePath( string moduleName, string fileName )

@@ -19,7 +19,7 @@ using Xceed.Wpf.Toolkit.Primitives;
 
 namespace Xceed.Wpf.Toolkit
 {
-  public class CheckListBox : Selector
+  public class CheckListBox : SelectAllSelector
   {
     #region Constructors
 
@@ -30,9 +30,13 @@ namespace Xceed.Wpf.Toolkit
 
     public CheckListBox()
     {
-
     }
 
     #endregion //Constructors
+
+    #region Base Class Override
+
+
+    #endregion
   }
 }

@@ -14,18 +14,15 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using Xceed.Utils.Wpf.DragDrop;
-using System.Diagnostics;
-using System.ComponentModel;
-using System.Collections.ObjectModel;
-using Xceed.Utils.Wpf;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Media;
+using Xceed.Utils.Wpf.DragDrop;
 using Xceed.Wpf.DataGrid.Views;
 
 namespace Xceed.Wpf.DataGrid
@@ -501,7 +498,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    internal void ShowFarDropMark( ColumnManagerCell cell, Point mousePosition )
+    internal void ShowFarDropMark( ColumnManagerCell cell, RelativePoint mousePosition )
     {
       Debug.Assert( cell != null );
       if( cell == null )
@@ -545,7 +542,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    internal void ShowFarDropMark( Point mousePosition )
+    internal void ShowFarDropMark( RelativePoint mousePosition )
     {
       int itemsCount = this.Items.Count;
       if( itemsCount < 1 )
@@ -580,11 +577,13 @@ namespace Xceed.Wpf.DataGrid
           AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer( this );
 
           if( adornerLayer != null )
+          {
             adornerLayer.Add( m_dropMarkAdorner );
-
+          }
         }
+
         // We Only want the drop mark to be displayed at the end of the HierarchicalGroupByControlNode
-        m_dropMarkAdorner.ForceAlignment( DropMarkAlignment.Far );
+        m_dropMarkAdorner.Alignment = DropMarkAlignment.Far;
       }
       else
       {
@@ -597,8 +596,10 @@ namespace Xceed.Wpf.DataGrid
         Debug.Assert( groupLevelDescription != null );
 
         // Show Far DropMark only if not already grouped
-        if( this.Items.Contains( groupLevelDescription ) == false )
+        if( !this.Items.Contains( groupLevelDescription ) )
+        {
           hierarchicalGroupByItem.ShowFarDropMark( mousePosition );
+        }
       }
     }
 
@@ -680,7 +681,7 @@ namespace Xceed.Wpf.DataGrid
 
     #region IDropTarget Members
 
-    bool IDropTarget.CanDropElement( UIElement draggedElement )
+    bool IDropTarget.CanDropElement( UIElement draggedElement, RelativePoint mousePosition )
     {
       ColumnManagerCell cell = null;
       HierarchicalGroupByItem hierarchicalGroupByItem = null;
@@ -761,7 +762,7 @@ namespace Xceed.Wpf.DataGrid
     {
     }
 
-    void IDropTarget.DragOver( UIElement draggedElement, Point mousePosition )
+    void IDropTarget.DragOver( UIElement draggedElement, RelativePoint mousePosition )
     {
       ColumnManagerCell cell = draggedElement as ColumnManagerCell;
 
@@ -788,7 +789,7 @@ namespace Xceed.Wpf.DataGrid
         HierarchicalGroupByControlNode draggedHierarchicalGroupByControlNode = HierarchicalGroupByItem.GetParentHierarchicalGroupByControlNode( hierarchicalGroupByItem );
 
         if( draggedHierarchicalGroupByControlNode == null )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "draggedHierarchicalGroupByControlNode is null." );
 
         if( draggedHierarchicalGroupByControlNode.GroupLevelDescriptions == this.GroupLevelDescriptions )
         {
@@ -840,7 +841,7 @@ namespace Xceed.Wpf.DataGrid
         HierarchicalGroupByControlNode draggedHierarchicalGroupByControlNode = HierarchicalGroupByItem.GetParentHierarchicalGroupByControlNode( hierarchicalGroupByItem );
 
         if( draggedHierarchicalGroupByControlNode == null )
-          throw new DataGridInternalException();
+          throw new DataGridInternalException( "draggedHierarchicalGroupByControlNode is null." );
 
         if( draggedHierarchicalGroupByControlNode.GroupLevelDescriptions == this.GroupLevelDescriptions )
         {
@@ -866,7 +867,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    void IDropTarget.Drop( UIElement draggedElement )
+    void IDropTarget.Drop( UIElement draggedElement, RelativePoint mousePosition )
     {
       ColumnManagerCell cell = draggedElement as ColumnManagerCell;
 

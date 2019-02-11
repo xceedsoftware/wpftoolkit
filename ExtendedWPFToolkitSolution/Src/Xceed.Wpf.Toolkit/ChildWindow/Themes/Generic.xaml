@@ -21,7 +21,7 @@
 
     <ResourceDictionary.MergedDictionaries>
        <ResourceDictionary Source="../../Themes/Generic/Common.xaml" />
-       <ResourceDictionary Source="../../Core/Themes/Generic/WindowControl.xaml" />
+       <ResourceDictionary Source="../../Primitives/Themes/Generic/WindowControl.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -67,7 +67,8 @@
                           Height="{TemplateBinding Height}">
 
                         <prim:WindowControl x:Name="PART_WindowControl" 
-                                            Caption="{TemplateBinding Caption}" 
+                                            Caption="{TemplateBinding Caption}"
+                                            CaptionFontSize="{TemplateBinding CaptionFontSize}"
                                             CaptionForeground="{TemplateBinding CaptionForeground}" 
                                             CaptionShadowBrush="{TemplateBinding CaptionShadowBrush}" 
                                             CaptionIcon="{TemplateBinding CaptionIcon}"
@@ -83,6 +84,7 @@
                                             CloseButtonStyle="{TemplateBinding CloseButtonStyle}" 
                                             WindowOpacity="{TemplateBinding WindowOpacity}" 
                                             Content="{TemplateBinding Content}"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}"
                                             WindowStyle="{TemplateBinding WindowStyle}"
                                             Width="{TemplateBinding Width}"
                                             Height="{TemplateBinding Height}">

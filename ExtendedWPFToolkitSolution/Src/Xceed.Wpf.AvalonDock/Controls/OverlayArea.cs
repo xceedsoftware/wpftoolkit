@@ -14,41 +14,47 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Controls;
 using System.Windows;
-using Xceed.Wpf.AvalonDock.Layout;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-    public abstract class OverlayArea : IOverlayWindowArea
+  public abstract class OverlayArea : IOverlayWindowArea
+  {
+    #region Members
+
+    private IOverlayWindow _overlayWindow;
+    private Rect? _screenDetectionArea;
+
+    #endregion
+
+    #region Constructors
+
+    internal OverlayArea( IOverlayWindow overlayWindow )
     {
-        internal OverlayArea(IOverlayWindow overlayWindow)
-        {
-            _overlayWindow = overlayWindow;
-        }
-
-        IOverlayWindow _overlayWindow;
-
-        Rect? _screenDetectionArea;
-        Rect IOverlayWindowArea.ScreenDetectionArea
-        {
-            get
-            {
-                return _screenDetectionArea.Value;
-            }
-        }
-
-        protected void SetScreenDetectionArea(Rect rect)
-        {
-            _screenDetectionArea = rect;
-        }
-
-
-
-
+      _overlayWindow = overlayWindow;
     }
+
+    #endregion
+
+    #region Internal Methods
+
+    protected void SetScreenDetectionArea( Rect rect )
+    {
+      _screenDetectionArea = rect;
+    }
+
+    #endregion
+
+    #region IOverlayWindowArea
+
+    Rect IOverlayWindowArea.ScreenDetectionArea
+    {
+      get
+      {
+        return _screenDetectionArea.Value;
+      }
+    }
+
+    #endregion
+  }
 }

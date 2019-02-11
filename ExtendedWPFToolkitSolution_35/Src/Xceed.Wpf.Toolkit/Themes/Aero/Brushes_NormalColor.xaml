@@ -19,9 +19,12 @@
                     xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes" >
 
-   <SolidColorBrush x:Key="{x:Static themes:ResourceKeys.ControlNormalBackgroundKey}" Color="#FFFFFF" options:Freeze="true" />
-   <SolidColorBrush x:Key="{x:Static themes:ResourceKeys.ControlDisabledBackgroundKey}" Color="#F4F4F4" options:Freeze="true" />
-   <LinearGradientBrush x:Key="{x:Static themes:ResourceKeys.ControlNormalBorderKey}" StartPoint="0.5,0" EndPoint="0.5,1" options:Freeze="true">
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ControlNormalBackgroundKey}" 
+                    Color="#FFFFFF" options:Freeze="true" />
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ControlDisabledBackgroundKey}" 
+                    Color="#F4F4F4" options:Freeze="true" />
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ControlNormalBorderKey}" 
+                        StartPoint="0.5,0" EndPoint="0.5,1" options:Freeze="true">
       <LinearGradientBrush.GradientStops>
          <GradientStopCollection>
             <GradientStop Color="#FFabadb3" Offset="0" />
@@ -31,7 +34,8 @@
          </GradientStopCollection>
       </LinearGradientBrush.GradientStops>
    </LinearGradientBrush>
-   <LinearGradientBrush x:Key="{x:Static themes:ResourceKeys.ControlMouseOverBorderKey}" StartPoint="0.5,0" EndPoint="0.5,1" options:Freeze="true">
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ControlMouseOverBorderKey}" 
+                        StartPoint="0.5,0" EndPoint="0.5,1" options:Freeze="true">
       <LinearGradientBrush.GradientStops>
          <GradientStopCollection>
             <GradientStop Color="#FF3d7bad" Offset="0" />
@@ -41,7 +45,8 @@
          </GradientStopCollection>
       </LinearGradientBrush.GradientStops>
    </LinearGradientBrush>
-   <LinearGradientBrush x:Key="{x:Static themes:ResourceKeys.ControlFocusedBorderKey}" StartPoint="0.5,0" EndPoint="0.5,1" options:Freeze="true">
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ControlFocusedBorderKey}" 
+                        StartPoint="0.5,0" EndPoint="0.5,1" options:Freeze="true">
       <LinearGradientBrush.GradientStops>
          <GradientStopCollection>
             <GradientStop Color="#FF3d7bad" Offset="0" />
@@ -52,30 +57,40 @@
       </LinearGradientBrush.GradientStops>
    </LinearGradientBrush>
 
-   <SolidColorBrush options:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonNormalOuterBorderKey}" Color="#FFABADB3" />
-   <LinearGradientBrush options:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonNormalInnerBorderKey}" StartPoint="0.5,0" EndPoint="0.5,1">
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonNormalOuterBorderKey}"
+                    options:Freeze="true"
+                    Color="#FFABADB3" />
+   <LinearGradientBrush options:Freeze="true"
+                        x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonNormalInnerBorderKey}" 
+                        StartPoint="0.5,0" EndPoint="0.5,1">
       <LinearGradientBrush.GradientStops>
          <GradientStopCollection>
             <GradientStop Offset="0" Color="#FFfcfcfc" />
-            <GradientStop Offset="0.69" Color="#FFf9f9f9" />
-            <GradientStop Offset="0.69" Color="#FFf3f3f3" />
+            <GradientStop Offset="0.5" Color="#FFf9f9f9" />
+            <GradientStop Offset="0.5" Color="#FFf3f3f3" />
             <GradientStop Offset="1" Color="#FFf3f3f3" />
          </GradientStopCollection>
       </LinearGradientBrush.GradientStops>
    </LinearGradientBrush>
-   <LinearGradientBrush options:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonNormalBackgroundKey}" StartPoint="0.5,0" EndPoint="0.5,1">
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonNormalBackgroundKey}"
+                        options:Freeze="true"
+                        StartPoint="0.5,0" EndPoint="0.5,1">
       <LinearGradientBrush.GradientStops>
          <GradientStopCollection>
             <GradientStop Offset="0" Color="#FFf2f2f2" />
-            <GradientStop Offset="0.69" Color="#FFe8e8e8" />
-            <GradientStop Offset="0.69" Color="#FFd1d1d1" />
+            <GradientStop Offset="0.5" Color="#FFe8e8e8" />
+            <GradientStop Offset="0.5" Color="#FFd1d1d1" />
             <GradientStop Offset="1" Color="#FFd1d1d1" />
          </GradientStopCollection>
       </LinearGradientBrush.GradientStops>
    </LinearGradientBrush>
 
-   <SolidColorBrush options:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonMouseOverOuterBorderKey}" Color="#FF3C7FB1" />
-   <LinearGradientBrush options:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonMouseOverInnerBorderKey}" StartPoint="0.5,0" EndPoint="0.5,1">
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonMouseOverOuterBorderKey}"
+                    options:Freeze="true"
+                    Color="#FF3C7FB1" />
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonMouseOverInnerBorderKey}"
+                        options:Freeze="true"
+                        StartPoint="0.5,0" EndPoint="0.5,1">
       <LinearGradientBrush.GradientStops>
          <GradientStopCollection>
             <GradientStop Color="#FFfafdfe" Offset="0" />
@@ -85,7 +100,9 @@
          </GradientStopCollection>
       </LinearGradientBrush.GradientStops>
    </LinearGradientBrush>
-   <LinearGradientBrush options:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonMouseOverBackgroundKey}" StartPoint="0.5,0" EndPoint="0.5,1">
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonMouseOverBackgroundKey}"
+                        options:Freeze="true"
+                        StartPoint="0.5,0" EndPoint="0.5,1">
       <LinearGradientBrush.GradientStops>
          <GradientStopCollection>
             <GradientStop Color="#FFeaf6fd" Offset="0" />
@@ -96,8 +113,12 @@
       </LinearGradientBrush.GradientStops>
    </LinearGradientBrush>
 
-   <SolidColorBrush options:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonPressedOuterBorderKey}" Color="#FF2C628B" />
-   <LinearGradientBrush options:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonPressedInnerBorderKey}" StartPoint="0.5,0" EndPoint="0.5,1">
+   <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonPressedOuterBorderKey}"
+                    options:Freeze="true"
+                    Color="#FF2C628B" />
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonPressedInnerBorderKey}"
+                        options:Freeze="true"
+                        StartPoint="0.5,0" EndPoint="0.5,1">
       <LinearGradientBrush.GradientStops>
          <GradientStopCollection>
             <GradientStop Color="#FF9eb0ba" Offset="0" />
@@ -108,7 +129,9 @@
          </GradientStopCollection>
       </LinearGradientBrush.GradientStops>
    </LinearGradientBrush>
-   <LinearGradientBrush options:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonPressedBackgroundKey}" StartPoint="0.5,0" EndPoint="0.5,1">
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonPressedBackgroundKey}"
+                        options:Freeze="true"
+                        StartPoint="0.5,0" EndPoint="0.5,1">
       <LinearGradientBrush.GradientStops>
          <GradientStopCollection>
             <GradientStop Color="#FFe5f4fc" Offset="0" />
@@ -119,7 +142,9 @@
       </LinearGradientBrush.GradientStops>
    </LinearGradientBrush>
 
-   <LinearGradientBrush options:Freeze="true" x:Key="{x:Static themes:ResourceKeys.ButtonFocusedOuterBorderKey}" StartPoint="0.5,0" EndPoint="0.5,1">
+   <LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonFocusedOuterBorderKey}" 
+                        options:Freeze="true"
+                        StartPoint="0.5,0" EndPoint="0.5,1">
       <LinearGradientBrush.GradientStops>
          <GradientStopCollection>
             <GradientStop Color="#FF3d7bad" Offset="0" />

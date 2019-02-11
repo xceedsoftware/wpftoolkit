@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="b0a68de0-12d0-4ced-9f46-c2365c0aa657" xmlns="urn:schemas-microsoft-com:xml-dataservicemap">
+  <MetadataSources>
+    <MetadataSource Address="http://demo.xceed.com/DataGrid_Silverlight/Demo_2.0/Demo_2.0.1/NorthwindDataService.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="service.edmx" MetadataType="Edmx" ID="2a12012c-5b3b-46f5-ad05-ea33d3a138a6" SourceId="1" SourceUrl="http://demo.xceed.com/DataGrid_Silverlight/Demo_2.0/Demo_2.0.1/NorthwindDataService.svc" />
+  </Metadata>
+  <Extensions />
+  <Parameters>
+    <Parameter Name="UseDataServiceCollection" Value="true" />
+    <Parameter Name="Version" Value="2.0" />
+  </Parameters>
+</ReferenceGroup>

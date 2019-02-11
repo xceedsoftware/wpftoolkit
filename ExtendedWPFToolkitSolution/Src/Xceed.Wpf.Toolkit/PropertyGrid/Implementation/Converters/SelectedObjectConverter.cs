@@ -28,7 +28,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
 {
   public class SelectedObjectConverter : IValueConverter
   {
-    private const string ValidParameterMessage = @"parameter must be one of the following strings: 'Type', 'TypeName'";
+    private const string ValidParameterMessage = @"parameter must be one of the following strings: 'Type', 'TypeName', 'SelectedObjectName'";
     #region IValueConverter Members
 
     public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
@@ -46,6 +46,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
       else if( this.CompareParam( parameter, "TypeName" ) )
       {
         return this.ConvertToTypeName( value, culture );
+      }
+      else if( this.CompareParam( parameter, "SelectedObjectName" ) )
+      {
+        return this.ConvertToSelectedObjectName( value, culture );
       }
       else
       {
@@ -72,11 +76,34 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
 
       Type newType = value.GetType();
 
+      //ICustomTypeProvider is only available in .net 4.5 and over. Use reflection so the .net 4.0 and .net 3.5 still works.
+      if( newType.GetInterface( "ICustomTypeProvider", true ) != null )
+      {
+        var methodInfo = newType.GetMethod( "GetCustomType" );
+        newType = methodInfo.Invoke( value, null ) as Type;
+      }
+
       DisplayNameAttribute displayNameAttribute = newType.GetCustomAttributes( false ).OfType<DisplayNameAttribute>().FirstOrDefault();
 
       return (displayNameAttribute == null)
         ? newType.Name 
         : displayNameAttribute.DisplayName;
+    }
+
+    private object ConvertToSelectedObjectName( object value, CultureInfo culture )
+    {
+      if( value == null )
+        return String.Empty;
+
+      Type newType = value.GetType();
+      PropertyInfo[] properties = newType.GetProperties();
+      foreach( PropertyInfo property in properties )
+      {
+        if( property.Name == "Name" )
+          return property.GetValue( value, null );
+      }
+
+      return String.Empty;
     }
 
     public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )

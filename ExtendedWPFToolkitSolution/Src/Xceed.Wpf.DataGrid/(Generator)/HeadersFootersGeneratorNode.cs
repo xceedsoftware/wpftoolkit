@@ -86,7 +86,7 @@ namespace Xceed.Wpf.DataGrid
       for( int i = 0; i < this.Items.Count; i++ )
       {
         //determine if the DataTemplate for the node is a GroupHeaderFooterTemplate 
-        groupHeaderTemplate = this.Items[ i ] as GroupHeaderFooterItemTemplate; 
+        groupHeaderTemplate = this.Items[ i ] as GroupHeaderFooterItemTemplate;
 
         //if the Node represent a GroupHeader of GroupFooter and the template is a GroupHeaderFooterTemplate which
         //is VisibleWhenCollapsed
@@ -180,36 +180,35 @@ namespace Xceed.Wpf.DataGrid
 
     public override object GetAt( int index )
     {
-      object retval = null;
-      GroupGeneratorNode parentGroup = this.Parent as GroupGeneratorNode;
-      if( ( parentGroup != null ) && ( parentGroup.IsExpanded == false ) )
+      var parentGroup = this.Parent as GroupGeneratorNode;
+      object item;
+
+      if( ( parentGroup != null ) && !parentGroup.IsExpanded )
       {
-        retval = this.ComputeCollapsedGetAt( index );
+        item = this.ComputeCollapsedGetAt( index );
       }
       else
       {
-        retval = base.GetAt( index );
+        item = base.GetAt( index );
       }
 
-      if( parentGroup != null )
-      {
-        retval = new GroupHeaderFooterItem( parentGroup.CollectionViewGroup, retval );
-      }
+      if( ( parentGroup != null ) && ( item != null ) )
+        return new GroupHeaderFooterItem( parentGroup.CollectionViewGroup, item );
 
-      return retval;
+      return item;
     }
 
     #region ImmediateUIGroups
 
     internal ReadOnlyCollection<Group> GetImmediateUIGroups( int generatorCurrentGeneration )
     {
-      if( ( m_cachedGeneratorCurrentGeneration != generatorCurrentGeneration ) 
+      if( ( m_cachedGeneratorCurrentGeneration != generatorCurrentGeneration )
         || ( m_readOnlyImmediateUIGroups == null ) )
       {
         Debug.WriteLineIf( ( ( m_cachedGeneratorCurrentGeneration != generatorCurrentGeneration ) && ( m_readOnlyImmediateUIGroups == null ) ),
           "Creating Groups collection since generator version differs AND ReadOnlyCollection is null." );
 
-        Debug.WriteLineIf( ( ( m_cachedGeneratorCurrentGeneration != generatorCurrentGeneration ) && ( m_readOnlyImmediateUIGroups != null ) ), 
+        Debug.WriteLineIf( ( ( m_cachedGeneratorCurrentGeneration != generatorCurrentGeneration ) && ( m_readOnlyImmediateUIGroups != null ) ),
           "Creating Groups collection since generator version differs." );
 
         Debug.WriteLineIf( ( ( m_cachedGeneratorCurrentGeneration == generatorCurrentGeneration ) && ( m_readOnlyImmediateUIGroups == null ) ),

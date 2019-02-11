@@ -17,22 +17,41 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Collections.ObjectModel;
-using System.Windows.Data;
-using System.Windows.Controls.Primitives;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using Xceed.Wpf.DataGrid.Automation;
-using System.Windows.Automation.Peers;
-using System.Windows.Automation;
+using System.Windows.Data;
+using Xceed.Wpf.DataGrid.Utils;
 
 namespace Xceed.Wpf.DataGrid
 {
-  public class Group : INotifyPropertyChanged
+  public sealed class Group : IGroupLevelDescription, INotifyPropertyChanged, IWeakEventListener
   {
-    internal Group( GroupGeneratorNode node, CollectionViewGroup group, IList<GroupLevelDescription> groupLevelDescriptions, DataGridContext dataGridContext )
+    #region Static Fields
+
+    internal static readonly string IsExpandedPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.IsExpanded );
+    internal static readonly string ItemCountPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ItemCount );
+    internal static readonly string GroupByPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.GroupBy );
+    internal static readonly string TitlePropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.Title );
+    internal static readonly string TitleTemplatePropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.TitleTemplate );
+    internal static readonly string TitleTemplateSelectorPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.TitleTemplateSelector );
+    internal static readonly string ValueTemplatePropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ValueTemplate );
+    internal static readonly string ValueTemplateSelectorPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ValueTemplateSelector );
+    internal static readonly string ValueStringFormatPropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ValueStringFormat );
+    internal static readonly string ValueStringFormatCulturePropertyName = PropertyHelper.GetPropertyName( ( Group g ) => g.ValueStringFormatCulture );
+
+    #endregion
+
+    internal Group(
+      GroupGeneratorNode node,
+      CollectionViewGroup group,
+      LateGroupLevelDescription groupLevelDescription,
+      DataGridContext dataGridContext )
     {
       if( node == null )
         throw new ArgumentNullException( "node" );
@@ -40,27 +59,18 @@ namespace Xceed.Wpf.DataGrid
       if( group == null )
         throw new ArgumentNullException( "group" );
 
-      if( groupLevelDescriptions == null )
-        throw new ArgumentNullException( "groupLevelDescriptions" );
+      if( groupLevelDescription == null )
+        throw new ArgumentNullException( "groupLevelDescription" );
 
       if( dataGridContext == null )
         throw new ArgumentNullException( "dataGridContext" );
 
-      m_generatorNode = node;
       m_collectionViewGroup = group;
-      m_groupDescriptionsCollection = groupLevelDescriptions;
-      m_dataGridContext = dataGridContext;
 
-      //In case no late bingding is to happen, and if we already have everything to get the groupLevelDescription immediately, let's do!
-      int level = m_generatorNode.Level;
-      if( m_groupDescriptionsCollection.Count > level )
-      {
-        m_groupLevelDescription = m_groupDescriptionsCollection[ level ];
-      }
-      m_lateGroupLevelDescriptionBindingPerformed = false;
-
-      m_generatorNode.TotalLeafCountChanged += OnTotalItemCountChanged;
-      m_generatorNode.IsExpandedChanged += OnIsExpandedChanged;
+      // Initialization is done through setters to register for events.
+      this.DataGridContext = dataGridContext;
+      this.GeneratorNode = node;
+      this.GroupLevelDescription = groupLevelDescription;
     }
 
     #region IsExpanded Property
@@ -76,8 +86,10 @@ namespace Xceed.Wpf.DataGrid
       }
       set
       {
-        if( m_generatorNode != null )
-          m_generatorNode.IsExpanded = value;
+        if( m_generatorNode == null )
+          return;
+
+        m_generatorNode.IsExpanded = value;
       }
     }
 
@@ -92,7 +104,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion IsExpanded Property
+    #endregion
 
     #region Level Property
 
@@ -107,7 +119,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion Level Property
+    #endregion
 
     #region ItemCount Property
 
@@ -122,7 +134,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion ItemCount Property
+    #endregion
 
     #region ParentGroups Property
 
@@ -130,30 +142,26 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        List<Group> list = new List<Group>();
+        if( m_generatorNode == null )
+          return ( new List<Group>( 0 ) ).AsReadOnly();
 
-        if( m_generatorNode != null )
+        var list = new List<Group>();
+        var nodeHelper = new GeneratorNodeHelper( m_generatorNode, 0, 0 ); //index is not important
+
+        while( nodeHelper.MoveToParent() )
         {
-          GeneratorNodeHelper nodeHelper = new GeneratorNodeHelper( m_generatorNode, 0, 0 ); //index is not important
+          GroupGeneratorNode parentGroup = nodeHelper.CurrentNode as GroupGeneratorNode;
+          if( parentGroup == null )
+            break;
 
-          while( nodeHelper.MoveToParent() )
-          {
-            GroupGeneratorNode parentGroup = nodeHelper.CurrentNode as GroupGeneratorNode;
-            if( parentGroup != null )
-            {
-              list.Insert( 0, parentGroup.UIGroup );
-            }
-            else
-            {
-              break;
-            }
-          }
+          list.Insert( 0, parentGroup.UIGroup );
         }
+
         return list.AsReadOnly();
       }
     }
 
-    #endregion ParentGroups Property
+    #endregion
 
     #region SiblingGroups Property
 
@@ -164,18 +172,16 @@ namespace Xceed.Wpf.DataGrid
         if( m_generatorNode == null )
           return null;
 
-        HeadersFootersGeneratorNode headersFootersGeneratorNode = HeadersFootersGeneratorNode.GetSameLevelFirstHeaderNode( m_generatorNode );
-
+        var headersFootersGeneratorNode = HeadersFootersGeneratorNode.GetSameLevelFirstHeaderNode( m_generatorNode );
         if( headersFootersGeneratorNode == null )
           return null;
 
-        int currentGeneratorContentGeneration = this.DataGridContext.CustomItemContainerGenerator.CurrentGeneratorContentGeneration;
-
+        var currentGeneratorContentGeneration = this.DataGridContext.CustomItemContainerGenerator.CurrentGeneratorContentGeneration;
         return headersFootersGeneratorNode.GetImmediateUIGroups( currentGeneratorContentGeneration );
       }
     }
 
-    #endregion SiblingGroups
+    #endregion
 
     #region Value Property
 
@@ -190,7 +196,39 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion Value Property
+    #endregion
+
+    #region ValueStringFormat Property
+
+    public string ValueStringFormat
+    {
+      get
+      {
+        var description = this.GroupLevelDescription;
+        if( description != null )
+          return description.ValueStringFormat;
+
+        return null;
+      }
+    }
+
+    #endregion
+
+    #region ValueStringFormatCulture Property
+
+    public CultureInfo ValueStringFormatCulture
+    {
+      get
+      {
+        var description = this.GroupLevelDescription;
+        if( description != null )
+          return description.ValueStringFormatCulture;
+
+        return null;
+      }
+    }
+
+    #endregion
 
     #region ValueTemplate Property
 
@@ -198,18 +236,15 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        this.PerformLateGroupLevelDescriptionBinding();
-
-        if( m_groupLevelDescription != null )
-        {
-          return m_groupLevelDescription.ValueTemplate;
-        }
+        var description = this.GroupLevelDescription;
+        if( description != null )
+          return description.ValueTemplate;
 
         return null;
       }
     }
 
-    #endregion ValueTemplate Property
+    #endregion
 
     #region ValueTemplateSelector Property
 
@@ -217,18 +252,15 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        this.PerformLateGroupLevelDescriptionBinding();
-
-        if( m_groupLevelDescription != null )
-        {
-          return m_groupLevelDescription.ValueTemplateSelector;
-        }
+        var description = this.GroupLevelDescription;
+        if( description != null )
+          return description.ValueTemplateSelector;
 
         return null;
       }
     }
 
-    #endregion ValueTemplateSelector Property
+    #endregion
 
     #region IsBottomLevel Property
 
@@ -243,7 +275,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion IsBottomLevel Property
+    #endregion
 
     #region Items Property [Obsoleted]
 
@@ -261,7 +293,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion Items Property [Obsoleted]
+    #endregion
 
     #region Title Property
 
@@ -269,18 +301,15 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        this.PerformLateGroupLevelDescriptionBinding();
-
-        if( m_groupLevelDescription != null )
-        {
-          return m_groupLevelDescription.Title;
-        }
+        var description = this.GroupLevelDescription;
+        if( description != null )
+          return description.Title;
 
         return null;
       }
     }
 
-    #endregion Title Property
+    #endregion
 
     #region TitleTemplate Property
 
@@ -288,18 +317,15 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        this.PerformLateGroupLevelDescriptionBinding();
-
-        if( m_groupLevelDescription != null )
-        {
-          return m_groupLevelDescription.TitleTemplate;
-        }
+        var description = this.GroupLevelDescription;
+        if( description != null )
+          return description.TitleTemplate;
 
         return null;
       }
     }
 
-    #endregion TitleTemplate Property
+    #endregion
 
     #region TitleTemplateSelector Property
 
@@ -307,18 +333,15 @@ namespace Xceed.Wpf.DataGrid
     {
       get
       {
-        this.PerformLateGroupLevelDescriptionBinding();
-
-        if( m_groupLevelDescription != null )
-        {
-          return m_groupLevelDescription.TitleTemplateSelector;
-        }
+        var description = this.GroupLevelDescription;
+        if( description != null )
+          return description.TitleTemplateSelector;
 
         return null;
       }
     }
 
-    #endregion TitleTemplateSelector Property
+    #endregion
 
     #region StatContext Property
 
@@ -330,7 +353,7 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion StatContext Property
+    #endregion
 
     #region GroupConfiguration Property
 
@@ -345,9 +368,9 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    #endregion GroupConfiguration Property
+    #endregion
 
-    #region GeneratorNode Property
+    #region GeneratorNode Internal Property
 
     internal GroupGeneratorNode GeneratorNode
     {
@@ -355,30 +378,48 @@ namespace Xceed.Wpf.DataGrid
       {
         return m_generatorNode;
       }
+      private set
+      {
+        if( value == m_generatorNode )
+          return;
+
+        if( m_generatorNode != null )
+        {
+          this.UnregisterItemCountEvent( m_generatorNode );
+          this.UnregisterIsExpandedEvent( m_generatorNode );
+        }
+
+        m_generatorNode = value;
+
+        if( m_generatorNode != null )
+        {
+          this.RegisterItemCountEvent( m_generatorNode, false );
+          this.RegisterIsExpandedEvent( m_generatorNode, false );
+        }
+      }
     }
 
-    #endregion GeneratorNode Property
+    private GroupGeneratorNode m_generatorNode; // = null
 
-    #region GroupBy Property
+    #endregion
+
+    #region GroupBy Internal Property
 
     internal string GroupBy
     {
       get
       {
-        this.PerformLateGroupLevelDescriptionBinding();
+        var description = this.GroupLevelDescription;
+        if( description != null )
+          return description.FieldName;
 
-        if( m_groupLevelDescription == null )
-        {
-          return string.Empty;
-        }
-
-        return m_groupLevelDescription.FieldName;
+        return string.Empty;
       }
     }
 
-    #endregion GroupBy Property
+    #endregion
 
-    #region DataGridContext Property
+    #region DataGridContext Internal Property
 
     internal DataGridContext DataGridContext
     {
@@ -386,29 +427,17 @@ namespace Xceed.Wpf.DataGrid
       {
         return m_dataGridContext;
       }
-    }
-
-    #endregion DataGridContext Property
-
-    internal DataGridGroupAutomationPeer CreateAutomationPeer()
-    {
-      return new DataGridGroupAutomationPeer( this );
-    }
-
-    internal void ClearGroup()
-    {
-      m_generatorNode.TotalLeafCountChanged -= OnTotalItemCountChanged;
-      m_generatorNode.IsExpandedChanged -= OnIsExpandedChanged;
-
-      if( m_groupLevelDescription != null )
+      private set
       {
-        m_groupLevelDescription.PropertyChanged -= GroupLevelDescriptionChangedHandler;
+        m_dataGridContext = value;
       }
-
-      m_groupLevelDescription = null;
-      m_generatorNode = null;
-      m_collectionViewGroup = null;
     }
+
+    private DataGridContext m_dataGridContext;
+
+    #endregion
+
+    #region CollectionViewGroup Internal Property
 
     internal CollectionViewGroup CollectionViewGroup
     {
@@ -418,118 +447,271 @@ namespace Xceed.Wpf.DataGrid
       }
     }
 
-    private void GroupLevelDescriptionChangedHandler( object sender, PropertyChangedEventArgs e )
+    private CollectionViewGroup m_collectionViewGroup;
+
+    #endregion
+
+    #region GroupDescription Private Property
+
+    private GroupDescription GroupDescription
     {
-      // Simply relay this property changed to this Group instance.
-      this.NotifyPropertyChanged( e );
+      get
+      {
+        return m_groupDescription;
+      }
     }
 
-    private void OnTotalItemCountChanged( object sender, EventArgs e )
+    private GroupDescription m_groupDescription;
+
+    #endregion
+
+    #region GroupLevelDescription Private Property
+
+    private LateGroupLevelDescription GroupLevelDescription
     {
-      this.NotifyPropertyChanged( "ItemCount" );
+      get
+      {
+        return m_groupLevelDescription;
+      }
+      set
+      {
+        if( value == m_groupLevelDescription )
+          return;
+
+        if( m_groupLevelDescription != null )
+        {
+          this.UnregisterGroupLevelDescriptionEvent( m_groupLevelDescription );
+        }
+
+        m_groupLevelDescription = value;
+
+        if( m_groupLevelDescription != null )
+        {
+          this.RegisterGroupLevelDescriptionEvent( m_groupLevelDescription, false );
+        }
+
+        this.OnGroupLevelDescriptionPropertyChanged();
+      }
+    }
+
+    private LateGroupLevelDescription m_groupLevelDescription;
+
+    #endregion
+
+    #region SyncRoot Private Property
+
+    private object SyncRoot
+    {
+      get
+      {
+        if( m_syncRoot == null )
+        {
+          Interlocked.CompareExchange( ref m_syncRoot, new object(), null );
+        }
+
+        return m_syncRoot;
+      }
+    }
+
+    private object m_syncRoot;
+
+    #endregion
+
+    #region ItemCount Event Handling
+
+    private void RegisterItemCountEvent( GroupGeneratorNode item, bool force )
+    {
+      if( item == null )
+        return;
+
+      lock( this.SyncRoot )
+      {
+        if( !force && ( m_propertyChanged == null ) )
+          return;
+
+        item.TotalLeafCountChanged += new EventHandler( this.OnItemCountChanged );
+      }
+    }
+
+    private void UnregisterItemCountEvent( GroupGeneratorNode item )
+    {
+      if( item == null )
+        return;
+
+      item.TotalLeafCountChanged -= new EventHandler( this.OnItemCountChanged );
+    }
+
+    private void OnItemCountChanged( object sender, EventArgs e )
+    {
+      this.OnPropertyChanged( Group.ItemCountPropertyName );
+    }
+
+    #endregion
+
+    #region IsExpanded Event Handling
+
+    private void RegisterIsExpandedEvent( GroupGeneratorNode item, bool force )
+    {
+      if( item == null )
+        return;
+
+      lock( this.SyncRoot )
+      {
+        if( !force && ( m_propertyChanged == null ) )
+          return;
+
+        item.IsExpandedChanged += new EventHandler( this.OnIsExpandedChanged );
+      }
+    }
+
+    private void UnregisterIsExpandedEvent( GroupGeneratorNode item )
+    {
+      if( item == null )
+        return;
+
+      item.IsExpandedChanged -= new EventHandler( this.OnIsExpandedChanged );
     }
 
     private void OnIsExpandedChanged( object sender, EventArgs e )
     {
-      this.NotifyPropertyChanged( "IsExpanded" );
-
-      if( AutomationPeer.ListenerExists( AutomationEvents.PropertyChanged ) )
-      {
-        DataGridGroupAutomationPeer groupAutomationPeer = this.CreateAutomationPeer();
-
-        ExpandCollapseState oldExpandCollapseState;
-        ExpandCollapseState newExpandCollapseState;
-
-        if( this.IsExpanded )
-        {
-          oldExpandCollapseState = ExpandCollapseState.Collapsed;
-          newExpandCollapseState = ExpandCollapseState.Expanded;
-        }
-        else
-        {
-          oldExpandCollapseState = ExpandCollapseState.Expanded;
-          newExpandCollapseState = ExpandCollapseState.Collapsed;
-        }
-
-        groupAutomationPeer.RaisePropertyChangedEvent(
-          ExpandCollapsePatternIdentifiers.ExpandCollapseStateProperty,
-          oldExpandCollapseState, newExpandCollapseState );
-      }
+      this.OnPropertyChanged( Group.IsExpandedPropertyName );
     }
 
-    private void PerformLateGroupLevelDescriptionBinding()
-    {
-      int level = this.Level;
+    #endregion
 
-      if( m_lateGroupLevelDescriptionBindingPerformed && this.ValidateGroupLevelDescription( level ) )
+    #region GroupLevelDescription Event Handling
+
+    private void RegisterGroupLevelDescriptionEvent( LateGroupLevelDescription item, bool force )
+    {
+      if( item == null )
         return;
 
-      m_lateGroupLevelDescriptionBindingPerformed = true;
-
-
-      if( m_groupDescriptionsCollection.Count > level )
+      lock( this.SyncRoot )
       {
-        m_groupLevelDescription = m_groupDescriptionsCollection[ level ];
-      }
+        if( !force && ( m_propertyChanged == null ) )
+          return;
 
-      if( m_groupLevelDescription != null )
-      {
-        m_groupLevelDescription.PropertyChanged += new PropertyChangedEventHandler( GroupLevelDescriptionChangedHandler );
-
-        this.NotifyPropertyChanged( "Title" );
-        this.NotifyPropertyChanged( "TitleTemplate" );
-        this.NotifyPropertyChanged( "TitleTemplateSelector" );
-        this.NotifyPropertyChanged( "ValueTemplate" );
-        this.NotifyPropertyChanged( "ValueTemplateSelector" );
+        item.PropertyChanged += new PropertyChangedEventHandler( this.OnGroupLevelDescriptionChanged );
       }
     }
 
-    private bool ValidateGroupLevelDescription( int level )
+    private void UnregisterGroupLevelDescriptionEvent( LateGroupLevelDescription item )
     {
-      //Returns false if the m_groupLevelDescription has changed since it was first initialized, and will be updated in the calling method.
-      if( m_groupDescriptionsCollection.Count > level )
-      {
-        return ( m_groupLevelDescription == m_groupDescriptionsCollection[ level ] );
-      }
+      if( item == null )
+        return;
 
-      //If there is no GroupDescription corresponding to the level this group is at, then lets make sure we do not leak on the old GroupDescription
-      if( m_groupLevelDescription != null )
-      {
-        m_groupLevelDescription.PropertyChanged -= new PropertyChangedEventHandler( GroupLevelDescriptionChangedHandler );
-        m_groupLevelDescription = null;
-      }
-
-      //Return true because there is nothing else to do anyway.
-      return true;
+      item.PropertyChanged -= new PropertyChangedEventHandler( this.OnGroupLevelDescriptionChanged );
     }
+
+    private void OnGroupLevelDescriptionChanged( object sender, PropertyChangedEventArgs e )
+    {
+      if( string.IsNullOrEmpty( e.PropertyName ) )
+      {
+        this.OnGroupLevelDescriptionPropertyChanged();
+      }
+      else
+      {
+        // Simply relay this property changed to this Group instance.
+        this.OnPropertyChanged( e.PropertyName );
+      }
+    }
+
+    private void OnGroupLevelDescriptionPropertyChanged()
+    {
+      this.OnPropertyChanged( Group.GroupByPropertyName );
+      this.OnPropertyChanged( Group.TitlePropertyName );
+      this.OnPropertyChanged( Group.TitleTemplatePropertyName );
+      this.OnPropertyChanged( Group.TitleTemplateSelectorPropertyName );
+      this.OnPropertyChanged( Group.ValueTemplatePropertyName );
+      this.OnPropertyChanged( Group.ValueTemplateSelectorPropertyName );
+      this.OnPropertyChanged( Group.ValueStringFormatPropertyName );
+      this.OnPropertyChanged( Group.ValueStringFormatCulturePropertyName );
+    }
+
+    #endregion
+
+    internal void ClearGroup()
+    {
+      m_groupDescription = null;
+      m_collectionViewGroup = null;
+      m_propertyChanged = null;
+
+      this.DataGridContext = null;
+      this.GeneratorNode = null;
+      this.GroupLevelDescription = null;
+    }
+
+    #region IGroupLevelDescription Members
+
+    string IGroupLevelDescription.FieldName
+    {
+      get
+      {
+        return this.GroupBy;
+      }
+    }
+
+    #endregion
 
     #region INotifyPropertyChanged Members
 
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void NotifyPropertyChanged( String propertyName )
+    public event PropertyChangedEventHandler PropertyChanged
     {
-      if( this.PropertyChanged != null )
+      add
       {
-        this.PropertyChanged( this, new PropertyChangedEventArgs( propertyName ) );
+        lock( this.SyncRoot )
+        {
+          if( m_propertyChanged == null )
+          {
+            this.RegisterItemCountEvent( this.GeneratorNode, true );
+            this.RegisterIsExpandedEvent( this.GeneratorNode, true );
+            this.RegisterGroupLevelDescriptionEvent( this.GroupLevelDescription, true );
+          }
+
+          m_propertyChanged += value;
+        }
+      }
+      remove
+      {
+        lock( this.SyncRoot )
+        {
+          m_propertyChanged -= value;
+
+          if( m_propertyChanged == null )
+          {
+            this.UnregisterItemCountEvent( this.GeneratorNode );
+            this.UnregisterIsExpandedEvent( this.GeneratorNode );
+            this.UnregisterGroupLevelDescriptionEvent( this.GroupLevelDescription );
+          }
+        }
       }
     }
 
-    private void NotifyPropertyChanged( PropertyChangedEventArgs e )
+    private PropertyChangedEventHandler m_propertyChanged;
+
+    private void OnPropertyChanged( string propertyName )
     {
-      if( this.PropertyChanged != null )
-      {
-        this.PropertyChanged( this, e );
-      }
+      var handler = m_propertyChanged;
+      if( handler == null )
+        return;
+
+      handler.Invoke( this, new PropertyChangedEventArgs( propertyName ) );
     }
 
-    #endregion INotifyPropertyChanged Members
+    #endregion
 
-    private GroupLevelDescription m_groupLevelDescription; // = null
-    private GroupGeneratorNode m_generatorNode; // = null
-    private CollectionViewGroup m_collectionViewGroup; // = null
-    private IList<GroupLevelDescription> m_groupDescriptionsCollection; // = null
-    private DataGridContext m_dataGridContext;
-    private bool m_lateGroupLevelDescriptionBindingPerformed;
+    #region IWeakEventListener Members
+
+    bool IWeakEventListener.ReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      return this.OnReceiveWeakEvent( managerType, sender, e );
+    }
+
+    private bool OnReceiveWeakEvent( Type managerType, object sender, EventArgs e )
+    {
+      return false;
+    }
+
+    #endregion
   }
 }

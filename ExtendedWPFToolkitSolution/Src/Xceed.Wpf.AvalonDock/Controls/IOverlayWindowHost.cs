@@ -14,24 +14,32 @@
 
   ***********************************************************************************/
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-    internal interface IOverlayWindowHost
+  internal interface IOverlayWindowHost
+  {
+    #region Properties
+
+    DockingManager Manager
     {
-        bool HitTest(Point dragPoint);
-
-        IOverlayWindow ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow);
-
-        void HideOverlayWindow();
-
-        IEnumerable<IDropArea> GetDropAreas(LayoutFloatingWindowControl draggingWindow);
-
-        DockingManager Manager { get; }
+      get;
     }
+
+    #endregion
+
+    #region Methods
+
+    bool HitTest( Point dragPoint );
+
+    IOverlayWindow ShowOverlayWindow( LayoutFloatingWindowControl draggingWindow );
+
+    void HideOverlayWindow();
+
+    IEnumerable<IDropArea> GetDropAreas( LayoutFloatingWindowControl draggingWindow );
+
+    #endregion
+  }
 }

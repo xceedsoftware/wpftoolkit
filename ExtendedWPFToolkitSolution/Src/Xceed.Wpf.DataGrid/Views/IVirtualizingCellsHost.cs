@@ -14,9 +14,7 @@
 
   ***********************************************************************************/
 
-using System;
 using System.Windows;
-using System.Collections.Generic;
 
 namespace Xceed.Wpf.DataGrid.Views
 {
@@ -29,6 +27,8 @@ namespace Xceed.Wpf.DataGrid.Views
       get;
     }
 
+    void ClearLogicalParent( Cell cell );
+
     void SetLogicalParent( Cell cell );
 
     void PrepareCellsHost( DataGridContext dataGridContext );
@@ -37,6 +37,6 @@ namespace Xceed.Wpf.DataGrid.Views
 
     void InvalidateCellsHostMeasure();
 
-    bool BringIntoView( Cell cell );
+    bool BringIntoView( Cell cell, RequestBringIntoViewEventArgs e );
   }
 }

@@ -19,18 +19,25 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
 {
   [TemplatePart( Name = PART_ResizeThumb, Type = typeof( Thumb ) )]
+  [TemplatePart( Name = PART_TextBox, Type = typeof( TextBox ) )]
+  [TemplatePart( Name = PART_DropDownButton, Type = typeof( ToggleButton ) )]
   public class MultiLineTextEditor : ContentControl
   {
     private const string PART_ResizeThumb = "PART_ResizeThumb";
+    private const string PART_TextBox = "PART_TextBox";
+    private const string PART_DropDownButton = "PART_DropDownButton";
 
     #region Members
 
-    Thumb _resizeThumb;
+    private Thumb _resizeThumb;
+    private TextBox _textBox;
+    private ToggleButton _toggleButton;
 
     #endregion //Members
 
@@ -90,7 +97,11 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnIsOpenChanged( bool oldValue, bool newValue )
     {
-
+      if( _textBox != null )
+      {
+        // Focus the content of the popup, after its loaded
+        Dispatcher.BeginInvoke( new Action( () => _textBox.Focus() ), DispatcherPriority.Background );
+      }
     }
 
     #endregion //IsOpen
@@ -214,7 +225,13 @@ namespace Xceed.Wpf.Toolkit
 
       if( _resizeThumb != null )
         _resizeThumb.DragDelta += ResizeThumb_DragDelta;
+
+      _textBox = GetTemplateChild( PART_TextBox ) as TextBox;
+      _toggleButton = GetTemplateChild( PART_DropDownButton ) as ToggleButton;
     }
+
+
+
 
     #endregion //Bass Class Overrides
 
@@ -268,6 +285,11 @@ namespace Xceed.Wpf.Toolkit
       if( IsOpen )
         IsOpen = false;
       ReleaseMouseCapture();
+
+      if( _toggleButton != null )
+      {
+        _toggleButton.Focus();
+      }
     }
 
     #endregion //Methods

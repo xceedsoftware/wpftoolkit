@@ -35,8 +35,13 @@ using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit.Zoombox
 {
+  [TemplatePart( Name = PART_VerticalScrollBar, Type = typeof( ScrollBar ) )]
+  [TemplatePart( Name = PART_HorizontalScrollBar, Type = typeof( ScrollBar ) )]
   public sealed class Zoombox : ContentControl
   {
+    private const string PART_VerticalScrollBar = "PART_VerticalScrollBar";
+    private const string PART_HorizontalScrollBar = "PART_HorizontalScrollBar";
+    private bool _isUpdatingVisualTree = false;
 
     #region Constructors
 
@@ -69,6 +74,8 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.AddHandler( FrameworkElement.SizeChangedEvent, new SizeChangedEventHandler( this.OnSizeChanged ), true );
 
       this.CoerceValue( Zoombox.ViewStackModeProperty );
+
+      this.Loaded += this.Zoombox_Loaded;
     }
 
     #endregion
@@ -288,6 +295,10 @@ namespace Xceed.Wpf.Toolkit.Zoombox
           Viewbox viewbox = ( Viewbox )_content;
 
           BindingOperations.ClearAllBindings( viewbox );
+          if( viewbox.Child is FrameworkElement )
+          {
+            ( viewbox.Child as FrameworkElement ).RemoveHandler( FrameworkElement.SizeChangedEvent, new SizeChangedEventHandler( this.OnContentSizeChanged ) );
+          }
           ( viewbox as Viewbox ).Child = null;
 
           this.RemoveLogicalChild( viewbox );
@@ -324,6 +335,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
           viewbox.HorizontalAlignment = HorizontalAlignment.Left;
           viewbox.VerticalAlignment = VerticalAlignment.Top;
           this.IsContentWrapped = true;
+        }
+
+        if( ( _content is Viewbox ) && ( this.IsContentWrapped ) && ( _trueContent is FrameworkElement ) )
+        {
+          ( _trueContent as FrameworkElement ).AddHandler( FrameworkElement.SizeChangedEvent, new SizeChangedEventHandler( this.OnContentSizeChanged ), true );
         }
 
         if( _contentPresenter != null )
@@ -598,6 +614,26 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     #endregion
 
+    #region IsUsingScrollBars Property
+
+    public static readonly DependencyProperty IsUsingScrollBarsProperty =
+      DependencyProperty.Register( "IsUsingScrollBars", typeof( bool ), typeof( Zoombox ),
+        new FrameworkPropertyMetadata( false, ( PropertyChangedCallback )null ) );
+
+    public bool IsUsingScrollBars
+    {
+      get
+      {
+        return ( bool )this.GetValue( Zoombox.IsUsingScrollBarsProperty );
+      }
+      set
+      {
+        this.SetValue( Zoombox.IsUsingScrollBarsProperty, value );
+      }
+    }
+
+    #endregion
+
     #region MaxScale Property
 
     public static readonly DependencyProperty MaxScaleProperty =
@@ -833,7 +869,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     private static readonly DependencyPropertyKey ViewFinderPropertyKey =
       DependencyProperty.RegisterReadOnly( "ViewFinder", typeof( FrameworkElement ), typeof( Zoombox ),
-        new FrameworkPropertyMetadata( null ) );
+        new FrameworkPropertyMetadata( null, new PropertyChangedCallback( Zoombox.OnViewFinderChanged ) ) );
 
     public static readonly DependencyProperty ViewFinderProperty = Zoombox.ViewFinderPropertyKey.DependencyProperty;
 
@@ -843,6 +879,20 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       {
         return ( FrameworkElement )this.GetValue( Zoombox.ViewFinderProperty );
       }
+      set
+      {
+        this.SetValue( Zoombox.ViewFinderPropertyKey, value );
+      }
+    }
+
+    private static void OnViewFinderChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      ( ( Zoombox )d ).OnViewFinderChanged( e );
+    }
+
+    private void OnViewFinderChanged( DependencyPropertyChangedEventArgs e )
+    {
+      this.AttachToVisualTree();
     }
 
     #endregion
@@ -1574,6 +1624,8 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     #endregion
 
+    public event EventHandler<ScrollEventArgs> Scroll;
+
     #region ViewStackIndexChanged Event
 
     public static readonly RoutedEvent ViewStackIndexChangedEvent = EventManager.RegisterRoutedEvent( "ViewStackIndexChanged", RoutingStrategy.Bubble, typeof( IndexChangedEventHandler ), typeof( Zoombox ) );
@@ -1765,6 +1817,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     {
       if( _content != null )
       {
+        this.SetScrollBars();
         this.ZoomTo( ZoomboxView.Center );
       }
     }
@@ -1773,6 +1826,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     {
       if( _content != null )
       {
+        this.SetScrollBars();
         this.ZoomTo( ZoomboxView.Fill );
       }
     }
@@ -1781,6 +1835,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     {
       if( _content != null )
       {
+        this.SetScrollBars();
         this.ZoomTo( ZoomboxView.Fit );
       }
     }
@@ -1907,11 +1962,13 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       if( _content != null )
       {
         // measure visuals according to supplied constraint
-        base.MeasureOverride( constraint );
+        Size size = base.MeasureOverride( constraint );
 
         // now re-measure content to let the child be whatever size it desires
         _content.Measure( new Size( double.PositiveInfinity, double.PositiveInfinity ) );
+        return size;
       }
+
 
       // avoid returning infinity
       if( double.IsInfinity( constraint.Height ) )
@@ -1997,6 +2054,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       base.OnRender( drawingContext );
     }
 
+
+
+
     private static void RefocusView( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
       Zoombox zoombox = o as Zoombox;
@@ -2005,6 +2065,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     private void AttachToVisualTree()
     {
+      if( _isUpdatingVisualTree )
+        return;
+
+      _isUpdatingVisualTree = true;
+
       // detach from the old tree
       this.DetachFromVisualTree();
 
@@ -2033,6 +2098,18 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       _contentPresenter = VisualTreeHelperEx.FindDescendantByType( this, typeof( ContentPresenter ) ) as ContentPresenter;
       if( _contentPresenter == null )
         throw new InvalidTemplateException( ErrorMessages.GetMessage( "ZoomboxTemplateNeedsContent" ) );
+
+      _verticalScrollBar = this.GetTemplateChild( PART_VerticalScrollBar ) as ScrollBar;
+      if( _verticalScrollBar == null )
+        throw new InvalidTemplateException( ErrorMessages.GetMessage( "Zoombox vertical scrollBar not found." ) );
+
+      _verticalScrollBar.Scroll += this.VerticalScrollBar_Scroll;
+
+      _horizontalScrollBar = this.GetTemplateChild( PART_HorizontalScrollBar ) as ScrollBar;
+      if( _horizontalScrollBar == null )
+        throw new InvalidTemplateException( ErrorMessages.GetMessage( "Zoombox horizontal scrollBar not found." ) );
+
+      _horizontalScrollBar.Scroll += this.HorizontalScrollBar_Scroll;
 
       // check the template for an AdornerDecorator
       AdornerLayer al = null;
@@ -2063,11 +2140,24 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       // If we don't do the following, the content is not laid out correctly (centered) initially.
       VisualTreeHelperEx.FindDescendantWithPropertyValue( this, Button.IsPressedProperty, true );
 
-      // set a reference to the ViewFinder element, if present
-      this.SetValue( Zoombox.ViewFinderPropertyKey, this.Template.FindName( "ViewFinder", this ) as FrameworkElement );
+      // User has not defined a ViewFinder, use the one from this template
+      if( this.GetValue( Zoombox.ViewFinderPropertyKey.DependencyProperty ) == null )
+      {
+        // set a reference to the ViewFinder element, if present
+        this.SetValue( Zoombox.ViewFinderPropertyKey, this.Template.FindName( "ViewFinder", this ) as FrameworkElement );
+        Zoombox.SetViewFinderVisibility( this, Visibility.Collapsed );
+      }
+      else
+      {
+        //user has defined a ViewFinder, hide the one from this template
+        Zoombox.SetViewFinderVisibility( this, Visibility.Hidden );
+      }
 
       // locate the view finder display panel
-      _viewFinderDisplay = VisualTreeHelperEx.FindDescendantByType( this, typeof( ZoomboxViewFinderDisplay ) ) as ZoomboxViewFinderDisplay;
+      if( this.ViewFinder != null )
+      {
+        _viewFinderDisplay = VisualTreeHelperEx.FindDescendantByType( this.ViewFinder, typeof( ZoomboxViewFinderDisplay ) ) as ZoomboxViewFinderDisplay;
+      }
 
       // if a ViewFinder was specified but no display panel is present, throw an exception
       if( this.ViewFinder != null && _viewFinderDisplay == null )
@@ -2092,8 +2182,12 @@ namespace Xceed.Wpf.Toolkit.Zoombox
         _viewFinderDisplay.SetBinding( ZoomboxViewFinderDisplay.ViewportRectProperty, binding );
       }
 
+      this.UpdateViewFinderDisplayContentBounds();
+
       // set up event handler to run once the content presenter has been arranged
       _contentPresenter.LayoutUpdated += new EventHandler( this.ContentPresenterFirstArranged );
+
+      _isUpdatingVisualTree = false;
     }
 
     private void CreateVisualBrushForViewFinder( Visual visual )
@@ -2187,12 +2281,14 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       {
         IsAnimated = oldAnimated;
       }
+      //When ViewFinder is modified, this will refresh the ZoomboxViewFinderDisplay
+      this.ZoomTo( this.Scale );
     }
 
     private void DetachFromVisualTree()
     {
       // remove the drag adorner
-      if( _dragAdorner != null )
+      if( (_dragAdorner != null) && ( AdornerLayer.GetAdornerLayer( this ) != null ) )
         AdornerLayer.GetAdornerLayer( this ).Remove( _dragAdorner );
 
       // remove the layout updated handler, if present
@@ -2201,14 +2297,80 @@ namespace Xceed.Wpf.Toolkit.Zoombox
         _contentPresenter.LayoutUpdated -= new EventHandler( this.ContentPresenterFirstArranged );
       }
 
+      //locate the vertical scrollBar
+      if( _verticalScrollBar != null )
+      {
+        _verticalScrollBar.Scroll -= this.VerticalScrollBar_Scroll;
+      }
+
+      //locate the horizontal scrollBar
+      if( _horizontalScrollBar != null )
+      {
+        _horizontalScrollBar.Scroll -= this.HorizontalScrollBar_Scroll;
+      }
+
       // remove the view finder display panel's visual brush and adorner
       if( _viewFinderDisplay != null )
       {
+        _viewFinderDisplay.MouseMove -= new MouseEventHandler( this.ViewFinderDisplayMouseMove );
+        _viewFinderDisplay.MouseLeftButtonDown -= new MouseButtonEventHandler( this.ViewFinderDisplayBeginCapture );
+        _viewFinderDisplay.MouseLeftButtonUp -= new MouseButtonEventHandler( this.ViewFinderDisplayEndCapture );
+        BindingOperations.ClearBinding( _viewFinderDisplay, ZoomboxViewFinderDisplay.ViewportRectProperty );
         _viewFinderDisplay = null;
       }
 
       // set object references to null
       _contentPresenter = null;
+    }
+
+    private void Zoombox_Loaded( object sender, RoutedEventArgs e )
+    {
+      this.SetScrollBars();
+    }
+
+    private void VerticalScrollBar_Scroll( object sender, ScrollEventArgs e )
+    {
+      double diff = -(e.NewValue + _relativePosition.Y);
+
+      if( e.ScrollEventType == ScrollEventType.LargeIncrement )
+      {
+        diff = -_verticalScrollBar.ViewportSize;
+      }
+      else if( e.ScrollEventType == ScrollEventType.LargeDecrement )
+      {
+        diff = _verticalScrollBar.ViewportSize;
+      }
+
+      this.OnDrag( new DragDeltaEventArgs( 0d, diff / this.Scale ), false );
+
+      // Raise the Scroll event to user
+      EventHandler<ScrollEventArgs> handler = this.Scroll;
+      if( handler != null )
+      {
+        handler( this, e );
+      }
+    }
+
+    private void HorizontalScrollBar_Scroll( object sender, ScrollEventArgs e )
+    {
+      double diff = -( e.NewValue + _relativePosition.X );
+      if( e.ScrollEventType == ScrollEventType.LargeIncrement )
+      {
+        diff = -_horizontalScrollBar.ViewportSize;
+      }
+      else if( e.ScrollEventType == ScrollEventType.LargeDecrement )
+      {
+        diff = _horizontalScrollBar.ViewportSize;
+      }
+
+      this.OnDrag( new DragDeltaEventArgs( diff / this.Scale, 0d ), false );
+
+      // Raise the Scroll event to user
+      EventHandler<ScrollEventArgs> handler = this.Scroll;
+      if( handler != null )
+      {
+        handler( this, e );
+      }
     }
 
     private void DragDisplayViewport( DragDeltaEventArgs e, bool end )
@@ -2332,6 +2494,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       {
         if( this.HasRenderedFirstView )
         {
+          this.SetScrollBars();
           this.UpdateView( this.CurrentView, true, false, this.CurrentViewIndex );
         }
         else
@@ -2350,6 +2513,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       Point relativePosition = _relativePosition;
       double scale = this.Scale;
       Point newPosition = relativePosition + ( this.ContentOffset * scale ) + new Vector( e.HorizontalChange * scale, e.VerticalChange * scale );
+      if( this.IsUsingScrollBars )
+      {
+        newPosition.X = Math.Max( Math.Min( newPosition.X, 0d ), -_horizontalScrollBar.Maximum );
+        newPosition.Y = Math.Max( Math.Min( newPosition.Y, 0d ), -_verticalScrollBar.Maximum );
+      }
 
       // update the transform
       this.UpdateView( new ZoomboxView( scale, newPosition ), false, end );
@@ -2397,6 +2565,8 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       if( !this.HasArrangedContentPresenter )
         return;
 
+      this.SetScrollBars();
+
       // when the size is changing, the viewbox factor must be updated before updating the view
       this.UpdateViewboxFactor();
 
@@ -2410,6 +2580,26 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       {
         this.IsAnimated = oldIsAnimated;
       }
+    }
+
+    private void SetScrollBars()
+    {
+      if( _content == null || _verticalScrollBar == null || _horizontalScrollBar == null )
+        return;
+
+      var contentSize = ( _content is Viewbox ) ? ( ( Viewbox )_content ).Child.DesiredSize : this.RenderSize;
+
+      _verticalScrollBar.SmallChange = 10d;
+      _verticalScrollBar.LargeChange = 10d;
+      _verticalScrollBar.Minimum = 0d;
+      _verticalScrollBar.ViewportSize = this.RenderSize.Height;
+      _verticalScrollBar.Maximum = contentSize.Height - _verticalScrollBar.ViewportSize;
+
+      _horizontalScrollBar.SmallChange = 10d;
+      _horizontalScrollBar.LargeChange = 10d;
+      _horizontalScrollBar.Minimum = 0d;
+      _horizontalScrollBar.ViewportSize = this.RenderSize.Width;
+      _horizontalScrollBar.Maximum = contentSize.Width - _horizontalScrollBar.ViewportSize;
     }
 
     private void PreProcessInput()
@@ -2839,6 +3029,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
             _contentPresenter.RenderTransform = tg;
 
+            var initialContentSize = ( _content is Viewbox ) ? ( ( Viewbox )_content ).Child.DesiredSize : this.RenderSize;
+            var scaledContentSize = new Size( initialContentSize.Width * newRelativeScale, initialContentSize.Height * newRelativeScale );
+
             if( allowAnimation && IsAnimated )
             {
               DoubleAnimation daScale = new DoubleAnimation( currentScale, newRelativeScale / _viewboxFactor, AnimationDuration );
@@ -2862,6 +3055,46 @@ namespace Xceed.Wpf.Toolkit.Zoombox
               st.BeginAnimation( ScaleTransform.ScaleYProperty, daScale );
               tt.BeginAnimation( TranslateTransform.XProperty, daTranslateX );
               tt.BeginAnimation( TranslateTransform.YProperty, daTranslateY );
+
+              if( this.IsUsingScrollBars )
+              {
+                //Vertical scrollBar animations
+                DoubleAnimation verticalMaxAnimation = new DoubleAnimation();
+                verticalMaxAnimation.From = _verticalScrollBar.Maximum;
+                verticalMaxAnimation.To = scaledContentSize.Height - _verticalScrollBar.ViewportSize;
+                verticalMaxAnimation.Duration = AnimationDuration;
+                _verticalScrollBar.BeginAnimation( ScrollBar.MaximumProperty, verticalMaxAnimation );
+
+                DoubleAnimation verticalValueAnimation = new DoubleAnimation();
+                verticalValueAnimation.From = _verticalScrollBar.Value;
+                verticalValueAnimation.To = -newRelativePosition.Y;
+                verticalValueAnimation.Duration = AnimationDuration;
+                verticalValueAnimation.Completed += this.VerticalValueAnimation_Completed;
+                _verticalScrollBar.BeginAnimation( ScrollBar.ValueProperty, verticalValueAnimation );
+
+                //Horizontal scrollBar animations
+                DoubleAnimation horizontalMaxAnimation = new DoubleAnimation();
+                horizontalMaxAnimation.From = _horizontalScrollBar.Maximum;
+                horizontalMaxAnimation.To = scaledContentSize.Width - _horizontalScrollBar.ViewportSize;
+                horizontalMaxAnimation.Duration = AnimationDuration;
+                _horizontalScrollBar.BeginAnimation( ScrollBar.MaximumProperty, horizontalMaxAnimation );
+
+                DoubleAnimation horizontalValueAnimation = new DoubleAnimation();
+                horizontalValueAnimation.From = _horizontalScrollBar.Value;
+                horizontalValueAnimation.To = -newRelativePosition.X;
+                horizontalValueAnimation.Duration = AnimationDuration;
+                horizontalValueAnimation.Completed += this.HorizontalValueAnimation_Completed;
+                _horizontalScrollBar.BeginAnimation( ScrollBar.ValueProperty, horizontalValueAnimation );
+              }
+            }
+            else if( this.IsUsingScrollBars )
+            {
+              //Vertical scrollBar
+              _verticalScrollBar.Maximum = scaledContentSize.Height - _verticalScrollBar.ViewportSize;
+              _verticalScrollBar.Value = -newRelativePosition.Y;
+              //Horizontal scrollBar
+              _horizontalScrollBar.Maximum = scaledContentSize.Width - _horizontalScrollBar.ViewportSize;
+              _horizontalScrollBar.Value = -newRelativePosition.X;
             }
 
             // maintain the relative scale and position for dragging and animating purposes
@@ -3298,6 +3531,46 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
+    private void VerticalValueAnimation_Completed( object sender, EventArgs e )
+    {
+      //When the animaton is completed, with the FillBehavior to HoldEnd, 
+      //the ScrollBarValue will be overriden with the final animation value, preventing future scroll.
+      //To remove it use BeginAnimation with null.
+      //http://msdn.microsoft.com/en-us/library/aa970493(v=vs.110).aspx      
+
+      // only do this when all the overlapped animations are done or limits values reached.
+      if( ( _verticalScrollBar.Value == -_relativePosition.Y )
+        || ( _verticalScrollBar.Value == _verticalScrollBar.Maximum )
+        || ( _verticalScrollBar.Value == _verticalScrollBar.Minimum ) )
+      {
+        var finalValue = _verticalScrollBar.Value;
+        //this will reset Value to original value of animation
+        _verticalScrollBar.BeginAnimation( ScrollBar.ValueProperty, null );
+        //this will set to last value of the animation.
+        _verticalScrollBar.Value = finalValue;
+      }
+    }
+
+    private void HorizontalValueAnimation_Completed( object sender, EventArgs e )
+    {
+      //When the animaton is completed, with the FillBehavior to HoldEnd, 
+      //the ScrollBarValue will be overriden with the final animation value, preventing future scroll.
+      //To remove it use BeginAnimation with null.
+      //http://msdn.microsoft.com/en-us/library/aa970493(v=vs.110).aspx      
+
+      // only do this when all the overlapped animations are done or limits values reached.
+      if( ( _horizontalScrollBar.Value == -_relativePosition.X )
+        || ( _horizontalScrollBar.Value == _horizontalScrollBar.Maximum )
+        || ( _horizontalScrollBar.Value == _horizontalScrollBar.Minimum ) )
+      {
+        var finalValue = _horizontalScrollBar.Value;
+        //this will reset Value to original value of animation
+        _horizontalScrollBar.BeginAnimation( ScrollBar.ValueProperty, null );
+        //this will set to last value of the animation.
+        _horizontalScrollBar.Value = finalValue;
+      }
+    }
+
     private void ZoomTo( double scale, bool allowStackAddition )
     {
       // if there is nothing to scale, just return
@@ -3312,6 +3585,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     {
       // if there is nothing to scale, just return
       if( _content == null )
+        return;
+
+      if( double.IsNaN( scale ) )
         return;
 
       // if necessary, verify that the relativeTo point falls within the content
@@ -3338,7 +3614,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
         // adjust translateFrom based on relativeTo
         translateFrom = this.TranslatePoint( relativeTo, _contentPresenter );
       }
-      else
+      else if( _contentPresenter != null )
       {
         // prior to the first render, just use the ContentPresenter's transform and do not adjust translateFrom
         if( _contentPresenter.RenderTransform == Transform.Identity )
@@ -3570,6 +3846,10 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     // the content control's one and only content presenter
     private ContentPresenter _contentPresenter = null;
+
+    //The Scrollbars
+    private ScrollBar _verticalScrollBar = null;
+    private ScrollBar _horizontalScrollBar = null;
 
     // the content of the Zoombox (cast as a UIElement)
     private UIElement _content = null;
