@@ -52,7 +52,7 @@ namespace Xceed.Wpf.AvalonDock
     private NavigatorWindow _navigatorWindow = null;
 
     internal bool SuspendDocumentsSourceBinding = false;
-    internal bool SuspendAnchorablesSourceBinding = false;    
+    internal bool SuspendAnchorablesSourceBinding = false;
 
     #endregion
 
@@ -156,8 +156,8 @@ namespace Xceed.Wpf.AvalonDock
       ClearLogicalChildrenList();
       DetachLayoutItems();
 
-            ActiveContent = null;
-            Layout.Manager = this;
+      ActiveContent = null;
+      Layout.Manager = this;
 
       AttachLayoutItems();
       AttachDocumentsSource( newLayout, DocumentsSource );
@@ -200,15 +200,15 @@ namespace Xceed.Wpf.AvalonDock
       CommandManager.InvalidateRequerySuggested();
     }
 
-        #endregion
+    #endregion
 
-        #region LayoutUpdateStrategy
+    #region LayoutUpdateStrategy
 
-        /// <summary>
-        /// LayoutUpdateStrategy Dependency Property
-        /// </summary>
-        public static readonly DependencyProperty LayoutUpdateStrategyProperty = DependencyProperty.Register( "LayoutUpdateStrategy", typeof( ILayoutUpdateStrategy ), typeof( DockingManager ),
-            new FrameworkPropertyMetadata( ( ILayoutUpdateStrategy )null ) );
+    /// <summary>
+    /// LayoutUpdateStrategy Dependency Property
+    /// </summary>
+    public static readonly DependencyProperty LayoutUpdateStrategyProperty = DependencyProperty.Register( "LayoutUpdateStrategy", typeof( ILayoutUpdateStrategy ), typeof( DockingManager ),
+        new FrameworkPropertyMetadata( ( ILayoutUpdateStrategy )null ) );
 
     /// <summary>
     /// Gets or sets the LayoutUpdateStrategy property.  This dependency property 
@@ -1131,10 +1131,10 @@ namespace Xceed.Wpf.AvalonDock
       if( _logicalChildren.Select( ch => ch.GetValueOrDefault<object>() ).Contains( element ) )
         return;
 
-            if (((FrameworkElement)element).Parent != null)
-            {
-                (((FrameworkElement)element).Parent as DockingManager).InternalRemoveLogicalChild(element);
-            }
+      if( ( ( FrameworkElement )element ).Parent != null )
+      {
+        ( ( ( FrameworkElement )element ).Parent as DockingManager ).InternalRemoveLogicalChild( element );
+      }
 
       _logicalChildren.Add( new WeakReference( element ) );
       AddLogicalChild( element );
@@ -1528,8 +1528,8 @@ namespace Xceed.Wpf.AvalonDock
     {
       var oldTheme = e.OldValue as Theme;
       var newTheme = e.NewValue as Theme;
-            var resources = Application.Current == null ? this.Resources : Application.Current.Resources;
-            if ( oldTheme != null )
+      var resources = Application.Current == null ? this.Resources : Application.Current.Resources;
+      if( oldTheme != null )
       {
         if( oldTheme is DictionaryTheme )
         {
@@ -1562,17 +1562,17 @@ namespace Xceed.Wpf.AvalonDock
         }
       }
 
-      if (Application.Current == null)
-            {
-                foreach (var fwc in _fwList)
-                    fwc.UpdateThemeResources(oldTheme);
+      if( Application.Current == null )
+      {
+        foreach( var fwc in _fwList )
+          fwc.UpdateThemeResources( oldTheme );
 
-                if (_navigatorWindow != null)
-                    _navigatorWindow.UpdateThemeResources();
+        if( _navigatorWindow != null )
+          _navigatorWindow.UpdateThemeResources();
 
-                if (_overlayWindow != null)
-                    _overlayWindow.UpdateThemeResources();
-            }
+        if( _overlayWindow != null )
+          _overlayWindow.UpdateThemeResources();
+      }
     }
 
     #endregion
@@ -1937,11 +1937,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-        #endregion
+    #endregion
 
-        #region Overrides
+    #region Overrides
 
-        public override void OnApplyTemplate()
+    public override void OnApplyTemplate()
     {
       base.OnApplyTemplate();
 
@@ -3253,8 +3253,8 @@ namespace Xceed.Wpf.AvalonDock
 
     bool IOverlayWindowHost.HitTest( Point dragPoint )
     {
-            if (!this.IsVisible) return false;
-            Rect detectionRect = new Rect( this.PointToScreenDPIWithoutFlowDirection( new Point() ), this.TransformActualSizeToAncestor() );
+      if( !this.IsVisible ) return false;
+      Rect detectionRect = new Rect( this.PointToScreenDPIWithoutFlowDirection( new Point() ), this.TransformActualSizeToAncestor() );
       return detectionRect.Contains( dragPoint );
     }
 
@@ -3269,12 +3269,12 @@ namespace Xceed.Wpf.AvalonDock
     IOverlayWindow IOverlayWindowHost.ShowOverlayWindow( LayoutFloatingWindowControl draggingWindow )
     {
       CreateOverlayWindow();
-            if (draggingWindow.Model.Root.ActiveContent.CanDock)
-            {
-                _overlayWindow.Owner = draggingWindow;
-                _overlayWindow.EnableDropTargets();
-                _overlayWindow.Show();
-            }
+      if( draggingWindow.Model.Root.ActiveContent.CanDock )
+      {
+        _overlayWindow.Owner = draggingWindow;
+        _overlayWindow.EnableDropTargets();
+        _overlayWindow.Show();
+      }
       return _overlayWindow;
     }
 

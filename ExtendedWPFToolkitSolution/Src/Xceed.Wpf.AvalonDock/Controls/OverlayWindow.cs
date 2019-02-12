@@ -151,10 +151,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     internal void UpdateThemeResources( Theme oldTheme = null )
     {
-            if (Application.Current != null)
-                return;
+      if( Application.Current != null )
+        return;
 
-      if ( oldTheme != null )
+      if( oldTheme != null )
       {
         if( oldTheme is DictionaryTheme )
         {
@@ -518,25 +518,25 @@ namespace Xceed.Wpf.AvalonDock.Controls
             var layoutDocumentPane = ( dropAreaDocumentPaneGroup.AreaElement.Model as LayoutDocumentPaneGroup ).Children.First() as LayoutDocumentPane;
             var parentDocumentPaneGroup = layoutDocumentPane.Parent as LayoutDocumentPaneGroup;
 
-						_documentPaneDropTargetLeft.Visibility = Visibility.Hidden;
-						_documentPaneDropTargetRight.Visibility = Visibility.Hidden;
-						_documentPaneDropTargetTop.Visibility = Visibility.Hidden;
-						_documentPaneDropTargetBottom.Visibility = Visibility.Hidden;
-					}
-					break;
-				case DropAreaType.DocumentPane:
-				default:
-					{
-						bool isDraggingAnchorables = false;
-						if (_floatingWindow != null)
-							isDraggingAnchorables = _floatingWindow.Model is LayoutAnchorableFloatingWindow;
+            _documentPaneDropTargetLeft.Visibility = Visibility.Hidden;
+            _documentPaneDropTargetRight.Visibility = Visibility.Hidden;
+            _documentPaneDropTargetTop.Visibility = Visibility.Hidden;
+            _documentPaneDropTargetBottom.Visibility = Visibility.Hidden;
+          }
+          break;
+        case DropAreaType.DocumentPane:
+        default:
+          {
+            bool isDraggingAnchorables = false;
+            if( _floatingWindow != null )
+              isDraggingAnchorables = _floatingWindow.Model is LayoutAnchorableFloatingWindow;
 
-						if (isDraggingAnchorables && _gridDocumentPaneFullDropTargets != null)
-						{
-							areaElement = _gridDocumentPaneFullDropTargets;
-							var dropAreaDocumentPaneGroup = area as DropArea<LayoutDocumentPaneControl>;
-							var layoutDocumentPane = dropAreaDocumentPaneGroup.AreaElement.Model as LayoutDocumentPane;
-							var parentDocumentPaneGroup = layoutDocumentPane.Parent as LayoutDocumentPaneGroup;
+            if( isDraggingAnchorables && _gridDocumentPaneFullDropTargets != null )
+            {
+              areaElement = _gridDocumentPaneFullDropTargets;
+              var dropAreaDocumentPaneGroup = area as DropArea<LayoutDocumentPaneControl>;
+              var layoutDocumentPane = dropAreaDocumentPaneGroup.AreaElement.Model as LayoutDocumentPane;
+              var parentDocumentPaneGroup = layoutDocumentPane.Parent as LayoutDocumentPaneGroup;
 
               SetDropTargetIntoVisibility( layoutDocumentPane );
 
@@ -672,46 +672,46 @@ namespace Xceed.Wpf.AvalonDock.Controls
           break;
       }
 
-			if (areaElement != null)
-			{
-				Canvas.SetLeft(areaElement, area.DetectionRect.Left - Left);
-				Canvas.SetTop(areaElement, area.DetectionRect.Top - Top);
-				areaElement.Width = area.DetectionRect.Width;
-				areaElement.Height = area.DetectionRect.Height;
-				areaElement.Visibility = System.Windows.Visibility.Visible;
-			}
-		}
+      if( areaElement != null )
+      {
+        Canvas.SetLeft( areaElement, area.DetectionRect.Left - Left );
+        Canvas.SetTop( areaElement, area.DetectionRect.Top - Top );
+        areaElement.Width = area.DetectionRect.Width;
+        areaElement.Height = area.DetectionRect.Height;
+        areaElement.Visibility = System.Windows.Visibility.Visible;
+      }
+    }
 
     void IOverlayWindow.DragLeave( IDropArea area )
     {
       _visibleAreas.Remove( area );
 
-			FrameworkElement areaElement;
-			switch (area.Type)
-			{
-				case DropAreaType.DockingManager:
-					areaElement = _gridDockingManagerDropTargets;
-					break;
-				case DropAreaType.AnchorablePane:
-					areaElement = _gridAnchorablePaneDropTargets;
-					break;
-				case DropAreaType.DocumentPaneGroup:
-					areaElement = _gridDocumentPaneDropTargets;
-					break;
-				case DropAreaType.DocumentPane:
-				default:
-					{
-						bool isDraggingAnchorables = false;
-						if (_floatingWindow != null)
-							isDraggingAnchorables = _floatingWindow.Model is LayoutAnchorableFloatingWindow;
+      FrameworkElement areaElement;
+      switch( area.Type )
+      {
+        case DropAreaType.DockingManager:
+          areaElement = _gridDockingManagerDropTargets;
+          break;
+        case DropAreaType.AnchorablePane:
+          areaElement = _gridAnchorablePaneDropTargets;
+          break;
+        case DropAreaType.DocumentPaneGroup:
+          areaElement = _gridDocumentPaneDropTargets;
+          break;
+        case DropAreaType.DocumentPane:
+        default:
+          {
+            bool isDraggingAnchorables = false;
+            if( _floatingWindow != null )
+              isDraggingAnchorables = _floatingWindow.Model is LayoutAnchorableFloatingWindow;
 
-						if (isDraggingAnchorables && _gridDocumentPaneFullDropTargets != null)
-							areaElement = _gridDocumentPaneFullDropTargets;
-						else
-							areaElement = _gridDocumentPaneDropTargets;
-					}
-					break;
-			}
+            if( isDraggingAnchorables && _gridDocumentPaneFullDropTargets != null )
+              areaElement = _gridDocumentPaneFullDropTargets;
+            else
+              areaElement = _gridDocumentPaneDropTargets;
+          }
+          break;
+      }
 
       areaElement.Visibility = System.Windows.Visibility.Hidden;
     }

@@ -131,98 +131,98 @@ namespace Xceed.Wpf.AvalonDock.Controls
       _openUpTimer = null;
       _model.Root.Manager.ShowAutoHideWindow( this );
 
-            if (!_manuallyOpened)
-            {
-                _clickGracePeriodTimer = new DispatcherTimer(DispatcherPriority.ApplicationIdle);
-                _clickGracePeriodTimer.Interval = TimeSpan.FromMilliseconds(1000);
-                _inGracePeriod = true;
-                _clickGracePeriodTimer.Tick += new EventHandler(_clickGracePeriodTimer_Tick);
-                _clickGracePeriodTimer.Start();
-            }
+      if( !_manuallyOpened )
+      {
+        _clickGracePeriodTimer = new DispatcherTimer( DispatcherPriority.ApplicationIdle );
+        _clickGracePeriodTimer.Interval = TimeSpan.FromMilliseconds( 1000 );
+        _inGracePeriod = true;
+        _clickGracePeriodTimer.Tick += new EventHandler( _clickGracePeriodTimer_Tick );
+        _clickGracePeriodTimer.Start();
+      }
 
-            _manuallyOpened = false;
-        }
+      _manuallyOpened = false;
+    }
 
-        private void _clickGracePeriodTimer_Tick(object sender, EventArgs e)
-        {
-            StopGraceTimer();
-        }
+    private void _clickGracePeriodTimer_Tick( object sender, EventArgs e )
+    {
+      StopGraceTimer();
+    }
 
-        private void StopGraceTimer()
-        {
-            _clickGracePeriodTimer.Tick -= new EventHandler(_clickGracePeriodTimer_Tick);
-            _clickGracePeriodTimer.Stop();
-            _clickGracePeriodTimer = null;
-            _inGracePeriod = false;
-        }
+    private void StopGraceTimer()
+    {
+      _clickGracePeriodTimer.Tick -= new EventHandler( _clickGracePeriodTimer_Tick );
+      _clickGracePeriodTimer.Stop();
+      _clickGracePeriodTimer = null;
+      _inGracePeriod = false;
+    }
 
-        #endregion
+    #endregion
 
-        #region Overrides
+    #region Overrides
 
-        //protected override void OnVisualParentChanged(DependencyObject oldParent)
-        //{
-        //    base.OnVisualParentChanged(oldParent);
+    //protected override void OnVisualParentChanged(DependencyObject oldParent)
+    //{
+    //    base.OnVisualParentChanged(oldParent);
 
-        //    var contentModel = _model;
+    //    var contentModel = _model;
 
-        //    if (oldParent != null && contentModel != null && contentModel.Content is UIElement)
-        //    {
-        //        var oldParentPaneControl = oldParent.FindVisualAncestor<LayoutAnchorablePaneControl>();
-        //        if (oldParentPaneControl != null)
-        //        {
-        //            ((ILogicalChildrenContainer)oldParentPaneControl).InternalRemoveLogicalChild(contentModel.Content);
-        //        }
-        //    }
+    //    if (oldParent != null && contentModel != null && contentModel.Content is UIElement)
+    //    {
+    //        var oldParentPaneControl = oldParent.FindVisualAncestor<LayoutAnchorablePaneControl>();
+    //        if (oldParentPaneControl != null)
+    //        {
+    //            ((ILogicalChildrenContainer)oldParentPaneControl).InternalRemoveLogicalChild(contentModel.Content);
+    //        }
+    //    }
 
-        //    if (contentModel.Content != null && contentModel.Content is UIElement)
-        //    {
-        //        var oldLogicalParentPaneControl = LogicalTreeHelper.GetParent(contentModel.Content as UIElement)
-        //            as ILogicalChildrenContainer;
-        //        if (oldLogicalParentPaneControl != null)
-        //            oldLogicalParentPaneControl.InternalRemoveLogicalChild(contentModel.Content);
-        //    }
+    //    if (contentModel.Content != null && contentModel.Content is UIElement)
+    //    {
+    //        var oldLogicalParentPaneControl = LogicalTreeHelper.GetParent(contentModel.Content as UIElement)
+    //            as ILogicalChildrenContainer;
+    //        if (oldLogicalParentPaneControl != null)
+    //            oldLogicalParentPaneControl.InternalRemoveLogicalChild(contentModel.Content);
+    //    }
 
-        //    if (contentModel != null && contentModel.Content != null && contentModel.Root != null && contentModel.Content is UIElement)
-        //    {
-        //        ((ILogicalChildrenContainer)contentModel.Root.Manager).InternalAddLogicalChild(contentModel.Content);
-        //    }
-        //}
+    //    if (contentModel != null && contentModel.Content != null && contentModel.Root != null && contentModel.Content is UIElement)
+    //    {
+    //        ((ILogicalChildrenContainer)contentModel.Root.Manager).InternalAddLogicalChild(contentModel.Content);
+    //    }
+    //}
 
-        protected override void OnMouseDown( System.Windows.Input.MouseButtonEventArgs e )
+    protected override void OnMouseDown( System.Windows.Input.MouseButtonEventArgs e )
     {
       base.OnMouseDown( e );
 
-            if (!e.Handled)
-            {
-                if (_model.Root.Manager.AutoHideWindow.Visibility != Visibility.Visible)
-                {
-                _model.Root.Manager.ShowAutoHideWindow(this);    
-                    _model.IsActive = true;
-                    _manuallyOpened = true;
-                }
-                else
-                {
-                    if (!_inGracePeriod)
-                    {
-                        _model.Root.Manager.HideAutoHideWindow(this);
-                    }
-                }
-            }
+      if( !e.Handled )
+      {
+        if( _model.Root.Manager.AutoHideWindow.Visibility != Visibility.Visible )
+        {
+          _model.Root.Manager.ShowAutoHideWindow( this );
+          _model.IsActive = true;
+          _manuallyOpened = true;
         }
+        else
+        {
+          if( !_inGracePeriod )
+          {
+            _model.Root.Manager.HideAutoHideWindow( this );
+          }
+        }
+      }
+    }
 
     protected override void OnMouseEnter( System.Windows.Input.MouseEventArgs e )
     {
       base.OnMouseEnter( e );
 
-            if (!e.Handled)
-            {
-                _openUpTimer = new DispatcherTimer(DispatcherPriority.ApplicationIdle);
-                _openUpTimer.Interval = TimeSpan.FromMilliseconds(400);
-                _openUpTimer.Tick += new EventHandler(_openUpTimer_Tick);
-                _openUpTimer.Start();
-            }
-        }
+      if( !e.Handled )
+      {
+        _openUpTimer = new DispatcherTimer( DispatcherPriority.ApplicationIdle );
+        _openUpTimer.Interval = TimeSpan.FromMilliseconds( 400 );
+        _openUpTimer.Tick += new EventHandler( _openUpTimer_Tick );
+        _openUpTimer.Start();
+      }
+    }
 
     protected override void OnMouseLeave( System.Windows.Input.MouseEventArgs e )
     {

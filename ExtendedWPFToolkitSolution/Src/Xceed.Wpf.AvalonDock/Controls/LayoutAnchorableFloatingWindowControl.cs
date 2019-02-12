@@ -199,10 +199,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     internal override void UpdateThemeResources( Xceed.Wpf.AvalonDock.Themes.Theme oldTheme = null )
     {
-			if (Application.Current != null)
-				return;
+      if( Application.Current != null )
+        return;
 
-			base.UpdateThemeResources( oldTheme );
+      base.UpdateThemeResources( oldTheme );
 
       if( _overlayWindow != null )
       {

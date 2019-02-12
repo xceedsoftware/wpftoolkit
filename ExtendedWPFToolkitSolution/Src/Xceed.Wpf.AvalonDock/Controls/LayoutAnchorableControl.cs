@@ -44,7 +44,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// Model Dependency Property
     /// </summary>
-    public static readonly DependencyProperty ModelProperty =  DependencyProperty.Register( "Model", typeof( LayoutAnchorable ), typeof( LayoutAnchorableControl ),
+    public static readonly DependencyProperty ModelProperty = DependencyProperty.Register( "Model", typeof( LayoutAnchorable ), typeof( LayoutAnchorableControl ),
             new FrameworkPropertyMetadata( ( LayoutAnchorable )null, new PropertyChangedCallback( OnModelChanged ) ) );
 
     /// <summary>

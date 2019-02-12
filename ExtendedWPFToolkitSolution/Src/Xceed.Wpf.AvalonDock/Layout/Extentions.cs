@@ -96,7 +96,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
           layoutPanel = parentContainer.FindParent<LayoutPanel>();
         }
 
-        if( (layoutPanel != null) && ( layoutPanel.Children.Count > 0 ) )
+        if( ( layoutPanel != null ) && ( layoutPanel.Children.Count > 0 ) )
         {
           if( layoutPanel.Orientation == System.Windows.Controls.Orientation.Horizontal )
             return layoutPanel.Children[ 0 ].Descendents().Contains( element ) ? AnchorSide.Left : AnchorSide.Right;

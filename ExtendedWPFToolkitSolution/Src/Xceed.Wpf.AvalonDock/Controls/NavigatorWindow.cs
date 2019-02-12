@@ -249,7 +249,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       bool shouldHandle = false;
 
       // Press Tab to switch Selected LayoutContent.
-      if( e.Key == System.Windows.Input.Key.Tab)
+      if( e.Key == System.Windows.Input.Key.Tab )
       {
         // Selecting LayoutDocuments
         if( _isSelectingDocument )
@@ -258,7 +258,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
           {
             // Jump to next LayoutDocument
             var docIndex = this.Documents.IndexOf<LayoutDocumentItem>( this.SelectedDocument );
-            if( docIndex < (this.Documents.Length - 1) )
+            if( docIndex < ( this.Documents.Length - 1 ) )
             {
               this.SelectNextDocument();
               shouldHandle = true;
@@ -289,7 +289,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
           {
             // Jump to next LayoutAnchorable
             var anchorableIndex = this.Anchorables.ToArray().IndexOf<LayoutAnchorableItem>( this.SelectedAnchorable );
-            if( anchorableIndex < (this.Anchorables.Count() - 1) )
+            if( anchorableIndex < ( this.Anchorables.Count() - 1 ) )
             {
               this.SelectNextAnchorable();
               shouldHandle = true;
@@ -374,10 +374,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     internal void UpdateThemeResources( Theme oldTheme = null )
     {
-            if (Application.Current != null)
-                return;
+      if( Application.Current != null )
+        return;
 
-      if ( oldTheme != null )
+      if( oldTheme != null )
       {
         if( oldTheme is DictionaryTheme )
         {
@@ -472,11 +472,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       this.Loaded -= new RoutedEventHandler( OnLoaded );
 
-      if( ( _documentListBox != null ) && (this.SelectedDocument != null) )
+      if( ( _documentListBox != null ) && ( this.SelectedDocument != null ) )
       {
         _documentListBox.Focus();
       }
-      else if( ( _anchorableListBox != null ) && (this.SelectedAnchorable != null) )
+      else if( ( _anchorableListBox != null ) && ( this.SelectedAnchorable != null ) )
       {
         _anchorableListBox.Focus();
       }

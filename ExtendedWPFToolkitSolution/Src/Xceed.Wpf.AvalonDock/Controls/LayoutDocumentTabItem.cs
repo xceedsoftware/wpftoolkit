@@ -57,7 +57,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// Model Dependency Property
     /// </summary>
-    public static readonly DependencyProperty ModelProperty =  DependencyProperty.Register( "Model", typeof( LayoutContent ), typeof( LayoutDocumentTabItem ),
+    public static readonly DependencyProperty ModelProperty = DependencyProperty.Register( "Model", typeof( LayoutContent ), typeof( LayoutDocumentTabItem ),
             new FrameworkPropertyMetadata( ( LayoutContent )null, new PropertyChangedCallback( OnModelChanged ) ) );
 
     /// <summary>

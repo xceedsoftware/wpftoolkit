@@ -34,7 +34,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         : base( overlayWindow )
     {
       _documentPaneControl = documentPaneControl;
-      base.SetScreenDetectionArea( new Rect(  _documentPaneControl.PointToScreenDPI( new Point() ),  _documentPaneControl.TransformActualSizeToAncestor() ) );
+      base.SetScreenDetectionArea( new Rect( _documentPaneControl.PointToScreenDPI( new Point() ), _documentPaneControl.TransformActualSizeToAncestor() ) );
     }
 
     #endregion

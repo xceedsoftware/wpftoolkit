@@ -222,13 +222,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
       return value;
     }
 
-        private bool CanExecuteDockCommand(object parameter)
-        {
-            if (LayoutElement == null)
-                return false;
+    private bool CanExecuteDockCommand( object parameter )
+    {
+      if( LayoutElement == null )
+        return false;
 
-            return LayoutElement.CanDock && LayoutElement.FindParent<LayoutAnchorableFloatingWindow>() != null;
-        }
+      return LayoutElement.CanDock && LayoutElement.FindParent<LayoutAnchorableFloatingWindow>() != null;
+    }
 
     private void ExecuteDockCommand( object parameter )
     {

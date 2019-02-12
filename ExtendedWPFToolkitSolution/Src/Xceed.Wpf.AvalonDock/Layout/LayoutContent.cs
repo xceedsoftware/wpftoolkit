@@ -42,7 +42,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     #region Title
 
-    public static readonly DependencyProperty TitleProperty =  DependencyProperty.Register( "Title", typeof( string ), typeof( LayoutContent ), new UIPropertyMetadata( null, OnTitlePropertyChanged, CoerceTitleValue ) );
+    public static readonly DependencyProperty TitleProperty = DependencyProperty.Register( "Title", typeof( string ), typeof( LayoutContent ), new UIPropertyMetadata( null, OnTitlePropertyChanged, CoerceTitleValue ) );
 
     public string Title
     {
@@ -539,29 +539,29 @@ namespace Xceed.Wpf.AvalonDock.Layout
       }
     }
 
-		#endregion
+    #endregion
 
-		#region CanDock
+    #region CanDock
 
-		private bool _canDock = true;
-		public bool CanDock
-		{
-			get { return _canDock; }
-			set
-			{
-				if (_canDock != value)
-				{
-					_canDock = value;
-					RaisePropertyChanged("CanDock");
-				}
-			}
-		}
+    private bool _canDock = true;
+    public bool CanDock
+    {
+      get { return _canDock; }
+      set
+      {
+        if( _canDock != value )
+        {
+          _canDock = value;
+          RaisePropertyChanged( "CanDock" );
+        }
+      }
+    }
 
-		#endregion
+    #endregion
 
-		#region IsEnabled
+    #region IsEnabled
 
-		private bool _isEnabled = true;
+    private bool _isEnabled = true;
     public bool IsEnabled
     {
       get
@@ -578,7 +578,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
       }
     }
 
-		#endregion
+    #endregion
 
 
 
@@ -586,11 +586,11 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
 
 
-		#endregion
+    #endregion
 
-		#region Overrides
+    #region Overrides
 
-		protected override void OnParentChanging( ILayoutContainer oldValue, ILayoutContainer newValue )
+    protected override void OnParentChanging( ILayoutContainer oldValue, ILayoutContainer newValue )
     {
       var root = Root;
 
@@ -789,22 +789,22 @@ namespace Xceed.Wpf.AvalonDock.Layout
         return;
       }
 
-			LayoutDocumentPane newParentPane;
-			if (root.LastFocusedDocument != null)
-			{
-				newParentPane = root.LastFocusedDocument.Parent as LayoutDocumentPane;
+      LayoutDocumentPane newParentPane;
+      if( root.LastFocusedDocument != null )
+      {
+        newParentPane = root.LastFocusedDocument.Parent as LayoutDocumentPane;
 
-				// LastFocusedDocument's parent isn't always a DocumentPane for some reason.
-				// Attempt to find one when this happens.
-				if (newParentPane == null)
-				{
-					newParentPane = root.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
-				}
-			}
-			else
-			{
-				newParentPane = root.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
-			}
+        // LastFocusedDocument's parent isn't always a DocumentPane for some reason.
+        // Attempt to find one when this happens.
+        if( newParentPane == null )
+        {
+          newParentPane = root.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
+        }
+      }
+      else
+      {
+        newParentPane = root.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
+      }
 
       if( newParentPane != null )
       {
@@ -886,10 +886,10 @@ namespace Xceed.Wpf.AvalonDock.Layout
       var parentAsContainer = Parent as ILayoutContainer;
       parentAsContainer.RemoveChild( this );
 
-	  if (Content is IDisposable contentAsDisposable)
-		contentAsDisposable.Dispose();
+      if( Content is IDisposable contentAsDisposable )
+        contentAsDisposable.Dispose();
 
-	  if ( root != null )
+      if( root != null )
         root.CollectGarbage();
 
       OnClosed();

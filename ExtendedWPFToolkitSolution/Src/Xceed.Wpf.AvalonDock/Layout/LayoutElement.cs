@@ -102,11 +102,11 @@ namespace Xceed.Wpf.AvalonDock.Layout
     #region Public Methods
 
 #if TRACE
-        public virtual void ConsoleDump(int tab)
-        {
-          System.Diagnostics.Trace.Write( new String( ' ', tab * 4 ) );
-          System.Diagnostics.Trace.WriteLine( this.ToString() );
-        }
+    public virtual void ConsoleDump( int tab )
+    {
+      System.Diagnostics.Trace.Write( new String( ' ', tab * 4 ) );
+      System.Diagnostics.Trace.WriteLine( this.ToString() );
+    }
 #endif
 
     #endregion

@@ -424,42 +424,42 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #endregion
 
-        #region CanDock
+    #region CanDock
 
-        public static readonly DependencyProperty CanDockProperty =
-            DependencyProperty.Register("CanDock", typeof(bool), typeof(LayoutItem),
-                new FrameworkPropertyMetadata(true,
-                new PropertyChangedCallback(OnCanDockChanged)));
+    public static readonly DependencyProperty CanDockProperty =
+        DependencyProperty.Register( "CanDock", typeof( bool ), typeof( LayoutItem ),
+            new FrameworkPropertyMetadata( true,
+            new PropertyChangedCallback( OnCanDockChanged ) ) );
 
-        public bool CanDock
-        {
-            get { return (bool)GetValue(CanDockProperty); }
-            set { SetValue(CanDockProperty, value); }
-        }
+    public bool CanDock
+    {
+      get { return ( bool )GetValue( CanDockProperty ); }
+      set { SetValue( CanDockProperty, value ); }
+    }
 
-        private static void OnCanDockChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((LayoutItem)d).OnCanDockChanged(e);
-        }
+    private static void OnCanDockChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      ( ( LayoutItem )d ).OnCanDockChanged( e );
+    }
 
-        protected virtual void OnCanDockChanged(DependencyPropertyChangedEventArgs e)
-        {
-            LayoutElement.CanDock = (bool)e.NewValue;
-        }
+    protected virtual void OnCanDockChanged( DependencyPropertyChangedEventArgs e )
+    {
+      LayoutElement.CanDock = ( bool )e.NewValue;
+    }
 
-        #endregion
+    #endregion
 
-        #endregion
+    #endregion
 
-        #region Commands
+    #region Commands
 
-        #region CloseCommand
+    #region CloseCommand
 
-        /// <summary>
-        /// CloseCommand Dependency Property
-        /// </summary>
-        public static readonly DependencyProperty CloseCommandProperty = DependencyProperty.Register( "CloseCommand", typeof( ICommand ), typeof( LayoutItem ),
-            new FrameworkPropertyMetadata( null, new PropertyChangedCallback( OnCloseCommandChanged ), new CoerceValueCallback( CoerceCloseCommandValue ) ) );
+    /// <summary>
+    /// CloseCommand Dependency Property
+    /// </summary>
+    public static readonly DependencyProperty CloseCommandProperty = DependencyProperty.Register( "CloseCommand", typeof( ICommand ), typeof( LayoutItem ),
+        new FrameworkPropertyMetadata( null, new PropertyChangedCallback( OnCloseCommandChanged ), new CoerceValueCallback( CoerceCloseCommandValue ) ) );
 
     /// <summary>
     /// Gets or sets the CloseCommand property.  This dependency property 
@@ -627,10 +627,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
       return value;
     }
 
-        private bool CanExecuteDockAsDocumentCommand(object parameter)
-        {
-            return LayoutElement != null && LayoutElement.CanDock && LayoutElement.FindParent<LayoutDocumentPane>() == null;
-        }
+    private bool CanExecuteDockAsDocumentCommand( object parameter )
+    {
+      return LayoutElement != null && LayoutElement.CanDock && LayoutElement.FindParent<LayoutDocumentPane>() == null;
+    }
 
     private void ExecuteDockAsDocumentCommand( object parameter )
     {
@@ -1109,13 +1109,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
       layoutElement.IsActive = true;
       layoutElement.Root.CollectGarbage();
     }
-        #endregion
+    #endregion
 
-        #endregion
+    #endregion
 
-        #region Internal Methods
+    #region Internal Methods
 
-        protected virtual void InitDefaultCommands()
+    protected virtual void InitDefaultCommands()
     {
       _defaultCloseCommand = new RelayCommand( ( p ) => ExecuteCloseCommand( p ), ( p ) => CanExecuteCloseCommand( p ) );
       _defaultFloatCommand = new RelayCommand( ( p ) => ExecuteFloatCommand( p ), ( p ) => CanExecuteFloatCommand( p ) );

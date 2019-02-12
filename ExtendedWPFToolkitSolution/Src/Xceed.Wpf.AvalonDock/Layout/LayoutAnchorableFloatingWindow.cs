@@ -228,13 +228,13 @@ namespace Xceed.Wpf.AvalonDock.Layout
     }
 
 #if TRACE
-        public override void ConsoleDump(int tab)
-        {
-          System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
-          System.Diagnostics.Trace.WriteLine( "FloatingAnchorableWindow()" );
+    public override void ConsoleDump( int tab )
+    {
+      System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
+      System.Diagnostics.Trace.WriteLine( "FloatingAnchorableWindow()" );
 
-          RootPanel.ConsoleDump(tab + 1);
-        }
+      RootPanel.ConsoleDump( tab + 1 );
+    }
 #endif
 
     #endregion

@@ -38,8 +38,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// DropDownContextMenu Dependency Property
     /// </summary>
-    public static readonly DependencyProperty DropDownContextMenuProperty =  DependencyProperty.Register( "DropDownContextMenu", typeof( ContextMenu ), typeof( DropDownButton ),
-            new FrameworkPropertyMetadata( ( ContextMenu )null,  new PropertyChangedCallback( OnDropDownContextMenuChanged ) ) );
+    public static readonly DependencyProperty DropDownContextMenuProperty = DependencyProperty.Register( "DropDownContextMenu", typeof( ContextMenu ), typeof( DropDownButton ),
+            new FrameworkPropertyMetadata( ( ContextMenu )null, new PropertyChangedCallback( OnDropDownContextMenuChanged ) ) );
 
     /// <summary>
     /// Gets or sets the DropDownContextMenu property.  This dependency property 
@@ -82,7 +82,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// DropDownContextMenuDataContext Dependency Property
     /// </summary>
-    public static readonly DependencyProperty DropDownContextMenuDataContextProperty =  DependencyProperty.Register( "DropDownContextMenuDataContext", typeof( object ), typeof( DropDownButton ),
+    public static readonly DependencyProperty DropDownContextMenuDataContextProperty = DependencyProperty.Register( "DropDownContextMenuDataContext", typeof( object ), typeof( DropDownButton ),
             new FrameworkPropertyMetadata( ( object )null ) );
 
     /// <summary>

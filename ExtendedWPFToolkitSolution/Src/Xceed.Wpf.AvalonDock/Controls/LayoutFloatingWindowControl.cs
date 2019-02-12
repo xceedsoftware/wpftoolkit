@@ -245,10 +245,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     internal virtual void UpdateThemeResources( Theme oldTheme = null )
     {
-			if (Application.Current != null)
-				return;
+      if( Application.Current != null )
+        return;
 
-			if ( oldTheme != null )
+      if( oldTheme != null )
       {
         if( oldTheme is DictionaryTheme )
         {

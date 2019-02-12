@@ -115,7 +115,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// LayoutItem Read-Only Dependency Property
     /// </summary>
     private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly( "LayoutItem", typeof( LayoutItem ), typeof( LayoutDocumentControl ),
-      new FrameworkPropertyMetadata(( LayoutItem )null ) );
+      new FrameworkPropertyMetadata( ( LayoutItem )null ) );
 
     public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 

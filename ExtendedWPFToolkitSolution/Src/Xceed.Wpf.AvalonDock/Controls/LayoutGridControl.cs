@@ -67,7 +67,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         return _model;
       }
-    }   
+    }
 
     public Orientation Orientation
     {
@@ -75,7 +75,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         return ( _model as ILayoutOrientableGroup ).Orientation;
       }
-    } 
+    }
 
     private bool AsyncRefreshCalled
     {
@@ -565,7 +565,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       _resizerWindowHost.Show();
     }
 
-    private  void HideResizerOverlayWindow()
+    private void HideResizerOverlayWindow()
     {
       if( _resizerWindowHost != null )
       {

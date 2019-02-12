@@ -97,7 +97,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void OnVisibilityChanged()
     {
-      if( (_document != null) && (_document.Root != null) )
+      if( ( _document != null ) && ( _document.Root != null ) )
       {
         _document.IsVisible = ( this.Visibility == Visibility.Visible );
 
@@ -138,6 +138,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
 
 
-#endregion
+    #endregion
   }
 }

@@ -351,25 +351,25 @@ namespace Xceed.Wpf.AvalonDock.Layout
     #region Overrides
 
 #if TRACE
-        public override void ConsoleDump(int tab)
-        {
-          System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
-          System.Diagnostics.Trace.WriteLine( "RootPanel()" );
+    public override void ConsoleDump( int tab )
+    {
+      System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
+      System.Diagnostics.Trace.WriteLine( "RootPanel()" );
 
-          RootPanel.ConsoleDump(tab + 1);
+      RootPanel.ConsoleDump( tab + 1 );
 
-          System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
-          System.Diagnostics.Trace.WriteLine( "FloatingWindows()" );
+      System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
+      System.Diagnostics.Trace.WriteLine( "FloatingWindows()" );
 
-          foreach (LayoutFloatingWindow fw in FloatingWindows)
-              fw.ConsoleDump(tab + 1);
+      foreach( LayoutFloatingWindow fw in FloatingWindows )
+        fw.ConsoleDump( tab + 1 );
 
-          System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
-          System.Diagnostics.Trace.WriteLine( "Hidden()" );
+      System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
+      System.Diagnostics.Trace.WriteLine( "Hidden()" );
 
-          foreach (LayoutAnchorable hidden in Hidden)
-              hidden.ConsoleDump(tab + 1);
-        }
+      foreach( LayoutAnchorable hidden in Hidden )
+        hidden.ConsoleDump( tab + 1 );
+    }
 #endif
 
     #endregion
@@ -607,7 +607,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
       System.Diagnostics.Debug.Assert(
           !this.Descendents().OfType<LayoutAnchorablePane>().Any( a => a.ChildrenCount == 0 && a.IsVisible ) );
 #if TRACE
-            RootPanel.ConsoleDump(4);
+      RootPanel.ConsoleDump( 4 );
 #endif
 #endif
     }
@@ -906,7 +906,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
       if( reader.LocalName.Equals( "RootPanel" ) )
       {
-        orientation = (reader.GetAttribute( "Orientation" ) == "Vertical") ? Orientation.Vertical : Orientation.Horizontal;
+        orientation = ( reader.GetAttribute( "Orientation" ) == "Vertical" ) ? Orientation.Vertical : Orientation.Horizontal;
         reader.Read();
 
         while( true )

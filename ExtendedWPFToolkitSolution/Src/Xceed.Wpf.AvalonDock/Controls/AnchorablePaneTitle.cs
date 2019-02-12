@@ -52,7 +52,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// Model Dependency Property
     /// </summary>
-    public static readonly DependencyProperty ModelProperty =  DependencyProperty.Register( "Model", typeof( LayoutAnchorable ), typeof( AnchorablePaneTitle ),
+    public static readonly DependencyProperty ModelProperty = DependencyProperty.Register( "Model", typeof( LayoutAnchorable ), typeof( AnchorablePaneTitle ),
             new FrameworkPropertyMetadata( ( LayoutAnchorable )null, new PropertyChangedCallback( _OnModelChanged ) ) );
 
     /// <summary>
@@ -98,10 +98,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// LayoutItem Read-Only Dependency Property
     /// </summary>
-    private static readonly DependencyPropertyKey LayoutItemPropertyKey  = DependencyProperty.RegisterReadOnly( "LayoutItem", typeof( LayoutItem ), typeof( AnchorablePaneTitle ),
+    private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly( "LayoutItem", typeof( LayoutItem ), typeof( AnchorablePaneTitle ),
             new FrameworkPropertyMetadata( ( LayoutItem )null ) );
 
-    public static readonly DependencyProperty LayoutItemProperty  = LayoutItemPropertyKey.DependencyProperty;
+    public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
     /// <summary>
     /// Gets the LayoutItem property.  This dependency property 
