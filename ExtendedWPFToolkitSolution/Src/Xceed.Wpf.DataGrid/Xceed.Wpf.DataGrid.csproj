@@ -40,7 +40,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>.\bin\Debug\</OutputPath>
+    <OutputPath>..\..\Bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;XBAP_FRIENDLY</DefineConstants>
     <DocumentationFile>
     </DocumentationFile>
@@ -52,7 +52,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <Optimize>true</Optimize>
-    <OutputPath>.\bin\Release\</OutputPath>
+    <OutputPath>..\..\Bin\Release\</OutputPath>
     <DefineConstants>TRACE;CODE_ANALYSIS;XBAP_FRIENDLY</DefineConstants>
     <DocumentationFile>
     </DocumentationFile>
