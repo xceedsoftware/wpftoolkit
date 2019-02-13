@@ -9,9 +9,9 @@ using System.Windows;
 // associated with an assembly.
 [assembly: AssemblyTitle( "Xceed Toolkit for WPF LiveExplorer" )]
 [assembly: AssemblyDescription( "" )]
-[assembly: AssemblyCompany( "Xceed Software Inc." )]
+[assembly: AssemblyCompany( "Xceed Software Inc. & APD Communications Ltd." )]
 [assembly: AssemblyProduct( "Xceed Toolkit for WPF" )]
-[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2017" )]
+[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2017 & APD Communications Ltd." )]
 [assembly: AssemblyCulture( "" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

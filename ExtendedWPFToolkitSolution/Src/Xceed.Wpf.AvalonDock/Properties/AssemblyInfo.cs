@@ -28,9 +28,9 @@ using System;
 [assembly: AssemblyTitle( "Xceed Toolkit for WPF - AvalonDock" )]
 [assembly: AssemblyDescription( "This assembly implements the Xceed.Wpf.AvalonDock namespace, a docking layout system for the Windows Presentation Framework." )]
 
-[assembly: AssemblyCompany( "Xceed Software Inc." )]
+[assembly: AssemblyCompany( "Xceed Software Inc. & APD Communications Ltd." )]
 [assembly: AssemblyProduct( "Xceed Toolkit for WPF - AvalonDock" )]
-[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2017" )]
+[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2017 & APD Communications Ltd." )]
 [assembly: AssemblyCulture( "" )]
 
 
