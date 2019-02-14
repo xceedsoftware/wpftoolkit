@@ -204,31 +204,19 @@ namespace Xceed.Wpf.Toolkit
     {
       Point mousePosition = Mouse.GetPosition( _richTextBox );
 
-      var left = mousePosition.X;
-      var top = mousePosition.Y;
+      double left = mousePosition.X;
+      double top = ( mousePosition.Y - 15 ) - adorningEditor.ActualHeight;
 
-      // Top boundary
+      //top
       if( top < 0 )
       {
-        top = 5d;
+        top = mousePosition.Y + 10;
       }
 
-      // Left boundary
-      if( left < 0 )
+      //right boundary
+      if( left + adorningEditor.ActualWidth > _richTextBox.ActualWidth - 20 )
       {
-        left = 5d;
-      }
-
-      // Right boundary
-      if( left + adorningEditor.ActualWidth > _richTextBox.ActualWidth - 10d )
-      {
-        left = _richTextBox.ActualWidth - adorningEditor.ActualWidth - 10d;
-      }
-
-      // Bottom boundary
-      if( top + adorningEditor.ActualHeight > _richTextBox.ActualHeight - 10d )
-      {
-        top = _richTextBox.ActualHeight - adorningEditor.ActualHeight - 10d;
+        left = left - ( adorningEditor.ActualWidth - ( _richTextBox.ActualWidth - left ) );
       }
 
       _adorner.SetOffsets( left, top );

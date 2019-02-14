@@ -14,11 +14,7 @@
 
   ***********************************************************************************/
 
-using System.Data;
-using Xceed.Wpf.DataGrid;
-using System.Diagnostics;
 using Xceed.Wpf.Samples.SampleData;
-using System.Collections.ObjectModel;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.DataGrid.Views
 {
@@ -29,7 +25,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.DataGrid.Views
   {
     public DataGridView()
     {
-      this.DataContext = SampleDataProvider.GetOrders();
       InitializeComponent();
     }
   }

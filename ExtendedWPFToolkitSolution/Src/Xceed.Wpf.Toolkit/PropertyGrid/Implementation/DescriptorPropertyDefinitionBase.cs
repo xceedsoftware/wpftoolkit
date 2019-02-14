@@ -157,21 +157,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return null;
     }
 
-    internal void UpdateAdvanceOptionsForItem( MarkupObject markupObject, DependencyObject dependencyObject, DependencyPropertyDescriptor dpDescriptor,
-                                                out object tooltip )
+    internal void UpdateAdvanceOptionsForItem( DependencyObject dependencyObject, DependencyPropertyDescriptor dpDescriptor, out object tooltip )
     {
       tooltip = StringConstants.Default;
 
       bool isResource = false;
       bool isDynamicResource = false;
 
-      var markupProperty = markupObject.Properties.FirstOrDefault( p => p.Name == PropertyName );
-      if( markupProperty != null )
-      {
-        //TODO: need to find a better way to determine if a StaticResource has been applied to any property not just a style(maybe with StaticResourceExtension)
-        isResource = typeof( Style ).IsAssignableFrom( markupProperty.PropertyType );
-        isDynamicResource = typeof( DynamicResourceExtension ).IsAssignableFrom( markupProperty.PropertyType );
-      }
+      //TODO: need to find a better way to determine if a StaticResource has been applied to any property not just a style(maybe with StaticResourceExtension)
+      isResource = typeof( Style ).IsAssignableFrom( this.PropertyType );
+      isDynamicResource = typeof( DynamicResourceExtension ).IsAssignableFrom( this.PropertyType );
 
       if( isResource || isDynamicResource )
       {
@@ -214,30 +209,27 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         else
         {
           // When the Value is diferent from the DefaultValue, use the local icon.
-          if( markupProperty != null && !markupProperty.Value.Equals( this.DefaultValue ) )
+          if( !this.Value.Equals( this.DefaultValue ) )
           {
             if( this.DefaultValue != null )
             {
-              if( !markupProperty.Value.Equals( this.DefaultValue ) )
-              {
-                tooltip = StringConstants.Local;
-              }
+              tooltip = StringConstants.Local;
             }
             else
             {
-              if( markupProperty.PropertyType.IsValueType )
+              if( this.PropertyType.IsValueType )
               {
-                var defaultValue = Activator.CreateInstance( markupProperty.PropertyType );
+                var defaultValue = Activator.CreateInstance( this.PropertyType );
                 // When the Value is diferent from the DefaultValue, use the local icon.
-                if( !markupProperty.Value.Equals( defaultValue ) )
+                if( !this.Value.Equals( defaultValue ) )
                 {
                   tooltip = StringConstants.Local;
                 }
               }
               else
               {
-                // When the Value is diferent from the DefaultValue, use the local icon.
-                if( !(markupProperty.Value is System.Windows.Markup.NullExtension) )
+                // When the Value is diferent from null, use the local icon.
+                if( this.Value != null )
                 {
                   tooltip = StringConstants.Local;
                 }
@@ -689,8 +681,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       _newItemTypes = ComputeNewItemTypes();
       _commandBindings = new CommandBinding[] { new CommandBinding( PropertyItemCommands.ResetValue, ExecuteResetValueCommand, CanExecuteResetValueCommand ) };
 
-      UpdateIsExpandable();
-      UpdateAdvanceOptions();
 
       BindingBase valueBinding = this.CreateValueBinding();
       BindingOperations.SetBinding( this, DescriptorPropertyDefinitionBase.ValueProperty, valueBinding );

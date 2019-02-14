@@ -51,7 +51,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return ( selectedObject != null ) ? ObjectContainerHelperBase.GetDefaultPropertyName( SelectedObject ) : ( string )null;
     }
 
-    protected override IEnumerable<PropertyItem> GenerateSubPropertiesCore()
+    protected override void GenerateSubPropertiesCore( Action<IEnumerable<PropertyItem>> updatePropertyItemsCallback )
     {
       var propertyItems = new List<PropertyItem>();
 
@@ -114,7 +114,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         }
       }
 
-      return propertyItems;
+      updatePropertyItemsCallback.Invoke( propertyItems );
     }
 
 

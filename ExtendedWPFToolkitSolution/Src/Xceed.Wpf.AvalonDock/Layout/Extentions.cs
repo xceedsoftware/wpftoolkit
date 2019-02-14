@@ -99,8 +99,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
         if( (layoutPanel != null) && ( layoutPanel.Children.Count > 0 ) )
         {
           if( layoutPanel.Orientation == System.Windows.Controls.Orientation.Horizontal )
-            return layoutPanel.Children[ 0 ].Descendents().Contains( element ) ? AnchorSide.Left : AnchorSide.Right;
-          return layoutPanel.Children[ 0 ].Descendents().Contains( element ) ? AnchorSide.Top : AnchorSide.Bottom;
+            return ( layoutPanel.Children[ 0 ].Equals(element) || layoutPanel.Children[ 0 ].Descendents().Contains( element ) ) ? AnchorSide.Left : AnchorSide.Right;
+          return ( layoutPanel.Children[ 0 ].Equals( element ) || layoutPanel.Children[ 0 ].Descendents().Contains( element ) ) ? AnchorSide.Top : AnchorSide.Bottom;
         }
       }
 

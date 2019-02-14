@@ -164,16 +164,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       return new HandleRef( this, _internalHwndSource.Handle );
     }
 
-    protected override IntPtr WndProc( IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled )
-    {
-      if( msg == Win32Helper.WM_WINDOWPOSCHANGING )
-      {
-        if( _internalHost_ContentRendered )
-          Win32Helper.SetWindowPos( _internalHwndSource.Handle, Win32Helper.HWND_TOP, 0, 0, 0, 0, Win32Helper.SetWindowPosFlags.IgnoreMove | Win32Helper.SetWindowPosFlags.IgnoreResize );
-      }
-      return base.WndProc( hwnd, msg, wParam, lParam, ref handled );
-    }
-
     protected override void DestroyWindowCore( System.Runtime.InteropServices.HandleRef hwnd )
     {
       if( _internalHwndSource != null )
@@ -182,11 +172,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
         _internalHwndSource.Dispose();
         _internalHwndSource = null;
       }
-    }
-
-    public override void OnApplyTemplate()
-    {
-      base.OnApplyTemplate();
     }
 
     protected override bool HasFocusWithinCore()
@@ -243,6 +228,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       Visibility = System.Windows.Visibility.Visible;
       InvalidateMeasure();
       UpdateWindowPos();
+      Win32Helper.BringWindowToTop( _internalHwndSource.Handle );
     }
 
     internal void Hide()

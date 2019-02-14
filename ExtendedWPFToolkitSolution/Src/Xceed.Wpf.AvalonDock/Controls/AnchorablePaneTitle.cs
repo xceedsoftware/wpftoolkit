@@ -155,6 +155,22 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
           manager.StartDraggingFloatingWindowForPane( paneModel );
         }
+        else
+        {
+          var model = this.Model;
+          if( model != null )
+          {
+            var root = model.Root;
+            if( root != null )
+            {
+              var manager = root.Manager;
+              if( manager != null )
+              {
+                manager.StartDraggingFloatingWindowForContent( model );
+              }
+            }
+          }
+        }
       }
 
       _isMouseDown = false;

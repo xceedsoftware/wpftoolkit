@@ -10,7 +10,6 @@
 //------------------------------------------------------------------------------
 
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Automation;
@@ -31,7 +30,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Shell;
 using Xceed.Wpf.Toolkit.LiveExplorer;
-using Xceed.Wpf.Toolkit.LiveExplorer.Samples.DataGrid;
 using Xceed.Wpf.Toolkit.LiveExplorer.Samples.DataGrid.Converters;
 
 
