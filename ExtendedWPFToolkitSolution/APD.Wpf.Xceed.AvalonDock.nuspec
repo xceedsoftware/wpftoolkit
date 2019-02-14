@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>APD.Wpf.Xceed.AvalonDock</id>
+    <version>0.0.0.0</version>
+    <title>APD Avalon Dock</title>
+    <description>Our fork of Xceed's AvalonDock. AvalonDock is a docking windows control for WPF that lets you create customizable layouts using a full featured window docking system similar to what is found in many popular integrated development environements (IDEs) such as Visual Studio.</description>
+    <authors>Xceed, APD Communications</authors>
+    <copyright>Xceed &amp; APD Communications</copyright>
+  </metadata>
+  <files>
+    <file src="Src\Xceed.Wpf.AvalonDock\bin\Release\**" target="lib\net40" />
+  </files>
+</package>
