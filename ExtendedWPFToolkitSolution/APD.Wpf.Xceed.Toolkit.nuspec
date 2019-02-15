@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>APD.Wpf.Xceed.Toolkit</id>
+    <version>0.0.0.0</version>
+    <title>APD Xceed Toolkit</title>
+    <description>Our fork of Xceed's Toolkit. A collection of WPF controls, components and utilities for creating next generation Windows applications. Use it to build professional looking, modern, and easy to use WPF applications. Excludes DataGrid and AvalonDock.</description>
+    <authors>Xceed, APD Communications</authors>
+    <copyright>Xceed &amp; APD Communications</copyright>
+  </metadata>
+  <files>
+    <file src="Src\Xceed.Wpf.Toolkit\bin\Release\**" target="lib\net40" />
+  </files>
+</package>

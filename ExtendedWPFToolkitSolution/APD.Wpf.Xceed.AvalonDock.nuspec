@@ -3,7 +3,7 @@
   <metadata>
     <id>APD.Wpf.Xceed.AvalonDock</id>
     <version>0.0.0.0</version>
-    <title>APD Avalon Dock</title>
+    <title>APD Xceed AvalonDock</title>
     <description>Our fork of Xceed's AvalonDock. AvalonDock is a docking windows control for WPF that lets you create customizable layouts using a full featured window docking system similar to what is found in many popular integrated development environements (IDEs) such as Visual Studio.</description>
     <authors>Xceed, APD Communications</authors>
     <copyright>Xceed &amp; APD Communications</copyright>
