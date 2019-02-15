@@ -29,7 +29,7 @@
          <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
 
-		<local:CollectionControl x:Name="_localCollectionControl"
+		<local:CollectionControl x:Name="_collectionControl"
                                ItemsSourceType="{Binding ItemsSourceType, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Mode=TwoWay}"
                                NewItemTypes="{Binding NewItemTypes, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
