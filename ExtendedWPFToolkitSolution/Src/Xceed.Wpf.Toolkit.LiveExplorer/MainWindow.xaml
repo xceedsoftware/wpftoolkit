@@ -516,7 +516,8 @@
 
           </core:LiveExplorerTreeViewItem>
           <core:LiveExplorerTreeViewItem Header="DataGrid"
-                                         SampleType="{x:Type samples:DataGrid.Views.DataGridView}" />
+                                         SampleType="{x:Type samples:DataGrid.Views.DataGridView}"
+                                         IsPlusOnlyFeature="True" />
           <core:LiveExplorerTreeViewItem Header="Multi-Column ComboBox"
                                          SampleType="{x:Type samples:DataGrid.Views.MultiColumnComboBoxView}"
                                          IsPlusOnlyFeature="True" />

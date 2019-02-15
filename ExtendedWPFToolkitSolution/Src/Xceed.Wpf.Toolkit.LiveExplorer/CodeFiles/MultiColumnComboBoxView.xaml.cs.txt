@@ -15,7 +15,6 @@
   *************************************************************************************/
 
 using System.Data;
-using Xceed.Wpf.DataGrid;
 using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Data;

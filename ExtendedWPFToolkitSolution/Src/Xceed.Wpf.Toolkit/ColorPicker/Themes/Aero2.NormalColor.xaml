@@ -211,11 +211,13 @@
             Value="0" />
     <Setter Property="MaxHeight"
             Value="500" />
+    <!-- ConverterParameter is margin/Padding from Popup-->
+    <Setter Property="Width"
+            Value="{Binding MaxDropDownWidth, RelativeSource={RelativeSource AncestorType={x:Type local:ColorPicker}}, Converter={StaticResource AdditionConverter}, ConverterParameter=-18}"/>
     <Setter Property="ItemsPanel">
       <Setter.Value>
         <ItemsPanelTemplate>
-          <!-- ConverterParameter is margin/Padding from Popup-->
-          <WrapPanel Width="{Binding MaxDropDownWidth, RelativeSource={RelativeSource AncestorType={x:Type local:ColorPicker}}, Converter={StaticResource AdditionConverter}, ConverterParameter=-18}" />
+          <WrapPanel Width="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}, Converter={StaticResource AdditionConverter}, ConverterParameter=-4}" />
         </ItemsPanelTemplate>
       </Setter.Value>
     </Setter>
@@ -291,7 +293,7 @@
     <Setter Property="VerticalContentAlignment"
             Value="Center" />
     <Setter Property="MaxDropDownWidth"
-            Value="218" />
+            Value="250" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:ColorPicker}">
@@ -339,7 +341,8 @@
                    HorizontalOffset="1"
                    VerticalOffset="1"
                    PopupAnimation="Slide"
-                   ToolTip="{x:Static sys:String.Empty}">
+                   ToolTip="{x:Static sys:String.Empty}"
+                   Width="{TemplateBinding MaxDropDownWidth}">
               <Popup.Resources>
                 <Style TargetType="ToolTip">
                   <Style.Triggers>
@@ -439,12 +442,16 @@
                                             Header="{Binding AdvancedButtonHeader, RelativeSource={RelativeSource TemplatedParent}}"
                                             Template="{StaticResource TabItemTemplate}">
                     <!-- ColorCanvas -->
-                    <Grid x:Name="_colorCanvasHost">
+                    <!-- ConverterParameter is margin/Padding from Popup-->
+                    <Grid x:Name="_colorCanvasHost"
+                          Width="{Binding MaxDropDownWidth, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource AdditionConverter}, ConverterParameter=-18}">
+                      <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                    VerticalScrollBarVisibility="Hidden">                        
                       <local:ColorCanvas Background="Transparent"
                                          BorderThickness="0"
                                          UsingAlphaChannel="{Binding UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}}"
-                                         SelectedColor="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}"
-                                         Width="{Binding MaxDropDownWidth, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource AdditionConverter}, ConverterParameter=-18}" />
+                                         SelectedColor="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}" />
+                      </ScrollViewer>
                     </Grid>
                   </local:ColorPickerTabItem>
                 </TabControl>

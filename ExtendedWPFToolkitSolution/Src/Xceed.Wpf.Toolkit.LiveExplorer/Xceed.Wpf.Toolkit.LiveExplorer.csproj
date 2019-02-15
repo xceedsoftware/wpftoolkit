@@ -101,10 +101,6 @@
       <Project>{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}</Project>
       <Name>Xceed.Wpf.AvalonDock</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Xceed.Wpf.DataGrid\Xceed.Wpf.DataGrid.csproj">
-      <Project>{63648392-6CE9-4A60-96D4-F9FD718D29B0}</Project>
-      <Name>Xceed.Wpf.DataGrid</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Xceed.Wpf.Toolkit\Xceed.Wpf.Toolkit.csproj">
       <Project>{72E591D6-8F83-4D8C-8F67-9C325E623234}</Project>
       <Name>Xceed.Wpf.Toolkit</Name>
@@ -179,7 +175,6 @@
       <DependentUpon>ColorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Samples\DataGrid\Converters\FlagPathConverter.cs" />
-    <Compile Include="Samples\DataGrid\UniqueIDCellValidationRule.cs" />
     <Compile Include="Samples\DataGrid\Views\DataGridView.xaml.cs">
       <DependentUpon>DataGridView.xaml</DependentUpon>
     </Compile>
@@ -1425,6 +1420,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialHamburger.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\DataGrid\OpenSourceImages\DataGrid.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

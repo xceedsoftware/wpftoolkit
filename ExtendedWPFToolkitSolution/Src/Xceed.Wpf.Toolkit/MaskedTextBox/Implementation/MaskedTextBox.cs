@@ -1455,9 +1455,7 @@ namespace Xceed.Wpf.Toolkit
 
     internal override bool GetIsEditTextEmpty()
     {
-      if( !m_maskIsNull )
-        return ( this.MaskedTextProvider.AssignedEditPositionCount == 0 );
-      return true;
+      return ( this.MaskedTextProvider.AssignedEditPositionCount == 0 );
     }
 
     #endregion INTERNAL PROPERTIES

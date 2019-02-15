@@ -23,7 +23,6 @@ using Xceed.Wpf.Toolkit;
 using System.Windows.Controls.Primitives;
 using System;
 using System.Data;
-using Xceed.Wpf.DataGrid.Views;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Diagnostics;
