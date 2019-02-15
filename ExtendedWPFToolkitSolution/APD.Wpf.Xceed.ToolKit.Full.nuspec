@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>APD.Wpf.Xceed.ToolKit.Full</id>
+		<version>0.0.0.0</version>
+		<title>APD Xceed ToolKit Full</title>
+		<description>Our fork of Xceed's ToolKit. Contain the full Xceed Wpf Tookit - Including avalon dock.</description>
+		<authors>Xceed, APD Communications</authors>
+		<copyright>Xceed &amp; APD Communications</copyright>
+	</metadata>
+	<files>
+		<file src="Src\Xceed.Wpf.AvalonDock\bin\Release\**" target="lib\net40" />
+		<file src="Src\Xceed.Wpf.Toolkit\bin\Release\**" target="lib\net40" />
+		<file src="Src\Xceed.Wpf.AvalonDock.Themes.Aero\bin\Release\**" target="lib\net40" />
+		<file src="Src\Xceed.Wpf.AvalonDock.Themes.Metro\bin\Release\**" target="lib\net40" />
+		<file src="Src\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\Release\**" target="lib\net40" />
+	</files>
+</package>
