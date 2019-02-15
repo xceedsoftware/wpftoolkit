@@ -117,7 +117,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return _collectionControl;
+        return this._collectionControl;
       }
     }
 
@@ -175,14 +175,14 @@ namespace Xceed.Wpf.Toolkit
         }
       }
 
-      _collectionControl.PersistChanges();
+      this._collectionControl.PersistChanges();
       this.DialogResult = true;
       this.Close();
     }
 
     private void CancelButton_Click( object sender, RoutedEventArgs e )
     {
-      _collectionControl.PersistChanges( originalData );
+      this._collectionControl.PersistChanges( originalData );
       this.DialogResult = false;
       this.Close();
     }
@@ -329,7 +329,7 @@ namespace Xceed.Wpf.Toolkit
 
     private bool AreDictionaryKeysValid()
     {
-      var keys = _collectionControl.Items.Select( x =>
+      var keys = this._collectionControl.Items.Select( x =>
       {
         var keyType = x.GetType().GetProperty( "Key" );
         if( keyType != null )
@@ -339,7 +339,7 @@ namespace Xceed.Wpf.Toolkit
         return null;
       } );
 
-      return ( keys.Distinct().Count() == _collectionControl.Items.Count )
+      return ( keys.Distinct().Count() == this._collectionControl.Items.Count )
              && keys.All( x => x != null );
     }
 
