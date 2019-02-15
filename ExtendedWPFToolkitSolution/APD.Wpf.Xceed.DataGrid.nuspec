@@ -9,7 +9,7 @@
     <copyright>Xceed &amp; APD Communications</copyright>
     <dependencies>
       <!-- IMPORTANT: Change me if necessary after upgrading source! (Build number is defined in build definition) -->
-      <dependency id="APD.Wpf.Xceed.Toolkit" version="[3.4,3.5)" />
+      <dependency id="APD.Wpf.Xceed.Toolkit" version="[3.5,3.6)" />
     </dependencies>
   </metadata>
   <files>
