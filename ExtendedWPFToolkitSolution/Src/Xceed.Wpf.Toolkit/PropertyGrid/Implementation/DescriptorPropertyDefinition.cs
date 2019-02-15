@@ -43,7 +43,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private object _selectedObject;
     private PropertyDescriptor _propertyDescriptor;
     private DependencyPropertyDescriptor _dpDescriptor;
-    private MarkupObject _markupObject;
 
     #endregion
 
@@ -136,7 +135,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     protected override object ComputeAdvancedOptionsTooltip()
     {
       object tooltip;
-      UpdateAdvanceOptionsForItem( _markupObject, SelectedObject as DependencyObject, _dpDescriptor, out tooltip );
+      UpdateAdvanceOptionsForItem( SelectedObject as DependencyObject, _dpDescriptor, out tooltip );
 
       return tooltip;
     }
@@ -254,7 +253,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       _propertyDescriptor = propertyDescriptor;
       _selectedObject = selectedObject;
       _dpDescriptor = DependencyPropertyDescriptor.FromProperty( propertyDescriptor );
-      _markupObject = MarkupWriter.GetMarkupObjectFor( SelectedObject );
     }
 
     #endregion //Private Methods

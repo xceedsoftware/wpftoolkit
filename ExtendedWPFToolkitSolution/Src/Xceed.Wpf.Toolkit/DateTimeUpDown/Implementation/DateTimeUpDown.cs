@@ -20,6 +20,7 @@ using System.Windows;
 using Xceed.Wpf.Toolkit.Primitives;
 using System.Windows.Controls;
 using Xceed.Wpf.Toolkit.Core.Utilities;
+using System.Windows.Input;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -663,6 +664,17 @@ namespace Xceed.Wpf.Toolkit
       throw new NotSupportedException( "DateTimeUpDown controls do not support modifying UpdateValueOnEnterKey property." );
     }
 
+    protected override void OnKeyDown( KeyEventArgs e )
+    {
+      if( e.Key == Key.Escape )
+      {
+        this.SyncTextAndValueProperties( false, null );
+        e.Handled = true;
+      }
+
+      base.OnKeyDown( e );
+    }
+
 
 #endregion //Base Class Overrides
 
@@ -710,6 +722,8 @@ namespace Xceed.Wpf.Toolkit
       if( currentValue.HasValue )
       {
         var newValue = this.UpdateDateTime( currentValue, step );
+        if( newValue == null )
+          return;
         this.TextBox.Text = newValue.Value.ToString( this.GetFormatString( this.Format ), this.CultureInfo );
       }
       else

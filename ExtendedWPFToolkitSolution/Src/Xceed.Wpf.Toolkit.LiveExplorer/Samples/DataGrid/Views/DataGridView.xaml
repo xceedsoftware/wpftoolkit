@@ -28,157 +28,47 @@
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
             <Run>Toolkit for WPF includes a powerful and fast datagrid control with many improvements over the stock WPF datagrid. In addition to providing a modern experience with the smooth scrolling and fully animated Tableflow view (can be turned off), it also provides zero-lag background data virtualization. Try a basic sample here. There are too many features and options to showcase in this sample. An even more feature-rich edition of this datagrid is available </Run>
-            <Hyperlink NavigateUri="http://xceed.com/Grid_WPF_Intro.html?adtype=154" RequestNavigate="Hyperlink_RequestNavigate">
+            <Hyperlink NavigateUri="https://xceed.com/xceed-datagrid-for-wpf/" RequestNavigate="Hyperlink_RequestNavigate">
                 here.
             </Hyperlink>
-        </Paragraph>
-    </local:DemoView.Description>
+         <LineBreak />
+         <LineBreak />
+         <Run>This feature is only available in the "Plus" version.</Run>
+         <LineBreak />
+         <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
+            Click here for more details about Xceed Toolkit Plus for WPF.
+         </Hyperlink>
+    </Paragraph>
+  </local:DemoView.Description>
 
-   <local:DemoView.Resources>
-      <xcdg:ImageConverter x:Key="imageConverter" />
-      <!-- Converter used to return a BitmapImage from a Country name -->
-      <conv:FlagPathConverter x:Key="flagPathConverter" />
 
-      <!-- DataTemplate to display an Employee object -->
-      <DataTemplate x:Key="employeeDataTemplate">
-         <Grid MaxHeight="30"
-               VerticalAlignment="Center">
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Image Margin="0, 0, 5, 0"
-                   Source="{Binding Photo, Converter={StaticResource imageConverter}, NotifyOnValidationError=False, ValidatesOnDataErrors=False}" />
 
-            <StackPanel Grid.Column="1"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center">
-               <TextBlock Text="{Binding FirstName, NotifyOnValidationError=False, ValidatesOnDataErrors=False}" />
-               <TextBlock Text=" " />
-               <TextBlock Text="{Binding LastName, NotifyOnValidationError=False, ValidatesOnDataErrors=False}" />
-            </StackPanel>
-         </Grid>
-      </DataTemplate>
 
-       <!-- DataTemplate to display the $ in Freight column -->
-      <DataTemplate x:Key="freightDataTemplate">
-         <TextBlock Text="{Binding StringFormat=\{0:C\}}"
-                    VerticalAlignment="Center" />
-      </DataTemplate>
 
-       <!-- DataTemplate to display a Country -->
-      <DataTemplate x:Key="countryDataTemplate">
-         <StackPanel Orientation="Horizontal"
-                     VerticalAlignment="Center"
-                     Margin="5,0,0,0">
-            <!--The flagPathConverter resource changes the value of a
-                               group (e.g., "Canada") to an image. -->
-            <Image MaxHeight="15"
-                   Margin="0, 0, 5, 0"
-                   Source="{Binding Converter={StaticResource flagPathConverter}}" />
 
-            <TextBlock Text="{Binding}"
-                       TextTrimming="WordEllipsis"
-                       VerticalAlignment="Center" />
-         </StackPanel>
-      </DataTemplate>
 
-   </local:DemoView.Resources>
 
-    <Grid>
-        <Grid.Resources>
-            <xcdg:DataGridCollectionViewSource x:Key="cvsOrders" 
-                                               Source="{Binding}">
-                <xcdg:DataGridCollectionViewSource.GroupDescriptions>
-                    <PropertyGroupDescription PropertyName="ShipCountry" />
-                    <PropertyGroupDescription PropertyName="ShipCity" />
-                </xcdg:DataGridCollectionViewSource.GroupDescriptions>
-            </xcdg:DataGridCollectionViewSource>
-        </Grid.Resources>
 
-        <xcdg:DataGridControl x:Name="_dataGrid"
-                            ItemsSource="{Binding Source={StaticResource cvsOrders}}" 
-                              AllowDrag="True">           
-            <xcdg:DataGridControl.View>
-                <xcdg:TableflowView FixedColumnCount="2" />
-            </xcdg:DataGridControl.View>
 
-            <xcdg:DataGridControl.Columns>
-                <xcdg:Column FieldName="OrderID"
-                             Title="Order"
-                             Width="100"
-                             IsMainColumn="True">
-                </xcdg:Column>
 
-                <xcdg:Column FieldName="Employee"
-                             Title="Employee"
-                             Width="160"
-                             CellContentTemplate="{StaticResource employeeDataTemplate}" 
-                             GroupValueTemplate="{StaticResource employeeDataTemplate}"/>
 
-                <xcdg:Column FieldName="Customer.CompanyName"
-                             Title="Customer"
-                             Width="185"/>
 
-                <xcdg:Column FieldName="OrderDate"
-                             Title="Order Date"
-                             Width="120" />
 
-                <xcdg:Column FieldName="Shipper.CompanyName"
-                             Title="Ship Via" />
 
-                <xcdg:Column FieldName="Freight"
-                             Width="100"
-                             CellContentTemplate="{StaticResource freightDataTemplate}"
-                             GroupValueTemplate="{StaticResource freightDataTemplate}"/>
 
-                <xcdg:Column FieldName="ShipCity"
-                             Title="City"
-                             Width="80" />
 
-                <xcdg:Column FieldName="ShipCountry"
-                             Title="Country"
-                             CellContentTemplate="{StaticResource countryDataTemplate}"
-                             GroupValueTemplate="{StaticResource countryDataTemplate}"/>
 
-                <xcdg:Column FieldName="ShipAddress"
-                             Title="Address"
-                             Width="200" />
 
-                <xcdg:Column FieldName="ShipPostalCode"
-                             Title="Postal Code"
-                             Width="120" />
 
-                <xcdg:Column FieldName="RequiredDate"
-                             Title="Required Date"
-                             Width="140" />
 
-                <xcdg:Column FieldName="ShippedDate"
-                             Title="Shipped Date"
-                             Width="140" />               
 
-                <xcdg:Column FieldName="ShipName"
-                              Visible="False" />
 
-                <xcdg:Column FieldName="ShipRegion"
-                              Visible="False" />
 
-                <xcdg:Column FieldName="EmployeeID"
-                              Visible="False" />
 
-                <xcdg:Column FieldName="CustomerID"
-                              Visible="False" />
 
-                <xcdg:Column FieldName="Customer"
-                              Visible="False" />
 
-                <xcdg:Column FieldName="ShipVia"
-                              Visible="False" />
 
-                <xcdg:Column FieldName="Shipper"
-                              Visible="False" />
-            </xcdg:DataGridControl.Columns>
-        </xcdg:DataGridControl>
-    </Grid>
+
+    <Image Source="..\OpenSourceImages\DataGrid.png" Width="600" Height="400"/>
 
 </local:DemoView>

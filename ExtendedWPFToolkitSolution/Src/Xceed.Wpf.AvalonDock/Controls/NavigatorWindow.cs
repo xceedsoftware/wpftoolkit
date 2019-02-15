@@ -244,85 +244,92 @@ namespace Xceed.Wpf.AvalonDock.Controls
       _documentListBox = this.GetTemplateChild( PART_DocumentListBox ) as ListBox;
     }
 
-    protected override void OnPreviewKeyDown( System.Windows.Input.KeyEventArgs e )
-    {
-      bool shouldHandle = false;
+	  protected override void OnPreviewKeyDown(System.Windows.Input.KeyEventArgs e)
+	  {
+		  bool shouldHandle = false;
 
-      // Press Tab to switch Selected LayoutContent.
-      if( e.Key == System.Windows.Input.Key.Tab )
-      {
-        // Selecting LayoutDocuments
-        if( _isSelectingDocument )
-        {
-          if( this.SelectedDocument != null )
-          {
-            // Jump to next LayoutDocument
-            var docIndex = this.Documents.IndexOf<LayoutDocumentItem>( this.SelectedDocument );
-            if( docIndex < ( this.Documents.Length - 1 ) )
-            {
-              this.SelectNextDocument();
-              shouldHandle = true;
-            }
-            // Jump to first LayoutAnchorable
-            else if( this.Anchorables.Count() > 0 )
-            {
-              _isSelectingDocument = false;
-              this.InternalSetSelectedDocument( null );
-              this.InternalSetSelectedAnchorable( this.Anchorables.First() );
-              shouldHandle = true;
-            }
-          }
-          // There is no SelectedDocument, select the first one.
-          else
-          {
-            if( this.Documents.Length > 0 )
-            {
-              this.InternalSetSelectedDocument( this.Documents[ 0 ] );
-              shouldHandle = true;
-            }
-          }
-        }
-        // Selecting LayoutAnchorables
-        else
-        {
-          if( this.SelectedAnchorable != null )
-          {
-            // Jump to next LayoutAnchorable
-            var anchorableIndex = this.Anchorables.ToArray().IndexOf<LayoutAnchorableItem>( this.SelectedAnchorable );
-            if( anchorableIndex < ( this.Anchorables.Count() - 1 ) )
-            {
-              this.SelectNextAnchorable();
-              shouldHandle = true;
-            }
-            // Jump to first LayoutDocument
-            else if( this.Documents.Length > 0 )
-            {
-              _isSelectingDocument = true;
-              this.InternalSetSelectedAnchorable( null );
-              this.InternalSetSelectedDocument( this.Documents[ 0 ] );
-              shouldHandle = true;
-            }
-          }
-          // There is no SelectedAnchorable, select the first one.
-          else
-          {
-            if( this.Anchorables.Count() > 0 )
-            {
-              this.InternalSetSelectedAnchorable( this.Anchorables.ToArray()[ 0 ] );
-              shouldHandle = true;
-            }
-          }
-        }
-      }
+		  // Press Tab to switch Selected LayoutContent.
+		  if (e.Key == System.Windows.Input.Key.Tab)
+		  {
+			  // Selecting LayoutDocuments
+			  if (_isSelectingDocument)
+			  {
+				  if (this.SelectedDocument != null)
+				  {
+					  // Jump to next LayoutDocument
+					  var docIndex = this.Documents.IndexOf<LayoutDocumentItem>(this.SelectedDocument);
+					  if (docIndex < (this.Documents.Length - 1))
+					  {
+						  this.SelectNextDocument();
+						  shouldHandle = true;
+					  }
+						// Jump to first LayoutAnchorable
+						else if (this.Anchorables.Count() > 0)
+						{
+							_isSelectingDocument = false;
+							this.InternalSetSelectedDocument(null);
+							this.InternalSetSelectedAnchorable(this.Anchorables.First());
+							shouldHandle = true;
+						}
+					}
+				  // There is no SelectedDocument, select the first one.
+				  else
+				  {
+					  if (this.Documents.Length > 0)
+					  {
+						  this.InternalSetSelectedDocument(this.Documents[0]);
+						  shouldHandle = true;
+					  }
+				  }
+			  }
+			  // Selecting LayoutAnchorables
+			  else
+			  {
+				  if (this.SelectedAnchorable != null)
+				  {
+					  // Jump to next LayoutAnchorable
+					  var anchorableIndex = this.Anchorables.ToArray()
+						  .IndexOf<LayoutAnchorableItem>(this.SelectedAnchorable);
+					  if (anchorableIndex < (this.Anchorables.Count() - 1))
+					  {
+						  this.SelectNextAnchorable();
+						  shouldHandle = true;
+					  }
+					  // Jump to first LayoutDocument
+					  else if (this.Documents.Length > 0)
+					  {
+						  _isSelectingDocument = true;
+						  this.InternalSetSelectedAnchorable(null);
+						  this.InternalSetSelectedDocument(this.Documents[0]);
+						  shouldHandle = true;
+					  }
+					  else if (!this.Documents.Any() && this.Anchorables.Any())
+					  {
+						  this.InternalSetSelectedAnchorable(this.Anchorables.ToArray()[0]);
+						  shouldHandle = true;
+					  }
+				  }
+				  // There is no SelectedAnchorable, select the first one.
+				  else
+				  {
+					  if (this.Anchorables.Count() > 0)
+					  {
+						  this.InternalSetSelectedAnchorable(this.Anchorables.ToArray()[0]);
+						  shouldHandle = true;
+					  }
+				  }
+			  }
+		  }
 
-      if( shouldHandle )
-      {
-        e.Handled = true;
-      }
-      base.OnPreviewKeyDown( e );
-    }
+		  if (shouldHandle)
+		  {
+			  e.Handled = true;
+		  }
 
-    protected override void OnPreviewKeyUp( System.Windows.Input.KeyEventArgs e )
+		  base.OnPreviewKeyDown(e);
+	  }
+
+	  protected override void OnPreviewKeyUp( System.Windows.Input.KeyEventArgs e )
     {
       if( e.Key != System.Windows.Input.Key.Tab )
       {

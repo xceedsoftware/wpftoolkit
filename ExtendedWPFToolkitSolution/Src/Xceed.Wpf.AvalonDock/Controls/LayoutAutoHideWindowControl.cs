@@ -195,11 +195,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    public override void OnApplyTemplate()
-    {
-      base.OnApplyTemplate();
-    }
-
     protected override bool HasFocusWithinCore()
     {
       return false;
@@ -254,6 +249,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       Visibility = System.Windows.Visibility.Visible;
       InvalidateMeasure();
       UpdateWindowPos();
+      Win32Helper.BringWindowToTop( _internalHwndSource.Handle );
     }
 
     internal void Hide()

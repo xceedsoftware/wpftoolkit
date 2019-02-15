@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xceed.Wpf.Toolkit.LiveExplo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xceed.Wpf.Toolkit", "Src\Xceed.Wpf.Toolkit\Xceed.Wpf.Toolkit.csproj", "{72E591D6-8F83-4D8C-8F67-9C325E623234}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xceed.Wpf.DataGrid", "Src\Xceed.Wpf.DataGrid\Xceed.Wpf.DataGrid.csproj", "{63648392-6CE9-4A60-96D4-F9FD718D29B0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xceed.Wpf.AvalonDock", "Src\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.csproj", "{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Themes", "Themes", "{8976E4A6-FF5F-44C5-AC57-FEDA249DD199}"
@@ -23,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		APD.Wpf.Xceed.AvalonDock.nuspec = APD.Wpf.Xceed.AvalonDock.nuspec
 		APD.Wpf.Xceed.DataGrid.nuspec = APD.Wpf.Xceed.DataGrid.nuspec
+		APD.Wpf.Xceed.ToolKit.Full.nuspec = APD.Wpf.Xceed.ToolKit.Full.nuspec
 		APD.Wpf.Xceed.Toolkit.nuspec = APD.Wpf.Xceed.Toolkit.nuspec
 	EndProjectSection
 EndProject
@@ -40,10 +39,6 @@ Global
 		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{63648392-6CE9-4A60-96D4-F9FD718D29B0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{63648392-6CE9-4A60-96D4-F9FD718D29B0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{63648392-6CE9-4A60-96D4-F9FD718D29B0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{63648392-6CE9-4A60-96D4-F9FD718D29B0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU

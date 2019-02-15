@@ -496,12 +496,20 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     void IOverlayWindow.DragEnter( IDropArea area )
     {
+      var floatingWindowManager = _floatingWindow.Model.Root.Manager;
+
       _visibleAreas.Add( area );
 
       FrameworkElement areaElement;
       switch( area.Type )
       {
         case DropAreaType.DockingManager:
+          var dropAreaDockingManager = area as DropArea<DockingManager>;
+          if( dropAreaDockingManager.AreaElement != floatingWindowManager )
+          {
+            _visibleAreas.Remove( area );
+            return;
+          }
           areaElement = _gridDockingManagerDropTargets;
           break;
         case DropAreaType.AnchorablePane:
@@ -509,6 +517,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
           var dropAreaAnchorablePaneGroup = area as DropArea<LayoutAnchorablePaneControl>;
           var layoutAnchorablePane = dropAreaAnchorablePaneGroup.AreaElement.Model as LayoutAnchorablePane;
+          if( layoutAnchorablePane.Root.Manager != floatingWindowManager )
+          {
+            _visibleAreas.Remove( area );
+            return;
+          }
           SetDropTargetIntoVisibility( layoutAnchorablePane );
           break;
         case DropAreaType.DocumentPaneGroup:
@@ -517,7 +530,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
             var dropAreaDocumentPaneGroup = area as DropArea<LayoutDocumentPaneGroupControl>;
             var layoutDocumentPane = ( dropAreaDocumentPaneGroup.AreaElement.Model as LayoutDocumentPaneGroup ).Children.First() as LayoutDocumentPane;
             var parentDocumentPaneGroup = layoutDocumentPane.Parent as LayoutDocumentPaneGroup;
-
+            if( parentDocumentPaneGroup.Root.Manager != floatingWindowManager )
+            {
+              _visibleAreas.Remove( area );
+              return;
+            }
             _documentPaneDropTargetLeft.Visibility = Visibility.Hidden;
             _documentPaneDropTargetRight.Visibility = Visibility.Hidden;
             _documentPaneDropTargetTop.Visibility = Visibility.Hidden;
@@ -537,6 +554,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
               var dropAreaDocumentPaneGroup = area as DropArea<LayoutDocumentPaneControl>;
               var layoutDocumentPane = dropAreaDocumentPaneGroup.AreaElement.Model as LayoutDocumentPane;
               var parentDocumentPaneGroup = layoutDocumentPane.Parent as LayoutDocumentPaneGroup;
+              if( layoutDocumentPane.Root.Manager != floatingWindowManager )
+              {
+                _visibleAreas.Remove( area );
+                return;
+              }
 
               SetDropTargetIntoVisibility( layoutDocumentPane );
 
@@ -628,6 +650,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
               var dropAreaDocumentPaneGroup = area as DropArea<LayoutDocumentPaneControl>;
               var layoutDocumentPane = dropAreaDocumentPaneGroup.AreaElement.Model as LayoutDocumentPane;
               var parentDocumentPaneGroup = layoutDocumentPane.Parent as LayoutDocumentPaneGroup;
+              if( layoutDocumentPane.Root.Manager != floatingWindowManager )
+              {
+                _visibleAreas.Remove( area );
+                return;
+              }
 
               SetDropTargetIntoVisibility( layoutDocumentPane );
 

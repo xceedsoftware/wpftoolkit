@@ -83,7 +83,8 @@
             <chrome:ButtonChrome x:Name="ControlChrome"
                                  Background="{TemplateBinding Background}"
                                  RenderEnabled="{TemplateBinding IsEnabled}"
-                                 CornerRadius="2.75">
+                                 CornerRadius="2.75"
+                                 BorderThickness="0">
               <Grid>
                 <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="*" />
@@ -122,7 +123,6 @@
                 </Button>
                 <ToggleButton x:Name="PART_ToggleButton"
                               Grid.Column="1"
-                              IsTabStop="False"
                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                               IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}">
                   <ToggleButton.Template>

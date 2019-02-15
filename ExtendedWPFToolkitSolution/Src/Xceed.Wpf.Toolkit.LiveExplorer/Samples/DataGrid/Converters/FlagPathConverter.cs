@@ -14,9 +14,6 @@
 
   ***********************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Data;
 using Xceed.Wpf.Samples.SampleData;
 using System.Globalization;
@@ -24,18 +21,5 @@ using System.Windows;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.DataGrid.Converters
 {
-  public class FlagPathConverter : IValueConverter
-  {
-    public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
-    {
-      // Use FlagsProvider to get Flags since it caches every BitmapImages it created.
-      // This optimizes the converter.
-      return FlagsProvider.Instance.GetFlagFromCountryName( value as string );
-    }
 
-    public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
-    {
-      return DependencyProperty.UnsetValue;
-    }
-  }
 }
