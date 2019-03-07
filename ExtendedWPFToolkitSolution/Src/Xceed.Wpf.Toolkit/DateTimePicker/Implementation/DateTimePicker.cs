@@ -455,12 +455,12 @@ namespace Xceed.Wpf.Toolkit
       {
         _calendar.BlackoutDates.Clear();
 
-        if( ( this.Minimum != null ) && this.Minimum.HasValue && ( this.Minimum.Value != DateTime.MinValue ) )
+        if( Minimum != null && ( this.Minimum.Value.Date != DateTime.MinValue.Date ) )
         {
           DateTime minDate = this.Minimum.Value;
           _calendar.BlackoutDates.Add( new CalendarDateRange( DateTime.MinValue, minDate.AddDays( -1 ) ) );
         }
-        if( ( this.Maximum != null ) && this.Maximum.HasValue && ( this.Maximum.Value != DateTime.MaxValue ) )
+        if( ( this.Maximum != null ) && ( this.Maximum.Value.Date != DateTime.MaxValue.Date ) )
         {
           DateTime maxDate = this.Maximum.Value;
           _calendar.BlackoutDates.Add( new CalendarDateRange( maxDate.AddDays( 1 ), DateTime.MaxValue ) );
