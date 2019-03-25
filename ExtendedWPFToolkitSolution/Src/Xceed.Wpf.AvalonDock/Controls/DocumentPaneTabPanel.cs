@@ -37,8 +37,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override Size MeasureOverride( Size availableSize )
     {
-      var visibleChildren = Children.Cast<UIElement>().Where( ch => ch.Visibility != System.Windows.Visibility.Collapsed );
-
       Size desideredSize = new Size();
       foreach( FrameworkElement child in Children )
       {
