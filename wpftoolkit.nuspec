@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+    <metadata>
+        <id>Extended.Wpf.Toolkit.Fixed</id>
+        <version>3.5.1</version>
+        <title>Extended.Wpf.Toolkit.Fixed</title>
+        <authors>sa.he</authors>
+        <owners>sa.he</owners>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <copyright>https://github.com/sa-he/wpftoolkit</copyright>
+        <license type="file">license.md</license>
+        <projectUrl>https://github.com/sa-he/wpftoolkit</projectUrl>
+        <repository url="https://github.com/sa-he/wpftoolkit" />
+        <description>Fork of Extended.Wpf.Toolkit that provides some minor/obvious bug fixes. This package becomes obsolete, once the bugfix is included in the official repo/nuget.</description>
+
+        <!-- supports copy to output for PackageReference -->
+        <contentFiles>
+            <files include="any/any/*.pdb" buildAction="None" copyToOutput="true" flatten="false" />
+        </contentFiles>
+    </metadata>
+
+    <files>
+        <file src="license.md" target="" />
+
+        <!-- include files for PackageReference -->
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.Toolkit\bin\Release\Xceed.Wpf.Toolkit.pdb" target="contentFiles\any\any" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock\bin\Release\Xceed.Wpf.AvalonDock.pdb" target="contentFiles\any\any" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock.Themes.Aero\bin\Release\Xceed.Wpf.AvalonDock.Themes.Aero.pdb" target="contentFiles\any\any" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock.Themes.Metro\bin\Release\Xceed.Wpf.AvalonDock.Themes.Metro.pdb" target="contentFiles\any\any" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\Release\Xceed.Wpf.AvalonDock.Themes.VS2010.pdb" target="contentFiles\any\any" />
+	
+        <!-- include files for packages.config -->		
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock\bin\Release\*" target="lib\net40" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock\bin\Release\de\*" target="lib\net40\de" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock\bin\Release\es\*" target="lib\net40\es" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock\bin\Release\fr\*" target="lib\net40\fr" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock\bin\Release\hu\*" target="lib\net40\hu" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock\bin\Release\it\*" target="lib\net40\it" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock\bin\Release\pt-BR\*" target="lib\net40/pt-BR" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock\bin\Release\ro\*" target="lib\net40\ro" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock\bin\Release\ru\*" target="lib\net40\ru" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock\bin\Release\sv\*" target="lib\net40\sv" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock\bin\Release\zh-Hans\*" target="lib\net40\zh-Hans" />
+		
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock.Themes.Aero\bin\Release\Xceed.Wpf.AvalonDock.Themes.Aero.dll" target="lib\net40" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock.Themes.Aero\bin\Release\Xceed.Wpf.AvalonDock.Themes.Aero.pdb" target="lib\net40" />
+		
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock.Themes.Metro\bin\Release\Xceed.Wpf.AvalonDock.Themes.Metro.dll" target="lib\net40" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock.Themes.Metro\bin\Release\Xceed.Wpf.AvalonDock.Themes.Metro.pdb" target="lib\net40" />
+		
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\Release\Xceed.Wpf.AvalonDock.Themes.VS2010.dll" target="lib\net40" />
+		<file src="ExtendedWPFToolkitSolution\Src\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\Release\Xceed.Wpf.AvalonDock.Themes.VS2010.pdb" target="lib\net40" />
+    </files>
+</package>
