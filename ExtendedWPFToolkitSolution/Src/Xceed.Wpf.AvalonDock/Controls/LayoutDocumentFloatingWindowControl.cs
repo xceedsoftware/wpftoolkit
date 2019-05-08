@@ -45,7 +45,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     }
 
     internal LayoutDocumentFloatingWindowControl( LayoutDocumentFloatingWindow model )
-        : base( model, false )
+        : this( model, false )
     {
     }
 
