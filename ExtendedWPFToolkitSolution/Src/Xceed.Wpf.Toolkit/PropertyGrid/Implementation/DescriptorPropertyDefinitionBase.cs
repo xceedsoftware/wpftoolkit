@@ -209,7 +209,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         else
         {
           // When the Value is diferent from the DefaultValue, use the local icon.
-          if( !this.Value.Equals( this.DefaultValue ) )
+          if( !object.Equals( this.Value, this.DefaultValue ) )
           {
             if( this.DefaultValue != null )
             {
@@ -221,7 +221,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
               {
                 var defaultValue = Activator.CreateInstance( this.PropertyType );
                 // When the Value is diferent from the DefaultValue, use the local icon.
-                if( !this.Value.Equals( defaultValue ) )
+                if( !object.Equals( this.Value, defaultValue ) )
                 {
                   tooltip = StringConstants.Local;
                 }
