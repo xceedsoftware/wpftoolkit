@@ -269,6 +269,12 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+	protected override void OnPreviewMouseDoubleClick(MouseButtonEventArgs e)
+	{
+		ClosePopup(true);
+		base.OnPreviewMouseDoubleClick(e);
+	}
+
     protected override void OnPreviewMouseUp( MouseButtonEventArgs e )
     {
       if( Mouse.Captured is CalendarItem)
