@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -175,8 +175,7 @@ namespace Xceed.Wpf.Toolkit
         }
       }
 
-      _collectionControl.PersistChanges();
-      this.DialogResult = true;
+      this.DialogResult = _collectionControl.PersistChanges();
       this.Close();
     }
 
@@ -245,63 +244,69 @@ namespace Xceed.Wpf.Toolkit
 
         foreach( var propertyInfo in properties )
         {
-          var parameters = propertyInfo.GetIndexParameters();
-          var index = parameters.GetLength( 0 ) == 0 ? null : new object[] { parameters.GetLength( 0 ) - 1 };
-          var propertyInfoValue = propertyInfo.GetValue( source, index );
-
-          if( propertyInfo.CanWrite )
+          try
           {
-            // Look for nested object
-            if( propertyInfo.PropertyType.IsClass
-              && ( propertyInfo.PropertyType != typeof( Transform ) )
-              && !propertyInfo.PropertyType.Equals( typeof( string ) ) )
+            var parameters = propertyInfo.GetIndexParameters();
+            var index = parameters.GetLength( 0 ) == 0 ? null : new object[] { parameters.GetLength( 0 ) - 1 };
+            var propertyInfoValue = propertyInfo.GetValue( source, index );
+
+            if( propertyInfo.CanWrite )
             {
-              // We have a Collection/List of T.
-              if( propertyInfo.PropertyType.IsGenericType )
+              // Look for nested object
+              if( propertyInfo.PropertyType.IsClass
+                && ( propertyInfo.PropertyType != typeof( Transform ) )
+                && !propertyInfo.PropertyType.Equals( typeof( string ) ) )
               {
-                // Clone sub-objects if the T are non-primitive types objects. 
-                var arg = propertyInfo.PropertyType.GetGenericArguments().FirstOrDefault();
-                if( ( arg != null ) && !arg.IsPrimitive && !arg.Equals( typeof( String ) ) && !arg.IsEnum )
+                // We have a Collection/List of T.
+                if( propertyInfo.PropertyType.IsGenericType )
                 {
-                  var nestedObject = this.Clone( propertyInfoValue );
-                  propertyInfo.SetValue( result, nestedObject, null );
-                }
-                else
-                {
-                  // copy object if the T are primitive types objects.
-                  propertyInfo.SetValue( result, propertyInfoValue, null );
-                }
-              }
-              else
-              {
-                var nestedObject = this.Clone( propertyInfoValue );
-                if( nestedObject != null )
-                {
-                  // For T object included in List/Collections, Add it to the List/Collection of T.
-                  if( index != null )
+                  // Clone sub-objects if the T are non-primitive types objects. 
+                  var arg = propertyInfo.PropertyType.GetGenericArguments().FirstOrDefault();
+                  if( ( arg != null ) && !arg.IsPrimitive && !arg.Equals( typeof( String ) ) && !arg.IsEnum )
                   {
-                    result.GetType().GetMethod( "Add" ).Invoke( result, new[] { nestedObject } );
+                    var nestedObject = this.Clone( propertyInfoValue );
+                    propertyInfo.SetValue( result, nestedObject, null );
                   }
                   else
                   {
-                    propertyInfo.SetValue( result, nestedObject, null );
+                    // copy object if the T are primitive types objects.
+                    propertyInfo.SetValue( result, propertyInfoValue, null );
+                  }
+                }
+                else
+                {
+                  var nestedObject = this.Clone( propertyInfoValue );
+                  if( nestedObject != null )
+                  {
+                    // For T object included in List/Collections, Add it to the List/Collection of T.
+                    if( index != null )
+                    {
+                      result.GetType().GetMethod( "Add" ).Invoke( result, new[] { nestedObject } );
+                    }
+                    else
+                    {
+                      propertyInfo.SetValue( result, nestedObject, null );
+                    }
                   }
                 }
               }
-            }
-            else
-            {
-              // For T object included in List/Collections, Add it to the List/Collection of T.
-              if( index != null )
-              {
-                result.GetType().GetMethod( "Add" ).Invoke( result, new[] { propertyInfoValue } );
-              }
               else
               {
-                // copy regular object
-                propertyInfo.SetValue( result, propertyInfoValue, null );
+                // For T object included in List/Collections, Add it to the List/Collection of T.
+                if( index != null )
+                {
+                  result.GetType().GetMethod( "Add" ).Invoke( result, new[] { propertyInfoValue } );
+                }
+                else
+                {
+                  // copy regular object
+                  propertyInfo.SetValue( result, propertyInfoValue, null );
+                }
               }
             }
+          }
+          catch( Exception )
+          {
           }
         }
       }

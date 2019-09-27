@@ -186,6 +186,9 @@
     <Compile Include="Samples\DateTime\Views\DateTimeView.xaml.cs">
       <DependentUpon>DateTimeView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Samples\ExtTabControl\Views\ExtTabControlView.xaml.cs">
+      <DependentUpon>ExtTabControlView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Samples\FilePicker\Views\FilePickerView.xaml.cs">
       <DependentUpon>FilePickerView.xaml</DependentUpon>
     </Compile>
@@ -543,6 +546,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Samples\DateTime\Views\DateTimeView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\ExtTabControl\Views\ExtTabControlView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -1420,6 +1427,13 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialHamburger.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\ExtTabControlView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ExtTabControlView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\ExtTabControl\OpenSourceImages\ExtTabControl.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\DataGrid\OpenSourceImages\DataGrid.png" />

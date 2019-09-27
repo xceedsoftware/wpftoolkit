@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -20,6 +20,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Primitives;
+using System.Diagnostics;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -261,26 +262,26 @@ namespace Xceed.Wpf.Toolkit
 
       TimeSpan current = this.Value.HasValue ? this.Value.Value : new TimeSpan();
       TimeSpan result;
-      var success = TimeSpan.TryParse( currentValue, out result );
-      if( !success )
+      // Validate when more than 60 seconds (or more than 60 minutes, or more than 24 hours) are entered.
+      var separators = currentValue.Where( x => x == ':' || x == '.' ).ToList();
+      var values = currentValue.Split( new char[] { ':', '.' } );
+      if( ( values.Count() >= 2 ) && !values.Any( x => string.IsNullOrEmpty( x ) ) )
       {
-        // Validate when more than 60 seconds (or more than 60 minutes, or more than 24 hours) are entered.
-        var separators = currentValue.Where( x => x == ':' || x == '.' ).ToList();
-        var values = currentValue.Split( new char[] { ':', '.' } );
-        if( ( values.Count() >= 2 ) && !values.Any( x => string.IsNullOrEmpty( x ) ) )
-        {
-          bool haveDays = separators.First() == '.';
-          bool haveMS = ( separators.Count() > 1 ) && ( separators.Last() == '.' );
+        bool haveDays = separators.First() == '.';
+        bool haveMS = ( separators.Count() > 1 ) && ( separators.Last() == '.' );
 
-          result = new TimeSpan( haveDays ? int.Parse( values[ 0 ] ) : 0,  //Days
-                                 haveDays ? int.Parse( values[ 1 ] ) : int.Parse( values[ 0 ] ),  //Hours
-                                 haveDays ? int.Parse( values[ 2 ] ) : int.Parse( values[ 1 ] ),  //Minutes
-                                 ( haveDays && this.ShowSeconds ) ? int.Parse( values[ 3 ] ) : this.ShowSeconds ? int.Parse( values[ 2 ] ) : 0,  //Seconds
-                                 haveMS ? int.Parse( values.Last() ) : 0 );  //Milliseconds
-        }
+        result = new TimeSpan( haveDays ? int.Parse( values[ 0 ] ) : 0,  //Days
+                                haveDays ? int.Parse( values[ 1 ] ) : int.Parse( values[ 0 ] ),  //Hours
+                                haveDays ? int.Parse( values[ 2 ] ) : int.Parse( values[ 1 ] ),  //Minutes
+                                ( haveDays && this.ShowSeconds ) ? int.Parse( values[ 3 ] ) : this.ShowSeconds ? int.Parse( values[ 2 ] ) : 0,  //Seconds
+                                haveMS ? int.Parse( values.Last() ) : 0 );  //Milliseconds
+
+        currentValue = result.ToString();
       }
-
-      currentValue = result.ToString();
+      else
+      {
+        Debug.Assert( false, "Something went wrong when parsing TimeSpan." );
+      }
 
       // When text is typed, if UpdateValueOnEnterKey is true, 
       // Sync Value on Text only when Enter Key is pressed.

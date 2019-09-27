@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -37,7 +37,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
     private LayoutAnchorable _model;
     private HwndSource _internalHwndSource = null;
     private IntPtr parentWindowHandle;
-    private bool _internalHost_ContentRendered = false;
     private ContentPresenter _internalHostPresenter = new ContentPresenter();
     private Grid _internalGrid = null;
     private AnchorSide _side;
@@ -156,8 +155,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
         Height = 0,
       } );
 
-      _internalHost_ContentRendered = false;
-      _internalHwndSource.ContentRendered += _internalHwndSource_ContentRendered;
       _internalHwndSource.RootVisual = _internalHostPresenter;
       AddLogicalChild( _internalHostPresenter );
       Win32Helper.BringWindowToTop( _internalHwndSource.Handle );
@@ -168,7 +165,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       if( _internalHwndSource != null )
       {
-        _internalHwndSource.ContentRendered -= _internalHwndSource_ContentRendered;
         _internalHwndSource.Dispose();
         _internalHwndSource = null;
       }
@@ -277,11 +273,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
     #endregion
 
     #region Private Methods
-
-    private void _internalHwndSource_ContentRendered( object sender, EventArgs e )
-    {
-      _internalHost_ContentRendered = true;
-    }
 
     private void _model_PropertyChanged( object sender, System.ComponentModel.PropertyChangedEventArgs e )
     {

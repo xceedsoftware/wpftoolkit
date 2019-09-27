@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2017 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -528,6 +528,10 @@
                                          SampleType="{x:Type samples:CheckLists.Views.CheckListsView}" />
           <core:LiveExplorerTreeViewItem Header="Watermark ComboBox"
                                          SampleType="{x:Type samples:WatermarkComboBox.Views.WatermarkComboBoxView}" />
+          <core:LiveExplorerTreeViewItem Header="Extended TabControl"
+                                         SampleType="{x:Type samples:ExtendedTabControl.Views.ExtTabControlView}"
+                                         IsPlusOnlyFeature="True"
+                                         IsNewFeature="True"/>
           <core:LiveExplorerTreeViewItem Header="TimelinePanel"
                                          SampleType="{x:Type samples:TimelinePanel.Views.TimelinePanelView}" />
         </core:LiveExplorerTreeViewItem>

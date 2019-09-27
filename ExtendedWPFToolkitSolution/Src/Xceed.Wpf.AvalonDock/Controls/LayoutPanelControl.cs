@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -63,7 +63,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 ( childContainerModel.IsOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() ||
                  childContainerModel.ContainsChildOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() ) )
             {
-              childPositionableModel.DockWidth = new GridLength( 1.0, GridUnitType.Star );
+             // childPositionableModel.DockWidth = new GridLength( 1.0, GridUnitType.Star );
             }
             else if( childPositionableModel != null && childPositionableModel.DockWidth.IsStar )
             {
@@ -80,17 +80,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
             }
           }
         }
-        else
-        {
-          for( int i = 0; i < _model.Children.Count; i++ )
-          {
-            var childPositionableModel = _model.Children[ i ] as ILayoutPositionableElement;
-            if( !childPositionableModel.DockWidth.IsStar )
-            {
-              childPositionableModel.DockWidth = new GridLength( 1.0, GridUnitType.Star );
-            }
-          }
-        }
+        //else
+        //{
+        //  for( int i = 0; i < _model.Children.Count; i++ )
+        //  {
+        //    var childPositionableModel = _model.Children[ i ] as ILayoutPositionableElement;
+        //    if( !childPositionableModel.DockWidth.IsStar )
+        //    {
+        //      childPositionableModel.DockWidth = new GridLength( 1.0, GridUnitType.Star );
+        //    }
+        //  }
+        //}
       }
       else
       {
@@ -105,7 +105,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 ( childContainerModel.IsOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() ||
                  childContainerModel.ContainsChildOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() ) )
             {
-              childPositionableModel.DockHeight = new GridLength( 1.0, GridUnitType.Star );
+              //childPositionableModel.DockHeight = new GridLength( 1.0, GridUnitType.Star );
             }
             else if( childPositionableModel != null && childPositionableModel.DockHeight.IsStar )
             {
@@ -119,17 +119,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
             }
           }
         }
-        else
-        {
-          for( int i = 0; i < _model.Children.Count; i++ )
-          {
-            var childPositionableModel = _model.Children[ i ] as ILayoutPositionableElement;
-            if( !childPositionableModel.DockHeight.IsStar )
-            {
-              childPositionableModel.DockHeight = new GridLength( 1.0, GridUnitType.Star );
-            }
-          }
-        }
+        //else
+        //{
+        //  for( int i = 0; i < _model.Children.Count; i++ )
+        //  {
+        //    var childPositionableModel = _model.Children[ i ] as ILayoutPositionableElement;
+        //    if( !childPositionableModel.DockHeight.IsStar )
+        //    {
+        //      childPositionableModel.DockHeight = new GridLength( 1.0, GridUnitType.Star );
+        //    }
+        //  }
+        //}
       }
       #endregion
     }

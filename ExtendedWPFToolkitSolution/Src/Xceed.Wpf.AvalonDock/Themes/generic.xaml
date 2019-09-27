@@ -1,14 +1,14 @@
 ﻿<!--***********************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -956,8 +956,9 @@
 
                           <ContentPresenter Grid.Row="1"
                                             FlowDirection="{TemplateBinding FlowDirection}"
-                                            Content="{Binding LayoutItem.View.Content, RelativeSource={RelativeSource TemplatedParent}}" />
-
+                                            Content="{Binding LayoutItem.View.Content, RelativeSource={RelativeSource TemplatedParent}}"
+                                            ContentTemplate="{Binding LayoutItem.View.ContentTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                            ContentTemplateSelector="{Binding LayoutItem.View.ContentTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}" />
                           <!--<ContentPresenter 
                                 FlowDirection="{TemplateBinding FlowDirection}"
                                 Content="{Binding Model.Content, RelativeSource={RelativeSource TemplatedParent}}" 
@@ -1011,10 +1012,11 @@
                                 BorderBrush="{TemplateBinding BorderBrush}">
                           <Grid Margin="3">
                             <Grid.RowDefinitions>
-                              <RowDefinition Height="16" />
+                              <RowDefinition MinHeight="16"
+                                             Height="Auto"/>
                               <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <Grid>
+                            <Grid UseLayoutRounding="True">
                               <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
@@ -1112,10 +1114,11 @@
                                 BorderBrush="{TemplateBinding BorderBrush}">
                           <Grid Margin="3">
                             <Grid.RowDefinitions>
-                              <RowDefinition Height="16" />
+                              <RowDefinition MinHeight="16"
+                                             Height="Auto"/>
                               <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <Grid>
+                            <Grid UseLayoutRounding="True">
                               <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />

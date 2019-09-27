@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -95,6 +95,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       _model.ChildrenTreeChanged += ( s, args ) =>
           {
+            if( args.Change != ChildrenTreeChange.DirectChildrenChanged )
+              return;
             if( _asyncRefreshCalled.HasValue &&
                       _asyncRefreshCalled.Value == args.Change )
               return;
@@ -415,7 +417,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
         else
         {
-          prevChildModel.DockWidth = new GridLength( prevChildModel.DockWidth.Value + delta, GridUnitType.Pixel );
+          var width = ( prevChildModel.DockWidth.IsAuto ) ? prevChildActualSize.Width : prevChildModel.DockWidth.Value;
+          prevChildModel.DockWidth = new GridLength( width + delta, GridUnitType.Pixel );
         }
 
         if( nextChildModel.DockWidth.IsStar )
@@ -424,7 +427,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
         else
         {
-          nextChildModel.DockWidth = new GridLength( nextChildModel.DockWidth.Value - delta, GridUnitType.Pixel );
+          var width = ( nextChildModel.DockWidth.IsAuto ) ? nextChildActualSize.Width : nextChildModel.DockWidth.Value;
+          nextChildModel.DockWidth = new GridLength( width - delta, GridUnitType.Pixel );
         }
       }
       else
@@ -435,7 +439,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
         else
         {
-          prevChildModel.DockHeight = new GridLength( prevChildModel.DockHeight.Value + delta, GridUnitType.Pixel );
+          var height = ( prevChildModel.DockHeight.IsAuto ) ? prevChildActualSize.Height : prevChildModel.DockHeight.Value;
+          prevChildModel.DockHeight = new GridLength( height + delta, GridUnitType.Pixel );
         }
 
         if( nextChildModel.DockHeight.IsStar )
@@ -444,7 +449,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
         else
         {
-          nextChildModel.DockHeight = new GridLength( nextChildModel.DockHeight.Value - delta, GridUnitType.Pixel );
+          var height = ( nextChildModel.DockHeight.IsAuto ) ? nextChildActualSize.Height : nextChildModel.DockHeight.Value;
+          nextChildModel.DockHeight = new GridLength( height - delta, GridUnitType.Pixel );
         }
       }
 

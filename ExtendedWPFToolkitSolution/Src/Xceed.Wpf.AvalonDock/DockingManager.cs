@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -30,6 +30,7 @@ using System.Collections.Specialized;
 using System.Windows.Data;
 using System.Windows.Threading;
 using Xceed.Wpf.AvalonDock.Themes;
+using System.Diagnostics;
 
 namespace Xceed.Wpf.AvalonDock
 {
@@ -2027,26 +2028,26 @@ namespace Xceed.Wpf.AvalonDock
       if( model is LayoutAnchorSide )
       {
         var templateModelView = new LayoutAnchorSideControl( model as LayoutAnchorSide );
-        templateModelView.SetBinding( LayoutAnchorSideControl.TemplateProperty, new Binding( "AnchorSideTemplate" ) { Source = this } );
+        templateModelView.SetBinding( LayoutAnchorSideControl.TemplateProperty, new Binding( DockingManager.AnchorSideTemplateProperty.Name ) { Source = this } );
         return templateModelView;
       }
       if( model is LayoutAnchorGroup )
       {
         var templateModelView = new LayoutAnchorGroupControl( model as LayoutAnchorGroup );
-        templateModelView.SetBinding( LayoutAnchorGroupControl.TemplateProperty, new Binding( "AnchorGroupTemplate" ) { Source = this } );
+        templateModelView.SetBinding( LayoutAnchorGroupControl.TemplateProperty, new Binding( DockingManager.AnchorGroupTemplateProperty.Name ) { Source = this } );
         return templateModelView;
       }
 
       if( model is LayoutDocumentPane )
       {
         var templateModelView = new LayoutDocumentPaneControl( model as LayoutDocumentPane );
-        templateModelView.SetBinding( LayoutDocumentPaneControl.StyleProperty, new Binding( "DocumentPaneControlStyle" ) { Source = this } );
+        templateModelView.SetBinding( LayoutDocumentPaneControl.StyleProperty, new Binding( DockingManager.DocumentPaneControlStyleProperty.Name ) { Source = this } );
         return templateModelView;
       }
       if( model is LayoutAnchorablePane )
       {
         var templateModelView = new LayoutAnchorablePaneControl( model as LayoutAnchorablePane );
-        templateModelView.SetBinding( LayoutAnchorablePaneControl.StyleProperty, new Binding( "AnchorablePaneControlStyle" ) { Source = this } );
+        templateModelView.SetBinding( LayoutAnchorablePaneControl.StyleProperty, new Binding( DockingManager.AnchorablePaneControlStyleProperty.Name ) { Source = this } );
         return templateModelView;
       }
 
@@ -2185,12 +2186,20 @@ namespace Xceed.Wpf.AvalonDock
 
     internal IEnumerable<LayoutFloatingWindowControl> GetFloatingWindowsByZOrder()
     {
+      IntPtr windowParentHanlde;
       var parentWindow = Window.GetWindow( this );
+      if( parentWindow != null )
+      {
+        windowParentHanlde = new WindowInteropHelper( parentWindow ).Handle;
+      }
+      else
+      {
+        var mainProcess = Process.GetCurrentProcess();
+        if( mainProcess == null )
+          yield break;
 
-      if( parentWindow == null )
-        yield break;
-
-      IntPtr windowParentHanlde = new WindowInteropHelper( parentWindow ).Handle;
+        windowParentHanlde = mainProcess.MainWindowHandle;
+      }
 
       IntPtr currentHandle = Win32Helper.GetWindow( windowParentHanlde, ( uint )Win32Helper.GetWindow_Cmd.GW_HWNDFIRST );
       while( currentHandle != IntPtr.Zero )
@@ -2309,8 +2318,6 @@ namespace Xceed.Wpf.AvalonDock
       {
         if( Layout.ActiveContent != null )
         {
-          //Debug.WriteLine(new StackTrace().ToString());
-
           //set focus on active element only after a layout pass is completed
           //it's possible that it is not yet visible in the visual tree
           //if (_setFocusAsyncOperation == null)
@@ -2324,12 +2331,9 @@ namespace Xceed.Wpf.AvalonDock
           //}
         }
 
-        //if (!_insideInternalSetActiveContent)
-        //    ActiveContent = Layout.ActiveContent != null ?
-        //        Layout.ActiveContent.Content : null;
-        if( !_insideInternalSetActiveContent && ( Layout.ActiveContent != null ) )
+        if( !_insideInternalSetActiveContent )
         {
-          this.ActiveContent = Layout.ActiveContent.Content;
+          this.ActiveContent = ( Layout.ActiveContent != null ) ? Layout.ActiveContent.Content : null;
         }
       }
     }

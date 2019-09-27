@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -54,8 +54,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
       UpdateThemeResources();
     }
 
-    internal LayoutAnchorableFloatingWindowControl( LayoutAnchorableFloatingWindow model)
-        : base( model, false )
+    internal LayoutAnchorableFloatingWindowControl( LayoutAnchorableFloatingWindow model )
+        : this( model, false )
     {
     }
 
@@ -127,14 +127,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       //SetBinding(VisibilityProperty, new Binding("IsVisible") { Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden });
 
       //Issue: http://avalondock.codeplex.com/workitem/15036
-      IsVisibleChanged += ( s, args ) =>
-      {
-        var visibilityBinding = GetBindingExpression( VisibilityProperty );
-        if( IsVisible && ( visibilityBinding == null ) )
-        {
-          SetBinding( VisibilityProperty, new Binding( "IsVisible" ) { Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden } );
-        }
-      };
+      IsVisibleChanged += this.LayoutAnchorableFloatingWindowControl_IsVisibleChanged;
 
       SetBinding( SingleContentLayoutItemProperty, new Binding( "Model.SinglePane.SelectedContent" ) { Source = this, Converter = new LayoutItemFromLayoutModelConverter() } );
 
@@ -162,7 +155,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
         root.FloatingWindows.Remove( _model );
       }
 
-      _model.PropertyChanged -= new System.ComponentModel.PropertyChangedEventHandler( _model_PropertyChanged );
+      _model.PropertyChanged -= new System.ComponentModel.PropertyChangedEventHandler( _model_PropertyChanged );      
+      IsVisibleChanged -= this.LayoutAnchorableFloatingWindowControl_IsVisibleChanged;
+      BindingOperations.ClearBinding( this, VisibilityProperty );
+      BindingOperations.ClearBinding( this, SingleContentLayoutItemProperty );
     }
 
     protected override void OnClosing( System.ComponentModel.CancelEventArgs e )
@@ -263,6 +259,19 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
 
       return false;
+    }
+
+    #endregion
+
+    #region Event Handlers
+
+    private void LayoutAnchorableFloatingWindowControl_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )
+    {
+      var visibilityBinding = GetBindingExpression( VisibilityProperty );
+      if( IsVisible && ( visibilityBinding == null ) )
+      {
+        SetBinding( VisibilityProperty, new Binding( "IsVisible" ) { Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden } );
+      }
     }
 
     #endregion

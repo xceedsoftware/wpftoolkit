@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -455,15 +455,15 @@ namespace Xceed.Wpf.Toolkit
       {
         _calendar.BlackoutDates.Clear();
 
-        if( ( this.Minimum != null ) && this.Minimum.HasValue && ( this.Minimum.Value != DateTime.MinValue ) )
+        if( ( this.Minimum != null ) && this.Minimum.HasValue && ( this.Minimum.Value != System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MinSupportedDateTime ) )
         {
           DateTime minDate = this.Minimum.Value;
-          _calendar.BlackoutDates.Add( new CalendarDateRange( DateTime.MinValue, minDate.AddDays( -1 ) ) );
+          _calendar.BlackoutDates.Add( new CalendarDateRange( System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MinSupportedDateTime, minDate.AddDays( -1 ) ) );
         }
-        if( ( this.Maximum != null ) && this.Maximum.HasValue && ( this.Maximum.Value != DateTime.MaxValue ) )
+        if( ( this.Maximum != null ) && this.Maximum.HasValue && ( this.Maximum.Value != System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MaxSupportedDateTime ) )
         {
           DateTime maxDate = this.Maximum.Value;
-          _calendar.BlackoutDates.Add( new CalendarDateRange( maxDate.AddDays( 1 ), DateTime.MaxValue ) );
+          _calendar.BlackoutDates.Add( new CalendarDateRange( maxDate.AddDays( 1 ), System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MaxSupportedDateTime ) );
         }
       }
     }

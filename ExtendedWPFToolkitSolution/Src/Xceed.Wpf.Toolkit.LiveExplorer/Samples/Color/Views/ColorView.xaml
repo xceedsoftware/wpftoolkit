@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2017 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -313,16 +313,16 @@
                               Value="{Binding ElementName=_colorPicker, Path=MaxDropDownWidth}" />
           <TextBlock Grid.Column="0"
                      Grid.Row="14"
-                     Text="AdvancedButtonHeader:" />
+                     Text="AdvancedTabHeader:" />
           <TextBox Grid.Column="1"
                    Grid.Row="14"
-                   Text="{Binding ElementName=_colorPicker, Path=AdvancedButtonHeader, Mode=TwoWay}" />
+                   Text="{Binding ElementName=_colorPicker, Path=AdvancedTabHeader, Mode=TwoWay}" />
           <TextBlock Grid.Column="0"
                      Grid.Row="15"
-                     Text="StandardButtonHeader:" />
+                     Text="StandardTabHeader:" />
           <TextBox Grid.Column="1"
                    Grid.Row="15"
-                   Text="{Binding ElementName=_colorPicker, Path=StandardButtonHeader, Mode=TwoWay}" />
+                   Text="{Binding ElementName=_colorPicker, Path=StandardTabHeader, Mode=TwoWay}" />
           <TextBlock Grid.Column="0"
                      Grid.Row="16"
                      Text="SelectedColorText:" />

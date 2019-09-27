@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -22,6 +22,7 @@ using System.Windows;
 using System.Globalization;
 using System.Windows.Media;
 using System.ComponentModel;
+using Xceed.Wpf.AvalonDock.Controls;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
@@ -89,6 +90,15 @@ namespace Xceed.Wpf.AvalonDock.Layout
           RaisePropertyChanging( "Content" );
           _content = value;
           RaisePropertyChanged( "Content" );
+
+          if( this.ContentId == null )
+          {
+            var contentAsControl = _content as FrameworkElement;
+            if( contentAsControl != null && !string.IsNullOrWhiteSpace( contentAsControl.Name ) )
+            {
+              this.SetCurrentValue( LayoutContent.ContentIdProperty, contentAsControl.Name );
+            }
+          }
         }
       }
     }
@@ -97,30 +107,38 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     #region ContentId
 
-    private string _contentId = null;
+    public static readonly DependencyProperty ContentIdProperty = DependencyProperty.Register( "ContentId", typeof( string ), typeof( LayoutContent ), new UIPropertyMetadata( null, OnContentIdPropertyChanged ) );
+
     public string ContentId
     {
       get
       {
-        if( _contentId == null )
-        {
-          var contentAsControl = _content as FrameworkElement;
-          if( contentAsControl != null && !string.IsNullOrWhiteSpace( contentAsControl.Name ) )
-            return contentAsControl.Name;
-        }
-        return _contentId;
+        return (string)GetValue( ContentIdProperty );
       }
       set
       {
-        if( _contentId != value )
-        {
-          _contentId = value;
-          RaisePropertyChanged( "ContentId" );
-        }
+        SetValue( ContentIdProperty, value );
       }
     }
 
-    #endregion
+    private static void OnContentIdPropertyChanged( DependencyObject obj, DependencyPropertyChangedEventArgs args )
+    {
+      var layoutContent = obj as LayoutContent;
+      if( layoutContent != null )
+      {
+        layoutContent.OnContentIdPropertyChanged( (string)args.OldValue, (string)args.NewValue );
+      }
+    }
+
+    private void OnContentIdPropertyChanged( string oldValue, string newValue )
+    {
+      if( oldValue != newValue )
+      {
+        this.RaisePropertyChanged( "ContentId" );
+      }
+    }
+
+    #endregion //ContentId
 
     #region IsSelected
 
@@ -143,6 +161,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
             parentSelector.SelectedContentIndex = _isSelected ? parentSelector.IndexOf( this ) : -1;
           OnIsSelectedChanged( oldValue, value );
           RaisePropertyChanged( "IsSelected" );
+          LayoutAnchorableTabItem.CancelMouseLeave();
         }
       }
     }

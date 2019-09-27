@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -340,7 +340,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
         writer.WriteAttributeString( "DockHeight", _gridLengthConverter.ConvertToInvariantString( DockHeight ) );
 
       if( DockMinWidth != 25.0 )
-        writer.WriteAttributeString( "DocMinWidth", DockMinWidth.ToString( CultureInfo.InvariantCulture ) );
+        writer.WriteAttributeString( "DockMinWidth", DockMinWidth.ToString( CultureInfo.InvariantCulture ) );
       if( DockMinHeight != 25.0 )
         writer.WriteAttributeString( "DockMinHeight", DockMinHeight.ToString( CultureInfo.InvariantCulture ) );
 
@@ -366,9 +366,9 @@ namespace Xceed.Wpf.AvalonDock.Layout
       if( reader.MoveToAttribute( "DockHeight" ) )
         _dockHeight = ( GridLength )_gridLengthConverter.ConvertFromInvariantString( reader.Value );
 
-      if( reader.MoveToAttribute( "DocMinWidth" ) )
+      if( reader.MoveToAttribute( "DockMinWidth" ) )
         _dockMinWidth = double.Parse( reader.Value, CultureInfo.InvariantCulture );
-      if( reader.MoveToAttribute( "DocMinHeight" ) )
+      if( reader.MoveToAttribute( "DockMinHeight" ) )
         _dockMinHeight = double.Parse( reader.Value, CultureInfo.InvariantCulture );
 
       if( reader.MoveToAttribute( "FloatingWidth" ) )

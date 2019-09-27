@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2017 Xceed Software Inc.
+   Copyright (C) 2007-2018 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
@@ -39,11 +39,13 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       person.FirstName = "John";
       person.LastName = "Doe";
       person.WritingFontSize = 12;
-      person.Friends = new List<Person>() { new Man() { FirstName = "First", LastName = "Friend" }, new Woman() { FirstName = "Second", LastName = "Friend" } };
+      person.RangeDouble = 5d;
+      person.Friends = new List<Person>() { new Man() { FirstName = "First", LastName = "Friend", RangeDouble = 5d }, new Woman() { FirstName = "Second", LastName = "Friend", RangeDouble = 5d } };
       person.Spouse = new Woman()
       {
         FirstName = "Jane",
-        LastName = "Doe"
+        LastName = "Doe",
+        RangeDouble = 5d
       };
 
       this.DataContext = person;
