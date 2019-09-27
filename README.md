@@ -10,13 +10,13 @@ This free and open source toolkit is provided under the [Microsoft Public Licens
 
 **September 27, 2019** v3.6.0 released with [36 bug fixes and improvements](../../wiki/Improvements-in-v3.6.0). 
 
-*January 15, 2018* v3.6.0 of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) released with [1 new control and 40 bug fixes and improvements](../../wiki/Improvements-in-v3.5.0#Plus360)
-
-*June 18, 2018* v3.7.0 of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) released with [27 bug fixes and improvements](../../wiki/Improvements-in-v3.5.0#Plus370)
-
 **February 7, 2019** v3.5.0 released with [26 bug fixes and improvements](../../wiki/Improvements-in-v3.5.0). 
 
 *January 30, 2019* v3.8.0 of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) released with [45 bug fixes and improvements](../../wiki/Improvements-in-v3.5.0#Plus380)
+
+*June 18, 2018* v3.7.0 of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) released with [27 bug fixes and improvements](../../wiki/Improvements-in-v3.5.0#Plus370)
+
+*January 15, 2018* v3.6.0 of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) released with [1 new control and 40 bug fixes and improvements](../../wiki/Improvements-in-v3.5.0#Plus360)
 
 **July 11, 2017:** The project's new home is Github. All issues from Codeplex are now located here.
 
