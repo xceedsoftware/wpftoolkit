@@ -69,7 +69,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region FormatString
 
-    public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register( "FormatString", typeof( string ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( String.Empty, OnFormatStringChanged ) );
+    public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register( "FormatString", typeof( string ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( String.Empty, OnFormatStringChanged, OnCoerceFormatString) );
     public string FormatString
     {
       get
@@ -87,6 +87,11 @@ namespace Xceed.Wpf.Toolkit
       NumericUpDown<T> numericUpDown = o as NumericUpDown<T>;
       if( numericUpDown != null )
         numericUpDown.OnFormatStringChanged( ( string )e.OldValue, ( string )e.NewValue );
+    }
+
+    private static object OnCoerceFormatString(DependencyObject d, object baseValue)
+    {
+        return baseValue ?? string.Empty;
     }
 
     protected virtual void OnFormatStringChanged( string oldValue, string newValue )
