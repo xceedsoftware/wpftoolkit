@@ -469,7 +469,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( editorElement == null )
       {
         if( pd.IsReadOnly )
-          editor = new TextBlockEditor();
+          editor = new ReadOnlyTextBoxEditor();
 
         // Fallback: Use a default type editor.
         if( editor == null )

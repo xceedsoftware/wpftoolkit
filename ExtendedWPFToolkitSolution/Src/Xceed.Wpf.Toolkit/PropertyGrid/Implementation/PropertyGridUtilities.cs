@@ -132,7 +132,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
             // Otherwise, return a TextBlock editor since no valid editor exists.
             editor = (typeConverter != null && typeConverter.CanConvertFrom( typeof( string ) ))
               ? (ITypeEditor)new TextBoxEditor()
-              : (ITypeEditor)new TextBlockEditor();
+              : (ITypeEditor)new ReadOnlyTextBoxEditor();
           }
         }
       }

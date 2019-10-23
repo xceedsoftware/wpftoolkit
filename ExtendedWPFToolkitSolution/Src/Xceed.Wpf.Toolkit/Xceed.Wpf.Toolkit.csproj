@@ -441,6 +441,7 @@
     <Compile Include="PropertyGrid\Implementation\Converters\IsDefaultCategoryConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\IsStringEmptyConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\CollectionEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\ReadOnlyTextBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\SourceComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\TrimmedTextBlock.cs" />
     <Compile Include="Core\Converters\WindowContentBorderMarginConverter.cs" />
