@@ -286,7 +286,20 @@
             Value="Gray" />
   </Style>
 
-  <!-- PropertyGrid MaskedTextBox Editors -->
+    <!-- PropertyGrid ReadOnly TextBox Editor -->
+   <Style TargetType="{x:Type editor:PropertyGridReadOnlyTextBoxEditor}" BasedOn="{StaticResource {x:Type TextBox}}">
+       <Setter Property="Foreground" Value="Gray" />
+       <Setter Property="Template">
+           <Setter.Value>
+               <ControlTemplate>
+                   <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Text="{Binding Path=Value}"></TextBlock>
+               </ControlTemplate>
+           </Setter.Value>
+       </Setter>
+   </Style>
+
+
+    <!-- PropertyGrid MaskedTextBox Editors -->
   <Style TargetType="{x:Type editor:PropertyGridEditorMaskedTextBox}"
          BasedOn="{StaticResource {x:Type TextBox}}">
   </Style>

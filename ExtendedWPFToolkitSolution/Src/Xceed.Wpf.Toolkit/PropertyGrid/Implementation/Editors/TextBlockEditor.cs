@@ -16,9 +16,11 @@
 
 using System.Windows.Controls;
 using System.Windows;
+using System;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
+  [Obsolete("Use ReadOnlyTextBoxEditor instead which uses a TextBox control for displaying content since TextBlock doesn't support ControlTemplate for customization")]
   public class TextBlockEditor : TypeEditor<TextBlock>
   {
     protected override TextBlock CreateEditor()
