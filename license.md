@@ -39,7 +39,8 @@ Support is not included in Community Licenses. The Software is provided on an �
 requests to Xceed’s technical support team only if a commercial license has been obtained. Bugs may be corrected at 
 Xceed’s discretion. 
 
-WARRANTY  
+WARRANTY 
+
 Xceed clearly states that this Community License includes no warranty of any type. Xceed products are provided 
 on an “as is” basis. In no case shall Xceed be responsible or liable for any direct or indirect, or consequential 
 damages whatsoever (including, without limitation, any damages for loss of revenues, of business profits, business 
