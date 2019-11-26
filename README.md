@@ -8,6 +8,8 @@ Starting at v3.7.0, this free and open source toolkit is provided under the [Xce
 
 ## Latest news
 
+**November 26, 2019** v3.7.0 released with [18 bug fixes and improvements](../../wiki/Improvements-in-v3.7.0). 
+
 **September 27, 2019** v3.6.0 released with [36 bug fixes and improvements](../../wiki/Improvements-in-v3.6.0). 
 
 **February 7, 2019** v3.5.0 released with [26 bug fixes and improvements](../../wiki/Improvements-in-v3.5.0). 
