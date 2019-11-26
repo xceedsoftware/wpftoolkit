@@ -1,31 +1,62 @@
-# Microsoft Public License (Ms-PL)
+XCEED SOFTWARE, INC.
 
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not accept the license, do not use the software.
+COMMUNITY LICENSE AGREEMENT
+(for non-commercial use)
 
-## 1. Definitions
+This “Agreement” is a legal agreement between you, a software developer (“Licensee”) and Xceed Software, Inc. (“Xceed”). 
+You, the Licensee, wish to use Xceed’s product “Xceed Extended WPF Toolkit™” (the “Software”), an Xceed product, for use 
+in a non-commercial application or system or program. “Non-Commercial use” means not primarily intended for commercial 
+advantages or for monetary compensation or any other type of compensation. 
+Xceed agrees to license its products to developers like you as along as all terms & conditions set forth herein are
+respected. Xceed Software is provided under a license; it is not “sold” in any manner.
+By installing, copying or otherwise using the Software, you confirm your agreement to the terms and conditions expressed 
+in this Agreement. If you do not agree, you are not authorized to use our Software. If you are not a software developer, 
+you are not authorized to use our Software.
 
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under U.S. copyright law.
+GENERAL
+This license is perpetual (or until revoked by Xceed), provided that:
+. All License Agreement terms & conditions are strictly followed by the Licensee;
+. Xceed Software is used for non-commercial purposes only (no re-selling, licensing or sub-licensing or any other rights 
+of use);
+. Xceed’s name and logo must appear clearly in the resulting work with an Xceed Copyright notice; the name and notice 
+must be visible, not be hidden.
 
-A "contribution" is the original software, or any additions or changes to the software.
+Pursuant to these conditions, Xceed grants to Licensee a non-exclusive right to install and use the Software for 
+designing, building, testing and/or deploying an application or system or program for non-commercial purposes only, 
+without the need to acquire a subscription. Would Licensee need to use the Software in any commercial way or purpose, 
+Licensee must acquire a Commercial License (with a paid subscription).
 
-A "contributor" is any person that distributes its contribution under this license.
+Licensee is not authorized to:
+. sell or license/sub-license/lease the resulting work to anyone nor charge any amounts of money or exchange services 
+for the said resulting work;
+. “deploy” the Software for/in a commercial environment;
+. create a competitive software product based on Xceed Software;
 
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
+SUPPORT
+Support is not included in Community Licenses. The Software is provided on an “as is” basis only. Licensee can send 
+requests to Xceed’s technical support team only if a commercial license has been obtained. Bugs may be corrected at 
+Xceed’s discretion. 
 
-## 2. Grant of Rights
+WARRANTY                                                                                                                                      Xceed clearly states that this Community License includes no warranty of any type. Xceed products are provided 
+on an “as is” basis. In no case shall Xceed be responsible or liable for any direct or indirect, or consequential 
+damages whatsoever (including, without limitation, any damages for loss of revenues, of business profits, business 
+interruption, or loss of business information, or any other type of loss or damages) arising out of the use of the 
+Software even if Xceed may have been advised of such potential damages or loss.
 
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
+OTHER
+Xceed does not allow Community Licensees to publish results from benchmarks or performance comparison tests (with 
+other products) without advance permission by Xceed. Licensee is not authorized to use Xceed’s name, tradenames 
+and trademarks without Xceed’s written permission (other than the Copyright notice stated above in the “General” 
+section). 
 
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
+GOVERNING LAW
+This Agreement shall be governed by the laws of the Province of Quebec (Canada). Any claim, dispute or problem 
+arising out of this Agreement shall be deemed non-receivable or may be settled or disposed of at Xceed’s discretion. 
+Xceed reserves the right to settle any action before an arbitration board in Quebec as per generally accepted, 
+international rules of arbitration prevailing in Quebec.       
 
-## 3. Conditions and Limitations
+Xceed reserves the right to modify this Agreement at all times without notice. 
 
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
+© Copyright: Xceed Software, Inc. - 2019. All rights reserved.
 
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, your patent license from such contributor to the software ends automatically.
 
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution notices that are present in the software.
-
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object code form, you may only do so under a license that complies with this license.
-
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular purpose and non-infringement.
