@@ -17,12 +17,12 @@ GENERAL
 
 This license is perpetual (or until revoked by Xceed), provided that:
 
-. All License Agreement terms & conditions are strictly followed by the Licensee;
+-All License Agreement terms & conditions are strictly followed by the Licensee;
 
-. Xceed Software is used for non-commercial purposes only (no re-selling, licensing or sub-licensing or any other rights 
+-Xceed Software is used for non-commercial purposes only (no re-selling, licensing or sub-licensing or any other rights 
 of use);
 
-. Xceed’s name and logo must appear clearly in the resulting work with an Xceed Copyright notice; the name and notice 
+-Xceed’s name and logo must appear clearly in the resulting work with an Xceed Copyright notice; the name and notice 
 must be visible, not be hidden.
 
 Pursuant to these conditions, Xceed grants to Licensee a non-exclusive right to install and use the Software for 
@@ -32,12 +32,12 @@ Licensee must acquire a Commercial License (with a paid subscription).
 
 Licensee is not authorized to:
 
-. sell or license/sub-license/lease the resulting work to anyone nor charge any amounts of money or exchange services 
+-sell or license/sub-license/lease the resulting work to anyone nor charge any amounts of money or exchange services 
 for the said resulting work;
 
-. “deploy” the Software for/in a commercial environment;
+-“deploy” the Software for/in a commercial environment;
 
-. create a competitive software product based on Xceed Software;
+-create a competitive software product based on Xceed Software;
 
 
 SUPPORT
