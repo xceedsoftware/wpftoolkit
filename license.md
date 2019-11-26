@@ -14,6 +14,7 @@ in this Agreement. If you do not agree, you are not authorized to use our Softwa
 you are not authorized to use our Software.
 
 GENERAL
+
 This license is perpetual (or until revoked by Xceed), provided that:
 . All License Agreement terms & conditions are strictly followed by the Licensee;
 . Xceed Software is used for non-commercial purposes only (no re-selling, licensing or sub-licensing or any other rights 
@@ -33,23 +34,27 @@ for the said resulting work;
 . create a competitive software product based on Xceed Software;
 
 SUPPORT
+
 Support is not included in Community Licenses. The Software is provided on an “as is” basis only. Licensee can send 
 requests to Xceed’s technical support team only if a commercial license has been obtained. Bugs may be corrected at 
 Xceed’s discretion. 
 
-WARRANTY                                                                                                                                      Xceed clearly states that this Community License includes no warranty of any type. Xceed products are provided 
+WARRANTY  
+Xceed clearly states that this Community License includes no warranty of any type. Xceed products are provided 
 on an “as is” basis. In no case shall Xceed be responsible or liable for any direct or indirect, or consequential 
 damages whatsoever (including, without limitation, any damages for loss of revenues, of business profits, business 
 interruption, or loss of business information, or any other type of loss or damages) arising out of the use of the 
 Software even if Xceed may have been advised of such potential damages or loss.
 
 OTHER
+
 Xceed does not allow Community Licensees to publish results from benchmarks or performance comparison tests (with 
 other products) without advance permission by Xceed. Licensee is not authorized to use Xceed’s name, tradenames 
 and trademarks without Xceed’s written permission (other than the Copyright notice stated above in the “General” 
 section). 
 
 GOVERNING LAW
+
 This Agreement shall be governed by the laws of the Province of Quebec (Canada). Any claim, dispute or problem 
 arising out of this Agreement shall be deemed non-receivable or may be settled or disposed of at Xceed’s discretion. 
 Xceed reserves the right to settle any action before an arbitration board in Quebec as per generally accepted, 
