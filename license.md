@@ -16,9 +16,12 @@ you are not authorized to use our Software.
 GENERAL
 
 This license is perpetual (or until revoked by Xceed), provided that:
+
 . All License Agreement terms & conditions are strictly followed by the Licensee;
+
 . Xceed Software is used for non-commercial purposes only (no re-selling, licensing or sub-licensing or any other rights 
 of use);
+
 . Xceed’s name and logo must appear clearly in the resulting work with an Xceed Copyright notice; the name and notice 
 must be visible, not be hidden.
 
