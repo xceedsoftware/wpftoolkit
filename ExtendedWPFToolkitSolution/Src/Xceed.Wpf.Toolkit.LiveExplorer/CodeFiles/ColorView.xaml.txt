@@ -29,7 +29,9 @@
 
   <local:DemoView.Resources>
     <Style x:Key="controlInError"
-           TargetType="xctk:IntegerUpDown">
+           TargetType="xctk:ByteUpDown">
+      <Setter Property="Width"
+              Value="45" />
       <Style.Triggers>
         <Trigger Property="Validation.HasError"
                  Value="true">
@@ -114,32 +116,25 @@
                       HorizontalAlignment="Stretch"
                       Orientation="Horizontal">
             <TextBlock Text="R:" />
-            <xctk:IntegerUpDown x:Name="_R"
-                                Value="{Binding ElementName=_colorCanvas, Path=R, Mode=TwoWay}"
-                                Minimum="0"
-                                Maximum="255"
-                                Style="{StaticResource controlInError}" />
+            <xctk:ByteUpDown x:Name="_R"
+                             Value="{Binding ElementName=_colorCanvas, Path=R, Mode=TwoWay}"
+                             Style="{StaticResource controlInError}"/>
             <TextBlock Text="G:"
                        Margin="5" />
-            <xctk:IntegerUpDown x:Name="_G"
-                                Value="{Binding ElementName=_colorCanvas, Path=G, Mode=TwoWay}"
-                                Minimum="0"
-                                Maximum="255"
-                                Style="{StaticResource controlInError}" />
+            <xctk:ByteUpDown x:Name="_G"
+                             Value="{Binding ElementName=_colorCanvas, Path=G, Mode=TwoWay}"
+                             Style="{StaticResource controlInError}"/>
             <TextBlock Text="B:"
                        Margin="5" />
-            <xctk:IntegerUpDown x:Name="_B"
-                                Value="{Binding ElementName=_colorCanvas, Path=B, Mode=TwoWay}"
-                                Minimum="0"
-                                Maximum="255"
-                                Style="{StaticResource controlInError}" />
+            <xctk:ByteUpDown x:Name="_B"
+                             Value="{Binding ElementName=_colorCanvas, Path=B, Mode=TwoWay}"
+                             Style="{StaticResource controlInError}"/>
             <TextBlock Text="A:"
                        Margin="5" />
-            <xctk:IntegerUpDown x:Name="_A"
-                                Value="{Binding ElementName=_colorCanvas, Path=A, Mode=TwoWay}"
-                                Minimum="0"
-                                Maximum="255"
-                                Style="{StaticResource controlInError}" />
+            <xctk:ByteUpDown x:Name="_A"
+                             Value="{Binding ElementName=_colorCanvas, Path=A, Mode=TwoWay}"
+                             Style="{StaticResource controlInError}"
+                             IsEnabled="{Binding IsChecked, ElementName=_usingAlphaChannel}"/>
           </StackPanel>
 
           <TextBlock Grid.Column="0"

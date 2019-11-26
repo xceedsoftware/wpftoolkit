@@ -55,6 +55,34 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region Properties
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    #region Model
+
     public ILayoutElement Model
     {
       get
@@ -62,6 +90,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         return _model;
       }
     }
+
+    #endregion
 
     #endregion
 
@@ -113,5 +143,29 @@ namespace Xceed.Wpf.AvalonDock.Controls
     }
 
     #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   }
 }

@@ -64,6 +64,7 @@
                        IsReadOnly="True"
                        Focusable="False"
                        Cursor="Arrow"
+                       IsTabStop="{TemplateBinding IsTabStop}"
                        Margin="{TemplateBinding Padding}"
                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
@@ -107,7 +108,20 @@
               <Setter Property="Cursor"
                       Value="{x:Null}"
                       TargetName="TextBox" />
+              <Setter Property="IsTabStop"
+                      Value="True" />
             </DataTrigger>
+            <MultiDataTrigger>
+              <MultiDataTrigger.Conditions>
+                <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type local:CheckComboBox}}}"
+                           Value="True" />
+                <Condition Binding="{Binding IsFocused, RelativeSource={RelativeSource AncestorType={x:Type local:CheckComboBox}}}"
+                           Value="True" />
+              </MultiDataTrigger.Conditions>
+              <Setter TargetName="TextBox"
+                      Property="FocusManager.FocusedElement"
+                      Value="{Binding ElementName=TextBox}" />
+            </MultiDataTrigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
       </Setter.Value>
@@ -211,6 +225,11 @@
                Value="True">
         <Setter Property="BorderBrush"
                 Value="{DynamicResource {x:Static themes:ResourceKeys.ControlSelectedBorderKey}}" />
+      </Trigger>
+      <Trigger Property="IsEditable"
+               Value="True">
+        <Setter Property="IsTabStop"
+                Value="False"/>
       </Trigger>
     </Style.Triggers>
   </Style>

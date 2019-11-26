@@ -110,12 +110,15 @@ namespace Xceed.Wpf.AvalonDock.Controls
         this.Drop( fwAsDocument );
       }
 
-      Dispatcher.BeginInvoke( new Action( () =>
+      if( currentActiveContent != null )
+      {
+        Dispatcher.BeginInvoke( new Action( () =>
             {
               currentActiveContent.IsSelected = false;
               currentActiveContent.IsActive = false;
               currentActiveContent.IsActive = true;
             } ), DispatcherPriority.Background );
+      }
     }
 
     public virtual bool HitTest( Point dragPoint )

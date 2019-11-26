@@ -139,7 +139,13 @@ namespace Xceed.Wpf.Toolkit
             dateParts[ "Year" ] = dateTimeParts[ i ] != "0" ? dateTimeParts[ i ] : "0000";
 
             if( dateParts[ "Year" ].Length == 2 )
-              dateParts[ "Year" ] = string.Format( "{0}{1}", currentDate.Year / 100, dateParts[ "Year" ] );
+            {
+              var yearDigits = int.Parse( dateParts[ "Year" ] );
+              var twoDigitYearMax = cultureInfo.Calendar.TwoDigitYearMax;
+              var hundredDigits = ( yearDigits <= twoDigitYearMax % 100 ) ? twoDigitYearMax / 100 : ( twoDigitYearMax / 100 ) - 1;
+
+              dateParts[ "Year" ] = string.Format( "{0}{1}", hundredDigits, dateParts[ "Year" ] );
+            }
           }
           else if( f.Contains( "hh" ) || f.Contains( "HH" ) )
           {

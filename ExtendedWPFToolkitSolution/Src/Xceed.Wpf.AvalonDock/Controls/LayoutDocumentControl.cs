@@ -19,6 +19,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Xceed.Wpf.AvalonDock.Layout;
+using System.Collections;
+using System;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
@@ -165,6 +167,34 @@ namespace Xceed.Wpf.AvalonDock.Controls
       base.OnMouseLeftButtonDown( e );
     }
 
+
+    #endregion
+
+    #region Internal Methods
+
+    internal void SetResourcesFromObject( FrameworkElement current )
+    {
+      while( current != null )
+      {
+        if( current.Resources.Count > 0 )
+        {
+          var entries = new DictionaryEntry[ current.Resources.Count ];
+          current.Resources.CopyTo( entries, 0 );
+          entries.ForEach( x =>
+          {
+            try
+            {
+              if( this.Resources[ x.Key ] == null )
+              {
+                this.Resources.Add( x.Key, x.Value );
+              }
+            }
+            catch( Exception ) { }
+          } );
+        }
+        current = current.Parent as FrameworkElement;
+      }
+    }
 
     #endregion
 

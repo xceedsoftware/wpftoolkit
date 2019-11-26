@@ -247,7 +247,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       this.GenerateSubPropertiesCore( this.UpdatePropertyItemsCallback );
     }
 
-    private void UpdatePropertyItemsCallback( IEnumerable<PropertyItem> subProperties )
+    protected internal virtual void UpdatePropertyItemsCallback( IEnumerable<PropertyItem> subProperties )
     {
       foreach( var propertyItem in subProperties )
       {
@@ -273,6 +273,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( propertyGrid != null )
       {
         propertyGrid.SelectedPropertyItem = this.DefaultProperty;
+      }
+
+      if( ObjectsGenerated != null )
+      {
+        ObjectsGenerated( this, EventArgs.Empty );
       }
     }
 
@@ -468,7 +473,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       if( editorElement == null )
       {
-        if( pd.IsReadOnly )
+        if( propertyItem.IsReadOnly )
           editor = new TextBlockEditor();
 
         // Fallback: Use a default type editor.
@@ -555,5 +560,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         || string.Equals( propertyName, PropertyItemCollection.PropertyOrderPropertyName );
     }
 
+    internal event EventHandler ObjectsGenerated;
   }
 }

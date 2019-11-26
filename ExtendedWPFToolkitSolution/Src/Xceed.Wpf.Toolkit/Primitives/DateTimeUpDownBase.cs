@@ -220,7 +220,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     protected virtual void PerformMouseSelection()
     {
       var dateTimeInfo = this.GetDateTimeInfo( TextBox.SelectionStart );
-      if( (this.TextBox is MaskedTextBox) && ( dateTimeInfo != null) && (dateTimeInfo.Type == DateTimePart.Other) )
+      if( ( dateTimeInfo != null) && (dateTimeInfo.Type == DateTimePart.Other) )
       {
         this.Dispatcher.BeginInvoke( DispatcherPriority.Background, new Action( () =>
         {
@@ -255,7 +255,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       return _dateTimeInfoList.FirstOrDefault( ( info ) =>info.Type == part );
     }
 
-    internal void Select( DateTimeInfo info )
+    internal virtual void Select( DateTimeInfo info )
     {
       if( (info != null) && !info.Equals( _selectedDateTimeInfo ) && ( this.TextBox != null) && !string.IsNullOrEmpty( this.TextBox.Text ) )
       {

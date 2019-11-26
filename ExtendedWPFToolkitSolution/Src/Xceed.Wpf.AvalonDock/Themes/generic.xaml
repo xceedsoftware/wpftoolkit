@@ -32,6 +32,10 @@
   <avalonDockConverters:ActivateCommandLayoutItemFromLayoutModelConverter x:Key="ActivateCommandLayoutItemFromLayoutModelConverter" />
   <avalonDockConverters:AnchorableContextMenuHideVisibilityConverter x:Key="AnchorableContextMenuHideVisibilityConverter" />
 
+  <DataTemplate x:Key="DocumentPaneControlContentTemplate">
+    <avalonDockControls:LayoutDocumentControl Model="{Binding}" />
+  </DataTemplate>
+
   <!--DocumentPaneControlStyle-->
   <Style x:Key="DocumentPaneControlStyle"
          TargetType="{x:Type avalonDockControls:LayoutDocumentPaneControl}">
@@ -201,13 +205,9 @@
       </Setter.Value>
     </Setter>
 
-    <Setter Property="ContentTemplate">
-      <Setter.Value>
-        <DataTemplate>
-          <avalonDockControls:LayoutDocumentControl Model="{Binding}" />
-        </DataTemplate>
-      </Setter.Value>
-    </Setter>
+    <Setter Property="ContentTemplate"
+            Value="{StaticResource DocumentPaneControlContentTemplate}" />
+
   </Style>
 
   <!--AnchorablePaneControlStyle-->

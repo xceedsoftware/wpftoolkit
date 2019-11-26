@@ -530,8 +530,7 @@
                                          SampleType="{x:Type samples:WatermarkComboBox.Views.WatermarkComboBoxView}" />
           <core:LiveExplorerTreeViewItem Header="Extended TabControl"
                                          SampleType="{x:Type samples:ExtendedTabControl.Views.ExtTabControlView}"
-                                         IsPlusOnlyFeature="True"
-                                         IsNewFeature="True"/>
+                                         IsPlusOnlyFeature="True"/>
           <core:LiveExplorerTreeViewItem Header="TimelinePanel"
                                          SampleType="{x:Type samples:TimelinePanel.Views.TimelinePanelView}" />
         </core:LiveExplorerTreeViewItem>

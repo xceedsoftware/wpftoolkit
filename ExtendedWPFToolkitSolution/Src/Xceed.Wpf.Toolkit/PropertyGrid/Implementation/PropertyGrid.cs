@@ -521,7 +521,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region IsReadOnly
 
-    public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register( "IsReadOnly", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( false ) );
+    public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register( "IsReadOnly", typeof( bool ), typeof( PropertyGrid ), new UIPropertyMetadata( false, OnIsReadOnlyChanged ) );
     public bool IsReadOnly
     {
       get
@@ -532,6 +532,18 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         SetValue( IsReadOnlyProperty, value );
       }
+    }
+
+    private static void OnIsReadOnlyChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var propertyGrid = o as PropertyGrid;
+      if( propertyGrid != null )
+        propertyGrid.OnIsReadOnlyChanged( (bool)e.OldValue, (bool)e.NewValue );
+    }
+
+    protected virtual void OnIsReadOnlyChanged( bool oldValue, bool newValue )
+    {
+      this.UpdateContainerHelper();
     }
 
     #endregion //ReadOnly
@@ -1025,7 +1037,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         if( ( parentPropertyItem != null ) && parentPropertyItem.IsExpandable )
         {
           //Rebuild Editor for parent propertyItem if one of its sub-propertyItem have changed.
-          this.RebuildEditor( parentPropertyItem );
+          this.RebuildPropertyItemEditor( parentPropertyItem );
         }
       }
     }
@@ -1138,24 +1150,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return null;
     }
 
-    private void RebuildEditor( PropertyItem propertyItem )
+    private void RebuildPropertyItemEditor( PropertyItem propertyItem )
     {
-      ObjectContainerHelperBase objectContainerHelperBase = propertyItem.ContainerHelper as ObjectContainerHelperBase;
-      //Re-build the editor to update this propertyItem
-      FrameworkElement editor = objectContainerHelperBase.GenerateChildrenEditorElement( propertyItem );
-      if( editor != null )
+      if( propertyItem != null )
       {
-        // Tag the editor as generated to know if we should clear it.
-        ContainerHelperBase.SetIsGenerated( editor, true );
-        propertyItem.Editor = editor;
-
-        //Update Source of binding and Validation of PropertyItem to update
-        var be = propertyItem.GetBindingExpression( PropertyItem.ValueProperty );
-        if( be != null )
-        {
-          be.UpdateSource();
-          propertyItem.SetRedInvalidBorder( be );
-        }
+        propertyItem.RebuildEditor();
       }
     }
 
@@ -1182,11 +1181,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         }
       }
 
+      ObjectContainerHelperBase objectContainerHelper = null;
 
 
-      _containerHelper = new ObjectContainerHelper( this, SelectedObject );
-      ( ( ObjectContainerHelper )_containerHelper ).GenerateProperties();
+      objectContainerHelper = new ObjectContainerHelper( this, SelectedObject );
+      objectContainerHelper.ObjectsGenerated += this.ObjectContainerHelper_ObjectsGenerated;
+      objectContainerHelper.GenerateProperties();
+    }
 
+    private void FinalizeUpdateContainerHelper( ItemsControl childrenItemsControl )
+    {
 
       if( _containerHelper != null )
       {
@@ -1254,6 +1258,21 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //Methods
 
+    #region Event Handlers
+
+    private void ObjectContainerHelper_ObjectsGenerated( object sender, EventArgs e )
+    {
+      var objectContainerHelper = sender as ObjectContainerHelperBase;
+      if( objectContainerHelper != null )
+      {
+        objectContainerHelper.ObjectsGenerated -= this.ObjectContainerHelper_ObjectsGenerated;
+        _containerHelper = objectContainerHelper;
+        this.FinalizeUpdateContainerHelper( objectContainerHelper.ChildrenItemsControl );
+      }
+    }
+
+    #endregion
+
     #region Events
 
     #region PropertyChanged Event
@@ -1315,8 +1334,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     public event IsPropertyBrowsableHandler IsPropertyBrowsable;
 
     #endregion
-
-
 
 
 

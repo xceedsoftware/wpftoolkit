@@ -1907,17 +1907,17 @@ namespace Xceed.Wpf.Toolkit
 
     private string GetFormattedString( MaskedTextProvider provider, string text )
     {
-      if( provider.Mask.StartsWith( ">" ) )
-        return text.ToUpper();
-      if( provider.Mask.StartsWith( "<" ) )
-        return text.ToLower();
-
       //System.Diagnostics.Debug.Assert( provider.EditPositionCount > 0 );
 
 
       bool includePrompt = ( this.IsReadOnly ) ? false : ( !this.HidePromptOnLeave || this.IsFocused );
 
       string displayString = provider.ToString( false, includePrompt, true, 0, m_maskedTextProvider.Length );
+
+      if( provider.Mask.StartsWith( ">" ) )
+        return displayString.ToUpper();
+      if( provider.Mask.StartsWith( "<" ) )
+        return displayString.ToLower();
 
       return displayString;
     }

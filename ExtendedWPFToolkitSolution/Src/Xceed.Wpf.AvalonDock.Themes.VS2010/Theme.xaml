@@ -37,6 +37,10 @@
   <avalonDockConverters:ActivateCommandLayoutItemFromLayoutModelConverter x:Key="ActivateCommandLayoutItemFromLayoutModelConverter" />
   <avalonDockConverters:AnchorableContextMenuHideVisibilityConverter x:Key="AnchorableContextMenuHideVisibilityConverter" />
 
+  <DataTemplate x:Key="DocumentPaneControlContentTemplate">
+    <avalonDockControls:LayoutDocumentControl Model="{Binding}" />
+  </DataTemplate>
+
 
   <Style x:Key="AvalonDock_ThemeVS2010_ToolButtonStyle"
          TargetType="ToggleButton">
@@ -365,13 +369,9 @@
       </Setter.Value>
     </Setter>
 
-    <Setter Property="ContentTemplate">
-      <Setter.Value>
-        <DataTemplate>
-          <avalonDockControls:LayoutDocumentControl Model="{Binding}" />
-        </DataTemplate>
-      </Setter.Value>
-    </Setter>
+    <Setter Property="ContentTemplate"
+            Value="{StaticResource DocumentPaneControlContentTemplate}" />
+
   </Style>
 
   <!--AnchorablePaneControlStyle-->

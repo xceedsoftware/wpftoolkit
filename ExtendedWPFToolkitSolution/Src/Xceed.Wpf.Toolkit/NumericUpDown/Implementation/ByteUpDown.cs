@@ -26,6 +26,7 @@ namespace Xceed.Wpf.Toolkit
     static ByteUpDown()
     {
       UpdateMetadata( typeof( ByteUpDown ), ( byte )1, byte.MinValue, byte.MaxValue );
+      MaxLengthProperty.OverrideMetadata( typeof(ByteUpDown), new FrameworkPropertyMetadata( 3 ) );
     }
 
     public ByteUpDown()
