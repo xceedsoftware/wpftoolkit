@@ -31,10 +31,14 @@ without the need to acquire a subscription. Would Licensee need to use the Softw
 Licensee must acquire a Commercial License (with a paid subscription).
 
 Licensee is not authorized to:
+
 . sell or license/sub-license/lease the resulting work to anyone nor charge any amounts of money or exchange services 
 for the said resulting work;
+
 . “deploy” the Software for/in a commercial environment;
+
 . create a competitive software product based on Xceed Software;
+
 
 SUPPORT
 
