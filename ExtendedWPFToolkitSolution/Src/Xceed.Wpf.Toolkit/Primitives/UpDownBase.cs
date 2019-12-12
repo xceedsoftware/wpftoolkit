@@ -407,7 +407,7 @@ UpDownBase<T> ), new UIPropertyMetadata( true ) );
       }
     }
 
-    private void SetValueInternal( T value )
+    protected void SetValueInternal( T value )
     {
       _internalValueSet = true;
       try

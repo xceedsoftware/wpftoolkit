@@ -392,9 +392,17 @@ namespace Xceed.Wpf.Toolkit
       this.ClosePopup( true );
     }
 
-    #endregion //Event Handlers
+        #endregion //Event Handlers
 
     #region Methods
+
+    public void UpdateValueProperty(DateTime? newValueDateTime)
+    {
+      if (newValueDateTime != null)
+      {
+        this.SetValueInternal(newValueDateTime);
+      }
+    }
 
     private void ValidateTime( TimeSpan time )
     {
