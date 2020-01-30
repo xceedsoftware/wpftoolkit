@@ -2,10 +2,10 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2018 Xceed Software Inc.
+   Copyright (C) 2007-2019 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -260,6 +260,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     public event EventHandler IsVisibleChanged;
     public event EventHandler<CancelEventArgs> Hiding;
+    public event EventHandler Hidden;
 
     #endregion
 
@@ -417,12 +418,20 @@ namespace Xceed.Wpf.AvalonDock.Layout
       {
         var parentAsGroup = Parent as ILayoutGroup;
         PreviousContainer = parentAsGroup;
-        PreviousContainerIndex = parentAsGroup.IndexOfChild( this );
+        if( parentAsGroup != null )
+        {
+          PreviousContainerIndex = parentAsGroup.IndexOfChild( this );
+        }
       }
-      Root.Hidden.Add( this );
+      if( this.Root != null )
+      {
+        this.Root.Hidden.Add( this );
+      }
       RaisePropertyChanged( "IsVisible" );
       RaisePropertyChanged( "IsHidden" );
       NotifyIsVisibleChanged();
+
+      OnHidden();
     }
 
 
@@ -658,6 +667,12 @@ namespace Xceed.Wpf.AvalonDock.Layout
           previousContainer.Children.Add( anchorableToToggle );
         }
 
+        if( previousContainer.Children.Count > 0 )
+        {
+          // Select the LayoutContent where the Toggle pin button was pressed.
+          previousContainer.SelectedContentIndex = previousContainer.Children.IndexOf( this );
+        }
+
         parentSide.Children.Remove( parentGroup );
 
         var parent = previousContainer.Parent as LayoutGroupBase;
@@ -727,6 +742,12 @@ namespace Xceed.Wpf.AvalonDock.Layout
     {
       if( Hiding != null )
         Hiding( this, args );
+    }
+
+    protected virtual void OnHidden()
+    {
+      if( Hidden != null )
+        Hidden( this, EventArgs.Empty );
     }
 
     internal void CloseAnchorable()

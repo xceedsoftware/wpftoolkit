@@ -2,10 +2,10 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2018 Xceed Software Inc.
+   Copyright (C) 2007-2019 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -182,6 +182,16 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Kind
 
+    #region TempValue (Internal)
+
+    internal DateTime? TempValue
+    {
+      get;
+      set;
+    }
+
+    #endregion
+
     #region ContextNow (Private)
 
     internal DateTime ContextNow
@@ -334,9 +344,11 @@ namespace Xceed.Wpf.Toolkit
       //this only occurs when the user manually type in a value for the Value Property
       if( info == null )
         info = (this.CurrentDateTimePart != DateTimePart.Other) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
+      if( info == null )
+        info = _dateTimeInfoList[ 0 ];
 
-        //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
-        //but only if it is not null
+      //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
+      //but only if it is not null
       if( newValue != null )
         ParseValueIntoDateTimeInfo( this.Value );
 
@@ -756,6 +768,8 @@ namespace Xceed.Wpf.Toolkit
         //this only occurs when the user manually type in a value for the Value Property
         if( info == null )
           info = ( this.CurrentDateTimePart != DateTimePart.Other ) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
+        if( info == null )
+          info = _dateTimeInfoList[ 0 ];
 
         //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
         this.ParseValueIntoDateTimeInfo( this.ConvertTextToValue( this.TextBox.Text ) );
@@ -861,6 +875,8 @@ namespace Xceed.Wpf.Toolkit
       //this only occurs when the user manually type in a value for the Value Property
       if( info == null )
         info = (this.CurrentDateTimePart != DateTimePart.Other) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
+      if( info == null )
+        info = _dateTimeInfoList[ 0 ];
 
       DateTime? result = null;
 
@@ -935,9 +951,10 @@ namespace Xceed.Wpf.Toolkit
       DateTime current = this.ContextNow;
       try
       {
-        current = (this.Value.HasValue)
-                    ? this.Value.Value
-                    : DateTime.Parse( this.ContextNow.ToString(), this.CultureInfo.DateTimeFormat );
+        // TempValue is used when Manipulating TextBox.Text while Value is not updated yet (used in DateTimePicker's TimePicker).
+        current = this.TempValue.HasValue
+                  ? this.TempValue.Value
+                  : this.Value.HasValue ? this.Value.Value : DateTime.Parse( this.ContextNow.ToString(), this.CultureInfo.DateTimeFormat );
 
         isValid = DateTimeParser.TryParse( text, this.GetFormatString( Format ), current, this.CultureInfo, this.AutoClipTimeParts, out result );
       }

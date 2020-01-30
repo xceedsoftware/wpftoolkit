@@ -2,10 +2,10 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2018 Xceed Software Inc.
+   Copyright (C) 2007-2019 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -358,6 +358,24 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Base Class Overrides
 
+    #region Internal Methods
+
+    internal void UpdateTempValue( DateTime? newDate )
+    {
+      var date = newDate ?? this.ContextNow;
+      // Set TimePicker TextBox (not Value) to DatetimePicker TextBox.
+      if( this.TextBox != null )
+      {
+        this.TextBox.Text = date.ToString( this.GetFormatString( this.Format ), this.CultureInfo );
+      }
+      // Set TimePicker TempValue to the same value. 
+      // It will be used when selecting a new date in Calendar (to keep the set time) and
+      // and when incrementing the TimePicker inside a DateTimePicker (to get the current time when Value is not up to date).
+      this.TempValue = date;
+    }
+
+    #endregion
+
     #region Event Handlers
 
     private void TimeListBox_SelectionChanged( object sender, SelectionChangedEventArgs e )
@@ -367,18 +385,18 @@ namespace Xceed.Wpf.Toolkit
         TimeItem selectedTimeListItem = ( TimeItem )e.AddedItems[ 0 ];
         var time = selectedTimeListItem.Time;
 
-        if( this.UpdateValueOnEnterKey )
-        {
-          var currentValue = this.ConvertTextToValue( this.TextBox.Text );
-          var date = currentValue ?? this.ContextNow;
-          var newValue = new DateTime( date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds, date.Kind );
-          this.TextBox.Text = newValue.ToString( this.GetFormatString( this.Format ), this.CultureInfo );
-        }
-        else
-        {
+        //if( this.UpdateValueOnEnterKey )
+        //{
+        //  var currentValue = this.ConvertTextToValue( this.TextBox.Text );
+        //  var date = currentValue ?? this.ContextNow;
+        //  var newValue = new DateTime( date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds, date.Kind );
+        //  this.TextBox.Text = newValue.ToString( this.GetFormatString( this.Format ), this.CultureInfo );
+        //}
+        //else
+        //{
           var date = this.Value ?? this.ContextNow;
           this.Value = new DateTime( date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds, date.Kind );
-        }
+        //}
       }
     }
 

@@ -49,9 +49,13 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Xceed.Wpf.Toolkit\AssemblyVersionInfo.cs">
+      <Link>AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Xceed.Wpf.Toolkit\AssemblyVersionInfoCommon.cs">
+      <Link>AssemblyVersionInfoCommon.cs</Link>
+    </Compile>
     <Compile Include="AeroColors.cs" />
-    <Compile Include="AssemblyVersionInfo.cs" />
-    <Compile Include="AssemblyVersionInfoCommon.cs" />
     <Compile Include="Controls\SplineBorder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

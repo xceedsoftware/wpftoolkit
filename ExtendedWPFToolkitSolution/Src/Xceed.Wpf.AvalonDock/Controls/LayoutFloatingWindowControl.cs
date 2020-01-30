@@ -2,10 +2,10 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2018 Xceed Software Inc.
+   Copyright (C) 2007-2019 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -58,6 +58,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       this.Loaded += new RoutedEventHandler( OnLoaded );
       this.Unloaded += new RoutedEventHandler( OnUnloaded );
+      this.IsVisibleChanged += this.LayoutFloatingWindowControl_IsVisibleChanged;
       _model = model;
     }
 
@@ -417,6 +418,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
       return null;
     }
 
+    private void LayoutFloatingWindowControl_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )
+    {
+      if( (bool)e.NewValue )
+      {
+      }
+    }
+
     private void OnLoaded( object sender, RoutedEventArgs e )
     {
       this.Loaded -= new RoutedEventHandler( OnLoaded );
@@ -454,7 +462,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         var clientArea = Win32Helper.GetClientRect( windowHandle );
         var windowArea = Win32Helper.GetWindowRect( windowHandle );
 
-        Left = mousePosition.X - windowArea.Width / 2.0;
+        Left = mousePosition.X - ( windowArea.Width - clientArea.Width ) / 2.0;
         Top = mousePosition.Y - ( windowArea.Height - clientArea.Height ) / 2.0;
         _attachDrag = false;
 

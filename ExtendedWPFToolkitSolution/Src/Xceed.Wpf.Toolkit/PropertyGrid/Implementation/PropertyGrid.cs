@@ -2,10 +2,10 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2018 Xceed Software Inc.
+   Copyright (C) 2007-2019 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -682,6 +682,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
+
     #region SelectedPropertyItem
 
     private static readonly DependencyPropertyKey SelectedPropertyItemPropertyKey = DependencyProperty.RegisterReadOnly( "SelectedPropertyItem", typeof( PropertyItemBase ), typeof( PropertyGrid ), new UIPropertyMetadata( null, OnSelectedPropertyItemChanged ) );
@@ -1072,6 +1073,19 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     public double GetScrollPosition()
     {
       var scrollViewer = this.GetScrollViewer();
@@ -1162,31 +1176,22 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       // Keep a backup of the template element and initialize the
       // new helper with it.
-      ItemsControl childrenItemsControl = null;
-      if( _containerHelper != null )
-      {
-        childrenItemsControl = _containerHelper.ChildrenItemsControl;
-        _containerHelper.ClearHelper();
-        if( _containerHelper is ObjectContainerHelperBase )
-        {
-          // If the actual AdvancedOptionMenu is the default menu for selected object, 
-          // remove it. Otherwise, it is a custom menu provided by the user.
-          // This "default" menu is only valid for the SelectedObject[s] case. Otherwise, 
-          // it is useless and we must remove it.
-          //var defaultAdvancedMenu = (ContextMenu)this.FindResource( PropertyGrid.SelectedObjectAdvancedOptionsMenuKey );
-          //if( this.AdvancedOptionsMenu == defaultAdvancedMenu )
-          //{
-            this.AdvancedOptionsMenu = null;
-          //}
-        }
-      }
-
+      ItemsControl childrenItemsControl = ( _containerHelper != null ) ? _containerHelper.ChildrenItemsControl : null;
       ObjectContainerHelperBase objectContainerHelper = null;
 
 
       objectContainerHelper = new ObjectContainerHelper( this, SelectedObject );
       objectContainerHelper.ObjectsGenerated += this.ObjectContainerHelper_ObjectsGenerated;
       objectContainerHelper.GenerateProperties();
+    }
+
+    private void SetContainerHelper( ContainerHelperBase containerHelper )
+    {
+      if( _containerHelper != null )
+      {
+        _containerHelper.ClearHelper();
+      }
+      _containerHelper = containerHelper;
     }
 
     private void FinalizeUpdateContainerHelper( ItemsControl childrenItemsControl )
@@ -1266,8 +1271,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( objectContainerHelper != null )
       {
         objectContainerHelper.ObjectsGenerated -= this.ObjectContainerHelper_ObjectsGenerated;
-        _containerHelper = objectContainerHelper;
+        this.SetContainerHelper( objectContainerHelper );
         this.FinalizeUpdateContainerHelper( objectContainerHelper.ChildrenItemsControl );
+
+        RaiseEvent( new RoutedEventArgs( PropertyGrid.PropertiesGeneratedEvent, this ) );
       }
     }
 
@@ -1334,6 +1341,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     public event IsPropertyBrowsableHandler IsPropertyBrowsable;
 
     #endregion
+
+
+
 
 
 
@@ -1413,6 +1423,23 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         RemoveHandler( PropertyGrid.ClearPropertyItemEvent, value );
       }
     }
+
+    #region PropertiesGenerated Event
+
+    public static readonly RoutedEvent PropertiesGeneratedEvent = EventManager.RegisterRoutedEvent( "PropertiesGenerated", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( PropertyGrid ) );
+    public event RoutedEventHandler PropertiesGenerated
+    {
+      add
+      {
+        AddHandler( PropertiesGeneratedEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( PropertiesGeneratedEvent, value );
+      }
+    }
+
+    #endregion //PropertiesGenerated Event
 
     /// <summary>
     /// Adds a handler for the ClearPropertyItem attached event

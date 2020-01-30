@@ -2,10 +2,10 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2018 Xceed Software Inc.
+   Copyright (C) 2007-2019 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -1987,6 +1987,8 @@ namespace Xceed.Wpf.AvalonDock
     /// <returns>Either a LayoutAnchorableItem or LayoutDocumentItem which contains the LayoutContent passed as argument</returns>
     public LayoutItem GetLayoutItemFromModel( LayoutContent content )
     {
+      if( _layoutItems == null )
+        return null;
       return _layoutItems.FirstOrDefault( item => item.LayoutElement == content );
     }
 
@@ -3360,32 +3362,42 @@ namespace Xceed.Wpf.AvalonDock
       if( _areas != null )
         return _areas;
 
+      var draggingWindowManager = draggingWindow.Model.Root.Manager;
       bool isDraggingDocuments = draggingWindow.Model is LayoutDocumentFloatingWindow;
 
       _areas = new List<IDropArea>();
 
       if( !isDraggingDocuments )
       {
-        _areas.Add( new DropArea<DockingManager>(
-            this,
-            DropAreaType.DockingManager ) );
+        if( draggingWindowManager == this )
+        {
+          _areas.Add( new DropArea<DockingManager>(
+          this,
+          DropAreaType.DockingManager ) );
+        }
 
         foreach( var areaHost in this.FindVisualChildren<LayoutAnchorablePaneControl>() )
         {
           if( areaHost.Model.Descendents().Any() )
           {
-            _areas.Add( new DropArea<LayoutAnchorablePaneControl>(
+            if( draggingWindowManager == areaHost.Model.Root.Manager )
+            {
+              _areas.Add( new DropArea<LayoutAnchorablePaneControl>(
                 areaHost,
                 DropAreaType.AnchorablePane ) );
+            }
           }
         }
       }
 
       foreach( var areaHost in this.FindVisualChildren<LayoutDocumentPaneControl>() )
       {
-        _areas.Add( new DropArea<LayoutDocumentPaneControl>(
+        if( draggingWindowManager == areaHost.Model.Root.Manager )
+        {
+          _areas.Add( new DropArea<LayoutDocumentPaneControl>(
             areaHost,
             DropAreaType.DocumentPane ) );
+        }
       }
 
       foreach( var areaHost in this.FindVisualChildren<LayoutDocumentPaneGroupControl>() )
@@ -3393,9 +3405,12 @@ namespace Xceed.Wpf.AvalonDock
         var documentGroupModel = areaHost.Model as LayoutDocumentPaneGroup;
         if( documentGroupModel.Children.Where( c => c.IsVisible ).Count() == 0 )
         {
-          _areas.Add( new DropArea<LayoutDocumentPaneGroupControl>(
+          if( draggingWindowManager == areaHost.Model.Root.Manager )
+          {
+            _areas.Add( new DropArea<LayoutDocumentPaneGroupControl>(
               areaHost,
               DropAreaType.DocumentPaneGroup ) );
+          }
         }
       }
 
