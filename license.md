@@ -70,6 +70,6 @@ international rules of arbitration prevailing in Quebec.
 
 Xceed reserves the right to modify this Agreement at all times without notice. 
 
-© Copyright: Xceed Software, Inc. - 2019. All rights reserved.
+© Copyright: Xceed Software, Inc. - 2020. All rights reserved.
 
 
