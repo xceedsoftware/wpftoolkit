@@ -672,6 +672,9 @@ namespace Xceed.Wpf.AvalonDock.Layout
       {
         this.Hidden.Add( ( LayoutAnchorable )hiddenObject );
       }
+
+      //Read the closing end element of LayoutRoot
+      reader.ReadEndElement();
     }
 
     public void WriteXml( XmlWriter writer )
