@@ -33,7 +33,7 @@ steps:
   inputs:
     command: 'pack'
     packagesToPack: 'ExtendedWPFToolkitSolution/*.nuspec'
-    versioningScheme: 'off'
+    versioningScheme: 'byBuildNumber'
     
 - task: PublishBuildArtifacts@1
   inputs:
