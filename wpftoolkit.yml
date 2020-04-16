@@ -5,6 +5,8 @@
 # Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
+name: APD-XceedWpfToolKit_$(MajorVersion).$(MinorVersion).$(Year:yy)$(DayOfYear)$(Rev:.r)
+
 trigger:
 - apd-master
 
