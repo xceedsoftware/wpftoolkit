@@ -27,7 +27,7 @@ Xceed Software
 
 **January 30, 2020** v3.8.0 released with [35 bug fixes and improvements](../../wiki/Improvements-in-v3.8.0). 
 
-**November 26, 2019** v3.7.0 released with [18 bug fixes and improvements](../../wiki/Improvements-in-v3.7.0). 
+**November 26, 2019** v3.7.0 released with [17 bug fixes and improvements](../../wiki/Improvements-in-v3.7.0). 
 
 **September 27, 2019** v3.6.0 released with [36 bug fixes and improvements](../../wiki/Improvements-in-v3.6.0). 
 
