@@ -33,7 +33,7 @@ Xceed Software
 
 ## Latest news
 
-**January 26, 2020** v4.0.0 released with [46 bug fixes and improvements](../../wiki/Improvements-in-v4.0.0). 
+**June 26, 2020** v4.0.0 released with [46 bug fixes and improvements](../../wiki/Improvements-in-v4.0.0). 
 
 **January 30, 2020** v3.8.0 released with [35 bug fixes and improvements](../../wiki/Improvements-in-v3.8.0). 
 
