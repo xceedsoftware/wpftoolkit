@@ -169,7 +169,11 @@ Xceed Software
 <td><a href="../../wiki/Themes-Usage-Instructions">Windows 10 theme</a></td>
 <td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">2 Metro themes</a></td>
 <td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">3 Office themes</a></td>
-<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">2+ releases ahead</a></td>
+<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">UI Automation</a></td>
+</tr>
+<tr>
+<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">Support for .NET Core 3+</a></td>
+<td><a href="../../wiki/Xceed-Toolkit-Plus-for-WPF#feature-comparison">Caching in Tab Panels</a></td>
 </tr>
 </table>
 
