@@ -6,7 +6,11 @@ Extended WPF Toolkit™ by [Xceed](https://xceed.com) is the number one collecti
 
 # Message from Xceed
 
-Dear community,
+<table>
+<tr>
+<td>
+  
+Dear community,  
 
 We have been following discussions about a recent revision to our license and we would like to address this issue because we believe some clarifications may be needed. It is possible that more clarity might have helped explaining why we chose to make a transition from the Microsoft Public License (MS-PL) to a new community license. If we have not been able to communicate our intentions clearly enough, then our apologies to those who may have been caught off-guard by those changes. 
 
@@ -21,7 +25,9 @@ We would also like to show our appreciation to the developers who have provided 
 We hope this message confirms our commitment to listening to our user community. You have spoken and we have listened. Thank you all for the great support and passion you have shown us.
 
 Xceed Software
-
+</td>
+</tr>
+</table>
 
 ## Latest news
 
