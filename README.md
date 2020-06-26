@@ -37,6 +37,8 @@ Xceed Software
 
 **January 30, 2020** v3.8.0 released with [35 bug fixes and improvements](../../wiki/Improvements-in-v3.8.0). 
 
+*January 30, 2020* v4.0.0 of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) released with [63 bug fixes and improvements](../../wiki/Improvements-in-v3.5.0#Plus400)
+
 **November 26, 2019** v3.7.0 released with [17 bug fixes and improvements](../../wiki/Improvements-in-v3.7.0). 
 
 **September 27, 2019** v3.6.0 released with [36 bug fixes and improvements](../../wiki/Improvements-in-v3.6.0). 
