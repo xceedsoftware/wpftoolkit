@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -740,6 +741,8 @@ namespace Xceed.Wpf.Toolkit
           for( int i = 0; i < _dateTimeInfoList.Count; ++i )
           {
             var timePart = _dateTimeInfoList[ i ];
+            var timePartContentLength = ( timePart.Content != null ) ? timePart.Content.Length : timePart.Length;
+
             // Current timePart is the selected timePart, TextBox selection will start here.
             if( ( _selectedDateTimeInfo != null ) && ( timePart.Type == _selectedDateTimeInfo.Type ) )
             {
@@ -749,39 +752,39 @@ namespace Xceed.Wpf.Toolkit
             switch( timePart.Type )
             {
               case DateTimePart.Day:
-                var dayText = Math.Abs( newValue.Value.Days ).ToString( new string( '0', timePart.Content.Length ) );
+                var dayText = Math.Abs( newValue.Value.Days ).ToString( new string( '0', timePartContentLength ) );
                 timePart.StartPosition = newTextBoxContent.Length;
                 timePart.Length = dayText.Length;
                 newTextBoxContent += dayText;
                 break;
               case DateTimePart.Hour24:
                 var hourText = ( i <= 1 ) 
-                                ? Math.Truncate( Math.Abs( newValue.Value.TotalHours ) ).ToString( new string( '0', timePart.Content.Length ) ) 
-                                : Math.Abs( newValue.Value.Hours) .ToString( new string( '0', timePart.Content.Length ) );
+                                ? Math.Truncate( Math.Abs( newValue.Value.TotalHours ) ).ToString( new string( '0', timePartContentLength ) ) 
+                                : Math.Abs( newValue.Value.Hours) .ToString( new string( '0', timePartContentLength ) );
                 timePart.StartPosition = newTextBoxContent.Length;
                 timePart.Length = hourText.Length;
                 newTextBoxContent += hourText;
                 break;
               case DateTimePart.Minute:
                 var minuteText = ( i <= 1 ) 
-                                  ? Math.Truncate( Math.Abs( newValue.Value.TotalMinutes ) ).ToString( new string( '0', timePart.Content.Length ) ) 
-                                  : Math.Abs( newValue.Value.Minutes ).ToString( new string( '0', timePart.Content.Length ) );
+                                  ? Math.Truncate( Math.Abs( newValue.Value.TotalMinutes ) ).ToString( new string( '0', timePartContentLength ) ) 
+                                  : Math.Abs( newValue.Value.Minutes ).ToString( new string( '0', timePartContentLength ) );
                 timePart.StartPosition = newTextBoxContent.Length;
                 timePart.Length = minuteText.Length;
                 newTextBoxContent += minuteText;
                 break;
               case DateTimePart.Second:
                 var secondText = ( i <= 1 ) 
-                                  ? Math.Truncate( Math.Abs( newValue.Value.TotalSeconds ) ).ToString( new string( '0', timePart.Content.Length ) ) 
-                                  : Math.Abs( newValue.Value.Seconds ).ToString( new string( '0', timePart.Content.Length ) );
+                                  ? Math.Truncate( Math.Abs( newValue.Value.TotalSeconds ) ).ToString( new string( '0', timePartContentLength ) ) 
+                                  : Math.Abs( newValue.Value.Seconds ).ToString( new string( '0', timePartContentLength ) );
                 timePart.StartPosition = newTextBoxContent.Length;
                 timePart.Length = secondText.Length;
                 newTextBoxContent += secondText;
                 break;
               case DateTimePart.Millisecond:
                 var millisecondText = ( i <= 1 )
-                                      ? Math.Truncate( Math.Abs( newValue.Value.TotalMilliseconds ) ).ToString( new string( '0', timePart.Content.Length ) ) 
-                                      : Math.Abs( newValue.Value.Milliseconds ).ToString( new string( '0', timePart.Content.Length ) );
+                                      ? Math.Truncate( Math.Abs( newValue.Value.TotalMilliseconds ) ).ToString( new string( '0', timePartContentLength ) ) 
+                                      : Math.Abs( newValue.Value.Milliseconds ).ToString( new string( '0', timePartContentLength ) );
                 timePart.StartPosition = newTextBoxContent.Length;
                 timePart.Length = millisecondText.Length;
                 newTextBoxContent += millisecondText;

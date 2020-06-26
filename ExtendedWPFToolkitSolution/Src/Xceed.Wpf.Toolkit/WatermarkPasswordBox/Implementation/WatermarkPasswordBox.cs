@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -140,7 +141,11 @@ namespace Xceed.Wpf.Toolkit
     [SecuritySafeCritical]
     protected override void OnPreviewTextInput( TextCompositionEventArgs e )
     {
-      this.PasswordInsert( e.Text, this.CaretIndex );
+      // Do not insert \r. When AcceptReturn is true, is it already added in OnPreviewKeyDown().
+      if( e.Text != "\r" )
+      {
+        this.PasswordInsert( e.Text, this.CaretIndex );
+      }
 
       e.Handled = true; //Handle to prevent TextChanged when OnPreviewTextInput exist
 
@@ -182,8 +187,6 @@ namespace Xceed.Wpf.Toolkit
             // Add input because it's not added by default.
             this.PasswordInsert( "\r", this.CaretIndex );
           }
-          // Do not add input when AcceptReturn is False.
-          e.Handled = true;  //Handle to prevent TextChanged when OnPreviewKeyDown exist
           break;
         case Key.Escape:
           e.Handled = true;  //Handle to prevent TextChanged when OnPreviewKeyDown exist

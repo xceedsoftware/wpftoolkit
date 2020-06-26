@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -235,6 +236,40 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //DropDownBackground
+
+    #region DropDownBorderBrush
+
+    public static readonly DependencyProperty DropDownBorderBrushProperty = DependencyProperty.Register( "DropDownBorderBrush", typeof( Brush ), typeof( ColorPicker ), new UIPropertyMetadata( null ) );
+    public Brush DropDownBorderBrush
+    {
+      get
+      {
+        return ( Brush )GetValue( DropDownBorderBrushProperty );
+      }
+      set
+      {
+        SetValue( DropDownBorderBrushProperty, value );
+      }
+    }
+
+    #endregion //DropDownBorderBrush
+
+    #region DropDownBorderThickness
+
+    public static readonly DependencyProperty DropDownBorderThicknessProperty = DependencyProperty.Register( "DropDownBorderThickness", typeof( Thickness ), typeof( ColorPicker ), new UIPropertyMetadata( null ) );
+    public Thickness DropDownBorderThickness
+    {
+      get
+      {
+        return ( Thickness )GetValue( DropDownBorderThicknessProperty );
+      }
+      set
+      {
+        SetValue( DropDownBorderThicknessProperty, value );
+      }
+    }
+
+    #endregion //DropDownBorderBrush
 
     #region HeaderBackground
 

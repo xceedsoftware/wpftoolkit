@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -21,6 +22,7 @@ using System.Windows.Input;
 using Xceed.Wpf.AvalonDock.Layout;
 using System.Collections;
 using System;
+using System.Windows.Media;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
@@ -151,20 +153,34 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void OnPreviewGotKeyboardFocus( KeyboardFocusChangedEventArgs e )
     {
-      this.SetIsActive();
+      var setIsActive = !( (e.NewFocus != null) && (e.OldFocus != null) && (e.OldFocus is LayoutFloatingWindowControl) );
+      if( setIsActive )
+      {
+        this.SetIsActive();
+      }
       base.OnPreviewGotKeyboardFocus( e );
     }
 
-    protected override void OnMouseLeftButtonDown( MouseButtonEventArgs e )
+    protected override void OnPreviewMouseLeftButtonDown( MouseButtonEventArgs e )
     {
-      this.SetIsActive();
-      base.OnMouseLeftButtonDown( e );
+      var parentDockingManager = ((Visual)e.OriginalSource).FindVisualAncestor<DockingManager>();
+      if ((this.Model != null) && (this.Model.Root != null) && (this.Model.Root.Manager != null)
+          && this.Model.Root.Manager.Equals(parentDockingManager))
+      {
+        this.SetIsActive();
+      }
+      base.OnPreviewMouseLeftButtonDown( e );
     }
 
-    protected override void OnMouseRightButtonDown( MouseButtonEventArgs e )
+    protected override void OnPreviewMouseRightButtonDown( MouseButtonEventArgs e )
     {
-      this.SetIsActive();
-      base.OnMouseLeftButtonDown( e );
+      var parentDockingManager = ((Visual)e.OriginalSource).FindVisualAncestor<DockingManager>();
+      if ((this.Model != null) && (this.Model.Root != null) && (this.Model.Root.Manager != null)
+          && this.Model.Root.Manager.Equals(parentDockingManager))
+      {
+        this.SetIsActive();
+      }
+      base.OnPreviewMouseRightButtonDown( e );
     }
 
 

@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -20,6 +21,9 @@ using System.Windows;
 using Xceed.Wpf.AvalonDock.Layout;
 using Xceed.Wpf.AvalonDock.Themes;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Threading;
+using System;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
@@ -56,8 +60,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
       _manager = manager;
 
       _internalSetSelectedDocument = true;
-      this.SetAnchorables( _manager.Layout.Descendents().OfType<LayoutAnchorable>().Where( a => a.IsVisible ).Select( d => ( LayoutAnchorableItem )_manager.GetLayoutItemFromModel( d ) ).ToArray() );
-      this.SetDocuments( _manager.Layout.Descendents().OfType<LayoutDocument>().OrderByDescending( d => d.LastActivationTimeStamp.GetValueOrDefault() ).Select( d => ( LayoutDocumentItem )_manager.GetLayoutItemFromModel( d ) ).ToArray() );
+      this.SetAnchorables( _manager.Layout.Descendents().OfType<LayoutAnchorable>().Where( a => a.IsVisible ).Select( d => (LayoutAnchorableItem)_manager.GetLayoutItemFromModel( d ) ).ToArray() );
+      this.SetDocuments( _manager.Layout.Descendents().OfType<LayoutDocument>().OrderByDescending( d => d.LastActivationTimeStamp.GetValueOrDefault() ).Select( d => (LayoutDocumentItem)_manager.GetLayoutItemFromModel( d ) ).ToArray() );
       _internalSetSelectedDocument = false;
 
       if( this.Documents.Length > 1 )
@@ -101,7 +105,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       get
       {
-        return ( LayoutDocumentItem[] )GetValue( DocumentsProperty );
+        return (LayoutDocumentItem[])GetValue( DocumentsProperty );
       }
     }
 
@@ -113,7 +117,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// Anchorables Read-Only Dependency Property
     /// </summary>
     private static readonly DependencyPropertyKey AnchorablesPropertyKey = DependencyProperty.RegisterReadOnly( "Anchorables", typeof( IEnumerable<LayoutAnchorableItem> ), typeof( NavigatorWindow ),
-            new FrameworkPropertyMetadata( ( IEnumerable<LayoutAnchorableItem> )null ) );
+            new FrameworkPropertyMetadata( (IEnumerable<LayoutAnchorableItem>)null ) );
 
     public static readonly DependencyProperty AnchorablesProperty = AnchorablesPropertyKey.DependencyProperty;
 
@@ -125,7 +129,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       get
       {
-        return ( IEnumerable<LayoutAnchorableItem> )GetValue( AnchorablesProperty );
+        return (IEnumerable<LayoutAnchorableItem>)GetValue( AnchorablesProperty );
       }
     }
 
@@ -137,7 +141,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// SelectedDocument Dependency Property
     /// </summary>
     public static readonly DependencyProperty SelectedDocumentProperty = DependencyProperty.Register( "SelectedDocument", typeof( LayoutDocumentItem ), typeof( NavigatorWindow ),
-            new FrameworkPropertyMetadata( ( LayoutDocumentItem )null, new PropertyChangedCallback( OnSelectedDocumentChanged ) ) );
+            new FrameworkPropertyMetadata( (LayoutDocumentItem)null, new PropertyChangedCallback( OnSelectedDocumentChanged ) ) );
 
     /// <summary>
     /// Gets or sets the SelectedDocument property.  This dependency property 
@@ -147,7 +151,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       get
       {
-        return ( LayoutDocumentItem )GetValue( SelectedDocumentProperty );
+        return (LayoutDocumentItem)GetValue( SelectedDocumentProperty );
       }
       set
       {
@@ -160,7 +164,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// </summary>
     private static void OnSelectedDocumentChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
-      ( ( NavigatorWindow )d ).OnSelectedDocumentChanged( e );
+      ( (NavigatorWindow)d ).OnSelectedDocumentChanged( e );
     }
 
     /// <summary>
@@ -187,7 +191,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// SelectedAnchorable Dependency Property
     /// </summary>
     public static readonly DependencyProperty SelectedAnchorableProperty = DependencyProperty.Register( "SelectedAnchorable", typeof( LayoutAnchorableItem ), typeof( NavigatorWindow ),
-            new FrameworkPropertyMetadata( ( LayoutAnchorableItem )null, new PropertyChangedCallback( OnSelectedAnchorableChanged ) ) );
+            new FrameworkPropertyMetadata( (LayoutAnchorableItem)null, new PropertyChangedCallback( OnSelectedAnchorableChanged ) ) );
 
     /// <summary>
     /// Gets or sets the SelectedAnchorable property.  This dependency property 
@@ -197,7 +201,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       get
       {
-        return ( LayoutAnchorableItem )GetValue( SelectedAnchorableProperty );
+        return (LayoutAnchorableItem)GetValue( SelectedAnchorableProperty );
       }
       set
       {
@@ -210,7 +214,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// </summary>
     private static void OnSelectedAnchorableChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
-      ( ( NavigatorWindow )d ).OnSelectedAnchorableChanged( e );
+      ( (NavigatorWindow)d ).OnSelectedAnchorableChanged( e );
     }
 
     /// <summary>
@@ -265,7 +269,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
             if( e.Key == System.Windows.Input.Key.Tab )
             {
               // Jump to next LayoutDocument
-              if( ( docIndex < ( this.Documents.Length - 1 )  )
+              if( ( docIndex < ( this.Documents.Length - 1 ) )
                 || ( this.Anchorables.Count() == 0 ) )
               {
                 this.SelectNextDocument();
@@ -409,6 +413,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
            this.SelectedDocument.ActivateCommand.CanExecute( null ) )
         {
           this.SelectedDocument.ActivateCommand.Execute( null );
+          this.FocusContent( this.SelectedDocument );
         }
 
         if( this.SelectedDocument == null &&
@@ -416,6 +421,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
             this.SelectedAnchorable.ActivateCommand.CanExecute( null ) )
         {
           this.SelectedAnchorable.ActivateCommand.Execute( null );
+          this.FocusContent( this.SelectedAnchorable );
         }
 
         e.Handled = true;
@@ -475,7 +481,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         if( _manager.Theme is DictionaryTheme )
         {
-          currentThemeResourceDictionary = ( ( DictionaryTheme )_manager.Theme ).ThemeResourceDictionary;
+          currentThemeResourceDictionary = ( (DictionaryTheme)_manager.Theme ).ThemeResourceDictionary;
           this.Resources.MergedDictionaries.Add( currentThemeResourceDictionary );
         }
         else
@@ -571,15 +577,40 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
+    private void FocusContent( LayoutItem layoutItem )
+    {
+      if( ( layoutItem == null ) || ( layoutItem.LayoutElement == null ) )
+        return;
+
+      // Set focus inside selected LayoutItem.
+      var content = layoutItem.LayoutElement.Content as UIElement;
+      if( content != null )
+      {
+        this.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
+        {
+          if( content.Focusable )
+          {
+            content.Focus();
+          }
+          else
+          {
+            content.MoveFocus( new TraversalRequest( FocusNavigationDirection.Next ) );
+          }
+        }
+         ) );
+
+      }
+    }
+
     private void OnLoaded( object sender, RoutedEventArgs e )
     {
       this.Loaded -= new RoutedEventHandler( OnLoaded );
 
-      if( ( _documentListBox != null ) && (this.SelectedDocument != null) )
+      if( ( _documentListBox != null ) && ( this.SelectedDocument != null ) )
       {
         _documentListBox.Focus();
       }
-      else if( ( _anchorableListBox != null ) && (this.SelectedAnchorable != null) )
+      else if( ( _anchorableListBox != null ) && ( this.SelectedAnchorable != null ) )
       {
         _anchorableListBox.Focus();
       }

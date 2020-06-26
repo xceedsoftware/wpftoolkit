@@ -2,10 +2,11 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -39,11 +40,15 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
   /// </summary>
   public partial class MainWindow : Window
   {
-    private const string toolkitAssembly = "Xceed.Wpf.Toolkit.LiveExplorer";
+    private const string toolkitAssembly =
+       "Xceed.Wpf.Toolkit.LiveExplorer"
+      ;
 
     public MainWindow()
     {
       InitializeComponent();
+       this.Title = "Toolkit Plus for WPF - LiveExplorer";
+
       this.Loaded += new RoutedEventHandler( this.MainWindow_Loaded );
 
       var version = Assembly.GetExecutingAssembly().GetName().Version;
@@ -51,9 +56,9 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
     }
 
 
-    #region Properties
+#region Properties
 
-    #region View
+#region View
 
     public static readonly DependencyProperty ViewProperty = DependencyProperty.Register( "View", typeof( DemoView ), typeof( MainWindow ), new UIPropertyMetadata( null, OnViewChanged ) );
     public DemoView View
@@ -80,11 +85,11 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
       this.InitView();
     }
 
-    #endregion //View
+#endregion //View
 
-    #endregion //Properties
+#endregion //Properties
 
-    #region Event Handler
+#region Event Handler
 
     void MainWindow_Loaded( object sender, RoutedEventArgs e )
     {
@@ -126,9 +131,9 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
       //
     }
 
-    #endregion //EventHandler
+#endregion //EventHandler
 
-    #region Methods
+#region Methods
 
     private void InitView()
     {
@@ -146,7 +151,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
       }
     }
 
-    #endregion
+#endregion
 
   }
 }

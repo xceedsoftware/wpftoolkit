@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -21,6 +22,7 @@ using System.Windows.Input;
 using System.Windows.Controls.Primitives;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 using Xceed.Wpf.Toolkit.Primitives;
+using System.Windows.Shapes;
 #if VS2008
 using Microsoft.Windows.Controls;
 using Microsoft.Windows.Controls.Primitives;
@@ -246,13 +248,17 @@ namespace Xceed.Wpf.Toolkit
       base.OnApplyTemplate();
 
       if( _calendar != null )
-        _calendar.SelectedDatesChanged -= Calendar_SelectedDatesChanged;
+      {
+        _calendar.SelectedDatesChanged -= this.Calendar_SelectedDatesChanged;
+        _calendar.MouseDoubleClick -= this.Calendar_MouseDoubleClick;
+      }
 
       _calendar = GetTemplateChild( PART_Calendar ) as Calendar;
 
       if( _calendar != null )
       {
-        _calendar.SelectedDatesChanged += Calendar_SelectedDatesChanged;
+        _calendar.SelectedDatesChanged += this.Calendar_SelectedDatesChanged;
+        _calendar.MouseDoubleClick += this.Calendar_MouseDoubleClick;
         _calendar.SelectedDate = Value ?? null;
         _calendar.DisplayDate = Value ?? this.ContextNow;
         this.SetBlackOutDates();
@@ -452,6 +458,15 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
+    private void Calendar_MouseDoubleClick( object sender, MouseButtonEventArgs e )
+    {
+      var source = e.OriginalSource as Shape;
+      if( ( source != null ) && ( source.TemplatedParent is CalendarDayButton ) )
+      {
+        this.ClosePopup( true );
+      }
+    }
+
     protected override void Popup_Opened( object sender, EventArgs e )
     {
       base.Popup_Opened( sender, e );
@@ -480,12 +495,12 @@ namespace Xceed.Wpf.Toolkit
       {
         _calendar.BlackoutDates.Clear();
 
-        if( ( this.Minimum != null ) && this.Minimum.HasValue && ( this.Minimum.Value != System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MinSupportedDateTime ) )
+        if( ( this.Minimum != null ) && this.Minimum.HasValue && ( this.Minimum.Value >= System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MinSupportedDateTime.AddDays(1) ) )
         {
           DateTime minDate = this.Minimum.Value;
           _calendar.BlackoutDates.Add( new CalendarDateRange( System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MinSupportedDateTime, minDate.AddDays( -1 ) ) );
         }
-        if( ( this.Maximum != null ) && this.Maximum.HasValue && ( this.Maximum.Value != System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MaxSupportedDateTime ) )
+        if( ( this.Maximum != null ) && this.Maximum.HasValue && ( this.Maximum.Value <= System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MaxSupportedDateTime.AddDays(-1)) )
         {
           DateTime maxDate = this.Maximum.Value;
           _calendar.BlackoutDates.Add( new CalendarDateRange( maxDate.AddDays( 1 ), System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MaxSupportedDateTime ) );

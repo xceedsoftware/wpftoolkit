@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -152,17 +153,27 @@ namespace Xceed.Wpf.Toolkit
 
     private bool HandleNullSpin()
     {
-      if( !Value.HasValue )
-      {
-        T forcedValue = ( DefaultValue.HasValue )
-          ? DefaultValue.Value
-          : default( T );
+      var hasValue = this.UpdateValueOnEnterKey
+                     ? (this.ConvertTextToValue( this.TextBox.Text ) != null)
+                     : this.Value.HasValue;
 
-        Value = CoerceValueMinMax( forcedValue );
+      if( !hasValue )
+      {
+        var forcedValue = this.DefaultValue.HasValue ? this.DefaultValue.Value : default( T );
+        var newValue = CoerceValueMinMax( forcedValue );
+
+        if( this.UpdateValueOnEnterKey )
+        {
+          this.TextBox.Text = newValue.Value.ToString( this.FormatString, this.CultureInfo );
+        }
+        else 
+        {
+          this.Value = newValue;
+        }        
 
         return true;
       }
-      else if( !Increment.HasValue )
+      else if( !this.Increment.HasValue )
       {
         return true;
       }

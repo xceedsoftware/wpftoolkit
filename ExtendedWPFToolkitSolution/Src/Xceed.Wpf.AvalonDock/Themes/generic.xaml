@@ -2,10 +2,11 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -18,10 +19,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:shell="clr-namespace:Microsoft.Windows.Shell"
                     xmlns:avalonDock="clr-namespace:Xceed.Wpf.AvalonDock"
-                    xmlns:avalonDockLayout="clr-namespace:Xceed.Wpf.AvalonDock.Layout"
                     xmlns:avalonDockControls="clr-namespace:Xceed.Wpf.AvalonDock.Controls"
                     xmlns:avalonDockConverters="clr-namespace:Xceed.Wpf.AvalonDock.Converters"
-                    xmlns:avalonDockProperties="clr-namespace:Xceed.Wpf.AvalonDock.Properties">
+                    xmlns:avalonDockProperties="clr-namespace:Xceed.Wpf.AvalonDock.Properties"
+                    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
 
   <avalonDockConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
   <avalonDockConverters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
@@ -34,6 +35,10 @@
 
   <DataTemplate x:Key="DocumentPaneControlContentTemplate">
     <avalonDockControls:LayoutDocumentControl Model="{Binding}" />
+  </DataTemplate>
+
+  <DataTemplate x:Key="AnchorablePaneControlContentTemplate">
+    <avalonDockControls:LayoutAnchorableControl Model="{Binding}" />
   </DataTemplate>
 
   <!--DocumentPaneControlStyle-->
@@ -62,7 +67,8 @@
                                                        Grid.Column="0"
                                                        IsItemsHost="true"
                                                        Grid.Row="0"
-                                                       KeyboardNavigation.TabIndex="1" />
+                                                       KeyboardNavigation.TabIndex="1"
+                                                       KeyboardNavigation.DirectionalNavigation="Cycle" />
               <avalonDockControls:DropDownButton x:Name="MenuDropDownButton"
                                                  Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
                                                  Focusable="False"
@@ -87,7 +93,7 @@
                   </avalonDockControls:ContextMenuEx>
                 </avalonDockControls:DropDownButton.DropDownContextMenu>
                 <Border Background="White">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinDocMenu.png">
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/PinDocMenu.png}">
                   </Image>
                 </Border>
               </avalonDockControls:DropDownButton>
@@ -105,6 +111,7 @@
                     KeyboardNavigation.TabNavigation="Cycle">
               <ContentPresenter x:Name="PART_SelectedContentHost"
                                 ContentSource="SelectedContent"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
                                 Margin="{TemplateBinding Padding}"
                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
             </Border>
@@ -148,7 +155,6 @@
                   <Border x:Name="Bd"
                           BorderBrush="{TemplateBinding BorderBrush}"
                           Background="{TemplateBinding Background}"
-                          Padding="{TemplateBinding Padding}"
                           BorderThickness="1,1,1,0">
                     <ContentPresenter x:Name="Content"
                                       ContentSource="Header"
@@ -243,6 +249,7 @@
                     KeyboardNavigation.TabNavigation="Cycle">
               <ContentPresenter x:Name="PART_SelectedContentHost"
                                 ContentSource="SelectedContent"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
                                 Margin="{TemplateBinding Padding}"
                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
             </Border>
@@ -251,6 +258,7 @@
                                                        IsItemsHost="true"
                                                        Grid.Row="1"
                                                        KeyboardNavigation.TabIndex="1"
+                                                       KeyboardNavigation.DirectionalNavigation="Cycle"
                                                        Panel.ZIndex="1" />
           </Grid>
           <ControlTemplate.Triggers>
@@ -280,8 +288,7 @@
                   <Border x:Name="Bd"
                           BorderBrush="{TemplateBinding BorderBrush}"
                           BorderThickness="1,0,1,1"
-                          Background="{TemplateBinding Background}"
-                          Padding="{TemplateBinding Padding}">
+                          Background="{TemplateBinding Background}">
                     <ContentPresenter x:Name="Content"
                                       ContentSource="Header"
                                       HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
@@ -342,13 +349,9 @@
       </Setter.Value>
     </Setter>
 
-    <Setter Property="ContentTemplate">
-      <Setter.Value>
-        <DataTemplate>
-          <avalonDockControls:LayoutAnchorableControl Model="{Binding}" />
-        </DataTemplate>
-      </Setter.Value>
-    </Setter>
+    <Setter Property="ContentTemplate"
+            Value="{StaticResource AnchorablePaneControlContentTemplate}" />
+
   </Style>
 
   <Style TargetType="avalonDockControls:AnchorablePaneTitle">
@@ -379,7 +382,7 @@
                                                  DropDownContextMenuDataContext="{Binding Path=LayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
                                                  ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_CxMenu_Hint}">
                 <Border Background="White">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinMenu.png">
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/PinMenu.png}">
                   </Image>
                 </Border>
               </avalonDockControls:DropDownButton>
@@ -392,7 +395,7 @@
                       Command="{Binding Path=LayoutItem.AutoHideCommand, RelativeSource={RelativeSource TemplatedParent}}"
                       ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnAutoHide_Hint}">
                 <Border Background="White">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinAutoHide.png">
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/PinAutoHide.png}">
                   </Image>
                 </Border>
               </Button>
@@ -405,7 +408,7 @@
                       Command="{Binding Path=LayoutItem.HideCommand, RelativeSource={RelativeSource TemplatedParent}}"
                       ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}">
                 <Border Background="White">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinClose.png">
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/PinClose.png}">
                   </Image>
                 </Border>
               </Button>
@@ -472,8 +475,8 @@
             Margin="2"
             Padding="2">
       <ContentPresenter Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
-                        ContentTemplate="{Binding AnchorableHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
-                        ContentTemplateSelector="{Binding AnchorableHeaderTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}" />
+                        ContentTemplate="{Binding Model.Root.Manager.AnchorableHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                        ContentTemplateSelector="{Binding Model.Root.Manager.AnchorableHeaderTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
     </Border>
   </ControlTemplate>
 
@@ -494,25 +497,25 @@
               <Image x:Name="PART_DockingManagerDropTargetLeft"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Left"
-                     Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/DockLeft.PNG"
+                     Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/DockLeft.PNG}"
                      Stretch="None">
               </Image>
               <Image x:Name="PART_DockingManagerDropTargetRight"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Right"
-                     Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/DockRight.PNG"
+                     Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/DockRight.PNG}"
                      Stretch="None">
               </Image>
               <Image x:Name="PART_DockingManagerDropTargetBottom"
                      VerticalAlignment="Bottom"
                      HorizontalAlignment="Center"
-                     Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/DockBottom.PNG"
+                     Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/DockBottom.PNG}"
                      Stretch="None">
               </Image>
               <Image x:Name="PART_DockingManagerDropTargetTop"
                      VerticalAlignment="Top"
                      HorizontalAlignment="Center"
-                     Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/DockTop.PNG"
+                     Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/DockTop.PNG}"
                      Stretch="None">
               </Image>
             </Grid>
@@ -533,41 +536,41 @@
                 </Grid.RowDefinitions>
                 <Image Grid.ColumnSpan="3"
                        Grid.RowSpan="3"
-                       Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/DockPaneEmpty.PNG"
+                       Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/DockPaneEmpty.PNG}"
                        Stretch="Uniform">
                 </Image>
                 <Border Name="PART_AnchorablePaneDropTargetTop"
                         Grid.Column="1"
                         Grid.Row="0">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/InnerDockPaneTop.png"
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/InnerDockPaneTop.png}"
                          Stretch="None">
                   </Image>
                 </Border>
                 <Border Name="PART_AnchorablePaneDropTargetRight"
                         Grid.Column="2"
                         Grid.Row="1">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/InnerDockPaneRight.png"
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/InnerDockPaneRight.png}"
                          Stretch="None">
                   </Image>
                 </Border>
                 <Border Name="PART_AnchorablePaneDropTargetBottom"
                         Grid.Column="1"
                         Grid.Row="2">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/InnerDockPaneBottom.png"
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/InnerDockPaneBottom.png}"
                          Stretch="None">
                   </Image>
                 </Border>
                 <Border Name="PART_AnchorablePaneDropTargetLeft"
                         Grid.Column="0"
                         Grid.Row="1">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/InnerDockPaneLeft.png"
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/InnerDockPaneLeft.png}"
                          Stretch="None">
                   </Image>
                 </Border>
                 <Border Name="PART_AnchorablePaneDropTargetInto"
                         Grid.Column="1"
                         Grid.Row="1">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/InnerDockPaneInside.png"
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/InnerDockPaneInside.png}"
                          Stretch="None">
                   </Image>
                 </Border>
@@ -590,41 +593,41 @@
                 </Grid.RowDefinitions>
                 <Image Grid.ColumnSpan="3"
                        Grid.RowSpan="3"
-                       Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/DockPaneEmpty.PNG"
+                       Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/DockPaneEmpty.PNG}"
                        Stretch="Uniform">
                 </Image>
                 <Border Name="PART_DocumentPaneDropTargetTop"
                         Grid.Column="1"
                         Grid.Row="0">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/InnerDockDocPaneTop.png"
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/InnerDockDocPaneTop.png}"
                          Stretch="None">
                   </Image>
                 </Border>
                 <Border Name="PART_DocumentPaneDropTargetRight"
                         Grid.Column="2"
                         Grid.Row="1">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/InnerDockDocPaneRight.png"
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/InnerDockDocPaneRight.png}"
                          Stretch="None">
                   </Image>
                 </Border>
                 <Border Name="PART_DocumentPaneDropTargetBottom"
                         Grid.Column="1"
                         Grid.Row="2">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/InnerDockDocPaneBottom.png"
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/InnerDockDocPaneBottom.png}"
                          Stretch="None">
                   </Image>
                 </Border>
                 <Border Name="PART_DocumentPaneDropTargetLeft"
                         Grid.Column="0"
                         Grid.Row="1">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/InnerDockDocPaneLeft.png"
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/InnerDockDocPaneLeft.png}"
                          Stretch="None">
                   </Image>
                 </Border>
                 <Border Name="PART_DocumentPaneDropTargetInto"
                         Grid.Column="1"
                         Grid.Row="1">
-                  <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/InnerDockPaneInside.png"
+                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/InnerDockPaneInside.png}"
                          Stretch="None">
                   </Image>
                 </Border>
@@ -852,11 +855,14 @@
                 <Setter Property="Template">
                   <Setter.Value>
                     <ControlTemplate TargetType="{x:Type avalonDockControls:LayoutDocumentTabItem}">
+                      <!--Use a transparent background to hit for contextMenu popup-->
                       <avalonDockControls:DropDownControlArea DropDownContextMenu="{Binding Root.Manager.DocumentContextMenu}"
-                                                              DropDownContextMenuDataContext="{Binding LayoutItem, RelativeSource={RelativeSource TemplatedParent}}">
+                                                              DropDownContextMenuDataContext="{Binding LayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
+                                                              Background="Transparent">
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}">
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Margin="{Binding Padding, RelativeSource={RelativeSource AncestorType={x:Type TabItem}}}">
                           <Grid>
                             <Grid.ColumnDefinitions>
                               <ColumnDefinition Width="*" />
@@ -866,8 +872,8 @@
                             <Border Grid.ColumnSpan="3"
                                     Background="Transparent" />
                             <ContentPresenter Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
-                                              ContentTemplate="{Binding DocumentHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
-                                              ContentTemplateSelector="{Binding DocumentHeaderTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}" />
+                                              ContentTemplate="{Binding Root.Manager.DocumentHeaderTemplate, Mode=OneWay}"
+                                              ContentTemplateSelector="{Binding Root.Manager.DocumentHeaderTemplateSelector, Mode=OneWay}" />
 
                             <Button x:Name="DocumentCloseButton"
                                     Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
@@ -875,7 +881,7 @@
                                     Visibility="Hidden"
                                     Command="{Binding Path=LayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                     ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}">
-                              <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinClose.png">
+                              <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/PinClose.png}">
                               </Image>
                             </Button>
                           </Grid>
@@ -916,19 +922,18 @@
                 <Setter Property="Template">
                   <Setter.Value>
                     <ControlTemplate TargetType="{x:Type avalonDockControls:LayoutAnchorableTabItem}">
+                      <!--Use a transparent background to hit for contextMenu popup-->
                       <avalonDockControls:DropDownControlArea DropDownContextMenu="{Binding Root.Manager.AnchorableContextMenu}"
-                                                              DropDownContextMenuDataContext="{Binding LayoutItem, RelativeSource={RelativeSource TemplatedParent}}">
+                                                              DropDownContextMenuDataContext="{Binding LayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
+                                                              Background="Transparent">
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}">
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Margin="{Binding Padding, RelativeSource={RelativeSource AncestorType={x:Type TabItem}}}">
                           <Grid>
                             <ContentPresenter Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
-                                              ContentTemplate="{Binding AnchorableHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
-                                              ContentTemplateSelector="{Binding AnchorableHeaderTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}" />
-                            <avalonDockControls:DropDownControlArea Grid.Column="0"
-                                                                    DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
-                                                                    DropDownContextMenuDataContext="{Binding Path=Model, RelativeSource={RelativeSource TemplatedParent}}">
-                            </avalonDockControls:DropDownControlArea>
+                                              ContentTemplate="{Binding Root.Manager.AnchorableHeaderTemplate, Mode=OneWay}"
+                                              ContentTemplateSelector="{Binding Root.Manager.AnchorableHeaderTemplateSelector, Mode=OneWay}" />
                           </Grid>
                         </Border>
                       </avalonDockControls:DropDownControlArea>
@@ -1005,69 +1010,71 @@
                 <Setter Property="Template">
                   <Setter.Value>
                     <ControlTemplate TargetType="{x:Type avalonDockControls:LayoutDocumentFloatingWindowControl}">
-                      <Grid>
-                        <Border x:Name="WindowBorder"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}">
-                          <Grid Margin="3">
-                            <Grid.RowDefinitions>
-                              <RowDefinition MinHeight="16"
-                                             Height="Auto"/>
-                              <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <Grid UseLayoutRounding="True">
-                              <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                              </Grid.ColumnDefinitions>
-                              <ContentPresenter Content="{Binding Model.RootDocument, RelativeSource={RelativeSource TemplatedParent}}"
-                                                ContentTemplate="{Binding Model.Root.Manager.DocumentTitleTemplate, RelativeSource={RelativeSource TemplatedParent}}"
-                                                ContentTemplateSelector="{Binding Model.Root.Manager.DocumentTitleTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}" />
+                      <AdornerDecorator>
+                        <Grid>
+                          <Border x:Name="WindowBorder"
+                                  BorderThickness="{TemplateBinding BorderThickness}"
+                                  Background="{TemplateBinding Background}"
+                                  BorderBrush="{TemplateBinding BorderBrush}">
+                            <Grid Margin="3">
+                              <Grid.RowDefinitions>
+                                <RowDefinition MinHeight="16"
+                                               Height="Auto" />
+                                <RowDefinition Height="*" />
+                              </Grid.RowDefinitions>
+                              <Grid UseLayoutRounding="True">
+                                <Grid.ColumnDefinitions>
+                                  <ColumnDefinition Width="*" />
+                                  <ColumnDefinition Width="Auto" />
+                                  <ColumnDefinition Width="Auto" />
+                                  <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter Content="{Binding Model.RootDocument, RelativeSource={RelativeSource TemplatedParent}}"
+                                                  ContentTemplate="{Binding Model.Root.Manager.DocumentTitleTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                                  ContentTemplateSelector="{Binding Model.Root.Manager.DocumentTitleTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}" />
 
 
-                              <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                                      Focusable="False"
-                                      Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}"
-                                      Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                      Command="{x:Static shell:SystemCommands.MaximizeWindowCommand}"
-                                      CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
-                                      ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
-                                      Grid.Column="2">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinMaximize.png">
-                                </Image>
-                              </Button>
+                                <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                        Focusable="False"
+                                        Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                        Command="{x:Static shell:SystemCommands.MaximizeWindowCommand}"
+                                        CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                                        ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
+                                        Grid.Column="2">
+                                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/PinMaximize.png}">
+                                  </Image>
+                                </Button>
 
-                              <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                                      Focusable="False"
-                                      Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
-                                      Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                      Command="{x:Static shell:SystemCommands.RestoreWindowCommand}"
-                                      CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
-                                      ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
-                                      Grid.Column="2">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinRestore.png">
-                                </Image>
-                              </Button>
+                                <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                        Focusable="False"
+                                        Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
+                                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                        Command="{x:Static shell:SystemCommands.RestoreWindowCommand}"
+                                        CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                                        ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
+                                        Grid.Column="2">
+                                <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/PinRestore.png}">
+                                  </Image>
+                                </Button>
 
-                              <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                                      Focusable="False"
-                                      Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                      Command="{Binding Path=RootDocumentLayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
-                                      ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
-                                      Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                                      Grid.Column="3">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinClose.png">
-                                </Image>
-                              </Button>
+                                <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                        Focusable="False"
+                                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                        Command="{Binding Path=RootDocumentLayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                        ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
+                                        Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                        Grid.Column="3">
+                                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/PinClose.png}">
+                                  </Image>
+                                </Button>
+                              </Grid>
+                              <ContentPresenter Content="{TemplateBinding Content}"
+                                                Grid.Row="1" />
                             </Grid>
-                            <ContentPresenter Content="{TemplateBinding Content}"
-                                              Grid.Row="1" />
-                          </Grid>
-                        </Border>
-                      </Grid>
+                          </Border>
+                        </Grid>
+                      </AdornerDecorator>
                       <ControlTemplate.Triggers>
                         <Trigger Property="WindowState"
                                  Value="Maximized">
@@ -1107,89 +1114,92 @@
                 <Setter Property="Template">
                   <Setter.Value>
                     <ControlTemplate TargetType="{x:Type avalonDockControls:LayoutAnchorableFloatingWindowControl}">
-                      <Grid>
-                        <Border x:Name="WindowBorder"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}">
-                          <Grid Margin="3">
-                            <Grid.RowDefinitions>
-                              <RowDefinition MinHeight="16"
-                                             Height="Auto"/>
-                              <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <Grid UseLayoutRounding="True">
-                              <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                              </Grid.ColumnDefinitions>
+                      <AdornerDecorator>
+                        <Grid>
+                          <Border x:Name="WindowBorder"
+                                  BorderThickness="{TemplateBinding BorderThickness}"
+                                  Background="{TemplateBinding Background}"
+                                  BorderBrush="{TemplateBinding BorderBrush}">
+                            <Grid Margin="3">
+                              <Grid.RowDefinitions>
+                                <RowDefinition MinHeight="16"
+                                               Height="Auto" />
+                                <RowDefinition Height="*" />
+                              </Grid.RowDefinitions>
+                              <Grid UseLayoutRounding="True">
+                                <Grid.ColumnDefinitions>
+                                  <ColumnDefinition Width="*" />
+                                  <ColumnDefinition Width="Auto" />
+                                  <ColumnDefinition Width="Auto" />
+                                  <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
 
-                              <Border Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <avalonDockControls:DropDownControlArea DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
-                                                                        DropDownContextMenuDataContext="{Binding Path=SingleContentLayoutItem, RelativeSource={RelativeSource TemplatedParent}}">
-                                  <ContentPresenter Content="{Binding Model.SinglePane.SelectedContent, RelativeSource={RelativeSource TemplatedParent}}"
-                                                    ContentTemplate="{Binding Model.Root.Manager.AnchorableTitleTemplate, RelativeSource={RelativeSource TemplatedParent}}"
-                                                    ContentTemplateSelector="{Binding Model.Root.Manager.AnchorableTitleTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}" />
-                                </avalonDockControls:DropDownControlArea>
-                              </Border>
+                                <Border Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}">
+                                  <avalonDockControls:DropDownControlArea DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                          DropDownContextMenuDataContext="{Binding Path=SingleContentLayoutItem, RelativeSource={RelativeSource TemplatedParent}}">
+                                    <ContentPresenter Content="{Binding Model.SinglePane.SelectedContent, RelativeSource={RelativeSource TemplatedParent}}"
+                                                      ContentTemplate="{Binding Model.Root.Manager.AnchorableTitleTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                                      ContentTemplateSelector="{Binding Model.Root.Manager.AnchorableTitleTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}" />
+                                  </avalonDockControls:DropDownControlArea>
+                                </Border>
 
 
-                              <avalonDockControls:DropDownButton x:Name="SinglePaneContextMenu"
-                                                                 shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                                                                 Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                                 Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
-                                                                 Focusable="False"
-                                                                 Grid.Column="1"
-                                                                 DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
-                                                                 DropDownContextMenuDataContext="{Binding Path=SingleContentLayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
-                                                                 ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_CxMenu_Hint}">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinMenu.png">
-                                </Image>
-                              </avalonDockControls:DropDownButton>
+                                <avalonDockControls:DropDownButton x:Name="SinglePaneContextMenu"
+                                                                   shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                                                   Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                                   Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
+                                                                   Focusable="False"
+                                                                   Grid.Column="1"
+                                                                   DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                   DropDownContextMenuDataContext="{Binding Path=SingleContentLayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                   ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_CxMenu_Hint}">
+                                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/PinMenu.png}">
+                                  </Image>
+                                </avalonDockControls:DropDownButton>
 
-                              <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                                      Focusable="False"
-                                      Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}"
-                                      Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                      Command="{x:Static shell:SystemCommands.MaximizeWindowCommand}"
-                                      CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
-                                      ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
-                                      Grid.Column="2">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinMaximize.png">
-                                </Image>
-                              </Button>
+                                <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                        Focusable="False"
+                                        Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                        Command="{x:Static shell:SystemCommands.MaximizeWindowCommand}"
+                                        CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                                        ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
+                                        Grid.Column="2">
+                                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/PinMaximize.png}">
+                                  </Image>
+                                </Button>
 
-                              <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                                      Focusable="False"
-                                      Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
-                                      Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                      Command="{x:Static shell:SystemCommands.RestoreWindowCommand}"
-                                      CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
-                                      ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
-                                      Grid.Column="2">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinRestore.png">
-                                </Image>
-                              </Button>
+                                <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                        Focusable="False"
+                                        Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
+                                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                        Command="{x:Static shell:SystemCommands.RestoreWindowCommand}"
+                                        CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                                        ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
+                                        Grid.Column="2">
+                                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/PinRestore.png}">
+                                  </Image>
+                                </Button>
 
-                              <Button x:Name="CloseButton"
-                                      shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                                      Focusable="False"
-                                      Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                      Command="{Binding HideWindowCommand, RelativeSource={RelativeSource TemplatedParent}}"
-                                      ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}"
-                                      Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                                      Grid.Column="3">
-                                <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinClose.png">
-                                </Image>
-                              </Button>
+                                <Button x:Name="CloseButton"
+                                        shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                        Focusable="False"
+                                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                        Command="{Binding HideWindowCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                        ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}"
+                                        Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                        Grid.Column="3">
+                                  <Image Source="{xctk:ImageUri AssemblyName=Xceed.Wpf.AvalonDock, Path=Themes/Generic/Images/PinClose.png}">
+                                  </Image>
+                                </Button>
+                              </Grid>
+                              <ContentPresenter Content="{TemplateBinding Content}"
+                                                Grid.Row="1" />
                             </Grid>
-                            <ContentPresenter Content="{TemplateBinding Content}"
-                                              Grid.Row="1" />
-                          </Grid>
-                        </Border>
-                      </Grid>
+                          </Border>
+                        </Grid>
+                      </AdornerDecorator>
+
                       <ControlTemplate.Triggers>
                         <Trigger Property="WindowState"
                                  Value="Maximized">

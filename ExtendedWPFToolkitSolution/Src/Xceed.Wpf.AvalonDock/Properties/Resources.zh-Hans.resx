@@ -142,16 +142,16 @@
     <value>隐藏</value>
   </data>
   <data name="Document_BtnPinned_Hint" xml:space="preserve">
-    <value>切換引腳狀態</value>
+    <value>切换固定状态</value>
   </data>
   <data name="Document_Close" xml:space="preserve">
     <value>关闭</value>
   </data>
   <data name="Document_CloseAll" xml:space="preserve">
-    <value>關閉所有</value>
+    <value>关闭所有</value>
   </data>
   <data name="Document_CloseAllButThis" xml:space="preserve">
-    <value>留此，关闭其他</value>
+    <value>除此之外全部关闭</value>
   </data>
   <data name="Document_CxMenu_Hint" xml:space="preserve">
     <value>窗口位置</value>

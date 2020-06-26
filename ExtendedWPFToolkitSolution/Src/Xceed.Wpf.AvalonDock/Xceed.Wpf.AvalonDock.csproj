@@ -78,6 +78,7 @@
     <Compile Include="Controls\DropDownButton.cs" />
     <Compile Include="Controls\DropDownControlArea.cs" />
     <Compile Include="Controls\DropTargetBase.cs" />
+    <Compile Include="Controls\LayoutCachePaneControl.cs" />
     <Compile Include="Controls\WeakDictionary.cs" />
     <Compile Include="Controls\WindowActivateEventArgs.cs" />
     <Compile Include="Controls\WindowHookHandler.cs" />
@@ -266,7 +267,9 @@
     <Compile Include="Themes\DictionaryTheme.cs" />
     <Compile Include="Themes\GenericTheme.cs" />
     <Compile Include="Themes\Theme.cs" />
-    <Compile Include="Utils\Exceptions\ThrowException.cs" />
+    <Compile Include="..\Xceed.Wpf.Toolkit\Utils\Exceptions\ThrowException.cs">
+      <Link>Utils\Exceptions\ThrowException.cs</Link>
+    </Compile>
     <Compile Include="Win32Helper.cs" />
     <Compile Include="WindowHelper.cs" />
     <EmbeddedResource Include="Properties\Resources.cs-CZ.resx">

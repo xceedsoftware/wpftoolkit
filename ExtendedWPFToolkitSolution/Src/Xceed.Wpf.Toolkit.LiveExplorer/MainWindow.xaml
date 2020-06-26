@@ -2,10 +2,11 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -17,12 +18,12 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
-        xmlns:samples="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples;assembly=Xceed.Wpf.Toolkit.LiveExplorer"
+        xmlns:samples="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples"
         xmlns:core="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Core"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         AllowsTransparency="False"
         Icon="App.ico"
-        Title="Toolkit Plus for WPF - LiveExplorer"
+        Title="The title is set in code"
         Height="778"
         Width="1300">
   <Window.Resources>

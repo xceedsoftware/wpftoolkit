@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -26,6 +27,7 @@ using System.Windows.Media;
 using Xceed.Wpf.AvalonDock.Layout;
 using System.Windows.Documents;
 using Xceed.Wpf.AvalonDock.Themes;
+using Standard;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
@@ -87,7 +89,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// IsContentImmutable Dependency Property
     /// </summary>
     public static readonly DependencyProperty IsContentImmutableProperty = DependencyProperty.Register( "IsContentImmutable", typeof( bool ), typeof( LayoutFloatingWindowControl ),
-              new FrameworkPropertyMetadata( (bool)false ) );
+              new FrameworkPropertyMetadata( ( bool )false ) );
 
     /// <summary>
     /// Gets/sets the IsContentImmutable property.  This dependency property 
@@ -97,7 +99,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       get
       {
-        return (bool)GetValue( IsContentImmutableProperty );
+        return ( bool )GetValue( IsContentImmutableProperty );
       }
       private set
       {
@@ -221,13 +223,16 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       if( !_isInternalChange )
       {
-        if( WindowState == WindowState.Maximized )
+        if( this.WindowState == WindowState.Maximized )
         {
-          UpdateMaximizedState( true );
+          this.UpdateMaximizedState( true );
         }
         else
         {
-          WindowState = IsMaximized ? WindowState.Maximized : WindowState.Normal;
+          if( this.IsMaximized )
+          {
+            this.WindowState = WindowState.Maximized;
+          }
         }
       }
 
@@ -240,13 +245,37 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region Overrides
 
+    protected override void OnClosing( System.ComponentModel.CancelEventArgs e )
+    {
+      if( this.CloseInitiatedByUser && !this.KeepContentVisibleOnClose )
+      {
+        // model.CanClose is false, can we hide ?
+        if( !this.CanClose() )
+        {
+          // Cancel the closing because we are hiding or nothing to do on (Alt + F4).
+          e.Cancel = true;
+          if( this.CanHide() )
+          {
+            // Just hiding.
+            this.DoHide();
+          }
+        }
+      }
+
+      base.OnClosing( e );
+    }
+
     protected override void OnClosed( EventArgs e )
     {
-      if( Content != null )
+      var root = this.Model.Root;
+      if( root != null )
       {
-        var host = Content as FloatingWindowContentHost;
-        host.Dispose();
+        root.Manager.RemoveFloatingWindow( this );
+        root.CollectGarbage();
+      }
 
+      if( this.Content != null )
+      {
         if( _hwndSrc != null )
         {
           _hwndSrc.RemoveHook( _hwndSrcHook );
@@ -256,6 +285,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
 
       base.OnClosed( e );
+
+      if( !this.CloseInitiatedByUser && ( root != null ) )
+      {
+        root.FloatingWindows.Remove( this.Model as LayoutFloatingWindow );
+      }
     }
 
     protected override void OnInitialized( EventArgs e )
@@ -270,6 +304,30 @@ namespace Xceed.Wpf.AvalonDock.Controls
           new ExecutedRoutedEventHandler( ( s, args ) => Microsoft.Windows.Shell.SystemCommands.RestoreWindow( ( Window )args.Parameter ) ) ) );
       //Debug.Assert(this.Owner != null);
       base.OnInitialized( e );
+    }
+
+    protected override void OnPreviewKeyDown( KeyEventArgs e )
+    {
+      if( Keyboard.IsKeyDown( Key.LeftCtrl ) || Keyboard.IsKeyDown( Key.RightCtrl ) )
+      {
+        if( e.IsDown && e.Key == Key.Tab )
+        {
+          if( ( this.Model != null ) && ( this.Model.Root != null ) )
+          {
+            var manager = this.Model.Root.Manager;
+            if( manager != null )
+            {
+              if( !manager.IsNavigatorWindowActive )
+              {
+                manager.ShowNavigatorWindow();
+                e.Handled = true;
+              }
+            }
+          }
+        }
+      }
+
+      base.OnPreviewKeyDown( e );
     }
 
 
@@ -314,6 +372,20 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
+    protected virtual bool CanClose( object parameter = null )
+    {
+      return false;
+    }
+
+    protected virtual bool CanHide( object parameter = null )
+    {
+      return false;
+    }
+
+    protected virtual void DoHide()
+    {
+    }
+
     internal void AttachDrag( bool onActivated = true )
     {
       if( onActivated )
@@ -335,6 +407,34 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       switch( msg )
       {
+        case Win32Helper.NCCALCSIZE:
+          if( wParam != IntPtr.Zero )
+          {
+            handled = true;
+            var client = (RECT)Marshal.PtrToStructure( lParam, typeof( RECT ) );
+            client.Bottom -= 1;
+            Marshal.StructureToPtr( client, lParam, false );
+          }
+          break;
+
+        //case Win32Helper.WM_NCHITTEST:
+        //  {
+        //    handled = true;
+        //    //var htLocation = DefWindowProc( hwnd, msg, wParam, lParam ).ToInt32();
+        //    //switch( htLocation )
+        //    //{
+        //    //  case (int)HitTestResult.HTBOTTOM:
+        //    //  case (int)HitTestResult.HTBOTTOMLEFT:
+        //    //  case (int)HitTestResult.HTBOTTOMRIGHT:
+        //    //  case (int)HitTestResult.HTLEFT:
+        //    //  case (int)HitTestResult.HTRIGHT:
+        //    //  case (int)HitTestResult.HTTOP:
+        //    //  case (int)HitTestResult.HTTOPLEFT:
+        //    //  case (int)HitTestResult.HTTOPRIGHT:
+        //    //    htLocation = (int)HitTestResult.HTBORDER;
+        //  }
+        //  break;
+
         case Win32Helper.WM_ACTIVATE:
           if( ( (int)wParam & 0xFFFF ) == Win32Helper.WA_INACTIVE )
           {
@@ -413,7 +513,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         if( lfwc.IsLoaded && lfwc.IsContentImmutable )
           return lfwc.Content;
-        return new FloatingWindowContentHost( sender as LayoutFloatingWindowControl ) { Content = content as UIElement };
+        return content;
       }
       return null;
     }
@@ -504,203 +604,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       var mousePosition = this.TransformToDeviceDPI( Win32Helper.GetMousePosition() );
       _dragService.UpdateMouseLocation( mousePosition );
-    }
-
-    #endregion
-
-    #region Internal Classes
-
-    protected internal class FloatingWindowContentHost : HwndHost
-    {
-      #region Members
-
-      private LayoutFloatingWindowControl _owner;
-      private HwndSource _wpfContentHost = null;
-      private Border _rootPresenter = null;
-      private DockingManager _manager = null;
-
-      #endregion
-
-      #region Constructors
-
-      public FloatingWindowContentHost( LayoutFloatingWindowControl owner )
-      {
-        _owner = owner;
-        var manager = _owner.Model.Root.Manager;
-
-        var binding = new Binding( "SizeToContent" ) { Source = _owner };
-        BindingOperations.SetBinding( this, FloatingWindowContentHost.SizeToContentProperty, binding );
-      }
-
-      #endregion
-
-      #region Properties
-
-      #region RootVisual
-
-      public Visual RootVisual
-      {
-        get
-        {
-          return _rootPresenter;
-        }
-      }
-
-      #endregion
-
-      #region Content
-
-      /// <summary>
-      /// Content Dependency Property
-      /// </summary>
-      public static readonly DependencyProperty ContentProperty = DependencyProperty.Register( "Content", typeof( UIElement ), typeof( FloatingWindowContentHost ),
-              new FrameworkPropertyMetadata( ( UIElement )null, new PropertyChangedCallback( OnContentChanged ) ) );
-
-      /// <summary>
-      /// Gets or sets the Content property.  This dependency property 
-      /// indicates ....
-      /// </summary>
-      public UIElement Content
-      {
-        get
-        {
-          return ( UIElement )GetValue( ContentProperty );
-        }
-        set
-        {
-          SetValue( ContentProperty, value );
-        }
-      }
-
-      /// <summary>
-      /// Handles changes to the Content property.
-      /// </summary>
-      private static void OnContentChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
-      {
-        ( ( FloatingWindowContentHost )d ).OnContentChanged( (UIElement)e.OldValue, (UIElement)e.NewValue );
-      }
-
-      /// <summary>
-      /// Provides derived classes an opportunity to handle changes to the Content property.
-      /// </summary>
-      protected virtual void OnContentChanged( UIElement oldValue, UIElement newValue )
-      {
-        if( _rootPresenter != null )
-          _rootPresenter.Child = Content;
-
-        var oldContent = oldValue as FrameworkElement;
-        if( oldContent != null )
-        {
-          oldContent.SizeChanged -= this.Content_SizeChanged;
-        }
-
-        var newContent = newValue as FrameworkElement;
-        if( newContent != null )
-        {
-          newContent.SizeChanged += this.Content_SizeChanged;
-        }
-      }
-
-      #endregion
-
-      #region SizeToContent
-
-      /// <summary>
-      /// SizeToContent Dependency Property
-      /// </summary>
-      public static readonly DependencyProperty SizeToContentProperty = DependencyProperty.Register( "SizeToContent", typeof( SizeToContent ), typeof( FloatingWindowContentHost ),
-              new FrameworkPropertyMetadata( SizeToContent.Manual, new PropertyChangedCallback( OnSizeToContentChanged ) ) );
-
-      /// <summary>
-      /// Gets or sets the SizeToContent property. 
-      /// </summary>
-      public SizeToContent SizeToContent
-      {
-        get
-        {
-          return (SizeToContent)GetValue( SizeToContentProperty );
-        }
-        set
-        {
-          SetValue( SizeToContentProperty, value );
-        }
-      }
-
-      /// <summary>
-      /// Handles changes to the SizeToContent property.
-      /// </summary>
-      private static void OnSizeToContentChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
-      {
-        ( (FloatingWindowContentHost)d ).OnSizeToContentChanged( (SizeToContent)e.OldValue, (SizeToContent)e.NewValue );
-      }
-
-      /// <summary>
-      /// Provides derived classes an opportunity to handle changes to the SizeToContent property.
-      /// </summary>
-      protected virtual void OnSizeToContentChanged( SizeToContent oldValue, SizeToContent newValue )
-      {
-        if( _wpfContentHost != null )
-        {
-          _wpfContentHost.SizeToContent = newValue;
-        }
-      }
-
-      #endregion
-
-      #endregion
-
-      #region Overrides
-
-      protected override System.Runtime.InteropServices.HandleRef BuildWindowCore( System.Runtime.InteropServices.HandleRef hwndParent )
-      {
-        _wpfContentHost = new HwndSource( new HwndSourceParameters()
-        {
-          ParentWindow = hwndParent.Handle,
-          WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_VISIBLE | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
-          Width = 1,
-          Height = 1
-        } );
-
-        _rootPresenter = new Border() { Child = new AdornerDecorator() { Child = Content }, Focusable = true };
-        _rootPresenter.SetBinding( Border.BackgroundProperty, new Binding( "Background" ) { Source = _owner } );
-        _wpfContentHost.RootVisual = _rootPresenter;
-
-        _manager = _owner.Model.Root.Manager;
-        _manager.InternalAddLogicalChild( _rootPresenter );
-
-        return new HandleRef( this, _wpfContentHost.Handle );
-      }
-
-      protected override void DestroyWindowCore( HandleRef hwnd )
-      {
-        _manager.InternalRemoveLogicalChild( _rootPresenter );
-        if( _wpfContentHost != null )
-        {
-          _wpfContentHost.Dispose();
-          _wpfContentHost = null;
-        }
-      }
-
-      protected override Size MeasureOverride( Size constraint )
-      {
-        if( Content == null )
-          return base.MeasureOverride( constraint );
-
-        Content.Measure( constraint );
-        return Content.DesiredSize;
-      }
-
-      #endregion
-
-      #region Event Handlers
-
-      private void Content_SizeChanged( object sender, SizeChangedEventArgs e )
-      {
-        this.InvalidateMeasure();
-        this.InvalidateArrange();
-      }
-
-      #endregion
     }
 
     #endregion

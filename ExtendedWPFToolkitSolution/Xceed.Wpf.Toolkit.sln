@@ -1,7 +1,16 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29418.71
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xceed.Wpf.Toolkit.LiveExplorer", "Src\Xceed.Wpf.Toolkit.LiveExplorer\Xceed.Wpf.Toolkit.LiveExplorer.csproj", "{5E7DC9C8-3E27-400C-B84C-29FF9E710CB3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B3FC3E21-5F2D-4581-AEA2-59F671CFFC21} = {B3FC3E21-5F2D-4581-AEA2-59F671CFFC21}
+		{DB81988F-E0F2-45A0-A1FD-8C37F3D35244} = {DB81988F-E0F2-45A0-A1FD-8C37F3D35244}
+		{89286EB4-B4A1-418C-839A-067B00F442D8} = {89286EB4-B4A1-418C-839A-067B00F442D8}
+		{72E591D6-8F83-4D8C-8F67-9C325E623234} = {72E591D6-8F83-4D8C-8F67-9C325E623234}
+		{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B} = {BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xceed.Wpf.Toolkit", "Src\Xceed.Wpf.Toolkit\Xceed.Wpf.Toolkit.csproj", "{72E591D6-8F83-4D8C-8F67-9C325E623234}"
 EndProject
@@ -29,10 +38,6 @@ Global
 		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{63648392-6CE9-4A60-96D4-F9FD718D29B0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{63648392-6CE9-4A60-96D4-F9FD718D29B0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{63648392-6CE9-4A60-96D4-F9FD718D29B0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{63648392-6CE9-4A60-96D4-F9FD718D29B0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
@@ -49,7 +54,6 @@ Global
 		{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,5 +62,8 @@ Global
 		{B3FC3E21-5F2D-4581-AEA2-59F671CFFC21} = {8976E4A6-FF5F-44C5-AC57-FEDA249DD199}
 		{89286EB4-B4A1-418C-839A-067B00F442D8} = {8976E4A6-FF5F-44C5-AC57-FEDA249DD199}
 		{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B} = {8976E4A6-FF5F-44C5-AC57-FEDA249DD199}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3A25421B-477A-4212-9A1F-F20CB611EF43}
 	EndGlobalSection
 EndGlobal

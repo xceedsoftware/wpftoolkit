@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -98,9 +99,29 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         if( (layoutPanel != null) && ( layoutPanel.Children.Count > 0 ) )
         {
+          var childrenCount = layoutPanel.Children.Count;
+          var currentChildID = -1;
+          for( int i = 0; i < childrenCount; ++i )
+          {
+            if( layoutPanel.Children[ i ].Equals( element ) || layoutPanel.Children[ i ].Descendents().Contains( element ) )
+            {
+              currentChildID = i;
+              break;
+            }
+          }
+
           if( layoutPanel.Orientation == System.Windows.Controls.Orientation.Horizontal )
-            return ( layoutPanel.Children[ 0 ].Equals(element) || layoutPanel.Children[ 0 ].Descendents().Contains( element ) ) ? AnchorSide.Left : AnchorSide.Right;
-          return ( layoutPanel.Children[ 0 ].Equals( element ) || layoutPanel.Children[ 0 ].Descendents().Contains( element ) ) ? AnchorSide.Top : AnchorSide.Bottom;
+          {
+            if( currentChildID < 0 )
+              return AnchorSide.Right;
+            return ( currentChildID <= ( childrenCount / 2 ) ) ? AnchorSide.Left : AnchorSide.Right;
+          }
+          else
+          {
+            if( currentChildID < 0 )
+              return AnchorSide.Bottom;
+            return ( currentChildID <= ( childrenCount / 2 ) ) ? AnchorSide.Top : AnchorSide.Bottom;
+          }
         }
       }
 

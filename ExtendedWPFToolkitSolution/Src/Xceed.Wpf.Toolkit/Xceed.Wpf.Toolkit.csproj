@@ -394,6 +394,9 @@
     <Compile Include="BusyIndicator\Implementation\Converters\ProgressBarWidthConverter.cs" />
     <Compile Include="ColorPicker\Implementation\ColorPickerTabItem.cs" />
     <Compile Include="Core\Converters\ColorModeToTabItemSelectedConverter.cs" />
+    <Compile Include="Core\ImageUriExtension.cs" />
+    <Compile Include="Core\PackUriExtension.cs" />
+    <Compile Include="Core\ResourceDictionary.cs" />
     <Compile Include="DateTimePicker\Implementation\Converters\BorderThicknessConverter.cs" />
     <Compile Include="Primitives\SelectAllSelectorItem.cs" />
     <Compile Include="Primitives\SelectAllSelector.cs" />

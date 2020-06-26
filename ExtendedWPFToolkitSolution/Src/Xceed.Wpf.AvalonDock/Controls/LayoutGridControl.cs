@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -413,9 +414,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         if( prevChildModel.DockWidth.IsStar )
         {
-          var width = prevChildModel.DockWidth.Value * ( prevChildActualSize.Width + delta ) / prevChildActualSize.Width;
-          var widthToSet = Math.Max( width, prevChildModel.DockMinWidth );
-          prevChildModel.DockWidth = new GridLength( widthToSet, GridUnitType.Star );
+          prevChildModel.DockWidth = new GridLength( prevChildActualSize.Width + delta, GridUnitType.Star );
         }
         else
         {
@@ -429,9 +428,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         {
           if( nextChildModel.DockWidth.IsStar )
           {
-            var width = nextChildModel.DockWidth.Value * ( nextChildActualSize.Width - delta ) / nextChildActualSize.Width;
-            var widthToSet = Math.Max( width, nextChildModel.DockMinWidth );
-            nextChildModel.DockWidth = new GridLength( widthToSet, GridUnitType.Star );
+            nextChildModel.DockWidth = new GridLength( nextChildActualSize.Width - delta, GridUnitType.Star );
           }
           else
           {
@@ -446,9 +443,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         if( prevChildModel.DockHeight.IsStar )
         {
-          var height = prevChildModel.DockHeight.Value * ( prevChildActualSize.Height + delta ) / prevChildActualSize.Height;
-          var heightToSet = Math.Max( height, prevChildModel.DockMinHeight );
-          prevChildModel.DockHeight = new GridLength( heightToSet, GridUnitType.Star );
+          prevChildModel.DockHeight = new GridLength( prevChildActualSize.Height + delta, GridUnitType.Star );
         }
         else
         {
@@ -462,9 +457,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         {
           if( nextChildModel.DockHeight.IsStar )
           {
-            var height = nextChildModel.DockHeight.Value * ( nextChildActualSize.Height - delta ) / nextChildActualSize.Height;
-            var heightToSet = Math.Max( height, nextChildModel.DockMinHeight );
-            nextChildModel.DockHeight = new GridLength( heightToSet, GridUnitType.Star );
+            nextChildModel.DockHeight = new GridLength( nextChildActualSize.Height - delta, GridUnitType.Star );
           }
           else
           {

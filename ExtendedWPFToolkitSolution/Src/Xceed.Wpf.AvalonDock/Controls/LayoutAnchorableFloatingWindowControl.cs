@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -136,40 +137,18 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void OnClosed( EventArgs e )
     {
-      var root = Model.Root;
-      if( root != null )
-      {
-        root.Manager.RemoveFloatingWindow( this );
-        root.CollectGarbage();
-      }
       if( _overlayWindow != null )
       {
         _overlayWindow.Close();
         _overlayWindow = null;
       }
 
-      base.OnClosed( e );
-
-      if( !CloseInitiatedByUser && (root != null) )
-      {
-        root.FloatingWindows.Remove( _model );
-      }
+      base.OnClosed( e );      
 
       _model.PropertyChanged -= new System.ComponentModel.PropertyChangedEventHandler( _model_PropertyChanged );      
       IsVisibleChanged -= this.LayoutAnchorableFloatingWindowControl_IsVisibleChanged;
       BindingOperations.ClearBinding( this, VisibilityProperty );
       BindingOperations.ClearBinding( this, SingleContentLayoutItemProperty );
-    }
-
-    protected override void OnClosing( System.ComponentModel.CancelEventArgs e )
-    {
-      if( CloseInitiatedByUser && !KeepContentVisibleOnClose )
-      {
-        e.Cancel = true;
-        _model.Descendents().OfType<LayoutAnchorable>().ToArray().ForEach<LayoutAnchorable>( ( a ) => a.Hide() );
-      }
-
-      base.OnClosing( e );
     }
 
     protected override IntPtr FilterMessage( IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled )
@@ -209,6 +188,75 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         _overlayWindow.UpdateThemeResources( oldTheme );
       }
+    }
+
+    protected override bool CanClose( object parameter = null )
+    {
+      if( this.Model == null )
+        return false;
+
+      var root = this.Model.Root;
+      if( root == null )
+        return false;
+
+      var manager = root.Manager;
+      if( manager == null )
+        return false;
+
+      foreach( var anchorable in this.Model.Descendents().OfType<LayoutAnchorable>().ToArray() )
+      {
+        if( !anchorable.CanClose )
+        {
+          return false;
+        }
+
+        var anchorableLayoutItem = manager.GetLayoutItemFromModel( anchorable ) as LayoutAnchorableItem;
+        if( anchorableLayoutItem == null ||
+            anchorableLayoutItem.CloseCommand == null ||
+            !anchorableLayoutItem.CloseCommand.CanExecute( parameter ) )
+        {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    protected override bool CanHide( object parameter = null )
+    {
+      if( this.Model == null )
+        return false;
+
+      var root = this.Model.Root;
+      if( root == null )
+        return false;
+
+      var manager = root.Manager;
+      if( manager == null )
+        return false;
+
+      foreach( var anchorable in this.Model.Descendents().OfType<LayoutAnchorable>().ToArray() )
+      {
+        if( !anchorable.CanHide )
+        {
+          return false;
+        }
+
+        var anchorableLayoutItem = manager.GetLayoutItemFromModel( anchorable ) as LayoutAnchorableItem;
+        if( anchorableLayoutItem == null ||
+            anchorableLayoutItem.HideCommand == null ||
+            !anchorableLayoutItem.HideCommand.CanExecute( parameter ) )
+        {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    protected override void DoHide()
+    {
+      this.OnExecuteHideWindowCommand( null );
     }
 
     #endregion
@@ -288,39 +336,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private bool CanExecuteHideWindowCommand( object parameter )
     {
-      if( Model == null )
-        return false;
-
-      var root = Model.Root;
-      if( root == null )
-        return false;
-
-      var manager = root.Manager;
-      if( manager == null )
-        return false;
-
-      bool canExecute = false;
-      foreach( var anchorable in this.Model.Descendents().OfType<LayoutAnchorable>().ToArray() )
-      {
-        if( !anchorable.CanHide )
-        {
-          canExecute = false;
-          break;
-        }
-
-        var anchorableLayoutItem = manager.GetLayoutItemFromModel( anchorable ) as LayoutAnchorableItem;
-        if( anchorableLayoutItem == null ||
-            anchorableLayoutItem.HideCommand == null ||
-            !anchorableLayoutItem.HideCommand.CanExecute( parameter ) )
-        {
-          canExecute = false;
-          break;
-        }
-
-        canExecute = true;
-      }
-
-      return canExecute;
+      return this.CanHide( parameter );     
     }
 
     private void OnExecuteHideWindowCommand( object parameter )
@@ -343,39 +359,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private bool CanExecuteCloseWindowCommand( object parameter )
     {
-      if( Model == null )
-        return false;
-
-      var root = Model.Root;
-      if( root == null )
-        return false;
-
-      var manager = root.Manager;
-      if( manager == null )
-        return false;
-
-      bool canExecute = false;
-      foreach( var anchorable in this.Model.Descendents().OfType<LayoutAnchorable>().ToArray() )
-      {
-        if( !anchorable.CanClose )
-        {
-          canExecute = false;
-          break;
-        }
-
-        var anchorableLayoutItem = manager.GetLayoutItemFromModel( anchorable ) as LayoutAnchorableItem;
-        if( anchorableLayoutItem == null ||
-            anchorableLayoutItem.CloseCommand == null ||
-            !anchorableLayoutItem.CloseCommand.CanExecute( parameter ) )
-        {
-          canExecute = false;
-          break;
-        }
-
-        canExecute = true;
-      }
-
-      return canExecute;
+      return this.CanClose( parameter );
     }
 
     private void OnExecuteCloseWindowCommand( object parameter )
@@ -437,7 +421,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       if( draggingWindow.Model is LayoutDocumentFloatingWindow )
         return _dropAreas;
 
-      var rootVisual = ( Content as FloatingWindowContentHost ).RootVisual;
+      var rootVisual = this.Content as System.Windows.Media.Visual;
 
       foreach( var areaHost in rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>() )
       {

@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -19,10 +20,11 @@ using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Data;
 using Xceed.Wpf.AvalonDock.Layout;
+using System.Windows.Media;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-  public class LayoutAnchorablePaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
+  public class LayoutAnchorablePaneControl : LayoutCachePaneControl, ILayoutControl//, ILogicalChildrenContainer
   {
     #region Members
 
@@ -80,9 +82,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       base.OnMouseLeftButtonDown( e );
 
-      if( !e.Handled && ( _model != null ) && ( _model.SelectedContent != null ) )
+      var parentDockingManager = ((Visual)e.OriginalSource).FindVisualAncestor<DockingManager>();
+      if ((this.Model != null) && (this.Model.Root != null) && (this.Model.Root.Manager != null)
+          && this.Model.Root.Manager.Equals(parentDockingManager))
       {
-        _model.SelectedContent.IsActive = true;
+        if (!e.Handled && (_model != null) && (_model.SelectedContent != null) )
+        {
+           _model.SelectedContent.IsActive = true;
+        }
       }
     }
 
@@ -90,9 +97,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       base.OnMouseRightButtonDown( e );
 
-      if( !e.Handled && ( _model != null ) && ( _model.SelectedContent != null ) )
+      var parentDockingManager = ((Visual)e.OriginalSource).FindVisualAncestor<DockingManager>();
+      if ((this.Model != null) && (this.Model.Root != null) && (this.Model.Root.Manager != null)
+          && this.Model.Root.Manager.Equals(parentDockingManager))
       {
-        _model.SelectedContent.IsActive = true;
+        if (!e.Handled && (_model != null) && (_model.SelectedContent != null))
+        {
+          _model.SelectedContent.IsActive = true;
+        }
       }
     }
 

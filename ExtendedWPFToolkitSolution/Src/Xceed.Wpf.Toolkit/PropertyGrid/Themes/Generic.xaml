@@ -2,10 +2,11 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -57,6 +58,8 @@
   <Style x:Key="PropertyGridNumericUpDown"
          TargetType="{x:Type prim:InputBase}"
          BasedOn="{StaticResource NumericUpDown}">
+    <Setter Property="TextAlignment"
+            Value="Left" />
   </Style>
 
   <Style TargetType="{x:Type editor:PropertyGridEditorByteUpDown}"
@@ -188,6 +191,8 @@
   <!-- PropertyGrid DateTime Editors -->
   <Style TargetType="{x:Type editor:PropertyGridEditorDateTimeUpDown}"
          BasedOn="{StaticResource DateTimeUpDown}">
+    <Setter Property="TextAlignment"
+            Value="Left" />
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -207,6 +212,8 @@
   <!-- PropertyGrid TimeSpan Editors -->
   <Style TargetType="{x:Type editor:PropertyGridEditorTimeSpanUpDown}"
          BasedOn="{StaticResource TimeSpanUpDown}">
+    <Setter Property="TextAlignment"
+            Value="Left" />
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -252,6 +259,8 @@
          BasedOn="{StaticResource {x:Type CheckBox}}">
     <Setter Property="Margin"
             Value="5,0,0,0" />
+    <Setter Property="Margin"
+            Value="5,0,0,0" />
   </Style>
 
   <!-- PropertyGrid TextBox Editors -->
@@ -284,16 +293,26 @@
          BasedOn="{StaticResource {x:Type TextBlock}}">
     <Setter Property="Foreground"
             Value="Gray" />
+    <Setter Property="Margin"
+            Value="5,0,0,0" />
+    <Setter Property="TextTrimming"
+            Value="CharacterEllipsis" />
   </Style>
 
   <!-- PropertyGrid MaskedTextBox Editors -->
   <Style TargetType="{x:Type editor:PropertyGridEditorMaskedTextBox}"
          BasedOn="{StaticResource {x:Type TextBox}}">
+    <Setter Property="BorderThickness"
+            Value="0" />
   </Style>
 
   <!-- PropertyGrid ColorPicker Editors -->
   <Style TargetType="{x:Type editor:PropertyGridEditorColorPicker}"
          BasedOn="{StaticResource {x:Type local:ColorPicker}}">
+    <Setter Property="DisplayColorAndName"
+            Value="True" />
+    <Setter Property="BorderThickness"
+            Value="0" />
     <Style.Triggers>
       <MultiTrigger>
         <MultiTrigger.Conditions>
@@ -314,6 +333,10 @@
   <!-- PropertyGrid PrimitiveTypeCollectionControl Editors -->
   <Style TargetType="{x:Type editor:PropertyGridEditorPrimitiveTypeCollectionControl}"
          BasedOn="{StaticResource PrimitiveTypeCollectionControl}">
+    <Setter Property="Content"
+            Value="(Collection)" />
+    <Setter Property="BorderThickness"
+            Value="0" />
     <Setter Property="BorderThickness"
             Value="0" />
     <Setter Property="Content"

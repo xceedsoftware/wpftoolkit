@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -21,13 +22,16 @@ using System.Text;
 
 namespace Xceed.Wpf.AvalonDock.Themes
 {
-    public class VS2010Theme : Theme
+  public class VS2010Theme : Theme
+  {
+    public override Uri GetResourceUri()
     {
-        public override Uri GetResourceUri()
-        {
-            return new Uri(
-                "/Xceed.Wpf.AvalonDock.Themes.VS2010;component/Theme.xaml", 
-                UriKind.Relative);  
-        }
+      string assemblyName = "Xceed.Wpf.AvalonDock.Themes.VS2010";
+
+
+      return new Uri(
+                "/" + assemblyName + ";component/Theme.xaml",
+                UriKind.Relative );
     }
+  }
 }
