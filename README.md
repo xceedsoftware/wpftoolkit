@@ -2,7 +2,7 @@
 
 Extended WPF Toolkit™ by [Xceed](https://xceed.com) is the number one collection of WPF controls, components and utilities for creating next generation Windows applications. Use it to build professional looking, modern, and easy to use WPF applications. It has been downloaded more than 1 million times here, on Codeplex, and on [NuGet](http://www.nuget.org/packages/Extended.Wpf.Toolkit/).
 
-Starting at v4.0.0, this free and open source toolkit is provided under the [Xceed Community License agreement](license.md)(for non-commercial use).
+Starting at v4.0.0, this free toolkit is provided under the [Xceed Community License agreement](license.md)(for non-commercial use).
 
 <a href="../../wiki/Xceed-Toolkit-Plus-for-WPF"><img align="right" src="https://user-images.githubusercontent.com/21266763/27969643-a5977614-6319-11e7-828e-b40fd1f8a283.png" width="233" style="margin:0px 30px" alt="Learn about Xceed Toolkit Plus for WPF here on Github"></a>Xceed offers the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) for developers that want to support the project, get additional controls and features, get updates and professional support, and work with a version a few releases ahead.
 
