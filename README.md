@@ -194,6 +194,7 @@ Xceed Software
 Extended WPF Toolkit™ is provided under the Xceed Software, Inc. Community License.
 
 [<img src="https://user-images.githubusercontent.com/29377763/69274195-d9382200-0ba7-11ea-9ab7-bfce3126f35a.png"/>](license.md)
+[<img src="https://user-images.githubusercontent.com/29377763/95855476-794deb00-0d26-11eb-8296-53edebc0b372.png"/>](license.md)
 
 More information can be found in the [License](license.md) page.
 
