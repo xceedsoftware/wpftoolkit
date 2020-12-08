@@ -201,6 +201,7 @@ A commercial license can be purchased at [Xceed](https://xceed.com).
 
 ## Release history
 
+* **June 26, 2020 v4.0.0 released with [46 bug fixes and improvements](../../wiki/Improvements-in-v4.0.0).**
 * **January 30, 2020 v3.8.0 released with [35 bug fixes and improvements](../../wiki/Improvements-in-v3.8.0).**
 * **November 26, 2019 v3.7.0 released with [18 bug fixes and improvements](../../wiki/Improvements-in-v3.7.0).**
 * **September 27, 2019 v3.6.0 released with [36 bug fixes and improvements](../../wiki/Improvements-in-v3.6.0).**
