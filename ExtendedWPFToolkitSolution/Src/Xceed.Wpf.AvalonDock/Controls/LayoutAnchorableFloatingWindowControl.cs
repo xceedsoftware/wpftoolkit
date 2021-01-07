@@ -347,6 +347,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         var anchorableLayoutItem = manager.GetLayoutItemFromModel( anchorable ) as LayoutAnchorableItem;
         anchorableLayoutItem.HideCommand.Execute( parameter );
       }
+
+      this.BringFocusOnDockingManager();
     }
     #endregion
 

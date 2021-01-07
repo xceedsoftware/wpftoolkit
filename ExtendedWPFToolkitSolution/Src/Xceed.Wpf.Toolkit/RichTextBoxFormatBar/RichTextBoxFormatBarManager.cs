@@ -174,7 +174,9 @@ namespace Xceed.Wpf.Toolkit
     void ShowAdorner()
     {
       if( _adorner.Visibility == Visibility.Visible )
-        return;
+      {
+        HideAdorner();
+      }
 
       VerifyAdornerLayer();
 

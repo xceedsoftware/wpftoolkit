@@ -2143,7 +2143,7 @@ namespace Xceed.Wpf.AvalonDock
           {
             newFW.WindowState = WindowState.Maximized;
           }
-        } ), DispatcherPriority.Send );
+        } ), DispatcherPriority.DataBind );
 
         return newFW;
       }
@@ -2365,7 +2365,7 @@ namespace Xceed.Wpf.AvalonDock
       content.IsActive = true;
     }
 
-    internal void ShowNavigatorWindow()
+    protected internal virtual void ShowNavigatorWindow()
     {
       if( _navigatorWindow == null )
       {
@@ -3259,6 +3259,8 @@ namespace Xceed.Wpf.AvalonDock
           contentModelAsAnchorable.IsAutoHidden )
         contentModelAsAnchorable.ToggleAutoHide();
 
+      this.UpdateStarSize( contentModel );
+
       var parentPane = contentModel.Parent as ILayoutPane;
       var parentPaneAsPositionableElement = contentModel.Parent as ILayoutPositionableElement;
       var parentPaneAsWithActualSize = contentModel.Parent as ILayoutPositionableElementWithActualSize;
@@ -3349,6 +3351,66 @@ namespace Xceed.Wpf.AvalonDock
       UpdateLayout();
 
       return fwc;
+    }
+
+    private void UpdateStarSize( LayoutContent contentModel )
+    {
+      if( contentModel == null )
+        return;
+
+      var parentPane = contentModel.Parent as ILayoutPositionableElement;
+      if( parentPane != null)
+      {
+        // Reset Dock Size of floating LayoutContent
+        if( parentPane.DockWidth.IsStar )
+        {
+          parentPane.DockWidth = new GridLength( 1d, GridUnitType.Star );
+        }
+        if( parentPane.DockHeight.IsStar )
+        {
+          parentPane.DockHeight = new GridLength( 1d, GridUnitType.Star );
+        }
+
+        var grandParentPaneOrientation = parentPane.Parent as ILayoutOrientableGroup;
+        var grandParentPane = parentPane.Parent as ILayoutPositionableElement;
+        if( (grandParentPaneOrientation != null) && (grandParentPane != null) )
+        {
+          if( grandParentPaneOrientation.Orientation == Orientation.Horizontal )
+          {
+            // Reset Dock Width of remaining LayoutContent
+            if( grandParentPane.DockWidth.IsStar )
+            {
+              var grandParentPaneContainer = parentPane.Parent as ILayoutContainer;
+              if( grandParentPaneContainer != null )
+              {
+                var children = grandParentPaneContainer.Children.Where( child => !child.Equals( parentPane ) ).Cast<ILayoutPositionableElement>().Where( child => child.DockWidth.IsStar );
+                var childrenTotalWidth = children.Sum( child => child.DockWidth.Value );
+                foreach( var child in children )
+                {
+                  child.DockWidth = new GridLength( child.DockWidth.Value / childrenTotalWidth, GridUnitType.Star );
+                }
+              }
+            }
+          }
+          else
+          {
+            // Reset Dock Height of remaining LayoutContent
+            if( grandParentPane.DockHeight.IsStar )
+            {
+              var grandParentPaneContainer = parentPane.Parent as ILayoutContainer;
+              if( grandParentPaneContainer != null )
+              {
+                var children = grandParentPaneContainer.Children.Where( child => !child.Equals( parentPane ) ).Cast<ILayoutPositionableElement>().Where( child => child.DockHeight.IsStar );
+                var childrenTotalHeight = children.Sum( child => child.DockHeight.Value );
+                foreach( var child in children )
+                {
+                  child.DockHeight = new GridLength( child.DockHeight.Value / childrenTotalHeight, GridUnitType.Star );
+                }
+              }
+            }
+          }
+        }
+      }
     }
 
     private void AnchorableContextMenu_Opened( object sender, RoutedEventArgs e )

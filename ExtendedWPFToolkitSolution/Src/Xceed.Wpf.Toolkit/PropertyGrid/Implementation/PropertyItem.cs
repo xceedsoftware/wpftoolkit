@@ -30,6 +30,7 @@ using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Linq.Expressions;
 using System.Diagnostics;
 using System.Globalization;
+using System.Windows.Threading;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -229,8 +230,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         DescriptorPropertyDefinitionBase descriptor = be.DataItem as DescriptorPropertyDefinitionBase;
         if( Validation.GetHasError( descriptor ) )
         {
-          ReadOnlyObservableCollection<ValidationError> errors = Validation.GetErrors( descriptor );
-          Validation.MarkInvalid( be, errors[ 0 ] );
+          this.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
+          {
+            var errors = Validation.GetErrors( descriptor );
+            Validation.MarkInvalid( be, errors[ 0 ] );
+          }
+         ) );
         }
       }
     }

@@ -76,6 +76,15 @@ namespace Xceed.Wpf.AvalonDock.Layout.Serialization
         lcToAttach.PreviousContainer = paneContainerToAttach as ILayoutContainer;
       }
 
+      foreach( var lcToAttach in layout.Descendents().OfType<ILayoutInitialContainer>().Where( lc => lc.InitialContainerId != null ) )
+      {
+        var paneContainerToAttach = layout.Descendents().OfType<ILayoutPaneSerializable>().FirstOrDefault( lps => lps.Id == lcToAttach.InitialContainerId );
+        if( paneContainerToAttach == null )
+          throw new ArgumentException( string.Format( "Unable to find a pane with id ='{0}'", lcToAttach.InitialContainerId ) );
+
+        lcToAttach.InitialContainer = paneContainerToAttach as ILayoutContainer;
+      }
+
 
       //now fix the content of the layoutcontents
       foreach( var lcToFix in layout.Descendents().OfType<LayoutAnchorable>().Where( lc => lc.Content == null ).ToArray() )

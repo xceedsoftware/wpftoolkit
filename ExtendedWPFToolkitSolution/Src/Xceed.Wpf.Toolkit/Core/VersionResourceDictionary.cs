@@ -16,6 +16,7 @@
   ***********************************************************************************/
 
 using System;
+using System.Windows;
 
 namespace Xceed.Wpf.Toolkit.Core
 {
@@ -24,14 +25,16 @@ namespace Xceed.Wpf.Toolkit.Core
     public VersionResourceDictionary() { }
 
     public VersionResourceDictionary( string assemblyName, string sourcePath )
-      :base( assemblyName, sourcePath )
+    :base( assemblyName, sourcePath )
     {
 
     }
 
+
     protected override Uri BuildUri()
     {
-      string uriStr = PackUriExtension.BuildAbsolutePackUriString( this.AssemblyName, _XceedVersionInfo.Version, this.SourcePath );
+      var source = this.SourcePath;
+      string uriStr = PackUriExtension.BuildAbsolutePackUriString( this.AssemblyName, _XceedVersionInfo.Version, source );
       return new Uri( uriStr, UriKind.Absolute );
     }
   }

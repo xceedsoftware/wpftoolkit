@@ -376,7 +376,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      if( !this.IsMouseCaptureWithin )
+      if( (_popup != null) && !_popup.IsMouseDirectlyOver )
       {
         this.CloseDropDown( true );
       }

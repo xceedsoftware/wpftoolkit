@@ -39,7 +39,7 @@
       <TabControl Margin="20,20,0,20"
                   Width="360"
                   Grid.Column="0"
-                  Background="White"
+                  Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
                   DataContext="{Binding ElementName=zoombox}">
          <TabControl.Resources>
             <xctk:RoundedValueConverter x:Key="Round"
@@ -86,19 +86,19 @@
                                   IsOpen="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsMouseOver, Mode=OneWay}">
                               <Border Name="Border"
                                       Background="#FFC72035"
-                                      BorderBrush="White"
+                                      BorderBrush="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
                                       Margin="0"
                                       BorderThickness="1"
                                       CornerRadius="10">
                                  <TextBlock Margin="7"
                                             MaxWidth="500"
                                             TextWrapping="Wrap"
-                                            Foreground="White"
+                                            Foreground="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
                                             Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag.InnerText}" />
                               </Border>
                            </Popup>
                            <Rectangle Grid.ColumnSpan="3"
-                                      Fill="White"
+                                      Fill="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
                                       Stroke="{x:Null}"
                                       StrokeThickness="0"
                                       RadiusX="0"

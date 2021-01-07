@@ -287,6 +287,9 @@ namespace Xceed.Wpf.Toolkit
 
     private void GenerateValue( PropertyInfo propertyInfo, object propertyInfoValue, object result, bool isIndexed = false )
     {
+      if( this.IsCyclingDependency( propertyInfoValue ) )
+        return;
+
       // Look for nested object
       if( propertyInfo.PropertyType.IsClass
         && ( propertyInfo.PropertyType != typeof( Transform ) )
@@ -339,6 +342,23 @@ namespace Xceed.Wpf.Toolkit
           propertyInfo.SetValue( result, propertyInfoValue, null );
         }
       }
+    }
+
+    private bool IsCyclingDependency( object propertyInfoValue )
+    {
+      if( propertyInfoValue == null )
+        return false;
+
+      if( object.ReferenceEquals( propertyInfoValue, this.ItemsSource ) )
+        return true;
+
+      foreach( var item in this.ItemsSource )
+      {
+        if( object.ReferenceEquals( propertyInfoValue, item ) )
+          return true;
+      }
+
+      return false;
     }
 
     private object GenerateEditableKeyValuePair( object source )

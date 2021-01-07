@@ -394,7 +394,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
           trToWnd.Transform( new Point() );
 
       double delta;
-      if( Orientation == System.Windows.Controls.Orientation.Horizontal )
+      if( Orientation == Orientation.Horizontal )
         delta = Canvas.GetLeft( _resizerGhost ) - _initialStartPoint.X;
       else
         delta = Canvas.GetTop( _resizerGhost ) - _initialStartPoint.Y;
@@ -406,15 +406,18 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       var prevChildActualSize = prevChild.TransformActualSizeToAncestor();
       var nextChildActualSize = (nextChild != null) ? nextChild.TransformActualSizeToAncestor() : new Size();
+      var totalActualSize = new Size(prevChildActualSize.Width + nextChildActualSize.Width, prevChildActualSize.Height + nextChildActualSize.Height );
 
       var prevChildModel = ( ILayoutPositionableElement )( prevChild as ILayoutControl ).Model;
       var nextChildModel = (nextChild != null) ? ( ILayoutPositionableElement )( nextChild as ILayoutControl ).Model : null;
+      var totalStarSize = new Size( prevChildModel.DockWidth.IsStar && nextChildModel.DockWidth.IsStar ? prevChildModel.DockWidth.Value + nextChildModel.DockWidth.Value : 1d,
+                                    prevChildModel.DockHeight.IsStar && nextChildModel.DockHeight.IsStar ? prevChildModel.DockHeight.Value + nextChildModel.DockHeight.Value : 1d );
 
-      if( Orientation == System.Windows.Controls.Orientation.Horizontal )
+      if( Orientation == Orientation.Horizontal )
       {
         if( prevChildModel.DockWidth.IsStar )
         {
-          prevChildModel.DockWidth = new GridLength( prevChildActualSize.Width + delta, GridUnitType.Star );
+          prevChildModel.DockWidth = new GridLength( ((prevChildActualSize.Width + delta) / totalActualSize.Width) * totalStarSize.Width, GridUnitType.Star );
         }
         else
         {
@@ -428,7 +431,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         {
           if( nextChildModel.DockWidth.IsStar )
           {
-            nextChildModel.DockWidth = new GridLength( nextChildActualSize.Width - delta, GridUnitType.Star );
+            nextChildModel.DockWidth = new GridLength( ((nextChildActualSize.Width - delta) / totalActualSize.Width) * totalStarSize.Width, GridUnitType.Star );
           }
           else
           {
@@ -443,7 +446,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         if( prevChildModel.DockHeight.IsStar )
         {
-          prevChildModel.DockHeight = new GridLength( prevChildActualSize.Height + delta, GridUnitType.Star );
+          prevChildModel.DockHeight = new GridLength( ((prevChildActualSize.Height + delta) / totalActualSize.Height) * totalStarSize.Height, GridUnitType.Star );
         }
         else
         {
@@ -457,7 +460,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         {
           if( nextChildModel.DockHeight.IsStar )
           {
-            nextChildModel.DockHeight = new GridLength( nextChildActualSize.Height - delta, GridUnitType.Star );
+            nextChildModel.DockHeight = new GridLength( ((nextChildActualSize.Height - delta) / totalActualSize.Height) * totalStarSize.Height, GridUnitType.Star );
           }
           else
           {

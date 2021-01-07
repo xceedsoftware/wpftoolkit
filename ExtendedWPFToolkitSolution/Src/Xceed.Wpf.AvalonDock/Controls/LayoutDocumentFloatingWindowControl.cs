@@ -59,6 +59,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       get
       {
+        if( ( _model == null ) || ( _model.Root == null ) || ( _model.Root.Manager == null ) )
+          return null;
+
         return _model.Root.Manager.GetLayoutItemFromModel( _model.RootDocument );
       }
     }

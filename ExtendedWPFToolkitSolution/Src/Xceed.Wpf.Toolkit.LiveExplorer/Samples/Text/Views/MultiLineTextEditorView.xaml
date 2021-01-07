@@ -33,7 +33,7 @@
             <xctk:MultiLineTextEditor
                TextWrapping="Wrap" 
                Text="{Binding Path=Review}" 
-               Content="{Binding Text, RelativeSource={RelativeSource Self}}" 
+               Content="{Binding Path=Review}" 
                HorizontalContentAlignment="Left" 
                VerticalContentAlignment="Center"
                Height="24" />

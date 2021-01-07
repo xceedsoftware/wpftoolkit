@@ -19,7 +19,8 @@
                     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
 
    <DataTemplate x:Key="SampleContent">
-      <Grid Margin="10">
+      <Grid Margin="10"
+          TextElement.Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}">
          <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />

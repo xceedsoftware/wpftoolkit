@@ -82,13 +82,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       base.OnMouseLeftButtonDown( e );
 
-      var parentDockingManager = ((Visual)e.OriginalSource).FindVisualAncestor<DockingManager>();
-      if ((this.Model != null) && (this.Model.Root != null) && (this.Model.Root.Manager != null)
-          && this.Model.Root.Manager.Equals(parentDockingManager))
+      if( e.OriginalSource is Visual )
       {
-        if (!e.Handled && (_model != null) && (_model.SelectedContent != null) )
+        var parentDockingManager = ( ( Visual )e.OriginalSource ).FindVisualAncestor<DockingManager>();
+
+        if( ( this.Model != null ) && ( this.Model.Root != null ) && ( this.Model.Root.Manager != null )
+            && this.Model.Root.Manager.Equals( parentDockingManager ) )
         {
-           _model.SelectedContent.IsActive = true;
+          if( !e.Handled && ( _model != null ) && ( _model.SelectedContent != null ) )
+          {
+            _model.SelectedContent.IsActive = true;
+          }
         }
       }
     }
@@ -97,15 +101,19 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       base.OnMouseRightButtonDown( e );
 
-      var parentDockingManager = ((Visual)e.OriginalSource).FindVisualAncestor<DockingManager>();
-      if ((this.Model != null) && (this.Model.Root != null) && (this.Model.Root.Manager != null)
-          && this.Model.Root.Manager.Equals(parentDockingManager))
+      if( e.OriginalSource is Visual )
       {
-        if (!e.Handled && (_model != null) && (_model.SelectedContent != null))
+        var parentDockingManager = ( ( Visual )e.OriginalSource ).FindVisualAncestor<DockingManager>();
+
+        if( ( this.Model != null ) && ( this.Model.Root != null ) && ( this.Model.Root.Manager != null )
+            && this.Model.Root.Manager.Equals( parentDockingManager ) )
         {
-          _model.SelectedContent.IsActive = true;
+          if( !e.Handled && ( _model != null ) && ( _model.SelectedContent != null ) )
+          {
+            _model.SelectedContent.IsActive = true;
+          }
         }
-      }
+      }       
     }
 
 

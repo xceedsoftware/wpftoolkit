@@ -196,7 +196,6 @@
                     Padding="0,1,0,2">
               <ContentPresenter x:Name="PART_SelectedContentHost"
                                 ContentSource="SelectedContent"
-                                ContentTemplate="{TemplateBinding ContentTemplate}"
                                 Margin="0,2,0,2"
                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
             </Border>
@@ -417,7 +416,6 @@
                     KeyboardNavigation.TabNavigation="Cycle">
               <ContentPresenter x:Name="PART_SelectedContentHost"
                                 ContentSource="SelectedContent"
-                                ContentTemplate="{TemplateBinding ContentTemplate}"
                                 Margin="{TemplateBinding Padding}"
                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
             </Border>
@@ -605,7 +603,7 @@
                       HorizontalAlignment="Center"
                       Command="{Binding Path=LayoutItem.HideCommand, RelativeSource={RelativeSource TemplatedParent}}"
                       Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                      ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}">
+                      ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_Hide}">
                 <Image x:Name="PART_ImgHidePin"
                        Source="Images/PinClose.png" >
                 </Image>

@@ -1333,7 +1333,7 @@ namespace Xceed.Wpf.Toolkit
       provider.IncludeLiterals = true;
       provider.IncludePrompt = true;
 
-      provider.IsPassword = false;
+      provider.IsPassword = false;   
 
       return provider;
     }

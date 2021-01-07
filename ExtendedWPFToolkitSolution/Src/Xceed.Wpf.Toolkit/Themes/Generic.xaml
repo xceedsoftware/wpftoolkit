@@ -21,7 +21,15 @@
    <ResourceDictionary.MergedDictionaries>
      <!-- core:VersionResourceDictionary will take care of modifying the value of 'AssemblyName' to match
           the real name of the assembly when compiled for other platforms, like .NET Core for example. -->
-      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Themes/Generic/Brushes.xaml" />
+
+
+
+
+
+
+
+
+     <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Themes/Generic/Brushes.xaml"/>
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Themes/Generic/Buttons.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Themes/Generic/Common.xaml" />
 
@@ -32,11 +40,11 @@
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="ButtonSpinner/Themes/Generic.xaml" />
 
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Calculator/Themes/Generic.xaml" />
-      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="CalculatorUpDown/Themes/Generic.xaml" />
+      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="CalculatorUpDown/Themes/Generic.xaml"  />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Primitives/Themes/Generic/WindowControl.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Primitives/Themes/Generic/SelectorItem.xaml" />
-      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="CheckComboBox/Themes/Generic.xaml" />
-      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="CheckListBox/Themes/Generic.xaml" />
+      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="CheckComboBox/Themes/Generic.xaml"  />
+      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="CheckListBox/Themes/Generic.xaml"  />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="ChildWindow/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="CollectionControl/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="ColorCanvas/Themes/Generic.xaml" />
@@ -57,9 +65,10 @@
 
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="TimePicker/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="TimeSpanUpDown/Themes/Generic.xaml" />
-      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="WatermarkComboBox/Themes/Generic.xaml" />
-      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="WatermarkTextBox/Themes/Generic.xaml" />
+      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="WatermarkComboBox/Themes/Generic.xaml"/>
+      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="WatermarkTextBox/Themes/Generic.xaml"/>
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Wizard/Themes/Generic.xaml" />
       <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Zoombox/Themes/Generic.xaml" />
+
    </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

@@ -229,9 +229,8 @@
           <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}">
             Transparent
           </SolidColorBrush>
-          <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}">
-            Black
-          </SolidColorBrush>
+          <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}"
+                           Color="{DynamicResource {x:Static SystemColors.ActiveCaptionTextColorKey}}" />
         </Style.Resources>
 
         <Setter Property="FontSize"
@@ -241,7 +240,7 @@
         <Setter Property="FontWeight"
                 Value="Light" />
         <Setter Property="Foreground"
-                Value="Black" />
+                Value="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" />
         <Setter Property="Focusable"
                 Value="False" />
         <Setter Property="IsExpanded"
@@ -271,9 +270,9 @@
           <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}">
             Transparent
           </SolidColorBrush>
-          <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}">
-            Black
-          </SolidColorBrush>
+          <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}"
+                           Color="{DynamicResource {x:Static SystemColors.ActiveCaptionTextColorKey}}"/>
+
         </Style.Resources>
 
         <Setter Property="FontSize"
@@ -283,7 +282,7 @@
         <Setter Property="FontWeight"
                 Value="Light" />
         <Setter Property="Foreground"
-                Value="Black" />
+                Value="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" />
         <Setter Property="Template"
                 Value="{StaticResource TreeViewItemTemplate}" />
         <Setter Property="HeaderTemplate">
@@ -314,7 +313,7 @@
         <Setter Property="FontWeight"
                 Value="Light" />
         <Setter Property="Foreground"
-                Value="Black" />
+                Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
         <Setter Property="Template"
                 Value="{StaticResource TreeViewItemTemplate}" />
         <Setter Property="HeaderTemplate">
@@ -332,7 +331,7 @@
                 <Trigger Property="IsMouseOver"
                          Value="True">
                   <Setter Property="Background"
-                          Value="#e8e8e8"
+                          Value="#b0b0b0"
                           TargetName="_treeViewItemBorder" />
                 </Trigger>
               </DataTemplate.Triggers>
@@ -373,7 +372,7 @@
                            FontFamily="Segoe UI"
                            FontWeight="Light"
                            TextAlignment="right"
-                           Foreground="Black"
+                           Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                            TextTrimming="CharacterEllipsis"
                            Text="{Binding View.Title, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
                 <TabPanel Grid.Column="1"
@@ -407,7 +406,7 @@
                            FontFamily="Segoe UI"
                            FontSize="14"
                            FontWeight="SemiBold"
-                           Foreground="Black"
+                           Foreground="{DynamicResource {x:Static SystemColors.DesktopBrushKey}}"
                            Text="{TemplateBinding Header}"
                            TextWrapping="Wrap" />
               </Grid>
@@ -419,7 +418,7 @@
                           Value="{StaticResource SampleDefaultBrush}" />
                   <Setter Property="Foreground"
                           TargetName="textBlock"
-                          Value="White" />
+                          Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
                 </Trigger>
               </ControlTemplate.Triggers>
             </ControlTemplate>
@@ -736,7 +735,7 @@
                  Grid.Column="1"
                  HorizontalAlignment="Right"
                  Margin="0,0,17,0"
-                 Foreground="Gray" />
+                 Foreground="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" />
 
       <Grid Grid.Column="1"
             Grid.Row="1">
@@ -776,7 +775,7 @@
               <Border Grid.Column="1"
                       Width="225"
                       BorderThickness="1"
-                      BorderBrush="Gray"
+                      BorderBrush="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}"
                       Margin="0,0,12,0">
                 <Grid>
                   <Grid.RowDefinitions>
@@ -789,7 +788,7 @@
 
                   <!-- Sample title -->
                   <TextBlock TextWrapping="Wrap"
-                             Foreground="#FF606060"
+                             Foreground="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}"
                              FontSize="16"
                              FontWeight="Bold"
                              FontFamily="Segoe UI"
@@ -821,7 +820,7 @@
 
                   <!-- Bottom Rectangle text -->
                   <TextBlock Grid.Row="2"
-                             Foreground="White"
+                             Foreground="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
                              FontFamily="Verdana"
                              FontSize="12"
                              Margin="5,5,5,0"
@@ -831,7 +830,7 @@
                   <TextBlock Grid.Row="3"
                              Margin="20,5,5,0"> 
                            <Hyperlink FontWeight="Black"
-                                      Foreground="White"
+                                      Foreground="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
                                       FontFamily="Verdana"
                                       FontSize="12"
                                       Focusable="False"

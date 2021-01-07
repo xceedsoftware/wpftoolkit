@@ -64,6 +64,11 @@
          <Trigger Property="FrameType" Value="Rectangle">
             <Setter Property="Template" Value="{StaticResource RectangleTemplate}" />
          </Trigger>
+      <Trigger Property="IsEnabled"
+               Value="False">
+        <Setter Property="Template"
+                Value="{x:Null}" />
+      </Trigger>
       </Style.Triggers>
    </Style>
 

@@ -415,14 +415,16 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
       RaisePropertyChanging( "IsHidden" );
       RaisePropertyChanging( "IsVisible" );
-      //if (Parent is ILayoutPane)
+
+      this.InitialContainer = this.PreviousContainer as ILayoutPane;
+      this.InitialContainerIndex = this.PreviousContainerIndex;
+      this.InitialContainerId = this.PreviousContainerId;
+
+      var parentAsGroup = this.Parent as ILayoutGroup;
+      this.PreviousContainer = parentAsGroup;
+      if( parentAsGroup != null )
       {
-        var parentAsGroup = Parent as ILayoutGroup;
-        PreviousContainer = parentAsGroup;
-        if( parentAsGroup != null )
-        {
-          PreviousContainerIndex = parentAsGroup.IndexOfChild( this );
-        }
+        this.PreviousContainerIndex = parentAsGroup.IndexOfChild( this );
       }
       if( this.Root != null )
       {
@@ -478,8 +480,13 @@ namespace Xceed.Wpf.AvalonDock.Layout
         }
       }
 
-      PreviousContainer = null;
-      PreviousContainerIndex = -1;
+      // When InitialContainer exists, set it to PreviousContainer in order to dock in expected position.
+      this.PreviousContainer = ( this.InitialContainer != null) ? this.InitialContainer : null;
+      this.PreviousContainerIndex = ( this.InitialContainerIndex != -1 ) ? this.InitialContainerIndex : -1;
+
+      this.InitialContainer = null;
+      this.InitialContainerIndex = -1;
+      this.InitialContainerId = null;
 
       RaisePropertyChanged( "IsVisible" );
       RaisePropertyChanged( "IsHidden" );

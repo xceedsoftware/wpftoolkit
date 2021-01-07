@@ -290,6 +290,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         root.FloatingWindows.Remove( this.Model as LayoutFloatingWindow );
       }
+
+      this.BringFocusOnDockingManager();  
     }
 
     protected override void OnInitialized( EventArgs e )
@@ -499,6 +501,26 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         _isClosing = true;
         this.Close();
+      }
+    }
+
+    internal void BringFocusOnDockingManager()
+    {
+      // Prevent focus lost on MainWindow when closing floatingWindows.
+      if( this.Owner != null )
+      {
+        this.Owner.Focus();
+      }
+      else
+      {
+        if( (this.Model != null) && ( this.Model.Root != null) && ( this.Model.Root.Manager != null ) )
+        {                
+          var firstUIElement = this.Model.Root.Manager.FindVisualChildren<UIElement>().Where( control => control.Focusable ).FirstOrDefault();
+          if( firstUIElement != null )
+          {
+            firstUIElement.Focus();
+          }
+        }
       }
     }
 

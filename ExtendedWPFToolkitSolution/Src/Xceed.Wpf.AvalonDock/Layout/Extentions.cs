@@ -113,14 +113,30 @@ namespace Xceed.Wpf.AvalonDock.Layout
           if( layoutPanel.Orientation == System.Windows.Controls.Orientation.Horizontal )
           {
             if( currentChildID < 0 )
+            {
               return AnchorSide.Right;
-            return ( currentChildID <= ( childrenCount / 2 ) ) ? AnchorSide.Left : AnchorSide.Right;
+            }
+            else
+            {
+              if( childrenCount == 1 )
+                return AnchorSide.Left;
+
+              return ( currentChildID < ( childrenCount / 2d ) ) ? AnchorSide.Left : AnchorSide.Right;
+            }
           }
           else
           {
             if( currentChildID < 0 )
+            {
               return AnchorSide.Bottom;
-            return ( currentChildID <= ( childrenCount / 2 ) ) ? AnchorSide.Top : AnchorSide.Bottom;
+            }
+            else
+            {
+              if( childrenCount == 1 )
+                return AnchorSide.Top;
+
+              return ( currentChildID < ( childrenCount / 2d ) ) ? AnchorSide.Top : AnchorSide.Bottom;
+            }
           }
         }
       }

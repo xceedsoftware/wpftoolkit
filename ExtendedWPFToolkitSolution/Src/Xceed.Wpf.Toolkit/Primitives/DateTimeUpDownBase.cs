@@ -147,7 +147,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
             return;
           }
         case Key.Add:
-          if( this.AllowSpin && !this.IsReadOnly )
+          if( this.AllowSpin && !this.AllowTextInput && !this.IsReadOnly )
           {
             this.DoIncrement();
             e.Handled = true;
@@ -155,7 +155,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
           _fireSelectionChangedEvent = false;
           break;
         case Key.Subtract:
-          if( this.AllowSpin && !this.IsReadOnly )
+          if( this.AllowSpin && !this.AllowTextInput && !this.IsReadOnly )
           {
             this.DoDecrement();
             e.Handled = true;

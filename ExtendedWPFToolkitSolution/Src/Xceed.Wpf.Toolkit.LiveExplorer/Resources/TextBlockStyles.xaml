@@ -29,7 +29,8 @@
     <Style x:Key="DisableGrayText" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
       <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-               <Setter Property="Foreground" Value="Gray" />
+        <Setter Property="Foreground"
+                Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
             </Trigger>
       </Style.Triggers>
     </Style>
@@ -44,5 +45,10 @@
          </Trigger>
       </Style.Triggers>
    </Style>
+
+  <Style TargetType="GroupBox">
+    <Setter Property="Foreground"
+            Value="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" />
+  </Style>
 
 </ResourceDictionary>

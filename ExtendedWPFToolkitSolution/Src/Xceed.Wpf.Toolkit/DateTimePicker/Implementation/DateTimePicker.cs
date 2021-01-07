@@ -43,6 +43,7 @@ namespace Xceed.Wpf.Toolkit
     private TimePicker _timePicker;
     private DateTime? _calendarTemporaryDateTime;
     private DateTime? _calendarIntendedDateTime;
+    private bool _isModifyingCalendarInternally;
 
     #endregion //Members
 
@@ -299,8 +300,10 @@ namespace Xceed.Wpf.Toolkit
 
       if( _calendar != null && _calendar.SelectedDate != newValueDate)
       {
+        _isModifyingCalendarInternally = true;
         _calendar.SelectedDate = newValueDate;
         _calendar.DisplayDate = newValue.GetValueOrDefault( this.ContextNow );
+        _isModifyingCalendarInternally = false;
       }
 
       //If we change any part of the datetime without
@@ -450,7 +453,7 @@ namespace Xceed.Wpf.Toolkit
         //}
         //else
         //{
-          if( !object.Equals( newDate, Value ) )
+          if( !_isModifyingCalendarInternally && !object.Equals( newDate, Value ) )
           {
             this.Value = newDate;
           }

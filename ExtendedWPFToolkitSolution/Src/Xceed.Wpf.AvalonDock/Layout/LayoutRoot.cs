@@ -440,6 +440,11 @@ namespace Xceed.Wpf.AvalonDock.Layout
         {
           content.PreviousContainer = null;
         }
+        foreach( var content in this.Descendents().OfType<ILayoutInitialContainer>().Where( c => c.InitialContainer != null &&
+             ( c.InitialContainer.Parent == null || c.InitialContainer.Parent.Root != this ) ) )
+        {
+          content.InitialContainer = null;
+        }
 
         //for each pane that is empty
         foreach( var emptyPane in this.Descendents().OfType<ILayoutPane>().Where( p => p.ChildrenCount == 0 ) )
@@ -462,7 +467,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
             continue;
 
           //...if this empty panes is not referenced by anyone, than removes it from its parent container
-          if( !this.Descendents().OfType<ILayoutPreviousContainer>().Any( c => c.PreviousContainer == emptyPane ) )
+          if( !this.Descendents().OfType<ILayoutPreviousContainer>().Any( c => c.PreviousContainer == emptyPane ) 
+            && !this.Descendents().OfType<ILayoutInitialContainer>().Any( c => c.InitialContainer == emptyPane ) )
           {
             var parentGroup = emptyPane.Parent as ILayoutContainer;
             parentGroup.RemoveChild( emptyPane );
@@ -493,7 +499,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
           foreach( var emptyPaneGroup in this.Descendents().OfType<LayoutPanel>().Where( p => p.ChildrenCount == 0 ) )
           {
             //...if this empty layout panel is not referenced by anyone, than removes it from its parent container
-            if( !this.Descendents().OfType<ILayoutPreviousContainer>().Any( c => c.PreviousContainer == emptyPaneGroup ) )
+            if( !this.Descendents().OfType<ILayoutPreviousContainer>().Any( c => c.PreviousContainer == emptyPaneGroup )
+              && !this.Descendents().OfType<ILayoutInitialContainer>().Any( c => c.InitialContainer == emptyPaneGroup ) )
             {
               var parentGroup = emptyPaneGroup.Parent as ILayoutContainer;
               parentGroup.RemoveChild( emptyPaneGroup );
@@ -509,7 +516,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
           foreach( var emptyPaneGroup in this.Descendents().OfType<LayoutFloatingWindow>().Where( p => p.ChildrenCount == 0 ) )
           {
             //...if this empty floating window is not referenced by anyone, than removes it from its parent container
-            if( !this.Descendents().OfType<ILayoutPreviousContainer>().Any( c => c.PreviousContainer == emptyPaneGroup ) )
+            if( !this.Descendents().OfType<ILayoutPreviousContainer>().Any( c => c.PreviousContainer == emptyPaneGroup )
+              && !this.Descendents().OfType<ILayoutInitialContainer>().Any( c => c.InitialContainer == emptyPaneGroup ) )
             {
               var parentGroup = emptyPaneGroup.Parent as ILayoutContainer;
               parentGroup.RemoveChild( emptyPaneGroup );
@@ -525,7 +533,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
           foreach( var emptyPaneGroup in this.Descendents().OfType<LayoutAnchorGroup>().Where( p => p.ChildrenCount == 0 ) )
           {
             //...if this empty Pane Group is not referenced by anyone, than removes it from its parent container
-            if( !this.Descendents().OfType<ILayoutPreviousContainer>().Any( c => c.PreviousContainer == emptyPaneGroup ) )
+            if( !this.Descendents().OfType<ILayoutPreviousContainer>().Any( c => c.PreviousContainer == emptyPaneGroup )
+              && !this.Descendents().OfType<ILayoutInitialContainer>().Any( c => c.InitialContainer == emptyPaneGroup ) )
             {
               var parentGroup = emptyPaneGroup.Parent as ILayoutContainer;
               parentGroup.RemoveChild( emptyPaneGroup );

@@ -479,11 +479,33 @@ namespace Xceed.Wpf.Toolkit.Primitives
         || propertyPath == "." )
         return item;
 
+      if( propertyPath.Contains( "." ) )
+      {
+        object objectValue = item;
+        var parts = propertyPath.Split( new char[] { '.' } );
 
-      PropertyInfo prop = item.GetType().GetProperty( propertyPath );
-      return ( prop != null )
-        ? prop.GetValue( item, null )
-        : null;
+        foreach( var part in parts )
+        {
+          var prop = objectValue.GetType().GetProperty( part );
+          if( prop != null )
+          {
+            objectValue = prop.GetValue( objectValue, null );
+          }
+          else
+          {
+            return null;
+          }
+        }
+
+        return objectValue;
+      }
+      else
+      {
+        var prop = item.GetType().GetProperty( propertyPath );
+        return ( prop != null )
+          ? prop.GetValue( item, null )
+          : null;
+      }      
     }
 
     protected object GetItemValue( object item )

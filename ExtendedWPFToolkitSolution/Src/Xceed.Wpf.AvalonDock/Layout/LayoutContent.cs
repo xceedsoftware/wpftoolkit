@@ -29,7 +29,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 {
   [ContentProperty( "Content" )]
   [Serializable]
-  public abstract class LayoutContent : LayoutElement, IXmlSerializable, ILayoutElementForFloatingWindow, IComparable<LayoutContent>, ILayoutPreviousContainer
+  public abstract class LayoutContent : LayoutElement, IXmlSerializable, ILayoutElementForFloatingWindow, IComparable<LayoutContent>, ILayoutPreviousContainer, ILayoutInitialContainer
   {
     #region Constructors
 
@@ -311,6 +311,66 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     #endregion
 
+    #region InitialContainer
+
+    [field: NonSerialized]
+    private ILayoutContainer _initialContainer = null;
+
+    [XmlIgnore]
+    ILayoutContainer ILayoutInitialContainer.InitialContainer
+    {
+      get
+      {
+        return _initialContainer;
+      }
+      set
+      {
+        if( _initialContainer != value )
+        {
+          _initialContainer = value;
+          RaisePropertyChanged( "InitialContainer" );
+
+          var paneSerializable = _initialContainer as ILayoutPaneSerializable;
+          if( paneSerializable != null &&
+              paneSerializable.Id == null )
+            paneSerializable.Id = Guid.NewGuid().ToString();
+        }
+      }
+    }
+
+    internal ILayoutContainer InitialContainer
+    {
+      get
+      {
+        return ( ( ILayoutInitialContainer )this ).InitialContainer;
+      }
+      set
+      {
+        ( ( ILayoutInitialContainer )this ).InitialContainer = value;
+      }
+    }
+
+    [XmlIgnore]
+    string ILayoutInitialContainer.InitialContainerId
+    {
+      get;
+      set;
+    }
+
+    internal string InitialContainerId
+    {
+      get
+      {
+        return ( ( ILayoutInitialContainer )this ).InitialContainerId;
+      }
+      set
+      {
+        ( ( ILayoutInitialContainer )this ).InitialContainerId = value;
+      }
+    }
+
+    #endregion
+
     #region PreviousContainerIndex
     [field: NonSerialized]
     private int _previousContainerIndex = -1;
@@ -327,6 +387,28 @@ namespace Xceed.Wpf.AvalonDock.Layout
         {
           _previousContainerIndex = value;
           RaisePropertyChanged( "PreviousContainerIndex" );
+        }
+      }
+    }
+
+    #endregion
+
+    #region InitialContainerIndex
+    [field: NonSerialized]
+    private int _initialContainerIndex = -1;
+    [XmlIgnore]
+    internal int InitialContainerIndex
+    {
+      get
+      {
+        return _initialContainerIndex;
+      }
+      set
+      {
+        if( _initialContainerIndex != value )
+        {
+          _initialContainerIndex = value;
+          RaisePropertyChanged( "InitialContainerIndex" );
         }
       }
     }
@@ -655,6 +737,10 @@ namespace Xceed.Wpf.AvalonDock.Layout
         PreviousContainerId = reader.Value;
       if( reader.MoveToAttribute( "PreviousContainerIndex" ) )
         PreviousContainerIndex = int.Parse( reader.Value );
+      if( reader.MoveToAttribute( "InitialContainerId" ) )
+        InitialContainerId = reader.Value;
+      if( reader.MoveToAttribute( "InitialContainerIndex" ) )
+        InitialContainerIndex = int.Parse( reader.Value );
 
       if( reader.MoveToAttribute( "FloatingLeft" ) )
         FloatingLeft = double.Parse( reader.Value, CultureInfo.InvariantCulture );
@@ -724,6 +810,15 @@ namespace Xceed.Wpf.AvalonDock.Layout
         {
           writer.WriteAttributeString( "PreviousContainerId", paneSerializable.Id );
           writer.WriteAttributeString( "PreviousContainerIndex", _previousContainerIndex.ToString() );
+        }
+      }
+      if( _initialContainer != null )
+      {
+        var paneSerializable = _initialContainer as ILayoutPaneSerializable;
+        if( paneSerializable != null )
+        {
+          writer.WriteAttributeString( "InitialContainerId", paneSerializable.Id );
+          writer.WriteAttributeString( "InitialContainerIndex", _initialContainerIndex.ToString() );
         }
       }
 
@@ -856,10 +951,12 @@ namespace Xceed.Wpf.AvalonDock.Layout
         InternalDock();
       }
 
-
-      Root.CollectGarbage();
-
+      if( this.Root != null )
+      {
+        Root.CollectGarbage();
+      }
     }
+
 
 
 
@@ -908,6 +1005,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
         Closing( this, args );
     }
 
+
     protected virtual void InternalDock()
     {
     }
@@ -930,6 +1028,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
     /// Hanlde the Hiding event for the LayoutAnchorable to cancel the hide operation.</remarks>
     public event EventHandler<CancelEventArgs> Closing;
 
-    #endregion
+
+#endregion
   }
 }

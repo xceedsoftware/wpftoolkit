@@ -127,7 +127,7 @@
     <value>Elrejtés</value>
   </data>
   <data name="Anchorable_CxMenu_Hint" xml:space="preserve">
-    <value>Elhelyezkedés</value>
+    <value>Rejtsd el mindet</value>
   </data>
   <data name="Anchorable_Dock" xml:space="preserve">
     <value>Dokkolás</value>

@@ -16,9 +16,11 @@
   ***********************************************************************************/
 
 
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Linq;
 using Xceed.Wpf.AvalonDock.Layout;
 
 namespace Xceed.Wpf.AvalonDock.Controls
@@ -73,7 +75,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       base.OnSelectionChanged( e );
     }
     #endregion
-
 
 
 
