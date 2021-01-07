@@ -6,31 +6,6 @@ Starting at v4.0.0, this free toolkit is provided under the [Xceed Community Lic
 
 <a href="../../wiki/Xceed-Toolkit-Plus-for-WPF"><img align="right" src="https://user-images.githubusercontent.com/21266763/27969643-a5977614-6319-11e7-828e-b40fd1f8a283.png" width="233" style="margin:0px 30px" alt="Learn about Xceed Toolkit Plus for WPF here on Github"></a>Xceed offers the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) for developers that want to support the project, get additional controls and features, get updates and professional support, and work with a version a few releases ahead.
 
-# Message from Xceed
-
-<table>
-<tr>
-<td>
-  
-Dear community,  
-
-We have been following discussions about a recent revision to our license and we would like to address this issue because we believe some clarifications may be needed. It is possible that more clarity might have helped explaining why we chose to make a transition from the Microsoft Public License (MS-PL) to a new community license. If we have not been able to communicate our intentions clearly enough, then our apologies to those who may have been caught off-guard by those changes. 
-
-While we are excited to witness the community’s sustained interest in our product, it is a challenge for us to keep funding the continuous development and improvement of the product. Therefore, we have opted to have commercial users fund the project through a commercial license. We believe this is beneficial for both commercial and community users as this will ensure significant time is invested to improving the product. We are enormously proud and fond of our community and will continue to be a contributor to the free version of our products. In fact, we continue to encourage you to use the free community license to help you learn the WPF framework and for personal, non-profit projects.
-
-To clarify the situation and give everyone the advance notice that should have been given before changing our licensing model, we have decided to re-publish the last version of the Extended Toolkit (v3.8) as per the initial MS-PL license with the original terms, until December 31st, 2020. This will be the last version to be released under such license, and the next release will be under our new community license, which only allows non-commercial use. 
-
-Should you desire to use the product for commercial projects, we do support small businesses with a significantly discounted version (a little less than 50%) that has all the features of the commercial license. We invite you to get in touch with us and inquire about how we can help you make the transition like so many already have. 
-
-We would also like to show our appreciation to the developers who have provided valuable contributions to the Extended WPF Toolkit project over the years. If you are part of those, please get in touch with us (ToolKitContributors@Xceed.com) and let us know what your contribution was so that we can reward you for your efforts. 
-
-We hope this message confirms our commitment to listening to our user community. You have spoken and we have listened. Thank you all for the great support and passion you have shown us.
-
-Xceed Software
-</td>
-</tr>
-</table>
-
 ## Latest news
 
 **January 7, 2021** v4.0.2 released with [22 bug fixes and improvements](../../wiki/Improvements-in-v4.0.2). 
