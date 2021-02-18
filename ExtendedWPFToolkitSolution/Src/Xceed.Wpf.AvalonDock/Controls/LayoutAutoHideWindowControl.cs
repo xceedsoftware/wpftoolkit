@@ -162,27 +162,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       return new HandleRef( this, _internalHwndSource.Handle );
     }
 
-    protected override IntPtr WndProc( IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled )
-    {
-      // Make sure that autohide windows always display on top of other Controls
-      // (even Win32 control which WPF cannot normally overlay!)
-      if( msg == Win32Helper.WM_WINDOWPOSCHANGING )
-      {
-        // APD Fix - Stop a recursive call to WndProc when the window has been destroyed
-        // It was making a call to SetWindowPos which could cause a stack overflow.
-        if( _internalHost_ContentRendered )
-        {
-          Win32Helper.WINDOWPOS mwp = ( Win32Helper.WINDOWPOS )Marshal.PtrToStructure( lParam, typeof( Win32Helper.WINDOWPOS ) );
-
-          mwp.hwndInsertAfter = Win32Helper.HWND_TOP;
-          mwp.flags = mwp.flags & ~( int )Win32Helper.SetWindowPosFlags.IgnoreZOrder;
-
-          Marshal.StructureToPtr( mwp, lParam, true );
-        }
-      }
-      return base.WndProc( hwnd, msg, wParam, lParam, ref handled );
-    }
-
     protected override void DestroyWindowCore( System.Runtime.InteropServices.HandleRef hwnd )
     {
       if( _internalHwndSource != null )
