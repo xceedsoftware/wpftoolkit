@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -43,6 +44,7 @@ namespace Xceed.Wpf.Toolkit
     private ComboBox _newItemTypesComboBox;
     private PropertyGrid.PropertyGrid _propertyGrid;
     private ListBox _listBox;
+    private bool _isCollectionUpdated;
 
     #endregion
 
@@ -442,6 +444,7 @@ namespace Xceed.Wpf.Toolkit
     {
       if( _listBox != null )
       {
+        _isCollectionUpdated = true;
         _listBox.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
         {
           _listBox.Items.Refresh();
@@ -494,6 +497,7 @@ namespace Xceed.Wpf.Toolkit
       this.Items.Add( newItem );
 
       this.RaiseEvent( new ItemEventArgs( ItemAddedEvent, newItem ) );
+      _isCollectionUpdated = true;
 
       this.SelectedItem = newItem;
     }
@@ -508,6 +512,7 @@ namespace Xceed.Wpf.Toolkit
       this.Items.Remove( e.Parameter );
 
       this.RaiseEvent( new ItemEventArgs( ItemDeletedEvent, e.Parameter ) );
+      _isCollectionUpdated = true;
     }
 
     private void CanDelete( object sender, CanExecuteRoutedEventArgs e )
@@ -558,6 +563,7 @@ namespace Xceed.Wpf.Toolkit
       Items.Insert( ++index, selectedItem );
 
       this.RaiseEvent( new ItemEventArgs( ItemMovedDownEvent, selectedItem ) );
+      _isCollectionUpdated = true;
 
       this.SelectedItem = selectedItem;
     }
@@ -576,6 +582,7 @@ namespace Xceed.Wpf.Toolkit
       this.Items.Insert( --index, selectedItem );
 
       this.RaiseEvent( new ItemEventArgs( ItemMovedUpEvent, selectedItem ) );
+      _isCollectionUpdated = true;
 
       this.SelectedItem = selectedItem;
     }
@@ -590,9 +597,10 @@ namespace Xceed.Wpf.Toolkit
 
     #region Methods
 
-    public void PersistChanges()
+    public bool PersistChanges()
     {
       this.PersistChanges( this.Items );
+      return _isCollectionUpdated;
     }
 
     internal void PersistChanges( IList sourceList )

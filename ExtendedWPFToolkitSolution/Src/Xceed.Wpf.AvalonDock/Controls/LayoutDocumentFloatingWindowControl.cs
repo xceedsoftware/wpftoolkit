@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -19,6 +20,7 @@ using Xceed.Wpf.AvalonDock.Layout;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using Microsoft.Windows.Shell;
+using System.Linq;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
@@ -45,7 +47,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     }
 
     internal LayoutDocumentFloatingWindowControl( LayoutDocumentFloatingWindow model )
-        : base( model, false )
+        : this( model, false )
     {
     }
 
@@ -57,6 +59,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       get
       {
+        if( ( _model == null ) || ( _model.Root == null ) || ( _model.Root.Manager == null ) )
+          return null;
+
         return _model.Root.Manager.GetLayoutItemFromModel( _model.RootDocument );
       }
     }
@@ -121,18 +126,41 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void OnClosed( EventArgs e )
     {
-      var root = Model.Root;
-      root.Manager.RemoveFloatingWindow( this );
-      root.CollectGarbage();
-
       base.OnClosed( e );
 
-      if( !CloseInitiatedByUser )
+      _model.RootDocumentChanged -= new EventHandler( _model_RootDocumentChanged );
+    }
+
+    protected override bool CanClose( object parameter = null )
+    {
+      if( this.Model == null )
+        return false;
+
+      var root = this.Model.Root;
+      if( root == null )
+        return false;
+
+      var manager = root.Manager;
+      if( manager == null )
+        return false;
+
+      foreach( var document in this.Model.Descendents().OfType<LayoutDocument>().ToArray() )
       {
-        root.FloatingWindows.Remove( _model );
+        if( !document.CanClose )
+        {
+          return false;
+        }
+
+        var documentLayoutItem = manager.GetLayoutItemFromModel( document ) as LayoutDocumentItem;
+        if( documentLayoutItem == null ||
+            documentLayoutItem.CloseCommand == null ||
+            !documentLayoutItem.CloseCommand.CanExecute( parameter ) )
+        {
+          return false;
+        }
       }
 
-      _model.RootDocumentChanged -= new EventHandler( _model_RootDocumentChanged );
+      return true;
     }
 
     #endregion

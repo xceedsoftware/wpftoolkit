@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -27,10 +28,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class UpDownEditor<TEditor, TType> : TypeEditor<TEditor> where TEditor : UpDownBase<TType>, new()
   {
-    protected override void SetControlProperties( PropertyItem propertyItem )
-    {
-      Editor.TextAlignment = System.Windows.TextAlignment.Left;
-    }
     protected override void SetValueDependencyProperty()
     {
       ValueProperty = UpDownBase<TType>.ValueProperty;
@@ -350,7 +347,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     }
   }
 
-  internal class PropertyGridEditorSByteUpDown : SByteUpDown
+  [CLSCompliantAttribute( false )]
+  public class PropertyGridEditorSByteUpDown : SByteUpDown
   {
     static PropertyGridEditorSByteUpDown()
     {
@@ -358,7 +356,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     }
   }
 
-  internal class PropertyGridEditorUIntegerUpDown : UIntegerUpDown
+  [CLSCompliantAttribute( false )]
+  public class PropertyGridEditorUIntegerUpDown : UIntegerUpDown
   {
     static PropertyGridEditorUIntegerUpDown()
     {
@@ -366,7 +365,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     }
   }
 
-  internal class PropertyGridEditorULongUpDown : ULongUpDown
+  [CLSCompliantAttribute( false )]
+  public class PropertyGridEditorULongUpDown : ULongUpDown
   {
     static PropertyGridEditorULongUpDown()
     {
@@ -374,7 +374,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     }
   }
 
-  internal class PropertyGridEditorUShortUpDown : UShortUpDown
+  [CLSCompliantAttribute( false )]
+  public class PropertyGridEditorUShortUpDown : UShortUpDown
   {
     static PropertyGridEditorUShortUpDown()
     {

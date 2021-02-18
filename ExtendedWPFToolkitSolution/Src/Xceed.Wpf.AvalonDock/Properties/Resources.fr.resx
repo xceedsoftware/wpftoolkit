@@ -124,7 +124,7 @@
     <value>Cacher Automatiquement</value>
   </data>
   <data name="Anchorable_BtnClose_Hint" xml:space="preserve">
-    <value>Cacher</value>
+    <value>Cacher Tout</value>
   </data>
   <data name="Anchorable_CxMenu_Hint" xml:space="preserve">
     <value>Position de la Fenêtre</value>

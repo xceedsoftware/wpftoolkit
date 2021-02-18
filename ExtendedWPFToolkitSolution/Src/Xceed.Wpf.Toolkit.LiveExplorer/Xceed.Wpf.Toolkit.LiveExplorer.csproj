@@ -80,31 +80,24 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Xceed.Wpf.Samples.SampleData">
-      <HintPath>..\..\Libs\Xceed.Wpf.Samples.SampleData.dll</HintPath>
-    </Reference>
+    <Reference Include="..\..\Libs\Xceed.Wpf.Samples.SampleData.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Xceed.Wpf.AvalonDock.Themes.Aero\Xceed.Wpf.AvalonDock.Themes.Aero.csproj">
-      <Project>{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}</Project>
-      <Name>Xceed.Wpf.AvalonDock.Themes.Aero</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Xceed.Wpf.AvalonDock.Themes.Metro\Xceed.Wpf.AvalonDock.Themes.Metro.csproj">
-      <Project>{89286EB4-B4A1-418C-839A-067B00F442D8}</Project>
-      <Name>Xceed.Wpf.AvalonDock.Themes.Metro</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Xceed.Wpf.AvalonDock.Themes.VS2010\Xceed.Wpf.AvalonDock.Themes.VS2010.csproj">
-      <Project>{B3FC3E21-5F2D-4581-AEA2-59F671CFFC21}</Project>
-      <Name>Xceed.Wpf.AvalonDock.Themes.VS2010</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.csproj">
-      <Project>{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}</Project>
-      <Name>Xceed.Wpf.AvalonDock</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Xceed.Wpf.Toolkit\Xceed.Wpf.Toolkit.csproj">
-      <Project>{72E591D6-8F83-4D8C-8F67-9C325E623234}</Project>
-      <Name>Xceed.Wpf.Toolkit</Name>
-    </ProjectReference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero.dll">
+      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.Aero\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro.dll">
+      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.Metro\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010.dll">
+      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\Debug\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.dll">
+      <HintPath>..\Xceed.Wpf.AvalonDock\bin\Debug\Xceed.Wpf.AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit.dll">
+      <HintPath>..\Xceed.Wpf.Toolkit\bin\Debug\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -185,6 +178,9 @@
     <Compile Include="Samples\DateTime\Converters\DateTimeToTimeSpanConverter.cs" />
     <Compile Include="Samples\DateTime\Views\DateTimeView.xaml.cs">
       <DependentUpon>DateTimeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\ExtTabControl\Views\ExtTabControlView.xaml.cs">
+      <DependentUpon>ExtTabControlView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Samples\FilePicker\Views\FilePickerView.xaml.cs">
       <DependentUpon>FilePickerView.xaml</DependentUpon>
@@ -543,6 +539,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Samples\DateTime\Views\DateTimeView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\ExtTabControl\Views\ExtTabControlView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -1420,6 +1420,13 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\MaterialControls\OpenSourceImages\MaterialHamburger.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\ExtTabControlView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\ExtTabControlView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\ExtTabControl\OpenSourceImages\ExtTabControl.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\DataGrid\OpenSourceImages\DataGrid.png" />

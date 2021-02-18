@@ -2,10 +2,11 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2017 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -29,7 +30,9 @@
 
   <local:DemoView.Resources>
     <Style x:Key="controlInError"
-           TargetType="xctk:IntegerUpDown">
+           TargetType="xctk:ByteUpDown">
+      <Setter Property="Width"
+              Value="45" />
       <Style.Triggers>
         <Trigger Property="Validation.HasError"
                  Value="true">
@@ -114,32 +117,25 @@
                       HorizontalAlignment="Stretch"
                       Orientation="Horizontal">
             <TextBlock Text="R:" />
-            <xctk:IntegerUpDown x:Name="_R"
-                                Value="{Binding ElementName=_colorCanvas, Path=R, Mode=TwoWay}"
-                                Minimum="0"
-                                Maximum="255"
-                                Style="{StaticResource controlInError}" />
+            <xctk:ByteUpDown x:Name="_R"
+                             Value="{Binding ElementName=_colorCanvas, Path=R, Mode=TwoWay}"
+                             Style="{StaticResource controlInError}"/>
             <TextBlock Text="G:"
                        Margin="5" />
-            <xctk:IntegerUpDown x:Name="_G"
-                                Value="{Binding ElementName=_colorCanvas, Path=G, Mode=TwoWay}"
-                                Minimum="0"
-                                Maximum="255"
-                                Style="{StaticResource controlInError}" />
+            <xctk:ByteUpDown x:Name="_G"
+                             Value="{Binding ElementName=_colorCanvas, Path=G, Mode=TwoWay}"
+                             Style="{StaticResource controlInError}"/>
             <TextBlock Text="B:"
                        Margin="5" />
-            <xctk:IntegerUpDown x:Name="_B"
-                                Value="{Binding ElementName=_colorCanvas, Path=B, Mode=TwoWay}"
-                                Minimum="0"
-                                Maximum="255"
-                                Style="{StaticResource controlInError}" />
+            <xctk:ByteUpDown x:Name="_B"
+                             Value="{Binding ElementName=_colorCanvas, Path=B, Mode=TwoWay}"
+                             Style="{StaticResource controlInError}"/>
             <TextBlock Text="A:"
                        Margin="5" />
-            <xctk:IntegerUpDown x:Name="_A"
-                                Value="{Binding ElementName=_colorCanvas, Path=A, Mode=TwoWay}"
-                                Minimum="0"
-                                Maximum="255"
-                                Style="{StaticResource controlInError}" />
+            <xctk:ByteUpDown x:Name="_A"
+                             Value="{Binding ElementName=_colorCanvas, Path=A, Mode=TwoWay}"
+                             Style="{StaticResource controlInError}"
+                             IsEnabled="{Binding IsChecked, ElementName=_usingAlphaChannel}"/>
           </StackPanel>
 
           <TextBlock Grid.Column="0"
@@ -313,16 +309,16 @@
                               Value="{Binding ElementName=_colorPicker, Path=MaxDropDownWidth}" />
           <TextBlock Grid.Column="0"
                      Grid.Row="14"
-                     Text="AdvancedButtonHeader:" />
+                     Text="AdvancedTabHeader:" />
           <TextBox Grid.Column="1"
                    Grid.Row="14"
-                   Text="{Binding ElementName=_colorPicker, Path=AdvancedButtonHeader, Mode=TwoWay}" />
+                   Text="{Binding ElementName=_colorPicker, Path=AdvancedTabHeader, Mode=TwoWay}" />
           <TextBlock Grid.Column="0"
                      Grid.Row="15"
-                     Text="StandardButtonHeader:" />
+                     Text="StandardTabHeader:" />
           <TextBox Grid.Column="1"
                    Grid.Row="15"
-                   Text="{Binding ElementName=_colorPicker, Path=StandardButtonHeader, Mode=TwoWay}" />
+                   Text="{Binding ElementName=_colorPicker, Path=StandardTabHeader, Mode=TwoWay}" />
           <TextBlock Grid.Column="0"
                      Grid.Row="16"
                      Text="SelectedColorText:" />

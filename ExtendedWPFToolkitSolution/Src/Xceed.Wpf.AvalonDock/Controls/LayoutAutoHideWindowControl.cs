@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -37,7 +38,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
     private LayoutAnchorable _model;
     private HwndSource _internalHwndSource = null;
     private IntPtr parentWindowHandle;
-    private bool _internalHost_ContentRendered = false;
     private ContentPresenter _internalHostPresenter = new ContentPresenter();
     private Grid _internalGrid = null;
     private AnchorSide _side;
@@ -156,8 +156,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
         Height = 0,
       } );
 
-      _internalHost_ContentRendered = false;
-      _internalHwndSource.ContentRendered += _internalHwndSource_ContentRendered;
       _internalHwndSource.RootVisual = _internalHostPresenter;
       AddLogicalChild( _internalHostPresenter );
       Win32Helper.BringWindowToTop( _internalHwndSource.Handle );
@@ -189,7 +187,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       if( _internalHwndSource != null )
       {
-        _internalHwndSource.ContentRendered -= _internalHwndSource_ContentRendered;
         _internalHwndSource.Dispose();
         _internalHwndSource = null;
       }
@@ -299,11 +296,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region Private Methods
 
-    private void _internalHwndSource_ContentRendered( object sender, EventArgs e )
-    {
-      _internalHost_ContentRendered = true;
-    }
-
     private void _model_PropertyChanged( object sender, System.ComponentModel.PropertyChangedEventArgs e )
     {
       if( e.PropertyName == "IsAutoHidden" )
@@ -334,10 +326,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       if( _side == AnchorSide.Right )
       {
-        _internalGrid.ColumnDefinitions.Add( new ColumnDefinition() { Width = new GridLength( _manager.GridSplitterWidth ) } );
+        _internalGrid.ColumnDefinitions.Add( new ColumnDefinition() { Width = new GridLength( double.IsNaN( _manager.GridSplitterWidth ) ? 6d : _manager.GridSplitterWidth ) } );
         _internalGrid.ColumnDefinitions.Add( new ColumnDefinition()
         {
-          Width = _model.AutoHideWidth == 0.0 ? new GridLength( _model.AutoHideMinWidth ) : new GridLength( _model.AutoHideWidth, GridUnitType.Pixel )
+          Width = _model.AutoHideWidth == 0.0 ? new GridLength( double.IsNaN( _model.AutoHideMinWidth ) ? 100d : _model.AutoHideMinWidth ) : new GridLength( double.IsNaN( _model.AutoHideWidth ) ? 0d : _model.AutoHideWidth, GridUnitType.Pixel )
         } );
 
         Grid.SetColumn( _resizer, 0 );
@@ -352,9 +344,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         _internalGrid.ColumnDefinitions.Add( new ColumnDefinition()
         {
-          Width = _model.AutoHideWidth == 0.0 ? new GridLength( _model.AutoHideMinWidth ) : new GridLength( _model.AutoHideWidth, GridUnitType.Pixel ),
+          Width = _model.AutoHideWidth == 0.0 ? new GridLength( double.IsNaN( _model.AutoHideMinWidth ) ? 100d : _model.AutoHideMinWidth ) : new GridLength( double.IsNaN( _model.AutoHideWidth ) ? 0d : _model.AutoHideWidth, GridUnitType.Pixel ),
         } );
-        _internalGrid.ColumnDefinitions.Add( new ColumnDefinition() { Width = new GridLength( _manager.GridSplitterWidth ) } );
+        _internalGrid.ColumnDefinitions.Add( new ColumnDefinition() { Width = new GridLength( double.IsNaN( _manager.GridSplitterWidth ) ? 6d : _manager.GridSplitterWidth ) } );
 
         Grid.SetColumn( _internalHost, 0 );
         Grid.SetColumn( _resizer, 1 );
@@ -368,9 +360,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         _internalGrid.RowDefinitions.Add( new RowDefinition()
         {
-          Height = _model.AutoHideHeight == 0.0 ? new GridLength( _model.AutoHideMinHeight ) : new GridLength( _model.AutoHideHeight, GridUnitType.Pixel ),
+          Height = _model.AutoHideHeight == 0.0 ? new GridLength( double.IsNaN( _model.AutoHideMinHeight ) ? 100d : _model.AutoHideMinHeight ) : new GridLength( double.IsNaN( _model.AutoHideHeight ) ? 0d : _model.AutoHideHeight, GridUnitType.Pixel ),
         } );
-        _internalGrid.RowDefinitions.Add( new RowDefinition() { Height = new GridLength( _manager.GridSplitterHeight ) } );
+        _internalGrid.RowDefinitions.Add( new RowDefinition() { Height = new GridLength( double.IsNaN( _manager.GridSplitterHeight ) ? 6d : _manager.GridSplitterHeight ) } );
 
         Grid.SetRow( _internalHost, 0 );
         Grid.SetRow( _resizer, 1 );
@@ -383,10 +375,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
       else if( _side == AnchorSide.Bottom )
       {
-        _internalGrid.RowDefinitions.Add( new RowDefinition() { Height = new GridLength( _manager.GridSplitterHeight ) } );
+        _internalGrid.RowDefinitions.Add( new RowDefinition() { Height = new GridLength( double.IsNaN( _manager.GridSplitterHeight ) ? 6d : _manager.GridSplitterHeight ) } );
         _internalGrid.RowDefinitions.Add( new RowDefinition()
         {
-          Height = _model.AutoHideHeight == 0.0 ? new GridLength( _model.AutoHideMinHeight ) : new GridLength( _model.AutoHideHeight, GridUnitType.Pixel ),
+          Height = _model.AutoHideHeight == 0.0 ? new GridLength( double.IsNaN( _model.AutoHideMinHeight ) ? 100d : _model.AutoHideMinHeight ) : new GridLength( double.IsNaN( _model.AutoHideHeight ) ? 0d : _model.AutoHideHeight, GridUnitType.Pixel ),
         } );
 
         Grid.SetRow( _resizer, 0 );
@@ -521,7 +513,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         else
           _model.AutoHideWidth -= delta;
 
-        _internalGrid.ColumnDefinitions[ 1 ].Width = new GridLength( _model.AutoHideWidth, GridUnitType.Pixel );
+        _internalGrid.ColumnDefinitions[ 1 ].Width = new GridLength( double.IsNaN( _model.AutoHideWidth ) ? 0d : _model.AutoHideWidth, GridUnitType.Pixel );
       }
       else if( _side == AnchorSide.Left )
       {
@@ -530,7 +522,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         else
           _model.AutoHideWidth += delta;
 
-        _internalGrid.ColumnDefinitions[ 0 ].Width = new GridLength( _model.AutoHideWidth, GridUnitType.Pixel );
+        _internalGrid.ColumnDefinitions[ 0 ].Width = new GridLength( double.IsNaN( _model.AutoHideWidth ) ? 0d : _model.AutoHideWidth, GridUnitType.Pixel );
       }
       else if( _side == AnchorSide.Top )
       {
@@ -539,7 +531,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         else
           _model.AutoHideHeight += delta;
 
-        _internalGrid.RowDefinitions[ 0 ].Height = new GridLength( _model.AutoHideHeight, GridUnitType.Pixel );
+        _internalGrid.RowDefinitions[ 0 ].Height = new GridLength( double.IsNaN( _model.AutoHideHeight ) ? 0d : _model.AutoHideHeight, GridUnitType.Pixel );
       }
       else if( _side == AnchorSide.Bottom )
       {
@@ -548,7 +540,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         else
           _model.AutoHideHeight -= delta;
 
-        _internalGrid.RowDefinitions[ 1 ].Height = new GridLength( _model.AutoHideHeight, GridUnitType.Pixel );
+        _internalGrid.RowDefinitions[ 1 ].Height = new GridLength( double.IsNaN( _model.AutoHideHeight ) ? 0d : _model.AutoHideHeight, GridUnitType.Pixel );
       }
 
       HideResizerOverlayWindow();

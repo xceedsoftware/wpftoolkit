@@ -1,64 +1,68 @@
 ﻿<!--***********************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
   **********************************************************************************-->
 
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:core="clr-namespace:Xceed.Wpf.Toolkit.Core">
 
-   <ResourceDictionary.MergedDictionaries>
+  <ResourceDictionary.MergedDictionaries>
 
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Themes/Aero2/Brushes.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Themes/Aero2/Buttons.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Themes/Aero2/Common.xaml" />
+    <!-- core:VersionResourceDictionary will take care of modifying the value of 'AssemblyName' to match
+         the real name of the assembly when compiled for other platforms, like .NET Core for example. -->
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Themes/Aero2/Brushes.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Themes/Aero2/Buttons.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Themes/Aero2/Common.xaml" />
 
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Chromes/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Chromes/Themes/Aero2.NormalColor.xaml" />
 
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/BusyIndicator/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="BusyIndicator/Themes/Aero2.NormalColor.xaml" />
 
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/ButtonSpinner/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="ButtonSpinner/Themes/Aero2.NormalColor.xaml" />
 
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Calculator/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/CalculatorUpDown/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Primitives/Themes/Aero2/WindowControl.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Primitives/Themes/Aero2/SelectorItem.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/CheckComboBox/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/CheckListBox/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/ChildWindow/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/CollectionControl/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/ColorCanvas/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/ColorPicker/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/DropDownButton/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/IconButton/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/MessageBox/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/DateTimeUpDown/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/DateTimePicker/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/MultiLineTextEditor/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/NumericUpDown/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Pie/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/RangeSlider/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/RichTextBoxFormatBar/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/SplitButton/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/PropertyGrid/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Calculator/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="CalculatorUpDown/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Primitives/Themes/Aero2/WindowControl.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Primitives/Themes/Aero2/SelectorItem.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="CheckComboBox/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="CheckListBox/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="ChildWindow/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="CollectionControl/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="ColorCanvas/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="ColorPicker/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="DropDownButton/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="IconButton/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="MessageBox/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="DateTimeUpDown/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="DateTimePicker/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="MultiLineTextEditor/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="NumericUpDown/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Pie/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="RangeSlider/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="RichTextBoxFormatBar/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="SplitButton/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="PropertyGrid/Themes/Aero2.NormalColor.xaml" />
 
 
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/TimePicker/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/TimeSpanUpDown/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/WatermarkComboBox/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/WatermarkTextBox/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Wizard/Themes/Aero2.NormalColor.xaml" />
-      <ResourceDictionary Source="/Xceed.Wpf.Toolkit;component/Zoombox/Themes/Aero2.NormalColor.xaml" />
-   </ResourceDictionary.MergedDictionaries>
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="TimePicker/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="TimeSpanUpDown/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="WatermarkComboBox/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="WatermarkTextBox/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Wizard/Themes/Aero2.NormalColor.xaml" />
+    <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Zoombox/Themes/Aero2.NormalColor.xaml" />
+  </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

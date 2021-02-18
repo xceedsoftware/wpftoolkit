@@ -1,14 +1,15 @@
 ﻿<!--***********************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -302,6 +303,7 @@
                        Grid.Column="1"
                        Margin="2,0,2,0"
                        VerticalAlignment="Center"
+                       Foreground="{TemplateBinding Foreground}"
                        Style="{StaticResource ColorCanvasTextBoxStyle}">
               </TextBox>
             </Grid>
@@ -339,6 +341,7 @@
             <TextBlock Grid.Row="0"
                        Grid.Column="0"
                        Text="R"
+                       Foreground="{TemplateBinding Foreground}"
                        VerticalAlignment="Center">
             </TextBlock>
             <Slider x:Name="PART_RSlider"
@@ -356,12 +359,14 @@
                               Grid.Column="2"
                               Value="{Binding Value, ElementName=PART_RSlider}"
                               VerticalAlignment="Center"
+                              Foreground="{TemplateBinding Foreground}"
                               Background="Transparent">
             </local:ByteUpDown>
 
             <TextBlock Grid.Row="1"
                        Grid.Column="0"
                        Text="G"
+                       Foreground="{TemplateBinding Foreground}"
                        VerticalAlignment="Center">
             </TextBlock>
             <Slider x:Name="PART_GSlider"
@@ -379,12 +384,14 @@
                               Grid.Column="2"
                               Value="{Binding Value, ElementName=PART_GSlider}"
                               VerticalAlignment="Center"
-                              Background="Transparent">
+                              Background="Transparent"
+                              Foreground="{TemplateBinding Foreground}">
             </local:ByteUpDown>
 
             <TextBlock Grid.Row="2"
                        Grid.Column="0"
                        Text="B"
+                       Foreground="{TemplateBinding Foreground}"
                        VerticalAlignment="Center">
             </TextBlock>
             <Slider x:Name="PART_BSlider"
@@ -402,12 +409,14 @@
                               Grid.Column="3"
                               Value="{Binding Value, ElementName=PART_BSlider}"
                               VerticalAlignment="Center"
-                              Background="Transparent">
+                              Background="Transparent"
+                              Foreground="{TemplateBinding Foreground}">
             </local:ByteUpDown>
 
             <TextBlock Grid.Row="3"
                        Grid.Column="0"
                        Text="A"
+                       Foreground="{TemplateBinding Foreground}"
                        VerticalAlignment="Center"
                        Visibility="{Binding Path=UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
             </TextBlock>
@@ -427,6 +436,7 @@
                               Value="{Binding Value, ElementName=PART_OpacitySlider}"
                               VerticalAlignment="Center"
                               Background="Transparent"
+                              Foreground="{TemplateBinding Foreground}"
                               Visibility="{Binding Path=UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
             </local:ByteUpDown>
           </Grid>

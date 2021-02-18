@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -29,6 +30,7 @@ using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Linq.Expressions;
 using System.Diagnostics;
 using System.Globalization;
+using System.Windows.Threading;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -43,13 +45,29 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     /// Identifies the IsReadOnly dependency property
     /// </summary>
     public static readonly DependencyProperty IsReadOnlyProperty =
-        DependencyProperty.Register( "IsReadOnly", typeof( bool ), typeof( PropertyItem ), new UIPropertyMetadata( false ) );
+        DependencyProperty.Register( "IsReadOnly", typeof( bool ), typeof( PropertyItem ), new UIPropertyMetadata( false, OnIsReadOnlyChanged ) );
 
     public bool IsReadOnly
     {
       get { return ( bool )GetValue( IsReadOnlyProperty ); }
       set { SetValue( IsReadOnlyProperty, value ); }
     }
+
+    private static void OnIsReadOnlyChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var propertyItem = o as PropertyItem;
+      if( propertyItem != null )
+        propertyItem.OnIsReadOnlyChanged( (bool)e.OldValue, (bool)e.NewValue );
+    }
+
+    protected virtual void OnIsReadOnlyChanged( bool oldValue, bool newValue )
+    {
+      if( this.IsLoaded )
+      {
+        this.RebuildEditor();
+      }
+    }
+
 
     #endregion //IsReadOnly
 
@@ -212,8 +230,33 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         DescriptorPropertyDefinitionBase descriptor = be.DataItem as DescriptorPropertyDefinitionBase;
         if( Validation.GetHasError( descriptor ) )
         {
-          ReadOnlyObservableCollection<ValidationError> errors = Validation.GetErrors( descriptor );
-          Validation.MarkInvalid( be, errors[ 0 ] );
+          this.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
+          {
+            var errors = Validation.GetErrors( descriptor );
+            Validation.MarkInvalid( be, errors[ 0 ] );
+          }
+         ) );
+        }
+      }
+    }
+
+    internal void RebuildEditor()
+    {
+      var objectContainerHelperBase = this.ContainerHelper as ObjectContainerHelperBase;
+      //Re-build the editor to update this propertyItem
+      var editor = objectContainerHelperBase.GenerateChildrenEditorElement( this );
+      if( editor != null )
+      {
+        // Tag the editor as generated to know if we should clear it.
+        ContainerHelperBase.SetIsGenerated( editor, true );
+        this.Editor = editor;
+
+        //Update Source of binding and Validation of PropertyItem to update
+        var be = this.GetBindingExpression( PropertyItem.ValueProperty );
+        if( be != null )
+        {
+          be.UpdateSource();
+          this.SetRedInvalidBorder( be );
         }
       }
     }

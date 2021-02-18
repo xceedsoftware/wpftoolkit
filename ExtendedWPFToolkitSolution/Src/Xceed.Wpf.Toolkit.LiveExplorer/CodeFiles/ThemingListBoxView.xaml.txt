@@ -2,10 +2,11 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2017 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md  
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -29,7 +30,7 @@
             <Run>Dress Up Your App in Style in Minutes</Run>
             <LineBreak />
             <LineBreak />
-         <Run>Supports implicit styles, so the entire listbox can be styled in minutes with a couple of lines of code. Also supports explicit styles and Expression Blend. Available themes are System, Office2007, LiveExplorer, MediaPlayer, Windows10 and Metro with accent color. The Xceed.Wpf.ListBox.Themes.xxx.dll assembly is necessary to use the themes.</Run>
+         <Run>Supports implicit styles, so the entire listbox can be styled in minutes with a couple of lines of code. Also supports explicit styles and Expression Blend. Available themes are System, HighContrast, Office2007, LiveExplorer, MediaPlayer, Windows10 and Metro with accent color. The Xceed.Wpf.ListBox.Themes.xxx.dll assembly is necessary to use the themes.</Run>
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />

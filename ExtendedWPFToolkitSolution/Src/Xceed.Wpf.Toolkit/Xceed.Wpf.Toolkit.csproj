@@ -394,6 +394,10 @@
     <Compile Include="BusyIndicator\Implementation\Converters\ProgressBarWidthConverter.cs" />
     <Compile Include="ColorPicker\Implementation\ColorPickerTabItem.cs" />
     <Compile Include="Core\Converters\ColorModeToTabItemSelectedConverter.cs" />
+    <Compile Include="Core\ImageUriExtension.cs" />
+    <Compile Include="Core\PackUriExtension.cs" />
+    <Compile Include="Core\ResourceDictionary.cs" />
+    <Compile Include="DateTimePicker\Implementation\Converters\BorderThicknessConverter.cs" />
     <Compile Include="Primitives\SelectAllSelectorItem.cs" />
     <Compile Include="Primitives\SelectAllSelector.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\PropertyItemEditorConverter.cs" />
@@ -650,6 +654,7 @@
     <Compile Include="TimePicker\Implementation\TimeItem.cs" />
     <Compile Include="TimePicker\Implementation\TimePicker.cs" />
     <Compile Include="TimeSpanUpDown\Implementation\TimeSpanUpDown.cs" />
+    <Compile Include="Utils\Exceptions\ThrowException.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\Implementation\VisualStates.MessageBox.cs" />
     <Compile Include="WatermarkComboBox\Implementation\WatermarkComboBox.cs" />
@@ -735,9 +740,6 @@
     <Resource Include="PropertyGrid\Images\ClearFilter16.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="MultiLineTextEditor\Images\Notes16.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Zoombox\Resources\Zoom.cur" />
     <Resource Include="Zoombox\Resources\ZoomRelative.cur" />
   </ItemGroup>
@@ -786,6 +788,207 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="CollectionControl\Images\Duplicate.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Calculator\Implementation\Calculator.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AutoSelectTextBox\Implementation\AutoSelectTextBox.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="BusyIndicator\Implementation\BusyIndicator.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ButtonSpinner\Implementation\ButtonSpinner.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CheckComboBox\Implementation\CheckComboBox.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CalculatorUpDown\Implementation\CalculatorUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CheckListBox\Implementation\CheckListBox.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ChildWindow\Implementation\ChildWindow.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CollectionControl\Implementation\CollectionControl.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CollectionControl\Implementation\CollectionControlButton.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CollectionControl\Implementation\PrimitiveTypeCollectionControl.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ColorCanvas\Implementation\ColorCanvas.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ColorPicker\Implementation\ColorPicker.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DateTimePicker\Implementation\DateTimePicker.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DateTimeUpDown\Implementation\DateTimeUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DropDownButton\Implementation\DropDownButton.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="IconButton\Implementation\IconButton.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Magnifier\Implementation\Magnifier.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MaskedTextBox\Implementation\MaskedTextBox.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MessageBox\Implementation\MessageBox.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MultiLineTextEditor\Implementation\MultiLineTextEditor.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NumericUpDown\Implementation\ByteUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NumericUpDown\Implementation\DecimalUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NumericUpDown\Implementation\DoubleUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NumericUpDown\Implementation\IntegerUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NumericUpDown\Implementation\LongUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NumericUpDown\Implementation\SByteUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NumericUpDown\Implementation\ShortUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NumericUpDown\Implementation\SingleUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NumericUpDown\Implementation\UIntegerUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NumericUpDown\Implementation\ULongUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NumericUpDown\Implementation\UShortUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Panels\RandomPanel.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Panels\WrapPanel.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Pie\Implementation\Pie.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Primitives\ValueRangeTextBox.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Primitives\WindowContainer.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Primitives\WindowControl.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="PropertyGrid\Implementation\PropertyGrid.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="RangeSlider\Implementation\RangeSlider.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="RichTextBox\RichTextBox.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="RichTextBoxFormatBar\RichTextBoxFormatBar.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SplitButton\Implementation\SplitButton.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="StyleableWindow\Implementation\StyleableWindow.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TimelinePanel\Implementation\TimelinePanel.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TimePicker\Implementation\TimePicker.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TimeSpanUpDown\Implementation\TimeSpanUpDown.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="WatermarkComboBox\Implementation\WatermarkComboBox.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="WatermarkPasswordBox\Implementation\WatermarkPasswordBox.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="WatermarkTextBox\Implementation\WatermarkTextBox.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Wizard\Implementation\Wizard.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Zoombox\Zoombox.Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="PropertyGrid\Images\SortAscending16_White.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\Bullets_White16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\Numbering_White16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\Bold_White16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\Italic_White16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\Underline_White16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\LeftAlign_White16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\CenterAlign_White16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\RightAlign_White16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\TextHighlightColorPicker_White16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RichTextBoxFormatBar\Images\FontColorPicker_White16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CollectionControl\Images\Duplicate_White.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CollectionControl\Images\Delete16_White.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="PropertyGrid\Images\ClearFilter16_White.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="PropertyGrid\Images\ClearFilter16_Green.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -21,11 +22,18 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using Xceed.Wpf.Toolkit.Core;
+using System.ComponentModel;
 
 namespace Xceed.Wpf.Toolkit
 {
   public class Wizard : ItemsControl
   {
+    #region Private Members
+
+    private bool? _dialogResult = null;
+
+    #endregion
+
     #region Properties
 
     public static readonly DependencyProperty BackButtonContentProperty = DependencyProperty.Register( "BackButtonContent", typeof( object ), typeof( Wizard ), new UIPropertyMetadata( "< Back" ) );
@@ -638,9 +646,30 @@ namespace Xceed.Wpf.Toolkit
       {
         //we can only set the DialogResult if the window was opened as modal with the ShowDialog() method. Otherwise an exception would occur
         if( ComponentDispatcher.IsThreadModal )
-          window.DialogResult = dialogResult;
+        {
+          _dialogResult = dialogResult;
+          window.Closing += this.Window_Closing;
+        }
 
         window.Close();
+      }
+    }
+
+    private void Window_Closing( object sender, CancelEventArgs e )
+    {
+      var window = sender as Window;
+
+      if( window != null )
+      {
+        if( !e.Cancel )
+        {
+          // Set dialog result only when closing is not canceled.
+          window.DialogResult = _dialogResult;          
+        }
+
+        _dialogResult = null;
+
+        window.Closing -= this.Window_Closing;
       }
     }
 
