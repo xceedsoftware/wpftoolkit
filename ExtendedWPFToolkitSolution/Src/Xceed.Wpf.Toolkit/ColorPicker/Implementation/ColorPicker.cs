@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -65,22 +66,22 @@ namespace Xceed.Wpf.Toolkit
 
     #region Properties
 
-    #region AdvancedButtonHeader
+    #region AdvancedTabHeader
 
-    public static readonly DependencyProperty AdvancedButtonHeaderProperty = DependencyProperty.Register( "AdvancedButtonHeader", typeof( string ), typeof( ColorPicker ), new UIPropertyMetadata( "Advanced" ) );
-    public string AdvancedButtonHeader
+    public static readonly DependencyProperty AdvancedTabHeaderProperty = DependencyProperty.Register( "AdvancedTabHeader", typeof( string ), typeof( ColorPicker ), new UIPropertyMetadata( "Advanced" ) );
+    public string AdvancedTabHeader
     {
       get
       {
-        return ( string )GetValue( AdvancedButtonHeaderProperty );
+        return ( string )GetValue( AdvancedTabHeaderProperty );
       }
       set
       {
-        SetValue( AdvancedButtonHeaderProperty, value );
+        SetValue( AdvancedTabHeaderProperty, value );
       }
     }
 
-    #endregion //AdvancedButtonHeader
+    #endregion //AdvancedTabHeader
 
     #region AvailableColors
 
@@ -218,6 +219,91 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //ColorMode
+
+    #region DropDownBackground
+
+    public static readonly DependencyProperty DropDownBackgroundProperty = DependencyProperty.Register( "DropDownBackground", typeof( Brush ), typeof( ColorPicker ), new UIPropertyMetadata( null ) );
+    public Brush DropDownBackground
+    {
+      get
+      {
+        return (Brush)GetValue( DropDownBackgroundProperty );
+      }
+      set
+      {
+        SetValue( DropDownBackgroundProperty, value );
+      }
+    }
+
+    #endregion //DropDownBackground
+
+    #region DropDownBorderBrush
+
+    public static readonly DependencyProperty DropDownBorderBrushProperty = DependencyProperty.Register( "DropDownBorderBrush", typeof( Brush ), typeof( ColorPicker ), new UIPropertyMetadata( null ) );
+    public Brush DropDownBorderBrush
+    {
+      get
+      {
+        return ( Brush )GetValue( DropDownBorderBrushProperty );
+      }
+      set
+      {
+        SetValue( DropDownBorderBrushProperty, value );
+      }
+    }
+
+    #endregion //DropDownBorderBrush
+
+    #region DropDownBorderThickness
+
+    public static readonly DependencyProperty DropDownBorderThicknessProperty = DependencyProperty.Register( "DropDownBorderThickness", typeof( Thickness ), typeof( ColorPicker ), new UIPropertyMetadata( null ) );
+    public Thickness DropDownBorderThickness
+    {
+      get
+      {
+        return ( Thickness )GetValue( DropDownBorderThicknessProperty );
+      }
+      set
+      {
+        SetValue( DropDownBorderThicknessProperty, value );
+      }
+    }
+
+    #endregion //DropDownBorderBrush
+
+    #region HeaderBackground
+
+    public static readonly DependencyProperty HeaderBackgroundProperty = DependencyProperty.Register( "HeaderBackground", typeof( Brush ), typeof( ColorPicker ), new UIPropertyMetadata( null ) );
+    public Brush HeaderBackground
+    {
+      get
+      {
+        return (Brush)GetValue( HeaderBackgroundProperty );
+      }
+      set
+      {
+        SetValue( HeaderBackgroundProperty, value );
+      }
+    }
+
+    #endregion //HeaderBackground
+
+    #region HeaderForeground
+
+    public static readonly DependencyProperty HeaderForegroundProperty = DependencyProperty.Register( "HeaderForeground", typeof( Brush ), typeof( ColorPicker ), new UIPropertyMetadata( Brushes.Black ) );
+    public Brush HeaderForeground
+    {
+      get
+      {
+        return (Brush)GetValue( HeaderForegroundProperty );
+      }
+      set
+      {
+        SetValue( HeaderForegroundProperty, value );
+      }
+    }
+
+    #endregion //HeaderForeground
 
     #region IsOpen
 
@@ -452,22 +538,22 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //ShowDropDownButton
 
-    #region StandardButtonHeader
+    #region StandardTabHeader
 
-    public static readonly DependencyProperty StandardButtonHeaderProperty = DependencyProperty.Register( "StandardButtonHeader", typeof( string ), typeof( ColorPicker ), new UIPropertyMetadata( "Standard" ) );
-    public string StandardButtonHeader
+    public static readonly DependencyProperty StandardTabHeaderProperty = DependencyProperty.Register( "StandardTabHeader", typeof( string ), typeof( ColorPicker ), new UIPropertyMetadata( "Standard" ) );
+    public string StandardTabHeader
     {
       get
       {
-        return ( string )GetValue( StandardButtonHeaderProperty );
+        return ( string )GetValue( StandardTabHeaderProperty );
       }
       set
       {
-        SetValue( StandardButtonHeaderProperty, value );
+        SetValue( StandardTabHeaderProperty, value );
       }
     }
 
-    #endregion //StandardButtonHeader
+    #endregion //StandardTabHeader
 
     #region StandardColors
 
@@ -502,6 +588,40 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //StandardColorsHeader
+
+    #region TabBackground
+
+    public static readonly DependencyProperty TabBackgroundProperty = DependencyProperty.Register( "TabBackground", typeof( Brush ), typeof( ColorPicker ), new UIPropertyMetadata( null ) );
+    public Brush TabBackground
+    {
+      get
+      {
+        return (Brush)GetValue( TabBackgroundProperty );
+      }
+      set
+      {
+        SetValue( TabBackgroundProperty, value );
+      }
+    }
+
+    #endregion //TabBackground
+
+    #region TabForeground
+
+    public static readonly DependencyProperty TabForegroundProperty = DependencyProperty.Register( "TabForeground", typeof( Brush ), typeof( ColorPicker ), new UIPropertyMetadata( Brushes.Black ) );
+    public Brush TabForeground
+    {
+      get
+      {
+        return (Brush)GetValue( TabForegroundProperty );
+      }
+      set
+      {
+        SetValue( TabForegroundProperty, value );
+      }
+    }
+
+    #endregion //TabForeground
 
     #region UsingAlphaChannel
 

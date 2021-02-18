@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -73,7 +74,18 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 Orientation = System.Windows.Controls.Orientation.Horizontal
               };
 
-              newOrientedPanel.Children.Add( floatingWindow.RootPanel );
+              var layoutAnchorablePaneGroup = floatingWindow.RootPanel as LayoutAnchorablePaneGroup;
+              if( layoutAnchorablePaneGroup != null &&
+                  layoutAnchorablePaneGroup.Orientation == System.Windows.Controls.Orientation.Horizontal )
+              {
+                var childrenToTransfer = layoutAnchorablePaneGroup.Children.ToArray();
+                for( int i = 0; i < childrenToTransfer.Length; i++ )
+                  newOrientedPanel.Children.Insert( i, childrenToTransfer[ i ] );
+              }
+              else
+              {
+                newOrientedPanel.Children.Add( floatingWindow.RootPanel );
+              }
               newOrientedPanel.Children.Add( _manager.Layout.RootPanel );
 
               _manager.Layout.RootPanel = newOrientedPanel;
@@ -108,7 +120,19 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 Orientation = System.Windows.Controls.Orientation.Horizontal
               };
 
-              newOrientedPanel.Children.Add( floatingWindow.RootPanel );
+              var layoutAnchorablePaneGroup = floatingWindow.RootPanel as LayoutAnchorablePaneGroup;
+              if( layoutAnchorablePaneGroup != null &&
+                  layoutAnchorablePaneGroup.Orientation == System.Windows.Controls.Orientation.Horizontal )
+              {
+                var childrenToTransfer = layoutAnchorablePaneGroup.Children.ToArray();
+                for( int i = 0; i < childrenToTransfer.Length; i++ )
+                  newOrientedPanel.Children.Add( childrenToTransfer[ i ] );
+              }
+              else
+              {
+                newOrientedPanel.Children.Add( floatingWindow.RootPanel );
+              }
+
               newOrientedPanel.Children.Insert( 0, _manager.Layout.RootPanel );
 
 
@@ -144,7 +168,18 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 Orientation = System.Windows.Controls.Orientation.Vertical
               };
 
-              newOrientedPanel.Children.Add( floatingWindow.RootPanel );
+              var layoutAnchorablePaneGroup = floatingWindow.RootPanel as LayoutAnchorablePaneGroup;
+              if( layoutAnchorablePaneGroup != null &&
+                  layoutAnchorablePaneGroup.Orientation == System.Windows.Controls.Orientation.Vertical )
+              {
+                var childrenToTransfer = layoutAnchorablePaneGroup.Children.ToArray();
+                for( int i = 0; i < childrenToTransfer.Length; i++ )
+                  newOrientedPanel.Children.Insert( i, childrenToTransfer[ i ] );
+              }
+              else
+              {
+                newOrientedPanel.Children.Add( floatingWindow.RootPanel );
+              }
               newOrientedPanel.Children.Add( _manager.Layout.RootPanel );
 
               _manager.Layout.RootPanel = newOrientedPanel;
@@ -180,7 +215,18 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 Orientation = System.Windows.Controls.Orientation.Vertical
               };
 
-              newOrientedPanel.Children.Add( floatingWindow.RootPanel );
+              var layoutAnchorablePaneGroup = floatingWindow.RootPanel as LayoutAnchorablePaneGroup;
+              if( layoutAnchorablePaneGroup != null &&
+                  layoutAnchorablePaneGroup.Orientation == System.Windows.Controls.Orientation.Vertical )
+              {
+                var childrenToTransfer = layoutAnchorablePaneGroup.Children.ToArray();
+                for( int i = 0; i < childrenToTransfer.Length; i++ )
+                  newOrientedPanel.Children.Add( childrenToTransfer[ i ] );
+              }
+              else
+              {
+                newOrientedPanel.Children.Add( floatingWindow.RootPanel );
+              }
               newOrientedPanel.Children.Insert( 0, _manager.Layout.RootPanel );
 
               _manager.Layout.RootPanel = newOrientedPanel;

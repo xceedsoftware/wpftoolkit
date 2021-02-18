@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -146,7 +147,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
             return;
           }
         case Key.Add:
-          if( this.AllowSpin && !this.IsReadOnly )
+          if( this.AllowSpin && !this.AllowTextInput && !this.IsReadOnly )
           {
             this.DoIncrement();
             e.Handled = true;
@@ -154,7 +155,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
           _fireSelectionChangedEvent = false;
           break;
         case Key.Subtract:
-          if( this.AllowSpin && !this.IsReadOnly )
+          if( this.AllowSpin && !this.AllowTextInput && !this.IsReadOnly )
           {
             this.DoDecrement();
             e.Handled = true;
@@ -220,7 +221,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     protected virtual void PerformMouseSelection()
     {
       var dateTimeInfo = this.GetDateTimeInfo( TextBox.SelectionStart );
-      if( (this.TextBox is MaskedTextBox) && ( dateTimeInfo != null) && (dateTimeInfo.Type == DateTimePart.Other) )
+      if( ( dateTimeInfo != null) && (dateTimeInfo.Type == DateTimePart.Other) )
       {
         this.Dispatcher.BeginInvoke( DispatcherPriority.Background, new Action( () =>
         {
@@ -255,7 +256,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       return _dateTimeInfoList.FirstOrDefault( ( info ) =>info.Type == part );
     }
 
-    internal void Select( DateTimeInfo info )
+    internal virtual void Select( DateTimeInfo info )
     {
       if( (info != null) && !info.Equals( _selectedDateTimeInfo ) && ( this.TextBox != null) && !string.IsNullOrEmpty( this.TextBox.Text ) )
       {

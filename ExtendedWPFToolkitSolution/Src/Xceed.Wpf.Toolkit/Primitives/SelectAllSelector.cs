@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -16,6 +17,7 @@
 
 using System.Collections.Specialized;
 using System.Windows;
+using System.Linq;
 
 namespace Xceed.Wpf.Toolkit.Primitives
 {
@@ -112,12 +114,12 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     public void SelectAll()
     {
+      // Have a faster selection when there are more than 200 items.
+      this.UpdateSelectedItemsWithoutNotifications( this.ItemsCollection.Cast<object>().ToList() );
+      // Raise SelectionChanged for every items.
       foreach( var item in this.ItemsCollection )
       {
-        if( !this.SelectedItems.Contains( item ) )
-        {
-          this.SelectedItems.Add( item );
-        }
+        this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, true ) );
       }
     }
 

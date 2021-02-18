@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -21,17 +22,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Input;
-using System.Windows.Markup.Primitives;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 #if !VS2008
 using System.ComponentModel.DataAnnotations;
 #endif
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using Xceed.Wpf.Toolkit.PropertyGrid.Commands;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
-using System.Reflection;
 using System.Globalization;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
@@ -43,6 +38,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private object _selectedObject;
     private PropertyDescriptor _propertyDescriptor;
     private DependencyPropertyDescriptor _dpDescriptor;
+    private static Dictionary<string, Type> _dictEditorTypeName = new Dictionary<string, Type>();
 
     #endregion
 
@@ -198,22 +194,33 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( editorAttribute != null )
       {
         Type type = null;
+        if( !_dictEditorTypeName.TryGetValue( editorAttribute.EditorTypeName, out type ) )
+        {
 #if VS2008
         type = Type.GetType( editorAttribute.EditorTypeName );
 #else
-        try
-        {
-          type = Type.GetType( editorAttribute.EditorTypeName, ( name ) =>
+          try
           {
-            return AppDomain.CurrentDomain.GetAssemblies().Where( l => l.FullName == name.FullName ).FirstOrDefault();
+            var typeDef = editorAttribute.EditorTypeName.Split( new char[] { ',' } );
+            if( typeDef.Length >= 2 )
+            {
+              var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault( a => a.FullName.Contains( typeDef[ 1 ].Trim() ) );
+              if( assembly != null )
+              {
+                type = assembly.GetTypes().FirstOrDefault( t => (t != null) && (t.FullName != null) && t.FullName.Contains( typeDef[ 0 ] ) );
+              }
+            }
           }
-          , null, true );
-        }
-        catch( Exception )
-        {
-          type = Type.GetType( editorAttribute.EditorTypeName );
-        }       
+          catch( Exception )
+          {
+          }
 #endif
+          if( type == null )
+          {
+            type = Type.GetType( editorAttribute.EditorTypeName );
+          }
+          _dictEditorTypeName.Add( editorAttribute.EditorTypeName, type );
+        }
 
         // If the editor does not have any public parameterless constructor, forget it.
         if( typeof( ITypeEditor ).IsAssignableFrom( type )

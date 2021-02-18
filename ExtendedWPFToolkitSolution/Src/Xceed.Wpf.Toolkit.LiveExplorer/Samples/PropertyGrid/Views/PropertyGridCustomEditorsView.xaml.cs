@@ -2,10 +2,11 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2017 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md  
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -16,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -45,7 +47,9 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       person.WritingFont = new FontFamily( "Arial" );
       person.WritingHand = System.Windows.HorizontalAlignment.Right;
       person.WritingFontSize = 12.5;
-
+      var friends = new ObservableCollection<Friend>() { new Friend() { FirstName = "Tom", LastName = "Sawyer", Age = 11 }, new Friend() { FirstName = "Mike", LastName = "Jones", Age = 9 } };
+      person.Friends = friends;
+      person.BestFriend = friends[ 1 ];
 
       this.DataContext = person;
     }
@@ -108,6 +112,23 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
         set;
       }
 
+      [Category( "Information" )]
+      [Description( "This property uses the editor defined by EditorTemplateDefinition #5 because it targets the property 'Friends'." )]
+      public ObservableCollection<Friend> Friends
+      {
+        get;
+        set;
+      }
+
+      [Category( "Information" )]
+      [Browsable(false)]
+      [Description( "This property is not displayed in the PropertyGrid, but its used as the selectedItem of the ComboBox for the 'Friends' property Editor." )]
+      public Friend BestFriend
+      {
+        get;
+        set;
+      }
+
       [Category( "Writing" )]
       [Description( "This property uses the editor defined by EditorTemplateDefinition #4 because it targets all properties of Type 'HorizontalAlignment'." )]
       public HorizontalAlignment WritingHand
@@ -127,6 +148,27 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       [Category( "Writing" )]
       [Description( "This property uses the editor defined by EditorTemplateDefinition #1 because it targets all properties of Type 'Double'." )]
       public double WritingFontSize
+      {
+        get;
+        set;
+      }     
+    }
+
+    public class Friend
+    {
+      public string FirstName
+      {
+        get;
+        set;
+      }
+
+      public string LastName
+      {
+        get;
+        set;
+      }
+
+      public int Age
       {
         get;
         set;

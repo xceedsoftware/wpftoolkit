@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -209,7 +210,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         else
         {
           // When the Value is diferent from the DefaultValue, use the local icon.
-          if( !this.Value.Equals( this.DefaultValue ) )
+          if( !object.Equals( this.Value, this.DefaultValue ) )
           {
             if( this.DefaultValue != null )
             {
@@ -221,7 +222,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
               {
                 var defaultValue = Activator.CreateInstance( this.PropertyType );
                 // When the Value is diferent from the DefaultValue, use the local icon.
-                if( !this.Value.Equals( defaultValue ) )
+                if( !object.Equals( this.Value, defaultValue ) )
                 {
                   tooltip = StringConstants.Local;
                 }

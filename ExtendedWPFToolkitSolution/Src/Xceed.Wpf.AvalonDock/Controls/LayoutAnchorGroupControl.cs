@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -19,6 +20,7 @@ using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using Xceed.Wpf.AvalonDock.Layout;
 using System.Windows;
+using System.Windows.Data;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
@@ -75,7 +77,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
       var manager = _model.Root.Manager;
       foreach( var childModel in _model.Children )
       {
-        _childViews.Add( new LayoutAnchorControl( childModel ) { Template = manager.AnchorTemplate } );
+        var lac = new LayoutAnchorControl( childModel );
+        lac.SetBinding( LayoutAnchorControl.TemplateProperty, new Binding( DockingManager.AnchorTemplateProperty.Name ) { Source = manager } );
+        _childViews.Add( lac );
       }
     }
 
@@ -105,7 +109,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
           int insertIndex = e.NewStartingIndex;
           foreach( LayoutAnchorable childModel in e.NewItems )
           {
-            _childViews.Insert( insertIndex++, new LayoutAnchorControl( childModel ) { Template = manager.AnchorTemplate } );
+            var lac = new LayoutAnchorControl( childModel );
+            lac.SetBinding( LayoutAnchorControl.TemplateProperty, new Binding( DockingManager.AnchorTemplateProperty.Name ) { Source = manager } );
+            _childViews.Insert( insertIndex++, lac );
           }
         }
       }

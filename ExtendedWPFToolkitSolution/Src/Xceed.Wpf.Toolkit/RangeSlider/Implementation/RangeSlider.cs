@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -45,7 +46,7 @@ namespace Xceed.Wpf.Toolkit
     private Slider _higherSlider;
     private Track _lowerTrack;
     private Track _higherTrack;
-    private double _deferredUpdateValue;
+    private double? _deferredUpdateValue;
 
     #endregion Members
 
@@ -823,7 +824,7 @@ namespace Xceed.Wpf.Toolkit
       return 0d;
     }
 
-    private void AdjustView()
+    private void AdjustView( bool isHigherValueChanged = false )
     {
       //Coerce values to make them consistent.
       var cv = this.GetCoercedValues();
@@ -847,18 +848,24 @@ namespace Xceed.Wpf.Toolkit
 
       actualWidth -= (lowerSliderThumbWidth + higherSliderThumbWidth);
 
-      this.SetLowerSliderValues( cv.LowerValue, cv.Minimum, cv.Maximum );
-      this.SetHigherSliderValues( cv.HigherValue, cv.Minimum, cv.Maximum );
+      if( !this.IsDeferredUpdateValues || ( _deferredUpdateValue == null ) )
+      {
+        this.SetLowerSliderValues( cv.LowerValue, cv.Minimum, cv.Maximum );
+        this.SetHigherSliderValues( cv.HigherValue, cv.Minimum, cv.Maximum );
+      }
 
       double entireRange = cv.Maximum - cv.Minimum;
 
       if( entireRange > 0 )
       {
-        this.HigherRangeWidth = (actualWidth * (cv.Maximum - cv.HigherValue)) / entireRange;
+        var higherValue = this.IsDeferredUpdateValues && isHigherValueChanged && (_deferredUpdateValue != null ) ? _deferredUpdateValue.Value : cv.HigherValue;
+        var lowerValue = this.IsDeferredUpdateValues && !isHigherValueChanged && ( _deferredUpdateValue != null ) ? _deferredUpdateValue.Value : cv.LowerValue;
 
-        this.RangeWidth = (actualWidth * (cv.HigherValue - cv.LowerValue)) / entireRange;
+        this.HigherRangeWidth = (actualWidth * (cv.Maximum - higherValue ) ) / entireRange;
 
-        this.LowerRangeWidth = (actualWidth * (cv.LowerValue - cv.Minimum)) / entireRange;
+        this.RangeWidth = (actualWidth * ( higherValue - lowerValue ) ) / entireRange;
+
+        this.LowerRangeWidth = (actualWidth * ( lowerValue - cv.Minimum)) / entireRange;
       }
       else
       {
@@ -938,19 +945,19 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    private void UpdateHigherValue( double value )
+    private void UpdateHigherValue( double? value )
     {
       CoercedValues cv = this.GetCoercedValues();
-      double newValue = Math.Max( cv.Minimum, Math.Min( cv.Maximum, value ) );
+      double newValue = Math.Max( cv.Minimum, Math.Min( cv.Maximum, value.HasValue ? value.Value : 0d ) );
       newValue = Math.Max( newValue, cv.LowerValue );
       this.SetHigherSliderValues( newValue, null, null );
       this.HigherValue = newValue;
     }
 
-    private void UpdateLowerValue( double value )
+    private void UpdateLowerValue( double? value )
     {
       CoercedValues cv = this.GetCoercedValues();
-      double newValue = Math.Max( cv.Minimum, Math.Min( cv.Maximum, value ) );
+      double newValue = Math.Max( cv.Minimum, Math.Min( cv.Maximum, value.HasValue ? value.Value : 0d ) );
       newValue = Math.Min( newValue, cv.HigherValue );
       this.SetLowerSliderValues( newValue, null, null );
       this.LowerValue = newValue;
@@ -1038,6 +1045,7 @@ namespace Xceed.Wpf.Toolkit
         else
         {
           _deferredUpdateValue = e.NewValue;
+          this.AdjustView( false );
         }
       }
     }
@@ -1053,6 +1061,7 @@ namespace Xceed.Wpf.Toolkit
         else
         {
           _deferredUpdateValue = e.NewValue;
+          this.AdjustView( true );
         }
       }
     }
@@ -1062,6 +1071,8 @@ namespace Xceed.Wpf.Toolkit
       if( this.IsDeferredUpdateValues )
       {
         this.UpdateHigherValue( _deferredUpdateValue );
+        _deferredUpdateValue = null;
+        this.AdjustView();
       }
     }
 
@@ -1070,6 +1081,8 @@ namespace Xceed.Wpf.Toolkit
       if( this.IsDeferredUpdateValues )
       {
         this.UpdateLowerValue( _deferredUpdateValue );
+        _deferredUpdateValue = null;
+        this.AdjustView();
       }
     }
 

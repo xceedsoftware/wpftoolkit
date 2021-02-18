@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -28,6 +29,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private bool _isMouseDown = false;
     private static LayoutAnchorableTabItem _draggingItem = null;
+    private static bool _cancelMouseLeave = false;
 
     #endregion
 
@@ -146,6 +148,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
         _isMouseDown = false;
         _draggingItem = null;
       }
+      else
+      {
+        _cancelMouseLeave = false;
+      }
     }
 
     protected override void OnMouseLeftButtonUp( System.Windows.Input.MouseButtonEventArgs e )
@@ -163,10 +169,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       if( _isMouseDown && e.LeftButton == MouseButtonState.Pressed )
       {
-        _draggingItem = this;
+        // drag the item if the mouse leave is not canceled.
+        // Mouse leave should be canceled when selecting a new tab to prevent automatic undock when Panel size is Auto.
+        _draggingItem = !_cancelMouseLeave ? this : null;
       }
 
       _isMouseDown = false;
+      _cancelMouseLeave = false;
     }
 
     protected override void OnMouseEnter( MouseEventArgs e )
@@ -214,7 +223,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       _draggingItem = null;
     }
+    internal static void CancelMouseLeave()
+    {
+      _cancelMouseLeave = true;
+    }
 
-    #endregion
-  }
+  #endregion
+}
 }

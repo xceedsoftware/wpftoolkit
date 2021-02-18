@@ -2,10 +2,11 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2017 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md  
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -173,6 +174,19 @@
                   VerticalAlignment="Center"
                   Margin="5"
                   ToolTip="Set if the PropertyGrid is using virtualization. Using virtualization will load the PropertyGrid faster with large dataSets." />
+        <TextBlock Text="PropertyNameLeftPadding:"
+                   VerticalAlignment="Center"
+                   Grid.Row="3"
+                   Grid.Column="4"
+                   Margin="10,0,0,0" />
+        <xctk:DoubleUpDown Grid.Row="3"
+                           Grid.Column="5"
+                           Value="{Binding PropertyNameLeftPadding, ElementName=_propertyGrid}"
+                           Minimum="0"
+                           Maximum="75"
+                           VerticalAlignment="Center"
+                           Margin="5"
+                           ToolTip="Gets/Sets the spacing on the left of each property name." />
       </Grid>
     </GroupBox>
 
@@ -210,6 +224,7 @@
                            ShowPreview="True"
                            HideInheritedProperties="False"
                            ShowHorizontalScrollBar="False"
+                           PropertyNameLeftPadding="15"
                            SelectedObject="{Binding ElementName=_button}">
         </xctk:PropertyGrid>
       </Grid>
