@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -95,6 +96,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       _model.ChildrenTreeChanged += ( s, args ) =>
           {
+            if( args.Change != ChildrenTreeChange.DirectChildrenChanged )
+              return;
             if( _asyncRefreshCalled.HasValue &&
                       _asyncRefreshCalled.Value == args.Change )
               return;
@@ -271,7 +274,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
             ColumnDefinitions.Add( new ColumnDefinition()
             {
-              Width = childModel.IsVisible && nextChildModelVisibleExist ? new GridLength( manager.GridSplitterWidth ) : new GridLength( 0.0, GridUnitType.Pixel )
+              Width = childModel.IsVisible && nextChildModelVisibleExist ? new GridLength( double.IsNaN( manager.GridSplitterWidth ) ? 6d : manager.GridSplitterWidth ) : new GridLength( 0.0, GridUnitType.Pixel )
             } );
             Grid.SetColumn( InternalChildren[ iChild ], iColumn );
           }
@@ -313,7 +316,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
             RowDefinitions.Add( new RowDefinition()
             {
-              Height = childModel.IsVisible && nextChildModelVisibleExist ? new GridLength( manager.GridSplitterHeight ) : new GridLength( 0.0, GridUnitType.Pixel )
+              Height = childModel.IsVisible && nextChildModelVisibleExist ? new GridLength( double.IsNaN( manager.GridSplitterHeight ) ? 6d : manager.GridSplitterHeight ) : new GridLength( 0.0, GridUnitType.Pixel )
             } );
             //if (RowDefinitions.Last().Height.Value == 0.0)
             //    System.Diagnostics.Debugger.Break();
@@ -391,7 +394,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
           trToWnd.Transform( new Point() );
 
       double delta;
-      if( Orientation == System.Windows.Controls.Orientation.Horizontal )
+      if( Orientation == Orientation.Horizontal )
         delta = Canvas.GetLeft( _resizerGhost ) - _initialStartPoint.X;
       else
         delta = Canvas.GetTop( _resizerGhost ) - _initialStartPoint.Y;
@@ -402,49 +405,70 @@ namespace Xceed.Wpf.AvalonDock.Controls
       var nextChild = GetNextVisibleChild( indexOfResizer );
 
       var prevChildActualSize = prevChild.TransformActualSizeToAncestor();
-      var nextChildActualSize = nextChild.TransformActualSizeToAncestor();
+      var nextChildActualSize = (nextChild != null) ? nextChild.TransformActualSizeToAncestor() : new Size();
+      var totalActualSize = new Size(prevChildActualSize.Width + nextChildActualSize.Width, prevChildActualSize.Height + nextChildActualSize.Height );
 
       var prevChildModel = ( ILayoutPositionableElement )( prevChild as ILayoutControl ).Model;
-      var nextChildModel = ( ILayoutPositionableElement )( nextChild as ILayoutControl ).Model;
+      var nextChildModel = (nextChild != null) ? ( ILayoutPositionableElement )( nextChild as ILayoutControl ).Model : null;
+      var totalStarSize = new Size( prevChildModel.DockWidth.IsStar && nextChildModel.DockWidth.IsStar ? prevChildModel.DockWidth.Value + nextChildModel.DockWidth.Value : 1d,
+                                    prevChildModel.DockHeight.IsStar && nextChildModel.DockHeight.IsStar ? prevChildModel.DockHeight.Value + nextChildModel.DockHeight.Value : 1d );
 
-      if( Orientation == System.Windows.Controls.Orientation.Horizontal )
+      if( Orientation == Orientation.Horizontal )
       {
         if( prevChildModel.DockWidth.IsStar )
         {
-          prevChildModel.DockWidth = new GridLength( prevChildModel.DockWidth.Value * ( prevChildActualSize.Width + delta ) / prevChildActualSize.Width, GridUnitType.Star );
+          prevChildModel.DockWidth = new GridLength( ((prevChildActualSize.Width + delta) / totalActualSize.Width) * totalStarSize.Width, GridUnitType.Star );
         }
         else
         {
-          prevChildModel.DockWidth = new GridLength( prevChildModel.DockWidth.Value + delta, GridUnitType.Pixel );
+          var width = ( prevChildModel.DockWidth.IsAuto ) ? prevChildActualSize.Width : prevChildModel.DockWidth.Value;
+          width += delta;
+          var widthToSet = Math.Max( width, prevChildModel.DockMinWidth );
+          prevChildModel.DockWidth = new GridLength( widthToSet, GridUnitType.Pixel );
         }
 
-        if( nextChildModel.DockWidth.IsStar )
+        if( nextChildModel != null )
         {
-          nextChildModel.DockWidth = new GridLength( nextChildModel.DockWidth.Value * ( nextChildActualSize.Width - delta ) / nextChildActualSize.Width, GridUnitType.Star );
-        }
-        else
-        {
-          nextChildModel.DockWidth = new GridLength( nextChildModel.DockWidth.Value - delta, GridUnitType.Pixel );
+          if( nextChildModel.DockWidth.IsStar )
+          {
+            nextChildModel.DockWidth = new GridLength( ((nextChildActualSize.Width - delta) / totalActualSize.Width) * totalStarSize.Width, GridUnitType.Star );
+          }
+          else
+          {
+            var width = ( nextChildModel.DockWidth.IsAuto ) ? nextChildActualSize.Width : nextChildModel.DockWidth.Value;
+            width -= delta;
+            var widthToSet = Math.Max( width, nextChildModel.DockMinWidth );
+            nextChildModel.DockWidth = new GridLength( widthToSet, GridUnitType.Pixel );
+          }
         }
       }
       else
       {
         if( prevChildModel.DockHeight.IsStar )
         {
-          prevChildModel.DockHeight = new GridLength( prevChildModel.DockHeight.Value * ( prevChildActualSize.Height + delta ) / prevChildActualSize.Height, GridUnitType.Star );
+          prevChildModel.DockHeight = new GridLength( ((prevChildActualSize.Height + delta) / totalActualSize.Height) * totalStarSize.Height, GridUnitType.Star );
         }
         else
         {
-          prevChildModel.DockHeight = new GridLength( prevChildModel.DockHeight.Value + delta, GridUnitType.Pixel );
+          var height = ( prevChildModel.DockHeight.IsAuto ) ? prevChildActualSize.Height : prevChildModel.DockHeight.Value;
+          height += delta;
+          var heightToSet = Math.Max( height, prevChildModel.DockMinHeight );
+          prevChildModel.DockHeight = new GridLength( heightToSet, GridUnitType.Pixel );
         }
 
-        if( nextChildModel.DockHeight.IsStar )
+        if( nextChildModel != null )
         {
-          nextChildModel.DockHeight = new GridLength( nextChildModel.DockHeight.Value * ( nextChildActualSize.Height - delta ) / nextChildActualSize.Height, GridUnitType.Star );
-        }
-        else
-        {
-          nextChildModel.DockHeight = new GridLength( nextChildModel.DockHeight.Value - delta, GridUnitType.Pixel );
+          if( nextChildModel.DockHeight.IsStar )
+          {
+            nextChildModel.DockHeight = new GridLength( ((nextChildActualSize.Height - delta) / totalActualSize.Height) * totalStarSize.Height, GridUnitType.Star );
+          }
+          else
+          {
+            var height = ( nextChildModel.DockHeight.IsAuto ) ? nextChildActualSize.Height : nextChildModel.DockHeight.Value;
+            height -= delta;
+            var heightToSet = Math.Max( height, nextChildModel.DockMinHeight );
+            nextChildModel.DockHeight = new GridLength( heightToSet, GridUnitType.Pixel );
+          }
         }
       }
 
@@ -487,10 +511,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
       var nextChild = GetNextVisibleChild( indexOfResizer );
 
       var prevChildActualSize = prevChild.TransformActualSizeToAncestor();
-      var nextChildActualSize = nextChild.TransformActualSizeToAncestor();
+      var nextChildActualSize = (nextChild != null) ? nextChild.TransformActualSizeToAncestor() : new Size();
 
       var prevChildModel = ( ILayoutPositionableElement )( prevChild as ILayoutControl ).Model;
-      var nextChildModel = ( ILayoutPositionableElement )( nextChild as ILayoutControl ).Model;
+      var nextChildModel = (nextChild != null) ? ( ILayoutPositionableElement )( nextChild as ILayoutControl ).Model : null;
 
       Point ptTopLeftScreen = prevChild.PointToScreenDPIWithoutFlowDirection( new Point() );
 
@@ -498,8 +522,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       if( Orientation == System.Windows.Controls.Orientation.Horizontal )
       {
+        var nextChildDockMinWidth = (nextChildModel != null) ? nextChildModel.DockMinWidth : 0d;
+
         actualSize = new Size(
-            prevChildActualSize.Width - prevChildModel.DockMinWidth + splitter.ActualWidth + nextChildActualSize.Width - nextChildModel.DockMinWidth,
+            prevChildActualSize.Width - prevChildModel.DockMinWidth + splitter.ActualWidth + nextChildActualSize.Width - nextChildDockMinWidth,
             nextChildActualSize.Height );
 
         _resizerGhost.Width = splitter.ActualWidth;
@@ -508,9 +534,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
       else
       {
+        var nextChildDockMinHeight = ( nextChildModel != null ) ? nextChildModel.DockMinHeight : 0d;
+
         actualSize = new Size(
             prevChildActualSize.Width,
-            prevChildActualSize.Height - prevChildModel.DockMinHeight + splitter.ActualHeight + nextChildActualSize.Height - nextChildModel.DockMinHeight );
+            prevChildActualSize.Height - prevChildModel.DockMinHeight + splitter.ActualHeight + nextChildActualSize.Height - nextChildDockMinHeight );
 
         _resizerGhost.Height = splitter.ActualHeight;
         _resizerGhost.Width = actualSize.Width;

@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -173,7 +174,9 @@ namespace Xceed.Wpf.Toolkit
     void ShowAdorner()
     {
       if( _adorner.Visibility == Visibility.Visible )
-        return;
+      {
+        HideAdorner();
+      }
 
       VerifyAdornerLayer();
 
@@ -204,19 +207,31 @@ namespace Xceed.Wpf.Toolkit
     {
       Point mousePosition = Mouse.GetPosition( _richTextBox );
 
-      double left = mousePosition.X;
-      double top = ( mousePosition.Y - 15 ) - adorningEditor.ActualHeight;
+      var left = mousePosition.X;
+      var top = mousePosition.Y;
 
-      //top
+      // Top boundary
       if( top < 0 )
       {
-        top = mousePosition.Y + 10;
+        top = 5d;
       }
 
-      //right boundary
-      if( left + adorningEditor.ActualWidth > _richTextBox.ActualWidth - 20 )
+      // Left boundary
+      if( left < 0 )
       {
-        left = left - ( adorningEditor.ActualWidth - ( _richTextBox.ActualWidth - left ) );
+        left = 5d;
+      }
+
+      // Right boundary
+      if( left + adorningEditor.ActualWidth > _richTextBox.ActualWidth - 10d )
+      {
+        left = _richTextBox.ActualWidth - adorningEditor.ActualWidth - 10d;
+      }
+
+      // Bottom boundary
+      if( top + adorningEditor.ActualHeight > _richTextBox.ActualHeight - 10d )
+      {
+        top = _richTextBox.ActualHeight - adorningEditor.ActualHeight - 10d;
       }
 
       _adorner.SetOffsets( left, top );

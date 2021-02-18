@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -94,9 +95,15 @@ namespace Xceed.Wpf.AvalonDock.Controls
           _view = new ContentPresenter();
 
           _view.SetBinding( ContentPresenter.ContentProperty, new Binding( "Content" ) { Source = LayoutElement } );
-          _view.SetBinding( ContentPresenter.ContentTemplateProperty, new Binding( "LayoutItemTemplate" ) { Source = LayoutElement.Root.Manager } );
-          _view.SetBinding( ContentPresenter.ContentTemplateSelectorProperty, new Binding( "LayoutItemTemplateSelector" ) { Source = LayoutElement.Root.Manager } );
-          LayoutElement.Root.Manager.InternalAddLogicalChild( _view );
+          if( ( LayoutElement != null ) && ( LayoutElement.Root != null ) )
+          {
+            _view.SetBinding( ContentPresenter.ContentTemplateProperty, new Binding( "LayoutItemTemplate" ) { Source = LayoutElement.Root.Manager } );
+            _view.SetBinding( ContentPresenter.ContentTemplateSelectorProperty, new Binding( "LayoutItemTemplateSelector" ) { Source = LayoutElement.Root.Manager } );
+            if( LayoutElement.Root.Manager != null )
+            {
+              LayoutElement.Root.Manager.InternalAddLogicalChild( _view );
+            }
+          }
         }
 
         return _view;
@@ -331,6 +338,20 @@ namespace Xceed.Wpf.AvalonDock.Controls
     }
 
     #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     #region CanClose
 
@@ -1139,25 +1160,25 @@ namespace Xceed.Wpf.AvalonDock.Controls
     protected virtual void SetDefaultBindings()
     {
       if( CloseCommand == null )
-        CloseCommand = _defaultCloseCommand;
+        this.SetCurrentValue( LayoutItem.CloseCommandProperty, _defaultCloseCommand );
       if( FloatCommand == null )
-        FloatCommand = _defaultFloatCommand;
+        this.SetCurrentValue( LayoutItem.FloatCommandProperty, _defaultFloatCommand );
       if( DockAsDocumentCommand == null )
-        DockAsDocumentCommand = _defaultDockAsDocumentCommand;
+        this.SetCurrentValue( LayoutItem.DockAsDocumentCommandProperty, _defaultDockAsDocumentCommand );
       if( CloseAllButThisCommand == null )
-        CloseAllButThisCommand = _defaultCloseAllButThisCommand;
+        this.SetCurrentValue( LayoutItem.CloseAllButThisCommandProperty, _defaultCloseAllButThisCommand );
       if( CloseAllCommand == null )
-        CloseAllCommand = _defaultCloseAllCommand;
+        this.SetCurrentValue( LayoutItem.CloseAllCommandProperty, _defaultCloseAllCommand );
       if( ActivateCommand == null )
-        ActivateCommand = _defaultActivateCommand;
+        this.SetCurrentValue( LayoutItem.ActivateCommandProperty, _defaultActivateCommand );
       if( NewVerticalTabGroupCommand == null )
-        NewVerticalTabGroupCommand = _defaultNewVerticalTabGroupCommand;
+        this.SetCurrentValue( LayoutItem.NewVerticalTabGroupCommandProperty, _defaultNewVerticalTabGroupCommand );
       if( NewHorizontalTabGroupCommand == null )
-        NewHorizontalTabGroupCommand = _defaultNewHorizontalTabGroupCommand;
+        this.SetCurrentValue( LayoutItem.NewHorizontalTabGroupCommandProperty, _defaultNewHorizontalTabGroupCommand );
       if( MoveToNextTabGroupCommand == null )
-        MoveToNextTabGroupCommand = _defaultMoveToNextTabGroupCommand;
+        this.SetCurrentValue( LayoutItem.MoveToNextTabGroupCommandProperty, _defaultMoveToNextTabGroupCommand );
       if( MoveToPreviousTabGroupCommand == null )
-        MoveToPreviousTabGroupCommand = _defaultMoveToPreviousTabGroupCommand;
+        this.SetCurrentValue( LayoutItem.MoveToPreviousTabGroupCommandProperty, _defaultMoveToPreviousTabGroupCommand );
 
 
       IsSelected = LayoutElement.IsSelected;

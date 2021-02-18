@@ -58,8 +58,12 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyVersionInfo.cs" />
-    <Compile Include="AssemblyVersionInfoCommon.cs" />
+    <Compile Include="..\Xceed.Wpf.Toolkit\AssemblyVersionInfo.cs">
+      <Link>AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Xceed.Wpf.Toolkit\AssemblyVersionInfoCommon.cs">
+      <Link>AssemblyVersionInfoCommon.cs</Link>
+    </Compile>
     <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="Controls\AnchorablePaneControlOverlayArea.cs" />
     <Compile Include="Controls\AnchorablePaneDropTarget.cs" />
@@ -74,6 +78,7 @@
     <Compile Include="Controls\DropDownButton.cs" />
     <Compile Include="Controls\DropDownControlArea.cs" />
     <Compile Include="Controls\DropTargetBase.cs" />
+    <Compile Include="Controls\LayoutCachePaneControl.cs" />
     <Compile Include="Controls\WeakDictionary.cs" />
     <Compile Include="Controls\WindowActivateEventArgs.cs" />
     <Compile Include="Controls\WindowHookHandler.cs" />
@@ -160,6 +165,7 @@
     <Compile Include="Layout\ILayoutElement.cs" />
     <Compile Include="Layout\ILayoutElementWithVisibility.cs" />
     <Compile Include="Layout\ILayoutGroup.cs" />
+    <Compile Include="Layout\ILayoutInitialContainer.cs" />
     <Compile Include="Layout\ILayoutOrientableElement.cs" />
     <Compile Include="Layout\ILayoutPane.cs" />
     <Compile Include="Layout\ILayoutPanelElement.cs" />
@@ -198,6 +204,16 @@
     <Compile Include="MathHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.ja-JP.Designer.cs">
+      <DependentUpon>Resources.ja-JP.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Properties\Resources.cs-CZ.Designer.cs">
+      <DependentUpon>Resources.cs-CZ.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Properties\Resources.de.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -257,8 +273,21 @@
     <Compile Include="Themes\DictionaryTheme.cs" />
     <Compile Include="Themes\GenericTheme.cs" />
     <Compile Include="Themes\Theme.cs" />
+    <Compile Include="..\Xceed.Wpf.Toolkit\Utils\Exceptions\ThrowException.cs">
+      <Link>Utils\Exceptions\ThrowException.cs</Link>
+    </Compile>
     <Compile Include="Win32Helper.cs" />
     <Compile Include="WindowHelper.cs" />
+    <EmbeddedResource Include="Properties\Resources.ja-JP.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.ja-JP.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.cs-CZ.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.cs-CZ.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.hu.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.hu.Designer.cs</LastGenOutput>
@@ -346,6 +375,10 @@
     <Resource Include="Themes\Generic\Images\PinRestore.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Themes\Default.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -356,6 +389,22 @@
       <Project>{72e591d6-8f83-4d8c-8f67-9c325e623234}</Project>
       <Name>Xceed.Wpf.Toolkit</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Themes\Generic\Images\PinAutoHide_White.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Themes\Generic\Images\PinClose_White.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Themes\Generic\Images\PinDocMenu_White.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Themes\Generic\Images\PinMenu_White.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Themes\Generic\Images\PinMaximize_White.png" />
+    <Resource Include="Themes\Generic\Images\PinRestore_White.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

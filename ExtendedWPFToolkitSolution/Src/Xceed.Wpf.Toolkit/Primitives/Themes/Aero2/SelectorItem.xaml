@@ -1,14 +1,15 @@
 ﻿<!--***********************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -19,48 +20,69 @@
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
                     xmlns:primitives="clr-namespace:Xceed.Wpf.Toolkit.Primitives">
 
-   <!-- =============================================================================== -->
-   <!-- SelectorItem                                                                    -->
-   <!-- =============================================================================== -->
+  <!-- =============================================================================== -->
+  <!-- SelectorItem                                                                    -->
+  <!-- =============================================================================== -->
 
-   <Style TargetType="{x:Type primitives:SelectorItem}">
-      <Setter Property="HorizontalContentAlignment"
-              Value="{Binding Path=HorizontalContentAlignment,RelativeSource={RelativeSource AncestorType={x:Type primitives:Selector}}}" />
-      <Setter Property="VerticalContentAlignment"
-              Value="{Binding Path=VerticalContentAlignment,RelativeSource={RelativeSource AncestorType={x:Type primitives:Selector}}}" />
-      <Setter Property="Padding"
-              Value="4,0,0,0" />
-      <Setter Property="IsTabStop" Value="False" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="Template">
-         <Setter.Value>
-            <ControlTemplate TargetType="{x:Type primitives:SelectorItem}">
-               <Border x:Name="_background" 
-                            Background="{TemplateBinding Background}" 
-                            BorderBrush="{TemplateBinding BorderBrush}" 
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                  <!-- In Classic Theme, The Foreground shouldn't be applied to Checkmark and Text-->
-                  <CheckBox IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}}"
-                            Padding="{TemplateBinding Padding}"
-                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
-                     <CheckBox.Content>
-                        <ContentControl Content="{TemplateBinding Content}"
-                                        ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
-                                        ContentTemplate="{TemplateBinding ContentTemplate}"
-                                        Foreground="{TemplateBinding Foreground}" />
-                     </CheckBox.Content>
-                  </CheckBox>
-               </Border>
-               <ControlTemplate.Triggers>
-                  <Trigger Property="IsMouseOver" Value="true">
-                     <Setter TargetName="_background" Property="Background" Value="#FFB8E0F3" />
-                     <Setter TargetName="_background" Property="BorderBrush" Value="#FF26A0DA" />
-                  </Trigger>
-               </ControlTemplate.Triggers>
-            </ControlTemplate>
-         </Setter.Value>
-      </Setter>
-   </Style>
+  <Style TargetType="{x:Type primitives:SelectorItem}">
+    <Setter Property="HorizontalContentAlignment"
+            Value="{Binding Path=HorizontalContentAlignment,RelativeSource={RelativeSource AncestorType={x:Type primitives:Selector}}}" />
+    <Setter Property="VerticalContentAlignment"
+            Value="{Binding Path=VerticalContentAlignment,RelativeSource={RelativeSource AncestorType={x:Type primitives:Selector}}}" />
+    <Setter Property="Padding"
+            Value="4,0,0,0" />
+    <Setter Property="IsTabStop"
+            Value="False" />
+    <Setter Property="BorderThickness"
+            Value="1" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type primitives:SelectorItem}">
+          <Border x:Name="_background"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}">
+            <!-- In Classic Theme, The Foreground shouldn't be applied to Checkmark and Text-->
+            <CheckBox x:Name="_checkBox"
+                      IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}}"
+                      Padding="{TemplateBinding Padding}"
+                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+              <CheckBox.Content>
+                <ContentControl Content="{TemplateBinding Content}"
+                                ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Foreground="{TemplateBinding Foreground}"
+                                Focusable="False" />
+              </CheckBox.Content>
+            </CheckBox>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver"
+                     Value="true">
+              <Setter TargetName="_background"
+                      Property="Background"
+                      Value="#FFB8E0F3" />
+              <Setter TargetName="_background"
+                      Property="BorderBrush"
+                      Value="#FF26A0DA" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocusWithin"
+                     Value="true">
+              <Setter TargetName="_background"
+                      Property="Background"
+                      Value="#FFB8E0F3" />
+              <Setter TargetName="_background"
+                      Property="BorderBrush"
+                      Value="#FF26A0DA" />
+              <Setter TargetName="_checkBox"
+                      Property="FocusManager.FocusedElement"
+                      Value="{Binding ElementName=_checkBox}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 
 </ResourceDictionary>

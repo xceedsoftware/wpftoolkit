@@ -2,10 +2,11 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2017 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md  
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -24,7 +25,7 @@
                  x:Name="_demo">
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-         <Run>Changes the themes of the Toolkit for WPF controls. Available themes are System, Office2007, Windows10 and Metro with accent color. The Xceed.Wpf.Toolkit.Themes.Office2007.dll, Xceed.Wpf.Toolkit.Themes.Windows10.dll or Xceed.Wpf.Toolkit.Themes.Metro.dll assemblies are necessary to use the themes.</Run>
+         <Run>Changes the themes of the Toolkit for WPF controls. Available themes are System, HighContrast, Office2007, Windows10 and Metro with accent color. The Xceed.Wpf.Toolkit.Themes.Office2007.dll, Xceed.Wpf.Toolkit.Themes.Windows10.dll or Xceed.Wpf.Toolkit.Themes.Metro.dll assemblies are necessary to use the themes.</Run>
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
@@ -33,6 +34,7 @@
             </Hyperlink>
         </Paragraph>
     </local:DemoView.Description>
+
 
 
 

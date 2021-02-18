@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -23,7 +24,7 @@ namespace Xceed.Wpf.Toolkit
 {
   internal class DateTimeParser
   {
-    public static bool TryParse( string value, string format, DateTime currentDate, CultureInfo cultureInfo, out DateTime result )
+    public static bool TryParse( string value, string format, DateTime currentDate, CultureInfo cultureInfo, bool autoClipTimeParts, out DateTime result )
     {
       bool success = false;
       result = currentDate;
@@ -31,7 +32,9 @@ namespace Xceed.Wpf.Toolkit
       if( string.IsNullOrEmpty( value ) || string.IsNullOrEmpty( format ) )
         return false;
 
-      var dateTimeString = ComputeDateTimeString( value, format, currentDate, cultureInfo ).Trim();
+      DateTimeParser.UpdateValueFormatForQuotes( ref value, ref format );      
+
+      var dateTimeString = ComputeDateTimeString( value, format, currentDate, cultureInfo, autoClipTimeParts ).Trim();
 
       if( !String.IsNullOrEmpty( dateTimeString ) )
         success = DateTime.TryParse( dateTimeString, cultureInfo.DateTimeFormat, DateTimeStyles.None, out result );
@@ -42,13 +45,32 @@ namespace Xceed.Wpf.Toolkit
       return success;
     }
 
-    private static string ComputeDateTimeString( string dateTime, string format, DateTime currentDate, CultureInfo cultureInfo )
+    private static void UpdateValueFormatForQuotes( ref string value, ref string format )
+    {
+      var quoteStart = format.IndexOf( "'" );
+      if( quoteStart > -1 )
+      {
+        var quoteEnd = format.IndexOf( "'", quoteStart + 1 );
+        if( quoteEnd > -1 )
+        {
+          var quoteContent = format.Substring( quoteStart + 1, quoteEnd - quoteStart - 1 );
+          value = value.Replace( quoteContent, "" );
+          format = format.Remove( quoteStart, quoteEnd - quoteStart + 1 );
+
+          // Use recursive calls for many quote text. 
+          DateTimeParser.UpdateValueFormatForQuotes( ref value, ref format );
+        }
+      }
+    }
+
+    private static string ComputeDateTimeString( string dateTime, string format, DateTime currentDate, CultureInfo cultureInfo, bool autoClipTimeParts )
     {
       Dictionary<string, string> dateParts = GetDateParts( currentDate, cultureInfo );
       string[] timeParts = new string[ 3 ] { currentDate.Hour.ToString(), currentDate.Minute.ToString(), currentDate.Second.ToString() };
       string millisecondsPart = currentDate.Millisecond.ToString();
       string designator = "";
       string[] dateTimeSeparators = new string[] { ",", " ", "-", ".", "/", cultureInfo.DateTimeFormat.DateSeparator, cultureInfo.DateTimeFormat.TimeSeparator };
+      var forcePMDesignator = false;
 
       UpdateSortableDateTimeString( ref dateTime, ref format, cultureInfo );
 
@@ -118,18 +140,50 @@ namespace Xceed.Wpf.Toolkit
             dateParts[ "Year" ] = dateTimeParts[ i ] != "0" ? dateTimeParts[ i ] : "0000";
 
             if( dateParts[ "Year" ].Length == 2 )
-              dateParts[ "Year" ] = string.Format( "{0}{1}", currentDate.Year / 100, dateParts[ "Year" ] );
+            {
+              var yearDigits = int.Parse( dateParts[ "Year" ] );
+              var twoDigitYearMax = cultureInfo.Calendar.TwoDigitYearMax;
+              var hundredDigits = ( yearDigits <= twoDigitYearMax % 100 ) ? twoDigitYearMax / 100 : ( twoDigitYearMax / 100 ) - 1;
+
+              dateParts[ "Year" ] = string.Format( "{0}{1}", hundredDigits, dateParts[ "Year" ] );
+            }
+          }
+          else if( f.Contains( "hh" ) || f.Contains( "HH" ) )
+          {
+            var hourValue = Convert.ToInt32( dateTimeParts[ i ] ) % 24;
+            timeParts[ 0 ] = autoClipTimeParts ? hourValue.ToString() : dateTimeParts[ i ];
           }
           else if( f.Contains( "h" ) || f.Contains( "H" ) )
-            timeParts[ 0 ] = dateTimeParts[ i ];
+          {
+            if( autoClipTimeParts )
+            {
+              var hourValue = Convert.ToInt32( dateTimeParts[ i ] ) % 24;
+              if( hourValue > 11 )
+              {
+                hourValue -= 12;
+                forcePMDesignator = true;
+              }
+              timeParts[ 0 ] = hourValue.ToString();
+            }
+            else
+            {
+              timeParts[ 0 ] = dateTimeParts[ i ];
+            }
+          }
           else if( f.Contains( "m" ) )
-            timeParts[ 1 ] = dateTimeParts[ i ];
+          {
+            var minuteValue = Convert.ToInt32( dateTimeParts[ i ] ) % 60;
+            timeParts[ 1 ] = autoClipTimeParts ? minuteValue.ToString() : dateTimeParts[ i ];
+          }
           else if( f.Contains( "s" ) )
-            timeParts[ 2 ] = dateTimeParts[ i ];
+          {
+            var secondValue = Convert.ToInt32( dateTimeParts[ i ] ) % 60;
+            timeParts[ 2 ] = autoClipTimeParts ? secondValue.ToString() : dateTimeParts[ i ];
+          }
           else if( f.Contains( "f" ) )
             millisecondsPart = dateTimeParts[ i ];
           else if( f.Contains( "t" ) )
-            designator = dateTimeParts[ i ];
+            designator = forcePMDesignator ? "PM" : dateTimeParts[ i ];
         }
       }
 

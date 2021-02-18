@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -69,7 +70,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region FormatString
 
-    public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register( "FormatString", typeof( string ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( String.Empty, OnFormatStringChanged ) );
+    public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register( "FormatString", typeof( string ), typeof( NumericUpDown<T> ), new UIPropertyMetadata( String.Empty, OnFormatStringChanged, OnCoerceFormatString ) );
     public string FormatString
     {
       get
@@ -80,6 +81,20 @@ namespace Xceed.Wpf.Toolkit
       {
         SetValue( FormatStringProperty, value );
       }
+    }
+
+    private static object OnCoerceFormatString( DependencyObject o, object baseValue )
+    {
+      NumericUpDown<T> numericUpDown = o as NumericUpDown<T>;
+      if( numericUpDown != null )
+        return numericUpDown.OnCoerceFormatString( (string)baseValue );
+
+      return baseValue;
+    }
+
+    protected virtual string OnCoerceFormatString( string baseValue )
+    {
+      return baseValue ?? string.Empty;
     }
 
     private static void OnFormatStringChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )

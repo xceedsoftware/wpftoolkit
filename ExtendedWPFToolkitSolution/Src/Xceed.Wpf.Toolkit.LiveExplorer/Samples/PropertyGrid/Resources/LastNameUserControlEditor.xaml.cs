@@ -2,10 +2,11 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2017 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md  
 
    This program can be provided to you by Xceed Software Inc. under a
    proprietary commercial license agreement for use in non-Open Source

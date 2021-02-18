@@ -1,14 +1,15 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -78,16 +79,18 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       if( e.OldValue != null )
       {
-        ( ( LayoutContent )e.OldValue ).PropertyChanged -= Model_PropertyChanged;
+        ( ( LayoutContent )e.OldValue ).PropertyChanged -= this.Model_PropertyChanged;
       }
 
-      if( Model != null )
+      if( ( this.Model != null) && ( this.Model.Root != null ) && ( this.Model.Root.Manager != null ) )
       {
-        Model.PropertyChanged += Model_PropertyChanged;
-        SetLayoutItem( Model.Root.Manager.GetLayoutItemFromModel( Model ) );
+        this.Model.PropertyChanged += this.Model_PropertyChanged;
+        this.SetLayoutItem( this.Model.Root.Manager.GetLayoutItemFromModel( this.Model ) );
       }
       else
-        SetLayoutItem( null );
+      {
+        this.SetLayoutItem( null );
+      }
     }
 
     private void Model_PropertyChanged( object sender, System.ComponentModel.PropertyChangedEventArgs e )
@@ -139,7 +142,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <param name="value">The new value for the property.</param>
     protected void SetLayoutItem( LayoutItem value )
     {
-      SetValue( LayoutItemPropertyKey, value );
+      this.SetValue( LayoutItemPropertyKey, value );
     }
 
     #endregion
@@ -150,8 +153,12 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void OnGotKeyboardFocus( System.Windows.Input.KeyboardFocusChangedEventArgs e )
     {
-      if( Model != null )
-        Model.IsActive = true;
+      var setIsActive = !( ( e.NewFocus != null ) && ( e.OldFocus != null ) && ( e.OldFocus is LayoutFloatingWindowControl ) );
+      if( setIsActive )
+      {
+        if( Model != null )
+          Model.IsActive = true;
+      }      
 
       base.OnGotKeyboardFocus( e );
     }

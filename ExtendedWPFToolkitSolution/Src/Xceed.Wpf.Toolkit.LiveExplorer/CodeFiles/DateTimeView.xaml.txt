@@ -2,10 +2,11 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2017 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md  
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -122,11 +123,13 @@
             <TextBlock Text="TimeWatermark:" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center"/>
             <TextBox x:Name="_timeWatermark" Grid.Row="2" Grid.Column="3" Text="Enter Text" Width="190" VerticalAlignment="Center" Margin="5"/>
             <TextBlock Text="Minimum:" Grid.Row="3" Grid.Column="2" VerticalAlignment="Center"/>
-            <xctk:DateTimeUpDown x:Name="_minimum" Grid.Row="3" Grid.Column="3" Format="Custom" FormatString="yyyy/MM/dd HH:mm" Value="2013/01/01T12:00" Width="190" VerticalAlignment="Center" Margin="5"/>
+            <xctk:DateTimeUpDown x:Name="_minimum" Grid.Row="3" Grid.Column="3" Format="Custom" FormatString="yyyy/MM/dd HH:mm" Value="2016/01/01T12:00" Width="190" VerticalAlignment="Center" Margin="5"/>
             <TextBlock Text="Maximum:" Grid.Row="4" Grid.Column="2" VerticalAlignment="Center"/>
-            <xctk:DateTimeUpDown x:Name="_maximum" Grid.Row="4" Grid.Column="3" Format="Custom" FormatString="yyyy/MM/dd HH:mm" Value="2018/12/31T12:00" Width="190" VerticalAlignment="Center" Margin="5"/>
+            <xctk:DateTimeUpDown x:Name="_maximum" Grid.Row="4" Grid.Column="3" Format="Custom" FormatString="yyyy/MM/dd HH:mm" Value="2022/12/31T12:00" Width="190" VerticalAlignment="Center" Margin="5"/>
             <TextBlock Text="CurrentDateTimePart:" Grid.Row="5" Grid.Column="2" VerticalAlignment="Center"/>
             <ComboBox x:Name="_currentDateTimePart" Grid.Row="5" Grid.Column="3" SelectedIndex="0" ItemsSource="{Binding Source={StaticResource enumDateTimePart}}" Width="190" Margin="5" ToolTip="Must match a DateTimePart of the DateTimePicker Format."/>
+            <TextBlock Text="Auto Clip time Parts:" Grid.Row="6" Grid.Column="2" VerticalAlignment="Center"/>
+            <CheckBox x:Name="_autoClipTimeParts" Grid.Row="6" Grid.Column="3" IsChecked="False" VerticalAlignment="Center" Margin="5,5,25,5"/>
          </Grid>
       </GroupBox>
 
@@ -152,7 +155,8 @@
                                  CalendarDisplayMode="{Binding SelectedItem, ElementName=_calendarDisplayMode}"
                                  CalendarWidth="{Binding Value, ElementName=_calendarWidth}"
                                  ShowDropDownButton="{Binding IsChecked, ElementName=_showDropDownButton}"
-                                 CurrentDateTimePart="{Binding SelectedItem, ElementName=_currentDateTimePart, Mode=TwoWay}"/>
+                                 CurrentDateTimePart="{Binding SelectedItem, ElementName=_currentDateTimePart, Mode=TwoWay}"
+                                 AutoClipTimeParts="{Binding IsChecked, ElementName=_autoClipTimeParts}"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch">
@@ -182,7 +186,7 @@
 
               <StackPanel>
                 <TextBlock Text="TimePicker Usage: " Style="{StaticResource Header}" />
-            <xctk:TimePicker x:Name="_timePicker"
+                <xctk:TimePicker x:Name="_timePicker"
                                  VerticalAlignment="Top"
                                  Format="{Binding Source={x:Reference _timeFormat}, Path=SelectedItem}"
                                  FormatString="{Binding Text, ElementName=_timeFormatString}"
@@ -194,7 +198,8 @@
                                  Minimum="{Binding Value, ElementName=_minimum}"
                                  Maximum="{Binding Value, ElementName=_maximum}"
                                  MaxDropDownHeight="{Binding Value, ElementName=_maxDropDownHeight}"
-                                 ShowDropDownButton="{Binding IsChecked, ElementName=_showDropDownButton}"/>
+                                 ShowDropDownButton="{Binding IsChecked, ElementName=_showDropDownButton}"
+                                 AutoClipTimeParts="{Binding IsChecked, ElementName=_autoClipTimeParts}" />
            </StackPanel>
         </StackPanel>
     </Grid>
