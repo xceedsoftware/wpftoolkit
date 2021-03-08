@@ -3,3 +3,6 @@
 ################################################################################
 
 /ExtendedWPFToolkitSolution/.vs/Xceed.Wpf.Toolkit/v16
+*/bin/Debug
+*/obj/Debug
+
