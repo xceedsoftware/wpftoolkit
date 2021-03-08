@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31019.35
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xceed.Wpf.DataGrid", "Src\Xceed.Wpf.DataGrid\Xceed.Wpf.DataGrid.csproj", "{63648392-6CE9-4A60-96D4-F9FD718D29B0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Release|Mixed Platforms = Release|Mixed Platforms
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{63648392-6CE9-4A60-96D4-F9FD718D29B0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{63648392-6CE9-4A60-96D4-F9FD718D29B0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{63648392-6CE9-4A60-96D4-F9FD718D29B0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{63648392-6CE9-4A60-96D4-F9FD718D29B0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {10BA5F90-D450-4394-AAC4-225D67CA0E65}
+	EndGlobalSection
+EndGlobal

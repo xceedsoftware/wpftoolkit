@@ -113,12 +113,6 @@
     <Resource Include="Images\PinRestore_Dark.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.csproj">
-      <Project>{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}</Project>
-      <Name>Xceed.Wpf.AvalonDock</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\PinDocMenu_Black.png" />
   </ItemGroup>
   <ItemGroup>

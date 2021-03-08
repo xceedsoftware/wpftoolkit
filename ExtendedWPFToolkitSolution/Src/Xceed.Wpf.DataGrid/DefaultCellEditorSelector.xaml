@@ -18,11 +18,11 @@
                   x:ClassModifier="internal"
                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                  xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
                   xmlns:local="clr-namespace:Xceed.Wpf.DataGrid"
                   xmlns:conv="clr-namespace:Xceed.Wpf.DataGrid.Converters"
                   xmlns:markup="clr-namespace:Xceed.Wpf.DataGrid.Markup"
-                  xmlns:s="clr-namespace:System;assembly=mscorlib">
+                  xmlns:s="clr-namespace:System;assembly=mscorlib"
+                  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
   <FrameworkElement.Resources>
 
     <conv:NullToBooleanConverter x:Key="nullToBooleanConverter" />

@@ -104,12 +104,6 @@
     <Resource Include="Images\PinRestore_Dark.png" />
     <Resource Include="Images\VTabGroup.png" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.csproj">
-      <Project>{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}</Project>
-      <Name>Xceed.Wpf.AvalonDock</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
