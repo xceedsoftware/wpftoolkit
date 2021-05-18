@@ -26,6 +26,11 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
 {
   internal class ListUtilities
   {
+    internal static bool IsListOfItems( Type listType )
+    {
+      return (ListUtilities.GetListItemType( listType ) != null);
+    }
+
     internal static Type GetListItemType( Type listType )
     {
       Type iListOfT = listType.GetInterfaces().FirstOrDefault(
@@ -34,6 +39,11 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
       return ( iListOfT != null )
         ? iListOfT.GetGenericArguments()[ 0 ]
         : null;
+    }
+
+    internal static bool IsCollectionOfItems( Type colType )
+    {
+      return ( ListUtilities.GetCollectionItemType( colType ) != null );
     }
 
     internal static Type GetCollectionItemType( Type colType )
@@ -52,6 +62,11 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
       return (iCollectionOfT != null)
         ? iCollectionOfT.GetGenericArguments()[ 0 ]
         : null;
+    }
+
+    internal static bool IsDictionaryOfItems( Type dictType )
+    {
+      return ( ListUtilities.GetDictionaryItemsType( dictType ) != null );
     }
 
     internal static Type[] GetDictionaryItemsType( Type dictType )

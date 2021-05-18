@@ -99,7 +99,7 @@
     </Style.Triggers>
   </Style>
 
-  <DrawingImage x:Key="ShowViewFinderGlyph">
+  <DrawingImage x:Key="ShowViewFinderGlyphResource">
     <DrawingImage.Drawing>
       <DrawingGroup>
         <DrawingGroup>
@@ -630,13 +630,11 @@
                           Style="{StaticResource ViewFinderToggleButtonStyle}"
                           Foreground="Transparent"
                           Background="Transparent"
-                          IsChecked="{Binding Path=ViewFinderVisibility, 
-                    Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent},
-                    Converter={StaticResource TrueIfVisibleConverter}}">
+                          IsChecked="{Binding Path=ViewFinderVisibility, Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource TrueIfVisibleConverter}}">
               <Grid Name="ShowViewFinderGlyph"
                     Opacity="0">
                 <Image x:Name="ShowViewFinderGlyphImage"
-                       Source="{StaticResource ShowViewFinderGlyph}">
+                       Source="{StaticResource ShowViewFinderGlyphResource}">
                 </Image>
               </Grid>
             </ToggleButton>
@@ -650,32 +648,9 @@
             </Trigger>
             <Trigger Property="IsMouseOver"
                      Value="True">
-              <Trigger.EnterActions>
-                <BeginStoryboard>
-                  <Storyboard>
-                    <DoubleAnimation Storyboard.TargetName="ShowViewFinderGlyph"
-                                     Storyboard.TargetProperty="Opacity"
-                                     DecelerationRatio="1"
-                                     Duration="0:0:0.3"
-                                     From="0"
-                                     To="1"
-                                     FillBehavior="HoldEnd" />
-                  </Storyboard>
-                </BeginStoryboard>
-              </Trigger.EnterActions>
-              <Trigger.ExitActions>
-                <BeginStoryboard>
-                  <Storyboard>
-                    <DoubleAnimation Storyboard.TargetName="ShowViewFinderGlyph"
-                                     Storyboard.TargetProperty="Opacity"
-                                     DecelerationRatio="1"
-                                     Duration="0:0:0.3"
-                                     From="1"
-                                     To="0"
-                                     FillBehavior="HoldEnd" />
-                  </Storyboard>
-                </BeginStoryboard>
-              </Trigger.ExitActions>
+              <Setter Property="Opacity"
+                      Value="1"
+                      TargetName="ShowViewFinderGlyph" />
             </Trigger>
             <Trigger Property="IsChecked"
                      Value="False"

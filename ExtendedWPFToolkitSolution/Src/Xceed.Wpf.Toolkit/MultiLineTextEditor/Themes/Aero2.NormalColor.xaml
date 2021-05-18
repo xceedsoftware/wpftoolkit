@@ -56,6 +56,7 @@
                 <ContentPresenter Content="{TemplateBinding Content}"
                                   ContentTemplate="{TemplateBinding ContentTemplate}"
                                   ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                  ContentStringFormat="{TemplateBinding ContentStringFormat}"
                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
               </Border>
@@ -135,6 +136,7 @@
                           Content="{TemplateBinding Content}"
                           ContentTemplate="{TemplateBinding ContentTemplate}"
                           ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                          ContentStringFormat="{TemplateBinding ContentStringFormat}"
                           IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                           Style="{StaticResource ToggleButtonStyle}"
                           IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"

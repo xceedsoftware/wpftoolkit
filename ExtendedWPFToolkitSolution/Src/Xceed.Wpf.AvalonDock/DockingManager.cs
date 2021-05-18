@@ -97,6 +97,10 @@ namespace Xceed.Wpf.AvalonDock
 
 
 
+
+
+
+
     #region Layout
 
     /// <summary>
@@ -2136,7 +2140,10 @@ namespace Xceed.Wpf.AvalonDock
 
         Dispatcher.BeginInvoke( new Action( () =>
         {
-           newFW.Show();
+          if( newFW.IsClosing() )
+            return;
+
+          newFW.Show();
 
           // Do not set the WindowState before showing or it will be lost
           if( paneForExtensions != null && paneForExtensions.IsMaximized )
@@ -2232,6 +2239,9 @@ namespace Xceed.Wpf.AvalonDock
       {
         Dispatcher.BeginInvoke( new Action( () =>
         {
+          if( fwc.IsClosing() )
+            return;
+
           if( startDrag )
             fwc.AttachDrag();
           fwc.Show();
@@ -2272,6 +2282,41 @@ namespace Xceed.Wpf.AvalonDock
         LayoutFloatingWindowControl ctrl = _fwList.FirstOrDefault( fw => new WindowInteropHelper( fw ).Handle == currentHandle );
         if( ctrl != null && ctrl.Model.Root.Manager == this )
           yield return ctrl;
+
+        currentHandle = Win32Helper.GetWindow( currentHandle, ( uint )Win32Helper.GetWindow_Cmd.GW_HWNDNEXT );
+      }
+    }
+
+    internal IEnumerable<Window> GetWindowsByZOrder()
+    {
+      IntPtr windowParentHanlde;
+      var parentWindow = Window.GetWindow( this );
+      if( parentWindow != null )
+      {
+        windowParentHanlde = new WindowInteropHelper( parentWindow ).Handle;
+      }
+      else
+      {
+        var mainProcess = Process.GetCurrentProcess();
+        if( mainProcess == null )
+          yield break;
+
+        windowParentHanlde = mainProcess.MainWindowHandle;
+      }
+
+      IntPtr currentHandle = Win32Helper.GetWindow( windowParentHanlde, ( uint )Win32Helper.GetWindow_Cmd.GW_HWNDFIRST );
+      while( currentHandle != IntPtr.Zero )
+      {
+        if( windowParentHanlde == currentHandle )
+        {
+          yield return parentWindow;
+        }
+        else
+        {
+          LayoutFloatingWindowControl ctrl = _fwList.FirstOrDefault( fw => new WindowInteropHelper( fw ).Handle == currentHandle );
+          if( ctrl != null && ctrl.Model.Root.Manager == this )
+            yield return ctrl;
+        }
 
         currentHandle = Win32Helper.GetWindow( currentHandle, ( uint )Win32Helper.GetWindow_Cmd.GW_HWNDNEXT );
       }
@@ -3359,21 +3404,25 @@ namespace Xceed.Wpf.AvalonDock
         return;
 
       var parentPane = contentModel.Parent as ILayoutPositionableElement;
-      if( parentPane != null)
+      if( parentPane != null )
       {
-        // Reset Dock Size of floating LayoutContent
-        if( parentPane.DockWidth.IsStar )
+        var parentLayoutContainer = parentPane as ILayoutContainer;
+        if( ( parentLayoutContainer != null ) && ( parentLayoutContainer.ChildrenCount == 1 ) )
         {
-          parentPane.DockWidth = new GridLength( 1d, GridUnitType.Star );
-        }
-        if( parentPane.DockHeight.IsStar )
-        {
-          parentPane.DockHeight = new GridLength( 1d, GridUnitType.Star );
+          // Reset Dock Size of floating LayoutContent
+          if( parentPane.DockWidth.IsStar )
+          {
+            parentPane.DockWidth = new GridLength( 1d, GridUnitType.Star );
+          }
+          if( parentPane.DockHeight.IsStar )
+          {
+            parentPane.DockHeight = new GridLength( 1d, GridUnitType.Star );
+          }
         }
 
         var grandParentPaneOrientation = parentPane.Parent as ILayoutOrientableGroup;
         var grandParentPane = parentPane.Parent as ILayoutPositionableElement;
-        if( (grandParentPaneOrientation != null) && (grandParentPane != null) )
+        if( ( grandParentPaneOrientation != null ) && ( grandParentPane != null ) )
         {
           if( grandParentPaneOrientation.Orientation == Orientation.Horizontal )
           {
@@ -3383,7 +3432,10 @@ namespace Xceed.Wpf.AvalonDock
               var grandParentPaneContainer = parentPane.Parent as ILayoutContainer;
               if( grandParentPaneContainer != null )
               {
-                var children = grandParentPaneContainer.Children.Where( child => !child.Equals( parentPane ) ).Cast<ILayoutPositionableElement>().Where( child => child.DockWidth.IsStar );
+                var children = grandParentPaneContainer.Children.Where( child => ( child.Equals( parentPane ) && ( parentPane is ILayoutContainer ) && ( ( ( ILayoutContainer )parentPane ).ChildrenCount > 1 ) )
+                                                                                || !child.Equals( parentPane ) )
+                                                                .Cast<ILayoutPositionableElement>()
+                                                                .Where( child => child.DockHeight.IsStar );
                 var childrenTotalWidth = children.Sum( child => child.DockWidth.Value );
                 foreach( var child in children )
                 {
@@ -3400,7 +3452,10 @@ namespace Xceed.Wpf.AvalonDock
               var grandParentPaneContainer = parentPane.Parent as ILayoutContainer;
               if( grandParentPaneContainer != null )
               {
-                var children = grandParentPaneContainer.Children.Where( child => !child.Equals( parentPane ) ).Cast<ILayoutPositionableElement>().Where( child => child.DockHeight.IsStar );
+                var children = grandParentPaneContainer.Children.Where( child => ( child.Equals( parentPane ) && ( parentPane is ILayoutContainer ) && ( ( ( ILayoutContainer )parentPane ).ChildrenCount > 1 ) )
+                                                                                || !child.Equals( parentPane ) )
+                                                                .Cast<ILayoutPositionableElement>()
+                                                                .Where( child => child.DockHeight.IsStar );
                 var childrenTotalHeight = children.Sum( child => child.DockHeight.Value );
                 foreach( var child in children )
                 {

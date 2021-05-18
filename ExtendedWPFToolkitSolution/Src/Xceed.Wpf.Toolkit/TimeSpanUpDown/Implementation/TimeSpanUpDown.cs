@@ -29,16 +29,16 @@ namespace Xceed.Wpf.Toolkit
   {
     #region Private Members
 
-    private static int HoursInDay = 24;
-    private static int MinutesInDay = 1440;
-    private static int MinutesInHour = 60;    
-    private static int SecondsInDay = 86400;
-    private static int SecondsInHour = 3600;
-    private static int SecondsInMinute = 60;
-    private static int MilliSecondsInDay = TimeSpanUpDown.SecondsInDay * 1000;
-    private static int MilliSecondsInHour = TimeSpanUpDown.SecondsInHour * 1000;
-    private static int MilliSecondsInMinute = TimeSpanUpDown.SecondsInMinute * 1000;
-    private static int MilliSecondsInSecond = 1000;
+    private static readonly int HoursInDay = 24;
+    private static readonly int MinutesInDay = 1440;
+    private static readonly int MinutesInHour = 60;    
+    private static readonly int SecondsInDay = 86400;
+    private static readonly int SecondsInHour = 3600;
+    private static readonly int SecondsInMinute = 60;
+    private static readonly int MilliSecondsInDay = TimeSpanUpDown.SecondsInDay * 1000;
+    private static readonly int MilliSecondsInHour = TimeSpanUpDown.SecondsInHour * 1000;
+    private static readonly int MilliSecondsInMinute = TimeSpanUpDown.SecondsInMinute * 1000;
+    private static readonly int MilliSecondsInSecond = 1000;
 
     #endregion
 
@@ -78,7 +78,7 @@ namespace Xceed.Wpf.Toolkit
 
     private static object OnCoerceFractionalSecondsDigitsCount( DependencyObject o, object value )
     {
-      TimeSpanUpDown timeSpanUpDown = o as TimeSpanUpDown;
+      var timeSpanUpDown = o as TimeSpanUpDown;
       if( timeSpanUpDown != null )
       {
         int digitsCount = (int)value;
@@ -425,7 +425,17 @@ namespace Xceed.Wpf.Toolkit
         this.InitializeDateTimeInfoList( this.Value );
       }
 
-      base.PerformMouseSelection();
+      var dateTimeInfo = (( _selectedDateTimeInfo == null ) && ( this.CurrentDateTimePart != DateTimePart.Other ))
+                          ? this.GetDateTimeInfo( this.CurrentDateTimePart )
+                          : this.GetDateTimeInfo( TextBox.SelectionStart );
+      if( ( dateTimeInfo != null ) && ( dateTimeInfo.Type == DateTimePart.Other ) )
+      {
+        // Select the next dateTime part
+        this.Select( this.GetDateTimeInfo( dateTimeInfo.StartPosition + dateTimeInfo.Length ) );
+        return;
+      }
+
+      this.Select( dateTimeInfo );
     }
 
     protected override void InitializeDateTimeInfoList( TimeSpan? value )
@@ -451,10 +461,10 @@ namespace Xceed.Wpf.Toolkit
 
       if( this.ShowDays )
       {
-        if( value.HasValue && value.Value.Days != 0 )
+        if( value.HasValue)
         {
-          int dayLength = Math.Abs( value.Value.Days ).ToString().Length;
-          _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Day, Length = dayLength, Format = "dd" } );
+          int dayLength = Math.Abs( value.Value.Days ).ToString("00").Length;
+          _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Day, Length = Math.Max(2, dayLength), Format = "dd" } );
           _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Other, Length = 1, Content = ".", IsReadOnly = true } );
 
           if( this.TextBox != null )
@@ -637,7 +647,7 @@ namespace Xceed.Wpf.Toolkit
           {
             if( info.Format == "dd" )
             {
-              content = Convert.ToInt32( content ).ToString();
+              content = Convert.ToInt32( content ).ToString( "00" );
             }
             info.Content = content;
             info.Length = info.Content.Length;
@@ -812,9 +822,22 @@ namespace Xceed.Wpf.Toolkit
           var newValue = this.UpdateTimeSpan( this.Value, step );
           if( newValue != null )
           {
+            int selectionStart;
+            int selectionLength;
+
             this.InitializeDateTimeInfoList( newValue );
-            var selectionStart = this.TextBox.SelectionStart;
-            var selectionLength = this.TextBox.SelectionLength;
+            if( ( _selectedDateTimeInfo == null ) && ( this.CurrentDateTimePart != DateTimePart.Other ) )
+            {
+              var currentDateTimeInfo = this.GetDateTimeInfo( this.CurrentDateTimePart );
+              selectionStart = currentDateTimeInfo.StartPosition;
+              selectionLength = currentDateTimeInfo.Length;
+            }
+            else
+            {
+              selectionStart = this.TextBox.SelectionStart;
+              selectionLength = this.TextBox.SelectionLength;
+            }
+
             this.Value = newValue;
             this.TextBox.Select( selectionStart, selectionLength );
           }

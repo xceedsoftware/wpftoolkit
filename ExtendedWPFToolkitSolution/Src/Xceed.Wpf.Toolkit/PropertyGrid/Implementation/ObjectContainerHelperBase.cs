@@ -474,7 +474,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       if( editorElement == null )
       {
-        if( propertyItem.IsReadOnly )
+        if( propertyItem.IsReadOnly 
+          && !ListUtilities.IsListOfItems( propertyItem.PropertyType ) 
+          && !ListUtilities.IsCollectionOfItems( propertyItem.PropertyType)
+          && !ListUtilities.IsDictionaryOfItems( propertyItem.PropertyType ) )
           editor = new TextBlockEditor();
 
         // Fallback: Use a default type editor.

@@ -105,6 +105,7 @@
                     <ContentPresenter Margin="{TemplateBinding Padding}"
                                       Content="{TemplateBinding Content}"
                                       ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      ContentStringFormat="{TemplateBinding ContentStringFormat}"
                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                       RecognizesAccessKey="true" />

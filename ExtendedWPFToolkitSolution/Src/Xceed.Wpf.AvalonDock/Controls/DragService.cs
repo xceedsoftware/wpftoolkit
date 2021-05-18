@@ -192,9 +192,20 @@ namespace Xceed.Wpf.AvalonDock.Controls
     #region Private Methods
 
     private void GetOverlayWindowHosts()
-    {
-      _overlayWindowHosts.AddRange( _manager.GetFloatingWindowsByZOrder().OfType<LayoutAnchorableFloatingWindowControl>().Where( fw => fw != _floatingWindow && fw.IsVisible ) );
-      _overlayWindowHosts.Add( _manager );
+    {      
+      var windows = _manager.GetWindowsByZOrder().Where( w => (w != _floatingWindow) && w.IsVisible );
+
+      foreach( var w in windows )
+      {
+        if( w == Window.GetWindow( _manager ) )
+        {
+          _overlayWindowHosts.Add( _manager );
+        }
+        else if( w is LayoutAnchorableFloatingWindowControl )
+        {
+          _overlayWindowHosts.Add( w as LayoutAnchorableFloatingWindowControl );
+        }
+      }
     }
 
     #endregion    

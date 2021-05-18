@@ -44,7 +44,26 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       {
         // Use the PropertyGrid.EditorDefinitions for the CollectionControl's propertyGrid.
         this.Editor.EditorDefinitions = propertyGrid.EditorDefinitions;
+
+        this.Editor.CollectionUpdated += this.Editor_CollectionUpdated;
       }
+    }
+
+    private void Editor_CollectionUpdated( object sender, RoutedEventArgs e )
+    {
+      var propertyGridEditorCollectionControl = sender as PropertyGridEditorCollectionControl;
+      if( propertyGridEditorCollectionControl != null )
+      {
+        var propertyItem = propertyGridEditorCollectionControl.DataContext as PropertyItem;
+        if( propertyItem != null )
+        {
+          var propertyGrid = propertyItem.ParentElement as PropertyGrid;
+          if( propertyGrid != null )
+          {
+            propertyGrid.RaiseEvent( new PropertyValueChangedEventArgs( PropertyGrid.PropertyValueChangedEvent, propertyItem, null, propertyItem.Instance ) );
+          }
+        }
+      }      
     }
 
     protected override void ResolveValueBinding( PropertyItem propertyItem )

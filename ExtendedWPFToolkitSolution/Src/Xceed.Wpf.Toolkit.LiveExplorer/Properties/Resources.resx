@@ -106,7 +106,7 @@
     <value>text/microsoft-resx</value>
   </resheader>
   <resheader name="version">
-    <value>4.0</value>
+    <value>4.1</value>
   </resheader>
   <resheader name="reader">
     <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

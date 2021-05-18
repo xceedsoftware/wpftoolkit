@@ -19,7 +19,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit"
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
-                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
+                    xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters"
+                    xmlns:core="clr-namespace:Xceed.Wpf.Toolkit.Core">
 
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="../../Themes/Aero2/Common.xaml" />
@@ -195,18 +196,18 @@
           <RowDefinition Height="Auto" />
           <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0"
-                   TextWrapping="Wrap"
-                   Margin="0,0,0,14"
-                   FontSize="16"
-                   FontWeight="Bold"
-                   Text="{TemplateBinding Title}">
-        </TextBlock>
-        <TextBlock Grid.Row="1"
-                   TextWrapping="Wrap"
-                   Margin="0,0,0,14"
-                   Text="{TemplateBinding Description}">
-        </TextBlock>
+        <core:GenericTextBlock Grid.Row="0"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,14"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Text="{TemplateBinding Title}">
+        </core:GenericTextBlock>
+        <core:GenericTextBlock Grid.Row="1"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,14"
+                               Text="{TemplateBinding Description}">
+        </core:GenericTextBlock>
         <ContentPresenter Grid.Row="2"
                           Content="{TemplateBinding Content}"
                           ContentTemplate="{TemplateBinding ContentTemplate}"
@@ -230,15 +231,15 @@
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <StackPanel>
-          <TextBlock Margin="16,9,0,1"
-                     TextWrapping="Wrap"
-                     FontWeight="Bold"
-                     Text="{TemplateBinding Title}">
-          </TextBlock>
-          <TextBlock Margin="32,0,0,3"
-                     TextWrapping="Wrap"
-                     Text="{TemplateBinding Description}">
-          </TextBlock>
+          <core:GenericTextBlock Margin="16,9,0,1"
+                                 TextWrapping="Wrap"
+                                 FontWeight="Bold"
+                                 Text="{TemplateBinding Title}">
+          </core:GenericTextBlock>
+          <core:GenericTextBlock Margin="32,0,0,3"
+                                 TextWrapping="Wrap"
+                                 Text="{TemplateBinding Description}">
+          </core:GenericTextBlock>
         </StackPanel>
         <Image Grid.Column="1"
                Margin="4"

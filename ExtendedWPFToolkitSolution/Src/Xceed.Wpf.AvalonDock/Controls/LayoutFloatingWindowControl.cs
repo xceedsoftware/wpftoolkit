@@ -524,6 +524,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
+    internal bool IsClosing()
+    {
+      return _isClosing;
+    }
+
     #endregion
 
     #region Private Methods

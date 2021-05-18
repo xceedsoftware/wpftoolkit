@@ -105,6 +105,7 @@
     <Compile Include="Controls\Shell\WindowChrome.cs" />
     <Compile Include="Controls\Shell\WindowChromeWorker.cs" />
     <Compile Include="Converters\ActivateCommandLayoutItemFromLayoutModelConverter.cs" />
+    <Compile Include="Converters\AnchorableContextMenuAutoHideHeaderConverter.cs" />
     <Compile Include="Converters\AnchorableContextMenuHideVisibilityConverter.cs" />
     <Compile Include="Converters\AutoHideCommandLayoutItemFromLayoutModelConverter.cs" />
     <Compile Include="Converters\HideCommandLayoutItemFromLayoutModelConverter.cs" />

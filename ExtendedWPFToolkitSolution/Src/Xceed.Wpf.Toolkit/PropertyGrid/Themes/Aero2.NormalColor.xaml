@@ -52,6 +52,7 @@
   <pgconv:IsDefaultCategoryConverter x:Key="IsDefaultCategoryConverter" />
   <pgconv:SelectedObjectConverter x:Key="objectConverter" />
   <pgconv:PropertyItemEditorConverter x:Key="PropertyItemEditorConverter" />
+  <pgconv:PropertyNameTextTrimmingConverter x:Key="PropertyNameTextTrimmingConverter" />
 
   <x:Static x:Key="EmptyString"
             Member="sys:String.Empty" />
@@ -248,6 +249,11 @@
         <Setter Property="Background"
                 Value="Transparent" />
       </MultiTrigger>
+      <Trigger Property="IsReadOnly"
+               Value="True">
+        <Setter Property="IsEnabled"
+                Value="False" />
+      </Trigger>
       <Trigger Property="IsEnabled"
                Value="False">
         <Setter Property="Foreground"
@@ -714,7 +720,7 @@
             <Border Visibility="Collapsed"
                     Grid.Row="1"
                     x:Name="ExpandSite"
-                    Background="{x:Static SystemColors.ControlBrush}"
+                    Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
                     Padding="10 0 0 0">
               <Border BorderThickness="0"
                       Margin="0"
@@ -904,7 +910,8 @@
                                          HighlightedText="{Binding HighlightedText, RelativeSource={RelativeSource TemplatedParent}}"
                                          HorizontalAlignment="Stretch"
                                          VerticalAlignment="Center"
-                                         TextTrimming="CharacterEllipsis"
+                                         TextTrimming="{Binding PropertyNameTextWrapping, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}, Converter={StaticResource PropertyNameTextTrimmingConverter}}"
+                                         TextWrapping="{Binding PropertyNameTextWrapping, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}}"
                                          IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}, Converter={StaticResource InverseBoolConverter}}" >
                       </pg:TrimmedTextBlock>
                   </Grid>
@@ -947,6 +954,8 @@
                                RelativeSource="{RelativeSource TemplatedParent}" />
                       <Binding Path="IsReadOnly"
                                RelativeSource="{RelativeSource AncestorType={x:Type pg:PropertyGrid}}" />
+                      <Binding Path="IsReadOnly"
+                               RelativeSource="{RelativeSource TemplatedParent}" />
                     </MultiBinding>
                   </ContentControl.Content>
                 </ContentControl>
@@ -965,7 +974,7 @@
                                          ItemContainerStyle="{Binding PropertyContainerStyle, RelativeSource={RelativeSource TemplatedParent}}"
                                          VirtualizingStackPanel.IsVirtualizing="{Binding IsVirtualizing, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}}"
                                          VirtualizingStackPanel.VirtualizationMode="Recycling"
-                                         ScrollViewer.CanContentScroll="True">
+                                         ScrollViewer.CanContentScroll="{Binding IsVirtualizing, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=pg:PropertyGrid}}">
                   <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                       <VirtualizingStackPanel />
@@ -1239,7 +1248,7 @@
                                          Background="{x:Static SystemColors.ControlBrush}"
                                          VirtualizingStackPanel.IsVirtualizing="{Binding IsVirtualizing, RelativeSource={RelativeSource TemplatedParent}}"
                                          VirtualizingStackPanel.VirtualizationMode="Recycling"
-                                         ScrollViewer.CanContentScroll="True"
+                                         ScrollViewer.CanContentScroll="{Binding IsVirtualizing, RelativeSource={RelativeSource TemplatedParent}}"
                                          VerticalAlignment="Top">
                   <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>

@@ -22,6 +22,12 @@ namespace Xceed.Wpf.Toolkit.Primitives
 {
   public class SelectorItem : ContentControl
   {
+    #region Members
+
+    private bool m_raiseSelectionChangedEvent = true;
+
+    #endregion
+
     #region Constructors
 
     static SelectorItem()
@@ -55,7 +61,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     protected virtual void OnIsSelectedChanged( bool? oldValue, bool? newValue )
     {
-      if( newValue.HasValue )
+      if( m_raiseSelectionChangedEvent && newValue.HasValue )
       {
         if( newValue.Value )
         {
@@ -77,6 +83,17 @@ namespace Xceed.Wpf.Toolkit.Primitives
     }
 
     #endregion //Properties
+
+    #region Internal Methods
+
+    internal void SetIsSelected( bool isSelected, bool raiseSelectionChangedEvent = true )
+    {
+      m_raiseSelectionChangedEvent = raiseSelectionChangedEvent;
+      this.IsSelected = isSelected;
+      m_raiseSelectionChangedEvent = true;
+    }
+
+    #endregion
 
     #region Events
 

@@ -418,6 +418,23 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //PropertyNameLeftPadding
 
+    #region PropertyNameTextWrapping
+
+    public static readonly DependencyProperty PropertyNameTextWrappingProperty = DependencyProperty.Register( "PropertyNameTextWrapping", typeof( TextWrapping ), typeof( PropertyGrid ), new UIPropertyMetadata( TextWrapping.NoWrap ) );
+    public TextWrapping PropertyNameTextWrapping
+    {
+      get
+      {
+        return ( TextWrapping )GetValue( PropertyNameTextWrappingProperty );
+      }
+      set
+      {
+        SetValue( PropertyNameTextWrappingProperty, value );
+      }
+    }
+
+    #endregion //PropertyNameTextWrapping
+
     #region Properties
 
     public IList Properties

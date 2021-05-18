@@ -31,7 +31,7 @@ using System;
 
 [assembly: AssemblyCompany( "Xceed Software Inc." )]
 [assembly: AssemblyProduct( "Xceed Toolkit for WPF - AvalonDock" )]
-[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2020" )]
+[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2021" )]
 
 
 // Setting ComVisible to false makes the types in this assembly not visible 

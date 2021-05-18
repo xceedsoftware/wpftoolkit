@@ -159,7 +159,8 @@
                             Focusable="False"
                             IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                             Style="{StaticResource CalculatorToggleButtonStyle}"
-                            IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}">
+                            IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                            IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}">
               </ToggleButton>
             </Grid>
             <Popup x:Name="PART_CalculatorPopup"

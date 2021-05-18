@@ -31,14 +31,17 @@ namespace Xceed.Wpf.AvalonDock
 
     public static void SetParentToMainWindowOf( this Window window, Visual element )
     {
-      var wndParent = Window.GetWindow( element );
-      if( wndParent != null )
-        window.Owner = wndParent;
-      else
+
       {
-        IntPtr parentHwnd;
-        if( GetParentWindowHandle( element, out parentHwnd ) )
-          Win32Helper.SetOwner( new WindowInteropHelper( window ).Handle, parentHwnd );
+        var wndParent = Window.GetWindow( element );
+        if( wndParent != null )
+          window.Owner = wndParent;
+        else
+        {
+          IntPtr parentHwnd;
+          if( GetParentWindowHandle( element, out parentHwnd ) )
+            Win32Helper.SetOwner( new WindowInteropHelper( window ).Handle, parentHwnd );
+        }
       }
     }
 

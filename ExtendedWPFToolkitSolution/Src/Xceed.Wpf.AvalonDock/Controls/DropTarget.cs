@@ -116,10 +116,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         Dispatcher.BeginInvoke( new Action( () =>
             {
-              if( ( currentActiveContent.Root != null ) && ( currentActiveContent.Root.Manager != null ) )
-              {
-                currentActiveContent.Root.Manager.MoveFocus( new TraversalRequest( FocusNavigationDirection.Next ) );
-              }
               currentActiveContent.IsSelected = false;
               currentActiveContent.IsActive = false;
               currentActiveContent.IsActive = true;
