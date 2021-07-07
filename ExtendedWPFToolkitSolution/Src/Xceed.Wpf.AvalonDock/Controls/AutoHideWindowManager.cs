@@ -28,6 +28,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     private DockingManager _manager;
     private WeakReference _currentAutohiddenAnchor = null;
     private DispatcherTimer _closeTimer = null;
+    private int _fastTimer = 0;
 
     #endregion
 
@@ -68,13 +69,23 @@ namespace Xceed.Wpf.AvalonDock.Controls
     private void SetupCloseTimer()
     {
       _closeTimer = new DispatcherTimer( DispatcherPriority.Background );
-      _closeTimer.Interval = TimeSpan.FromMilliseconds( 1500 );
+      _closeTimer.Interval = TimeSpan.FromMilliseconds( 100 );
       _closeTimer.Tick += ( s, e ) =>
       {
         if( _manager.AutoHideWindow.IsWin32MouseOver ||
                   ( ( LayoutAnchorable )_manager.AutoHideWindow.Model ).IsActive ||
                   _manager.AutoHideWindow.IsResizing )
+        {
+          if (_fastTimer == 0) {
+            _closeTimer.Interval = TimeSpan.FromMilliseconds( 1500 );
+            _fastTimer = -1;
+          }
+          else if (_fastTimer > 0)
+          {
+            --_fastTimer;
+          }
           return;
+        }
 
         StopCloseTimer();
       };
@@ -82,6 +93,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private void StartCloseTimer()
     {
+      _fastTimer = 5;
       _closeTimer.Start();
     }
 
