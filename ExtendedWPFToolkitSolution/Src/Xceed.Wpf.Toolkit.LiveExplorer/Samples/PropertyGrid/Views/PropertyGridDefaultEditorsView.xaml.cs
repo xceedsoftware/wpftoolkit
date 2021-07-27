@@ -167,9 +167,15 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       public Person Person { get; set; }
     }
 
-    public class Person
+    public class Person : ICloneable
     {
+      [ReadOnly(true)]
+      public Guid UniqueID { get; set; } = Guid.NewGuid();
       public string Name { get; set; }
+      public object Clone()
+      {
+        return new Person { Name = Name };
+      }
     }
   }
 }
