@@ -83,9 +83,9 @@
 
     <SolidColorBrush x:Key="Window_WindowBorderBrush" Color="Gray" />
 
-    <SolidColorBrush x:Key="Window_WindowBackground" Color="{x:Static media:WindowColors.ColorizationColor}" />
+    <SolidColorBrush x:Key="Window_WindowBackground" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
 
-    <SolidColorBrush x:Key="Window_Background"  Color="White"/>
+    <SolidColorBrush x:Key="Window_Background" Color="White"/>
 
     <SolidColorBrush x:Key="Window_WindowInactiveBackground" Color="#FFEBEBEB" />
 

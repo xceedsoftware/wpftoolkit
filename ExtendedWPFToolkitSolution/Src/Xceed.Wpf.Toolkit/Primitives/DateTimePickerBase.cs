@@ -42,6 +42,74 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #region Properties
 
+    #region DropDownButtonContent
+
+    public static readonly DependencyProperty DropDownButtonContentProperty = DependencyProperty.Register( "DropDownButtonContent", typeof( object ), typeof( DateTimePickerBase ), new UIPropertyMetadata( null ) );
+    public object DropDownButtonContent
+    {
+      get
+      {
+        return (object)GetValue( DropDownButtonContentProperty );
+      }
+      set
+      {
+        SetValue( DropDownButtonContentProperty, value );
+      }
+    }
+
+    #endregion //DropDownButtonContent
+
+    #region DropDownButtonDisabledContent
+
+    public static readonly DependencyProperty DropDownButtonDisabledContentProperty = DependencyProperty.Register( "DropDownButtonDisabledContent", typeof( object ), typeof( DateTimePickerBase ), new UIPropertyMetadata( null ) );
+    public object DropDownButtonDisabledContent
+    {
+      get
+      {
+        return (object)GetValue( DropDownButtonDisabledContentProperty );
+      }
+      set
+      {
+        SetValue( DropDownButtonDisabledContentProperty, value );
+      }
+    }
+
+    #endregion //DropDownButtonDisabledContent
+
+    #region DropDownButtonHeight
+
+    public static readonly DependencyProperty DropDownButtonHeightProperty = DependencyProperty.Register( "DropDownButtonHeight", typeof( double ), typeof( DateTimePickerBase ), new UIPropertyMetadata( double.NaN ) );
+    public double DropDownButtonHeight
+    {
+      get
+      {
+        return (double)GetValue( DropDownButtonHeightProperty );
+      }
+      set
+      {
+        SetValue( DropDownButtonHeightProperty, value );
+      }
+    }
+
+    #endregion //DropDownButtonHeight
+
+    #region DropDownButtonWidth
+
+    public static readonly DependencyProperty DropDownButtonWidthProperty = DependencyProperty.Register( "DropDownButtonWidth", typeof( double ), typeof( DateTimePickerBase ), new UIPropertyMetadata( double.NaN ) );
+    public double DropDownButtonWidth
+    {
+      get
+      {
+        return (double)GetValue( DropDownButtonWidthProperty );
+      }
+      set
+      {
+        SetValue( DropDownButtonWidthProperty, value );
+      }
+    }
+
+    #endregion //DropDownButtonWidth
+
     #region IsOpen
 
     public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register( "IsOpen", typeof( bool ), typeof( DateTimePickerBase ), new UIPropertyMetadata( false, OnIsOpenChanged ) );

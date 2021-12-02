@@ -29,12 +29,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
   {
     #region Members
 
+    private static double MinDragBuffer = 5d;
+    private static double MaxDragBuffer = 50d;
+
     private List<Rect> _otherTabsScreenArea = null;
     private List<TabItem> _otherTabs = null;
     private Rect _parentDocumentTabPanelScreenArea;
     private DocumentPaneTabPanel _parentDocumentTabPanel;
     private bool _isMouseDown = false;
     private Point _mouseDownPoint;
+    private double _mouseLastChangePositionX;
+    private double _dragBuffer = MinDragBuffer;
 
     #endregion
 
@@ -159,10 +164,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       base.OnMouseMove( e );
 
+      var ptMouseMove = e.GetPosition( this );
+
       if( _isMouseDown )
       {
-        Point ptMouseMove = e.GetPosition( this );
-
         if( Math.Abs( ptMouseMove.X - _mouseDownPoint.X ) > SystemParameters.MinimumHorizontalDragDistance ||
             Math.Abs( ptMouseMove.Y - _mouseDownPoint.Y ) > SystemParameters.MinimumVerticalDragDistance )
         {
@@ -174,7 +179,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       if( this.IsMouseCaptured )
       {
-        var mousePosInScreenCoord = this.PointToScreenDPI( e.GetPosition( this ) );
+        var mousePosInScreenCoord = this.PointToScreenDPI( ptMouseMove );
+
         if( !_parentDocumentTabPanelScreenArea.Contains( mousePosInScreenCoord ) )
         {
           this.StartDraggingFloatingWindowForContent();
@@ -187,17 +193,38 @@ namespace Xceed.Wpf.AvalonDock.Controls
             var targetModel = _otherTabs[ indexOfTabItemWithMouseOver ].Content as LayoutContent;
             var container = this.Model.Parent as ILayoutContainer;
             var containerPane = this.Model.Parent as ILayoutPane;
+            var currentTabScreenArea = this.FindLogicalAncestor<TabItem>().GetScreenArea();
 
-            if( ( containerPane is LayoutDocumentPane ) && !( ( LayoutDocumentPane )containerPane ).CanRepositionItems )
+            // Inside current TabItem, do not care about _mouseLastChangePosition for next change position.
+            if( targetModel == this.Model )
+            {
+              _mouseLastChangePositionX = currentTabScreenArea.Left + ( currentTabScreenArea.Width / 2 );
+            }
+
+            if( ( containerPane is LayoutDocumentPane ) && !( (LayoutDocumentPane)containerPane ).CanRepositionItems )
               return;
-            if( ( containerPane.Parent != null ) && ( containerPane.Parent is LayoutDocumentPaneGroup ) && !( ( LayoutDocumentPaneGroup )containerPane.Parent ).CanRepositionItems )
+            if( ( containerPane.Parent != null ) && ( containerPane.Parent is LayoutDocumentPaneGroup ) && !( (LayoutDocumentPaneGroup)containerPane.Parent ).CanRepositionItems )
               return;
 
             var childrenList = container.Children.ToList();
-            containerPane.MoveChild( childrenList.IndexOf( Model ), childrenList.IndexOf( targetModel ) );
-            this.Model.IsActive = true;
-            _parentDocumentTabPanel.UpdateLayout();
-            this.UpdateDragDetails();
+            var currentIndex = childrenList.IndexOf( this.Model );
+            var newIndex = childrenList.IndexOf( targetModel );
+
+            if( currentIndex != newIndex )
+            {
+              // Moving left when cursor leave tabItem or moving left past last change position.
+              // Or, moving right cursor leave tabItem or moving right past last change position.
+              if( ( ( mousePosInScreenCoord.X < currentTabScreenArea.Left ) && ( mousePosInScreenCoord.X < _mouseLastChangePositionX ) )
+                || ( ( mousePosInScreenCoord.X > ( currentTabScreenArea.Left + currentTabScreenArea.Width ) ) && ( mousePosInScreenCoord.X > _mouseLastChangePositionX ) ) )
+              {
+                containerPane.MoveChild( currentIndex, newIndex );
+                _dragBuffer = MaxDragBuffer;
+                this.Model.IsActive = true;
+                _parentDocumentTabPanel.UpdateLayout();
+                this.UpdateDragDetails();
+                _mouseLastChangePositionX = mousePosInScreenCoord.X;
+              }
+            }
           }
         }
       }
@@ -206,8 +233,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
     protected override void OnMouseLeftButtonUp( System.Windows.Input.MouseButtonEventArgs e )
     {
       if( IsMouseCaptured )
-        ReleaseMouseCapture();
+      {
+        this.ReleaseMouseCapture();
+      }
       _isMouseDown = false;
+      _dragBuffer = MinDragBuffer;
 
       base.OnMouseLeftButtonUp( e );
     }
@@ -243,13 +273,15 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       _parentDocumentTabPanel = this.FindLogicalAncestor<DocumentPaneTabPanel>();
       _parentDocumentTabPanelScreenArea = _parentDocumentTabPanel.GetScreenArea();
-      _otherTabs = _parentDocumentTabPanel.Children.Cast<TabItem>().Where( ch =>
-           ch.Visibility != System.Windows.Visibility.Collapsed ).ToList();
-      Rect currentTabScreenArea = this.FindLogicalAncestor<TabItem>().GetScreenArea();
+      _parentDocumentTabPanelScreenArea.Inflate( 0, _dragBuffer );
+      _otherTabs = _parentDocumentTabPanel.Children.Cast<TabItem>().Where( ch => ch.Visibility != System.Windows.Visibility.Collapsed ).ToList();
+      var currentTabScreenArea = this.FindLogicalAncestor<TabItem>().GetScreenArea();
       _otherTabsScreenArea = _otherTabs.Select( ti =>
       {
         var screenArea = ti.GetScreenArea();
-        return new Rect( screenArea.Left, screenArea.Top, currentTabScreenArea.Width, screenArea.Height );
+        var rect = new Rect( screenArea.Left, screenArea.Top, screenArea.Width, screenArea.Height );
+        rect.Inflate( 0, _dragBuffer );
+        return rect;
       } ).ToList();
     }
 

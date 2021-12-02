@@ -119,6 +119,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
               currentActiveContent.IsSelected = false;
               currentActiveContent.IsActive = false;
               currentActiveContent.IsActive = true;
+              currentActiveContent.IsFloating = false;
             } ), DispatcherPriority.Background );
       }
     }

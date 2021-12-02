@@ -3280,7 +3280,10 @@ namespace Xceed.Wpf.AvalonDock
         Left = fwLeft
       };
 
-
+      foreach( var layoutContent in destPane.Children )
+      {
+        layoutContent.IsFloating = true;
+      }
 
       //fwc.Owner = Window.GetWindow(this);
       //fwc.SetParentToMainWindowOf(this);
@@ -3384,6 +3387,7 @@ namespace Xceed.Wpf.AvalonDock
         };
       }
 
+      contentModel.IsFloating = true;
 
       //fwc.Owner = Window.GetWindow(this);
       //fwc.SetParentToMainWindowOf(this);
@@ -3433,9 +3437,9 @@ namespace Xceed.Wpf.AvalonDock
               if( grandParentPaneContainer != null )
               {
                 var children = grandParentPaneContainer.Children.Where( child => ( child.Equals( parentPane ) && ( parentPane is ILayoutContainer ) && ( ( ( ILayoutContainer )parentPane ).ChildrenCount > 1 ) )
-                                                                                || !child.Equals( parentPane ) )
+                                                                                || (!child.Equals( parentPane ) && (child is ILayoutContainer) && (((ILayoutContainer)child).ChildrenCount > 0)) )
                                                                 .Cast<ILayoutPositionableElement>()
-                                                                .Where( child => child.DockHeight.IsStar );
+                                                                .Where( child => child.DockWidth.IsStar );
                 var childrenTotalWidth = children.Sum( child => child.DockWidth.Value );
                 foreach( var child in children )
                 {

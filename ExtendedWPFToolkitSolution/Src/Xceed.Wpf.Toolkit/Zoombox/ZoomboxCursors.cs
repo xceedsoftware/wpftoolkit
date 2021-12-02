@@ -31,7 +31,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     {
       try
       {
+#if !NETCORE && !NET5
         new EnvironmentPermission( PermissionState.Unrestricted ).Demand();
+#endif
         _zoom = new Cursor( ResourceHelper.LoadResourceStream( Assembly.GetExecutingAssembly(), "Zoombox/Resources/Zoom.cur" ) );
         _zoomRelative = new Cursor( ResourceHelper.LoadResourceStream( Assembly.GetExecutingAssembly(), "Zoombox/Resources/ZoomRelative.cur" ) );
       }

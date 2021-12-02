@@ -50,7 +50,7 @@ namespace Xceed.Utils.Exceptions
     #endif // !NO_CODE_ANALYSIS
     public static void ThrowLicenseException( Type type, object instance, string message )
     {
-      #if PORTABLE || NETCORE
+      #if PORTABLE || NETCORE || NET5
       throw new Exception( message );
       #elif ( XCEEDCF || SILVERLIGHT || XAMARIN )
       throw new SystemException( message );
@@ -62,7 +62,7 @@ namespace Xceed.Utils.Exceptions
       #else
       throw new System.ComponentModel.LicenseException( type, instance, message );
       #endif // XBAP_FRIENDLY
-      #endif // ( XCEEDCF || NETCORE )
+      #endif // ( XCEEDCF || NETCORE || NET5)
     }
 
     #endregion PUBLIC STATIC METHODS

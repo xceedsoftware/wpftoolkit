@@ -50,6 +50,14 @@
             Value="1" />
     <Setter Property="VerticalContentAlignment"
             Value="Center" />
+    <Setter Property="SpinnerUpContentTemplate"
+            Value="{StaticResource IncreaseGlyphNormalKey}" />
+    <Setter Property="SpinnerDownContentTemplate"
+            Value="{StaticResource DecreaseGlyphNormalKey}" />
+    <Setter Property="SpinnerUpDisabledContentTemplate"
+            Value="{StaticResource IncreaseGlyphDisabledKey}" />
+    <Setter Property="SpinnerDownDisabledContentTemplate"
+            Value="{StaticResource DecreaseGlyphDisabledKey}" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:ButtonSpinner}">
@@ -72,9 +80,10 @@
                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
 
-              <Grid x:Name="gridContent"
+              <Grid x:Name="gridContent" 
                     Grid.Column="1"
-                    Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}">
+                    Width="{TemplateBinding SpinnerWidth}"
+                    Height="{TemplateBinding SpinnerHeight}">
                 <Grid.RowDefinitions>
                   <RowDefinition Height="*" />
                   <RowDefinition Height="*" />
@@ -83,21 +92,21 @@
                 <RepeatButton x:Name="PART_IncreaseButton"
                               Style="{DynamicResource {x:Static themes:ResourceKeys.SpinnerButtonStyleKey}}"
                               IsTabStop="{TemplateBinding IsTabStop}"
-                              ContentTemplate="{StaticResource IncreaseGlyphNormalKey}">
+                              ContentTemplate="{TemplateBinding SpinnerUpContentTemplate}">
                 </RepeatButton>
 
                 <RepeatButton x:Name="PART_DecreaseButton"
                               Grid.Row="1"
                               Style="{DynamicResource {x:Static themes:ResourceKeys.SpinnerButtonStyleKey}}"
                               IsTabStop="{TemplateBinding IsTabStop}"
-                              ContentTemplate="{StaticResource DecreaseGlyphNormalKey}">
+                              ContentTemplate="{TemplateBinding SpinnerDownContentTemplate}">
                 </RepeatButton>
 
               </Grid>
             </Grid>
           </Border>
           <ControlTemplate.Triggers>
-            <Trigger Property="ShowButtonSpinner"
+            <Trigger Property="ShowSpinner"
                      Value="False">
               <Setter Property="Visibility"
                       Value="Hidden"
@@ -126,16 +135,16 @@
                      Value="False">
               <Setter TargetName="PART_IncreaseButton"
                       Property="ContentTemplate"
-                      Value="{StaticResource IncreaseGlyphDisabledKey}" />
+                      Value="{Binding SpinnerUpDisabledContentTemplate, RelativeSource={RelativeSource TemplatedParent}}" />
             </Trigger>
             <Trigger SourceName="PART_DecreaseButton"
                      Property="IsEnabled"
                      Value="False">
               <Setter TargetName="PART_DecreaseButton"
                       Property="ContentTemplate"
-                      Value="{StaticResource DecreaseGlyphDisabledKey}" />
+                      Value="{Binding SpinnerDownDisabledContentTemplate, RelativeSource={RelativeSource TemplatedParent}}" />
             </Trigger>
-            <Trigger Property="ButtonSpinnerLocation"
+            <Trigger Property="SpinnerLocation"
                      Value="Left">
               <Setter TargetName="firstContentColumn"
                       Property="Width"

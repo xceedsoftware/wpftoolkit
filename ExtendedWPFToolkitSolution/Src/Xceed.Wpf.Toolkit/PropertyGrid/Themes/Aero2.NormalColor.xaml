@@ -306,6 +306,13 @@
             Value="0" />
   </Style>
 
+  <!-- PropertyGrid Password Editors -->
+  <Style TargetType="{x:Type editor:PropertyGridEditorWatermarkPasswordBox}"
+         BasedOn="{StaticResource {x:Type TextBox}}">
+    <Setter Property="BorderThickness"
+            Value="0" />
+  </Style>
+
   <!-- PropertyGrid ColorPicker Editors -->
   <Style TargetType="{x:Type editor:PropertyGridEditorColorPicker}"
          BasedOn="{StaticResource ColorPicker}">

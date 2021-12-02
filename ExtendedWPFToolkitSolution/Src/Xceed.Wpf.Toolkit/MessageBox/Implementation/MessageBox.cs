@@ -1190,7 +1190,9 @@ namespace Xceed.Wpf.Toolkit
 
       try
       {
+#if !NETCORE && !NET5
         new UIPermission( UIPermissionClipboard.AllClipboard ).Demand();
+#endif
         Clipboard.SetText( sb.ToString() );
       }
       catch( SecurityException )
@@ -1199,6 +1201,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    #endregion COMMANDS
+#endregion COMMANDS
   }
 }

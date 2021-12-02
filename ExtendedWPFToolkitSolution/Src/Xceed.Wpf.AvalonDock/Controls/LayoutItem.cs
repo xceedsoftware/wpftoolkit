@@ -1181,9 +1181,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
         this.SetCurrentValue( LayoutItem.MoveToPreviousTabGroupCommandProperty, _defaultMoveToPreviousTabGroupCommand );
 
 
-      IsSelected = LayoutElement.IsSelected;
-      IsActive = LayoutElement.IsActive;
-      CanClose = LayoutElement.CanClose;
+      this.SetCurrentValue( LayoutItem.IsSelectedProperty, LayoutElement.IsSelected );
+      this.SetCurrentValue( LayoutItem.IsActiveProperty, LayoutElement.IsActive );
+      this.SetCurrentValue( LayoutItem.CanCloseProperty, LayoutElement.CanClose );
     }
 
     protected virtual void OnVisibilityChanged()

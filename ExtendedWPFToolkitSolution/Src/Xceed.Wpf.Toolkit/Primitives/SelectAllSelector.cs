@@ -18,6 +18,7 @@
 using System.Collections.Specialized;
 using System.Windows;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Xceed.Wpf.Toolkit.Primitives
 {
@@ -114,10 +115,15 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     public void SelectAll()
     {
+      var currentSelectedItems = new List<object>(this.SelectedItems as IEnumerable<object>);
+      var items = this.ItemsCollection.Cast<object>();
+
       // Have a faster selection when there are more than 200 items.
-      this.UpdateSelectedItemsWithoutNotifications( this.ItemsCollection.Cast<object>().ToList() );
-      // Raise SelectionChanged for every items.
-      foreach( var item in this.ItemsCollection )
+      this.UpdateSelectedItemsWithoutNotifications( items.ToList() );
+
+      // Raise SelectionChanged for new selected items.
+      var newSelectedItems = items.Except( currentSelectedItems );
+      foreach ( var item in newSelectedItems)
       {
         this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, true ) );
       }
@@ -125,7 +131,15 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     public void UnSelectAll()
     {
+      var currentSelectedItems = new List<object>( this.SelectedItems as IEnumerable<object> );
+
       this.SelectedItems.Clear();
+
+      // Raise SelectionChanged for selected items.
+      foreach (var item in currentSelectedItems)
+      {
+        this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, false ) );
+      }
     }
 
     #endregion

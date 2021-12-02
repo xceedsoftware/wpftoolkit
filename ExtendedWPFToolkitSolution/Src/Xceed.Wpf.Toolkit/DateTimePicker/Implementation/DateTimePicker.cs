@@ -23,6 +23,7 @@ using System.Windows.Controls.Primitives;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 using Xceed.Wpf.Toolkit.Primitives;
 using System.Windows.Shapes;
+using System.Windows.Markup;
 #if VS2008
 using Microsoft.Windows.Controls;
 using Microsoft.Windows.Controls.Primitives;
@@ -258,6 +259,7 @@ namespace Xceed.Wpf.Toolkit
 
       if( _calendar != null )
       {
+        _calendar.Language = XmlLanguage.GetLanguage( System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag );
         _calendar.SelectedDatesChanged += this.Calendar_SelectedDatesChanged;
         _calendar.MouseDoubleClick += this.Calendar_MouseDoubleClick;
         _calendar.SelectedDate = Value ?? null;

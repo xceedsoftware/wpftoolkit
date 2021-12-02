@@ -237,6 +237,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( itemsSourceAttribute != null )
         return new ItemsSourceAttributeEditor( itemsSourceAttribute );
 
+      var passwordPropertyTextAttribute = GetAttribute<PasswordPropertyTextAttribute>();
+      if( passwordPropertyTextAttribute != null )
+        return new PasswordEditor();
+
       return null;
     }
 

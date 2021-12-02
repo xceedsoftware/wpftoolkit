@@ -19,6 +19,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
                     xmlns:local="clr-namespace:Xceed.Wpf.Toolkit">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="../../Themes/Aero2/Glyphs.xaml" />
+  </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate x:Key="DefaultWatermarkTemplate">
         <ContentControl Content="{Binding}" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Focusable="False" Margin="0,0,3,0" />
@@ -39,19 +42,33 @@
         <Setter Property="TextAlignment" Value="Right" />
         <Setter Property="WatermarkTemplate" Value="{StaticResource DefaultWatermarkTemplate}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="ButtonSpinnerUpContentTemplate"
+                Value="{StaticResource IncreaseGlyphNormalKey}" />
+        <Setter Property="ButtonSpinnerDownContentTemplate"
+                Value="{StaticResource DecreaseGlyphNormalKey}" />
+        <Setter Property="ButtonSpinnerUpDisabledContentTemplate"
+                Value="{StaticResource IncreaseGlyphDisabledKey}" />
+        <Setter Property="ButtonSpinnerDownDisabledContentTemplate"
+                Value="{StaticResource DecreaseGlyphDisabledKey}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:DateTimeUpDown}">
                     <local:ButtonSpinner x:Name="PART_Spinner"
-                                    IsTabStop="False"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    HorizontalContentAlignment="Stretch"
-                                    VerticalContentAlignment="Stretch"
-                                    ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
-                                    AllowSpin="{TemplateBinding AllowSpin}"
-                                    ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
+                                         IsTabStop="False"
+                                         Background="{TemplateBinding Background}"
+                                         BorderBrush="{TemplateBinding BorderBrush}"
+                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         HorizontalContentAlignment="Stretch"
+                                         VerticalContentAlignment="Stretch"
+                                         SpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
+                                         SpinnerWidth="{TemplateBinding ButtonSpinnerWidth}"
+                                         SpinnerHeight="{TemplateBinding ButtonSpinnerHeight}"
+                                         SpinnerUpContentTemplate="{TemplateBinding ButtonSpinnerUpContentTemplate}"
+                                         SpinnerDownContentTemplate="{TemplateBinding ButtonSpinnerDownContentTemplate}"
+                                         SpinnerUpDisabledContentTemplate="{TemplateBinding ButtonSpinnerUpDisabledContentTemplate}"
+                                         SpinnerDownDisabledContentTemplate="{TemplateBinding ButtonSpinnerDownDisabledContentTemplate}"
+                                         AllowSpin="{TemplateBinding AllowSpin}"
+                                         ShowSpinner="{TemplateBinding ShowButtonSpinner}">
                         <local:WatermarkTextBox x:Name="PART_TextBox"
                                           BorderThickness="0" 
                                           Background="Transparent"

@@ -91,6 +91,7 @@ namespace Xceed.Wpf.Toolkit.Core.Media
 
     private static int GetDWMIntValue( string keyName )
     {
+#pragma warning disable CA1416
       // This value is not accessible throught the standard WPF API.
       // We must dig into the registry to get the value.
       var curUser = Microsoft.Win32.Registry.CurrentUser;
@@ -100,9 +101,10 @@ namespace Xceed.Wpf.Toolkit.Core.Media
 #if VS2008
         );
 #else
-        ,Microsoft.Win32.RegistryOptions.None );
+        , Microsoft.Win32.RegistryOptions.None );
 #endif
-      return ( int )subKey.GetValue( keyName );
+      return (int)subKey.GetValue( keyName );
+#pragma warning restore CA1416
     }
 
     private static Color GetDWMColorValue( string keyName )

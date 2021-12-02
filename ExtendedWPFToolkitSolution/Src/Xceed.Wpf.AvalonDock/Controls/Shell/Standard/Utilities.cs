@@ -578,7 +578,9 @@ namespace Standard
       if( null != t )
       {
         Assert.IsTrue( Marshal.IsComObject( t ) );
+#if !NETCORE && !NET5
         Marshal.ReleaseComObject( t );
+#endif
       }
     }
 
@@ -1005,7 +1007,7 @@ namespace Standard
       dpd.RemoveValueChanged( component, listener );
     }
 
-    #region Extension Methods
+#region Extension Methods
 
     public static bool IsThicknessNonNegative( Thickness thickness )
     {
@@ -1067,6 +1069,6 @@ namespace Standard
       return true;
     }
 
-    #endregion
+#endregion
   }
 }

@@ -1037,7 +1037,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !e.CanExecute ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        PlayBeep();
+      }
     }
 
     private void CanExecuteDeletePreviousWord( object sender, CanExecuteRoutedEventArgs e )
@@ -1067,7 +1069,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !e.CanExecute ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        this.PlayBeep();
+      }
     }
 
     private void CanExecuteDeleteNextWord( object sender, CanExecuteRoutedEventArgs e )
@@ -1097,7 +1101,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !e.CanExecute ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        this.PlayBeep();
+      }
     }
 
     private void CanExecuteBackspace( object sender, CanExecuteRoutedEventArgs e )
@@ -1109,7 +1115,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !e.CanExecute ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        this.PlayBeep();
+      }
     }
 
     private void CanExecuteCut( object sender, CanExecuteRoutedEventArgs e )
@@ -1132,7 +1140,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !canCut ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        this.PlayBeep();
+      }
     }
 
     private void CanExecutePaste( object sender, CanExecuteRoutedEventArgs e )
@@ -1166,7 +1176,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !e.CanExecute ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        this.PlayBeep();
+      }
     }
 
     private void CanExecuteCopy( object sender, CanExecuteRoutedEventArgs e )
@@ -1178,7 +1190,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !e.CanExecute ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        this.PlayBeep();
+      }
     }
 
     private void ExecuteCopy()
@@ -1186,7 +1200,9 @@ namespace Xceed.Wpf.Toolkit
       string selectedText = this.GetSelectedText();
       try
       {
+#if !NETCORE && !NET5
         new UIPermission( UIPermissionClipboard.AllClipboard ).Demand();
+#endif
 
         if( selectedText.Length == 0 )
         {
@@ -1207,9 +1223,9 @@ namespace Xceed.Wpf.Toolkit
       m_insertToggled = !m_insertToggled;
     }
 
-    #endregion COMMANDS
+#endregion COMMANDS
 
-    #region DRAG DROP
+#region DRAG DROP
 
     private void PreviewQueryContinueDragCallback( object sender, QueryContinueDragEventArgs e )
     {
@@ -1242,10 +1258,10 @@ namespace Xceed.Wpf.Toolkit
       base.OnDragOver( e );
     }
 
-    #endregion DRAG DROP
+#endregion DRAG DROP
 
 
-    #region VALUE FROM TEXT
+#region VALUE FROM TEXT
 
     protected override bool QueryValueFromTextCore( string text, out object value )
     {
@@ -1268,9 +1284,9 @@ namespace Xceed.Wpf.Toolkit
       return base.QueryValueFromTextCore( text, out value );
     }
 
-    #endregion VALUE FROM TEXT
+#endregion VALUE FROM TEXT
 
-    #region TEXT FROM VALUE
+#region TEXT FROM VALUE
 
     protected override string QueryTextFromValueCore( object value )
     {
@@ -1289,10 +1305,10 @@ namespace Xceed.Wpf.Toolkit
       return base.QueryTextFromValueCore( value );
     }
 
-    #endregion TEXT FROM VALUE
+#endregion TEXT FROM VALUE
 
 
-    #region PROTECTED METHODS
+#region PROTECTED METHODS
 
     protected virtual char[] GetMaskCharacters()
     {
@@ -1393,7 +1409,9 @@ namespace Xceed.Wpf.Toolkit
         else
         {
           if( this.BeepOnError )
-            System.Media.SystemSounds.Beep.Play();
+          {
+            this.PlayBeep();
+          }
         }
 
         if( this.SelectionLength > 0 )
@@ -1421,10 +1439,10 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    #endregion PROTECTED METHODS
+#endregion PROTECTED METHODS
 
 
-    #region INTERNAL PROPERTIES
+#region INTERNAL PROPERTIES
 
     internal bool IsForcingMask
     {
@@ -1461,9 +1479,9 @@ namespace Xceed.Wpf.Toolkit
       return true;
     }
 
-    #endregion INTERNAL PROPERTIES
+#endregion INTERNAL PROPERTIES
 
-    #region INTERNAL METHODS
+#region INTERNAL METHODS
 
     internal override string GetCurrentText()
     {
@@ -1577,9 +1595,9 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    #endregion INTERNAL METHODS
+#endregion INTERNAL METHODS
 
-    #region PRIVATE PROPERTIES
+#region PRIVATE PROPERTIES
 
     private bool IsOverwriteMode
     {
@@ -1613,6 +1631,13 @@ namespace Xceed.Wpf.Toolkit
     #endregion PRIVATE PROPERTIES
 
     #region PRIVATE METHODS
+
+    private void PlayBeep()
+    {
+#pragma warning disable CA1416
+      System.Media.SystemSounds.Beep.Play();
+#pragma warning restore CA1416
+    }
 
     private bool PlaceChar( char ch, int startPosition, int length, bool overwrite, out int caretIndex )
     {
@@ -1726,7 +1751,9 @@ namespace Xceed.Wpf.Toolkit
       else
       {
         if( this.BeepOnError )
-          System.Media.SystemSounds.Beep.Play();
+        {
+          this.PlayBeep();
+        }
       }
     }
 
@@ -1843,7 +1870,9 @@ namespace Xceed.Wpf.Toolkit
       if( !success )
       {
         if( this.BeepOnError )
-          System.Media.SystemSounds.Beep.Play();
+        {
+          this.PlayBeep();
+        }
 
         return;
       }
@@ -1937,9 +1966,9 @@ namespace Xceed.Wpf.Toolkit
       return m_maskedTextProvider.ToString( true, includePrompt, includeLiterals, this.SelectionStart, selectionLength );
     }
 
-    #endregion PRIVATE METHODS
+#endregion PRIVATE METHODS
 
-    #region PRIVATE FIELDS
+#region PRIVATE FIELDS
 
     private MaskedTextProvider m_maskedTextProvider; // = null;
     private bool m_insertToggled; // = false;
@@ -1950,6 +1979,6 @@ namespace Xceed.Wpf.Toolkit
     private string m_formatSpecifier;
     private MethodInfo m_valueToStringMethodInfo; // = null;
 
-    #endregion PRIVATE FIELDS
+#endregion PRIVATE FIELDS
   }
 }

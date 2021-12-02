@@ -251,7 +251,7 @@
     <Setter Property="BorderThickness"
             Value="0" />
     <Setter Property="MaxHeight"
-            Value="500" />
+            Value="275" />
     <!-- ConverterParameter is margin/Padding from Popup-->
     <Setter Property="Width"
             Value="{Binding MaxDropDownWidth, RelativeSource={RelativeSource AncestorType={x:Type local:ColorPicker}}, Converter={StaticResource AdditionConverter}, ConverterParameter=-18}" />

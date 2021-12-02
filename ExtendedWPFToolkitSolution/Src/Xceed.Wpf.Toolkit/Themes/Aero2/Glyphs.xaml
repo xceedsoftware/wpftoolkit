@@ -65,4 +65,26 @@
             Focusable="False" />
     </DataTemplate>
 
+  <Grid x:Key="DropDownArrowGlyph"
+        IsHitTestVisible="False"
+        Grid.Column="1"
+        Margin="5">
+    <Path Width="9"
+          Height="5"
+          Data="{StaticResource DownArrowGeometry}"
+          Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+          Margin="0,1,0,0" />
+  </Grid>
+
+  <Grid x:Key="DropDownDisabledArrowGlyph"
+        IsHitTestVisible="False"
+        Grid.Column="1"
+        Margin="5">
+    <Path Width="9"
+          Height="5"
+          Data="{StaticResource DownArrowGeometry}"
+          Fill="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+          Margin="0,1,0,0" />
+  </Grid>
+
 </ResourceDictionary>

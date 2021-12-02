@@ -819,7 +819,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       {
         if( this.BeepOnError )
         {
-          System.Media.SystemSounds.Beep.Play();
+          this.PlayBeep();          
         }
         return false;
       }
@@ -1075,7 +1075,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
         if( this.BeepOnError )
         {
-          System.Media.SystemSounds.Beep.Play();
+          this.PlayBeep();
         }
 
         if( exception is ArgumentOutOfRangeException )
@@ -1112,6 +1112,13 @@ namespace Xceed.Wpf.Toolkit.Primitives
       }
 
       return value;
+    }
+
+    private void PlayBeep()
+    {
+#pragma warning disable CA1416
+      System.Media.SystemSounds.Beep.Play();
+#pragma warning restore CA1416
     }
 
     private void CanEnterLineBreak( object sender, CanExecuteRoutedEventArgs e )

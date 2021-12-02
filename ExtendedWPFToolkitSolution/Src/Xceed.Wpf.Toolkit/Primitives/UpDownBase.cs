@@ -85,6 +85,23 @@ new UIPropertyMetadata( true ) );
 
     #endregion //AllowSpin
 
+    #region ButtonSpinnerHeight
+
+    public static readonly DependencyProperty ButtonSpinnerHeightProperty = DependencyProperty.Register( "ButtonSpinnerHeight", typeof( double ), typeof( UpDownBase<T> ), new UIPropertyMetadata( double.NaN ) );
+    public double ButtonSpinnerHeight
+    {
+      get
+      {
+        return (double)GetValue( ButtonSpinnerHeightProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerHeightProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerHeight
+
     #region ButtonSpinnerLocation
 
     public static readonly DependencyProperty ButtonSpinnerLocationProperty = DependencyProperty.Register( "ButtonSpinnerLocation", typeof( Location
@@ -103,6 +120,91 @@ new UIPropertyMetadata( true ) );
     }
 
     #endregion //ButtonSpinnerLocation
+
+    #region ButtonSpinnerDownContentTemplate
+
+    public static readonly DependencyProperty ButtonSpinnerDownContentTemplateProperty = DependencyProperty.Register( "ButtonSpinnerDownContentTemplate", typeof( DataTemplate ), typeof( UpDownBase<T> ), new UIPropertyMetadata( null ) );
+    public DataTemplate ButtonSpinnerDownContentTemplate
+    {
+      get
+      {
+        return (DataTemplate)GetValue( ButtonSpinnerDownContentTemplateProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerDownContentTemplateProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerDownContentTemplate
+
+    #region ButtonSpinnerDownDisabledContentTemplate
+
+    public static readonly DependencyProperty ButtonSpinnerDownDisabledContentTemplateProperty = DependencyProperty.Register( "ButtonSpinnerDownDisabledContentTemplate", typeof( DataTemplate ), typeof( UpDownBase<T> ), new UIPropertyMetadata( null ) );
+    public DataTemplate ButtonSpinnerDownDisabledContentTemplate
+    {
+      get
+      {
+        return (DataTemplate)GetValue( ButtonSpinnerDownDisabledContentTemplateProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerDownDisabledContentTemplateProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerDownDisabledContentTemplate
+
+    #region ButtonSpinnerUpContentTemplate
+
+    public static readonly DependencyProperty ButtonSpinnerUpContentTemplateProperty = DependencyProperty.Register( "ButtonSpinnerUpContentTemplate", typeof( DataTemplate), typeof( UpDownBase<T> ), new UIPropertyMetadata( null ) );
+    public DataTemplate ButtonSpinnerUpContentTemplate
+    {
+      get
+      {
+        return (DataTemplate)GetValue( ButtonSpinnerUpContentTemplateProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerUpContentTemplateProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerUpContentTemplate
+
+    #region ButtonSpinnerUpDisabledContentTemplate
+
+    public static readonly DependencyProperty ButtonSpinnerUpDisabledContentTemplateProperty = DependencyProperty.Register( "ButtonSpinnerUpDisabledContentTemplate", typeof( DataTemplate ), typeof( UpDownBase<T> ), new UIPropertyMetadata( null ) );
+    public DataTemplate ButtonSpinnerUpDisabledContentTemplate
+    {
+      get
+      {
+        return (DataTemplate)GetValue( ButtonSpinnerUpDisabledContentTemplateProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerUpDisabledContentTemplateProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerUpDisabledContentTemplate
+
+    #region ButtonSpinnerWidth
+
+    public static readonly DependencyProperty ButtonSpinnerWidthProperty = DependencyProperty.Register( "ButtonSpinnerWidth", typeof( double ), typeof( UpDownBase<T> ), new UIPropertyMetadata( SystemParameters.VerticalScrollBarWidth ) );
+    public double ButtonSpinnerWidth
+    {
+      get
+      {
+        return (double)GetValue( ButtonSpinnerWidthProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerWidthProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerWidth   
 
     #region ClipValueToMinMax
 

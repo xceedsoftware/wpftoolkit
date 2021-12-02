@@ -21,6 +21,9 @@
                     xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes"
                     xmlns:prim="clr-namespace:Xceed.Wpf.Toolkit.Primitives"
                     xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.Core.Converters">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="../../Themes/Aero2/Glyphs.xaml" />
+  </ResourceDictionary.MergedDictionaries>
 
   <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
 
@@ -62,8 +65,14 @@
                                HorizontalContentAlignment="Stretch"
                                VerticalContentAlignment="Stretch"
                                AllowSpin="{Binding AllowSpin, RelativeSource={RelativeSource TemplatedParent}}"
-                               ShowButtonSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}"
-                               ButtonSpinnerLocation="{Binding ButtonSpinnerLocation, RelativeSource={RelativeSource TemplatedParent}}">
+                               ShowSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}"
+                               SpinnerLocation="{Binding ButtonSpinnerLocation, RelativeSource={RelativeSource TemplatedParent}}"
+                               SpinnerWidth="{Binding ButtonSpinnerWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                               SpinnerHeight="{Binding ButtonSpinnerHeight, RelativeSource={RelativeSource TemplatedParent}}"
+                               SpinnerUpContentTemplate="{Binding ButtonSpinnerUpContentTemplate, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource IncreaseGlyphNormalKey}}"
+                               SpinnerDownContentTemplate="{Binding ButtonSpinnerDownContentTemplate, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DecreaseGlyphNormalKey}}"
+                               SpinnerUpDisabledContentTemplate="{Binding ButtonSpinnerUpDisabledContentTemplate, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource IncreaseGlyphDisabledKey}}"
+                               SpinnerDownDisabledContentTemplate="{Binding ButtonSpinnerDownDisabledContentTemplate, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DecreaseGlyphDisabledKey}}">
             <local:WatermarkTextBox x:Name="PART_TextBox"
                                     BorderThickness="0"
                                     Background="Transparent"

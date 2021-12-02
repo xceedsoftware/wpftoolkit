@@ -49,6 +49,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       selectedObject.FontWeight = FontWeights.Bold;
       selectedObject.Guid = new Guid( "F9168C5E-CEB2-4faa-B6BF-329BF39FA1E4" );
       selectedObject.Char = 'T';
+      selectedObject.Password = "This is my password";
       selectedObject.Int16 = ( short )4;
       selectedObject.Int32 = (int)5;
       selectedObject.Int64 = (long)6;
@@ -144,6 +145,9 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       [Category( "Non-Numeric Editors" )]
       [Description( "This property uses a Char as the default editor." )]
       public Char Char { get; set; }
+      [Category( "Non-Numeric Editors" )]
+      [PasswordPropertyText(true)]
+      public string Password { get; set; }
       [Category( "Non-Numeric Editors" )]
       [Description( "This property uses a PrimitiveTypeCollectionEditor as the default editor." )]
       public List<string> ListOfStrings { get; set; }

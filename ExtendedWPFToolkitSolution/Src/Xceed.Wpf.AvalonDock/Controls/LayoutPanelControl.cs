@@ -45,96 +45,97 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void OnFixChildrenDockLengths()
     {
-      if( ActualWidth == 0.0 ||
-          ActualHeight == 0.0 )
-        return;
+      //               This is because the commented part is setting DockWidth of children....strange code.
+       return;
 
-      var modelAsPositionableElement = _model as ILayoutPositionableElementWithActualSize;
-      #region Setup DockWidth/Height for children
-      if( _model.Orientation == Orientation.Horizontal )
-      {
-        if( _model.ContainsChildOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() )
-        {
-          for( int i = 0; i < _model.Children.Count; i++ )
-          {
-            var childContainerModel = _model.Children[ i ] as ILayoutContainer;
-            var childPositionableModel = _model.Children[ i ] as ILayoutPositionableElement;
+      //if (ActualWidth == 0.0 ||
+      //    ActualHeight == 0.0)
+      //  return;
 
-            if( childContainerModel != null &&
-                ( childContainerModel.IsOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() ||
-                 childContainerModel.ContainsChildOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() ) )
-            {
-             // childPositionableModel.DockWidth = new GridLength( 1.0, GridUnitType.Star );
-            }
-            else if( (childPositionableModel != null) && childPositionableModel.DockWidth.IsStar )
-            {
-              var childPositionableModelWidthActualSize = childPositionableModel as ILayoutPositionableElementWithActualSize;
-              if( childPositionableModelWidthActualSize.ActualWidth == 0d )
-                continue;
+      //var modelAsPositionableElement = _model as ILayoutPositionableElementWithActualSize;
+      //if (_model.Orientation == Orientation.Horizontal)
+      //{
+      //  if (_model.ContainsChildOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>())
+      //  {
+      //    for (int i = 0; i < _model.Children.Count; i++)
+      //    {
+      //      var childContainerModel = _model.Children[i] as ILayoutContainer;
+      //      var childPositionableModel = _model.Children[i] as ILayoutPositionableElement;
 
-              var widthToSet = Math.Max( childPositionableModelWidthActualSize.ActualWidth, childPositionableModel.DockMinWidth );
+      //      if (childContainerModel != null &&
+      //          (childContainerModel.IsOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() ||
+      //           childContainerModel.ContainsChildOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>()))
+      //      {
+      //        // childPositionableModel.DockWidth = new GridLength( 1.0, GridUnitType.Star );
+      //      }
+      //      else if ((childPositionableModel != null) && childPositionableModel.DockWidth.IsStar)
+      //      {
+      //        var childPositionableModelWidthActualSize = childPositionableModel as ILayoutPositionableElementWithActualSize;
+      //        if (childPositionableModelWidthActualSize.ActualWidth == 0d)
+      //          continue;
 
-              widthToSet = Math.Min( widthToSet, ActualWidth / 2.0 );
-              widthToSet = Math.Max( widthToSet, childPositionableModel.DockMinWidth );
+      //        var widthToSet = Math.Max(childPositionableModelWidthActualSize.ActualWidth, childPositionableModel.DockMinWidth);
 
-              childPositionableModel.DockWidth = new GridLength( double.IsNaN( widthToSet ) ? ActualWidth / 2.0 : widthToSet, GridUnitType.Pixel );
-            }
-          }
-        }
-        //else
-        //{
-        //  for( int i = 0; i < _model.Children.Count; i++ )
-        //  {
-        //    var childPositionableModel = _model.Children[ i ] as ILayoutPositionableElement;
-        //    if( !childPositionableModel.DockWidth.IsStar )
-        //    {
-        //      childPositionableModel.DockWidth = new GridLength( 1.0, GridUnitType.Star );
-        //    }
-        //  }
-        //}
-      }
-      else
-      {
-        if( _model.ContainsChildOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() )
-        {
-          for( int i = 0; i < _model.Children.Count; i++ )
-          {
-            var childContainerModel = _model.Children[ i ] as ILayoutContainer;
-            var childPositionableModel = _model.Children[ i ] as ILayoutPositionableElement;
+      //        widthToSet = Math.Min(widthToSet, ActualWidth / 2.0);
+      //        widthToSet = Math.Max(widthToSet, childPositionableModel.DockMinWidth);
 
-            if( childContainerModel != null &&
-                ( childContainerModel.IsOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() ||
-                 childContainerModel.ContainsChildOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() ) )
-            {
-              //childPositionableModel.DockHeight = new GridLength( 1.0, GridUnitType.Star );
-            }
-            else if( (childPositionableModel != null) && childPositionableModel.DockHeight.IsStar )
-            {
-              var childPositionableModelWidthActualSize = childPositionableModel as ILayoutPositionableElementWithActualSize;
-              if( childPositionableModelWidthActualSize.ActualHeight == 0d )
-                continue;
+      //        childPositionableModel.DockWidth = new GridLength(double.IsNaN(widthToSet) ? ActualWidth / 2.0 : widthToSet, GridUnitType.Pixel);
+      //      }
+      //    }
+      //  }
+      //  //else
+      //  //{
+      //  //  for( int i = 0; i < _model.Children.Count; i++ )
+      //  //  {
+      //  //    var childPositionableModel = _model.Children[ i ] as ILayoutPositionableElement;
+      //  //    if( !childPositionableModel.DockWidth.IsStar )
+      //  //    {
+      //  //      childPositionableModel.DockWidth = new GridLength( 1.0, GridUnitType.Star );
+      //  //    }
+      //  //  }
+      //  //}
+      //}
+      //else
+      //{
+      //  if (_model.ContainsChildOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>())
+      //  {
+      //    for (int i = 0; i < _model.Children.Count; i++)
+      //    {
+      //      var childContainerModel = _model.Children[i] as ILayoutContainer;
+      //      var childPositionableModel = _model.Children[i] as ILayoutPositionableElement;
 
-              var heightToSet = Math.Max( childPositionableModelWidthActualSize.ActualHeight, childPositionableModel.DockMinHeight );
-              heightToSet = Math.Min( heightToSet, ActualHeight / 2.0 );
-              heightToSet = Math.Max( heightToSet, childPositionableModel.DockMinHeight );
+      //      if (childContainerModel != null &&
+      //          (childContainerModel.IsOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() ||
+      //           childContainerModel.ContainsChildOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>()))
+      //      {
+      //       // childPositionableModel.DockHeight = new GridLength( 1.0, GridUnitType.Star );
+      //      }
+      //      else if ((childPositionableModel != null) && childPositionableModel.DockHeight.IsStar)
+      //      {
+      //        var childPositionableModelWidthActualSize = childPositionableModel as ILayoutPositionableElementWithActualSize;
+      //        if (childPositionableModelWidthActualSize.ActualHeight == 0d)
+      //          continue;
 
-              childPositionableModel.DockHeight = new GridLength( double.IsNaN( heightToSet ) ? ActualHeight / 2.0 : heightToSet, GridUnitType.Pixel );
-            }
-          }
-        }
-        //else
-        //{
-        //  for( int i = 0; i < _model.Children.Count; i++ )
-        //  {
-        //    var childPositionableModel = _model.Children[ i ] as ILayoutPositionableElement;
-        //    if( !childPositionableModel.DockHeight.IsStar )
-        //    {
-        //      childPositionableModel.DockHeight = new GridLength( 1.0, GridUnitType.Star );
-        //    }
-        //  }
-        //}
-      }
-      #endregion
+      //        var heightToSet = Math.Max(childPositionableModelWidthActualSize.ActualHeight, childPositionableModel.DockMinHeight);
+      //        heightToSet = Math.Min(heightToSet, ActualHeight / 2.0);
+      //        heightToSet = Math.Max(heightToSet, childPositionableModel.DockMinHeight);
+
+      //        childPositionableModel.DockHeight = new GridLength(double.IsNaN(heightToSet) ? ActualHeight / 2.0 : heightToSet, GridUnitType.Pixel);
+      //      }
+      //    }
+      //  }
+      //  //else
+      //  //{
+      //  //  for( int i = 0; i < _model.Children.Count; i++ )
+      //  //  {
+      //  //    var childPositionableModel = _model.Children[ i ] as ILayoutPositionableElement;
+      //  //    if( !childPositionableModel.DockHeight.IsStar )
+      //  //    {
+      //  //      childPositionableModel.DockHeight = new GridLength( 1.0, GridUnitType.Star );
+      //  //    }
+      //  //  }
+      //  //}
+      //}
     }
 
     #endregion

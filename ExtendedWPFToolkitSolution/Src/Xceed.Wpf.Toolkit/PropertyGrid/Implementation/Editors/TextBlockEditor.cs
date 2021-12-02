@@ -17,11 +17,27 @@
 
 using System.Windows.Controls;
 using System.Windows;
+using System.ComponentModel;
+using System.Windows.Data;
+using Xceed.Wpf.Toolkit.Core;
+using System;
+using System.Globalization;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class TextBlockEditor : TypeEditor<TextBlock>
   {
+    TypeConverter _typeConverter;
+
+    public TextBlockEditor()
+    {
+    }
+
+    public TextBlockEditor( TypeConverter typeConverter )
+    {
+      _typeConverter = typeConverter;
+    }
+
     protected override TextBlock CreateEditor()
     {
       return new PropertyGridEditorTextBlock();
@@ -31,7 +47,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     {
       ValueProperty = TextBlock.TextProperty;
     }
+
   }
+
+
+
+
 
   public class PropertyGridEditorTextBlock : TextBlock
   {

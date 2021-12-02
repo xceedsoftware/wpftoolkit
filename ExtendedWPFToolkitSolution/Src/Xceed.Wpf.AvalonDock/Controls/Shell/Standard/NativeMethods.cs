@@ -1354,7 +1354,9 @@ namespace Standard
 
   internal sealed class SafeFindHandle : SafeHandleZeroOrMinusOneIsInvalid
   {
+#if !NETCORE && !NET5
     [SecurityPermission( SecurityAction.LinkDemand, UnmanagedCode = true )]
+#endif
     private SafeFindHandle() : base( true ) { }
 
     protected override bool ReleaseHandle()
@@ -1404,7 +1406,9 @@ namespace Standard
 
     private SafeDC() : base( true ) { }
 
+#if !NETCORE && !NET5
     [ReliabilityContract( Consistency.WillNotCorruptState, Cer.MayFail )]
+#endif
     protected override bool ReleaseHandle()
     {
       if( _created )
@@ -1527,7 +1531,9 @@ namespace Standard
   {
     private SafeHBITMAP() : base( true ) { }
 
+#if !NETCORE && !NET5
     [ReliabilityContract( Consistency.WillNotCorruptState, Cer.MayFail )]
+#endif
     protected override bool ReleaseHandle()
     {
       return NativeMethods.DeleteObject( handle );
@@ -1538,7 +1544,9 @@ namespace Standard
   {
     private SafeGdiplusStartupToken() : base( true ) { }
 
+#if !NETCORE && !NET5
     [ReliabilityContract( Consistency.WillNotCorruptState, Cer.MayFail )]
+#endif
     protected override bool ReleaseHandle()
     {
       Status s = NativeMethods.GdiplusShutdown( this.handle );
@@ -1607,7 +1615,9 @@ namespace Standard
     }
 
     [SuppressMessage( "Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes" )]
+#if !NETCORE && !NET5
     [ReliabilityContract( Consistency.WillNotCorruptState, Cer.MayFail )]
+#endif
     protected override bool ReleaseHandle()
     {
       try
@@ -1636,9 +1646,9 @@ namespace Standard
     }
   }
 
-  #endregion
+#endregion
 
-  #region Native Types
+#region Native Types
 
   [StructLayout( LayoutKind.Sequential )]
   internal struct BLENDFUNCTION
@@ -1872,7 +1882,7 @@ namespace Standard
       Assert.IsTrue( hr.Succeeded );
     }
 
-    #region IDisposable Pattern
+#region IDisposable Pattern
 
     public void Dispose()
     {
@@ -1891,7 +1901,7 @@ namespace Standard
       Clear();
     }
 
-    #endregion
+#endregion
   }
 
   [SuppressMessage( "Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses" )]
@@ -2454,7 +2464,7 @@ namespace Standard
     public ulong cBuffersEmpty;
   }
 
-  #endregion
+#endregion
 
   /// <summary>Delegate declaration that matches native WndProc signatures.</summary>
   internal delegate IntPtr WndProc( IntPtr hwnd, WM uMsg, IntPtr wParam, IntPtr lParam );
@@ -2830,7 +2840,9 @@ namespace Standard
 
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     [DllImport( "kernel32.dll" )]
+#if !NETCORE && !NET5
     [ReliabilityContract( Consistency.WillNotCorruptState, Cer.Success )]
+#endif
     [return: MarshalAs( UnmanagedType.Bool )]
     public static extern bool FindClose( IntPtr handle );
 
@@ -2965,12 +2977,7 @@ namespace Standard
 
     public static IntPtr GetStockObject( StockObject fnObject )
     {
-      IntPtr retPtr = _GetStockObject( fnObject );
-      if( retPtr == null )
-      {
-        HRESULT.ThrowLastError();
-      }
-      return retPtr;
+      return _GetStockObject( fnObject );
     }
 
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
@@ -3453,7 +3460,7 @@ namespace Standard
       }
     }
 
-    #region Win7 declarations
+#region Win7 declarations
 
     [DllImport( "shell32.dll", EntryPoint = "SHAddToRecentDocs" )]
     private static extern void _SHAddToRecentDocs_String( SHARD uFlags, [MarshalAs( UnmanagedType.LPWStr )] string pv );
@@ -3541,6 +3548,6 @@ namespace Standard
     [DllImport( "shell32.dll" )]
     public static extern HRESULT GetCurrentProcessExplicitAppUserModelID( [Out, MarshalAs( UnmanagedType.LPWStr )] out string AppID );
 
-    #endregion
+#endregion
   }
 }

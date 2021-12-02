@@ -227,16 +227,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       if( (be != null) && be.DataItem is DescriptorPropertyDefinitionBase )
       {
-        DescriptorPropertyDefinitionBase descriptor = be.DataItem as DescriptorPropertyDefinitionBase;
-        if( Validation.GetHasError( descriptor ) )
+        this.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
         {
-          this.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
+          DescriptorPropertyDefinitionBase descriptor = be.DataItem as DescriptorPropertyDefinitionBase;
+          if( ( descriptor != null) && Validation.GetHasError( descriptor ) )
           {
-            var errors = Validation.GetErrors( descriptor );
-            Validation.MarkInvalid( be, errors[ 0 ] );
+              var errors = Validation.GetErrors( descriptor );
+              Validation.MarkInvalid( be, errors[0] );
           }
-         ) );
-        }
+        } ) );
       }
     }
 

@@ -352,7 +352,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       if( DockCommand == null )
         this.SetCurrentValue( LayoutAnchorableItem.DockCommandProperty, _defaultDockCommand );
 
-      Visibility = _anchorable.IsVisible ? Visibility.Visible : System.Windows.Visibility.Hidden;
+      this.SetCurrentValue( LayoutAnchorableItem.VisibilityProperty, _anchorable.IsVisible ? Visibility.Visible : System.Windows.Visibility.Hidden );
       base.SetDefaultBindings();
     }
 

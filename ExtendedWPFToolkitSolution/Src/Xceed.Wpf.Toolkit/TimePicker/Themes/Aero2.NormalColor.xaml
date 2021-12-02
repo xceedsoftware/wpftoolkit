@@ -61,29 +61,9 @@
                 <ContentPresenter HorizontalAlignment="Stretch"
                                   VerticalAlignment="Stretch"
                                   SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-
-                <Grid x:Name="arrowGlyph"
-                      IsHitTestVisible="False"
-                      Grid.Column="1"
-                      Margin="5">
-                  <Path x:Name="Arrow"
-                        Width="9"
-                        Height="5"
-                        Data="{StaticResource DownArrowGeometry}"
-                        Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
-                        Margin="0,1,0,0" />
-                </Grid>
               </Grid>
             </chrome:ButtonChrome>
           </Grid>
-          <ControlTemplate.Triggers>
-            <Trigger Property="IsEnabled"
-                     Value="False">
-              <Setter Property="Fill"
-                      TargetName="Arrow"
-                      Value="#AFAFAF" />
-            </Trigger>
-          </ControlTemplate.Triggers>
         </ControlTemplate>
       </Setter.Value>
     </Setter>
@@ -162,8 +142,20 @@
             Value="Center" />
     <Setter Property="TextAlignment"
             Value="Right" />
+    <Setter Property="ButtonSpinnerUpContentTemplate"
+            Value="{StaticResource IncreaseGlyphNormalKey}" />
+    <Setter Property="ButtonSpinnerDownContentTemplate"
+            Value="{StaticResource DecreaseGlyphNormalKey}" />
+    <Setter Property="ButtonSpinnerUpDisabledContentTemplate"
+            Value="{StaticResource IncreaseGlyphDisabledKey}" />
+    <Setter Property="ButtonSpinnerDownDisabledContentTemplate"
+            Value="{StaticResource DecreaseGlyphDisabledKey}" />
     <Setter Property="WatermarkTemplate"
             Value="{StaticResource DefaultWatermarkTemplate}" />
+    <Setter Property="DropDownButtonContent"
+            Value="{StaticResource DropDownArrowGlyph}" />
+    <Setter Property="DropDownButtonDisabledContent"
+            Value="{StaticResource DropDownDisabledArrowGlyph}" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:TimePicker}">
@@ -179,9 +171,15 @@
                                  HorizontalContentAlignment="Stretch"
                                  VerticalContentAlignment="Stretch"
                                  BorderBrush="{TemplateBinding BorderBrush}"
-                                 ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
+                                 SpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
+                                 SpinnerWidth="{TemplateBinding ButtonSpinnerWidth}"
+                                 SpinnerHeight="{TemplateBinding ButtonSpinnerHeight}"
+                                 SpinnerUpContentTemplate="{TemplateBinding ButtonSpinnerUpContentTemplate}"
+                                 SpinnerDownContentTemplate="{TemplateBinding ButtonSpinnerDownContentTemplate}"
+                                 SpinnerUpDisabledContentTemplate="{TemplateBinding ButtonSpinnerUpDisabledContentTemplate}"
+                                 SpinnerDownDisabledContentTemplate="{TemplateBinding ButtonSpinnerDownDisabledContentTemplate}"
                                  AllowSpin="{TemplateBinding AllowSpin}"
-                                 ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
+                                 ShowSpinner="{TemplateBinding ShowButtonSpinner}">
               <local:WatermarkTextBox x:Name="PART_TextBox"
                                       BorderThickness="0"
                                       Background="Transparent"
@@ -207,8 +205,11 @@
             </local:ButtonSpinner>
             <ToggleButton x:Name="_timePickerToggleButton"
                           Grid.Column="1"
+                          Width="{Binding DropDownButtonWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                          Height="{Binding DropDownButtonHeight, RelativeSource={RelativeSource TemplatedParent}}"
                           Background="White"
                           Focusable="False"
+                          Content="{Binding DropDownButtonContent, RelativeSource={RelativeSource TemplatedParent}}"
                           IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                           Style="{StaticResource TimePickerToggleButtonStyle}"
                           IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
@@ -278,6 +279,9 @@
                      Value="False">
               <Setter Property="Foreground"
                       Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+              <Setter TargetName="_timePickerToggleButton"
+                      Property="Content"
+                      Value="{Binding DropDownButtonDisabledContent, RelativeSource={RelativeSource TemplatedParent}}" />
             </Trigger>
             <Trigger Property="IsFocused"
                      Value="True">

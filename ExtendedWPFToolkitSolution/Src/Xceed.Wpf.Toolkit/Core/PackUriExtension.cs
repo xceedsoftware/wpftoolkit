@@ -112,6 +112,7 @@ namespace Xceed.Wpf.Toolkit.Core
 
 
 
+
       // If we have version information
       if( !String.IsNullOrEmpty( version ) )
       {
@@ -134,6 +135,7 @@ namespace Xceed.Wpf.Toolkit.Core
     {
       string platformSuffix = String.Empty;
       bool hasAssemblyName = !String.IsNullOrEmpty( assemblyName );
+
 
 
 

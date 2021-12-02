@@ -162,7 +162,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
             parentSelector.SelectedContentIndex = _isSelected ? parentSelector.IndexOf( this ) : -1;
           OnIsSelectedChanged( oldValue, value );
           RaisePropertyChanged( "IsSelected" );
-          LayoutAnchorableTabItem.CancelMouseLeave();
         }
       }
     }
@@ -568,11 +567,22 @@ namespace Xceed.Wpf.AvalonDock.Layout
     #endregion
 
     #region IsFloating
+
+    private bool _isFloating = false;
+
     public bool IsFloating
     {
       get
       {
-        return this.FindParent<LayoutFloatingWindow>() != null;
+        return _isFloating;
+      }
+      internal set
+      {
+        if( _isFloating != value )
+        {
+          _isFloating = value;
+          RaisePropertyChanged( "IsFloating" );
+        }
       }
     }
 
@@ -750,6 +760,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
         FloatingWidth = double.Parse( reader.Value, CultureInfo.InvariantCulture );
       if( reader.MoveToAttribute( "FloatingHeight" ) )
         FloatingHeight = double.Parse( reader.Value, CultureInfo.InvariantCulture );
+      if( reader.MoveToAttribute( "IsFloating" ) )
+        IsFloating = bool.Parse( reader.Value );
       if( reader.MoveToAttribute( "IsMaximized" ) )
         IsMaximized = bool.Parse( reader.Value );
       if( reader.MoveToAttribute( "CanClose" ) )
@@ -792,6 +804,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
         writer.WriteAttributeString( "FloatingWidth", FloatingWidth.ToString( CultureInfo.InvariantCulture ) );
       if( FloatingHeight != 0.0 )
         writer.WriteAttributeString( "FloatingHeight", FloatingHeight.ToString( CultureInfo.InvariantCulture ) );
+      if( IsFloating )
+        writer.WriteAttributeString( "IsFloating", IsFloating.ToString() );
       if( IsMaximized )
         writer.WriteAttributeString( "IsMaximized", IsMaximized.ToString() );
       // Always serialize CanClose because the default value is different for LayoutAnchorable vs LayoutDocument.

@@ -80,8 +80,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
         return false;
 
       var valueSource = DependencyPropertyHelper.GetValueSource( editorObject, dp );
-      if( valueSource == null )
-        return false;
 
       return ( valueSource.BaseValueSource == BaseValueSource.Local );
     }

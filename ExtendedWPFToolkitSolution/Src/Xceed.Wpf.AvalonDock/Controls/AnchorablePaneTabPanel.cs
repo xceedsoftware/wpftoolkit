@@ -93,21 +93,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       return finalSize;
     }
 
-    protected override void OnMouseLeave( System.Windows.Input.MouseEventArgs e )
-    {
-      if( e.LeftButton == System.Windows.Input.MouseButtonState.Pressed &&
-          LayoutAnchorableTabItem.IsDraggingItem() )
-      {
-        var contentModel = LayoutAnchorableTabItem.GetDraggingItem().Model as LayoutAnchorable;
-        var manager = contentModel.Root.Manager;
-        LayoutAnchorableTabItem.ResetDraggingItem();
-
-        manager.StartDraggingFloatingWindowForContent( contentModel );
-      }
-
-      base.OnMouseLeave( e );
-    }
-
     #endregion
   }
 }

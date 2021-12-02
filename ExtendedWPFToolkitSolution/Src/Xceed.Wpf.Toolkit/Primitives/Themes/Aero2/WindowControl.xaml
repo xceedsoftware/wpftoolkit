@@ -365,7 +365,7 @@
     <Setter Property="BorderBrush"
             Value="#5D6C7A" />
     <Setter Property="BorderThickness"
-            Value="1,1,1,1" />
+            Value="0" />
     <Setter Property="Background"
             Value="{StaticResource Window_Background}" />
     <Setter Property="CaptionFontSize"
