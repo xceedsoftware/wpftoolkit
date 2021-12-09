@@ -539,20 +539,28 @@ namespace Xceed.Wpf.Toolkit
 
       var baseItem = e.Parameter;
       var newItemType = baseItem.GetType();
-      var newItem = this.CreateNewItem( newItemType );
-
-      var type = newItemType;
-      while( type != null )
+      if (typeof(ICloneable).IsAssignableFrom(newItemType))
       {
-        var baseProperties = type.GetFields( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance );
-        foreach( var prop in baseProperties )
-        {
-          prop.SetValue( newItem, prop.GetValue( baseItem ) );
-        }
-        type = type.BaseType;
+          return ((ICloneable) baseItem).Clone();
       }
+      else
+      {
+          var newItem = this.CreateNewItem(newItemType);
 
-      return newItem;
+          var type = newItemType;
+          while (type != null)
+          {
+              var baseProperties = type.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+              foreach (var prop in baseProperties)
+              {
+                  prop.SetValue(newItem, prop.GetValue(baseItem));
+              }
+
+              type = type.BaseType;
+          }
+
+          return newItem;
+      }
     }
 
     private void MoveDown( object sender, ExecutedRoutedEventArgs e )
