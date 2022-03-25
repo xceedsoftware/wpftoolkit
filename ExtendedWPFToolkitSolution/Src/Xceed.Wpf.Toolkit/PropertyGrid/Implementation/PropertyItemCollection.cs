@@ -140,9 +140,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           }
         }
 
+        SortBy( PropertyOrderPropertyName, ListSortDirection.Ascending );
+
         if( sortAlphabetically )
         {
-          SortBy( PropertyOrderPropertyName, ListSortDirection.Ascending );
           SortBy( DisplayNamePropertyName, ListSortDirection.Ascending );
         }
       }

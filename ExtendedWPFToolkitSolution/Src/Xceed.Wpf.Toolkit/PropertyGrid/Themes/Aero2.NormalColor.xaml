@@ -842,12 +842,12 @@
     </Setter>
   </Style>
 
-  <ContextMenu x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type pg:PropertyGrid}, ResourceId=SelectedObjectAdvancedOptionsMenu}">
+  <pg:PropertyGridContextMenu x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type pg:PropertyGrid}, ResourceId=SelectedObjectAdvancedOptionsMenu}">
     <MenuItem Header="Reset Value"
               Command="commands:PropertyItemCommands.ResetValue"
               CommandParameter="{Binding}"
               CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"/>
-  </ContextMenu>
+  </pg:PropertyGridContextMenu>
 
   <pg:CategoryGroupStyleSelector x:Key="categoryGroupStyleSelector"
                                  SingleDefaultCategoryItemGroupStyle="{StaticResource SingleDefaultCategoryItemGroupContainerStyle}"
@@ -1096,6 +1096,9 @@
       </Setter.Value>
     </Setter>
   </Style>
+
+  <Style TargetType="{x:Type pg:PropertyItem}"
+         BasedOn="{StaticResource {x:Type pg:PropertyItemBase}}" />
 
   <Style TargetType="{x:Type pg:PropertyGrid}">
     <Setter Property="AdvancedOptionsMenu"

@@ -43,12 +43,26 @@ namespace Xceed.Wpf.Toolkit.Primitives
     #region CurrentDateTimePart
 
     public static readonly DependencyProperty CurrentDateTimePartProperty = DependencyProperty.Register( "CurrentDateTimePart", typeof( DateTimePart )
-      , typeof( DateTimeUpDownBase<T> ), new UIPropertyMetadata( DateTimePart.Other, OnCurrentDateTimePartChanged ) );
+      , typeof( DateTimeUpDownBase<T> ), new UIPropertyMetadata( DateTimePart.Other, OnCurrentDateTimePartChanged, OnCurrentDateTimePartCoerce ) );
+
+    private static object OnCurrentDateTimePartCoerce( DependencyObject d, object baseValue )
+    {
+      DateTimeUpDownBase<T> dateTimeUpDownBase = d as DateTimeUpDownBase<T>;
+      if( dateTimeUpDownBase != null )
+        return dateTimeUpDownBase.OnCurrentDateTimePartCoerce( baseValue );
+      return baseValue;
+    }
+
+    protected virtual object OnCurrentDateTimePartCoerce( object baseValue )
+    {
+      return baseValue;
+    }
+
     public DateTimePart CurrentDateTimePart
     {
       get
       {
-        return (DateTimePart)GetValue( CurrentDateTimePartProperty );
+        return ( DateTimePart )GetValue( CurrentDateTimePartProperty );
       }
       set
       {
@@ -60,7 +74,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       DateTimeUpDownBase<T> dateTimeUpDownBase = o as DateTimeUpDownBase<T>;
       if( dateTimeUpDownBase != null )
-        dateTimeUpDownBase.OnCurrentDateTimePartChanged( (DateTimePart)e.OldValue, (DateTimePart)e.NewValue );
+        dateTimeUpDownBase.OnCurrentDateTimePartChanged( ( DateTimePart )e.OldValue, ( DateTimePart )e.NewValue );
     }
 
     protected virtual void OnCurrentDateTimePartChanged( DateTimePart oldValue, DateTimePart newValue )
@@ -78,7 +92,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       get
       {
-        return (int)GetValue( StepProperty );
+        return ( int )GetValue( StepProperty );
       }
       set
       {
@@ -90,7 +104,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       var dateTimeUpDownBase = o as DateTimeUpDownBase<T>;
       if( dateTimeUpDownBase != null )
-        dateTimeUpDownBase.OnStepChanged( (int)e.OldValue, (int)e.NewValue );
+        dateTimeUpDownBase.OnStepChanged( ( int )e.OldValue, ( int )e.NewValue );
     }
 
     protected virtual void OnStepChanged( int oldValue, int newValue )
@@ -221,7 +235,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     protected virtual void PerformMouseSelection()
     {
       var dateTimeInfo = this.GetDateTimeInfo( TextBox.SelectionStart );
-      if( ( dateTimeInfo != null) && (dateTimeInfo.Type == DateTimePart.Other) )
+      if( ( dateTimeInfo != null ) && ( dateTimeInfo.Type == DateTimePart.Other ) )
       {
         this.Dispatcher.BeginInvoke( DispatcherPriority.Background, new Action( () =>
         {
@@ -230,7 +244,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
         }
         ) );
         return;
-      }     
+      }
 
       this.Select( dateTimeInfo );
     }
@@ -253,12 +267,12 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     internal DateTimeInfo GetDateTimeInfo( DateTimePart part )
     {
-      return _dateTimeInfoList.FirstOrDefault( ( info ) =>info.Type == part );
+      return _dateTimeInfoList.FirstOrDefault( ( info ) => info.Type == part );
     }
 
     internal virtual void Select( DateTimeInfo info )
     {
-      if( (info != null) && !info.Equals( _selectedDateTimeInfo ) && ( this.TextBox != null) && !string.IsNullOrEmpty( this.TextBox.Text ) )
+      if( ( info != null ) && !info.Equals( _selectedDateTimeInfo ) && ( this.TextBox != null ) && !string.IsNullOrEmpty( this.TextBox.Text ) )
       {
         _fireSelectionChangedEvent = false;
         this.TextBox.Select( info.StartPosition, info.Length );
@@ -322,7 +336,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       {
         this.Select( this.GetPreviousDateTimeInfo( nextSelectionStart - 1 ) );
       }
-    }    
+    }
 
     private DateTimeInfo GetNextDateTimeInfo( int nextSelectionStart )
     {
@@ -360,7 +374,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
       DateTimeInfo initialDateTimeInfo = previousDateTimeInfo;
 
-      while( (previousDateTimeInfo != null) && (previousDateTimeInfo.Type == DateTimePart.Other) )
+      while( ( previousDateTimeInfo != null ) && ( previousDateTimeInfo.Type == DateTimePart.Other ) )
       {
         previousDateTimeInfo = this.GetDateTimeInfo( previousDateTimeInfo.StartPosition - 1 );
         if( previousDateTimeInfo == null )
@@ -377,7 +391,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       if( _selectedDateTimeInfo == null )
       {
-        this.Select( (this.CurrentDateTimePart != DateTimePart.Other) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : this.GetDateTimeInfo( 0 ) );
+        this.Select( ( this.CurrentDateTimePart != DateTimePart.Other ) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : this.GetDateTimeInfo( 0 ) );
       }
     }
 

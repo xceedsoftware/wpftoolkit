@@ -539,6 +539,10 @@ namespace Xceed.Wpf.Toolkit
 
       var baseItem = e.Parameter;
       var newItemType = baseItem.GetType();
+
+      if( typeof( ICloneable ).IsAssignableFrom( newItemType ) )
+        return ( ( ICloneable )baseItem ).Clone();
+
       var newItem = this.CreateNewItem( newItemType );
 
       var type = newItemType;

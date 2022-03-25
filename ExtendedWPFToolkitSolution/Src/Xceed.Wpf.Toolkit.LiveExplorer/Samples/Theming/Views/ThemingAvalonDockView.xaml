@@ -27,7 +27,11 @@
    <local:DemoView.Description>
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
-         <Run>Changes the themes of the AvalonDock controls. Available themes are System, HighContrast, Aero, VS2010, Metro, Office2007, Windows10 and Metro with accent color. The Xceed.Wpf.AvalonDock.Themes.xxx.dll assemblies are necessary to use these themes.</Run>
+         <Run>Changes the themes of the AvalonDock controls. Available themes are System, HighContrast, Aero, VS2010, Metro, Office2007, Windows10, MaterialDesign(Plus only) and Metro with accent color.</Run>
+      <LineBreak />
+      <LineBreak />
+      <Run>The Xceed.Wpf.AvalonDock.Themes.xxx.dll assemblies are necessary to use these themes.</Run>
+      <LineBreak />
             <LineBreak />
             <Run>Some features of this sample are only available in the "Plus" version.</Run>
             <LineBreak />

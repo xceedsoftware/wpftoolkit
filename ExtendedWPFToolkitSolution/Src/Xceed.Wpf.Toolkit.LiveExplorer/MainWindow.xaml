@@ -471,6 +471,9 @@
                                              SampleType="{x:Type samples:PropertyGrid.Views.PropertyGridDefaultEditorsView}" />
               <core:LiveExplorerTreeViewItem Header="EditorTemplateDefinition"
                                              SampleType="{x:Type samples:PropertyGrid.Views.PropertyGridCustomEditorsView}" />
+              <core:LiveExplorerTreeViewItem Header="EditorDefinition Source"
+                                             SampleType="{x:Type samples:PropertyGrid.Views.PropertyGridEditorComboBoxDefinitionSourceView}" 
+                                             IsPlusOnlyFeature="True" />
               <core:LiveExplorerTreeViewItem Header="More EditorDefinitions..."
                                              SampleType="{x:Type samples:PropertyGrid.Views.PropertyGridEditorDefinitionsView}"
                                              IsPlusOnlyFeature="True" />
@@ -512,6 +515,9 @@
             </core:LiveExplorerTreeViewItem>
             <core:LiveExplorerTreeViewItem Header="Customizing PropertyItems"
                                            SampleType="{x:Type samples:PropertyGrid.Views.PropertyGridPropertyItemStyleView}"
+                                           Style="{StaticResource TreeViewItemStyle}" />
+            <core:LiveExplorerTreeViewItem Header="Advanced ContextMenu"
+                                           SampleType="{x:Type samples:PropertyGrid.Views.PropertyGridAdvancedContextMenuView}"
                                            Style="{StaticResource TreeViewItemStyle}" />
 
           </core:LiveExplorerTreeViewItem>
@@ -688,7 +694,15 @@
                                        Style="{StaticResource TreeViewHeaderStyle}"
                                        ItemContainerStyle="{StaticResource TreeViewItemStyle}">
           <core:LiveExplorerTreeViewItem Header="AvalonDock"
-                                         SampleType="{x:Type samples:AvalonDock.Views.AvalonDockView}" />
+                                           Style="{StaticResource TreeViewHeaderStyle}"
+                                           ItemContainerStyle="{StaticResource TreeViewItemStyle}"
+                                           SampleType="{x:Type samples:AvalonDock.Views.AvalonDockView}"
+                                           IsExpanded="True">
+            <core:LiveExplorerTreeViewItem Header="Properties"
+                                         SampleType="{x:Type samples:AvalonDock.Views.AvalonDockPropertiesView}" />
+            <core:LiveExplorerTreeViewItem Header="Sources"
+                                           SampleType="{x:Type samples:AvalonDock.Views.AvalonDockSourcesView}" />
+          </core:LiveExplorerTreeViewItem>
           <core:LiveExplorerTreeViewItem Header="Magnifier"
                                          SampleType="{x:Type samples:Magnifier.Views.MagnifierView}" />
           <core:LiveExplorerTreeViewItem Header="Pie"

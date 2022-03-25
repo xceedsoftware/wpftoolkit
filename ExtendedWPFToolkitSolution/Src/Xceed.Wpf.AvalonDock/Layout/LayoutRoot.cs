@@ -447,8 +447,11 @@ namespace Xceed.Wpf.AvalonDock.Layout
         }
 
         //for each pane that is empty
-        foreach( var emptyPane in this.Descendents().OfType<ILayoutPane>().Where( p => p.ChildrenCount == 0 ) )
+        var layoutPanes = this.Descendents().OfType<ILayoutPane>().Where( p => p.ChildrenCount == 0 ).ToArray();
+        for( int i = 0; i < layoutPanes.Count(); ++i )
         {
+          var emptyPane = layoutPanes[ i ];
+
           //...set null any reference coming from contents not yet hosted in a floating window
           foreach( var contentReferencingEmptyPane in this.Descendents().OfType<LayoutContent>()
               .Where( c => ( ( ILayoutPreviousContainer )c ).PreviousContainer == emptyPane && !c.IsFloating ) )
@@ -464,7 +467,10 @@ namespace Xceed.Wpf.AvalonDock.Layout
           //...if this pane is the only documentpane present in the layout than skip it
           if( emptyPane is LayoutDocumentPane &&
               this.Descendents().OfType<LayoutDocumentPane>().Count( c => c != emptyPane ) == 0 )
+          {
+            emptyPane = null;
             continue;
+          }
 
           //...if this empty panes is not referenced by anyone, than removes it from its parent container
           if( !this.Descendents().OfType<ILayoutPreviousContainer>().Any( c => c.PreviousContainer == emptyPane ) 

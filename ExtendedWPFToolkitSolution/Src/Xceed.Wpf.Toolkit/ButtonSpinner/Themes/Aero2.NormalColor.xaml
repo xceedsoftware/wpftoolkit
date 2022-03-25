@@ -106,13 +106,16 @@
             </Grid>
           </Border>
           <ControlTemplate.Triggers>
+            <Trigger Property="ShowButtonSpinner"
+                     Value="False">
+              <Setter Property="Visibility"
+                      Value="Collapsed"
+                      TargetName="gridContent" />
+            </Trigger>
             <Trigger Property="ShowSpinner"
                      Value="False">
               <Setter Property="Visibility"
-                      Value="Hidden"
-                      TargetName="gridContent" />
-              <Setter Property="Width"
-                      Value="0"
+                      Value="Collapsed"
                       TargetName="gridContent" />
             </Trigger>
             <Trigger Property="IsMouseOver"

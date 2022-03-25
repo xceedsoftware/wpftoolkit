@@ -54,7 +54,7 @@
                          PreparePropertyItem="OnPreparePropertyItem">
          <xctk:PropertyGrid.PropertyContainerStyle>
             <!--This style will be set to all PropertyItem instances (direct and expanded) in the property grid. -->
-            <Style TargetType="{x:Type xctk:PropertyItemBase}">
+            <Style TargetType="{x:Type xctk:PropertyItem}" BasedOn="{StaticResource {x:Type xctk:PropertyItem}}">
                <Setter Property="Foreground" Value="Red" />
             </Style>
          </xctk:PropertyGrid.PropertyContainerStyle>

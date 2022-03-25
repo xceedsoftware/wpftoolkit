@@ -30,6 +30,7 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
     {
       get
       {
+
 #if !VS2008
         // Workaround for a WPF 4 bug.
         foreach( FontFamily font in Fonts.SystemFontFamilies )
@@ -94,6 +95,16 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
         yield return FontStretches.UltraCondensed;
         yield return FontStretches.UltraExpanded;
       }
+    }
+
+    internal static FontFamily GetFontFamily( string fontFamilyName )
+    {
+      return FontUtilities.Families.FirstOrDefault( fontFamily => FontUtilities.GetFontFamilyName( fontFamily ) == fontFamilyName );
+    }
+
+    internal static string GetFontFamilyName( FontFamily fontFamily )
+    {
+      return fontFamily.FamilyNames.Values.FirstOrDefault();
     }
   }
 }

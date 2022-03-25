@@ -117,6 +117,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
 
 
+
+
     internal override void Attach( LayoutContent model )
     {
       _document = model as LayoutDocument;

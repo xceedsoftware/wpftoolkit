@@ -119,6 +119,7 @@
                                    SpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
                                    AllowSpin="{TemplateBinding AllowSpin}"
                                    ShowSpinner="{TemplateBinding ShowButtonSpinner}"
+                                   ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
                                    SpinnerWidth="{TemplateBinding ButtonSpinnerWidth}"
                                    SpinnerHeight="{TemplateBinding ButtonSpinnerHeight}"
                                    SpinnerUpContentTemplate="{TemplateBinding ButtonSpinnerUpContentTemplate}"

@@ -23,17 +23,22 @@
                  xmlns:sys="clr-namespace:System;assembly=mscorlib"
                  Title="Theming Toolkit Plus For WPF"
                  x:Name="_demo">
-    <local:DemoView.Description>
-        <Paragraph FontSize="14" FontFamily="Segoe">
-         <Run>Changes the themes of the Toolkit for WPF controls. Available themes are System, HighContrast, Office2007, Windows10 and Metro with accent color. The Xceed.Wpf.Toolkit.Themes.Office2007.dll, Xceed.Wpf.Toolkit.Themes.Windows10.dll or Xceed.Wpf.Toolkit.Themes.Metro.dll assemblies are necessary to use the themes.</Run>
+  <local:DemoView.Description>
+    <Paragraph FontSize="14" FontFamily="Segoe">
+      <Run>Changes the themes of the Toolkit for WPF controls. Available themes are System, HighContrast, Office2007, Windows10, MaterialDesign and Metro with accent color.</Run>
+      <LineBreak />
+      <LineBreak />
+      <Run>The Xceed.Wpf.Toolkit.Themes.Office2007.dll, Xceed.Wpf.Toolkit.Themes.Windows10.dll, Xceed.Wpf.Toolkit.Themes.MaterialDesign.dll or Xceed.Wpf.Toolkit.Themes.Metro.dll assemblies are necessary to use the themes.</Run>
+      <LineBreak />
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
-        </Paragraph>
-    </local:DemoView.Description>
+    </Paragraph>
+  </local:DemoView.Description>
+
 
 
 

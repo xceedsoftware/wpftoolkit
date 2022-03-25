@@ -140,14 +140,19 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     public void ReplaceChild( ILayoutElement oldElement, ILayoutElement newElement )
     {
-      int index = _children.IndexOf( ( T )oldElement );
-      _children.Insert( index, ( T )newElement );
-      _children.RemoveAt( index + 1 );
+      var index = _children.IndexOf( ( T )oldElement );
+      if( index >= 0 )
+      {
+        this.ReplaceChildAt( index, newElement );
+      }
     }
 
     public void ReplaceChildAt( int index, ILayoutElement element )
     {
-      _children[ index ] = ( T )element;
+      if( (index >= 0) && (index < _children.Count) )
+      {
+        _children[ index ] = ( T )element;
+      }
     }
 
 

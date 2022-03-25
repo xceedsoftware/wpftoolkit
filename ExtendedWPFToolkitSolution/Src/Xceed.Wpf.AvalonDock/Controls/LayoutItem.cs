@@ -41,7 +41,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     private ICommand _defaultNewHorizontalTabGroupCommand;
     private ICommand _defaultMoveToNextTabGroupCommand;
     private ICommand _defaultMoveToPreviousTabGroupCommand;
-    private ContentPresenter _view = null;
+    internal ContentPresenter _view = null;
     private ReentrantFlag _isSelectedReentrantFlag = new ReentrantFlag();
     private ReentrantFlag _isActiveReentrantFlag = new ReentrantFlag();
 
@@ -1133,53 +1133,116 @@ namespace Xceed.Wpf.AvalonDock.Controls
       _defaultMoveToPreviousTabGroupCommand = new RelayCommand( ( p ) => ExecuteMoveToPreviousTabGroupCommand( p ), ( p ) => CanExecuteMoveToPreviousTabGroupCommand( p ) );
     }
 
+    protected virtual void ClearDefaultCommands()
+    {
+      _defaultCloseCommand = null;
+      _defaultFloatCommand = null;
+      _defaultDockAsDocumentCommand = null;
+      _defaultCloseAllButThisCommand = null;
+      _defaultCloseAllCommand = null;
+      _defaultActivateCommand = null;
+      _defaultNewVerticalTabGroupCommand = null;
+      _defaultNewHorizontalTabGroupCommand = null;
+      _defaultMoveToNextTabGroupCommand = null;
+      _defaultMoveToPreviousTabGroupCommand = null;
+    }
+
     protected virtual void ClearDefaultBindings()
     {
-      if( CloseCommand == _defaultCloseCommand )
+      if( this.CloseCommand == _defaultCloseCommand )
+      {
         BindingOperations.ClearBinding( this, CloseCommandProperty );
-      if( FloatCommand == _defaultFloatCommand )
+        this.CloseCommand = null;
+      }
+      if( this.FloatCommand == _defaultFloatCommand )
+      {
         BindingOperations.ClearBinding( this, FloatCommandProperty );
-      if( DockAsDocumentCommand == _defaultDockAsDocumentCommand )
+        this.FloatCommand = null;
+      }
+      if( this.DockAsDocumentCommand == _defaultDockAsDocumentCommand )
+      {
         BindingOperations.ClearBinding( this, DockAsDocumentCommandProperty );
-      if( CloseAllButThisCommand == _defaultCloseAllButThisCommand )
+        this.DockAsDocumentCommand = null;
+      }
+      if( this.CloseAllButThisCommand == _defaultCloseAllButThisCommand )
+      {
         BindingOperations.ClearBinding( this, CloseAllButThisCommandProperty );
-      if( CloseAllCommand == _defaultCloseAllCommand )
+        this.CloseAllButThisCommand = null;
+      }
+      if( this.CloseAllCommand == _defaultCloseAllCommand )
+      {
         BindingOperations.ClearBinding( this, CloseAllCommandProperty );
-      if( ActivateCommand == _defaultActivateCommand )
+        this.CloseAllCommand = null;
+      }
+      if( this.ActivateCommand == _defaultActivateCommand )
+      {
         BindingOperations.ClearBinding( this, ActivateCommandProperty );
-      if( NewVerticalTabGroupCommand == _defaultNewVerticalTabGroupCommand )
+        this.ActivateCommand = null;
+      }
+      if( this.NewVerticalTabGroupCommand == _defaultNewVerticalTabGroupCommand )
+      {
         BindingOperations.ClearBinding( this, NewVerticalTabGroupCommandProperty );
-      if( NewHorizontalTabGroupCommand == _defaultNewHorizontalTabGroupCommand )
+        this.NewVerticalTabGroupCommand = null;
+      }
+      if( this.NewHorizontalTabGroupCommand == _defaultNewHorizontalTabGroupCommand )
+      {
         BindingOperations.ClearBinding( this, NewHorizontalTabGroupCommandProperty );
-      if( MoveToNextTabGroupCommand == _defaultMoveToNextTabGroupCommand )
+        this.NewHorizontalTabGroupCommand = null;
+      }
+      if( this.MoveToNextTabGroupCommand == _defaultMoveToNextTabGroupCommand )
+      {
         BindingOperations.ClearBinding( this, MoveToNextTabGroupCommandProperty );
-      if( MoveToPreviousTabGroupCommand == _defaultMoveToPreviousTabGroupCommand )
+        this.MoveToNextTabGroupCommand = null;
+      }
+      if( this.MoveToPreviousTabGroupCommand == _defaultMoveToPreviousTabGroupCommand )
+      {
         BindingOperations.ClearBinding( this, MoveToPreviousTabGroupCommandProperty );
+        this.MoveToPreviousTabGroupCommand = null;
+      }
     }
 
     protected virtual void SetDefaultBindings()
     {
-      if( CloseCommand == null )
+      if( this.CloseCommand == null )
+      {
         this.SetCurrentValue( LayoutItem.CloseCommandProperty, _defaultCloseCommand );
-      if( FloatCommand == null )
+      }
+      if( this.FloatCommand == null )
+      {
         this.SetCurrentValue( LayoutItem.FloatCommandProperty, _defaultFloatCommand );
-      if( DockAsDocumentCommand == null )
+      }
+      if( this.DockAsDocumentCommand == null )
+      {
         this.SetCurrentValue( LayoutItem.DockAsDocumentCommandProperty, _defaultDockAsDocumentCommand );
-      if( CloseAllButThisCommand == null )
+      }
+      if( this.CloseAllButThisCommand == null )
+      {
         this.SetCurrentValue( LayoutItem.CloseAllButThisCommandProperty, _defaultCloseAllButThisCommand );
-      if( CloseAllCommand == null )
+      }
+      if( this.CloseAllCommand == null )
+      {
         this.SetCurrentValue( LayoutItem.CloseAllCommandProperty, _defaultCloseAllCommand );
-      if( ActivateCommand == null )
+      }
+      if( this.ActivateCommand == null )
+      {
         this.SetCurrentValue( LayoutItem.ActivateCommandProperty, _defaultActivateCommand );
-      if( NewVerticalTabGroupCommand == null )
+      }
+      if( this.NewVerticalTabGroupCommand == null )
+      {
         this.SetCurrentValue( LayoutItem.NewVerticalTabGroupCommandProperty, _defaultNewVerticalTabGroupCommand );
-      if( NewHorizontalTabGroupCommand == null )
+      }
+      if( this.NewHorizontalTabGroupCommand == null )
+      {
         this.SetCurrentValue( LayoutItem.NewHorizontalTabGroupCommandProperty, _defaultNewHorizontalTabGroupCommand );
-      if( MoveToNextTabGroupCommand == null )
+      }
+      if( this.MoveToNextTabGroupCommand == null )
+      {
         this.SetCurrentValue( LayoutItem.MoveToNextTabGroupCommandProperty, _defaultMoveToNextTabGroupCommand );
-      if( MoveToPreviousTabGroupCommand == null )
+      }
+      if( this.MoveToPreviousTabGroupCommand == null )
+      {
         this.SetCurrentValue( LayoutItem.MoveToPreviousTabGroupCommandProperty, _defaultMoveToPreviousTabGroupCommand );
-
+      }
 
       this.SetCurrentValue( LayoutItem.IsSelectedProperty, LayoutElement.IsSelected );
       this.SetCurrentValue( LayoutItem.IsActiveProperty, LayoutElement.IsActive );
@@ -1188,30 +1251,34 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected virtual void OnVisibilityChanged()
     {
-      if( LayoutElement != null &&
-          Visibility == System.Windows.Visibility.Collapsed )
+      if( LayoutElement != null && Visibility == System.Windows.Visibility.Collapsed )
         LayoutElement.Close();
     }
 
     internal virtual void Attach( LayoutContent model )
     {
-      LayoutElement = model;
-      Model = model.Content;
+      this.LayoutElement = model;
+      this.Model = model.Content;
 
-      InitDefaultCommands();
+      this.InitDefaultCommands();
 
-      LayoutElement.IsSelectedChanged += new EventHandler( LayoutElement_IsSelectedChanged );
-      LayoutElement.IsActiveChanged += new EventHandler( LayoutElement_IsActiveChanged );
+      this.LayoutElement.IsSelectedChanged += new EventHandler( LayoutElement_IsSelectedChanged );
+      this.LayoutElement.IsActiveChanged += new EventHandler( LayoutElement_IsActiveChanged );
 
-      DataContext = this;
+      this.DataContext = this;
     }
 
     internal virtual void Detach()
     {
-      LayoutElement.IsSelectedChanged -= new EventHandler( LayoutElement_IsSelectedChanged );
-      LayoutElement.IsActiveChanged -= new EventHandler( LayoutElement_IsActiveChanged );
-      LayoutElement = null;
-      Model = null;
+      this.ClearDefaultCommands();
+
+      this.LayoutElement.IsSelectedChanged -= new EventHandler( LayoutElement_IsSelectedChanged );
+      this.LayoutElement.IsActiveChanged -= new EventHandler( LayoutElement_IsActiveChanged );
+
+      this.LayoutElement = null;
+      this.Model = null;
+
+      this.DataContext = null;
     }
 
     internal void _ClearDefaultBindings()
@@ -1239,9 +1306,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         using( _isActiveReentrantFlag.Enter() )
         {
-          var bnd = BindingOperations.GetBinding( this, IsActiveProperty );
           IsActive = LayoutElement.IsActive;
-          var bnd2 = BindingOperations.GetBinding( this, IsActiveProperty );
         }
       }
     }

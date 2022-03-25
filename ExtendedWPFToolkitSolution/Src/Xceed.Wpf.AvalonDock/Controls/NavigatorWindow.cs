@@ -55,21 +55,21 @@ namespace Xceed.Wpf.AvalonDock.Controls
       ShowInTaskbarProperty.OverrideMetadata( typeof( NavigatorWindow ), new FrameworkPropertyMetadata( false ) );
     }
 
-    internal NavigatorWindow( DockingManager manager )
+    public NavigatorWindow( DockingManager manager )
     {
       _manager = manager;
 
       _internalSetSelectedDocument = true;
-      this.SetAnchorables( _manager.Layout.Descendents().OfType<LayoutAnchorable>().Where( a => a.IsVisible ).Select( d => (LayoutAnchorableItem)_manager.GetLayoutItemFromModel( d ) ).ToArray() );
-      this.SetDocuments( _manager.Layout.Descendents().OfType<LayoutDocument>().OrderByDescending( d => d.LastActivationTimeStamp.GetValueOrDefault() ).Select( d => (LayoutDocumentItem)_manager.GetLayoutItemFromModel( d ) ).ToArray() );
+      this.SetAnchorables( _manager.Layout.Descendents().OfType<LayoutAnchorable>().Where( a => a.IsVisible && a.IsEnabled).Select( d => (LayoutAnchorableItem)_manager.GetLayoutItemFromModel( d ) ).ToArray() );
+      this.SetDocuments( _manager.Layout.Descendents().OfType<LayoutDocument>().Where( d => d.IsEnabled ).OrderByDescending( d => d.LastActivationTimeStamp.GetValueOrDefault() ).Select( d => (LayoutDocumentItem)_manager.GetLayoutItemFromModel( d ) ).ToArray() );
       _internalSetSelectedDocument = false;
 
-      if( this.Documents.Length > 1 )
+      if( ( this.Documents != null) && (this.Documents.Length > 1) )
       {
         this.InternalSetSelectedDocument( this.Documents[ 1 ] );
         _isSelectingDocument = true;
       }
-      else if( this.Anchorables.Count() > 1 )
+      else if( (this.Anchorables != null) && (this.Anchorables.Count() > 1) )
       {
         this.InternalSetSelectedAnchorable( this.Anchorables.ToArray()[ 1 ] );
         _isSelectingDocument = false;
@@ -262,7 +262,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         // Selecting LayoutDocuments
         if( _isSelectingDocument )
         {
-          if( this.SelectedDocument != null )
+          if( (this.SelectedDocument != null) && ( this.Documents != null) )
           {
             var docIndex = this.Documents.IndexOf<LayoutDocumentItem>( this.SelectedDocument );
 
@@ -270,6 +270,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
             {
               // Jump to next LayoutDocument
               if( ( docIndex < ( this.Documents.Length - 1 ) )
+                || (this.Anchorables == null)
                 || ( this.Anchorables.Count() == 0 ) )
               {
                 this.SelectNextDocument();
@@ -298,7 +299,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
             }
             else if( ( e.Key == System.Windows.Input.Key.Left ) || ( e.Key == System.Windows.Input.Key.Right ) )
             {
-              if( this.Anchorables.Count() > 0 )
+              if( (this.Anchorables != null) && (this.Anchorables.Count() > 0) )
               {
                 _isSelectingDocument = false;
                 this.InternalSetSelectedDocument( null );
@@ -318,7 +319,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
           // There is no SelectedDocument, select the first one.
           else
           {
-            if( this.Documents.Length > 0 )
+            if( ( this.Documents != null ) && (this.Documents.Length > 0) )
             {
               this.InternalSetSelectedDocument( this.Documents[ 0 ] );
               shouldHandle = true;
@@ -330,19 +331,19 @@ namespace Xceed.Wpf.AvalonDock.Controls
         {
           if( this.SelectedAnchorable != null )
           {
-            var anchorableIndex = this.Anchorables.ToArray().IndexOf<LayoutAnchorableItem>( this.SelectedAnchorable );
+            var anchorableIndex = ( this.Anchorables != null) ?  this.Anchorables.ToArray().IndexOf<LayoutAnchorableItem>( this.SelectedAnchorable ) : -1;
 
             if( e.Key == System.Windows.Input.Key.Tab )
             {
               // Jump to next LayoutAnchorable
-              if( ( anchorableIndex < ( this.Anchorables.Count() - 1 ) )
-                || ( this.Documents.Length == 0 ) )
+              if( ( ( this.Anchorables != null) && ( anchorableIndex < ( this.Anchorables.Count() - 1 ) ) )
+                || ( ( this.Documents != null ) && ( this.Documents.Length == 0 ) ) )
               {
                 this.SelectNextAnchorable();
                 shouldHandle = true;
               }
               // Jump to first LayoutDocument
-              else if( this.Documents.Length > 0 )
+              else if( ( this.Documents != null) && (this.Documents.Length > 0) )
               {
                 _isSelectingDocument = true;
                 this.InternalSetSelectedAnchorable( null );
@@ -364,7 +365,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
             }
             else if( ( e.Key == System.Windows.Input.Key.Left ) || ( e.Key == System.Windows.Input.Key.Right ) )
             {
-              if( this.Documents.Count() > 0 )
+              if( ( this.Documents != null) && (this.Documents.Count() > 0) )
               {
                 _isSelectingDocument = true;
                 this.InternalSetSelectedAnchorable( null );
@@ -383,7 +384,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
           // There is no SelectedAnchorable, select the first one.
           else
           {
-            if( this.Anchorables.Count() > 0 )
+            if( ( this.Anchorables != null) && (this.Anchorables.Count() > 0) )
             {
               this.InternalSetSelectedAnchorable( this.Anchorables.ToArray()[ 0 ] );
               shouldHandle = true;
@@ -493,7 +494,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     internal void SelectNextDocument()
     {
-      if( this.SelectedDocument != null )
+      if( (this.SelectedDocument != null) && ( this.Documents != null) )
       {
         int docIndex = this.Documents.IndexOf<LayoutDocumentItem>( this.SelectedDocument );
         docIndex++;
@@ -507,7 +508,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     internal void SelectPreviousDocument()
     {
-      if( this.SelectedDocument != null )
+      if( (this.SelectedDocument != null) && ( this.Documents != null) )
       {
         int docIndex = this.Documents.IndexOf<LayoutDocumentItem>( this.SelectedDocument );
         docIndex--;
@@ -521,7 +522,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     internal void SelectNextAnchorable()
     {
-      if( this.SelectedAnchorable != null )
+      if( (this.SelectedAnchorable != null) && ( this.Anchorables != null) )
       {
         var anchorablesArray = this.Anchorables.ToArray();
         int anchorableIndex = anchorablesArray.IndexOf<LayoutAnchorableItem>( this.SelectedAnchorable );
@@ -536,7 +537,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     internal void SelectPreviousAnchorable()
     {
-      if( this.SelectedAnchorable != null )
+      if( (this.SelectedAnchorable != null) && ( this.Anchorables != null ) )
       {
         var anchorablesArray = this.Anchorables.ToArray();
         int anchorableIndex = anchorablesArray.IndexOf<LayoutAnchorableItem>( this.SelectedAnchorable );

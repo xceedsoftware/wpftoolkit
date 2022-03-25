@@ -66,6 +66,7 @@
                                VerticalContentAlignment="Stretch"
                                AllowSpin="{Binding AllowSpin, RelativeSource={RelativeSource TemplatedParent}}"
                                ShowSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}"
+                               ShowButtonSpinner="{Binding ShowButtonSpinner, RelativeSource={RelativeSource TemplatedParent}}"
                                SpinnerLocation="{Binding ButtonSpinnerLocation, RelativeSource={RelativeSource TemplatedParent}}"
                                SpinnerWidth="{Binding ButtonSpinnerWidth, RelativeSource={RelativeSource TemplatedParent}}"
                                SpinnerHeight="{Binding ButtonSpinnerHeight, RelativeSource={RelativeSource TemplatedParent}}"

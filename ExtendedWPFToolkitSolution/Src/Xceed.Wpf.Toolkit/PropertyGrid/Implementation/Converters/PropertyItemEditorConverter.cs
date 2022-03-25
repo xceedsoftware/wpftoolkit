@@ -20,6 +20,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
 {
@@ -45,7 +46,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
         if( !this.IsPropertySetLocally( editor, TextBoxBase.IsReadOnlyProperty )  )
         {
           // Set Editor.IsReadOnly to PropertyGrid.IsReadOnly & propertyItem.IsReadOnly.
-          editorIsReadOnlyPropertyInfo.SetValue( editor, isPropertyGridReadOnly.Value ? true : isPropertyItemReadOnly.Value, null );
+          var isReadOnlyValue = isPropertyGridReadOnly.Value
+                                ? true
+                                : ( editor is PropertyGridEditorCollectionControl ) ? false : isPropertyItemReadOnly.Value;
+
+          editorIsReadOnlyPropertyInfo.SetValue( editor, isReadOnlyValue, null );
+
         }
       }
       // No Editor.IsReadOnly property, set the Editor.IsEnabled property.
@@ -56,8 +62,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
         {
           if( !this.IsPropertySetLocally( editor, UIElement.IsEnabledProperty ) )
           {
-            // Set Editor.IsEnabled to PropertyGrid.IsReadOnly & propertyItem.IsReadOnly.
-            editorIsEnabledPropertyInfo.SetValue( editor, isPropertyGridReadOnly.Value ? false : !isPropertyItemReadOnly.Value, null );
+            // Set Editor.IsReadOnly to PropertyGrid.IsReadOnly & propertyItem.IsReadOnly.
+            var isEnabledValue = isPropertyGridReadOnly.Value
+                                ? false
+                                : ( editor is PropertyGridEditorCollectionControl ) ? true : !isPropertyItemReadOnly.Value;
+
+            editorIsEnabledPropertyInfo.SetValue( editor, isEnabledValue, null );
           }
         }
       }

@@ -84,19 +84,19 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero.dll">
-      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.Aero\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.Aero\bin\$(Configuration)\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
     </Reference>
     <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro.dll">
-      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.Metro\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.Metro\bin\$(Configuration)\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
     </Reference>
     <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010.dll">
-      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\Debug\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\$(Configuration)\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
     </Reference>
     <Reference Include="Xceed.Wpf.AvalonDock.dll">
-      <HintPath>..\Xceed.Wpf.AvalonDock\bin\Debug\Xceed.Wpf.AvalonDock.dll</HintPath>
+      <HintPath>..\Xceed.Wpf.AvalonDock\bin\$(Configuration)\Xceed.Wpf.AvalonDock.dll</HintPath>
     </Reference>
     <Reference Include="Xceed.Wpf.Toolkit.dll">
-      <HintPath>..\Xceed.Wpf.Toolkit\bin\Debug\Xceed.Wpf.Toolkit.dll</HintPath>
+      <HintPath>..\Xceed.Wpf.Toolkit\bin\$(Configuration)\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +110,22 @@
     <Compile Include="Core\XamlFormatter.cs" />
     <Compile Include="HomeView.xaml.cs">
       <DependentUpon>HomeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\AvalonDock\Resources\Document.cs" />
+    <Compile Include="Samples\AvalonDock\Resources\DocumentBase.cs" />
+    <Compile Include="Samples\AvalonDock\Resources\DocumentView.xaml.cs">
+      <DependentUpon>DocumentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\AvalonDock\Resources\Note.cs" />
+    <Compile Include="Samples\AvalonDock\Resources\NoteView.xaml.cs">
+      <DependentUpon>NoteView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\AvalonDock\Resources\Page.cs" />
+    <Compile Include="Samples\AvalonDock\Resources\PageView.xaml.cs">
+      <DependentUpon>PageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\AvalonDock\Views\AvalonDockSourcesView.xaml.cs">
+      <DependentUpon>AvalonDockSourcesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Samples\AvalonDock\Views\AvalonDockView.xaml.cs">
       <DependentUpon>AvalonDockView.xaml</DependentUpon>
@@ -178,6 +194,9 @@
     <Compile Include="Samples\DateTime\Converters\DateTimeToTimeSpanConverter.cs" />
     <Compile Include="Samples\DateTime\Views\DateTimeView.xaml.cs">
       <DependentUpon>DateTimeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\AvalonDock\Views\AvalonDockPropertiesView.xaml.cs">
+      <DependentUpon>AvalonDockPropertiesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Samples\ExtTabControl\Views\ExtTabControlView.xaml.cs">
       <DependentUpon>ExtTabControlView.xaml</DependentUpon>
@@ -278,6 +297,12 @@
     <Compile Include="Samples\PropertyGrid\Converters\DimensionConverter.cs" />
     <Compile Include="Samples\PropertyGrid\Resources\LastNameUserControlEditor.xaml.cs">
       <DependentUpon>LastNameUserControlEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridAdvancedContextMenuView.xaml.cs">
+      <DependentUpon>PropertyGridAdvancedContextMenuView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Samples\PropertyGrid\Views\PropertyGridEditorComboBoxDefinitionSourceView.xaml.cs">
+      <DependentUpon>PropertyGridEditorComboBoxDefinitionSourceView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Samples\PropertyGrid\Views\PropertyGridPropertyItemStyleView.xaml.cs">
       <DependentUpon>PropertyGridPropertyItemStyleView.xaml</DependentUpon>
@@ -454,6 +479,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Samples\AvalonDock\Resources\DocumentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\AvalonDock\Resources\NoteView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\AvalonDock\Resources\PageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\AvalonDock\Views\AvalonDockSourcesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Samples\AvalonDock\Views\AvalonDockView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -541,6 +582,10 @@
     <Page Include="Samples\DateTime\Views\DateTimeView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\AvalonDock\Views\AvalonDockPropertiesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Samples\ExtTabControl\Views\ExtTabControlView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -665,6 +710,14 @@
     <Page Include="Samples\PropertyGrid\Resources\LastNameUserControlEditor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridAdvancedContextMenuView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Samples\PropertyGrid\Views\PropertyGridEditorComboBoxDefinitionSourceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Samples\PropertyGrid\Views\PropertyGridPropertyItemStyleView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -1430,6 +1483,25 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\DataGrid\OpenSourceImages\DataGrid.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\AvalonDockSourcesView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\AvalonDockSourcesView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\AvalonDockPropertiesView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\AvalonDockPropertiesView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\PropertyGridAdvancedContextMenuView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridAdvancedContextMenuView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CodeFiles\PropertyGridEditorComboBoxDefinitionSourceView.xaml.cs.txt" />
+    <Resource Include="CodeFiles\PropertyGridEditorComboBoxDefinitionSourceView.xaml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Samples\PropertyGrid\OpenSourceImages\EditorComboBoxDefinition.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

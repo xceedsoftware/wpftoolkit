@@ -33,12 +33,16 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
 
     internal static Type GetListItemType( Type listType )
     {
-      Type iListOfT = listType.GetInterfaces().FirstOrDefault(
+      var iListOfT = listType.GetInterfaces().FirstOrDefault(
         ( i ) => i.IsGenericType && i.GetGenericTypeDefinition() == typeof( IList<> ) );
 
-      return ( iListOfT != null )
-        ? iListOfT.GetGenericArguments()[ 0 ]
-        : null;
+      if( iListOfT != null )
+        return iListOfT.GetGenericArguments()[ 0 ];
+
+      if( listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof( IEnumerable<> ) )
+        return listType.GetGenericArguments()[ 0 ];
+
+      return null;
     }
 
     internal static bool IsCollectionOfItems( Type colType )

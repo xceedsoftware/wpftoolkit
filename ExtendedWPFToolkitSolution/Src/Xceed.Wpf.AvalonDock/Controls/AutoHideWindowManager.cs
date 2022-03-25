@@ -27,6 +27,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private DockingManager _manager;
     private WeakReference _currentAutohiddenAnchor = null;
+    private DispatcherTimer _closingTimer = null;
     private DispatcherTimer _closeTimer = null;
 
     #endregion
@@ -36,7 +37,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
     internal AutoHideWindowManager( DockingManager manager )
     {
       _manager = manager;
+      this.SetupClosingTimer();
       this.SetupCloseTimer();
+    }
+
+    internal void UpdateCloseTimerInterval( int newValue )
+    {
+      _closeTimer.Interval = TimeSpan.FromMilliseconds( newValue );
     }
 
     #endregion
@@ -47,10 +54,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       if( _currentAutohiddenAnchor.GetValueOrDefault<LayoutAnchorControl>() != anchor )
       {
-        StopCloseTimer();
+        this.StopClosingTimer();
+        this.StopCloseTimer();
         _currentAutohiddenAnchor = new WeakReference( anchor );
         _manager.AutoHideWindow.Show( anchor );
-        StartCloseTimer();
+        this.StartClosingTimer();
       }
     }
 
@@ -59,24 +67,55 @@ namespace Xceed.Wpf.AvalonDock.Controls
       if( anchor == null ||
           anchor == _currentAutohiddenAnchor.GetValueOrDefault<LayoutAnchorControl>() )
       {
-        StopCloseTimer();
+        this.StopClosingTimer();
+        this.StopCloseTimer();
       }
       else
         System.Diagnostics.Debug.Assert( false );
     }
 
+    private void SetupClosingTimer()
+    {
+      _closingTimer = new DispatcherTimer( DispatcherPriority.Background );
+      _closingTimer.Interval = TimeSpan.FromMilliseconds( 50 );
+      _closingTimer.Tick += ( s, e ) =>
+      {
+        if( _manager.AutoHideWindow.IsWin32MouseOver
+          || ( ( LayoutAnchorable )_manager.AutoHideWindow.Model ).IsActive
+          || _manager.AutoHideWindow.IsResizing )
+          return;
+
+        this.StopClosingTimer();
+        this.StartCloseTimer();
+      };
+    }
+
+    private void StartClosingTimer()
+    {
+      _closingTimer.Start();
+    }
+
+    private void StopClosingTimer()
+    {
+      _closingTimer.Stop();
+    }
+
     private void SetupCloseTimer()
     {
       _closeTimer = new DispatcherTimer( DispatcherPriority.Background );
-      _closeTimer.Interval = TimeSpan.FromMilliseconds( 1500 );
+      _closeTimer.Interval = TimeSpan.FromMilliseconds( _manager.AutoHideWindowClosingTimer );
       _closeTimer.Tick += ( s, e ) =>
       {
-        if( _manager.AutoHideWindow.IsWin32MouseOver ||
-                  ( ( LayoutAnchorable )_manager.AutoHideWindow.Model ).IsActive ||
-                  _manager.AutoHideWindow.IsResizing )
+        if( _manager.AutoHideWindow.IsWin32MouseOver
+          || ( ( LayoutAnchorable )_manager.AutoHideWindow.Model ).IsActive
+          || _manager.AutoHideWindow.IsResizing )
+        {
+          _closeTimer.Stop();
+          this.StartClosingTimer();
           return;
+        }
 
-        StopCloseTimer();
+        this.StopCloseTimer();
       };
     }
 

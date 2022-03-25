@@ -71,7 +71,7 @@
                                                        KeyboardNavigation.TabIndex="1"
                                                        KeyboardNavigation.DirectionalNavigation="Cycle" />
               <avalonDockControls:DropDownButton x:Name="MenuDropDownButton"
-                                                 Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
+                                                 Style="{DynamicResource {x:Static ToolBar.ToggleButtonStyleKey}}"
                                                  Focusable="False"
                                                  Grid.Column="1">
                 <avalonDockControls:DropDownButton.DropDownContextMenu>
@@ -374,7 +374,7 @@
                                   ContentTemplateSelector="{Binding Model.Root.Manager.AnchorableTitleTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}" />
               </avalonDockControls:DropDownControlArea>
 
-              <avalonDockControls:DropDownButton Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
+              <avalonDockControls:DropDownButton Style="{DynamicResource {x:Static ToolBar.ToggleButtonStyleKey}}"
                                                  Focusable="False"
                                                  Grid.Column="1"
                                                  DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
@@ -389,7 +389,7 @@
               <Button x:Name="PART_AutoHidePin"
                       Grid.Column="2"
                       Focusable="False"
-                      Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                      Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}"
                       Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                       Command="{Binding Path=LayoutItem.AutoHideCommand, RelativeSource={RelativeSource TemplatedParent}}"
                       ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnAutoHide_Hint}">
@@ -402,7 +402,7 @@
               <Button x:Name="PART_HidePin"
                       Grid.Column="3"
                       Focusable="False"
-                      Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                      Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}"
                       Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                       Command="{Binding Path=LayoutItem.HideCommand, RelativeSource={RelativeSource TemplatedParent}}"
                       ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_Hide}">
@@ -747,6 +747,10 @@
   <!--DockingManager-->
   <Style x:Key="{x:Type avalonDock:DockingManager}"
          TargetType="{x:Type avalonDock:DockingManager}">
+    <Setter Property="Background"
+            Value="White" />
+    <Setter Property="Foreground"
+            Value="Black" />
     <Setter Property="DocumentPaneControlStyle"
             Value="{StaticResource DocumentPaneControlStyle}" />
     <Setter Property="AnchorablePaneControlStyle"
@@ -878,7 +882,7 @@
                                   ContentTemplateSelector="{Binding Root.Manager.DocumentHeaderTemplateSelector, Mode=OneWay}" />
 
                 <Button x:Name="DocumentCloseButton"
-                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                        Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}"
                         Grid.Column="2"
                         Visibility="Hidden"
                         Command="{Binding Path=LayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
@@ -1039,7 +1043,7 @@
                     <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Focusable="False"
                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}"
-                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                            Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}"
                             Command="{x:Static shell:SystemCommands.MaximizeWindowCommand}"
                             CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
@@ -1051,7 +1055,7 @@
                     <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Focusable="False"
                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
-                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                            Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}"
                             Command="{x:Static shell:SystemCommands.RestoreWindowCommand}"
                             CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
@@ -1062,7 +1066,7 @@
 
                     <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Focusable="False"
-                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                            Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}"
                             Command="{Binding Path=RootDocumentLayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
                             ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
                             Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
@@ -1149,7 +1153,7 @@
                     <avalonDockControls:DropDownButton x:Name="SinglePaneContextMenu"
                                                        shell:WindowChrome.IsHitTestVisibleInChrome="True"
                                                        Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                       Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
+                                                       Style="{DynamicResource {x:Static ToolBar.ToggleButtonStyleKey}}"
                                                        Focusable="False"
                                                        Grid.Column="1"
                                                        DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
@@ -1162,7 +1166,7 @@
                     <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Focusable="False"
                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}"
-                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                            Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}"
                             Command="{x:Static shell:SystemCommands.MaximizeWindowCommand}"
                             CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
@@ -1174,7 +1178,7 @@
                     <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Focusable="False"
                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
-                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                            Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}"
                             Command="{x:Static shell:SystemCommands.RestoreWindowCommand}"
                             CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
@@ -1186,7 +1190,7 @@
                     <Button x:Name="CloseButton"
                             shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Focusable="False"
-                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                            Style="{DynamicResource {x:Static ToolBar.ButtonStyleKey}}"
                             Command="{Binding HideWindowCommand, RelativeSource={RelativeSource TemplatedParent}}"
                             ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}"
                             Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"

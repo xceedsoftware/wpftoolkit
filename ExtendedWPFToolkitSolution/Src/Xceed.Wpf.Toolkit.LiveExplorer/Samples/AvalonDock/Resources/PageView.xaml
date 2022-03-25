@@ -1,0 +1,31 @@
+﻿<!--*************************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2021 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************-->
+
+<UserControl x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.AvalonDock.Resources.PageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.AvalonDock.Resources"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+  <Grid>
+    <Label Content="Content goes here..."
+           HorizontalAlignment="Stretch"
+           VerticalAlignment="Stretch" />
+  </Grid>
+</UserControl>

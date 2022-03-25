@@ -80,6 +80,7 @@
                                     SpinnerUpDisabledContentTemplate="{TemplateBinding ButtonSpinnerUpDisabledContentTemplate}"
                                     SpinnerDownDisabledContentTemplate="{TemplateBinding ButtonSpinnerDownDisabledContentTemplate}"
                                     AllowSpin="{TemplateBinding AllowSpin}"
+                                    ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
                                     ShowSpinner="{TemplateBinding ShowButtonSpinner}">
             <local:WatermarkTextBox x:Name="PART_TextBox"
                                           BorderThickness="0"

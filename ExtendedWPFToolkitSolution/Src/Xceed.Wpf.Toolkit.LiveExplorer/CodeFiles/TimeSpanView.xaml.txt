@@ -29,16 +29,6 @@
     </Paragraph>
   </local:DemoView.Description>
 
-  <local:DemoView.Resources>
-    <ObjectDataProvider x:Key="enumDateTimePart"
-                        MethodName="GetValues"
-                        ObjectType="{x:Type sys:Enum}">
-      <ObjectDataProvider.MethodParameters>
-        <x:Type TypeName="xctk:DateTimePart" />
-      </ObjectDataProvider.MethodParameters>
-    </ObjectDataProvider>
-  </local:DemoView.Resources>
-
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
@@ -119,10 +109,21 @@
         <ComboBox x:Name="_currentDateTimePart"
                   Grid.Row="5"
                   Grid.Column="1"
-                  ItemsSource="{Binding Source={StaticResource enumDateTimePart}}"
-                  SelectedItem="{Binding CurrentDateTimePart, ElementName=_timeSpanUpDown}"
+                  SelectedValue="{Binding CurrentDateTimePart, ElementName=_timeSpanUpDown}"
+                  SelectedValuePath="Tag"
                   Margin="5,5,25,5"
-                  ToolTip="Must match a DateTimePart of the TimeSpanUpDown" />
+                  ToolTip="Must match a DateTimePart of the TimeSpanUpDown" >
+          <ComboBoxItem Content="Day"
+                        Tag="{x:Static xctk:DateTimePart.Day}" />
+          <ComboBoxItem Content="Hour24"
+                        Tag="{x:Static xctk:DateTimePart.Hour24}" />
+          <ComboBoxItem Content="Minute"
+                        Tag="{x:Static xctk:DateTimePart.Minute}" />
+          <ComboBoxItem Content="Second"
+                        Tag="{x:Static xctk:DateTimePart.Second}" />
+          <ComboBoxItem Content="Millisecond"
+                        Tag="{x:Static xctk:DateTimePart.Millisecond}" />
+        </ComboBox>
 
         <!-- 2nd column-->
         <TextBlock Grid.Column="2"

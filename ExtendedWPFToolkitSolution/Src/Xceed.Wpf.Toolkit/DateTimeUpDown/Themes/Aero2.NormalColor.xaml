@@ -68,7 +68,8 @@
                                          SpinnerUpDisabledContentTemplate="{TemplateBinding ButtonSpinnerUpDisabledContentTemplate}"
                                          SpinnerDownDisabledContentTemplate="{TemplateBinding ButtonSpinnerDownDisabledContentTemplate}"
                                          AllowSpin="{TemplateBinding AllowSpin}"
-                                         ShowSpinner="{TemplateBinding ShowButtonSpinner}">
+                                         ShowSpinner="{TemplateBinding ShowButtonSpinner}"
+                                         ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
                         <local:WatermarkTextBox x:Name="PART_TextBox"
                                           BorderThickness="0" 
                                           Background="Transparent"
@@ -82,6 +83,7 @@
                                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                           IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
+                                          AutoSelectBehavior="OnFocus"
                                           IsTabStop="True"
                                           MinWidth="20"
                                           AcceptsReturn="False"

@@ -39,7 +39,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     protected override void SetControlProperties( PropertyItem propertyItem )
     {
 
-      var propertyGrid = propertyItem.ParentElement as PropertyGrid;
+      var propertyGrid = this.GetParentPropertyGrid( propertyItem.ParentElement );
       if( propertyGrid != null )
       {
         // Use the PropertyGrid.EditorDefinitions for the CollectionControl's propertyGrid.
@@ -47,6 +47,25 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 
         this.Editor.CollectionUpdated += this.Editor_CollectionUpdated;
       }
+    }
+
+    private PropertyGrid GetParentPropertyGrid( FrameworkElement element )
+    {
+      var propertyGrid = element as PropertyGrid;
+      if( propertyGrid == null )
+      {
+        var parentPropertyItem = element as PropertyItem;
+        while( ( parentPropertyItem != null ) && ( propertyGrid == null ) )
+        {
+          propertyGrid = parentPropertyItem.ParentElement as PropertyGrid;
+          if( propertyGrid == null )
+          {
+            parentPropertyItem = parentPropertyItem.ParentElement as PropertyItem;
+          }
+        }
+      }
+
+      return propertyGrid;
     }
 
     private void Editor_CollectionUpdated( object sender, RoutedEventArgs e )
@@ -57,7 +76,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
         var propertyItem = propertyGridEditorCollectionControl.DataContext as PropertyItem;
         if( propertyItem != null )
         {
-          var propertyGrid = propertyItem.ParentElement as PropertyGrid;
+          var propertyGrid = this.GetParentPropertyGrid( propertyItem.ParentElement );
           if( propertyGrid != null )
           {
             propertyGrid.RaiseEvent( new PropertyValueChangedEventArgs( PropertyGrid.PropertyValueChangedEvent, propertyItem, null, propertyItem.Instance ) );

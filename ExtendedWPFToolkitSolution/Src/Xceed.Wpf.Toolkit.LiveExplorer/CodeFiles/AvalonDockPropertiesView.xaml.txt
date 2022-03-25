@@ -1,0 +1,664 @@
+﻿<!--*************************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2021 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************-->
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.AvalonDock.Views.AvalonDockPropertiesView"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+                xmlns:s="clr-namespace:System;assembly=mscorlib"
+                xmlns:localView="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.AvalonDock.Views"
+                Title="DockingManager Properties">
+  <local:DemoView.Description>
+    <Paragraph FontSize="14"
+               FontFamily="Segoe">
+      The DockingManager is the core control of AvalonDock. The class provides several "Template" properties (e.g., AnchorableTitleTemplate/DocumentTitleTemplate, AnchorableHeaderTemplate/DocumentHeaderTemplate, etc.) that allow designers and developers to specify the template for the elements contained in the layout.
+    </Paragraph>
+  </local:DemoView.Description>
+
+  <local:DemoView.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <localView:GenericResourceDictionary />
+      </ResourceDictionary.MergedDictionaries>
+
+      <xcad:LayoutRoot x:Key="DefaultLayout" x:Name="layoutRoot1">
+        <xcad:LayoutPanel Orientation="Horizontal">
+          <xcad:LayoutAnchorablePane DockWidth="160">
+            <xcad:LayoutAnchorable ContentId="properties"
+                                   Title="Properties"
+                                   CanHide="False"
+                                   CanClose="False"
+                                   AutoHideWidth="240"
+                                   IconSource="../Images/property-blue.png">
+              <xctk:PropertyGrid x:Name="propertyGrid"
+                                 NameColumnWidth="110"
+                                 AutoGenerateProperties="False">
+              </xctk:PropertyGrid>
+            </xcad:LayoutAnchorable>
+          </xcad:LayoutAnchorablePane>
+          <xcad:LayoutDocumentPaneGroup>
+            <xcad:LayoutDocumentPane>
+              <xcad:LayoutDocument ContentId="document1"
+                                   Title="Document 1"
+                                   IconSource="../Images/document.png">
+                <Button Content="Document 1 Content"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+              </xcad:LayoutDocument>
+              <xcad:LayoutDocument ContentId="document2"
+                                     Title="Document 2"
+                                     IconSource="../Images/document.png">
+                <TextBox Text="Document 2 Content"
+                         AcceptsReturn="True" />
+              </xcad:LayoutDocument>
+            </xcad:LayoutDocumentPane>
+          </xcad:LayoutDocumentPaneGroup >
+          <xcad:LayoutAnchorablePaneGroup DockWidth="125">
+            <xcad:LayoutAnchorablePane>
+              <xcad:LayoutAnchorable ContentId="alarms"
+                                     Title="Alarms"
+                                     IconSource="../Images/alarm-clock-blue.png"
+                                     CanClose="True">
+                <ListBox>
+                  <s:String>Alarm 1</s:String>
+                  <s:String>Alarm 2</s:String>
+                  <s:String>Alarm 3</s:String>
+                </ListBox>
+              </xcad:LayoutAnchorable>
+              <xcad:LayoutAnchorable ContentId="journal"
+                                     Title="Journal">
+                <RichTextBox>
+                  <FlowDocument>
+                    <Paragraph FontSize="14"
+                                 FontFamily="Segoe">
+                      This is the content of the Journal Pane.
+                      <LineBreak />
+                      A
+                      <Bold>RichTextBox</Bold> has been added here
+                    </Paragraph>
+                  </FlowDocument>
+                </RichTextBox>
+              </xcad:LayoutAnchorable>
+            </xcad:LayoutAnchorablePane>
+          </xcad:LayoutAnchorablePaneGroup>
+        </xcad:LayoutPanel>
+        <xcad:LayoutRoot.LeftSide>
+          <xcad:LayoutAnchorSide>
+            <xcad:LayoutAnchorGroup>
+              <xcad:LayoutAnchorable Title="Agenda"
+                                     ContentId="agenda"
+                                     IconSource="../Images/address-book-open.png">
+                <TextBlock Text="Agenda Content"
+                             Margin="10"
+                             FontSize="18"
+                             FontWeight="Black"
+                             TextWrapping="Wrap" />
+              </xcad:LayoutAnchorable>
+              <xcad:LayoutAnchorable Title="Contacts"
+                                       ContentId="contacts"
+                                       IconSource="../Images/address-book--pencil.png">
+                <TextBlock Text="Contacts Content"
+                             Margin="10"
+                             FontSize="18"
+                             FontWeight="Black"
+                             TextWrapping="Wrap" />
+              </xcad:LayoutAnchorable>
+            </xcad:LayoutAnchorGroup>
+          </xcad:LayoutAnchorSide>
+        </xcad:LayoutRoot.LeftSide>
+      </xcad:LayoutRoot>
+
+      <xcad:LayoutRoot x:Key="CustomLayout" x:Name="layoutRoot2">
+        <xcad:LayoutPanel x:Name="layoutPanel" Orientation="Horizontal">
+          <xcad:LayoutAnchorablePane DockWidth="200">
+            <xcad:LayoutAnchorable ContentId="explorer"
+                                   Title="Explorer"
+                                   CanHide="False"
+                                   CanClose="False"
+                                   AutoHideWidth="240"
+                                   IconSource="../Images/property-blue.png">
+              <TreeView>
+                <TreeViewItem Header="Level 1" IsExpanded="True">
+                  <TreeViewItem Header="Level 2.1" />
+                  <TreeViewItem Header="Level 2.2" IsExpanded="True">
+                    <TreeViewItem Header="Level 3.1" />
+                    <TreeViewItem Header="Level 3.2" />
+                  </TreeViewItem>
+                  <TreeViewItem Header="Level 2.3" />
+                </TreeViewItem>
+              </TreeView>
+            </xcad:LayoutAnchorable>
+          </xcad:LayoutAnchorablePane>
+
+          <xcad:LayoutDocumentPaneGroup Orientation="Horizontal">
+            <xcad:LayoutDocumentPane>
+              <xcad:LayoutDocument ContentId="docs" Title="Documents" >
+                <TextBox>Simple text doc.</TextBox>
+              </xcad:LayoutDocument>
+            </xcad:LayoutDocumentPane>
+            <xcad:LayoutDocumentPane>
+              <xcad:LayoutDocument ContentId="files" Title="Files" >
+                <DockPanel Margin="10">
+                  <WrapPanel HorizontalAlignment="Center" DockPanel.Dock="Top" Margin="0,0,0,10">
+                    <Button x:Name="OpenFile">Open files</Button>
+                  </WrapPanel>
+                  <ListBox Name="lbFiles">
+                    <TextBox>File 1</TextBox>
+                    <TextBox>File 2</TextBox>
+                    <TextBox>File 3</TextBox>
+                  </ListBox>
+                </DockPanel>
+              </xcad:LayoutDocument>
+            </xcad:LayoutDocumentPane>
+          </xcad:LayoutDocumentPaneGroup >
+
+        </xcad:LayoutPanel>
+
+        <xcad:LayoutRoot.RightSide>
+          <xcad:LayoutAnchorSide>
+            <xcad:LayoutAnchorGroup>
+              <xcad:LayoutAnchorable Title="Options"
+                                     ContentId="options">
+                <TextBlock Text="Options"
+                           Margin="10"
+                           FontSize="18"
+                           FontWeight="Black"
+                           TextWrapping="Wrap" />
+              </xcad:LayoutAnchorable>
+              <xcad:LayoutAnchorable Title="Tools"
+                                     ContentId="Tools">
+                <TextBlock Text="Items"
+                           Margin="10"
+                           FontSize="18"
+                           FontWeight="Black"
+                           TextWrapping="Wrap" />
+              </xcad:LayoutAnchorable>
+            </xcad:LayoutAnchorGroup>
+          </xcad:LayoutAnchorSide>
+        </xcad:LayoutRoot.RightSide>
+      </xcad:LayoutRoot>
+
+      <Style x:Key="DefaultDocumentPaneControlStyle"
+             TargetType="{x:Type xcad:LayoutDocumentPaneControl}"
+             BasedOn="{StaticResource DocumentPaneControlStyle}">
+        <Setter Property="Background" Value="Transparent" />
+      </Style>
+
+      <Style x:Key="DocumentPaneControlStyle1"
+             TargetType="{x:Type xcad:LayoutDocumentPaneControl}"
+             BasedOn="{StaticResource DocumentPaneControlStyle}">
+        <Setter Property="Background" Value="LightSlateGray" />
+
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type xcad:LayoutDocumentPaneControl}">
+              <Grid>
+                 <TabControl x:Name="leftMaterialTabs"
+                             TabStripPlacement="Left">
+                  <TabItem Header="First"
+                           VerticalContentAlignment="Center"
+                           Content="MaterialTabItem #1" />
+                  <TabItem Header="Second"
+                           VerticalContentAlignment="Center"
+                           Content="MaterialTabItem #2" />
+                  <TabItem Header="Third"
+                           VerticalContentAlignment="Center"
+                           Content="MaterialTabItem #3" />
+                  <TabItem Header="Fourth"
+                           VerticalContentAlignment="Center"
+                           Content="MaterialTabItem #4" />
+                  <TabItem Header="Fifth"
+                           VerticalContentAlignment="Center"
+                           Content="MaterialTabItem #5" />
+                </TabControl>
+              </Grid>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+
+      <Style x:Key="DocumentPaneControlStyle2"
+             TargetType="{x:Type xcad:LayoutDocumentPaneControl}"
+             BasedOn="{StaticResource DocumentPaneControlStyle}">
+        <Setter Property="Background" Value="DarkGray" />
+        <Style.Triggers>
+          <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Model.ChildrenCount}"
+                       Value="0">
+            <!-- New template when no more LayoutDocument in LayoutDocumentPane -->
+            <Setter Property="Template">
+              <Setter.Value>
+                <ControlTemplate TargetType="{x:Type xcad:LayoutDocumentPaneControl}">
+                  <Grid>
+                    <Button Content="Button"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center" />
+                  </Grid>
+                </ControlTemplate>
+              </Setter.Value>
+            </Setter>
+          </DataTrigger>
+        </Style.Triggers>
+      </Style>
+
+      <ControlTemplate x:Key="DefaultAnchorSideTemplate"
+                       TargetType="{x:Type xcad:LayoutAnchorSideControl}">
+        <ItemsControl ItemsSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Children}"
+                      Background="{TemplateBinding Background}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="{Binding Path=Model.Side, RelativeSource={RelativeSource AncestorType={x:Type xcad:LayoutAnchorSideControl}, Mode=FindAncestor}}" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </ControlTemplate>
+
+      <ControlTemplate x:Key="AnchorSideTemplate1"
+                       TargetType="{x:Type xcad:LayoutAnchorSideControl}">
+        <ItemsControl ItemsSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Children}"
+                      Background="LightCyan">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="{Binding Path=Model.Side, RelativeSource={RelativeSource AncestorType={x:Type xcad:LayoutAnchorSideControl}, Mode=FindAncestor}}" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </ControlTemplate>
+
+      <ControlTemplate x:Key="AnchorSideTemplate2"
+                       TargetType="{x:Type xcad:LayoutAnchorSideControl}">
+        <ItemsControl ItemsSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Children}"
+                      Background="Beige" BorderThickness="2">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="{Binding Path=Model.Side, RelativeSource={RelativeSource AncestorType={x:Type xcad:LayoutAnchorSideControl}, Mode=FindAncestor}}" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </ControlTemplate>
+
+      <ControlTemplate x:Key="DefaultAnchorTemplate" 
+                       TargetType="{x:Type xcad:LayoutAnchorControl}">
+        <Border Cursor="Hand"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Background="{TemplateBinding Background}">
+          <ContentPresenter Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
+                            ContentTemplate="{Binding Model.Root.Manager.AnchorableHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                            ContentTemplateSelector="{Binding Model.Root.Manager.AnchorableHeaderTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Margin="3"/>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver"
+                   Value="True">
+            <Setter Property="Background"
+                   Value="Gray" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+
+      <ControlTemplate x:Key="AnchorTemplate1" 
+                       TargetType="{x:Type xcad:LayoutAnchorControl}">
+        <Border Cursor="Hand"
+                BorderBrush="BlueViolet"
+                BorderThickness="2"
+                CornerRadius="1"
+                Background="{TemplateBinding Background}">
+          <ContentPresenter Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
+                            ContentTemplate="{Binding Model.Root.Manager.AnchorableHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                            ContentTemplateSelector="{Binding Model.Root.Manager.AnchorableHeaderTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Margin="3"/>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver"
+                   Value="True">
+            <Setter Property="Background"
+                   Value="Gray" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+
+      <ControlTemplate x:Key="AnchorTemplate2" 
+                       TargetType="{x:Type xcad:LayoutAnchorControl}">
+        <Border Cursor="Hand"
+                BorderBrush="Black"
+                BorderThickness="4"
+                CornerRadius="3"
+                Background="{TemplateBinding Background}">
+          <ContentPresenter Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
+                            ContentTemplate="{Binding Model.Root.Manager.AnchorableHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                            ContentTemplateSelector="{Binding Model.Root.Manager.AnchorableHeaderTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Margin="3"
+                            Width="32"/>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver"
+                   Value="True">
+            <Setter Property="Background"
+                    Value="Beige" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+
+      <DataTemplate x:Key="DefaultDocumentHeaderTemplate">
+        <StackPanel Orientation="Horizontal">
+          <Image Source="{Binding IconSource}"
+                   Margin="0,0,4,0" />
+          <TextBlock Text="{Binding Title}" 
+                       TextTrimming="WordEllipsis" />
+        </StackPanel>
+      </DataTemplate>
+
+      <DataTemplate x:Key="DocumentHeaderTemplate1">
+        <StackPanel Orientation="Horizontal">
+          <Image Source="{Binding IconSource}"
+                 Margin="0,0,4,0" />
+          <TextBlock Text="{Binding Title}">
+            <TextBlock.Style>
+              <Style  TargetType="{x:Type TextBlock}">
+                <Setter Property="Background">
+                  <Setter.Value>
+                    <SolidColorBrush Color="SlateGray"/>
+                  </Setter.Value>
+                </Setter>
+              </Style>
+            </TextBlock.Style>
+          </TextBlock>
+        </StackPanel>
+      </DataTemplate>
+
+      <DataTemplate x:Key="DocumentHeaderTemplate2">
+        <StackPanel Orientation="Horizontal">
+          <Border Background="Blue" Margin="5,4" />
+          <Image Source="{Binding IconSource}"
+                 Margin="0,0,4,0" />
+          <TextBlock Text="{Binding Title}">
+            <TextBlock.Style>
+              <Style  TargetType="{x:Type TextBlock}">
+                <Setter Property="Foreground">
+                  <Setter.Value>
+                    <SolidColorBrush Color="OrangeRed"/>
+                  </Setter.Value>
+                </Setter>
+              </Style>
+            </TextBlock.Style>
+          </TextBlock>
+        </StackPanel>
+      </DataTemplate>
+
+      <ContextMenu x:Key="DefaultDocumentContextMenu">
+        <MenuItem Header="{x:Static xcad:Resources.Document_Close}"
+              Command="{Binding Path=CloseCommand}"
+              Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+        <MenuItem Header="{x:Static xcad:Resources.Document_CloseAllButThis}"
+              Command="{Binding Path=CloseAllButThisCommand}" />
+        <MenuItem Header="{x:Static xcad:Resources.Document_CloseAll}"
+              Command="{Binding Path=CloseAllCommand}" />
+        <MenuItem Header="{x:Static xcad:Resources.Document_Float}"
+              Command="{Binding Path=FloatCommand}" />
+        <MenuItem Header="{x:Static xcad:Resources.Document_DockAsDocument}"
+              Command="{Binding Path=DockAsDocumentCommand}" />
+        <MenuItem Header="{x:Static xcad:Resources.Document_NewHorizontalTabGroup}"
+              Command="{Binding Path=NewHorizontalTabGroupCommand}"
+              Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+        <MenuItem Header="{x:Static xcad:Resources.Document_NewVerticalTabGroup}"
+              Command="{Binding Path=NewVerticalTabGroupCommand}"
+              Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+        <MenuItem Header="{x:Static xcad:Resources.Document_MoveToNextTabGroup}"
+              Command="{Binding Path=MoveToNextTabGroupCommand}"
+              Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+        <MenuItem Header="{x:Static xcad:Resources.Document_MoveToPreviousTabGroup}"
+              Command="{Binding Path=MoveToPreviousTabGroupCommand}"
+              Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+      </ContextMenu>
+
+      <ContextMenu x:Key="DocumentContextMenu1">
+        <MenuItem Header="Menu item 1" />
+        <MenuItem Header="Menu item 2" />
+        <Separator />
+        <MenuItem Header="Menu item 3" />
+      </ContextMenu>
+
+      <ContextMenu x:Key="DocumentContextMenu2">
+        <MenuItem Header="Option 1" />
+        <MenuItem Header="Option 2" />
+        <Separator />
+        <MenuItem Header="Option 3" />
+        <MenuItem Header="Option 4" />
+      </ContextMenu>
+
+    </ResourceDictionary>
+  </local:DemoView.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <GroupBox Header="Features"
+              Grid.Row="0"
+              Margin="5">
+      <Grid Margin="5">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <!-- 1st column-->
+        <TextBlock Text="Layout: "
+                   VerticalAlignment="Center" />
+        <ComboBox Grid.Column="1"
+                  Width="120"
+                  Margin="5"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Center"
+                  SelectedValue="{Binding Layout, ElementName=_dockingManager}"
+                  SelectedValuePath="Tag"
+                  ToolTip="Displays different layout panes in the DockingManager.">
+          <ComboBoxItem Content="Default"
+                        Tag="{StaticResource DefaultLayout}" />
+          <ComboBoxItem Content="Template 1"
+                        Tag="{StaticResource CustomLayout}" />
+        </ComboBox>
+
+        <TextBlock Text="DocumentPaneControlStyle: "
+                   VerticalAlignment="Center"
+                   Grid.Row="1"
+                   Grid.Column="0" />
+        <ComboBox Grid.Column="1"
+                  Grid.Row="1"
+                  Width="120"
+                  Margin="5"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Center"
+                  SelectedValue="{Binding DocumentPaneControlStyle, ElementName=_dockingManager}"
+                  SelectedValuePath="Tag"
+                  ToolTip="Displays different document pane styles in the DockingManager.">
+          <ComboBoxItem Content="Default"
+                        Tag="{StaticResource DefaultDocumentPaneControlStyle}" />
+          <ComboBoxItem Content="Template1"
+                        Tag="{StaticResource DocumentPaneControlStyle1}" />
+          <ComboBoxItem Content="Template2"
+                        Tag="{StaticResource DocumentPaneControlStyle2}" />
+        </ComboBox>
+
+        <TextBlock Text="AnchorSideTemplate: "
+                   VerticalAlignment="Center"
+                   Grid.Row="2"
+                   Grid.Column="0" />
+        <ComboBox Grid.Row="2"
+                  Grid.Column="1"
+                  Width="120"
+                  Margin="5"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Center"
+                  SelectedValue="{Binding AnchorSideTemplate, ElementName=_dockingManager}"
+                  SelectedValuePath="Tag"
+                  ToolTip="Sets the ControlTemplate to use to render LayoutAnchorSideControl.">
+          <ComboBoxItem Content="Default"
+                        Tag="{StaticResource DefaultAnchorSideTemplate}" />
+          <ComboBoxItem Content="Template1"
+                        Tag="{StaticResource AnchorSideTemplate1}" />
+          <ComboBoxItem Content="Template2"
+                        Tag="{StaticResource AnchorSideTemplate2}" />
+        </ComboBox>
+
+        <TextBlock Text="DocumentContextMenu:"
+                   VerticalAlignment="Center"
+                   Grid.Row="3"
+                   Grid.Column="0" />
+        <ComboBox Grid.Row="3"
+                  Grid.Column="1"
+                  Margin="5"
+                  Width="120"
+                  VerticalAlignment="Center"
+                  SelectedValue="{Binding DocumentContextMenu, ElementName=_dockingManager}"
+                  SelectedValuePath="Tag"
+                  ToolTip="Sets different context menus to show for documents.">
+          <ComboBoxItem Content="Default"
+                        Tag="{StaticResource DefaultDocumentContextMenu}" />
+          <ComboBoxItem Content="Template1"
+                        Tag="{StaticResource DocumentContextMenu1}" />
+          <ComboBoxItem Content="Template2"
+                        Tag="{StaticResource DocumentContextMenu2}" />
+        </ComboBox>
+
+        <!--2nd column-->
+        <TextBlock Text="AnchorTemplate: "
+                   VerticalAlignment="Center"
+                   Grid.Row="0"
+                   Grid.Column="2" 
+                   Margin="40,0,0,0"/>
+        <ComboBox Grid.Column="3"
+                  Width="120"
+                  Margin="5"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Center"
+                  SelectedValue="{Binding AnchorTemplate, ElementName=_dockingManager}"
+                  SelectedValuePath="Tag"
+                  ToolTip="Displays different ControlTemplate for LayoutAnchorControl.">
+          <ComboBoxItem Content="Default"
+                        Tag="{StaticResource DefaultAnchorTemplate}" />
+          <ComboBoxItem Content="Template1"
+                        Tag="{StaticResource AnchorTemplate1}" />
+          <ComboBoxItem Content="Template2"
+                        Tag="{StaticResource AnchorTemplate2}" />
+        </ComboBox>
+
+        <TextBlock Text="DocumentHeaderTemplate: "
+                   VerticalAlignment="Center"
+                   Grid.Row="1"
+                   Grid.Column="2"
+                   Margin="40,0,0,0" />
+        <ComboBox Grid.Row="1"
+                  Grid.Column="3"
+                  VerticalAlignment="Center"
+                  Margin="5"
+                  Width="120"
+                  SelectedValue="{Binding DocumentHeaderTemplate, ElementName=_dockingManager}"
+                  SelectedValuePath="Tag"
+                  ToolTip="Displays different data template to use for document headers.">
+          <ComboBoxItem Content="Default"
+                        Tag="{StaticResource DefaultDocumentHeaderTemplate}" />
+          <ComboBoxItem Content="Template1"
+                        Tag="{StaticResource DocumentHeaderTemplate1}" />
+          <ComboBoxItem Content="Template2"
+                        Tag="{StaticResource DocumentHeaderTemplate2}" />
+        </ComboBox>
+
+        <TextBlock Text="AutoHideWindowClosingTimer:"
+                   VerticalAlignment="Center"
+                   Grid.Row="2"
+                   Grid.Column="2"
+                   Margin="40,0,0,0"/>
+        <xctk:IntegerUpDown x:Name="_integerUpDown"
+                            Grid.Row="2"
+                            Grid.Column="3"
+                            VerticalAlignment="Center"
+                            Margin="5"
+                            Width="120"
+                            Value="{Binding AutoHideWindowClosingTimer, ElementName=_dockingManager, ValidatesOnExceptions=True}"
+                            ToolTip="Set the time (in ms, ex: 2000, 3000, 6000) it will take to close the AutoHideWindow (Agenda/Contacts) when not moused over or active."/>
+
+        <TextBlock Text="AllowMixedOrientation:"
+                   VerticalAlignment="Center"
+                   Grid.Row="3"
+                   Grid.Column="2"
+                   Margin="40,0,0,0" />
+        <CheckBox Grid.Row="3"
+                  Grid.Column="3"
+                  Width="120"
+                  IsChecked="{Binding AllowMixedOrientation, ElementName=_dockingManager}"
+                  VerticalAlignment="Center"
+                  Margin="5"
+                  ToolTip="Sets whether the docking manager should allow mixed orientation for document panes." />
+
+      </Grid>
+    </GroupBox>
+
+    <Grid Grid.Row="1"
+          Margin="5">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition />
+      </Grid.ColumnDefinitions>
+
+      <TextBlock Grid.Row="0"
+               Text="Usage:"
+               Style="{StaticResource Header}" />
+
+      <StackPanel Grid.Row="1">
+        <xcad:DockingManager x:Name="_dockingManager"
+                             Height="300"
+                             MaxHeight="395"
+                             Layout="{StaticResource DefaultLayout}"
+                             DocumentPaneControlStyle="{StaticResource DefaultDocumentPaneControlStyle}"
+                             AnchorSideTemplate="{StaticResource DefaultAnchorSideTemplate}"
+                             AnchorTemplate="{StaticResource DefaultAnchorTemplate}"
+                             DocumentHeaderTemplate="{StaticResource DefaultDocumentHeaderTemplate}"
+                             AutoHideWindowClosingTimer="1000"
+                             DocumentContextMenu="{StaticResource DefaultDocumentContextMenu}"
+                             BorderBrush="Black"
+                             BorderThickness="1"
+                             AllowMixedOrientation="True">
+        </xcad:DockingManager>
+
+      </StackPanel>
+    </Grid>
+  </Grid>
+</local:DemoView>
+

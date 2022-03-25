@@ -31,6 +31,7 @@ using System.Collections.ObjectModel;
 using System.Collections;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Linq.Expressions;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -1053,10 +1054,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         }
 
         var parentPropertyItem = modifiedPropertyItem.ParentNode as PropertyItem;
-        if( ( parentPropertyItem != null ) && parentPropertyItem.IsExpandable )
+        while( ( parentPropertyItem != null ) && parentPropertyItem.IsExpandable )
         {
           //Rebuild Editor for parent propertyItem if one of its sub-propertyItem have changed.
           this.RebuildPropertyItemEditor( parentPropertyItem );
+
+          parentPropertyItem = parentPropertyItem.ParentNode as PropertyItem;
         }
       }
     }
@@ -1544,9 +1547,19 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       get
       {
+        var categoryPropertyOrderAttribute = TypeDescriptor.GetAttributes( this.SelectedObject )
+                                             .OfType<CategoryPropertyOrderAttribute>()
+                                             .FirstOrDefault();
+
+        if( this.IsCategorized
+          && ( categoryPropertyOrderAttribute != null )
+          && ( categoryPropertyOrderAttribute.CategoryPropertyOrder == CategoryPropertyOrderEnum.Declaration ) )
+          return false;
+
         return true;
       }
     }
+
 
 
     bool? IPropertyContainer.IsPropertyVisible( PropertyDescriptor pd )

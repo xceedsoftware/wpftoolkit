@@ -21,6 +21,7 @@ using System;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Documents;
+using Microsoft.Win32;
 
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views

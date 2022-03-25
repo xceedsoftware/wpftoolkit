@@ -62,7 +62,7 @@ namespace Xceed.Wpf.Toolkit
     private static void AllowSpinPropertyChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ButtonSpinner source = d as ButtonSpinner;
-      source.OnAllowSpinChanged( (bool)e.OldValue, (bool)e.NewValue );
+      source.OnAllowSpinChanged( ( bool )e.OldValue, ( bool )e.NewValue );
     }
 
     #endregion //AllowSpin
@@ -94,7 +94,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Location)GetValue( SpinnerLocationProperty );
+        return ( Location )GetValue( SpinnerLocationProperty );
       }
       set
       {
@@ -111,7 +111,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( SpinnerWidthProperty );
+        return ( double )GetValue( SpinnerWidthProperty );
       }
       set
       {
@@ -128,7 +128,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( SpinnerHeightProperty );
+        return ( double )GetValue( SpinnerHeightProperty );
       }
       set
       {
@@ -145,7 +145,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (DataTemplate)GetValue( SpinnerDownContentTemplateProperty );
+        return ( DataTemplate )GetValue( SpinnerDownContentTemplateProperty );
       }
       set
       {
@@ -162,7 +162,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (DataTemplate)GetValue( SpinnerDownDisabledContentTemplateProperty );
+        return ( DataTemplate )GetValue( SpinnerDownDisabledContentTemplateProperty );
       }
       set
       {
@@ -179,7 +179,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (DataTemplate)GetValue( SpinnerUpContentTemplateProperty );
+        return ( DataTemplate )GetValue( SpinnerUpContentTemplateProperty );
       }
       set
       {
@@ -196,7 +196,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (DataTemplate)GetValue( SpinnerUpDisabledContentTemplateProperty );
+        return ( DataTemplate )GetValue( SpinnerUpDisabledContentTemplateProperty );
       }
       set
       {
@@ -265,7 +265,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (bool)GetValue( ShowSpinnerProperty );
+        return ( bool )GetValue( ShowSpinnerProperty );
       }
       set
       {
@@ -423,11 +423,11 @@ namespace Xceed.Wpf.Toolkit
 
             break;
           }
-          case Key.Enter:
+        case Key.Enter:
           {
             //Do not Spin on enter Key when spinners have focus
-            if( ((this.IncreaseButton != null) && (this.IncreaseButton.IsFocused)) 
-              || (( this.DecreaseButton != null ) && this.DecreaseButton.IsFocused ))
+            if( ( ( this.IncreaseButton != null ) && ( this.IncreaseButton.IsFocused ) )
+              || ( ( this.DecreaseButton != null ) && this.DecreaseButton.IsFocused ) )
             {
               e.Handled = true;
             }

@@ -25,6 +25,7 @@
   </ResourceDictionary.MergedDictionaries>
 
   <conv:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
+  <conv:PrintableFontFamilyConverter x:Key="PrintableFontFamilyConverter" />
 
   <ControlTemplate x:Key="ThumbControlTemplate"
                    TargetType="{x:Type Thumb}">
@@ -622,6 +623,12 @@
                       IsEditable="True"
                       Width="100"
                       ToolTip="Font Family">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding}"
+                             FontFamily="{Binding Converter={StaticResource PrintableFontFamilyConverter}, TargetNullValue=Arial}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
             </ComboBox>
 
             <ComboBox x:Name="_cmbFontSizes"

@@ -34,6 +34,10 @@ namespace Xceed.Wpf.AvalonDock.Layout
     public LayoutDocumentPane( LayoutContent firstChild )
     {
       this.Children.Add( firstChild );
+      if( this.Root != null )
+      {
+        this.Root.CollectGarbage();
+      }
     }
 
     #endregion

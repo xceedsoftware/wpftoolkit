@@ -872,8 +872,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         IsSelected = true;
         IsActive = true;
-
-        Root.CollectGarbage();
       }
       else
       {
@@ -883,6 +881,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
         IsActive = true;
       }
 
+      Root.CollectGarbage();
     }
 
     /// <summary>
@@ -959,6 +958,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         IsSelected = true;
         IsActive = true;
+        IsFloating = false;
       }
       else
       {

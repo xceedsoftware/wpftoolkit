@@ -68,6 +68,7 @@
   <Grid x:Key="DropDownArrowGlyph"
         IsHitTestVisible="False"
         Grid.Column="1"
+        x:Shared="False"
         Margin="5">
     <Path Width="9"
           Height="5"
@@ -79,6 +80,7 @@
   <Grid x:Key="DropDownDisabledArrowGlyph"
         IsHitTestVisible="False"
         Grid.Column="1"
+        x:Shared="False"
         Margin="5">
     <Path Width="9"
           Height="5"

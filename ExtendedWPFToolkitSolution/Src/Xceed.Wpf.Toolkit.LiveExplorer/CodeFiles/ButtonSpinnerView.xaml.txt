@@ -62,8 +62,8 @@
             <TextBlock Text="AllowSpin:" VerticalAlignment="Center" />
             <CheckBox x:Name="_allowSpin" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5" ToolTip="When true allows the ButtonSpinner to perform increment/decrement operations." />
 
-            <TextBlock Text="ShowButtonSpinner:" VerticalAlignment="Center" Grid.Row="1" />
-            <CheckBox x:Name="_showButtonSpinner" Grid.Row="1" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5" ToolTip="Gets/Sets the visibility of the button spinners." />
+            <TextBlock Text="ShowSpinner:" VerticalAlignment="Center" Grid.Row="1" />
+        <CheckBox x:Name="_showSpinner" Grid.Row="1" Grid.Column="1" IsChecked="True" VerticalAlignment="Center" Margin="5" ToolTip="Gets/Sets the visibility of the button spinners." />
          </Grid>
       </GroupBox>
 
@@ -76,7 +76,7 @@
                              Width="150" 
                              HorizontalAlignment="Left"
                              AllowSpin="{Binding IsChecked, ElementName=_allowSpin}"
-                             ShowButtonSpinner="{Binding IsChecked, ElementName=_showButtonSpinner}"
+                             ShowSpinner="{Binding IsChecked, ElementName=_showSpinner}"
                              Spin="ButtonSpinner_Spin">
             <TextBox Text="John Smith" IsReadOnly="True" BorderThickness="0" HorizontalContentAlignment="Right" />
          </xctk:ButtonSpinner>

@@ -15,13 +15,6 @@
 
   ************************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Windows;
-using System.Windows.Media;
-using System.Linq;
-using System.Collections.ObjectModel;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 

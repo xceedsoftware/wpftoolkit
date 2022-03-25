@@ -237,7 +237,7 @@ namespace Xceed.Wpf.Toolkit
       Debug.Assert( result != null );
       if( result != null )
       {
-        var properties = sourceType.GetProperties();
+        var properties = sourceType.GetProperties( BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly );
 
         foreach( var propertyInfo in properties )
         {

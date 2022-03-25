@@ -1,0 +1,45 @@
+﻿<!--**************************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2021 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md  
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ************************************************************************************-->
+
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views.PropertyGridEditorComboBoxDefinitionSourceView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+        xmlns:view="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:s="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="PropertyGrid EditorComboBoxDefinition Source" Height="450" Width="800">
+
+  <local:DemoView.Description>
+    <Paragraph FontSize="14" FontFamily="Segoe">
+      When using the PropertyGrid EditorComboBoxDefinition, you can bind its ItemsSource to a non-static collection source.
+            <LineBreak />
+            <Run>This feature is only available in the "Plus" version.</Run>
+            <LineBreak />
+            <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
+               Click here for more details about Xceed Toolkit Plus for WPF.
+            </Hyperlink>
+    </Paragraph>
+  </local:DemoView.Description>
+
+
+
+    <Image Source="..\OpenSourceImages\EditorComboBoxDefinition.png" Width="660" Height="430"/>
+</local:DemoView>

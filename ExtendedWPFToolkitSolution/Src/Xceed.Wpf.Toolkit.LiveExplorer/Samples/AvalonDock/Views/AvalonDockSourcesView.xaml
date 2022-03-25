@@ -1,0 +1,102 @@
+﻿<!--*************************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2021 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************-->
+
+<local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.AvalonDock.Views.AvalonDockSourcesView"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:localView="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.AvalonDock.Views" 
+                xmlns:views="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.AvalonDock.Resources"
+                xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+                mc:Ignorable="d"
+                Title="Sources">
+  <local:DemoView.Description>
+    <Paragraph FontSize="14"
+               FontFamily="Segoe">
+      <Run>DocumentsSource/AnchorablesSource properties allows you to bind the DockingManager to a collection source from XAML.</Run>
+      <LineBreak />
+      <Run>ILayoutUpdateStrategy is mainly used to modify or position a LayoutContent when DockingManager.DocumentsSource/AnchorablesSource changes.</Run>
+    </Paragraph>
+  </local:DemoView.Description>
+
+  <local:DemoView.Resources>
+    <DataTemplate DataType="{x:Type views:Page}">
+      <views:PageView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type views:Document}">
+      <views:DocumentView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type views:Note}">
+      <views:NoteView />
+    </DataTemplate>
+
+  </local:DemoView.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <TextBlock Grid.Row="0"
+               Text="Usage:"
+               Style="{StaticResource Header}" />
+
+    <StackPanel Grid.Row="1">
+      <xcad:DockingManager x:Name="_dockingManager"
+                           DocumentsSource="{Binding Documents}"
+                           AnchorablesSource="{Binding Anchorables}"
+                           Height="350"
+                           MaxHeight="450"
+                           AllowMixedOrientation="True"
+                           BorderBrush="Black"
+                           BorderThickness="1">
+
+        <xcad:DockingManager.LayoutUpdateStrategy>
+          <localView:LayoutManager />
+        </xcad:DockingManager.LayoutUpdateStrategy>
+
+        <xcad:DockingManager.LayoutItemContainerStyleSelector>
+          <localView:ContainerStyleSelector>
+
+            <!-- StyleSelector that defines a Style for a LayoutDocument. This defines the LayoutDocument title according to the DocumentBase Title property.-->
+            <localView:ContainerStyleSelector.LayoutItemStyle>
+              <Style TargetType="{x:Type xcad:LayoutItem}">
+                <Setter Property="Title" Value="{Binding Model.Title}" />
+              </Style>
+            </localView:ContainerStyleSelector.LayoutItemStyle>
+
+            <!-- StyleSelector that defines a Style for a LayoutAnchorable. This defines the LayoutAnchorable title according to the Control content property.-->
+            <localView:ContainerStyleSelector.LayoutAnchorableItemStyle>
+              <Style TargetType="{x:Type xcad:LayoutAnchorableItem}">
+                <Setter Property="Title" Value="{Binding Model.Content}" />
+                <Setter Property="ContentId" Value="{Binding Model.Content}" />
+              </Style>
+            </localView:ContainerStyleSelector.LayoutAnchorableItemStyle>
+
+          </localView:ContainerStyleSelector>
+        </xcad:DockingManager.LayoutItemContainerStyleSelector>
+
+      </xcad:DockingManager>
+
+    </StackPanel>
+  </Grid>
+</local:DemoView>
