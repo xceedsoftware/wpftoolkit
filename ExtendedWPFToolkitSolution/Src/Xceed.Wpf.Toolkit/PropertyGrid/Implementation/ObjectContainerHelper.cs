@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -82,8 +82,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
               if( displayAttribute != null )
               {
                 var autoGenerateField = displayAttribute.GetAutoGenerateField();
-                isBrowsable = this.PropertyContainer.AutoGenerateProperties 
-                              && ((autoGenerateField.HasValue && autoGenerateField.Value) || !autoGenerateField.HasValue);
+                isBrowsable = this.PropertyContainer.AutoGenerateProperties
+                              && ( ( autoGenerateField.HasValue && autoGenerateField.Value ) || !autoGenerateField.HasValue );
               }
               else
 #endif
@@ -121,7 +121,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private PropertyItem CreatePropertyItem( PropertyDescriptor property, PropertyDefinition propertyDef )
     {
-      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property, SelectedObject, this.PropertyContainer );                                                                                 
+      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property, SelectedObject, this.PropertyContainer );
       definition.InitProperties();
 
       this.InitializeDescriptorDefinition( definition, propertyDef );

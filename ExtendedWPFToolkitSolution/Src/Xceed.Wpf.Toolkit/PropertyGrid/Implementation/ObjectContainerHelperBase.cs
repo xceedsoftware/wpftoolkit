@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,21 +16,20 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Core.Utilities;
-using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
-using System.Collections;
-using System.Collections.ObjectModel;
-using System.Windows.Controls.Primitives;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using System.Windows.Controls;
+using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -44,7 +43,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private bool _isPreparingItemFlag = false;
     private PropertyItemCollection _propertyItemCollection;
 
-    public ObjectContainerHelperBase( IPropertyContainer propertyContainer)
+    public ObjectContainerHelperBase( IPropertyContainer propertyContainer )
       : base( propertyContainer )
     {
       _propertyItemCollection = new PropertyItemCollection( new ObservableCollection<PropertyItem>() );
@@ -55,12 +54,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public override IList Properties
     {
-      get { return _propertyItemCollection; }
+      get
+      {
+        return _propertyItemCollection;
+      }
     }
 
     private PropertyItem DefaultProperty
     {
-      get 
+      get
       {
         PropertyItem defaultProperty = null;
         var defaultName = this.GetDefaultPropertyName();
@@ -115,7 +117,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       return propertyItem.PropertyDescriptor.Name;
     }
 
-    public override void  UpdateValuesFromSource()
+    public override void UpdateValuesFromSource()
     {
       foreach( PropertyItem item in PropertyItems )
       {
@@ -126,7 +128,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public void GenerateProperties()
     {
-      if( (PropertyItems.Count == 0)
+      if( ( PropertyItems.Count == 0 )
         )
       {
         this.RegenerateProperties();
@@ -199,7 +201,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private void UpdateCategorization( bool updateSubPropertiesCategorization )
     {
       _propertyItemCollection.UpdateCategorization( this.ComputeCategoryGroupDescription(), this.PropertyContainer.IsCategorized, this.PropertyContainer.IsSortedAlphabetically );
-      if( updateSubPropertiesCategorization && (_propertyItemCollection.Count > 0) )
+      if( updateSubPropertiesCategorization && ( _propertyItemCollection.Count > 0 ) )
       {
         foreach( PropertyItem propertyItem in _propertyItemCollection )
         {
@@ -291,7 +293,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         if( instance is ICustomTypeDescriptor )
         {
-          descriptors = ((ICustomTypeDescriptor)instance).GetProperties();
+          descriptors = ( ( ICustomTypeDescriptor )instance ).GetProperties();
         }
         //ICustomTypeProvider is only available in .net 4.5 and over. Use reflection so the .net 4.0 and .net 3.5 still works.
         else if( instance.GetType().GetInterface( "ICustomTypeProvider", true ) != null )
@@ -431,7 +433,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         type = type.GetProperty( "Value" ).PropertyType;
       }
 
-      return ( type.IsValueType ? Activator.CreateInstance( type ) : null ) ;
+      return ( type.IsValueType ? Activator.CreateInstance( type ) : null );
     }
 
     private void SetupDefinitionBinding<T>(
@@ -466,7 +468,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         editorElement = editor.ResolveEditor( propertyItem );
 
 
-      if( (editorElement == null) && (definitionKey == null) && ( propertyItem.PropertyDescriptor != null ) )
+      if( ( editorElement == null ) && ( definitionKey == null ) && ( propertyItem.PropertyDescriptor != null ) )
         editorElement = this.GenerateCustomEditingElement( propertyItem.PropertyDescriptor.Name, propertyItem );
 
       if( editorElement == null && definitionKeyAsType == null )
@@ -479,7 +481,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           && !ListUtilities.IsCollectionOfItems( propertyItem.PropertyType )
           && !ListUtilities.IsDictionaryOfItems( propertyItem.PropertyType ) )
         {
-          editor = new TextBlockEditor( (propertyItem.PropertyDescriptor != null) ? propertyItem.PropertyDescriptor.Converter : null );
+          editor = new TextBlockEditor( ( propertyItem.PropertyDescriptor != null ) ? propertyItem.PropertyDescriptor.Converter : null );
         }
 
         // Fallback: Use a default type editor.
@@ -536,7 +538,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public override void ClearChildrenPropertyItem( PropertyItemBase propertyItem, object item )
     {
-      if( propertyItem.Editor != null 
+      if( propertyItem.Editor != null
         && ContainerHelperBase.GetIsGenerated( propertyItem.Editor ) )
       {
         propertyItem.Editor = null;

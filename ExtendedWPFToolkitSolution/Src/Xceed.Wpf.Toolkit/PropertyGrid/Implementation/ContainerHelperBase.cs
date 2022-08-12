@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,16 +15,14 @@
 
   ***********************************************************************************/
 
-using System.Collections.Generic;
-using System.Collections;
 using System;
-using System.Windows;
+using System.Collections;
 using System.ComponentModel;
-using Xceed.Wpf.Toolkit.Core.Utilities;
-using System.Windows.Data;
-using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -32,7 +30,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
   {
     protected readonly IPropertyContainer PropertyContainer;
 
-    public ContainerHelperBase(IPropertyContainer propertyContainer)
+    public ContainerHelperBase( IPropertyContainer propertyContainer )
     {
       if( propertyContainer == null )
         throw new ArgumentNullException( "propertyContainer" );
@@ -106,7 +104,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       this.IsCleaning = false;
     }
 
-    public virtual void PrepareChildrenPropertyItem( PropertyItemBase propertyItem, object item ) 
+    public virtual void PrepareChildrenPropertyItem( PropertyItemBase propertyItem, object item )
     {
       // Initialize the parent node
       propertyItem.ParentNode = PropertyContainer;
@@ -163,30 +161,44 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         this.OnHideInheritedPropertiesChanged();
       }
-      else if(propertyName == ReflectionHelper.GetPropertyOrFieldName( () => ps.EditorDefinitions ))
+      else if( propertyName == ReflectionHelper.GetPropertyOrFieldName( () => ps.EditorDefinitions ) )
       {
         this.OnEditorDefinitionsChanged();
       }
-      else if(propertyName == ReflectionHelper.GetPropertyOrFieldName( () => ps.PropertyDefinitions ))
+      else if( propertyName == ReflectionHelper.GetPropertyOrFieldName( () => ps.PropertyDefinitions ) )
       {
         this.OnPropertyDefinitionsChanged();
       }
     }
 
-    protected virtual void OnCategorizationChanged() { }
+    protected virtual void OnCategorizationChanged()
+    {
+    }
 
-    protected virtual void OnFilterChanged() { }
+    protected virtual void OnFilterChanged()
+    {
+    }
 
-    protected virtual void OnAutoGeneratePropertiesChanged() { }
+    protected virtual void OnAutoGeneratePropertiesChanged()
+    {
+    }
 
-    protected virtual void OnHideInheritedPropertiesChanged() { }
+    protected virtual void OnHideInheritedPropertiesChanged()
+    {
+    }
 
-    protected virtual void OnEditorDefinitionsChanged() { }
+    protected virtual void OnEditorDefinitionsChanged()
+    {
+    }
 
-    protected virtual void OnPropertyDefinitionsChanged() { }
+    protected virtual void OnPropertyDefinitionsChanged()
+    {
+    }
 
 
-    public virtual void OnEndInit() { }
+    public virtual void OnEndInit()
+    {
+    }
 
     public abstract PropertyItemBase ContainerFromItem( object item );
 
@@ -194,8 +206,12 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public abstract Binding CreateChildrenDefaultBinding( PropertyItemBase propertyItem );
 
-    public virtual void NotifyEditorDefinitionsCollectionChanged() { }
-    public virtual void NotifyPropertyDefinitionsCollectionChanged() { }
+    public virtual void NotifyEditorDefinitionsCollectionChanged()
+    {
+    }
+    public virtual void NotifyPropertyDefinitionsCollectionChanged()
+    {
+    }
 
     public abstract void UpdateValuesFromSource();
 
@@ -204,7 +220,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       foreach( var item in this.Properties )
       {
         var propertyItem = item as PropertyItemBase;
-        if( (propertyItem != null) && propertyItem.IsExpandable )
+        if( ( propertyItem != null ) && propertyItem.IsExpandable )
         {
           if( propertyItem.ContainerHelper != null )
           {
@@ -220,7 +236,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       foreach( var item in this.Properties )
       {
         var propertyItem = item as PropertyItemBase;
-        if( (propertyItem != null) && propertyItem.IsExpandable )
+        if( ( propertyItem != null ) && propertyItem.IsExpandable )
         {
           if( propertyItem.DisplayName == propertyName )
           {

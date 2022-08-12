@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,9 +15,6 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Windows.Controls;
-using System.Windows;
 using Xceed.Wpf.AvalonDock.Layout;
 
 namespace Xceed.Wpf.AvalonDock.Controls
@@ -46,7 +43,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     protected override void OnFixChildrenDockLengths()
     {
       //               This is because the commented part is setting DockWidth of children....strange code.
-       return;
+      return;
 
       //if (ActualWidth == 0.0 ||
       //    ActualHeight == 0.0)

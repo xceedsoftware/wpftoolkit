@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,20 +16,11 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Data;
-using System.Collections;
-using Xceed.Wpf.Toolkit.Core.Utilities;
-using System.Linq.Expressions;
-using System.Diagnostics;
-using System.Globalization;
 using System.Windows.Threading;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
@@ -49,15 +40,21 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public bool IsReadOnly
     {
-      get { return ( bool )GetValue( IsReadOnlyProperty ); }
-      set { SetValue( IsReadOnlyProperty, value ); }
+      get
+      {
+        return ( bool )GetValue( IsReadOnlyProperty );
+      }
+      set
+      {
+        SetValue( IsReadOnlyProperty, value );
+      }
     }
 
     private static void OnIsReadOnlyChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
       var propertyItem = o as PropertyItem;
       if( propertyItem != null )
-        propertyItem.OnIsReadOnlyChanged( (bool)e.OldValue, (bool)e.NewValue );
+        propertyItem.OnIsReadOnlyChanged( ( bool )e.OldValue, ( bool )e.NewValue );
     }
 
     protected virtual void OnIsReadOnlyChanged( bool oldValue, bool newValue )
@@ -133,7 +130,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       get
       {
-        return (this.DescriptorDefinition != null) ? this.DescriptorDefinition.PropertyName : null;
+        return ( this.DescriptorDefinition != null ) ? this.DescriptorDefinition.PropertyName : null;
       }
     }
 
@@ -172,6 +169,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     }
 
     #endregion //Instance
+
 
     #endregion //Properties
 
@@ -225,15 +223,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     internal void SetRedInvalidBorder( BindingExpression be )
     {
-      if( (be != null) && be.DataItem is DescriptorPropertyDefinitionBase )
+      if( ( be != null ) && be.DataItem is DescriptorPropertyDefinitionBase )
       {
         this.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
         {
           DescriptorPropertyDefinitionBase descriptor = be.DataItem as DescriptorPropertyDefinitionBase;
-          if( ( descriptor != null) && Validation.GetHasError( descriptor ) )
+          if( ( descriptor != null ) && Validation.GetHasError( descriptor ) )
           {
-              var errors = Validation.GetErrors( descriptor );
-              Validation.MarkInvalid( be, errors[0] );
+            var errors = Validation.GetErrors( descriptor );
+            Validation.MarkInvalid( be, errors[ 0 ] );
           }
         } ) );
       }

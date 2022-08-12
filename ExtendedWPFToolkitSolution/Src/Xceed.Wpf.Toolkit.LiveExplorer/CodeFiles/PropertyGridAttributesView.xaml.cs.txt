@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,7 +15,6 @@
 
   *************************************************************************************/
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -53,7 +52,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     }
   }
 
-  [CategoryOrder("Information", 0)]
+  [CategoryOrder( "Information", 0 )]
   [CategoryOrder( "Conections", 1 )]
   [CategoryOrder( "Other", 2 )]
   public abstract class Person : INotifyPropertyChanged
@@ -64,60 +63,95 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     [Category( "Information" )]
     [Description( "This property uses the [DisplayName(\"Is a Men\")] attribute to customize the name of this property." )]
     [DisplayName( "Is male" )]
-    public bool IsMale { get; set; }
+    public bool IsMale
+    {
+      get; set;
+    }
 
     [Category( "Information" )]
     [Description( "This property uses the [Editor(..)] attribute to provide a custom editor using the 'FirstNameEditor' class. In the Plus version, it also depends on the IsMale property to change its foreground and source." )]
     [Editor( typeof( FirstNameEditor ), typeof( FirstNameEditor ) )]
     public string FirstName
     {
-      get{ return _firstName; }
-      set{ _firstName = value; OnPropertyChanged( "FirstName" );}
+      get
+      {
+        return _firstName;
+      }
+      set
+      {
+        _firstName = value;
+        OnPropertyChanged( "FirstName" );
+      }
     }
     private string _firstName;
 
     [Category( "Information" )]
     [Description( "This property uses the [Editor(..)] attribute to provide a custom editor using the 'LastNameUserControlEditor' user control." )]
     [Editor( typeof( LastNameUserControlEditor ), typeof( LastNameUserControlEditor ) )]
-    [DefaultValue("Friend")]
+    [DefaultValue( "Friend" )]
     public string LastName
     {
-      get{ return _lastName; }
-      set{ _lastName = value; OnPropertyChanged( "LastName" );}
+      get
+      {
+        return _lastName;
+      }
+      set
+      {
+        _lastName = value;
+        OnPropertyChanged( "LastName" );
+      }
     }
     private string _lastName;
 
     [Category( "Conections" )]
     [Description( "This property uses the [NewItemTypes(...)] attribute to provide the underlying CollectionEditor with class types (eg. Man, Woman) that can be inserted in the collection." )]
     [NewItemTypes( typeof( Man ), typeof( Woman ) )]
-    public List<Person> Friends { get; set; }
+    public List<Person> Friends
+    {
+      get; set;
+    }
 
     [Category( "Information" )]
     [DisplayName( "Writing Font Size" )]
     [Description( "This property defines the [ItemsSource(..)] attribute that allows you to specify a ComboBox editor and control its items." )]
     [ItemsSource( typeof( FontSizeItemsSource ) )]
     [RefreshProperties( RefreshProperties.All )]    //This will reload the PropertyGrid
-    public double WritingFontSize { get; set; }
+    public double WritingFontSize
+    {
+      get; set;
+    }
 
     [Category( "Conections" )]
     [Description( "This property defines the [ExpandableObject()] attribute. This allows you to expand this property and drill down through its values." )]
     [ExpandableObject()]
-    public Person Spouse { get; set; }
+    public Person Spouse
+    {
+      get; set;
+    }
 
     [Category( "Other" )]
     [Description( "This property uses the [PropertyOrder(1)] attribute to control its position in the categorized and non-categorized views. Otherwise, alphabetical order is used." )]
     [PropertyOrder( 1 )]
-    public string A_SecondProperty { get; set; }
+    public string A_SecondProperty
+    {
+      get; set;
+    }
 
     [Category( "Other" )]
     [Description( "This property uses the [PropertyOrder(0)] attribute to control its position in the categorized and non-categorized view. Otherwise, alphabetical order is used." )]
     [PropertyOrder( 0 )]
-    public string B_FirstProperty { get; set; }
+    public string B_FirstProperty
+    {
+      get; set;
+    }
 
     [Category( "Other" )]
     [Description( "This property uses the [ParenthesizePropertyName()] attribute to force the name to be displayed within round brackets." )]
-    [ParenthesizePropertyNameAttribute(true)]
-    public string NameInParentheses { get; set; }
+    [ParenthesizePropertyNameAttribute( true )]
+    public string NameInParentheses
+    {
+      get; set;
+    }
 
     [Category( "Other" )]
     [Description( "This property uses the [Browsable(false)] attribute to not display the property" )]
@@ -128,9 +162,9 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       set;
     }
 
-    [Range(0d, 10d)]
+    [Range( 0d, 10d )]
     [Category( "Other" )]
-    [DefaultValue(5d)]
+    [DefaultValue( 5d )]
     [Description( "This property uses the [Range(0,10)] and DefaultValue attributes to set the Minimum, Maximum and default properties." )]
     public double RangeDouble
     {
@@ -166,15 +200,27 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
             , GroupName = "Information"
             , AutoGenerateField = true
             , AutoGenerateFilter = false )]
-    public string FavoriteSport { get; set; }
-    public Man() { this.IsMale = true; }
+    public string FavoriteSport
+    {
+      get; set;
+    }
+    public Man()
+    {
+      this.IsMale = true;
+    }
   }
   public class Woman : Person
   {
     [Category( "Information" )]
     [Description( "This property has no special attribute besides [Categroy(\"Information\")] and [Description(...)]" )]
-    public string FavoriteRestaurant { get; set; }
-    public Woman() { this.IsMale = false; }
+    public string FavoriteRestaurant
+    {
+      get; set;
+    }
+    public Woman()
+    {
+      this.IsMale = false;
+    }
   }
 
   // This is the custom editor referenced by the "EditorAttribute"

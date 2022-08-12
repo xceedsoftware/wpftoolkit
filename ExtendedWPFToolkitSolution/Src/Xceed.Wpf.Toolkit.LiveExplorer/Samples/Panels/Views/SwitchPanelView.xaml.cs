@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,16 +15,11 @@
 
   ************************************************************************************/
 
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System;
-using System.Windows;
-using Xceed.Wpf.Toolkit.Panels;
-using System.Collections.Generic;
-using Xceed.Wpf.Toolkit;
-using System.Text.RegularExpressions;
 using System.IO;
-using System.Diagnostics;
+using System.Windows;
+using System.Windows.Controls;
+using Xceed.Wpf.Toolkit.Panels;
 using System.Windows.Media.Imaging;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Panels.Views
@@ -151,7 +146,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Panels.Views
 
 
 
-    #endregion 
+    #endregion
 
     #region Methods (Private)
 

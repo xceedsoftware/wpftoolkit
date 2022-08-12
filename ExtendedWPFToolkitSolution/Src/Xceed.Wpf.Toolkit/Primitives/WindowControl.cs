@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,23 +16,19 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Controls;
+using System.IO;
 using System.Windows;
-using System.Windows.Media;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.IO;
+using System.Windows.Media;
 using Xceed.Wpf.Toolkit.Core;
-using System.ComponentModel;
 
 namespace Xceed.Wpf.Toolkit.Primitives
 {
   [TemplatePart( Name = PART_HeaderThumb, Type = typeof( Thumb ) )]
   [TemplatePart( Name = PART_Icon, Type = typeof( Image ) )]
-  [TemplatePart( Name = PART_CloseButton, Type = typeof( Button ) )]  
+  [TemplatePart( Name = PART_CloseButton, Type = typeof( Button ) )]
   [TemplatePart( Name = PART_ToolWindowCloseButton, Type = typeof( Button ) )]
   [TemplatePart( Name = PART_BlockMouseInputsBorder, Type = typeof( Border ) )]
   [TemplatePart( Name = PART_HeaderGrid, Type = typeof( Grid ) )]
@@ -100,7 +96,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       get
       {
-        return (double)GetValue( CaptionFontSizeProperty );
+        return ( double )GetValue( CaptionFontSizeProperty );
       }
       set
       {
@@ -398,6 +394,9 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
 
 
+
+
+
     #region WindowBackground
 
     public static readonly DependencyProperty WindowBackgroundProperty = DependencyProperty.Register( "WindowBackground", typeof( Brush ), typeof( WindowControl ), new PropertyMetadata( null ) );
@@ -572,7 +571,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       {
         if( value != _IsBlockMouseInputsPanelActive )
         {
-          _IsBlockMouseInputsPanelActive = value;         
+          _IsBlockMouseInputsPanelActive = value;
           this.UpdateBlockMouseInputsPanel();
         }
       }
@@ -584,7 +583,10 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     internal virtual bool AllowPublicIsActiveChange
     {
-      get { return true; }
+      get
+      {
+        return true;
+      }
     }
 
 

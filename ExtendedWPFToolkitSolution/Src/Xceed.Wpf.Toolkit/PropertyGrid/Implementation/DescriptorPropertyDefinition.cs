@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -98,7 +98,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         Mode = PropertyDescriptor.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay,
         ValidatesOnDataErrors = true,
         ValidatesOnExceptions = true,
-        ConverterCulture = CultureInfo.CurrentCulture 
+        ConverterCulture = CultureInfo.CurrentCulture
       };
 
       return binding;
@@ -119,7 +119,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( !PropertyDescriptor.IsReadOnly )
       {
         var defaultValue = this.ComputeDefaultValueAttribute();
-        if( defaultValue != null)
+        if( defaultValue != null )
           return !defaultValue.Equals( this.Value ); // can Reset if different from defaultValue.
 
         return PropertyDescriptor.CanResetValue( SelectedObject );
@@ -207,7 +207,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
               var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault( a => a.FullName.Contains( typeDef[ 1 ].Trim() ) );
               if( assembly != null )
               {
-                type = assembly.GetTypes().FirstOrDefault( t => (t != null) && (t.FullName != null) && t.FullName.Contains( typeDef[ 0 ] ) );
+                type = assembly.GetTypes().FirstOrDefault( t => ( t != null ) && ( t.FullName != null ) && t.FullName.Contains( typeDef[ 0 ] ) );
               }
             }
           }

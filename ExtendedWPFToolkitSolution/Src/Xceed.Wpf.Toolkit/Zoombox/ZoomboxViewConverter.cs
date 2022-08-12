@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -59,9 +59,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
           || ( base.CanConvertTo( typeDescriptorContext, type ) );
     }
 
-    public override object ConvertFrom( 
+    public override object ConvertFrom(
       ITypeDescriptorContext typeDescriptorContext,
-      CultureInfo cultureInfo, 
+      CultureInfo cultureInfo,
       object value )
     {
       ZoomboxView result = null;
@@ -145,10 +145,10 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return ( result == null ? base.ConvertFrom( typeDescriptorContext, cultureInfo, value ) : result );
     }
 
-    public override object ConvertTo( 
+    public override object ConvertTo(
       ITypeDescriptorContext typeDescriptorContext,
-      CultureInfo cultureInfo, 
-      object value, 
+      CultureInfo cultureInfo,
+      object value,
       Type destinationType )
     {
       object result = null;

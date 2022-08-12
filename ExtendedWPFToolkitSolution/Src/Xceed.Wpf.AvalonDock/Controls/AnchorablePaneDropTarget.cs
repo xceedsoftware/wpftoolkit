@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -54,6 +54,12 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       ILayoutAnchorablePane targetModel = _targetPane.Model as ILayoutAnchorablePane;
       LayoutAnchorable anchorableActive = floatingWindow.Descendents().OfType<LayoutAnchorable>().FirstOrDefault();
+
+      if( ( targetModel.FindParent<LayoutFloatingWindow>() == null )
+       && ( anchorableActive != null ) )
+      {
+        anchorableActive.IsFloating = false;
+      }
 
       switch( Type )
       {
@@ -231,8 +237,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
           }
           break;
         #endregion
-
-
         case DropTargetType.AnchorablePaneDockInside:
           #region DropTargetType.AnchorablePaneDockInside
           {
@@ -250,8 +254,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
           }
           break;
           #endregion
-
-
       }
 
       anchorableActive.IsActive = true;

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -238,9 +238,9 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
 
     public static decimal ParseDecimal( string text )
     {
-      decimal result; 
+      decimal result;
       var success = Decimal.TryParse( text, NumberStyles.Any, CultureInfo.CurrentCulture, out result );
-      return success ? result : decimal.Zero;      
+      return success ? result : decimal.Zero;
     }
 
     public static decimal Add( decimal firstNumber, decimal secondNumber )

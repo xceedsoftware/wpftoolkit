@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -17,8 +17,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace Xceed.Wpf.AvalonDock.Layout
@@ -149,7 +149,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     public void ReplaceChildAt( int index, ILayoutElement element )
     {
-      if( (index >= 0) && (index < _children.Count) )
+      if( ( index >= 0 ) && ( index < _children.Count ) )
       {
         _children[ index ] = ( T )element;
       }

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,23 +15,12 @@
 
   ***********************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Diagnostics;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Globalization;
-using System.Reflection;
-using Xceed.Wpf.Toolkit.LiveExplorer;
 using Xceed.Wpf.Toolkit.LiveExplorer.Core;
-using System.Diagnostics;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer
 {
@@ -41,13 +30,25 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
   public partial class MainWindow : Window
   {
     private const string toolkitAssembly =
-       "Xceed.Wpf.Toolkit.LiveExplorer"
+#if NETCORE
+        "Xceed.Wpf.Toolkit.LiveExplorer.NETCore"
+#elif NET5
+        "Xceed.Wpf.Toolkit.LiveExplorer.NET5"
+#else
+        "Xceed.Wpf.Toolkit.LiveExplorer"
+#endif
       ;
 
     public MainWindow()
     {
       InitializeComponent();
-       this.Title = "Toolkit Plus for WPF - LiveExplorer";
+#if NETCORE
+        this.Title = "Toolkit Plus for WPF .NET Core - LiveExplorer";
+#elif NET5
+        this.Title = "Toolkit Plus for WPF .NET 5 - LiveExplorer";
+#else
+      this.Title = "Toolkit Plus for WPF - LiveExplorer";
+#endif
 
       this.Loaded += new RoutedEventHandler( this.MainWindow_Loaded );
 
@@ -56,9 +57,9 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
     }
 
 
-#region Properties
+    #region Properties
 
-#region View
+    #region View
 
     public static readonly DependencyProperty ViewProperty = DependencyProperty.Register( "View", typeof( DemoView ), typeof( MainWindow ), new UIPropertyMetadata( null, OnViewChanged ) );
     public DemoView View
@@ -85,11 +86,11 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
       this.InitView();
     }
 
-#endregion //View
+    #endregion //View
 
-#endregion //Properties
+    #endregion //Properties
 
-#region Event Handler
+    #region Event Handler
 
     void MainWindow_Loaded( object sender, RoutedEventArgs e )
     {
@@ -131,13 +132,13 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
       //
     }
 
-#endregion //EventHandler
+    #endregion //EventHandler
 
-#region Methods
+    #region Methods
 
     private void InitView()
     {
-      if( ( _flowDocumentDesc != null ) && ( this.View != null) )
+      if( ( _flowDocumentDesc != null ) && ( this.View != null ) )
       {
         _flowDocumentDesc.Blocks.Clear();
         if( this.View.Description != null )
@@ -151,7 +152,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
       }
     }
 
-#endregion
+    #endregion
 
   }
 }

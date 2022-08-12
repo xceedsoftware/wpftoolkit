@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -19,17 +19,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Windows;
-using System.Windows.Media;
-using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Security;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using Xceed.Wpf.Toolkit.PropertyGrid;
+using System.Windows;
 using System.Windows.Controls;
-using System.Reflection;
+using System.Windows.Media;
+using Xceed.Wpf.Toolkit.Core.Utilities;
+using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -204,7 +202,7 @@ namespace Xceed.Wpf.Toolkit
 
       if( source is Array )
       {
-        result = (source as Array).Clone();
+        result = ( source as Array ).Clone();
       }
       // For IDictionary, we need to create EditableKeyValuePair to edit the Key-Value.
       else if( ( this.ItemsSource is IDictionary )
@@ -252,13 +250,13 @@ namespace Xceed.Wpf.Toolkit
                 var propertyInfoValue = propertyInfo.GetValue( source, null );
                 this.GenerateValue( propertyInfo, propertyInfoValue, result );
               }
-              else 
+              else
               {
                 var countPropertyInfo = sourceType.GetProperty( "Count" );
                 if( countPropertyInfo != null )
                 {
                   var count = countPropertyInfo.GetValue( source, null ) as int?;
-                  if( ( count != null) && count.HasValue )
+                  if( ( count != null ) && count.HasValue )
                   {
                     for( int i = 0; i < count.Value; ++i )
                     {

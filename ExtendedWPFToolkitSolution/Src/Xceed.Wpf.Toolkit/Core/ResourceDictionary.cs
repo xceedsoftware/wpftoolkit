@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -28,7 +28,9 @@ namespace Xceed.Wpf.Toolkit.Core
     private string _sourcePath;
 
 
-    public ResourceDictionary() { }
+    public ResourceDictionary()
+    {
+    }
 
     public ResourceDictionary( string assemblyName, string sourcePath )
     {
@@ -40,8 +42,11 @@ namespace Xceed.Wpf.Toolkit.Core
 
     public string AssemblyName
     {
-      get { return _assemblyName; }
-      set 
+      get
+      {
+        return _assemblyName;
+      }
+      set
       {
         this.EnsureInitialization();
         _assemblyName = value;
@@ -50,11 +55,14 @@ namespace Xceed.Wpf.Toolkit.Core
 
     public string SourcePath
     {
-      get { return _sourcePath; }
-      set 
+      get
+      {
+        return _sourcePath;
+      }
+      set
       {
         this.EnsureInitialization();
-        _sourcePath = value; 
+        _sourcePath = value;
       }
     }
 

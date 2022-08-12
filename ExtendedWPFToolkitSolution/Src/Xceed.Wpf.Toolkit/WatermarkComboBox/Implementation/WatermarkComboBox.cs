@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -17,6 +17,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -56,7 +57,26 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    #endregion //WatermarkTemplate
+    #endregion //WatermarkBackground
+
+    #region WatermarkBackground
+
+    public static readonly DependencyProperty WatermarkBackgroundProperty = DependencyProperty.RegisterAttached(
+        "WatermarkBackground", typeof( Brush ), typeof( WatermarkComboBox ), new PropertyMetadata( ( Brush )null ) );
+
+    public Brush WatermarkBackground
+    {
+      get
+      {
+        return ( Brush )GetValue( WatermarkBackgroundProperty );
+      }
+      set
+      {
+        SetValue( WatermarkBackgroundProperty, value );
+      }
+    }
+
+    #endregion //WatermarkBackground
 
     #endregion //Properties
 

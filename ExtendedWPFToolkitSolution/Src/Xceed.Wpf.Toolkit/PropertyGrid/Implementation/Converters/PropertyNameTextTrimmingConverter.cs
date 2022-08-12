@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -26,7 +26,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
     public object Convert( object value, Type targetType, object parameter, System.Globalization.CultureInfo culture )
     {
       var textWrapping = ( TextWrapping )value;
-      return (textWrapping == TextWrapping.NoWrap) ? TextTrimming.CharacterEllipsis : TextTrimming.None;
+      return ( textWrapping == TextWrapping.NoWrap ) ? TextTrimming.CharacterEllipsis : TextTrimming.None;
     }
 
     public object ConvertBack( object value, Type targetType, object parameter, System.Globalization.CultureInfo culture )

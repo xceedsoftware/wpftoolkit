@@ -11,7 +11,7 @@ using System.Windows;
 [assembly: AssemblyDescription( "" )]
 [assembly: AssemblyCompany( "Xceed Software Inc." )]
 [assembly: AssemblyProduct( "Xceed Toolkit for WPF" )]
-[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2021" )]
+[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2022" )]
 [assembly: AssemblyCulture( "" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -49,10 +49,14 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion( "4.3" )]
+[assembly: AssemblyVersion( "4.4" )]
 
 #pragma warning disable 1699
 [assembly: AssemblyDelaySign( false )]
+#if NETCORE || NET5
+[assembly: AssemblyKeyFile( @"..\..\..\..\sn.snk" )]
+#else
 [assembly: AssemblyKeyFile( @"..\..\..\sn.snk" )]
+#endif
 [assembly: AssemblyKeyName( "" )]
 #pragma warning restore 1699

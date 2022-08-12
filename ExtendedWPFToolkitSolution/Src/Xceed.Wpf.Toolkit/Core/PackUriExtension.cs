@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -25,7 +25,7 @@ namespace Xceed.Wpf.Toolkit.Core
   {
     #region Constructors
     public PackUriExtension()
-      :this( UriKind.Relative )
+      : this( UriKind.Relative )
     {
 
     }
@@ -41,8 +41,14 @@ namespace Xceed.Wpf.Toolkit.Core
 
     public string AssemblyName
     {
-      get { return this.m_assemblyName; }
-      set { this.m_assemblyName = value; }
+      get
+      {
+        return this.m_assemblyName;
+      }
+      set
+      {
+        this.m_assemblyName = value;
+      }
     }
 
     #endregion // AssemblyName Property
@@ -51,8 +57,14 @@ namespace Xceed.Wpf.Toolkit.Core
 
     public string Path
     {
-      get { return this.m_path; }
-      set { this.m_path = value; }
+      get
+      {
+        return this.m_path;
+      }
+      set
+      {
+        this.m_path = value;
+      }
     }
 
     #endregion // Path Property
@@ -61,8 +73,14 @@ namespace Xceed.Wpf.Toolkit.Core
 
     public UriKind Kind
     {
-      get { return this.m_uriKind; }
-      set { this.m_uriKind = value; }
+      get
+      {
+        return this.m_uriKind;
+      }
+      set
+      {
+        this.m_uriKind = value;
+      }
     }
 
     #endregion // Kind Property
@@ -110,8 +128,25 @@ namespace Xceed.Wpf.Toolkit.Core
 
       string platformSuffix = String.Empty;
 
+#if NETCORE
+          // If the assembly name doesn't already end with .NETCore
+          if( !assemblyName.EndsWith( ".NETCore", StringComparison.OrdinalIgnoreCase ) )
+          {
+            /* In the .NET core version, all assembly names end with .NETCore. */
 
+            // Setup a suffix
+            platformSuffix = ".NETCore";
+          }
+#elif NET5
+          // If the assembly name doesn't already end with .NET5
+          if( !assemblyName.EndsWith( ".NET5", StringComparison.OrdinalIgnoreCase ) )
+          {
+            /* In the .NET version, all assembly names end with .NET5. */
 
+            // Setup a suffix
+            platformSuffix = ".NET5";
+          }
+#endif // NETCORE
 
       // If we have version information
       if( !String.IsNullOrEmpty( version ) )
@@ -136,8 +171,25 @@ namespace Xceed.Wpf.Toolkit.Core
       string platformSuffix = String.Empty;
       bool hasAssemblyName = !String.IsNullOrEmpty( assemblyName );
 
+#if NETCORE
+          // If the assembly name doesn't already end with .NETCore
+          if( hasAssemblyName && !assemblyName.EndsWith( ".NETCore", StringComparison.OrdinalIgnoreCase ) )
+          {
+            /* In the .NET core version, all assembly names end with .NETCore. */
 
+            // Setup a suffix
+            platformSuffix = ".NETCore";
+          }
+#elif NET5
+          // If the assembly name doesn't already end with .NET5
+          if( hasAssemblyName && !assemblyName.EndsWith( ".NET5", StringComparison.OrdinalIgnoreCase ) )
+          {
+            /* In the .NET version, all assembly names end with .NET5. */
 
+            // Setup a suffix
+            platformSuffix = ".NET5";
+          }
+#endif // NETCORE
 
       // If we have an assembly name and version information
       if( hasAssemblyName && !String.IsNullOrEmpty( version ) )

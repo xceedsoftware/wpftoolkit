@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,15 +15,10 @@
 
   *************************************************************************************/
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
-using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
 {
@@ -121,7 +116,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       }
 
       [Category( "Information" )]
-      [Browsable(false)]
+      [Browsable( false )]
       [Description( "This property is not displayed in the PropertyGrid, but its used as the selectedItem of the ComboBox for the 'Friends' property Editor." )]
       public Friend BestFriend
       {
@@ -151,7 +146,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
       {
         get;
         set;
-      }     
+      }
     }
 
     public class Friend

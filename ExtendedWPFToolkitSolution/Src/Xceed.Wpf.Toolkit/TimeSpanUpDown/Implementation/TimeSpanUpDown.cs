@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -131,6 +131,35 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //ShowDays
+
+    #region ShowHours
+
+    public static readonly DependencyProperty ShowHoursProperty = DependencyProperty.Register( "ShowHours", typeof( bool ), typeof( TimeSpanUpDown ), new UIPropertyMetadata( true, OnShowHoursChanged ) );
+    public bool ShowHours
+    {
+      get
+      {
+        return ( bool )GetValue( ShowHoursProperty );
+      }
+      set
+      {
+        SetValue( ShowHoursProperty, value );
+      }
+    }
+
+    private static void OnShowHoursChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var timeSpanUpDown = o as TimeSpanUpDown;
+      if( timeSpanUpDown != null )
+        timeSpanUpDown.OnShowHoursChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+    }
+
+    protected virtual void OnShowHoursChanged( bool oldValue, bool newValue )
+    {
+      this.UpdateValue();
+    }
+
+    #endregion //ShowHours
 
     #region ShowSeconds
 
@@ -266,6 +295,14 @@ namespace Xceed.Wpf.Toolkit
         var haveMS = ( separators.Count() > 1 ) && ( separators.Last() == '.' );
         var haveDays = ( separators.Count() > 1 ) && ( separators.First() == '.' ) && ( intValues.Count() >= 3 );
 
+        if( !this.ShowHours )
+        {
+          if( this.ShowDays )
+          {
+            throw new NotSupportedException( "Cannot show days when show hours is set to false." );
+          }
+        }
+
         if( this.ShowDays )
         {
           var days = haveDays ? intValues[ 0 ] : intValues[ 0 ] / 24;
@@ -290,20 +327,37 @@ namespace Xceed.Wpf.Toolkit
         }
         else
         {
-          var hours = intValues[ 0 ];
-          if( hours > TimeSpan.MaxValue.TotalHours )
-            return this.ResetToLastValidValue();
-          var minutes = intValues[ 1 ];
-          if( ( ( hours * TimeSpanUpDown.MinutesInHour ) + minutes ) > TimeSpan.MaxValue.TotalMinutes )
-            return this.ResetToLastValidValue();
-          var seconds = this.ShowSeconds && ( intValues.Count() >= 3 ) ? intValues[ 2 ] : 0;
-          if( ( ( hours * TimeSpanUpDown.SecondsInHour ) + ( minutes * TimeSpanUpDown.SecondsInMinute ) + seconds ) > TimeSpan.MaxValue.TotalSeconds )
-            return this.ResetToLastValidValue();
-          var milliseconds = haveMS ? intValues.Last() : 0;
-          if( ( ( hours * TimeSpanUpDown.MilliSecondsInHour ) + ( minutes * TimeSpanUpDown.MilliSecondsInMinute ) + ( seconds * TimeSpanUpDown.MilliSecondsInSecond ) + milliseconds ) > TimeSpan.MaxValue.TotalMilliseconds )
-            return this.ResetToLastValidValue();
+          if( this.ShowHours )
+          {
+            var hours = intValues[ 0 ];
+            if( hours > TimeSpan.MaxValue.TotalHours )
+              return this.ResetToLastValidValue();
+            var minutes = intValues[ 1 ];
+            if( ( ( hours * TimeSpanUpDown.MinutesInHour ) + minutes ) > TimeSpan.MaxValue.TotalMinutes )
+              return this.ResetToLastValidValue();
+            var seconds = this.ShowSeconds && ( intValues.Count() >= 3 ) ? intValues[ 2 ] : 0;
+            if( ( ( hours * TimeSpanUpDown.SecondsInHour ) + ( minutes * TimeSpanUpDown.SecondsInMinute ) + seconds ) > TimeSpan.MaxValue.TotalSeconds )
+              return this.ResetToLastValidValue();
+            var milliseconds = haveMS ? intValues.Last() : 0;
+            if( ( ( hours * TimeSpanUpDown.MilliSecondsInHour ) + ( minutes * TimeSpanUpDown.MilliSecondsInMinute ) + ( seconds * TimeSpanUpDown.MilliSecondsInSecond ) + milliseconds ) > TimeSpan.MaxValue.TotalMilliseconds )
+              return this.ResetToLastValidValue();
 
-          timeSpan = new TimeSpan( 0, hours, minutes, seconds, milliseconds );
+            timeSpan = new TimeSpan( 0, hours, minutes, seconds, milliseconds );
+          }
+          else
+          {
+            var minutes = intValues[ 0 ];
+            if( minutes > TimeSpan.MaxValue.TotalMinutes )
+              return this.ResetToLastValidValue();
+            var seconds = this.ShowSeconds && ( intValues.Count() >= 2 ) ? intValues[ 1 ] : 0;
+            if( ( ( minutes * TimeSpanUpDown.SecondsInMinute ) + seconds ) > TimeSpan.MaxValue.TotalSeconds )
+              return this.ResetToLastValidValue();
+            var milliseconds = haveMS ? intValues.Last() : 0;
+            if( ( ( minutes * TimeSpanUpDown.MilliSecondsInMinute ) + ( seconds * TimeSpanUpDown.MilliSecondsInSecond ) + milliseconds ) > TimeSpan.MaxValue.TotalMilliseconds )
+              return this.ResetToLastValidValue();
+
+            timeSpan = new TimeSpan( 0, 0, minutes, seconds, milliseconds );
+          }
         }
 
         if( text.StartsWith( "-" ) )
@@ -454,6 +508,8 @@ namespace Xceed.Wpf.Toolkit
     {
       var lastDayInfo = _dateTimeInfoList.FirstOrDefault( x => x.Type == DateTimePart.Day );
       bool hasDay = lastDayInfo != null;
+      var lastHourInfo = _dateTimeInfoList.FirstOrDefault( x => x.Type == DateTimePart.Hour12 || x.Type == DateTimePart.Hour24 );
+      bool hasHour = lastHourInfo != null;
       var negInfo = _dateTimeInfoList.FirstOrDefault( x => x.Type == DateTimePart.Other );
       bool hasNegative = ( negInfo != null ) && ( negInfo.Content == "-" );
 
@@ -468,6 +524,14 @@ namespace Xceed.Wpf.Toolkit
           _fireSelectionChangedEvent = false;
           this.TextBox.SelectionStart++;
           _fireSelectionChangedEvent = true;
+        }
+      }
+
+      if( !this.ShowHours )
+      {
+        if( this.ShowDays )
+        {
+          throw new NotSupportedException( "Cannot show days when show hours is set to false." );
         }
       }
 
@@ -506,9 +570,43 @@ namespace Xceed.Wpf.Toolkit
         }
       }
 
-      _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Hour24, Length = 2, Format = "hh" } );
-      _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Other, Length = 1, Content = ":", IsReadOnly = true } );
+      if( this.ShowHours )
+      {
+        if( value.HasValue )
+        {
+          int hourLength = Math.Abs( value.Value.Hours ).ToString( "00" ).Length;
+          _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Hour24, Length = Math.Max( 2, hourLength ), Format = "hh" } );
+          _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Other, Length = 1, Content = ":", IsReadOnly = true } );
+
+          if( this.TextBox != null )
+          {
+            //number of digits for hours has changed when selection is not on date part, move TextBox.Selection to keep it on current DateTimeInfo
+            if( hasHour && ( hourLength != lastHourInfo.Length ) && ( _selectedDateTimeInfo.Type != DateTimePart.Hour24 ) )
+            {
+              _fireSelectionChangedEvent = false;
+              this.TextBox.SelectionStart = Math.Max( 0, this.TextBox.SelectionStart + ( hourLength - lastHourInfo.Length ) );
+              _fireSelectionChangedEvent = true;
+            }
+            // hour has been added, move TextBox.Selection to keep it on current DateTimeInfo
+            else if( !hasHour )
+            {
+              _fireSelectionChangedEvent = false;
+              this.TextBox.SelectionStart += ( hourLength + 1 );
+              _fireSelectionChangedEvent = true;
+            }
+          }
+        }
+        // Hour has been removed, move TextBox.Selection to keep it on current DateTimeInfo
+        else if( hasHour )
+        {
+          _fireSelectionChangedEvent = false;
+          this.TextBox.SelectionStart = Math.Max( hasNegative ? 1 : 0, this.TextBox.SelectionStart - ( lastHourInfo.Length + 1 ) );
+          _fireSelectionChangedEvent = true;
+        }
+      }
+
       _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Minute, Length = 2, Format = "mm" } );
+
       if( this.ShowSeconds )
       {
         _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Other, Length = 1, Content = ":", IsReadOnly = true } );

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -17,7 +17,6 @@
 
 using System;
 using System.Windows.Controls;
-using Xceed.Wpf.Toolkit;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Button.Views
 {
@@ -33,7 +32,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Button.Views
 
     private void ButtonSpinner_Spin( object sender, SpinEventArgs e )
     {
-      String[] names = (String[])this.Resources[ "names" ];
+      String[] names = ( String[] )this.Resources[ "names" ];
 
       ButtonSpinner spinner = ( ButtonSpinner )sender;
       TextBox txtBox = ( TextBox )spinner.Content;

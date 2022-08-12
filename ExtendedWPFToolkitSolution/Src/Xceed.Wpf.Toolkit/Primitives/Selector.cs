@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -17,18 +17,15 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Reflection;
 using Xceed.Wpf.Toolkit.Core.Utilities;
-using System.Windows.Threading;
 
 namespace Xceed.Wpf.Toolkit.Primitives
 {
@@ -511,7 +508,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
         return ( prop != null )
           ? prop.GetValue( item, null )
           : null;
-      }      
+      }
     }
 
     protected object GetItemValue( object item )
@@ -817,8 +814,8 @@ namespace Xceed.Wpf.Toolkit.Primitives
     protected virtual void OnItemSelectionChanging( ItemSelectionChangingEventArgs args )
     {
       if( ItemSelectionChanging != null )
-      { 
-         ItemSelectionChanging( this, args );
+      {
+        ItemSelectionChanging( this, args );
       }
     }
 
@@ -1072,7 +1069,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     }
   }
 
-  public delegate void ItemSelectionChangingEventHandler( object sender, ItemSelectionChangingEventArgs e ); 
+  public delegate void ItemSelectionChangingEventHandler( object sender, ItemSelectionChangingEventArgs e );
   public class ItemSelectionChangingEventArgs : CancelEventArgs
   {
     public bool NewIsSelected

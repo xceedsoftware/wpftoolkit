@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -20,7 +20,6 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Resources;
-using Xceed.Wpf.Toolkit.LiveExplorer.Core;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer
 {
@@ -62,11 +61,17 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
 
   public class XamlBox : CodeBox
   {
-    public XamlBox() { this.TextFormatter = new Core.XamlFormatter(); }
+    public XamlBox()
+    {
+      this.TextFormatter = new Core.XamlFormatter();
+    }
   }
 
   public class CSharpBox : CodeBox
   {
-    public CSharpBox() { this.TextFormatter = new Core.CSharpFormatter(); }
+    public CSharpBox()
+    {
+      this.TextFormatter = new Core.CSharpFormatter();
+    }
   }
 }

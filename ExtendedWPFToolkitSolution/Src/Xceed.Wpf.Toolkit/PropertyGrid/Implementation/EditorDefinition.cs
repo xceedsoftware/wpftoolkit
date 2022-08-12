@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,13 +16,13 @@
   ***********************************************************************************/
 
 using System;
-using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
-  [Obsolete(@"Use EditorTemplateDefinition instead of EditorDefinition. " + EditorDefinition.UsageEx)]
+  [Obsolete( @"Use EditorTemplateDefinition instead of EditorDefinition. " + EditorDefinition.UsageEx )]
   public class EditorDefinition : EditorTemplateDefinition
   {
     private const string UsageEx = " (XAML Ex: <t:EditorTemplateDefinition TargetProperties=\"FirstName,LastName\" .../> OR <t:EditorTemplateDefinition TargetProperties=\"{x:Type l:MyType}\" .../> )";
@@ -76,7 +76,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( this.EditingTemplate != null )
         throw new InvalidOperationException( string.Format( usageError, "EditingTemplate" ) );
 
-      if( this.TargetProperties != null && this.TargetProperties.Count > 0)
+      if( this.TargetProperties != null && this.TargetProperties.Count > 0 )
         throw new InvalidOperationException( string.Format( usageError, "TargetProperties" ) );
 
       List<object> properties = new List<object>();

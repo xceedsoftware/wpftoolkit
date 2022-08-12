@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -28,11 +28,11 @@ namespace Xceed.Wpf.Toolkit.Core.Converters
       if( values == null || values.Length != 2 )
         throw new ArgumentException( "Wrong number of arguments for WizardPageButtonVisibilityConverter." );
 
-      Visibility wizardVisibility = ( (values[ 0 ] == null) || (values[ 0 ] == DependencyProperty.UnsetValue) )
+      Visibility wizardVisibility = ( ( values[ 0 ] == null ) || ( values[ 0 ] == DependencyProperty.UnsetValue ) )
                                     ? Visibility.Hidden
                                     : ( Visibility )values[ 0 ];
 
-      WizardPageButtonVisibility wizardPageVisibility = ( (values[ 1 ] == null) || (values[ 1 ] == DependencyProperty.UnsetValue) )
+      WizardPageButtonVisibility wizardPageVisibility = ( ( values[ 1 ] == null ) || ( values[ 1 ] == DependencyProperty.UnsetValue ) )
                                                         ? WizardPageButtonVisibility.Hidden
                                                         : ( WizardPageButtonVisibility )values[ 1 ];
 

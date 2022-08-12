@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -182,7 +182,7 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
 
       }
 
-      return Color.FromArgb( 255, ( byte )(  Math.Round(r * 255) ), ( byte )(  Math.Round(g * 255) ), ( byte )(  Math.Round(b * 255) ) );
+      return Color.FromArgb( 255, ( byte )( Math.Round( r * 255 ) ), ( byte )( Math.Round( g * 255 ) ), ( byte )( Math.Round( b * 255 ) ) );
     }
 
     /// <summary>
@@ -194,7 +194,7 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
       var colorsList = new List<Color>();
       int hStep = 60;
 
-      for( int h = 0; h < 360; h+= hStep )
+      for( int h = 0; h < 360; h += hStep )
       {
         colorsList.Add( ColorUtilities.ConvertHsvToRgb( h, 1, 1 ) );
       }

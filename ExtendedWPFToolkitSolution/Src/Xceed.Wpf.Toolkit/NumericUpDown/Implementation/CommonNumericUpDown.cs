@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,10 +16,10 @@
   ***********************************************************************************/
 
 using System;
-using System.Windows;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Windows;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -63,8 +63,14 @@ namespace Xceed.Wpf.Toolkit
 
     public NumberStyles ParsingNumberStyle
     {
-      get { return ( NumberStyles )GetValue( ParsingNumberStyleProperty ); }
-      set { SetValue( ParsingNumberStyleProperty, value ); }
+      get
+      {
+        return ( NumberStyles )GetValue( ParsingNumberStyleProperty );
+      }
+      set
+      {
+        SetValue( ParsingNumberStyleProperty, value );
+      }
     }
 
     #endregion //ParsingNumberStyle
@@ -154,7 +160,7 @@ namespace Xceed.Wpf.Toolkit
     private bool HandleNullSpin()
     {
       var hasValue = this.UpdateValueOnEnterKey
-                     ? (this.ConvertTextToValue( this.TextBox.Text ) != null)
+                     ? ( this.ConvertTextToValue( this.TextBox.Text ) != null )
                      : this.Value.HasValue;
 
       if( !hasValue )
@@ -166,10 +172,10 @@ namespace Xceed.Wpf.Toolkit
         {
           this.TextBox.Text = newValue.Value.ToString( this.FormatString, this.CultureInfo );
         }
-        else 
+        else
         {
           this.Value = newValue;
-        }        
+        }
 
         return true;
       }
@@ -304,9 +310,9 @@ namespace Xceed.Wpf.Toolkit
       ValidSpinDirections validDirections = ValidSpinDirections.None;
 
       // Null increment always prevents spin.
-      if( (this.Increment != null) && !IsReadOnly )
+      if( ( this.Increment != null ) && !IsReadOnly )
       {
-        if( IsLowerThan( Value, Maximum ) || !Value.HasValue || !Maximum.HasValue)
+        if( IsLowerThan( Value, Maximum ) || !Value.HasValue || !Maximum.HasValue )
           validDirections = validDirections | ValidSpinDirections.Increase;
 
         if( IsGreaterThan( Value, Minimum ) || !Value.HasValue || !Minimum.HasValue )
@@ -323,12 +329,23 @@ namespace Xceed.Wpf.Toolkit
       if( PIndex >= 0 )
       {
         //stringToTest contains a "P" between 2 "'", it's considered as text, not percent
-        bool isText = (stringToTest.Substring( 0, PIndex ).Contains( "'" )
-                      && stringToTest.Substring( PIndex, FormatString.Length - PIndex ).Contains( "'" ));
+        bool isText = ( stringToTest.Substring( 0, PIndex ).Contains( "'" )
+                      && stringToTest.Substring( PIndex, FormatString.Length - PIndex ).Contains( "'" ) );
 
         return !isText;
       }
       return false;
+    }
+
+    private bool CultureContainsCharacter( char c )
+    {
+      NumberFormatInfo info = NumberFormatInfo.GetInstance( this.CultureInfo );
+      var charString = c.ToString();
+
+      return info.GetType().GetProperties()
+                 .Where( p => p.PropertyType == typeof( string ) )
+                 .Select( p => ( string )p.GetValue( info, null ) )
+                 .Any( value => !string.IsNullOrEmpty( value ) && value == charString );
     }
 
     private T? ConvertTextToValueCore( string currentValueText, string text )
@@ -360,10 +377,26 @@ namespace Xceed.Wpf.Toolkit
               // same non-digit characters on currentValueText and new text => remove them on new Text to parse it again.
               if( currentValueTextSpecialCharacters.Except( textSpecialCharacters ).ToList().Count == 0 )
               {
-                foreach( var character in textSpecialCharacters )
+                var numericValue = new string( text.Where( c => char.IsDigit( c ) || this.CultureContainsCharacter( c ) ).ToArray() );
+                decimal number;
+                if( Decimal.TryParse( numericValue, this.ParsingNumberStyle, CultureInfo, out number ) )
                 {
-                  text = text.Replace( character.ToString(), string.Empty );
+                  foreach( var character in textSpecialCharacters )
+                  {
+                    if( !this.CultureContainsCharacter( character ) )
+                    {
+                      text = text.Replace( character.ToString(), string.Empty );
+                    }
+                  }
                 }
+                else
+                {
+                  foreach( var character in textSpecialCharacters )
+                  {
+                    text = text.Replace( character.ToString(), string.Empty );
+                  }
+                }
+
                 // if without the special characters, parsing is good, do not throw
                 if( _fromText( text, this.ParsingNumberStyle, CultureInfo, out outputValue ) )
                 {

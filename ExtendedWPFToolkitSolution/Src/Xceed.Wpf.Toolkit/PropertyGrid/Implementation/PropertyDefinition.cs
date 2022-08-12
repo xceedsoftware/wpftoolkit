@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -29,31 +29,40 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     private string _category = null;
     private int? _displayOrder = null;
 
-    [Obsolete(@"Use 'TargetProperties' instead of 'Name'")]
+    [Obsolete( @"Use 'TargetProperties' instead of 'Name'" )]
     public string Name
     {
-      get { return _name; }
-      set 
+      get
+      {
+        return _name;
+      }
+      set
       {
         const string usageError = "{0}: \'Name\' property is obsolete. Instead use \'TargetProperties\'. (XAML example: <t:PropertyDefinition TargetProperties=\"FirstName,LastName\" />)";
         System.Diagnostics.Trace.TraceWarning( usageError, typeof( PropertyDefinition ) );
-        _name = value; 
+        _name = value;
       }
     }
 
     public string Category
     {
-      get { return _category; }
-      set 
+      get
+      {
+        return _category;
+      }
+      set
       {
         this.ThrowIfLocked( () => this.Category );
-        _category = value; 
+        _category = value;
       }
     }
 
     public string DisplayName
     {
-      get { return _displayName; }
+      get
+      {
+        return _displayName;
+      }
       set
       {
         this.ThrowIfLocked( () => this.DisplayName );
@@ -63,7 +72,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public string Description
     {
-      get { return _description; }
+      get
+      {
+        return _description;
+      }
       set
       {
         this.ThrowIfLocked( () => this.Description );
@@ -73,7 +85,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public int? DisplayOrder
     {
-      get { return _displayOrder; }
+      get
+      {
+        return _displayOrder;
+      }
       set
       {
         this.ThrowIfLocked( () => this.DisplayOrder );
@@ -83,7 +98,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public bool? IsBrowsable
     {
-      get { return _isBrowsable; }
+      get
+      {
+        return _isBrowsable;
+      }
       set
       {
         this.ThrowIfLocked( () => this.IsBrowsable );
@@ -93,7 +111,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public bool? IsExpandable
     {
-      get { return _isExpandable; }
+      get
+      {
+        return _isExpandable;
+      }
       set
       {
         this.ThrowIfLocked( () => this.IsExpandable );
@@ -109,7 +130,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       {
         throw new InvalidOperationException(
           string.Format(
-            @"{0}: When using 'TargetProperties' property, do not use 'Name' property.", 
+            @"{0}: When using 'TargetProperties' property, do not use 'Name' property.",
             typeof( PropertyDefinition ) ) );
       }
 

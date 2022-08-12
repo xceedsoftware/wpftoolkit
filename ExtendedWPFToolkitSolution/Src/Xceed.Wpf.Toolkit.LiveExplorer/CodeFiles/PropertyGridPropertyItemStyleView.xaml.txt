@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -23,30 +23,30 @@
                 xmlns:s="clr-namespace:System;assembly=mscorlib"
                 VerticalScrollBarVisibility="Disabled"
                 Title="Customizing PropertyItems display">
-    <local:DemoView.Description>
-        <Paragraph FontSize="14" FontFamily="Segoe">
-         This sample demonstrates the usage of the PropertyGrid's
-         <Bold>PropertyContainerStyle</Bold> property and
-         <Bold>PreparePropertyItem</Bold> event to customize the display of the PropertyGrid content.
-      </Paragraph>
-    </local:DemoView.Description>
+  <local:DemoView.Description>
+    <Paragraph FontSize="14" FontFamily="Segoe">
+      This sample demonstrates the usage of the PropertyGrid's
+      <Bold>PropertyContainerStyle</Bold> property and
+      <Bold>PreparePropertyItem</Bold> event to customize the display of the PropertyGrid content.
+    </Paragraph>
+  </local:DemoView.Description>
 
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-      <StackPanel Grid.Row="0" Margin="10" >
-         <TextBlock Text="Using the PropertyContainerStyle property, the Foreground of all properties are set to Red."
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+    <StackPanel Grid.Row="0" Margin="10" >
+      <TextBlock Text="Using the PropertyContainerStyle property, the Foreground of all properties are set to Red."
                     TextWrapping="Wrap"
                     Margin="0,0,0,10"/>
-         <TextBlock Text="Using the PreparePropertyItem event, the display name of the property 'Friend' is changed to 'Friend (renamed)'."
+      <TextBlock Text="Using the PreparePropertyItem event, the display name of the property 'Friend' is changed to 'Friend (renamed)'."
                     TextWrapping="Wrap"
-                    Margin="0,0,0,10"/>         
-         <TextBlock Text="(CLick the XAML and Code tabs to see details,)" 
+                    Margin="0,0,0,10"/>
+      <TextBlock Text="(CLick the XAML and Code tabs to see details,)" 
                     FontStyle="Italic"
                     Margin="0,10,0,0"/>
-      </StackPanel>
+    </StackPanel>
 
 
       <xctk:PropertyGrid x:Name="_propertyGrid" Grid.Row="1" Width="350" MaxHeight="300"

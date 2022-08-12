@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,12 +15,8 @@
 
   *************************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
 using System.Globalization;
-using Xceed.Wpf.Toolkit;
+using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Converters
 {
@@ -28,12 +24,12 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Converters
   {
     public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
     {
-      return ((WindowState)value == WindowState.Open);
+      return ( ( WindowState )value == WindowState.Open );
     }
 
     public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
     {
-      return (bool)value ? WindowState.Open : WindowState.Closed;
+      return ( bool )value ? WindowState.Open : WindowState.Closed;
     }
   }
 }

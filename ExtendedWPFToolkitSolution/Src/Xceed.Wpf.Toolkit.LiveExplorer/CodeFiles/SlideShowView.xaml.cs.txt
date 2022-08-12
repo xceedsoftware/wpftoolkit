@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,32 +15,24 @@
 
   ***********************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using Xceed.Wpf.Samples.SampleData;
-using System.Windows.Media.Imaging;
-using System.IO;
+using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.SlideShow.Views
 {
-    /// <summary>
-    /// Interaction logic for SlideShow.xaml
-    /// </summary>
-    public partial class SlideShowView : DemoView
+  /// <summary>
+  /// Interaction logic for SlideShow.xaml
+  /// </summary>
+  public partial class SlideShowView : DemoView
+  {
+    public SlideShowView()
     {
-        public SlideShowView()
-        {
-            InitializeComponent();
+      InitializeComponent();
 
-
-      }
 
     }
+
+  }
 }

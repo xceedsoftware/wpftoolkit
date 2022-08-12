@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -91,7 +91,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (IEnumerable)GetValue( ItemsSourceProperty );
+        return ( IEnumerable )GetValue( ItemsSourceProperty );
       }
       set
       {
@@ -103,7 +103,7 @@ namespace Xceed.Wpf.Toolkit
     {
       var CollectionControl = ( CollectionControl )d;
       if( CollectionControl != null )
-        CollectionControl.OnItemSourceChanged( (IEnumerable)e.OldValue, (IEnumerable)e.NewValue );
+        CollectionControl.OnItemSourceChanged( ( IEnumerable )e.OldValue, ( IEnumerable )e.NewValue );
     }
 
     public void OnItemSourceChanged( IEnumerable oldValue, IEnumerable newValue )
@@ -117,12 +117,12 @@ namespace Xceed.Wpf.Toolkit
           // We need to Add EditableKeyValuePairs from DictionaryEntries.
           foreach( DictionaryEntry item in dict )
           {
-            var keyType = (item.Key != null) 
+            var keyType = ( item.Key != null )
                           ? item.Key.GetType()
-                          : (dict.GetType().GetGenericArguments().Count() > 0) ? dict.GetType().GetGenericArguments()[0] : typeof( object );
-            var valueType = (item.Value != null)
+                          : ( dict.GetType().GetGenericArguments().Count() > 0 ) ? dict.GetType().GetGenericArguments()[ 0 ] : typeof( object );
+            var valueType = ( item.Value != null )
                           ? item.Value.GetType()
-                          : (dict.GetType().GetGenericArguments().Count() > 1) ? dict.GetType().GetGenericArguments()[ 1 ] : typeof( object );
+                          : ( dict.GetType().GetGenericArguments().Count() > 1 ) ? dict.GetType().GetGenericArguments()[ 1 ] : typeof( object );
             var editableKeyValuePair = ListUtilities.CreateEditableKeyValuePair( item.Key
                                                                                 , keyType
                                                                                 , item.Value
@@ -528,7 +528,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void CanDuplicate( object sender, CanExecuteRoutedEventArgs e )
     {
-      var t = (e.Parameter != null) ? e.Parameter.GetType() : null;
+      var t = ( e.Parameter != null ) ? e.Parameter.GetType() : null;
       this.CanAddNewCore( t, e );
     }
 
@@ -617,7 +617,7 @@ namespace Xceed.Wpf.Toolkit
       if( collection is IDictionary )
       {
         //For a Dictionary, we need to parse the list of EditableKeyValuePair and add KeyValuePair to the Dictionary.
-        var dict = (IDictionary)collection;
+        var dict = ( IDictionary )collection;
         //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
         dict.Clear();
 
@@ -625,7 +625,7 @@ namespace Xceed.Wpf.Toolkit
         {
           var propInfoKey = item.GetType().GetProperty( "Key" );
           var propInfoValue = item.GetType().GetProperty( "Value" );
-          if( (propInfoKey != null) && (propInfoValue != null) )
+          if( ( propInfoKey != null ) && ( propInfoValue != null ) )
           {
             dict.Add( propInfoKey.GetValue( item, null ), propInfoValue.GetValue( item, null ) );
           }
@@ -634,7 +634,7 @@ namespace Xceed.Wpf.Toolkit
       //IList
       else if( collection is IList )
       {
-        var list = (IList)collection;
+        var list = ( IList )collection;
 
         //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
         list.Clear();
@@ -642,7 +642,7 @@ namespace Xceed.Wpf.Toolkit
         if( list.IsFixedSize )
         {
           if( sourceList.Count > list.Count )
-            throw new IndexOutOfRangeException("Exceeding array size.");
+            throw new IndexOutOfRangeException( "Exceeding array size." );
 
           for( int i = 0; i < sourceList.Count; ++i )
             list[ i ] = sourceList[ i ];
@@ -659,7 +659,7 @@ namespace Xceed.Wpf.Toolkit
       {
         //ICollection<T> (or IList<T>)
         var collectionType = collection.GetType();
-        var iCollectionOfTInterface = collectionType.GetInterfaces().FirstOrDefault( x => x.IsGenericType && (x.GetGenericTypeDefinition() == typeof( ICollection<> )) );
+        var iCollectionOfTInterface = collectionType.GetInterfaces().FirstOrDefault( x => x.IsGenericType && ( x.GetGenericTypeDefinition() == typeof( ICollection<> ) ) );
         if( iCollectionOfTInterface != null )
         {
           var argumentType = iCollectionOfTInterface.GetGenericArguments().FirstOrDefault();

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,21 +16,13 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Controls;
-using System.Windows;
-using System.Collections;
-using System.Reflection;
-using System.Windows.Input;
-using System.Windows.Documents;
-using System.Globalization;
-using Microsoft.Win32;
-using System.ComponentModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Windows.Automation;
-using Xceed.Wpf.Toolkit;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Core;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 
@@ -819,7 +811,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       {
         if( this.BeepOnError )
         {
-          this.PlayBeep();          
+          this.PlayBeep();
         }
         return false;
       }

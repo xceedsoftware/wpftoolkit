@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,9 +16,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections;
 using System.Collections.Specialized;
 using Xceed.Wpf.Toolkit.Core.Utilities;
@@ -89,12 +86,18 @@ namespace Xceed.Wpf.Toolkit.Core
 
     bool IList.IsFixedSize
     {
-      get { return _innerList.IsFixedSize; }
+      get
+      {
+        return _innerList.IsFixedSize;
+      }
     }
 
     bool IList.IsReadOnly
     {
-      get { return _innerList.IsReadOnly; }
+      get
+      {
+        return _innerList.IsReadOnly;
+      }
     }
 
     void IList.Remove( object value )
@@ -109,8 +112,14 @@ namespace Xceed.Wpf.Toolkit.Core
 
     object IList.this[ int index ]
     {
-      get { return _innerList[ index ]; }
-      set { _innerList[ index ] = value; }
+      get
+      {
+        return _innerList[ index ];
+      }
+      set
+      {
+        _innerList[ index ] = value;
+      }
     }
     #endregion
 
@@ -123,17 +132,26 @@ namespace Xceed.Wpf.Toolkit.Core
 
     int ICollection.Count
     {
-      get { return _innerList.Count; }
+      get
+      {
+        return _innerList.Count;
+      }
     }
 
     bool ICollection.IsSynchronized
     {
-      get { return _innerList.IsSynchronized; }
+      get
+      {
+        return _innerList.IsSynchronized;
+      }
     }
 
     object ICollection.SyncRoot
     {
-      get { return _innerList.SyncRoot; }
+      get
+      {
+        return _innerList.SyncRoot;
+      }
     }
 
     #endregion

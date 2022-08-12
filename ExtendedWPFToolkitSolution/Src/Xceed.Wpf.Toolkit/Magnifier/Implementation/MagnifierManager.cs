@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -75,7 +75,7 @@ namespace Xceed.Wpf.Toolkit
     private void Element_MouseWheel( object sender, MouseWheelEventArgs e )
     {
       var magnifier = MagnifierManager.GetMagnifier( _element ) as Magnifier;
-      if( (magnifier != null) && magnifier.IsUsingZoomOnMouseWheel )
+      if( ( magnifier != null ) && magnifier.IsUsingZoomOnMouseWheel )
       {
         if( e.Delta < 0 )
         {
@@ -86,9 +86,9 @@ namespace Xceed.Wpf.Toolkit
           magnifier.SetCurrentValue( Magnifier.ZoomFactorProperty, newValue );
 #endif
         }
-        else if ( e.Delta > 0 )
+        else if( e.Delta > 0 )
         {
-          var newValue = (magnifier.ZoomFactor >= magnifier.ZoomFactorOnMouseWheel) ? magnifier.ZoomFactor - magnifier.ZoomFactorOnMouseWheel : 0d;
+          var newValue = ( magnifier.ZoomFactor >= magnifier.ZoomFactorOnMouseWheel ) ? magnifier.ZoomFactor - magnifier.ZoomFactorOnMouseWheel : 0d;
 #if VS2008
           magnifier.ZoomFactor = newValue;
 #else
@@ -142,6 +142,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-#endregion //Methods
+    #endregion //Methods
   }
 }

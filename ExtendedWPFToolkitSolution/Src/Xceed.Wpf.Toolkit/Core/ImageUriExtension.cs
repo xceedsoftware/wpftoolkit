@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -29,7 +29,7 @@ namespace Xceed.Wpf.Toolkit.Core
     /// </summary>
     /// <remarks>Generate an absolute uri by default</remarks>
     public ImageUriExtension()
-      :base( UriKind.Absolute )
+      : base( UriKind.Absolute )
     {
 
     }
@@ -37,7 +37,7 @@ namespace Xceed.Wpf.Toolkit.Core
     public override object ProvideValue( IServiceProvider serviceProvider )
     {
       // Call base class
-      Uri uri = ( Uri ) base.ProvideValue( serviceProvider );
+      Uri uri = ( Uri )base.ProvideValue( serviceProvider );
 
       // Create a bitmap image object using the generated uri as the source
       BitmapImage image = new BitmapImage( uri );

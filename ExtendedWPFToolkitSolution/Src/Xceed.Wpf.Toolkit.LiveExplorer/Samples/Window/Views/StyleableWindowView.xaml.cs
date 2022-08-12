@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,22 +15,9 @@
 
   *************************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Xceed.Wpf.Toolkit;
-using System.ComponentModel;
-using System.Diagnostics;
-using Xceed.Wpf.Toolkit.Primitives;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
 {
@@ -53,7 +40,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
     public StyleableWindowView()
     {
       InitializeComponent();
-      this.UpdateWindowsStyles(null,null);
+      this.UpdateWindowsStyles( null, null );
     }
 
 
@@ -81,7 +68,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
       msgBox.DataContext = this.DataContext;
       msgBox.Text = StyledMsgBoxMessage;
       msgBox.Caption = StyledMsgBoxTitle;
-      if( _enableStyleCheckBox.IsChecked.GetValueOrDefault() ) 
+      if( _enableStyleCheckBox.IsChecked.GetValueOrDefault() )
       {
         msgBox.Style = ( Style )this.Resources[ MessageBoxStyleKey ];
       }
@@ -117,8 +104,14 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
 
     public Brush WindowBackground
     {
-      get { return ( Brush )GetValue( WindowBackgroundProperty ); }
-      set { SetValue( WindowBackgroundProperty, value ); }
+      get
+      {
+        return ( Brush )GetValue( WindowBackgroundProperty );
+      }
+      set
+      {
+        SetValue( WindowBackgroundProperty, value );
+      }
     }
 
     #endregion //WindowBackground
@@ -149,11 +142,20 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
 
     public Brush WindowBorderBrush
     {
-      get { return ( Brush )GetValue( WindowBorderBrushProperty ); }
-      set { SetValue( WindowBorderBrushProperty, value ); }
+      get
+      {
+        return ( Brush )GetValue( WindowBorderBrushProperty );
+      }
+      set
+      {
+        SetValue( WindowBorderBrushProperty, value );
+      }
     }
 
     #endregion //WindowBorderBrush
+
+
+
 
     #region TitleFontSize
 
@@ -164,7 +166,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
     {
       get
       {
-        return (double)GetValue( TitleFontSizeProperty );
+        return ( double )GetValue( TitleFontSizeProperty );
       }
       set
       {
@@ -181,8 +183,14 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
 
     public Brush TitleForeground
     {
-      get { return ( Brush )GetValue( TitleForegroundProperty ); }
-      set { SetValue( TitleForegroundProperty, value ); }
+      get
+      {
+        return ( Brush )GetValue( TitleForegroundProperty );
+      }
+      set
+      {
+        SetValue( TitleForegroundProperty, value );
+      }
     }
 
     #endregion //TitleForeground
@@ -213,8 +221,14 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
 
     public Thickness WindowBorderThickness
     {
-      get { return ( Thickness )GetValue( WindowBorderThicknessProperty ); }
-      set { SetValue( WindowBorderThicknessProperty, value ); }
+      get
+      {
+        return ( Thickness )GetValue( WindowBorderThicknessProperty );
+      }
+      set
+      {
+        SetValue( WindowBorderThicknessProperty, value );
+      }
     }
 
     #endregion //WindowBorderThickness
@@ -226,8 +240,14 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
 
     public double WindowOpacity
     {
-      get { return ( double )GetValue( WindowOpacityProperty ); }
-      set { SetValue( WindowOpacityProperty, value ); }
+      get
+      {
+        return ( double )GetValue( WindowOpacityProperty );
+      }
+      set
+      {
+        SetValue( WindowOpacityProperty, value );
+      }
     }
 
     #endregion //WindowOpacity
@@ -239,8 +259,14 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
 
     public WindowStyle WindowStyle
     {
-      get { return ( WindowStyle )GetValue( WindowStyleProperty ); }
-      set { SetValue( WindowStyleProperty, value ); }
+      get
+      {
+        return ( WindowStyle )GetValue( WindowStyleProperty );
+      }
+      set
+      {
+        SetValue( WindowStyleProperty, value );
+      }
     }
 
     #endregion //WindowStyle
@@ -252,8 +278,14 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
 
     public ResizeMode ResizeMode
     {
-      get { return ( ResizeMode )GetValue( ResizeModeProperty ); }
-      set { SetValue( ResizeModeProperty, value ); }
+      get
+      {
+        return ( ResizeMode )GetValue( ResizeModeProperty );
+      }
+      set
+      {
+        SetValue( ResizeModeProperty, value );
+      }
     }
 
     #endregion //ResizeMode
@@ -264,8 +296,14 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
 
     public Visibility CloseButtonVisibility
     {
-      get { return ( Visibility )GetValue( CloseButtonVisibilityProperty ); }
-      set { SetValue( CloseButtonVisibilityProperty, value ); }
+      get
+      {
+        return ( Visibility )GetValue( CloseButtonVisibilityProperty );
+      }
+      set
+      {
+        SetValue( CloseButtonVisibilityProperty, value );
+      }
     }
     #endregion //CloseButtonVisibility
 
@@ -275,8 +313,14 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
 
     public Style CloseButtonStyle
     {
-      get { return ( Style )GetValue( CloseButtonStyleProperty ); }
-      set { SetValue( CloseButtonStyleProperty, value ); }
+      get
+      {
+        return ( Style )GetValue( CloseButtonStyleProperty );
+      }
+      set
+      {
+        SetValue( CloseButtonStyleProperty, value );
+      }
     }
     #endregion //CloseButtonStyle
 
@@ -286,8 +330,14 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
 
     public Style MinimizeButtonStyle
     {
-      get { return ( Style )GetValue( MinimizeButtonStyleProperty ); }
-      set { SetValue( MinimizeButtonStyleProperty, value ); }
+      get
+      {
+        return ( Style )GetValue( MinimizeButtonStyleProperty );
+      }
+      set
+      {
+        SetValue( MinimizeButtonStyleProperty, value );
+      }
     }
     #endregion //MinimizeButtonStyle
 
@@ -297,8 +347,14 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
 
     public Style MaximizeButtonStyle
     {
-      get { return ( Style )GetValue( MaximizeButtonStyleProperty ); }
-      set { SetValue( MaximizeButtonStyleProperty, value ); }
+      get
+      {
+        return ( Style )GetValue( MaximizeButtonStyleProperty );
+      }
+      set
+      {
+        SetValue( MaximizeButtonStyleProperty, value );
+      }
     }
     #endregion //MaximizeButtonStyle
 
@@ -308,8 +364,14 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Window.Views
 
     public Style RestoreButtonStyle
     {
-      get { return ( Style )GetValue( RestoreButtonStyleProperty ); }
-      set { SetValue( RestoreButtonStyleProperty, value ); }
+      get
+      {
+        return ( Style )GetValue( RestoreButtonStyleProperty );
+      }
+      set
+      {
+        SetValue( RestoreButtonStyleProperty, value );
+      }
     }
     #endregion //RestoreButtonStyle
 

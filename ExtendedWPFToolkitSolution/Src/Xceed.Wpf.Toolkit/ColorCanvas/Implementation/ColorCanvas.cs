@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -242,7 +242,7 @@ namespace Xceed.Wpf.Toolkit
         Color? col = null;
         if( !string.IsNullOrEmpty( newColorString ) )
         {
-          col = ( Color )ColorConverter.ConvertFromString( newColorString );      
+          col = ( Color )ColorConverter.ConvertFromString( newColorString );
         }
         UpdateSelectedColor( col );
       }
@@ -453,7 +453,7 @@ namespace Xceed.Wpf.Toolkit
 
     void SpectrumSlider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
     {
-      if( (_currentColorPosition != null) && (this.SelectedColor != null) )
+      if( ( _currentColorPosition != null ) && ( this.SelectedColor != null ) )
       {
         CalculateColor( ( Point )_currentColorPosition );
       }
@@ -493,8 +493,8 @@ namespace Xceed.Wpf.Toolkit
 
     private void UpdateSelectedColor( Color? color )
     {
-      SelectedColor = ( ( color != null ) && color.HasValue ) 
-                      ? (Color?)Color.FromArgb( color.Value.A, color.Value.R, color.Value.G, color.Value.B )
+      SelectedColor = ( ( color != null ) && color.HasValue )
+                      ? ( Color? )Color.FromArgb( color.Value.A, color.Value.R, color.Value.G, color.Value.B )
                       : null;
     }
 
@@ -515,10 +515,10 @@ namespace Xceed.Wpf.Toolkit
 
     private void UpdateColorShadeSelectorPositionAndCalculateColor( Point p, bool calculateColor )
     {
-      if( (_colorShadingCanvas == null) || ( _colorShadeSelector == null) )
+      if( ( _colorShadingCanvas == null ) || ( _colorShadeSelector == null ) )
         return;
 
-        if( p.Y < 0 )
+      if( p.Y < 0 )
         p.Y = 0;
 
       if( p.X < 0 )
@@ -544,7 +544,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void UpdateColorShadeSelectorPosition( Color? color )
     {
-      if( (_spectrumSlider == null) || (_colorShadingCanvas == null) || (color == null) || !color.HasValue)
+      if( ( _spectrumSlider == null ) || ( _colorShadingCanvas == null ) || ( color == null ) || !color.HasValue )
         return;
 
       _currentColorPosition = null;

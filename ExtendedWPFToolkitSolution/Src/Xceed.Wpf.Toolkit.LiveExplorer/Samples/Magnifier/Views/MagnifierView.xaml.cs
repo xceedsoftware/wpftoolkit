@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -33,7 +33,15 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Magnifier.Views
 
       // Load and display the RTF file.
       Uri uri = new Uri( "pack://application:,,,/" +
-         "Xceed.Wpf.Toolkit.LiveExplorer"
+
+#if NETCORE
+            "Xceed.Wpf.Toolkit.LiveExplorer.NETCore"
+#elif NET5
+            "Xceed.Wpf.Toolkit.LiveExplorer.NET5"
+#else
+            "Xceed.Wpf.Toolkit.LiveExplorer"
+#endif
+
         + ";component/Samples/Magnifier/Resources/SampleText.rtf" );
       StreamResourceInfo info = Application.GetResourceStream( uri );
       using( StreamReader txtReader = new StreamReader( info.Stream ) )

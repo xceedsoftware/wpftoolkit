@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -24,7 +24,13 @@ namespace Xceed.Wpf.AvalonDock.Themes
     public override Uri GetResourceUri()
     {
       string uri;
+#if NETCORE
+          uri = "Xceed.Wpf.AvalonDock.NETCore";
+#elif NET5
+          uri = "Xceed.Wpf.AvalonDock.NET5";
+#else
       uri = "Xceed.Wpf.AvalonDock";
+#endif
 
       return new Uri( "/" + uri + ";component/Themes/generic.xaml", UriKind.Relative );
     }

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -17,23 +17,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Windows.Controls;
-using System.Windows;
-using System.Windows.Data;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Windows.Input;
 using System.Diagnostics;
-using System.Windows.Documents;
 using System.Globalization;
-using System.Windows.Controls.Primitives;
 using System.Reflection;
-
-using System.Collections;
 using System.Security;
 using System.Security.Permissions;
-using System.Windows.Automation;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Primitives;
 
 namespace Xceed.Wpf.Toolkit
@@ -1223,9 +1217,9 @@ namespace Xceed.Wpf.Toolkit
       m_insertToggled = !m_insertToggled;
     }
 
-#endregion COMMANDS
+    #endregion COMMANDS
 
-#region DRAG DROP
+    #region DRAG DROP
 
     private void PreviewQueryContinueDragCallback( object sender, QueryContinueDragEventArgs e )
     {
@@ -1258,10 +1252,10 @@ namespace Xceed.Wpf.Toolkit
       base.OnDragOver( e );
     }
 
-#endregion DRAG DROP
+    #endregion DRAG DROP
 
 
-#region VALUE FROM TEXT
+    #region VALUE FROM TEXT
 
     protected override bool QueryValueFromTextCore( string text, out object value )
     {
@@ -1284,9 +1278,9 @@ namespace Xceed.Wpf.Toolkit
       return base.QueryValueFromTextCore( text, out value );
     }
 
-#endregion VALUE FROM TEXT
+    #endregion VALUE FROM TEXT
 
-#region TEXT FROM VALUE
+    #region TEXT FROM VALUE
 
     protected override string QueryTextFromValueCore( object value )
     {
@@ -1305,10 +1299,10 @@ namespace Xceed.Wpf.Toolkit
       return base.QueryTextFromValueCore( value );
     }
 
-#endregion TEXT FROM VALUE
+    #endregion TEXT FROM VALUE
 
 
-#region PROTECTED METHODS
+    #region PROTECTED METHODS
 
     protected virtual char[] GetMaskCharacters()
     {
@@ -1349,7 +1343,7 @@ namespace Xceed.Wpf.Toolkit
       provider.IncludeLiterals = true;
       provider.IncludePrompt = true;
 
-      provider.IsPassword = false;   
+      provider.IsPassword = false;
 
       return provider;
     }
@@ -1439,10 +1433,10 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-#endregion PROTECTED METHODS
+    #endregion PROTECTED METHODS
 
 
-#region INTERNAL PROPERTIES
+    #region INTERNAL PROPERTIES
 
     internal bool IsForcingMask
     {
@@ -1479,9 +1473,9 @@ namespace Xceed.Wpf.Toolkit
       return true;
     }
 
-#endregion INTERNAL PROPERTIES
+    #endregion INTERNAL PROPERTIES
 
-#region INTERNAL METHODS
+    #region INTERNAL METHODS
 
     internal override string GetCurrentText()
     {
@@ -1595,9 +1589,9 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-#endregion INTERNAL METHODS
+    #endregion INTERNAL METHODS
 
-#region PRIVATE PROPERTIES
+    #region PRIVATE PROPERTIES
 
     private bool IsOverwriteMode
     {
@@ -1939,7 +1933,7 @@ namespace Xceed.Wpf.Toolkit
     {
       //System.Diagnostics.Debug.Assert( provider.EditPositionCount > 0 );
 
-      bool includePrompt =  ( !this.HidePromptOnLeave || this.IsFocused );
+      bool includePrompt = ( !this.HidePromptOnLeave || this.IsFocused );
 
       string displayString = provider.ToString( false, includePrompt, true, 0, m_maskedTextProvider.Length );
 
@@ -1966,9 +1960,9 @@ namespace Xceed.Wpf.Toolkit
       return m_maskedTextProvider.ToString( true, includePrompt, includeLiterals, this.SelectionStart, selectionLength );
     }
 
-#endregion PRIVATE METHODS
+    #endregion PRIVATE METHODS
 
-#region PRIVATE FIELDS
+    #region PRIVATE FIELDS
 
     private MaskedTextProvider m_maskedTextProvider; // = null;
     private bool m_insertToggled; // = false;
@@ -1979,6 +1973,6 @@ namespace Xceed.Wpf.Toolkit
     private string m_formatSpecifier;
     private MethodInfo m_valueToStringMethodInfo; // = null;
 
-#endregion PRIVATE FIELDS
+    #endregion PRIVATE FIELDS
   }
 }

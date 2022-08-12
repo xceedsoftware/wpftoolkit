@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -19,21 +19,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
-using System.Linq.Expressions;
-using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Core.Utilities;
-using System.Windows.Controls;
-using System.Reflection;
-using System.Windows.Controls.Primitives;
-using Xceed.Wpf.Toolkit.PropertyGrid.Converters;
-using Xceed.Wpf.Toolkit.Primitives;
-using System.IO;
+using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -52,16 +45,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       ITypeEditor editor = null;
 
       var context = new EditorTypeDescriptorContext( null, propertyItem.Instance, propertyItem.PropertyDescriptor );
-      if( (typeConverter != null)
+      if( ( typeConverter != null )
         && typeConverter.GetStandardValuesSupported( context )
         && typeConverter.GetStandardValuesExclusive( context )
         && !( typeConverter is ReferenceConverter )  
-        && (propertyType != typeof( bool )) && (propertyType != typeof( bool? )) )  //Bool type always have a BooleanConverter with standardValues : True/False.
+        && ( propertyType != typeof( bool ) ) && ( propertyType != typeof( bool? ) ) )  //Bool type always have a BooleanConverter with standardValues : True/False.
       {
         var items = typeConverter.GetStandardValues( context );
         editor = new SourceComboBoxEditor( items, typeConverter );
       }
-      else if( propertyType == typeof( string )  )
+      else if( propertyType == typeof( string ) )
         editor = new TextBoxEditor();
       else if( propertyType == typeof( bool ) || propertyType == typeof( bool? ) )
         editor = new CheckBoxEditor();
@@ -97,9 +90,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         editor = new TimeSpanUpDownEditor();
       else if( propertyType == typeof( FontFamily ) || propertyType == typeof( FontWeight ) || propertyType == typeof( FontStyle ) || propertyType == typeof( FontStretch ) )
         editor = new FontComboBoxEditor();
-      else if (propertyType == typeof(Guid) || propertyType == typeof(Guid?))
+      else if( propertyType == typeof( Guid ) || propertyType == typeof( Guid? ) )
         editor = new MaskedTextBoxEditor() { ValueDataType = propertyType, Mask = "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA" };
-      else if (propertyType == typeof(char) || propertyType == typeof(char?))
+      else if( propertyType == typeof( char ) || propertyType == typeof( char? ) )
         editor = new MaskedTextBoxEditor() { ValueDataType = propertyType, Mask = "&" };
       else if( propertyType == typeof( object ) )
         // If any type of object is possible in the property, default to the TextBoxEditor.
@@ -123,7 +116,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
           var dictionaryType = ListUtilities.GetDictionaryItemsType( propertyType );
           var collectionType = ListUtilities.GetCollectionItemType( propertyType );
           // A dictionary of T or a Collection of T or an ICollection
-          if( (dictionaryType != null) || (collectionType != null) || typeof( ICollection ).IsAssignableFrom( propertyType ) )
+          if( ( dictionaryType != null ) || ( collectionType != null ) || typeof( ICollection ).IsAssignableFrom( propertyType ) )
           {
             editor = new Xceed.Wpf.Toolkit.PropertyGrid.Editors.CollectionEditor();
           }
@@ -132,9 +125,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
             // If the type is not supported, check if there is a converter that supports
             // string conversion to the object type. Use TextBox in theses cases.
             // Otherwise, return a TextBlock editor since no valid editor exists.
-            editor = (typeConverter != null && typeConverter.CanConvertFrom( typeof( string ) ))
-              ? (ITypeEditor)new TextBoxEditor()
-              : (ITypeEditor)new TextBlockEditor();
+            editor = ( typeConverter != null && typeConverter.CanConvertFrom( typeof( string ) ) )
+              ? ( ITypeEditor )new TextBoxEditor()
+              : ( ITypeEditor )new TextBlockEditor();
           }
         }
       }

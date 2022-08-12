@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -21,6 +21,7 @@
 
 namespace Standard
 {
+  using Microsoft.Win32.SafeHandles;
   using System;
   using System.ComponentModel;
   using System.Diagnostics.CodeAnalysis;
@@ -30,12 +31,8 @@ namespace Standard
   using System.Runtime.InteropServices.ComTypes;
   using System.Security.Permissions;
   using System.Text;
-  using Microsoft.Win32.SafeHandles;
-
   // Some COM interfaces and Win32 structures are already declared in the framework.
   // Interesting ones to remember in System.Runtime.InteropServices.ComTypes are:
-  using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
-  using IPersistFile = System.Runtime.InteropServices.ComTypes.IPersistFile;
   using IStream = System.Runtime.InteropServices.ComTypes.IStream;
 
   #region Native Values
@@ -1646,9 +1643,9 @@ namespace Standard
     }
   }
 
-#endregion
+  #endregion
 
-#region Native Types
+  #region Native Types
 
   [StructLayout( LayoutKind.Sequential )]
   internal struct BLENDFUNCTION
@@ -1882,7 +1879,7 @@ namespace Standard
       Assert.IsTrue( hr.Succeeded );
     }
 
-#region IDisposable Pattern
+    #region IDisposable Pattern
 
     public void Dispose()
     {
@@ -1901,7 +1898,7 @@ namespace Standard
       Clear();
     }
 
-#endregion
+    #endregion
   }
 
   [SuppressMessage( "Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses" )]
@@ -2464,7 +2461,7 @@ namespace Standard
     public ulong cBuffersEmpty;
   }
 
-#endregion
+  #endregion
 
   /// <summary>Delegate declaration that matches native WndProc signatures.</summary>
   internal delegate IntPtr WndProc( IntPtr hwnd, WM uMsg, IntPtr wParam, IntPtr lParam );
@@ -3460,7 +3457,7 @@ namespace Standard
       }
     }
 
-#region Win7 declarations
+    #region Win7 declarations
 
     [DllImport( "shell32.dll", EntryPoint = "SHAddToRecentDocs" )]
     private static extern void _SHAddToRecentDocs_String( SHARD uFlags, [MarshalAs( UnmanagedType.LPWStr )] string pv );
@@ -3548,6 +3545,6 @@ namespace Standard
     [DllImport( "shell32.dll" )]
     public static extern HRESULT GetCurrentProcessExplicitAppUserModelID( [Out, MarshalAs( UnmanagedType.LPWStr )] out string AppID );
 
-#endregion
+    #endregion
   }
 }

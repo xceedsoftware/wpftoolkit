@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,14 +16,11 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
-using System.Globalization;
 using System.ComponentModel;
-using System.Windows;
+using System.Globalization;
+using System.Linq;
 using System.Reflection;
+using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
 {
@@ -40,7 +37,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
       if( !( parameter is string ) )
         throw new ArgumentException( SelectedObjectConverter.ValidParameterMessage );
 
-      if( this.CompareParam(parameter, "Type") )
+      if( this.CompareParam( parameter, "Type" ) )
       {
         return this.ConvertToType( value, culture );
       }
@@ -58,7 +55,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
       }
     }
 
-    private bool CompareParam(object parameter, string parameterValue )
+    private bool CompareParam( object parameter, string parameterValue )
     {
       return string.Compare( ( string )parameter, parameterValue, true ) == 0;
     }
@@ -86,8 +83,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Converters
 
       DisplayNameAttribute displayNameAttribute = newType.GetCustomAttributes( false ).OfType<DisplayNameAttribute>().FirstOrDefault();
 
-      return (displayNameAttribute == null)
-        ? newType.Name 
+      return ( displayNameAttribute == null )
+        ? newType.Name
         : displayNameAttribute.DisplayName;
     }
 

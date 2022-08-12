@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -150,6 +150,8 @@
             Value="{StaticResource DropDownArrowGlyph}" />
     <Setter Property="DropDownButtonDisabledContent"
             Value="{StaticResource DropDownDisabledArrowGlyph}" />
+    <Setter Property="TimeListItemsStyle"
+            Value="{StaticResource TimeItemStyle}" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:TimePicker}">
@@ -205,12 +207,12 @@
                           Height="{Binding DropDownButtonHeight, RelativeSource={RelativeSource TemplatedParent}}"
                           Background="White"
                           Focusable="False"
-                          Content="{Binding DropDownButtonContent, RelativeSource={RelativeSource TemplatedParent}}"                          
+                          Content="{Binding DropDownButtonContent, RelativeSource={RelativeSource TemplatedParent}}"
                           IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                           Style="{StaticResource TimePickerToggleButtonStyle}"
                           IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
                           IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
-                          Visibility="{TemplateBinding ShowDropDownButton, Converter={StaticResource BooleanToVisibilityConverter}}" >
+                          Visibility="{TemplateBinding ShowDropDownButton, Converter={StaticResource BooleanToVisibilityConverter}}">
             </ToggleButton>
             <Popup x:Name="PART_Popup"
                    IsOpen="{Binding IsChecked, ElementName=_timePickerToggleButton}"
@@ -237,7 +239,7 @@
                   <ListBox x:Name="PART_TimeListItems"
                            BorderThickness="0"
                            DisplayMemberPath="Display"
-                           ItemContainerStyle="{StaticResource TimeItemStyle}" >
+                           ItemContainerStyle="{TemplateBinding TimeListItemsStyle}">
                   </ListBox>
                 </Grid>
               </Border>

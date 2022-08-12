@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,9 +15,6 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.ComponentModel;
 
 namespace Xceed.Wpf.Toolkit
@@ -36,11 +33,14 @@ namespace Xceed.Wpf.Toolkit
 
     #region MaskedTextProvider PROPERTY
 
-    private MaskedTextProvider m_maskedTextProvider;  
+    private MaskedTextProvider m_maskedTextProvider;
 
     public MaskedTextProvider MaskedTextProvider
     {
-      get { return m_maskedTextProvider; }
+      get
+      {
+        return m_maskedTextProvider;
+      }
     }
 
     #endregion MaskedTextProvider PROPERTY
@@ -51,7 +51,10 @@ namespace Xceed.Wpf.Toolkit
 
     public int StartPosition
     {
-      get { return m_startPosition; }
+      get
+      {
+        return m_startPosition;
+      }
     }
 
     #endregion StartPosition PROPERTY
@@ -62,7 +65,10 @@ namespace Xceed.Wpf.Toolkit
 
     public int SelectionLength
     {
-      get { return m_selectionLength; }
+      get
+      {
+        return m_selectionLength;
+      }
     }
 
     #endregion SelectionLength PROPERTY
@@ -73,7 +79,10 @@ namespace Xceed.Wpf.Toolkit
 
     public string Input
     {
-      get { return m_input; }
+      get
+      {
+        return m_input;
+      }
     }
 
     #endregion Input PROPERTY
@@ -85,8 +94,14 @@ namespace Xceed.Wpf.Toolkit
 
     public int AutoCompleteStartPosition
     {
-      get { return m_autoCompleteStartPosition; }
-      set { m_autoCompleteStartPosition = value; }
+      get
+      {
+        return m_autoCompleteStartPosition;
+      }
+      set
+      {
+        m_autoCompleteStartPosition = value;
+      }
     }
 
     #endregion AutoCompleteStartPosition PROPERTY
@@ -97,8 +112,14 @@ namespace Xceed.Wpf.Toolkit
 
     public string AutoCompleteText
     {
-      get { return m_autoCompleteText; }
-      set { m_autoCompleteText = value; }
+      get
+      {
+        return m_autoCompleteText;
+      }
+      set
+      {
+        m_autoCompleteText = value;
+      }
     }
 
     #endregion AutoCompleteText PROPERTY

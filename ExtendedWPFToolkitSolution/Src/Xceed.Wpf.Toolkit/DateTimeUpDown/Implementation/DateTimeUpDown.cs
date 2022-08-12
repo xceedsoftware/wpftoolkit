@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -43,7 +43,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (bool)GetValue( AutoClipTimePartsProperty );
+        return ( bool )GetValue( AutoClipTimePartsProperty );
       }
       set
       {
@@ -102,7 +102,7 @@ namespace Xceed.Wpf.Toolkit
       try
       {
         // Test the format string if it is used.
-        CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MinSupportedDateTime.ToString( (string)value, CultureInfo.CurrentCulture );
+        CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MinSupportedDateTime.ToString( ( string )value, CultureInfo.CurrentCulture );
       }
       catch
       {
@@ -121,14 +121,14 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnFormatStringChanged( string oldValue, string newValue )
     {
-        FormatUpdated();
+      FormatUpdated();
     }
 
     #endregion //FormatString
 
     #region Kind
 
-    public static readonly DependencyProperty KindProperty = DependencyProperty.Register( "Kind", typeof( DateTimeKind ), typeof( DateTimeUpDown ), 
+    public static readonly DependencyProperty KindProperty = DependencyProperty.Register( "Kind", typeof( DateTimeKind ), typeof( DateTimeUpDown ),
       new FrameworkPropertyMetadata( DateTimeKind.Unspecified, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnKindChanged ) );
     public DateTimeKind Kind
     {
@@ -153,7 +153,7 @@ namespace Xceed.Wpf.Toolkit
     {
       //Upate the value based on kind. (Postpone to EndInit if not yet initialized)
       if( !_setKindInternal
-        && this.Value != null 
+        && this.Value != null
         && this.IsInitialized )
       {
         this.Value = this.ConvertToKind( this.Value.Value, newValue );
@@ -244,7 +244,7 @@ namespace Xceed.Wpf.Toolkit
       {
         this.Increment( this.Step );
       }
-    }    
+    }
 
     protected override void OnDecrement()
     {
@@ -329,7 +329,7 @@ namespace Xceed.Wpf.Toolkit
       DateTime? value = ( DateTime? )base.OnCoerceValue( newValue );
 
       //Let the initialized determine the final "kind" value.
-      if(value != null && this.IsInitialized)
+      if( value != null && this.IsInitialized )
       {
         //Update kind based on value kind
         this.SetKindInternal( value.Value.Kind );
@@ -344,7 +344,7 @@ namespace Xceed.Wpf.Toolkit
 
       //this only occurs when the user manually type in a value for the Value Property
       if( info == null )
-        info = (this.CurrentDateTimePart != DateTimePart.Other) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
+        info = ( this.CurrentDateTimePart != DateTimePart.Other ) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
       if( info == null )
         info = _dateTimeInfoList[ 0 ];
 
@@ -678,7 +678,7 @@ namespace Xceed.Wpf.Toolkit
       if( value1 == null || value2 == null )
         return false;
 
-      return (value1.Value < value2.Value);
+      return ( value1.Value < value2.Value );
     }
 
     protected override bool IsGreaterThan( DateTime? value1, DateTime? value2 )
@@ -686,7 +686,7 @@ namespace Xceed.Wpf.Toolkit
       if( value1 == null || value2 == null )
         return false;
 
-      return (value1.Value > value2.Value);
+      return ( value1.Value > value2.Value );
     }
 
     protected override void OnUpdateValueOnEnterKeyChanged( bool oldValue, bool newValue )
@@ -706,7 +706,7 @@ namespace Xceed.Wpf.Toolkit
     }
 
 
-#endregion //Base Class Overrides
+    #endregion //Base Class Overrides
 
     #region Methods
 
@@ -875,7 +875,7 @@ namespace Xceed.Wpf.Toolkit
 
       //this only occurs when the user manually type in a value for the Value Property
       if( info == null )
-        info = (this.CurrentDateTimePart != DateTimePart.Other) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
+        info = ( this.CurrentDateTimePart != DateTimePart.Other ) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
       if( info == null )
         info = _dateTimeInfoList[ 0 ];
 
@@ -887,45 +887,45 @@ namespace Xceed.Wpf.Toolkit
         {
           case DateTimePart.Year:
             {
-              result = ( ( DateTime )currentDateTime).AddYears( value );
+              result = ( ( DateTime )currentDateTime ).AddYears( value );
               break;
             }
           case DateTimePart.Month:
           case DateTimePart.MonthName:
             {
-              result = ( ( DateTime )currentDateTime).AddMonths( value );
+              result = ( ( DateTime )currentDateTime ).AddMonths( value );
               break;
             }
           case DateTimePart.Day:
           case DateTimePart.DayName:
             {
-              result = ( ( DateTime )currentDateTime).AddDays( value );
+              result = ( ( DateTime )currentDateTime ).AddDays( value );
               break;
             }
           case DateTimePart.Hour12:
           case DateTimePart.Hour24:
             {
-              result = ( ( DateTime )currentDateTime).AddHours( value );
+              result = ( ( DateTime )currentDateTime ).AddHours( value );
               break;
             }
           case DateTimePart.Minute:
             {
-              result = ( ( DateTime )currentDateTime).AddMinutes( value );
+              result = ( ( DateTime )currentDateTime ).AddMinutes( value );
               break;
             }
           case DateTimePart.Second:
             {
-              result = ( ( DateTime )currentDateTime).AddSeconds( value );
+              result = ( ( DateTime )currentDateTime ).AddSeconds( value );
               break;
             }
           case DateTimePart.Millisecond:
             {
-              result = ( ( DateTime )currentDateTime).AddMilliseconds( value );
+              result = ( ( DateTime )currentDateTime ).AddMilliseconds( value );
               break;
             }
           case DateTimePart.AmPmDesignator:
             {
-              result = ( ( DateTime )currentDateTime).AddHours( value * 12 );
+              result = ( ( DateTime )currentDateTime ).AddHours( value * 12 );
               break;
             }
           default:
@@ -986,7 +986,7 @@ namespace Xceed.Wpf.Toolkit
       //"ToLocalTime()" from an unspecified will assume
       // That the time was originaly Utc and affect the datetime value. 
       // Just "Force" the "Kind" instead.
-      if( dateTime.Kind == DateTimeKind.Unspecified 
+      if( dateTime.Kind == DateTimeKind.Unspecified
         || kind == DateTimeKind.Unspecified )
         return DateTime.SpecifyKind( dateTime, kind );
 

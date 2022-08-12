@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29418.71
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.Toolkit.LiveExplorer.NET5", "Src\Xceed.Wpf.Toolkit.LiveExplorer\Xceed.Wpf.Toolkit.LiveExplorer.NET5.csproj", "{5E7DC9C8-3E27-400C-B84C-29FF9E710CB3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B3FC3E21-5F2D-4581-AEA2-59F671CFFC21} = {B3FC3E21-5F2D-4581-AEA2-59F671CFFC21}
+		{DB81988F-E0F2-45A0-A1FD-8C37F3D35244} = {DB81988F-E0F2-45A0-A1FD-8C37F3D35244}
+		{89286EB4-B4A1-418C-839A-067B00F442D8} = {89286EB4-B4A1-418C-839A-067B00F442D8}
+		{72E591D6-8F83-4D8C-8F67-9C325E623234} = {72E591D6-8F83-4D8C-8F67-9C325E623234}
+		{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B} = {BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.Toolkit.NET5", "Src\Xceed.Wpf.Toolkit\Xceed.Wpf.Toolkit.NET5.csproj", "{72E591D6-8F83-4D8C-8F67-9C325E623234}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.NET5", "Src\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.NET5.csproj", "{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Themes", "Themes", "{8976E4A6-FF5F-44C5-AC57-FEDA249DD199}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.Themes.VS2010.NET5", "Src\Xceed.Wpf.AvalonDock.Themes.VS2010\Xceed.Wpf.AvalonDock.Themes.VS2010.NET5.csproj", "{B3FC3E21-5F2D-4581-AEA2-59F671CFFC21}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.Themes.Metro.NET5", "Src\Xceed.Wpf.AvalonDock.Themes.Metro\Xceed.Wpf.AvalonDock.Themes.Metro.NET5.csproj", "{89286EB4-B4A1-418C-839A-067B00F442D8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.Themes.Aero.NET5", "Src\Xceed.Wpf.AvalonDock.Themes.Aero\Xceed.Wpf.AvalonDock.Themes.Aero.NET5.csproj", "{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5E7DC9C8-3E27-400C-B84C-29FF9E710CB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E7DC9C8-3E27-400C-B84C-29FF9E710CB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E7DC9C8-3E27-400C-B84C-29FF9E710CB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E7DC9C8-3E27-400C-B84C-29FF9E710CB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72E591D6-8F83-4D8C-8F67-9C325E623234}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3FC3E21-5F2D-4581-AEA2-59F671CFFC21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3FC3E21-5F2D-4581-AEA2-59F671CFFC21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3FC3E21-5F2D-4581-AEA2-59F671CFFC21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3FC3E21-5F2D-4581-AEA2-59F671CFFC21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89286EB4-B4A1-418C-839A-067B00F442D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89286EB4-B4A1-418C-839A-067B00F442D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89286EB4-B4A1-418C-839A-067B00F442D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89286EB4-B4A1-418C-839A-067B00F442D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5B29CA6B-7CCA-4E10-8788-C2902D49C5AE}
+	EndGlobalSection
+EndGlobal

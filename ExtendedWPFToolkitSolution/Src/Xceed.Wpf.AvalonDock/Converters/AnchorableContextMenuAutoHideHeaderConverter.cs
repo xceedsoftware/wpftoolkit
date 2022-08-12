@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,8 +16,8 @@
   ***********************************************************************************/
 
 using System;
-using System.Windows.Data;
 using System.Globalization;
+using System.Windows.Data;
 using Xceed.Wpf.AvalonDock.Properties;
 
 namespace Xceed.Wpf.AvalonDock.Converters
@@ -28,7 +28,7 @@ namespace Xceed.Wpf.AvalonDock.Converters
     {
       var isAutoHidden = value as bool?;
 
-      return (isAutoHidden != null) && isAutoHidden.Value ? Resources.Window_Restore : Resources.Anchorable_AutoHide;
+      return ( isAutoHidden != null ) && isAutoHidden.Value ? Resources.Window_Restore : Resources.Anchorable_AutoHide;
     }
 
     public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )

@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -307,7 +307,9 @@
                 TargetName="TitleText" />
       </Trigger>
 
-      <!-- Center the Window Title on the entire window -->
+
+
+
       <DataTrigger Value="1">
         <DataTrigger.Binding>
           <MultiBinding Converter="{StaticResource CenterTitleConverter}">
@@ -330,7 +332,6 @@
                 Value="Center" />
       </DataTrigger>
 
-      <!-- Center the Window Title in it's own column -->
       <DataTrigger Value="2">
         <DataTrigger.Binding>
           <MultiBinding Converter="{StaticResource CenterTitleConverter}">
@@ -346,7 +347,6 @@
                 Property="HorizontalAlignment"
                 Value="Center" />
       </DataTrigger>
-
     </ControlTemplate.Triggers>
   </ControlTemplate>
 

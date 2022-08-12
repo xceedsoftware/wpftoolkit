@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -45,7 +45,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// Model Dependency Property
     /// </summary>
-    public static readonly DependencyProperty ModelProperty =  DependencyProperty.Register( "Model", typeof( LayoutAnchorable ), typeof( LayoutAnchorableControl ),
+    public static readonly DependencyProperty ModelProperty = DependencyProperty.Register( "Model", typeof( LayoutAnchorable ), typeof( LayoutAnchorableControl ),
             new FrameworkPropertyMetadata( ( LayoutAnchorable )null, new PropertyChangedCallback( OnModelChanged ) ) );
 
     /// <summary>
@@ -82,7 +82,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         ( ( LayoutContent )e.OldValue ).PropertyChanged -= this.Model_PropertyChanged;
       }
 
-      if( ( this.Model != null) && ( this.Model.Root != null ) && ( this.Model.Root.Manager != null ) )
+      if( ( this.Model != null ) && ( this.Model.Root != null ) && ( this.Model.Root.Manager != null ) )
       {
         this.Model.PropertyChanged += this.Model_PropertyChanged;
         this.SetLayoutItem( this.Model.Root.Manager.GetLayoutItemFromModel( this.Model ) );
@@ -158,7 +158,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         if( Model != null )
           Model.IsActive = true;
-      }      
+      }
 
       base.OnGotKeyboardFocus( e );
     }

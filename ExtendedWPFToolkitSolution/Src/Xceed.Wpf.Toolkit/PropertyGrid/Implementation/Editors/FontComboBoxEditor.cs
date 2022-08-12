@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,11 +15,10 @@
 
   ***********************************************************************************/
 
-using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using System.Collections;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
@@ -29,7 +28,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     protected override IEnumerable CreateItemsSource( PropertyItem propertyItem )
     {
       if( propertyItem.PropertyType == typeof( FontFamily ) )
-        return FontUtilities.Families.OrderBy( x => x.Source);
+        return FontUtilities.Families.OrderBy( x => x.Source );
       else if( propertyItem.PropertyType == typeof( FontWeight ) )
         return FontUtilities.Weights;
       else if( propertyItem.PropertyType == typeof( FontStyle ) )

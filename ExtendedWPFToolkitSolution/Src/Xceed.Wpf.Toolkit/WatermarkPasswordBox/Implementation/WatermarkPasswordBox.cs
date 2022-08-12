@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -85,7 +85,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (char)GetValue( PasswordCharProperty );
+        return ( char )GetValue( PasswordCharProperty );
       }
 
       set
@@ -99,7 +99,7 @@ namespace Xceed.Wpf.Toolkit
       var watermarkPasswordBox = o as WatermarkPasswordBox;
       if( watermarkPasswordBox != null )
       {
-        watermarkPasswordBox.OnPasswordCharChanged( (char)e.OldValue, (char)e.NewValue );
+        watermarkPasswordBox.OnPasswordCharChanged( ( char )e.OldValue, ( char )e.NewValue );
       }
     }
 
@@ -164,7 +164,7 @@ namespace Xceed.Wpf.Toolkit
           break;
         case Key.Back:
           // With a selection, delete from CaretIndex. Without a selection delete the character before the CaretIndex.
-          this.PasswordRemove( (this.SelectedText.Length > 0) ? this.CaretIndex : this.CaretIndex - 1 );
+          this.PasswordRemove( ( this.SelectedText.Length > 0 ) ? this.CaretIndex : this.CaretIndex - 1 );
           e.Handled = true;  //Handle to prevent TextChanged when OnPreviewKeyDown exists
           break;
         case Key.Delete:
@@ -172,7 +172,7 @@ namespace Xceed.Wpf.Toolkit
           e.Handled = true;  //Handle to prevent TextChanged when OnPreviewKeyDown exist
           break;
         case Key.V:
-          if( (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control )
+          if( ( Keyboard.Modifiers & ModifierKeys.Control ) == ModifierKeys.Control )
           {
             if( Clipboard.ContainsText() )
             {
@@ -240,7 +240,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region Event Handlers
 
-    [ SecuritySafeCritical]
+    [SecuritySafeCritical]
     private void OnPaste( object sender, DataObjectPastingEventArgs e )
     {
       //Pasting something that is not text
@@ -276,7 +276,7 @@ namespace Xceed.Wpf.Toolkit
     {
       if( text == null )
         return;
-      if( (index < 0) || (index > this.Password.Length) )
+      if( ( index < 0 ) || ( index > this.Password.Length ) )
         return;
 
       //If there is a selection, remove it first
@@ -289,7 +289,7 @@ namespace Xceed.Wpf.Toolkit
       for( int i = 0; i < text.Length; ++i )
       {
         // MaxLength == 0 is no limit
-        if( (this.MaxLength == 0) || (newPassword.Length < this.MaxLength) )
+        if( ( this.MaxLength == 0 ) || ( newPassword.Length < this.MaxLength ) )
         {
           newPassword = newPassword.Insert( index++, text[ i ].ToString() );
         }
@@ -300,7 +300,7 @@ namespace Xceed.Wpf.Toolkit
     [SecurityCritical]
     private void PasswordRemove( int index )
     {
-      if( (index < 0) || (index >= this.Password.Length) )
+      if( ( index < 0 ) || ( index >= this.Password.Length ) )
         return;
 
       if( this.SelectedText.Length > 0 )
@@ -308,7 +308,7 @@ namespace Xceed.Wpf.Toolkit
         var newPassword = this.Password;
         for( int i = 0; i < this.SelectedText.Length; ++i )
         {
-          newPassword = newPassword.Remove( index, 1 );          
+          newPassword = newPassword.Remove( index, 1 );
         }
         this.SetPassword( newPassword, index );
       }
@@ -329,7 +329,7 @@ namespace Xceed.Wpf.Toolkit
     private void SyncTextPassword( int nextCarretIndex )
     {
       var sb = new StringBuilder();
-      this.Text = sb.Append( Enumerable.Repeat(this.PasswordChar, this.Password.Length).ToArray() ).ToString();
+      this.Text = sb.Append( Enumerable.Repeat( this.PasswordChar, this.Password.Length ).ToArray() ).ToString();
       //set CaretIndex after Text is changed
       this.CaretIndex = Math.Max( nextCarretIndex, 0 );
     }

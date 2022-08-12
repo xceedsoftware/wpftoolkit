@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -32,7 +32,7 @@ namespace Xceed.Wpf.Toolkit
       if( string.IsNullOrEmpty( value ) || string.IsNullOrEmpty( format ) )
         return false;
 
-      DateTimeParser.UpdateValueFormatForQuotes( ref value, ref format );      
+      DateTimeParser.UpdateValueFormatForQuotes( ref value, ref format );
 
       var dateTimeString = ComputeDateTimeString( value, format, currentDate, cultureInfo, autoClipTimeParts ).Trim();
 
@@ -98,12 +98,12 @@ namespace Xceed.Wpf.Toolkit
               dateTimeParts.Add( currentString );
             }
             currentformat = c.ToString();
-            currentString = (i < dateTime.Length) ? dateTime[ i ].ToString() : "";
+            currentString = ( i < dateTime.Length ) ? dateTime[ i ].ToString() : "";
           }
           else
           {
             currentformat = string.Concat( currentformat, c );
-            currentString = string.Concat( currentString, (i < dateTime.Length) ? dateTime[ i ] : '\0' );
+            currentString = string.Concat( currentString, ( i < dateTime.Length ) ? dateTime[ i ] : '\0' );
           }
         }
         if( !string.IsNullOrEmpty( currentformat ) )
@@ -116,7 +116,7 @@ namespace Xceed.Wpf.Toolkit
       //Auto-complete missing date parts
       if( dateTimeParts.Count < formats.Count )
       {
-        while( dateTimeParts.Count != formats.Count  )
+        while( dateTimeParts.Count != formats.Count )
         {
           dateTimeParts.Add( "0" );
         }
@@ -231,7 +231,7 @@ namespace Xceed.Wpf.Toolkit
         else if( item.Contains( "y" ) )
         {
           key = "Year";
-          value = currentDate.Year.ToString("D4");
+          value = currentDate.Year.ToString( "D4" );
         }
         if( !dateParts.ContainsKey( key ) )
         {

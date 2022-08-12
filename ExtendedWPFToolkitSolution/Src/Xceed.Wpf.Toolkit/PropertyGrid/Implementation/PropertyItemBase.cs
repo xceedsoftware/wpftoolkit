@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -50,8 +50,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public ImageSource AdvancedOptionsIcon
     {
-      get { return ( ImageSource )GetValue( AdvancedOptionsIconProperty ); }
-      set { SetValue( AdvancedOptionsIconProperty, value ); }
+      get
+      {
+        return ( ImageSource )GetValue( AdvancedOptionsIconProperty );
+      }
+      set
+      {
+        SetValue( AdvancedOptionsIconProperty, value );
+      }
     }
 
     #endregion //AdvancedOptionsIcon
@@ -63,8 +69,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public object AdvancedOptionsTooltip
     {
-      get { return ( object )GetValue( AdvancedOptionsTooltipProperty ); }
-      set { SetValue( AdvancedOptionsTooltipProperty, value ); }
+      get
+      {
+        return ( object )GetValue( AdvancedOptionsTooltipProperty );
+      }
+      set
+      {
+        SetValue( AdvancedOptionsTooltipProperty, value );
+      }
     }
 
     #endregion //AdvancedOptionsTooltip
@@ -81,8 +93,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public string Description
     {
-      get { return ( string )GetValue( DescriptionProperty ); }
-      set { SetValue( DescriptionProperty, value ); }
+      get
+      {
+        return ( string )GetValue( DescriptionProperty );
+      }
+      set
+      {
+        SetValue( DescriptionProperty, value );
+      }
     }
 
     #endregion //Description
@@ -94,8 +112,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public string DisplayName
     {
-      get { return ( string )GetValue( DisplayNameProperty ); }
-      set { SetValue( DisplayNameProperty, value ); }
+      get
+      {
+        return ( string )GetValue( DisplayNameProperty );
+      }
+      set
+      {
+        SetValue( DisplayNameProperty, value );
+      }
     }
 
     #endregion //DisplayName
@@ -181,8 +205,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public bool IsExpandable
     {
-      get { return ( bool )GetValue( IsExpandableProperty ); }
-      set { SetValue( IsExpandableProperty, value ); }
+      get
+      {
+        return ( bool )GetValue( IsExpandableProperty );
+      }
+      set
+      {
+        SetValue( IsExpandableProperty, value );
+      }
     }
 
     #endregion //IsExpandable
@@ -224,7 +254,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     /// </summary>
     public FrameworkElement ParentElement
     {
-      get { return this.ParentNode as FrameworkElement; }
+      get
+      {
+        return this.ParentNode as FrameworkElement;
+      }
     }
     #endregion
 
@@ -286,7 +319,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     /// Get the PropertyContainerStyle for sub items of this property.
     /// It return the value defined on PropertyGrid.PropertyContainerStyle.
     /// </summary>
-    public Style PropertyContainerStyle 
+    public Style PropertyContainerStyle
     {
       get
       {
@@ -379,6 +412,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     internal PropertyItemBase()
     {
+      this.DataContext = this;
       this.GotFocus += new RoutedEventHandler( PropertyItemBase_GotFocus );
       this.RequestBringIntoView += this.PropertyItemBase_RequestBringIntoView;
       AddHandler( PropertyItemsControl.PreparePropertyItemEvent, new PropertyItemEventHandler( OnPreparePropertyItemInternal ) );
@@ -447,7 +481,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
     private void PropertyItemBase_GotFocus( object sender, RoutedEventArgs e )
-    { 
+    {
       IsSelected = true;
       // Handle the event; otherwise, the possible 
       // parent property item will select itself too.
@@ -460,10 +494,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       // First check that the raised property is actually a real CLR property.
       // This could be something else like an Attached DP.
-      if( ReflectionHelper.IsPublicInstanceProperty( GetType(), e.Property.Name ) 
-        && this.IsLoaded 
-        && (_parentNode != null) 
-        && !_parentNode.ContainerHelper.IsCleaning)
+      if( ReflectionHelper.IsPublicInstanceProperty( GetType(), e.Property.Name )
+        && this.IsLoaded
+        && ( _parentNode != null )
+        && !_parentNode.ContainerHelper.IsCleaning )
       {
         this.RaisePropertyChanged( e.Property.Name );
       }
@@ -471,7 +505,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private PropertyDefinitionCollection GetPropertItemPropertyDefinitions()
     {
-      if( (this.ParentNode != null) && (this.ParentNode.PropertyDefinitions != null) )
+      if( ( this.ParentNode != null ) && ( this.ParentNode.PropertyDefinitions != null ) )
       {
         var name = this.GetPropertyItemName();
         foreach( var pd in this.ParentNode.PropertyDefinitions )
@@ -490,7 +524,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
               {
                 var targetPropertyType = targetProperty as Type;
                 // PropertyDefinitions contains a PropertyDefinition for this PropertyItem Type => return its PropertyDefinitions.
-                if( (targetPropertyType != null) && targetPropertyType.IsAssignableFrom( type ) )
+                if( ( targetPropertyType != null ) && targetPropertyType.IsAssignableFrom( type ) )
                   return pd.PropertyDefinitions;
               }
             }
@@ -511,14 +545,17 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     Style IPropertyContainer.PropertyContainerStyle
     {
-      get { return this.PropertyContainerStyle; }
+      get
+      {
+        return this.PropertyContainerStyle;
+      }
     }
 
     EditorDefinitionCollection IPropertyContainer.EditorDefinitions
     {
       get
       {
-        return (this.ParentNode != null) ? this.ParentNode.EditorDefinitions : null;
+        return ( this.ParentNode != null ) ? this.ParentNode.EditorDefinitions : null;
       }
     }
 
@@ -530,7 +567,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
-    ContainerHelperBase IPropertyContainer.ContainerHelper 
+    ContainerHelperBase IPropertyContainer.ContainerHelper
     {
       get
       {
@@ -538,7 +575,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
-    bool IPropertyContainer.IsCategorized 
+    bool IPropertyContainer.IsCategorized
     {
       get
       {
@@ -562,7 +599,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         {
           var propertyItemPropertyDefinitions = this.GetPropertItemPropertyDefinitions();
           // No PropertyDefinitions specified : show all properties of this PropertyItem.
-          if( (propertyItemPropertyDefinitions == null) || (propertyItemPropertyDefinitions.Count == 0) )
+          if( ( propertyItemPropertyDefinitions == null ) || ( propertyItemPropertyDefinitions.Count == 0 ) )
             return true;
 
           // A PropertyDefinitions is specified : show only the properties of the PropertyDefinitions from this PropertyItem.
@@ -582,7 +619,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     FilterInfo IPropertyContainer.FilterInfo
     {
-      get { return new FilterInfo(); }
+      get
+      {
+        return new FilterInfo();
+      }
     }
 
     bool? IPropertyContainer.IsPropertyVisible( PropertyDescriptor pd )
@@ -597,7 +637,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
 
 
-#endregion
+    #endregion
 
   }
 }

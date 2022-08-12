@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -18,8 +18,8 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 #if VS2008
 using Microsoft.Windows.Controls;
@@ -49,7 +49,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       get
       {
-        return (object)GetValue( DropDownButtonContentProperty );
+        return ( object )GetValue( DropDownButtonContentProperty );
       }
       set
       {
@@ -66,7 +66,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       get
       {
-        return (object)GetValue( DropDownButtonDisabledContentProperty );
+        return ( object )GetValue( DropDownButtonDisabledContentProperty );
       }
       set
       {
@@ -83,7 +83,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       get
       {
-        return (double)GetValue( DropDownButtonHeightProperty );
+        return ( double )GetValue( DropDownButtonHeightProperty );
       }
       set
       {
@@ -100,7 +100,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       get
       {
-        return (double)GetValue( DropDownButtonWidthProperty );
+        return ( double )GetValue( DropDownButtonWidthProperty );
       }
       set
       {

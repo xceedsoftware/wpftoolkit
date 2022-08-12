@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -45,7 +45,7 @@ namespace Xceed.Wpf.Toolkit.Panels
 
     // Using a DependencyProperty as the backing store for DelaySwitch.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty DelaySwitchProperty =
-      DependencyProperty.Register( "DelaySwitch", typeof( bool ), typeof( SwitchPresenter ), 
+      DependencyProperty.Register( "DelaySwitch", typeof( bool ), typeof( SwitchPresenter ),
         new UIPropertyMetadata( false ) );
 
     public bool DelaySwitch
@@ -87,7 +87,7 @@ namespace Xceed.Wpf.Toolkit.Panels
 
     internal static readonly DependencyProperty SwitchParentProperty =
       DependencyProperty.Register( "SwitchParent", typeof( SwitchPanel ), typeof( SwitchPresenter ),
-        new FrameworkPropertyMetadata( null, 
+        new FrameworkPropertyMetadata( null,
           new PropertyChangedCallback( SwitchPresenter.OnSwitchParentChanged ) ) );
 
     internal SwitchPanel SwitchParent
@@ -249,7 +249,7 @@ namespace Xceed.Wpf.Toolkit.Panels
       {
         Dictionary<string, Rect> newLocations = null;
         RoutedEventHandler onLoaded = null;
-        onLoaded = delegate( object sender, RoutedEventArgs e )
+        onLoaded = delegate ( object sender, RoutedEventArgs e )
         {
           FrameworkElement element = sender as FrameworkElement;
           element.Loaded -= onLoaded;

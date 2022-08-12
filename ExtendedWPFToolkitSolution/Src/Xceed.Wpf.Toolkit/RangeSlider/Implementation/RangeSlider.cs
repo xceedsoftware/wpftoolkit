@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -75,7 +75,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (AutoToolTipPlacement)GetValue( RangeSlider.AutoToolTipPlacementProperty );
+        return ( AutoToolTipPlacement )GetValue( RangeSlider.AutoToolTipPlacementProperty );
       }
       set
       {
@@ -88,7 +88,7 @@ namespace Xceed.Wpf.Toolkit
       var rangeSlider = sender as RangeSlider;
       if( rangeSlider != null )
       {
-        rangeSlider.OnAutoToolTipPlacementChanged( (AutoToolTipPlacement)e.OldValue, (AutoToolTipPlacement)e.NewValue );
+        rangeSlider.OnAutoToolTipPlacementChanged( ( AutoToolTipPlacement )e.OldValue, ( AutoToolTipPlacement )e.NewValue );
       }
     }
 
@@ -107,7 +107,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (int)GetValue( RangeSlider.AutoToolTipPrecisionProperty );
+        return ( int )GetValue( RangeSlider.AutoToolTipPrecisionProperty );
       }
       set
       {
@@ -129,7 +129,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Brush)GetValue( RangeSlider.HigherRangeBackgroundProperty );
+        return ( Brush )GetValue( RangeSlider.HigherRangeBackgroundProperty );
       }
       set
       {
@@ -151,7 +151,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Style)this.GetValue( RangeSlider.HigherRangeStyleProperty );
+        return ( Style )this.GetValue( RangeSlider.HigherRangeStyleProperty );
       }
       set
       {
@@ -176,7 +176,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( RangeSlider.HigherRangeWidthProperty );
+        return ( double )GetValue( RangeSlider.HigherRangeWidthProperty );
       }
       private set
       {
@@ -198,7 +198,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Brush)GetValue( RangeSlider.HigherThumbBackgroundProperty );
+        return ( Brush )GetValue( RangeSlider.HigherThumbBackgroundProperty );
       }
       set
       {
@@ -219,7 +219,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( RangeSlider.HigherValueProperty );
+        return ( double )GetValue( RangeSlider.HigherValueProperty );
       }
       set
       {
@@ -229,14 +229,14 @@ namespace Xceed.Wpf.Toolkit
 
     private static object OnCoerceHigherValueChanged( DependencyObject d, object basevalue )
     {
-      var rangeSlider = (RangeSlider)d;
-      if( (rangeSlider == null) || !rangeSlider.IsLoaded)
+      var rangeSlider = ( RangeSlider )d;
+      if( ( rangeSlider == null ) || !rangeSlider.IsLoaded )
         return basevalue;
 
       var min = Math.Min( rangeSlider.Minimum, rangeSlider.Maximum );
       var max = Math.Max( rangeSlider.Minimum, rangeSlider.Maximum );
-      var higherValue = Math.Max( rangeSlider.Minimum, Math.Min( rangeSlider.Maximum, (double)basevalue ) );
-      higherValue = Math.Max( rangeSlider.LowerValue, ( double)basevalue );
+      var higherValue = Math.Max( rangeSlider.Minimum, Math.Min( rangeSlider.Maximum, ( double )basevalue ) );
+      higherValue = Math.Max( rangeSlider.LowerValue, ( double )basevalue );
 
       return higherValue;
     }
@@ -246,7 +246,7 @@ namespace Xceed.Wpf.Toolkit
       RangeSlider rangeSlider = sender as RangeSlider;
       if( rangeSlider != null )
       {
-        rangeSlider.OnHigherValueChanged( (double)args.OldValue, (double)args.NewValue );
+        rangeSlider.OnHigherValueChanged( ( double )args.OldValue, ( double )args.NewValue );
       }
     }
 
@@ -272,7 +272,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (bool)GetValue( RangeSlider.IsDeferredUpdateValuesProperty );
+        return ( bool )GetValue( RangeSlider.IsDeferredUpdateValuesProperty );
       }
       set
       {
@@ -291,7 +291,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (bool)GetValue( RangeSlider.IsSnapToTickEnabledProperty );
+        return ( bool )GetValue( RangeSlider.IsSnapToTickEnabledProperty );
       }
       set
       {
@@ -313,7 +313,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Brush)GetValue( RangeSlider.LowerRangeBackgroundProperty );
+        return ( Brush )GetValue( RangeSlider.LowerRangeBackgroundProperty );
       }
       set
       {
@@ -335,7 +335,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Style)this.GetValue( RangeSlider.LowerRangeStyleProperty );
+        return ( Style )this.GetValue( RangeSlider.LowerRangeStyleProperty );
       }
       set
       {
@@ -360,7 +360,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( RangeSlider.LowerRangeWidthProperty );
+        return ( double )GetValue( RangeSlider.LowerRangeWidthProperty );
       }
       private set
       {
@@ -381,7 +381,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Brush)GetValue( RangeSlider.LowerThumbBackgroundProperty );
+        return ( Brush )GetValue( RangeSlider.LowerThumbBackgroundProperty );
       }
       set
       {
@@ -402,7 +402,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( RangeSlider.LowerValueProperty );
+        return ( double )GetValue( RangeSlider.LowerValueProperty );
       }
       set
       {
@@ -412,14 +412,14 @@ namespace Xceed.Wpf.Toolkit
 
     private static object OnCoerceLowerValueChanged( DependencyObject d, object basevalue )
     {
-      var rangeSlider = (RangeSlider)d;
-      if( (rangeSlider == null) || !rangeSlider.IsLoaded )
+      var rangeSlider = ( RangeSlider )d;
+      if( ( rangeSlider == null ) || !rangeSlider.IsLoaded )
         return basevalue;
 
       var min = Math.Min( rangeSlider.Minimum, rangeSlider.Maximum );
       var max = Math.Max( rangeSlider.Minimum, rangeSlider.Maximum );
-      var lowerValue = Math.Max( rangeSlider.Minimum, Math.Min( rangeSlider.Maximum, (double)basevalue ) );
-      lowerValue = Math.Min( (double)basevalue, rangeSlider.HigherValue );
+      var lowerValue = Math.Max( rangeSlider.Minimum, Math.Min( rangeSlider.Maximum, ( double )basevalue ) );
+      lowerValue = Math.Min( ( double )basevalue, rangeSlider.HigherValue );
 
       return lowerValue;
     }
@@ -429,7 +429,7 @@ namespace Xceed.Wpf.Toolkit
       RangeSlider rangeSlider = sender as RangeSlider;
       if( rangeSlider != null )
       {
-        rangeSlider.OnLowerValueChanged( (double)args.OldValue, (double)args.NewValue );
+        rangeSlider.OnLowerValueChanged( ( double )args.OldValue, ( double )args.NewValue );
       }
     }
 
@@ -455,7 +455,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( RangeSlider.MaximumProperty );
+        return ( double )GetValue( RangeSlider.MaximumProperty );
       }
       set
       {
@@ -468,7 +468,7 @@ namespace Xceed.Wpf.Toolkit
       RangeSlider rangeSlider = sender as RangeSlider;
       if( rangeSlider != null )
       {
-        rangeSlider.OnMaximumChanged( (double)args.OldValue, (double)args.NewValue );
+        rangeSlider.OnMaximumChanged( ( double )args.OldValue, ( double )args.NewValue );
       }
     }
 
@@ -490,7 +490,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( RangeSlider.MinimumProperty );
+        return ( double )GetValue( RangeSlider.MinimumProperty );
       }
       set
       {
@@ -503,7 +503,7 @@ namespace Xceed.Wpf.Toolkit
       RangeSlider rangeSlider = sender as RangeSlider;
       if( rangeSlider != null )
       {
-        rangeSlider.OnMinimumChanged( (double)args.OldValue, (double)args.NewValue );
+        rangeSlider.OnMinimumChanged( ( double )args.OldValue, ( double )args.NewValue );
       }
     }
 
@@ -527,7 +527,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Orientation)GetValue( RangeSlider.OrientationProperty );
+        return ( Orientation )GetValue( RangeSlider.OrientationProperty );
       }
       set
       {
@@ -540,7 +540,7 @@ namespace Xceed.Wpf.Toolkit
       RangeSlider rangeSlider = sender as RangeSlider;
       if( rangeSlider != null )
       {
-        rangeSlider.OnOrientationChanged( (Orientation)e.OldValue, (Orientation)e.NewValue );
+        rangeSlider.OnOrientationChanged( ( Orientation )e.OldValue, ( Orientation )e.NewValue );
       }
     }
 
@@ -562,7 +562,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Brush)GetValue( RangeSlider.RangeBackgroundProperty );
+        return ( Brush )GetValue( RangeSlider.RangeBackgroundProperty );
       }
       set
       {
@@ -584,7 +584,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Style)this.GetValue( RangeSlider.RangeStyleProperty );
+        return ( Style )this.GetValue( RangeSlider.RangeStyleProperty );
       }
       set
       {
@@ -608,7 +608,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( RangeSlider.RangeWidthProperty );
+        return ( double )GetValue( RangeSlider.RangeWidthProperty );
       }
       private set
       {
@@ -629,7 +629,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( RangeSlider.StepProperty );
+        return ( double )GetValue( RangeSlider.StepProperty );
       }
       set
       {
@@ -640,7 +640,7 @@ namespace Xceed.Wpf.Toolkit
     private static object CoerceStep( DependencyObject sender, object value )
     {
       RangeSlider rangeSlider = sender as RangeSlider;
-      double newValue = (double)value;
+      double newValue = ( double )value;
 
       return Math.Max( 0.01, newValue );
     }
@@ -658,7 +658,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( RangeSlider.TickFrequencyProperty );
+        return ( double )GetValue( RangeSlider.TickFrequencyProperty );
       }
       set
       {
@@ -671,7 +671,7 @@ namespace Xceed.Wpf.Toolkit
       var rangeSlider = sender as RangeSlider;
       if( rangeSlider != null )
       {
-        rangeSlider.OnTickFrequencyChanged( (double)args.OldValue, (double)args.NewValue );
+        rangeSlider.OnTickFrequencyChanged( ( double )args.OldValue, ( double )args.NewValue );
       }
     }
 
@@ -690,7 +690,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (TickPlacement)GetValue( RangeSlider.TickPlacementProperty );
+        return ( TickPlacement )GetValue( RangeSlider.TickPlacementProperty );
       }
       set
       {
@@ -703,7 +703,7 @@ namespace Xceed.Wpf.Toolkit
       var rangeSlider = sender as RangeSlider;
       if( rangeSlider != null )
       {
-        rangeSlider.OnTickPlacementChanged( (TickPlacement)e.OldValue, (TickPlacement)e.NewValue );
+        rangeSlider.OnTickPlacementChanged( ( TickPlacement )e.OldValue, ( TickPlacement )e.NewValue );
       }
     }
 
@@ -800,7 +800,7 @@ namespace Xceed.Wpf.Toolkit
     {
       if( slider != null )
       {
-        var track = (Track)slider.Template.FindName( "PART_Track", slider );
+        var track = ( Track )slider.Template.FindName( "PART_Track", slider );
         if( track != null )
         {
           var thumb = track.Thumb;
@@ -814,7 +814,7 @@ namespace Xceed.Wpf.Toolkit
     {
       if( slider != null )
       {
-        var track = (Track)slider.Template.FindName( "PART_Track", slider );
+        var track = ( Track )slider.Template.FindName( "PART_Track", slider );
         if( track != null )
         {
           var thumb = track.Thumb;
@@ -846,7 +846,7 @@ namespace Xceed.Wpf.Toolkit
         higherSliderThumbWidth = RangeSlider.GetThumbHeight( _higherSlider );
       }
 
-      actualWidth -= (lowerSliderThumbWidth + higherSliderThumbWidth);
+      actualWidth -= ( lowerSliderThumbWidth + higherSliderThumbWidth );
 
       if( !this.IsDeferredUpdateValues || ( _deferredUpdateValue == null ) )
       {
@@ -858,14 +858,14 @@ namespace Xceed.Wpf.Toolkit
 
       if( entireRange > 0 )
       {
-        var higherValue = this.IsDeferredUpdateValues && isHigherValueChanged && (_deferredUpdateValue != null ) ? _deferredUpdateValue.Value : cv.HigherValue;
+        var higherValue = this.IsDeferredUpdateValues && isHigherValueChanged && ( _deferredUpdateValue != null ) ? _deferredUpdateValue.Value : cv.HigherValue;
         var lowerValue = this.IsDeferredUpdateValues && !isHigherValueChanged && ( _deferredUpdateValue != null ) ? _deferredUpdateValue.Value : cv.LowerValue;
 
-        this.HigherRangeWidth = (actualWidth * (cv.Maximum - higherValue ) ) / entireRange;
+        this.HigherRangeWidth = ( actualWidth * ( cv.Maximum - higherValue ) ) / entireRange;
 
-        this.RangeWidth = (actualWidth * ( higherValue - lowerValue ) ) / entireRange;
+        this.RangeWidth = ( actualWidth * ( higherValue - lowerValue ) ) / entireRange;
 
-        this.LowerRangeWidth = (actualWidth * ( lowerValue - cv.Minimum)) / entireRange;
+        this.LowerRangeWidth = ( actualWidth * ( lowerValue - cv.Minimum ) ) / entireRange;
       }
       else
       {
@@ -877,7 +877,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void SetSlidersMargins()
     {
-      if( (_lowerSlider != null) && (_higherSlider != null) )
+      if( ( _lowerSlider != null ) && ( _higherSlider != null ) )
       {
         if( this.Orientation == Orientation.Horizontal )
         {
@@ -1036,7 +1036,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void LowerSlider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
     {
-      if( (_lowerSlider != null) && _lowerSlider.IsLoaded )
+      if( ( _lowerSlider != null ) && _lowerSlider.IsLoaded )
       {
         if( !this.IsDeferredUpdateValues )
         {
@@ -1052,7 +1052,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void HigherSlider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
     {
-      if( ( _higherSlider != null) && _higherSlider.IsLoaded )
+      if( ( _higherSlider != null ) && _higherSlider.IsLoaded )
       {
         if( !this.IsDeferredUpdateValues )
         {

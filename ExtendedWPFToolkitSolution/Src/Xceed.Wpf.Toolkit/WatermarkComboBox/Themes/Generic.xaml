@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -95,16 +95,8 @@
                   <Border x:Name="templateRoot"
                           BorderBrush="{TemplateBinding BorderBrush}"
                           BorderThickness="{TemplateBinding BorderThickness}"
-                          SnapsToDevicePixels="True">
-                    <Border.Background>
-                      <LinearGradientBrush EndPoint="0,1"
-                                           StartPoint="0,0">
-                        <GradientStop Color="#FFF0F0F0"
-                                      Offset="0" />
-                        <GradientStop Color="#FFE5E5E5"
-                                      Offset="1" />
-                      </LinearGradientBrush>
-                    </Border.Background>
+                          SnapsToDevicePixels="True"
+                          Background="{Binding WatermarkBackground, RelativeSource={RelativeSource AncestorType={x:Type local:WatermarkComboBox}}}">
                     <Border x:Name="splitBorder"
                             BorderBrush="Transparent"
                             BorderThickness="1"
@@ -131,6 +123,8 @@
                                    Value="false" />
                         <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}"
                                    Value="true" />
+                        <Condition Binding="{Binding WatermarkBackground, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ComboBox}}}"
+                                   Value="{x:Null}" />
                       </MultiDataTrigger.Conditions>
                       <Setter Property="Background"
                               TargetName="templateRoot"
@@ -154,6 +148,8 @@
                                    Value="true" />
                         <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ComboBox}}}"
                                    Value="false" />
+                        <Condition Binding="{Binding WatermarkBackground, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ComboBox}}}"
+                                   Value="{x:Null}" />
                       </MultiDataTrigger.Conditions>
                       <Setter Property="Background"
                               TargetName="templateRoot">
@@ -177,6 +173,8 @@
                                    Value="true" />
                         <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ComboBox}}}"
                                    Value="true" />
+                        <Condition Binding="{Binding WatermarkBackground, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ComboBox}}}"
+                                   Value="{x:Null}" />
                       </MultiDataTrigger.Conditions>
                       <Setter Property="Background"
                               TargetName="templateRoot"
@@ -212,6 +210,8 @@
                                    Value="true" />
                         <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ComboBox}}}"
                                    Value="false" />
+                        <Condition Binding="{Binding WatermarkBackground, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ComboBox}}}"
+                                   Value="{x:Null}" />
                       </MultiDataTrigger.Conditions>
                       <Setter Property="Background"
                               TargetName="templateRoot">
@@ -235,6 +235,8 @@
                                    Value="true" />
                         <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ComboBox}}}"
                                    Value="true" />
+                        <Condition Binding="{Binding WatermarkBackground, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ComboBox}}}"
+                                   Value="{x:Null}" />
                       </MultiDataTrigger.Conditions>
                       <Setter Property="Background"
                               TargetName="templateRoot"
@@ -270,6 +272,8 @@
                                    Value="false" />
                         <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ComboBox}}}"
                                    Value="false" />
+                        <Condition Binding="{Binding WatermarkBackground, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ComboBox}}}"
+                                   Value="{x:Null}" />
                       </MultiDataTrigger.Conditions>
                       <Setter Property="Background"
                               TargetName="templateRoot"
@@ -284,6 +288,8 @@
                                    Value="false" />
                         <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ComboBox}}}"
                                    Value="true" />
+                        <Condition Binding="{Binding WatermarkBackground, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ComboBox}}}"
+                                   Value="{x:Null}" />
                       </MultiDataTrigger.Conditions>
                       <Setter Property="Background"
                               TargetName="templateRoot"
@@ -316,7 +322,7 @@
                         SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
       <Border x:Name="Border"
-              Background="White"
+              Background="{TemplateBinding WatermarkBackground}"
               Margin="{TemplateBinding BorderThickness}"
               Visibility="Collapsed">
         <TextBox x:Name="PART_EditableTextBox"

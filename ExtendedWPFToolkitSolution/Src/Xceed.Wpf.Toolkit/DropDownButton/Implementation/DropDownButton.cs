@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -21,7 +21,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using Xceed.Wpf.Toolkit.Primitives;
 using System.Windows.Media;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 
@@ -135,7 +134,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (PlacementMode)GetValue( DropDownPositionProperty );
+        return ( PlacementMode )GetValue( DropDownPositionProperty );
       }
       set
       {
@@ -221,7 +220,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( MaxDropDownHeightProperty );
+        return ( double )GetValue( MaxDropDownHeightProperty );
       }
       set
       {
@@ -233,7 +232,7 @@ namespace Xceed.Wpf.Toolkit
     {
       var dropDownButton = o as DropDownButton;
       if( dropDownButton != null )
-        dropDownButton.OnMaxDropDownHeightChanged( (double)e.OldValue, (double)e.NewValue );
+        dropDownButton.OnMaxDropDownHeightChanged( ( double )e.OldValue, ( double )e.NewValue );
     }
 
     protected virtual void OnMaxDropDownHeightChanged( double oldValue, double newValue )
@@ -376,7 +375,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void OnMouseDownOutsideCapturedElement( object sender, MouseButtonEventArgs e )
     {
-      if( (_popup != null) && !_popup.IsMouseDirectlyOver )
+      if( ( _popup != null ) && !_popup.IsMouseDirectlyOver )
       {
         this.CloseDropDown( true );
       }
@@ -397,7 +396,7 @@ namespace Xceed.Wpf.Toolkit
       // Set the focus on the content of the ContentPresenter.
       if( _contentPresenter != null )
       {
-        _contentPresenter.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+        _contentPresenter.MoveFocus( new TraversalRequest( FocusNavigationDirection.First ) );
       }
     }
 
@@ -431,7 +430,7 @@ namespace Xceed.Wpf.Toolkit
       }
       ReleaseMouseCapture();
 
-      if( isFocusOnButton && (this.Button != null) )
+      if( isFocusOnButton && ( this.Button != null ) )
       {
         Button.Focus();
       }

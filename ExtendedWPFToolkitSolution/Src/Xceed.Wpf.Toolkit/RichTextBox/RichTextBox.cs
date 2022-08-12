@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -18,7 +18,6 @@
 using System;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Threading;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -109,7 +108,7 @@ namespace Xceed.Wpf.Toolkit
     protected override void OnTextChanged( System.Windows.Controls.TextChangedEventArgs e )
     {
       this.UpdateTextFromDocument();
-      base.OnTextChanged( e );     
+      base.OnTextChanged( e );
     }
 
     private void UpdateTextFromDocument()

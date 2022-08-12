@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -67,7 +67,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     {
       var _binding = new Binding( "Value" );
       _binding.Source = propertyItem;
-      _binding.UpdateSourceTrigger = (Editor is InputBase) ? UpdateSourceTrigger.PropertyChanged : UpdateSourceTrigger.Default;
+      _binding.UpdateSourceTrigger = ( Editor is InputBase ) ? UpdateSourceTrigger.PropertyChanged : UpdateSourceTrigger.Default;
       _binding.Mode = propertyItem.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay;
       _binding.Converter = CreateValueConverter();
       BindingOperations.SetBinding( Editor, ValueProperty, _binding );

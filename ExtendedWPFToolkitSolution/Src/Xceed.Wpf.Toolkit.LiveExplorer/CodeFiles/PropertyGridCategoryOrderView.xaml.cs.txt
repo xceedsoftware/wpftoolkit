@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,13 +15,8 @@
 
   *************************************************************************************/
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Windows;
-using System.Windows.Media;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using System.Diagnostics;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
 {
@@ -40,35 +35,63 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     [CategoryOrder( "Information", 1 )]
     [CategoryOrder( "Hobbies", 2 )]
     [CategoryOrder( "Connections", 3 )]
-    public class PersonOrdered : PersonBase { }
+    public class PersonOrdered : PersonBase
+    {
+    }
 
-    public class PersonNonOrdered : PersonBase { }
+    public class PersonNonOrdered : PersonBase
+    {
+    }
 
     public abstract class PersonBase
     {
       [Category( "Information" )]
-      public string FirstName { get; set; }
+      public string FirstName
+      {
+        get; set;
+      }
 
       [Category( "Information" )]
-      public string LastName { get; set; }
+      public string LastName
+      {
+        get; set;
+      }
 
       [Category( "Hobbies" )]
-      public bool Baseball { get; set; }
+      public bool Baseball
+      {
+        get; set;
+      }
 
       [Category( "Hobbies" )]
-      public bool Football { get; set; }
+      public bool Football
+      {
+        get; set;
+      }
 
       [Category( "Hobbies" )]
-      public bool Basketball { get; set; }
+      public bool Basketball
+      {
+        get; set;
+      }
 
       [Category( "Connections" )]
-      public string Father { get; set; }
+      public string Father
+      {
+        get; set;
+      }
 
       [Category( "Connections" )]
-      public string Mother { get; set; }
+      public string Mother
+      {
+        get; set;
+      }
 
       [Category( "Connections" )]
-      public bool HasChildren { get; set; }
+      public bool HasChildren
+      {
+        get; set;
+      }
 
       public static PersonBase InitPerson( PersonBase person )
       {

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,17 +16,13 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit.Converters
 {
-  [Obsolete("This class is no longer used internaly and may be removed in a future release")]
+  [Obsolete( "This class is no longer used internaly and may be removed in a future release" )]
   public class SliderThumbWidthConverter : IValueConverter
   {
     public object Convert( object value, Type targetType, object parameter, CultureInfo culture )

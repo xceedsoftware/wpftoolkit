@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,8 +16,8 @@
   ***********************************************************************************/
 
 using System;
-using System.Windows;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Threading;
 
@@ -42,8 +42,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
               // Ensure that no pending calls are in the dispatcher queue
               Dispatcher.CurrentDispatcher.BeginInvoke( DispatcherPriority.SystemIdle, ( Action )delegate
                  {
-                              // Remove and add the binding to re-trigger the binding error
-                              dependencyObject.ClearValue( dpd.DependencyProperty );
+                   // Remove and add the binding to re-trigger the binding error
+                   dependencyObject.ClearValue( dpd.DependencyProperty );
                    BindingOperations.SetBinding( dependencyObject, dpd.DependencyProperty, binding.ParentBindingBase );
                  } );
             }

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -28,15 +28,24 @@ namespace Xceed.Wpf.Toolkit.Core.Converters
 
     public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
     {
-      var thickness = (Thickness)value;
-      var sideToRemove = int.Parse( (string)parameter );
+      var thickness = ( Thickness )value;
+      var sideToRemove = int.Parse( ( string )parameter );
       switch( sideToRemove )
       {
-        case 0: thickness.Left = 0d; break;
-        case 1: thickness.Top = 0d; break;
-        case 2: thickness.Right = 0d; break;
-        case 3: thickness.Bottom = 0d; break;
-        default: throw new InvalidContentException("parameter should be from 0 to 3 to specify the side to remove.");
+        case 0:
+          thickness.Left = 0d;
+          break;
+        case 1:
+          thickness.Top = 0d;
+          break;
+        case 2:
+          thickness.Right = 0d;
+          break;
+        case 3:
+          thickness.Bottom = 0d;
+          break;
+        default:
+          throw new InvalidContentException( "parameter should be from 0 to 3 to specify the side to remove." );
       }
       return thickness;
     }

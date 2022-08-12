@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -21,7 +21,6 @@ using System.ComponentModel;
 using System.Windows.Data;
 using System;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using System.Linq;
 using System.Collections;
@@ -51,19 +50,28 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       DisplayNamePropertyName = ReflectionHelper.GetPropertyOrFieldName( () => p.DisplayName );
     }
 
-    public PropertyItemCollection(ObservableCollection<PropertyItem> editableCollection)
-      :base(editableCollection)
+    public PropertyItemCollection( ObservableCollection<PropertyItem> editableCollection )
+      : base( editableCollection )
     {
       EditableCollection = editableCollection;
     }
 
     internal Predicate<object> FilterPredicate
     {
-      get { return GetDefaultView().Filter; }
-      set { GetDefaultView().Filter = value; }
+      get
+      {
+        return GetDefaultView().Filter;
+      }
+      set
+      {
+        GetDefaultView().Filter = value;
+      }
     }
 
-    public ObservableCollection<PropertyItem> EditableCollection { get; private set; }
+    public ObservableCollection<PropertyItem> EditableCollection
+    {
+      get; private set;
+    }
 
     private ICollectionView GetDefaultView()
     {
@@ -175,7 +183,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
             }
 #endif
             property.HighlightedText = property.DisplayName.ToLower().Contains( text.ToLower() ) ? text : null;
-            return (property.HighlightedText != null);
+            return ( property.HighlightedText != null );
           }
 
           return false;

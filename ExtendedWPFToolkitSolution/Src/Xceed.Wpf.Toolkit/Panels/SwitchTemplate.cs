@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -28,7 +28,7 @@ namespace Xceed.Wpf.Toolkit.Panels
 
     public static readonly DependencyProperty IDProperty =
       DependencyProperty.RegisterAttached( "ID", typeof( string ), typeof( SwitchTemplate ),
-        new FrameworkPropertyMetadata( null, 
+        new FrameworkPropertyMetadata( null,
           new PropertyChangedCallback( SwitchTemplate.OnIDChanged ) ) );
 
     public static string GetID( DependencyObject d )
@@ -54,7 +54,7 @@ namespace Xceed.Wpf.Toolkit.Panels
       else
       {
         d.Dispatcher.BeginInvoke( DispatcherPriority.Loaded,
-            ( ThreadStart )delegate()
+            ( ThreadStart )delegate ()
         {
           parentPresenter = VisualTreeHelperEx.FindAncestorByType<SwitchPresenter>( d );
           if( parentPresenter != null )

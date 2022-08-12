@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -70,56 +70,12 @@
   </Style>
 
   <Style x:Key="TimeItemStyle"
-         TargetType="ListBoxItem">
+         TargetType="{x:Type ListBoxItem}">
     <Style.Setters>
-    <Setter Property="Padding"
+      <Setter Property="Padding"
               Value="4" />
     </Style.Setters>
-    <Style.Triggers>
-      <!-- MouseOver Only -->
-      <MultiTrigger>
-        <MultiTrigger.Conditions>
-          <Condition Property="IsMouseOver"
-                     Value="True" />
-          <Condition Property="IsSelected"
-                     Value="False" />
-        </MultiTrigger.Conditions>
-        <Setter Property="Background"
-                Value="#FFB8E0F3" />
-        <Setter Property="BorderBrush"
-                Value="#FF26A0DA" />
-      </MultiTrigger>
-
-      <!-- Selected Only -->
-      <MultiTrigger>
-        <MultiTrigger.Conditions>
-          <Condition Property="IsMouseOver"
-                     Value="False" />
-          <Condition Property="IsSelected"
-                     Value="True" />
-        </MultiTrigger.Conditions>
-        <Setter Property="Background"
-                Value="#FFC4E5F6" />
-        <Setter Property="BorderBrush"
-                Value="#FF26A0DA" />
-      </MultiTrigger>
-
-      <!-- MouseOver + Selected -->
-      <MultiTrigger>
-        <MultiTrigger.Conditions>
-          <Condition Property="IsMouseOver"
-                     Value="True" />
-          <Condition Property="IsSelected"
-                     Value="True" />
-        </MultiTrigger.Conditions>
-        <Setter Property="Background"
-                Value="#FFD1E8FF" />
-        <Setter Property="BorderBrush"
-                Value="#FF66A7E8" />
-      </MultiTrigger>
-    </Style.Triggers>
   </Style>
-
 
   <!-- =============================================================================== -->
   <!-- TimePicker                                                                      -->
@@ -156,6 +112,8 @@
             Value="{StaticResource DropDownArrowGlyph}" />
     <Setter Property="DropDownButtonDisabledContent"
             Value="{StaticResource DropDownDisabledArrowGlyph}" />
+    <Setter Property="TimeListItemsStyle"
+            Value="{StaticResource TimeItemStyle}" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:TimePicker}">
@@ -243,7 +201,7 @@
                   <ListBox x:Name="PART_TimeListItems"
                            BorderThickness="0"
                            DisplayMemberPath="Display"
-                           ItemContainerStyle="{StaticResource TimeItemStyle}" >
+                           ItemContainerStyle="{TemplateBinding TimeListItemsStyle}">
                   </ListBox>
                 </Grid>
               </Border>

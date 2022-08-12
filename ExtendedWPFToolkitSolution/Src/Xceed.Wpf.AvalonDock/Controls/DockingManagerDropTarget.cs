@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -45,6 +45,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void Drop( LayoutAnchorableFloatingWindow floatingWindow )
     {
+      if( ( floatingWindow != null )
+       && ( floatingWindow.Root != null )
+       && ( floatingWindow.Root.ActiveContent != null ) )
+      {
+        var currentActiveContent = floatingWindow.Root.ActiveContent;
+        currentActiveContent.IsFloating = false;
+      }
+
       switch( Type )
       {
         case DropTargetType.DockingManagerDockLeft:
@@ -235,7 +243,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
           break;
           #endregion
       }
-
 
       base.Drop( floatingWindow );
     }

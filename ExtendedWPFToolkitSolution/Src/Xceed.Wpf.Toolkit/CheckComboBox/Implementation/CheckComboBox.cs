@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -68,7 +68,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (bool)GetValue( IsEditableProperty );
+        return ( bool )GetValue( IsEditableProperty );
       }
       set
       {
@@ -98,7 +98,7 @@ namespace Xceed.Wpf.Toolkit
     {
       var checkComboBox = o as CheckComboBox;
       if( checkComboBox != null )
-        checkComboBox.OnTextChanged( (string)e.OldValue, (string)e.NewValue );
+        checkComboBox.OnTextChanged( ( string )e.OldValue, ( string )e.NewValue );
     }
 
     protected virtual void OnTextChanged( string oldValue, string newValue )
@@ -264,8 +264,8 @@ namespace Xceed.Wpf.Toolkit
     private void Popup_Opened( object sender, EventArgs e )
     {
       UIElement item = ItemContainerGenerator.ContainerFromItem( SelectedItem ) as UIElement;
-      if( (item == null) && (Items.Count > 0) )
-        item = ItemContainerGenerator.ContainerFromItem( Items[0] ) as UIElement;
+      if( ( item == null ) && ( Items.Count > 0 ) )
+        item = ItemContainerGenerator.ContainerFromItem( Items[ 0 ] ) as UIElement;
       if( item != null )
         item.Focus();
     }
@@ -310,6 +310,12 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void UpdateText()
     {
+      if( Items.Count == SelectedItems.Count )
+      {
+        SetCurrentValue( CheckComboBox.TextProperty, AllItemsSelectedContent );
+        return;
+      }
+
 #if VS2008
       string newValue = String.Join( Delimiter, SelectedItems.Cast<object>().Select( x => GetItemDisplayValue( x ).ToString() ).ToArray() ); 
 #else
@@ -398,6 +404,6 @@ namespace Xceed.Wpf.Toolkit
         Focus();
     }
 
-#endregion //Methods
+    #endregion //Methods
   }
 }

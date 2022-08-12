@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -72,7 +72,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (bool)GetValue( IsUsingZoomOnMouseWheelProperty );
+        return ( bool )GetValue( IsUsingZoomOnMouseWheelProperty );
       }
       set
       {
@@ -155,7 +155,7 @@ namespace Xceed.Wpf.Toolkit
 
     #region ZoomFactor
 
-    public static readonly DependencyProperty ZoomFactorProperty = DependencyProperty.Register( "ZoomFactor", typeof( double ), typeof( Magnifier ), new FrameworkPropertyMetadata( 0.5, OnZoomFactorPropertyChanged), OnValidationCallback );
+    public static readonly DependencyProperty ZoomFactorProperty = DependencyProperty.Register( "ZoomFactor", typeof( double ), typeof( Magnifier ), new FrameworkPropertyMetadata( 0.5, OnZoomFactorPropertyChanged ), OnValidationCallback );
     public double ZoomFactor
     {
       get
@@ -195,7 +195,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( ZoomFactorOnMouseWheelProperty );
+        return ( double )GetValue( ZoomFactorOnMouseWheelProperty );
       }
       set
       {
@@ -205,13 +205,13 @@ namespace Xceed.Wpf.Toolkit
 
     private static bool OnZoomFactorOnMouseWheelValidationCallback( object baseValue )
     {
-      double zoomFactorOnMouseWheel = (double)baseValue;
-      return (zoomFactorOnMouseWheel >= 0);
+      double zoomFactorOnMouseWheel = ( double )baseValue;
+      return ( zoomFactorOnMouseWheel >= 0 );
     }
 
     private static void OnZoomFactorOnMouseWheelPropertyChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
-      Magnifier m = (Magnifier)d;
+      Magnifier m = ( Magnifier )d;
       m.OnZoomFactorOnMouseWheelChanged( e );
     }
 
@@ -250,12 +250,12 @@ namespace Xceed.Wpf.Toolkit
       if( this.FrameType == Toolkit.FrameType.Circle )
       {
         double newSize = Radius * 2;
-        if(!DoubleHelper.AreVirtuallyEqual( Width, newSize ))
+        if( !DoubleHelper.AreVirtuallyEqual( Width, newSize ) )
         {
           Width = newSize;
         }
 
-        if(!DoubleHelper.AreVirtuallyEqual( Height, newSize ))
+        if( !DoubleHelper.AreVirtuallyEqual( Height, newSize ) )
         {
           Height = newSize;
         }
@@ -302,9 +302,9 @@ namespace Xceed.Wpf.Toolkit
       if( !IsInitialized )
         return;
 
-      ViewBox = new Rect( 
-        ViewBox.Location, 
-        new Size( ActualWidth * ZoomFactor , ActualHeight * ZoomFactor ) );
+      ViewBox = new Rect(
+        ViewBox.Location,
+        new Size( ActualWidth * ZoomFactor, ActualHeight * ZoomFactor ) );
     }
 
     #endregion //Methods

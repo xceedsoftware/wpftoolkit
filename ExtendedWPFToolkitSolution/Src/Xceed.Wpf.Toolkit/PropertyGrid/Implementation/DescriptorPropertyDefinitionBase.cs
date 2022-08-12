@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -25,7 +25,6 @@ using System.Windows.Media;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 using System.Diagnostics;
 using System.ComponentModel;
-using System.Windows.Markup.Primitives;
 using System.Windows.Data;
 #if !VS2008
 using System.ComponentModel.DataAnnotations;
@@ -249,7 +248,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     internal void UpdateIsExpandable()
     {
-      this.IsExpandable = this.ComputeIsExpandable() 
+      this.IsExpandable = this.ComputeIsExpandable()
                           && ( this.ExpandableAttribute
                              );
     }
@@ -283,7 +282,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 #endif
 
       var descriptionAtt = PropertyGridUtilities.GetAttribute<DescriptionAttribute>( pd );
-      return (descriptionAtt != null)
+      return ( descriptionAtt != null )
               ? descriptionAtt.Description
               : pd.Description;
     }
@@ -293,7 +292,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       PropertyDescriptor pd = item as PropertyDescriptor;
       var attribute = PropertyGridUtilities.GetAttribute<NewItemTypesAttribute>( pd );
 
-      return (attribute != null)
+      return ( attribute != null )
               ? attribute.Types
               : null;
     }
@@ -323,15 +322,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
         if( this.IsPropertyGridCategorized )
         {
-          var attribute = list.FirstOrDefault( x => ((x.UsageContext == UsageContextEnum.Categorized)
-                                                    || (x.UsageContext == UsageContextEnum.Both)) );
+          var attribute = list.FirstOrDefault( x => ( ( x.UsageContext == UsageContextEnum.Categorized )
+                                                    || ( x.UsageContext == UsageContextEnum.Both ) ) );
           if( attribute != null )
             return attribute.Order;
         }
         else
         {
-          var attribute = list.FirstOrDefault( x => ((x.UsageContext == UsageContextEnum.Alphabetical)
-                                                    || (x.UsageContext == UsageContextEnum.Both)) );
+          var attribute = list.FirstOrDefault( x => ( ( x.UsageContext == UsageContextEnum.Alphabetical )
+                                                    || ( x.UsageContext == UsageContextEnum.Both ) ) );
           if( attribute != null )
             return attribute.Order;
         }
@@ -343,10 +342,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     internal object ComputeExpandableAttributeForItem( object item )
     {
-      var pd = (PropertyDescriptor)item;
+      var pd = ( PropertyDescriptor )item;
 
       var attribute = PropertyGridUtilities.GetAttribute<ExpandableObjectAttribute>( pd );
-      return (attribute != null);
+      return ( attribute != null );
     }
 
     internal int ComputeDisplayOrderInternal( bool isPropertyGridCategorized )
@@ -400,7 +399,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         affectedPropertyItem = sender as PropertyItem;
       }
 
-      e.CanExecute = ( (affectedPropertyItem != null) && ( affectedPropertyItem.DescriptorDefinition != null) ) 
+      e.CanExecute = ( ( affectedPropertyItem != null ) && ( affectedPropertyItem.DescriptorDefinition != null ) )
                       ? affectedPropertyItem.DescriptorDefinition.ComputeCanResetValue()
                       : false;
     }
@@ -411,11 +410,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         var displayName = PropertyDescriptor.DisplayName;
 #else
       var displayAttribute = PropertyGridUtilities.GetAttribute<DisplayAttribute>( PropertyDescriptor );
-      var displayName = (displayAttribute != null) ? displayAttribute.GetName() : PropertyDescriptor.DisplayName;
+      var displayName = ( displayAttribute != null ) ? displayAttribute.GetName() : PropertyDescriptor.DisplayName;
 #endif
 
       var attribute = PropertyGridUtilities.GetAttribute<ParenthesizePropertyNameAttribute>( PropertyDescriptor );
-      if( (attribute != null) && attribute.NeedParenthesis )
+      if( ( attribute != null ) && attribute.NeedParenthesis )
       {
         displayName = "(" + displayName + ")";
       }
@@ -428,7 +427,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( list.Count > 0 )
       {
         PropertyOrderAttribute both = list.FirstOrDefault( x => x.UsageContext == UsageContextEnum.Both );
-        if( (both != null) && (list.Count > 1) )
+        if( ( both != null ) && ( list.Count > 1 ) )
           Debug.Assert( false, "A PropertyItem can't have more than 1 PropertyOrderAttribute when it has UsageContext : Both" );
       }
     }
@@ -450,7 +449,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       get
       {
-        return (ImageSource)GetValue( AdvancedOptionsIconProperty );
+        return ( ImageSource )GetValue( AdvancedOptionsIconProperty );
       }
       set
       {
@@ -469,7 +468,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       get
       {
-        return (object)GetValue( AdvancedOptionsTooltipProperty );
+        return ( object )GetValue( AdvancedOptionsTooltipProperty );
       }
       set
       {
@@ -488,7 +487,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       get
       {
-        return (bool)GetValue( IsExpandableProperty );
+        return ( bool )GetValue( IsExpandableProperty );
       }
       set
       {
@@ -652,7 +651,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private static void OnValueChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
-      ((DescriptorPropertyDefinitionBase)o).OnValueChanged( e.OldValue, e.NewValue );
+      ( ( DescriptorPropertyDefinitionBase )o ).OnValueChanged( e.OldValue, e.NewValue );
     }
 
     internal virtual void OnValueChanged( object oldValue, object newValue )

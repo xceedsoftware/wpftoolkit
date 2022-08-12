@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -53,13 +53,13 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return new double[] { 
-		            3.0, 4.0, 5.0, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 
-		            10.0, 10.5, 11.0, 11.5, 12.0, 12.5, 13.0, 13.5, 14.0, 15.0,
-		            16.0, 17.0, 18.0, 19.0, 20.0, 22.0, 24.0, 26.0, 28.0, 30.0,
-		            32.0, 34.0, 36.0, 38.0, 40.0, 44.0, 48.0, 52.0, 56.0, 60.0, 64.0, 68.0, 72.0, 76.0,
-		            80.0, 88.0, 96.0, 104.0, 112.0, 120.0, 128.0, 136.0, 144.0
-		            };
+        return new double[] {
+                3.0, 4.0, 5.0, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5,
+                10.0, 10.5, 11.0, 11.5, 12.0, 12.5, 13.0, 13.5, 14.0, 15.0,
+                16.0, 17.0, 18.0, 19.0, 20.0, 22.0, 24.0, 26.0, 28.0, 30.0,
+                32.0, 34.0, 36.0, 38.0, 40.0, 44.0, 48.0, 52.0, 56.0, 60.0, 64.0, 68.0, 72.0, 76.0,
+                80.0, 88.0, 96.0, 104.0, 112.0, 120.0, 128.0, 136.0, 144.0
+                };
       }
     }
 
@@ -122,7 +122,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void Bullets_Clicked( object sender, RoutedEventArgs e )
     {
-      if( BothSelectionListsAreChecked() && ( _btnNumbers != null) )
+      if( BothSelectionListsAreChecked() && ( _btnNumbers != null ) )
       {
         _btnNumbers.IsChecked = false;
       }
@@ -130,7 +130,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void Numbers_Clicked( object sender, RoutedEventArgs e )
     {
-      if( BothSelectionListsAreChecked() && ( _btnBullets != null) )
+      if( BothSelectionListsAreChecked() && ( _btnBullets != null ) )
       {
         _btnBullets.IsChecked = false;
       }
@@ -294,7 +294,7 @@ namespace Xceed.Wpf.Toolkit
         return;
 
       FontFamily currentFontFamily = ( FontFamily )value;
-      if( (currentFontFamily != null) && ( _cmbFontFamilies != null) )
+      if( ( currentFontFamily != null ) && ( _cmbFontFamilies != null ) )
       {
         _cmbFontFamilies.SelectedItem = FontUtilities.GetFontFamilyName( currentFontFamily );
       }
@@ -328,7 +328,7 @@ namespace Xceed.Wpf.Toolkit
       if( value == DependencyProperty.UnsetValue )
         return;
 
-      Color? currentColor =  ( ( value == null )
+      Color? currentColor = ( ( value == null )
                               ? null
                               : ( Color? )( ( SolidColorBrush )value ).Color );
       if( _cmbFontColor != null )
@@ -362,7 +362,7 @@ namespace Xceed.Wpf.Toolkit
     /// </summary>
     private void UpdateSelectionListType()
     {
-      if( (_btnNumbers == null) || ( _btnBullets == null) )
+      if( ( _btnNumbers == null ) || ( _btnBullets == null ) )
         return;
 
       //uncheck both
@@ -395,8 +395,8 @@ namespace Xceed.Wpf.Toolkit
     /// <returns></returns>
     private bool BothSelectionListsAreChecked()
     {
-      return (( _btnBullets != null) && (_btnBullets.IsChecked == true) )
-          && (( _btnNumbers != null) && (_btnNumbers.IsChecked == true));
+      return ( ( _btnBullets != null ) && ( _btnBullets.IsChecked == true ) )
+          && ( ( _btnNumbers != null ) && ( _btnNumbers.IsChecked == true ) );
     }
 
     void ApplyPropertyValueToSelectedText( DependencyProperty formattingProperty, object value )
@@ -452,10 +452,10 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( (( _cmbFontFamilies != null) && _cmbFontFamilies.IsDropDownOpen)
-              || (( _cmbFontSizes != null) && _cmbFontSizes.IsDropDownOpen)
-              ||  (( _cmbFontBackgroundColor != null) && _cmbFontBackgroundColor.IsOpen)
-              || (( _cmbFontColor != null) && _cmbFontColor.IsOpen)
+        return ( ( ( _cmbFontFamilies != null ) && _cmbFontFamilies.IsDropDownOpen )
+              || ( ( _cmbFontSizes != null ) && _cmbFontSizes.IsDropDownOpen )
+              || ( ( _cmbFontBackgroundColor != null ) && _cmbFontBackgroundColor.IsOpen )
+              || ( ( _cmbFontColor != null ) && _cmbFontColor.IsOpen )
               || _waitingForMouseOver );
       }
     }

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -17,8 +17,8 @@
 
 using System;
 using System.Linq;
-using System.Windows.Controls;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -123,7 +123,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
         double height = double.IsNaN( this.Height )
                         ? this.Children.OfType<WindowControl>().Max( ( w ) => w.Top + w.DesiredSize.Height )
                         : this.Height;
-        return new Size( Math.Min( width, constraint.Width), Math.Min( height, constraint.Height) );
+        return new Size( Math.Min( width, constraint.Width ), Math.Min( height, constraint.Height ) );
       }
 
       return size;
@@ -316,7 +316,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       if( ( windowControl.ActualWidth != 0 ) && ( windowControl.ActualHeight != 0 ) )
       {
         windowControl.Left = ( this.ActualWidth - windowControl.ActualWidth ) / 2.0;
-        windowControl.Left += (windowControl.Margin.Left - windowControl.Margin.Right);
+        windowControl.Left += ( windowControl.Margin.Left - windowControl.Margin.Right );
         windowControl.Top = ( this.ActualHeight - windowControl.ActualHeight ) / 2.0;
         windowControl.Top += ( windowControl.Margin.Top - windowControl.Margin.Bottom );
       }
@@ -377,15 +377,15 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     private bool IsModalWindow( WindowControl windowControl )
     {
-      return ( ( ( windowControl is MessageBox ) && (windowControl.Visibility == Visibility.Visible) )
-             || ( ( windowControl is ChildWindow ) && ( ( ChildWindow )windowControl ).IsModal && ( ( ChildWindow )windowControl).WindowState == WindowState.Open ) );
+      return ( ( ( windowControl is MessageBox ) && ( windowControl.Visibility == Visibility.Visible ) )
+             || ( ( windowControl is ChildWindow ) && ( ( ChildWindow )windowControl ).IsModal && ( ( ChildWindow )windowControl ).WindowState == WindowState.Open ) );
     }
 
     private WindowControl GetModalWindow()
     {
       return this.Children.OfType<WindowControl>()
                       .OrderByDescending( ( x ) => Canvas.GetZIndex( x ) )
-                      .FirstOrDefault( ( x ) => IsModalWindow( x ) && (x.Visibility == Visibility.Visible) );
+                      .FirstOrDefault( ( x ) => IsModalWindow( x ) && ( x.Visibility == Visibility.Visible ) );
     }
 
     private double GetRestrictedLeft( WindowControl windowControl )

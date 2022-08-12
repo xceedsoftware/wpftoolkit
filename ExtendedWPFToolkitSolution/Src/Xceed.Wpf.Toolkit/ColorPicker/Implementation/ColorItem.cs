@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -38,11 +38,11 @@ namespace Xceed.Wpf.Toolkit
       Name = name;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals( object obj )
     {
       var ci = obj as ColorItem;
-      if (ci == null)
-          return false;
+      if( ci == null )
+        return false;
       return ( ci.Color.Equals( Color ) && ci.Name.Equals( Name ) );
     }
 

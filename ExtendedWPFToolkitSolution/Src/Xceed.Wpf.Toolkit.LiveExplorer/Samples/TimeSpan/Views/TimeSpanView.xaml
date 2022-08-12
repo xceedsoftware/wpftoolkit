@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -29,6 +29,45 @@
     </Paragraph>
   </local:DemoView.Description>
 
+  <local:DemoView.Resources>
+    <Style TargetType="CheckBox"
+           x:Key="ShowDaysAndShowSecondsStyle">
+      <Style.Triggers>
+        <MultiDataTrigger>
+          <MultiDataTrigger.Conditions>
+            <Condition Binding="{Binding IsChecked, ElementName=_showDays}"
+                       Value="False" />
+            <Condition Binding="{Binding IsChecked, ElementName=_showHours}"
+                       Value="False" />
+          </MultiDataTrigger.Conditions>
+          <Setter Property="IsEnabled"
+                  Value="False" />
+        </MultiDataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style TargetType="CheckBox"
+           x:Key="ShowHoursStyle">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsChecked, ElementName=_showDays}"
+                     Value="True">
+          <Setter Property="IsEnabled"
+                  Value="False" />
+        </DataTrigger>
+        <MultiDataTrigger>
+          <MultiDataTrigger.Conditions>
+            <Condition Binding="{Binding IsChecked, ElementName=_showDays}"
+                       Value="False" />
+            <Condition Binding="{Binding IsChecked, ElementName=_showSeconds}"
+                       Value="False" />
+          </MultiDataTrigger.Conditions>
+          <Setter Property="IsEnabled"
+                  Value="False" />
+        </MultiDataTrigger>
+      </Style.Triggers>
+    </Style>
+  </local:DemoView.Resources>
+
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
@@ -39,6 +78,7 @@
               HorizontalAlignment="Stretch">
       <Grid>
         <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
@@ -81,38 +121,54 @@
                   IsChecked="{Binding ShowDays, ElementName=_timeSpanUpDown}"
                   HorizontalAlignment="Left"
                   VerticalAlignment="Center"
-                  Margin="5,5,25,5" />
+                  ClickMode="Press"
+                  Margin="5,5,25,5"
+                  Style="{StaticResource ShowDaysAndShowSecondsStyle}" />
         <TextBlock Grid.Row="3"
+                   Text="ShowHours:"
+                   VerticalAlignment="Center" />
+        <CheckBox x:Name="_showHours"
+                  Grid.Row="3"
+                  Grid.Column="1"
+                  IsChecked="{Binding ShowHours, ElementName=_timeSpanUpDown}"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Center"
+                  ClickMode="Press"
+                  Margin="5,5,25,5"
+                  Style="{StaticResource ShowHoursStyle}" />
+        <TextBlock Grid.Row="4"
                    Text="ShowSeconds:"
                    VerticalAlignment="Center" />
         <CheckBox x:Name="_showSeconds"
-                  Grid.Row="3"
+                  Grid.Row="4"
                   Grid.Column="1"
                   IsChecked="{Binding ShowSeconds, ElementName=_timeSpanUpDown}"
                   HorizontalAlignment="Left"
                   VerticalAlignment="Center"
-                  Margin="5,5,25,5" />
-        <TextBlock Grid.Row="4"
+                  ClickMode="Press"
+                  Margin="5,5,25,5"
+                  Style="{StaticResource ShowDaysAndShowSecondsStyle}" />
+        <TextBlock Grid.Row="5"
                    Text="FractionalSecondsDigitsCount:"
                    VerticalAlignment="Center" />
         <xctk:IntegerUpDown x:Name="_fractionalSecondsDigitsCount"
-                            Grid.Row="4"
+                            Grid.Row="5"
                             Grid.Column="1"
                             Value="{Binding FractionalSecondsDigitsCount, ElementName=_timeSpanUpDown}"
                             Maximum="3"
                             Minimum="0"
                             HorizontalAlignment="Left"
                             Margin="5,5,25,5" />
-        <TextBlock Grid.Row="5"
+        <TextBlock Grid.Row="6"
                    Text="CurrentDateTimePart:"
                    VerticalAlignment="Center" />
         <ComboBox x:Name="_currentDateTimePart"
-                  Grid.Row="5"
+                  Grid.Row="6"
                   Grid.Column="1"
                   SelectedValue="{Binding CurrentDateTimePart, ElementName=_timeSpanUpDown}"
                   SelectedValuePath="Tag"
                   Margin="5,5,25,5"
-                  ToolTip="Must match a DateTimePart of the TimeSpanUpDown" >
+                  ToolTip="Must match a DateTimePart of the TimeSpanUpDown">
           <ComboBoxItem Content="Day"
                         Tag="{x:Static xctk:DateTimePart.Day}" />
           <ComboBoxItem Content="Hour24"
@@ -196,6 +252,7 @@
                            Minimum="-5.00:00:00"
                            ClipValueToMinMax="False"
                            ShowDays="True"
+                           ShowHours="True"
                            ShowSeconds="True"
                            FractionalSecondsDigitsCount="0"
                            CurrentDateTimePart="Hour24"

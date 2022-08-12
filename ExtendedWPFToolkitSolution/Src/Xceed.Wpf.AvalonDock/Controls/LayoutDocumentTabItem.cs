@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -63,7 +63,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// Model Dependency Property
     /// </summary>
-    public static readonly DependencyProperty ModelProperty =  DependencyProperty.Register( "Model", typeof( LayoutContent ), typeof( LayoutDocumentTabItem ),
+    public static readonly DependencyProperty ModelProperty = DependencyProperty.Register( "Model", typeof( LayoutContent ), typeof( LayoutDocumentTabItem ),
             new FrameworkPropertyMetadata( ( LayoutContent )null, new PropertyChangedCallback( OnModelChanged ) ) );
 
     /// <summary>
@@ -201,9 +201,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
               _mouseLastChangePositionX = currentTabScreenArea.Left + ( currentTabScreenArea.Width / 2 );
             }
 
-            if( ( containerPane is LayoutDocumentPane ) && !( (LayoutDocumentPane)containerPane ).CanRepositionItems )
+            if( ( containerPane is LayoutDocumentPane ) && !( ( LayoutDocumentPane )containerPane ).CanRepositionItems )
               return;
-            if( ( containerPane.Parent != null ) && ( containerPane.Parent is LayoutDocumentPaneGroup ) && !( (LayoutDocumentPaneGroup)containerPane.Parent ).CanRepositionItems )
+            if( ( containerPane.Parent != null ) && ( containerPane.Parent is LayoutDocumentPaneGroup ) && !( ( LayoutDocumentPaneGroup )containerPane.Parent ).CanRepositionItems )
               return;
 
             var childrenList = container.Children.ToList();

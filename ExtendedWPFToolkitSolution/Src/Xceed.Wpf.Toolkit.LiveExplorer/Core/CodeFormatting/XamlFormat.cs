@@ -149,12 +149,12 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
         return TokenizeElementWhitespace();
       else
         if( StartsWith( "/>" ) )
-          return TokenizeSimple( "/>", XmlTokenKind.SelfClose, XmlTokenizerMode.OutsideElement );
-        else
+        return TokenizeSimple( "/>", XmlTokenKind.SelfClose, XmlTokenizerMode.OutsideElement );
+      else
           if( StartsWith( ">" ) )
-            return TokenizeSimple( ">", XmlTokenKind.Close, XmlTokenizerMode.OutsideElement );
-          else
-            return TokenizeName( XmlTokenKind.AttributeName, XmlTokenizerMode.AfterAttributeName );
+        return TokenizeSimple( ">", XmlTokenKind.Close, XmlTokenizerMode.OutsideElement );
+      else
+        return TokenizeName( XmlTokenKind.AttributeName, XmlTokenizerMode.AfterAttributeName );
     }
     private XmlToken TokenizeText()
     {
@@ -198,15 +198,15 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
         return TokenizeSimple( "<!--", XmlTokenKind.CommentBegin, XmlTokenizerMode.InsideComment );
       else
         if( StartsWith( "<![CDATA[" ) )
-          return TokenizeSimple( "<![CDATA[", XmlTokenKind.CDataBegin, XmlTokenizerMode.InsideCData );
-        else
+        return TokenizeSimple( "<![CDATA[", XmlTokenKind.CDataBegin, XmlTokenizerMode.InsideCData );
+      else
           if( StartsWith( "<?" ) )
-            return TokenizeSimple( "<?", XmlTokenKind.OpenProcessingInstruction, XmlTokenizerMode.InsideProcessingInstruction );
-          else
+        return TokenizeSimple( "<?", XmlTokenKind.OpenProcessingInstruction, XmlTokenizerMode.InsideProcessingInstruction );
+      else
             if( StartsWith( "</" ) )
-              return TokenizeSimple( "</", XmlTokenKind.OpenClose, XmlTokenizerMode.AfterOpen );
-            else
-              return TokenizeSimple( "<", XmlTokenKind.Open, XmlTokenizerMode.AfterOpen );
+        return TokenizeSimple( "</", XmlTokenKind.OpenClose, XmlTokenizerMode.AfterOpen );
+      else
+        return TokenizeSimple( "<", XmlTokenKind.Open, XmlTokenizerMode.AfterOpen );
     }
     private XmlToken TokenizeEntity()
     {

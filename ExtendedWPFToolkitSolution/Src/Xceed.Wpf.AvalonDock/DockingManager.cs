@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -34,7 +34,6 @@ using Xceed.Wpf.AvalonDock.Themes;
 using System.Diagnostics;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
-using System.Globalization;
 
 namespace Xceed.Wpf.AvalonDock
 {
@@ -2348,8 +2347,10 @@ namespace Xceed.Wpf.AvalonDock
       var model = anchorable as LayoutAnchorable;
       if( model != null )
       {
-        model.CloseAnchorable();
-        this.RemoveViewFromLogicalChild( anchorable );
+        if( model.CloseAnchorable() )
+        {
+          this.RemoveViewFromLogicalChild( anchorable );
+        }
       }
     }
 
@@ -2499,7 +2500,14 @@ namespace Xceed.Wpf.AvalonDock
           //fw.Owner = null;
           fw.SetParentWindowToNull();
           fw.KeepContentVisibleOnClose = true;
-          fw.Close();
+
+          // Added Dispatcher to prevent InvalidOperationException issue in reference to bug case 
+          // DevOps #2106
+          Dispatcher.BeginInvoke( new Action( () =>
+          {
+            fw.Close();
+          } ), DispatcherPriority.Send );
+
         }
         _fwList.Clear();
 
@@ -3089,7 +3097,7 @@ namespace Xceed.Wpf.AvalonDock
         for( int i = 0; i < layoutItems.Count(); ++i )
         {
           var itemToRemove = layoutItems[ i ];
-          this.RemoveDocumentLayoutItem(itemToRemove.LayoutElement as LayoutDocument);
+          this.RemoveDocumentLayoutItem( itemToRemove.LayoutElement as LayoutDocument );
         }
       } ) );
     }
@@ -3319,6 +3327,17 @@ namespace Xceed.Wpf.AvalonDock
 
       parentPane.RemoveChildAt( contentModelParentChildrenIndex );
 
+      while( ( parentPane != null ) && ( parentPane.ChildrenCount == 0 ) )
+      {
+        var grandParent = parentPane.Parent as ILayoutPane;
+        if( grandParent != null )
+        {
+          grandParent.RemoveChild( parentPane );
+        }
+
+        parentPane = grandParent;
+      }
+
       double fwWidth = contentModel.FloatingWidth;
       double fwHeight = contentModel.FloatingHeight;
 
@@ -3355,11 +3374,14 @@ namespace Xceed.Wpf.AvalonDock
 
         Layout.FloatingWindows.Add( fw );
 
+        // Must be done after Layout.FloatingWindows.Add( fw ) to be able to modify the values in _dockingManager.Layout.FloatingWindows.CollectionChanged.
+        var fwSize = this.UpdateFloatingDimensions( contentModel, new Size( fwWidth, fwHeight ) );
+
         fwc = new LayoutAnchorableFloatingWindowControl(
             fw as LayoutAnchorableFloatingWindow, isContentImmutable )
         {
-          Width = fwWidth,
-          Height = fwHeight,
+          Width = fwSize.Width,
+          Height = fwSize.Height,
           Left = contentModel.FloatingLeft,
           Top = contentModel.FloatingTop
         };
@@ -3374,11 +3396,14 @@ namespace Xceed.Wpf.AvalonDock
 
         Layout.FloatingWindows.Add( fw );
 
+        // Must be done after Layout.FloatingWindows.Add( fw ) to be able to modify the values in _dockingManager.Layout.FloatingWindows.CollectionChanged.
+        var fwSize = this.UpdateFloatingDimensions( contentModel, new Size( fwWidth, fwHeight ) );
+
         fwc = new LayoutDocumentFloatingWindowControl(
             fw as LayoutDocumentFloatingWindow, isContentImmutable )
         {
-          Width = fwWidth,
-          Height = fwHeight,
+          Width = fwSize.Width,
+          Height = fwSize.Height,
           Left = contentModel.FloatingLeft,
           Top = contentModel.FloatingTop
         };
@@ -3399,6 +3424,16 @@ namespace Xceed.Wpf.AvalonDock
       UpdateLayout();
 
       return fwc;
+    }
+
+    private Size UpdateFloatingDimensions( ILayoutElementForFloatingWindow contentModel, Size currentSize )
+    {
+      if( contentModel.FloatingWidth != 0d )
+        currentSize.Width = contentModel.FloatingWidth;
+      if( contentModel.FloatingHeight != 0d )
+        currentSize.Height = contentModel.FloatingHeight;
+
+      return currentSize;
     }
 
     private void UpdateStarSize( LayoutContent contentModel )

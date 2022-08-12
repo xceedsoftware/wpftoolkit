@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -33,7 +33,7 @@
   <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
   <dateConv:BorderThicknessConverter x:Key="BorderThicknessConverter" />
 
-   <DataTemplate x:Key="DefaultWatermarkTemplate">
+  <DataTemplate x:Key="DefaultWatermarkTemplate">
     <ContentControl Content="{Binding}"
                     Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
                     Focusable="False"
@@ -69,7 +69,6 @@
       </Setter.Value>
     </Setter>
   </Style>
-
 
   <!-- =============================================================================== -->
   <!-- DateTimePicker                                                                  -->
@@ -227,6 +226,7 @@
                                       AllowSpin="{TemplateBinding TimePickerAllowSpin}"
                                       Step="{TemplateBinding Step}"
                                       ShowButtonSpinner="{TemplateBinding TimePickerShowButtonSpinner}"
+                                      TimeListItemsStyle="{TemplateBinding TimePickerTimeListItemsStyle}"
                                       Watermark="{TemplateBinding TimeWatermark}"
                                       WatermarkTemplate="{TemplateBinding TimeWatermarkTemplate}"
                                       Visibility="{TemplateBinding TimePickerVisibility}" />
@@ -278,15 +278,15 @@
                       Value="{Binding ElementName=PART_TextBox}" />
             </Trigger>
             <MultiTrigger>
-               <MultiTrigger.Conditions>
-                  <Condition Property="ShowButtonSpinner"
-                              Value="False" />
-                  <Condition Property="ShowDropDownButton"
-                              Value="False" />
-               </MultiTrigger.Conditions>
-                  <Setter Property="BorderThickness"
-                           Value="{Binding BorderThickness, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BorderThicknessConverter}}"
-                           TargetName="PART_Spinner"/>
+              <MultiTrigger.Conditions>
+                <Condition Property="ShowButtonSpinner"
+                           Value="False" />
+                <Condition Property="ShowDropDownButton"
+                           Value="False" />
+              </MultiTrigger.Conditions>
+              <Setter Property="BorderThickness"
+                      Value="{Binding BorderThickness, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BorderThicknessConverter}}"
+                      TargetName="PART_Spinner" />
             </MultiTrigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>

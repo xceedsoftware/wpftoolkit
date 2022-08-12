@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,9 +16,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -63,7 +60,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private void OnIsTextTrimmedChanged( bool oldValue, bool newValue )
     {
-        this.ToolTip = ( newValue ) ? this.Text : null;
+      this.ToolTip = ( newValue ) ? this.Text : null;
     }
 
     #endregion
@@ -120,7 +117,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( newValue == null )
       {
         var newrRun = new Run( this.Text );
-        this.Inlines.Clear();        
+        this.Inlines.Clear();
         this.Inlines.Add( newrRun );
 
         return;
@@ -153,7 +150,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region Event Handler
 
-    private void TrimmedTextBlock_SizeChanged(object sender, SizeChangedEventArgs e)
+    private void TrimmedTextBlock_SizeChanged( object sender, SizeChangedEventArgs e )
     {
       var textBlock = sender as TextBlock;
       if( textBlock != null )

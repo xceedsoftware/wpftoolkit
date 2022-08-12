@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -1249,14 +1249,8 @@
             Value="WidthAndHeight" />
     <Setter Property="ResizeMode"
             Value="NoResize" />
-    <Setter Property="shell:WindowChrome.WindowChrome">
-      <Setter.Value>
-        <shell:WindowChrome ResizeBorderThickness="10"
-                            CaptionHeight="16"
-                            CornerRadius="3,3,3,3"
-                            GlassFrameThickness="4" />
-      </Setter.Value>
-    </Setter>
+    <Setter Property="WindowStyle"
+            Value="None" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type avalonDockControls:NavigatorWindow}">
@@ -1311,7 +1305,7 @@
                       <RowDefinition Height="Auto" />
                       <RowDefinition />
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Active Tool Windows"
+                    <TextBlock Text="{Binding LayoutAnchorablesLabel, Mode=TwoWay}"
                                FontWeight="Bold"
                                Margin="0,3,0,4">
                     </TextBlock>
@@ -1364,7 +1358,7 @@
                       <RowDefinition Height="Auto" />
                       <RowDefinition />
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Active Files"
+                    <TextBlock Text="{Binding LayoutDocumentsLabel, Mode=TwoWay}"
                                FontWeight="Bold"
                                Margin="0,3,0,4">
                     </TextBlock>

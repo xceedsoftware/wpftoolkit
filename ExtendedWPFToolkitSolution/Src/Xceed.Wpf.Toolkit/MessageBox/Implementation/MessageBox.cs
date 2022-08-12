@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -99,7 +99,10 @@ namespace Xceed.Wpf.Toolkit
 
     protected Window Container
     {
-      get { return ( this.Parent as Window ); }
+      get
+      {
+        return ( this.Parent as Window );
+      }
     }
 
     #endregion //Protected Properties
@@ -215,7 +218,10 @@ namespace Xceed.Wpf.Toolkit
     /// </summary>
     public MessageBoxResult MessageBoxResult
     {
-      get { return _dialogResult; }
+      get
+      {
+        return _dialogResult;
+      }
     }
 
     #endregion //MessageBoxResult
@@ -313,7 +319,10 @@ namespace Xceed.Wpf.Toolkit
 
     internal override bool AllowPublicIsActiveChange
     {
-      get { return false; }
+      get
+      {
+        return false;
+      }
     }
 
     /// <summary>
@@ -404,7 +413,7 @@ namespace Xceed.Wpf.Toolkit
     /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
     public static MessageBoxResult Show( string messageText )
     {
-      return Show( messageText, string.Empty, MessageBoxButton.OK, (Style)null );
+      return Show( messageText, string.Empty, MessageBoxButton.OK, ( Style )null );
     }
 
     /// <summary>
@@ -416,7 +425,7 @@ namespace Xceed.Wpf.Toolkit
     /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
     public static MessageBoxResult Show( Window owner, string messageText )
     {
-      return Show( owner, messageText, string.Empty, MessageBoxButton.OK, (Style) null );
+      return Show( owner, messageText, string.Empty, MessageBoxButton.OK, ( Style )null );
     }
 
     /// <summary>
@@ -427,12 +436,12 @@ namespace Xceed.Wpf.Toolkit
     /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
     public static MessageBoxResult Show( string messageText, string caption )
     {
-        return Show(messageText, caption, MessageBoxButton.OK, (Style)null);
+      return Show( messageText, caption, MessageBoxButton.OK, ( Style )null );
     }
 
     public static MessageBoxResult Show( Window owner, string messageText, string caption )
     {
-        return Show(owner, messageText, caption, (Style)null);
+      return Show( owner, messageText, caption, ( Style )null );
     }
 
     public static MessageBoxResult Show( Window owner, string messageText, string caption, Style messageBoxStyle )
@@ -442,7 +451,7 @@ namespace Xceed.Wpf.Toolkit
 
     public static MessageBoxResult Show( string messageText, string caption, MessageBoxButton button )
     {
-        return Show(messageText, caption, button, (Style)null);
+      return Show( messageText, caption, button, ( Style )null );
     }
 
     /// <summary>
@@ -461,7 +470,7 @@ namespace Xceed.Wpf.Toolkit
 
     public static MessageBoxResult Show( Window owner, string messageText, string caption, MessageBoxButton button )
     {
-        return Show(owner, messageText, caption, button, (Style)null);
+      return Show( owner, messageText, caption, button, ( Style )null );
     }
 
     public static MessageBoxResult Show( Window owner, string messageText, string caption, MessageBoxButton button, Style messageBoxStyle )
@@ -472,7 +481,7 @@ namespace Xceed.Wpf.Toolkit
 
     public static MessageBoxResult Show( string messageText, string caption, MessageBoxButton button, MessageBoxImage icon )
     {
-        return Show(messageText, caption, button, icon, (Style)null);
+      return Show( messageText, caption, button, icon, ( Style )null );
     }
 
     /// <summary>
@@ -491,7 +500,7 @@ namespace Xceed.Wpf.Toolkit
 
     public static MessageBoxResult Show( Window owner, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon )
     {
-        return Show(owner, messageText, caption, button, icon, (Style)null);
+      return Show( owner, messageText, caption, button, icon, ( Style )null );
     }
 
     public static MessageBoxResult Show( Window owner, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, Style messageBoxStyle )
@@ -502,7 +511,7 @@ namespace Xceed.Wpf.Toolkit
 
     public static MessageBoxResult Show( string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult )
     {
-        return Show(messageText, caption, button, icon, defaultResult, (Style)null);
+      return Show( messageText, caption, button, icon, defaultResult, ( Style )null );
     }
     /// <summary>
     /// Displays a message box that has a message and that returns a result.
@@ -521,7 +530,7 @@ namespace Xceed.Wpf.Toolkit
 
     public static MessageBoxResult Show( Window owner, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult )
     {
-        return Show(owner, messageText, caption, button, icon, defaultResult, (Style) null);
+      return Show( owner, messageText, caption, button, icon, defaultResult, ( Style )null );
     }
 
 
@@ -829,7 +838,7 @@ namespace Xceed.Wpf.Toolkit
         throw new InvalidOperationException( "Static methods for MessageBoxes are not available in XBAP. Use the instance ShowMessageBox methods instead." );
       }
 
-      if( (owner != null) && (ownerHandle != IntPtr.Zero) )
+      if( ( owner != null ) && ( ownerHandle != IntPtr.Zero ) )
       {
         throw new NotSupportedException( "The owner of a MessageBox can't be both a Window and a WindowHandle." );
       }
@@ -871,7 +880,7 @@ namespace Xceed.Wpf.Toolkit
           }
           ) );
         }
-      }     
+      }
 
       return result;
     }
@@ -1122,7 +1131,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void MessageBox_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )
     {
-      if( (bool)e.NewValue )
+      if( ( bool )e.NewValue )
       {
         Action action = () =>
         {
@@ -1201,6 +1210,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-#endregion COMMANDS
+    #endregion COMMANDS
   }
 }

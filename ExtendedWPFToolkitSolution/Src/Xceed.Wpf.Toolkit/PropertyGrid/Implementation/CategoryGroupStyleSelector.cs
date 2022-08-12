@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -40,7 +40,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     {
       var group = item as CollectionViewGroup;
       // Category is not "Misc" => use regular ItemGroupStyle
-      if( (group.Name != null) && !group.Name.Equals( CategoryAttribute.Default.Category ) )
+      if( ( group.Name != null ) && !group.Name.Equals( CategoryAttribute.Default.Category ) )
         return this.ItemGroupStyle;
 
       // Category is "Misc"
@@ -55,7 +55,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( itemsControl != null )
       {
         // Category is "Misc" and this is the only category => use SingleDefaultCategoryItemGroupContainerStyle
-        if( (itemsControl.Items.Count > 0) && (itemsControl.Items.Groups.Count == 1) )
+        if( ( itemsControl.Items.Count > 0 ) && ( itemsControl.Items.Groups.Count == 1 ) )
           return this.SingleDefaultCategoryItemGroupStyle;
       }
 

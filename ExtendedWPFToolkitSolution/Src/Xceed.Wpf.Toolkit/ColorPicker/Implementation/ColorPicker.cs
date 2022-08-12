@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -227,7 +227,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Brush)GetValue( DropDownBackgroundProperty );
+        return ( Brush )GetValue( DropDownBackgroundProperty );
       }
       set
       {
@@ -278,7 +278,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Brush)GetValue( HeaderBackgroundProperty );
+        return ( Brush )GetValue( HeaderBackgroundProperty );
       }
       set
       {
@@ -295,7 +295,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Brush)GetValue( HeaderForegroundProperty );
+        return ( Brush )GetValue( HeaderForegroundProperty );
       }
       set
       {
@@ -322,9 +322,9 @@ namespace Xceed.Wpf.Toolkit
 
     private static void OnIsOpenChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
-      ColorPicker colorPicker = (ColorPicker)d;
+      ColorPicker colorPicker = ( ColorPicker )d;
       if( colorPicker != null )
-        colorPicker.OnIsOpenChanged( (bool)e.OldValue, (bool)e.NewValue );
+        colorPicker.OnIsOpenChanged( ( bool )e.OldValue, ( bool )e.NewValue );
     }
 
     private void OnIsOpenChanged( bool oldValue, bool newValue )
@@ -596,7 +596,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Brush)GetValue( TabBackgroundProperty );
+        return ( Brush )GetValue( TabBackgroundProperty );
       }
       set
       {
@@ -613,7 +613,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (Brush)GetValue( TabForegroundProperty );
+        return ( Brush )GetValue( TabForegroundProperty );
       }
       set
       {
@@ -726,7 +726,7 @@ namespace Xceed.Wpf.Toolkit
     }
 
 
-#endregion //Base Class Overrides
+    #endregion //Base Class Overrides
 
     #region Event Handlers
 
@@ -866,7 +866,7 @@ namespace Xceed.Wpf.Toolkit
         IsOpen = false;
       ReleaseMouseCapture();
 
-      if( isFocusOnColorPicker && ( _toggleButton != null) )
+      if( isFocusOnColorPicker && ( _toggleButton != null ) )
         _toggleButton.Focus();
       this.UpdateRecentColors( new ColorItem( SelectedColor, SelectedColorText ) );
     }

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -17,16 +17,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Markup;
-using System.Xml.Serialization;
-using Standard;
 using System.Xml;
 using System.Xml.Schema;
-using System.Windows.Controls;
+using System.Xml.Serialization;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
@@ -473,7 +470,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
           }
 
           //...if this empty panes is not referenced by anyone, than removes it from its parent container
-          if( !this.Descendents().OfType<ILayoutPreviousContainer>().Any( c => c.PreviousContainer == emptyPane ) 
+          if( !this.Descendents().OfType<ILayoutPreviousContainer>().Any( c => c.PreviousContainer == emptyPane )
             && !this.Descendents().OfType<ILayoutInitialContainer>().Any( c => c.InitialContainer == emptyPane ) )
           {
             var parentGroup = emptyPane.Parent as ILayoutContainer;
@@ -940,7 +937,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
       if( reader.LocalName.Equals( "RootPanel" ) )
       {
-        orientation = (reader.GetAttribute( "Orientation" ) == "Vertical") ? Orientation.Vertical : Orientation.Horizontal;
+        orientation = ( reader.GetAttribute( "Orientation" ) == "Vertical" ) ? Orientation.Vertical : Orientation.Horizontal;
         reader.Read();
 
         while( true )

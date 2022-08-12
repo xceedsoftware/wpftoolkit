@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,8 +16,8 @@
   ***********************************************************************************/
 
 using System.Linq;
-using System.Windows.Controls;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Xceed.Wpf.AvalonDock.Layout;
 
@@ -53,7 +53,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// Model Dependency Property
     /// </summary>
-    public static readonly DependencyProperty ModelProperty =  DependencyProperty.Register( "Model", typeof( LayoutAnchorable ), typeof( AnchorablePaneTitle ),
+    public static readonly DependencyProperty ModelProperty = DependencyProperty.Register( "Model", typeof( LayoutAnchorable ), typeof( AnchorablePaneTitle ),
             new FrameworkPropertyMetadata( ( LayoutAnchorable )null, new PropertyChangedCallback( _OnModelChanged ) ) );
 
     /// <summary>
@@ -99,10 +99,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// LayoutItem Read-Only Dependency Property
     /// </summary>
-    private static readonly DependencyPropertyKey LayoutItemPropertyKey  = DependencyProperty.RegisterReadOnly( "LayoutItem", typeof( LayoutItem ), typeof( AnchorablePaneTitle ),
+    private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly( "LayoutItem", typeof( LayoutItem ), typeof( AnchorablePaneTitle ),
             new FrameworkPropertyMetadata( ( LayoutItem )null ) );
 
-    public static readonly DependencyProperty LayoutItemProperty  = LayoutItemPropertyKey.DependencyProperty;
+    public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
     /// <summary>
     /// Gets the LayoutItem property.  This dependency property 

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,9 +15,9 @@
 
   ***********************************************************************************/
 
-using System.Windows.Controls.Primitives;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
@@ -39,8 +39,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// DropDownContextMenu Dependency Property
     /// </summary>
-    public static readonly DependencyProperty DropDownContextMenuProperty =  DependencyProperty.Register( "DropDownContextMenu", typeof( ContextMenu ), typeof( DropDownButton ),
-            new FrameworkPropertyMetadata( ( ContextMenu )null,  new PropertyChangedCallback( OnDropDownContextMenuChanged ) ) );
+    public static readonly DependencyProperty DropDownContextMenuProperty = DependencyProperty.Register( "DropDownContextMenu", typeof( ContextMenu ), typeof( DropDownButton ),
+            new FrameworkPropertyMetadata( ( ContextMenu )null, new PropertyChangedCallback( OnDropDownContextMenuChanged ) ) );
 
     /// <summary>
     /// Gets or sets the DropDownContextMenu property.  This dependency property 
@@ -83,7 +83,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// <summary>
     /// DropDownContextMenuDataContext Dependency Property
     /// </summary>
-    public static readonly DependencyProperty DropDownContextMenuDataContextProperty =  DependencyProperty.Register( "DropDownContextMenuDataContext", typeof( object ), typeof( DropDownButton ),
+    public static readonly DependencyProperty DropDownContextMenuDataContextProperty = DependencyProperty.Register( "DropDownContextMenuDataContext", typeof( object ), typeof( DropDownButton ),
             new FrameworkPropertyMetadata( ( object )null ) );
 
     /// <summary>

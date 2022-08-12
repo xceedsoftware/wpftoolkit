@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -82,13 +82,13 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.Loaded += this.Zoombox_Loaded;
     }
 
-#endregion
+    #endregion
 
-#region AnimationAccelerationRatio Property
+    #region AnimationAccelerationRatio Property
 
     public static readonly DependencyProperty AnimationAccelerationRatioProperty =
       DependencyProperty.Register( "AnimationAccelerationRatio", typeof( double ), typeof( Zoombox ),
-        new FrameworkPropertyMetadata( 0d ), 
+        new FrameworkPropertyMetadata( 0d ),
           new ValidateValueCallback( Zoombox.ValidateAccelerationRatio ) );
 
     public double AnimationAccelerationRatio
@@ -112,13 +112,13 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return true;
     }
 
-#endregion
+    #endregion
 
-#region AnimationDecelerationRatio Property
+    #region AnimationDecelerationRatio Property
 
     public static readonly DependencyProperty AnimationDecelerationRatioProperty =
       DependencyProperty.Register( "AnimationDecelerationRatio", typeof( double ), typeof( Zoombox ),
-        new FrameworkPropertyMetadata( 0d ), 
+        new FrameworkPropertyMetadata( 0d ),
           new ValidateValueCallback( Zoombox.ValidateDecelerationRatio ) );
 
     public double AnimationDecelerationRatio
@@ -142,9 +142,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return true;
     }
 
-#endregion
+    #endregion
 
-#region AnimationDuration Property
+    #region AnimationDuration Property
 
     public static readonly DependencyProperty AnimationDurationProperty =
       DependencyProperty.Register( "AnimationDuration", typeof( Duration ), typeof( Zoombox ),
@@ -162,9 +162,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region AreDragModifiersActive Property
+    #region AreDragModifiersActive Property
 
     private static readonly DependencyPropertyKey AreDragModifiersActivePropertyKey =
       DependencyProperty.RegisterReadOnly( "AreDragModifiersActive", typeof( bool ), typeof( Zoombox ),
@@ -185,9 +185,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.SetValue( Zoombox.AreDragModifiersActivePropertyKey, value );
     }
 
-#endregion
+    #endregion
 
-#region AreRelativeZoomModifiersActive Property
+    #region AreRelativeZoomModifiersActive Property
 
     private static readonly DependencyPropertyKey AreRelativeZoomModifiersActivePropertyKey =
       DependencyProperty.RegisterReadOnly( "AreRelativeZoomModifiersActive", typeof( bool ), typeof( Zoombox ),
@@ -208,9 +208,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.SetValue( Zoombox.AreRelativeZoomModifiersActivePropertyKey, value );
     }
 
-#endregion
+    #endregion
 
-#region AreZoomModifiersActive Property
+    #region AreZoomModifiersActive Property
 
     private static readonly DependencyPropertyKey AreZoomModifiersActivePropertyKey =
       DependencyProperty.RegisterReadOnly( "AreZoomModifiersActive", typeof( bool ), typeof( Zoombox ),
@@ -231,9 +231,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.SetValue( Zoombox.AreZoomModifiersActivePropertyKey, value );
     }
 
-#endregion
+    #endregion
 
-#region AreZoomToSelectionModifiersActive Property
+    #region AreZoomToSelectionModifiersActive Property
 
     private static readonly DependencyPropertyKey AreZoomToSelectionModifiersActivePropertyKey =
       DependencyProperty.RegisterReadOnly( "AreZoomToSelectionModifiersActive", typeof( bool ), typeof( Zoombox ),
@@ -254,13 +254,13 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.SetValue( Zoombox.AreZoomToSelectionModifiersActivePropertyKey, value );
     }
 
-#endregion
+    #endregion
 
-#region AutoWrapContentWithViewbox Property
+    #region AutoWrapContentWithViewbox Property
 
     public static readonly DependencyProperty AutoWrapContentWithViewboxProperty =
       DependencyProperty.Register( "AutoWrapContentWithViewbox", typeof( bool ), typeof( Zoombox ),
-        new FrameworkPropertyMetadata( true, 
+        new FrameworkPropertyMetadata( true,
           new PropertyChangedCallback( Zoombox.OnAutoWrapContentWithViewboxChanged ) ) );
 
     public bool AutoWrapContentWithViewbox
@@ -373,13 +373,13 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     private UIElement _trueContent; //null
 
-#endregion
+    #endregion
 
-#region CurrentView Property
+    #region CurrentView Property
 
     private static readonly DependencyPropertyKey CurrentViewPropertyKey =
       DependencyProperty.RegisterReadOnly( "CurrentView", typeof( ZoomboxView ), typeof( Zoombox ),
-        new FrameworkPropertyMetadata( ZoomboxView.Empty, 
+        new FrameworkPropertyMetadata( ZoomboxView.Empty,
           new PropertyChangedCallback( Zoombox.OnCurrentViewChanged ) ) );
 
     public static readonly DependencyProperty CurrentViewProperty = Zoombox.CurrentViewPropertyKey.DependencyProperty;
@@ -407,9 +407,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       zoombox.RaiseEvent( new ZoomboxViewChangedEventArgs( e.OldValue as ZoomboxView, e.NewValue as ZoomboxView, zoombox._lastViewIndex, zoombox.CurrentViewIndex ) );
     }
 
-#endregion
+    #endregion
 
-#region CurrentViewIndex Property
+    #region CurrentViewIndex Property
 
     private static readonly DependencyPropertyKey CurrentViewIndexPropertyKey =
       DependencyProperty.RegisterReadOnly( "CurrentViewIndex", typeof( int ), typeof( Zoombox ),
@@ -430,9 +430,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.SetValue( Zoombox.CurrentViewIndexPropertyKey, value );
     }
 
-#endregion
+    #endregion
 
-#region DragModifiers Property
+    #region DragModifiers Property
 
     public static readonly DependencyProperty DragModifiersProperty =
       DependencyProperty.Register( "DragModifiers", typeof( KeyModifierCollection ), typeof( Zoombox ),
@@ -459,9 +459,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return result;
     }
 
-#endregion
+    #endregion
 
-#region DragOnPreview Property
+    #region DragOnPreview Property
 
     public static readonly DependencyProperty DragOnPreviewProperty =
       DependencyProperty.Register( "DragOnPreview", typeof( bool ), typeof( Zoombox ),
@@ -479,9 +479,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region EffectiveViewStackMode Property
+    #region EffectiveViewStackMode Property
 
     private static readonly DependencyPropertyKey EffectiveViewStackModePropertyKey =
       DependencyProperty.RegisterReadOnly( "EffectiveViewStackMode", typeof( ZoomboxViewStackMode ), typeof( Zoombox ),
@@ -502,9 +502,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.SetValue( Zoombox.EffectiveViewStackModePropertyKey, value );
     }
 
-#endregion
+    #endregion
 
-#region HasBackStack Property
+    #region HasBackStack Property
 
     private static readonly DependencyPropertyKey HasBackStackPropertyKey =
       DependencyProperty.RegisterReadOnly( "HasBackStack", typeof( bool ), typeof( Zoombox ),
@@ -520,9 +520,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region HasForwardStack Property
+    #region HasForwardStack Property
 
     private static readonly DependencyPropertyKey HasForwardStackPropertyKey =
       DependencyProperty.RegisterReadOnly( "HasForwardStack", typeof( bool ), typeof( Zoombox ),
@@ -538,13 +538,13 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region IsAnimated Property
+    #region IsAnimated Property
 
     public static readonly DependencyProperty IsAnimatedProperty =
       DependencyProperty.Register( "IsAnimated", typeof( bool ), typeof( Zoombox ),
-        new FrameworkPropertyMetadata( true, 
+        new FrameworkPropertyMetadata( true,
           ( PropertyChangedCallback )null, new CoerceValueCallback( Zoombox.CoerceIsAnimatedValue ) ) );
 
     public bool IsAnimated
@@ -570,9 +570,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return result;
     }
 
-#endregion
+    #endregion
 
-#region IsDraggingContent Property
+    #region IsDraggingContent Property
 
     private static readonly DependencyPropertyKey IsDraggingContentPropertyKey =
       DependencyProperty.RegisterReadOnly( "IsDraggingContent", typeof( bool ), typeof( Zoombox ),
@@ -593,9 +593,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.SetValue( Zoombox.IsDraggingContentPropertyKey, value );
     }
 
-#endregion
+    #endregion
 
-#region IsSelectingRegion Property
+    #region IsSelectingRegion Property
 
     private static readonly DependencyPropertyKey IsSelectingRegionPropertyKey =
       DependencyProperty.RegisterReadOnly( "IsSelectingRegion", typeof( bool ), typeof( Zoombox ),
@@ -616,9 +616,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.SetValue( Zoombox.IsSelectingRegionPropertyKey, value );
     }
 
-#endregion
+    #endregion
 
-#region IsUsingScrollBars Property
+    #region IsUsingScrollBars Property
 
     public static readonly DependencyProperty IsUsingScrollBarsProperty =
       DependencyProperty.Register( "IsUsingScrollBars", typeof( bool ), typeof( Zoombox ),
@@ -636,9 +636,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region MaxScale Property
+    #region MaxScale Property
 
     public static readonly DependencyProperty MaxScaleProperty =
       DependencyProperty.Register( "MaxScale", typeof( double ), typeof( Zoombox ),
@@ -675,9 +675,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return result;
     }
 
-#endregion
+    #endregion
 
-#region MinScale Property
+    #region MinScale Property
 
     public static readonly DependencyProperty MinScaleProperty =
       DependencyProperty.Register( "MinScale", typeof( double ), typeof( Zoombox ),
@@ -714,9 +714,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return result;
     }
 
-#endregion
+    #endregion
 
-#region NavigateOnPreview Property
+    #region NavigateOnPreview Property
 
     public static readonly DependencyProperty NavigateOnPreviewProperty =
       DependencyProperty.Register( "NavigateOnPreview", typeof( bool ), typeof( Zoombox ),
@@ -734,9 +734,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region PanDistance Property
+    #region PanDistance Property
 
     public static readonly DependencyProperty PanDistanceProperty =
       DependencyProperty.Register( "PanDistance", typeof( double ), typeof( Zoombox ),
@@ -754,9 +754,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region Position Property
+    #region Position Property
 
     public static readonly DependencyProperty PositionProperty =
       DependencyProperty.Register( "Position", typeof( Point ), typeof( Zoombox ),
@@ -788,9 +788,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region RelativeZoomModifiers Property
+    #region RelativeZoomModifiers Property
 
     public static readonly DependencyProperty RelativeZoomModifiersProperty =
       DependencyProperty.Register( "RelativeZoomModifiers", typeof( KeyModifierCollection ), typeof( Zoombox ),
@@ -818,13 +818,13 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return result;
     }
 
-#endregion
+    #endregion
 
-#region Scale Property
+    #region Scale Property
 
     public static readonly DependencyProperty ScaleProperty =
       DependencyProperty.Register( "Scale", typeof( double ), typeof( Zoombox ),
-        new FrameworkPropertyMetadata( double.NaN, 
+        new FrameworkPropertyMetadata( double.NaN,
           new PropertyChangedCallback( Zoombox.OnScaleChanged ), new CoerceValueCallback( Zoombox.CoerceScaleValue ) ) );
 
     public double Scale
@@ -867,9 +867,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return result;
     }
 
-#endregion
+    #endregion
 
-#region ViewFinder Property
+    #region ViewFinder Property
 
     private static readonly DependencyPropertyKey ViewFinderPropertyKey =
       DependencyProperty.RegisterReadOnly( "ViewFinder", typeof( FrameworkElement ), typeof( Zoombox ),
@@ -900,9 +900,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       _isUsingDefaultViewFinder = false;
     }
 
-#endregion
+    #endregion
 
-#region ViewFinderVisibility Attached Property
+    #region ViewFinderVisibility Attached Property
 
     public static readonly DependencyProperty ViewFinderVisibilityProperty =
       DependencyProperty.RegisterAttached( "ViewFinderVisibility", typeof( Visibility ), typeof( Zoombox ),
@@ -918,13 +918,13 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       d.SetValue( Zoombox.ViewFinderVisibilityProperty, value );
     }
 
-#endregion
+    #endregion
 
-#region Viewport Property
+    #region Viewport Property
 
     private static readonly DependencyPropertyKey ViewportPropertyKey =
       DependencyProperty.RegisterReadOnly( "Viewport", typeof( Rect ), typeof( Zoombox ),
-        new FrameworkPropertyMetadata( Rect.Empty, 
+        new FrameworkPropertyMetadata( Rect.Empty,
           new PropertyChangedCallback( Zoombox.OnViewportChanged ) ) );
 
     public static readonly DependencyProperty ViewportProperty = Zoombox.ViewportPropertyKey.DependencyProperty;
@@ -944,9 +944,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       zoombox.Position = new Point( -zoombox.Viewport.Left * zoombox.Scale / zoombox._viewboxFactor, -zoombox.Viewport.Top * zoombox.Scale / zoombox._viewboxFactor );
     }
 
-#endregion
+    #endregion
 
-#region ViewStackCount Property
+    #region ViewStackCount Property
 
     private static readonly DependencyPropertyKey ViewStackCountPropertyKey =
       DependencyProperty.RegisterReadOnly( "ViewStackCount", typeof( int ), typeof( Zoombox ),
@@ -981,9 +981,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.UpdateStackProperties();
     }
 
-#endregion
+    #endregion
 
-#region ViewStackIndex Property
+    #region ViewStackIndex Property
 
     public static readonly DependencyProperty ViewStackIndexProperty =
       DependencyProperty.Register( "ViewStackIndex", typeof( int ), typeof( Zoombox ),
@@ -1033,11 +1033,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return ( zoombox.EffectiveViewStackMode == ZoomboxViewStackMode.Disabled ) ? -1 : value;
     }
 
-#endregion
+    #endregion
 
-#region ViewStackMode Property
+    #region ViewStackMode Property
 
-    public static readonly DependencyProperty ViewStackModeProperty = 
+    public static readonly DependencyProperty ViewStackModeProperty =
       DependencyProperty.Register( "ViewStackMode", typeof( ZoomboxViewStackMode ), typeof( Zoombox ),
         new FrameworkPropertyMetadata( ZoomboxViewStackMode.Default,
           new PropertyChangedCallback( Zoombox.OnViewStackModeChanged ), new CoerceValueCallback( Zoombox.CoerceViewStackModeValue ) ) );
@@ -1097,9 +1097,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return value;
     }
 
-#endregion
+    #endregion
 
-#region ViewStackSource Property
+    #region ViewStackSource Property
 
     public static readonly DependencyProperty ViewStackSourceProperty =
       DependencyProperty.Register( "ViewStackSource", typeof( IEnumerable ), typeof( Zoombox ),
@@ -1150,9 +1150,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       zoombox.CoerceValue( Zoombox.ViewStackModeProperty );
     }
 
-#endregion
+    #endregion
 
-#region ZoomModifiers Property
+    #region ZoomModifiers Property
 
     public static readonly DependencyProperty ZoomModifiersProperty =
       DependencyProperty.Register( "ZoomModifiers", typeof( KeyModifierCollection ), typeof( Zoombox ),
@@ -1179,9 +1179,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return result;
     }
 
-#endregion
+    #endregion
 
-#region ZoomOnPreview Property
+    #region ZoomOnPreview Property
 
     public static readonly DependencyProperty ZoomOnPreviewProperty =
       DependencyProperty.Register( "ZoomOnPreview", typeof( bool ), typeof( Zoombox ),
@@ -1199,9 +1199,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region ZoomOrigin Property
+    #region ZoomOrigin Property
 
     public static readonly DependencyProperty ZoomOriginProperty =
       DependencyProperty.Register( "ZoomOrigin", typeof( Point ), typeof( Zoombox ),
@@ -1219,9 +1219,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region ZoomPercentage Property
+    #region ZoomPercentage Property
 
     public static readonly DependencyProperty ZoomPercentageProperty =
       DependencyProperty.Register( "ZoomPercentage", typeof( double ), typeof( Zoombox ),
@@ -1239,9 +1239,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region ZoomOn Property
+    #region ZoomOn Property
 
     public static readonly DependencyProperty ZoomOnProperty =
       DependencyProperty.Register( "ZoomOn", typeof( ZoomboxZoomOn ), typeof( Zoombox ),
@@ -1259,9 +1259,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region ZoomToSelectionModifiers Property
+    #region ZoomToSelectionModifiers Property
 
     public static readonly DependencyProperty ZoomToSelectionModifiersProperty =
       DependencyProperty.Register( "ZoomToSelectionModifiers", typeof( KeyModifierCollection ), typeof( Zoombox ),
@@ -1288,13 +1288,13 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return result;
     }
 
-#endregion
+    #endregion
 
-#region KeepContentInBounds Property
+    #region KeepContentInBounds Property
 
     public static readonly DependencyProperty KeepContentInBoundsProperty =
       DependencyProperty.Register( "KeepContentInBounds", typeof( bool ), typeof( Zoombox ),
-        new FrameworkPropertyMetadata( false, 
+        new FrameworkPropertyMetadata( false,
           new PropertyChangedCallback( Zoombox.OnKeepContentInBoundsChanged ) ) );
 
     public bool KeepContentInBounds
@@ -1331,9 +1331,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region ViewStack Property
+    #region ViewStack Property
 
     public ZoomboxViewStack ViewStack
     {
@@ -1347,9 +1347,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region HasArrangedContentPresenter Internal Property
+    #region HasArrangedContentPresenter Internal Property
 
     internal bool HasArrangedContentPresenter
     {
@@ -1363,9 +1363,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region IsUpdatingView Internal Property
+    #region IsUpdatingView Internal Property
 
     internal bool IsUpdatingView
     {
@@ -1379,9 +1379,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region ContentOffset Private Property
+    #region ContentOffset Private Property
 
     private Vector ContentOffset
     {
@@ -1423,9 +1423,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region ContentRect Private Property
+    #region ContentRect Private Property
 
     private Rect ContentRect
     {
@@ -1436,9 +1436,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region HasRenderedFirstView Private Property
+    #region HasRenderedFirstView Private Property
 
     private bool HasRenderedFirstView
     {
@@ -1452,9 +1452,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region HasUIPermission Private Property
+    #region HasUIPermission Private Property
 
     private bool HasUIPermission
     {
@@ -1464,9 +1464,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region IsContentWrapped Private Property
+    #region IsContentWrapped Private Property
 
     private bool IsContentWrapped
     {
@@ -1480,9 +1480,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region IsDraggingViewport Private Property
+    #region IsDraggingViewport Private Property
 
     private bool IsDraggingViewport
     {
@@ -1496,9 +1496,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region IsMonitoringInput Private Property
+    #region IsMonitoringInput Private Property
 
     private bool IsMonitoringInput
     {
@@ -1512,9 +1512,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region IsResizingViewport Private Property
+    #region IsResizingViewport Private Property
 
     private bool IsResizingViewport
     {
@@ -1528,9 +1528,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region IsUpdatingViewport Private Property
+    #region IsUpdatingViewport Private Property
 
     private bool IsUpdatingViewport
     {
@@ -1544,9 +1544,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region RefocusViewOnFirstRender Private Property
+    #region RefocusViewOnFirstRender Private Property
 
     private bool RefocusViewOnFirstRender
     {
@@ -1560,9 +1560,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region ViewFinderDisplayRect Private Property
+    #region ViewFinderDisplayRect Private Property
 
     private Rect ViewFinderDisplayRect
     {
@@ -1573,9 +1573,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region AnimationBeginning Event
+    #region AnimationBeginning Event
 
     public static readonly RoutedEvent AnimationBeginningEvent = EventManager.RegisterRoutedEvent( "AnimationBeginning", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( Zoombox ) );
 
@@ -1591,9 +1591,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region AnimationCompleted Event
+    #region AnimationCompleted Event
 
     public static readonly RoutedEvent AnimationCompletedEvent = EventManager.RegisterRoutedEvent( "AnimationCompleted", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( Zoombox ) );
 
@@ -1609,9 +1609,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region CurrentViewChanged Event
+    #region CurrentViewChanged Event
 
     public static readonly RoutedEvent CurrentViewChangedEvent = EventManager.RegisterRoutedEvent( "CurrentViewChanged", RoutingStrategy.Bubble, typeof( ZoomboxViewChangedEventHandler ), typeof( Zoombox ) );
 
@@ -1627,11 +1627,11 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
     public event EventHandler<ScrollEventArgs> Scroll;
 
-#region ViewStackIndexChanged Event
+    #region ViewStackIndexChanged Event
 
     public static readonly RoutedEvent ViewStackIndexChangedEvent = EventManager.RegisterRoutedEvent( "ViewStackIndexChanged", RoutingStrategy.Bubble, typeof( IndexChangedEventHandler ), typeof( Zoombox ) );
 
@@ -1647,9 +1647,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
     }
 
-#endregion
+    #endregion
 
-#region Back Command
+    #region Back Command
 
     public static RoutedUICommand Back = new RoutedUICommand( "Go Back", "GoBack", typeof( Zoombox ) );
 
@@ -1664,9 +1664,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.GoBack();
     }
 
-#endregion
+    #endregion
 
-#region Center Command
+    #region Center Command
 
     public static RoutedUICommand Center = new RoutedUICommand( "Center Content", "Center", typeof( Zoombox ) );
 
@@ -1675,9 +1675,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.CenterContent();
     }
 
-#endregion
+    #endregion
 
-#region Fill Command
+    #region Fill Command
 
     public static RoutedUICommand Fill = new RoutedUICommand( "Fill Bounds with Content", "FillToBounds", typeof( Zoombox ) );
 
@@ -1686,9 +1686,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.FillToBounds();
     }
 
-#endregion
+    #endregion
 
-#region Fit Command
+    #region Fit Command
 
     public static RoutedUICommand Fit = new RoutedUICommand( "Fit Content within Bounds", "FitToBounds", typeof( Zoombox ) );
 
@@ -1697,9 +1697,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.FitToBounds();
     }
 
-#endregion
+    #endregion
 
-#region Forward Command
+    #region Forward Command
 
     public static RoutedUICommand Forward = new RoutedUICommand( "Go Forward", "GoForward", typeof( Zoombox ) );
 
@@ -1714,9 +1714,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.GoForward();
     }
 
-#endregion
+    #endregion
 
-#region Home Command
+    #region Home Command
 
     public static RoutedUICommand Home = new RoutedUICommand( "Go Home", "GoHome", typeof( Zoombox ) );
 
@@ -1732,9 +1732,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.GoHome();
     }
 
-#endregion
+    #endregion
 
-#region PanDown Command
+    #region PanDown Command
 
     public static RoutedUICommand PanDown = new RoutedUICommand( "Pan Down", "PanDown", typeof( Zoombox ) );
 
@@ -1743,9 +1743,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.Position = new Point( _basePosition.X, _basePosition.Y + PanDistance );
     }
 
-#endregion
+    #endregion
 
-#region PanLeft Command
+    #region PanLeft Command
 
     public static RoutedUICommand PanLeft = new RoutedUICommand( "Pan Left", "PanLeft", typeof( Zoombox ) );
 
@@ -1754,9 +1754,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.Position = new Point( _basePosition.X - this.PanDistance, _basePosition.Y );
     }
 
-#endregion
+    #endregion
 
-#region PanRight Command
+    #region PanRight Command
 
     public static RoutedUICommand PanRight = new RoutedUICommand( "Pan Right", "PanRight", typeof( Zoombox ) );
 
@@ -1765,9 +1765,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.Position = new Point( _basePosition.X + this.PanDistance, _basePosition.Y );
     }
 
-#endregion
+    #endregion
 
-#region PanUp Command
+    #region PanUp Command
 
     public static RoutedUICommand PanUp = new RoutedUICommand( "Pan Up", "PanUp", typeof( Zoombox ) );
 
@@ -1776,9 +1776,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.Position = new Point( _basePosition.X, _basePosition.Y - this.PanDistance );
     }
 
-#endregion
+    #endregion
 
-#region Refocus Command
+    #region Refocus Command
 
     public static RoutedUICommand Refocus = new RoutedUICommand( "Refocus View", "Refocus", typeof( Zoombox ) );
 
@@ -1794,9 +1794,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.RefocusView();
     }
 
-#endregion
+    #endregion
 
-#region ZoomIn Command
+    #region ZoomIn Command
 
     public static RoutedUICommand ZoomIn = new RoutedUICommand( "Zoom In", "ZoomIn", typeof( Zoombox ) );
 
@@ -1805,9 +1805,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.Zoom( this.ZoomPercentage / 100 );
     }
 
-#endregion
+    #endregion
 
-#region ZoomOut Command
+    #region ZoomOut Command
 
     public static RoutedUICommand ZoomOut = new RoutedUICommand( "Zoom Out", "ZoomOut", typeof( Zoombox ) );
 
@@ -1816,7 +1816,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       this.Zoom( -this.ZoomPercentage / 100 );
     }
 
-#endregion
+    #endregion
 
     public void CenterContent()
     {
@@ -2149,7 +2149,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       VisualTreeHelperEx.FindDescendantWithPropertyValue( this, Button.IsPressedProperty, true );
 
       // User has not defined a ViewFinder(or is using the one from this template), use the one from this template
-      if( (this.GetValue( Zoombox.ViewFinderPropertyKey.DependencyProperty ) == null) || _isUsingDefaultViewFinder )
+      if( ( this.GetValue( Zoombox.ViewFinderPropertyKey.DependencyProperty ) == null ) || _isUsingDefaultViewFinder )
       {
         // set a reference to the ViewFinder element, if present
         this.SetValue( Zoombox.ViewFinderPropertyKey, this.Template.FindName( "ViewFinder", this ) as FrameworkElement );
@@ -2299,7 +2299,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     private void DetachFromVisualTree()
     {
       // remove the drag adorner
-      if( (_dragAdorner != null) && ( AdornerLayer.GetAdornerLayer( this ) != null ) )
+      if( ( _dragAdorner != null ) && ( AdornerLayer.GetAdornerLayer( this ) != null ) )
         AdornerLayer.GetAdornerLayer( this ).Remove( _dragAdorner );
 
       this.InputBindings.Clear();
@@ -2343,7 +2343,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     private void VerticalScrollBar_Scroll( object sender, ScrollEventArgs e )
     {
-      double diff = -(e.NewValue + _relativePosition.Y);
+      double diff = -( e.NewValue + _relativePosition.Y );
 
       if( e.ScrollEventType == ScrollEventType.LargeIncrement )
       {
@@ -3690,7 +3690,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       return zoomPoint;
     }
 
-#region OnKeyDown Methods
+    #region OnKeyDown Methods
 
     protected override void OnPreviewKeyDown( KeyEventArgs e )
     {
@@ -3712,9 +3712,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       base.OnKeyDown( e );
     }
 
-#endregion
+    #endregion
 
-#region OnMouseDown Methods
+    #region OnMouseDown Methods
 
     protected override void OnPreviewMouseDown( MouseButtonEventArgs e )
     {
@@ -3736,9 +3736,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       base.OnMouseDown( e );
     }
 
-#endregion
+    #endregion
 
-#region OnMouseEnter Methods
+    #region OnMouseEnter Methods
 
     protected override void OnMouseEnter( MouseEventArgs e )
     {
@@ -3747,9 +3747,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       base.OnMouseEnter( e );
     }
 
-#endregion
+    #endregion
 
-#region OnMouseLeave Methods
+    #region OnMouseLeave Methods
 
     protected override void OnMouseLeave( MouseEventArgs e )
     {
@@ -3758,9 +3758,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       base.OnMouseLeave( e );
     }
 
-#endregion
+    #endregion
 
-#region OnMouseLeftButton Methods
+    #region OnMouseLeftButton Methods
 
     protected override void OnPreviewMouseLeftButtonDown( MouseButtonEventArgs e )
     {
@@ -3802,9 +3802,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       base.OnMouseLeftButtonUp( e );
     }
 
-#endregion
+    #endregion
 
-#region OnMouseMove Methods
+    #region OnMouseMove Methods
 
     protected override void OnPreviewMouseMove( MouseEventArgs e )
     {
@@ -3826,9 +3826,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       base.OnMouseMove( e );
     }
 
-#endregion
+    #endregion
 
-#region OnMouseWheel Methods
+    #region OnMouseWheel Methods
 
     protected override void OnPreviewMouseWheel( MouseWheelEventArgs e )
     {
@@ -3850,9 +3850,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       base.OnMouseWheel( e );
     }
 
-#endregion
+    #endregion
 
-#region Private Fields
+    #region Private Fields
 
     // the default value for a single mouse wheel delta appears to be 28
     private static int MOUSE_WHEEL_DELTA = 28;
@@ -3896,9 +3896,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
 
     private BitVector32 _cacheBits = new BitVector32( 0 );
 
-#endregion
+    #endregion
 
-#region ViewFinderSelectionConverter Nested Type
+    #region ViewFinderSelectionConverter Nested Type
 
     private sealed class ViewFinderSelectionConverter : IValueConverter
     {
@@ -3931,9 +3931,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       private readonly Zoombox _zoombox;
     }
 
-#endregion
+    #endregion
 
-#region DragAdorner Nested Type
+    #region DragAdorner Nested Type
 
     internal sealed class DragAdorner : Adorner
     {
@@ -4031,9 +4031,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       private Size _cachedSize;
     }
 
-#endregion
+    #endregion
 
-#region CacheBits Nested Type
+    #region CacheBits Nested Type
 
     private enum CacheBits
     {
@@ -4049,9 +4049,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       HasUIPermission = 0x00000200,
     }
 
-#endregion
+    #endregion
 
-#region ResizeEdge Nested Type
+    #region ResizeEdge Nested Type
 
     private enum ResizeEdge
     {
@@ -4066,6 +4066,6 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       Bottom,
     }
 
-#endregion
+    #endregion
   }
 }

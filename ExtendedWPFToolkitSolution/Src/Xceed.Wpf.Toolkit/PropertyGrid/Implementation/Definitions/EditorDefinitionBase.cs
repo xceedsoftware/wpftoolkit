@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,15 +15,7 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -32,12 +24,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     internal EditorDefinitionBase() { }
 
-    internal FrameworkElement GenerateEditingElementInternal( PropertyItemBase propertyItem ) 
+    internal FrameworkElement GenerateEditingElementInternal( PropertyItemBase propertyItem )
     {
       return this.GenerateEditingElement( propertyItem );
     }
 
-    protected virtual FrameworkElement GenerateEditingElement( PropertyItemBase propertyItem ) { return null; }
+    protected virtual FrameworkElement GenerateEditingElement( PropertyItemBase propertyItem )
+    {
+      return null;
+    }
 
     internal void UpdateProperty( FrameworkElement element, DependencyProperty elementProp, DependencyProperty definitionProperty )
     {

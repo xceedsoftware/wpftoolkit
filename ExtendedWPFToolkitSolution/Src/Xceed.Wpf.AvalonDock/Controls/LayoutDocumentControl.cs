@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -119,7 +119,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// LayoutItem Read-Only Dependency Property
     /// </summary>
     private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly( "LayoutItem", typeof( LayoutItem ), typeof( LayoutDocumentControl ),
-      new FrameworkPropertyMetadata(( LayoutItem )null ) );
+      new FrameworkPropertyMetadata( ( LayoutItem )null ) );
 
     public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
@@ -153,7 +153,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void OnPreviewGotKeyboardFocus( KeyboardFocusChangedEventArgs e )
     {
-      var setIsActive = !( (e.NewFocus != null) && (e.OldFocus != null) && (e.OldFocus is LayoutFloatingWindowControl) );
+      var setIsActive = !( ( e.NewFocus != null ) && ( e.OldFocus != null ) && ( e.OldFocus is LayoutFloatingWindowControl ) );
       if( setIsActive )
       {
         this.SetIsActive();

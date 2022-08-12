@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,11 +16,8 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
 namespace Xceed.Wpf.Toolkit.Core.Utilities
 {
@@ -28,7 +25,7 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
   {
     internal static bool IsListOfItems( Type listType )
     {
-      return (ListUtilities.GetListItemType( listType ) != null);
+      return ( ListUtilities.GetListItemType( listType ) != null );
     }
 
     internal static Type GetListItemType( Type listType )
@@ -53,17 +50,17 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
     internal static Type GetCollectionItemType( Type colType )
     {
       Type iCollectionOfT = null;
-      var isCollectionOfT = colType.IsGenericType && (colType.GetGenericTypeDefinition() == typeof( ICollection<> ) );
+      var isCollectionOfT = colType.IsGenericType && ( colType.GetGenericTypeDefinition() == typeof( ICollection<> ) );
       if( isCollectionOfT )
       {
         iCollectionOfT = colType;
       }
       else
       {
-        iCollectionOfT = colType.GetInterfaces().FirstOrDefault(( i ) => i.IsGenericType && i.GetGenericTypeDefinition() == typeof( ICollection<> ) );
+        iCollectionOfT = colType.GetInterfaces().FirstOrDefault( ( i ) => i.IsGenericType && i.GetGenericTypeDefinition() == typeof( ICollection<> ) );
       }
 
-      return (iCollectionOfT != null)
+      return ( iCollectionOfT != null )
         ? iCollectionOfT.GetGenericArguments()[ 0 ]
         : null;
     }
@@ -75,8 +72,8 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
 
     internal static Type[] GetDictionaryItemsType( Type dictType )
     {
-      var isDict = dictType.IsGenericType 
-        && ((dictType.GetGenericTypeDefinition() == typeof( Dictionary<,>) ) || (dictType.GetGenericTypeDefinition() == typeof( IDictionary<,>) ));
+      var isDict = dictType.IsGenericType
+        && ( ( dictType.GetGenericTypeDefinition() == typeof( Dictionary<,> ) ) || ( dictType.GetGenericTypeDefinition() == typeof( IDictionary<,> ) ) );
 
       return isDict
         ? new Type[] { dictType.GetGenericArguments()[ 0 ], dictType.GetGenericArguments()[ 1 ] }

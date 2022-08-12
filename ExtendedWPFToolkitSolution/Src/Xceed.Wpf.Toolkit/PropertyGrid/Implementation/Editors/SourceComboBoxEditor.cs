@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -34,8 +34,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     public SourceComboBoxEditor( ICollection collection, TypeConverter typeConverter )
     {
       // Add a "Null" input value in the ComboBox when using a NullableConverter.
-      _collection = (typeConverter is NullableConverter) 
-                    ? collection.Cast<object>().Select( x => x ?? SourceComboBoxEditor.ComboBoxNullValue ).ToArray() 
+      _collection = ( typeConverter is NullableConverter )
+                    ? collection.Cast<object>().Select( x => x ?? SourceComboBoxEditor.ComboBoxNullValue ).ToArray()
                     : collection;
       _typeConverter = typeConverter;
     }
@@ -73,8 +73,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     {
       if( _typeConverter != null )
       {
-        if( _typeConverter.CanConvertTo( typeof(string) ) )
-          return _typeConverter.ConvertTo( value, typeof(string) );
+        if( _typeConverter.CanConvertTo( typeof( string ) ) )
+          return _typeConverter.ConvertTo( value, typeof( string ) );
       }
       return value;
     }

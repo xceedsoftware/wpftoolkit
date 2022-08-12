@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,9 +15,6 @@
 
   ***********************************************************************************/
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -35,14 +32,14 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.RangeSlider.Views
 
     private void RangeStyleComboBox_SelectionChanged( object sender, SelectionChangedEventArgs e )
     {
-      if( e.AddedItems.Count > 0 && e.AddedItems[ 0 ] is ComboBoxItem)
+      if( e.AddedItems.Count > 0 && e.AddedItems[ 0 ] is ComboBoxItem )
       {
         ComboBoxItem item = e.AddedItems[ 0 ] as ComboBoxItem;
         //A style different from null is chosen
         if( item.Tag != null )
         {
           //LowerRangeBackground is Transparent, force a color
-          if( object.Equals( sender, lowerRangeStyleComboBox ) && ((SolidColorBrush)_rangeSlider.LowerRangeBackground).Color.Equals( Colors.Transparent) )
+          if( object.Equals( sender, lowerRangeStyleComboBox ) && ( ( SolidColorBrush )_rangeSlider.LowerRangeBackground ).Color.Equals( Colors.Transparent ) )
           {
             _rangeSlider.LowerRangeBackground = new SolidColorBrush( Colors.Green );
           }

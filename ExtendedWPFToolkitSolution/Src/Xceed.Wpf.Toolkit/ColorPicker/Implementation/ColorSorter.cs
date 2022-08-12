@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -17,10 +17,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Media;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -34,8 +30,8 @@ namespace Xceed.Wpf.Toolkit
       ColorItem colorItem1 = ( ColorItem )firstItem;
       ColorItem colorItem2 = ( ColorItem )secondItem;
 
-      if( (colorItem1.Color == null) || !colorItem1.Color.HasValue || 
-          (colorItem2.Color == null) || !colorItem2.Color.HasValue )
+      if( ( colorItem1.Color == null ) || !colorItem1.Color.HasValue ||
+          ( colorItem2.Color == null ) || !colorItem2.Color.HasValue )
         return -1;
 
       System.Drawing.Color drawingColor1 = System.Drawing.Color.FromArgb( colorItem1.Color.Value.A, colorItem1.Color.Value.R, colorItem1.Color.Value.G, colorItem1.Color.Value.B );

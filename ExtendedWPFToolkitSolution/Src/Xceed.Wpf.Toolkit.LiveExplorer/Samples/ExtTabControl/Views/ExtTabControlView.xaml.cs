@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -38,5 +38,5 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.ExtendedTabControl.Views
 
 
 
-    }
   }
+}

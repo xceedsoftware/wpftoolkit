@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -21,13 +21,10 @@ using System.Windows;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using System.Windows.Input;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Media;
 using Xceed.Wpf.AvalonDock.Layout;
-using System.Windows.Documents;
 using Xceed.Wpf.AvalonDock.Themes;
 using Standard;
+using System.Windows.Threading;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
@@ -291,7 +288,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         root.FloatingWindows.Remove( this.Model as LayoutFloatingWindow );
       }
 
-      this.BringFocusOnDockingManager();  
+      this.BringFocusOnDockingManager();
     }
 
     protected override void OnInitialized( EventArgs e )
@@ -413,7 +410,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
           if( wParam != IntPtr.Zero )
           {
             handled = true;
-            var client = (RECT)Marshal.PtrToStructure( lParam, typeof( RECT ) );
+            var client = ( RECT )Marshal.PtrToStructure( lParam, typeof( RECT ) );
             client.Bottom -= 1;
             Marshal.StructureToPtr( client, lParam, false );
           }
@@ -438,7 +435,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         //  break;
 
         case Win32Helper.WM_ACTIVATE:
-          if( ( (int)wParam & 0xFFFF ) == Win32Helper.WA_INACTIVE )
+          if( ( ( int )wParam & 0xFFFF ) == Win32Helper.WA_INACTIVE )
           {
             if( lParam == this.GetParentWindowHandle() )
             {
@@ -481,7 +478,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
           }
           break;
         case Win32Helper.WM_SYSCOMMAND:
-          int command = (int)wParam & 0xFFF0;
+          int command = ( int )wParam & 0xFFF0;
           if( command == Win32Helper.SC_MAXIMIZE || command == Win32Helper.SC_RESTORE )
           {
             UpdateMaximizedState( command == Win32Helper.SC_MAXIMIZE );
@@ -500,7 +497,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
       if( !_isClosing )
       {
         _isClosing = true;
-        this.Close();
+
+        // Added Dispatcher to prevent InvalidOperationException issue in reference to bug case 
+        // DevOps #2106
+        Dispatcher.BeginInvoke( new Action( () =>
+        {
+          this.Close();
+        } ), DispatcherPriority.Send );
       }
     }
 
@@ -513,8 +516,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
       else
       {
-        if( (this.Model != null) && ( this.Model.Root != null) && ( this.Model.Root.Manager != null ) )
-        {                
+        if( ( this.Model != null ) && ( this.Model.Root != null ) && ( this.Model.Root.Manager != null ) )
+        {
           var firstUIElement = this.Model.Root.Manager.FindVisualChildren<UIElement>().Where( control => control.Focusable ).FirstOrDefault();
           if( firstUIElement != null )
           {
@@ -547,7 +550,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private void LayoutFloatingWindowControl_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )
     {
-      if( (bool)e.NewValue )
+      if( ( bool )e.NewValue )
       {
       }
     }

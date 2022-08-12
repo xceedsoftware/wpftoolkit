@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -191,7 +191,7 @@
                               Height="{Binding DropDownButtonHeight, RelativeSource={RelativeSource TemplatedParent}}"
                               Background="White"
                               Focusable="False"
-                              Content="{Binding DropDownButtonContent, RelativeSource={RelativeSource TemplatedParent}}"                              
+                              Content="{Binding DropDownButtonContent, RelativeSource={RelativeSource TemplatedParent}}"
                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                               Style="{StaticResource DateTimePickerToggleButtonStyle}"
                               IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
@@ -251,6 +251,7 @@
                                       AllowSpin="{TemplateBinding TimePickerAllowSpin}"
                                       Step="{TemplateBinding Step}"
                                       ShowButtonSpinner="{TemplateBinding TimePickerShowButtonSpinner}"
+                                      TimeListItemsStyle="{TemplateBinding TimePickerTimeListItemsStyle}"
                                       Watermark="{TemplateBinding TimeWatermark}"
                                       WatermarkTemplate="{TemplateBinding TimeWatermarkTemplate}"
                                       Visibility="{TemplateBinding TimePickerVisibility}" />
@@ -285,18 +286,18 @@
                       Property="Content"
                       Value="{Binding DropDownButtonDisabledContent, RelativeSource={RelativeSource TemplatedParent}}" />
             </Trigger>
-               <MultiTrigger>
-                  <MultiTrigger.Conditions>
-                     <Condition Property="ShowButtonSpinner"
-                                 Value="False" />
-                     <Condition Property="ShowDropDownButton"
-                                 Value="False" />
-                  </MultiTrigger.Conditions>
-                  <Setter Property="BorderThickness"
-                           Value="{Binding BorderThickness, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BorderThicknessConverter}}"
-                           TargetName="PART_Spinner" />
-               </MultiTrigger>
-            </ControlTemplate.Triggers>
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="ShowButtonSpinner"
+                           Value="False" />
+                <Condition Property="ShowDropDownButton"
+                           Value="False" />
+              </MultiTrigger.Conditions>
+              <Setter Property="BorderThickness"
+                      Value="{Binding BorderThickness, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BorderThicknessConverter}}"
+                      TargetName="PART_Spinner" />
+            </MultiTrigger>
+          </ControlTemplate.Triggers>
         </ControlTemplate>
       </Setter.Value>
     </Setter>

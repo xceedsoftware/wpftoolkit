@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,7 +16,6 @@
   *************************************************************************************/
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.CheckLists.Views
@@ -108,7 +107,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.CheckLists.Views
     {
       get
       {
-        string completeName = string.Format("{0} {1}", FirstName, LastName).PadRight(20);
+        string completeName = string.Format( "{0} {1}", FirstName, LastName ).PadRight( 20 );
         return string.Format(
           "ID={0}: Name= {1}, IsSelected= {2}",
           ID,

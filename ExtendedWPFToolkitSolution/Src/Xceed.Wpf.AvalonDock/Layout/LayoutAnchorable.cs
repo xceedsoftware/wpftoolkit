@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,12 +16,12 @@
   ***********************************************************************************/
 
 using System;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
-using System.Xml.Serialization;
 using System.Windows.Controls;
-using System.Globalization;
-using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
@@ -481,7 +481,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
       }
 
       // When InitialContainer exists, set it to PreviousContainer in order to dock in expected position.
-      this.PreviousContainer = ( this.InitialContainer != null) ? this.InitialContainer : null;
+      this.PreviousContainer = ( this.InitialContainer != null ) ? this.InitialContainer : null;
       this.PreviousContainerIndex = ( this.InitialContainerIndex != -1 ) ? this.InitialContainerIndex : -1;
 
       this.InitialContainer = null;
@@ -751,15 +751,18 @@ namespace Xceed.Wpf.AvalonDock.Layout
         Hidden( this, EventArgs.Empty );
     }
 
-    internal void CloseAnchorable()
+    internal bool CloseAnchorable()
     {
-      if( this.TestCanClose() )
+      var canClose = this.TestCanClose();
+      if( canClose )
       {
         if( this.IsAutoHidden )
           this.ToggleAutoHide();
 
         this.CloseInternal();
       }
+
+      return canClose;
     }
 
     internal void SetCanCloseInternal( bool canClose )

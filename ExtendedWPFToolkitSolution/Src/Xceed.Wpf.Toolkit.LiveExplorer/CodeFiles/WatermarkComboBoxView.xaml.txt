@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2021 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -22,70 +22,72 @@
                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                 Title="WatermarkComboBox">
 
-   <local:DemoView.Description>
-      <Paragraph FontSize="14"
+  <local:DemoView.Description>
+    <Paragraph FontSize="14"
                  FontFamily="Segoe">
-         <Run>The WatermarkComboBox is a ComboBox with a fully customizable watermark.</Run>
-      </Paragraph>
-   </local:DemoView.Description>
+      <Run>The WatermarkComboBox is a ComboBox with a fully customizable watermark.</Run>
+    </Paragraph>
+  </local:DemoView.Description>
 
-   <local:DemoView.Resources>
-      <DataTemplate x:Key="WatermarkComboBoxTemplate1">
-         <Grid>
-            <StackPanel Orientation="Horizontal">
-               <Image Source="..\Resources\PencilTool16.png" />
-               <TextBlock Text="{Binding}"
+  <local:DemoView.Resources>
+    <DataTemplate x:Key="WatermarkComboBoxTemplate1">
+      <Grid>
+        <StackPanel Orientation="Horizontal">
+          <Image Source="..\Resources\PencilTool16.png" />
+          <TextBlock Text="{Binding}"
                           Foreground="Green"
                           FontFamily="Sans Serif"
                           FontWeight="Bold"
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"
                           Margin="4,0,0,0"/>
-            </StackPanel>           
-         </Grid>
-      </DataTemplate>
+        </StackPanel>
+      </Grid>
+    </DataTemplate>
 
-      <DataTemplate x:Key="WatermarkComboBoxTemplate2">
-         <Border BorderBrush="Green"
+    <DataTemplate x:Key="WatermarkComboBoxTemplate2">
+      <Border BorderBrush="Green"
                  BorderThickness="1">
-            <TextBlock Text="{Binding}"
+        <TextBlock Text="{Binding}"
                        Foreground="Red"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center" />
-         </Border>
-      </DataTemplate>
-   </local:DemoView.Resources>
+      </Border>
+    </DataTemplate>
+  </local:DemoView.Resources>
 
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
 
-      <GroupBox Header="Features"
+    <GroupBox Header="Features"
                 Margin="5">
-         <Grid Margin="5">
-            <Grid.RowDefinitions>
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="Auto" />
-               <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+      <Grid Margin="5">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Watermark: "
+        <TextBlock Text="Watermark: "
                        VerticalAlignment="Center" />
-            <TextBox Grid.Column="1"
+        <TextBox Grid.Column="1"
                      HorizontalAlignment="Stretch"
                      VerticalAlignment="Center"
                      Margin="5"
                      ToolTip="Gets/Sets the watermark when there are no comboBoxItem selected and focus is not on WatermarkComboBox."
                      Text="{Binding Watermark, ElementName=_watermarkComboBox, UpdateSourceTrigger=PropertyChanged}" />
-            <TextBlock Text="WatermarkTemplate: "
+        <TextBlock Text="WatermarkTemplate: "
                        Grid.Row="1"
                        VerticalAlignment="Center" />
-            <ComboBox Grid.Column="1"
+        <ComboBox Grid.Column="1"
                       Grid.Row="1"
                       Width="150"
                       Margin="5"
@@ -93,37 +95,55 @@
                       VerticalAlignment="Center"
                       SelectedValue="{Binding WatermarkTemplate, ElementName=_watermarkComboBox}"
                       SelectedValuePath="Tag">
-               <ComboBoxItem Content="Default"
+          <ComboBoxItem Content="Default"
                              Tag="{x:Null}" />
-               <ComboBoxItem Content="Template 1"
+          <ComboBoxItem Content="Template 1"
                              Tag="{StaticResource WatermarkComboBoxTemplate1}" />
-               <ComboBoxItem Content="Template 2"
+          <ComboBoxItem Content="Template 2"
                              Tag="{StaticResource WatermarkComboBoxTemplate2}" />
-            </ComboBox>
-         </Grid>
-      </GroupBox>
+        </ComboBox>
+        <TextBlock Text="WatermarkBackgound: "
+                       Grid.Row="2"
+                       VerticalAlignment="Center" />
+        <ComboBox Grid.Column="1"
+                      Grid.Row="2"
+                      Width="150"
+                      Margin="5"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Center"
+                      SelectedValue="{Binding WatermarkBackground, ElementName=_watermarkComboBox}"
+                      SelectedValuePath="Tag">
+          <ComboBoxItem Content="Default" Tag="{x:Null}" />
+          <ComboBoxItem Foreground="Blue" Tag="Blue" Content="Blue" />
+          <ComboBoxItem Foreground="Orange" Tag="Orange" Content="Orange" />
+          <ComboBoxItem Foreground="Green" Tag="Green" Content="Green" />
+        </ComboBox>
 
-      <StackPanel Grid.Row="1"
+      </Grid>
+    </GroupBox>
+
+    <StackPanel Grid.Row="1"
                   Margin="10">
 
-         <TextBlock Text="Usage:"
+      <TextBlock Text="Usage:"
                     Margin="10"
                     Style="{StaticResource Header}" />
 
-         <xctk:WatermarkComboBox x:Name="_watermarkComboBox"
-                                 Margin="10"
-                                 Width="350"
-                                 IsEditable="True"
-                                 Watermark="Choose a ComboBox Item..."
-                                 WatermarkTemplate="{x:Null}"
-                                 VerticalContentAlignment="Center">
-            <ComboBoxItem Content="Red" />
-            <ComboBoxItem Content="Green" />
-            <ComboBoxItem Content="Blue" />
-            <ComboBoxItem Content="Yellow" />
-            <ComboBoxItem Content="Black" />
-         </xctk:WatermarkComboBox>
+      <xctk:WatermarkComboBox x:Name="_watermarkComboBox"
+                              Margin="10"
+                              Width="350"
+                              IsEditable="True"
+                              Watermark="Choose a ComboBox Item..."
+                              WatermarkTemplate="{x:Null}"
+                              WatermarkBackground="{x:Null}"
+                              VerticalContentAlignment="Center">
+        <ComboBoxItem Content="Red" />
+        <ComboBoxItem Content="Green" />
+        <ComboBoxItem Content="Blue" />
+        <ComboBoxItem Content="Yellow" />
+        <ComboBoxItem Content="Black" />
+      </xctk:WatermarkComboBox>
 
-      </StackPanel>
-   </Grid>
+    </StackPanel>
+  </Grid>
 </local:DemoView>

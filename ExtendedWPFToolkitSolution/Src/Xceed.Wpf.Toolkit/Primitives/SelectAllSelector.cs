@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,10 +15,10 @@
 
   ***********************************************************************************/
 
-using System.Collections.Specialized;
-using System.Windows;
-using System.Linq;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Windows;
 
 namespace Xceed.Wpf.Toolkit.Primitives
 {
@@ -34,6 +34,35 @@ namespace Xceed.Wpf.Toolkit.Primitives
     #endregion
 
     #region Properties
+
+    #region AllItemsSelectedContent
+
+    public static readonly DependencyProperty AllItemsSelectedContentProperty = DependencyProperty.Register( "AllItemsSelectedContent", typeof( string ), typeof( SelectAllSelector )
+      , new UIPropertyMetadata( "All", OnAllItemsSelectedContentChanged ) );
+    public string AllItemsSelectedContent
+    {
+      get
+      {
+        return ( string )GetValue( AllItemsSelectedContentProperty );
+      }
+      set
+      {
+        SetValue( AllItemsSelectedContentProperty, value );
+      }
+    }
+
+    private static void OnAllItemsSelectedContentChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var selectAllSelector = o as SelectAllSelector;
+      if( selectAllSelector != null )
+        selectAllSelector.OnAllItemsSelectedContentChanged( ( string )e.OldValue, ( string )e.NewValue );
+    }
+
+    protected virtual void OnAllItemsSelectedContentChanged( string oldValue, string newValue )
+    {
+    }
+
+    #endregion // SelectAllText
 
     #region IsSelectAllActive
 
@@ -115,7 +144,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     public void SelectAll()
     {
-      var currentSelectedItems = new List<object>(this.SelectedItems as IEnumerable<object>);
+      var currentSelectedItems = new List<object>( this.SelectedItems as IEnumerable<object> );
       var items = this.ItemsCollection.Cast<object>();
 
       // Have a faster selection when there are more than 200 items.
@@ -123,7 +152,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
       // Raise SelectionChanged for new selected items.
       var newSelectedItems = items.Except( currentSelectedItems );
-      foreach ( var item in newSelectedItems)
+      foreach( var item in newSelectedItems )
       {
         this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, true ) );
       }
@@ -136,7 +165,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       this.SelectedItems.Clear();
 
       // Raise SelectionChanged for selected items.
-      foreach (var item in currentSelectedItems)
+      foreach( var item in currentSelectedItems )
       {
         this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, false ) );
       }

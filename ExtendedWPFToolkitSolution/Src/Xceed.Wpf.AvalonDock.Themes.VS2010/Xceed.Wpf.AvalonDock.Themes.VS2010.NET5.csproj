@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>obj\net5\</BaseIntermediateOutputPath>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <RootNamespace>Xceed.Wpf.AvalonDock.Themes</RootNamespace>
+    <AssemblyName>Xceed.Wpf.AvalonDock.Themes.VS2010.NET5</AssemblyName>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NET5</DefineConstants>
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;NET5</DefineConstants>
+    <DebugType>none</DebugType>
+    <DebugSymbols>False</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Page Include="Brushes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Theme.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="..\Xceed.Wpf.Toolkit\AssemblyVersionInfo.cs">
+      <Link>AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Xceed.Wpf.Toolkit\AssemblyVersionInfoCommon.cs">
+      <Link>AssemblyVersionInfoCommon.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="VS2010Theme.cs" />
+    <AppDesigner Include="Properties\" />
+    <Resource Include="Images\DockAnchorableBottom.png" />
+    <Resource Include="Images\DockAnchorableLeft.png" />
+    <Resource Include="Images\DockAnchorableRight.png" />
+    <Resource Include="Images\DockAnchorableTop.png" />
+    <Resource Include="Images\DockDocumentAsAnchorableBottom.png" />
+    <Resource Include="Images\DockDocumentAsAnchorableLeft.png" />
+    <Resource Include="Images\DockDocumentAsAnchorableRight.png" />
+    <Resource Include="Images\DockDocumentAsAnchorableTop.png" />
+    <Resource Include="Images\DockDocumentBottom.png" />
+    <Resource Include="Images\DockDocumentInside.png" />
+    <Resource Include="Images\DockDocumentLeft.png" />
+    <Resource Include="Images\DockDocumentRight.png" />
+    <Resource Include="Images\DockDocumentTop.png" />
+    <Resource Include="Images\DockPaneEmpty.png" />
+    <Resource Include="Images\DockPaneLargeEmpty.png" />
+    <Resource Include="Images\HTabGroup.png" />
+    <Resource Include="Images\Locked.png" />
+    <Resource Include="Images\PinAutoHide.png" />
+    <Resource Include="Images\PinClose.png" />
+    <Resource Include="Images\PinDocMenu.png" />
+    <Resource Include="Images\PinMenu.png" />
+    <Resource Include="Images\VTabGroup.png" />
+    <Resource Include="Images\PinAutoHide_Dark.png" />
+    <Resource Include="Images\PinClose_Dark.png" />
+    <Resource Include="Images\PinMenu_Dark.png" />
+    <Resource Include="Images\PinMaximize.png" />
+    <Resource Include="Images\PinRestore.png" />
+    <Resource Include="Images\PinMaximize_Dark.png" />
+    <Resource Include="Images\PinRestore_Dark.png" />
+    <Resource Include="Images\PinDocMenu_Black.png" />
+    <Resource Include="Images\PinAutoHide_Black.png" />
+    <Resource Include="Images\PinClose_Black.png" />
+    <Resource Include="Images\PinMaximize_Black.png" />
+    <Resource Include="Images\PinMenu_Black.png" />
+    <Resource Include="Images\PinRestore_Black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.NET5.csproj" />
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+</Project>

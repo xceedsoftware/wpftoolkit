@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,14 +16,13 @@
   ***********************************************************************************/
 
 using System;
-using System.Linq;
-using System.Windows.Markup;
-using System.Xml.Serialization;
-using System.Windows;
-using System.Globalization;
-using System.Windows.Media;
 using System.ComponentModel;
-using Xceed.Wpf.AvalonDock.Controls;
+using System.Globalization;
+using System.Linq;
+using System.Windows;
+using System.Windows.Markup;
+using System.Windows.Media;
+using System.Xml.Serialization;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
@@ -43,7 +42,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     #region Title
 
-    public static readonly DependencyProperty TitleProperty =  DependencyProperty.Register( "Title", typeof( string ), typeof( LayoutContent ), new UIPropertyMetadata( null, OnTitlePropertyChanged, CoerceTitleValue ) );
+    public static readonly DependencyProperty TitleProperty = DependencyProperty.Register( "Title", typeof( string ), typeof( LayoutContent ), new UIPropertyMetadata( null, OnTitlePropertyChanged, CoerceTitleValue ) );
 
     public string Title
     {
@@ -114,7 +113,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
     {
       get
       {
-        return (string)GetValue( ContentIdProperty );
+        return ( string )GetValue( ContentIdProperty );
       }
       set
       {
@@ -127,7 +126,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
       var layoutContent = obj as LayoutContent;
       if( layoutContent != null )
       {
-        layoutContent.OnContentIdPropertyChanged( (string)args.OldValue, (string)args.NewValue );
+        layoutContent.OnContentIdPropertyChanged( ( string )args.OldValue, ( string )args.NewValue );
       }
     }
 
@@ -897,9 +896,9 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
       if( this is LayoutAnchorable )
       {
-        if( ( (LayoutAnchorable)this ).CanClose )
+        if( ( ( LayoutAnchorable )this ).CanClose )
         {
-          ( (LayoutAnchorable)this ).SetCanCloseInternal( true );
+          ( ( LayoutAnchorable )this ).SetCanCloseInternal( true );
         }
       }
 
@@ -958,12 +957,13 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         IsSelected = true;
         IsActive = true;
-        IsFloating = false;
       }
       else
       {
         InternalDock();
       }
+
+      IsFloating = false;
 
       if( this.Root != null )
       {
@@ -1043,6 +1043,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
     public event EventHandler<CancelEventArgs> Closing;
 
 
-#endregion
+    #endregion
   }
 }

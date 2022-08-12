@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -64,7 +64,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (object)GetValue( DropDownButtonContentProperty );
+        return ( object )GetValue( DropDownButtonContentProperty );
       }
       set
       {
@@ -81,7 +81,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (object)GetValue( DropDownButtonDisabledContentProperty );
+        return ( object )GetValue( DropDownButtonDisabledContentProperty );
       }
       set
       {
@@ -98,7 +98,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( DropDownButtonHeightProperty );
+        return ( double )GetValue( DropDownButtonHeightProperty );
       }
       set
       {
@@ -115,7 +115,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return (double)GetValue( DropDownButtonWidthProperty );
+        return ( double )GetValue( DropDownButtonWidthProperty );
       }
       set
       {
@@ -314,7 +314,7 @@ namespace Xceed.Wpf.Toolkit
           {
             if( this.UpdateValueOnEnterKey )
             {
-              this.TextBox.Text = (_initialValue != null) ? _initialValue.Value.ToString( this.FormatString, this.CultureInfo ) : null;
+              this.TextBox.Text = ( _initialValue != null ) ? _initialValue.Value.ToString( this.FormatString, this.CultureInfo ) : null;
             }
             else
             {

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -15,43 +15,56 @@
 
   ***********************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
   public static class StringConstants
   {
     public static string Local
     {
-      get { return "Local"; }
+      get
+      {
+        return "Local";
+      }
     }
 
     public static string Resource
     {
-      get { return "Resource"; }
+      get
+      {
+        return "Resource";
+      }
     }
 
     public static string Databinding
     {
-      get { return "Databinding"; }
+      get
+      {
+        return "Databinding";
+      }
     }
 
     public static string Inheritance
     {
-      get { return "Inheritance"; }
+      get
+      {
+        return "Inheritance";
+      }
     }
 
     public static string StyleSetter
     {
-      get { return "Style Setter"; }
+      get
+      {
+        return "Style Setter";
+      }
     }
 
     public static string Default
     {
-      get { return "Default"; }
+      get
+      {
+        return "Default";
+      }
     }
   }
 }

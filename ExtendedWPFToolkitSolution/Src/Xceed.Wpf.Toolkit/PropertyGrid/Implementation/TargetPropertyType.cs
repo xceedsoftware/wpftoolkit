@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -16,10 +16,6 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -35,8 +31,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     public Type Type
     {
-      get { return _type; }
-      set 
+      get
+      {
+        return _type;
+      }
+      set
       {
         if( _sealed )
           throw new InvalidOperationException(
@@ -44,7 +43,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
             "{0}.Type property cannot be modified once the instance is used",
             typeof( TargetPropertyType ) ) );
 
-        _type = value; 
+        _type = value;
       }
     }
 

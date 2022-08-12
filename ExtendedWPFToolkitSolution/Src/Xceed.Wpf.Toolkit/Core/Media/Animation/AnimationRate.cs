@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -18,8 +18,8 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using Xceed.Wpf.Toolkit.Core.Utilities;
 using Xceed.Wpf.Toolkit.Core;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit.Media.Animation
 {
@@ -99,11 +99,11 @@ namespace Xceed.Wpf.Toolkit.Media.Animation
         if( this.HasDuration )
           return TimeSpan.FromTicks( _duration );
 
-        throw new InvalidOperationException( 
+        throw new InvalidOperationException(
           string.Format(
             ErrorMessages.GetMessage( ErrorMessages.InvalidRatePropertyAccessed ),
-            "Duration", 
-            this, 
+            "Duration",
+            this,
             "Speed" ) );
       }
     }
@@ -131,11 +131,11 @@ namespace Xceed.Wpf.Toolkit.Media.Animation
         if( this.HasSpeed )
           return _speed;
 
-        throw new InvalidOperationException( 
+        throw new InvalidOperationException(
           string.Format(
             ErrorMessages.GetMessage( ErrorMessages.InvalidRatePropertyAccessed ),
-            "Speed", 
-            this, 
+            "Speed",
+            this,
             "Duration" ) );
       }
     }

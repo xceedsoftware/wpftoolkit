@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -17,10 +17,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
 using System.Globalization;
+using System.Linq;
+using System.Windows.Data;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit.Converters
@@ -40,11 +39,11 @@ namespace Xceed.Wpf.Toolkit.Converters
     {
 
       if( values.Length != 2 )
-        throw new ArgumentException("The 'values' argument should contain 2 objects.");
+        throw new ArgumentException( "The 'values' argument should contain 2 objects." );
 
       if( values[ 1 ] != null )
       {
-        if( !values[ 1 ].GetType().IsGenericType || !(values[ 1 ].GetType().GetGenericArguments().First().GetType() is Type) )
+        if( !values[ 1 ].GetType().IsGenericType || !( values[ 1 ].GetType().GetGenericArguments().First().GetType() is Type ) )
           throw new ArgumentException( "The 'value' argument is not of the correct type." );
 
         return values[ 1 ];

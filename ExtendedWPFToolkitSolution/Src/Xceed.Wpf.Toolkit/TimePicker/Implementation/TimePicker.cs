@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -17,11 +17,11 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Core.Utilities;
-using System.Collections.Generic;
 using Xceed.Wpf.Toolkit.Primitives;
 
 namespace Xceed.Wpf.Toolkit
@@ -97,6 +97,48 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //Format
+
+    #region TimeListItemsStyle
+
+    /// <summary>
+    /// TimeListItemsStyle Dependency Property
+    /// </summary>
+    public static readonly DependencyProperty TimeListItemsStyleProperty = DependencyProperty.Register( "TimeListItemsStyle", typeof( Style ), typeof( TimePicker ),
+            new FrameworkPropertyMetadata( ( Style )null, new PropertyChangedCallback( OnTimeListItemsStyleChanged ) ) );
+
+    /// <summary>
+    /// Gets or sets the TimeListItemsStyle property.  
+    /// This dependency property indicates the style to apply to TimeListItems objects.
+    /// </summary>
+    public Style TimeListItemsStyle
+    {
+      get
+      {
+        return ( Style )GetValue( TimeListItemsStyleProperty );
+      }
+      set
+      {
+        SetValue( TimeListItemsStyleProperty, value );
+      }
+    }
+
+    /// <summary>
+    /// Handles changes to the TimeListItemsStyle property.
+    /// </summary>
+    private static void OnTimeListItemsStyleChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      ( ( TimePicker )d ).OnTimeListItemsStyleChanged( e );
+    }
+
+    /// <summary>
+    /// Provides derived classes an opportunity to handle changes to the TimeListItemsStyle property.
+    /// </summary>
+    protected virtual void OnTimeListItemsStyleChanged( DependencyPropertyChangedEventArgs e )
+    {
+      // TODO: Add your property changed side-effects. Descendants can override as well.
+    }
+
+    #endregion
 
     #region MaxDropDownHeight
 
@@ -307,7 +349,7 @@ namespace Xceed.Wpf.Toolkit
       {
         this.UpdateListBoxItems();
 
-        var time = (this.Value != null) ? this.Value.Value.TimeOfDay : TimePicker.StartTimeDefaultValue;
+        var time = ( this.Value != null ) ? this.Value.Value.TimeOfDay : TimePicker.StartTimeDefaultValue;
         var nearestItem = this.GetNearestTimeItem( time );
         if( nearestItem != null )
         {
@@ -395,8 +437,8 @@ namespace Xceed.Wpf.Toolkit
         //}
         //else
         //{
-          var date = this.Value ?? this.ContextNow;
-          this.Value = new DateTime( date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds, date.Kind );
+        var date = this.Value ?? this.ContextNow;
+        this.Value = new DateTime( date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds, date.Kind );
         //}
       }
     }
@@ -476,7 +518,7 @@ namespace Xceed.Wpf.Toolkit
     protected virtual TimeItem CreateTimeItem( TimeSpan time )
     {
       var date = Value ?? this.ContextNow;
-      string formatString = this.GetFormatString( (DateTimeFormat)this.Format );
+      string formatString = this.GetFormatString( ( DateTimeFormat )this.Format );
       return new TimeItem( date.Date.Add( time ).ToString( formatString, CultureInfo ), time );
     }
 

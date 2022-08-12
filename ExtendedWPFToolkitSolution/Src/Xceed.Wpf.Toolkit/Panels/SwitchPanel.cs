@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2020 Xceed Software Inc.
+   Copyright (C) 2007-2022 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -23,12 +23,10 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Xceed.Wpf.Toolkit.Primitives;
-using Xceed.Wpf.Toolkit.Media.Animation;
 using Xceed.Wpf.Toolkit.Core.Utilities;
+using Xceed.Wpf.Toolkit.Media.Animation;
 
 namespace Xceed.Wpf.Toolkit.Panels
 {
@@ -118,7 +116,7 @@ namespace Xceed.Wpf.Toolkit.Panels
       this.RaiseActiveLayoutChangedEvent();
       this.Dispatcher.BeginInvoke(
         DispatcherPriority.Normal,
-        ( ThreadStart )delegate()
+        ( ThreadStart )delegate ()
         {
           this.UpdateSwitchTemplate();
         } );
