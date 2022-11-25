@@ -34,6 +34,8 @@ using Xceed.Wpf.AvalonDock.Themes;
 using System.Diagnostics;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
+using System.IO;
+using System.Reflection;
 
 namespace Xceed.Wpf.AvalonDock
 {
@@ -99,6 +101,32 @@ namespace Xceed.Wpf.AvalonDock
 
 
 
+
+    #region AllowMovingFloatingWindowWithKeyboard
+
+    /// <summary>
+    /// AllowMovingFloatingWindowWithKeyboard Dependency Property
+    /// </summary>
+    public static readonly DependencyProperty AllowMovingFloatingWindowWithKeyboardProperty = DependencyProperty.Register( "AllowMovingFloatingWindowWithKeyboard", typeof( bool ), typeof( DockingManager ),
+              new FrameworkPropertyMetadata( ( bool )false ) );
+
+    /// <summary>
+    /// Gets/sets the AllowMovingFloatingWindowWithKeyboard property.  This dependency property 
+    /// indicates if the window can be moved with arrows keys.
+    /// </summary>
+    public bool AllowMovingFloatingWindowWithKeyboard
+    {
+      get
+      {
+        return ( bool )GetValue( AllowMovingFloatingWindowWithKeyboardProperty );
+      }
+      private set
+      {
+        SetValue( AllowMovingFloatingWindowWithKeyboardProperty, value );
+      }
+    }
+
+    #endregion
 
     #region Layout
 
@@ -2098,8 +2126,12 @@ namespace Xceed.Wpf.AvalonDock
         };
         newFW.SetParentToMainWindowOf( this );
 
-        var mainWindow = Window.GetWindow( this );
-        newFW.InputBindings.AddRange( mainWindow.InputBindings );
+        var parent = this.Parent as FrameworkElement;
+        while( parent != null )
+        {
+          newFW.InputBindings.AddRange( parent.InputBindings );
+          parent = parent.Parent as FrameworkElement;
+        }
 
         var paneForExtensions = modelFW.RootPanel.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault();
         if( paneForExtensions != null )
@@ -2142,6 +2174,13 @@ namespace Xceed.Wpf.AvalonDock
           //Owner = Window.GetWindow(this) 
         };
         newFW.SetParentToMainWindowOf( this );
+
+        var parent = this.Parent as FrameworkElement;
+        while( parent != null )
+        {
+          newFW.InputBindings.AddRange( parent.InputBindings );
+          parent = parent.Parent as FrameworkElement;
+        }
 
         var paneForExtensions = modelFW.RootDocument;
         if( paneForExtensions != null )
@@ -2438,7 +2477,7 @@ namespace Xceed.Wpf.AvalonDock
 #if VS2008
           this.ActiveContent = ( Layout.ActiveContent != null ) ? Layout.ActiveContent.Content : null;
 #else
-          this.SetCurrentValue( DockingManager.ActiveContentProperty, ( Layout.ActiveContent != null ) ? Layout.ActiveContent.Content : null );
+          this.SetCurrentValue( DockingManager.ActiveContentProperty, ( Layout.ActiveContent != null ) ? Layout.ActiveContent : null );
 #endif
         }
       }
@@ -2866,7 +2905,6 @@ namespace Xceed.Wpf.AvalonDock
 
 
         CreateAnchorableLayoutItem( anchorableToImport );
-
       }
 
       _suspendLayoutItemCreation = false;
@@ -3043,11 +3081,26 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    private void InternalSetActiveContent( object contentObject )
+    private void InternalSetActiveContent( object activeContent )
     {
-      var layoutContent = Layout.Descendents().OfType<LayoutContent>().FirstOrDefault( lc => lc == contentObject || lc.Content == contentObject );
+      var activeLayoutContent = activeContent as LayoutContent;
+      var layoutContent = this.Layout.Descendents().OfType<LayoutContent>().FirstOrDefault( lc =>
+      {
+        if( activeLayoutContent != null )
+        {
+          if( activeLayoutContent.Content != null )
+            return ( ( lc == activeLayoutContent.Content ) || ( lc.Content == activeLayoutContent.Content ) );
+
+          if( activeLayoutContent.ContentId != null )
+            return ( lc.ContentId == activeLayoutContent.ContentId );
+        }
+        else
+          return ( ( lc == activeContent ) || ( lc.Content == activeContent ) );
+
+        return ( ( lc == null ) || ( lc.Content == null ) );
+      } );
       _insideInternalSetActiveContent = true;
-      Layout.ActiveContent = layoutContent;
+      this.Layout.ActiveContent = layoutContent;
       _insideInternalSetActiveContent = false;
     }
 
@@ -3207,6 +3260,9 @@ namespace Xceed.Wpf.AvalonDock
 
     private LayoutFloatingWindowControl CreateFloatingWindowForLayoutAnchorableWithoutParent( LayoutAnchorablePane paneModel, bool isContentImmutable )
     {
+      var selectedlayoutContent = paneModel.SelectedContent;
+      this.RaisePreviewFloatEvent( selectedlayoutContent );
+
       if( paneModel.Children.Any( c => !c.CanFloat ) )
         return null;
       var paneAsPositionableElement = paneModel as ILayoutPositionableElement;
@@ -3282,19 +3338,23 @@ namespace Xceed.Wpf.AvalonDock
         Left = fwLeft
       };
 
-      var mainWindow = Window.GetWindow( this );
-      fwc.InputBindings.AddRange( mainWindow.InputBindings );
+      this.ShowInTaskbar( fwc );
+
+      var parent = this.Parent as FrameworkElement;
+      while( parent != null )
+      {
+        fwc.InputBindings.AddRange( parent.InputBindings );
+        parent = parent.Parent as FrameworkElement;
+      }
 
       foreach( var layoutContent in destPane.Children )
       {
         layoutContent.IsFloating = true;
       }
 
-      //fwc.Owner = Window.GetWindow(this);
-      //fwc.SetParentToMainWindowOf(this);
-
-
       _fwList.Add( fwc );
+
+      this.RaiseFloatedEvent( selectedlayoutContent );
 
       Layout.CollectGarbage();
 
@@ -3305,11 +3365,13 @@ namespace Xceed.Wpf.AvalonDock
 
     private LayoutFloatingWindowControl CreateFloatingWindowCore( LayoutContent contentModel, bool isContentImmutable )
     {
+      this.RaisePreviewFloatEvent( contentModel );
+
       if( !contentModel.CanFloat )
         return null;
+
       var contentModelAsAnchorable = contentModel as LayoutAnchorable;
-      if( contentModelAsAnchorable != null &&
-          contentModelAsAnchorable.IsAutoHidden )
+      if( contentModelAsAnchorable != null && contentModelAsAnchorable.IsAutoHidden )
         contentModelAsAnchorable.ToggleAutoHide();
 
       this.UpdateStarSize( contentModel );
@@ -3318,6 +3380,7 @@ namespace Xceed.Wpf.AvalonDock
       var parentPaneAsPositionableElement = contentModel.Parent as ILayoutPositionableElement;
       var parentPaneAsWithActualSize = contentModel.Parent as ILayoutPositionableElementWithActualSize;
       var contentModelParentChildrenIndex = parentPane.Children.ToList().IndexOf( contentModel );
+
 
       if( contentModel.FindParent<LayoutFloatingWindow>() == null )
       {
@@ -3407,23 +3470,64 @@ namespace Xceed.Wpf.AvalonDock
           Left = contentModel.FloatingLeft,
           Top = contentModel.FloatingTop
         };
+
       }
 
+      this.ShowInTaskbar( fwc );
       contentModel.IsFloating = true;
 
-      //fwc.Owner = Window.GetWindow(this);
-      //fwc.SetParentToMainWindowOf(this);
-
-      var mainWindow = Window.GetWindow( this );
-      fwc.InputBindings.AddRange( mainWindow.InputBindings );
+      var parent = this.Parent as FrameworkElement;
+      while( parent != null )
+      {
+        fwc.InputBindings.AddRange( parent.InputBindings );
+        parent = parent.Parent as FrameworkElement;
+      }
 
       _fwList.Add( fwc );
+
+      this.RaiseFloatedEvent( contentModel );
 
       Layout.CollectGarbage();
 
       UpdateLayout();
 
       return fwc;
+    }
+
+    private void ShowInTaskbar( LayoutFloatingWindowControl fwc )
+    {
+      var layouts = fwc.Model.Descendents().OfType<LayoutContent>().Where( l => l != null );
+
+      if( layouts != null )
+      {
+        fwc.ShowInTaskbar = true;
+        if( layouts.Count() > 1 )
+        {
+          var selectedLayout = layouts.FirstOrDefault( l => l.IsSelected );
+          fwc.Title = ( selectedLayout != null ) ? selectedLayout.Title : "";
+        }
+        else
+        {
+          fwc.Title = layouts.ElementAt( 0 ).Title ?? "";
+        }
+      }
+
+      RenameWindowTitleForMultipleDockingManagerRunningInstances( fwc );
+    }
+
+    private void RenameWindowTitleForMultipleDockingManagerRunningInstances( LayoutFloatingWindowControl fwc )
+    {
+      // Check if others applications run DockingManager
+      var exists = Process.GetProcessesByName( Path.GetFileNameWithoutExtension( Assembly.GetEntryAssembly().Location ) ).Count() > 1;
+
+      if( exists )
+      {
+        var mainWindowTitle = Window.GetWindow( this ).Title;
+        if( !string.IsNullOrEmpty( mainWindowTitle ) )
+        {
+          fwc.Title = mainWindowTitle + " - " + fwc.Title;
+        }
+      }
     }
 
     private Size UpdateFloatingDimensions( ILayoutElementForFloatingWindow contentModel, Size currentSize )
@@ -3644,6 +3748,87 @@ namespace Xceed.Wpf.AvalonDock
       return _areas;
     }
 
+    public static readonly RoutedEvent PreviewFloatEvent = EventManager.RegisterRoutedEvent( "PreviewFloat", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( DockingManager ) );
+
+    public event RoutedEventHandler PreviewFloat
+    {
+      add
+      {
+        AddHandler( PreviewFloatEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( PreviewFloatEvent, value );
+      }
+    }
+
+    protected virtual void RaisePreviewFloatEvent( LayoutContent layoutContent )
+    {
+      var args = new RoutedEventArgs( DockingManager.PreviewFloatEvent, layoutContent );
+      RaiseEvent( args );
+    }
+
+    public static readonly RoutedEvent FloatedEvent = EventManager.RegisterRoutedEvent( "Floated", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( DockingManager ) );
+
+    public event RoutedEventHandler Floated
+    {
+      add
+      {
+        AddHandler( FloatedEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( FloatedEvent, value );
+      }
+    }
+
+    protected virtual void RaiseFloatedEvent( LayoutContent layoutContent )
+    {
+      var args = new RoutedEventArgs( DockingManager.FloatedEvent, layoutContent );
+      RaiseEvent( args );
+    }
+
+
+    public static readonly RoutedEvent PreviewDockEvent = EventManager.RegisterRoutedEvent( "PreviewDock", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( DockingManager ) );
+
+    public event RoutedEventHandler PreviewDock
+    {
+      add
+      {
+        AddHandler( PreviewDockEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( PreviewDockEvent, value );
+      }
+    }
+
+    protected internal virtual void RaisePreviewDockEvent( LayoutContent layoutContent )
+    {
+      var args = new RoutedEventArgs( DockingManager.PreviewDockEvent, layoutContent );
+      RaiseEvent( args );
+    }
+
+    public static readonly RoutedEvent DockedEvent = EventManager.RegisterRoutedEvent( "Docked", RoutingStrategy.Bubble, typeof( RoutedEventHandler ), typeof( DockingManager ) );
+
+    public event RoutedEventHandler Docked
+    {
+      add
+      {
+        AddHandler( DockedEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( DockedEvent, value );
+      }
+    }
+
+    protected internal virtual void RaiseDockedEvent( LayoutContent layoutContent )
+    {
+      var args = new RoutedEventArgs( DockingManager.DockedEvent, layoutContent );
+      RaiseEvent( args );
+    }
+
     #endregion
 
     #region IWeakEventListener
@@ -3676,5 +3861,10 @@ namespace Xceed.Wpf.AvalonDock
     }
 
     #endregion
+
   }
+
+
 }
+
+

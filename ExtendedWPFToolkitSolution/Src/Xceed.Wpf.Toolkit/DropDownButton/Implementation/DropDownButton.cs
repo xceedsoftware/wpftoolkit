@@ -16,12 +16,15 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
@@ -262,12 +265,28 @@ namespace Xceed.Wpf.Toolkit
         _popup.Opened += Popup_Opened;
     }
 
+
     protected override void OnIsKeyboardFocusWithinChanged( DependencyPropertyChangedEventArgs e )
     {
       base.OnIsKeyboardFocusWithinChanged( e );
+
       if( !( bool )e.NewValue )
       {
-        this.CloseDropDown( false );
+        var contextMenu = this.GetContextMenu( _popup.Child );
+
+        if( contextMenu == null ) 
+          this.CloseDropDown( false );
+        else
+        {
+          RoutedEventHandler handler = null;
+          handler = new RoutedEventHandler( ( s, a ) =>
+          {
+            contextMenu.Closed -= handler;
+            if( !this.IsKeyboardFocusWithin )
+              this.CloseDropDown( false );
+          } );
+          contextMenu.Closed += handler;
+        }
       }
     }
 
@@ -338,6 +357,32 @@ namespace Xceed.Wpf.Toolkit
     #endregion //Events
 
     #region Event Handlers
+
+    private ContextMenu GetContextMenu( DependencyObject parent )
+    {
+      if( parent == null )
+        return null;
+
+      for( int i = 0; i < VisualTreeHelper.GetChildrenCount( parent ); i++ )
+      {
+        var child = VisualTreeHelper.GetChild( parent, i );
+        if( child == null )
+          continue;
+
+        if( child is FrameworkElement children && children.ContextMenu != null && children.ContextMenu.IsOpen )
+        {
+          return children.ContextMenu;
+        }
+        else
+        {
+          var result = GetContextMenu( child );
+
+          if( result != null )
+            return result;
+        }
+      }
+      return null;
+    }
 
     private static void OnAccessKeyPressed( object sender, AccessKeyPressedEventArgs e )
     {

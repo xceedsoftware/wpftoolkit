@@ -113,5 +113,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
       while( target != null && !( target is T ) );
       return target as T;
     }
+
+    public static IEnumerable<DependencyObject> FindLogicalAncestorsAndSelf( this DependencyObject self )
+    {
+      while( self != null )
+      {
+        yield return self;
+        self = LogicalTreeHelper.GetParent( self ) ?? VisualTreeHelper.GetParent( self );
+      }
+    }
   }
 }

@@ -35,7 +35,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     private List<Rect> _otherTabsScreenArea = null;
     private List<TabItem> _otherTabs = null;
     private Rect _parentDocumentTabPanelScreenArea;
-    private DocumentPaneTabPanel _parentDocumentTabPanel;
+    private Panel _parentTabPanel;
     private bool _isMouseDown = false;
     private Point _mouseDownPoint;
     private double _mouseLastChangePositionX;
@@ -220,7 +220,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
                 containerPane.MoveChild( currentIndex, newIndex );
                 _dragBuffer = MaxDragBuffer;
                 this.Model.IsActive = true;
-                _parentDocumentTabPanel.UpdateLayout();
+                _parentTabPanel.UpdateLayout();
                 this.UpdateDragDetails();
                 _mouseLastChangePositionX = mousePosInScreenCoord.X;
               }
@@ -271,10 +271,19 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private void UpdateDragDetails()
     {
-      _parentDocumentTabPanel = this.FindLogicalAncestor<DocumentPaneTabPanel>();
-      _parentDocumentTabPanelScreenArea = _parentDocumentTabPanel.GetScreenArea();
+      _parentTabPanel = this.FindLogicalAncestor<DocumentPaneTabPanel>();
+
+      if( _parentTabPanel == null )
+      {
+        _parentTabPanel = this.GetParentPanel();
+      }
+
+      if( _parentTabPanel == null )
+        return;
+
+      _parentDocumentTabPanelScreenArea = _parentTabPanel.GetScreenArea();
       _parentDocumentTabPanelScreenArea.Inflate( 0, _dragBuffer );
-      _otherTabs = _parentDocumentTabPanel.Children.Cast<TabItem>().Where( ch => ch.Visibility != System.Windows.Visibility.Collapsed ).ToList();
+      _otherTabs = _parentTabPanel.Children.Cast<TabItem>().Where( ch => ch.Visibility != System.Windows.Visibility.Collapsed ).ToList();
       var currentTabScreenArea = this.FindLogicalAncestor<TabItem>().GetScreenArea();
       _otherTabsScreenArea = _otherTabs.Select( ti =>
       {
@@ -283,6 +292,21 @@ namespace Xceed.Wpf.AvalonDock.Controls
         rect.Inflate( 0, _dragBuffer );
         return rect;
       } ).ToList();
+    }
+
+    private Panel GetParentPanel()
+    {
+      var parents = this.FindLogicalAncestorsAndSelf();
+
+      foreach( var parent in parents )
+      {
+        var panel = parent as Panel;
+        if( panel != null && ( panel.Children[ 0 ] as TabItem ) != null )
+        {
+          return panel;
+        }
+      }
+      return null;
     }
 
     private void StartDraggingFloatingWindowForContent()

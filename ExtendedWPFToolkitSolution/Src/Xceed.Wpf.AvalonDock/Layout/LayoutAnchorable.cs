@@ -280,37 +280,42 @@ namespace Xceed.Wpf.AvalonDock.Layout
     protected override void InternalDock()
     {
       var root = Root as LayoutRoot;
-      LayoutAnchorablePane anchorablePane = null;
+      ILayoutPane layoutPane = null;
 
       if( root.ActiveContent != null &&
           root.ActiveContent != this )
       {
         //look for active content parent pane
-        anchorablePane = root.ActiveContent.Parent as LayoutAnchorablePane;
+        layoutPane = root.ActiveContent.Parent as LayoutAnchorablePane;
       }
 
-      if( anchorablePane == null )
+      if( layoutPane == null )
       {
         //look for a pane on the right side
-        anchorablePane = root.Descendents().OfType<LayoutAnchorablePane>().Where( pane => !pane.IsHostedInFloatingWindow && pane.GetSide() == AnchorSide.Right ).FirstOrDefault();
+        layoutPane = root.Descendents().OfType<LayoutAnchorablePane>().Where( pane => !pane.IsHostedInFloatingWindow && pane.GetSide() == AnchorSide.Right ).FirstOrDefault();
       }
 
-      if( anchorablePane == null )
+      if( layoutPane == null )
       {
         //look for an available pane
-        anchorablePane = root.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault();
+        layoutPane = root.Descendents().OfType<LayoutAnchorablePane>().Where( pane => !pane.IsHostedInFloatingWindow ).FirstOrDefault();
       }
 
+      if( layoutPane == null )
+      {
+        //look for an available pane
+        layoutPane = root.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
+      }
 
       bool added = false;
       if( root.Manager.LayoutUpdateStrategy != null )
       {
-        added = root.Manager.LayoutUpdateStrategy.BeforeInsertAnchorable( root, this, anchorablePane );
+        added = root.Manager.LayoutUpdateStrategy.BeforeInsertAnchorable( root, this, layoutPane );
       }
 
       if( !added )
       {
-        if( anchorablePane == null )
+        if( layoutPane == null )
         {
           var mainLayoutPanel = new LayoutPanel() { Orientation = Orientation.Horizontal };
           if( root.RootPanel != null )
@@ -319,11 +324,19 @@ namespace Xceed.Wpf.AvalonDock.Layout
           }
 
           root.RootPanel = mainLayoutPanel;
-          anchorablePane = new LayoutAnchorablePane() { DockWidth = new GridLength( 200.0, GridUnitType.Pixel ) };
-          mainLayoutPanel.Children.Add( anchorablePane );
+          layoutPane = new LayoutAnchorablePane() { DockWidth = new GridLength( 200.0, GridUnitType.Pixel ) };
+          mainLayoutPanel.Children.Add( ( ILayoutPanelElement )layoutPane );
         }
 
-        anchorablePane.Children.Add( this );
+        if( layoutPane is LayoutAnchorablePane )
+        {
+          ( layoutPane as LayoutAnchorablePane ).Children.Add( this );
+        }
+        else
+        {
+          ( layoutPane as LayoutDocumentPane ).Children.Add( this );
+        }
+
         added = true;
       }
 

@@ -452,7 +452,7 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    #endregion //Cancel Event
+    #endregion //Today Event
 
     #endregion // Events
 

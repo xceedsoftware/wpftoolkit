@@ -20,6 +20,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Xml.Serialization;
@@ -170,6 +171,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
     /// </summary>
     protected virtual void OnIsSelectedChanged( bool oldValue, bool newValue )
     {
+      this.UpdateContainedFloatingWindowTaskbarTitle( newValue );
+
       if( IsSelectedChanged != null )
         IsSelectedChanged( this, EventArgs.Empty );
     }
@@ -921,9 +924,25 @@ namespace Xceed.Wpf.AvalonDock.Layout
       if( newParentPane != null )
       {
         newParentPane.Children.Add( this );
-        root.CollectGarbage();
+      }
+      else
+      {
+        var mainLayoutPanel = new LayoutPanel() { Orientation = Orientation.Horizontal };
+        if( root.RootPanel != null )
+        {
+          mainLayoutPanel.Children.Add( root.RootPanel );
+        }
+
+        root.RootPanel = mainLayoutPanel;
+        newParentPane = new LayoutDocumentPane() { };
+        mainLayoutPanel.Children.Add( ( ILayoutPanelElement )newParentPane );
+
+        newParentPane.Children.Add( this );
       }
 
+      root.CollectGarbage();
+
+      IsFloating = false;
       IsSelected = true;
       IsActive = true;
     }
@@ -1025,6 +1044,39 @@ namespace Xceed.Wpf.AvalonDock.Layout
     }
 
     #endregion
+
+    #region Private Methods
+
+    private void UpdateContainedFloatingWindowTaskbarTitle( bool newValue )
+    {
+      if( !newValue ) // LayoutContent is being deselected
+      {
+        // Check if LayoutContent is inside a FloatingWindowControl
+        // And set the correct title for Taskbar Title
+        var root = Root;
+
+        if( root != null )
+        {
+          var lfwc = root.Manager.FloatingWindows;
+          var containedFloatingWindowControl = lfwc.FirstOrDefault( f => f.Model.Descendents().OfType<LayoutContent>().Where( l => l.ContentId == this.ContentId ).FirstOrDefault() != null );
+
+          if( containedFloatingWindowControl != null )
+          {
+            var selectedLayoutContent = containedFloatingWindowControl.Model.Descendents().OfType<LayoutContent>().Where( l => l.IsSelected ).FirstOrDefault();
+
+            if( selectedLayoutContent != null )
+            {
+              if( containedFloatingWindowControl.Title != selectedLayoutContent.Title )
+              {
+                containedFloatingWindowControl.Title = selectedLayoutContent.Title;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    #endregion // Private Methods
 
     #region Events
 

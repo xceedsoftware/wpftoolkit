@@ -31,6 +31,7 @@
     <ResourceDictionary Source="../../NumericUpDown/Themes/Generic.xaml" />
     <ResourceDictionary Source="../../DateTimeUpDown/Themes/Generic.xaml" />
     <ResourceDictionary Source="../../TimeSpanUpDown/Themes/Generic.xaml" />
+    <ResourceDictionary Source="../../CheckComboBox/Themes/Generic.xaml" />
     <ResourceDictionary Source="../../WatermarkTextBox/Themes/Generic.xaml" />
     <ResourceDictionary Source="../../ColorPicker/Themes/Generic.xaml" />
     <ResourceDictionary Source="../../CollectionControl/Themes/Generic.xaml" />
@@ -264,6 +265,15 @@
   <!-- PropertyGrid CheckBox Editors -->
   <Style TargetType="{x:Type editor:PropertyGridEditorCheckBox}"
          BasedOn="{StaticResource {x:Type CheckBox}}">
+    <Setter Property="Margin"
+            Value="5,0,0,0" />
+    <Setter Property="Margin"
+            Value="5,0,0,0" />
+  </Style>
+
+  <!-- PropertyGrid Enum CheckBox Editors -->
+  <Style TargetType="{x:Type editor:PropertyGridEditorEnumCheckComboBox}"
+         BasedOn="{StaticResource CheckComboBox}">
     <Setter Property="Margin"
             Value="5,0,0,0" />
     <Setter Property="Margin"

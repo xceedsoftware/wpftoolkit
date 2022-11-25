@@ -85,7 +85,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       else if( ( propertyType == typeof( Color ) ) || ( propertyType == typeof( Color? ) ) )
         editor = new ColorEditor();
       else if( propertyType.IsEnum )
-        editor = new EnumComboBoxEditor();
+      {
+        if( propertyType.GetCustomAttributes( typeof( FlagsAttribute ), false ).Length > 0 )
+        {
+          editor = new EnumCheckComboBoxEditor();
+        }
+        else
+        {
+          editor = new EnumComboBoxEditor();
+        }
+      }
       else if( propertyType == typeof( TimeSpan ) || propertyType == typeof( TimeSpan? ) )
         editor = new TimeSpanUpDownEditor();
       else if( propertyType == typeof( FontFamily ) || propertyType == typeof( FontWeight ) || propertyType == typeof( FontStyle ) || propertyType == typeof( FontStretch ) )

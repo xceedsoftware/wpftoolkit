@@ -364,6 +364,7 @@
     <Compile Include="ColorPicker\Implementation\ColorPickerTabItem.cs" />
     <Compile Include="Core\Converters\ColorModeToTabItemSelectedConverter.cs" />
     <Compile Include="Core\Converters\PrintableFontFamilyConverter.cs" />
+    <Compile Include="Core\Converters\TabItemSizeConverter.cs" />
     <Compile Include="Core\GenericTextBlock.cs" />
     <Compile Include="Core\ImageUriExtension.cs" />
     <Compile Include="Core\PackUriExtension.cs" />
@@ -418,6 +419,7 @@
     <Compile Include="PropertyGrid\Implementation\Converters\IsStringEmptyConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\PropertyNameTextTrimmingConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\CollectionEditor.cs" />
+    <Compile Include="PropertyGrid\Implementation\Editors\EnumCheckComboboxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\PasswordEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\Editors\SourceComboBoxEditor.cs" />
     <Compile Include="PropertyGrid\Implementation\PropertyGridContextMenu.cs" />

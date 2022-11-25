@@ -233,7 +233,41 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
       }
 
+      if( this.WindowState == WindowState.Normal )
+      {
+        this.UpdatePositionAndSizeOfPanes();
+      }
+
       base.OnStateChanged( e );
+    }
+
+    #endregion
+
+    #region ResizeBorderThickness
+
+    /// <summary>
+    /// ResizeBorderThickness Dependency Property
+    /// </summary>
+    public static readonly DependencyProperty ResizeBorderThicknessProperty = DependencyProperty.Register(
+        "ResizeBorderThickness",
+        typeof( Thickness ),
+        typeof( LayoutFloatingWindowControl ),
+        new FrameworkPropertyMetadata( new Thickness( 10 ) ) );
+
+    /// <summary>
+    /// Gets or sets the LayoutDocumentFloatingWindowControl/LayoutAnchorableFloatingWindowControl resize icon Border Thickness property.  
+    /// This dependency property makes it possible to increase the resize icon border of floating windows.
+    /// </summary>
+    public Thickness ResizeBorderThickness
+    {
+      get
+      {
+        return ( Thickness )GetValue( ResizeBorderThicknessProperty );
+      }
+      set
+      {
+        SetValue( ResizeBorderThicknessProperty, value );
+      }
     }
 
     #endregion
@@ -264,10 +298,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void OnClosed( EventArgs e )
     {
-      var root = this.Model.Root;
+      var root = ( this.Model != null ) ? this.Model.Root : null;
       if( root != null )
       {
-        root.Manager.RemoveFloatingWindow( this );
+        if( root.Manager != null )
+        {
+          root.Manager.RemoveFloatingWindow( this );
+        }
         root.CollectGarbage();
       }
 
@@ -303,6 +340,34 @@ namespace Xceed.Wpf.AvalonDock.Controls
           new ExecutedRoutedEventHandler( ( s, args ) => Microsoft.Windows.Shell.SystemCommands.RestoreWindow( ( Window )args.Parameter ) ) ) );
       //Debug.Assert(this.Owner != null);
       base.OnInitialized( e );
+    }
+
+    protected override void OnKeyDown( KeyEventArgs e )
+    {
+      var root = this.Model.Root;
+      if( root != null )
+      {
+        if( root.Manager.AllowMovingFloatingWindowWithKeyboard )
+        {
+          switch( e.Key )
+          {
+            case Key.Left:
+              this.Left -= 25;
+              break;
+            case Key.Right:
+              this.Left += 25;
+              break;
+            case Key.Up:
+              this.Top -= 25;
+              break;
+            case Key.Down:
+              this.Top += 25;
+              break;
+          }
+        }
+      }
+
+      base.OnKeyDown( e );
     }
 
     protected override void OnPreviewKeyDown( KeyEventArgs e )
@@ -499,7 +564,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         _isClosing = true;
 
         // Added Dispatcher to prevent InvalidOperationException issue in reference to bug case 
-        // DevOps #2106
+        // Azure case #2106
         Dispatcher.BeginInvoke( new Action( () =>
         {
           this.Close();

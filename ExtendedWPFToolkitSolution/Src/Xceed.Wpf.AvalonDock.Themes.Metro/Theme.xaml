@@ -1357,11 +1357,11 @@
     <Setter Property="BorderBrush"
             Value="{DynamicResource AvalonDock_ThemeMetro_BaseColor6}" />
     <Setter Property="BorderThickness"
-            Value="1" />
+            Value="3" />
     <Setter Property="shell:WindowChrome.WindowChrome">
       <Setter.Value>
         <shell:WindowChrome CornerRadius="0"
-                            ResizeBorderThickness="10"
+                            ResizeBorderThickness="{Binding ResizeBorderThickness, RelativeSource={RelativeSource AncestorType={x:Type avalonDockControls:LayoutDocumentFloatingWindowControl}}}"
                             CaptionHeight="24"
                             GlassFrameThickness="0"
                             ShowSystemMenu="False" />
@@ -1548,11 +1548,11 @@
     <Setter Property="BorderBrush"
             Value="{DynamicResource AvalonDock_ThemeMetro_BaseColor6}" />
     <Setter Property="BorderThickness"
-            Value="1" />
+            Value="3" />
     <Setter Property="shell:WindowChrome.WindowChrome">
       <Setter.Value>
         <shell:WindowChrome CornerRadius="0"
-                            ResizeBorderThickness="10"
+                            ResizeBorderThickness="{Binding ResizeBorderThickness, RelativeSource={RelativeSource AncestorType={x:Type avalonDockControls:LayoutAnchorableFloatingWindowControl}}}"
                             CaptionHeight="24"
                             GlassFrameThickness="0" />
       </Setter.Value>

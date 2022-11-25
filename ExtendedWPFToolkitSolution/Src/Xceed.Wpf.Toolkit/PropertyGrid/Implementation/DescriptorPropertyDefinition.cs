@@ -86,7 +86,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       this.RaiseContainerHelperInvalidated();
     }
 
-    protected override BindingBase CreateValueBinding()
+    protected override void CreateValueBinding()
     {
       var selectedObject = this.SelectedObject;
       var propertyName = this.PropertyDescriptor.Name;
@@ -101,7 +101,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         ConverterCulture = CultureInfo.CurrentCulture
       };
 
-      return binding;
+      BindingOperations.SetBinding( this, DescriptorPropertyDefinitionBase.ValueProperty, binding );
     }
 
     protected override bool ComputeIsReadOnly()

@@ -26,6 +26,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Core.Utilities;
+using Xceed.Wpf.Toolkit.PropertyGrid;
+using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
 namespace Xceed.Wpf.Toolkit.Primitives
 {
@@ -299,8 +301,11 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     protected virtual void OnSelectedValueChanged( string oldValue, string newValue )
     {
-      if( !this.IsInitialized || _ignoreSelectedValueChanged )
-        return;
+      if( !( this is PropertyGridEditorEnumCheckComboBox ) )
+      {
+        if( !this.IsInitialized || _ignoreSelectedValueChanged )
+          return;
+      }
 
       UpdateFromSelectedValue();
     }

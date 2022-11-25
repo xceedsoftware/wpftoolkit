@@ -131,7 +131,8 @@
     </Setter>
   </Style>
 
-  <Style TargetType="{x:Type local:CheckComboBox}">
+  <Style x:Key="CheckComboBox"
+         TargetType="{x:Type local:CheckComboBox}">
     <Setter Property="Foreground"
             Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
     <Setter Property="Background"
@@ -226,5 +227,8 @@
       </Trigger>
     </Style.Triggers>
   </Style>
+
+  <Style TargetType="{x:Type local:CheckComboBox}"
+         BasedOn="{StaticResource CheckComboBox}" />
 
 </ResourceDictionary>

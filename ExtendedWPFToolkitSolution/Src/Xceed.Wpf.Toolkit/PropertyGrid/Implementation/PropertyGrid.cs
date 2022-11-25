@@ -952,10 +952,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       base.OnApplyTemplate();
 
       if( _dragThumb != null )
-        _dragThumb.DragDelta -= DragThumb_DragDelta;
+      {
+        _dragThumb.DragDelta -= this.DragThumb_DragDelta;
+        _dragThumb.MouseWheel -= this.DragThumb_MouseWheel;
+      }
       _dragThumb = GetTemplateChild( PART_DragThumb ) as Thumb;
       if( _dragThumb != null )
-        _dragThumb.DragDelta += DragThumb_DragDelta;
+      {
+        _dragThumb.DragDelta += this.DragThumb_DragDelta;
+        _dragThumb.MouseWheel += this.DragThumb_MouseWheel;
+      }
 
       if( _containerHelper != null )
       {
@@ -1052,6 +1058,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       NameColumnWidth = Math.Min( Math.Max( this.ActualWidth * 0.1, NameColumnWidth + e.HorizontalChange ), this.ActualWidth * 0.9 );
     }
 
+    private void DragThumb_MouseWheel( object sender, MouseWheelEventArgs e )
+    {
+      this.ScrollToPosition( this.GetScrollPosition() - ( e.Delta * 0.4 ) );
+    }
 
     private void PropertyGrid_PropertyValueChanged( object sender, PropertyValueChangedEventArgs e )
     {

@@ -53,5 +53,9 @@
 
 
 
+
+
+
+
     <Image Source="..\OpenSourceImages\ExtTabControl.png" Width="600" Height="400"/>
 </local:DemoView>

@@ -1006,7 +1006,7 @@
             Value="3" />
     <Setter Property="shell:WindowChrome.WindowChrome">
       <Setter.Value>
-        <shell:WindowChrome ResizeBorderThickness="10"
+        <shell:WindowChrome ResizeBorderThickness="{Binding ResizeBorderThickness, RelativeSource={RelativeSource AncestorType={x:Type avalonDockControls:LayoutDocumentFloatingWindowControl}}}"
                             CaptionHeight="16"
                             CornerRadius="3,3,3,3"
                             GlassFrameThickness="0"
@@ -1110,7 +1110,7 @@
             Value="3" />
     <Setter Property="shell:WindowChrome.WindowChrome">
       <Setter.Value>
-        <shell:WindowChrome ResizeBorderThickness="10"
+        <shell:WindowChrome ResizeBorderThickness="{Binding ResizeBorderThickness, RelativeSource={RelativeSource AncestorType={x:Type avalonDockControls:LayoutAnchorableFloatingWindowControl}}}"
                             CaptionHeight="16"
                             CornerRadius="3,3,3,3"
                             GlassFrameThickness="0"

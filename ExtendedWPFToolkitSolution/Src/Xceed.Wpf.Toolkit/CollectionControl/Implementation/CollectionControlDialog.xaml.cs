@@ -235,9 +235,11 @@ namespace Xceed.Wpf.Toolkit
       Debug.Assert( result != null );
       if( result != null )
       {
-        var properties = sourceType.GetProperties( BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly );
+        PropertyInfo[] propertyInfos = typeof( ICollection ).IsAssignableFrom( sourceType )
+                                       ? sourceType.GetProperties( BindingFlags.Instance | BindingFlags.Public )
+                                       : sourceType.GetProperties( BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly );
 
-        foreach( var propertyInfo in properties )
+        foreach( var propertyInfo in propertyInfos )
         {
           try
           {
