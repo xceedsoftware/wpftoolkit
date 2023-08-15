@@ -21,6 +21,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Xceed.Wpf.AvalonDock.Layout;
 
 namespace Xceed.Wpf.AvalonDock.Controls
@@ -96,11 +97,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
     /// </summary>
     protected virtual void OnModelChanged( DependencyPropertyChangedEventArgs e )
     {
-      if( Model != null )
-        SetLayoutItem( Model.Root.Manager.GetLayoutItemFromModel( Model ) );
+      if( ( this.Model != null ) && ( this.Model.Root != null ) && ( this.Model.Root.Manager != null ) )
+        this.SetLayoutItem( Model.Root.Manager.GetLayoutItemFromModel( Model ) );
       else
-        SetLayoutItem( null );
-      //UpdateLogicalParent();
+        this.SetLayoutItem( null );
     }
 
     #endregion

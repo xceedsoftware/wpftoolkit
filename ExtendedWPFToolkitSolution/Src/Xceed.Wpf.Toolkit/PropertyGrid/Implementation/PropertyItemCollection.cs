@@ -141,11 +141,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         if( groupDescription != null )
         {
           view.GroupDescriptions.Add( groupDescription );
-          if( sortAlphabetically )
-          {
-            SortBy( CategoryOrderPropertyName, ListSortDirection.Ascending );
-            SortBy( CategoryPropertyName, ListSortDirection.Ascending );
-          }
+          SortBy( CategoryOrderPropertyName, ListSortDirection.Ascending );
+          SortBy( CategoryPropertyName, ListSortDirection.Ascending );
         }
 
         SortBy( PropertyOrderPropertyName, ListSortDirection.Ascending );

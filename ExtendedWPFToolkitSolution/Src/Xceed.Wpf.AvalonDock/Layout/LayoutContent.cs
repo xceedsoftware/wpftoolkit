@@ -923,10 +923,13 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
       if( newParentPane != null )
       {
+        Root.Manager.RaisePreviewDockEvent( this );
         newParentPane.Children.Add( this );
+        Root.Manager.RaiseDockedEvent( this );
       }
       else
       {
+        Root.Manager.RaisePreviewDockEvent( this );
         var mainLayoutPanel = new LayoutPanel() { Orientation = Orientation.Horizontal };
         if( root.RootPanel != null )
         {
@@ -938,6 +941,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
         mainLayoutPanel.Children.Add( ( ILayoutPanelElement )newParentPane );
 
         newParentPane.Children.Add( this );
+        Root.Manager.RaiseDockedEvent( this );
       }
 
       root.CollectGarbage();
@@ -952,6 +956,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
     /// </summary>
     public void Dock()
     {
+      Root.Manager.RaisePreviewDockEvent( this );
+
       if( PreviousContainer != null )
       {
         var currentContainer = Parent as ILayoutContainer;
@@ -982,6 +988,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
         InternalDock();
       }
 
+      Root.Manager.RaiseDockedEvent( this );
       IsFloating = false;
 
       if( this.Root != null )

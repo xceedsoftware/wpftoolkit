@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -283,7 +283,7 @@
                              Grid.Column="3"
                              Format="Custom"
                              FormatString="yyyy/MM/dd HH:mm"
-                             Value="2022/12/31T12:00"
+                             Value="2030/12/31T12:00"
                              Width="185"
                              VerticalAlignment="Center"
                              Margin="5" />

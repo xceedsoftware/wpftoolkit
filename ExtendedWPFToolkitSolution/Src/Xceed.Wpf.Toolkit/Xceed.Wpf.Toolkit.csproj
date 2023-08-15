@@ -401,6 +401,7 @@
     <Compile Include="Core\PackUriExtension.cs" />
     <Compile Include="Core\ResourceDictionary.cs" />
     <Compile Include="DateTimePicker\Implementation\Converters\BorderThicknessConverter.cs" />
+    <Compile Include="ExtendedTabControl\Implementation\TabItemEventArgs.cs" />
     <Compile Include="Primitives\SelectAllSelectorItem.cs" />
     <Compile Include="Primitives\SelectAllSelector.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\CategoryPropertyOrderAttribute.cs" />

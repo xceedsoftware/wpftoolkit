@@ -11,7 +11,7 @@ using System.Windows;
 [assembly: AssemblyDescription( "" )]
 [assembly: AssemblyCompany( "Xceed Software Inc." )]
 [assembly: AssemblyProduct( "Xceed Toolkit for WPF" )]
-[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2022" )]
+[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2023" )]
 [assembly: AssemblyCulture( "" )]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

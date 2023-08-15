@@ -944,7 +944,7 @@ namespace Xceed.Wpf.Toolkit
       return this.CoerceValueMinMax( result );
     }
 
-    private bool TryParseDateTime( string text, out DateTime result )
+    protected virtual bool TryParseDateTime( string text, out DateTime result )
     {
       bool isValid = false;
       result = this.ContextNow;

@@ -342,8 +342,9 @@ namespace Xceed.Wpf.Toolkit
       NumberFormatInfo info = NumberFormatInfo.GetInstance( this.CultureInfo );
       var charString = c.ToString();
 
+      // Only accept Separators and Negative Sign.
       return info.GetType().GetProperties()
-                 .Where( p => p.PropertyType == typeof( string ) )
+                 .Where( p => p.PropertyType == typeof( string ) && (p.Name.Contains( "Separator" ) || p.Name.Contains( "NegativeSign" )) )
                  .Select( p => ( string )p.GetValue( info, null ) )
                  .Any( value => !string.IsNullOrEmpty( value ) && value == charString );
     }
@@ -374,34 +375,30 @@ namespace Xceed.Wpf.Toolkit
             if( currentValueTextSpecialCharacters.Count() > 0 )
             {
               var textSpecialCharacters = text.Where( c => !Char.IsDigit( c ) );
-              // same non-digit characters on currentValueText and new text => remove them on new Text to parse it again.
-              if( currentValueTextSpecialCharacters.Except( textSpecialCharacters ).ToList().Count == 0 )
+              var numericValue = new string( text.Where( c => char.IsDigit( c ) || this.CultureContainsCharacter( c ) ).ToArray() );
+              decimal number;
+              if( Decimal.TryParse( numericValue, this.ParsingNumberStyle, CultureInfo, out number ) )
               {
-                var numericValue = new string( text.Where( c => char.IsDigit( c ) || this.CultureContainsCharacter( c ) ).ToArray() );
-                decimal number;
-                if( Decimal.TryParse( numericValue, this.ParsingNumberStyle, CultureInfo, out number ) )
+                foreach( var character in textSpecialCharacters )
                 {
-                  foreach( var character in textSpecialCharacters )
-                  {
-                    if( !this.CultureContainsCharacter( character ) )
-                    {
-                      text = text.Replace( character.ToString(), string.Empty );
-                    }
-                  }
-                }
-                else
-                {
-                  foreach( var character in textSpecialCharacters )
+                  if( !this.CultureContainsCharacter( character ) )
                   {
                     text = text.Replace( character.ToString(), string.Empty );
                   }
                 }
-
-                // if without the special characters, parsing is good, do not throw
-                if( _fromText( text, this.ParsingNumberStyle, CultureInfo, out outputValue ) )
+              }
+              else
+              {
+                foreach( var character in textSpecialCharacters )
                 {
-                  shouldThrow = false;
+                  text = text.Replace( character.ToString(), string.Empty );
                 }
+              }
+
+              // if without the special characters, parsing is good, do not throw
+              if( _fromText( text, this.ParsingNumberStyle, CultureInfo, out outputValue ) )
+              {
+                shouldThrow = false;
               }
             }
           }

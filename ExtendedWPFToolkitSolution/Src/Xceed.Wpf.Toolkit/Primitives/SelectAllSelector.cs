@@ -155,6 +155,11 @@ namespace Xceed.Wpf.Toolkit.Primitives
       foreach( var item in newSelectedItems )
       {
         this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, true ) );
+
+        if( this.Command != null )
+        {
+          this.Command.Execute( item );
+        }
       }
     }
 
@@ -168,6 +173,11 @@ namespace Xceed.Wpf.Toolkit.Primitives
       foreach( var item in currentSelectedItems )
       {
         this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, false ) );
+
+        if( this.Command != null )
+        {
+          this.Command.Execute( item );
+        }
       }
     }
 

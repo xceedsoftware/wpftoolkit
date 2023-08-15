@@ -568,6 +568,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     protected virtual void OnIsReadOnlyChanged( bool oldValue, bool newValue )
     {
+
+
       this.UpdateContainerHelper();
     }
 
